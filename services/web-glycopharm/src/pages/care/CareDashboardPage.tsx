@@ -1,15 +1,14 @@
 /**
  * CareDashboardPage - Care Home (환자 관리 포털)
  *
- * WO-CARE-HOME-LAYOUT-PHASE1-V1
+ * WO-CARE-DATA-ALIGNMENT-PHASE1-V1
  *
- * Phase 1: 레이아웃 구조 확정
- * - Hero Header + KPI Row + Action Bar + Patient Table
- * - 기존 API만 사용 (백엔드 수정 없음)
- * - 타입 변경 없음, 라우트 변경 없음
+ * - 위험도: Care snapshot risk_level 기반 (fallback: 'low')
+ * - 최근 분석일: Care snapshot created_at 기반
+ * - KPI: Care dashboard summary 데이터
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -31,6 +30,11 @@ const RISK_CONFIG = {
   moderate: { label: '주의', cls: 'bg-amber-100 text-amber-700' },
   low: { label: '양호', cls: 'bg-green-100 text-green-700' },
 } as const;
+
+interface SnapshotData {
+  riskLevel: string;
+  createdAt: string;
+}
 
 export default function CareDashboardPage() {
   const navigate = useNavigate();
@@ -78,11 +82,32 @@ export default function CareDashboardPage() {
     loadData();
   }, [loadData]);
 
-  // Risk level: diabetesType 기반 (Mock)
+  // Snapshot map: patientId → { riskLevel, createdAt }
+  const snapshotMap = useMemo(() => {
+    const map = new Map<string, SnapshotData>();
+    if (summary?.recentSnapshots) {
+      for (const s of summary.recentSnapshots) {
+        if (!map.has(s.patientId)) {
+          map.set(s.patientId, { riskLevel: s.riskLevel, createdAt: s.createdAt });
+        }
+      }
+    }
+    return map;
+  }, [summary]);
+
+  // Risk level: Care snapshot 기반 (fallback: 'low')
   const getRisk = (p: PharmacyCustomer): keyof typeof RISK_CONFIG => {
-    if (p.diabetesType === 'type1') return 'high';
-    if (p.diabetesType === 'type2') return 'moderate';
+    const snapshot = snapshotMap.get(p.id);
+    if (snapshot && snapshot.riskLevel in RISK_CONFIG) {
+      return snapshot.riskLevel as keyof typeof RISK_CONFIG;
+    }
     return 'low';
+  };
+
+  // Analysis date from snapshot
+  const getAnalysisDate = (p: PharmacyCustomer): string | null => {
+    const snapshot = snapshotMap.get(p.id);
+    return snapshot?.createdAt ?? null;
   };
 
   // Client-side risk filter
@@ -90,6 +115,10 @@ export default function CareDashboardPage() {
     if (riskFilter === 'all') return true;
     return getRisk(p) === riskFilter;
   });
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('ko-KR');
+  };
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
@@ -239,6 +268,7 @@ export default function CareDashboardPage() {
                 {filteredPatients.map((patient) => {
                   const risk = getRisk(patient);
                   const config = RISK_CONFIG[risk];
+                  const analysisDate = getAnalysisDate(patient);
                   return (
                     <tr
                       key={patient.id}
@@ -265,7 +295,9 @@ export default function CareDashboardPage() {
                           {config.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-400">-</td>
+                      <td className="px-6 py-4 text-sm text-slate-500">
+                        {analysisDate ? formatDate(analysisDate) : '-'}
+                      </td>
                       <td className="px-6 py-4 text-sm text-slate-400">-</td>
                       <td className="px-6 py-4 text-right">
                         <ChevronRight className="w-4 h-4 text-slate-300 inline-block" />

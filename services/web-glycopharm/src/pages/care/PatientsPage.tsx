@@ -1,15 +1,14 @@
 /**
  * PatientsPage - 환자 목록 관리
  *
- * WO-CARE-PATIENTS-SORTING-PHASE1-V1
+ * WO-CARE-DATA-ALIGNMENT-PHASE1-V1
  *
- * Phase 1: 단일 컬럼 테이블 + 기본 정렬
- * - 기본 정렬: 최근 분석일 desc (fallback: 마지막 주문일 → createdAt)
- * - 클릭 시 정렬 방향 전환
- * - Care Home과 UI 구조 통일
+ * - 위험도: Care snapshot risk_level 기반 (fallback: 'low')
+ * - 최근 분석일: Care snapshot created_at 기반
+ * - 정렬: 최근 분석일 desc (fallback: lastOrderAt → createdAt)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -39,6 +38,11 @@ const DIABETES_LABELS: Record<string, string> = {
   gestational: '임신성',
   prediabetes: '전단계',
 };
+
+interface SnapshotData {
+  riskLevel: string;
+  createdAt: string;
+}
 
 export default function PatientsPage() {
   const navigate = useNavigate();
@@ -87,11 +91,32 @@ export default function PatientsPage() {
     loadData();
   }, [loadData]);
 
-  // Risk level: diabetesType 기반 (Mock)
+  // Snapshot map: patientId → { riskLevel, createdAt }
+  const snapshotMap = useMemo(() => {
+    const map = new Map<string, SnapshotData>();
+    if (summary?.recentSnapshots) {
+      for (const s of summary.recentSnapshots) {
+        if (!map.has(s.patientId)) {
+          map.set(s.patientId, { riskLevel: s.riskLevel, createdAt: s.createdAt });
+        }
+      }
+    }
+    return map;
+  }, [summary]);
+
+  // Risk level: Care snapshot 기반 (fallback: 'low')
   const getRisk = (p: PharmacyCustomer): keyof typeof RISK_CONFIG => {
-    if (p.diabetesType === 'type1') return 'high';
-    if (p.diabetesType === 'type2') return 'moderate';
+    const snapshot = snapshotMap.get(p.id);
+    if (snapshot && snapshot.riskLevel in RISK_CONFIG) {
+      return snapshot.riskLevel as keyof typeof RISK_CONFIG;
+    }
     return 'low';
+  };
+
+  // Analysis date from snapshot
+  const getAnalysisDate = (p: PharmacyCustomer): string | null => {
+    const snapshot = snapshotMap.get(p.id);
+    return snapshot?.createdAt ?? null;
   };
 
   // Client-side risk filter
@@ -102,7 +127,8 @@ export default function PatientsPage() {
 
   // Sort: 최근 분석일 → 마지막 주문일 → createdAt (fallback chain)
   const getSortDate = (p: PharmacyCustomer): number => {
-    // Phase 1: analysisDate 없음, fallback to lastOrderAt → createdAt
+    const analysisDate = getAnalysisDate(p);
+    if (analysisDate) return new Date(analysisDate).getTime();
     if (p.lastOrderAt) return new Date(p.lastOrderAt).getTime();
     return new Date(p.createdAt).getTime();
   };
@@ -242,6 +268,7 @@ export default function PatientsPage() {
                 {sortedPatients.map((patient) => {
                   const risk = getRisk(patient);
                   const config = RISK_CONFIG[risk];
+                  const analysisDate = getAnalysisDate(patient);
                   return (
                     <tr
                       key={patient.id}
@@ -271,7 +298,9 @@ export default function PatientsPage() {
                           {config.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-400">-</td>
+                      <td className="px-6 py-4 text-sm text-slate-500">
+                        {analysisDate ? formatDate(analysisDate) : '-'}
+                      </td>
                       <td className="px-6 py-4 text-slate-500">
                         {patient.lastOrderAt ? formatDate(patient.lastOrderAt) : '-'}
                       </td>

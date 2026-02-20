@@ -142,20 +142,29 @@ async function buildDashboard(
     : await ds.query(improvingQuery, [pharmacyId]);
   const improvingCount = improvingResult[0]?.count ?? 0;
 
-  // E. Recent 5 snapshots (pharmacy-scoped)
+  // E. Latest snapshot per patient (pharmacy-scoped)
   const recentSnapshots = isAdmin
     ? await ds.query(`
-        SELECT patient_id AS "patientId", risk_level AS "riskLevel", created_at AS "createdAt"
-        FROM care_kpi_snapshots
-        ORDER BY created_at DESC
-        LIMIT 5
+        SELECT s.patient_id AS "patientId", s.risk_level AS "riskLevel", s.created_at AS "createdAt"
+        FROM care_kpi_snapshots s
+        INNER JOIN (
+          SELECT patient_id, MAX(created_at) AS max_at
+          FROM care_kpi_snapshots
+          GROUP BY patient_id
+        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
+        ORDER BY s.created_at DESC
       `)
     : await ds.query(`
-        SELECT patient_id AS "patientId", risk_level AS "riskLevel", created_at AS "createdAt"
-        FROM care_kpi_snapshots
-        WHERE pharmacy_id = $1
-        ORDER BY created_at DESC
-        LIMIT 5
+        SELECT s.patient_id AS "patientId", s.risk_level AS "riskLevel", s.created_at AS "createdAt"
+        FROM care_kpi_snapshots s
+        INNER JOIN (
+          SELECT patient_id, MAX(created_at) AS max_at
+          FROM care_kpi_snapshots
+          WHERE pharmacy_id = $1
+          GROUP BY patient_id
+        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
+        WHERE s.pharmacy_id = $1
+        ORDER BY s.created_at DESC
       `, [pharmacyId]);
 
   // F. Recent 5 coaching sessions (pharmacy-scoped)

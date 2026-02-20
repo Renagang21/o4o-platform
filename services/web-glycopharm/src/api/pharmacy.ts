@@ -511,6 +511,11 @@ export interface CareDashboardSummary {
   lowRiskCount: number;
   recentCoachingCount: number;
   improvingCount: number;
+  recentSnapshots: Array<{
+    patientId: string;
+    riskLevel: string;
+    createdAt: string;
+  }>;
 }
 
 // Export singleton instance
