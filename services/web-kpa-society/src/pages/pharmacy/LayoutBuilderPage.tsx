@@ -12,7 +12,10 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../contexts/AuthContext';
+import { listPlatformServices, applyForService } from '../../api/platform-services';
+import type { PlatformServiceItem } from '../../api/platform-services';
 import {
   StoreBlockRegistry,
   type StoreBlock,
@@ -24,6 +27,7 @@ const GLYCOPHARM_API = import.meta.env.VITE_API_BASE_URL
   : '/api/v1/glycopharm';
 
 export function LayoutBuilderPage() {
+  const navigate = useNavigate();
   const [slug, setSlug] = useState<string | null>(null);
   const [blocks, setBlocks] = useState<StoreBlock[]>([]);
   const [isDefault, setIsDefault] = useState(true);
@@ -32,11 +36,27 @@ export function LayoutBuilderPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // No-store state
+  const [noStore, setNoStore] = useState(false);
+  const [glycopharmSvc, setGlycopharmSvc] = useState<PlatformServiceItem | null>(null);
+  const [applying, setApplying] = useState(false);
+  const [applyDone, setApplyDone] = useState(false);
+
   // Resolve slug from cockpit
   useEffect(() => {
+    const checkEnrollment = async () => {
+      try {
+        const services = await listPlatformServices();
+        const gp = services.find(s => s.code.toLowerCase().includes('glycopharm'));
+        setGlycopharmSvc(gp || null);
+      } catch { /* silent */ }
+      setNoStore(true);
+      setLoading(false);
+    };
+
     const fetchSlug = async () => {
       try {
-        const token = localStorage.getItem('access_token');
+        const token = getAccessToken();
         const res = await fetch(`${GLYCOPHARM_API}/cockpit/status`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
@@ -44,10 +64,10 @@ export function LayoutBuilderPage() {
         if (json.success && json.data?.storeSlug) {
           setSlug(json.data.storeSlug);
         } else {
-          setError('매장 정보를 찾을 수 없습니다.');
+          await checkEnrollment();
         }
       } catch {
-        setError('매장 정보를 불러올 수 없습니다.');
+        await checkEnrollment();
       }
     };
     fetchSlug();
@@ -124,6 +144,20 @@ export function LayoutBuilderPage() {
     }
   };
 
+  // Apply for GlycoPharm service
+  const handleApplyGlycopharm = async () => {
+    if (!glycopharmSvc || applying) return;
+    setApplying(true);
+    try {
+      await applyForService(glycopharmSvc.code);
+      setApplyDone(true);
+    } catch {
+      setError('서비스 신청에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setApplying(false);
+    }
+  };
+
   /** Registry lookup — label, description, defaultConfig */
   const getBlockMeta = (type: StoreBlockType) => {
     const def = StoreBlockRegistry[type];
@@ -131,6 +165,127 @@ export function LayoutBuilderPage() {
       ? { name: def.label, description: def.description, defaultConfig: def.defaultConfig }
       : { name: type, description: '', defaultConfig: {} };
   };
+
+  // No-store empty state
+  if (noStore) {
+    const enrolled = glycopharmSvc?.enrollmentStatus;
+
+    return (
+      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <div style={{ marginBottom: '24px' }}>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>스토어 레이아웃</h1>
+        </div>
+
+        {error && (
+          <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{
+          padding: '40px 24px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🏪</div>
+          <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', margin: '0 0 8px' }}>
+            사이버 공간이 설정되지 않았습니다
+          </h3>
+
+          {applyDone ? (
+            <>
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+                서비스 이용 신청이 완료되었습니다.<br />
+                운영자 승인 후 사이버 공간을 이용하실 수 있습니다.
+              </p>
+              <span style={{
+                display: 'inline-block',
+                padding: '8px 20px',
+                borderRadius: '8px',
+                backgroundColor: '#f1f5f9',
+                color: '#64748b',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}>
+                승인 대기 중
+              </span>
+            </>
+          ) : enrolled === 'applied' ? (
+            <>
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+                서비스 이용 신청이 접수되어 있습니다.<br />
+                운영자 승인 후 이용 가능합니다.
+              </p>
+              <span style={{
+                display: 'inline-block',
+                padding: '8px 20px',
+                borderRadius: '8px',
+                backgroundColor: '#f1f5f9',
+                color: '#64748b',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}>
+                승인 대기 중
+              </span>
+            </>
+          ) : enrolled === 'approved' ? (
+            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+              서비스가 승인되었으나 매장 설정이 완료되지 않았습니다.<br />
+              잠시 후 다시 시도해주세요.
+            </p>
+          ) : glycopharmSvc ? (
+            <>
+              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+                사이버 공간(온라인 매장)을 이용하려면 서비스 신청이 필요합니다.
+              </p>
+              <button
+                onClick={handleApplyGlycopharm}
+                disabled={applying}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#1e40af',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: applying ? 'not-allowed' : 'pointer',
+                  opacity: applying ? 0.6 : 1,
+                }}
+              >
+                {applying ? '신청 중...' : '사이버 공간 이용 신청'}
+              </button>
+            </>
+          ) : (
+            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+              매장 정보를 불러올 수 없습니다.<br />
+              약국 HUB에서 서비스를 확인해주세요.
+            </p>
+          )}
+
+          <div style={{ marginTop: '20px' }}>
+            <button
+              onClick={() => navigate('/pharmacy/hub')}
+              style={{
+                padding: '8px 20px',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                color: '#475569',
+                fontSize: '14px',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              약국 HUB로 이동 →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
