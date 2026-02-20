@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
@@ -32,7 +32,6 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -44,7 +43,7 @@ export default function Header() {
   };
 
   /** 인증 필요 메뉴 클릭 핸들러 */
-  const handleAuthNavClick = (path: string, requiresAuth: boolean, e: React.MouseEvent) => {
+  const handleAuthNavClick = (_path: string, requiresAuth: boolean, e: React.MouseEvent) => {
     if (requiresAuth && !isAuthenticated) {
       e.preventDefault();
       openLoginModal();
