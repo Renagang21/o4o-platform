@@ -96,15 +96,42 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
   const created: string[] = [];
   const skipped: string[] = [];
 
-  // Helper: insert if not exists
-  async function insertIfNotExists(table: string, id: string, sql: string, params: any[], label: string) {
-    const existing = await ds.query(`SELECT id FROM ${table} WHERE id = $1`, [id]);
-    if (existing.length > 0) {
-      skipped.push(label);
-      return;
+  const missingTables = new Set<string>();
+
+  // Helper: check if table exists
+  async function tableExists(table: string): Promise<boolean> {
+    if (missingTables.has(table)) return false;
+    try {
+      const result = await ds.query(
+        `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = $1) AS exists`,
+        [table],
+      );
+      if (!result[0]?.exists) {
+        missingTables.add(table);
+        skipped.push(`[TABLE MISSING] ${table}`);
+        return false;
+      }
+      return true;
+    } catch {
+      missingTables.add(table);
+      return false;
     }
-    await ds.query(sql, params);
-    created.push(label);
+  }
+
+  // Helper: insert if not exists (with table check)
+  async function insertIfNotExists(table: string, id: string, sql: string, params: any[], label: string) {
+    if (!(await tableExists(table))) return;
+    try {
+      const existing = await ds.query(`SELECT id FROM ${table} WHERE id = $1`, [id]);
+      if (existing.length > 0) {
+        skipped.push(label);
+        return;
+      }
+      await ds.query(sql, params);
+      created.push(label);
+    } catch (error: any) {
+      skipped.push(`[ERROR] ${label}: ${error.message}`);
+    }
   }
 
   // ------------------------------------------------------------------
