@@ -69,7 +69,7 @@
 3. **SQL 직접**: Google Cloud Console SQL Editor
 4. ❌ 로컬 psql/scripts 사용 금지
 
-> 📄 상세: `docs/_platform/operations/PRODUCTION-MIGRATION-STANDARD.md`
+> 📄 상세: `docs/platform-core/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
 ---
 
@@ -164,7 +164,7 @@ import type { RelatedEntity } from './related.entity.js';
 | Tourism | TOURISM | ✅ |
 | GlycoPharm | GLYCOPHARM | ❌ BLOCKED |
 
-> 📄 상세: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
+> 📄 상세: `docs/platform-core/E-COMMERCE-ORDER-CONTRACT.md`
 
 ---
 
@@ -248,7 +248,7 @@ import type { RelatedEntity } from './related.entity.js';
 ### GlycoPharm Legacy (Phase 9-A):
 - `glycopharm_orders`: READ-ONLY
 - `OrderType.GLYCOPHARM`: BLOCKED
-- 📄 교훈: `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
+- 📄 교훈: `docs/platform-core/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
 
 ---
 
@@ -380,7 +380,7 @@ import type { RelatedEntity } from './related.entity.js';
 ## 17. KPA Society 구조 기준
 
 > kpa-society 관련 작업(기획, 조사, 개발, 정비)은
-> `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
+> `docs/platform-core/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
 
 ### 핵심 구조
 
@@ -414,7 +414,7 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 | 문서 | 경로 |
 |------|------|
-| 서비스 구조 기준 | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| 서비스 구조 기준 | `docs/platform-core/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
 | Phase 0 현황 조사 | `docs/investigations/kpa-society-auth-current-state.md` |
 | Phase 2 데이터 모델 | `docs/investigations/KPA-SOCIETY-PHASE2-MEMBERSHIP-DATA-MODEL.md` |
 | Phase 2 가입/승인 흐름 | `docs/investigations/KPA-SOCIETY-PHASE2-SIGNUP-AND-APPROVAL-FLOW.md` |
@@ -534,8 +534,8 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
-| E-commerce 계약 | `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md` |
-| GlycoPharm Legacy | `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
+| E-commerce 계약 | `docs/platform-core/E-COMMERCE-ORDER-CONTRACT.md` |
+| GlycoPharm Legacy | `docs/platform-core/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
 | Store Template | `docs/templates/o4o-store-template/` |
 | ESM Entity 규칙 | `docs/reports/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
 | 디버깅 가이드 | `docs/debugging/README.md` |
@@ -545,7 +545,7 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 | **LMS Core** | `docs/platform/lms/` |
 | **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | **Extension** | `docs/platform/extensions/` |
-| **KPA Society 구조** | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| **KPA Society 구조** | `docs/platform-core/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
 | **KPA 권한 매트릭스** | `docs/_platform/KPA-ROLE-MATRIX-V1.md` |
 | **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
 | **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
