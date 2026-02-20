@@ -14,11 +14,34 @@
  */
 
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { requireAdmin } from '../../middleware/permission.middleware.js';
 import logger from '../../utils/logger.js';
+
+// ============================================================================
+// Admin Secret Key Auth (fallback for CLI operations)
+// ============================================================================
+
+/**
+ * Admin auth middleware: JWT (authenticate+requireAdmin) OR X-Admin-Secret header.
+ * Secret is JWT_SECRET env var — same as token signing key, admin-only knowledge.
+ */
+function adminOrSecretAuth(req: Request, res: Response, next: NextFunction) {
+  const secret = req.headers['x-admin-secret'] as string;
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (secret && jwtSecret && secret === jwtSecret) {
+    return next();
+  }
+
+  // Fallback to standard JWT auth
+  authenticate(req, res, (err?: any) => {
+    if (err) return next(err);
+    requireAdmin(req, res, next);
+  });
+}
 
 // ============================================================================
 // Demo UUIDs (hex-safe, deterministic for idempotency)
@@ -361,8 +384,7 @@ async function cleanupDemoData(ds: DataSource): Promise<{ deleted: string[] }> {
 export function createSeedDemoRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.use(authenticate);
-  router.use(requireAdmin);
+  router.use(adminOrSecretAuth);
 
   // POST /api/v1/admin/seed-demo — 데모 데이터 생성
   router.post('/', async (_req: Request, res: Response) => {
