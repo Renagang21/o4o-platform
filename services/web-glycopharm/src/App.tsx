@@ -197,10 +197,12 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 }
 
 /**
- * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1 + WO-MENU-REALIGN-V1
+ * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1 + WO-CARE-MENU-ENTRY-STRUCTURE-V1
  * / 접근 시:
- * - pharmacy 역할: CareDashboardPage 표시 (Care 중심)
- * - 기타 역할: 역할 기반 대시보드로 자동 리다이렉트
+ * - 로그인 사용자: 역할 기반 대시보드로 자동 리다이렉트
+ *   - pharmacy → /care
+ *   - operator → /operator
+ *   - admin → /admin
  * - 비로그인: HomePage 표시
  */
 function RoleBasedHome() {
@@ -209,22 +211,12 @@ function RoleBasedHome() {
 
   useEffect(() => {
     if (user?.roles[0]) {
-      const role = user.roles[0];
-      // pharmacy 역할은 / 경로에서 CareDashboardPage를 표시하므로 리다이렉트하지 않음
-      if (role === 'pharmacy') {
-        return;
-      }
-      const target = getDefaultRouteByRole(role);
+      const target = getDefaultRouteByRole(user.roles[0]);
       if (target !== '/') {
         navigate(target, { replace: true });
       }
     }
   }, [user, navigate]);
-
-  // pharmacy 역할이면 CareDashboardPage, 아니면 HomePage
-  if (user?.roles[0] === 'pharmacy') {
-    return <CareDashboardPage />;
-  }
 
   return <HomePage />;
 }
@@ -287,19 +279,22 @@ function AppRoutes() {
           </ProtectedRoute>
         } />
 
-        {/* Care Routes (WO-MENU-REALIGN-V1) */}
-        <Route path="patients" element={
-          <ProtectedRoute allowedRoles={['pharmacy']}>
-            <PatientsPage />
-          </ProtectedRoute>
-        } />
-
         {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
         <Route path="store" element={
           <ProtectedRoute allowedRoles={['pharmacy']}>
             <StoreEntryPage />
           </ProtectedRoute>
         } />
+      </Route>
+
+      {/* Care Routes (WO-CARE-MENU-ENTRY-STRUCTURE-V1) */}
+      <Route path="care" element={
+        <ProtectedRoute allowedRoles={['pharmacy']}>
+          <MainLayout />
+        </ProtectedRoute>
+      }>
+        <Route index element={<CareDashboardPage />} />
+        <Route path="patients" element={<PatientsPage />} />
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}

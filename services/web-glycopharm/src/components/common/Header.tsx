@@ -20,10 +20,20 @@ import {
   UserCircle,
 } from 'lucide-react';
 
-/** App 중심 메뉴 정의 */
-const appMenuItems = [
+/**
+ * WO-CARE-MENU-ENTRY-STRUCTURE-V1: App 중심 메뉴 정의
+ * - 비로그인: Home(/) | 약국 매장 허브 | 내정보
+ * - pharmacy 로그인: Home(/care) | 환자관리(/care/patients) | 약국 매장 허브 | 내정보
+ */
+const publicMenuItems = [
   { path: '/', label: 'Home', icon: Home, end: true, requiresAuth: false },
-  { path: '/patients', label: '환자관리', icon: Users, end: false, requiresAuth: true },
+  { path: '/store', label: '약국 매장 허브', icon: Store, end: false, requiresAuth: true },
+  { path: '/mypage', label: '내정보', icon: UserCircle, end: false, requiresAuth: true },
+];
+
+const pharmacyMenuItems = [
+  { path: '/care', label: 'Home', icon: Home, end: true, requiresAuth: true },
+  { path: '/care/patients', label: '환자관리', icon: Users, end: false, requiresAuth: true },
   { path: '/store', label: '약국 매장 허브', icon: Store, end: false, requiresAuth: true },
   { path: '/mypage', label: '내정보', icon: UserCircle, end: false, requiresAuth: true },
 ];
@@ -34,6 +44,10 @@ export default function Header() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  /** pharmacy 로그인 시 /care 중심 메뉴, 그 외 공개 메뉴 */
+  const isPharmacy = isAuthenticated && user?.roles?.includes('pharmacy');
+  const appMenuItems = isPharmacy ? pharmacyMenuItems : publicMenuItems;
 
   const handleLogout = () => {
     logout();

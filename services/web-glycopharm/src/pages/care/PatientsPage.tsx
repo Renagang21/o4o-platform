@@ -272,7 +272,7 @@ export default function PatientsPage() {
                   return (
                     <tr
                       key={patient.id}
-                      onClick={() => navigate(`/patients?id=${patient.id}`)}
+                      onClick={() => navigate(`/care/patients?id=${patient.id}`)}
                       className="hover:bg-slate-50 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4">

@@ -215,7 +215,7 @@ export default function CareDashboardPage() {
           <div className="flex-1" />
 
           <button
-            onClick={() => navigate('/patients')}
+            onClick={() => navigate('/care/patients')}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -272,7 +272,7 @@ export default function CareDashboardPage() {
                   return (
                     <tr
                       key={patient.id}
-                      onClick={() => navigate(`/patients?id=${patient.id}`)}
+                      onClick={() => navigate(`/care/patients?id=${patient.id}`)}
                       className="hover:bg-slate-50 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4">
