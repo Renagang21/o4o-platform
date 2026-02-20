@@ -141,12 +141,18 @@ const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
 const FunnelPage = lazy(() => import('@/pages/pharmacy/FunnelPage'));
 
-// Care Pages (WO-CARE-INTERNAL-NAV-STRUCTURE-V1)
+// Care Pages (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
 const CareDashboardPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })));
 const PatientsPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientsPage })));
 const PatientDetailPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientDetailPage })));
 const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.AnalysisPage })));
 const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
+
+// Patient Detail Tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
+const SummaryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.SummaryTab })));
+const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
+const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
+const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
 
 // Test Guide Pages
 const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
@@ -298,7 +304,13 @@ function AppRoutes() {
       }>
         <Route index element={<CareDashboardPage />} />
         <Route path="patients" element={<PatientsPage />} />
-        <Route path="patients/:id" element={<PatientDetailPage />} />
+        {/* Patient Detail with nested tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1) */}
+        <Route path="patients/:id" element={<PatientDetailPage />}>
+          <Route index element={<SummaryTab />} />
+          <Route path="analysis" element={<PatientAnalysisTab />} />
+          <Route path="coaching" element={<PatientCoachingTab />} />
+          <Route path="history" element={<HistoryTab />} />
+        </Route>
         <Route path="analysis" element={<AnalysisPage />} />
         <Route path="coaching" element={<CoachingPage />} />
       </Route>
