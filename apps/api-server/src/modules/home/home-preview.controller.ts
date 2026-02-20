@@ -90,6 +90,15 @@ async function resolvePharmacyId(ds: DataSource, userId: string): Promise<string
 // Aggregation Queries
 // ============================================================================
 
+/** Safe query wrapper — returns fallback on table-not-found or other errors */
+async function safeQuery(ds: DataSource, sql: string, params?: any[]): Promise<any[]> {
+  try {
+    return await ds.query(sql, params);
+  } catch {
+    return [];
+  }
+}
+
 async function buildCarePreview(
   ds: DataSource,
   pharmacyId: string | null,
@@ -99,8 +108,8 @@ async function buildCarePreview(
 
   // A. Total patients
   const totalResult = isGlobal
-    ? await ds.query(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
-    : await ds.query(
+    ? await safeQuery(ds, `SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
+    : await safeQuery(ds,
         `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE pharmacist_id = $1`,
         [userId]
       );
@@ -108,7 +117,7 @@ async function buildCarePreview(
 
   // B. High risk count (latest snapshot per patient)
   const highRiskResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COUNT(*)::int AS count
         FROM care_kpi_snapshots s
         INNER JOIN (
@@ -117,7 +126,7 @@ async function buildCarePreview(
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
         WHERE s.risk_level = 'high'
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count
         FROM care_kpi_snapshots s
         INNER JOIN (
@@ -130,11 +139,11 @@ async function buildCarePreview(
 
   // C. Recent coaching (last 7 days)
   const coachingResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM care_coaching_sessions
         WHERE created_at >= NOW() - INTERVAL '7 days'
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM care_coaching_sessions
         WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
       `, [pharmacyId]);
@@ -142,11 +151,11 @@ async function buildCarePreview(
 
   // D. Recent analysis (distinct patients with snapshots in last 7 days)
   const analysisResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COUNT(DISTINCT patient_id)::int AS count FROM care_kpi_snapshots
         WHERE created_at >= NOW() - INTERVAL '7 days'
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COUNT(DISTINCT patient_id)::int AS count FROM care_kpi_snapshots
         WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
       `, [pharmacyId]);
@@ -194,8 +203,8 @@ async function buildCarePreview(
       LIMIT 3
     `;
   const recentChanges = isGlobal
-    ? await ds.query(changesQuery)
-    : await ds.query(changesQuery, [pharmacyId]);
+    ? await safeQuery(ds, changesQuery)
+    : await safeQuery(ds, changesQuery, [pharmacyId]);
 
   return {
     totalPatients,
@@ -219,40 +228,35 @@ async function buildStorePreview(
 
   // A. Monthly orders
   const ordersResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM checkout_orders
         WHERE created_at >= date_trunc('month', CURRENT_DATE)
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM checkout_orders
         WHERE created_at >= date_trunc('month', CURRENT_DATE) AND seller_id = $1
       `, [userId]);
   const monthlyOrders = ordersResult[0]?.count ?? 0;
 
   // B. Pending requests (organization_product_applications)
-  let pendingRequests = 0;
-  try {
-    const pendingResult = isGlobal
-      ? await ds.query(`
-          SELECT COUNT(*)::int AS count FROM organization_product_applications
-          WHERE status = 'pending'
-        `)
-      : await ds.query(`
-          SELECT COUNT(*)::int AS count FROM organization_product_applications
-          WHERE status = 'pending' AND requested_by = $1
-        `, [userId]);
-    pendingRequests = pendingResult[0]?.count ?? 0;
-  } catch {
-    // Table may not exist — safe fallback
-  }
+  const pendingResult = isGlobal
+    ? await safeQuery(ds, `
+        SELECT COUNT(*)::int AS count FROM organization_product_applications
+        WHERE status = 'pending'
+      `)
+    : await safeQuery(ds, `
+        SELECT COUNT(*)::int AS count FROM organization_product_applications
+        WHERE status = 'pending' AND requested_by = $1
+      `, [userId]);
+  const pendingRequests = pendingResult[0]?.count ?? 0;
 
   // C. Active products
   const productsResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM glycopharm_products
         WHERE status = 'active'
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM glycopharm_products
         WHERE status = 'active' AND pharmacy_id = $1
       `, [pharmacyId]);
@@ -260,11 +264,11 @@ async function buildStorePreview(
 
   // D. Monthly revenue (paid orders only)
   const revenueResult = isGlobal
-    ? await ds.query(`
+    ? await safeQuery(ds, `
         SELECT COALESCE(SUM(total_amount), 0)::int AS total FROM checkout_orders
         WHERE created_at >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
       `)
-    : await ds.query(`
+    : await safeQuery(ds, `
         SELECT COALESCE(SUM(total_amount), 0)::int AS total FROM checkout_orders
         WHERE created_at >= date_trunc('month', CURRENT_DATE) AND status = 'paid' AND seller_id = $1
       `, [userId]);

@@ -240,8 +240,8 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
       const daysAgo = Math.floor((i - 1) * 6 / cc.count); // spread across 6 days
       await insertIfNotExists(
         'care_coaching_sessions', cid,
-        `INSERT INTO care_coaching_sessions (id, pharmacy_id, patient_id, pharmacist_id, summary, action_plan, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW() - INTERVAL '${daysAgo} days', NOW())`,
+        `INSERT INTO care_coaching_sessions (id, pharmacy_id, patient_id, pharmacist_id, summary, action_plan, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW() - INTERVAL '${daysAgo} days')`,
         [cid, cc.pharmId, pid, cc.userId, `[DEMO] ${cc.label} 상담 ${i}: 혈당 관리 가이드`, `[DEMO] 식이요법 조정, 운동 권장`],
         `coaching:${cc.label}-${i}`,
       );
