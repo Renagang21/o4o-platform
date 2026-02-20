@@ -1087,13 +1087,14 @@ const startServer = async () => {
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
     }
 
-    // 37-b. Register Demo Seed Admin routes (WO-DEMO-SEED-SCRIPT-V1)
+    // 37-b. Register Demo Seed routes (WO-DEMO-SEED-SCRIPT-V1)
+    // Path: /api/v1/ops/seed-demo (NOT /api/v1/admin/* to avoid adminDashboardRoutes auth middleware)
     try {
       const { createSeedDemoRouter } = await import('./modules/admin/seed-demo.controller.js');
-      app.use('/api/v1/admin/seed-demo', createSeedDemoRouter(AppDataSource));
-      logger.info('✅ Demo Seed Admin routes registered at /api/v1/admin/seed-demo');
+      app.use('/api/v1/ops/seed-demo', createSeedDemoRouter(AppDataSource));
+      logger.info('✅ Demo Seed routes registered at /api/v1/ops/seed-demo');
     } catch (seedDemoError) {
-      logger.error('Failed to register Demo Seed Admin routes:', seedDemoError);
+      logger.error('Failed to register Demo Seed routes:', seedDemoError);
     }
 
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
