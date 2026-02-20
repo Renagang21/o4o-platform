@@ -32,7 +32,7 @@ import {
 } from 'lucide-react';
 import { useAuth, getAccessToken } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
-import { publicApi, type HomePreviewData } from '@/api/public';
+import { publicApi, type HomePreviewData, type MetricStatus } from '@/api/public';
 
 // ============================================================================
 // Hero Section
@@ -78,28 +78,45 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 // KPI Card
 // ============================================================================
 
-function KpiCard({ icon: Icon, label, value, unit }: {
+function KpiCard({ icon: Icon, label, value, unit, status }: {
   icon: typeof Users;
   label: string;
   value: number;
   unit?: string;
+  status?: MetricStatus;
 }) {
+  const isTableMissing = status === 'TABLE_MISSING';
+  const isZero = status === 'ZERO';
   const formatted = unit === '원'
     ? value.toLocaleString()
     : String(value);
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+    <div className={`bg-white rounded-2xl p-5 shadow-sm border ${
+      isTableMissing ? 'border-dashed border-slate-300' : 'border-slate-100'
+    }`}>
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
-          <Icon className="w-5 h-5 text-primary-600" />
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+          isTableMissing ? 'bg-slate-100' : 'bg-primary-50'
+        }`}>
+          <Icon className={`w-5 h-5 ${isTableMissing ? 'text-slate-400' : 'text-primary-600'}`} />
         </div>
         <span className="text-xs text-slate-500 font-medium">{label}</span>
+        {isTableMissing && (
+          <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded-full">준비 중</span>
+        )}
       </div>
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-bold text-slate-800">{formatted}</span>
-        {unit && <span className="text-sm text-slate-400">{unit}</span>}
+        {isTableMissing ? (
+          <span className="text-lg text-slate-300">--</span>
+        ) : (
+          <span className={`text-2xl font-bold ${isZero ? 'text-slate-300' : 'text-slate-800'}`}>{formatted}</span>
+        )}
+        {unit && !isTableMissing && <span className="text-sm text-slate-400">{unit}</span>}
       </div>
+      {isZero && !isTableMissing && (
+        <p className="text-[10px] text-slate-400 mt-1">데이터 없음</p>
+      )}
     </div>
   );
 }
@@ -116,10 +133,10 @@ function CareSnapshotSection({ care }: { care: HomePreviewData['care'] }) {
         <p className="text-xs text-slate-500 mt-1">환자 관리 및 분석 현황</p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KpiCard icon={Users} label="총 환자 수" value={care.totalPatients} unit="명" />
-        <KpiCard icon={AlertTriangle} label="고위험 환자" value={care.highRiskCount} unit="명" />
-        <KpiCard icon={MessageSquare} label="최근 7일 상담" value={care.recentCoaching} unit="건" />
-        <KpiCard icon={BarChart3} label="최근 분석 완료" value={care.recentAnalysis} unit="건" />
+        <KpiCard icon={Users} label="총 환자 수" value={care.totalPatients} unit="명" status={care.totalPatientsStatus} />
+        <KpiCard icon={AlertTriangle} label="고위험 환자" value={care.highRiskCount} unit="명" status={care.highRiskCountStatus} />
+        <KpiCard icon={MessageSquare} label="최근 7일 상담" value={care.recentCoaching} unit="건" status={care.recentCoachingStatus} />
+        <KpiCard icon={BarChart3} label="최근 분석 완료" value={care.recentAnalysis} unit="건" status={care.recentAnalysisStatus} />
       </div>
     </section>
   );
@@ -194,10 +211,10 @@ function StoreSnapshotSection({ store }: { store: HomePreviewData['store'] }) {
           <p className="text-xs text-slate-500 mt-1">매장 운영 및 매출 현황</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <KpiCard icon={ShoppingCart} label="이번달 주문" value={store.monthlyOrders} unit="건" />
-          <KpiCard icon={Package} label="승인 대기" value={store.pendingRequests} unit="건" />
-          <KpiCard icon={Store} label="활성 상품" value={store.activeProducts} unit="개" />
-          <KpiCard icon={TrendingUp} label="이번달 매출" value={store.monthlyRevenue} unit="원" />
+          <KpiCard icon={ShoppingCart} label="이번달 주문" value={store.monthlyOrders} unit="건" status={store.monthlyOrdersStatus} />
+          <KpiCard icon={Package} label="승인 대기" value={store.pendingRequests} unit="건" status={store.pendingRequestsStatus} />
+          <KpiCard icon={Store} label="활성 상품" value={store.activeProducts} unit="개" status={store.activeProductsStatus} />
+          <KpiCard icon={TrendingUp} label="이번달 매출" value={store.monthlyRevenue} unit="원" status={store.monthlyRevenueStatus} />
         </div>
       </div>
     </section>

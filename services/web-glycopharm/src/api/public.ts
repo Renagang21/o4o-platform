@@ -46,13 +46,20 @@ export interface PublicApiResponse<T> {
   };
 }
 
+// WO-HOME-UX-ZERO-STATE-V1: Metric status for zero-state UX
+export type MetricStatus = 'OK' | 'ZERO' | 'TABLE_MISSING' | 'NOT_ACTIVATED';
+
 // WO-HOME-LIVE-PREVIEW-V1: Home Preview 데이터 타입
 export interface HomePreviewData {
   care: {
     totalPatients: number;
+    totalPatientsStatus?: MetricStatus;
     highRiskCount: number;
+    highRiskCountStatus?: MetricStatus;
     recentCoaching: number;
+    recentCoachingStatus?: MetricStatus;
     recentAnalysis: number;
+    recentAnalysisStatus?: MetricStatus;
     recentChanges: Array<{
       tirChange?: number;
       cvChange?: number;
@@ -61,9 +68,13 @@ export interface HomePreviewData {
   };
   store: {
     monthlyOrders: number;
+    monthlyOrdersStatus?: MetricStatus;
     pendingRequests: number;
+    pendingRequestsStatus?: MetricStatus;
     activeProducts: number;
+    activeProductsStatus?: MetricStatus;
     monthlyRevenue: number;
+    monthlyRevenueStatus?: MetricStatus;
   };
 }
 
