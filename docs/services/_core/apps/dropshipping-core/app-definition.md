@@ -1,83 +1,38 @@
-# dropshipping-core - Definition
+# dropshipping-core
 
-> 앱 정의 문서
+> **Status**: Active | **Version**: 1.0.0 | **Package**: @o4o/dropshipping-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** dropshipping-core
-- **App Type:** core
-- **Package:** @o4o/dropshipping-core
-- **Service Group:** cosmetics, tourist, operations
-- **Status:** Active
+산업 중립적 드롭쉬핑 엔진. cosmetics, tourist, operations에서 사용.
 
-## 역할 및 책임
-
-### 주요 역할
-산업 중립적 확장형 드롭쉬핑 엔진으로서 Supplier/Seller/Product/Order/Settlement/Commission을 관리한다.
-
-### 책임 범위
-- Supplier 및 Seller 관리
-- Product Master, Offer, Listing 관리
-- Order Relay 워크플로우
-- Settlement Batch 관리
-- Commission Rule 및 Transaction 관리
-
-### 경계
-- 드롭쉬핑 워크플로우만 담당
-- 실제 주문 원장은 ecommerce-core에 위임
-- 업종별 검증은 Extension에 위임 (pharmaceutical-extension 등)
-- 결제는 ecommerce-core에 위임
-
-## 의존성
-
-### Core Dependencies
-- organization-core
-
-### Optional Dependencies
-(없음)
+| 책임 | 경계 |
+|------|------|
+| Supplier / Seller 관리 | 주문 원장 → ecommerce-core |
+| Product Master / Offer / Listing | 업종별 검증 → Extension |
+| Order Relay 워크플로우 | 결제 → ecommerce-core |
+| Settlement / Commission | |
 
 ## 외부 노출
 
-### Services
-- SupplierService
-- SellerService
-- ProductService
-- OrderRelayService
-- SettlementService
-- CommissionService
+**Services**: SupplierService, SellerService, ProductService, OrderRelayService, SettlementService, CommissionService
+**Types**: Supplier, Seller, ProductMaster, SupplierProductOffer, SellerListing, OrderRelay
+**Events**: `product.master/offer.updated`, `listing.created`, `order.created/relay.dispatched/relay.fulfilled`, `settlement.closed`, `commission.applied`
 
-### Types
-- Supplier
-- Seller
-- ProductMaster
-- SupplierProductOffer
-- SellerListing
-- OrderRelay
+## API Routes
 
-### Events
-- `product.master.updated`
-- `product.offer.updated`
-- `listing.created`
-- `order.created`
-- `order.relay.dispatched`
-- `order.relay.fulfilled`
-- `settlement.closed`
-- `commission.applied`
+- `/api/v1/dropshipping/suppliers`
+- `/api/v1/dropshipping/sellers`
+- `/api/v1/dropshipping/products`
+- `/api/v1/dropshipping/orders`
+- `/api/v1/dropshipping/settlement`
 
 ## 설정
 
-### 기본 설정
-- enableAutoRelayToSupplier: true
-- defaultCommissionRate: 10
-- settlementCycle: 'monthly'
-- requireSellerApproval: true
-- requireSupplierApproval: true
+- enableAutoRelayToSupplier: true, defaultCommissionRate: 10%
+- settlementCycle: monthly
+- requireSellerApproval: true, requireSupplierApproval: true
 
-### 환경 변수
-(없음)
+## Dependencies
 
-## 특징
-
-- 산업 중립적 설계
-- Extension Interface 제공
-- 복잡한 워크플로우 (app-behavior.md 참조)
+- organization-core

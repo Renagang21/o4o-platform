@@ -1,73 +1,29 @@
-# cms-core - Definition
+# cms-core
 
-> 앱 정의 문서
+> **Status**: FROZEN (Foundation Core) | **Version**: 2.0.0 | **Package**: @o4o-apps/cms-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** cms-core
-- **App Type:** core
-- **Package:** @o4o-apps/cms-core
-- **Service Group:** All services
-- **Status:** @status FROZEN - Foundation Core
+플랫폼 CMS 엔진. 모든 서비스에 콘텐츠 생성/관리 기능 제공.
 
-## 역할 및 책임
-
-### 주요 역할
-플랫폼의 콘텐츠 관리 시스템(CMS) 엔진으로서 모든 서비스에 콘텐츠 생성/관리 기능을 제공한다.
-
-### 책임 범위
-- CPT (Custom Post Type) 시스템 관리
-- ACF (Advanced Custom Fields) 시스템 관리
-- Block Editor Core 제공
-- Template System 관리
-- ViewBlock Rendering Pipeline
-- Content API 제공
-
-### 경계
-- 콘텐츠 저장/조회만 담당
-- 비즈니스 로직은 각 서비스 앱이 담당
-- 권한 관리는 organization-core에 위임
-
-## 의존성
-
-### Core Dependencies
-- platform-core (암묵적)
-
-### Optional Dependencies
-(없음 - Foundation Core)
+| 책임 | 경계 |
+|------|------|
+| CPT (Custom Post Type) 시스템 | 콘텐츠 저장/조회만 |
+| ACF (Advanced Custom Fields) | 비즈니스 로직 → 서비스 앱 |
+| Block Editor Core | 권한 → organization-core |
+| Template System / ViewBlock Pipeline | |
 
 ## 외부 노출
 
-### Services
-- CPTService
-- ACFService
-- BlockService
-- TemplateService
+**Services**: CPTService, ACFService, BlockService, TemplateService
+**Types**: CPT, ACF, Block, Template, ViewBlock
+**Events**: `cpt.created`, `cpt.updated`, `content.published`, `template.registered`
 
-### Types
-- CPT
-- ACF
-- Block
-- Template
-- ViewBlock
+## API Routes
 
-### Events
-- `cpt.created`
-- `cpt.updated`
-- `content.published`
-- `template.registered`
+- `/api/v1/cms/cpt`, `/api/v1/cms/acf`
+- `/api/v1/cms/blocks`, `/api/v1/cms/templates`
 
-## 설정
+## Dependencies
 
-### 기본 설정
-(manifest에 defaultConfig 없음 - 설정 불필요)
-
-### 환경 변수
-(없음)
-
-## 특징
-
-- @status FROZEN 표시 (Foundation Core)
-- 모든 서비스에서 사용
-- Phase A/B complete (2025-12-14)
-- 수정 시 Phase review 필요
+- platform-core (암묵적)

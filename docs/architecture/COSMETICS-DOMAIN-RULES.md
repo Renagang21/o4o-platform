@@ -182,12 +182,9 @@ CORE_API_URL=https://api.neture.co.kr
 
 ## 참조 문서
 
-- 📄 상세 규정: `docs/architecture/cosmetics-db-schema.md`
-- 📄 API 스펙: `docs/services/cosmetics/api-definition.md`
-- 📄 서비스 흐름: `docs/services/cosmetics/service-flow.md`
-- 📄 호출 계약: `docs/services/cosmetics/web-api-contract.md`
-- 📄 배포 경계: `docs/services/cosmetics/deployment-boundary.md`
-- 📄 판정 문서: `docs/_platform/COSMETICS-ORDER-POSITIONING.md`
+- 📄 E-commerce 계약: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
+- 📄 O4O Store 규칙: `docs/architecture/O4O-STORE-RULES.md`
+- 📄 GlycoPharm Legacy: `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
 
 ---
 

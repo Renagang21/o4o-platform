@@ -141,8 +141,7 @@ import type { RelatedEntity } from './related.entity.js';
 조사 → 문제확정 → 최소 수정 → 검증 → 종료
 ```
 
-> 📄 템플릿: `docs/rules/work-order-standard-header.md`
-> 📄 신규 서비스: `docs/rules/new-service-workorder-template.md`
+> 모든 WO는 위 5단계를 준수한다.
 
 ---
 
@@ -327,8 +326,7 @@ import type { RelatedEntity } from './related.entity.js';
 | `/__debug__/navigation` | 📋 참고 설계 | 필요 시 구현 |
 | `/__debug__/api` | 📋 참고 설계 | 필요 시 구현 |
 
-> 📄 상세: `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md`
-> 📄 가이드: `docs/debugging/README.md`
+> 진단 Entry Point와 루틴은 위 표 참조.
 
 ---
 
@@ -352,10 +350,8 @@ import type { RelatedEntity } from './related.entity.js';
 | 영역 | 문서 | 경로 |
 |------|------|------|
 | Content Core | Content Core 개요 | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| LMS Core | Core-Extension 원칙 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
-| LMS Core | 데이터 소유권 | `docs/platform/lms/LMS-CORE-DATA-OWNERSHIP.md` |
-| LMS Core | API 계약 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
-| LMS Core | 이벤트 표준 | `docs/platform/lms/LMS-EVENT-STANDARD.md` |
+| LMS Core | Core-Extension 원칙 + 데이터 소유권 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
+| LMS Core | API 계약 + 이벤트 표준 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
 | Navigation | 운영자 대시보드 네비게이션 | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | Extension | 일반 가이드 | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
 | Extension | 파트너 가이드 | `docs/platform/extensions/EXTENSION-PARTNER-GUIDE.md` |
@@ -538,8 +534,6 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 | GlycoPharm Legacy | `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
 | Store Template | `docs/templates/o4o-store-template/` |
 | ESM Entity 규칙 | `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
-| 디버깅 가이드 | `docs/debugging/README.md` |
-| **진단 인프라 기준** | `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md` |
 | Design Core | `docs/rules/design-core-governance.md` |
 | **Content Core** | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
 | **LMS Core** | `docs/platform/lms/` |
@@ -550,12 +544,11 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 | **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
 | **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
 | **Operator OS Baseline** | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
-| **Operator UX Core Freeze** | `docs/baseline/OPERATOR_UX_CORE_FREEZE_V1.md` |
-| **Admin UX Core Freeze** | `docs/baseline/ADMIN_UX_CORE_FREEZE_V1.md` |
+| **UX Core Freeze (Operator+Admin)** | `docs/baseline/UX-CORE-FREEZE-V1.md` |
 | **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
 
 ---
 
-*Updated: 2026-02-17*
-*Version: 5.1*
+*Updated: 2026-02-20*
+*Version: 5.2*
 *Status: Active Constitution*

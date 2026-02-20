@@ -1,77 +1,34 @@
-# ecommerce-core - Definition
+# ecommerce-core
 
-> 앱 정의 문서
+> **Status**: Active | **Version**: 1.0.0 | **Package**: @o4o/ecommerce-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** ecommerce-core
-- **App Type:** core
-- **Package:** @o4o/ecommerce-core
-- **Service Group:** All commerce services
-- **Status:** Active
+판매 원장(Source of Truth). 주문·결제·판매 유형 통합 관리.
 
-## 역할 및 책임
-
-### 주요 역할
-판매 원장(Source of Truth)으로서 주문, 결제, 판매 유형을 통합 관리한다.
-
-### 책임 범위
-- 주문 관리 (EcommerceOrder, EcommerceOrderItem)
-- 결제 관리 (EcommercePayment)
-- 판매 유형 분류 (retail, dropshipping, b2b, subscription)
-- 주문/결제 상태 관리
-
-### 경계
-- 주문/결제 원장만 담당
-- 재고 관리는 각 서비스 앱이 담당
-- 배송 로직은 dropshipping-core 등에 위임
-- 정산은 각 비즈니스 앱이 담당
-
-## 의존성
-
-### Core Dependencies
-- organization-core
-
-### Optional Dependencies
-(없음)
+| 책임 | 경계 |
+|------|------|
+| EcommerceOrder, EcommerceOrderItem | 재고 → 서비스 앱 |
+| EcommercePayment | 배송 → dropshipping-core |
+| 판매 유형 분류 (retail, dropshipping, b2b, subscription) | 정산 → 비즈니스 앱 |
 
 ## 외부 노출
 
-### Services
-- EcommerceOrderService
-- EcommercePaymentService
+**Services**: EcommerceOrderService, EcommercePaymentService
+**Types**: EcommerceOrder, EcommerceOrderItem, EcommercePayment, OrderType, OrderStatus, PaymentStatus
+**Events**: `order.created/confirmed/cancelled/completed`, `payment.pending/completed/failed/refunded`
 
-### Types
-- EcommerceOrder
-- EcommerceOrderItem
-- EcommercePayment
-- OrderType
-- OrderStatus
-- PaymentStatus
+## API Routes
 
-### Events
-- `order.created`
-- `order.confirmed`
-- `order.cancelled`
-- `order.completed`
-- `payment.pending`
-- `payment.completed`
-- `payment.failed`
-- `payment.refunded`
+- `/api/v1/ecommerce/orders`, `/api/v1/ecommerce/orders/:id`
+- `/api/v1/ecommerce/payments`, `/api/v1/ecommerce/payments/:id`
 
 ## 설정
 
-### 기본 설정
-- defaultCurrency: 'KRW'
-- autoConfirmPayment: false
-- orderNumberPrefix: 'ORD'
-- paymentTimeout: 30 (분)
+- defaultCurrency: 'KRW', autoConfirmPayment: false
+- orderNumberPrefix: 'ORD', paymentTimeout: 30분
+- **allowPurge: false** (원장 데이터 삭제 금지)
 
-### 환경 변수
-(없음)
+## Dependencies
 
-## 특징
-
-- 판매 원장(Source of Truth) 역할
-- 모든 커머스 서비스에서 사용
-- uninstallPolicy.allowPurge: false (원장 데이터 삭제 금지)
+- organization-core

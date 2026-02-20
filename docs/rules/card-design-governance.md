@@ -225,7 +225,4 @@ interface DashboardCard {
 
 ## 관련 문서
 
-* [Legacy 대시보드 제거 계획서](../plan/active/legacy-dashboard-phaseout-plan.md)
-* 통합 대시보드 v1 Work Order
-* 통합 대시보드 v1.1 임원 컨텍스트 설계서
-* 통합 알림 구조 v1 설계서
+* [O4O 5대 헌법](./O4O-CONSTITUTION.md)
