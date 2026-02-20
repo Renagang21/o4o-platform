@@ -58,34 +58,21 @@ const DEMO_IDS = {
   appPrefix: 'd0000000-de08-4000',
 };
 
-function patientId(orgIndex: number, patientIndex: number): string {
-  const hex = patientIndex.toString(16).padStart(2, '0');
-  return `${DEMO_IDS.patientPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}${hex}-000000000001`;
+// UUID format: 8-4-4-4-12
+// prefix provides 8-4-4, we need 4-12
+// 4th segment: a + orgIndex (1 hex) + itemIndex (2 hex) = 4 chars total (pad to 4)
+// 5th segment: 12 hex chars
+
+function demoUuid(prefix: string, orgIdx: number, itemIdx: number): string {
+  const seg4 = `a${orgIdx.toString(16)}${itemIdx.toString(16).padStart(2, '0')}`;
+  return `${prefix}-${seg4}-000000000001`;
 }
 
-function productId(orgIndex: number, productIndex: number): string {
-  const hex = productIndex.toString(16).padStart(2, '0');
-  return `${DEMO_IDS.productPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}${hex}-000000000001`;
-}
-
-function orderId(orgIndex: number, orderIndex: number): string {
-  const hex = orderIndex.toString(16).padStart(2, '0');
-  return `${DEMO_IDS.orderPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}${hex}-000000000001`;
-}
-
-function coachingId(orgIndex: number, sessionIndex: number): string {
-  const hex = sessionIndex.toString(16).padStart(2, '0');
-  return `${DEMO_IDS.coachingPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}${hex}-000000000001`;
-}
-
-function snapshotId(orgIndex: number, snapshotIndex: number): string {
-  const hex = snapshotIndex.toString(16).padStart(4, '0');
-  return `${DEMO_IDS.snapshotPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}0-00000000${hex}`;
-}
-
-function appId(orgIndex: number, appIndex: number): string {
-  const hex = appIndex.toString(16).padStart(2, '0');
-  return `${DEMO_IDS.appPrefix}-a0${orgIndex.toString(16).padStart(2, '0')}${hex}-000000000001`;
+function demoUuidLong(prefix: string, orgIdx: number, itemIdx: number): string {
+  // For tables with many items, use 5th segment for item index
+  const seg4 = `a00${orgIdx.toString(16)}`;
+  const seg5 = itemIdx.toString(16).padStart(12, '0');
+  return `${prefix}-${seg4}-${seg5}`;
 }
 
 // ============================================================================
@@ -183,7 +170,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const pc of patientConfigs) {
     for (let i = 1; i <= pc.count; i++) {
-      const pid = patientId(pc.orgIdx, i);
+      const pid = demoUuid(DEMO_IDS.patientPrefix,pc.orgIdx, i);
       await insertIfNotExists(
         'glucoseview_customers', pid,
         `INSERT INTO glucoseview_customers (id, pharmacist_id, name, phone, visit_count, sync_status, created_at, updated_at)
@@ -205,14 +192,14 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
   for (const pc of patientConfigs) {
     const pharmId = pc.orgIdx === 1 ? DEMO_IDS.pharmCare : DEMO_IDS.pharmHybrid;
     for (let i = 1; i <= pc.count; i++) {
-      const pid = patientId(pc.orgIdx, i);
+      const pid = demoUuid(DEMO_IDS.patientPrefix,pc.orgIdx, i);
 
       // Older snapshot (14 days ago)
       const tirOld = 50 + Math.floor(i * 3);
       const cvOld = 40 - Math.floor(i * 1.5);
       const risk = riskLevels[i % 3];
       snapIdx++;
-      const sid1 = snapshotId(pc.orgIdx, snapIdx);
+      const sid1 = demoUuidLong(DEMO_IDS.snapshotPrefix,pc.orgIdx, snapIdx);
       await insertIfNotExists(
         'care_kpi_snapshots', sid1,
         `INSERT INTO care_kpi_snapshots (id, pharmacy_id, patient_id, tir, cv, risk_level, created_at)
@@ -226,7 +213,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
       const cvNew = cvOld + (i % 3 === 0 ? 3 : i % 3 === 1 ? -4 : 0);
       const riskNew = i % 3 === 0 ? 'high' : i % 3 === 1 ? 'low' : 'medium';
       snapIdx++;
-      const sid2 = snapshotId(pc.orgIdx, snapIdx);
+      const sid2 = demoUuidLong(DEMO_IDS.snapshotPrefix,pc.orgIdx, snapIdx);
       await insertIfNotExists(
         'care_kpi_snapshots', sid2,
         `INSERT INTO care_kpi_snapshots (id, pharmacy_id, patient_id, tir, cv, risk_level, created_at)
@@ -248,8 +235,8 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const cc of coachingConfigs) {
     for (let i = 1; i <= cc.count; i++) {
-      const pid = patientId(cc.orgIdx, ((i - 1) % cc.patientCount) + 1);
-      const cid = coachingId(cc.orgIdx, i);
+      const pid = demoUuid(DEMO_IDS.patientPrefix,cc.orgIdx, ((i - 1) % cc.patientCount) + 1);
+      const cid = demoUuid(DEMO_IDS.coachingPrefix,cc.orgIdx, i);
       const daysAgo = Math.floor((i - 1) * 6 / cc.count); // spread across 6 days
       await insertIfNotExists(
         'care_coaching_sessions', cid,
@@ -272,7 +259,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const pc of productConfigs) {
     for (let i = 1; i <= pc.count; i++) {
-      const pid = productId(pc.orgIdx, i);
+      const pid = demoUuid(DEMO_IDS.productPrefix,pc.orgIdx, i);
       const price = 10000 + i * 5000;
       await insertIfNotExists(
         'glycopharm_products', pid,
@@ -295,7 +282,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const oc of orderConfigs) {
     for (let i = 1; i <= oc.count; i++) {
-      const oid = orderId(oc.orgIdx, i);
+      const oid = demoUuid(DEMO_IDS.orderPrefix,oc.orgIdx, i);
       const amount = 50000 + i * 15000;
       const status = i <= Math.ceil(oc.count * 0.7) ? 'paid' : 'pending';
       const orderNum = `DEMO-${oc.label.toUpperCase()}-${String(i).padStart(4, '0')}`;
@@ -326,7 +313,7 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
 
   for (const ac of appConfigs) {
     for (let i = 1; i <= ac.count; i++) {
-      const aid = appId(ac.orgIdx, i);
+      const aid = demoUuid(DEMO_IDS.appPrefix,ac.orgIdx, i);
       const status = i <= Math.ceil(ac.count * 0.4) ? 'approved' : 'pending';
       await insertIfNotExists(
         'organization_product_applications', aid,
