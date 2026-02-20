@@ -2,26 +2,21 @@
  * PharmacyPage - 약국경영 게이트 페이지
  *
  * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거, 자체 게이트 로직
+ * WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1: API 기반 승인 확인 (토큰 스테일 대응)
  *
- * 이 페이지가 약국 서비스의 1차 진입점이며, 모든 분기를 자체 처리한다.
- * (PharmacyGuard는 운영 라우트(dashboard, store 등)에만 적용)
- *
- * 분기 로직:
- * 1. 미로그인 → "로그인 필요" + 로그인 링크
+ * 분기 로직 (API-first):
+ * 1. 미로그인 → "로그인 필요"
  * 2. 관리자/운영자 → "접근 불가"
- * 3. 직역 미설정 → FunctionGateModal 표시
- * 4. 직역 != pharmacy_owner → "개설자만 이용 가능" + 신청 링크
- * 5. pharmacy_owner + loading → 로딩 표시
- * 6. pharmacy_owner + 승인 완료 → /pharmacy/dashboard
- * 7. pharmacy_owner + 대기 중 → 대기 안내
- * 8. API 에러 → 에러 안내 (401 시 로그인 링크)
- * 9. pharmacy_owner + 미신청 → /pharmacy/approval
+ * 3. API 로딩 중 → 로딩 표시
+ * 4. API 승인 완료 → /pharmacy/dashboard (pharmacistRole 무관)
+ * 5. API 대기 중 → 대기 안내
+ * 6. API 에러 → 에러 안내
+ * 7. 미신청 → /pharmacy/approval
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useAuthModal } from '../../contexts/AuthModalContext';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
@@ -31,27 +26,24 @@ const NON_PHARMACIST_ROLES = ['admin', 'super_admin', 'district_admin', 'branch_
 export function PharmacyPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { openFunctionGateModal } = useAuthModal();
   const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none' | 'error'>('loading');
   const [approvalError, setApprovalError] = useState<string | null>(null);
+  const fetchedRef = useRef(false);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
-  const isPharmacyOwner = !!user && !isAdminOrOperator && user.pharmacistRole === 'pharmacy_owner';
-  const needsFunctionSelection = !!user && !isAdminOrOperator && !user.pharmacistRole;
 
-  // 직역 미설정 시 모달 자동 표시
+  // WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1:
+  // 모든 인증된 비관리자 사용자에 대해 API로 승인 상태를 직접 확인.
+  // pharmacistRole이 토큰에 없어도 DB 상태로 판단한다.
   useEffect(() => {
-    if (needsFunctionSelection) {
-      openFunctionGateModal();
-    }
-  }, [needsFunctionSelection, openFunctionGateModal]);
-
-  // pharmacy_owner의 승인 상태 확인
-  useEffect(() => {
-    if (!isPharmacyOwner) {
+    if (!user || isAdminOrOperator) {
       setApprovalStatus('none');
       return;
     }
+    // 중복 호출 방지
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+
     let cancelled = false;
     (async () => {
       try {
@@ -71,19 +63,16 @@ export function PharmacyPage() {
           const status = err?.status || err?.response?.status;
           console.error('[PharmacyPage] getMyRequests failed:', status, err?.message);
           if (status === 401) {
-            // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
-            // 401 시 interceptor가 토큰 정리 → 새로고침하면 user=null → 미로그인 화면 표시
             setApprovalError('인증이 만료되었습니다. 페이지를 새로고침해 주세요.');
-            setApprovalStatus('error');
           } else {
             setApprovalError(err?.message || '승인 상태를 확인할 수 없습니다.');
-            setApprovalStatus('error');
           }
+          setApprovalStatus('error');
         }
       }
     })();
     return () => { cancelled = true; };
-  }, [isPharmacyOwner]);
+  }, [user, isAdminOrOperator]);
 
   // 1. 미로그인
   if (!user) {
@@ -117,7 +106,7 @@ export function PharmacyPage() {
     );
   }
 
-  // 2. 관리자/운영자 → 약사 직능 선택 불필요, 접근 불가 표시
+  // 2. 관리자/운영자 → 접근 불가
   if (isAdminOrOperator) {
     return (
       <div style={styles.page}>
@@ -146,66 +135,7 @@ export function PharmacyPage() {
     );
   }
 
-  // 3. 직역 미설정 → 직능/직역 선택 모달 표시 (useEffect에서 모달 오픈)
-  if (!user.pharmacistRole) {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>💊</span>
-            </div>
-            <h1 style={styles.title}>직능/직역을 먼저 선택해 주세요</h1>
-            <p style={styles.desc}>
-              약국경영 서비스를 이용하려면<br />
-              약사 직능과 직역을 먼저 선택해야 합니다.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 4. 직역 != pharmacy_owner → 개설자 전용 안내
-  if (user.pharmacistRole !== 'pharmacy_owner') {
-    return (
-      <div style={styles.page}>
-        <div style={styles.container}>
-          <div style={styles.card}>
-            <div style={styles.iconWrap}>
-              <span style={styles.icon}>🔒</span>
-            </div>
-            <h1 style={styles.title}>약국 개설자 전용 서비스입니다</h1>
-            <p style={styles.desc}>
-              이 서비스는 약국을 개설하여 운영하는 회원만 이용할 수 있습니다.<br />
-              약국 개설자로 전환하려면 승인 신청이 필요합니다.
-            </p>
-            <div style={styles.infoBox}>
-              <p style={styles.infoText}>
-                <strong>약국 개설자 서비스란?</strong><br />
-                사이버 매장 관리, B2B 구매, 사이니지 콘텐츠 관리 등<br />
-                약국 운영에 필요한 경영지원 기능을 제공합니다.
-              </p>
-            </div>
-            <div style={styles.actions}>
-              <Link to="/pharmacy/approval" style={styles.joinBtn}>
-                약국 개설자 신청하기
-              </Link>
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                style={styles.backBtn}
-              >
-                돌아가기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 5. pharmacy_owner — 승인 상태에 따라 분기
+  // 3. API 로딩 중
   if (approvalStatus === 'loading') {
     return (
       <div style={styles.page}>
@@ -218,12 +148,12 @@ export function PharmacyPage() {
     );
   }
 
-  // 6. 승인 완료 → 내 매장관리로 이동 (WO-KPA-A-STORE-ROUTE-REALIGN-V1)
+  // 4. 승인 완료 → 내 매장관리로 이동 (pharmacistRole 무관, DB 기준)
   if (approvalStatus === 'approved') {
     return <Navigate to="/pharmacy/dashboard" replace />;
   }
 
-  // 7. 대기 중 → 대기 안내 화면
+  // 5. 대기 중 → 대기 안내 화면
   if (approvalStatus === 'pending') {
     return (
       <div style={styles.page}>
@@ -252,8 +182,7 @@ export function PharmacyPage() {
     );
   }
 
-  // 8. API 에러 → 새로고침 안내
-  // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1: 401 별도 분기 제거, AuthContext에 위임
+  // 6. API 에러 → 새로고침 안내
   if (approvalStatus === 'error') {
     return (
       <div style={styles.page}>
@@ -288,7 +217,7 @@ export function PharmacyPage() {
     );
   }
 
-  // 9. 미신청 → 신청 게이트로 이동
+  // 7. 미신청 → 신청 게이트로 이동
   return <Navigate to="/pharmacy/approval" replace />;
 }
 
