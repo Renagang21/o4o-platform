@@ -19,7 +19,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrganization } from '../../contexts';
-import { ContextGuard } from '../../components/common/ContextGuard';
 import {
   fetchChannelOverview,
   fetchStoreHubOverview,
@@ -436,11 +435,7 @@ function QuickBtn({ icon, label, onClick }: {
 // ── Export ──
 
 export function PharmacyDashboardPage() {
-  return (
-    <ContextGuard requiredType="pharmacy" fallbackPath="/pharmacy">
-      <PharmacyDashboardContent />
-    </ContextGuard>
-  );
+  return <PharmacyDashboardContent />;
 }
 
 // ── Styles ──

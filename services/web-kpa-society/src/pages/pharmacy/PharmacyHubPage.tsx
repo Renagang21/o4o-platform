@@ -11,7 +11,6 @@
  */
 
 import { useOrganization } from '../../contexts';
-import { ContextGuard } from '../../components/common/ContextGuard';
 import { ActiveServicesSection } from './sections/ActiveServicesSection';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
 
@@ -44,9 +43,5 @@ function PharmacyHubContent() {
 }
 
 export function PharmacyHubPage() {
-  return (
-    <ContextGuard requiredType="pharmacy" fallbackPath="/pharmacy">
-      <PharmacyHubContent />
-    </ContextGuard>
-  );
+  return <PharmacyHubContent />;
 }
