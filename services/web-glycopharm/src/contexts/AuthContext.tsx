@@ -87,6 +87,7 @@ interface AuthContextType {
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   availableRoles: UserRole[];
+  updateUser: (updates: Partial<User>) => void;
   // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -301,6 +302,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateUser = (updates: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
   const switchRole = selectRole;
   const hasMultipleRoles = availableRoles.length > 1;
 
@@ -368,6 +375,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         switchRole,
         hasMultipleRoles,
         availableRoles,
+        updateUser,
         // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,

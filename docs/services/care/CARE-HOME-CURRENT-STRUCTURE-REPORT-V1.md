@@ -1,346 +1,328 @@
 # CARE-HOME-CURRENT-STRUCTURE-REPORT-V1
 
-> **Status**: 현재 상태 기록 (2026-02-20)
-> **대상**: Care Home (CareDashboardPage) 전수 조사
+> **WO-CARE-HOME-CURRENT-STATE-INVESTIGATION-V1**
+> 작성일: 2026-02-20 (갱신)
+> 대상: https://glycopharm.co.kr/ (pharmacy 역할 로그인 시 홈 화면)
+> 상태: 현 개발 상태 전수 조사 (수정 제안 없음)
 
 ---
 
 ## 1. 컴포넌트 트리 다이어그램
 
-Care Home은 **2개 서비스**에 각각 독립 구현되어 있다.
-
-### web-glucoseview (GlucoseView)
-
 ```
-App.tsx
-└─ <Layout />                         ← 공통 레이아웃 (nav + footer)
-   └─ <ProtectedRoute>
-      └─ <CareDashboardPage />         ← pages/CareDashboardPage.tsx (199줄)
-```
-
-- **라우트**: `/care/dashboard`
-- **네비게이션**: Layout.tsx navItems 4번째 항목 `{ path: '/care/dashboard', label: 'Dashboard', protected: true }`
-- **Layout**: 고정 상단 nav (`fixed top-0`, h-14) + `<Outlet />` + footer
-- **보호**: `ProtectedRoute` (인증 + 승인 필수)
-
-### web-glycopharm (GlycoPharm)
-
-```
-App.tsx
-└─ <MainLayout />
-   └─ <RoleBasedHome />
-      └─ user.roles[0] === 'pharmacy'
-         → <CareDashboardPage />       ← pages/care/CareDashboardPage.tsx (263줄)
+BrowserRouter
+└── AuthProvider
+    └── LoginModalProvider
+        └── Suspense
+            └── AppRoutes
+                └── MainLayout
+                    ├── Header (sticky top-0)
+                    │   ├── 로고: GlycoPharm (혈당관리 전문 플랫폼)
+                    │   ├── Desktop Nav: 홈 | 포럼 | 교육/자료 | 참여 신청 | 디지털 사이니지 | [약국 관리]
+                    │   └── User Menu 드롭다운: 사용자명/이메일 | 마이페이지 | [약국 관리] | 로그아웃
+                    │
+                    ├── <Outlet /> ← RoleBasedHome
+                    │   └── user.roles[0] === 'pharmacy'
+                    │       → CareDashboardPage (인라인 렌더링)
+                    │
+                    └── Footer
 ```
 
-- **라우트**: `/` (pharmacy 역할 사용자의 기본 홈 화면)
-- **네비게이션**: 별도 care/dashboard 경로 없음. `/`에서 역할 기반으로 렌더링
-- **Layout**: `MainLayout` (Outlet 기반)
-- **보호**: `RoleBasedHome` 내부에서 역할 분기 (pharmacy 역할만 CareDashboardPage 노출)
-- **lazy loading**: `lazy(() => import('@/pages/care').then(...))`
+### 렌더링 경로
+
+```
+URL: https://glycopharm.co.kr/
+→ App.tsx line 252: <Route index element={<RoleBasedHome />} />
+  → RoleBasedHome (line 205-229)
+    → user.roles[0] === 'pharmacy' → <CareDashboardPage />
+    → 비로그인/기타 역할 → <HomePage />
+```
+
+- **lazy loading**: `lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })))`
+- **보호**: RoleBasedHome 내부 역할 분기 (별도 ProtectedRoute 없음)
+
+**파일**: `services/web-glycopharm/src/App.tsx` (499줄)
 
 ---
 
 ## 2. 섹션 순서 명시
 
-### GlucoseView CareDashboardPage — 렌더 순서
+CareDashboardPage.tsx (315줄) JSX 렌더링 순서:
 
-| # | 섹션명 | 컴포넌트/JSX 블록 | 조건부 렌더링 |
-|---|--------|-------------------|---------------|
-| 1 | Header | `<div className="bg-white border-b">` h1 + subtitle | 없음 (항상) |
-| 2 | KPI Cards | `grid grid-cols-2 lg:grid-cols-4` | 없음 (항상) |
-| 3 | Risk Distribution | `위험군 분포` 카드 + stacked bar | `totalRisk === 0` → "아직 분석 기록이 없습니다" |
-| 4 | Recent Analysis | `최근 분석` 리스트 (좌 컬럼) | `recentSnapshots.length === 0` → "분석 기록이 없습니다" |
-| 5 | Recent Coaching | `최근 상담` 리스트 (우 컬럼) | `recentSessions.length === 0` → "상담 기록이 없습니다" |
+| # | 섹션명 | 위치 (line) | 조건부 렌더링 |
+|---|--------|-------------|-------------|
+| 1 | Hero Header | 128-134 | 없음 (항상) |
+| 2 | KPI Row (4카드) | 138-186 | 없음 (항상) |
+| 3 | Action Bar | 189-224 | 없음 (항상) |
+| 4 | Error Banner | 227-231 | `error !== null` |
+| 5 | Patient Table | 234-310 | 없음 (항상, 내부 3분기) |
 
-### GlycoPharm CareDashboardPage — 렌더 순서
-
-| # | 섹션명 | 컴포넌트/JSX 블록 | 조건부 렌더링 |
-|---|--------|-------------------|---------------|
-| 1 | Header (Gradient) | `bg-gradient-to-br from-primary-600` + 인사말 + 새로고침 | 없음 (항상) |
-| 2 | Error Banner | `bg-amber-50 border-amber-200` | `error` 존재 시만 |
-| 3 | Care Summary Cards | `grid grid-cols-2 lg:grid-cols-4` (4장) | 없음 (항상) |
-| 4 | Activity Summary | `grid md:grid-cols-2` (최근 상담 + 개선 중) | 없음 (항상) |
-| 5 | Quick Actions | `grid grid-cols-2 md:grid-cols-4` (4개 링크) | 없음 (항상) |
-| 6 | Info Banner | `bg-gradient-to-r from-primary-50 to-violet-50` | 없음 (항상) |
+**하위 컴포넌트**: **없음**. 전체가 단일 파일 인라인 JSX.
 
 ---
 
 ## 3. KPI 카드 구성
 
-### GlucoseView — 4장 (1행)
+### 4장 (1행, grid-cols-2 → lg:grid-cols-4)
 
-| 카드 | 데이터 필드 | 계산 위치 | border 색상 | 로딩 처리 | Skeleton |
-|------|------------|-----------|-------------|-----------|----------|
-| 관리 환자 | `data.totalPatients` | API (서버) | slate-200 | 없음 (전체 로딩) | 없음 |
-| 고위험 환자 | `data.highRiskCount` | API (서버) | red-200 | 없음 | 없음 |
-| 최근 7일 상담 | `data.recentCoachingCount` | API (서버) | slate-200 | 없음 | 없음 |
-| 개선 환자 | `data.improvingCount` | API (서버) | green-200 | 없음 | 없음 |
+| 순서 | 타이틀 | 아이콘 | 아이콘 배경 | 값 색상 | 데이터 필드 | Fallback |
+|------|--------|--------|-----------|---------|-----------|---------|
+| 1 | 전체 환자 | `Users` | bg-primary-50 | text-slate-900 | `summary?.totalPatients` | `patients.length` |
+| 2 | 고위험 | `AlertTriangle` | bg-red-50 | text-red-600 | `summary?.highRiskCount` | `0` |
+| 3 | 주의 | `AlertCircle` | bg-amber-50 | text-amber-600 | `summary?.moderateRiskCount` | `0` |
+| 4 | 최근 7일 상담 | `MessageCircle` | bg-blue-50 | text-slate-900 | `summary?.recentCoachingCount` | `0` |
 
-- Grid: `grid-cols-2 lg:grid-cols-4`
-- 카드 스타일: `bg-white rounded-xl border p-6`
-- 숫자 스타일: `text-3xl font-bold`
-- Skeleton/개별 로딩 **없음** — 전체 페이지 로딩 spinner만 존재
+### 카드 공통 스타일
 
-### GlycoPharm — 4장 (1행) + 2장 (Activity)
+```
+div.bg-white.rounded-2xl.shadow-sm.p-5.border.border-slate-200
+├── div.flex.items-center.gap-3.mb-2
+│   ├── div.w-9.h-9.rounded-lg (아이콘 배경)
+│   │   └── Icon (w-5 h-5)
+│   └── p.text-sm.text-slate-500 (타이틀)
+└── p.text-3xl.font-bold (값)
+```
 
-**상단 4장:**
-
-| 카드 | 데이터 필드 | 계산 위치 | 아이콘 | 서브텍스트 |
-|------|------------|-----------|--------|-----------|
-| 전체 환자 | `stats.totalPatients` | API (서버) | `Users` (primary) | "등록된 관리 환자" |
-| 고위험 | `stats.highRiskCount` | API (서버) | `AlertTriangle` (red) | "즉시 관리 필요" |
-| 주의 필요 | `stats.moderateRiskCount` | API (서버) | `AlertCircle` (amber) | "정기 모니터링" |
-| 양호 | `stats.lowRiskCount` | API (서버) | `CheckCircle` (green) | "안정적인 관리" |
-
-- Grid: `grid-cols-2 lg:grid-cols-4`
-- 카드 스타일: `bg-white rounded-2xl shadow-sm p-5`
-- 아이콘: `w-10 h-10 rounded-xl` 색상 배경 + lucide icon
-- Skeleton **없음**
-
-**Activity 2장:**
-
-| 카드 | 데이터 필드 | 서브텍스트 | 링크 |
-|------|------------|-----------|------|
-| 최근 상담 | `stats.recentCoachingCount` | "지난 7일간 상담 세션" | → `/patients` "상세보기" |
-| 개선 중 | `stats.improvingCount` | "혈당 조절 개선 환자" | → `/patients` "상세보기" |
-
-- Grid: `grid md:grid-cols-2`
-- 숫자: `text-4xl font-bold`
+| 항목 | 값 |
+|------|------|
+| 카드 컴포넌트 | 인라인 JSX (공용 카드 컴포넌트 미사용) |
+| 계산 위치 | API (CareDashboardSummary) |
+| 로딩 처리 | **없음** (KPI 카드에 로딩/스피너 없음) |
+| Skeleton | **없음** |
+| 클릭 동작 | **없음** (KPI 카드는 네비게이션 없음) |
 
 ---
 
 ## 4. 데이터 흐름 다이어그램
 
-### GlucoseView
+### API 호출 구조
 
 ```
-CareDashboardPage
-  │
-  └─ useEffect (mount) ─── 1 API call
-       │
-       └─ api.getCareDashboard()
-            GET /api/v1/care/dashboard
-            │
-            └─ 반환: CareDashboardDto
-                {
-                  totalPatients: number,      ← glucoseview_customers COUNT
-                  highRiskCount: number,       ← care_kpi_snapshots 최신 risk_level='high' 수
-                  moderateRiskCount: number,   ← care_kpi_snapshots 최신 risk_level='moderate' 수
-                  lowRiskCount: number,        ← care_kpi_snapshots 최신 risk_level='low' 수
-                  recentCoachingCount: number, ← care_coaching_sessions 7일 이내 COUNT
-                  improvingCount: number,      ← 최신 TIR > 이전 TIR 환자 수
-                  recentSnapshots: Array<{patientId, riskLevel, createdAt}>,  ← 최근 5건
-                  recentSessions: Array<{patientId, summary, createdAt}>,     ← 최근 5건
-                }
+loadData() [useCallback, dep: debouncedSearch]
+├── setLoading(true), setError(null)
+├── Promise.all([
+│   ├── pharmacyApi.getCustomers({ search, pageSize: 100 })
+│   │   → GET /api/v1/glycopharm/pharmacy/customers
+│   │   → StoreApiResponse<StorePaginatedResponse<PharmacyCustomer>>
+│   │
+│   └── pharmacyApi.getCareDashboardSummary().catch(() => null)
+│       → GET /api/v1/care/dashboard
+│       → CareDashboardSummary (직접 반환, StoreApiResponse 미래핑)
+│])
+├── setPatients(items), setSummary(result)
+├── catch → setError('환자 정보를 불러오는데 실패했습니다.'), setPatients([])
+└── finally → setLoading(false)
 ```
 
-**상태 관리:**
-- `data: CareDashboardDto | null` — 단일 state
-- `loading: boolean`
-- `error: string | null`
-- API 호출: 1회, 비병렬 (단일 엔드포인트)
-- 에러 처리: try/catch → setError 문자열
-- 토큰: `ApiService.token` (Bearer)
+| 항목 | 값 |
+|------|------|
+| API 호출 수 | **2개** |
+| 병렬 호출 | ✅ `Promise.all` |
+| 재호출 트리거 | `debouncedSearch` 변경 시 |
+| 인증 | Bearer Token (pharmacyApi 내부, getAccessToken()) |
 
-### GlycoPharm
+### 반환 데이터 구조
 
-```
-CareDashboardPage
-  │
-  ├─ useAuth() → user (인사말용)
-  │
-  └─ useCallback(fetchData) ── useEffect(mount) ─── 1 API call
-       │
-       └─ pharmacyApi.getCareDashboardSummary()
-            GET /api/v1/care/dashboard
-            │
-            └─ 반환: CareDashboardSummary
-                {
-                  totalPatients: number,
-                  highRiskCount: number,
-                  moderateRiskCount: number,
-                  lowRiskCount: number,
-                  recentCoachingCount: number,
-                  improvingCount: number,
-                }
-                ⚠ recentSnapshots, recentSessions 필드 없음 (타입에 미포함)
+**CareDashboardSummary** (`GET /api/v1/care/dashboard`):
+
+```typescript
+{
+  totalPatients: number;
+  highRiskCount: number;
+  moderateRiskCount: number;
+  lowRiskCount: number;
+  recentCoachingCount: number;
+  improvingCount: number;            // ⚠ 화면에서 미사용
+  recentSnapshots: Array<{
+    patientId: string;
+    riskLevel: string;
+    createdAt: string;
+  }>;
+}
 ```
 
-**상태 관리:**
-- `data: CareDashboardSummary | null`
-- `loading: boolean`
-- `error: string | null`
-- API 호출: 1회
-- **에러 fallback**: API 실패 시 모든 필드 0으로 채운 fallback 객체 set + error 메시지 표시
-- 토큰: `getAccessToken()` (localStorage Bearer)
-- **새로고침 버튼** 존재: `fetchData()` 재호출
+**PharmacyCustomer** (`GET /api/v1/glycopharm/pharmacy/customers`):
 
-### 백엔드 — care-dashboard.controller.ts
+```typescript
+{
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  diabetesType?: 'type1' | 'type2' | 'gestational' | 'prediabetes';
+  lastOrderAt?: string;
+  totalOrders: number;
+  totalSpent: number;
+  status: 'active' | 'inactive';
+  createdAt: string;
+}
+```
+
+### 데이터 파생 (useMemo / 함수)
+
+| 파생 데이터 | 소스 | 방식 | 용도 |
+|-----------|------|------|------|
+| `snapshotMap` | `summary.recentSnapshots` | `useMemo` → `Map<patientId, {riskLevel, createdAt}>` | 환자별 위험도/분석일 조회 |
+| `getRisk(patient)` | `snapshotMap.get(patient.id)` | 함수, fallback: `'low'` | 테이블 위험도 뱃지 |
+| `getAnalysisDate(patient)` | `snapshotMap.get(patient.id)` | 함수, fallback: `null` | 테이블 최근 분석일 |
+| `filteredPatients` | `patients` + `riskFilter` | 클라이언트 사이드 필터링 | 테이블 렌더링 대상 |
+
+### useEffect 구조
 
 ```
-GET /api/v1/care/dashboard
-  │
-  ├─ middleware: authenticate → requirePharmacyContext
-  │   └─ pharmacyId 결정 (admin은 null = 전체, pharmacy는 자기 약국)
-  │
-  └─ buildDashboard(dataSource, pharmacyId, userId)
-       │
-       ├─ A. totalPatients: SELECT COUNT(*) FROM glucoseview_customers [WHERE pharmacist_id=$1]
-       ├─ B. risk분포: care_kpi_snapshots → 환자별 최신 스냅샷의 risk_level 집계
-       ├─ C. recentCoachingCount: care_coaching_sessions 7일 이내 COUNT
-       ├─ D. improvingCount: 최신 TIR > 이전 TIR CTE 쿼리
-       ├─ E. recentSnapshots: 최근 5건 (patient_id, risk_level, created_at)
-       └─ F. recentSessions: 최근 5건 (patient_id, summary, created_at)
+useEffect #1 [searchQuery]
+  → setTimeout 300ms → setDebouncedSearch
 
-  총 6개 SQL 쿼리 (순차 실행, 병렬 아님)
-  Pharmacy-scoped: 모든 쿼리에 pharmacy_id 필터 적용
-  Admin: pharmacy_id IS NULL → 전체 데이터
+useEffect #2 [loadData]
+  → loadData() 실행
+  (loadData는 useCallback([debouncedSearch]))
 ```
+
+### 상태 관리
+
+| State | 타입 | 초기값 | 용도 |
+|-------|------|--------|------|
+| `patients` | `PharmacyCustomer[]` | `[]` | 환자 목록 (테이블 데이터) |
+| `summary` | `CareDashboardSummary \| null` | `null` | KPI + snapshotMap 소스 |
+| `loading` | `boolean` | `true` | 테이블 로딩 상태 |
+| `error` | `string \| null` | `null` | 에러 배너 메시지 |
+| `searchQuery` | `string` | `''` | 검색 입력값 (즉시) |
+| `debouncedSearch` | `string` | `''` | 디바운스된 검색값 (300ms) |
+| `riskFilter` | `RiskLevel` | `'all'` | 위험도 필터 (all/high/moderate/low) |
 
 ---
 
 ## 5. 상태 분기 표
 
-### GlucoseView
+### Patient Table 3분기
 
-| 상태 | UI 동작 |
-|------|---------|
-| **로딩 중** | 전체 화면 spinner (`border-2 border-blue-500 animate-spin`) + "대시보드 로딩 중..." |
-| **에러 또는 data=null** | 헤더("Care Dashboard") + 에러 메시지 + "다시 시도" 버튼 (`window.location.reload()`) |
-| **환자 0명** | totalPatients=0 표시, KPI 카드는 정상 렌더 (숫자 0) |
-| **Snapshot 0건** | Risk Distribution: "아직 분석 기록이 없습니다" / 최근 분석: "분석 기록이 없습니다" |
-| **Coaching 0건** | 최근 상담: "상담 기록이 없습니다" |
-| **Risk total=0** | Risk bar 미렌더링, 범례 미표시 (조건부) |
+| 조건 | 렌더링 |
+|------|--------|
+| `loading === true` | `Loader2` 스피너 (py-16 중앙, text-primary-600 animate-spin) |
+| `filteredPatients.length === 0` | 텍스트 메시지 (py-16 중앙) |
+| `filteredPatients.length > 0` | `<table>` (5컬럼) |
 
-### GlycoPharm
+### 빈 상태 메시지 분기
 
-| 상태 | UI 동작 |
-|------|---------|
-| **로딩 중** | 중앙 `Loader2` spinner (`text-primary-600 animate-spin`) |
-| **에러** | **fallback 데이터** (모든 값 0) 세팅 + amber Error Banner 표시 → 카드는 정상 렌더 |
-| **환자 0명** | 카드에 숫자 0 표시, 별도 empty state 없음 |
-| **Coaching 0건** | Activity "최근 상담" 카드에 숫자 0 |
-| **데이터 성공** | Header(인사말) + 4 KPI + 2 Activity + Quick Actions + Info Banner |
+| 조건 | 메시지 |
+|------|--------|
+| 검색어 or 필터 활성 | "조건에 맞는 환자가 없습니다." |
+| 그 외 (기본) | "등록된 환자가 없습니다." |
 
-**핵심 차이**: GlucoseView는 에러 시 **전체 교체** (에러 화면), GlycoPharm은 에러 시 **fallback 데이터로 카드 렌더 + 배너 경고**
+### 상태별 전체 UI 동작
+
+| 상태 | Hero Header | KPI Row | Action Bar | Error Banner | Patient Table |
+|------|------------|---------|------------|-------------|--------------|
+| **로딩 중** | ✅ 표시 | summary=null → fallback (patients.length/0/0/0) | ✅ 표시 | 숨김 | Spinner |
+| **환자 0명** | ✅ 표시 | totalPatients=0, 나머지=0 | ✅ 표시 | 숨김 | "등록된 환자가 없습니다." |
+| **Snapshot 0건** | ✅ 표시 | KPI 정상 | ✅ 표시 | 숨김 | 모든 환자 위험도='양호', 분석일='-' |
+| **Coaching 0건** | ✅ 표시 | 최근 7일 상담=0 | ✅ 표시 | 숨김 | 최근 상담='-' (항상 하드코딩 '-') |
+| **customers API 실패** | ✅ 표시 | summary=null → fallback | ✅ 표시 | ✅ "환자 정보를 불러오는데 실패했습니다." | "등록된 환자가 없습니다." |
+| **summary API 실패** | ✅ 표시 | summary=null → fallback | ✅ 표시 | 숨김 (catch → null) | 모든 환자 위험도='양호', 분석일='-' |
+
+**핵심**: summary API 실패는 에러 배너 미표시 (`.catch(() => null)`). customers API 실패만 에러 배너 표시.
 
 ---
 
-## 6. Store/HUB 연결 요소 존재 여부
-
-### GlucoseView CareDashboardPage
+## 6. Store / HUB 연결 요소 존재 여부
 
 | 항목 | 존재 여부 | 상세 |
-|------|-----------|------|
-| Store 관련 KPI | **없음** | Store 데이터 참조 없음 |
-| Store 이동 버튼 | **없음** | |
-| HUB 연결 UI | **없음** | |
-| 외부 URL 이동 | **있음** | `<Link to="/insights">` (최근 분석/상담 → "전체 보기") |
+|------|----------|------|
+| Store 관련 KPI | **없음** | 매출/주문/상품 등 Store 데이터 참조 없음 |
+| Store 이동 버튼 | **없음** | CareDashboardPage 내부에 `/store` 링크 없음 |
+| HUB 연결 UI | **없음** | HUB 관련 import/컴포넌트 없음 |
+| Quick Actions | **없음** | Quick Actions 섹션 없음 |
+| Activity Summary | **없음** | Activity 카드 섹션 없음 |
+| Info Banner | **없음** | 하단 배너 없음 |
+| 새로고침 버튼 | **없음** | RefreshCw 아이콘/버튼 없음 |
+| 인사말 | **없음** | useAuth/user 참조 없음 |
 
-### GlycoPharm CareDashboardPage
+### 내부 네비게이션
 
-| 항목 | 존재 여부 | 상세 |
-|------|-----------|------|
-| Store 관련 KPI | **없음** | Care 데이터만 사용 |
-| Store 이동 버튼 | **있음** | Quick Actions → `NavLink to="/store"` "매장 허브" |
-| 상품 관리 이동 | **있음** | Quick Actions → `NavLink to="/store/products"` "상품 관리" |
-| HUB 연결 UI | **없음** | HUB 관련 import 없음 |
-| 환자 관리 이동 | **있음** | Quick Actions → `NavLink to="/patients"` + Activity 카드 → `/patients` |
-| 내 정보 이동 | **있음** | Quick Actions → `NavLink to="/mypage"` "내 정보" |
+| 동작 | 대상 경로 | 방식 |
+|------|----------|------|
+| "환자 등록" 버튼 (Action Bar) | `/patients` | `navigate('/patients')` |
+| 환자 행 클릭 (Table) | `/patients?id=${patient.id}` | `navigate(...)` (row onClick) |
 
-### Quick Actions (GlycoPharm) 상세
+### Header 네비게이션 (pharmacy 역할)
 
-| 순서 | 라벨 | 대상 경로 | 아이콘 |
-|------|------|-----------|--------|
-| 1 | 환자 관리 | `/patients` | `Users` |
-| 2 | 매장 허브 | `/store` | `Store` |
-| 3 | 상품 관리 | `/store/products` | `Activity` |
-| 4 | 내 정보 | `/mypage` | `Heart` |
+| 메뉴 | 경로 | 비고 |
+|------|------|------|
+| 홈 | `/` | CareDashboardPage 렌더링 |
+| 포럼 | `/forum` | 공용 |
+| 교육/자료 | `/education` | 공용 |
+| 참여 신청 | `/apply` | 공용 |
+| 디지털 사이니지 | `/signage` | 공용 |
+| 약국 관리 | `/pharmacy` | ⚠ 라우트 제거됨 (404) |
+| 마이페이지 | `/mypage` | 사용자 메뉴 드롭다운 |
 
----
-
-## 7. 관련 페이지 — 보조 조사
-
-### InsightsPage (GlucoseView only)
-
-- 경로: `/insights`
-- 역할: 환자 개별 분석 + KPI 비교 + 상담 기록
-- API: 3개 병렬 호출 (`getCareAnalysis`, `getCareKpi`, `getCoachingSessions`)
-- Care Dashboard의 "전체 보기" 링크 대상
-- 상담 기록 Modal 포함 (createCoachingSession)
-
-### PatientsPage (GlycoPharm only)
-
-- 경로: `/patients`
-- 역할: 환자 목록 + 상세 (탭 기반)
-- API: 2개 병렬 호출 (`getCustomers`, `getCareDashboardSummary`)
-- 위험도: **Mock 로직** (diabetesType 기반, Care API 미연동)
-- 탭 4개 중 3개 placeholder ("GlucoseView Care 모듈 연동 예정")
+**⚠ Header roleNavigation 불일치**: `pharmacy: { path: '/pharmacy' }` 정의되어 있으나,
+`/pharmacy` 라우트는 `WO-PHARMACY-FULL-REMOVAL-V1`로 제거됨. 클릭 시 404.
+Store 대시보드는 `/store`에 존재하나 Header에서 직접 링크 없음.
 
 ---
 
-## 8. 파일 인벤토리
+## 부록: Patient Table 컬럼 구조
+
+| 순서 | 컬럼 Header | 데이터 소스 | 정렬 | 비고 |
+|------|-----------|-----------|------|------|
+| 1 | 환자명 | patient.name + phone | 없음 | Avatar(이니셜 gradient) + 이름 + 연락처 |
+| 2 | 위험도 | getRisk(patient) → RISK_CONFIG | 없음 | Badge: 고위험(red)/주의(amber)/양호(green) |
+| 3 | 최근 분석일 | getAnalysisDate(patient) | 없음 | formatDate(ko-KR), null이면 '-' |
+| 4 | 최근 상담 | - | 없음 | **항상 '-'** (하드코딩, API 데이터 미연결) |
+| 5 | (빈 header) | - | - | ChevronRight 아이콘 (행 클릭 어포던스) |
+
+---
+
+## 부록: 상위 Layout 상세
+
+### MainLayout (15줄)
+
+```
+div.min-h-screen.flex.flex-col.bg-slate-50
+├── <Header /> (sticky)
+├── <main className="flex-1"> <Outlet /> </main>
+└── <Footer />
+```
+
+| 항목 | 값 |
+|------|------|
+| 사이드바 | **없음** |
+| 최대 너비 제한 | **없음** (Layout 레벨, CareDashboardPage 자체에서 max-w-7xl) |
+| 배경색 | bg-slate-50 |
+
+### CareDashboardPage 내부 레이아웃
+
+| 항목 | 값 |
+|------|------|
+| 최대 너비 | `max-w-7xl` (1280px) |
+| 패딩 | `px-4 sm:px-6` |
+| 섹션 간격 | `space-y-6` (24px) |
+| KPI Grid | `grid-cols-2 lg:grid-cols-4` |
+| 반응형 breakpoint | sm(패딩), lg(KPI 4열) |
+| Section Wrapper | **없음** (공통 래퍼 컴포넌트 미사용) |
+
+---
+
+## 부록: 핵심 파일 목록
 
 ### 프론트엔드
 
-| 파일 | 서비스 | 줄수 | 역할 |
-|------|--------|------|------|
-| `services/web-glucoseview/src/pages/CareDashboardPage.tsx` | GlucoseView | 199 | Dashboard 본체 |
-| `services/web-glucoseview/src/pages/InsightsPage.tsx` | GlucoseView | 364 | 환자별 분석+상담 |
-| `services/web-glucoseview/src/components/Layout.tsx` | GlucoseView | 296 | 상단 nav (Dashboard 메뉴 포함) |
-| `services/web-glucoseview/src/services/api.ts` | GlucoseView | 547 | API client (CareDashboardDto 정의 포함) |
-| `services/web-glycopharm/src/pages/care/CareDashboardPage.tsx` | GlycoPharm | 263 | Dashboard 본체 |
-| `services/web-glycopharm/src/pages/care/PatientsPage.tsx` | GlycoPharm | 400 | 환자 관리 |
-| `services/web-glycopharm/src/pages/care/index.ts` | GlycoPharm | 7 | barrel export |
-| `services/web-glycopharm/src/api/pharmacy.ts` | GlycoPharm | 521 | API client (CareDashboardSummary 정의 포함) |
+| 파일 | 줄수 | 역할 |
+|------|------|------|
+| `services/web-glycopharm/src/pages/care/CareDashboardPage.tsx` | 315 | Care Home 전체 |
+| `services/web-glycopharm/src/pages/care/index.ts` | 6 | Barrel export |
+| `services/web-glycopharm/src/App.tsx` | 499 | 라우트, RoleBasedHome |
+| `services/web-glycopharm/src/components/layouts/MainLayout.tsx` | 15 | 상위 Layout |
+| `services/web-glycopharm/src/components/common/Header.tsx` | 341 | 공용 Header |
+| `services/web-glycopharm/src/api/pharmacy.ts` | 526 | API 클라이언트 |
 
 ### 백엔드
 
 | 파일 | 줄수 | 역할 |
 |------|------|------|
-| `apps/api-server/src/modules/care/care-dashboard.controller.ts` | 188 | Dashboard 집계 API |
-| `apps/api-server/src/modules/care/care-analysis.controller.ts` | 65 | 환자별 분석 API |
-| `apps/api-server/src/modules/care/care-coaching.controller.ts` | 62 | 상담 CRUD API |
-| `apps/api-server/src/modules/care/care-pharmacy-context.middleware.ts` | 80 | 약국 스코프 미들웨어 |
-| `apps/api-server/src/modules/care/care-kpi-snapshot.service.ts` | 105 | 스냅샷 기록/비교 |
-| `apps/api-server/src/modules/care/care-coaching-session.service.ts` | 83 | 상담 세션 관리 |
-| `apps/api-server/src/modules/care/analysis.engine.ts` | 44 | TIR/CV/Risk 계산 |
-| `apps/api-server/src/modules/care/analysis.provider.ts` | 54 | AnalysisProvider + DefaultAnalysisProvider |
-| `apps/api-server/src/modules/care/ai-analysis.provider.ts` | 47 | AI 분석 Provider |
-| `apps/api-server/src/modules/care/cgm.provider.ts` | 9 | CgmProvider 인터페이스 |
-| `apps/api-server/src/modules/care/mock-cgm.provider.ts` | 92 | Mock CGM 데이터 생성 |
-| `apps/api-server/src/modules/care/dto.ts` | 8 | CareInsightDto |
-
-### 엔티티/마이그레이션
-
-| 파일 | 역할 |
-|------|------|
-| `entities/care-kpi-snapshot.entity.ts` | `care_kpi_snapshots` 테이블 (id, pharmacy_id, patient_id, tir, cv, risk_level, created_at) |
-| `entities/care-coaching-session.entity.ts` | `care_coaching_sessions` 테이블 (id, pharmacy_id, patient_id, pharmacist_id, snapshot_id, summary, action_plan, created_at) |
-| 4개 migration 파일 | 테이블 생성 + pharmacy_id 컬럼 추가 |
-
----
-
-## 9. 두 구현체 대비표
-
-| 항목 | GlucoseView | GlycoPharm |
-|------|-------------|------------|
-| 라우트 | `/care/dashboard` | `/` (pharmacy 역할 홈) |
-| KPI 카드 수 | 4장 (1행) | 4장 + 2 Activity (2행) |
-| KPI 카드 항목 | 환자/고위험/상담/개선 | 환자/고위험/주의/양호 + 상담/개선 |
-| Risk Distribution | **있음** (stacked bar + 범례) | **없음** |
-| Recent Analysis 리스트 | **있음** (최근 5건) | **없음** |
-| Recent Coaching 리스트 | **있음** (최근 5건) | **없음** |
-| Quick Actions | **없음** | **있음** (4개 NavLink) |
-| Info Banner | **없음** | **있음** ("GlycoPharm Care") |
-| 새로고침 버튼 | **없음** (에러 시 location.reload) | **있음** (RefreshCw 아이콘) |
-| 인사말 | **없음** | **있음** (`안녕하세요, {user.name}님`) |
-| 에러 처리 | 전체 교체 (에러 화면) | fallback 0 + 배너 경고 |
-| API DTO | `CareDashboardDto` (snapshots/sessions 포함) | `CareDashboardSummary` (숫자만) |
-| Layout | 공통 Layout (nav+footer) | MainLayout (Outlet) |
-| 아이콘 라이브러리 | 없음 (텍스트 only) | lucide-react |
-| 디자인 토큰 | 직접 tailwind (slate/blue) | primary-* 변수 + tailwind |
+| `apps/api-server/src/modules/care/care-dashboard.controller.ts` | 197 | Dashboard 집계 API |
+| `apps/api-server/src/modules/care/care-pharmacy-context.middleware.ts` | ~80 | 약국 스코프 미들웨어 |
 
 ---
 

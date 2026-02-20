@@ -1,10 +1,10 @@
 /**
  * Header - GlycoPharm 헤더
- * WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1: 중앙화된 LoginModal 사용
+ * WO-GLYCOPHARM-PUBLIC-MENU-UNIFICATION-V1: App 중심 4-메뉴 구조
  */
 
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import {
@@ -13,24 +13,26 @@ import {
   User,
   LogOut,
   ChevronDown,
-  Building2,
-  Truck,
-  Handshake,
-  Shield,
   Activity,
+  Home,
+  Users,
+  Store,
+  UserCircle,
 } from 'lucide-react';
 
-const roleNavigation: Record<string, { path: string; label: string; icon: typeof Building2 }> = {
-  pharmacy: { path: '/pharmacy', label: '약국 관리', icon: Building2 },
-  supplier: { path: '/supplier', label: '공급자 관리', icon: Truck },
-  partner: { path: '/partner', label: '파트너 관리', icon: Handshake },
-  operator: { path: '/operator', label: '운영자 관리', icon: Shield },
-};
+/** App 중심 메뉴 정의 */
+const appMenuItems = [
+  { path: '/', label: 'Home', icon: Home, end: true, requiresAuth: false },
+  { path: '/patients', label: '환자관리', icon: Users, end: false, requiresAuth: true },
+  { path: '/store', label: '약국 매장 허브', icon: Store, end: false, requiresAuth: true },
+  { path: '/mypage', label: '내정보', icon: UserCircle, end: false, requiresAuth: true },
+];
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -41,7 +43,27 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
-  const roleNav = user?.roles[0] ? roleNavigation[user.roles[0]] : null;
+  /** 인증 필요 메뉴 클릭 핸들러 */
+  const handleAuthNavClick = (path: string, requiresAuth: boolean, e: React.MouseEvent) => {
+    if (requiresAuth && !isAuthenticated) {
+      e.preventDefault();
+      openLoginModal();
+    }
+  };
+
+  /** NavLink 활성 스타일 (desktop) */
+  const desktopNavClass = (isActive: boolean) =>
+    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+      isActive
+        ? 'bg-primary-100 text-primary-700'
+        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+    }`;
+
+  /** NavLink 활성 스타일 (mobile) */
+  const mobileNavClass = (isActive: boolean) =>
+    `px-4 py-3 rounded-xl text-sm font-medium ${
+      isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
+    }`;
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/50">
@@ -58,77 +80,19 @@ export default function Header() {
             </div>
           </NavLink>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - App 4-메뉴 */}
           <nav className="hidden md:flex items-center gap-1">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`
-              }
-            >
-              홈
-            </NavLink>
-            <NavLink
-              to="/forum"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`
-              }
-            >
-              포럼
-            </NavLink>
-            <NavLink
-              to="/education"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`
-              }
-            >
-              교육/자료
-            </NavLink>
-            <NavLink
-              to="/apply"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`
-              }
-            >
-              참여 신청
-            </NavLink>
-            <NavLink
-              to="/signage"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                }`
-              }
-            >
-              디지털 사이니지
-            </NavLink>
-            {isAuthenticated && roleNav && (
+            {appMenuItems.map((item) => (
               <NavLink
-                to={roleNav.path}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                    ? 'bg-accent-100 text-accent-700'
-                    : 'text-accent-600 hover:bg-accent-50 hover:text-accent-700'
-                  }`
-                }
+                key={item.path}
+                to={item.path}
+                end={item.end}
+                className={({ isActive }) => desktopNavClass(isActive)}
+                onClick={(e) => handleAuthNavClick(item.path, item.requiresAuth, e)}
               >
-                {roleNav.label}
+                {item.label}
               </NavLink>
-            )}
+            ))}
           </nav>
 
           {/* Desktop User Actions */}
@@ -170,18 +134,8 @@ export default function Header() {
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <User className="w-4 h-4" />
-                        마이페이지
+                        내정보
                       </NavLink>
-                      {roleNav && (
-                        <NavLink
-                          to={roleNav.path}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <roleNav.icon className="w-4 h-4" />
-                          {roleNav.label}
-                        </NavLink>
-                      )}
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -228,90 +182,36 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t animate-fade-in">
             <nav className="flex flex-col gap-1">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                홈
-              </NavLink>
-              <NavLink
-                to="/forum"
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                포럼
-              </NavLink>
-              <NavLink
-                to="/education"
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                교육/자료
-              </NavLink>
-              <NavLink
-                to="/apply"
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                참여 신청
-              </NavLink>
-              <NavLink
-                to="/signage"
-                className={({ isActive }) =>
-                  `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-primary-100 text-primary-700' : 'text-slate-600'
-                  }`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                디지털 사이니지
-              </NavLink>
-              {isAuthenticated && roleNav && (
+              {appMenuItems.map((item) => (
                 <NavLink
-                  to={roleNav.path}
-                  className={({ isActive }) =>
-                    `px-4 py-3 rounded-xl text-sm font-medium ${isActive ? 'bg-accent-100 text-accent-700' : 'text-accent-600'
-                    }`
-                  }
-                  onClick={() => setMobileMenuOpen(false)}
+                  key={item.path}
+                  to={item.path}
+                  end={item.end}
+                  className={({ isActive }) => mobileNavClass(isActive)}
+                  onClick={(e) => {
+                    handleAuthNavClick(item.path, item.requiresAuth, e);
+                    if (!item.requiresAuth || isAuthenticated) {
+                      setMobileMenuOpen(false);
+                    }
+                  }}
                 >
-                  {roleNav.label}
+                  <span className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </span>
                 </NavLink>
-              )}
+              ))}
             </nav>
 
             <div className="mt-4 pt-4 border-t">
               {isAuthenticated ? (
-                <>
-                  <NavLink
-                    to="/mypage"
-                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <User className="w-5 h-5" />
-                    마이페이지
-                  </NavLink>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    로그아웃
-                  </button>
-                </>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600"
+                >
+                  <LogOut className="w-5 h-5" />
+                  로그아웃
+                </button>
               ) : (
                 <div className="flex flex-col gap-2 px-4">
                   <button
