@@ -87,11 +87,18 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
       return;
     }
 
+    if (!user?.id) {
+      const errorMsg = '사용자 정보를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해 주세요.';
+      alert(errorMsg);
+      options.onError?.(errorMsg);
+      closeCopyModal();
+      return;
+    }
+
     const sourceId = modalState.sourceId;
     closeCopyModal();
 
-    // For now, use user.id as dashboard ID
-    const targetDashboardId = user!.id;
+    const targetDashboardId = user.id;
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
@@ -139,9 +146,8 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
    * Legacy: Direct copy without modal (Phase 2-A compatibility)
    */
   const copy = useCallback(async (sourceId: string, copyOptions?: CopyOptions) => {
-    // Check if user is logged in
-    if (!user) {
-      const errorMsg = '로그인이 필요합니다.';
+    if (!user?.id) {
+      const errorMsg = !user ? '로그인이 필요합니다.' : '사용자 정보를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해 주세요.';
       setState(prev => ({ ...prev, error: errorMsg }));
       options.onError?.(errorMsg);
       alert(errorMsg);
