@@ -520,12 +520,9 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* News (공지/소식) - WO-FIX-NEWS-ROUTES: 모든 콘텐츠 타입 라우트 추가 */}
+          {/* News (공지사항) — 뉴스 게시판은 약사공론 연결 예정으로 제거 */}
           <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/hero" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/promo" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
 
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}

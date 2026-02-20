@@ -55,7 +55,7 @@ export function CommunityHomePage() {
     <div style={styles.page}>
       <HeroSection />
       <div style={styles.content}>
-        <NoticeSection prefetchedNotices={data?.notices} prefetchedNews={data?.news} loading={loading} />
+        <NoticeSection prefetchedNotices={data?.notices} loading={loading} />
         <ActivitySection
           prefetchedPosts={data?.community.posts}
           prefetchedFeatured={data?.community.featured}
