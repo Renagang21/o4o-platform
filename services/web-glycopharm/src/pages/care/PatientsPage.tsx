@@ -1,12 +1,12 @@
 /**
  * PatientsPage - 환자 목록 관리
  *
- * WO-CARE-PATIENTS-LAYOUT-PHASE1-V1
+ * WO-CARE-PATIENTS-SORTING-PHASE1-V1
  *
- * Phase 1: 단일 컬럼 테이블 구조
- * - Split layout / 상세 패널 / 탭 제거
+ * Phase 1: 단일 컬럼 테이블 + 기본 정렬
+ * - 기본 정렬: 최근 분석일 desc (fallback: 마지막 주문일 → createdAt)
+ * - 클릭 시 정렬 방향 전환
  * - Care Home과 UI 구조 통일
- * - 기존 API만 사용 (백엔드 수정 없음)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -20,6 +20,8 @@ import {
   AlertTriangle,
   AlertCircle,
   CheckCircle,
+  ArrowDown,
+  ArrowUp,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
 
@@ -47,6 +49,7 @@ export default function PatientsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [riskFilter, setRiskFilter] = useState<RiskLevel>('all');
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
   // Debounce search input
   useEffect(() => {
@@ -97,9 +100,24 @@ export default function PatientsPage() {
     return getRisk(p) === riskFilter;
   });
 
+  // Sort: 최근 분석일 → 마지막 주문일 → createdAt (fallback chain)
+  const getSortDate = (p: PharmacyCustomer): number => {
+    // Phase 1: analysisDate 없음, fallback to lastOrderAt → createdAt
+    if (p.lastOrderAt) return new Date(p.lastOrderAt).getTime();
+    return new Date(p.createdAt).getTime();
+  };
+
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    const dateA = getSortDate(a);
+    const dateB = getSortDate(b);
+    return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+  });
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR');
   };
+
+  const SortIcon = sortDirection === 'desc' ? ArrowDown : ArrowUp;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -176,7 +194,7 @@ export default function PatientsPage() {
             <div className="flex items-center justify-center py-16">
               <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
             </div>
-          ) : filteredPatients.length === 0 ? (
+          ) : sortedPatients.length === 0 ? (
             <div className="text-center py-16">
               <Users className="w-12 h-12 text-slate-200 mx-auto mb-3" />
               <p className="text-slate-500">
@@ -201,6 +219,15 @@ export default function PatientsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     위험도
                   </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider cursor-pointer select-none hover:text-primary-600 transition-colors"
+                    onClick={() => setSortDirection((d) => d === 'desc' ? 'asc' : 'desc')}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      최근 분석일
+                      <SortIcon className="w-3.5 h-3.5" />
+                    </span>
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     마지막 주문
                   </th>
@@ -212,7 +239,7 @@ export default function PatientsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredPatients.map((patient) => {
+                {sortedPatients.map((patient) => {
                   const risk = getRisk(patient);
                   const config = RISK_CONFIG[risk];
                   return (
@@ -244,6 +271,7 @@ export default function PatientsPage() {
                           {config.label}
                         </span>
                       </td>
+                      <td className="px-6 py-4 text-sm text-slate-400">-</td>
                       <td className="px-6 py-4 text-slate-500">
                         {patient.lastOrderAt ? formatDate(patient.lastOrderAt) : '-'}
                       </td>
