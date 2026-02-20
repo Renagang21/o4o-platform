@@ -16,6 +16,7 @@ import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import jwt from 'jsonwebtoken';
 import logger from '../../utils/logger.js';
+import { cacheGetOrSet } from '../../infrastructure/cache.service.js';
 
 // ============================================================================
 // Types
@@ -279,6 +280,10 @@ async function buildStorePreview(
 export function createHomePreviewRouter(dataSource: DataSource): Router {
   const router = Router();
 
+  // WO-INFRA-REDIS-FOUNDATION-V1: Global aggregate TTL
+  const GLOBAL_CACHE_KEY = 'home_preview_global';
+  const GLOBAL_CACHE_TTL = 120; // seconds
+
   router.get('/preview', optionalAuthenticate, async (req: Request, res: Response) => {
     try {
       const user = (req as any).user;
@@ -290,6 +295,25 @@ export function createHomePreviewRouter(dataSource: DataSource): Router {
         pharmacyId = await resolvePharmacyId(dataSource, userId);
       }
 
+      // Global (비로그인) → Redis 캐시, Pharmacy-scoped → 실시간
+      const isGlobal = !pharmacyId;
+
+      if (isGlobal) {
+        const data = await cacheGetOrSet<HomePreviewData>(
+          GLOBAL_CACHE_KEY,
+          GLOBAL_CACHE_TTL,
+          async () => {
+            const [care, store] = await Promise.all([
+              buildCarePreview(dataSource, null, null),
+              buildStorePreview(dataSource, null, null),
+            ]);
+            return { care, store };
+          },
+        );
+        return res.json({ success: true, data });
+      }
+
+      // Pharmacy-scoped: 캐시 없이 실시간
       const [care, store] = await Promise.all([
         buildCarePreview(dataSource, pharmacyId, userId),
         buildStorePreview(dataSource, pharmacyId, userId),
