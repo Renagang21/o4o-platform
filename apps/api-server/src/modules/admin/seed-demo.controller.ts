@@ -14,34 +14,9 @@
  */
 
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
 import logger from '../../utils/logger.js';
-
-// ============================================================================
-// Admin Secret Key Auth (fallback for CLI operations)
-// ============================================================================
-
-/**
- * Admin auth middleware: JWT (authenticate+requireAdmin) OR X-Admin-Secret header.
- * Secret is JWT_SECRET env var — same as token signing key, admin-only knowledge.
- */
-function adminOrSecretAuth(req: Request, res: Response, next: NextFunction) {
-  const secret = req.headers['x-admin-secret'] as string;
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (secret && jwtSecret && secret === jwtSecret) {
-    return next();
-  }
-
-  // Fallback to standard JWT auth
-  authenticate(req, res, (err?: any) => {
-    if (err) return next(err);
-    requireAdmin(req, res, next);
-  });
-}
 
 // ============================================================================
 // Demo UUIDs (hex-safe, deterministic for idempotency)
@@ -381,13 +356,29 @@ async function cleanupDemoData(ds: DataSource): Promise<{ deleted: string[] }> {
 // Router Factory
 // ============================================================================
 
+/**
+ * Verify admin access: X-Admin-Secret header must match JWT_SECRET.
+ * Returns true if authorized, sends 401 and returns false if not.
+ */
+function verifyAdminSecret(req: Request, res: Response): boolean {
+  const secret = req.headers['x-admin-secret'] as string;
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (secret && jwtSecret && secret === jwtSecret) {
+    return true;
+  }
+
+  res.status(401).json({ success: false, error: 'Invalid admin secret', code: 'ADMIN_SECRET_REQUIRED' });
+  return false;
+}
+
 export function createSeedDemoRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.use(adminOrSecretAuth);
-
   // POST /api/v1/admin/seed-demo — 데모 데이터 생성
-  router.post('/', async (_req: Request, res: Response) => {
+  router.post('/', async (req: Request, res: Response) => {
+    if (!verifyAdminSecret(req, res)) return;
+
     try {
       logger.info('[SeedDemo] Starting demo data seed...');
       const result = await seedDemoData(dataSource);
@@ -408,7 +399,9 @@ export function createSeedDemoRouter(dataSource: DataSource): Router {
   });
 
   // DELETE /api/v1/admin/seed-demo — 데모 데이터 삭제
-  router.delete('/', async (_req: Request, res: Response) => {
+  router.delete('/', async (req: Request, res: Response) => {
+    if (!verifyAdminSecret(req, res)) return;
+
     try {
       logger.info('[SeedDemo] Starting demo data cleanup...');
       const result = await cleanupDemoData(dataSource);
