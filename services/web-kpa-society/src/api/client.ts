@@ -10,6 +10,7 @@
  */
 
 import { getAccessToken } from '../contexts/AuthContext';
+import { tryRefreshToken } from './token-refresh';
 
 // VITE_API_BASE_URL is set via Docker build-arg in deploy workflow
 // Default: /api/v1/kpa (relative path for local development)
@@ -68,6 +69,18 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        // 401: 토큰 갱신 후 재시도
+        if (response.status === 401) {
+          const newToken = await tryRefreshToken();
+          if (newToken) {
+            const retryResponse = await fetch(url, {
+              ...fetchOptions,
+              headers: { ...headers, 'Authorization': `Bearer ${newToken}` },
+            });
+            if (retryResponse.ok) return retryResponse.json() as Promise<T>;
+          }
+        }
+
         const body = await response.json().catch(() => ({ message: 'Network error' }));
         const error: any = new Error(body.message || body.error || `HTTP error! status: ${response.status}`);
         error.status = response.status;

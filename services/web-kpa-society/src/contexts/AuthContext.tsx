@@ -287,6 +287,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [checkAuth]);
 
+  // 토큰 갱신 실패 시 user 상태 정리 (api/token-refresh.ts에서 이벤트 발행)
+  useEffect(() => {
+    const handleTokenCleared = () => setUser(null);
+    window.addEventListener('auth:token-cleared', handleTokenCleared);
+    return () => window.removeEventListener('auth:token-cleared', handleTokenCleared);
+  }, []);
+
   const login = async (email: string, password: string): Promise<User> => {
     const response = await authClient.login({ email, password });
 

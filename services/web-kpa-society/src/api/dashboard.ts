@@ -9,6 +9,7 @@
  */
 
 import { getAccessToken } from '../contexts/AuthContext';
+import { tryRefreshToken } from './token-refresh';
 
 // Dashboard API는 /api/v1/dashboard/assets 경로
 const DASHBOARD_API_BASE = import.meta.env.VITE_API_BASE_URL
@@ -22,17 +23,32 @@ async function dashboardApiRequest<T>(
   const token = getAccessToken();
   const url = `${DASHBOARD_API_BASE}${endpoint}`;
 
+  const makeHeaders = (t: string | null) => ({
+    'Content-Type': 'application/json',
+    ...(t && { Authorization: `Bearer ${t}` }),
+    ...(options.headers as Record<string, string> || {}),
+  });
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
+    headers: makeHeaders(token),
     credentials: 'include',
   });
 
   if (!response.ok) {
+    // 401: 토큰 갱신 후 재시도
+    if (response.status === 401) {
+      const newToken = await tryRefreshToken();
+      if (newToken) {
+        const retryResponse = await fetch(url, {
+          ...options,
+          headers: makeHeaders(newToken),
+          credentials: 'include',
+        });
+        if (retryResponse.ok) return retryResponse.json();
+      }
+    }
+
     const error = await response.json().catch(() => ({ message: 'Network error' }));
     throw new Error(error.error?.message || error.message || `HTTP error! status: ${response.status}`);
   }
