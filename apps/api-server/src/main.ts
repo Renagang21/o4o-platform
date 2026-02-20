@@ -940,6 +940,15 @@ const startServer = async () => {
       logger.error('Failed to register Care Dashboard routes:', dashboardError);
     }
 
+    // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
+    try {
+      const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');
+      app.use('/api/v1/home', createHomePreviewRouter(AppDataSource));
+      logger.info('✅ Home Preview routes registered at /api/v1/home/preview');
+    } catch (homeError) {
+      logger.error('Failed to register Home Preview routes:', homeError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(AppDataSource);

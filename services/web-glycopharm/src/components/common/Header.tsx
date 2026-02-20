@@ -1,6 +1,6 @@
 /**
  * Header - GlycoPharm 헤더
- * WO-GLYCOPHARM-PUBLIC-MENU-UNIFICATION-V1: App 중심 4-메뉴 구조
+ * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 4-메뉴 (로그인 무관)
  */
 
 import { useState } from 'react';
@@ -21,21 +21,19 @@ import {
 } from 'lucide-react';
 
 /**
- * WO-CARE-MENU-ENTRY-STRUCTURE-V1: App 중심 메뉴 정의
- * - 비로그인: Home(/) | 약국 매장 허브 | 내정보
- * - pharmacy 로그인: Home(/care) | 환자관리(/care/patients) | 약국 매장 허브 | 내정보
+ * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 4-메뉴
+ * 로그인 여부와 무관하게 동일한 메뉴 구조.
+ * 비로그인 시 접근하면 기능 안내 페이지(FeatureIntroPage)를 표시.
+ *
+ * Home 경로만 로그인 상태에 따라 다름:
+ * - 비로그인: / (랜딩)
+ * - pharmacy 로그인: /care (대시보드)
  */
-const publicMenuItems = [
-  { path: '/', label: 'Home', icon: Home, end: true, requiresAuth: false },
-  { path: '/store', label: '약국 매장 허브', icon: Store, end: false, requiresAuth: true },
-  { path: '/mypage', label: '내정보', icon: UserCircle, end: false, requiresAuth: true },
-];
-
-const pharmacyMenuItems = [
-  { path: '/care', label: 'Home', icon: Home, end: true, requiresAuth: true },
-  { path: '/care/patients', label: '환자관리', icon: Users, end: false, requiresAuth: true },
-  { path: '/store', label: '약국 매장 허브', icon: Store, end: false, requiresAuth: true },
-  { path: '/mypage', label: '내정보', icon: UserCircle, end: false, requiresAuth: true },
+const menuItems = [
+  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/care', end: true },
+  { label: '환자관리', icon: Users, pathPublic: '/care/patients', pathAuth: '/care/patients', end: false },
+  { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },
+  { label: '내정보', icon: UserCircle, pathPublic: '/mypage', pathAuth: '/mypage', end: false },
 ];
 
 export default function Header() {
@@ -45,23 +43,13 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  /** pharmacy 로그인 시 /care 중심 메뉴, 그 외 공개 메뉴 */
   const isPharmacy = isAuthenticated && user?.roles?.includes('pharmacy');
-  const appMenuItems = isPharmacy ? pharmacyMenuItems : publicMenuItems;
 
   const handleLogout = () => {
     logout();
     navigate('/');
     setUserMenuOpen(false);
     setMobileMenuOpen(false);
-  };
-
-  /** 인증 필요 메뉴 클릭 핸들러 */
-  const handleAuthNavClick = (_path: string, requiresAuth: boolean, e: React.MouseEvent) => {
-    if (requiresAuth && !isAuthenticated) {
-      e.preventDefault();
-      openLoginModal();
-    }
   };
 
   /** NavLink 활성 스타일 (desktop) */
@@ -93,19 +81,21 @@ export default function Header() {
             </div>
           </NavLink>
 
-          {/* Desktop Navigation - App 4-메뉴 */}
+          {/* Desktop Navigation - 통합 4-메뉴 */}
           <nav className="hidden md:flex items-center gap-1">
-            {appMenuItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.end}
-                className={({ isActive }) => desktopNavClass(isActive)}
-                onClick={(e) => handleAuthNavClick(item.path, item.requiresAuth, e)}
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {menuItems.map((item) => {
+              const path = isPharmacy ? item.pathAuth : item.pathPublic;
+              return (
+                <NavLink
+                  key={item.label}
+                  to={path}
+                  end={item.end}
+                  className={({ isActive }) => desktopNavClass(isActive)}
+                >
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </nav>
 
           {/* Desktop User Actions */}
@@ -195,25 +185,23 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t animate-fade-in">
             <nav className="flex flex-col gap-1">
-              {appMenuItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.end}
-                  className={({ isActive }) => mobileNavClass(isActive)}
-                  onClick={(e) => {
-                    handleAuthNavClick(item.path, item.requiresAuth, e);
-                    if (!item.requiresAuth || isAuthenticated) {
-                      setMobileMenuOpen(false);
-                    }
-                  }}
-                >
-                  <span className="flex items-center gap-3">
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </span>
-                </NavLink>
-              ))}
+              {menuItems.map((item) => {
+                const path = isPharmacy ? item.pathAuth : item.pathPublic;
+                return (
+                  <NavLink
+                    key={item.label}
+                    to={path}
+                    end={item.end}
+                    className={({ isActive }) => mobileNavClass(isActive)}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5" />
+                      {item.label}
+                    </span>
+                  </NavLink>
+                );
+              })}
             </nav>
 
             <div className="mt-4 pt-4 border-t">

@@ -46,6 +46,27 @@ export interface PublicApiResponse<T> {
   };
 }
 
+// WO-HOME-LIVE-PREVIEW-V1: Home Preview 데이터 타입
+export interface HomePreviewData {
+  care: {
+    totalPatients: number;
+    highRiskCount: number;
+    recentCoaching: number;
+    recentAnalysis: number;
+    recentChanges: Array<{
+      tirChange?: number;
+      cvChange?: number;
+      riskTrend: 'improving' | 'stable' | 'worsening';
+    }>;
+  };
+  store: {
+    monthlyOrders: number;
+    pendingRequests: number;
+    activeProducts: number;
+    monthlyRevenue: number;
+  };
+}
+
 // ============================================================================
 // Fallback Data (API 실패 시 사용)
 // ============================================================================
@@ -180,6 +201,33 @@ class PublicApiClient {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * WO-HOME-LIVE-PREVIEW-V1: Home Preview 집계 데이터
+   * 인증 토큰이 있으면 pharmacy-scoped, 없으면 global aggregate
+   */
+  async getHomePreview(accessToken?: string | null): Promise<HomePreviewData> {
+    const fallback: HomePreviewData = {
+      care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, recentChanges: [] },
+      store: { monthlyOrders: 0, pendingRequests: 0, activeProducts: 0, monthlyRevenue: 0 },
+    };
+
+    try {
+      const url = `${this.baseUrl}/api/v1/home/preview`;
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(url, { method: 'GET', headers });
+      if (!response.ok) return fallback;
+
+      const json = await response.json();
+      return json.data || fallback;
+    } catch {
+      return fallback;
     }
   }
 }

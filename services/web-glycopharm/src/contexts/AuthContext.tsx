@@ -123,7 +123,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 
 export const ROLE_DASHBOARDS: Record<UserRole, string> = {
   admin: '/admin',
-  pharmacy: '/',  // WO-MENU-REALIGN-V1: CareDashboard가 Home
+  pharmacy: '/care',  // WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: auth-utils.ts와 통일
   supplier: '/supplier',
   partner: '/partner',
   operator: '/operator',

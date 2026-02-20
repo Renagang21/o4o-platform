@@ -1,7 +1,6 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { getDefaultRouteByRole } from '@/lib/auth-utils';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 
@@ -15,10 +14,11 @@ import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
-import HomePage from '@/pages/HomePage';
+import HomeLivePage from '@/pages/HomeLivePage';
 import LoginPage from '@/pages/auth/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import RedirectNoticeBanner from '@/components/common/RedirectNoticeBanner';
+import FeatureIntroPage from '@/components/common/FeatureIntroPage';
 
 // Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
 const ServiceLoginPage = lazy(() => import('@/pages/auth/ServiceLoginPage'));
@@ -206,28 +206,42 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 }
 
 /**
- * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1 + WO-CARE-MENU-ENTRY-STRUCTURE-V1
- * / 접근 시:
- * - 로그인 사용자: 역할 기반 대시보드로 자동 리다이렉트
- *   - pharmacy → /care
- *   - operator → /operator
- *   - admin → /admin
- * - 비로그인: HomePage 표시
+ * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: Soft Guard
+ * 비로그인 → FeatureIntroPage 표시 (로그인 리다이렉트 대신)
+ * 로그인 + 권한 불일치 → / 리다이렉트
+ * 로그인 + 권한 일치 → children 렌더
  */
-function RoleBasedHome() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+function SoftGuard({ feature, allowedRoles, children }: {
+  feature: 'care' | 'store' | 'mypage';
+  allowedRoles?: string[];
+  children: React.ReactNode;
+}) {
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (user?.roles[0]) {
-      const target = getDefaultRouteByRole(user.roles[0]);
-      if (target !== '/') {
-        navigate(target, { replace: true });
-      }
-    }
-  }, [user, navigate]);
+  if (isLoading) return <PageLoading />;
+  if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+}
 
-  return <HomePage />;
+/**
+ * SoftGuardOutlet — Layout route용 Soft Guard
+ * Route의 element로 사용, Outlet을 렌더하거나 FeatureIntroPage를 렌더
+ */
+function SoftGuardOutlet({ feature, allowedRoles }: {
+  feature: 'care' | 'store' | 'mypage';
+  allowedRoles?: string[];
+}) {
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  if (isLoading) return <PageLoading />;
+  if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+    return <Navigate to="/" replace />;
+  }
+  return <Outlet />;
 }
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
@@ -251,7 +265,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route index element={<RoleBasedHome />} />
+        <Route index element={<HomeLivePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
@@ -283,36 +297,34 @@ function AppRoutes() {
         {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage" element={<ContentLibraryPage />} />
         <Route path="mypage" element={
-          <ProtectedRoute>
+          <SoftGuard feature="mypage">
             <MyPage />
-          </ProtectedRoute>
+          </SoftGuard>
         } />
 
         {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
         <Route path="store" element={
-          <ProtectedRoute allowedRoles={['pharmacy']}>
+          <SoftGuard feature="store" allowedRoles={['pharmacy']}>
             <StoreEntryPage />
-          </ProtectedRoute>
+          </SoftGuard>
         } />
       </Route>
 
-      {/* Care Routes (WO-CARE-MENU-ENTRY-STRUCTURE-V1) */}
-      <Route path="care" element={
-        <ProtectedRoute allowedRoles={['pharmacy']}>
-          <MainLayout />
-        </ProtectedRoute>
-      }>
-        <Route index element={<CareDashboardPage />} />
-        <Route path="patients" element={<PatientsPage />} />
-        {/* Patient Detail with nested tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1) */}
-        <Route path="patients/:id" element={<PatientDetailPage />}>
-          <Route index element={<SummaryTab />} />
-          <Route path="analysis" element={<PatientAnalysisTab />} />
-          <Route path="coaching" element={<PatientCoachingTab />} />
-          <Route path="history" element={<HistoryTab />} />
+      {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
+      <Route path="care" element={<MainLayout />}>
+        <Route element={<SoftGuardOutlet feature="care" allowedRoles={['pharmacy']} />}>
+          <Route index element={<CareDashboardPage />} />
+          <Route path="patients" element={<PatientsPage />} />
+          {/* Patient Detail with nested tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1) */}
+          <Route path="patients/:id" element={<PatientDetailPage />}>
+            <Route index element={<SummaryTab />} />
+            <Route path="analysis" element={<PatientAnalysisTab />} />
+            <Route path="coaching" element={<PatientCoachingTab />} />
+            <Route path="history" element={<HistoryTab />} />
+          </Route>
+          <Route path="analysis" element={<AnalysisPage />} />
+          <Route path="coaching" element={<CoachingPage />} />
         </Route>
-        <Route path="analysis" element={<AnalysisPage />} />
-        <Route path="coaching" element={<CoachingPage />} />
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
