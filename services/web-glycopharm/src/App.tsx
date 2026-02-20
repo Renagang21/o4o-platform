@@ -106,6 +106,7 @@ const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
+const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
@@ -292,6 +293,13 @@ function AppRoutes() {
             <PatientsPage />
           </ProtectedRoute>
         } />
+
+        {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
+        <Route path="store" element={
+          <ProtectedRoute allowedRoles={['pharmacy']}>
+            <StoreEntryPage />
+          </ProtectedRoute>
+        } />
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
@@ -447,7 +455,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<StoreOverviewPage />} />
+        <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
         <Route path="orders" element={<PharmacyOrders />} />
