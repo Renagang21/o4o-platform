@@ -23,6 +23,7 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
+import CareSubNav from './CareSubNav';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
 
@@ -147,6 +148,7 @@ export default function PatientsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <CareSubNav />
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
