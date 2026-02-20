@@ -24,7 +24,7 @@ interface PreviewCardData {
 
 const GLUCOSEVIEW_URL = import.meta.env.DEV
   ? 'http://localhost:4101'
-  : 'https://glucoseview.neture.co.kr';
+  : 'https://glucoseview.co.kr';
 
 /** 약국 경영 내부 서비스 */
 const managementCards: PreviewCardData[] = [

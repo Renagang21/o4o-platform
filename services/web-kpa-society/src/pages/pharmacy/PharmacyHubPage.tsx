@@ -4,14 +4,12 @@
  * WO-KPA-A-PAGE-ROLE-CLEANUP-V1
  *
  * Hub = "여기서 가져간다" — 탐색/선택 공간
- * - 연결 서비스 탐색 (ActiveServicesSection)
  * - 추천 서비스 발견 (RecommendedServicesSection)
  *
  * 결과/KPI/매장 상태는 여기에 넣지 않는다.
  */
 
 import { useOrganization } from '../../contexts';
-import { ActiveServicesSection } from './sections/ActiveServicesSection';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
 
 function PharmacyHubContent() {
@@ -33,10 +31,7 @@ function PharmacyHubContent() {
         </p>
       </div>
 
-      {/* 1. Connected Services — 통합 서비스 탐색 */}
-      <ActiveServicesSection />
-
-      {/* 2. Recommended — 추천 서비스 발견 */}
+      {/* 추천 서비스 발견 */}
       <RecommendedServicesSection />
     </div>
   );
