@@ -121,7 +121,7 @@ function PharmacyDashboardContent() {
 
   // ── Signals (조건 기반) ──
 
-  const signals: Array<{ type: 'warning' | 'error' | 'info'; message: string }> = [];
+  const signals: Array<{ type: 'warning' | 'error' | 'info'; message: string; actionPath?: string; actionLabel?: string }> = [];
 
   if (channels.length > 0 && approvedChannels.length === 0) {
     signals.push({ type: 'error', message: '승인된 채널이 없습니다. 채널 승인 후 상품 판매가 가능합니다' });
@@ -136,7 +136,7 @@ function PharmacyDashboardContent() {
     signals.push({ type: 'warning', message: '노출되는 상품이 없습니다. 상품 등록이 필요합니다' });
   }
   if (signageContentCount === 0) {
-    signals.push({ type: 'info', message: '사이니지 콘텐츠가 설정되지 않았습니다' });
+    signals.push({ type: 'info', message: '등록된 영상/동영상 목록이 없습니다', actionPath: '/signage', actionLabel: '영상 등록하기' });
   }
 
   // ── Loading ──
@@ -188,7 +188,7 @@ function PharmacyDashboardContent() {
           <h2 style={S.sectionTitle}>운영 신호</h2>
           <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '8px' }}>
             {signals.map((sig, i) => (
-              <SignalCard key={i} type={sig.type} message={sig.message} />
+              <SignalCard key={i} type={sig.type} message={sig.message} actionPath={sig.actionPath} actionLabel={sig.actionLabel} />
             ))}
           </div>
         </section>
@@ -330,7 +330,13 @@ function KpiCard({ label, value, sub, alert }: {
   );
 }
 
-function SignalCard({ type, message }: { type: 'warning' | 'error' | 'info'; message: string }) {
+function SignalCard({ type, message, actionPath, actionLabel }: {
+  type: 'warning' | 'error' | 'info';
+  message: string;
+  actionPath?: string;
+  actionLabel?: string;
+}) {
+  const navigate = useNavigate();
   const config = {
     warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', icon: '⚠️' },
     error: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', icon: '🔴' },
@@ -348,7 +354,25 @@ function SignalCard({ type, message }: { type: 'warning' | 'error' | 'info'; mes
       borderRadius: '8px',
     }}>
       <span style={{ fontSize: '16px', flexShrink: 0 }}>{config.icon}</span>
-      <span style={{ fontSize: '13px', fontWeight: 500, color: config.color }}>{message}</span>
+      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: config.color }}>{message}</span>
+      {actionPath && actionLabel && (
+        <button
+          onClick={() => navigate(actionPath)}
+          style={{
+            flexShrink: 0,
+            padding: '4px 12px',
+            fontSize: '12px',
+            fontWeight: 600,
+            color: config.color,
+            background: 'transparent',
+            border: `1px solid ${config.color}`,
+            borderRadius: '6px',
+            cursor: 'pointer',
+          }}
+        >
+          {actionLabel} →
+        </button>
+      )}
     </div>
   );
 }
