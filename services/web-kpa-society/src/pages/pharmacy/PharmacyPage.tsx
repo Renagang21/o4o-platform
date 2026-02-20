@@ -14,10 +14,10 @@
  * 7. 미신청 → /pharmacy/approval
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
+import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
 /** Admin/operator roles that should NOT see pharmacist function selection */
@@ -28,28 +28,26 @@ export function PharmacyPage() {
   const { user } = useAuth();
   const [approvalStatus, setApprovalStatus] = useState<'loading' | 'approved' | 'pending' | 'none' | 'error'>('loading');
   const [approvalError, setApprovalError] = useState<string | null>(null);
-  const fetchedRef = useRef(false);
 
   const isAdminOrOperator = user?.roles.some(r => NON_PHARMACIST_ROLES.includes(r)) ?? false;
 
   // WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1:
   // 모든 인증된 비관리자 사용자에 대해 API로 승인 상태를 직접 확인.
   // pharmacistRole이 토큰에 없어도 DB 상태로 판단한다.
+  // getMyRequestsCached: 모듈 레벨 캐시 + in-flight dedup → 무한 루프 방지
   useEffect(() => {
     if (!user || isAdminOrOperator) {
       setApprovalStatus('none');
       return;
     }
-    // 중복 호출 방지
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+    // 이미 결과가 있으면 재요청 불필요
+    if (approvalStatus !== 'loading') return;
 
     let cancelled = false;
     (async () => {
       try {
-        const res = await pharmacyRequestApi.getMyRequests();
+        const items = await getMyRequestsCached();
         if (cancelled) return;
-        const items = res?.data?.items || [];
         const approved = items.find((r) => r.status === 'approved');
         if (approved) {
           setApprovalStatus('approved');
@@ -72,7 +70,7 @@ export function PharmacyPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [user, isAdminOrOperator]);
+  }, [user, isAdminOrOperator, approvalStatus]);
 
   // 1. 미로그인
   if (!user) {

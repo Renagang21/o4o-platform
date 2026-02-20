@@ -86,3 +86,56 @@ export const pharmacyRequestApi = {
       { reviewNote }
     ),
 };
+
+/**
+ * Module-level approval cache
+ *
+ * WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1
+ *
+ * PharmacyGuard와 PharmacyPage가 동일한 API를 호출하고,
+ * AuthContext/OrganizationContext 재렌더링으로 컴포넌트가 반복 마운트될 때
+ * 무한 루프를 방지한다.
+ *
+ * - 동시 in-flight 요청을 하나로 dedup
+ * - 결과를 모듈 레벨에서 캐시 (컴포넌트 unmount 생존)
+ * - 5분 TTL 후 자동 만료
+ */
+let _cachedItems: PharmacyRequest[] | null = null;
+let _cacheTimestamp = 0;
+let _inflightPromise: Promise<PharmacyRequest[]> | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5분
+
+export async function getMyRequestsCached(): Promise<PharmacyRequest[]> {
+  // 캐시 유효 → 즉시 반환
+  if (_cachedItems !== null && Date.now() - _cacheTimestamp < CACHE_TTL_MS) {
+    return _cachedItems;
+  }
+
+  // 이미 진행 중인 요청이 있으면 같은 Promise 반환 (dedup)
+  if (_inflightPromise) {
+    return _inflightPromise;
+  }
+
+  _inflightPromise = pharmacyRequestApi
+    .getMyRequests()
+    .then((res) => {
+      const items = res?.data?.items || [];
+      _cachedItems = items;
+      _cacheTimestamp = Date.now();
+      _inflightPromise = null;
+      return items;
+    })
+    .catch((err) => {
+      _inflightPromise = null;
+      throw err;
+    });
+
+  return _inflightPromise;
+}
+
+/** 캐시 무효화 (승인 후 재조회 필요 시) */
+export function clearApprovalCache(): void {
+  _cachedItems = null;
+  _cacheTimestamp = 0;
+  _inflightPromise = null;
+}

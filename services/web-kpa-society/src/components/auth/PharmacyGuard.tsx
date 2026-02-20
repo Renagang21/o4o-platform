@@ -13,11 +13,11 @@
  *   - 그 외 → /pharmacy (게이트 페이지로 안내)
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
-import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
+import { getMyRequestsCached } from '../../api/pharmacyRequestApi';
 
 interface PharmacyGuardProps {
   children: React.ReactNode;
@@ -27,27 +27,30 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
-  const fetchedRef = useRef(false);
 
-  // 토큰에 pharmacistRole이 없을 때 API로 확인
+  // 토큰에 pharmacistRole이 없을 때 API로 확인 (모듈 레벨 캐시 사용)
   const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && user.pharmacistRole !== 'pharmacy_owner';
 
   useEffect(() => {
-    if (!needsApiCheck || fetchedRef.current) return;
-    fetchedRef.current = true;
+    if (!needsApiCheck) return;
+    // apiCheck이 이미 approved/denied면 재요청 불필요
+    if (apiCheck === 'approved' || apiCheck === 'denied') return;
     setApiCheck('loading');
 
+    let cancelled = false;
     (async () => {
       try {
-        const res = await pharmacyRequestApi.getMyRequests();
-        const items = res?.data?.items || [];
+        // getMyRequestsCached: 모듈 레벨 캐시 + in-flight dedup
+        const items = await getMyRequestsCached();
+        if (cancelled) return;
         const approved = items.find((r) => r.status === 'approved');
         setApiCheck(approved ? 'approved' : 'denied');
       } catch {
-        setApiCheck('denied');
+        if (!cancelled) setApiCheck('denied');
       }
     })();
-  }, [needsApiCheck]);
+    return () => { cancelled = true; };
+  }, [needsApiCheck, apiCheck]);
 
   if (isLoading) {
     return (
