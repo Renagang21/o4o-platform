@@ -15,9 +15,12 @@
  * 레이아웃: StoreDashboardLayout (Outlet) → HubLayout (content)
  */
 
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HubLayout } from '@o4o/hub-core';
 import type { HubSectionDefinition } from '@o4o/hub-core';
+import { computeStoreInsights } from '@o4o/store-ui-core';
+import type { StoreInsight } from '@o4o/store-ui-core';
 import {
   BrainCircuit,
   TrendingUp,
@@ -162,9 +165,63 @@ function AiSummaryCard({ data }: { data: AiSummaryData }) {
 
 // ─── Component ───
 
+// ─── Insight Block (WO-STORE-AI-INSIGHT-LAYER-V1) ───
+
+function InsightBlock({ insights, onNavigate }: { insights: StoreInsight[]; onNavigate: (path: string) => void }) {
+  if (insights.length === 0) return null;
+  const levelIcon = (l: StoreInsight['level']) =>
+    l === 'critical' ? '🔴' : l === 'warning' ? '🟡' : '🔵';
+
+  return (
+    <section style={styles.insightSection}>
+      <h2 style={styles.sectionTitle}>경영 인사이트</h2>
+      <div style={styles.insightCard}>
+        {insights.map((ins) => (
+          <div key={ins.code} style={styles.insightRow}>
+            <span style={styles.insightIcon}>{levelIcon(ins.level)}</span>
+            <div style={{ flex: 1 }}>
+              <span style={styles.insightMsg}>{ins.message}</span>
+              {ins.recommendation && (
+                <span style={styles.insightRec}> — {ins.recommendation}</span>
+              )}
+            </div>
+            {ins.action && (
+              <button
+                onClick={() => onNavigate(ins.action!.target)}
+                style={styles.insightActionBtn}
+              >
+                {ins.action.label} →
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Component ───
+
 export default function StoreOverviewPage() {
   const navigate = useNavigate();
   const { cockpitData, loading, error, signals, userRoles, fetchData, handleActionTrigger } = useStoreHub();
+
+  // WO-STORE-AI-INSIGHT-LAYER-V1: Rule-based insights
+  const insights = useMemo(() => {
+    const pendingOrders = cockpitData.todayActions?.pendingOrders ?? 0;
+    const pendingReceive = cockpitData.todayActions?.pendingReceiveOrders ?? 0;
+    const signageEnabled = cockpitData.signageStats?.enabled ? 1 : 0;
+    const totalChannels = cockpitData.signageStats ? 1 : 0;
+
+    return computeStoreInsights({
+      monthlyRevenue: 0, // API 미연결 — Phase 2+
+      totalOrders: cockpitData.todayActions?.todayOrders ?? 0,
+      inProgressOrders: pendingOrders + pendingReceive,
+      activeChannels: signageEnabled,
+      totalChannels,
+      visibleProducts: cockpitData.productStats?.total ?? 0,
+    });
+  }, [cockpitData]);
 
   return (
     <HubLayout
@@ -206,6 +263,9 @@ export default function StoreOverviewPage() {
               </div>
             )}
           </section>
+
+          {/* WO-STORE-AI-INSIGHT-LAYER-V1 + WO-STORE-INSIGHT-ACTION-BRIDGE-V1 */}
+          {!loading && <InsightBlock insights={insights} onNavigate={navigate} />}
         </>
       }
       footerNote="허브는 각 기능의 진입점입니다. QuickAction 버튼으로 즉시 실행하거나, 카드를 클릭하여 상세 페이지로 이동하세요."
@@ -301,5 +361,51 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '50%',
     backgroundColor: '#3b82f6',
     flexShrink: 0,
+  },
+  // WO-STORE-AI-INSIGHT-LAYER-V1
+  insightSection: {
+    marginBottom: '32px',
+  },
+  insightCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    padding: '16px 20px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '10px',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+  },
+  insightRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '10px',
+  },
+  insightIcon: {
+    fontSize: '16px',
+    lineHeight: '22px',
+    flexShrink: 0,
+  },
+  insightMsg: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  insightRec: {
+    fontSize: '13px',
+    color: '#64748b',
+  },
+  insightActionBtn: {
+    flexShrink: 0,
+    alignSelf: 'center',
+    padding: '4px 12px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#2563eb',
+    backgroundColor: 'transparent',
+    border: '1px solid #93c5fd',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap' as const,
   },
 };

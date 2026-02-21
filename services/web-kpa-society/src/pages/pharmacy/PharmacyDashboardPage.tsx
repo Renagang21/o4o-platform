@@ -31,6 +31,7 @@ import {
   type ProductApplication,
 } from '../../api/pharmacyProducts';
 import { publishedAssetsApi } from '../../api/assetSnapshot';
+import { computeStoreInsights } from '@o4o/store-ui-core';
 
 // ── Channel status display ──
 
@@ -119,6 +120,17 @@ function PharmacyDashboardContent() {
   const cosmeticsCount = overview?.products.cosmetics.listedCount ?? 0;
   const totalB2bProducts = glycopharmCount + cosmeticsCount;
 
+  // ── AI Insights (WO-STORE-AI-INSIGHT-LAYER-V1) ──
+
+  const insights = computeStoreInsights({
+    monthlyRevenue: 0, // API 미연결
+    totalOrders: 0,
+    inProgressOrders: 0,
+    activeChannels: approvedChannels.length,
+    totalChannels: channels.length,
+    visibleProducts: totalVisibleProducts,
+  });
+
   // ── Signals (조건 기반) ──
 
   const signals: Array<{ type: 'warning' | 'error' | 'info'; message: string; actionPath?: string; actionLabel?: string }> = [];
@@ -182,6 +194,36 @@ function PharmacyDashboardContent() {
         </div>
       </section>
 
+      {/* AI 경영 인사이트 (WO-STORE-AI-INSIGHT-LAYER-V1 + WO-STORE-INSIGHT-ACTION-BRIDGE-V1) */}
+      {insights.length > 0 && (
+        <section style={S.section}>
+          <h2 style={S.sectionTitle}>경영 인사이트</h2>
+          <div style={S.insightCard}>
+            {insights.map((ins) => (
+              <div key={ins.code} style={S.insightRow}>
+                <span style={S.insightIcon}>
+                  {ins.level === 'critical' ? '🔴' : ins.level === 'warning' ? '🟡' : '🔵'}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <p style={S.insightMsg}>{ins.message}</p>
+                  {ins.recommendation && (
+                    <p style={S.insightRec}>{ins.recommendation}</p>
+                  )}
+                </div>
+                {ins.action && (
+                  <button
+                    onClick={() => navigate(ins.action!.target)}
+                    style={S.insightActionBtn}
+                  >
+                    {ins.action.label} →
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* [2] 운영 신호 */}
       {signals.length > 0 && (
         <section style={S.section}>
@@ -216,7 +258,7 @@ function PharmacyDashboardContent() {
           <StatusRow label="진열 상품" value={String(cosmeticsCount)} />
         </div>
         <button
-          onClick={() => navigate('/pharmacy/sales/b2b')}
+          onClick={() => navigate('/store/products')}
           style={S.b2bLink}
         >
           B2B 관리 &rarr;
@@ -289,11 +331,12 @@ function PharmacyDashboardContent() {
       <section>
         <h2 style={S.sectionTitle}>빠른 실행</h2>
         <div style={S.quickGrid}>
-          <QuickBtn icon="🏪" label="매장 관리" onClick={() => navigate('/pharmacy/store')} />
-          <QuickBtn icon="🤝" label="B2B 관리" onClick={() => navigate('/pharmacy/sales/b2b')} />
-          <QuickBtn icon="📦" label="주문 관리" onClick={() => navigate('/pharmacy/sales/b2c')} />
-          <QuickBtn icon="🗂️" label="자산 보기" onClick={() => navigate('/pharmacy/assets')} />
-          <QuickBtn icon="⚙️" label="설정" onClick={() => navigate('/pharmacy/settings')} />
+          <QuickBtn icon="🏪" label="상품 관리" onClick={() => navigate('/store/products')} />
+          <QuickBtn icon="📦" label="주문 관리" onClick={() => navigate('/store/orders')} />
+          <QuickBtn icon="📡" label="채널 관리" onClick={() => navigate('/store/channels')} />
+          <QuickBtn icon="🗂️" label="콘텐츠" onClick={() => navigate('/store/content')} />
+          <QuickBtn icon="🖥️" label="사이니지" onClick={() => navigate('/store/signage')} />
+          <QuickBtn icon="⚙️" label="설정" onClick={() => navigate('/store/settings')} />
         </div>
       </section>
     </div>
@@ -558,4 +601,49 @@ const S: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     transition: 'background 0.15s',
   },
+  // AI Insight styles (WO-STORE-AI-INSIGHT-LAYER-V1)
+  insightCard: {
+    background: '#f0f9ff',
+    border: '1px solid #bae6fd',
+    borderRadius: '10px',
+    padding: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  } as React.CSSProperties,
+  insightRow: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '10px',
+  },
+  insightIcon: {
+    fontSize: '14px',
+    flexShrink: 0,
+    marginTop: '2px',
+  } as React.CSSProperties,
+  insightMsg: {
+    margin: 0,
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#0f172a',
+  },
+  insightRec: {
+    margin: '2px 0 0',
+    fontSize: '12px',
+    fontWeight: 400,
+    color: '#64748b',
+  },
+  insightActionBtn: {
+    flexShrink: 0,
+    alignSelf: 'center',
+    padding: '4px 12px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#2563eb',
+    background: 'transparent',
+    border: '1px solid #93c5fd',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
 };
