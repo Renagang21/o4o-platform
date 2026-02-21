@@ -35,7 +35,7 @@ import {
 } from './pages/participation';
 
 // Groupbuy pages
-import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage } from './pages/groupbuy';
+import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage, KpaGroupbuyPage } from './pages/groupbuy';
 
 // News pages
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
@@ -558,8 +558,8 @@ function App() {
           <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
-          {/* Groupbuy (공동구매) */}
-          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><GroupbuyListPage /></Layout>} />
+          {/* Groupbuy (공동구매) — WO-KPA-GROUPBUY-PAGE-V1: 상품 카탈로그 */}
+          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><KpaGroupbuyPage /></Layout>} />
           <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
 
           {/* Function Gate - SVC-A: 직능/직역 선택 모달로 전환 (WO-KPA-FUNCTION-GATE-V1) */}

@@ -6,8 +6,9 @@
  *
  * 핵심 기능:
  * - 신청 상세 정보 조회
- * - 승인/거절 실행 (공급자 주체)
+ * - 승인/거절/중단/재활성화/종료 실행 (공급자 주체)
  * - P5 사용 맥락 요약 재사용
+ * - WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1: 상태별 버튼 분기
  */
 
 import { useState, useEffect } from 'react';
@@ -23,6 +24,9 @@ import {
   XCircle,
   Clock,
   Sparkles,
+  PauseCircle,
+  PlayCircle,
+  Ban,
 } from 'lucide-react';
 import { supplierApi, type SupplierRequestDetail } from '../../lib/api';
 
@@ -66,6 +70,8 @@ export default function SellerRequestDetailPage() {
   const [processing, setProcessing] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [actionNote, setActionNote] = useState('');
+  const [showRevokeModal, setShowRevokeModal] = useState(false);
 
   useEffect(() => {
     const fetchRequest = async () => {
@@ -133,6 +139,63 @@ export default function SellerRequestDetailPage() {
     }
   };
 
+  // WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1: 관계 통제 핸들러
+
+  const handleSuspend = async () => {
+    if (!request || !id) return;
+    setProcessing(true);
+    try {
+      const result = await supplierApi.suspendRequest(id, actionNote || undefined);
+      if (result.success) {
+        setRequest({ ...request, status: 'suspended', suspendedAt: new Date().toISOString() });
+        alert('공급이 일시 중단되었습니다.');
+      } else {
+        alert(result.error || '처리 중 오류가 발생했습니다.');
+      }
+    } catch {
+      alert('처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    if (!request || !id) return;
+    setProcessing(true);
+    try {
+      const result = await supplierApi.reactivateRequest(id, actionNote || undefined);
+      if (result.success) {
+        setRequest({ ...request, status: 'approved', suspendedAt: null });
+        alert('공급이 재활성화되었습니다.');
+      } else {
+        alert(result.error || '처리 중 오류가 발생했습니다.');
+      }
+    } catch {
+      alert('처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleRevoke = async () => {
+    if (!request || !id) return;
+    setProcessing(true);
+    try {
+      const result = await supplierApi.revokeRequest(id, actionNote || undefined);
+      if (result.success) {
+        setRequest({ ...request, status: 'revoked', revokedAt: new Date().toISOString() });
+        setShowRevokeModal(false);
+        alert('공급이 종료되었습니다.');
+      } else {
+        alert(result.error || '처리 중 오류가 발생했습니다.');
+      }
+    } catch {
+      alert('처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return <div style={styles.loading}>로딩 중...</div>;
   }
@@ -150,6 +213,20 @@ export default function SellerRequestDetailPage() {
   const usageContext = USAGE_CONTEXTS[request.service.id];
   const serviceIcon = SERVICE_ICONS[request.service.id] || '📦';
   const isPending = request.status === 'pending';
+  const isApproved = request.status === 'approved';
+  const isSuspended = request.status === 'suspended';
+
+  // 상태 뱃지 설정 (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1)
+  const STATUS_BADGE: Record<string, { bg: string; color: string; icon: React.ReactNode; label: string }> = {
+    pending: { bg: '#fef3c7', color: '#b45309', icon: <Clock size={14} />, label: '승인 대기' },
+    approved: { bg: '#dcfce7', color: '#15803d', icon: <CheckCircle size={14} />, label: '승인됨' },
+    rejected: { bg: '#fee2e2', color: '#dc2626', icon: <XCircle size={14} />, label: '거절됨' },
+    suspended: { bg: '#fff7ed', color: '#c2410c', icon: <PauseCircle size={14} />, label: '일시 중단' },
+    revoked: { bg: '#fee2e2', color: '#dc2626', icon: <Ban size={14} />, label: '공급 종료' },
+    expired: { bg: '#f1f5f9', color: '#64748b', icon: <Clock size={14} />, label: '계약 만료' },
+  };
+
+  const badge = STATUS_BADGE[request.status] || STATUS_BADGE.pending;
 
   return (
     <div>
@@ -172,17 +249,12 @@ export default function SellerRequestDetailPage() {
         <div
           style={{
             ...styles.statusBadge,
-            backgroundColor: request.status === 'pending' ? '#fef3c7' :
-              request.status === 'approved' ? '#dcfce7' : '#fee2e2',
-            color: request.status === 'pending' ? '#b45309' :
-              request.status === 'approved' ? '#15803d' : '#dc2626',
+            backgroundColor: badge.bg,
+            color: badge.color,
           }}
         >
-          {request.status === 'pending' && <Clock size={14} />}
-          {request.status === 'approved' && <CheckCircle size={14} />}
-          {request.status === 'rejected' && <XCircle size={14} />}
-          {request.status === 'pending' ? '승인 대기' :
-            request.status === 'approved' ? '승인됨' : '거절됨'}
+          {badge.icon}
+          {badge.label}
         </div>
       </div>
 
@@ -292,19 +364,91 @@ export default function SellerRequestDetailPage() {
             </div>
           )}
 
+          {/* WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1: Approved Actions */}
+          {isApproved && (
+            <div style={styles.actionCard}>
+              <h2 style={styles.actionTitle}>관계 관리</h2>
+              <p style={styles.actionDescription}>
+                승인된 공급 관계를 관리합니다. 일시 중단 시 판매자의 판매가 중지되며, 재활성화가 가능합니다.
+              </p>
+              <div style={styles.actionButtons}>
+                <button
+                  onClick={handleSuspend}
+                  disabled={processing}
+                  style={styles.suspendButton}
+                >
+                  <PauseCircle size={18} />
+                  {processing ? '처리 중...' : '일시 중단'}
+                </button>
+                <button
+                  onClick={() => setShowRevokeModal(true)}
+                  disabled={processing}
+                  style={styles.revokeButton}
+                >
+                  <Ban size={18} />
+                  공급 종료
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1: Suspended Actions */}
+          {isSuspended && (
+            <div style={styles.actionCard}>
+              <h2 style={styles.actionTitle}>중단된 공급</h2>
+              <p style={styles.actionDescription}>
+                공급이 일시 중단되었습니다. 재활성화하거나 완전히 종료할 수 있습니다.
+              </p>
+              <div style={styles.actionButtons}>
+                <button
+                  onClick={handleReactivate}
+                  disabled={processing}
+                  style={styles.approveButton}
+                >
+                  <PlayCircle size={18} />
+                  {processing ? '처리 중...' : '재활성화'}
+                </button>
+                <button
+                  onClick={() => setShowRevokeModal(true)}
+                  disabled={processing}
+                  style={styles.revokeButton}
+                >
+                  <Ban size={18} />
+                  공급 종료
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Processed Info */}
-          {!isPending && (
+          {!isPending && !isApproved && !isSuspended && (
             <div style={styles.processedCard}>
               <h2 style={styles.processedTitle}>처리 정보</h2>
-              <p>
-                처리 일시: {request.decidedAt
-                  ? new Date(request.decidedAt).toLocaleString('ko-KR')
-                  : '-'}
-              </p>
+              {request.decidedAt && (
+                <p>
+                  처리 일시: {new Date(request.decidedAt).toLocaleString('ko-KR')}
+                </p>
+              )}
+              {request.revokedAt && (
+                <p>
+                  종료 일시: {new Date(request.revokedAt).toLocaleString('ko-KR')}
+                </p>
+              )}
+              {request.expiredAt && (
+                <p>
+                  만료 일시: {new Date(request.expiredAt).toLocaleString('ko-KR')}
+                </p>
+              )}
               {request.rejectReason && (
                 <div style={styles.rejectReasonBox}>
                   <p style={styles.rejectReasonLabel}>거절 사유</p>
                   <p style={styles.rejectReasonText}>{request.rejectReason}</p>
+                </div>
+              )}
+              {request.relationNote && (
+                <div style={{ ...styles.rejectReasonBox, backgroundColor: '#f1f5f9' }}>
+                  <p style={{ ...styles.rejectReasonLabel, color: '#475569' }}>사유</p>
+                  <p style={{ ...styles.rejectReasonText, color: '#334155' }}>{request.relationNote}</p>
                 </div>
               )}
             </div>
@@ -352,6 +496,41 @@ export default function SellerRequestDetailPage() {
                 style={styles.confirmRejectButton}
               >
                 {processing ? '처리 중...' : '거절 확인'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revoke Modal (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) */}
+      {showRevokeModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h2 style={styles.modalTitle}>공급 종료</h2>
+            <p style={styles.modalDescription}>
+              공급 관계를 완전히 종료합니다. 이 작업은 되돌릴 수 없습니다.
+              사유를 입력해주세요 (선택).
+            </p>
+            <textarea
+              value={actionNote}
+              onChange={(e) => setActionNote(e.target.value)}
+              placeholder="종료 사유를 입력하세요 (선택)..."
+              style={styles.textarea}
+              rows={4}
+            />
+            <div style={styles.modalButtons}>
+              <button
+                onClick={() => { setShowRevokeModal(false); setActionNote(''); }}
+                style={styles.cancelButton}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleRevoke}
+                disabled={processing}
+                style={styles.confirmRejectButton}
+              >
+                {processing ? '처리 중...' : '공급 종료 확인'}
               </button>
             </div>
           </div>
@@ -583,6 +762,36 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: '#fff',
     color: '#dc2626',
     border: '2px solid #fecaca',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  suspendButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    padding: '14px',
+    backgroundColor: '#f59e0b',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '15px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  revokeButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    padding: '14px',
+    backgroundColor: '#dc2626',
+    color: '#fff',
+    border: 'none',
     borderRadius: '8px',
     fontSize: '15px',
     fontWeight: 600,

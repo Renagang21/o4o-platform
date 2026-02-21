@@ -5,7 +5,7 @@
 
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
-import { INTRANET_ROLES, hasAnyRole } from '../../lib/role-constants';
+import { INTRANET_ROLES, hasAnyRole, hasBranchRole } from '../../lib/role-constants';
 
 interface IntranetAuthGuardProps {
   children: React.ReactNode;
@@ -38,8 +38,8 @@ export function IntranetAuthGuard({ children }: IntranetAuthGuardProps) {
     );
   }
 
-  // WO-KPA-ROLE-SIMPLIFICATION-PHASE1-V1: 상수 사용
-  const hasRole = hasAnyRole(user.roles, INTRANET_ROLES);
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: 플랫폼 역할 + membership 역할 체크
+  const hasRole = hasAnyRole(user.roles, INTRANET_ROLES) || hasBranchRole(user.membershipRole);
 
   if (!hasRole) {
     return (

@@ -5,13 +5,34 @@
 import { apiClient } from './client';
 import type {
   Groupbuy,
+  GroupbuyProduct,
+  GroupbuyStats,
   GroupbuyParticipation,
   PaginatedResponse,
   ApiResponse,
 } from '../types';
 
 export const groupbuyApi = {
-  // 공동구매 목록
+  // 공동구매 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
+  getGroupbuyProducts: (params?: {
+    page?: number;
+    limit?: number;
+  }) =>
+    apiClient.get<{
+      success: boolean;
+      data: GroupbuyProduct[];
+      pagination: { page: number; limit: number; total: number; totalPages: number };
+    }>('/groupbuy', params),
+
+  // 공동구매 상품 상세 (WO-KPA-GROUPBUY-PAGE-V1)
+  getGroupbuyProduct: (id: string) =>
+    apiClient.get<{ success: boolean; data: GroupbuyProduct }>(`/groupbuy/${id}`),
+
+  // 공동구매 운영 통계 (WO-KPA-GROUPBUY-STATS-V1)
+  getGroupbuyStats: () =>
+    apiClient.get<{ success: boolean; data: GroupbuyStats }>('/groupbuy/stats'),
+
+  // 공동구매 목록 (legacy campaign)
   getGroupbuys: (params?: {
     status?: 'upcoming' | 'active' | 'ended';
     category?: string;

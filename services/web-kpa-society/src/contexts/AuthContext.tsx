@@ -99,6 +99,8 @@ export interface User {
   membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분
   pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
   pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role (SSOT)
+  membershipRole?: string;  // 'member' | 'operator' | 'admin' | undefined (비소속)
 
   // ============================================
   // P2-T4: Super Operator 확장 지점
@@ -271,7 +273,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = response.data as { success: boolean; data: ApiUser };
 
       if (data.success && data.data) {
-        setUser(createUserFromApiResponse(data.data));
+        const userData = createUserFromApiResponse(data.data);
+
+        // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role fetch
+        try {
+          const membershipRes = await authClient.api.get('/kpa/me/membership');
+          const membershipData = (membershipRes.data as any);
+          if (membershipData?.success && membershipData?.data?.role) {
+            userData.membershipRole = membershipData.data.role;
+          }
+        } catch {
+          // non-critical: 비소속 사용자는 membership 없음
+        }
+
+        setUser(userData);
       } else {
         setUser(null);
       }

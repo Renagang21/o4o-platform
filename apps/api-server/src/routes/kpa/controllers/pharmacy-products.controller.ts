@@ -21,8 +21,26 @@ import { OrganizationProductChannel } from '../entities/organization-product-cha
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { SERVICE_KEYS } from '../../../constants/service-keys.js';
+import { ApiError } from '../../../utils/api-error.js';
 
 type AuthMiddleware = RequestHandler;
+
+const VALID_SERVICE_KEYS = Object.values(SERVICE_KEYS) as string[];
+
+function resolveServiceKeyFromQuery(query: any): string {
+  const requested = query?.service_key;
+  if (!requested) return SERVICE_KEYS.KPA;
+  if (VALID_SERVICE_KEYS.includes(requested)) return requested;
+  throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
+}
+
+function resolveServiceKeyFromBody(body: any): string {
+  const requested = body?.service_key;
+  if (!requested) return SERVICE_KEYS.KPA;
+  if (VALID_SERVICE_KEYS.includes(requested)) return requested;
+  throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
+}
 
 /**
  * Get user's organization ID from KPA membership
@@ -94,12 +112,14 @@ export function createPharmacyProductsController(
       return;
     }
 
+    const serviceKey = resolveServiceKeyFromBody(req.body);
+
     // 중복 체크: 동일 조직 + 동일 상품 pending/approved 신청 존재 여부
     const existing = await appRepo.findOne({
       where: {
         organization_id: organizationId,
         external_product_id: externalProductId,
-        service_key: 'kpa',
+        service_key: serviceKey,
       },
     });
 
@@ -150,7 +170,7 @@ export function createPharmacyProductsController(
     // 신규 신청
     const application = appRepo.create({
       organization_id: organizationId,
-      service_key: 'kpa',
+      service_key: serviceKey,
       external_product_id: externalProductId,
       product_name: productName,
       product_metadata: productMetadata || {},
@@ -186,9 +206,10 @@ export function createPharmacyProductsController(
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
+    const serviceKey = resolveServiceKeyFromQuery(req.query);
     const qb = appRepo.createQueryBuilder('app')
       .where('app.organization_id = :organizationId', { organizationId })
-      .andWhere('app.service_key = :serviceKey', { serviceKey: 'kpa' });
+      .andWhere('app.service_key = :serviceKey', { serviceKey });
 
     if (status && ['pending', 'approved', 'rejected'].includes(status)) {
       qb.andWhere('app.status = :status', { status });
@@ -213,11 +234,12 @@ export function createPharmacyProductsController(
   // ─── GET /approved — 승인된 상품 목록 (진열 가능 상품) ────────────
   router.get('/approved', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
+    const serviceKey = resolveServiceKeyFromQuery(req.query);
 
     const approved = await appRepo.find({
       where: {
         organization_id: organizationId,
-        service_key: 'kpa',
+        service_key: serviceKey,
         status: 'approved' as any,
       },
       order: { requested_at: 'DESC' },
@@ -229,11 +251,12 @@ export function createPharmacyProductsController(
   // ─── GET /listings — 내 매장 진열 상품 ─────────────────────────────
   router.get('/listings', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
+    const serviceKey = resolveServiceKeyFromQuery(req.query);
 
     const listings = await listingRepo.find({
       where: {
         organization_id: organizationId,
-        service_key: 'kpa',
+        service_key: serviceKey,
       },
       order: { display_order: 'ASC', created_at: 'DESC' },
     });
@@ -247,8 +270,9 @@ export function createPharmacyProductsController(
     const organizationId = (req as any).organizationId;
     const { id } = req.params;
 
+    const serviceKey = resolveServiceKeyFromBody(req.body);
     const listing = await listingRepo.findOne({
-      where: { id, organization_id: organizationId, service_key: 'kpa' },
+      where: { id, organization_id: organizationId, service_key: serviceKey },
     });
 
     if (!listing) {
@@ -291,8 +315,9 @@ export function createPharmacyProductsController(
     const { id } = req.params;
 
     // Verify listing belongs to this organization
+    const serviceKey = resolveServiceKeyFromQuery(req.query);
     const listing = await listingRepo.findOne({
-      where: { id, organization_id: organizationId, service_key: 'kpa' },
+      where: { id, organization_id: organizationId, service_key: serviceKey },
     });
     if (!listing) {
       res.status(404).json({
@@ -344,8 +369,9 @@ export function createPharmacyProductsController(
     }
 
     // Verify listing
+    const serviceKey = resolveServiceKeyFromBody(req.body);
     const listing = await listingRepo.findOne({
-      where: { id, organization_id: organizationId, service_key: 'kpa' },
+      where: { id, organization_id: organizationId, service_key: serviceKey },
     });
     if (!listing) {
       res.status(404).json({

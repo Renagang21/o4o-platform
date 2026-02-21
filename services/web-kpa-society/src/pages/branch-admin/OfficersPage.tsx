@@ -8,12 +8,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import { branchAdminApi } from '../../api/branchAdmin';
-import type { BranchOfficer } from '../../api/branchAdmin';
+import type { BranchOfficer, MemberOption } from '../../api/branchAdmin';
 
 export function OfficersPage() {
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingOfficer, setEditingOfficer] = useState<BranchOfficer | null>(null);
   const [officers, setOfficers] = useState<BranchOfficer[]>([]);
+  const [members, setMembers] = useState<MemberOption[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchOfficers = useCallback(async () => {
@@ -28,7 +29,16 @@ export function OfficersPage() {
     }
   }, []);
 
-  useEffect(() => { fetchOfficers(); }, [fetchOfficers]);
+  const fetchMembers = useCallback(async () => {
+    try {
+      const res = await branchAdminApi.getMembers();
+      setMembers(res.data || []);
+    } catch {
+      // silent
+    }
+  }, []);
+
+  useEffect(() => { fetchOfficers(); fetchMembers(); }, [fetchOfficers, fetchMembers]);
 
   const handleEdit = (officer: BranchOfficer) => {
     setEditingOfficer(officer);
@@ -52,26 +62,48 @@ export function OfficersPage() {
 
   const handleSaveOfficer = async (form: HTMLFormElement) => {
     const fd = new FormData(form);
-    const data = {
-      name: fd.get('name') as string,
-      position: ROLE_LABELS[fd.get('role') as string] || fd.get('role') as string,
-      role: fd.get('role') as string,
-      pharmacy_name: fd.get('pharmacy_name') as string || undefined,
-      phone: (fd.get('phone') as string)?.replace(/\D/g, '') || undefined,
-      email: fd.get('email') as string || undefined,
-      term_start: fd.get('term_start') as string || undefined,
-      term_end: fd.get('term_end') as string || undefined,
-    };
-    try {
-      if (editingOfficer) {
-        await branchAdminApi.updateOfficer(editingOfficer.id, data);
-      } else {
-        await branchAdminApi.createOfficer(data);
+    const roleValue = fd.get('role') as string;
+    const memberId = fd.get('member_id') as string;
+
+    if (editingOfficer) {
+      // PATCH: send changed fields
+      const updateData: Record<string, any> = {
+        position: ROLE_LABELS[roleValue] || roleValue,
+        role: roleValue,
+        phone: (fd.get('phone') as string)?.replace(/\D/g, '') || undefined,
+        email: fd.get('email') as string || undefined,
+        term_start: fd.get('term_start') as string || undefined,
+        term_end: fd.get('term_end') as string || undefined,
+      };
+      if (memberId && memberId !== editingOfficer.member_id) {
+        updateData.member_id = memberId;
       }
-      setShowFormModal(false);
-      fetchOfficers();
-    } catch (err: any) {
-      alert('저장에 실패했습니다: ' + (err.message || ''));
+      try {
+        await branchAdminApi.updateOfficer(editingOfficer.id, updateData);
+        setShowFormModal(false);
+        fetchOfficers();
+      } catch (err: any) {
+        alert('저장에 실패했습니다: ' + (err.message || ''));
+      }
+    } else {
+      // POST: member_id required
+      if (!memberId) { alert('회원을 선택해주세요.'); return; }
+      const createData = {
+        member_id: memberId,
+        position: ROLE_LABELS[roleValue] || roleValue,
+        role: roleValue,
+        phone: (fd.get('phone') as string)?.replace(/\D/g, '') || undefined,
+        email: fd.get('email') as string || undefined,
+        term_start: fd.get('term_start') as string || undefined,
+        term_end: fd.get('term_end') as string || undefined,
+      };
+      try {
+        await branchAdminApi.createOfficer(createData);
+        setShowFormModal(false);
+        fetchOfficers();
+      } catch (err: any) {
+        alert('저장에 실패했습니다: ' + (err.message || ''));
+      }
     }
   };
 
@@ -226,15 +258,20 @@ export function OfficersPage() {
             <div style={pageStyles.modalBody}>
               <div style={pageStyles.formRow}>
                 <div style={pageStyles.formGroup}>
-                  <label style={pageStyles.label}>이름</label>
-                  <input
-                    type="text"
-                    name="name"
-                    style={pageStyles.input}
-                    defaultValue={editingOfficer?.name}
-                    placeholder="이름"
-                    required
-                  />
+                  <label style={pageStyles.label}>회원 선택</label>
+                  <select
+                    name="member_id"
+                    style={pageStyles.select}
+                    defaultValue={editingOfficer?.member_id || ''}
+                    required={!editingOfficer}
+                  >
+                    <option value="">회원 선택...</option>
+                    {members.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.user_name} ({m.pharmacy_name || '약국 미등록'})
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div style={pageStyles.formGroup}>
                   <label style={pageStyles.label}>직책</label>
@@ -247,16 +284,6 @@ export function OfficersPage() {
                     <option value="auditor">감사</option>
                   </select>
                 </div>
-              </div>
-              <div style={pageStyles.formGroup}>
-                <label style={pageStyles.label}>약국명</label>
-                <input
-                  type="text"
-                  name="pharmacy_name"
-                  style={pageStyles.input}
-                  defaultValue={editingOfficer?.pharmacy_name || ''}
-                  placeholder="소속 약국명"
-                />
               </div>
               <div style={pageStyles.formRow}>
                 <div style={pageStyles.formGroup}>

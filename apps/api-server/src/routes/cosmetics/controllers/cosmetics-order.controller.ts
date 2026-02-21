@@ -19,8 +19,10 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { body, query, param, validationResult } from 'express-validator';
+import type { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 
 // ============================================================================
 // Type Definitions (H1-2 확정 스키마와 동일)
@@ -428,6 +430,7 @@ function applyOrderFilters(
  * Create cosmetics order router
  */
 export function createCosmeticsOrderController(
+  dataSource: DataSource,
   requireAuth: (req: Request, res: Response, next: NextFunction) => void,
   requireScope: (scope: string) => (req: Request, res: Response, next: NextFunction) => void
 ): Router {
@@ -484,6 +487,12 @@ export function createCosmeticsOrderController(
         const channelValidation = validateChannelMetadata(dto.metadata);
         if (!channelValidation.valid) {
           return errorResponse(res, 400, 'CHANNEL_VALIDATION_ERROR', channelValidation.error!);
+        }
+
+        // 공급 계약 검증 (WO-O4O-CHECKOUT-GUARD-ORGANIZATION-LEVEL-V1)
+        const guardResult = await validateSupplierSellerRelation(dataSource, dto.sellerId);
+        if (!guardResult.allowed) {
+          return errorResponse(res, 403, guardResult.code || 'SUPPLY_CONTRACT_NOT_APPROVED', guardResult.reason || '공급 계약이 승인되지 않았습니다');
         }
 
         // 금액 계산

@@ -15,7 +15,7 @@ import {
   Index,
 } from 'typeorm';
 
-export type JoinRequestType = 'join' | 'promotion' | 'operator' | 'pharmacy_join' | 'pharmacy_operator';
+export type JoinRequestType = 'join' | 'promotion' | 'operator';
 export type JoinRequestStatus = 'pending' | 'approved' | 'rejected';
 export type RequestedRole = 'admin' | 'manager' | 'member' | 'moderator';
 

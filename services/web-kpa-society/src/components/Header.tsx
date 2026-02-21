@@ -79,8 +79,9 @@ const menuItems: MenuItem[] = [
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
-  { label: '약국 HUB', href: '/pharmacy/hub' },
-  { label: '내 매장관리', href: '/pharmacy/dashboard' },
+  { label: '공동구매', href: '/groupbuy' },
+  { label: '약국 HUB', href: '/store/content/hub' },
+  { label: '내 매장관리', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
   { label: '테스트 센터', href: '/test' },
 ];
@@ -102,8 +103,8 @@ export function Header({ serviceName }: { serviceName: string }) {
   const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/operator') return isOperatorOrAdmin;
-    if (item.href === '/pharmacy/dashboard') return isPharmacyOwner;
-    if (item.href === '/pharmacy/hub') return isPharmacyOwner;
+    if (item.href === '/store') return isPharmacyOwner;
+    if (item.href === '/store/content/hub') return isPharmacyOwner;
     return true;
   });
 

@@ -1,9 +1,13 @@
 /**
  * KPA Society Role Constants
  * WO-KPA-ROLE-SIMPLIFICATION-PHASE1-V1
+ * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:* 제거 — KpaMember.role이 SSOT
  *
  * 모든 role 문자열의 단일 진실 원천 (Single Source of Truth).
  * Guard/Component에서 하드코딩 대신 이 상수를 import.
+ *
+ * kpa-c:branch_admin / kpa-c:operator는 User.roles[]에서 제거됨.
+ * 조직 역할은 KpaMember.role (member | operator | admin)로 관리.
  */
 
 // ─── 개별 Role ─────────────────────────────────
@@ -15,10 +19,6 @@ export const ROLES = {
   // KPA-a 커뮤니티
   KPA_PHARMACIST: 'kpa:pharmacist',
   KPA_STUDENT: 'kpa:student',
-
-  // KPA-c 분회 서비스
-  KPA_C_BRANCH_ADMIN: 'kpa-c:branch_admin',
-  KPA_C_OPERATOR: 'kpa-c:operator',
 
   // KPA-b 레거시/데모 (격리, 제거 예정)
   KPA_DISTRICT_ADMIN: 'kpa:district_admin',
@@ -40,22 +40,14 @@ export const PLATFORM_ROLES = [
   ROLES.KPA_OPERATOR,
 ] as const;
 
-/** KPA-c 분회 서비스 역할 */
-export const BRANCH_ROLES = [
-  ROLES.KPA_C_BRANCH_ADMIN,
-  ROLES.KPA_C_OPERATOR,
-] as const;
-
-/** 인트라넷 접근 = 플랫폼 + 분회 */
+/** 인트라넷 접근 = 플랫폼 역할 (분회 역할은 membershipRole로 체크) */
 export const INTRANET_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
-  ...BRANCH_ROLES,
 ];
 
-/** 직능 선택 면제 역할 = 플랫폼 + 분회 + 학생 */
+/** 직능 선택 면제 역할 = 플랫폼 + 학생 (분회 역할은 membershipRole로 체크) */
 export const FUNCTION_GATE_EXEMPT_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
-  ...BRANCH_ROLES,
   ROLES.KPA_STUDENT,
 ];
 
@@ -80,4 +72,12 @@ export const DASHBOARD_ADMIN_ROLES: readonly string[] = [
 /** user.roles 배열에 지정 그룹의 role이 하나라도 있는지 */
 export function hasAnyRole(userRoles: string[], group: readonly string[]): boolean {
   return userRoles.some(r => group.includes(r));
+}
+
+/**
+ * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1
+ * 분회 역할 체크 — membershipRole (KpaMember.role) 기반
+ */
+export function hasBranchRole(membershipRole?: string): boolean {
+  return membershipRole === 'admin' || membershipRole === 'operator';
 }

@@ -8,7 +8,7 @@
  * - 콘텐츠 CRUD (공지사항, 게시판, 자료실) → BranchOperatorRoutes 이동
  * - Admin은 구조 관리만: 대시보드, 임원 관리, 분회 설정
  *
- * 권한 체크: BranchAdminAuthGuard (kpa-c:branch_admin + 상위 역할)
+ * 권한 체크: BranchAdminAuthGuard (KpaMember.role 기반 + kpa:admin bypass)
  */
 
 import { Routes, Route } from 'react-router-dom';

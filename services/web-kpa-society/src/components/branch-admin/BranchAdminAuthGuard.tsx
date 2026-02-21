@@ -17,7 +17,7 @@ import { useAuth, User } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
-import { ROLES, hasAnyRole } from '../../lib/role-constants';
+import { ROLES } from '../../lib/role-constants';
 
 interface MembershipResponse {
   success: boolean;
@@ -63,26 +63,23 @@ export function BranchAdminAuthGuard({ children }: BranchAdminAuthGuardProps) {
       }
 
       try {
-        // 1차: 역할 체크 (로컬, 빠름)
-        const hasBranchAdminRole = checkBranchAdminRole(user);
-
-        if (!hasBranchAdminRole) {
-          setError('이 분회의 관리자 권한이 없습니다.');
-          setIsAuthorized(false);
-          return;
-        }
-
-        // Super admin / district admin → 모든 분회 접근 허용
+        // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa:admin bypass
         if (hasBypassRole(user)) {
           setIsAuthorized(true);
           return;
         }
 
-        // 2차: 조직 소유권 검증 (API 호출)
+        // KpaMember.role 기반 검증 (SSOT)
         const response = await apiClient.get<MembershipResponse>('/me/membership');
 
         if (!response.data || response.data.organizationId !== branchId) {
           setError('이 분회에 대한 접근 권한이 없습니다. 소속 분회가 아닙니다.');
+          setIsAuthorized(false);
+          return;
+        }
+
+        if (response.data.role !== 'admin') {
+          setError('이 분회의 관리자 권한이 없습니다.');
           setIsAuthorized(false);
           return;
         }
@@ -135,15 +132,6 @@ export function BranchAdminAuthGuard({ children }: BranchAdminAuthGuardProps) {
 
   // 권한 있음 - 자식 컴포넌트 렌더링
   return <>{children}</>;
-}
-
-/**
- * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
- * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: branchId 검증 분리 — 역할만 확인
- * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
- */
-function checkBranchAdminRole(user: User): boolean {
-  return hasAnyRole(user.roles, [ROLES.KPA_ADMIN, ROLES.KPA_C_BRANCH_ADMIN]);
 }
 
 /**

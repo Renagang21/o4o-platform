@@ -86,10 +86,22 @@ import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
 import { OrganizationStore } from './entities/organization-store.entity.js';
+import { OrganizationProductListing } from './entities/organization-product-listing.entity.js';
+import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+// WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: E-commerce Core entities for order creation
+import {
+  EcommerceOrder,
+  EcommerceOrderItem,
+  OrderType,
+  OrderStatus,
+  PaymentStatus,
+  BuyerType,
+  SellerType,
+} from '@o4o/ecommerce-core/entities';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -689,36 +701,207 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Groupbuy Routes - /api/v1/kpa/groupbuy/*
-  // Placeholder: Returns mock data until groupbuy module integration
+  // WO-KPA-GROUPBUY-PAGE-V1: product listing 기반 공동구매 카탈로그
+  // WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: participate → ecommerce_orders
   // ============================================================================
+
+  // WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: ORD-YYYYMMDD-XXXX (GlycoPharm 동일 포맷)
+  function generateGroupbuyOrderNumber(): string {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return `ORD-${dateStr}-${random}`;
+  }
+
   const groupbuyRouter = Router();
+  const groupbuyListingRepo = dataSource.getRepository(OrganizationProductListing);
 
-  groupbuyRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+  groupbuyRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 12;
+    const limit = Math.min(parseInt(req.query.limit as string) || 12, 50);
+
+    const [data, total] = await groupbuyListingRepo.findAndCount({
+      where: { service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
+      order: { display_order: 'ASC', created_at: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
     res.json({
       success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-      message: 'Groupbuy API - Integration pending'
+      data,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
-  });
+  }));
 
-  groupbuyRouter.get('/my-participations', authenticate, (req: Request, res: Response) => {
-    res.json({
-      success: true,
-      data: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
+  // WO-KPA-GROUPBUY-STATS-V1: 운영자 통계 엔드포인트
+  groupbuyRouter.get('/stats', authenticate, requireKpaScope('kpa:operator'),
+    asyncHandler(async (req: Request, res: Response) => {
+      const [orderStats, quantityStats, storeStats, listingCount] = await Promise.all([
+        dataSource.query(`
+          SELECT
+            COUNT(*)::int as "totalOrders",
+            COALESCE(SUM(eo."totalAmount"), 0)::numeric as "totalRevenue"
+          FROM ecommerce_orders eo
+          WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
+            AND eo.status = 'paid'
+        `),
+        dataSource.query(`
+          SELECT COALESCE(SUM(oi.quantity), 0)::int as "totalQuantity"
+          FROM ecommerce_order_items oi
+          INNER JOIN ecommerce_orders eo ON eo.id = oi."orderId"
+          WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
+            AND eo.status = 'paid'
+        `),
+        dataSource.query(`
+          SELECT COUNT(DISTINCT eo."buyerId")::int as "participatingStores"
+          FROM ecommerce_orders eo
+          WHERE eo.metadata->>'serviceKey' = 'kpa-groupbuy'
+            AND eo.status = 'paid'
+        `),
+        groupbuyListingRepo.count({
+          where: { service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
+        }),
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          totalOrders: orderStats[0]?.totalOrders ?? 0,
+          totalQuantity: quantityStats[0]?.totalQuantity ?? 0,
+          totalRevenue: parseFloat(orderStats[0]?.totalRevenue ?? '0'),
+          participatingStores: storeStats[0]?.participatingStores ?? 0,
+          registeredProducts: listingCount,
+        },
+      });
+    })
+  );
+
+  // WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: 내 공동구매 주문 목록
+  groupbuyRouter.get('/my-participations', authenticate,
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+        return;
+      }
+
+      const orderRepo = dataSource.getRepository(EcommerceOrder);
+      const [orders, total] = await orderRepo
+        .createQueryBuilder('o')
+        .leftJoinAndSelect('o.items', 'items')
+        .where('o."buyerId" = :buyerId', { buyerId: user.id })
+        .andWhere("o.metadata->>'serviceKey' = :sk", { sk: 'kpa-groupbuy' })
+        .orderBy('o."createdAt"', 'DESC')
+        .take(20)
+        .getManyAndCount();
+
+      res.json({
+        success: true,
+        data: orders.map(o => ({
+          id: o.id,
+          orderNumber: o.orderNumber,
+          status: o.status,
+          totalAmount: o.totalAmount,
+          productName: (o.metadata as any)?.productName,
+          createdAt: o.createdAt,
+        })),
+        pagination: { page: 1, limit: 20, total, totalPages: Math.ceil(total / 20) },
+      });
+    })
+  );
+
+  groupbuyRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const listing = await groupbuyListingRepo.findOne({
+      where: { id: req.params.id, service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
     });
-  });
+    if (!listing) {
+      res.status(404).json({ success: false, error: { message: 'Groupbuy product not found' } });
+      return;
+    }
+    res.json({ success: true, data: listing });
+  }));
 
-  groupbuyRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
-  });
+  // WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: 공동구매 주문 생성
+  // listing.service_key → Order.metadata.serviceKey 전파 보장
+  groupbuyRouter.post('/:id/participate', authenticate,
+    asyncHandler(async (req: Request, res: Response) => {
+      const user = (req as any).user;
+      if (!user?.id) {
+        res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+        return;
+      }
 
-  groupbuyRouter.post('/:id/participate', authenticate, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
-  });
+      // 1. listing 조회
+      const listing = await groupbuyListingRepo.findOne({
+        where: { id: req.params.id, service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
+      });
+      if (!listing) {
+        res.status(404).json({ success: false, error: { message: 'Product not found' } });
+        return;
+      }
+
+      // 2. 수량 (기본 1)
+      const quantity = Math.max(1, parseInt(req.body?.quantity) || 1);
+      const unitPrice = Number(listing.retail_price ?? 0);
+      const subtotal = quantity * unitPrice;
+
+      // 3. metadata.serviceKey 전파 — listing.service_key → Order.metadata.serviceKey
+      const metadata: Record<string, unknown> = {
+        serviceKey: listing.service_key,
+        productListingId: listing.id,
+        productName: listing.product_name,
+        externalProductId: listing.external_product_id,
+      };
+
+      // 4. ecommerce_orders에 주문 생성 (GlycoPharm createCoreOrder 패턴)
+      const orderRepo = dataSource.getRepository(EcommerceOrder);
+      const orderItemRepo = dataSource.getRepository(EcommerceOrderItem);
+
+      const order = orderRepo.create({
+        orderNumber: generateGroupbuyOrderNumber(),
+        buyerId: user.id,
+        buyerType: BuyerType.USER,
+        sellerId: listing.organization_id,
+        sellerType: SellerType.ORGANIZATION,
+        orderType: OrderType.RETAIL,
+        subtotal,
+        shippingFee: 0,
+        discount: 0,
+        totalAmount: subtotal,
+        currency: 'KRW',
+        paymentStatus: PaymentStatus.PENDING,
+        status: OrderStatus.CREATED,
+        metadata,
+        orderSource: 'kpa-society',
+      });
+
+      const savedOrder = await orderRepo.save(order);
+
+      const orderItem = orderItemRepo.create({
+        orderId: savedOrder.id,
+        productId: listing.external_product_id || listing.id,
+        productName: listing.product_name,
+        quantity,
+        unitPrice,
+        discount: 0,
+        subtotal,
+        metadata: { productListingId: listing.id },
+      });
+
+      await orderItemRepo.save(orderItem);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          orderId: savedOrder.id,
+          orderNumber: savedOrder.orderNumber,
+          status: savedOrder.status,
+          totalAmount: savedOrder.totalAmount,
+        },
+      });
+    })
+  );
 
   router.use('/groupbuy', groupbuyRouter);
 

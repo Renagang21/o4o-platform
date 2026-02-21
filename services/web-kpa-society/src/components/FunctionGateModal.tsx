@@ -19,7 +19,7 @@ import {
   type PharmacistRole,
 } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
-import { FUNCTION_GATE_EXEMPT_ROLES, hasAnyRole } from '../lib/role-constants';
+import { FUNCTION_GATE_EXEMPT_ROLES, hasAnyRole, hasBranchRole } from '../lib/role-constants';
 
 interface FunctionOption {
   key: string;
@@ -49,8 +49,10 @@ export default function FunctionGateModal() {
     if (isOpen) setSelectedKey(null);
   }, [isOpen]);
 
-  // WO-KPA-ROLE-SIMPLIFICATION-PHASE1-V1: 상수 사용
-  const isExempt = user ? hasAnyRole(user.roles, FUNCTION_GATE_EXEMPT_ROLES) : false;
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: 플랫폼 역할 + membership 역할 체크
+  const isExempt = user
+    ? hasAnyRole(user.roles, FUNCTION_GATE_EXEMPT_ROLES) || hasBranchRole(user.membershipRole)
+    : false;
 
   // Close if exempt role or already set
   useEffect(() => {

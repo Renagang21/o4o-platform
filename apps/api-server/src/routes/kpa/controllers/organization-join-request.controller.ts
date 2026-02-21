@@ -28,7 +28,7 @@ import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
 import logger from '../../../utils/logger.js';
 
-const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator', 'pharmacy_join', 'pharmacy_operator'];
+const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator'];
 const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator'];
 
 /**
@@ -107,7 +107,7 @@ export function createOrganizationJoinRequestRoutes(
       }
 
       // join 요청 시: 이미 멤버인지 확인
-      if (requestType === 'join' || requestType === 'pharmacy_join') {
+      if (requestType === 'join') {
         try {
           const memberService = getMemberService();
           const isMember = await memberService.isMember(user.id, organizationId);
@@ -153,8 +153,6 @@ export function createOrganizationJoinRequestRoutes(
           join: 'KPA 지부/분회',
           promotion: 'KPA 역할 승격',
           operator: 'KPA 운영자',
-          pharmacy_join: 'KPA 약국 서비스',
-          pharmacy_operator: 'KPA 약국 운영자',
         };
         const serviceName = serviceNameMap[requestType] || 'KPA Society';
 
@@ -326,7 +324,7 @@ export function createOrganizationJoinRequestRoutes(
       const memberService = getMemberService();
 
       try {
-        if (request.request_type === 'join' || request.request_type === 'pharmacy_join') {
+        if (request.request_type === 'join') {
           await memberService.addMember(request.organization_id, {
             userId: request.user_id,
             role: request.requested_role,
@@ -368,48 +366,10 @@ export function createOrganizationJoinRequestRoutes(
       );
 
       // =====================================================================
-      // WO-KPA-C-APPROVAL-USER-SYNC-ALIGNMENT-V1: User.roles 동기화
-      // KPA-a 패턴과 동일 — 승인 시 User.roles에 kpa-c role 반영
+      // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: User.roles에 kpa-c:* 추가 제거
+      // KpaMember.role이 SSOT — memberService.addMember/updateMemberRole에서 이미 설정됨
       // =====================================================================
       try {
-        // WO-KPA-PHARMACY-IDENTITY-REALIGN-V1: pharmacy_join은 KPA-a 도메인
-        // → kpa-c role 매핑 대신 pharmacist_role(1차 정체성) 설정
-        if (request.request_type === 'pharmacy_join') {
-          await dataSource.query(
-            `UPDATE users SET pharmacist_role = 'pharmacy_owner'
-             WHERE id = $1`,
-            [request.user_id]
-          );
-          logger.info(
-            `[WO-KPA-PHARMACY-IDENTITY-REALIGN] User ${request.user_id} pharmacist_role set to pharmacy_owner`
-          );
-        } else {
-          // request_type + requested_role → kpa-c role 매핑
-          let kpaCRole: string | null = null;
-
-          if (request.request_type === 'operator' || request.request_type === 'pharmacy_operator') {
-            kpaCRole = 'kpa-c:operator';
-          } else if (request.requested_role === 'admin') {
-            kpaCRole = 'kpa-c:branch_admin';
-          } else if (request.requested_role === 'manager' || request.requested_role === 'moderator') {
-            kpaCRole = 'kpa-c:operator';
-          }
-          // requested_role === 'member' → 일반 조직 멤버, 별도 kpa-c role 불필요
-
-          if (kpaCRole) {
-            // 멱등성: 이미 있으면 추가하지 않음
-            await dataSource.query(
-              `UPDATE users SET roles = array_append(roles, $2)
-               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
-              [request.user_id, kpaCRole]
-            );
-
-            logger.info(
-              `[WO-KPA-C-APPROVAL-USER-SYNC] User ${request.user_id} role added: ${kpaCRole}`
-            );
-          }
-        }
-
         // User.status ACTIVE 보장 (PENDING 상태에서 승인된 경우)
         await dataSource.query(
           `UPDATE users
@@ -418,7 +378,7 @@ export function createOrganizationJoinRequestRoutes(
           [request.user_id, user.id]
         );
       } catch (syncError) {
-        logger.error('[WO-KPA-C-APPROVAL-USER-SYNC] User sync failed:', syncError);
+        logger.error('[WO-KPA-C-APPROVAL-USER-SYNC] User status sync failed:', syncError);
         // best-effort: 동기화 실패해도 승인 자체는 유지
       }
 
@@ -434,8 +394,6 @@ export function createOrganizationJoinRequestRoutes(
           join: 'KPA 지부/분회',
           promotion: 'KPA 역할 승격',
           operator: 'KPA 운영자',
-          pharmacy_join: 'KPA 약국 서비스',
-          pharmacy_operator: 'KPA 약국 운영자',
         };
         const serviceName = serviceNameMap[request.request_type] || 'KPA Society';
 
@@ -521,8 +479,6 @@ export function createOrganizationJoinRequestRoutes(
           join: 'KPA 지부/분회',
           promotion: 'KPA 역할 승격',
           operator: 'KPA 운영자',
-          pharmacy_join: 'KPA 약국 서비스',
-          pharmacy_operator: 'KPA 약국 운영자',
         };
         const serviceName = serviceNameMap[request.request_type] || 'KPA Society';
 

@@ -1927,6 +1927,177 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
   }
 });
 
+// ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
+
+/**
+ * POST /api/v1/neture/supplier/requests/:id/suspend
+ * 공급 일시 중단 (approved → suspended)
+ */
+router.post('/supplier/requests/:id/suspend', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+    const { note } = req.body;
+
+    const result = await netureService.suspendSupplierRequest(id, supplierId, note);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error suspending supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to suspend supplier request',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/supplier/requests/:id/reactivate
+ * 공급 재활성화 (suspended → approved)
+ */
+router.post('/supplier/requests/:id/reactivate', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+    const { note } = req.body;
+
+    const result = await netureService.reactivateSupplierRequest(id, supplierId, note);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error reactivating supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to reactivate supplier request',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/supplier/requests/:id/revoke
+ * 공급 종료 (approved|suspended → revoked)
+ */
+router.post('/supplier/requests/:id/revoke', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { id } = req.params;
+    const { note } = req.body;
+
+    const result = await netureService.revokeSupplierRequest(id, supplierId, note);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error revoking supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to revoke supplier request',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/requests/:id/suspend
+ * Admin override: 소유권 무관 일시 중단
+ */
+router.post('/admin/requests/:id/suspend', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { note } = req.body;
+    const actorId = req.user?.id || '';
+    const actorName = req.user?.name || 'Admin';
+
+    const result = await netureService.suspendSupplierRequestAsAdmin(id, actorId, note, actorName);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error admin-suspending supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to suspend supplier request',
+    });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/requests/:id/revoke
+ * Admin override: 소유권 무관 공급 종료
+ */
+router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { note } = req.body;
+    const actorId = req.user?.id || '';
+    const actorName = req.user?.name || 'Admin';
+
+    const result = await netureService.revokeSupplierRequestAsAdmin(id, actorId, note, actorName);
+
+    if (!result.success) {
+      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error admin-revoking supplier request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to revoke supplier request',
+    });
+  }
+});
+
 // Hub Trigger routes (WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1)
 const netureActionLogService = new ActionLogService(AppDataSource);
 const hubTriggerController = createNetureHubTriggerController({

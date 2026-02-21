@@ -215,7 +215,31 @@ export interface Certificate {
   downloadUrl: string;
 }
 
-// 공동구매
+// 공동구매 통계 (WO-KPA-GROUPBUY-STATS-V1)
+export interface GroupbuyStats {
+  totalOrders: number;
+  totalQuantity: number;
+  totalRevenue: number;
+  participatingStores: number;
+  registeredProducts: number;
+}
+
+// 공동구매 상품 (OrganizationProductListing 기반, WO-KPA-GROUPBUY-PAGE-V1)
+export interface GroupbuyProduct {
+  id: string;
+  organization_id: string;
+  service_key: string;
+  external_product_id: string;
+  product_name: string;
+  product_metadata: Record<string, unknown>;
+  retail_price: number | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// 공동구매 (캠페인 모델 - legacy)
 export interface Groupbuy {
   id: string;
   title: string;

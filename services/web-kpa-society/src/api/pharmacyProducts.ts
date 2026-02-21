@@ -59,6 +59,7 @@ export async function applyProduct(params: {
   externalProductId: string;
   productName: string;
   productMetadata?: Record<string, unknown>;
+  service_key?: string;
 }): Promise<{ success: boolean; data: ProductApplication }> {
   return apiClient.post('/pharmacy/products/apply', params);
 }
@@ -70,6 +71,7 @@ export async function getApplications(params?: {
   status?: string;
   page?: number;
   limit?: number;
+  service_key?: string;
 }): Promise<PaginatedResponse<ProductApplication>> {
   return apiClient.get('/pharmacy/products/applications', params);
 }
@@ -77,15 +79,19 @@ export async function getApplications(params?: {
 /**
  * 승인된 상품 목록
  */
-export async function getApprovedProducts(): Promise<{ success: boolean; data: ProductApplication[] }> {
-  return apiClient.get('/pharmacy/products/approved');
+export async function getApprovedProducts(params?: {
+  service_key?: string;
+}): Promise<{ success: boolean; data: ProductApplication[] }> {
+  return apiClient.get('/pharmacy/products/approved', params);
 }
 
 /**
  * 내 매장 진열 상품 목록
  */
-export async function getListings(): Promise<{ success: boolean; data: ProductListing[] }> {
-  return apiClient.get('/pharmacy/products/listings');
+export async function getListings(params?: {
+  service_key?: string;
+}): Promise<{ success: boolean; data: ProductListing[] }> {
+  return apiClient.get('/pharmacy/products/listings', params);
 }
 
 /**

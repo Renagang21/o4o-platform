@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
-import { ROLES, hasAnyRole } from '../../lib/role-constants';
+import { ROLES } from '../../lib/role-constants';
 
 interface AdminAuthGuardProps {
   children: React.ReactNode;
@@ -85,19 +85,10 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
 }
 
 /**
- * P2-T2 (WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1):
- * Phase 4 prefixed roles + Legacy roles 모두 지원
- *
- * Backward Compatibility:
- * - Legacy roles 체크 유지 (기존 사용자 영향 없음)
- * - Additive change only (확장만, 파괴 없음)
- */
-/**
- * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
- * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
+ * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa:admin 또는 membershipRole === 'admin'
  */
 function checkBranchAdminRole(user: User): boolean {
-  return hasAnyRole(user.roles, [ROLES.KPA_ADMIN, ROLES.KPA_C_BRANCH_ADMIN]);
+  return user.roles.includes(ROLES.KPA_ADMIN) || user.membershipRole === 'admin';
 }
 
 const styles: Record<string, React.CSSProperties> = {

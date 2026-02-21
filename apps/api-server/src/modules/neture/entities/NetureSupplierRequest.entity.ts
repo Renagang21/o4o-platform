@@ -2,14 +2,16 @@
  * NetureSupplierRequest Entity
  *
  * Work Order: WO-NETURE-SUPPLIER-REQUEST-API-V1
+ * Extended: WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1
  *
  * 판매자가 공급자에게 보내는 신청 (Seller → Supplier)
- * 공급자가 승인/거절 결정
+ * 공급자가 승인/거절/중단/종료 결정
  *
  * 상태 전이:
- * - pending → approved
- * - pending → rejected
- * - 그 외 전이 ❌
+ * - pending → approved | rejected
+ * - approved → suspended | revoked | expired
+ * - suspended → approved | revoked
+ * - rejected / revoked / expired → 전이 불가
  */
 
 import {
@@ -24,6 +26,9 @@ export enum SupplierRequestStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  SUSPENDED = 'suspended',
+  REVOKED = 'revoked',
+  EXPIRED = 'expired',
 }
 
 @Entity('neture_supplier_requests')
@@ -91,6 +96,22 @@ export class NetureSupplierRequest {
 
   @Column({ name: 'reject_reason', type: 'text', nullable: true })
   rejectReason: string;
+
+  // WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1: 관계 통제 컬럼
+  @Column({ name: 'suspended_at', type: 'timestamptz', nullable: true })
+  suspendedAt: Date | null;
+
+  @Column({ name: 'revoked_at', type: 'timestamptz', nullable: true })
+  revokedAt: Date | null;
+
+  @Column({ name: 'expired_at', type: 'timestamptz', nullable: true })
+  expiredAt: Date | null;
+
+  @Column({ name: 'relation_note', type: 'text', nullable: true })
+  relationNote: string | null;
+
+  @Column({ name: 'effective_until', type: 'timestamptz', nullable: true })
+  effectiveUntil: Date | null;
 
   // 메타데이터
   @Column({ type: 'jsonb', nullable: true })

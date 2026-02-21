@@ -20,6 +20,7 @@ import { body, validationResult } from 'express-validator';
 import { DataSource, In, Brackets } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import {
@@ -279,6 +280,15 @@ export function createCheckoutController(
         if (!pharmacy) {
           await queryRunner.release();
           return errorResponse(res, 404, 'PHARMACY_NOT_FOUND', VALIDATION_ERRORS.PHARMACY_NOT_FOUND);
+        }
+
+        // ================================================================
+        // 1-B. 공급 계약 검증 (WO-O4O-CHECKOUT-GUARD-ORGANIZATION-LEVEL-V1)
+        // ================================================================
+        const guardResult = await validateSupplierSellerRelation(dataSource, pharmacy.id);
+        if (!guardResult.allowed) {
+          await queryRunner.release();
+          return errorResponse(res, 403, guardResult.code || 'SUPPLY_CONTRACT_NOT_APPROVED', guardResult.reason || '공급 계약이 승인되지 않았습니다');
         }
 
         // ================================================================

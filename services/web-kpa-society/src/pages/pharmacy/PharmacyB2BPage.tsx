@@ -1,124 +1,39 @@
 /**
  * PharmacyB2BPage - B2B 구매 화면
  *
- * WO-KPA-PHARMACY-B2B-FUNCTION-V1
- * - "거래 화면이 아니라 약국이 접근 가능한 B2B 생태계를 구조적으로 보여주는 화면"
- * - 4개 섹션 고정 배치:
- *   A. 서비스별 B2B 리스트
- *   B. 공동구매 (참여 가능한 것만, 명확히 구분된 섹션)
- *   C. 전체 B2B 리스트 (탐색/조사용)
- *   D. Market Trail (시장 흐름, 정보 영역)
+ * WO-KPA-PHARMACY-B2B-FUNCTION-V1: 초기 구조
+ * WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1: 도메인 탭 통합
  *
- * 공동구매 경계:
- * - B2B의 "한 거래 방식"이지 독립 서비스가 아님
- * - 결제/정산 없음 (이 Phase 기준)
- * - 가격 확정, 할인 강조 표현 금지
+ * 매장 중심 멀티도메인 구조:
+ * - service_key 기반 도메인 탭 필터
+ * - 실 API 데이터 (getListings)
+ * - 매장 사업자가 한 화면에서 모든 서비스 상품 탐색
  */
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { getListings } from '../../api/pharmacyProducts';
+import type { ProductListing } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
-import { useAuth, TestUser } from '../../contexts/AuthContext';
-import { isPharmacyOwner, PharmacistFeeCategory } from '../../types';
 
 // ============================================
-// Mock 데이터
+// WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1
+// 도메인 탭 정의
 // ============================================
 
-// 서비스별 B2B 구조
-const mockServiceB2B = [
-  {
-    serviceId: 'medicine',
-    serviceName: '일반 의약품',
-    icon: '💊',
-    suppliers: [
-      { id: 's1', name: '대웅제약', productCount: 156 },
-      { id: 's2', name: '일동제약', productCount: 203 },
-    ],
-    totalProducts: 359,
-  },
-  {
-    serviceId: 'health',
-    serviceName: '건강기능식품',
-    icon: '🍀',
-    suppliers: [
-      { id: 's3', name: '종근당건강', productCount: 89 },
-      { id: 's4', name: '한독', productCount: 45 },
-    ],
-    totalProducts: 134,
-  },
-  {
-    serviceId: 'supplies',
-    serviceName: '약국 운영용품',
-    icon: '🏪',
-    suppliers: [
-      { id: 's5', name: '메디팜', productCount: 2340 },
-      { id: 's6', name: '팜스토어', productCount: 567 },
-    ],
-    totalProducts: 2907,
-  },
-];
+const DOMAIN_TABS = [
+  { id: 'all', label: '전체', serviceKey: undefined },
+  { id: 'kpa', label: '일반 B2B', serviceKey: 'kpa' },
+  { id: 'kpa-groupbuy', label: '공동구매', serviceKey: 'kpa-groupbuy' },
+  { id: 'glycopharm', label: '혈당관리', serviceKey: 'glycopharm' },
+  { id: 'cosmetics', label: '화장품', serviceKey: 'cosmetics' },
+] as const;
 
-// 현재 참여 가능한 공동구매
-const mockGroupbuys = [
-  {
-    id: 'gb-1',
-    productName: '우루사 100정',
-    supplierName: '대웅제약',
-    targetQty: 100,
-    currentQty: 67,
-    minQty: 50,
-    deadline: '2025-02-15',
-    status: 'open',
-    pharmacyStatus: 'not_joined', // not_joined | joined | pending
-  },
-  {
-    id: 'gb-2',
-    productName: '비타민C 1000mg (90정)',
-    supplierName: '종근당건강',
-    targetQty: 200,
-    currentQty: 180,
-    minQty: 100,
-    deadline: '2025-02-10',
-    status: 'open',
-    pharmacyStatus: 'joined',
-  },
-  {
-    id: 'gb-3',
-    productName: '마스크 (50매입)',
-    supplierName: '메디팜',
-    targetQty: 500,
-    currentQty: 320,
-    minQty: 300,
-    deadline: '2025-02-20',
-    status: 'open',
-    pharmacyStatus: 'not_joined',
-  },
-];
-
-// 전체 B2B 항목
-const mockAllB2BItems = [
-  { id: 'item-1', name: '우루사 100정', supplier: '대웅제약', type: 'b2b', service: '의약품' },
-  { id: 'item-2', name: '베아제 60정', supplier: '대웅제약', type: 'b2b', service: '의약품' },
-  { id: 'item-3', name: '아로나민골드', supplier: '일동제약', type: 'b2b', service: '의약품' },
-  { id: 'item-4', name: '비타민C 1000mg', supplier: '종근당건강', type: 'groupbuy', service: '건강식품' },
-  { id: 'item-5', name: '오메가3', supplier: '종근당건강', type: 'b2b', service: '건강식품' },
-  { id: 'item-6', name: '약봉투 (대)', supplier: '메디팜', type: 'b2b', service: '용품' },
-  { id: 'item-7', name: '마스크 50매', supplier: '메디팜', type: 'groupbuy', service: '용품' },
-  { id: 'item-8', name: '손소독제', supplier: '팜스토어', type: 'b2b', service: '용품' },
-];
-
-// Market Trail (시장 흐름)
-const mockMarketTrail = [
-  { id: 'mt-1', type: 'trend', title: '2025년 1분기 건강기능식품 수요 증가 전망', date: '2025-01-20' },
-  { id: 'mt-2', type: 'new_supplier', title: '신규 공급자: 한미약품 입점', date: '2025-01-18' },
-  { id: 'mt-3', type: 'upcoming', title: '[예정] 대웅제약 신제품 공동구매 (2월 예정)', date: '2025-01-15' },
-  { id: 'mt-4', type: 'info', title: '의약품 공급 안정화 공지', date: '2025-01-10' },
-];
-
-// 약국 정보
-const mockPharmacy = {
-  name: '강남중앙약국',
+const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: string }> = {
+  kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
+  'kpa-groupbuy': { text: '공동구매', color: '#7C3AED', bg: '#EDE9FE' },
+  cosmetics: { text: '화장품', color: '#DB2777', bg: '#FCE7F3' },
+  glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
 };
 
 // ============================================
@@ -126,283 +41,159 @@ const mockPharmacy = {
 // ============================================
 
 export function PharmacyB2BPage() {
-  const { user } = useAuth();
-  const testUser = user as TestUser | null;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = DOMAIN_TABS.some(t => t.id === searchParams.get('tab'))
+    ? searchParams.get('tab')!
+    : 'all';
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [listings, setListings] = useState<ProductListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const userFeeCategory: PharmacistFeeCategory =
-    testUser?.role === 'pharmacist' ? 'B1_pharmacy_employee' : 'A1_pharmacy_owner';
-  const isOwner = isPharmacyOwner(userFeeCategory);
-  const roleLabel = isOwner ? '개설약사' : '근무약사';
+  const loadListings = useCallback(async () => {
+    try {
+      setLoading(true);
+      const tab = DOMAIN_TABS.find(t => t.id === activeTab);
+      const result = await getListings(
+        tab?.serviceKey ? { service_key: tab.serviceKey } : undefined
+      );
+      setListings(result.data || []);
+    } catch (err) {
+      console.warn('Failed to load listings:', err);
+      setListings([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab]);
 
-  // 공동구매 참여 상태 관리 (데모용)
-  const [groupbuyStatus, setGroupbuyStatus] = useState<Record<string, string>>(
-    mockGroupbuys.reduce((acc, gb) => ({ ...acc, [gb.id]: gb.pharmacyStatus }), {})
-  );
+  useEffect(() => {
+    loadListings();
+  }, [loadListings]);
 
-  // 공동구매 참여/취소 핸들러
-  const handleGroupbuyAction = (gbId: string, action: 'join' | 'cancel') => {
-    if (!isOwner) return;
-    setGroupbuyStatus(prev => ({
-      ...prev,
-      [gbId]: action === 'join' ? 'joined' : 'not_joined',
-    }));
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+    setSearchParams(tabId === 'all' ? {} : { tab: tabId }, { replace: true });
   };
 
-  // 전체 리스트 필터
-  const [filter, setFilter] = useState({ service: 'all', type: 'all' });
+  const formatPrice = (price: number | null) => {
+    if (price === null || price === undefined) return '가격 미정';
+    return new Intl.NumberFormat('ko-KR').format(price) + '원';
+  };
 
-  const filteredItems = mockAllB2BItems.filter(item => {
-    if (filter.service !== 'all' && item.service !== filter.service) return false;
-    if (filter.type !== 'all' && item.type !== filter.type) return false;
-    return true;
-  });
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('ko-KR');
+  };
 
   return (
     <div style={styles.container}>
       {/* 헤더 */}
       <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <Link to="/pharmacy" style={styles.backLink}>← 약국 경영지원</Link>
-          <div style={styles.headerMain}>
-            <div style={styles.pharmacyInfo}>
-              <h1 style={styles.pageTitle}>B2B 구매</h1>
-              <span style={styles.subLabel}>{mockPharmacy.name} · 운영 화면</span>
-            </div>
-            <div style={styles.roleInfo}>
-              <span style={styles.roleBadge}>{roleLabel}</span>
-            </div>
+        <Link to="/store" style={styles.backLink}>&larr; 약국 경영지원</Link>
+        <div style={styles.headerMain}>
+          <div>
+            <h1 style={styles.pageTitle}>B2B 구매</h1>
+            <p style={styles.pageDesc}>매장에서 취급하는 상품을 서비스별로 탐색합니다</p>
           </div>
         </div>
       </header>
 
-      {/* ============================================
-       * 섹션 A: 서비스별 B2B 리스트
-       * "어떤 서비스 맥락에서 B2B를 이용하는가"
-       * ============================================ */}
-      <section style={styles.section}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>🅐 서비스별 B2B</h2>
-          <span style={styles.sectionDesc}>
-            서비스 맥락별로 공급자와 상품을 확인합니다
-          </span>
-        </div>
-        <div style={styles.serviceGrid}>
-          {mockServiceB2B.map((service) => (
-            <Link
-              key={service.serviceId}
-              to="/store/products"
-              style={styles.serviceCard}
-            >
-              <div style={styles.serviceIcon}>{service.icon}</div>
-              <div style={styles.serviceInfo}>
-                <h3 style={styles.serviceName}>{service.serviceName}</h3>
-                <div style={styles.serviceMeta}>
-                  <span>{service.suppliers.length}개 공급자</span>
-                  <span style={styles.dot}>·</span>
-                  <span>{service.totalProducts.toLocaleString()}개 상품</span>
-                </div>
-              </div>
-              <span style={styles.serviceArrow}>→</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* 도메인 탭 (WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1) */}
+      <div style={styles.tabBar}>
+        {DOMAIN_TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            style={{
+              ...styles.tabButton,
+              ...(activeTab === tab.id ? styles.tabButtonActive : {}),
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-      {/* ============================================
-       * 섹션 B: 공동구매
-       * "참여 가능한 공동구매만 노출, 명확히 구분된 섹션"
-       * ============================================ */}
-      <section style={{ ...styles.section, ...styles.groupbuySection }}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>🅑 공동구매</h2>
-          <span style={styles.sectionDesc}>
-            현재 참여 가능한 공동구매 목록입니다
-          </span>
+      {/* 공동구매 탭 활성 시 크로스 네비게이션 (WO-O4O-GROUPBUY-IA-ALIGNMENT-V1) */}
+      {activeTab === 'kpa-groupbuy' && (
+        <div style={styles.crossNavBanner}>
+          <span>공동구매 전용 카탈로그에서 더 자세한 정보를 확인하세요.</span>
+          <Link to="/groupbuy" style={styles.crossNavLink}>공동구매 홈으로 이동 &rarr;</Link>
         </div>
+      )}
 
-        {/* 공동구매 안내 */}
-        <div style={styles.groupbuyNotice}>
-          <span style={styles.noticeIcon}>ℹ️</span>
-          <span>
-            공동구매는 B2B의 한 거래 방식입니다.
-            조건 성립 전까지 구매 확정이 아니며, 본 화면에서는 참여 상태만 관리합니다.
-          </span>
+      {/* 결과 카운트 */}
+      <div style={styles.resultBar}>
+        <span style={styles.resultCount}>
+          {loading ? '불러오는 중...' : `${listings.length}개 상품`}
+        </span>
+      </div>
+
+      {/* 상품 그리드 */}
+      {loading ? (
+        <div style={styles.loadingState}>
+          <span style={styles.loadingText}>상품을 불러오는 중...</span>
         </div>
-
-        <div style={styles.groupbuyGrid}>
-          {mockGroupbuys.map((gb) => {
-            const status = groupbuyStatus[gb.id];
-            const progress = (gb.currentQty / gb.targetQty) * 100;
-            const isMinMet = gb.currentQty >= gb.minQty;
+      ) : listings.length === 0 ? (
+        <div style={styles.emptyState}>
+          <span style={styles.emptyIcon}>📦</span>
+          <h3 style={styles.emptyTitle}>
+            {activeTab === 'all' ? '등록된 상품이 없습니다' : `${DOMAIN_TABS.find(t => t.id === activeTab)?.label} 상품이 없습니다`}
+          </h3>
+          <p style={styles.emptyDesc}>
+            상품 판매 관리에서 상품을 등록하세요.
+          </p>
+          <Link to="/store/sell" style={styles.emptyAction}>상품 판매 관리 →</Link>
+        </div>
+      ) : (
+        <div style={styles.productGrid}>
+          {listings.map(listing => {
+            const labelInfo = SERVICE_KEY_LABELS[listing.service_key];
 
             return (
-              <div key={gb.id} style={styles.groupbuyCard}>
-                <div style={styles.gbHeader}>
-                  <div style={styles.gbInfo}>
-                    <h4 style={styles.gbName}>{gb.productName}</h4>
-                    <span style={styles.gbSupplier}>{gb.supplierName}</span>
-                  </div>
-                  {status === 'joined' && (
-                    <span style={styles.joinedBadge}>참여중</span>
-                  )}
-                </div>
-
-                <div style={styles.gbProgress}>
-                  <div style={styles.progressLabels}>
-                    <span>현재 {gb.currentQty} / 목표 {gb.targetQty}</span>
-                    <span style={isMinMet ? styles.minMetText : styles.minNotMetText}>
-                      {isMinMet ? '✓ 최소수량 달성' : `최소 ${gb.minQty} 필요`}
+              <div key={listing.id} style={styles.productCard}>
+                <div style={styles.cardHeader}>
+                  {labelInfo && (
+                    <span style={{
+                      ...styles.serviceKeyBadge,
+                      color: labelInfo.color,
+                      backgroundColor: labelInfo.bg,
+                    }}>
+                      {labelInfo.text}
                     </span>
-                  </div>
-                  <div style={styles.progressBar}>
-                    <div style={{
-                      ...styles.progressFill,
-                      width: `${Math.min(progress, 100)}%`,
-                      backgroundColor: isMinMet ? '#22c55e' : colors.primary,
-                    }} />
-                    {/* 최소 수량 마커 */}
-                    <div style={{
-                      ...styles.minMarker,
-                      left: `${(gb.minQty / gb.targetQty) * 100}%`,
-                    }} />
-                  </div>
+                  )}
+                  <span style={{
+                    ...styles.statusBadge,
+                    ...(listing.is_active ? styles.statusActive : styles.statusInactive),
+                  }}>
+                    {listing.is_active ? '활성' : '비활성'}
+                  </span>
                 </div>
 
-                <div style={styles.gbFooter}>
-                  <span style={styles.gbDeadline}>마감: {gb.deadline}</span>
+                <h3 style={styles.productName}>{listing.product_name}</h3>
 
-                  {isOwner ? (
-                    status === 'joined' ? (
-                      <button
-                        style={styles.cancelButton}
-                        onClick={() => handleGroupbuyAction(gb.id, 'cancel')}
-                      >
-                        참여 취소
-                      </button>
-                    ) : (
-                      <button
-                        style={styles.joinButton}
-                        onClick={() => handleGroupbuyAction(gb.id, 'join')}
-                      >
-                        참여하기
-                      </button>
-                    )
-                  ) : (
-                    <span style={styles.viewOnlyLabel}>열람 전용</span>
-                  )}
+                <div style={styles.productMeta}>
+                  <span style={styles.productPrice}>{formatPrice(listing.retail_price)}</span>
+                </div>
+
+                <div style={styles.cardFooter}>
+                  <span style={styles.productDate}>
+                    {formatDate(listing.created_at)}
+                  </span>
+                  <span style={styles.productId}>
+                    ID: {listing.external_product_id}
+                  </span>
                 </div>
               </div>
             );
           })}
         </div>
-
-        {!isOwner && (
-          <div style={styles.roleNotice}>
-            공동구매 참여는 개설약사만 가능합니다.
-          </div>
-        )}
-      </section>
-
-      {/* ============================================
-       * 섹션 C: 전체 B2B 리스트
-       * "탐색/조사용 영역, 구매 흐름의 출발점은 아님"
-       * ============================================ */}
-      <section style={styles.section}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>🅒 전체 B2B 리스트</h2>
-          <span style={styles.sectionDesc}>
-            접근 가능한 모든 B2B 항목을 탐색합니다
-          </span>
-        </div>
-
-        {/* 필터 */}
-        <div style={styles.filterRow}>
-          <select
-            style={styles.filterSelect}
-            value={filter.service}
-            onChange={(e) => setFilter(prev => ({ ...prev, service: e.target.value }))}
-          >
-            <option value="all">전체 서비스</option>
-            <option value="의약품">의약품</option>
-            <option value="건강식품">건강식품</option>
-            <option value="용품">용품</option>
-          </select>
-          <select
-            style={styles.filterSelect}
-            value={filter.type}
-            onChange={(e) => setFilter(prev => ({ ...prev, type: e.target.value }))}
-          >
-            <option value="all">전체 거래방식</option>
-            <option value="b2b">일반 B2B</option>
-            <option value="groupbuy">공동구매</option>
-          </select>
-          <span style={styles.filterResult}>
-            {filteredItems.length}개 항목
-          </span>
-        </div>
-
-        <div style={styles.itemList}>
-          {filteredItems.map((item) => (
-            <div key={item.id} style={styles.itemRow}>
-              <div style={styles.itemInfo}>
-                <span style={styles.itemName}>{item.name}</span>
-                <span style={styles.itemMeta}>
-                  {item.supplier} · {item.service}
-                </span>
-              </div>
-              <span style={{
-                ...styles.typeBadge,
-                ...(item.type === 'groupbuy' ? styles.groupbuyTypeBadge : {}),
-              }}>
-                {item.type === 'b2b' ? '일반' : '공동구매'}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <Link to="/store/products/suppliers" style={styles.viewAllLink}>
-          공급자 전체 보기 →
-        </Link>
-      </section>
-
-      {/* ============================================
-       * 섹션 D: Market Trail (시장 흐름)
-       * "정보 → 판단용 섹션, 행동 유도 없음"
-       * ============================================ */}
-      <section style={{ ...styles.section, ...styles.marketSection }}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>🅓 시장 흐름</h2>
-          <span style={styles.sectionDesc}>
-            시장 정보를 참고하여 판단에 활용하세요
-          </span>
-        </div>
-
-        <div style={styles.marketList}>
-          {mockMarketTrail.map((item) => (
-            <div key={item.id} style={styles.marketItem}>
-              <span style={styles.marketIcon}>
-                {item.type === 'trend' && '📈'}
-                {item.type === 'new_supplier' && '🏭'}
-                {item.type === 'upcoming' && '📅'}
-                {item.type === 'info' && '📋'}
-              </span>
-              <div style={styles.marketInfo}>
-                <span style={styles.marketTitle}>{item.title}</span>
-                <span style={styles.marketDate}>{item.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      )}
 
       {/* 페이지 안내 */}
       <div style={styles.pageNotice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          이 화면은 약국이 접근 가능한 B2B 생태계를 구조적으로 보여줍니다.
-          {isOwner
-            ? ' 공급자를 선택하여 상품을 확인하거나 공동구매에 참여할 수 있습니다.'
-            : ' 구매 및 공동구매 참여는 개설약사만 가능합니다.'}
+          이 화면은 매장에 등록된 상품을 서비스별로 탐색합니다.
+          상품 추가/수정은 <Link to="/store/sell" style={{ color: colors.primary }}>상품 판매 관리</Link>에서 가능합니다.
         </span>
       </div>
     </div>
@@ -422,12 +213,7 @@ const styles: Record<string, React.CSSProperties> = {
 
   // Header
   header: {
-    marginBottom: '32px',
-  },
-  headerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
+    marginBottom: '24px',
   },
   backLink: {
     color: colors.primary,
@@ -436,354 +222,198 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
   headerMain: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  pharmacyInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
+    marginTop: '12px',
   },
   pageTitle: {
     fontSize: '1.75rem',
     fontWeight: 700,
     color: colors.neutral900,
+    margin: '0 0 4px 0',
+  },
+  pageDesc: {
+    fontSize: '0.95rem',
+    color: colors.neutral500,
     margin: 0,
   },
-  subLabel: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
+
+  // Domain Tabs (WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1)
+  tabBar: {
+    display: 'flex',
+    gap: 0,
+    borderBottom: '2px solid #E5E7EB',
+    marginBottom: '24px',
   },
-  roleInfo: {},
-  roleBadge: {
-    padding: '6px 14px',
-    backgroundColor: colors.primary + '15',
-    color: colors.primary,
-    borderRadius: '20px',
-    fontSize: '0.8125rem',
+  tabButton: {
+    padding: '12px 24px',
+    fontSize: '0.95rem',
+    fontWeight: 400,
+    color: '#6B7280',
+    background: 'none',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    marginBottom: -2,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  tabButtonActive: {
     fontWeight: 600,
+    color: '#2563EB',
+    borderBottom: '2px solid #2563EB',
   },
 
-  // Section
-  section: {
-    marginBottom: '40px',
-  },
-  sectionHeader: {
-    marginBottom: '20px',
-  },
-  sectionTitle: {
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-    margin: '0 0 6px 0',
-  },
-  sectionDesc: {
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-
-  // Section A: Service B2B
-  serviceGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '16px',
-  },
-  serviceCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    padding: '20px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    textDecoration: 'none',
-    color: 'inherit',
-    transition: 'box-shadow 0.2s',
-  },
-  serviceIcon: {
-    fontSize: '32px',
-    flexShrink: 0,
-  },
-  serviceInfo: {
-    flex: 1,
-  },
-  serviceName: {
-    fontSize: '1.0625rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    margin: 0,
-  },
-  serviceMeta: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    marginTop: '4px',
-  },
-  dot: {
-    margin: '0 4px',
-  },
-  serviceArrow: {
-    fontSize: '1.25rem',
-    color: colors.neutral400,
-  },
-
-  // Section B: Groupbuy
-  groupbuySection: {
-    backgroundColor: colors.primary + '05',
-    margin: '0 -24px 40px -24px',
-    padding: '24px',
-    borderTop: `1px solid ${colors.primary}20`,
-    borderBottom: `1px solid ${colors.primary}20`,
-  },
-  groupbuyNotice: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '10px',
-    padding: '14px 18px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    border: `1px solid ${colors.neutral200}`,
-    marginBottom: '20px',
-    fontSize: '0.8125rem',
-    color: colors.neutral600,
-    lineHeight: 1.5,
-  },
-  groupbuyGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-    gap: '16px',
-  },
-  groupbuyCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
-  },
-  gbHeader: {
+  // Cross-nav banner (WO-O4O-GROUPBUY-IA-ALIGNMENT-V1)
+  crossNavBanner: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    padding: '14px 20px',
+    backgroundColor: '#F5F3FF',
+    border: '1px solid #DDD6FE',
+    borderRadius: '8px',
+    marginBottom: '20px',
+    fontSize: '0.875rem',
+    color: '#5B21B6',
   },
-  gbInfo: {
+  crossNavLink: {
+    color: '#7C3AED',
+    fontWeight: 600,
+    textDecoration: 'none',
+    whiteSpace: 'nowrap',
+  },
+
+  // Result bar
+  resultBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+  },
+  resultCount: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+    fontWeight: 500,
+  },
+
+  // Loading
+  loadingState: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '80px 0',
+  },
+  loadingText: {
+    fontSize: '0.95rem',
+    color: colors.neutral500,
+  },
+
+  // Empty state
+  emptyState: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    alignItems: 'center',
+    padding: '80px 0',
+    textAlign: 'center',
   },
-  gbName: {
+  emptyIcon: {
+    fontSize: '48px',
+    marginBottom: '16px',
+  },
+  emptyTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 600,
+    color: colors.neutral700,
+    margin: '0 0 8px 0',
+  },
+  emptyDesc: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+    margin: '0 0 20px 0',
+  },
+  emptyAction: {
+    color: colors.primary,
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    textDecoration: 'none',
+  },
+
+  // Product grid
+  productGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+    gap: '20px',
+  },
+  productCard: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    border: `1px solid ${colors.neutral200}`,
+  },
+  cardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  serviceKeyBadge: {
+    padding: '3px 10px',
+    borderRadius: '4px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  },
+  statusBadge: {
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '0.6875rem',
+    fontWeight: 500,
+  },
+  statusActive: {
+    color: '#047857',
+    backgroundColor: '#D1FAE5',
+  },
+  statusInactive: {
+    color: '#6B7280',
+    backgroundColor: '#F3F4F6',
+  },
+  productName: {
     fontSize: '1rem',
     fontWeight: 600,
     color: colors.neutral900,
     margin: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
   },
-  gbSupplier: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
-  joinedBadge: {
-    padding: '4px 10px',
-    backgroundColor: '#dcfce7',
-    color: '#166534',
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-  },
-  gbProgress: {
+  productMeta: {
     display: 'flex',
-    flexDirection: 'column',
+    alignItems: 'baseline',
     gap: '8px',
   },
-  progressLabels: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '0.8125rem',
-    color: colors.neutral600,
+  productPrice: {
+    fontSize: '1.125rem',
+    fontWeight: 700,
+    color: colors.neutral900,
   },
-  minMetText: {
-    color: '#166534',
-    fontWeight: 500,
-  },
-  minNotMetText: {
-    color: colors.neutral400,
-  },
-  progressBar: {
-    position: 'relative',
-    height: '10px',
-    backgroundColor: colors.neutral200,
-    borderRadius: '5px',
-    overflow: 'visible',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: '5px',
-    transition: 'width 0.3s',
-  },
-  minMarker: {
-    position: 'absolute',
-    top: '-2px',
-    width: '2px',
-    height: '14px',
-    backgroundColor: colors.neutral500,
-  },
-  gbFooter: {
+  cardFooter: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderTop: `1px solid ${colors.neutral200}`,
+    paddingTop: '12px',
     marginTop: 'auto',
   },
-  gbDeadline: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
-  joinButton: {
-    padding: '8px 20px',
-    backgroundColor: colors.primary,
-    color: colors.white,
-    border: 'none',
-    borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  cancelButton: {
-    padding: '8px 20px',
-    backgroundColor: colors.white,
-    color: colors.neutral600,
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  viewOnlyLabel: {
-    padding: '8px 16px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral500,
-    borderRadius: borderRadius.md,
-    fontSize: '0.8125rem',
-  },
-  roleNotice: {
-    marginTop: '16px',
-    padding: '12px',
-    backgroundColor: colors.neutral100,
-    borderRadius: borderRadius.md,
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    textAlign: 'center',
-  },
-
-  // Section C: All Items
-  filterRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '16px',
-  },
-  filterSelect: {
-    padding: '10px 14px',
-    border: `1px solid ${colors.neutral300}`,
-    borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
-    backgroundColor: colors.white,
-    cursor: 'pointer',
-  },
-  filterResult: {
-    marginLeft: 'auto',
-    fontSize: '0.875rem',
-    color: colors.neutral500,
-  },
-  itemList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    maxHeight: '320px',
-    overflowY: 'auto',
-    marginBottom: '16px',
-  },
-  itemRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '14px 18px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    border: `1px solid ${colors.neutral200}`,
-  },
-  itemInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-  },
-  itemName: {
-    fontSize: '0.9375rem',
-    fontWeight: 500,
-    color: colors.neutral800,
-  },
-  itemMeta: {
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-  },
-  typeBadge: {
-    padding: '4px 10px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral600,
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-  },
-  groupbuyTypeBadge: {
-    backgroundColor: colors.primary + '15',
-    color: colors.primary,
-  },
-  viewAllLink: {
-    display: 'inline-block',
-    color: colors.primary,
-    fontSize: '0.875rem',
-    fontWeight: 500,
-    textDecoration: 'none',
-  },
-
-  // Section D: Market Trail
-  marketSection: {
-    backgroundColor: colors.neutral100 + '80',
-    margin: '0 -24px 40px -24px',
-    padding: '24px',
-    borderRadius: 0,
-  },
-  marketList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  marketItem: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '14px',
-    padding: '16px 18px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    border: `1px solid ${colors.neutral200}`,
-  },
-  marketIcon: {
-    fontSize: '20px',
-    flexShrink: 0,
-  },
-  marketInfo: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  marketTitle: {
-    fontSize: '0.9375rem',
-    color: colors.neutral800,
-    lineHeight: 1.4,
-  },
-  marketDate: {
+  productDate: {
     fontSize: '0.8125rem',
     color: colors.neutral400,
+  },
+  productId: {
+    fontSize: '0.75rem',
+    color: colors.neutral400,
+    fontFamily: 'monospace',
   },
 
   // Page Notice
@@ -795,6 +425,10 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.primary + '08',
     borderRadius: borderRadius.lg,
     border: `1px solid ${colors.primary}20`,
+    marginTop: '40px',
+    fontSize: '0.875rem',
+    color: colors.neutral600,
+    lineHeight: 1.5,
   },
   noticeIcon: {
     fontSize: '18px',

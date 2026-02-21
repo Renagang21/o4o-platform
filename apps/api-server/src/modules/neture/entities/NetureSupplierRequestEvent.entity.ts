@@ -10,7 +10,7 @@
  * - 승인자(supplierId)
  * - 시각(timestamp)
  * - 대상(sellerId, productId)
- * - 이벤트 유형(approved, rejected)
+ * - 이벤트 유형(approved, rejected, suspended, reactivated, revoked, expired)
  */
 
 import {
@@ -24,6 +24,10 @@ export enum RequestEventType {
   CREATED = 'created',
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  SUSPENDED = 'suspended',
+  REACTIVATED = 'reactivated',
+  REVOKED = 'revoked',
+  EXPIRED = 'expired',
 }
 
 @Entity('neture_supplier_request_events')

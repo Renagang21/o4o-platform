@@ -112,6 +112,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Create order controller (H2-0)
   const orderController = createCosmeticsOrderController(
+    dataSource,
     coreRequireAuth as any,
     requireCosmeticsScope
   );

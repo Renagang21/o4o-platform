@@ -20,6 +20,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  PauseCircle,
+  Ban,
   Filter,
   Package,
   Search,
@@ -46,6 +48,9 @@ const STATUS_CONFIG: Record<
   pending: { label: '대기 중', twBg: 'bg-amber-50', twText: 'text-amber-700', icon: Clock },
   approved: { label: '승인됨', twBg: 'bg-green-50', twText: 'text-green-700', icon: CheckCircle },
   rejected: { label: '거절됨', twBg: 'bg-red-50', twText: 'text-red-700', icon: XCircle },
+  suspended: { label: '일시 중단', twBg: 'bg-orange-50', twText: 'text-orange-700', icon: PauseCircle },
+  revoked: { label: '공급 종료', twBg: 'bg-red-50', twText: 'text-red-700', icon: Ban },
+  expired: { label: '계약 만료', twBg: 'bg-slate-50', twText: 'text-slate-500', icon: Clock },
 };
 
 const SERVICE_OPTIONS = [

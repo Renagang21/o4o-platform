@@ -58,6 +58,10 @@ export class KpaBranchOfficer {
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
 
+  // WO-KPA-C-OFFICER-FK-NORMALIZATION-V1: member FK
+  @Column({ type: 'uuid', nullable: true })
+  member_id: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -68,4 +72,8 @@ export class KpaBranchOfficer {
   @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'organization_id' })
   organization: any;
+
+  @ManyToOne('KpaMember')
+  @JoinColumn({ name: 'member_id' })
+  member: any;
 }

@@ -31,11 +31,11 @@ const SERVICE_ROLES = {
     { value: 'platform:admin', label: 'Platform Admin', description: 'Platform administrator' },
     { value: 'platform:operator', label: 'Platform Operator', description: 'Platform operator' },
   ],
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:operator 제거 — 분회 역할은 KpaMember.role이 SSOT
   kpa: [
     { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
     { value: 'kpa-b:district', label: '데모서비스 지부 운영자', description: '지부/분회 데모 서비스 지부 운영자 (/demo)' },
     { value: 'kpa-b:branch', label: '데모서비스 분회 운영자', description: '지부/분회 데모 서비스 분회 운영자 (/demo)' },
-    { value: 'kpa-c:operator', label: '분회서비스 운영자', description: '분회 서비스 운영자 (/branch-services)' },
   ],
   neture: [
     { value: 'neture:admin', label: 'Neture Admin', description: 'Neture administrator' },

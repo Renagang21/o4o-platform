@@ -18,8 +18,9 @@ import { KpaBranchOfficer } from '../entities/kpa-branch-officer.entity.js';
 import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
+import { User } from '../../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { requireOrgRole } from '../middleware/kpa-org-role.middleware.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -38,10 +39,9 @@ interface RecentActivity {
   status: 'pending' | 'completed' | 'rejected';
 }
 
-const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
-
 /**
  * Get user's organization ID from membership
+ * (유지: kpa:admin bypass 시 kpaMember가 없으므로 fallback 필요)
  */
 async function getUserOrganizationId(
   dataSource: DataSource,
@@ -60,9 +60,10 @@ export function createBranchAdminDashboardController(
 ): Router {
   const router = Router();
 
-  // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: Branch scope enforced at router level
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role 기반 가드
+  // requireOrgRole('admin') = KpaMember.role >= admin 검증 + kpa:admin bypass
   router.use(requireAuth);
-  router.use(requireKpaScope('kpa:branch_admin'));
+  router.use(requireOrgRole(dataSource, 'admin'));
 
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
@@ -420,6 +421,48 @@ export function createBranchAdminDashboardController(
   );
 
   // ──────────────────────────────────────────────────────
+  // Members list (for officer selection dropdown)
+  // ──────────────────────────────────────────────────────
+
+  /** GET /branch-admin/members — active members for dropdown */
+  router.get(
+    '/members',
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        if (!userId) { res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } }); return; }
+
+        const organizationId = await getUserOrganizationId(dataSource, userId);
+        if (!organizationId) { res.json({ success: true, data: [] }); return; }
+
+        const memberRepo = dataSource.getRepository(KpaMember);
+        const members = await memberRepo.find({
+          where: { organization_id: organizationId, status: 'active' },
+          select: ['id', 'user_id', 'pharmacy_name', 'license_number'],
+        });
+
+        // Join user names
+        const userRepo = dataSource.getRepository(User);
+        const data = await Promise.all(members.map(async (m) => {
+          const user = await userRepo.findOne({ where: { id: m.user_id }, select: ['id', 'name'] });
+          return {
+            id: m.id,
+            user_name: user?.name || 'Unknown',
+            pharmacy_name: m.pharmacy_name,
+            license_number: m.license_number,
+          };
+        }));
+
+        res.json({ success: true, data });
+      } catch (error: any) {
+        console.error('Failed to get members for officer selection:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  // ──────────────────────────────────────────────────────
   // Officers CRUD
   // ──────────────────────────────────────────────────────
 
@@ -464,23 +507,36 @@ export function createBranchAdminDashboardController(
         const organizationId = await getUserOrganizationId(dataSource, userId);
         if (!organizationId) { res.status(400).json({ error: { code: 'NO_ORGANIZATION', message: 'User not associated with an organization' } }); return; }
 
-        const { name, position, role, pharmacy_name, phone, email, term_start, term_end, is_active, sort_order } = req.body;
-        if (!name || !position || !role) { res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'name, position, role are required' } }); return; }
+        const { member_id, position, role, phone, email, term_start, term_end, is_active, sort_order } = req.body;
+        if (!member_id || !position || !role) { res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'member_id, position, role are required' } }); return; }
+
+        // Verify member exists in same organization
+        const memberRepo = dataSource.getRepository(KpaMember);
+        const member = await memberRepo.findOne({
+          where: { id: member_id, organization_id: organizationId, status: 'active' },
+        });
+        if (!member) { res.status(404).json({ error: { code: 'MEMBER_NOT_FOUND', message: 'Member not found in this organization' } }); return; }
+
+        // Derive name from user
+        const userRepo = dataSource.getRepository(User);
+        const memberUser = await userRepo.findOne({ where: { id: member.user_id } });
 
         const repo = dataSource.getRepository(KpaBranchOfficer);
         const officer = repo.create({
           organization_id: organizationId,
-          name, position, role,
-          pharmacy_name: pharmacy_name || null,
+          member_id,
+          name: memberUser?.name || 'Unknown',
+          position, role,
+          pharmacy_name: member.pharmacy_name || null,
           phone: phone ? phone.replace(/\D/g, '') : null,
-          email: email || null,
+          email: email || memberUser?.email || null,
           term_start: term_start || null,
           term_end: term_end || null,
           is_active: is_active ?? true,
           sort_order: sort_order ?? 0,
         });
         const saved = await repo.save(officer);
-        await writeAuditLog(authReq.user, 'OFFICER_CREATED', 'branch_officer', saved.id, { name, position, organizationId });
+        await writeAuditLog(authReq.user, 'OFFICER_CREATED', 'branch_officer', saved.id, { member_id, name: saved.name, position, organizationId });
         res.status(201).json({ success: true, data: saved });
       } catch (error: any) {
         console.error('Failed to create branch officer:', error);
@@ -507,7 +563,22 @@ export function createBranchAdminDashboardController(
         const existing = await repo.findOne({ where: { id: req.params.id, organization_id: organizationId, is_deleted: false } });
         if (!existing) { res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Officer not found' } }); return; }
 
-        const fields = ['name', 'position', 'role', 'pharmacy_name', 'phone', 'email', 'term_start', 'term_end', 'is_active', 'sort_order'] as const;
+        // If member_id changed, re-derive name/pharmacy_name
+        if (req.body.member_id && req.body.member_id !== existing.member_id) {
+          const memberRepo = dataSource.getRepository(KpaMember);
+          const member = await memberRepo.findOne({
+            where: { id: req.body.member_id, organization_id: organizationId, status: 'active' },
+          });
+          if (!member) { res.status(404).json({ error: { code: 'MEMBER_NOT_FOUND', message: 'Member not found in this organization' } }); return; }
+
+          const userRepo = dataSource.getRepository(User);
+          const memberUser = await userRepo.findOne({ where: { id: member.user_id } });
+          existing.member_id = member.id;
+          existing.name = memberUser?.name || existing.name;
+          existing.pharmacy_name = member.pharmacy_name || existing.pharmacy_name;
+        }
+
+        const fields = ['position', 'role', 'phone', 'email', 'term_start', 'term_end', 'is_active', 'sort_order'] as const;
         for (const f of fields) {
           if (req.body[f] !== undefined) (existing as any)[f] = req.body[f];
         }

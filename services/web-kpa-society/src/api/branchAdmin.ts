@@ -55,6 +55,7 @@ export interface BranchNews {
 export interface BranchOfficer {
   id: string;
   organization_id: string;
+  member_id: string | null;
   name: string;
   position: string;
   role: string;
@@ -67,6 +68,13 @@ export interface BranchOfficer {
   sort_order: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface MemberOption {
+  id: string;
+  user_name: string;
+  pharmacy_name: string | null;
+  license_number: string | null;
 }
 
 export interface BranchDoc {
@@ -126,11 +134,15 @@ export const branchAdminApi = {
   deleteNews: (id: string) =>
     apiClient.delete(`/branch-admin/news/${id}`),
 
+  // Members (for officer selection)
+  getMembers: () =>
+    apiClient.get<{ data: MemberOption[] }>('/branch-admin/members'),
+
   // Officers CRUD
   getOfficers: () =>
     apiClient.get<{ data: BranchOfficer[] }>('/branch-admin/officers'),
 
-  createOfficer: (data: { name: string; position: string; role: string; pharmacy_name?: string; phone?: string; email?: string; term_start?: string; term_end?: string; sort_order?: number }) =>
+  createOfficer: (data: { member_id: string; position: string; role: string; phone?: string; email?: string; term_start?: string; term_end?: string; sort_order?: number }) =>
     apiClient.post<{ data: BranchOfficer }>('/branch-admin/officers', data),
 
   updateOfficer: (id: string, data: Partial<BranchOfficer>) =>

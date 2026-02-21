@@ -4,7 +4,7 @@
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
  */
 
-export type JoinRequestType = 'join' | 'promotion' | 'operator' | 'pharmacy_join' | 'pharmacy_operator';
+export type JoinRequestType = 'join' | 'promotion' | 'operator';
 export type JoinRequestStatus = 'pending' | 'approved' | 'rejected';
 export type RequestedRole = 'admin' | 'manager' | 'member' | 'moderator';
 
@@ -34,8 +34,6 @@ export const JOIN_REQUEST_TYPE_LABELS: Record<JoinRequestType, string> = {
   join: '가입 요청',
   promotion: '권한 상향 요청',
   operator: '운영자 요청',
-  pharmacy_join: '약국 가입 요청',
-  pharmacy_operator: '약국 운영자 요청',
 };
 
 export const REQUESTED_ROLE_LABELS: Record<RequestedRole, string> = {

@@ -691,7 +691,7 @@ interface CmsContent {
 
 // ==================== Supplier Request API (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
 
-export type SupplierRequestStatus = 'pending' | 'approved' | 'rejected';
+export type SupplierRequestStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'revoked' | 'expired';
 
 interface SupplierRequest {
   id: string;
@@ -729,6 +729,11 @@ interface SupplierRequestDetail {
   decidedBy: string | null;
   decidedAt: string | null;
   rejectReason: string | null;
+  suspendedAt: string | null;
+  revokedAt: string | null;
+  expiredAt: string | null;
+  relationNote: string | null;
+  effectiveUntil: string | null;
   createdAt: string;
 }
 
@@ -813,6 +818,65 @@ export const supplierApi = {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ reason }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1
+
+  /**
+   * POST /api/v1/neture/supplier/requests/:id/suspend
+   * 공급 일시 중단
+   */
+  async suspendRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/suspend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ note }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * POST /api/v1/neture/supplier/requests/:id/reactivate
+   * 공급 재활성화
+   */
+  async reactivateRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/reactivate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ note }),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * POST /api/v1/neture/supplier/requests/:id/revoke
+   * 공급 종료
+   */
+  async revokeRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/revoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ note }),
       });
 
       return response.json();

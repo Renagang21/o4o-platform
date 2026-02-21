@@ -38,6 +38,20 @@ const CHANNEL_LABELS: Record<string, string> = {
   SIGNAGE: '사이니지',
 };
 
+const SERVICE_KEY_OPTIONS = [
+  { value: 'kpa', label: '일반 B2B' },
+  { value: 'kpa-groupbuy', label: 'KPA 공동구매' },
+  { value: 'cosmetics', label: '화장품 서비스' },
+  { value: 'glycopharm', label: '혈당관리 서비스' },
+] as const;
+
+const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: string }> = {
+  kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
+  'kpa-groupbuy': { text: '공동구매', color: '#7C3AED', bg: '#EDE9FE' },
+  cosmetics: { text: '화장품', color: '#DB2777', bg: '#FCE7F3' },
+  glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
+};
+
 export function PharmacySellPage() {
   const [activeTab, setActiveTab] = useState<TabId>('applications');
 
@@ -96,7 +110,7 @@ function ApplicationsTab() {
   const [applications, setApplications] = useState<ProductApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ externalProductId: '', productName: '' });
+  const [formData, setFormData] = useState({ externalProductId: '', productName: '', serviceKey: 'kpa' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -128,8 +142,9 @@ function ApplicationsTab() {
       await applyProduct({
         externalProductId: formData.externalProductId.trim(),
         productName: formData.productName.trim(),
+        service_key: formData.serviceKey,
       });
-      setFormData({ externalProductId: '', productName: '' });
+      setFormData({ externalProductId: '', productName: '', serviceKey: 'kpa' });
       setShowForm(false);
       await loadApplications();
     } catch (e: any) {
@@ -220,6 +235,42 @@ function ApplicationsTab() {
               />
             </div>
 
+            <div>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: 8 }}>
+                서비스 영역
+              </label>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {SERVICE_KEY_OPTIONS.map(opt => (
+                  <label
+                    key={opt.value}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '8px 14px',
+                      border: formData.serviceKey === opt.value ? '2px solid #2563EB' : '1px solid #D1D5DB',
+                      borderRadius: 8,
+                      backgroundColor: formData.serviceKey === opt.value ? '#EFF6FF' : '#fff',
+                      cursor: 'pointer',
+                      fontSize: '0.875rem',
+                      fontWeight: formData.serviceKey === opt.value ? 600 : 400,
+                      color: formData.serviceKey === opt.value ? '#2563EB' : '#374151',
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="serviceKey"
+                      value={opt.value}
+                      checked={formData.serviceKey === opt.value}
+                      onChange={e => setFormData(prev => ({ ...prev, serviceKey: e.target.value }))}
+                      style={{ display: 'none' }}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
               <button
                 onClick={handleApply}
@@ -274,8 +325,22 @@ function ApplicationsTab() {
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-                    {app.product_name}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontWeight: 600, color: '#0F172A' }}>
+                      {app.product_name}
+                    </span>
+                    {app.service_key && SERVICE_KEY_LABELS[app.service_key] && (
+                      <span style={{
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        fontSize: '0.7rem',
+                        fontWeight: 500,
+                        color: SERVICE_KEY_LABELS[app.service_key].color,
+                        backgroundColor: SERVICE_KEY_LABELS[app.service_key].bg,
+                      }}>
+                        {SERVICE_KEY_LABELS[app.service_key].text}
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
                     ID: {app.external_product_id} &middot; {new Date(app.requested_at).toLocaleDateString('ko-KR')}
@@ -412,8 +477,22 @@ function ListingsTab() {
                 }}
               >
                 <div>
-                  <div style={{ fontWeight: 600, color: '#0F172A', marginBottom: 4 }}>
-                    {listing.product_name}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontWeight: 600, color: '#0F172A' }}>
+                      {listing.product_name}
+                    </span>
+                    {listing.service_key && SERVICE_KEY_LABELS[listing.service_key] && (
+                      <span style={{
+                        padding: '2px 8px',
+                        borderRadius: 4,
+                        fontSize: '0.7rem',
+                        fontWeight: 500,
+                        color: SERVICE_KEY_LABELS[listing.service_key].color,
+                        backgroundColor: SERVICE_KEY_LABELS[listing.service_key].bg,
+                      }}>
+                        {SERVICE_KEY_LABELS[listing.service_key].text}
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
                     ID: {listing.external_product_id}

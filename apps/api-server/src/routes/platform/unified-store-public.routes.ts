@@ -28,6 +28,7 @@
 import { Router, Request, Response } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
 import rateLimit from 'express-rate-limit';
+import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { OrganizationStore } from '../kpa/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
@@ -443,7 +444,7 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
       const limit = req.query.limit ? Number(req.query.limit) : 8;
 
       // WO-STORE-MULTI-SERVICE-GRID-V1: optional ?services= for multi-service grid
-      const ALLOWED_SERVICE_KEYS = ['glycopharm', 'kpa', 'cosmetics'];
+      const ALLOWED_SERVICE_KEYS = Object.values(SERVICE_KEYS) as string[];
       let serviceKeys: string[];
       if (req.query.services && typeof req.query.services === 'string') {
         const requested = req.query.services.split(',')

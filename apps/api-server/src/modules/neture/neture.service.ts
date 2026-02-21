@@ -800,10 +800,28 @@ export class NetureService {
     }
   }
 
+  // ==================== State Transition Guard (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
+
+  /**
+   * 허용 상태 전이 맵
+   */
+  private static readonly VALID_TRANSITIONS: Record<string, string[]> = {
+    [SupplierRequestStatus.PENDING]: [SupplierRequestStatus.APPROVED, SupplierRequestStatus.REJECTED],
+    [SupplierRequestStatus.APPROVED]: [SupplierRequestStatus.SUSPENDED, SupplierRequestStatus.REVOKED, SupplierRequestStatus.EXPIRED],
+    [SupplierRequestStatus.SUSPENDED]: [SupplierRequestStatus.APPROVED, SupplierRequestStatus.REVOKED],
+    [SupplierRequestStatus.REJECTED]: [],
+    [SupplierRequestStatus.REVOKED]: [],
+    [SupplierRequestStatus.EXPIRED]: [],
+  };
+
+  private validateTransition(from: string, to: string): boolean {
+    return NetureService.VALID_TRANSITIONS[from]?.includes(to) ?? false;
+  }
+
   /**
    * POST /supplier/requests/:id/approve - 신청 승인
    *
-   * 상태 전이: pending → approved
+   * 상태 전이: pending → approved, suspended → approved (재활성화)
    * 이벤트 로그 기록 (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2)
    */
   async approveSupplierRequest(id: string, supplierId: string, actorName?: string) {
@@ -816,8 +834,8 @@ export class NetureService {
         return { success: false, error: 'REQUEST_NOT_FOUND' };
       }
 
-      // 상태 전이 규칙 검증
-      if (request.status !== SupplierRequestStatus.PENDING) {
+      // 상태 전이 규칙 검증 (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1)
+      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
         return {
           success: false,
           error: 'INVALID_STATUS_TRANSITION',
@@ -885,8 +903,8 @@ export class NetureService {
         return { success: false, error: 'REQUEST_NOT_FOUND' };
       }
 
-      // 상태 전이 규칙 검증
-      if (request.status !== SupplierRequestStatus.PENDING) {
+      // 상태 전이 규칙 검증 (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1)
+      if (!this.validateTransition(request.status, SupplierRequestStatus.REJECTED)) {
         return {
           success: false,
           error: 'INVALID_STATUS_TRANSITION',
@@ -955,7 +973,7 @@ export class NetureService {
         return { success: false, error: 'REQUEST_NOT_FOUND' };
       }
 
-      if (request.status !== SupplierRequestStatus.PENDING) {
+      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
         return {
           success: false,
           error: 'INVALID_STATUS_TRANSITION',
@@ -1017,7 +1035,7 @@ export class NetureService {
         return { success: false, error: 'REQUEST_NOT_FOUND' };
       }
 
-      if (request.status !== SupplierRequestStatus.PENDING) {
+      if (!this.validateTransition(request.status, SupplierRequestStatus.REJECTED)) {
         return {
           success: false,
           error: 'INVALID_STATUS_TRANSITION',
@@ -1066,6 +1084,328 @@ export class NetureService {
       };
     } catch (error) {
       logger.error('[NetureService] Error admin-rejecting supplier request:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
+
+  /**
+   * POST /supplier/requests/:id/suspend — 공급 일시 중단
+   * 상태 전이: approved → suspended
+   */
+  async suspendSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (!this.validateTransition(request.status, SupplierRequestStatus.SUSPENDED)) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot suspend request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.SUSPENDED;
+      request.suspendedAt = new Date();
+      request.relationNote = note || null;
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.SUSPENDED,
+        actorId: supplierId,
+        actorName: actorName || '',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.SUSPENDED,
+        reason: note || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Suspended supplier request ${id} by ${supplierId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          suspendedAt: updatedRequest.suspendedAt,
+          relationNote: updatedRequest.relationNote,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error suspending supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /supplier/requests/:id/reactivate — 재활성화
+   * 상태 전이: suspended → approved
+   */
+  async reactivateSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot reactivate request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.APPROVED;
+      request.suspendedAt = null;
+      request.relationNote = note || null;
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.REACTIVATED,
+        actorId: supplierId,
+        actorName: actorName || '',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.APPROVED,
+        reason: note || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Reactivated supplier request ${id} by ${supplierId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          relationNote: updatedRequest.relationNote,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error reactivating supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /supplier/requests/:id/revoke — 공급 종료
+   * 상태 전이: approved|suspended → revoked
+   */
+  async revokeSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({
+        where: { id, supplierId },
+      });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (!this.validateTransition(request.status, SupplierRequestStatus.REVOKED)) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot revoke request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.REVOKED;
+      request.revokedAt = new Date();
+      request.relationNote = note || null;
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.REVOKED,
+        actorId: supplierId,
+        actorName: actorName || '',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.REVOKED,
+        reason: note || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Revoked supplier request ${id} by ${supplierId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          revokedAt: updatedRequest.revokedAt,
+          relationNote: updatedRequest.relationNote,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error revoking supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Admin override: 소유권 검증 없이 일시 중단
+   * 상태 전이: approved → suspended
+   */
+  async suspendSupplierRequestAsAdmin(id: string, actorId: string, note?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({ where: { id } });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (!this.validateTransition(request.status, SupplierRequestStatus.SUSPENDED)) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot suspend request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.SUSPENDED;
+      request.suspendedAt = new Date();
+      request.relationNote = note || null;
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.SUSPENDED,
+        actorId,
+        actorName: actorName || 'Admin',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.SUSPENDED,
+        reason: note || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Admin suspended supplier request ${id} by ${actorId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          suspendedAt: updatedRequest.suspendedAt,
+          relationNote: updatedRequest.relationNote,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error admin-suspending supplier request:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Admin override: 소유권 검증 없이 공급 종료
+   * 상태 전이: approved|suspended → revoked
+   */
+  async revokeSupplierRequestAsAdmin(id: string, actorId: string, note?: string, actorName?: string) {
+    try {
+      const request = await this.supplierRequestRepo.findOne({ where: { id } });
+
+      if (!request) {
+        return { success: false, error: 'REQUEST_NOT_FOUND' };
+      }
+
+      if (!this.validateTransition(request.status, SupplierRequestStatus.REVOKED)) {
+        return {
+          success: false,
+          error: 'INVALID_STATUS_TRANSITION',
+          message: `Cannot revoke request with status: ${request.status}`,
+        };
+      }
+
+      const fromStatus = request.status;
+
+      request.status = SupplierRequestStatus.REVOKED;
+      request.revokedAt = new Date();
+      request.relationNote = note || null;
+
+      const updatedRequest = await this.supplierRequestRepo.save(request);
+
+      const event = this.requestEventRepo.create({
+        requestId: id,
+        eventType: RequestEventType.REVOKED,
+        actorId,
+        actorName: actorName || 'Admin',
+        sellerId: request.sellerId,
+        sellerName: request.sellerName,
+        productId: request.productId,
+        productName: request.productName,
+        serviceId: request.serviceId,
+        serviceName: request.serviceName,
+        fromStatus,
+        toStatus: SupplierRequestStatus.REVOKED,
+        reason: note || '',
+      });
+      await this.requestEventRepo.save(event);
+
+      logger.info(`[NetureService] Admin revoked supplier request ${id} by ${actorId} (event: ${event.id})`);
+
+      return {
+        success: true,
+        data: {
+          id: updatedRequest.id,
+          status: updatedRequest.status,
+          revokedAt: updatedRequest.revokedAt,
+          relationNote: updatedRequest.relationNote,
+          eventId: event.id,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error admin-revoking supplier request:', error);
       throw error;
     }
   }

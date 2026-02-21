@@ -12,7 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Filter, Clock, CheckCircle, XCircle, PauseCircle, Ban } from 'lucide-react';
 import { supplierApi, type SupplierRequest, type SupplierRequestStatus } from '../../lib/api';
 import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
 
@@ -27,6 +27,9 @@ const STATUS_CONFIG: Record<SupplierRequestStatus, { label: string; color: strin
   pending: { label: '대기 중', color: '#b45309', bgColor: '#fef3c7', icon: Clock },
   approved: { label: '승인됨', color: '#15803d', bgColor: '#dcfce7', icon: CheckCircle },
   rejected: { label: '거절됨', color: '#dc2626', bgColor: '#fee2e2', icon: XCircle },
+  suspended: { label: '일시 중단', color: '#c2410c', bgColor: '#fff7ed', icon: PauseCircle },
+  revoked: { label: '공급 종료', color: '#dc2626', bgColor: '#fee2e2', icon: Ban },
+  expired: { label: '계약 만료', color: '#64748b', bgColor: '#f1f5f9', icon: Clock },
 };
 
 const SERVICES = [
