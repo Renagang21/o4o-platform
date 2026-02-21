@@ -16,15 +16,15 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
     // ============================================================
     // 1. status enum 확장 (neture_supplier_requests.status)
     // ============================================================
-    // TypeORM이 생성한 PostgreSQL enum 타입명 확인
-    // 일반적으로: neture_supplier_requests_status_enum
+    // PostgreSQL enum 타입명 (원본 migration 1737200000000에서 생성):
+    // neture_supplier_request_status_enum
     await queryRunner.query(`
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'suspended'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_requests_status_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_status_enum'))
         THEN
-          ALTER TYPE neture_supplier_requests_status_enum ADD VALUE 'suspended';
+          ALTER TYPE neture_supplier_request_status_enum ADD VALUE 'suspended';
         END IF;
       END $$;
     `);
@@ -33,9 +33,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'revoked'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_requests_status_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_status_enum'))
         THEN
-          ALTER TYPE neture_supplier_requests_status_enum ADD VALUE 'revoked';
+          ALTER TYPE neture_supplier_request_status_enum ADD VALUE 'revoked';
         END IF;
       END $$;
     `);
@@ -44,9 +44,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'expired'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_requests_status_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_status_enum'))
         THEN
-          ALTER TYPE neture_supplier_requests_status_enum ADD VALUE 'expired';
+          ALTER TYPE neture_supplier_request_status_enum ADD VALUE 'expired';
         END IF;
       END $$;
     `);
@@ -58,9 +58,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'suspended'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_events_event_type_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_request_event_type_enum'))
         THEN
-          ALTER TYPE neture_supplier_request_events_event_type_enum ADD VALUE 'suspended';
+          ALTER TYPE neture_request_event_type_enum ADD VALUE 'suspended';
         END IF;
       END $$;
     `);
@@ -69,9 +69,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'reactivated'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_events_event_type_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_request_event_type_enum'))
         THEN
-          ALTER TYPE neture_supplier_request_events_event_type_enum ADD VALUE 'reactivated';
+          ALTER TYPE neture_request_event_type_enum ADD VALUE 'reactivated';
         END IF;
       END $$;
     `);
@@ -80,9 +80,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'revoked'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_events_event_type_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_request_event_type_enum'))
         THEN
-          ALTER TYPE neture_supplier_request_events_event_type_enum ADD VALUE 'revoked';
+          ALTER TYPE neture_request_event_type_enum ADD VALUE 'revoked';
         END IF;
       END $$;
     `);
@@ -91,9 +91,9 @@ export class NetureSupplierRelationStateExtension20260222000000 implements Migra
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'expired'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_request_events_event_type_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_request_event_type_enum'))
         THEN
-          ALTER TYPE neture_supplier_request_events_event_type_enum ADD VALUE 'expired';
+          ALTER TYPE neture_request_event_type_enum ADD VALUE 'expired';
         END IF;
       END $$;
     `);

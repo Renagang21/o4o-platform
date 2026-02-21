@@ -21,8 +21,12 @@ import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { requireOrgRole } from '../middleware/kpa-org-role.middleware.js';
+import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
 
 type AuthMiddleware = RequestHandler;
+
+// WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: service-level scope guard
+const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
 
 // Response interfaces
 // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
@@ -60,9 +64,11 @@ export function createBranchAdminDashboardController(
 ): Router {
   const router = Router();
 
-  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role 기반 가드
-  // requireOrgRole('admin') = KpaMember.role >= admin 검증 + kpa:admin bypass
+  // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: service scope → org role 2-layer guard
+  // Layer 1: requireKpaScope — KPA 서비스 역할 확인 (security-core)
+  // Layer 2: requireOrgRole('admin') — 분회 조직 역할 확인 (KpaMember.role >= admin)
   router.use(requireAuth);
+  router.use(requireKpaScope);
   router.use(requireOrgRole(dataSource, 'admin'));
 
   const auditRepo = dataSource.getRepository(KpaAuditLog);
