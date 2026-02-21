@@ -20,9 +20,7 @@ import { useAuth, User } from '../../contexts/AuthContext';
 import { apiClient } from '../../api/client';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
-
-/** Roles that can access any branch without ownership check */
-const BRANCH_BYPASS_ROLES = ['kpa:admin', 'kpa:district_admin'];
+import { ROLES, BRANCH_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface MembershipResponse {
   success: boolean;
@@ -139,34 +137,18 @@ export function BranchOperatorAuthGuard({ children }: BranchOperatorAuthGuardPro
 /**
  * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
  * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: branchId 검증 분리 — 역할만 확인
+ * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
  */
 function checkBranchOperatorRole(user: User): boolean {
-  const allowedRoles = [
-    'kpa-c:operator',
-    'kpa-c:branch_admin',
-    'kpa:admin',
-    'kpa:district_admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-  ];
-
-  if (user.roles.some(r => allowedRoles.includes(r))) {
-    return true;
-  }
-
-  return false;
+  return hasAnyRole(user.roles, [...BRANCH_ROLES, ROLES.KPA_ADMIN]);
 }
 
 /**
  * WO-KPA-BRANCH-SCOPE-VALIDATION-V1: Super admin bypass check
- * kpa:admin과 kpa:district_admin은 모든 분회에 접근 가능
+ * kpa:admin은 모든 분회에 접근 가능
  */
 function hasBypassRole(user: User): boolean {
-  if (user.roles.some(r => BRANCH_BYPASS_ROLES.includes(r))) {
-    return true;
-  }
-
-  return false;
+  return user.roles.includes(ROLES.KPA_ADMIN);
 }
 
 const styles: Record<string, React.CSSProperties> = {

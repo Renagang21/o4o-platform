@@ -12,7 +12,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
@@ -38,7 +38,7 @@ export function createPharmacyStoreConfigController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
   // GET /config — 매장 설정 조회
@@ -108,7 +108,7 @@ export function createPharmacyStoreConfigController(
     // JSON 전체 overwrite
     await orgRepo
       .createQueryBuilder()
-      .update(KpaOrganization)
+      .update(OrganizationStore)
       .set({ storefront_config: config } as any)
       .where('id = :id', { id: organizationId })
       .execute();

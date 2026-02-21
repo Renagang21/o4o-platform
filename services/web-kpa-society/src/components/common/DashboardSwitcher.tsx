@@ -9,6 +9,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth, useOrganization } from '../../contexts';
 import { colors } from '../../styles/theme';
+import { DASHBOARD_ADMIN_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface DashboardItem {
   label: string;
@@ -31,16 +32,11 @@ export function useAccessibleDashboards(): DashboardItem[] {
   items.push({ label: '내 대시보드', icon: '🏠', path: '/dashboard' });
 
   // 약국 context가 있는 사용자: 약국경영
+  // admin/operator는 Hub가 메인이므로 제외
+  const isAdminOrOperator = hasAnyRole(user.roles, DASHBOARD_ADMIN_ROLES);
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
-  if (hasPharmacyContext) {
+  if (hasPharmacyContext && !isAdminOrOperator) {
     items.push({ label: '약국경영', icon: '💊', path: '/pharmacy' });
-  }
-
-  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
-  const adminRoles = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator'];
-  const hasAdminRole = user.roles.some((r: string) => adminRoles.includes(r));
-  if (hasAdminRole) {
-    items.push({ label: '운영자 대시보드', icon: '🖥️', path: '/admin/kpa-dashboard' });
   }
 
   return items;

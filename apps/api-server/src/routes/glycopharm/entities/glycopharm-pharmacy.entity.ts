@@ -21,6 +21,16 @@ import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
 import type { KpaOrganization } from '../../kpa/entities/kpa-organization.entity.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
+export type TemplateProfile = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
+
+/** WO-STORE-BLOCK-ENGINE-V1 */
+export type StoreBlockType = 'HERO' | 'PRODUCT_GRID' | 'BLOG_LIST' | 'TABLET_PROMO' | 'SIGNAGE_PROMO' | 'INFO_SECTION';
+
+export interface StoreBlock {
+  type: StoreBlockType;
+  enabled: boolean;
+  config?: Record<string, any>;
+}
 
 @Entity({ name: 'glycopharm_pharmacies', schema: 'public' })
 export class GlycopharmPharmacy {
@@ -79,6 +89,13 @@ export class GlycopharmPharmacy {
 
   @Column({ name: 'storefront_config', type: 'jsonb', nullable: true })
   storefront_config?: Record<string, any>;
+
+  @Column({ name: 'template_profile', type: 'varchar', length: 30, default: 'BASIC' })
+  template_profile!: TemplateProfile;
+
+  /** WO-STORE-BLOCK-ENGINE-V1: JSON 기반 블록 레이아웃. NULL이면 template_profile fallback */
+  @Column({ name: 'storefront_blocks', type: 'jsonb', nullable: true })
+  storefront_blocks?: StoreBlock[];
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at!: Date;

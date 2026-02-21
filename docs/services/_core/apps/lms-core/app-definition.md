@@ -1,67 +1,28 @@
-# lms-core - Definition
+# lms-core
 
-> 앱 정의 문서
+> **Status**: FROZEN (Foundation Core) | **Version**: 1.0.0 | **Package**: @o4o/lms-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** lms-core
-- **App Type:** core
-- **Package:** @o4o/lms-core
-- **Service Group:** yaksa, education
-- **Status:** @status FROZEN - Foundation Core
+LMS 핵심 기능. yaksa, education에서 사용.
 
-## 역할 및 책임
-
-### 주요 역할
-학습 관리 시스템(LMS) 핵심 기능을 제공하는 Foundation Core로서 코스, 레슨, 진도 관리를 담당한다.
-
-### 책임 범위
-- Course 관리
-- Lesson 관리
-- Enrollment 관리
-- Progress 추적
-
-### 경계
-- LMS 기본 기능만 담당
-- 업종별 확장은 Extension에 위임 (lms-yaksa, lms-marketing 등)
-- 권한 관리는 organization-core에 위임
-
-## 의존성
-
-### Core Dependencies
-(없음 - Foundation Core)
-
-### Optional Dependencies
-(없음)
+| 책임 | 경계 |
+|------|------|
+| Course / Lesson 관리 | 업종별 확장 → Extension (lms-yaksa 등) |
+| Enrollment / Progress 추적 | 권한 → organization-core |
 
 ## 외부 노출
 
-### Services
-- LMSService
-- CourseService
-- EnrollmentService
+**Services**: LMSService, CourseService, EnrollmentService
+**Types**: Course, Lesson, Enrollment, Progress
+**Events**: `course.created`, `enrollment.created`, `progress.updated`, `course.completed`
 
-### Types
-- Course
-- Lesson
-- Enrollment
-- Progress
+## API Routes
 
-### Events
-- `course.created`
-- `enrollment.created`
-- `progress.updated`
-- `course.completed`
+- `/api/v1/lms/courses`, `/api/v1/lms/courses/:id/lessons`
+- `/api/v1/lms/enrollments`
+- `/api/v1/lms/progress`
 
-## 설정
+## Dependencies
 
-### 기본 설정
-(manifest에 defaultConfig 없음)
-
-### 환경 변수
-(없음)
-
-## 특징
-
-- @status FROZEN (Foundation Core)
-- yaksa, education 서비스에서 사용
+없음 (Foundation Core)

@@ -50,17 +50,24 @@ interface ForumPostItem {
 export interface OperatorSummary {
   content: {
     totalPublished: number;
+    pendingDraft: number;
     recentItems: ContentItem[];
   };
   signage: {
     totalMedia: number;
     totalPlaylists: number;
+    pendingMedia: number;
+    pendingPlaylists: number;
     recentMedia: MediaItem[];
     recentPlaylists: PlaylistItem[];
   };
   forum: {
     totalPosts: number;
+    pendingRequests: number;
     recentPosts: ForumPostItem[];
+  };
+  store?: {
+    forcedExpirySoon: number;
   };
 }
 
@@ -100,12 +107,45 @@ interface ForumAnalyticsResponse {
   data: ForumAnalytics;
 }
 
+// District Operator summary (KPA-c)
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1
+export interface DistrictOperatorSummary {
+  kpis: {
+    totalBranches: number;
+    totalMembers: number;
+    pendingApprovals: number;
+  };
+  pendingRequests: {
+    total: number;
+    items: Array<{
+      id: string;
+      user_id: string;
+      organization_id: string;
+      request_type: string;
+      requested_role: string;
+      requested_sub_role: string | null;
+      status: string;
+      created_at: string;
+    }>;
+  };
+}
+
+interface DistrictOperatorSummaryResponse {
+  success: boolean;
+  data: DistrictOperatorSummary;
+}
+
 export const operatorApi = {
   getSummary: () =>
     apiClient.get<OperatorSummaryResponse>('/operator/summary'),
 
   getForumAnalytics: () =>
     apiClient.get<ForumAnalyticsResponse>('/operator/forum-analytics'),
+
+  getDistrictSummary: (limit?: number) =>
+    apiClient.get<DistrictOperatorSummaryResponse>(
+      `/operator/district-summary${limit ? `?limit=${limit}` : ''}`
+    ),
 };
 
 export type { ContentItem, MediaItem, PlaylistItem, ForumPostItem };

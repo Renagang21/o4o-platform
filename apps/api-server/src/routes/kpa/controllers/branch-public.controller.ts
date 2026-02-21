@@ -9,7 +9,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaBranchNews } from '../entities/kpa-branch-news.entity.js';
 import { KpaBranchOfficer } from '../entities/kpa-branch-officer.entity.js';
 import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
@@ -58,11 +58,11 @@ async function resolveBranch(
   dataSource: DataSource,
   branchId: string,
 ): Promise<ResolvedBranch> {
-  const repo = dataSource.getRepository(KpaOrganization);
+  const repo = dataSource.getRepository(OrganizationStore);
 
   // Try UUID lookup
   if (UUID_RE.test(branchId)) {
-    const org = await repo.findOne({ where: { id: branchId, is_active: true } });
+    const org = await repo.findOne({ where: { id: branchId, isActive: true } });
     if (org) {
       return { id: org.id, name: org.name, type: org.type, description: org.description, address: org.address, phone: org.phone, isVirtual: false };
     }
@@ -70,7 +70,7 @@ async function resolveBranch(
     // Slug / name lookup – match name ignoring case
     const org = await repo
       .createQueryBuilder('o')
-      .where('o.is_active = true')
+      .where('o.isActive = true')
       .andWhere('LOWER(o.name) = LOWER(:name)', { name: branchId })
       .getOne();
     if (org) {

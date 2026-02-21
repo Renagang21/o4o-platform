@@ -1,6 +1,7 @@
 /**
  * ContentManagementPage - KPA-a 콘텐츠 CMS (공지/뉴스)
  * WO-KPA-A-CONTENT-CMS-PHASE1-V1
+ * WO-KPA-A-HUB-TO-STORE-CLONE-FLOW-V2: 매장 복사 후 자동 이동
  *
  * API:
  *   GET    /api/v1/kpa/news/admin/list
@@ -10,6 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileText,
   Megaphone,
@@ -88,10 +90,12 @@ function formatDate(dateStr: string | null): string {
 type TabKey = 'notice' | 'news';
 
 export default function ContentManagementPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabKey>('notice');
   const [showEditor, setShowEditor] = useState(false);
   const [editTarget, setEditTarget] = useState<CmsContent | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
 
   function handleCreate() {
     setEditTarget(null);
@@ -111,6 +115,13 @@ export default function ContentManagementPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Copy toast */}
+      {copyToast && (
+        <div className="fixed top-4 right-4 z-50 bg-green-50 border border-green-200 rounded-lg px-4 py-3 shadow-lg text-sm text-green-700">
+          {copyToast}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -160,6 +171,8 @@ export default function ContentManagementPage() {
         refreshKey={refreshKey}
         onEdit={handleEdit}
         onDeleted={() => setRefreshKey(k => k + 1)}
+        onCopyToast={setCopyToast}
+        navigate={navigate}
       />
 
       {/* Editor Modal */}
@@ -182,11 +195,15 @@ function ContentList({
   refreshKey,
   onEdit,
   onDeleted,
+  onCopyToast,
+  navigate,
 }: {
   type: ContentType;
   refreshKey: number;
   onEdit: (item: CmsContent) => void;
   onDeleted: () => void;
+  onCopyToast: (msg: string | null) => void;
+  navigate: (path: string) => void;
 }) {
   const [items, setItems] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -258,12 +275,18 @@ function ContentList({
         sourceAssetId: item.id,
         assetType: 'cms',
       });
-      alert('매장으로 복사되었습니다.');
+      onCopyToast(`"${item.title}" — 매장에 추가되었습니다.`);
+      setTimeout(() => {
+        onCopyToast(null);
+        navigate('/pharmacy/assets?tab=cms');
+      }, 1500);
     } catch (e: any) {
       if (e.message?.includes('DUPLICATE') || e.message?.includes('already')) {
-        alert('이미 매장에 복사된 콘텐츠입니다.');
+        onCopyToast('이미 매장에 복사된 콘텐츠입니다.');
+        setTimeout(() => onCopyToast(null), 3000);
       } else {
-        alert(`복사 실패: ${e.message}`);
+        onCopyToast(`복사 실패: ${e.message}`);
+        setTimeout(() => onCopyToast(null), 3000);
       }
     } finally {
       setActionLoading(null);

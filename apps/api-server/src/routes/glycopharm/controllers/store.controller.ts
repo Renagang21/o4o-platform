@@ -22,10 +22,12 @@ import { DataSource } from 'typeorm';
 import { GlycopharmService } from '../services/glycopharm.service.js';
 import { FeaturedProductsService } from '../services/featured-products.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import type { TemplateProfile } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import type { ListProductsQueryDto } from '../dto/index.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 // ============================================================================
 // WO-O4O-STOREFRONT-VISIBILITY-GATE-FIX-V1
@@ -164,12 +166,47 @@ async function queryVisibleProducts(
   };
 }
 
+// WO-STORE-SLUG-REDIRECT-LAYER-V1
+// Old slug → 301 redirect to new slug (SEO/brand asset protection)
+async function checkSlugRedirect(
+  dataSource: DataSource,
+  slug: string,
+  req: Request,
+  res: Response,
+): Promise<boolean> {
+  try {
+    const slugService = new StoreSlugService(dataSource);
+    const redirect = await slugService.findOldSlugRedirect(slug);
+    if (redirect) {
+      const newPath = req.originalUrl.replace(
+        `/${encodeURIComponent(slug)}`,
+        `/${encodeURIComponent(redirect.newSlug)}`,
+      );
+      res.redirect(301, newPath);
+      return true;
+    }
+  } catch {
+    // redirect check failure → fallback to original 404
+  }
+  return false;
+}
+
 export function createStoreController(dataSource: DataSource): Router {
   const router = Router();
   const service = new GlycopharmService(dataSource);
   const featuredService = new FeaturedProductsService(dataSource);
   const productRepo = dataSource.getRepository(GlycopharmProduct);
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
+  const slugService = new StoreSlugService(dataSource);
+
+  /** Resolve slug → OrganizationStore (active only when activeOnly=true) */
+  async function findOrgBySlug(slug: string, activeOnly = false): Promise<OrganizationStore | null> {
+    const record = await slugService.findBySlug(slug);
+    if (!record || !record.isActive) return null;
+    const where: any = { id: record.storeId };
+    if (activeOnly) where.isActive = true;
+    return orgRepo.findOne({ where });
+  }
 
   // ============================================================================
   // GET /stores/:slug — 매장 정보 (public)
@@ -180,6 +217,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getActivePharmacyBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -206,6 +244,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -265,6 +304,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -310,6 +350,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -346,6 +387,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const pharmacy = await service.getPharmacyEntityBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -384,9 +426,10 @@ export function createStoreController(dataSource: DataSource): Router {
   router.get('/:slug/storefront-config', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -412,7 +455,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const { slug } = req.params;
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         res.status(404).json({
@@ -459,7 +502,7 @@ export function createStoreController(dataSource: DataSource): Router {
         ...(template !== undefined && { template }),
       };
 
-      await pharmacyRepo.update(pharmacy.id, { storefront_config: updatedConfig });
+      await orgRepo.update(pharmacy.id, { storefront_config: updatedConfig });
 
       res.json({ success: true, data: updatedConfig });
     } catch (error: any) {
@@ -477,9 +520,10 @@ export function createStoreController(dataSource: DataSource): Router {
   router.get('/:slug/hero', async (req: Request, res: Response): Promise<void> => {
     try {
       const { slug } = req.params;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
         res.status(404).json({
           success: false,
           error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
@@ -506,7 +550,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const { slug } = req.params;
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const pharmacy = await pharmacyRepo.findOne({ where: { slug } });
+      const pharmacy = await findOrgBySlug(slug);
 
       if (!pharmacy) {
         res.status(404).json({
@@ -562,7 +606,7 @@ export function createStoreController(dataSource: DataSource): Router {
       const currentConfig = pharmacy.storefront_config || {};
       const updatedConfig = { ...currentConfig, heroContents };
 
-      await pharmacyRepo.update(pharmacy.id, { storefront_config: updatedConfig });
+      await orgRepo.update(pharmacy.id, { storefront_config: updatedConfig });
 
       res.json({ success: true, data: heroContents });
     } catch (error: any) {
@@ -570,6 +614,81 @@ export function createStoreController(dataSource: DataSource): Router {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update hero contents' },
+      });
+    }
+  });
+
+  // ============================================================================
+  // GET /stores/:slug/template — Template Profile 조회 (public)
+  // WO-STORE-TEMPLATE-PROFILE-V1
+  // ============================================================================
+  router.get('/:slug/template', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { slug } = req.params;
+      const pharmacy = await findOrgBySlug(slug, true);
+
+      if (!pharmacy) {
+        if (await checkSlugRedirect(dataSource, slug, req, res)) return;
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: {
+          templateProfile: pharmacy.template_profile || 'BASIC',
+          theme: pharmacy.storefront_config?.theme || null,
+        },
+      });
+    } catch (error: any) {
+      console.error('[StoreController] GET /:slug/template error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch template profile' },
+      });
+    }
+  });
+
+  // ============================================================================
+  // PUT /stores/:slug/template — Template Profile 변경 (authenticated, owner only)
+  // WO-STORE-TEMPLATE-PROFILE-V1
+  // ============================================================================
+  const VALID_PROFILES: TemplateProfile[] = ['BASIC', 'COMMERCE_FOCUS', 'CONTENT_FOCUS', 'MINIMAL'];
+
+  router.put('/:slug/template', authenticate, async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { slug } = req.params;
+      const authReq = req as unknown as AuthRequest;
+      const userId = authReq.user?.id || authReq.authUser?.id;
+      const { templateProfile } = req.body;
+
+      if (!templateProfile || !VALID_PROFILES.includes(templateProfile)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: `templateProfile must be one of: ${VALID_PROFILES.join(', ')}` },
+        });
+        return;
+      }
+
+      const pharmacy = await findOrgBySlug(slug, true);
+      if (!pharmacy) {
+        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+        return;
+      }
+
+      if (!userId || pharmacy.created_by_user_id !== userId) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Not the store owner' } });
+        return;
+      }
+
+      await orgRepo.update(pharmacy.id, { template_profile: templateProfile });
+
+      res.json({ success: true, data: { templateProfile } });
+    } catch (error: any) {
+      console.error('[StoreController] PUT /:slug/template error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to update template profile' },
       });
     }
   });

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, User } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../common';
 import { colors } from '../../styles/theme';
+import { ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface AdminAuthGuardProps {
   children: React.ReactNode;
@@ -93,21 +94,10 @@ export function AdminAuthGuard({ children }: AdminAuthGuardProps) {
  */
 /**
  * WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles only
- * DEV bypass removed, legacy roles removed, platform roles removed
+ * WO-KPA-B-ISOLATION-ALIGNMENT-V1: demo role 제거, KPA-c role만 허용
  */
 function checkBranchAdminRole(user: User): boolean {
-  const allowedRoles = [
-    'kpa:admin',
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-    'kpa:district_admin',
-  ];
-
-  if (user.roles.some(r => allowedRoles.includes(r))) {
-    return true;
-  }
-
-  return false;
+  return hasAnyRole(user.roles, [ROLES.KPA_ADMIN, ROLES.KPA_C_BRANCH_ADMIN]);
 }
 
 const styles: Record<string, React.CSSProperties> = {

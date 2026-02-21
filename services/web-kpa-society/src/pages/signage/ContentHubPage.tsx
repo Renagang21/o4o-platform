@@ -2,20 +2,23 @@
  * Signage Content Hub Page - KPA-Society
  *
  * WO-SIGNAGE-CONTENT-HUB-V2
+ * WO-KPA-A-HUB-TO-STORE-CLONE-FLOW-V2
  * 레이아웃:
  * ├─ Header (안내 영상 · 자료)
  * ├─ 최신 콘텐츠 / 추천 콘텐츠 (2열 하이라이트)
  * ├─ 카테고리 탭 (운영자 제공 / 공급자 제공 / 커뮤니티 공유)
  * │  ├─ 플레이리스트 리스트
  * │  └─ 동영상 리스트
- * └─ Clone/가져오기 기능 유지
+ * ├─ Clone/가져오기 기능 유지
+ * └─ + 내 매장에 추가 (asset snapshot copy → Store Assets)
  */
 
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff } from 'lucide-react';
+import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus } from 'lucide-react';
 import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
 import { getMediaThumbnailUrl } from '@o4o/types/signage';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 
 /** Image with onError fallback — shows placeholder icon when image fails to load */
 function SafeImg({ src, alt, className }: { src: string; alt: string; className: string }) {
@@ -46,7 +49,11 @@ function formatDuration(seconds: number): string {
 
 // ── Compact list-row components ──
 
-function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone: (id: string, name: string) => void }) {
+function PlaylistRow({ playlist, onClone, onAddToStore }: {
+  playlist: SignagePlaylist;
+  onClone: (id: string, name: string) => void;
+  onAddToStore: (id: string, name: string) => void;
+}) {
   const navigate = useNavigate();
 
   return (
@@ -77,6 +84,13 @@ function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone
       </div>
       <div className="flex gap-1 flex-shrink-0">
         <button
+          onClick={(e) => { e.stopPropagation(); onAddToStore(playlist.id, playlist.name); }}
+          className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
+          title="내 매장에 추가"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+        <button
           onClick={(e) => { e.stopPropagation(); onClone(playlist.id, playlist.name); }}
           className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
           title="가져오기"
@@ -88,28 +102,20 @@ function PlaylistRow({ playlist, onClone }: { playlist: SignagePlaylist; onClone
   );
 }
 
-function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string, name: string) => void }) {
+function MediaRow({ item, onClone, onAddToStore }: {
+  item: SignageMedia;
+  onClone: (id: string, name: string) => void;
+  onAddToStore: (id: string, name: string) => void;
+}) {
   const navigate = useNavigate();
-  const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
     <div
       onClick={() => navigate(`/signage/media/${item.id}`)}
       className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
     >
-      <div className="flex-shrink-0 w-16 h-10 rounded overflow-hidden bg-slate-100">
-        {thumbnailUrl ? (
-          <div className="block relative group/thumb">
-            <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center">
-              <Play className="h-4 w-4 text-white" fill="white" />
-            </div>
-          </div>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <VideoIcon className="h-4 w-4 text-slate-300" />
-          </div>
-        )}
+      <div className="flex-shrink-0 w-8 text-center">
+        <VideoIcon className="h-5 w-5 text-purple-600 mx-auto" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
@@ -127,6 +133,13 @@ function MediaRow({ item, onClone }: { item: SignageMedia; onClone: (id: string,
         {new Date(item.createdAt).toLocaleDateString()}
       </div>
       <div className="flex gap-1 flex-shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); onAddToStore(item.id, item.name); }}
+          className="p-1.5 text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
+          title="내 매장에 추가"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
         <button
           onClick={(e) => { e.stopPropagation(); onClone(item.id, item.name); }}
           className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
@@ -179,25 +192,15 @@ function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
 
 function HighlightMediaCard({ item }: { item: SignageMedia }) {
   const navigate = useNavigate();
-  const thumbnailUrl = getMediaThumbnailUrl(item);
 
   return (
     <div
       onClick={() => navigate(`/signage/media/${item.id}`)}
       className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
     >
-      {thumbnailUrl ? (
-        <div className="block relative group">
-          <SafeImg src={thumbnailUrl} alt={item.name} className="w-full h-32 object-cover" />
-          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <Play className="h-8 w-8 text-white" fill="white" />
-          </div>
-        </div>
-      ) : (
-        <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
-          <VideoIcon className="h-8 w-8 text-purple-300" />
-        </div>
-      )}
+      <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
+        <VideoIcon className="h-8 w-8 text-purple-300" />
+      </div>
       <div className="p-3">
         <h4 className="font-semibold text-sm text-slate-800 truncate">{item.name}</h4>
         <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
@@ -214,6 +217,7 @@ function HighlightMediaCard({ item }: { item: SignageMedia }) {
 // ── Main Component ──
 
 export default function ContentHubPage() {
+  const navigate = useNavigate();
   const [playlistSource, setPlaylistSource] = useState<ContentSource>('community');
   const [mediaSource, setMediaSource] = useState<ContentSource>('community');
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
@@ -281,6 +285,30 @@ export default function ContentHubPage() {
     () => allMedia.filter((m) => (m as any).source === mediaSource),
     [allMedia, mediaSource],
   );
+
+  // Add to Store handler (asset snapshot copy)
+  const handleAddToStore = async (sourceId: string, name: string) => {
+    try {
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: sourceId,
+        assetType: 'signage',
+      });
+      setCloneSuccess(`"${name}" — 내 매장에 추가되었습니다.`);
+      setTimeout(() => {
+        setCloneSuccess(null);
+        navigate('/pharmacy/assets?tab=signage');
+      }, 1500);
+    } catch (e: any) {
+      const msg = e?.message || '';
+      if (msg.includes('DUPLICATE') || msg.includes('already')) {
+        setError('이미 매장에 추가된 항목입니다.');
+      } else {
+        setError('매장 추가에 실패했습니다.');
+      }
+      setTimeout(() => setError(null), 3000);
+    }
+  };
 
   // Clone handlers
   const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
@@ -430,7 +458,7 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 플레이리스트가 없습니다</div>
             ) : (
               filteredPlaylists.map((pl) => (
-                <PlaylistRow key={pl.id} playlist={pl} onClone={handleClonePlaylist} />
+                <PlaylistRow key={pl.id} playlist={pl} onClone={handleClonePlaylist} onAddToStore={handleAddToStore} />
               ))
             )}
           </div>
@@ -471,7 +499,7 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 동영상이 없습니다</div>
             ) : (
               filteredMedia.map((m) => (
-                <MediaRow key={m.id} item={m} onClone={handleCloneMedia} />
+                <MediaRow key={m.id} item={m} onClone={handleCloneMedia} onAddToStore={handleAddToStore} />
               ))
             )}
           </div>

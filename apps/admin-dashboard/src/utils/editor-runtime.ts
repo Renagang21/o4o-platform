@@ -11,7 +11,8 @@ import React, {
   forwardRef, memo, lazy, Suspense, StrictMode, PureComponent,
   cloneElement, isValidElement
 } from 'react';
-import ReactDOM, { createPortal, render, unmountComponentAtNode } from 'react-dom';
+import ReactDOM, { createPortal } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { getBlockManager } from '@/utils/block-manager';
 import '../styles/o4o-admin-dashboard.css';
 
@@ -51,8 +52,16 @@ export async function initializeWordPress() {
       cloneElement,
       isValidElement,
       createPortal,
-      render,
-      unmountComponentAtNode,
+      render: (element: any, container: HTMLElement) => {
+        const root = createRoot(container);
+        root.render(element);
+        return root;
+      },
+      unmountComponentAtNode: (container: HTMLElement) => {
+        const root = createRoot(container);
+        root.unmount();
+        return true;
+      },
     };
 
     // Initialize i18n

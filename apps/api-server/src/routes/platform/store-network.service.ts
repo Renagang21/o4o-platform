@@ -110,7 +110,7 @@ export class StoreNetworkService {
     const storeSubquery =
       service === 'cosmetics'
         ? `SELECT id FROM cosmetics.cosmetics_stores`
-        : `SELECT id FROM glycopharm_pharmacies`;
+        : `SELECT o.id FROM organizations o JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'`;
 
     const result = await this.dataSource.query(
       `SELECT
@@ -178,15 +178,16 @@ export class StoreNetworkService {
     const [storeResult, orderResult] = await Promise.all([
       this.dataSource.query(
         `SELECT COUNT(*)::int as count
-         FROM glycopharm_pharmacies
-         WHERE status = 'active'`,
+         FROM organizations o
+         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+         WHERE o."isActive" = true`,
       ),
       this.dataSource.query(
         `SELECT
            COUNT(*)::int as "orderCount",
            COALESCE(SUM("totalAmount"), 0)::numeric as revenue
          FROM ecommerce_orders
-         WHERE store_id IN (SELECT id FROM glycopharm_pharmacies)
+         WHERE store_id IN (SELECT o.id FROM organizations o JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm')
            AND "createdAt" >= $1
            AND status != 'cancelled'`,
         [monthStartISO],
@@ -237,7 +238,7 @@ export class StoreNetworkService {
          COUNT(*)::int as "monthlyOrders",
          COALESCE(SUM(o."totalAmount"), 0)::numeric as "monthlyRevenue"
        FROM ecommerce_orders o
-       INNER JOIN glycopharm_pharmacies p ON p.id = o.store_id
+       INNER JOIN organizations p ON p.id = o.store_id
        WHERE o."createdAt" >= $1
          AND o.status != 'cancelled'
          AND o.store_id IS NOT NULL

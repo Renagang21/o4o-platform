@@ -101,7 +101,7 @@ export class KpaSteward {
 
   // Relations (string-based per CLAUDE.md ESM rules)
   // Type annotations use 'any' to avoid tsup/SWC decorator type issues
-  @ManyToOne('KpaOrganization')
+  @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'organization_id' })
   organization: any;
 

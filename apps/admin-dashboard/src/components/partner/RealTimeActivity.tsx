@@ -33,7 +33,7 @@ export const RealTimeActivity = ({
   const [isConnected, setIsConnected] = useState(false);
   const [isTracking, setIsTracking] = useState(true);
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   // Mock real-time events for demonstration
   useEffect(() => {

@@ -97,12 +97,6 @@ export default function Footer() {
                 <MapPin className="w-3 h-3" />
                 <span>서울특별시 서초구 강남대로 000, 0층</span>
               </div>
-              <NavLink
-                to="/test-center"
-                className="flex items-center gap-1 text-xs text-primary-400 hover:text-primary-300 transition-colors"
-              >
-                🧪 테스트 센터
-              </NavLink>
             </div>
           </div>
 

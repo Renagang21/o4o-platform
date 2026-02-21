@@ -1,0 +1,103 @@
+name: "Guard Policy Check"
+
+# WO-O4O-GUARD-CI-ENFORCEMENT-V1
+# ROLE_GUARD_TEST_BASELINE_V1 정적 분석 규칙 강제
+#
+# 검사 대상: services/web-*/src/**/*.{ts,tsx}
+# 실패 시: PR Merge 차단
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'services/web-*/src/**'
+
+concurrency:
+  group: guard-policy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard-check:
+    name: Guard Static Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: "GUARD-005: Detect user.role direct comparison"
+        run: |
+          echo "::group::GUARD-005 — user.role direct comparison"
+          VIOLATIONS=0
+
+          # user.role === / == / !== / != (direct equality comparison)
+          if grep -rn --include="*.ts" --include="*.tsx" \
+            'user\.role\s*[!=]=\s*' \
+            services/web-*/src/; then
+            echo "::error::GUARD-005 FAIL: user.role direct comparison detected"
+            echo "Fix: Replace with user.roles.includes() or user.roles.some()"
+            VIOLATIONS=1
+          fi
+
+          # user?.role === (optional chaining variant)
+          if grep -rn --include="*.ts" --include="*.tsx" \
+            'user?\.role\s*[!=]=\s*' \
+            services/web-*/src/; then
+            echo "::error::GUARD-005 FAIL: user?.role direct comparison detected"
+            VIOLATIONS=1
+          fi
+
+          echo "::endgroup::"
+          if [ "$VIOLATIONS" -ne 0 ]; then exit 1; fi
+          echo "GUARD-005 PASSED"
+
+      - name: "GUARD-006: Detect user.currentRole usage"
+        run: |
+          echo "::group::GUARD-006 — user.currentRole"
+          VIOLATIONS=0
+
+          # user.currentRole or user?.currentRole (actual property access)
+          if grep -rn --include="*.ts" --include="*.tsx" \
+            'user[?]\?\.currentRole' \
+            services/web-*/src/; then
+            echo "::error::GUARD-006 FAIL: user.currentRole usage detected"
+            echo "Fix: Replace with user.roles[0] or user.roles.includes()"
+            VIOLATIONS=1
+          fi
+
+          echo "::endgroup::"
+          if [ "$VIOLATIONS" -ne 0 ]; then exit 1; fi
+          echo "GUARD-006 PASSED"
+
+      - name: "GUARD-007: Detect RoleGuard without allowedRoles"
+        run: |
+          echo "::group::GUARD-007 — RoleGuard without allowedRoles"
+          VIOLATIONS=0
+
+          # <RoleGuard> without any props (self-closing or opening tag without allowedRoles)
+          if grep -rn --include="*.ts" --include="*.tsx" \
+            '<RoleGuard>' \
+            services/web-*/src/; then
+            echo "::error::GUARD-007 FAIL: RoleGuard without allowedRoles detected"
+            echo "Fix: Add allowedRoles prop, e.g. <RoleGuard allowedRoles={['admin']}>"
+            VIOLATIONS=1
+          fi
+
+          echo "::endgroup::"
+          if [ "$VIOLATIONS" -ne 0 ]; then exit 1; fi
+          echo "GUARD-007 PASSED"
+
+      - name: "Summary"
+        if: success()
+        run: |
+          echo "=========================================="
+          echo "  Guard Policy Check: ALL PASSED"
+          echo "=========================================="
+          echo ""
+          echo "  GUARD-005: user.role comparison    — OK"
+          echo "  GUARD-006: user.currentRole usage  — OK"
+          echo "  GUARD-007: RoleGuard allowedRoles  — OK"
+          echo ""
+          echo "  Ref: docs/platform-core/ROLE_GUARD_TEST_BASELINE_V1.md"
+          echo "=========================================="

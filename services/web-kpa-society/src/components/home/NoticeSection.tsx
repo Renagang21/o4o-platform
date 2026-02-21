@@ -1,31 +1,27 @@
 /**
- * NoticeSection - 공지사항 + 뉴스 2컬럼 섹션
+ * NoticeSection - 공지사항 + 약사공론 뉴스 예고 2컬럼 섹션
  *
- * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지/뉴스 요약
- * Performance: prefetchedNotices/prefetchedNews가 있으면 자체 API 호출 건너뜀
+ * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지 요약
+ * Performance: prefetchedNotices가 있으면 자체 API 호출 건너뜀
  *
  * 레이아웃:
- * [공지사항 컬럼] | [뉴스 컬럼]
+ * [공지사항 컬럼] | [약사공론 뉴스 연결 예정]
  */
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { homeApi } from '../../api/home';
 import type { HomeNotice } from '../../api/home';
-import { newsApi } from '../../api/news';
 import { colors, spacing, borderRadius, shadows } from '../../styles/theme';
 
 interface Props {
   prefetchedNotices?: HomeNotice[];
-  prefetchedNews?: HomeNotice[];
   loading?: boolean;
 }
 
-export function NoticeSection({ prefetchedNotices, prefetchedNews, loading: parentLoading }: Props) {
+export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Props) {
   const [notices, setNotices] = useState<HomeNotice[]>([]);
-  const [news, setNews] = useState<HomeNotice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newsLoading, setNewsLoading] = useState(true);
 
   useEffect(() => {
     if (prefetchedNotices) {
@@ -39,20 +35,7 @@ export function NoticeSection({ prefetchedNotices, prefetchedNews, loading: pare
     }
   }, [prefetchedNotices]);
 
-  useEffect(() => {
-    if (prefetchedNews) {
-      setNews(prefetchedNews);
-      setNewsLoading(false);
-    } else {
-      newsApi.getNotices({ type: 'news', limit: 3, sort: 'latest' })
-        .then((res) => { if (res.data) setNews(res.data as unknown as HomeNotice[]); })
-        .catch(() => {})
-        .finally(() => setNewsLoading(false));
-    }
-  }, [prefetchedNews]);
-
   const isNoticeLoading = parentLoading ?? loading;
-  const isNewsLoading = parentLoading ?? newsLoading;
 
   return (
     <section style={styles.container}>
@@ -74,19 +57,16 @@ export function NoticeSection({ prefetchedNotices, prefetchedNews, loading: pare
           </div>
         </div>
 
-        {/* 뉴스 컬럼 */}
+        {/* 약사공론 뉴스 (연결 예정) */}
         <div style={styles.column}>
           <div style={styles.columnHeader}>
-            <h2 style={styles.columnTitle}>뉴스</h2>
-            <Link to="/news/news" style={styles.moreLink}>전체 보기 →</Link>
+            <h2 style={styles.columnTitle}>약사공론 뉴스</h2>
           </div>
-          <div style={styles.card}>
-            <ItemList
-              items={news}
-              loading={isNewsLoading}
-              emptyText="아직 등록된 뉴스가 없습니다."
-              emptyHint="뉴스가 등록되면 여기에 표시됩니다."
-            />
+          <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={styles.emptyWrap}>
+              <p style={{ ...styles.empty, fontSize: '0.938rem', fontWeight: 500 }}>약사공론 뉴스 연결 예정</p>
+              <p style={styles.emptyHint}>약사공론 뉴스가 연결되면 여기에 표시됩니다.</p>
+            </div>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@
  *
  * Flow:
  * 1. Requires auth (req.user must exist — use after authenticate middleware)
- * 2. Looks up glycopharm_pharmacies where created_by_user_id = userId
+ * 2. Looks up organizations (glycopharm enrolled) where created_by_user_id = userId
  * 3. Admin bypass: glycopharm:admin / platform:admin → pharmacyId = null (global access)
  * 4. If pharmacy found → req.pharmacyId set
  * 5. If not found → 403
@@ -54,7 +54,9 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
     // Look up pharmacy for this user
     try {
       const result = await dataSource.query(
-        `SELECT id FROM glycopharm_pharmacies WHERE created_by_user_id = $1 AND status = 'active' LIMIT 1`,
+        `SELECT o.id FROM organizations o
+         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+         WHERE o.created_by_user_id = $1 AND o."isActive" = true LIMIT 1`,
         [userId]
       );
 

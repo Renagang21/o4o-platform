@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
@@ -72,8 +72,6 @@ import { AdminRoutes } from './routes/AdminRoutes';
 // Operator Routes (서비스 운영자)
 import { OperatorRoutes } from './routes/OperatorRoutes';
 
-// Hub Page (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-import { HubPage } from './pages/hub';
 
 // Intranet Routes (인트라넷)
 import { IntranetRoutes } from './routes/IntranetRoutes';
@@ -88,6 +86,7 @@ import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchO
 // Platform Home (WO-KPA-HOME-FOUNDATION-V1) - legacy, kept for reference
 // import { HomePage } from './pages/platform';
 import TestCenterPage from './pages/TestCenterPage';
+import { TestMainPage, TestHubPage, TestStorePage } from './pages/test-center';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -102,7 +101,10 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, StoreHubPage, PharmacySellPage, StoreAssetsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyServicesPage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreOverviewPage, StoreChannelsPage, CyberTemplateGalleryPage } from './pages/pharmacy';
+
+// WO-STORE-ADMIN-CONSOLIDATION-V1: Store Management Layout (sidebar)
+import { StoreManagementLayout } from './components/pharmacy/StoreManagementLayout';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -119,10 +121,20 @@ import { UserDashboardPage, MyContentPage } from './pages/dashboard';
 import { getDefaultRouteByRole } from './lib/auth-utils';
 
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
-import { RoleGuard } from './components/auth/RoleGuard';
+import { PharmacyGuard } from './components/auth/PharmacyGuard';
 
-// Debug Pages (CLAUDE.md Section 14)
-import { ApiDebugPage } from './pages/debug/ApiDebugPage';
+// Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
+import { TabletStorePage } from './pages/tablet/TabletStorePage';
+
+// Store Blog (WO-STORE-BLOG-CHANNEL-V1)
+import { StoreBlogPage } from './pages/store/StoreBlogPage';
+import { StoreBlogPostPage } from './pages/store/StoreBlogPostPage';
+
+// Store Home (WO-STORE-TEMPLATE-PROFILE-V1)
+import { StorefrontHomePage } from './pages/store/StorefrontHomePage';
+
+// Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
+import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
 // Legacy pages (for backward compatibility)
 import {
@@ -151,14 +163,25 @@ const SERVICE_NAME = 'KPA-Society';
 function LoginRedirect() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { openLoginModal } = useAuthModal();
+  const [searchParams] = useSearchParams();
+  const { openLoginModal, setOnLoginSuccess } = useAuthModal();
 
   useEffect(() => {
-    // state.from이 있으면 원래 페이지로 복귀, 없으면 홈
-    const from = (location.state as { from?: string })?.from || '/';
-    navigate(from, { replace: true });
+    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+    // 항상 / (공개 페이지)로 이동 — 가드된 경로로 직접 이동하면 Guard→/login→Guard 무한 루프 발생
+    navigate('/', { replace: true });
+
+    // from/returnTo는 로그인 성공 후에만 사용
+    const returnTo = searchParams.get('returnTo') ||
+                     (location.state as { from?: string })?.from;
+    if (returnTo) {
+      setOnLoginSuccess(() => {
+        navigate(returnTo);
+      });
+    }
+
     openLoginModal();
-  }, [navigate, openLoginModal, location.state]);
+  }, [navigate, openLoginModal, location.state, searchParams, setOnLoginSuccess]);
 
   return null;
 }
@@ -180,9 +203,10 @@ function RegisterRedirect() {
  * (페이지 → 모달 전환 후 하위호환용)
  */
 /**
- * WO-KPA-A-ROLE-BASED-REDIRECT-V1
- * / 접근 시 이미 로그인된 admin/operator는 /hub로 자동 리다이렉트
- * 비로그인 상태에서 로그인해도 현재 페이지 유지 (1회 체크)
+ * WO-KPA-A-DEFAULT-ROUTE-FIX-V2
+ * / 접근 시 로그인된 관리자/운영자는 적절한 경로로 자동 리다이렉트
+ * WO-KPA-C-DEFAULT-ROUTE-ALIGNMENT-V1: branch role → /branch-services 추가
+ * 일반 사용자 및 비로그인 → CommunityHomePage 표시
  */
 function RoleBasedHome() {
   const { user, isLoading } = useAuth();
@@ -195,7 +219,7 @@ function RoleBasedHome() {
 
     if (user?.roles) {
       const target = getDefaultRouteByRole(user.roles);
-      if (target !== '/dashboard') {
+      if (target !== '/dashboard' && target !== '/login') {
         navigate(target, { replace: true });
       }
     }
@@ -205,14 +229,23 @@ function RoleBasedHome() {
 }
 
 /**
- * HubGuard → RoleGuard alias
- * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
- * 실제 로직은 components/auth/RoleGuard.tsx (user.roles[] 배열 체크)
- * Hub 전용 allowedRoles: ['kpa:admin', 'kpa:operator'] — 라우트에서 지정
+ * WO-KPA-A-DEFAULT-ROUTE-FIX-V2
+ * WO-KPA-C-DEFAULT-ROUTE-ALIGNMENT-V1
+ * /dashboard 접근 시 관리자/운영자는 적절한 경로로 자동 리다이렉트
+ * 일반 사용자만 UserDashboardPage 렌더링
  */
-const HubGuard = ({ children }: { children: React.ReactNode }) => (
-  <RoleGuard allowedRoles={['kpa:admin', 'kpa:operator']}>{children}</RoleGuard>
-);
+function DashboardRoute() {
+  const { user } = useAuth();
+
+  if (user?.roles) {
+    const target = getDefaultRouteByRole(user.roles);
+    if (target !== '/dashboard' && target !== '/login') {
+      return <Navigate to={target} replace />;
+    }
+  }
+
+  return <Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>;
+}
 
 function FunctionGateRedirect() {
   const navigate = useNavigate();
@@ -224,6 +257,14 @@ function FunctionGateRedirect() {
   }, [navigate, openFunctionGateModal]);
 
   return null;
+}
+
+/** WO-STORE-SLUG-UNIFICATION-V1: /kpa/store/:slug → /store/:slug redirect */
+function KpaRedirect({ to, suffix }: { to: string; suffix?: string }) {
+  const { slug, postSlug } = useParams<{ slug: string; postSlug: string }>();
+  let target = `${to}/${slug}`;
+  if (suffix) target += suffix.replace(':postSlug', postSlug || '');
+  return <Navigate to={target} replace />;
 }
 
 function App() {
@@ -257,7 +298,7 @@ function App() {
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
           <Route path="/" element={<RoleBasedHome />} />
-          <Route path="/dashboard" element={<Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>} />
+          <Route path="/dashboard" element={<DashboardRoute />} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
@@ -272,11 +313,12 @@ function App() {
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
 
-          {/* Debug Pages (CLAUDE.md Section 14) */}
-          <Route path="/__debug__/api" element={<ApiDebugPage />} />
-
-          {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
-          <Route path="/test-center" element={<TestCenterPage />} />
+          {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
+          <Route path="/test" element={<TestCenterPage />} />
+          <Route path="/test/main" element={<TestMainPage />} />
+          <Route path="/test/hub" element={<TestHubPage />} />
+          <Route path="/test/store" element={<TestStorePage />} />
+          <Route path="/test-center" element={<Navigate to="/test" replace />} />
 
           {/* =========================================================
            * Service C - 분회 서비스 (Branch Services)
@@ -310,25 +352,57 @@ function App() {
 
           {/* ========================================
            * 약국 경영지원 (실 서비스 경로)
-           * WO-KPA-PHARMACY-LOCATION-V1: /pharmacy를 단일 기준 경로로
-           * WO-KPA-PHARMACY-DEPTH-V1: 깊이 화면 추가
+           * WO-KPA-A-STORE-ROUTE-REALIGN-V1: Hub/Store/Assets IA 정렬
            * ======================================== */}
+          {/* 게이트: 인증/승인 분기 → 승인 완료 시 /pharmacy/dashboard
+           * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거
+           * PharmacyPage 자체에 완전한 게이트 로직 존재 (미로그인/관리자/직역 미설정/비개설자) */}
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
-          {/* WO-PHARMACY-HUB-REALIGN-PHASEH1-V1: 약국 운영 허브 (dashboard → hub 개념 전환) */}
-          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyDashboardPage /></Layout>} />
-          {/* 기존 /pharmacy/dashboard 하위호환 리다이렉트 */}
-          <Route path="/pharmacy/dashboard" element={<Navigate to="/pharmacy/hub" replace />} />
-          <Route path="/pharmacy/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyB2BPage /></Layout>} />
-          <Route path="/pharmacy/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><SupplierListPage /></Layout>} />
-          <Route path="/pharmacy/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><SupplierDetailPage /></Layout>} />
-          <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyStorePage /></Layout>} />
-          {/* WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1: 통합 매장 허브 */}
-          <Route path="/pharmacy/store-hub" element={<Layout serviceName={SERVICE_NAME}><StoreHubPage /></Layout>} />
-          {/* WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1: 매장 복사 자산 목록 */}
-          <Route path="/pharmacy/store-assets" element={<Layout serviceName={SERVICE_NAME}><StoreAssetsPage /></Layout>} />
-          <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyServicesPage /></Layout>} />
-          {/* WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리 */}
-          <Route path="/pharmacy/sell" element={<Layout serviceName={SERVICE_NAME}><PharmacySellPage /></Layout>} />
+          {/* 약국 HUB: 공동 자원 탐색 공간 (WO-KPA-A-PHARMACY-HUB-MENU-ALIGNMENT-V1) */}
+          <Route path="/pharmacy/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubPage /></PharmacyGuard></Layout>} />
+          {/* 내 매장관리: 매장 실행 요약 화면 */}
+          <Route path="/pharmacy/dashboard" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyDashboardPage /></PharmacyGuard></Layout>} />
+          {/* Sales 그룹 (WO-KPA-A-STORE-IA-REALIGN-PHASE2-V1) */}
+          <Route path="/pharmacy/sales/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyB2BPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2b/suppliers" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierListPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2b/suppliers/:supplierId" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><SupplierDetailPage /></PharmacyGuard></Layout>} />
+          {/* 레거시 redirect: /pharmacy/b2b → /pharmacy/sales/b2b */}
+          <Route path="/pharmacy/b2b" element={<Navigate to="/pharmacy/sales/b2b" replace />} />
+          <Route path="/pharmacy/b2b/suppliers" element={<Navigate to="/pharmacy/sales/b2b/suppliers" replace />} />
+          {/* 매장 설정 (WO-KPA-A-STORE-IA-REALIGN-PHASE3-V1) */}
+          <Route path="/pharmacy/settings" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyStorePage /></PharmacyGuard></Layout>} />
+
+          {/* ========================================
+           * 매장 관리 (Store-Centric Admin)
+           * WO-STORE-ADMIN-CONSOLIDATION-V1
+           * /pharmacy/store/* 하위에 StoreManagementLayout 사이드바 적용
+           * ======================================== */}
+          <Route path="/pharmacy/store" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><StoreOverviewPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/layout" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><LayoutBuilderPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/template" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><PharmacyTemplatePage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/blog" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><PharmacyBlogPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/tablet" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><TabletRequestsPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/channels" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><StoreChannelsPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/store/cyber-templates" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreManagementLayout><CyberTemplateGalleryPage /></StoreManagementLayout></PharmacyGuard></Layout>} />
+
+          {/* 자산: 통합 자산 목록 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
+          <Route path="/pharmacy/assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
+          {/* 콘텐츠 편집 (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1) */}
+          <Route path="/pharmacy/assets/content/:snapshotId/edit" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreContentEditPage /></PharmacyGuard></Layout>} />
+          {/* 하위호환: /pharmacy/store-hub → /pharmacy/assets */}
+          <Route path="/pharmacy/store-hub" element={<Navigate to="/pharmacy/assets" replace />} />
+          {/* 하위호환: /pharmacy/store-assets (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1) */}
+          <Route path="/pharmacy/store-assets" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><StoreAssetsPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/services" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyServicesPage /></PharmacyGuard></Layout>} />
+          <Route path="/pharmacy/sales/b2c" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacySellPage /></PharmacyGuard></Layout>} />
+          {/* 레거시 redirect: /pharmacy/sell → /pharmacy/sales/b2c */}
+          <Route path="/pharmacy/sell" element={<Navigate to="/pharmacy/sales/b2c" replace />} />
+          {/* 레거시 리다이렉트 → /pharmacy/store/* (WO-STORE-ADMIN-CONSOLIDATION-V1) */}
+          <Route path="/pharmacy/tablet-requests" element={<Navigate to="/pharmacy/store/tablet" replace />} />
+          <Route path="/pharmacy/blog" element={<Navigate to="/pharmacy/store/blog" replace />} />
+          <Route path="/pharmacy/kpa-blog" element={<Navigate to="/pharmacy/store/blog" replace />} />
+          <Route path="/pharmacy/template" element={<Navigate to="/pharmacy/store/template" replace />} />
+          <Route path="/pharmacy/layout-builder" element={<Navigate to="/pharmacy/store/layout" replace />} />
 
           {/* ========================================
            * 약국 서비스 신청 게이트
@@ -336,6 +410,7 @@ function App() {
            * - Service User 로그인 제거, Platform User 단일 인증
            * - 약국 승인 미완료 시 신청 폼 표시
            * ======================================== */}
+          {/* WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: PharmacyGuard 제거 (자체 인증 체크) */}
           <Route path="/pharmacy/approval" element={<Layout serviceName={SERVICE_NAME}><PharmacyApprovalGatePage /></Layout>} />
 
           {/* ========================================
@@ -390,8 +465,8 @@ function App() {
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
-          {/* Operator Routes — /demo/operator → /hub 리다이렉트 */}
-          <Route path="/demo/operator/*" element={<Navigate to="/hub" replace />} />
+          {/* Operator Routes — /demo/operator → /operator 리다이렉트 */}
+          <Route path="/demo/operator/*" element={<Navigate to="/operator" replace />} />
 
           {/* Intranet Routes (인트라넷 - 별도 레이아웃) */}
           <Route path="/demo/intranet/*" element={<IntranetRoutes />} />
@@ -418,9 +493,9 @@ function App() {
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          {/* Hub (통합 운영 허브 - WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
-          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubPage /></HubGuard></Layout>} />
-          {/* Operator Routes — /operator root → /hub 리다이렉트, 서브페이지는 Layout 래핑 */}
+          {/* Hub → Operator 리다이렉트 (WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1) */}
+          <Route path="/hub" element={<Navigate to="/operator" replace />} />
+          {/* Operator Routes — 5-Block 대시보드 + 서브페이지 */}
           <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
@@ -437,12 +512,9 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* News (공지/소식) - WO-FIX-NEWS-ROUTES: 모든 콘텐츠 타입 라우트 추가 */}
+          {/* News (공지사항) — 뉴스 게시판은 약사공론 연결 예정으로 제거 */}
           <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/hero" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/promo" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
 
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
@@ -499,6 +571,26 @@ function App() {
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
           <Route path="/privacy" element={<Layout serviceName={SERVICE_NAME}><PrivacyPage /></Layout>} />
+
+          {/* Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1) — fullscreen, no auth */}
+          <Route path="/tablet/:slug" element={<TabletStorePage />} />
+
+          {/* Store Home (WO-STORE-TEMPLATE-PROFILE-V1) — public, block-based storefront */}
+          <Route path="/store/:slug" element={<StorefrontHomePage />} />
+
+          {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
+          <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />
+          <Route path="/store/:slug/blog/:postSlug" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPostPage /></Layout>} />
+
+          {/* WO-STORE-SLUG-UNIFICATION-V1: KPA store → unified store redirects */}
+          <Route path="/kpa/tablet/:slug" element={<KpaRedirect to="/tablet" />} />
+          <Route path="/kpa/store/:slug/blog/:postSlug" element={<KpaRedirect to="/store" suffix="/blog/:postSlug" />} />
+          <Route path="/kpa/store/:slug/blog" element={<KpaRedirect to="/store" suffix="/blog" />} />
+          <Route path="/kpa/store/:slug" element={<KpaRedirect to="/store" />} />
+
+          {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
+          <Route path="/content/:snapshotId/print" element={<PrintContentPage />} />
+          <Route path="/content/:snapshotId" element={<PublicContentViewPage />} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />

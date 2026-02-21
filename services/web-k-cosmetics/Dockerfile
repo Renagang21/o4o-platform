@@ -23,6 +23,7 @@ COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -35,6 +36,7 @@ COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/types/ ./packages/types/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/

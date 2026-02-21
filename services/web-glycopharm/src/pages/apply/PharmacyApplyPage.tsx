@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, Truck, Monitor, CheckCircle, AlertCircle } from 'lucide-react';
+import { Building2, Truck, Monitor, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { glycopharmApi } from '@/api/glycopharm';
-import type { SubmitApplicationRequest, ServiceType } from '@/api/glycopharm';
+import type { SubmitApplicationRequest, ServiceType, SlugCheckResponse } from '@/api/glycopharm';
 
 /**
  * Pharmacy Apply Page
@@ -32,6 +32,9 @@ const SERVICE_OPTIONS: { value: ServiceType; label: string; description: string;
   },
 ];
 
+// WO-CORE-STORE-REQUESTED-SLUG-V1: Slug validation status
+type SlugStatus = 'idle' | 'checking' | 'available' | 'unavailable' | 'invalid';
+
 export default function PharmacyApplyPage() {
   const [formData, setFormData] = useState<SubmitApplicationRequest>({
     organizationType: 'pharmacy',
@@ -39,9 +42,60 @@ export default function PharmacyApplyPage() {
     businessNumber: '',
     serviceTypes: [],
     note: '',
+    requestedSlug: '',
   });
   const [status, setStatus] = useState<SubmitStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // WO-CORE-STORE-REQUESTED-SLUG-V1: Slug validation state
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle');
+  const [slugMessage, setSlugMessage] = useState<string>('');
+
+  // Debounced slug check
+  useEffect(() => {
+    const slug = formData.requestedSlug?.trim() || '';
+
+    // Reset if empty
+    if (!slug) {
+      setSlugStatus('idle');
+      setSlugMessage('');
+      return;
+    }
+
+    // Minimum length check
+    if (slug.length < 3) {
+      setSlugStatus('invalid');
+      setSlugMessage('최소 3자 이상 입력해주세요');
+      return;
+    }
+
+    setSlugStatus('checking');
+    setSlugMessage('확인 중...');
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const result: SlugCheckResponse = await glycopharmApi.checkSlugAvailability(slug);
+        if (result.available) {
+          setSlugStatus('available');
+          setSlugMessage(`사용 가능 (${result.normalizedValue})`);
+        } else {
+          setSlugStatus('unavailable');
+          if (result.reason === 'taken') {
+            setSlugMessage('이미 사용 중인 주소입니다');
+          } else if (result.reason === 'reserved') {
+            setSlugMessage('예약어로 사용할 수 없습니다');
+          } else {
+            setSlugMessage(result.validationError || '형식이 올바르지 않습니다');
+          }
+        }
+      } catch {
+        setSlugStatus('invalid');
+        setSlugMessage('확인 중 오류가 발생했습니다');
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.requestedSlug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,11 +105,22 @@ export default function PharmacyApplyPage() {
       return;
     }
 
+    // WO-CORE-STORE-REQUESTED-SLUG-V1: Validate slug before submit
+    if (formData.requestedSlug && slugStatus !== 'available' && slugStatus !== 'idle') {
+      setErrorMessage('매장 URL이 사용 불가능합니다. 다른 URL을 입력해주세요.');
+      return;
+    }
+
     setStatus('loading');
     setErrorMessage(null);
 
     try {
-      await glycopharmApi.submitApplication(formData);
+      // Clean up empty slug
+      const submitData = {
+        ...formData,
+        requestedSlug: formData.requestedSlug?.trim() || undefined,
+      };
+      await glycopharmApi.submitApplication(submitData);
       setStatus('success');
     } catch (err: any) {
       setStatus('error');
@@ -65,6 +130,8 @@ export default function PharmacyApplyPage() {
         setErrorMessage('이미 심사 대기 중인 신청이 있습니다.');
       } else if (err.code === 'ALREADY_APPROVED') {
         setErrorMessage('이미 승인된 약국입니다.');
+      } else if (err.code === 'SLUG_NOT_AVAILABLE') {
+        setErrorMessage('입력한 매장 URL이 이미 사용 중입니다.');
       } else {
         setErrorMessage(err.message || '신청 중 오류가 발생했습니다.');
       }
@@ -158,6 +225,53 @@ export default function PharmacyApplyPage() {
               placeholder="예: 123-45-67890"
               className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
+          </div>
+
+          {/* WO-CORE-STORE-REQUESTED-SLUG-V1: Requested Slug */}
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              매장 URL (선택)
+            </label>
+            <div className="relative">
+              <div className="flex items-center">
+                <span className="text-sm text-slate-500 bg-slate-100 px-3 py-3 rounded-l-xl border border-r-0 border-slate-200">
+                  glycopharm.co.kr/store/
+                </span>
+                <input
+                  type="text"
+                  value={formData.requestedSlug || ''}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, requestedSlug: e.target.value }))}
+                  placeholder="my-pharmacy"
+                  className={`flex-1 px-4 py-3 border rounded-r-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                    slugStatus === 'available'
+                      ? 'border-green-300 bg-green-50'
+                      : slugStatus === 'unavailable' || slugStatus === 'invalid'
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-slate-200'
+                  }`}
+                />
+                {slugStatus === 'checking' && (
+                  <Loader2 className="absolute right-3 w-5 h-5 text-slate-400 animate-spin" />
+                )}
+                {slugStatus === 'available' && (
+                  <CheckCircle className="absolute right-3 w-5 h-5 text-green-500" />
+                )}
+                {(slugStatus === 'unavailable' || slugStatus === 'invalid') && (
+                  <AlertCircle className="absolute right-3 w-5 h-5 text-red-500" />
+                )}
+              </div>
+            </div>
+            {slugMessage && (
+              <p className={`mt-2 text-sm ${
+                slugStatus === 'available' ? 'text-green-600' :
+                slugStatus === 'checking' ? 'text-slate-500' : 'text-red-600'
+              }`}>
+                {slugStatus === 'available' && '✓ '}{slugMessage}
+              </p>
+            )}
+            <p className="mt-1 text-xs text-slate-400">
+              영문, 숫자, 하이픈(-), 한글 사용 가능. 승인 후 매장 URL로 사용됩니다.
+            </p>
           </div>
 
           {/* Service Selection */}

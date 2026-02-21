@@ -42,8 +42,10 @@ export default function RoleSelectPage() {
     selectRole(role);
 
     // Navigate to role-specific dashboard
+    // WO-MENU-REALIGN-V1: pharmacy는 / (CareDashboard)로 이동
     const dashboardPaths: Record<UserRole, string> = {
-      pharmacy: '/pharmacy',
+      admin: '/admin',
+      pharmacy: '/',
       supplier: '/supplier',
       partner: '/partner',
       operator: '/operator',

@@ -1,77 +1,24 @@
 /**
  * PharmacyOnboardingBanner
  * WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1
+ * WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
  *
- * 조건: pharmacistRole === 'pharmacy_owner' AND pharmacy Context 없음
- * CTA: pharmacy_join JoinRequest 생성
+ * 조건: pharmacistRole === 'pharmacy_owner' AND pharmacy 승인 없음
+ * CTA: /pharmacy/approval 페이지로 이동 (신청 폼 작성 필요)
  */
 
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useOrganization } from '../../contexts/OrganizationContext';
-import { joinRequestApi } from '../../api/joinRequestApi';
-
-type BannerState = 'idle' | 'submitting' | 'success' | 'duplicate' | 'error';
 
 export function PharmacyOnboardingBanner() {
   const { user } = useAuth();
-  const { accessibleOrganizations } = useOrganization();
-  const [state, setState] = useState<BannerState>('idle');
+  const navigate = useNavigate();
 
-  // Guard: pharmacy_owner만 대상, pharmacy context가 없을 때만 표시
+  // Guard: pharmacy_owner만 대상
   const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
-  const hasPharmacyContext = accessibleOrganizations.some(
-    (org) => org.type === 'pharmacy'
-  );
 
-  if (!isPharmacyOwner || hasPharmacyContext) {
+  if (!isPharmacyOwner) {
     return null;
-  }
-
-  const handleJoinRequest = async () => {
-    setState('submitting');
-    try {
-      await joinRequestApi.create({
-        organizationId: 'pharmacy-1',
-        requestType: 'pharmacy_join',
-        requestedRole: 'admin',
-      });
-      setState('success');
-    } catch (err: any) {
-      if (err?.response?.status === 409 || err?.status === 409) {
-        setState('duplicate');
-      } else {
-        setState('error');
-      }
-    }
-  };
-
-  if (state === 'success') {
-    return (
-      <div style={styles.banner}>
-        <div style={styles.content}>
-          <span style={styles.icon}>&#x2705;</span>
-          <div>
-            <p style={styles.title}>요청이 접수되었습니다</p>
-            <p style={styles.desc}>승인 후 약국경영 서비스를 이용하실 수 있습니다.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (state === 'duplicate') {
-    return (
-      <div style={styles.banner}>
-        <div style={styles.content}>
-          <span style={styles.icon}>&#x23F3;</span>
-          <div>
-            <p style={styles.title}>이미 요청하셨습니다</p>
-            <p style={styles.desc}>승인 대기 중입니다. 잠시만 기다려 주세요.</p>
-          </div>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -85,20 +32,12 @@ export function PharmacyOnboardingBanner() {
           </p>
         </div>
         <button
-          style={{
-            ...styles.cta,
-            opacity: state === 'submitting' ? 0.6 : 1,
-            cursor: state === 'submitting' ? 'not-allowed' : 'pointer',
-          }}
-          onClick={handleJoinRequest}
-          disabled={state === 'submitting'}
+          style={styles.cta}
+          onClick={() => navigate('/pharmacy/approval')}
         >
-          {state === 'submitting' ? '요청 중...' : '내 약국 등록하기'}
+          내 약국 등록하기
         </button>
       </div>
-      {state === 'error' && (
-        <p style={styles.error}>요청에 실패했습니다. 다시 시도해 주세요.</p>
-      )}
     </div>
   );
 }
@@ -142,11 +81,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     fontWeight: 600,
     whiteSpace: 'nowrap',
-  },
-  error: {
-    marginTop: '8px',
-    marginBottom: 0,
-    fontSize: '0.8rem',
-    color: '#dc2626',
+    cursor: 'pointer',
   },
 };

@@ -46,6 +46,38 @@ export interface PublicApiResponse<T> {
   };
 }
 
+// WO-HOME-UX-ZERO-STATE-V1: Metric status for zero-state UX
+export type MetricStatus = 'OK' | 'ZERO' | 'TABLE_MISSING' | 'NOT_ACTIVATED';
+
+// WO-HOME-LIVE-PREVIEW-V1: Home Preview 데이터 타입
+export interface HomePreviewData {
+  care: {
+    totalPatients: number;
+    totalPatientsStatus?: MetricStatus;
+    highRiskCount: number;
+    highRiskCountStatus?: MetricStatus;
+    recentCoaching: number;
+    recentCoachingStatus?: MetricStatus;
+    recentAnalysis: number;
+    recentAnalysisStatus?: MetricStatus;
+    recentChanges: Array<{
+      tirChange?: number;
+      cvChange?: number;
+      riskTrend: 'improving' | 'stable' | 'worsening';
+    }>;
+  };
+  store: {
+    monthlyOrders: number;
+    monthlyOrdersStatus?: MetricStatus;
+    pendingRequests: number;
+    pendingRequestsStatus?: MetricStatus;
+    activeProducts: number;
+    activeProductsStatus?: MetricStatus;
+    monthlyRevenue: number;
+    monthlyRevenueStatus?: MetricStatus;
+  };
+}
+
 // ============================================================================
 // Fallback Data (API 실패 시 사용)
 // ============================================================================
@@ -58,7 +90,7 @@ const fallbackNowRunning: NowRunningItem[] = [
     supplier: '글루코헬스',
     deadline: '2026.01.31',
     participants: 23,
-    link: '/pharmacy/market-trial',
+    link: '/store/market-trial',
   },
   {
     id: '2',
@@ -66,7 +98,7 @@ const fallbackNowRunning: NowRunningItem[] = [
     title: '혈당관리 앱 연동 이벤트',
     supplier: 'GlucoseView',
     deadline: '2026.02.15',
-    link: '/pharmacy/market-trial',
+    link: '/store/market-trial',
   },
   {
     id: '3',
@@ -180,6 +212,33 @@ class PublicApiClient {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * WO-HOME-LIVE-PREVIEW-V1: Home Preview 집계 데이터
+   * 인증 토큰이 있으면 pharmacy-scoped, 없으면 global aggregate
+   */
+  async getHomePreview(accessToken?: string | null): Promise<HomePreviewData> {
+    const fallback: HomePreviewData = {
+      care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, recentChanges: [] },
+      store: { monthlyOrders: 0, pendingRequests: 0, activeProducts: 0, monthlyRevenue: 0 },
+    };
+
+    try {
+      const url = `${this.baseUrl}/api/v1/home/preview`;
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(url, { method: 'GET', headers });
+      if (!response.ok) return fallback;
+
+      const json = await response.json();
+      return json.data || fallback;
+    } catch {
+      return fallback;
     }
   }
 }

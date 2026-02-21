@@ -492,6 +492,64 @@ export class AuthController extends BaseController {
   }
 
   /**
+   * PATCH /api/v1/auth/me/profile
+   * Update pharmacist profile (pharmacistFunction, pharmacistRole)
+   *
+   * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1:
+   * FunctionGateModal 선택값을 DB에 영속화
+   */
+  static async updateProfile(req: AuthRequest, res: Response): Promise<any> {
+    const userId = req.user?.id;
+    if (!userId) {
+      return BaseController.unauthorized(res, 'Not authenticated');
+    }
+
+    const { pharmacistFunction, pharmacistRole } = req.body;
+
+    const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
+    const validRoles = ['general', 'pharmacy_owner', 'hospital', 'other'];
+
+    if (pharmacistFunction && !validFunctions.includes(pharmacistFunction)) {
+      return BaseController.error(res, 'Invalid pharmacistFunction', 400);
+    }
+    if (pharmacistRole && !validRoles.includes(pharmacistRole)) {
+      return BaseController.error(res, 'Invalid pharmacistRole', 400);
+    }
+
+    const updates: string[] = [];
+    const params: any[] = [];
+    let idx = 1;
+    if (pharmacistFunction) {
+      updates.push(`pharmacist_function = $${idx++}`);
+      params.push(pharmacistFunction);
+    }
+    if (pharmacistRole) {
+      updates.push(`pharmacist_role = $${idx++}`);
+      params.push(pharmacistRole);
+    }
+
+    if (updates.length === 0) {
+      return BaseController.error(res, 'No fields to update', 400);
+    }
+
+    try {
+      params.push(userId);
+      await AppDataSource.query(
+        `UPDATE users SET ${updates.join(', ')} WHERE id = $${idx}`,
+        params
+      );
+
+      return BaseController.ok(res, { pharmacistFunction, pharmacistRole });
+    } catch (error: any) {
+      logger.error('[AuthController.updateProfile] Update failed', {
+        error: error.message,
+        userId,
+      });
+      return BaseController.error(res, 'Failed to update profile');
+    }
+  }
+
+  /**
    * GET /api/v1/auth/status
    * Check authentication status (public endpoint)
    */

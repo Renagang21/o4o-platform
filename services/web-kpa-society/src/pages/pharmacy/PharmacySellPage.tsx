@@ -45,8 +45,8 @@ export function PharmacySellPage() {
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <Link to="/pharmacy/hub" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
-          &larr; 약국 운영 허브
+        <Link to="/pharmacy/dashboard" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
+          &larr; 대시보드
         </Link>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>
           상품 판매 관리

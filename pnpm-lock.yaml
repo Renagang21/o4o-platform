@@ -751,6 +751,9 @@ importers:
       '@o4o/pharmacy-ai-insight':
         specifier: workspace:*
         version: link:../../packages/pharmacy-ai-insight
+      '@o4o/platform-core':
+        specifier: workspace:*
+        version: link:../../packages/platform-core
       '@o4o/reporting-yaksa':
         specifier: workspace:*
         version: link:../../packages/reporting-yaksa
@@ -869,7 +872,7 @@ importers:
         specifier: ^6.2.0
         version: 6.2.0
       ioredis:
-        specifier: ^5.7.0
+        specifier: ^5.8.2
         version: 5.8.2
       iterare:
         specifier: ^1.2.1
@@ -1019,6 +1022,9 @@ importers:
       '@types/express-session':
         specifier: ^1.18.2
         version: 1.18.2
+      '@types/ioredis':
+        specifier: ^5.0.0
+        version: 5.0.0
       '@types/jest':
         specifier: 29.5.14
         version: 29.5.14
@@ -1497,6 +1503,22 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+
+  packages/admin-ux-core:
+    dependencies:
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
 
   packages/ai-common-core:
     devDependencies:
@@ -3166,6 +3188,9 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      react-router-dom:
+        specifier: ^6.21.0
+        version: 6.30.2(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       typescript:
         specifier: 5.4.5
         version: 5.4.5
@@ -3494,6 +3519,9 @@ importers:
 
   services/web-glycopharm:
     dependencies:
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -3640,6 +3668,9 @@ importers:
 
   services/web-kpa-society:
     dependencies:
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -3710,6 +3741,9 @@ importers:
 
   services/web-neture:
     dependencies:
+      '@o4o/admin-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/admin-ux-core
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -7506,6 +7540,10 @@ packages:
 
   '@types/http-proxy@1.17.17':
     resolution: {integrity: sha512-ED6LB+Z1AVylNTu7hdzuBqOgMnvG/ld6wGCG8wFnAzKX5uyW2K3WD52v0gnLCTK/VLpXtKckgWuyScYK6cSPaw==}
+
+  '@types/ioredis@5.0.0':
+    resolution: {integrity: sha512-zJbJ3FVE17CNl5KXzdeSPtdltc4tMT3TzC6fxQS0sQngkbFZ6h+0uTafsRqu+eSLIugf6Yb0Ea0SUuRr42Nk9g==}
+    deprecated: This is a stub types definition. ioredis provides its own type definitions, so you do not need this installed.
 
   '@types/istanbul-lib-coverage@2.0.6':
     resolution: {integrity: sha512-2QF/t/auWm0lsy8XtKVPG19v3sSOQlJe/YHZgfjb/KBBHOGSV+J2q/S671rcq9uTBrLAXmZpqJiaQbMT+zNU1w==}
@@ -17705,6 +17743,12 @@ snapshots:
     dependencies:
       '@types/node': 22.17.2
 
+  '@types/ioredis@5.0.0':
+    dependencies:
+      ioredis: 5.8.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@types/istanbul-lib-coverage@2.0.6': {}
 
   '@types/istanbul-lib-report@3.0.3':
@@ -18419,7 +18463,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
 
   '@vitest/utils@3.2.4':
     dependencies:

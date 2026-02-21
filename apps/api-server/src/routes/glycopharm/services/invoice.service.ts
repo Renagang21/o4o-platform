@@ -185,7 +185,7 @@ export class InvoiceService {
     const rows = await this.dataSource.query(
       `SELECT i.*, p.name AS pharmacy_name
        FROM glycopharm_billing_invoices i
-       LEFT JOIN glycopharm_pharmacies p ON p.id = i.pharmacy_id
+       LEFT JOIN organizations p ON p.id = i.pharmacy_id
        WHERE i.id = $1`,
       [invoiceId],
     );
@@ -233,7 +233,7 @@ export class InvoiceService {
     const rows = await this.dataSource.query(
       `SELECT i.*, p.name AS pharmacy_name
        FROM glycopharm_billing_invoices i
-       LEFT JOIN glycopharm_pharmacies p ON p.id = i.pharmacy_id
+       LEFT JOIN organizations p ON p.id = i.pharmacy_id
        ${where}
        ORDER BY i.created_at DESC`,
       values,

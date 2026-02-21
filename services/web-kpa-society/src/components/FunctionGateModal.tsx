@@ -19,6 +19,7 @@ import {
   type PharmacistRole,
 } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
+import { FUNCTION_GATE_EXEMPT_ROLES, hasAnyRole } from '../lib/role-constants';
 
 interface FunctionOption {
   key: string;
@@ -37,7 +38,7 @@ const options: FunctionOption[] = [
 ];
 
 export default function FunctionGateModal() {
-  const { user, setPharmacistFunction, setPharmacistRole } = useAuth();
+  const { user, setPharmacistProfile } = useAuth();
   const { activeModal, closeModal } = useAuthModal();
 
   const isOpen = activeModal === 'functionGate';
@@ -48,10 +49,8 @@ export default function FunctionGateModal() {
     if (isOpen) setSelectedKey(null);
   }, [isOpen]);
 
-  // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: KPA prefixed roles
-  // 직능 선택 대상이 아닌 역할: 운영자/관리자 + 학생
-  const EXEMPT_ROLES = ['kpa:admin', 'kpa:operator', 'kpa:district_admin', 'kpa:branch_admin', 'kpa:branch_operator', 'kpa:student'];
-  const isExempt = user?.roles.some((r: string) => EXEMPT_ROLES.includes(r)) || false;
+  // WO-KPA-ROLE-SIMPLIFICATION-PHASE1-V1: 상수 사용
+  const isExempt = user ? hasAnyRole(user.roles, FUNCTION_GATE_EXEMPT_ROLES) : false;
 
   // Close if exempt role or already set
   useEffect(() => {
@@ -80,8 +79,8 @@ export default function FunctionGateModal() {
   const handleConfirm = () => {
     const selected = options.find(o => o.key === selectedKey);
     if (selected) {
-      setPharmacistFunction(selected.pharmacistFunction);
-      setPharmacistRole(selected.pharmacistRole);
+      // WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 1회 API + 1회 리렌더로 통합
+      setPharmacistProfile(selected.pharmacistFunction, selected.pharmacistRole);
       closeModal();
     }
   };

@@ -88,20 +88,20 @@ export const FEEDBACK_STATUS_COLORS: Record<FeedbackStatus, string> = {
   wont_fix: '#9ca3af', // light gray
 };
 
+import { ROLES, hasAnyRole } from '../lib/role-constants';
+
 /**
  * 피드백 작성 권한 확인
  */
 export function canWriteFeedback(userRoles?: string[]): boolean {
-  const writeRoles = ['kpa:district_admin', 'kpa:branch_admin', 'kpa:admin'];
-  if (userRoles && userRoles.some(r => writeRoles.includes(r))) return true;
-  return false;
+  if (!userRoles) return false;
+  return hasAnyRole(userRoles, [ROLES.KPA_DISTRICT_ADMIN, ROLES.KPA_BRANCH_ADMIN, ROLES.KPA_ADMIN]);
 }
 
 /**
  * 피드백 관리 권한 확인 (상태 변경, 고정 등)
  */
 export function canManageFeedback(userRoles?: string[]): boolean {
-  const manageRoles = ['kpa:admin', 'kpa:district_admin'];
-  if (userRoles && userRoles.some(r => manageRoles.includes(r))) return true;
-  return false;
+  if (!userRoles) return false;
+  return hasAnyRole(userRoles, [ROLES.KPA_ADMIN, ROLES.KPA_DISTRICT_ADMIN]);
 }

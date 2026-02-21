@@ -10,6 +10,7 @@ import { forumApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
+import { PLATFORM_ROLES, ROLES, hasAnyRole } from '../../lib/role-constants';
 
 export function ForumDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,8 +55,13 @@ export function ForumDetailPage() {
       const res = await forumApi.likePost(post.id);
       setPost({ ...post, likeCount: res.data.likeCount });
       setIsLiked((res.data as any).isLiked ?? !isLiked);
-    } catch (err) {
-      alert('좋아요 처리에 실패했습니다.');
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {
+        alert('로그인 세션이 만료되었습니다. 페이지를 새로고침해 주세요.');
+      } else {
+        alert('좋아요 처리에 실패했습니다.');
+      }
     } finally {
       setIsLiking(false);
     }
@@ -105,7 +111,8 @@ export function ForumDetailPage() {
     );
   }
 
-  const isAuthor = user?.id === post.authorId;
+  const isAdmin = hasAnyRole(user?.roles ?? [], [...PLATFORM_ROLES, ROLES.PLATFORM_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]);
+  const isAuthor = user?.id === post.authorId || isAdmin;
 
   return (
     <div style={styles.container}>

@@ -9,7 +9,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { FunnelService } from '../services/funnel.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
@@ -20,7 +20,7 @@ export function createFunnelController(
   requireAuth: AuthMiddleware,
 ): Router {
   const router = Router();
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   const funnelService = new FunnelService(dataSource);
 
   /**

@@ -228,7 +228,7 @@ export default function MySignagePage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-4">
           <NavLink
-            to="/pharmacy/signage/library"
+            to="/store/signage/library"
             className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-slate-600" />
@@ -245,7 +245,7 @@ export default function MySignagePage() {
         </div>
         <div className="flex gap-2">
           <NavLink
-            to="/pharmacy/signage/preview"
+            to="/store/signage/preview"
             className="flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
           >
             <Eye className="w-4 h-4" />
@@ -331,7 +331,7 @@ export default function MySignagePage() {
             {selectedChannel} 재생 목록
           </h2>
           <NavLink
-            to="/pharmacy/signage/library"
+            to="/store/signage/library"
             className="flex items-center gap-2 text-sm text-primary-600 hover:underline"
           >
             <Plus className="w-4 h-4" />
@@ -450,7 +450,7 @@ export default function MySignagePage() {
               콘텐츠 라이브러리에서 추가해주세요.
             </p>
             <NavLink
-              to="/pharmacy/signage/library"
+              to="/store/signage/library"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <Plus className="w-4 h-4" />

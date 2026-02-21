@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaMember, KpaOrganization, KpaMemberService, KpaAuditLog } from '../entities/index.js';
+import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -30,7 +30,7 @@ export function createMemberController(
 ): Router {
   const router = Router();
   const memberRepo = dataSource.getRepository(KpaMember);
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
   const serviceRepo = dataSource.getRepository(KpaMemberService);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
@@ -206,6 +206,7 @@ export function createMemberController(
         const { organization_id, status, role, page = '1', limit = '20' } = req.query;
 
         const qb = memberRepo.createQueryBuilder('m')
+          .leftJoinAndSelect('m.user', 'u')
           .leftJoinAndSelect('m.organization', 'org');
 
         if (organization_id) {
@@ -283,6 +284,57 @@ export function createMemberController(
         }
 
         const saved = await memberRepo.save(member);
+
+        // ============================================================
+        // WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1: Sync User entity
+        // Uses raw SQL to avoid importing User entity (ESM rule compliance)
+        // ============================================================
+        try {
+          const kpaRole = member.membership_type === 'student' ? 'kpa:student' : 'kpa:pharmacist';
+
+          if (oldStatus === 'pending' && newStatus === 'active') {
+            // APPROVAL: Activate user + add KPA role
+            await dataSource.query(
+              `UPDATE users
+               SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+               WHERE id = $1`,
+              [member.user_id, req.user!.id]
+            );
+            await dataSource.query(
+              `UPDATE users SET roles = array_append(roles, $2)
+               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+              [member.user_id, kpaRole]
+            );
+          } else if (newStatus === 'suspended') {
+            // SUSPENSION: Remove KPA role + suspend user
+            await dataSource.query(
+              `UPDATE users SET roles = array_remove(roles, $2), status = 'suspended'
+               WHERE id = $1`,
+              [member.user_id, kpaRole]
+            );
+          } else if (newStatus === 'withdrawn') {
+            // WITHDRAWAL: Remove KPA role only
+            await dataSource.query(
+              `UPDATE users SET roles = array_remove(roles, $2)
+               WHERE id = $1`,
+              [member.user_id, kpaRole]
+            );
+          } else if (oldStatus === 'suspended' && newStatus === 'active') {
+            // REACTIVATION: Restore user + re-add KPA role
+            await dataSource.query(
+              `UPDATE users SET status = 'active', "isActive" = true
+               WHERE id = $1`,
+              [member.user_id]
+            );
+            await dataSource.query(
+              `UPDATE users SET roles = array_append(roles, $2)
+               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
+              [member.user_id, kpaRole]
+            );
+          }
+        } catch (syncError) {
+          console.error('[WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1] User sync failed:', syncError);
+        }
 
         // 서비스 레코드 동기화 (kpa-a)
         const svcRecord = await serviceRepo.findOne({

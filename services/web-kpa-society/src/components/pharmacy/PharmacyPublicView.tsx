@@ -24,7 +24,7 @@ interface PreviewCardData {
 
 const GLUCOSEVIEW_URL = import.meta.env.DEV
   ? 'http://localhost:4101'
-  : 'https://glucoseview.neture.co.kr';
+  : 'https://glucoseview.co.kr';
 
 /** 약국 경영 내부 서비스 */
 const managementCards: PreviewCardData[] = [
@@ -32,13 +32,13 @@ const managementCards: PreviewCardData[] = [
     title: 'B2B 구매',
     description: '약국 운영에 필요한 상품 구매',
     icon: '🏭',
-    href: '/pharmacy/b2b',
+    href: '/pharmacy/sales/b2b',
   },
   {
     title: '내 약국 몰 관리',
     description: '고객 노출 화면 및 상품 관리',
     icon: '🏪',
-    href: '/pharmacy/store',
+    href: '/pharmacy/settings',
   },
   {
     title: '내 약국 서비스',

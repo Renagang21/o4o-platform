@@ -27,7 +27,7 @@ export function AdminSidebar() {
     { path: '/members', label: '회원 관리', icon: '👥' },
     { path: '/committee-requests', label: '위원회 관리', icon: '👥' },
     { path: '/annual-report', label: '신상신고', icon: '📝', badge: 3 },
-    { path: '/membership-fee', label: '연회비', icon: '💰', badge: 2 },
+    { path: '/fee', label: '연회비', icon: '💰', badge: 2 },
     { path: '/officers', label: '임원 관리', icon: '👔' },
     { path: '/settings', label: '설정', icon: '⚙️' },
   ];

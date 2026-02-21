@@ -83,6 +83,15 @@ import { createStoreNetworkRoutes } from './routes/platform/store-network.routes
 // Physical Store Linking (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
 import { createPhysicalStoreRoutes } from './routes/platform/physical-store.routes.js';
 
+// Platform Slug Check (WO-CORE-STORE-REQUESTED-SLUG-V1)
+import { createSlugRoutes } from './routes/platform/slug.routes.js';
+
+// Platform Store Policy (WO-CORE-STORE-POLICY-SYSTEM-V1)
+import { createStorePolicyRoutes } from './routes/platform/store-policy.routes.js';
+
+// Unified Public Store routes (WO-STORE-SLUG-UNIFICATION-V1)
+import { createUnifiedStorePublicRoutes } from './routes/platform/unified-store-public.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -745,6 +754,18 @@ const startServer = async () => {
     app.use('/api/v1/admin/physical-stores', createPhysicalStoreRoutes(AppDataSource));
     logger.info('✅ Physical Store routes registered at /api/v1/admin/physical-stores');
 
+    // 8.10. Register Platform Slug Check routes (WO-CORE-STORE-REQUESTED-SLUG-V1)
+    app.use('/api/v1/platform/slug', createSlugRoutes(AppDataSource));
+    logger.info('✅ Platform Slug routes registered at /api/v1/platform/slug');
+
+    // 8.11a. Register Unified Public Store routes (WO-STORE-SLUG-UNIFICATION-V1)
+    app.use('/api/v1/stores', createUnifiedStorePublicRoutes(AppDataSource));
+    logger.info('✅ Unified Public Store routes registered at /api/v1/stores/:slug');
+
+    // 8.11b. Register Platform Store Policy routes (WO-CORE-STORE-POLICY-SYSTEM-V1)
+    app.use('/api/v1/stores', createStorePolicyRoutes(AppDataSource));
+    logger.info('✅ Platform Store Policy routes registered at /api/v1/stores/:slug/policies');
+
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);
     logger.info('✅ User Role routes registered at /api/v1/userRole');
@@ -919,6 +940,15 @@ const startServer = async () => {
       logger.error('Failed to register Care Dashboard routes:', dashboardError);
     }
 
+    // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
+    try {
+      const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');
+      app.use('/api/v1/home', createHomePreviewRouter(AppDataSource));
+      logger.info('✅ Home Preview routes registered at /api/v1/home/preview');
+    } catch (homeError) {
+      logger.error('Failed to register Home Preview routes:', homeError);
+    }
+
     // 29. Register Neture routes (Phase D-1)
     try {
       const netureRoutes = createNetureRoutes(AppDataSource);
@@ -1055,6 +1085,16 @@ const startServer = async () => {
       logger.info('✅ Admin Ops Metrics routes registered at /api/v1/admin/ops');
     } catch (opsMetricsError) {
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
+    }
+
+    // 37-b. Register Demo Seed routes (WO-DEMO-SEED-SCRIPT-V1)
+    // Path: /api/v1/ops/seed-demo (NOT /api/v1/admin/* to avoid adminDashboardRoutes auth middleware)
+    try {
+      const { createSeedDemoRouter } = await import('./modules/admin/seed-demo.controller.js');
+      app.use('/api/v1/ops/seed-demo', createSeedDemoRouter(AppDataSource));
+      logger.info('✅ Demo Seed routes registered at /api/v1/ops/seed-demo');
+    } catch (seedDemoError) {
+      logger.error('Failed to register Demo Seed routes:', seedDemoError);
     }
 
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)

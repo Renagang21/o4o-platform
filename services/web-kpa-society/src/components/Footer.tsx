@@ -56,9 +56,6 @@ export function Footer() {
                 운영: ㈜쓰리라이프존 | 사업자등록번호 108-86-02873
               </p>
             </div>
-            <Link to="/test-center" style={styles.testCenterLink}>
-              🧪 테스트 센터
-            </Link>
           </div>
         </div>
       </div>
@@ -154,13 +151,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.gray600,
     margin: 0,
-  },
-  testCenterLink: {
-    fontSize: '12px',
-    color: colors.primary,
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
   },
 };

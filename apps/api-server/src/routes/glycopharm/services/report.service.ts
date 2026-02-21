@@ -130,7 +130,9 @@ export class ReportService {
 
   async listPharmacies(): Promise<Array<{ id: string; name: string }>> {
     const rows = await this.dataSource.query(
-      `SELECT id, name FROM glycopharm_pharmacies WHERE status = 'active' ORDER BY name`,
+      `SELECT o.id, o.name FROM organizations o
+       JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+       WHERE o."isActive" = true ORDER BY o.name`,
     );
     return rows.map((r: any) => ({ id: r.id, name: r.name }));
   }
@@ -139,7 +141,7 @@ export class ReportService {
     pharmacyId: string,
   ): Promise<{ id: string; name: string } | undefined> {
     const rows = await this.dataSource.query(
-      `SELECT id, name FROM glycopharm_pharmacies WHERE id = $1`,
+      `SELECT id, name FROM organizations WHERE id = $1`,
       [pharmacyId],
     );
     return rows[0] ? { id: rows[0].id, name: rows[0].name } : undefined;

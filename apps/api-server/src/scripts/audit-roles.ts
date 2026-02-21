@@ -15,8 +15,8 @@
  */
 
 import 'reflect-metadata';
-import { AppDataSource } from '../config/data-source.js';
-import { User } from '../entities/user.entity.js';
+import { AppDataSource } from '../database/connection.js';
+import { User } from '../modules/auth/entities/User.js';
 import { getRoleMigrationStatus, isPrefixedRole } from '../utils/role.utils.js';
 import type { ServiceKey } from '../types/roles.js';
 

@@ -1,70 +1,33 @@
-# organization-core - Definition
+# organization-core
 
-> 앱 정의 문서
+> **Status**: FROZEN (Foundation Core) | **Version**: 1.0.0 | **Package**: @o4o/organization-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** organization-core
-- **App Type:** core
-- **Package:** @o4o/organization-core
-- **Service Group:** All organization services
-- **Status:** @status FROZEN - Foundation Core
+전사 조직 관리 시스템. 모든 조직 서비스에서 사용.
 
-## 역할 및 책임
-
-### 주요 역할
-전사 조직 관리 시스템으로서 계층 구조 조직, 멤버 관리, 조직 스코프 권한을 제공한다.
-
-### 책임 범위
-- 조직 계층 구조 관리 (Organization, OrganizationUnit)
-- 조직 멤버 관리 (OrganizationMember)
-- 조직 역할 관리 (OrganizationRole)
-- 조직 스코프 권한 제공
-
-### 경계
-- 조직 구조만 담당
-- 사용자 인증은 auth-core에 위임
-- 비즈니스 권한은 각 서비스 앱이 담당
-
-## 의존성
-
-### Core Dependencies
-(없음 - Foundation Core)
-
-### Optional Dependencies
-(없음)
+| 책임 | 경계 |
+|------|------|
+| 조직 계층 구조 (Organization, OrganizationUnit) | 인증 → auth-core |
+| 멤버 관리 (OrganizationMember) | 비즈니스 권한 → 서비스 앱 |
+| 역할 관리 (OrganizationRole) | |
 
 ## 외부 노출
 
-### Services
-- OrganizationService
-- OrganizationMemberService
+**Services**: OrganizationService, OrganizationMemberService
+**Types**: Organization, OrganizationMember, OrganizationUnit, OrganizationRole
+**Events**: `organization.created/updated/deleted`, `member.added/removed`
 
-### Types
-- Organization
-- OrganizationMember
-- OrganizationUnit
-- OrganizationRole
+## API Routes
 
-### Events
-- `organization.created`
-- `organization.updated`
-- `organization.deleted`
-- `member.added`
-- `member.removed`
+- `/api/v1/organizations`, `/api/v1/organizations/:id`
+- `/api/v1/organizations/:id/members`
 
 ## 설정
 
-### 기본 설정
-- enableHierarchy: true
-- maxDepth: 5
+- enableHierarchy: true, maxDepth: 5
 - defaultOrganizationType: 'branch'
 
-### 환경 변수
-(없음)
+## Dependencies
 
-## 특징
-
-- @status FROZEN (Foundation Core)
-- 모든 조직 서비스에서 사용
-- Phase A/B complete (2025-12-14)
+없음 (Foundation Core)

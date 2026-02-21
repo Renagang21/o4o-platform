@@ -14,7 +14,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Download, Play, Clock, List, User, Calendar, RotateCw, Film } from 'lucide-react';
 import { publicContentApi, globalContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
 import type { SignagePlaylistItemResponse, ContentSource } from '@o4o/types/signage';
-import { getMediaThumbnailUrl, getMediaPlayUrl, extractYouTubeVideoId, SIGNAGE_SOURCE_LABELS, SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
+import { getMediaPlayUrl, extractYouTubeVideoId, SIGNAGE_SOURCE_LABELS, SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -280,7 +280,6 @@ export default function PlaylistDetailPage() {
             {items.map((item: any, index: number) => {
               const media = item.media;
               const isSelected = index === selectedItemIndex;
-              const thumb = media ? getMediaThumbnailUrl(media) : null;
 
               return (
                 <li
@@ -295,15 +294,9 @@ export default function PlaylistDetailPage() {
                     {isSelected ? <Play className="h-4 w-4 mx-auto" /> : index + 1}
                   </span>
 
-                  {/* Thumbnail */}
-                  <div className="w-20 h-12 bg-slate-100 rounded overflow-hidden flex-shrink-0">
-                    {thumb ? (
-                      <img src={thumb} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-300">
-                        <Film className="h-5 w-5" />
-                      </div>
-                    )}
+                  {/* Icon */}
+                  <div className="flex-shrink-0 w-8 text-center">
+                    <Film className={`h-5 w-5 mx-auto ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
                   </div>
 
                   {/* Info */}

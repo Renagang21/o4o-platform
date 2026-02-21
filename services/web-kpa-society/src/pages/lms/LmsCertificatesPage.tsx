@@ -40,8 +40,14 @@ export function LmsCertificatesPage() {
 
       setCertificates(res.data);
       setTotalPages(res.totalPages);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '완료 기록을 불러오는데 실패했습니다.');
+    } catch (err: any) {
+      const msg = err?.message || '';
+      // 인증 오류(토큰 만료 등)는 빈 상태로 처리
+      if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {
+        setCertificates([]);
+      } else {
+        setError(msg || '완료 기록을 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }

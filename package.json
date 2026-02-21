@@ -184,5 +184,15 @@
     "react-dom": "^19.2.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
+      "@types/react": "19.2.7",
+      "@types/react-dom": "19.2.3",
+      "@types/express": "4.17.23",
+      "zod": "3.23.8"
+    }
   }
 }

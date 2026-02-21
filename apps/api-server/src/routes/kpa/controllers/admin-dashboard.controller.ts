@@ -10,7 +10,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaOrganization } from '../entities/kpa-organization.entity.js';
+import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 
@@ -18,12 +18,11 @@ type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
 
 // Response interfaces
+// WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거
 interface DashboardStats {
   totalBranches: number;     // 분회 수 (type = 'branch' or 'group')
   totalMembers: number;      // 전체 활성 회원 수
   pendingApprovals: number;  // 승인 대기 신청서
-  activeGroupbuys: number;   // 공동구매 (Entity 없음 - 0 반환)
-  recentPosts: number;       // 최근 게시물 (Entity 없음 - 0 반환)
 }
 
 interface OrganizationStats {
@@ -87,14 +86,14 @@ export function createAdminDashboardController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         // Get repositories
-        const orgRepo = dataSource.getRepository(KpaOrganization);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
         const memberRepo = dataSource.getRepository(KpaMember);
         const appRepo = dataSource.getRepository(KpaApplication);
 
         // Query organization stats
         const [branchCount, groupCount] = await Promise.all([
-          orgRepo.count({ where: { type: 'branch', is_active: true } }),
-          orgRepo.count({ where: { type: 'group', is_active: true } }),
+          orgRepo.count({ where: { type: 'branch', isActive: true } }),
+          orgRepo.count({ where: { type: 'group', isActive: true } }),
         ]);
         const totalBranches = branchCount + groupCount;
 
@@ -104,16 +103,10 @@ export function createAdminDashboardController(
         // Query pending applications
         const pendingApprovals = await appRepo.count({ where: { status: 'submitted' } });
 
-        // No groupbuy or forum entities - return 0
-        const activeGroupbuys = 0;
-        const recentPosts = 0;
-
         const stats: DashboardStats = {
           totalBranches,
           totalMembers,
           pendingApprovals,
-          activeGroupbuys,
-          recentPosts,
         };
 
         res.json({ success: true, data: stats });
@@ -134,15 +127,15 @@ export function createAdminDashboardController(
     '/dashboard/organizations',
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const orgRepo = dataSource.getRepository(KpaOrganization);
+        const orgRepo = dataSource.getRepository(OrganizationStore);
 
         const [total, association, branch, group, active, inactive] = await Promise.all([
           orgRepo.count(),
           orgRepo.count({ where: { type: 'association' } }),
           orgRepo.count({ where: { type: 'branch' } }),
           orgRepo.count({ where: { type: 'group' } }),
-          orgRepo.count({ where: { is_active: true } }),
-          orgRepo.count({ where: { is_active: false } }),
+          orgRepo.count({ where: { isActive: true } }),
+          orgRepo.count({ where: { isActive: false } }),
         ]);
 
         const stats: OrganizationStats = {

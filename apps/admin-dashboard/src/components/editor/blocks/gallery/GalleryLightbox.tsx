@@ -50,8 +50,8 @@ const GalleryLightbox: React.FC<GalleryLightboxProps> = ({
   const lightboxRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const autoPlayRef = useRef<NodeJS.Timeout>(undefined);
+  const controlsTimeoutRef = useRef<NodeJS.Timeout>(undefined);
 
   const currentImage = images[currentIndex];
   const isVideo = currentImage?.url?.match(/\.(mp4|webm|ogg|mov)$/i);

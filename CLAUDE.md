@@ -69,7 +69,7 @@
 3. **SQL 직접**: Google Cloud Console SQL Editor
 4. ❌ 로컬 psql/scripts 사용 금지
 
-> 📄 상세: `docs/_platform/operations/PRODUCTION-MIGRATION-STANDARD.md`
+> 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
 ---
 
@@ -123,7 +123,7 @@ import type { RelatedEntity } from './related.entity.js';
 @ManyToOne('RelatedEntity', 'property')
 ```
 
-> 📄 상세: `docs/reports/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md`
+> 📄 상세: `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md`
 
 ---
 
@@ -141,8 +141,7 @@ import type { RelatedEntity } from './related.entity.js';
 조사 → 문제확정 → 최소 수정 → 검증 → 종료
 ```
 
-> 📄 템플릿: `docs/app-guidelines/work-order-standard-header.md`
-> 📄 신규 서비스: `docs/app-guidelines/new-service-workorder-template.md`
+> 모든 WO는 위 5단계를 준수한다.
 
 ---
 
@@ -164,7 +163,7 @@ import type { RelatedEntity } from './related.entity.js';
 | Tourism | TOURISM | ✅ |
 | GlycoPharm | GLYCOPHARM | ❌ BLOCKED |
 
-> 📄 상세: `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md`
+> 📄 상세: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
 
 ---
 
@@ -248,7 +247,7 @@ import type { RelatedEntity } from './related.entity.js';
 ### GlycoPharm Legacy (Phase 9-A):
 - `glycopharm_orders`: READ-ONLY
 - `OrderType.GLYCOPHARM`: BLOCKED
-- 📄 교훈: `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
+- 📄 교훈: `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
 
 ---
 
@@ -327,8 +326,7 @@ import type { RelatedEntity } from './related.entity.js';
 | `/__debug__/navigation` | 📋 참고 설계 | 필요 시 구현 |
 | `/__debug__/api` | 📋 참고 설계 | 필요 시 구현 |
 
-> 📄 상세: `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md`
-> 📄 가이드: `docs/debugging/README.md`
+> 진단 Entry Point와 루틴은 위 표 참조.
 
 ---
 
@@ -338,7 +336,7 @@ import type { RelatedEntity } from './related.entity.js';
 - App 내 독자적 디자인 시스템 생성 금지
 - 디자인 변경은 Work Order 통해서만
 
-> 📄 상세: `docs/app-guidelines/design-core-governance.md`
+> 📄 상세: `docs/rules/design-core-governance.md`
 
 ---
 
@@ -352,10 +350,8 @@ import type { RelatedEntity } from './related.entity.js';
 | 영역 | 문서 | 경로 |
 |------|------|------|
 | Content Core | Content Core 개요 | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| LMS Core | Core-Extension 원칙 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
-| LMS Core | 데이터 소유권 | `docs/platform/lms/LMS-CORE-DATA-OWNERSHIP.md` |
-| LMS Core | API 계약 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
-| LMS Core | 이벤트 표준 | `docs/platform/lms/LMS-EVENT-STANDARD.md` |
+| LMS Core | Core-Extension 원칙 + 데이터 소유권 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
+| LMS Core | API 계약 + 이벤트 표준 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
 | Navigation | 운영자 대시보드 네비게이션 | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | Extension | 일반 가이드 | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
 | Extension | 파트너 가이드 | `docs/platform/extensions/EXTENSION-PARTNER-GUIDE.md` |
@@ -380,7 +376,7 @@ import type { RelatedEntity } from './related.entity.js';
 ## 17. KPA Society 구조 기준
 
 > kpa-society 관련 작업(기획, 조사, 개발, 정비)은
-> `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
+> `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
 
 ### 핵심 구조
 
@@ -414,11 +410,11 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 | 문서 | 경로 |
 |------|------|
-| 서비스 구조 기준 | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
-| Phase 0 현황 조사 | `docs/investigations/kpa-society-auth-current-state.md` |
-| Phase 2 데이터 모델 | `docs/investigations/KPA-SOCIETY-PHASE2-MEMBERSHIP-DATA-MODEL.md` |
-| Phase 2 가입/승인 흐름 | `docs/investigations/KPA-SOCIETY-PHASE2-SIGNUP-AND-APPROVAL-FLOW.md` |
-| Phase 2 서비스 이동 규칙 | `docs/investigations/KPA-SOCIETY-PHASE2-SERVICE-NAVIGATION-RULES.md` |
+| 서비스 구조 기준 | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| Phase 0 현황 조사 | `docs/reference/kpa-society-auth-current-state.md` |
+| Phase 2 데이터 모델 | `docs/reference/KPA-SOCIETY-PHASE2-MEMBERSHIP-DATA-MODEL.md` |
+| Phase 2 가입/승인 흐름 | `docs/reference/KPA-SOCIETY-PHASE2-SIGNUP-AND-APPROVAL-FLOW.md` |
+| Phase 2 서비스 이동 규칙 | `docs/reference/KPA-SOCIETY-PHASE2-SERVICE-NAVIGATION-RULES.md` |
 
 ---
 
@@ -469,7 +465,7 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 ## 20. OPERATOR OS BASELINE (v1) — FROZEN
 
 > **Tag: `o4o-operator-os-baseline-v1` (2026-02-16)**
-> **상세: `docs/_platform/BASELINE-OPERATOR-OS-V1.md`**
+> **상세: `docs/baseline/BASELINE-OPERATOR-OS-V1.md`**
 
 다음 Core 패키지는 **구조 동결(Frozen)** 상태이다:
 
@@ -481,6 +477,7 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | `@o4o/action-log-core` | 실행 이력 기록 | Frozen |
 | `@o4o/asset-copy-core` | CMS 콘텐츠 복제 | Frozen |
 | `@o4o/operator-ux-core` | 5-Block Operator 대시보드 표준 | Frozen |
+| `@o4o/admin-ux-core` | 4-Block Admin 대시보드 표준 | Frozen |
 
 ### 허용되는 변경
 
@@ -498,6 +495,34 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 
 ---
 
+## 21. KPA UX BASELINE (v1) — FROZEN
+
+> **Tag: `v1.00-kpa-ux-baseline` (2026-02-17)**
+> **상세: `docs/baseline/KPA_UX_BASELINE_V1.md`**
+
+KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
+
+| 영역 | Operator (5-Block) | Admin (4-Block) | 특이사항 |
+|------|-------------------|-----------------|----------|
+| KPA-a (커뮤니티) | Frozen | - | Admin 대시보드 없음 |
+| KPA-b (분회 서비스) | Frozen | Frozen | 4-Block 외부 회계 섹션 |
+| KPA-c (조직관리 데모) | Frozen | Frozen | - |
+
+### 금지 사항
+
+- 커스텀 UI로 회귀
+- Block 구조 변경 (Core Freeze 위반)
+- 독자적 레이아웃 생성
+
+### 허용 사항
+
+- KPI/Quick Actions 항목 조정
+- AI Summary 규칙 추가
+- 4-Block 외부 서비스 고유 섹션 추가
+- 버그 수정, 성능 개선
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -505,26 +530,25 @@ kpa-society.co.kr은 하나의 사이트처럼 보이지만,
 | Cosmetics 도메인 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
 | Business 서비스 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
-| E-commerce 계약 | `docs/_platform/E-COMMERCE-ORDER-CONTRACT.md` |
-| GlycoPharm Legacy | `docs/_platform/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
+| E-commerce 계약 | `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md` |
+| GlycoPharm Legacy | `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
 | Store Template | `docs/templates/o4o-store-template/` |
-| ESM Entity 규칙 | `docs/reports/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
-| 디버깅 가이드 | `docs/debugging/README.md` |
-| **진단 인프라 기준** | `docs/debugging/DIAGNOSTIC-INFRASTRUCTURE-INVENTORY.md` |
-| Design Core | `docs/app-guidelines/design-core-governance.md` |
+| ESM Entity 규칙 | `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
+| Design Core | `docs/rules/design-core-governance.md` |
 | **Content Core** | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
 | **LMS Core** | `docs/platform/lms/` |
 | **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | **Extension** | `docs/platform/extensions/` |
-| **KPA Society 구조** | `docs/_platform/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
-| **KPA 권한 매트릭스** | `docs/_platform/KPA-ROLE-MATRIX-V1.md` |
+| **KPA Society 구조** | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| **KPA 권한 매트릭스** | `docs/baseline/KPA-ROLE-MATRIX-V1.md` |
 | **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
 | **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| **Operator OS Baseline** | `docs/_platform/BASELINE-OPERATOR-OS-V1.md` |
-| **Operator UX Core Freeze** | `docs/platform-core/OPERATOR_UX_CORE_FREEZE_V1.md` |
+| **Operator OS Baseline** | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
+| **UX Core Freeze (Operator+Admin)** | `docs/baseline/UX-CORE-FREEZE-V1.md` |
+| **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
 
 ---
 
-*Updated: 2026-02-17*
-*Version: 4.9*
+*Updated: 2026-02-20*
+*Version: 5.2*
 *Status: Active Constitution*

@@ -9,7 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateStoreSlug } from '../../../utils/slug.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlucoseViewApplication } from '../entities/glucoseview-application.entity.js';
 import { GlucoseViewPharmacy } from '../entities/glucoseview-pharmacy.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
@@ -564,27 +564,47 @@ export function createGlucoseViewApplicationController(
           });
 
           if (!existingPharmacy) {
-            // Create new pharmacy with enabled services
-            pharmacy = new GlucoseViewPharmacy();
-            pharmacy.userId = application.userId;
-            pharmacy.name = application.pharmacyName;
-            pharmacy.businessNumber = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
-            pharmacy.slug = generateStoreSlug(application.pharmacyName);
-            pharmacy.glycopharmPharmacyId = application.pharmacyId;
-            pharmacy.status = 'active';
-            pharmacy.enabledServices = ['cgm_view'];
+            // WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1: Atomic pharmacy + slug creation
+            const queryRunner = dataSource.createQueryRunner();
+            await queryRunner.connect();
+            await queryRunner.startTransaction();
 
-            // slug 중복 시 suffix 추가
-            const existingSlug = await pharmacyRepo.findOne({ where: { slug: pharmacy.slug } });
-            if (existingSlug) {
-              pharmacy.slug = `${pharmacy.slug}-${Date.now().toString(36).slice(-4)}`;
+            try {
+              // Create new pharmacy with enabled services
+              pharmacy = new GlucoseViewPharmacy();
+              pharmacy.userId = application.userId;
+              pharmacy.name = application.pharmacyName;
+              pharmacy.businessNumber = application.businessNumber ? normalizeBusinessNumber(application.businessNumber) : '';
+
+              // Use StoreSlugService with EntityManager for transaction support
+              const slugService = new StoreSlugService(queryRunner.manager);
+              pharmacy.slug = await slugService.generateUniqueSlug(application.pharmacyName);
+
+              pharmacy.glycopharmPharmacyId = application.pharmacyId;
+              pharmacy.status = 'active';
+              pharmacy.enabledServices = ['cgm_view'];
+
+              // Save pharmacy within transaction
+              pharmacy = await queryRunner.manager.save(GlucoseViewPharmacy, pharmacy);
+
+              // Register slug in platform-wide registry (same transaction)
+              await slugService.reserveSlug({
+                storeId: pharmacy.id,
+                serviceKey: 'glucoseview',
+                slug: pharmacy.slug,
+              });
+
+              await queryRunner.commitTransaction();
+
+              logger.info(
+                `[GlucoseView Admin] Pharmacy created: ${pharmacy.id} for user ${application.userId}`
+              );
+            } catch (txError) {
+              await queryRunner.rollbackTransaction();
+              throw txError;
+            } finally {
+              await queryRunner.release();
             }
-
-            await pharmacyRepo.save(pharmacy);
-
-            logger.info(
-              `[GlucoseView Admin] Pharmacy created: ${pharmacy.id} for user ${application.userId}`
-            );
           } else {
             // Pharmacy already exists - merge new services
             pharmacy = existingPharmacy;

@@ -48,7 +48,7 @@ export const useZoneContent = (
   const [error, setError] = useState<string | null>(null)
   const [isDirty, setIsDirty] = useState(false)
   
-  const autoSaveTimerRef = useRef<NodeJS.Timeout>()
+  const autoSaveTimerRef = useRef<NodeJS.Timeout>(undefined)
   const isAutoSaveEnabled = useRef(false)
 
   // Track changes for dirty state

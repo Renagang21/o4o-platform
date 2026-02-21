@@ -1,18 +1,25 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
 import type { AnalysisProvider } from './analysis.provider.js';
-import { MockAnalysisProvider } from './mock-analysis.provider.js';
+import { DefaultAnalysisProvider } from './analysis.provider.js';
 import { AiInsightProvider } from './ai-analysis.provider.js';
+import { MockCgmProvider } from './mock-cgm.provider.js';
+import type { CgmProvider } from './cgm.provider.js';
 import { CareKpiSnapshotService } from './care-kpi-snapshot.service.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from './care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from './care-pharmacy-context.middleware.js';
 
-// Provider selection: default Mock, env var opt-in for AI
+// CGM provider selection: default Mock
+const cgmProvider: CgmProvider =
+  // Future: process.env.CGM_PROVIDER === 'vendor' ? new VendorCgmProvider() :
+  new MockCgmProvider();
+
+// Analysis provider selection: default rule-based, env var opt-in for AI
 const provider: AnalysisProvider =
   process.env.CARE_ANALYSIS_PROVIDER === 'ai'
-    ? new AiInsightProvider()
-    : new MockAnalysisProvider();
+    ? new AiInsightProvider(cgmProvider)
+    : new DefaultAnalysisProvider(cgmProvider);
 
 export function createCareAnalysisRouter(dataSource: DataSource): Router {
   const router = Router();

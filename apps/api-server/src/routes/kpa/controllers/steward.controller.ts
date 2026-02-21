@@ -10,7 +10,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { KpaSteward, StewardScopeType, KpaMember, KpaOrganization } from '../entities/index.js';
+import { KpaSteward, StewardScopeType, KpaMember, OrganizationStore } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -35,7 +35,7 @@ export function createStewardController(
   const router = Router();
   const stewardRepo = dataSource.getRepository(KpaSteward);
   const memberRepo = dataSource.getRepository(KpaMember);
-  const orgRepo = dataSource.getRepository(KpaOrganization);
+  const orgRepo = dataSource.getRepository(OrganizationStore);
 
   /**
    * GET /kpa/stewards

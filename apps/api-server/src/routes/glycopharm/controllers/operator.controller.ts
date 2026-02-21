@@ -9,7 +9,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
@@ -155,31 +155,32 @@ export function createOperatorController(
         }
 
         // Get repositories
-        const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
         // orderRepo - REMOVED (Phase 4-A: Legacy Order System Deprecation)
         const productRepo = dataSource.getRepository(GlycopharmProduct);
 
-        // === Service Status ===
-        const [activePharmacies, suspendedPharmacies, totalPharmacies] = await Promise.all([
-          pharmacyRepo.count({ where: { status: 'active' } }),
-          pharmacyRepo.count({ where: { status: 'suspended' } }),
-          pharmacyRepo.count(),
-        ]);
+        // === Service Status (organizations + enrollment JOIN) ===
+        const pharmacyCounts: Array<{ is_active: boolean; cnt: number }> = await dataSource.query(`
+          SELECT o."isActive" AS is_active, COUNT(*)::int AS cnt
+          FROM organizations o
+          JOIN organization_service_enrollments ose
+            ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+          GROUP BY o."isActive"
+        `);
+        const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;
+        const inactivePharmacies = pharmacyCounts.find(r => r.is_active === false)?.cnt || 0;
+        const totalPharmacies = activePharmacies + inactivePharmacies;
 
         const serviceStatus: ServiceStatus = {
           activePharmacies,
-          approvedStores: activePharmacies, // Same as active (no separate store)
-          warnings: suspendedPharmacies,
+          approvedStores: activePharmacies,
+          warnings: 0, // 'suspended' concept removed in organizations model
           lastUpdated: new Date().toISOString(),
         };
 
         // === Store Status ===
-        // Note: 'supplementing' status does not exist in GlycopharmApplicationStatus
-        // Valid statuses are: 'submitted' | 'approved' | 'rejected'
-        const [pendingApprovals, inactivePharmacies] = await Promise.all([
+        const [pendingApprovals] = await Promise.all([
           applicationRepo.count({ where: { status: 'submitted' } }),
-          pharmacyRepo.count({ where: { status: 'inactive' } }),
         ]);
         const supplementRequests = 0; // No supplementing status in current schema
 

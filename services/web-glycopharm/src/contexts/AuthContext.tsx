@@ -87,6 +87,7 @@ interface AuthContextType {
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   availableRoles: UserRole[];
+  updateUser: (updates: Partial<User>) => void;
   // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -112,6 +113,7 @@ function mapApiRoleToWebRole(apiRole: string): UserRole {
 }
 
 export const ROLE_LABELS: Record<UserRole, string> = {
+  admin: '관리자',
   pharmacy: '약국',
   supplier: '공급자',
   partner: '파트너',
@@ -120,14 +122,16 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 export const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  pharmacy: '/pharmacy',
+  admin: '/admin',
+  pharmacy: '/care',  // WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: auth-utils.ts와 통일
   supplier: '/supplier',
   partner: '/partner',
   operator: '/operator',
-  consumer: '/consumer',
+  consumer: '/',
 };
 
 export const ROLE_ICONS: Record<UserRole, string> = {
+  admin: '👑',
   pharmacy: '💊',
   supplier: '📦',
   partner: '🤝',
@@ -298,6 +302,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateUser = (updates: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
   const switchRole = selectRole;
   const hasMultipleRoles = availableRoles.length > 1;
 
@@ -365,6 +375,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         switchRole,
         hasMultipleRoles,
         availableRoles,
+        updateUser,
         // Phase 2: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,

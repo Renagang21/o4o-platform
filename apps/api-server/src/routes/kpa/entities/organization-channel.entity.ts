@@ -17,7 +17,7 @@ import {
   Index,
 } from 'typeorm';
 
-import type { KpaOrganization } from './kpa-organization.entity.js';
+import type { OrganizationStore } from './organization-store.entity.js';
 import type { OrganizationProductChannel } from './organization-product-channel.entity.js';
 
 export type OrganizationChannelType = 'B2C' | 'KIOSK' | 'TABLET' | 'SIGNAGE';
@@ -54,9 +54,9 @@ export class OrganizationChannel {
   updated_at: Date;
 
   // Relations (string-based per CLAUDE.md Section 4)
-  @ManyToOne('KpaOrganization')
+  @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'organization_id' })
-  organization?: KpaOrganization;
+  organization?: OrganizationStore;
 
   @OneToMany('OrganizationProductChannel', 'channel')
   productChannels?: OrganizationProductChannel[];

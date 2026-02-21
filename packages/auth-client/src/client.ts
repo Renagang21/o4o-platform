@@ -143,17 +143,14 @@ export class AuthClient {
               clearAllTokens();
             }
 
-            // Don't redirect if already on login page
-            if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-              const errorData = (refreshError as any)?.response?.data;
-              if (errorData?.code === 'TOKEN_EXPIRED') {
-                console.warn('Session expired, redirecting to login');
-              } else {
-                console.warn('Authentication failed, redirecting to login');
-              }
-
-              // Redirect to login page
-              window.location.href = '/login';
+            // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+            // window.location.href = '/login' 제거 — 하드 리다이렉트가 React 상태 초기화 → 무한 루프 유발
+            // 토큰만 정리하고 reject → React 레이어(AuthContext)에서 user=null 처리
+            const errorData = (refreshError as any)?.response?.data;
+            if (errorData?.code === 'TOKEN_EXPIRED') {
+              console.warn('Session expired. Tokens cleared.');
+            } else {
+              console.warn('Authentication failed. Tokens cleared.');
             }
 
             return Promise.reject(refreshError);

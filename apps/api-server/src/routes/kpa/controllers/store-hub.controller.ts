@@ -117,7 +117,7 @@ export function createStoreHubController(
         let organizationName: string | null = null;
         try {
           const orgResult = await dataSource.query(
-            `SELECT name FROM kpa_organizations WHERE id = $1`,
+            `SELECT name FROM organizations WHERE id = $1`,
             [organizationId]
           );
           organizationName = orgResult[0]?.name || null;

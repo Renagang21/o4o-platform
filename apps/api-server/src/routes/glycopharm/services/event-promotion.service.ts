@@ -35,7 +35,7 @@ import {
   type CustomerRequestPurpose,
   type CustomerRequestSourceType,
 } from '../entities/customer-request.entity.js';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 
 /** 쿨타임 (분) */
 const COOLDOWN_MINUTES = 10;
@@ -67,12 +67,12 @@ export interface PromotionResult {
 export class EventPromotionService {
   private eventRepo: Repository<GlycopharmEvent>;
   private requestRepo: Repository<GlycopharmCustomerRequest>;
-  private pharmacyRepo: Repository<GlycopharmPharmacy>;
+  private pharmacyRepo: Repository<OrganizationStore>;
 
   constructor(private dataSource: DataSource) {
     this.eventRepo = dataSource.getRepository(GlycopharmEvent);
     this.requestRepo = dataSource.getRepository(GlycopharmCustomerRequest);
-    this.pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+    this.pharmacyRepo = dataSource.getRepository(OrganizationStore);
   }
 
   /**

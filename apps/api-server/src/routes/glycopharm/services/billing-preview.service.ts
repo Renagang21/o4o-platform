@@ -81,7 +81,7 @@ export class BillingPreviewService {
     pharmacyId: string,
   ): Promise<{ id: string; name: string } | undefined> {
     const rows = await this.dataSource.query(
-      `SELECT id, name FROM glycopharm_pharmacies WHERE id = $1`,
+      `SELECT id, name FROM organizations WHERE id = $1`,
       [pharmacyId],
     );
     return rows[0] ? { id: rows[0].id, name: rows[0].name } : undefined;

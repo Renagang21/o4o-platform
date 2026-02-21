@@ -15,6 +15,8 @@ export function generateSlug(text: string): string {
  * "강남약국" → "강남약국"
  * "ABC Pharmacy" → "abc-pharmacy"
  * "서울 강남 약국" → "서울-강남-약국"
+ *
+ * @deprecated WO-CORE-STORE-SLUG-INTEGRATION-V1: Use StoreSlugService.generateUniqueSlug() from @o4o/platform-core/store-identity
  */
 export function generateStoreSlug(name: string): string {
   return name
@@ -58,6 +60,8 @@ export async function generateUniqueSlug(
  * WO-O4O-STOREFRONT-STABILIZATION-V1 Phase 4
  *
  * "강남약국" → "강남약국" (first) or "강남약국-1" (collision)
+ *
+ * @deprecated WO-CORE-STORE-SLUG-INTEGRATION-V1: Use StoreSlugService.generateUniqueSlug() from @o4o/platform-core/store-identity
  */
 export async function generateUniqueStoreSlug(
   name: string,

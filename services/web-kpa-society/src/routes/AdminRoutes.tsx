@@ -3,7 +3,7 @@
  *
  * WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1:
  * - 콘텐츠 CRUD (news, docs, signage, forum) → OperatorRoutes 이동
- * - 요청 관리 (organization-requests, service-enrollments) → OperatorRoutes 이동
+ * - 요청 관리 (organization-requests) → OperatorRoutes 이동
  * - Admin은 구조 관리만 담당: 분회, 회원, 위원회, 임원, 설정
  */
 

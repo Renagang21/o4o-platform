@@ -60,7 +60,7 @@ export function AGSearchBar({
   autoFocus = false,
 }: AGSearchBarProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<NodeJS.Timeout>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const currentValue = value ?? internalValue;

@@ -189,6 +189,8 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   setPharmacistFunction: (fn: PharmacistFunction) => void;
   setPharmacistRole: (role: PharmacistRole) => void;
+  /** WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 한 번에 설정 (1회 API, 1회 리렌더) */
+  setPharmacistProfile: (fn: PharmacistFunction, role: PharmacistRole) => void;
   // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -255,6 +257,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
 
   const checkAuth = useCallback(async () => {
+    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
+    // 토큰 없으면 /auth/me 호출 자체를 생략 → 불필요한 401 방지
+    const token = getAccessToken();
+    if (!token) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await authClient.api.get('/auth/me');
       const data = response.data as { success: boolean; data: ApiUser };
@@ -275,6 +286,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // 토큰 갱신 실패 시 user 상태 정리 (api/token-refresh.ts에서 이벤트 발행)
+  useEffect(() => {
+    const handleTokenCleared = () => setUser(null);
+    window.addEventListener('auth:token-cleared', handleTokenCleared);
+    return () => window.removeEventListener('auth:token-cleared', handleTokenCleared);
+  }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
     const response = await authClient.login({ email, password });
@@ -326,10 +344,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const setPharmacistFunction = async (fn: PharmacistFunction) => {
     if (user) {
-      // TODO: API call to update pharmacistFunction on server
-      // await authClient.api.put('/auth/me/pharmacist-function', { pharmacistFunction: fn });
-      const updatedUser = { ...user, pharmacistFunction: fn };
-      setUser(updatedUser);
+      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
+      try {
+        await authClient.api.patch('/auth/me/profile', { pharmacistFunction: fn });
+      } catch (err) {
+        console.error('Failed to save pharmacistFunction:', err);
+      }
+      setUser({ ...user, pharmacistFunction: fn });
     }
   };
 
@@ -340,10 +361,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const setPharmacistRole = async (role: PharmacistRole) => {
     if (user) {
-      // TODO: API call to update pharmacistRole on server
-      // await authClient.api.put('/auth/me/pharmacist-role', { pharmacistRole: role });
-      const updatedUser = { ...user, pharmacistRole: role };
-      setUser(updatedUser);
+      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
+      try {
+        await authClient.api.patch('/auth/me/profile', { pharmacistRole: role });
+      } catch (err) {
+        console.error('Failed to save pharmacistRole:', err);
+      }
+      setUser({ ...user, pharmacistRole: role });
+    }
+  };
+
+  /**
+   * WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 통합 설정
+   * FunctionGateModal에서 1회 API + 1회 setUser로 불필요한 중간 리렌더 제거
+   */
+  const setPharmacistProfile = async (fn: PharmacistFunction, role: PharmacistRole) => {
+    if (user) {
+      try {
+        await authClient.api.patch('/auth/me/profile', {
+          pharmacistFunction: fn,
+          pharmacistRole: role,
+        });
+      } catch (err) {
+        console.error('Failed to save pharmacist profile:', err);
+      }
+      setUser({ ...user, pharmacistFunction: fn, pharmacistRole: role });
     }
   };
 
@@ -413,6 +455,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         checkAuth,
         setPharmacistFunction,
         setPharmacistRole,
+        setPharmacistProfile,
         // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,

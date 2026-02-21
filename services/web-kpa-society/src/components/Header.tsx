@@ -21,6 +21,7 @@ import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
+import { PLATFORM_ROLES, SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
 
 /**
  * Super Operator 감지 헬퍼
@@ -29,9 +30,7 @@ import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSw
 function isSuperOperator(user: UserType | null): boolean {
   if (!user) return false;
   if ((user as any).isSuperOperator) return true;
-  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
-  if (user.roles.some(r => operatorRoles.includes(r))) return true;
-  return false;
+  return hasAnyRole(user.roles, SUPER_OPERATOR_ROLES);
 }
 
 /**
@@ -65,21 +64,25 @@ interface MenuItem {
 }
 
 /**
- * 메뉴 구조 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
+ * 메뉴 구조 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
  *
- * 사이트 기본 메뉴 + 허브
  * - 홈: 커뮤니티 메인
  * - 포럼: 커뮤니티 포럼
  * - 강의: LMS 강좌
  * - 콘텐츠: 공지/뉴스
- * - 허브: 운영 허브 (operator 이상)
+ * - 내 매장관리: 매장 대시보드 (pharmacy_owner)
+ * - 운영 대시보드: admin/operator → /operator (5-Block)
+ * - 테스트 센터: 오른쪽 끝 배치
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '콘텐츠', href: '/news' },
-  { label: '허브', href: '/hub' },
+  { label: '약국 HUB', href: '/pharmacy/hub' },
+  { label: '내 매장관리', href: '/pharmacy/dashboard' },
+  { label: '운영 대시보드', href: '/operator' },
+  { label: '테스트 센터', href: '/test' },
 ];
 
 export function Header({ serviceName }: { serviceName: string }) {
@@ -93,16 +96,20 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 허브 메뉴: kpa:operator 이상만 노출 (WO-KPA-A-HUB-ARCHITECTURE-RESTRUCTURE-V1)
-  const hasHubAccess = user?.roles.some(r => ['kpa:admin', 'kpa:operator'].includes(r)) ?? false;
+  // 운영 대시보드: kpa:admin 또는 kpa:operator만 노출
+  const isOperatorOrAdmin = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
+  // 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
+  const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
   const displayMenuItems = menuItems.filter(item => {
-    if (item.href === '/hub') return hasHubAccess;
+    if (item.href === '/operator') return isOperatorOrAdmin;
+    if (item.href === '/pharmacy/dashboard') return isPharmacyOwner;
+    if (item.href === '/pharmacy/hub') return isPharmacyOwner;
     return true;
   });
 
   const handleLogout = async () => {
     await logout();
-    navigate('/demo');
+    navigate('/');
   };
 
   return (

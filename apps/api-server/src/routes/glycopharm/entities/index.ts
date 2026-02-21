@@ -4,7 +4,10 @@
  * Phase B-1: Glycopharm API Implementation
  */
 
-export { GlycopharmPharmacy, type GlycopharmPharmacyStatus } from './glycopharm-pharmacy.entity.js';
+// GlycopharmPharmacy class removed (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
+// GlycopharmPharmacyStatus moved to dto/index.ts (canonical source)
+// TemplateProfile, StoreBlockType, StoreBlock preserved — consumers use import type directly
+export type { TemplateProfile, StoreBlockType, StoreBlock } from './glycopharm-pharmacy.entity.js';
 export { GlycopharmProduct, type GlycopharmProductStatus, type GlycopharmProductCategory } from './glycopharm-product.entity.js';
 export { GlycopharmProductLog, type GlycopharmProductLogAction } from './glycopharm-product-log.entity.js';
 export {
@@ -60,3 +63,19 @@ export {
 // Orders - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // GlycopharmOrder, GlycopharmOrderItem entities removed
 // New orders will use E-commerce Core with OrderType.GLYCOPHARM
+
+// Tablet Service Request (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
+export {
+  TabletServiceRequest,
+  type TabletServiceRequestStatus,
+  type TabletRequestItem,
+} from './tablet-service-request.entity.js';
+
+// Store Blog Post (WO-STORE-BLOG-CHANNEL-V1)
+export {
+  StoreBlogPost,
+  type StoreBlogPostStatus,
+} from './store-blog-post.entity.js';
+
+// WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
+export { GlycopharmPharmacyExtension } from './glycopharm-pharmacy-extension.entity.js';

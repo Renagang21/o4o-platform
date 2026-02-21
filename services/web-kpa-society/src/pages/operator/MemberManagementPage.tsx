@@ -122,11 +122,15 @@ export default function MemberManagementPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('members');
   const [stats, setStats] = useState<ApplicationStats | null>(null);
   const [memberTotal, setMemberTotal] = useState<number>(0);
+  const [pendingMemberCount, setPendingMemberCount] = useState<number>(0);
 
-  // Stats fetch
+  // Stats fetch — 회원 대기 수는 HUB과 동일 소스(/members?status=pending) 사용
   useEffect(() => {
     apiFetch<{ data: ApplicationStats }>('/api/v1/kpa/applications/admin/stats')
       .then(r => setStats(r.data))
+      .catch(() => {});
+    apiFetch<{ total: number }>('/api/v1/kpa/members?status=pending&limit=1')
+      .then(r => setPendingMemberCount(r.total ?? 0))
       .catch(() => {});
   }, []);
 
@@ -157,8 +161,8 @@ export default function MemberManagementPage() {
               <Clock className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-xs text-slate-500">대기 신청</p>
-              <p className="text-xl font-bold text-slate-900">{stats?.submitted ?? '-'}</p>
+              <p className="text-xs text-slate-500">승인 대기</p>
+              <p className="text-xl font-bold text-slate-900">{pendingMemberCount}</p>
             </div>
           </div>
         </div>

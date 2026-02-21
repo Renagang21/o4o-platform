@@ -50,6 +50,13 @@ export class GlycopharmApplication {
   @Column({ type: 'text', nullable: true })
   note?: string;
 
+  /**
+   * Optional slug requested by applicant.
+   * WO-CORE-STORE-REQUESTED-SLUG-V1
+   */
+  @Column({ name: 'requested_slug', type: 'varchar', length: 120, nullable: true })
+  requestedSlug?: string;
+
   @Column({
     type: 'varchar',
     length: 20,

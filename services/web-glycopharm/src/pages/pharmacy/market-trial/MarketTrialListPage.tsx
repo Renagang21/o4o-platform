@@ -293,7 +293,7 @@ export default function MarketTrialListPage() {
             {/* 연결된 경우 바로 이동 옵션 */}
             {connectionModal.type === 'signage' && connectionModal.trial.signageContentId && (
               <NavLink
-                to="/pharmacy/signage/library"
+                to="/store/signage/library"
                 className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-accent-600 text-white rounded-xl font-medium hover:bg-accent-700 transition-colors mb-3"
               >
                 <ExternalLink className="w-4 h-4" />

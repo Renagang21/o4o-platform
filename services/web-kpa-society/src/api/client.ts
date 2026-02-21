@@ -10,6 +10,7 @@
  */
 
 import { getAccessToken } from '../contexts/AuthContext';
+import { tryRefreshToken } from './token-refresh';
 
 // VITE_API_BASE_URL is set via Docker build-arg in deploy workflow
 // Default: /api/v1/kpa (relative path for local development)
@@ -55,10 +56,11 @@ class ApiClient {
     // Retry on 404 for GET requests (Cloud Run cold start: routes not yet registered)
     const maxRetries = fetchOptions.method === 'GET' ? 2 : 0;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      // WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1:
+      // credentials 제거 — authClient(localStorage 전략)와 동일하게 Bearer 토큰만 사용
       const response = await fetch(url, {
         ...fetchOptions,
         headers,
-        credentials: 'include',
       });
 
       if (response.status === 404 && attempt < maxRetries) {
@@ -67,8 +69,23 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'Network error' }));
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
+        // 401: 토큰 갱신 후 재시도
+        if (response.status === 401) {
+          const newToken = await tryRefreshToken();
+          if (newToken) {
+            const retryResponse = await fetch(url, {
+              ...fetchOptions,
+              headers: { ...headers, 'Authorization': `Bearer ${newToken}` },
+            });
+            if (retryResponse.ok) return retryResponse.json() as Promise<T>;
+          }
+        }
+
+        const body = await response.json().catch(() => ({ message: 'Network error' }));
+        const error: any = new Error(body.message || body.error || `HTTP error! status: ${response.status}`);
+        error.status = response.status;
+        error.code = body.code;
+        throw error;
       }
 
       return response.json();

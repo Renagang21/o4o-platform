@@ -54,7 +54,7 @@ const GallerySlider: React.FC<GallerySliderProps> = ({
   const [currentColumns, setCurrentColumns] = useState(columns);
 
   const sliderRef = useRef<HTMLDivElement>(null);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
+  const autoPlayRef = useRef<NodeJS.Timeout>(undefined);
 
   // Update responsive columns
   useEffect(() => {

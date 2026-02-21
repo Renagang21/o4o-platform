@@ -18,6 +18,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts';
+import { ROLES } from '../../lib/role-constants';
 import { operatorApi, type OperatorSummary } from '../../api/operator';
 import { colors, shadows, borderRadius, spacing } from '../../styles/theme';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
@@ -44,7 +45,6 @@ import {
   Megaphone,
   FolderOpen,
   UserPlus,
-  ClipboardList,
 } from 'lucide-react';
 
 // ─── Icon helper ───
@@ -101,19 +101,11 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
       },
       {
         id: 'organization-requests',
-        title: '가입 요청 관리',
-        description: '조직 가입/역할 요청 심사',
+        title: '가입/서비스 신청',
+        description: '조직 가입 및 서비스 신청 관리',
         href: '/operator/organization-requests',
         icon: <LucideIcon Icon={UserPlus} color="#059669" />,
         iconBg: '#ECFDF5',
-      },
-      {
-        id: 'service-enrollments',
-        title: '서비스 신청 관리',
-        description: '서비스 신청 승인/관리',
-        href: '/operator/service-enrollments',
-        icon: <LucideIcon Icon={ClipboardList} color="#D97706" />,
-        iconBg: '#FFFBEB',
       },
       {
         id: 'lms',
@@ -146,7 +138,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
     id: 'admin',
     title: '관리자 전용',
     badge: 'Admin',
-    roles: ['kpa:admin'],
+    roles: [ROLES.KPA_ADMIN],
     cards: [
       {
         id: 'organizations',
@@ -276,6 +268,21 @@ function buildKpaSignals(data: KpaHubData): Record<string, HubSignal> {
     }
   }
 
+  // 매장 강제노출 만료 임박 신호
+  if (summary?.store?.forcedExpirySoon) {
+    const count = summary.store.forcedExpirySoon;
+    if (count > 0) {
+      signals['kpa.store'] = createActionSignal('warning', {
+        label: '만료 임박',
+        count,
+        action: {
+          key: 'kpa.navigate.forced_expiry',
+          buttonLabel: '확인하기',
+        },
+      });
+    }
+  }
+
   // 조직 관리 신호 (Admin 카드)
   if (adminStats) {
     if (adminStats.pendingApprovals > 0) {
@@ -313,7 +320,7 @@ export default function HubPage() {
   const [error, setError] = useState<string | null>(null);
 
   const userRoles = user?.roles ?? [];
-  const isAdmin = userRoles.includes('kpa:admin');
+  const isAdmin = userRoles.includes(ROLES.KPA_ADMIN);
   const signals = useMemo(() => buildKpaSignals(hubData), [hubData]);
 
   const fetchData = useCallback(async () => {
@@ -373,6 +380,9 @@ export default function HubPage() {
         case 'kpa.navigate.org_approvals':
           navigate('/demo/admin/dashboard');
           return { success: true, message: '조직 관리 페이지로 이동' };
+        case 'kpa.navigate.forced_expiry':
+          navigate('/pharmacy/assets?view=forced-expiring');
+          return { success: true, message: '강제노출 만료 임박 목록으로 이동' };
         default:
           return { success: false, message: '알 수 없는 액션' };
       }
@@ -418,26 +428,44 @@ export default function HubPage() {
                   <span style={{ color: colors.error, fontSize: '14px' }}>{error}</span>
                 </div>
               ) : (
-                <div style={styles.statusGrid}>
-                  <StatusCard
-                    label="콘텐츠"
-                    count={hubData.summary?.content?.totalPublished ?? 0}
-                    unit="건 게시됨"
-                    status={hubData.summary?.content?.totalPublished ? 'good' : 'warning'}
-                  />
-                  <StatusCard
-                    label="포럼"
-                    count={hubData.summary?.forum?.totalPosts ?? 0}
-                    unit="건 게시글"
-                    status={hubData.summary?.forum?.totalPosts ? 'good' : 'warning'}
-                  />
-                  <StatusCard
-                    label="사이니지"
-                    count={(hubData.summary?.signage?.totalMedia ?? 0) + (hubData.summary?.signage?.totalPlaylists ?? 0)}
-                    unit="건 미디어"
-                    status={(hubData.summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
-                  />
-                </div>
+                <>
+                  <div style={styles.statusGrid}>
+                    <StatusCard
+                      label="콘텐츠"
+                      count={hubData.summary?.content?.totalPublished ?? 0}
+                      unit="건 게시됨"
+                      status={hubData.summary?.content?.totalPublished ? 'good' : 'warning'}
+                    />
+                    <StatusCard
+                      label="포럼"
+                      count={hubData.summary?.forum?.totalPosts ?? 0}
+                      unit="건 게시글"
+                      status={hubData.summary?.forum?.totalPosts ? 'good' : 'warning'}
+                    />
+                    <StatusCard
+                      label="사이니지"
+                      count={(hubData.summary?.signage?.totalMedia ?? 0) + (hubData.summary?.signage?.totalPlaylists ?? 0)}
+                      unit="건 미디어"
+                      status={(hubData.summary?.signage?.totalMedia ?? 0) > 0 ? 'good' : 'warning'}
+                    />
+                  </div>
+                  {/* WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 경고 */}
+                  {(hubData.summary?.store?.forcedExpirySoon ?? 0) > 0 && (
+                    <div
+                      style={styles.storeWarningBanner}
+                      onClick={() => navigate('/pharmacy/assets?view=forced-expiring')}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate('/pharmacy/assets?view=forced-expiring')}
+                    >
+                      <AlertCircle style={{ width: 18, height: 18, color: '#D97706', flexShrink: 0 }} />
+                      <span style={{ flex: 1, fontSize: '13px', color: '#92400E' }}>
+                        매장 자산 강제노출 <strong>{hubData.summary!.store!.forcedExpirySoon}건</strong>이 7일 이내 만료됩니다
+                      </span>
+                      <span style={{ fontSize: '12px', color: '#D97706', fontWeight: 500 }}>{'확인하기 →'}</span>
+                    </div>
+                  )}
+                </>
               )}
             </section>
           </>
@@ -610,6 +638,19 @@ const styles: Record<string, React.CSSProperties> = {
   statusUnit: {
     fontSize: '13px',
     color: colors.neutral500,
+  },
+
+  // Store warning banner
+  storeWarningBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginTop: spacing.md,
+    padding: '12px 16px',
+    backgroundColor: '#FFFBEB',
+    border: '1px solid #FDE68A',
+    borderRadius: borderRadius.md,
+    cursor: 'pointer',
   },
 
   // Loading / Error

@@ -143,7 +143,7 @@ import {
 // GLYCOPHARM ENTITIES (Phase B-1)
 // ============================================================================
 import {
-  GlycopharmPharmacy,
+  // GlycopharmPharmacy - REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
   GlycopharmProduct,
   GlycopharmProductLog,
   GlycopharmApplication,
@@ -153,6 +153,9 @@ import {
   GlycopharmRequestActionLog,
   GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
   // GlycopharmOrder, GlycopharmOrderItem - REMOVED (Phase 4-A: Legacy Order System Deprecation)
+  TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+  StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+  GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
 } from '../routes/glycopharm/entities/index.js';
 
 // ============================================================================
@@ -216,6 +219,11 @@ import {
   OrganizationProductListing,
   OrganizationChannel,
   OrganizationProductChannel,
+  KpaStoreAssetControl,
+  KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+  KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+  OrganizationStore, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+  OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -244,6 +252,12 @@ import {
   PhysicalStore,
   PhysicalStoreLink,
 } from '../routes/platform/entities/index.js';
+
+// ============================================================================
+// PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
+// (WO-CORE-STORE-POLICY-SYSTEM-V1, WO-CORE-STORE-PAYMENT-CONFIG-V1)
+// ============================================================================
+import { PlatformStorePolicy, PlatformStorePaymentConfig } from '@o4o/platform-core/store-policy';
 
 // ============================================================================
 // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
@@ -544,9 +558,9 @@ export const AppDataSource = new DataSource({
     YaksaPostLog,
     // ============================================================================
     // GLYCOPHARM ENTITIES (Phase B-1)
+    // Note: GlycopharmPharmacy REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)
     // Note: GlycopharmOrder, GlycopharmOrderItem REMOVED (Phase 4-A Legacy Deprecation)
     // ============================================================================
-    GlycopharmPharmacy,
     GlycopharmProduct,
     GlycopharmProductLog,
     GlycopharmApplication,
@@ -555,6 +569,9 @@ export const AppDataSource = new DataSource({
     GlycopharmEvent,
     GlycopharmRequestActionLog,
     GlycopharmBillingInvoice, // Phase 3-D: Invoice Finalization
+    TabletServiceRequest, // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+    StoreBlogPost, // WO-STORE-BLOG-CHANNEL-V1
+    GlycopharmPharmacyExtension, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
     // ============================================================================
     // GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3: API + Customer + Pharmacist)
     // ============================================================================
@@ -612,6 +629,15 @@ export const AppDataSource = new DataSource({
     OrganizationProductListing,
     OrganizationChannel,
     OrganizationProductChannel,
+    // WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
+    KpaStoreAssetControl,
+    // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+    KpaStoreContent,
+    // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+    KpaPharmacyRequest,
+    // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
+    OrganizationStore,
+    OrganizationServiceEnrollment,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
@@ -702,6 +728,11 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PhysicalStore,
     PhysicalStoreLink,
+    // ============================================================================
+    // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
+    // ============================================================================
+    PlatformStorePolicy,
+    PlatformStorePaymentConfig,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { DisplayPlaylist } from './display-playlist.entity.js';
 
 @Entity('glycopharm_display_schedules')
@@ -23,9 +23,9 @@ export class DisplaySchedule {
   @Column({ type: 'uuid' })
   pharmacy_id!: string;
 
-  @ManyToOne('GlycopharmPharmacy', { onDelete: 'CASCADE' })
+  @ManyToOne('OrganizationStore', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'pharmacy_id' })
-  pharmacy!: GlycopharmPharmacy;
+  pharmacy!: OrganizationStore;
 
   @Column({ type: 'varchar', length: 100 })
   name!: string;

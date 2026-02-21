@@ -21,3 +21,12 @@ export * from './organization-product-listing.entity.js';
 // WO-PHARMACY-HUB-OWNERSHIP-RESTRUCTURE-PHASE1-V1
 export * from './organization-channel.entity.js';
 export * from './organization-product-channel.entity.js';
+// WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
+export * from './kpa-store-asset-control.entity.js';
+// WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
+export * from './kpa-store-content.entity.js';
+// WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+export * from './kpa-pharmacy-request.entity.js';
+// WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
+export { OrganizationStore } from './organization-store.entity.js';
+export { OrganizationServiceEnrollment } from './organization-service-enrollment.entity.js';

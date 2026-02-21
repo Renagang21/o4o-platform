@@ -1,68 +1,28 @@
-# forum-core - Definition
+# forum-core
 
-> 앱 정의 문서
+> **Status**: FROZEN (Foundation Core) | **Version**: 1.0.0 | **Package**: @o4o/forum-core
 
-## 앱 정보
+## 역할
 
-- **App ID:** forum-core
-- **App Type:** core
-- **Package:** @o4o/forum-core (formerly @o4o-apps/forum)
-- **Service Group:** yaksa, platform
-- **Status:** @status FROZEN - Foundation Core
+포럼 핵심 기능 (게시판, 댓글, 좋아요). yaksa, platform에서 사용.
 
-## 역할 및 책임
-
-### 주요 역할
-포럼 핵심 기능을 제공하는 Foundation Core로서 게시판, 댓글, 좋아요 등을 관리한다.
-
-### 책임 범위
-- Forum 게시판 관리
-- Post 관리
-- Comment 관리
-- Like/Reaction 관리
-
-### 경계
-- 포럼 기본 기능만 담당
-- 업종별 확장은 Extension에 위임 (forum-yaksa, forum-cosmetics 등)
-- 권한 관리는 organization-core에 위임
-
-## 의존성
-
-### Core Dependencies
-(없음 - Foundation Core)
-
-### Optional Dependencies
-(없음)
+| 책임 | 경계 |
+|------|------|
+| Forum 게시판 관리 | 업종별 확장 → Extension (forum-yaksa 등) |
+| Post / Comment / Reaction | 권한 → organization-core |
 
 ## 외부 노출
 
-### Services
-- ForumService
-- PostService
-- CommentService
+**Services**: ForumService, PostService, CommentService
+**Types**: Forum, Post, Comment, Reaction
+**Events**: `forum.created`, `post.created`, `post.updated`, `comment.created`
 
-### Types
-- Forum
-- Post
-- Comment
-- Reaction
+## API Routes
 
-### Events
-- `forum.created`
-- `post.created`
-- `post.updated`
-- `comment.created`
+- `/api/v1/forum`
+- `/api/v1/forum/:id/posts`
+- `/api/v1/posts/:id/comments`
 
-## 설정
+## Dependencies
 
-### 기본 설정
-(manifest에 defaultConfig 없음)
-
-### 환경 변수
-(없음)
-
-## 특징
-
-- @status FROZEN (Foundation Core)
-- Phase 2에서 forum-app → forum-core로 명칭 변경
-- yaksa, platform 서비스에서 사용
+없음 (Foundation Core)

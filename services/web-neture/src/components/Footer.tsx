@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 export function Footer() {
   return (
     <footer style={styles.footer}>
@@ -13,9 +11,6 @@ export function Footer() {
               고객센터 1577-2779 | sohae2100@gmail.com
             </p>
           </div>
-          <Link to="/forum/test-feedback" style={styles.testCenterLink}>
-            🧪 테스트 센터
-          </Link>
         </div>
       </div>
     </footer>
@@ -48,13 +43,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: '#666',
     margin: 0,
-  },
-  testCenterLink: {
-    fontSize: '12px',
-    color: '#16a34a',
-    textDecoration: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
   },
 };

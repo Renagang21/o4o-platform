@@ -65,7 +65,7 @@ export class KpaBranchOfficer {
   updated_at: Date;
 
   // ESM string-based relation (CLAUDE.md §4)
-  @ManyToOne('KpaOrganization')
+  @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'organization_id' })
   organization: any;
 }

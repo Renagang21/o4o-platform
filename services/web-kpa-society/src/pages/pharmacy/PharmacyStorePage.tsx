@@ -1,18 +1,15 @@
 /**
- * PharmacyStorePage - 약국 매장 UI-UX 관리
+ * PharmacyStorePage - 매장 설정
  *
- * WO-KPA-PHARMACY-STORE-UX-TEMPLATE-V1
- * - 약국 매장 화면(B2C 몰, 태블릿, 키오스크) UI-UX 표준화
- * - 템플릿 선택 (구조 변경 불가)
- * - 테마 선택 (색상/폰트/스타일)
- * - 컴포넌트 On/Off (순서 변경 불가)
- * - 디바이스별 미리보기
+ * WO-KPA-A-STORE-SETTINGS-STRUCTURE-CLEANUP-V1
+ *
+ * 3-Section 구조:
+ * 1. 매장 기본 설정 — 매장 정보, 디바이스 미리보기
+ * 2. 서비스 관리 — 컴포넌트 표시/숨김 토글
+ * 3. 디자인 관리 — 템플릿 선택, 테마 선택
  *
  * 핵심 원칙:
  * "약국 매장 UI는 자유 편집 대상이 아니라 표준 템플릿을 선택하는 구조다."
- *
- * 표준 범위: 템플릿 선택, 테마 선택, 컴포넌트 On/Off
- * 유료 커스텀: 템플릿 구조 변경, 신규 컴포넌트, 레이아웃 재배치
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -181,16 +178,16 @@ export function PharmacyStorePage() {
     return (
       <div style={styles.container}>
         <header style={styles.header}>
-          <Link to="/pharmacy" style={styles.backLink}>← 돌아가기</Link>
-          <h1 style={styles.pageTitle}>내 약국 몰</h1>
+          <Link to="/pharmacy/dashboard" style={styles.backLink}>&larr; 내 매장관리</Link>
+          <h1 style={styles.pageTitle}>매장 설정</h1>
         </header>
         <div style={styles.accessDenied}>
           <span style={styles.accessDeniedIcon}>🔒</span>
           <h2 style={styles.accessDeniedTitle}>접근 권한 없음</h2>
           <p style={styles.accessDeniedText}>
-            매장 UI-UX 설정은 개설약사만 변경할 수 있습니다.
+            매장 설정은 개설약사만 변경할 수 있습니다.
           </p>
-          <Link to="/pharmacy" style={styles.backButton}>
+          <Link to="/pharmacy/dashboard" style={styles.backButton}>
             돌아가기
           </Link>
         </div>
@@ -198,16 +195,19 @@ export function PharmacyStorePage() {
     );
   }
 
+  const enabledCount = Object.values(componentStates).filter(Boolean).length;
+  const totalCount = storeComponents.length;
+
   return (
     <div style={styles.container}>
       {/* 헤더 */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to="/pharmacy" style={styles.backLink}>← 돌아가기</Link>
+          <Link to="/pharmacy/dashboard" style={styles.backLink}>&larr; 내 매장관리</Link>
           <div style={styles.headerMain}>
             <div style={styles.pharmacyInfo}>
               <h1 style={styles.pharmacyName}>{pharmacyName}</h1>
-              <span style={styles.subLabel}>· 매장 UI-UX 관리</span>
+              <span style={styles.subLabel}>· 매장 설정</span>
             </div>
             <div style={styles.roleInfo}>
               <span style={styles.roleBadge}>{roleLabel}</span>
@@ -216,117 +216,185 @@ export function PharmacyStorePage() {
         </div>
       </header>
 
-      {/* 정책 고지 */}
-      <div style={styles.policyNotice}>
-        <span style={styles.policyIcon}>📋</span>
-        <div style={styles.policyContent}>
-          <strong>UI-UX 표준화 정책</strong>
-          <p style={styles.policyText}>
-            약국 매장 화면은 플랫폼에서 제공하는 템플릿과 테마를 기반으로 운영됩니다.
-            템플릿 구조를 벗어나는 UI 변경은 별도 제작이 필요합니다.
-          </p>
-        </div>
-      </div>
-
       <div style={styles.mainGrid}>
         {/* 좌측: 설정 패널 */}
         <div style={styles.settingsPanel}>
-          {/* 템플릿 선택 */}
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>템플릿 선택</h2>
-            <p style={styles.sectionDesc}>페이지 레이아웃과 컴포넌트 배치 구조를 선택합니다.</p>
-            <div style={styles.templateGrid}>
-              {templates.map(template => (
-                <div
-                  key={template.id}
-                  style={{
-                    ...styles.templateCard,
-                    borderColor: selectedTemplate === template.id ? colors.primary : colors.neutral200,
-                    backgroundColor: selectedTemplate === template.id ? colors.primary + '08' : colors.white,
-                  }}
-                  onClick={() => setSelectedTemplate(template.id)}
-                >
-                  <div style={styles.templatePreview}>{template.preview}</div>
-                  <div style={styles.templateInfo}>
-                    <h3 style={styles.templateName}>{template.name}</h3>
-                    <p style={styles.templateDesc}>{template.description}</p>
-                  </div>
-                  {selectedTemplate === template.id && (
-                    <span style={styles.selectedBadge}>선택됨</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
 
-          {/* 테마 선택 */}
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>테마 선택</h2>
-            <p style={styles.sectionDesc}>색상과 스타일을 선택합니다. 즉시 반영됩니다.</p>
-            <div style={styles.themeGrid}>
-              {themes.map(theme => (
-                <div
-                  key={theme.id}
-                  style={{
-                    ...styles.themeCard,
-                    borderColor: selectedTheme === theme.id ? theme.primaryColor : colors.neutral200,
-                  }}
-                  onClick={() => setSelectedTheme(theme.id)}
-                >
-                  <div style={styles.themeColors}>
-                    <span style={{ ...styles.colorDot, backgroundColor: theme.primaryColor }} />
-                    <span style={{ ...styles.colorDot, backgroundColor: theme.accentColor }} />
-                  </div>
-                  <span style={styles.themeName}>{theme.name}</span>
-                  {selectedTheme === theme.id && (
-                    <span style={styles.themeCheck}>✓</span>
-                  )}
-                </div>
-              ))}
+          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           * Section 1: 매장 기본 설정
+           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+          <div style={styles.sectionGroup}>
+            <div style={styles.sectionGroupHeader}>
+              <span style={styles.sectionGroupIcon}>🏪</span>
+              <h2 style={styles.sectionGroupTitle}>매장 기본 설정</h2>
             </div>
-          </section>
 
-          {/* 컴포넌트 On/Off */}
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>컴포넌트 표시 설정</h2>
-            <p style={styles.sectionDesc}>표시할 영역을 선택합니다. 순서 변경은 불가합니다.</p>
-            <div style={styles.componentList}>
-              {storeComponents.map(component => (
-                <div
-                  key={component.id}
-                  style={{
-                    ...styles.componentItem,
-                    opacity: component.required ? 0.7 : 1,
-                  }}
-                >
-                  <div style={styles.componentInfo}>
-                    <span style={styles.componentName}>{component.name}</span>
-                    <span style={styles.componentDesc}>{component.description}</span>
-                    {component.required && (
-                      <span style={styles.requiredBadge}>필수</span>
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>매장 정보</h3>
+              <div style={styles.infoRow}>
+                <span style={styles.infoLabel}>매장명</span>
+                <span style={styles.infoValue}>{pharmacyName}</span>
+              </div>
+              <div style={styles.infoRow}>
+                <span style={styles.infoLabel}>적용 템플릿</span>
+                <span style={styles.infoValue}>
+                  {templates.find(t => t.id === selectedTemplate)?.name || 'Standard'}
+                </span>
+              </div>
+              <div style={styles.infoRow}>
+                <span style={styles.infoLabel}>적용 테마</span>
+                <span style={styles.infoValue}>
+                  {themes.find(t => t.id === selectedTheme)?.name || '기본'}
+                </span>
+              </div>
+            </section>
+
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>디바이스 미리보기</h3>
+              <p style={styles.sectionDesc}>매장이 노출되는 디바이스 채널입니다.</p>
+              <div style={styles.deviceList}>
+                {devices.map(device => (
+                  <div key={device.id} style={styles.deviceCard}>
+                    <span style={styles.deviceCardIcon}>{device.icon}</span>
+                    <div>
+                      <span style={styles.deviceCardName}>{device.name}</span>
+                      <span style={styles.deviceCardDesc}>{device.description}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           * Section 2: 서비스 관리
+           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+          <div style={styles.sectionGroup}>
+            <div style={styles.sectionGroupHeader}>
+              <span style={styles.sectionGroupIcon}>🔧</span>
+              <div>
+                <h2 style={styles.sectionGroupTitle}>서비스 관리</h2>
+                <span style={styles.sectionGroupMeta}>{enabledCount}/{totalCount} 활성</span>
+              </div>
+            </div>
+
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>컴포넌트 표시 설정</h3>
+              <p style={styles.sectionDesc}>매장에 표시할 서비스 영역을 선택합니다. 필수 항목은 변경할 수 없습니다.</p>
+              <div style={styles.componentList}>
+                {storeComponents.map(component => (
+                  <div
+                    key={component.id}
+                    style={{
+                      ...styles.componentItem,
+                      opacity: component.required ? 0.7 : 1,
+                    }}
+                  >
+                    <div style={styles.componentInfo}>
+                      <div style={styles.componentNameRow}>
+                        <span style={styles.componentName}>{component.name}</span>
+                        {component.required && (
+                          <span style={styles.requiredBadge}>필수</span>
+                        )}
+                        <span style={{
+                          ...styles.statusBadge,
+                          backgroundColor: componentStates[component.id as keyof typeof componentStates]
+                            ? '#dcfce7' : '#f1f5f9',
+                          color: componentStates[component.id as keyof typeof componentStates]
+                            ? '#16a34a' : '#94a3b8',
+                        }}>
+                          {componentStates[component.id as keyof typeof componentStates] ? '활성' : '비활성'}
+                        </span>
+                      </div>
+                      <span style={styles.componentDesc}>{component.description}</span>
+                    </div>
+                    <button
+                      style={{
+                        ...styles.toggleButton,
+                        backgroundColor: componentStates[component.id as keyof typeof componentStates]
+                          ? colors.primary
+                          : colors.neutral300,
+                      }}
+                      onClick={() => toggleComponent(component.id)}
+                      disabled={component.required}
+                    >
+                      <span style={{
+                        ...styles.toggleKnob,
+                        transform: componentStates[component.id as keyof typeof componentStates]
+                          ? 'translateX(20px)'
+                          : 'translateX(0)',
+                      }} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           * Section 3: 디자인 관리
+           * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+          <div style={styles.sectionGroup}>
+            <div style={styles.sectionGroupHeader}>
+              <span style={styles.sectionGroupIcon}>🎨</span>
+              <h2 style={styles.sectionGroupTitle}>디자인 관리</h2>
+            </div>
+
+            {/* 템플릿 선택 */}
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>레이아웃 템플릿</h3>
+              <p style={styles.sectionDesc}>페이지 레이아웃과 컴포넌트 배치 구조를 선택합니다.</p>
+              <div style={styles.templateGrid}>
+                {templates.map(template => (
+                  <div
+                    key={template.id}
+                    style={{
+                      ...styles.templateCard,
+                      borderColor: selectedTemplate === template.id ? colors.primary : colors.neutral200,
+                      backgroundColor: selectedTemplate === template.id ? colors.primary + '08' : colors.white,
+                    }}
+                    onClick={() => setSelectedTemplate(template.id)}
+                  >
+                    <div style={styles.templatePreview}>{template.preview}</div>
+                    <div style={styles.templateInfo}>
+                      <h4 style={styles.templateName}>{template.name}</h4>
+                      <p style={styles.templateDesc}>{template.description}</p>
+                    </div>
+                    {selectedTemplate === template.id && (
+                      <span style={styles.selectedBadge}>선택됨</span>
                     )}
                   </div>
-                  <button
+                ))}
+              </div>
+            </section>
+
+            {/* 테마 선택 */}
+            <section style={styles.section}>
+              <h3 style={styles.sectionTitle}>테마 · 컬러</h3>
+              <p style={styles.sectionDesc}>색상과 스타일을 선택합니다. 즉시 미리보기에 반영됩니다.</p>
+              <div style={styles.themeGrid}>
+                {themes.map(theme => (
+                  <div
+                    key={theme.id}
                     style={{
-                      ...styles.toggleButton,
-                      backgroundColor: componentStates[component.id as keyof typeof componentStates]
-                        ? colors.primary
-                        : colors.neutral300,
+                      ...styles.themeCard,
+                      borderColor: selectedTheme === theme.id ? theme.primaryColor : colors.neutral200,
                     }}
-                    onClick={() => toggleComponent(component.id)}
-                    disabled={component.required}
+                    onClick={() => setSelectedTheme(theme.id)}
                   >
-                    <span style={{
-                      ...styles.toggleKnob,
-                      transform: componentStates[component.id as keyof typeof componentStates]
-                        ? 'translateX(20px)'
-                        : 'translateX(0)',
-                    }} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
+                    <div style={styles.themeColors}>
+                      <span style={{ ...styles.colorDot, backgroundColor: theme.primaryColor }} />
+                      <span style={{ ...styles.colorDot, backgroundColor: theme.accentColor }} />
+                    </div>
+                    <span style={styles.themeName}>{theme.name}</span>
+                    {selectedTheme === theme.id && (
+                      <span style={styles.themeCheck}>✓</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
 
         {/* 우측: 미리보기 패널 */}
@@ -344,7 +412,7 @@ export function PharmacyStorePage() {
                   }}
                   onClick={() => setPreviewDevice(device.id as typeof previewDevice)}
                 >
-                  <span style={styles.deviceIcon}>{device.icon}</span>
+                  <span style={styles.deviceTabIcon}>{device.icon}</span>
                   <span>{device.name}</span>
                 </button>
               ))}
@@ -357,7 +425,6 @@ export function PharmacyStorePage() {
               ...(previewDevice === 'tablet' ? styles.tabletFrame : {}),
               ...(previewDevice === 'kiosk' ? styles.kioskFrame : {}),
             }}>
-              {/* 미리보기 내용 */}
               <div style={styles.mockScreen}>
                 <div style={{
                   ...styles.mockHeader,
@@ -425,32 +492,27 @@ export function PharmacyStorePage() {
               기본값으로 초기화
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* 표준 vs 유료 경계 안내 */}
-      <div style={styles.boundaryNotice}>
-        <div style={styles.boundarySection}>
-          <h3 style={styles.boundaryTitle}>✅ 표준 범위 (기본 제공)</h3>
-          <ul style={styles.boundaryList}>
-            <li>템플릿 선택</li>
-            <li>테마 선택</li>
-            <li>컴포넌트 표시/숨김</li>
-            <li>디바이스별 프리셋</li>
-          </ul>
-        </div>
-        <div style={styles.boundaryDivider} />
-        <div style={styles.boundarySection}>
-          <h3 style={styles.boundaryTitlePaid}>💎 유료 커스텀</h3>
-          <ul style={styles.boundaryList}>
-            <li>템플릿 구조 변경</li>
-            <li>신규 UI 컴포넌트</li>
-            <li>레이아웃 재배치</li>
-            <li>브랜드 전용 UI</li>
-          </ul>
-          <button style={styles.inquiryButton}>
-            커스텀 문의 →
-          </button>
+          {/* 표준 vs 유료 안내 */}
+          <div style={styles.boundaryNotice}>
+            <div style={styles.boundaryCol}>
+              <h4 style={styles.boundaryTitle}>✅ 표준 범위</h4>
+              <ul style={styles.boundaryList}>
+                <li>템플릿 선택</li>
+                <li>테마 선택</li>
+                <li>컴포넌트 표시/숨김</li>
+              </ul>
+            </div>
+            <div style={styles.boundaryDivider} />
+            <div style={styles.boundaryCol}>
+              <h4 style={styles.boundaryTitlePaid}>💎 유료 커스텀</h4>
+              <ul style={styles.boundaryList}>
+                <li>템플릿 구조 변경</li>
+                <li>브랜드 전용 UI</li>
+              </ul>
+              <button style={styles.inquiryButton}>문의 →</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -553,32 +615,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
 
-  // Policy Notice
-  policyNotice: {
-    display: 'flex',
-    gap: '16px',
-    padding: '20px',
-    backgroundColor: colors.info + '10',
-    borderRadius: borderRadius.lg,
-    border: `1px solid ${colors.info}30`,
-    marginBottom: '24px',
-  },
-  policyIcon: {
-    fontSize: '24px',
-    flexShrink: 0,
-  },
-  policyContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  policyText: {
-    fontSize: '0.875rem',
-    color: colors.neutral600,
-    margin: 0,
-    lineHeight: 1.5,
-  },
-
   // Main Grid
   mainGrid: {
     display: 'grid',
@@ -591,8 +627,38 @@ const styles: Record<string, React.CSSProperties> = {
   settingsPanel: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '32px',
   },
+
+  // Section Group (3-section structure)
+  sectionGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  },
+  sectionGroupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    paddingBottom: '12px',
+    borderBottom: `2px solid ${colors.neutral200}`,
+  },
+  sectionGroupIcon: {
+    fontSize: '1.25rem',
+  },
+  sectionGroupTitle: {
+    fontSize: '1.125rem',
+    fontWeight: 700,
+    color: colors.neutral900,
+    margin: 0,
+  },
+  sectionGroupMeta: {
+    fontSize: '0.75rem',
+    color: colors.neutral500,
+    fontWeight: 500,
+  },
+
+  // Section Card
   section: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
@@ -600,7 +666,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '24px',
   },
   sectionTitle: {
-    fontSize: '1.125rem',
+    fontSize: '1rem',
     fontWeight: 600,
     color: colors.neutral800,
     margin: '0 0 4px',
@@ -609,6 +675,53 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     color: colors.neutral500,
     margin: '0 0 16px',
+  },
+
+  // Info Rows (매장 기본 설정)
+  infoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 0',
+    borderBottom: `1px solid ${colors.neutral100}`,
+  },
+  infoLabel: {
+    fontSize: '0.875rem',
+    color: colors.neutral500,
+  },
+  infoValue: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral800,
+  },
+
+  // Device List
+  deviceList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  deviceCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px',
+    backgroundColor: colors.neutral50,
+    borderRadius: borderRadius.md,
+  },
+  deviceCardIcon: {
+    fontSize: '1.25rem',
+  },
+  deviceCardName: {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.neutral800,
+  },
+  deviceCardDesc: {
+    display: 'block',
+    fontSize: '0.75rem',
+    color: colors.neutral500,
   },
 
   // Template Grid
@@ -720,6 +833,11 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     gap: '2px',
   },
+  componentNameRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
   componentName: {
     fontSize: '0.9375rem',
     fontWeight: 500,
@@ -731,10 +849,16 @@ const styles: Record<string, React.CSSProperties> = {
   },
   requiredBadge: {
     display: 'inline-block',
-    marginTop: '4px',
-    padding: '2px 6px',
+    padding: '1px 6px',
     backgroundColor: colors.warning + '20',
     color: colors.warning,
+    borderRadius: '4px',
+    fontSize: '0.625rem',
+    fontWeight: 500,
+  },
+  statusBadge: {
+    display: 'inline-block',
+    padding: '1px 6px',
     borderRadius: '4px',
     fontSize: '0.625rem',
     fontWeight: 500,
@@ -747,6 +871,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     cursor: 'pointer',
     transition: 'background-color 0.2s',
+    flexShrink: 0,
   },
   toggleKnob: {
     position: 'absolute',
@@ -762,21 +887,21 @@ const styles: Record<string, React.CSSProperties> = {
 
   // Preview Panel
   previewPanel: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '24px',
     display: 'flex',
     flexDirection: 'column',
+    gap: '16px',
     position: 'sticky',
     top: '100px',
     height: 'fit-content',
   },
   previewHeader: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    padding: '20px',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
-    marginBottom: '16px',
   },
   previewTitle: {
     fontSize: '1.125rem',
@@ -799,20 +924,20 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     transition: 'all 0.2s',
   },
-  deviceIcon: {
+  deviceTabIcon: {
     fontSize: '1rem',
   },
   previewFrame: {
-    backgroundColor: colors.neutral100,
-    borderRadius: borderRadius.md,
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
     padding: '16px',
-    marginBottom: '16px',
   },
   previewContent: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.sm,
     overflow: 'hidden',
-    boxShadow: shadows.sm,
+    border: `1px solid ${colors.neutral200}`,
   },
   tabletFrame: {
     maxWidth: '280px',
@@ -873,6 +998,10 @@ const styles: Record<string, React.CSSProperties> = {
 
   // Action Buttons
   actionButtons: {
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    boxShadow: shadows.sm,
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
@@ -900,13 +1029,13 @@ const styles: Record<string, React.CSSProperties> = {
   // Boundary Notice
   boundaryNotice: {
     display: 'flex',
-    gap: '24px',
-    padding: '24px',
+    gap: '16px',
+    padding: '16px',
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     boxShadow: shadows.sm,
   },
-  boundarySection: {
+  boundaryCol: {
     flex: 1,
   },
   boundaryDivider: {
@@ -914,32 +1043,32 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: colors.neutral200,
   },
   boundaryTitle: {
-    fontSize: '1rem',
+    fontSize: '0.8125rem',
     fontWeight: 600,
     color: colors.success,
-    margin: '0 0 12px',
+    margin: '0 0 8px',
   },
   boundaryTitlePaid: {
-    fontSize: '1rem',
+    fontSize: '0.8125rem',
     fontWeight: 600,
     color: colors.warning,
-    margin: '0 0 12px',
+    margin: '0 0 8px',
   },
   boundaryList: {
     margin: 0,
-    paddingLeft: '20px',
-    fontSize: '0.875rem',
+    paddingLeft: '16px',
+    fontSize: '0.75rem',
     color: colors.neutral600,
     lineHeight: 1.8,
   },
   inquiryButton: {
-    marginTop: '16px',
-    padding: '10px 20px',
+    marginTop: '8px',
+    padding: '6px 12px',
     backgroundColor: colors.warning + '15',
     color: colors.warning,
     border: `1px solid ${colors.warning}`,
     borderRadius: borderRadius.md,
-    fontSize: '0.875rem',
+    fontSize: '0.75rem',
     fontWeight: 500,
     cursor: 'pointer',
   },

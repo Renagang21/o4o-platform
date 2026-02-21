@@ -15,7 +15,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { GlycopharmPharmacy } from '../entities/glycopharm-pharmacy.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { runAIInsight } from '@o4o/ai-core';
 import type { AuthRequest } from '../../../types/auth.js';
 import type { ActionLogService } from '@o4o/action-log-core';
@@ -26,7 +26,7 @@ type AuthMiddleware = RequestHandler;
  * Resolve pharmacy from authenticated user
  */
 async function resolvePharmacy(dataSource: DataSource, userId: string) {
-  const pharmacyRepo = dataSource.getRepository(GlycopharmPharmacy);
+  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
   return pharmacyRepo.findOne({ where: { created_by_user_id: userId } });
 }
 

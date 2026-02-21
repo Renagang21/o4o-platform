@@ -1,7 +1,6 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { getDefaultRouteByRole } from '@/lib/auth-utils';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 
@@ -15,10 +14,11 @@ import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
-import HomePage from '@/pages/HomePage';
+import HomeLivePage from '@/pages/HomeLivePage';
 import LoginPage from '@/pages/auth/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import RedirectNoticeBanner from '@/components/common/RedirectNoticeBanner';
+import FeatureIntroPage from '@/components/common/FeatureIntroPage';
 
 // Phase 2: Service User Login (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
 const ServiceLoginPage = lazy(() => import('@/pages/auth/ServiceLoginPage'));
@@ -75,6 +75,9 @@ const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-ma
 const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
 const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 
+// Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block)
+const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdminDashboard'));
+
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
@@ -103,6 +106,7 @@ const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
+const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
@@ -136,6 +140,19 @@ const QrLandingPage = lazy(() => import('@/pages/qr/QrLandingPage'));
 
 // Funnel Visualization (Phase 3-A: WO-O4O-FUNNEL-VISUALIZATION-PHASE3A-CP1)
 const FunnelPage = lazy(() => import('@/pages/pharmacy/FunnelPage'));
+
+// Care Pages (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
+const CareDashboardPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CareDashboardPage })));
+const PatientsPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientsPage })));
+const PatientDetailPage = lazy(() => import('@/pages/care').then(m => ({ default: m.PatientDetailPage })));
+const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.AnalysisPage })));
+const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
+
+// Patient Detail Tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
+const SummaryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.SummaryTab })));
+const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
+const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
+const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
 
 // Test Guide Pages
 const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
@@ -189,23 +206,42 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
 }
 
 /**
- * WO-GLYCOPHARM-ROLE-BASED-LANDING-V1
- * / 접근 시 로그인된 사용자는 역할 기반 대시보드로 자동 리다이렉트
+ * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: Soft Guard
+ * 비로그인 → FeatureIntroPage 표시 (로그인 리다이렉트 대신)
+ * 로그인 + 권한 불일치 → / 리다이렉트
+ * 로그인 + 권한 일치 → children 렌더
  */
-function RoleBasedHome() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+function SoftGuard({ feature, allowedRoles, children }: {
+  feature: 'care' | 'store' | 'mypage';
+  allowedRoles?: string[];
+  children: React.ReactNode;
+}) {
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (user?.roles[0]) {
-      const target = getDefaultRouteByRole(user.roles[0]);
-      if (target !== '/') {
-        navigate(target, { replace: true });
-      }
-    }
-  }, [user, navigate]);
+  if (isLoading) return <PageLoading />;
+  if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+    return <Navigate to="/" replace />;
+  }
+  return <>{children}</>;
+}
 
-  return <HomePage />;
+/**
+ * SoftGuardOutlet — Layout route용 Soft Guard
+ * Route의 element로 사용, Outlet을 렌더하거나 FeatureIntroPage를 렌더
+ */
+function SoftGuardOutlet({ feature, allowedRoles }: {
+  feature: 'care' | 'store' | 'mypage';
+  allowedRoles?: string[];
+}) {
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  if (isLoading) return <PageLoading />;
+  if (!isAuthenticated) return <FeatureIntroPage feature={feature} />;
+  if (allowedRoles && user && !user.roles.some(r => allowedRoles.includes(r))) {
+    return <Navigate to="/" replace />;
+  }
+  return <Outlet />;
 }
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
@@ -229,7 +265,7 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route index element={<RoleBasedHome />} />
+        <Route index element={<HomeLivePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
@@ -261,10 +297,34 @@ function AppRoutes() {
         {/* Signage Public (WO-SIGNAGE-CONTENT-HUB-V1) */}
         <Route path="signage" element={<ContentLibraryPage />} />
         <Route path="mypage" element={
-          <ProtectedRoute>
+          <SoftGuard feature="mypage">
             <MyPage />
-          </ProtectedRoute>
+          </SoftGuard>
         } />
+
+        {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
+        <Route path="store" element={
+          <SoftGuard feature="store" allowedRoles={['pharmacy']}>
+            <StoreEntryPage />
+          </SoftGuard>
+        } />
+      </Route>
+
+      {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
+      <Route path="care" element={<MainLayout />}>
+        <Route element={<SoftGuardOutlet feature="care" allowedRoles={['pharmacy']} />}>
+          <Route index element={<CareDashboardPage />} />
+          <Route path="patients" element={<PatientsPage />} />
+          {/* Patient Detail with nested tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1) */}
+          <Route path="patients/:id" element={<PatientDetailPage />}>
+            <Route index element={<SummaryTab />} />
+            <Route path="analysis" element={<PatientAnalysisTab />} />
+            <Route path="coaching" element={<PatientCoachingTab />} />
+            <Route path="history" element={<HistoryTab />} />
+          </Route>
+          <Route path="analysis" element={<AnalysisPage />} />
+          <Route path="coaching" element={<CoachingPage />} />
+        </Route>
       </Route>
 
       {/* Service User Routes (Phase 2: WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM) */}
@@ -320,7 +380,7 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
       </Route>
 
-      {/* Admin Dashboard (WO-GLYCOPHARM-ADMIN-AREA-V1: 구조 관리 영역 신설) */}
+      {/* Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block 구조) */}
       <Route
         path="admin"
         element={
@@ -329,7 +389,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<GlycoPharmOperatorDashboard />} />
+        <Route index element={<GlycoPharmAdminDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="settings" element={<SettingsPage />} />
@@ -420,7 +480,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<StoreOverviewPage />} />
+        <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
         <Route path="orders" element={<PharmacyOrders />} />

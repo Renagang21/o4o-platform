@@ -59,7 +59,7 @@ export class InvoiceDispatchService {
     let pharmacyName = '전체';
     if (invoice.pharmacy_id) {
       const pRows = await this.dataSource.query(
-        `SELECT name FROM glycopharm_pharmacies WHERE id = $1`,
+        `SELECT name FROM organizations WHERE id = $1`,
         [invoice.pharmacy_id],
       );
       if (pRows.length > 0) pharmacyName = pRows[0].name;

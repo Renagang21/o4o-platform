@@ -68,15 +68,24 @@ import { createOperatorSummaryController } from './controllers/operator-summary.
 import { createGroupbuyOperatorController } from './controllers/groupbuy-operator.controller.js';
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
+import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from './controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
 import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
 import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
+import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
+import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
+import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
+import { createStoreContentController } from './controllers/store-content.controller.js';
+import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
+import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
+import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
+import { createLayoutController } from '../glycopharm/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
-import { KpaOrganization } from './entities/kpa-organization.entity.js';
+import { OrganizationStore } from './entities/organization-store.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
@@ -136,6 +145,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Admin Dashboard routes (WO-KPA-SOCIETY-DASHBOARD-P1-A)
   router.use('/admin', createAdminDashboardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
+  // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
+  router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));
+
   // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
   router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
 
@@ -163,6 +175,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
   router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
 
+  // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
+  // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
+  router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
+
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));
 
@@ -181,6 +197,30 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Asset Snapshot routes (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
   router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
+
+  // Store Asset Control routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V1)
+  router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
+
+  // Store Content routes (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1)
+  router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+
+  // ============================================================================
+  // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
+  // organizations 테이블 단일 참조 (Phase C 전환 완료)
+  // Tablet/Blog/Template 채널을 KPA 네임스페이스에서 제공
+  // /api/v1/kpa/stores/:slug/tablet|blog|template
+  // ============================================================================
+  const kpaTabletController = createTabletController(dataSource, coreRequireAuth as any, 'kpa');
+  router.use('/stores', kpaTabletController);
+
+  const kpaBlogController = createBlogController(dataSource, coreRequireAuth as any, 'kpa');
+  router.use('/stores', kpaBlogController);
+
+  const kpaTemplateController = createKpaStoreTemplateController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaTemplateController);
+
+  const kpaLayoutController = createLayoutController(dataSource, coreRequireAuth as any);
+  router.use('/stores', kpaLayoutController);
 
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership
@@ -201,7 +241,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       return;
     }
 
-    const orgRepo = dataSource.getRepository(KpaOrganization);
+    const orgRepo = dataSource.getRepository(OrganizationStore);
     const org = await orgRepo.findOne({ where: { id: member.organization_id } });
 
     res.json({
@@ -211,7 +251,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         organizationId: member.organization_id,
         organizationType: org?.type || null,
         organizationName: org?.name || null,
-        parentId: org?.parent_id || null,
+        parentId: org?.parentId || null,
         role: member.role,
         status: member.status,
       },
@@ -221,6 +261,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // PUBLIC / MIXED ROUTES — optionalAuth or mixed auth levels
   // ============================================================================
+
+  // Published Assets routes — public storefront/signage/promotion rendering
+  // WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
+  router.use('/published-assets', createPublishedAssetsController(dataSource));
 
   // ============================================================================
   // Forum Routes - /api/v1/kpa/forum/*

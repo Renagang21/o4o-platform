@@ -92,7 +92,8 @@ export class StartupService {
     });
 
     let dbConnected = false;
-    const maxRetries = 3;
+    const maxRetries = 5;
+    const retryDelayMs = 3000;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
@@ -100,7 +101,7 @@ export class StartupService {
 
         const dbConnectionPromise = AppDataSource.initialize();
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Database connection timeout')), 10000);
+          setTimeout(() => reject(new Error('Database connection timeout')), 15000);
         });
 
         await Promise.race([dbConnectionPromise, timeoutPromise]);
@@ -111,8 +112,9 @@ export class StartupService {
         logger.warn(`Database connection attempt ${attempt} failed:`, connectionError);
 
         if (attempt < maxRetries) {
-          logger.info(`Retrying in 2 seconds...`);
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          const delay = retryDelayMs * attempt;
+          logger.info(`Retrying in ${delay / 1000} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }

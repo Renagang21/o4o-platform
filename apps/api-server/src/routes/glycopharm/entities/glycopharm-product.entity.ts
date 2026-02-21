@@ -24,7 +24,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import type { GlycopharmPharmacy } from './glycopharm-pharmacy.entity.js';
+import type { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import type { GlycopharmProductLog } from './glycopharm-product-log.entity.js';
 
 export type GlycopharmProductStatus = 'draft' | 'active' | 'inactive' | 'discontinued';
@@ -129,9 +129,9 @@ export class GlycopharmProduct {
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
 
-  @ManyToOne('GlycopharmPharmacy', 'products')
+  @ManyToOne('OrganizationStore')
   @JoinColumn({ name: 'pharmacy_id' })
-  pharmacy?: GlycopharmPharmacy;
+  pharmacy?: OrganizationStore;
 
   @OneToMany('GlycopharmProductLog', 'product')
   logs?: GlycopharmProductLog[];

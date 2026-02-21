@@ -3,7 +3,7 @@
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
  * 기존 ProtectedRoute 로직을 그대로 유지하며 통일된 인터페이스 제공.
- * role 필드: user.currentRole
+ * role 필드: user.roles[]
  * 특이사항: isSessionChecked + checkSession() 트리거 포함
  */
 

@@ -3,14 +3,19 @@
  *
  * Phase B-1: Glycopharm API Implementation
  * Business logic layer for pharmacies and products
+ *
+ * WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C:
+ * Converted from GlycopharmPharmacy → OrganizationStore + Extension
  */
 
 import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { generateUniqueStoreSlug } from '../../../utils/slug.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
-import { GlycopharmPharmacy, GlycopharmPharmacyStatus } from '../entities/glycopharm-pharmacy.entity.js';
-import { GlycopharmProduct, GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
+import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
+import type { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
+import { GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
 import {
   ListPharmaciesQueryDto,
   ListProductsQueryDto,
@@ -22,12 +27,15 @@ import {
   ProductResponseDto,
   ProductListItemDto,
   PaginationMeta,
+  GlycopharmPharmacyStatus,
 } from '../dto/index.js';
 
 export class GlycopharmService {
   private repository: GlycopharmRepository;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.repository = new GlycopharmRepository(dataSource);
   }
 
@@ -42,9 +50,12 @@ export class GlycopharmService {
     const result = await this.repository.findAllPharmacies(query);
 
     const data = await Promise.all(
-      result.data.map(async (pharmacy) => {
-        const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
-        return this.toPharmacyResponse(pharmacy, productCount);
+      result.data.map(async (org) => {
+        const [productCount, extension] = await Promise.all([
+          this.repository.countProductsByPharmacy(org.id),
+          this.repository.findExtension(org.id),
+        ]);
+        return this.toPharmacyResponse(org, extension, productCount);
       })
     );
 
@@ -52,29 +63,35 @@ export class GlycopharmService {
   }
 
   async getPharmacyById(id: string): Promise<PharmacyResponseDto | null> {
-    const pharmacy = await this.repository.findPharmacyById(id);
-    if (!pharmacy) return null;
+    const org = await this.repository.findPharmacyById(id);
+    if (!org) return null;
 
-    const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
-    return this.toPharmacyResponse(pharmacy, productCount);
+    const [productCount, extension] = await Promise.all([
+      this.repository.countProductsByPharmacy(org.id),
+      this.repository.findExtension(org.id),
+    ]);
+    return this.toPharmacyResponse(org, extension, productCount);
   }
 
   async getActivePharmacyBySlug(slug: string): Promise<PharmacyResponseDto | null> {
-    const pharmacy = await this.repository.findActivePharmacyBySlug(slug);
-    if (!pharmacy) return null;
+    const org = await this.repository.findActivePharmacyBySlug(slug);
+    if (!org) return null;
 
-    const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
-    return this.toPharmacyResponse(pharmacy, productCount);
+    const [productCount, extension] = await Promise.all([
+      this.repository.countProductsByPharmacy(org.id),
+      this.repository.findExtension(org.id),
+    ]);
+    return this.toPharmacyResponse(org, extension, productCount, slug);
   }
 
-  async getPharmacyEntityBySlug(slug: string): Promise<GlycopharmPharmacy | null> {
+  async getPharmacyEntityBySlug(slug: string): Promise<OrganizationStore | null> {
     return this.repository.findActivePharmacyBySlug(slug);
   }
 
   async createPharmacy(
     dto: CreatePharmacyRequestDto,
     userId?: string,
-    userName?: string
+    _userName?: string
   ): Promise<PharmacyResponseDto> {
     // Check for duplicate code
     const existing = await this.repository.findPharmacyByCode(dto.code);
@@ -82,23 +99,66 @@ export class GlycopharmService {
       throw new Error('Pharmacy code already exists');
     }
 
-    // Generate collision-safe slug (WO-STOREFRONT-STABILIZATION Phase 4)
-    const slug = await generateUniqueStoreSlug(dto.name, async (candidate) => {
-      const found = await this.repository.findPharmacyBySlug(candidate);
-      return !!found;
-    });
+    // WO-CORE-STORE-SLUG-TRANSACTION-HARDENING-V1: Atomic pharmacy + slug creation
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const pharmacy = await this.repository.createPharmacy({
-      ...dto,
-      phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
-      business_number: dto.business_number ? normalizeBusinessNumber(dto.business_number) : dto.business_number,
-      slug,
-      status: 'active',
-      created_by_user_id: userId,
-      created_by_user_name: userName,
-    });
+    try {
+      // Use StoreSlugService with EntityManager for transaction support
+      const slugService = new StoreSlugService(queryRunner.manager);
+      const slug = await slugService.generateUniqueSlug(dto.name);
 
-    return this.toPharmacyResponse(pharmacy, 0);
+      const org = await this.repository.createPharmacyWithManager(
+        queryRunner.manager,
+        {
+          name: dto.name,
+          code: dto.code,
+          address: dto.address,
+          phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone,
+          business_number: dto.business_number
+            ? normalizeBusinessNumber(dto.business_number)
+            : dto.business_number,
+          type: 'pharmacy',
+          isActive: true,
+          level: 0,
+          path: dto.code,
+          created_by_user_id: userId,
+        }
+      );
+
+      // Create glycopharm extension
+      const extRepo = queryRunner.manager.getRepository(GlycopharmPharmacyExtension);
+      const ext = extRepo.create({
+        organization_id: org.id,
+        owner_name: dto.owner_name,
+        sort_order: dto.sort_order || 0,
+      });
+      await extRepo.save(ext);
+
+      // Create service enrollment
+      await queryRunner.manager.query(
+        `INSERT INTO organization_service_enrollments (organization_id, service_code, status, enrolled_at)
+         VALUES ($1, 'glycopharm', 'active', NOW())`,
+        [org.id],
+      );
+
+      // Register slug in platform-wide registry (same transaction)
+      await slugService.reserveSlug({
+        storeId: org.id,
+        serviceKey: 'glycopharm',
+        slug,
+      });
+
+      await queryRunner.commitTransaction();
+
+      return this.toPharmacyResponse(org, ext, 0, slug);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async updatePharmacy(
@@ -116,14 +176,44 @@ export class GlycopharmService {
       }
     }
 
-    const normalizedDto = dto.phone !== undefined
-      ? { ...dto, phone: dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone }
-      : dto;
-    const pharmacy = await this.repository.updatePharmacy(id, normalizedDto);
-    if (!pharmacy) return null;
+    // Split org fields vs extension fields
+    const orgUpdate: Partial<OrganizationStore> = {};
+    if (dto.name !== undefined) orgUpdate.name = dto.name;
+    if (dto.code !== undefined) orgUpdate.code = dto.code;
+    if (dto.address !== undefined) orgUpdate.address = dto.address;
+    if (dto.phone !== undefined) orgUpdate.phone = dto.phone ? dto.phone.replace(/\D/g, '') : dto.phone;
+    if (dto.business_number !== undefined) orgUpdate.business_number = dto.business_number;
 
-    const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
-    return this.toPharmacyResponse(pharmacy, productCount);
+    if (Object.keys(orgUpdate).length > 0) {
+      await this.repository.updatePharmacy(id, orgUpdate);
+    }
+
+    // Extension fields
+    if (dto.owner_name !== undefined || dto.sort_order !== undefined) {
+      const extRepo = this.dataSource.getRepository(GlycopharmPharmacyExtension);
+      let ext = await this.repository.findExtension(id);
+      if (ext) {
+        if (dto.owner_name !== undefined) ext.owner_name = dto.owner_name;
+        if (dto.sort_order !== undefined) ext.sort_order = dto.sort_order;
+        await extRepo.save(ext);
+      } else {
+        ext = extRepo.create({
+          organization_id: id,
+          owner_name: dto.owner_name,
+          sort_order: dto.sort_order || 0,
+        });
+        await extRepo.save(ext);
+      }
+    }
+
+    const org = await this.repository.findPharmacyById(id);
+    if (!org) return null;
+
+    const [productCount, extension] = await Promise.all([
+      this.repository.countProductsByPharmacy(org.id),
+      this.repository.findExtension(org.id),
+    ]);
+    return this.toPharmacyResponse(org, extension, productCount);
   }
 
   // Allowed pharmacy status transitions (WO-STOREFRONT-STABILIZATION Phase 3)
@@ -140,20 +230,27 @@ export class GlycopharmService {
     const existing = await this.repository.findPharmacyById(id);
     if (!existing) return null;
 
+    // Map current isActive to status string for transition validation
+    const currentStatus: GlycopharmPharmacyStatus = existing.isActive ? 'active' : 'inactive';
+
     // Validate status transition
-    const allowed = GlycopharmService.PHARMACY_STATUS_TRANSITIONS[existing.status];
+    const allowed = GlycopharmService.PHARMACY_STATUS_TRANSITIONS[currentStatus];
     if (!allowed || !allowed.includes(status)) {
       throw new Error(
-        `INVALID_STATUS_TRANSITION: Cannot transition from '${existing.status}' to '${status}'. ` +
+        `INVALID_STATUS_TRANSITION: Cannot transition from '${currentStatus}' to '${status}'. ` +
         `Allowed: ${allowed?.join(', ') || 'none'}`
       );
     }
 
-    const pharmacy = await this.repository.updatePharmacy(id, { status });
-    if (!pharmacy) return null;
+    const isActive = status === 'active';
+    const org = await this.repository.updatePharmacy(id, { isActive });
+    if (!org) return null;
 
-    const productCount = await this.repository.countProductsByPharmacy(pharmacy.id);
-    return this.toPharmacyResponse(pharmacy, productCount);
+    const [productCount, extension] = await Promise.all([
+      this.repository.countProductsByPharmacy(org.id),
+      this.repository.findExtension(org.id),
+    ]);
+    return this.toPharmacyResponse(org, extension, productCount);
   }
 
   // ============================================================================
@@ -361,26 +458,31 @@ export class GlycopharmService {
   // Response Mappers
   // ============================================================================
 
-  private toPharmacyResponse(pharmacy: GlycopharmPharmacy, productCount: number): PharmacyResponseDto {
+  private toPharmacyResponse(
+    org: OrganizationStore,
+    extension: GlycopharmPharmacyExtension | null,
+    productCount: number,
+    slug?: string,
+  ): PharmacyResponseDto {
     return {
-      id: pharmacy.id,
-      name: pharmacy.name,
-      code: pharmacy.code,
-      slug: pharmacy.slug,
-      address: pharmacy.address,
-      phone: pharmacy.phone,
-      email: pharmacy.email,
-      owner_name: pharmacy.owner_name,
-      business_number: pharmacy.business_number,
-      description: pharmacy.description,
-      logo: pharmacy.logo,
-      hero_image: pharmacy.hero_image,
-      status: pharmacy.status,
-      sort_order: pharmacy.sort_order,
+      id: org.id,
+      name: org.name,
+      code: org.code,
+      slug,
+      address: org.address,
+      phone: org.phone,
+      email: undefined, // GAP: email not yet migrated to extension
+      owner_name: extension?.owner_name || undefined,
+      business_number: org.business_number,
+      description: org.description,
+      logo: extension?.logo || undefined,
+      hero_image: extension?.hero_image || undefined,
+      status: org.isActive ? 'active' : 'inactive',
+      sort_order: extension?.sort_order || 0,
       product_count: productCount,
-      storefront_config: pharmacy.storefront_config,
-      created_at: pharmacy.created_at.toISOString(),
-      updated_at: pharmacy.updated_at.toISOString(),
+      storefront_config: org.storefront_config,
+      created_at: org.createdAt.toISOString(),
+      updated_at: org.updatedAt.toISOString(),
     };
   }
 
@@ -394,13 +496,13 @@ export class GlycopharmService {
         code: product.pharmacy.code,
         address: product.pharmacy.address,
         phone: product.pharmacy.phone,
-        email: product.pharmacy.email,
-        owner_name: product.pharmacy.owner_name,
+        email: undefined, // GAP: email not on OrganizationStore or Extension
+        owner_name: undefined, // Extension field — loaded separately when needed
         business_number: product.pharmacy.business_number,
-        status: product.pharmacy.status,
-        sort_order: product.pharmacy.sort_order,
-        created_at: product.pharmacy.created_at.toISOString(),
-        updated_at: product.pharmacy.updated_at.toISOString(),
+        status: product.pharmacy.isActive ? 'active' : 'inactive',
+        sort_order: 0, // Extension field — loaded separately when needed
+        created_at: product.pharmacy.createdAt.toISOString(),
+        updated_at: product.pharmacy.updatedAt.toISOString(),
       } : undefined,
       name: product.name,
       sku: product.sku,
