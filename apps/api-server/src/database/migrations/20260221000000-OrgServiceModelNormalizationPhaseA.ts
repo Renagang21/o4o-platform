@@ -252,6 +252,63 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
     `);
 
     // ============================================================
+    // A-3d: glycopharm_pharmacies → organizations INSERT (UPSERT)
+    //
+    // glycopharm_pharmacies의 PK는 organizations.id와 공유 가능.
+    // kpa_organizations에 없는 약국들을 organizations에 등록.
+    // 동적 컬럼 조회: synchronize:true로 생성된 테이블이므로
+    // 프로덕션에서 일부 컬럼이 없을 수 있음.
+    // ============================================================
+
+    const gpAllCols = await queryRunner.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'glycopharm_pharmacies' AND table_schema = 'public'
+    `);
+    const gpAllColSet = new Set(gpAllCols.map((r: any) => r.column_name));
+
+    // 기본 INSERT: id, name, code 필수 + 존재하는 컬럼 동적 추가
+    const hasName = gpAllColSet.has('name');
+    const hasCode = gpAllColSet.has('code');
+    const hasAddress = gpAllColSet.has('address');
+    const hasPhone = gpAllColSet.has('phone');
+    const hasDescription = gpAllColSet.has('description');
+    const hasStatus = gpAllColSet.has('status');
+
+    console.log(`[Phase A] A-3d: glycopharm_pharmacies columns found: ${[...gpAllColSet].join(', ')}`);
+
+    // 동적 INSERT — 존재하는 컬럼만 포함
+    const insertCols: string[] = ['id', 'name', 'code', 'type', 'level', 'path', '"isActive"', '"childrenCount"', 'metadata'];
+    const selectExprs: string[] = [
+      'gp.id',
+      hasName ? 'gp.name' : "'Pharmacy'",
+      // code: UNIQUE 충돌 방지를 위해 항상 gp- prefix 사용
+      "'gp-' || REPLACE(gp.id::text, '-', '')",
+      "'pharmacy'",
+      '0',
+      "'/pharmacy/' || gp.id::text",
+      hasStatus ? "gp.status = 'active'" : 'true',
+      '0',
+      "'{}'::jsonb",
+    ];
+
+    if (hasAddress) { insertCols.push('address'); selectExprs.push('gp.address'); }
+    if (hasPhone) { insertCols.push('phone'); selectExprs.push('gp.phone'); }
+    if (hasDescription) { insertCols.push('description'); selectExprs.push('gp.description'); }
+
+    insertCols.push('"createdAt"', '"updatedAt"');
+    selectExprs.push('NOW()', 'NOW()');
+
+    await queryRunner.query(`
+      INSERT INTO organizations (${insertCols.join(', ')})
+      SELECT ${selectExprs.join(', ')}
+      FROM glycopharm_pharmacies gp
+      WHERE NOT EXISTS (SELECT 1 FROM organizations o WHERE o.id = gp.id)
+      ON CONFLICT (id) DO NOTHING;
+    `);
+
+    console.log('[Phase A] A-3d: glycopharm_pharmacies inserted into organizations');
+
+    // ============================================================
     // A-4: glycopharm_pharmacies → organizations 확장 필드 반영
     //
     // glycopharm_pharmacies는 synchronize:true로 생성된 테이블이므로
@@ -259,11 +316,8 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
     // 존재하는 컬럼만 동적으로 복사.
     // ============================================================
 
-    const gpCols = await queryRunner.query(`
-      SELECT column_name FROM information_schema.columns
-      WHERE table_name = 'glycopharm_pharmacies' AND table_schema = 'public'
-    `);
-    const gpColSet = new Set(gpCols.map((r: any) => r.column_name));
+    // gpAllColSet 재사용 (A-3d에서 이미 조회됨)
+    const gpColSet = gpAllColSet;
 
     // 동적 SET 절 구성
     const setClauses: string[] = [];
