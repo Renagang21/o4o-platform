@@ -8,7 +8,7 @@
  * 1. 미로그인 → "로그인 필요"
  * 2. 관리자/운영자 → "접근 불가"
  * 3. API 로딩 중 → 로딩 표시
- * 4. API 승인 완료 → /pharmacy/dashboard (pharmacistRole 무관)
+ * 4. API 승인 완료 → /store (pharmacistRole 무관)
  * 5. API 대기 중 → 대기 안내
  * 6. API 에러 → 에러 안내
  * 7. 미신청 → /pharmacy/approval
@@ -148,7 +148,7 @@ export function PharmacyPage() {
 
   // 4. 승인 완료 → 내 매장관리로 이동 (pharmacistRole 무관, DB 기준)
   if (approvalStatus === 'approved') {
-    return <Navigate to="/pharmacy/dashboard" replace />;
+    return <Navigate to="/store" replace />;
   }
 
   // 5. 대기 중 → 대기 안내 화면

@@ -38,7 +38,7 @@ import PartnerApplyPage from './pages/partners/ApplyPage';
 import OperatorLayout from './components/layouts/OperatorLayout';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/operator-core';
+import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/store-ui-core';
 import StoreOverviewPage from './pages/store/StoreOverviewPage';
 
 import { RoleGuard } from './components/auth/RoleGuard';

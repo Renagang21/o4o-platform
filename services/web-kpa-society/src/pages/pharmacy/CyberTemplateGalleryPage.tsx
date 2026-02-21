@@ -1,7 +1,7 @@
 /**
  * CyberTemplateGalleryPage — 사이버 공간 템플릿 갤러리
  *
- * 경로: /pharmacy/store/cyber-templates
+ * 경로: /store/settings
  * 인증 필수 + PharmacyGuard
  *
  * 4 채널(블로그, 태블릿, 전자상거래, 키오스크) × 4 디자인 스타일(현대적, 감성적, 건조한, 전문적)

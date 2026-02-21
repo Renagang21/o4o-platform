@@ -278,7 +278,7 @@ function ContentList({
       onCopyToast(`"${item.title}" — 매장에 추가되었습니다.`);
       setTimeout(() => {
         onCopyToast(null);
-        navigate('/pharmacy/assets?tab=cms');
+        navigate('/store/content?tab=cms');
       }, 1500);
     } catch (e: any) {
       if (e.message?.includes('DUPLICATE') || e.message?.includes('already')) {

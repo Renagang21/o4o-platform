@@ -3,7 +3,7 @@
  *
  * WO-STORE-ADMIN-CONSOLIDATION-V1
  *
- * 경로: /pharmacy/store/channels
+ * 경로: /store/channels
  * 모든 판매 채널(B2C, TABLET, SIGNAGE, KIOSK)의 상태를 표시.
  * ChannelLayerSection 로직 기반, standalone 페이지 형태.
  */

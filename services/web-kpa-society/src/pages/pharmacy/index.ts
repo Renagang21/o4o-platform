@@ -44,5 +44,11 @@ export { LayoutBuilderPage } from './LayoutBuilderPage';
 export { StoreOverviewPage } from './StoreOverviewPage';
 export { StoreChannelsPage } from './StoreChannelsPage';
 
+// WO-STORE-ORDERS-FOUNDATION-V1: 주문 관리
+export { StoreOrdersPage } from './StoreOrdersPage';
+
+// WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
+export { StoreBillingPage } from './StoreBillingPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

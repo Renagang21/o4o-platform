@@ -284,7 +284,7 @@ export default function StoreAssetsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-sm text-slate-500 mb-1">
-            <Link to="/pharmacy/dashboard" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
+            <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">매장 자산</h1>
           <p className="text-sm text-slate-500 mt-1">채널별 노출 현황을 확인하고 게시 상태를 관리합니다</p>
@@ -427,7 +427,7 @@ export default function StoreAssetsPage() {
           </span>
           {isForcedExpiringView && (
             <Link
-              to="/pharmacy/assets"
+              to="/store/content"
               className="text-xs text-blue-600 hover:underline whitespace-nowrap"
             >
               전체 보기
@@ -481,7 +481,7 @@ export default function StoreAssetsPage() {
                     item={item}
                     updatingId={updatingId}
                     onToggleStatus={handleToggleStatus}
-                    onEdit={(id) => navigate(`/pharmacy/assets/content/${id}/edit`)}
+                    onEdit={(id) => navigate(`/store/content/${id}/edit`)}
                   />
                 ))}
               </tbody>

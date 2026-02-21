@@ -381,7 +381,7 @@ export default function HubPage() {
           navigate('/demo/admin/dashboard');
           return { success: true, message: '조직 관리 페이지로 이동' };
         case 'kpa.navigate.forced_expiry':
-          navigate('/pharmacy/assets?view=forced-expiring');
+          navigate('/store/content?view=forced-expiring');
           return { success: true, message: '강제노출 만료 임박 목록으로 이동' };
         default:
           return { success: false, message: '알 수 없는 액션' };
@@ -453,10 +453,10 @@ export default function HubPage() {
                   {(hubData.summary?.store?.forcedExpirySoon ?? 0) > 0 && (
                     <div
                       style={styles.storeWarningBanner}
-                      onClick={() => navigate('/pharmacy/assets?view=forced-expiring')}
+                      onClick={() => navigate('/store/content?view=forced-expiring')}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && navigate('/pharmacy/assets?view=forced-expiring')}
+                      onKeyDown={(e) => e.key === 'Enter' && navigate('/store/content?view=forced-expiring')}
                     >
                       <AlertCircle style={{ width: 18, height: 18, color: '#D97706', flexShrink: 0 }} />
                       <span style={{ flex: 1, fontSize: '13px', color: '#92400E' }}>

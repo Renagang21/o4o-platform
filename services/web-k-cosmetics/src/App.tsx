@@ -65,7 +65,7 @@ const SignagePlaylistDetailPage = lazy(() => import('@/pages/signage/PlaylistDet
 const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/operator-core';
+import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/store-ui-core';
 
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
@@ -262,12 +262,10 @@ function AppRoutes() {
         }
       >
         <Route index element={<StoreCockpitPage />} />
-        <Route path="identity" element={<StorePlaceholderPage title="매장 정보" />} />
         <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
-        <Route path="settlement" element={<StorePlaceholderPage title="정산" />} />
-        <Route path="content" element={<StorePlaceholderPage title="콘텐츠/사이니지" />} />
-        <Route path="services" element={<StorePlaceholderPage title="서비스 관리" />} />
+        <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
+        <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 

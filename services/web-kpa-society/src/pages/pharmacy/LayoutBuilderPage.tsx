@@ -4,7 +4,7 @@
  * WO-STORE-BLOCK-ENGINE-V1
  * WO-STORE-BLOCK-REGISTRY-V1: Registry에서 label/description 참조
  *
- * 경로: /pharmacy/layout-builder
+ * 경로: /store/settings/layout
  * 인증 필수 + PharmacyGuard
  *
  * 블록 순서 변경 (Up/Down), 활성화 토글, config 수정.
@@ -267,7 +267,7 @@ export function LayoutBuilderPage() {
 
           <div style={{ marginTop: '20px' }}>
             <button
-              onClick={() => navigate('/pharmacy/hub')}
+              onClick={() => navigate('/store/content/hub')}
               style={{
                 padding: '8px 20px',
                 borderRadius: '8px',

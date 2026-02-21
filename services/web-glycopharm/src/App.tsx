@@ -104,12 +104,15 @@ const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/operator-core';
+import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
+
+// WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
+const StoreBillingPage = lazy(() => import('@/pages/pharmacy/StoreBillingPage'));
 
 // Consumer Store
 const StoreFront = lazy(() => import('@/pages/store/StoreFront'));
@@ -483,18 +486,21 @@ function AppRoutes() {
         <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
+        {/* channels: 채널 관리 (WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 P3) */}
+        <Route path="channels" element={<StorePlaceholderPage title="채널 관리" />} />
         <Route path="orders" element={<PharmacyOrders />} />
         <Route path="content" element={<ContentHubPage />} />
         <Route path="services" element={<PharmacyPatients />} />
         <Route path="settings" element={<PharmacySettings />} />
         <Route path="apply" element={<StoreApplyPage />} />
-        {/* Smart Display (moved from /pharmacy/smart-display) */}
-        <Route path="display" element={<SmartDisplayPage />} />
-        <Route path="display/playlists" element={<PlaylistsPage />} />
-        <Route path="display/schedules" element={<SchedulesPage />} />
-        <Route path="display/media" element={<MediaLibraryPage />} />
-        <Route path="display/forum" element={<PlaylistForumPage />} />
-        {/* Signage Extension */}
+        {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
+        <Route path="billing" element={<StoreBillingPage />} />
+        {/* Signage — Store Core v1.0 통합 (display + signage extension) */}
+        <Route path="signage" element={<SmartDisplayPage />} />
+        <Route path="signage/playlists" element={<PlaylistsPage />} />
+        <Route path="signage/schedules" element={<SchedulesPage />} />
+        <Route path="signage/media" element={<MediaLibraryPage />} />
+        <Route path="signage/forum" element={<PlaylistForumPage />} />
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />

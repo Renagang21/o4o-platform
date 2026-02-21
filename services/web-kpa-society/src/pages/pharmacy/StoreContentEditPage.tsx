@@ -4,7 +4,7 @@
  * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
  * WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1: 활용 설정 (displayMode, CTA, QR, print)
  *
- * 경로: /pharmacy/assets/content/:snapshotId/edit
+ * 경로: /store/content/:snapshotId/edit
  *
  * 기능:
  * - 제목 수정
@@ -270,7 +270,7 @@ export default function StoreContentEditPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          to="/pharmacy/assets"
+          to="/store/content"
           className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />

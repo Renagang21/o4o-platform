@@ -3,7 +3,7 @@
  *
  * WO-STORE-ADMIN-CONSOLIDATION-V1
  *
- * /pharmacy/store/* 하위 모든 페이지에 사이드바 내비게이션을 제공.
+ * /store/* 하위 모든 페이지에 사이드바 내비게이션을 제공.
  * 패턴 참조: AdminSidebar.tsx
  */
 
@@ -27,7 +27,7 @@ const MENU_ITEMS: MenuItem[] = [
   { path: '/cyber-templates', label: '사이버 공간', icon: '🌐' },
 ];
 
-const BASE_PATH = '/pharmacy/store';
+const BASE_PATH = '/store';
 
 export function StoreManagementLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
@@ -68,7 +68,7 @@ export function StoreManagementLayout({ children }: { children: ReactNode }) {
         </nav>
 
         <div style={styles.footer}>
-          <Link to="/pharmacy/dashboard" style={styles.footerLink}>
+          <Link to="/store" style={styles.footerLink}>
             ← 대시보드로 돌아가기
           </Link>
         </div>

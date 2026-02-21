@@ -44,18 +44,3 @@ export {
 export type { OperatorActionSuggestion, OperatorActionTrigger } from './action';
 export { generateOperatorActions } from './action';
 export { OperatorActionPanel } from './layout/OperatorActionPanel';
-
-// Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-export type {
-  StoreMenuKey,
-  StoreDashboardConfig,
-  StoreMenuItemDef,
-} from './store/storeMenuConfig';
-export {
-  ALL_STORE_MENUS,
-  COSMETICS_STORE_CONFIG,
-  GLYCOPHARM_STORE_CONFIG,
-  GLUCOSEVIEW_STORE_CONFIG,
-} from './store/storeMenuConfig';
-export { StoreDashboardLayout } from './store/StoreDashboardLayout';
-export { StorePlaceholderPage } from './store/StorePlaceholderPage';

@@ -1,10 +1,10 @@
 /**
  * StoreDashboardLayout - Store Owner 대시보드 공통 Shell
- * WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1 Phase 1
+ * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 1
  *
  * 구성:
  *   [ Header: 서비스 로고 + "내 매장" 뱃지 + 홈/유저 ]
- *   [ Sidebar: 공통 9메뉴 (config 기반 필터링) ]
+ *   [ Sidebar: Store Core v1.0 기준 8메뉴 (config 기반 필터링) ]
  *   [ Content: <Outlet /> ]
  */
 
@@ -13,33 +13,30 @@ import { Outlet, NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Store,
-  Globe,
   Package,
+  LayoutGrid,
   ShoppingCart,
-  CreditCard,
+  FileText,
   Monitor,
-  Tv,
-  Layers,
+  Receipt,
   Settings,
   Menu,
   X,
   LogOut,
   Home,
 } from 'lucide-react';
-import type { StoreDashboardConfig, StoreMenuKey } from './storeMenuConfig';
-import { ALL_STORE_MENUS } from './storeMenuConfig';
+import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
+import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
 
-/** 메뉴 키 → lucide 아이콘 매핑 */
+/** Store Core v1.0 메뉴 키 → lucide 아이콘 매핑 */
 const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
-  overview: LayoutDashboard,
-  identity: Store,
-  storefront: Globe,
+  dashboard: LayoutDashboard,
   products: Package,
+  channels: LayoutGrid,
   orders: ShoppingCart,
-  settlement: CreditCard,
-  content: Monitor,
-  display: Tv,
-  services: Layers,
+  content: FileText,
+  signage: Monitor,
+  billing: Receipt,
   settings: Settings,
 };
 
@@ -168,7 +165,7 @@ export function StoreDashboardLayout({
                 <NavLink
                   key={item.key}
                   to={fullPath}
-                  end={item.key === 'overview'}
+                  end={item.key === 'dashboard'}
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${

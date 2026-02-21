@@ -4,7 +4,7 @@
  * WO-PHARMACY-DASHBOARD-REALIGN-PHASEA1-V1
  *
  * Store Hub API 재사용, 단일 카드에 3개 숫자 배지.
- * 클릭 시 /pharmacy/assets으로 이동.
+ * 클릭 시 /store/content으로 이동.
  */
 
 import { useEffect, useState } from 'react';
@@ -49,7 +49,7 @@ export function StoreOverviewSection() {
       <section style={{ marginBottom: '32px' }}>
         <div
           style={{ ...cardBase, cursor: 'pointer' }}
-          onClick={() => navigate('/pharmacy/assets')}
+          onClick={() => navigate('/store/content')}
         >
           <div style={headerRow}>
             <h2 style={titleStyle}>매장 현황</h2>
@@ -71,7 +71,7 @@ export function StoreOverviewSection() {
     <section style={{ marginBottom: '32px' }}>
       <div
         style={{ ...cardBase, cursor: 'pointer' }}
-        onClick={() => navigate('/pharmacy/assets')}
+        onClick={() => navigate('/store/content')}
         onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#93c5fd'; }}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; }}
       >

@@ -32,19 +32,19 @@ const managementCards: PreviewCardData[] = [
     title: 'B2B 구매',
     description: '약국 운영에 필요한 상품 구매',
     icon: '🏭',
-    href: '/pharmacy/sales/b2b',
+    href: '/store/products',
   },
   {
     title: '내 약국 몰 관리',
     description: '고객 노출 화면 및 상품 관리',
     icon: '🏪',
-    href: '/pharmacy/settings',
+    href: '/store/settings',
   },
   {
     title: '내 약국 서비스',
     description: '콘텐츠, 사이니지, 포럼 등',
     icon: '🔧',
-    href: '/pharmacy/services',
+    href: '/store/settings',
   },
 ];
 

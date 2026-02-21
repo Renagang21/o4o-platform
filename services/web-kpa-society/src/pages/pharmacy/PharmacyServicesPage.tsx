@@ -192,7 +192,7 @@ export function PharmacyServicesPage() {
             </div>
           </div>
           <div style={styles.serviceFooter}>
-            <Link to="/pharmacy/signage" style={styles.linkButton}>
+            <Link to="/content-hub" style={styles.linkButton}>
               사이니지 관리 →
             </Link>
           </div>

@@ -170,7 +170,7 @@ export function ServiceDashboardPage() {
             </Link>
 
             <Link
-              to="/pharmacy/sales/b2b"
+              to="/store/products"
               className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
@@ -185,7 +185,7 @@ export function ServiceDashboardPage() {
             </Link>
 
             <Link
-              to="/pharmacy/services"
+              to="/store/settings"
               className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors"
             >
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">

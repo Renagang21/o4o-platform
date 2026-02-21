@@ -178,7 +178,7 @@ export function PharmacyStorePage() {
     return (
       <div style={styles.container}>
         <header style={styles.header}>
-          <Link to="/pharmacy/dashboard" style={styles.backLink}>&larr; 내 매장관리</Link>
+          <Link to="/store" style={styles.backLink}>&larr; 내 매장관리</Link>
           <h1 style={styles.pageTitle}>매장 설정</h1>
         </header>
         <div style={styles.accessDenied}>
@@ -187,7 +187,7 @@ export function PharmacyStorePage() {
           <p style={styles.accessDeniedText}>
             매장 설정은 개설약사만 변경할 수 있습니다.
           </p>
-          <Link to="/pharmacy/dashboard" style={styles.backButton}>
+          <Link to="/store" style={styles.backButton}>
             돌아가기
           </Link>
         </div>
@@ -203,7 +203,7 @@ export function PharmacyStorePage() {
       {/* 헤더 */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to="/pharmacy/dashboard" style={styles.backLink}>&larr; 내 매장관리</Link>
+          <Link to="/store" style={styles.backLink}>&larr; 내 매장관리</Link>
           <div style={styles.headerMain}>
             <div style={styles.pharmacyInfo}>
               <h1 style={styles.pharmacyName}>{pharmacyName}</h1>

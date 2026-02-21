@@ -65,7 +65,7 @@ export default function SmartDisplayPage() {
       title: '플레이리스트',
       description: '영상 목록을 만들고 관리하세요',
       icon: ListVideo,
-      path: '/store/display/playlists',
+      path: '/store/signage/playlists',
       color: 'blue',
       stat: stats ? `${stats.totalPlaylists}개` : '-',
     },
@@ -73,7 +73,7 @@ export default function SmartDisplayPage() {
       title: '스케줄 관리',
       description: '시간대별 재생 스케줄을 설정하세요',
       icon: Calendar,
-      path: '/store/display/schedules',
+      path: '/store/signage/schedules',
       color: 'green',
       stat: stats ? `${stats.scheduledHours}개` : '-',
     },
@@ -81,7 +81,7 @@ export default function SmartDisplayPage() {
       title: '미디어 라이브러리',
       description: 'YouTube/Vimeo 영상을 추가하세요',
       icon: Film,
-      path: '/store/display/media',
+      path: '/store/signage/media',
       color: 'purple',
       stat: stats ? `${stats.totalMedia}개` : '-',
     },
@@ -89,7 +89,7 @@ export default function SmartDisplayPage() {
       title: '공유 포럼',
       description: '다른 약국의 플레이리스트를 둘러보세요',
       icon: Share2,
-      path: '/store/display/forum',
+      path: '/store/signage/forum',
       color: 'orange',
       stat: stats ? `${stats.sharedPlaylists}개 공유중` : '-',
     },
@@ -117,7 +117,7 @@ export default function SmartDisplayPage() {
         </div>
         <div className="flex gap-2">
           <NavLink
-            to="/store/display/playlists/new"
+            to="/store/signage/playlists/new"
             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Plus className="w-4 h-4" />

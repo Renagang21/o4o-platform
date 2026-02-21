@@ -3,7 +3,7 @@
  *
  * WO-STORE-TEMPLATE-PROFILE-V1
  *
- * 경로: /pharmacy/template
+ * 경로: /store/settings/template
  * 인증 필수 + PharmacyGuard
  * 4개 Template Profile 중 선택
  */

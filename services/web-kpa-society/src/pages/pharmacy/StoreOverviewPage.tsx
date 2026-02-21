@@ -3,7 +3,7 @@
  *
  * WO-STORE-ADMIN-CONSOLIDATION-V1
  *
- * 경로: /pharmacy/store
+ * 경로: /store
  * 채널 상태, 상품 수, 블로그, 태블릿 대기 등을 한 눈에 표시.
  * 각 카드 클릭 → 해당 서브페이지로 이동.
  */
@@ -76,24 +76,24 @@ export function StoreOverviewPage() {
           label="활성 채널"
           value={`${approvedCount} / ${channels.length}`}
           sub="승인된 채널"
-          onClick={() => navigate('/pharmacy/store/channels')}
+          onClick={() => navigate('/store/channels')}
         />
         <KpiCard
           label="진열 상품"
           value={`${totalProducts}개`}
           sub="B2C 상품 기준"
-          onClick={() => navigate('/pharmacy/sales/b2c')}
+          onClick={() => navigate('/store/products/b2c')}
         />
         <KpiCard
           label="콘텐츠"
           value={`${overview?.contents.totalSlotCount || 0}개`}
           sub="등록된 콘텐츠 슬롯"
-          onClick={() => navigate('/pharmacy/assets')}
+          onClick={() => navigate('/store/content')}
         />
       </div>
 
       {/* Channel Status */}
-      <Section title="채널 상태" linkTo="/pharmacy/store/channels">
+      <Section title="채널 상태" linkTo="/store/channels">
         {channels.length === 0 ? (
           <p style={{ color: '#94a3b8', fontSize: '14px' }}>등록된 채널이 없습니다.</p>
         ) : (
@@ -117,12 +117,12 @@ export function StoreOverviewPage() {
       {/* Quick Links */}
       <Section title="빠른 이동">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
-          <QuickLink icon="🧱" label="레이아웃 편집" to="/pharmacy/store/layout" />
-          <QuickLink icon="🎨" label="템플릿 선택" to="/pharmacy/store/template" />
-          <QuickLink icon="📝" label="블로그 관리" to="/pharmacy/store/blog" />
-          <QuickLink icon="📱" label="태블릿 요청" to="/pharmacy/store/tablet" />
-          <QuickLink icon="📡" label="채널 관리" to="/pharmacy/store/channels" />
-          <QuickLink icon="⚙️" label="매장 설정" to="/pharmacy/settings" />
+          <QuickLink icon="🧱" label="레이아웃 편집" to="/store/settings/layout" />
+          <QuickLink icon="🎨" label="템플릿 선택" to="/store/settings/template" />
+          <QuickLink icon="📝" label="블로그 관리" to="/store/content/blog" />
+          <QuickLink icon="📱" label="태블릿 요청" to="/store/channels/tablet" />
+          <QuickLink icon="📡" label="채널 관리" to="/store/channels" />
+          <QuickLink icon="⚙️" label="매장 설정" to="/store/settings" />
         </div>
       </Section>
     </div>

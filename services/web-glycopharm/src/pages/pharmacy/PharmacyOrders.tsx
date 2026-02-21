@@ -46,11 +46,22 @@ const statusTabs = [
   { key: 'delivered', label: '완료' },
 ];
 
+/** KPI 요약 (WO-STORE-ORDERS-KPI-ENHANCEMENT-V1) */
+interface OrdersKpiSummary {
+  total: number;
+  inProgress: number;
+  completed: number;
+  monthlyRevenue: number;
+}
+
+const IN_PROGRESS_STATUSES = ['pending', 'received', 'confirmed', 'shipped'];
+
 export default function PharmacyOrders() {
   const [orders, setOrders] = useState<PharmacyOrder[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [kpi, setKpi] = useState<OrdersKpiSummary | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -65,6 +76,34 @@ export default function PharmacyOrders() {
     }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // KPI 로드 — 상태별 카운트 + 이번 달 매출
+  const loadKpi = useCallback(async () => {
+    try {
+      const [allRes, deliveredRes] = await Promise.all([
+        pharmacyApi.getOrders({ pageSize: 100 }),
+        pharmacyApi.getOrders({ status: 'delivered', pageSize: 100 }),
+      ]);
+
+      const allOrders = allRes.success && allRes.data ? allRes.data.items : [];
+      const total = allRes.success && allRes.data ? allRes.data.total : 0;
+      const deliveredOrders = deliveredRes.success && deliveredRes.data ? deliveredRes.data.items : [];
+
+      const inProgress = allOrders.filter(o => IN_PROGRESS_STATUSES.includes(o.status)).length;
+      const completed = allOrders.filter(o => o.status === 'delivered').length;
+
+      // 이번 달 매출: 완료 주문 중 이번 달 것만
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthlyRevenue = deliveredOrders
+        .filter(o => new Date(o.createdAt) >= monthStart)
+        .reduce((sum, o) => sum + o.totalAmount, 0);
+
+      setKpi({ total, inProgress, completed, monthlyRevenue });
+    } catch {
+      // KPI 실패 시 무시 — 목록은 정상 표시
+    }
+  }, []);
 
   // 주문 로드
   const loadOrders = useCallback(async () => {
@@ -96,6 +135,10 @@ export default function PharmacyOrders() {
   useEffect(() => {
     loadOrders();
   }, [loadOrders]);
+
+  useEffect(() => {
+    loadKpi();
+  }, [loadKpi]);
 
   // 주문 접수 처리 (RECEIVED)
   const handleReceiveOrder = async (orderId: string) => {
@@ -133,6 +176,34 @@ export default function PharmacyOrders() {
         <p className="text-slate-500 text-sm">
           {loading ? '불러오는 중...' : `총 ${totalCount}건의 주문`}
         </p>
+      </div>
+
+      {/* KPI 4블록 (WO-STORE-ORDERS-KPI-ENHANCEMENT-V1) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+          <p className="text-xs font-medium text-slate-500">총 주문</p>
+          <p className="mt-1 text-2xl font-bold text-slate-800">
+            {kpi ? kpi.total.toLocaleString() : '—'}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+          <p className="text-xs font-medium text-slate-500">진행 중</p>
+          <p className="mt-1 text-2xl font-bold text-amber-600">
+            {kpi ? kpi.inProgress.toLocaleString() : '—'}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+          <p className="text-xs font-medium text-slate-500">완료</p>
+          <p className="mt-1 text-2xl font-bold text-emerald-600">
+            {kpi ? kpi.completed.toLocaleString() : '—'}
+          </p>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+          <p className="text-xs font-medium text-slate-500">이번 달 매출</p>
+          <p className="mt-1 text-2xl font-bold text-blue-600">
+            {kpi ? `₩${kpi.monthlyRevenue.toLocaleString()}` : '—'}
+          </p>
+        </div>
       </div>
 
       {/* Filters */}

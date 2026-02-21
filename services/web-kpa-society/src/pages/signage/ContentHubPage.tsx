@@ -297,7 +297,7 @@ export default function ContentHubPage() {
       setCloneSuccess(`"${name}" — 내 매장에 추가되었습니다.`);
       setTimeout(() => {
         setCloneSuccess(null);
-        navigate('/pharmacy/assets?tab=signage');
+        navigate('/store/content?tab=signage');
       }, 1500);
     } catch (e: any) {
       const msg = e?.message || '';

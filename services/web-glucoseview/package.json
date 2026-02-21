@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@o4o/operator-core": "workspace:*",
+    "@o4o/store-ui-core": "workspace:*",
     "lucide-react": "^0.523.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

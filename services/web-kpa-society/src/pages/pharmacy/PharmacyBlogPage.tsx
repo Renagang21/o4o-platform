@@ -3,7 +3,7 @@
  *
  * WO-STORE-BLOG-CHANNEL-V1
  *
- * 경로: /pharmacy/blog
+ * 경로: /store/content/blog
  * 인증 필수 + PharmacyGuard
  * 게시글 목록/작성/수정/발행/보관/삭제
  */

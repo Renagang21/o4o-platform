@@ -64,7 +64,7 @@ export function SupplierDetailPage() {
       {/* 헤더 */}
       <header style={styles.header}>
         <div style={styles.headerContent}>
-          <Link to="/pharmacy/sales/b2b/suppliers" style={styles.backLink}>← 공급자 목록</Link>
+          <Link to="/store/products/suppliers" style={styles.backLink}>← 공급자 목록</Link>
           <div style={styles.headerMain}>
             <div style={styles.supplierHeader}>
               <h1 style={styles.supplierName}>{supplier.name}</h1>
@@ -125,7 +125,7 @@ export function SupplierDetailPage() {
               {supplier.categories.map((cat) => (
                 <Link
                   key={cat.id}
-                  to={`/pharmacy/sales/b2b/suppliers/${supplierId}/products?category=${cat.id}`}
+                  to={`/store/products/suppliers/${supplierId}?category=${cat.id}`}
                   style={styles.categoryCard}
                 >
                   <span style={styles.categoryName}>{cat.name}</span>
@@ -134,7 +134,7 @@ export function SupplierDetailPage() {
               ))}
             </div>
             <Link
-              to={`/pharmacy/sales/b2b/suppliers/${supplierId}/products`}
+              to={`/store/products/suppliers/${supplierId}`}
               style={styles.viewAllLink}
             >
               전체 상품 보기 →
@@ -187,7 +187,7 @@ export function SupplierDetailPage() {
                   </span>
                   {isOwner ? (
                     <Link
-                      to={`/pharmacy/sales/b2b/groupbuy/${gb.id}`}
+                      to={`/groupbuy/${gb.id}`}
                       style={styles.joinButton}
                     >
                       참여하기
@@ -207,14 +207,14 @@ export function SupplierDetailPage() {
             <h3 style={styles.sideCardTitle}>빠른 액션</h3>
             <div style={styles.actionButtons}>
               <Link
-                to={`/pharmacy/sales/b2b/suppliers/${supplierId}/products`}
+                to={`/store/products/suppliers/${supplierId}`}
                 style={styles.actionButton}
               >
                 📦 상품 목록
               </Link>
               {supplier.tradeTypes.includes('groupbuy') && (
                 <Link
-                  to={`/pharmacy/sales/b2b/groupbuy?supplier=${supplierId}`}
+                  to={`/groupbuy?supplier=${supplierId}`}
                   style={styles.actionButton}
                 >
                   🛒 공동구매 보기

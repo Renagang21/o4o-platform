@@ -68,7 +68,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/store/products', label: '상품 관리', icon: Package },
       { path: '/store/orders', label: '주문 내역', icon: ShoppingCart },
       { path: '/store/services', label: '고객 관리', icon: Users },
-      { path: '/store/display', label: '스마트 디스플레이', icon: Tv },
+      { path: '/store/signage', label: '스마트 디스플레이', icon: Tv },
       { path: '/store/content', label: '콘텐츠 가져오기', icon: Monitor },
       { path: '/store/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
       { path: '/store/signage/my', label: '내 사이니지', icon: Tv },

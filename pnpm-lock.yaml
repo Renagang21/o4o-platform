@@ -3129,6 +3129,25 @@ importers:
 
   packages/store-core: {}
 
+  packages/store-ui-core:
+    dependencies:
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/supplier-connector:
     dependencies:
       axios:
@@ -3458,6 +3477,9 @@ importers:
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
+      '@o4o/store-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/store-ui-core
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -3534,6 +3556,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/store-ui-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -3619,6 +3644,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/store-ui-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -3689,6 +3717,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-ui-core':
+        specifier: workspace:*
+        version: link:../../packages/store-ui-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../../packages/types
