@@ -614,7 +614,11 @@
       "Bash(git -C \"c:\\\\Users\\\\sohae\\\\o4o-platform\" add .github/workflows/deploy-api.yml)",
       "Bash(git -C \"c:\\\\Users\\\\sohae\\\\o4o-platform\" commit -m \"$\\(cat <<''EOF''\nfix\\(ci\\): add platform-core to deploy-api build pipeline\n\nplatform-core subpath exports \\(store-identity, store-policy\\) are imported\nby api-server but platform-core was missing from the CI build chain,\ncausing TS2307 module resolution failures during deployment.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git -C \"c:\\\\Users\\\\sohae\\\\o4o-platform\" branch --show-current)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(more:*)",
+      "Bash(timeout:*)",
+      "Bash(tr:*)",
+      "Bash(request \")"
     ],
     "deny": []
   }
