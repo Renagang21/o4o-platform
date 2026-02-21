@@ -19,6 +19,35 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
   public async up(queryRunner: QueryRunner): Promise<void> {
 
     // ============================================================
+    // A-0: organizations 테이블 생성 (IF NOT EXISTS)
+    //
+    // @o4o/organization-core Organization 엔티티 기준.
+    // 프로덕션에서는 synchronize:false이므로 테이블이 없을 수 있음.
+    // 컬럼명: camelCase quoted (Organization 엔티티 원본 규칙)
+    // ============================================================
+
+    await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS organizations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name VARCHAR(255) NOT NULL,
+        code VARCHAR(100) NOT NULL UNIQUE,
+        type VARCHAR(50) NOT NULL DEFAULT 'branch',
+        "parentId" UUID,
+        level INT NOT NULL DEFAULT 0,
+        path TEXT NOT NULL DEFAULT '/',
+        metadata JSONB,
+        "isActive" BOOLEAN NOT NULL DEFAULT true,
+        "childrenCount" INT NOT NULL DEFAULT 0,
+        "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+        "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_organizations_parentId" ON organizations("parentId");`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_organizations_type" ON organizations(type);`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_organizations_isActive" ON organizations("isActive");`);
+
+    // ============================================================
     // A-1: organizations 테이블에 storefront/약국 컬럼 추가
     //
     // organizations 컬럼명 규칙: camelCase quoted
@@ -289,7 +318,29 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
     `);
 
     // ============================================================
-    // A-7: v_glycopharm_pharmacies 호환성 뷰
+    // A-7a: platform_store_slugs 테이블 생성 (IF NOT EXISTS)
+    //
+    // 프로덕션에서 src/migrations/ 디렉토리의 마이그레이션이 로드되지 않으므로
+    // 이 테이블이 존재하지 않을 수 있음. VIEW에서 참조하기 전에 생성.
+    // ============================================================
+
+    await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS platform_store_slugs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        slug VARCHAR(120) NOT NULL UNIQUE,
+        store_id UUID NOT NULL,
+        service_key VARCHAR(50) NOT NULL,
+        is_active BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_platform_store_slugs_slug" ON platform_store_slugs(slug);`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "idx_platform_store_slugs_service_store" ON platform_store_slugs(service_key, store_id);`);
+
+    // ============================================================
+    // A-7b: v_glycopharm_pharmacies 호환성 뷰
     // ============================================================
 
     await queryRunner.query(`
