@@ -25,6 +25,70 @@ export class OrgServiceModelNormalizationPhaseC20260221100000 implements Migrati
   public async up(queryRunner: QueryRunner): Promise<void> {
 
     // ============================================================
+    // C-0: glycopharm_pharmacies → organizations 보강 INSERT
+    //
+    // PhaseA가 이전 코드 버전에서 실행된 경우, A-3d 단계가 없었을 수 있음.
+    // glycopharm_pharmacies의 ID가 organizations에 없으면 FK 재지정 실패.
+    // 여기서 보강 삽입.
+    // ============================================================
+
+    const gpTableCheck = await queryRunner.query(`
+      SELECT 1 FROM information_schema.tables
+      WHERE table_name = 'glycopharm_pharmacies' AND table_schema = 'public'
+    `);
+
+    if (gpTableCheck.length > 0) {
+      // 동적 컬럼 감지
+      const gpCols = await queryRunner.query(`
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = 'glycopharm_pharmacies' AND table_schema = 'public'
+      `);
+      const gpColSet = new Set(gpCols.map((r: any) => r.column_name));
+
+      const hasName = gpColSet.has('name');
+      const hasStatus = gpColSet.has('status');
+
+      // organizations에 없는 glycopharm_pharmacies를 INSERT
+      await queryRunner.query(`
+        INSERT INTO organizations (id, name, code, type, level, path, "isActive", "childrenCount", metadata, "createdAt", "updatedAt")
+        SELECT
+          gp.id,
+          ${hasName ? 'gp.name' : "'Pharmacy'"},
+          'gp-' || REPLACE(gp.id::text, '-', ''),
+          'pharmacy',
+          0,
+          '/pharmacy/' || gp.id::text,
+          ${hasStatus ? "gp.status = 'active'" : 'true'},
+          0,
+          '{}'::jsonb,
+          NOW(),
+          NOW()
+        FROM glycopharm_pharmacies gp
+        WHERE NOT EXISTS (SELECT 1 FROM organizations o WHERE o.id = gp.id)
+        ON CONFLICT (id) DO NOTHING;
+      `);
+
+      // orphaned pharmacy_id 정리: products의 pharmacy_id가 organizations에도
+      // glycopharm_pharmacies에도 없으면 NULL로 설정
+      for (const tbl of ['glycopharm_products']) {
+        const hasPharmCol = await queryRunner.query(`
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = $1 AND column_name = 'pharmacy_id' AND table_schema = 'public'
+        `, [tbl]);
+        if (hasPharmCol.length > 0) {
+          const cleaned = await queryRunner.query(`
+            UPDATE ${tbl} SET pharmacy_id = NULL
+            WHERE pharmacy_id IS NOT NULL
+              AND NOT EXISTS (SELECT 1 FROM organizations o WHERE o.id = ${tbl}.pharmacy_id)
+          `);
+          console.log(`[Phase C] C-0: Cleaned orphaned pharmacy_id in ${tbl}`);
+        }
+      }
+
+      console.log('[Phase C] C-0: glycopharm_pharmacies backfill to organizations complete');
+    }
+
+    // ============================================================
     // C-1: glycopharm_pharmacies를 참조하는 모든 FK 찾아서 재지정
     //
     // information_schema로 동적 발견 → DROP → organizations 참조로 재생성
