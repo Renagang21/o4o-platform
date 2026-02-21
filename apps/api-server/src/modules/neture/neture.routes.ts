@@ -453,11 +453,13 @@ router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedReq
     }
 
     const { id } = req.params;
-    const { isActive, acceptsApplications } = req.body;
+    const { isActive, acceptsApplications, distributionType, allowedSellerIds } = req.body;
 
     const result = await netureService.updateSupplierProduct(id, supplierId, {
       isActive,
       acceptsApplications,
+      distributionType,
+      allowedSellerIds,
     });
 
     if (!result.success) {
@@ -1839,6 +1841,35 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
       success: false,
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch seller approved products',
+    });
+  }
+});
+
+// ==================== Seller Available Supply Products (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1) ====================
+
+/**
+ * GET /api/v1/neture/seller/available-supply-products
+ * 판매자용 공급 가능 제품 목록 (PUBLIC + PRIVATE 중 본인 배정)
+ */
+router.get('/seller/available-supply-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const data = await netureService.getSellerAvailableSupplyProducts(sellerId);
+    res.json({ success: true, data });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching seller available supply products:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch seller available supply products',
     });
   }
 });

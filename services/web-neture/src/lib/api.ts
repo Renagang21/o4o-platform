@@ -914,7 +914,12 @@ export const supplierApi = {
    */
   async updateProduct(
     id: string,
-    updates: { isActive?: boolean; acceptsApplications?: boolean }
+    updates: {
+      isActive?: boolean;
+      acceptsApplications?: boolean;
+      distributionType?: DistributionType;
+      allowedSellerIds?: string[] | null;
+    }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products/${id}`, {
@@ -1145,6 +1150,26 @@ export const sellerApi = {
       return { success: false, error: 'NETWORK_ERROR' };
     }
   },
+
+  /**
+   * GET /api/v1/neture/seller/available-supply-products
+   * 판매자용 공급 가능 제품 (PUBLIC + PRIVATE 배정)
+   * WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1
+   */
+  async getAvailableSupplyProducts(): Promise<OperatorSupplyProduct[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/seller/available-supply-products`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Seller API] Failed to fetch available supply products:', error);
+      return [];
+    }
+  },
 };
 
 // ==================== Admin Operator API (WO-NETURE-OPERATOR-UI-REALIZATION-V1) ====================
@@ -1207,6 +1232,8 @@ export const adminOperatorApi = {
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
+export type DistributionType = 'PUBLIC' | 'PRIVATE';
+
 interface SupplierProduct {
   id: string;
   name: string;
@@ -1215,6 +1242,8 @@ interface SupplierProduct {
   purpose: SupplierProductPurpose;
   isActive: boolean;
   acceptsApplications: boolean;
+  distributionType: DistributionType;
+  allowedSellerIds: string[] | null;
   pendingRequestCount: number;
   activeServiceCount: number;
   createdAt: string;
@@ -1539,6 +1568,7 @@ interface OperatorSupplyProduct {
   name: string;
   category: string;
   description: string;
+  distributionType?: DistributionType;
   supplierId: string;
   supplierName: string;
   supplyStatus: 'available' | 'pending' | 'approved' | 'rejected';

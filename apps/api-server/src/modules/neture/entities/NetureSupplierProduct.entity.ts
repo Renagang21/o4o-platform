@@ -18,6 +18,14 @@ export enum ProductPurpose {
   ACTIVE_SALES = 'ACTIVE_SALES', // 판매 중
 }
 
+/**
+ * 유통 정책 (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1)
+ */
+export enum DistributionType {
+  PUBLIC = 'PUBLIC',   // HUB 공개 (모든 운영자에게 노출)
+  PRIVATE = 'PRIVATE', // 지정 판매자 전용
+}
+
 @Entity('neture_supplier_products')
 export class NetureSupplierProduct {
   @PrimaryGeneratedColumn('uuid')
@@ -47,6 +55,22 @@ export class NetureSupplierProduct {
 
   @Column({ name: 'accepts_applications', default: false })
   acceptsApplications: boolean;
+
+  @Column({
+    name: 'distribution_type',
+    type: 'enum',
+    enum: DistributionType,
+    default: DistributionType.PUBLIC,
+  })
+  distributionType: DistributionType;
+
+  @Column({
+    name: 'allowed_seller_ids',
+    type: 'text',
+    array: true,
+    nullable: true,
+  })
+  allowedSellerIds: string[] | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

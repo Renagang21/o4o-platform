@@ -249,15 +249,26 @@ export function createPharmacyProductsController(
   }));
 
   // ─── GET /listings — 내 매장 진열 상품 ─────────────────────────────
+  // WO-O4O-STORE-DOMAIN-TABS-OPERATIONAL-READINESS-V1:
+  // service_key 미전달 시 전체 도메인 반환 (all 탭 지원)
   router.get('/listings', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
-    const serviceKey = resolveServiceKeyFromQuery(req.query);
+    const requestedKey = req.query.service_key as string | undefined;
+
+    if (requestedKey && !VALID_SERVICE_KEYS.includes(requestedKey)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_SERVICE_KEY', message: `Invalid service_key: ${requestedKey}` },
+      });
+    }
+
+    const where: Record<string, string> = { organization_id: organizationId };
+    if (requestedKey) {
+      where.service_key = requestedKey;
+    }
 
     const listings = await listingRepo.find({
-      where: {
-        organization_id: organizationId,
-        service_key: serviceKey,
-      },
+      where,
       order: { display_order: 'ASC', created_at: 'DESC' },
     });
 

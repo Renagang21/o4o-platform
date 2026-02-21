@@ -3,6 +3,7 @@
  *
  * WO-KPA-PHARMACY-B2B-FUNCTION-V1: 초기 구조
  * WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1: 도메인 탭 통합
+ * WO-O4O-STORE-DOMAIN-TABS-OPERATIONAL-READINESS-V1: 에러/EmptyState 운영 보강
  *
  * 매장 중심 멀티도메인 구조:
  * - service_key 기반 도메인 탭 필터
@@ -37,6 +38,22 @@ const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: stri
 };
 
 // ============================================
+// WO-O4O-STORE-DOMAIN-TABS-OPERATIONAL-READINESS-V1
+// 에러 타입 분류
+// ============================================
+
+type ErrorType = 'network' | 'unauthorized' | 'forbidden' | 'invalid_key' | 'server' | null;
+
+// 도메인별 EmptyState 정의
+const EMPTY_STATE_CONFIG: Record<string, { title: string; desc: string; linkTo: string; linkLabel: string }> = {
+  all: { title: '현재 구매 가능한 상품이 없습니다', desc: '공급자 승인 및 진열 여부를 확인하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
+  kpa: { title: '일반 B2B 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
+  'kpa-groupbuy': { title: '공동구매 상품이 아직 등록되지 않았습니다', desc: '공동구매 홈에서 안내를 확인하세요.', linkTo: '/groupbuy', linkLabel: '공동구매 홈 →' },
+  glycopharm: { title: '혈당관리 서비스 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
+  cosmetics: { title: '화장품 서비스 상품이 아직 없습니다', desc: '상품 판매 관리에서 상품을 등록하세요.', linkTo: '/store/sell', linkLabel: '상품 판매 관리 →' },
+};
+
+// ============================================
 // 컴포넌트
 // ============================================
 
@@ -48,17 +65,25 @@ export function PharmacyB2BPage() {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [listings, setListings] = useState<ProductListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ErrorType>(null);
 
   const loadListings = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const tab = DOMAIN_TABS.find(t => t.id === activeTab);
       const result = await getListings(
         tab?.serviceKey ? { service_key: tab.serviceKey } : undefined
       );
       setListings(result.data || []);
-    } catch (err) {
-      console.warn('Failed to load listings:', err);
+    } catch (err: any) {
+      const status = err?.response?.status || err?.status;
+      const code = err?.response?.data?.error?.code || err?.code;
+      if (status === 401) setError('unauthorized');
+      else if (status === 403) setError('forbidden');
+      else if (code === 'INVALID_SERVICE_KEY') setError('invalid_key');
+      else if (!navigator.onLine || err?.message?.includes('Network')) setError('network');
+      else setError('server');
       setListings([]);
     } finally {
       setLoading(false);
@@ -127,21 +152,52 @@ export function PharmacyB2BPage() {
         </span>
       </div>
 
-      {/* 상품 그리드 */}
+      {/* 상품 그리드 (WO-O4O-STORE-DOMAIN-TABS-OPERATIONAL-READINESS-V1) */}
       {loading ? (
         <div style={styles.loadingState}>
           <span style={styles.loadingText}>상품을 불러오는 중...</span>
+        </div>
+      ) : error ? (
+        <div style={styles.emptyState}>
+          <span style={styles.emptyIcon}>
+            {error === 'network' ? '🌐' : error === 'unauthorized' ? '🔒' : error === 'forbidden' ? '🚫' : '⚠️'}
+          </span>
+          <h3 style={styles.emptyTitle}>
+            {error === 'network' && '네트워크 연결을 확인해주세요'}
+            {error === 'unauthorized' && '로그인이 필요합니다'}
+            {error === 'forbidden' && '매장 등록 후 이용할 수 있습니다'}
+            {error === 'invalid_key' && '잘못된 도메인 요청입니다'}
+            {error === 'server' && '일시적인 오류가 발생했습니다'}
+          </h3>
+          <p style={styles.emptyDesc}>
+            {error === 'network' && '인터넷 연결 상태를 확인한 후 다시 시도해주세요.'}
+            {error === 'unauthorized' && '상품을 조회하려면 로그인이 필요합니다.'}
+            {error === 'forbidden' && '약국 매장 등록이 완료된 후 상품을 조회할 수 있습니다.'}
+            {error === 'invalid_key' && '링크가 잘못되었을 수 있습니다.'}
+            {error === 'server' && '잠시 후 다시 시도해주세요.'}
+          </p>
+          {(error === 'network' || error === 'server') && (
+            <button onClick={loadListings} style={styles.retryButton}>다시 시도</button>
+          )}
+          {error === 'unauthorized' && (
+            <Link to="/" style={styles.emptyAction}>로그인</Link>
+          )}
+          {error === 'invalid_key' && (
+            <button onClick={() => handleTabChange('all')} style={styles.retryButton}>전체 보기</button>
+          )}
         </div>
       ) : listings.length === 0 ? (
         <div style={styles.emptyState}>
           <span style={styles.emptyIcon}>📦</span>
           <h3 style={styles.emptyTitle}>
-            {activeTab === 'all' ? '등록된 상품이 없습니다' : `${DOMAIN_TABS.find(t => t.id === activeTab)?.label} 상품이 없습니다`}
+            {EMPTY_STATE_CONFIG[activeTab]?.title || '등록된 상품이 없습니다'}
           </h3>
           <p style={styles.emptyDesc}>
-            상품 판매 관리에서 상품을 등록하세요.
+            {EMPTY_STATE_CONFIG[activeTab]?.desc || '상품 판매 관리에서 상품을 등록하세요.'}
           </p>
-          <Link to="/store/sell" style={styles.emptyAction}>상품 판매 관리 →</Link>
+          <Link to={EMPTY_STATE_CONFIG[activeTab]?.linkTo || '/store/sell'} style={styles.emptyAction}>
+            {EMPTY_STATE_CONFIG[activeTab]?.linkLabel || '상품 판매 관리 →'}
+          </Link>
         </div>
       ) : (
         <div style={styles.productGrid}>
@@ -334,6 +390,16 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.875rem',
     fontWeight: 500,
     textDecoration: 'none',
+  },
+  retryButton: {
+    padding: '8px 20px',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: colors.white,
+    backgroundColor: colors.primary,
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
 
   // Product grid

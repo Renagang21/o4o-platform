@@ -17,6 +17,7 @@ import {
   RecruitmentStatus,
   ApplicationStatus,
   ProductPurpose,
+  DistributionType,
   ContentType,
   ContentStatus,
   RequestEventType,
@@ -1609,6 +1610,8 @@ export class NetureService {
         purpose: product.purpose,
         isActive: product.isActive,
         acceptsApplications: product.acceptsApplications,
+        distributionType: product.distributionType,
+        allowedSellerIds: product.allowedSellerIds,
         pendingRequestCount: pendingMap.get(product.id) || 0,
         activeServiceCount: serviceMap.get(product.id) || 0,
         createdAt: product.createdAt,
@@ -1630,7 +1633,12 @@ export class NetureService {
   async updateSupplierProduct(
     productId: string,
     supplierId: string,
-    updates: { isActive?: boolean; acceptsApplications?: boolean }
+    updates: {
+      isActive?: boolean;
+      acceptsApplications?: boolean;
+      distributionType?: DistributionType;
+      allowedSellerIds?: string[] | null;
+    }
   ) {
     try {
       const product = await this.productRepo.findOne({
@@ -1649,6 +1657,20 @@ export class NetureService {
         product.acceptsApplications = updates.acceptsApplications;
       }
 
+      if (updates.distributionType !== undefined) {
+        product.distributionType = updates.distributionType;
+      }
+
+      if (updates.allowedSellerIds !== undefined) {
+        product.allowedSellerIds = updates.allowedSellerIds;
+      }
+
+      // Validation: PRIVATE requires at least one seller ID
+      if (product.distributionType === DistributionType.PRIVATE &&
+          (!product.allowedSellerIds || product.allowedSellerIds.length === 0)) {
+        return { success: false, error: 'PRIVATE_REQUIRES_SELLER_IDS' };
+      }
+
       const savedProduct = await this.productRepo.save(product);
 
       logger.info(`[NetureService] Updated product ${productId} by supplier ${supplierId}`);
@@ -1659,6 +1681,8 @@ export class NetureService {
           id: savedProduct.id,
           isActive: savedProduct.isActive,
           acceptsApplications: savedProduct.acceptsApplications,
+          distributionType: savedProduct.distributionType,
+          allowedSellerIds: savedProduct.allowedSellerIds,
           updatedAt: savedProduct.updatedAt,
         },
       };
@@ -2439,9 +2463,9 @@ export class NetureService {
    */
   async getOperatorSupplyProducts(operatorUserId: string) {
     try {
-      // 1. 모든 활성 공급자 제품 조회
+      // 1. 모든 활성 PUBLIC 공급자 제품 조회 (HUB = PUBLIC only)
       const products = await this.productRepo.find({
-        where: { isActive: true },
+        where: { isActive: true, distributionType: DistributionType.PUBLIC },
         relations: ['supplier'],
         order: { createdAt: 'DESC' },
       });
@@ -2486,6 +2510,80 @@ export class NetureService {
       });
     } catch (error) {
       logger.error('[NetureService] Error fetching operator supply products:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Seller Available Supply Products (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1) ====================
+
+  /**
+   * 판매자용 공급 가능 제품 목록 (PUBLIC + PRIVATE 중 본인에게 배정된 것)
+   */
+  async getSellerAvailableSupplyProducts(sellerId: string) {
+    try {
+      // 1. PUBLIC + PRIVATE(본인 배정) 제품 조회
+      const products: Array<{
+        id: string;
+        name: string;
+        category: string;
+        description: string;
+        supplier_id: string;
+        supplier_name: string;
+        distribution_type: string;
+      }> = await AppDataSource.query(`
+        SELECT sp.id, sp.name, sp.category, sp.description,
+               sp.supplier_id, s.name AS supplier_name,
+               sp.distribution_type
+        FROM neture_supplier_products sp
+        JOIN neture_suppliers s ON s.id = sp.supplier_id
+        WHERE sp.is_active = true
+          AND (
+            sp.distribution_type = 'PUBLIC'
+            OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+          )
+        ORDER BY sp.created_at DESC
+      `, [sellerId]);
+
+      // 2. 해당 판매자의 기존 공급요청 조회
+      const myRequests = await this.supplierRequestRepo.find({
+        where: { sellerId },
+      });
+
+      // 3. productId → 요청 상태 매핑
+      const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
+      for (const req of myRequests) {
+        const key = `${req.supplierId}:${req.productId}`;
+        const existing = requestMap.get(key);
+        if (!existing ||
+            req.status === SupplierRequestStatus.PENDING ||
+            req.status === SupplierRequestStatus.APPROVED) {
+          requestMap.set(key, {
+            status: req.status,
+            requestId: req.id,
+            rejectReason: req.rejectReason || undefined,
+          });
+        }
+      }
+
+      // 4. 머지하여 반환
+      return products.map((product) => {
+        const key = `${product.supplier_id}:${product.id}`;
+        const request = requestMap.get(key);
+        return {
+          id: product.id,
+          name: product.name,
+          category: product.category || '',
+          description: product.description || '',
+          distributionType: product.distribution_type,
+          supplierId: product.supplier_id,
+          supplierName: product.supplier_name || '',
+          supplyStatus: request?.status || 'available',
+          requestId: request?.requestId || null,
+          rejectReason: request?.rejectReason || null,
+        };
+      });
+    } catch (error) {
+      logger.error('[NetureService] Error fetching seller available supply products:', error);
       throw error;
     }
   }

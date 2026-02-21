@@ -2,16 +2,19 @@
  * SupplierProductsPage - 공급자 제품 관리
  *
  * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2
+ * Extended: WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1
  *
  * 표시 항목:
  * - 제품명
  * - 제품 목적 (CATALOG / APPLICATION / ACTIVE_SALES)
  * - 현재 사용 중인 서비스 수
  * - 신청 대기 건수
+ * - 유통 정책 (PUBLIC / PRIVATE)
  *
  * 허용 액션:
  * - 제품 활성/비활성 전환
  * - 판매자 신청 허용 여부 토글
+ * - 유통 정책 변경 (PUBLIC ↔ PRIVATE + 판매자 지정)
  *
  * 금지:
  * - 판매자 매장 직접 수정
@@ -19,8 +22,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Package, Users, Clock, ToggleLeft, ToggleRight, AlertCircle } from 'lucide-react';
-import { supplierApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
+import { Package, Users, Clock, ToggleLeft, ToggleRight, AlertCircle, Globe, Lock, X, Check } from 'lucide-react';
+import { supplierApi, type SupplierProduct, type SupplierProductPurpose, type DistributionType } from '../../lib/api';
 
 const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; color: string; bgColor: string }> = {
   CATALOG: { label: '정보 제공', color: '#64748b', bgColor: '#f1f5f9' },
@@ -32,6 +35,9 @@ export default function SupplierProductsPage() {
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [editingDistribution, setEditingDistribution] = useState<string | null>(null);
+  const [editDistType, setEditDistType] = useState<DistributionType>('PUBLIC');
+  const [editSellerIds, setEditSellerIds] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -61,6 +67,36 @@ export default function SupplierProductsPage() {
       setProducts((prev) =>
         prev.map((p) => (p.id === productId ? { ...p, acceptsApplications: !currentValue } : p))
       );
+    }
+    setUpdating(null);
+  };
+
+  const openDistributionEditor = (product: SupplierProduct) => {
+    setEditingDistribution(product.id);
+    setEditDistType(product.distributionType || 'PUBLIC');
+    setEditSellerIds(product.allowedSellerIds?.join(', ') || '');
+  };
+
+  const handleSaveDistribution = async (productId: string) => {
+    setUpdating(productId);
+    const allowedSellerIds = editDistType === 'PRIVATE'
+      ? editSellerIds.split(',').map((s) => s.trim()).filter(Boolean)
+      : null;
+
+    const result = await supplierApi.updateProduct(productId, {
+      distributionType: editDistType,
+      allowedSellerIds,
+    });
+
+    if (result.success) {
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === productId
+            ? { ...p, distributionType: editDistType, allowedSellerIds }
+            : p
+        )
+      );
+      setEditingDistribution(null);
     }
     setUpdating(null);
   };
@@ -127,6 +163,8 @@ export default function SupplierProductsPage() {
           {products.map((product) => {
             const purposeConfig = PURPOSE_CONFIG[product.purpose];
             const isUpdating = updating === product.id;
+            const isEditingDist = editingDistribution === product.id;
+            const isPrivate = product.distributionType === 'PRIVATE';
 
             return (
               <div key={product.id} style={styles.productCard}>
@@ -142,6 +180,21 @@ export default function SupplierProductsPage() {
                       }}
                     >
                       {purposeConfig.label}
+                    </span>
+                    <span
+                      style={{
+                        ...styles.purposeBadge,
+                        backgroundColor: isPrivate ? '#fef3c7' : '#ecfdf5',
+                        color: isPrivate ? '#92400e' : '#065f46',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => openDistributionEditor(product)}
+                    >
+                      {isPrivate ? (
+                        <><Lock size={10} style={{ marginRight: '3px', verticalAlign: 'middle' }} />비공개</>
+                      ) : (
+                        <><Globe size={10} style={{ marginRight: '3px', verticalAlign: 'middle' }} />공개</>
+                      )}
                     </span>
                   </div>
                   {product.category && (
@@ -159,6 +212,69 @@ export default function SupplierProductsPage() {
                       </span>
                     )}
                   </div>
+
+                  {/* Distribution Editor (inline) */}
+                  {isEditingDist && (
+                    <div style={styles.distEditor}>
+                      <p style={styles.distEditorTitle}>유통 정책 설정</p>
+                      <div style={styles.distRadioGroup}>
+                        <label style={styles.distRadioLabel}>
+                          <input
+                            type="radio"
+                            name={`dist-${product.id}`}
+                            value="PUBLIC"
+                            checked={editDistType === 'PUBLIC'}
+                            onChange={() => setEditDistType('PUBLIC')}
+                          />
+                          <Globe size={14} style={{ color: '#065f46' }} />
+                          <span>공개 (HUB에 노출)</span>
+                        </label>
+                        <label style={styles.distRadioLabel}>
+                          <input
+                            type="radio"
+                            name={`dist-${product.id}`}
+                            value="PRIVATE"
+                            checked={editDistType === 'PRIVATE'}
+                            onChange={() => setEditDistType('PRIVATE')}
+                          />
+                          <Lock size={14} style={{ color: '#92400e' }} />
+                          <span>비공개 (지정 판매자만)</span>
+                        </label>
+                      </div>
+                      {editDistType === 'PRIVATE' && (
+                        <div style={{ marginTop: '8px' }}>
+                          <label style={styles.distInputLabel}>
+                            지정 판매자 ID (쉼표로 구분)
+                          </label>
+                          <textarea
+                            value={editSellerIds}
+                            onChange={(e) => setEditSellerIds(e.target.value)}
+                            placeholder="판매자 UUID를 입력하세요..."
+                            style={styles.distTextarea}
+                            rows={2}
+                          />
+                        </div>
+                      )}
+                      <div style={styles.distActions}>
+                        <button
+                          onClick={() => setEditingDistribution(null)}
+                          style={styles.distCancelBtn}
+                        >
+                          <X size={14} /> 취소
+                        </button>
+                        <button
+                          onClick={() => handleSaveDistribution(product.id)}
+                          disabled={isUpdating || (editDistType === 'PRIVATE' && !editSellerIds.trim())}
+                          style={{
+                            ...styles.distSaveBtn,
+                            opacity: isUpdating || (editDistType === 'PRIVATE' && !editSellerIds.trim()) ? 0.5 : 1,
+                          }}
+                        >
+                          <Check size={14} /> {isUpdating ? '저장 중...' : '저장'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Toggles */}
@@ -289,7 +405,7 @@ const styles: Record<string, React.CSSProperties> = {
   productCard: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: '#fff',
     borderRadius: '12px',
     border: '1px solid #e2e8f0',
@@ -352,5 +468,76 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     cursor: 'pointer',
     padding: 0,
+  },
+  distEditor: {
+    marginTop: '12px',
+    padding: '12px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+  },
+  distEditorTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#334155',
+    margin: '0 0 8px 0',
+  },
+  distRadioGroup: {
+    display: 'flex',
+    gap: '16px',
+  },
+  distRadioLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '13px',
+    color: '#475569',
+    cursor: 'pointer',
+  },
+  distInputLabel: {
+    display: 'block',
+    fontSize: '12px',
+    color: '#64748b',
+    marginBottom: '4px',
+  },
+  distTextarea: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '12px',
+    border: '1px solid #cbd5e1',
+    borderRadius: '6px',
+    resize: 'vertical' as const,
+    fontFamily: 'monospace',
+    boxSizing: 'border-box' as const,
+  },
+  distActions: {
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'flex-end',
+    marginTop: '8px',
+  },
+  distCancelBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    fontSize: '12px',
+    color: '#64748b',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '6px',
+    cursor: 'pointer',
+  },
+  distSaveBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    fontSize: '12px',
+    color: '#fff',
+    backgroundColor: '#2563eb',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
 };

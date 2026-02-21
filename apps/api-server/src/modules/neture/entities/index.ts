@@ -1,5 +1,5 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
-export { NetureSupplierProduct, ProductPurpose } from './NetureSupplierProduct.entity.js';
+export { NetureSupplierProduct, ProductPurpose, DistributionType } from './NetureSupplierProduct.entity.js';
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 export { NetureSupplierRequest, SupplierRequestStatus } from './NetureSupplierRequest.entity.js';
