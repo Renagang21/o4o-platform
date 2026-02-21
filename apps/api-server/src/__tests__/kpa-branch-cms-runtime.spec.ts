@@ -42,10 +42,10 @@ let currentUser: Record<string, any> | null = null;
 const auditCreate = jest.fn((data: any) => data);
 const auditSave = jest.fn().mockResolvedValue({});
 
-// Member — drives getUserOrganizationId resolution
+// Member — drives getUserOrganizationId + requireOrgRole resolution
 const memberFindOne = jest.fn().mockImplementation(({ where }: any) => {
-  if (where.user_id === USER_A) return Promise.resolve({ id: 'm1', user_id: USER_A, organization_id: ORG_A });
-  if (where.user_id === USER_B) return Promise.resolve({ id: 'm2', user_id: USER_B, organization_id: ORG_B });
+  if (where.user_id === USER_A) return Promise.resolve({ id: 'm1', user_id: USER_A, organization_id: ORG_A, role: 'admin', status: 'active' });
+  if (where.user_id === USER_B) return Promise.resolve({ id: 'm2', user_id: USER_B, organization_id: ORG_B, role: 'admin', status: 'active' });
   return Promise.resolve(null);
 });
 
