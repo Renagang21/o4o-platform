@@ -15,7 +15,6 @@ import { Loader2 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 
 const COMMISSION_RATE = 0.05; // 5%
-const IN_PROGRESS_STATUSES = ['pending', 'received', 'confirmed', 'shipped'];
 
 interface BillingSummary {
   monthlyRevenue: number;

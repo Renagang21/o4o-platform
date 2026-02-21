@@ -68,7 +68,7 @@ export function createBranchAdminDashboardController(
   // Layer 1: requireKpaScope — KPA 서비스 역할 확인 (security-core)
   // Layer 2: requireOrgRole('admin') — 분회 조직 역할 확인 (KpaMember.role >= admin)
   router.use(requireAuth);
-  router.use(requireKpaScope);
+  router.use(requireKpaScope('kpa:branch_admin'));
   router.use(requireOrgRole(dataSource, 'admin'));
 
   const auditRepo = dataSource.getRepository(KpaAuditLog);
