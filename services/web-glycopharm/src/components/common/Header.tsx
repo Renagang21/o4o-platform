@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 const roleNavigation: Record<string, { path: string; label: string; icon: typeof Building2 }> = {
-  pharmacy: { path: '/pharmacy', label: '약국 관리', icon: Building2 },
+  pharmacy: { path: '/store', label: '약국 관리', icon: Building2 },
   supplier: { path: '/supplier', label: '공급자 관리', icon: Truck },
   partner: { path: '/partner', label: '파트너 관리', icon: Handshake },
   operator: { path: '/operator', label: '운영자 관리', icon: Shield },
