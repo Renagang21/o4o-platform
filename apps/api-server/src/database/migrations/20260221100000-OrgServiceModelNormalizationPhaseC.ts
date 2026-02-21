@@ -195,8 +195,11 @@ export class OrgServiceModelNormalizationPhaseC20260221100000 implements Migrati
     // C-4: v_glycopharm_pharmacies VIEW 갱신 (email 포함)
     // ============================================================
 
+    // DROP first — PostgreSQL CREATE OR REPLACE VIEW cannot change column order/names
+    await queryRunner.query(`DROP VIEW IF EXISTS v_glycopharm_pharmacies`);
+
     await queryRunner.query(`
-      CREATE OR REPLACE VIEW v_glycopharm_pharmacies AS
+      CREATE VIEW v_glycopharm_pharmacies AS
       SELECT
         o.id,
         o.name,
