@@ -107,15 +107,24 @@ export class OrgServiceModelNormalizationPhaseC20260221100000 implements Migrati
     `);
 
     if (tableExists.length > 0) {
-      const emailResult = await queryRunner.query(`
-        UPDATE glycopharm_pharmacy_extensions ext
-        SET email = gp.email
-        FROM glycopharm_pharmacies gp
-        WHERE ext.organization_id = gp.id
-          AND gp.email IS NOT NULL
-          AND ext.email IS NULL
+      // email 컬럼 존재 여부 확인 (synchronize:true로 생성된 테이블이므로 컬럼 보장 안 됨)
+      const hasEmail = await queryRunner.query(`
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'glycopharm_pharmacies' AND column_name = 'email' AND table_schema = 'public'
       `);
-      console.log(`[Phase C] Email backfill complete`);
+      if (hasEmail.length > 0) {
+        await queryRunner.query(`
+          UPDATE glycopharm_pharmacy_extensions ext
+          SET email = gp.email
+          FROM glycopharm_pharmacies gp
+          WHERE ext.organization_id = gp.id
+            AND gp.email IS NOT NULL
+            AND ext.email IS NULL
+        `);
+        console.log(`[Phase C] Email backfill complete`);
+      } else {
+        console.log(`[Phase C] Email column not found on glycopharm_pharmacies, skipping backfill`);
+      }
     }
 
     // ============================================================

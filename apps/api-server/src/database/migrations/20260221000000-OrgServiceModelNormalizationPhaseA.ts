@@ -253,19 +253,37 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
 
     // ============================================================
     // A-4: glycopharm_pharmacies → organizations 확장 필드 반영
+    //
+    // glycopharm_pharmacies는 synchronize:true로 생성된 테이블이므로
+    // 프로덕션에서 일부 컬럼이 존재하지 않을 수 있음.
+    // 존재하는 컬럼만 동적으로 복사.
     // ============================================================
 
-    await queryRunner.query(`
-      UPDATE organizations o SET
-        business_number = gp.business_number,
-        created_by_user_id = gp.created_by_user_id,
-        template_profile = gp.template_profile,
-        storefront_blocks = gp.storefront_blocks,
-        storefront_config = COALESCE(o.storefront_config, '{}'::jsonb)
-                            || COALESCE(gp.storefront_config, '{}'::jsonb)
-      FROM glycopharm_pharmacies gp
-      WHERE o.id = gp.id;
+    const gpCols = await queryRunner.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_name = 'glycopharm_pharmacies' AND table_schema = 'public'
     `);
+    const gpColSet = new Set(gpCols.map((r: any) => r.column_name));
+
+    // 동적 SET 절 구성
+    const setClauses: string[] = [];
+    if (gpColSet.has('business_number')) setClauses.push('business_number = gp.business_number');
+    if (gpColSet.has('created_by_user_id')) setClauses.push('created_by_user_id = gp.created_by_user_id');
+    if (gpColSet.has('template_profile')) setClauses.push('template_profile = gp.template_profile');
+    if (gpColSet.has('storefront_blocks')) setClauses.push('storefront_blocks = gp.storefront_blocks');
+    if (gpColSet.has('storefront_config')) {
+      setClauses.push(`storefront_config = COALESCE(o.storefront_config, '{}'::jsonb) || COALESCE(gp.storefront_config, '{}'::jsonb)`);
+    }
+
+    if (setClauses.length > 0) {
+      await queryRunner.query(`
+        UPDATE organizations o SET ${setClauses.join(', ')}
+        FROM glycopharm_pharmacies gp
+        WHERE o.id = gp.id;
+      `);
+    }
+
+    console.log(`[Phase A] A-4: Copied ${setClauses.length} columns from glycopharm_pharmacies → organizations`);
 
     // ============================================================
     // A-5: organization_service_enrollments 시딩
@@ -308,14 +326,33 @@ export class OrgServiceModelNormalizationPhaseA20260221000000 implements Migrati
       );
     `);
 
+    // 동적 컬럼 확인 후 삽입 (gpColSet은 A-4에서 이미 조회됨)
+    const extInsertCols: string[] = ['organization_id'];
+    const extSelectCols: string[] = ['id'];
+
+    for (const [extCol, gpCol] of [
+      ['enabled_services', 'enabled_services'],
+      ['hero_image', 'hero_image'],
+      ['logo', 'logo'],
+      ['owner_name', 'owner_name'],
+      ['sort_order', 'sort_order'],
+    ] as const) {
+      if (gpColSet.has(gpCol)) {
+        extInsertCols.push(extCol);
+        extSelectCols.push(gpCol);
+      }
+    }
+
     await queryRunner.query(`
       INSERT INTO glycopharm_pharmacy_extensions
-        (organization_id, enabled_services, hero_image, logo, owner_name, sort_order)
-      SELECT id, enabled_services, hero_image, logo, owner_name, sort_order
+        (${extInsertCols.join(', ')})
+      SELECT ${extSelectCols.join(', ')}
       FROM glycopharm_pharmacies
       WHERE EXISTS (SELECT 1 FROM organizations o WHERE o.id = glycopharm_pharmacies.id)
       ON CONFLICT (organization_id) DO NOTHING;
     `);
+
+    console.log(`[Phase A] A-6: Migrated ${extInsertCols.length - 1} extension columns from glycopharm_pharmacies`);
 
     // ============================================================
     // A-7a: platform_store_slugs 테이블 생성 (IF NOT EXISTS)
