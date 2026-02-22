@@ -114,7 +114,8 @@ async function safeQuery(ds: DataSource, sql: string, params?: any[]): Promise<S
   try {
     const rows = await ds.query(sql, params);
     return { rows, outcome: 'QUERY_OK' };
-  } catch {
+  } catch (err: any) {
+    logger.warn('[HomePreview] safeQuery TABLE_MISSING:', err?.message || err);
     return { rows: [], outcome: 'TABLE_MISSING' };
   }
 }
@@ -126,10 +127,11 @@ function deriveStatus(outcome: QueryOutcome, value: number): MetricStatus {
 
 async function buildCarePreview(
   ds: DataSource,
-  pharmacyId: string | null,
+  _pharmacyId: string | null,
   userId: string | null,
 ): Promise<HomePreviewCare> {
-  const isGlobal = !pharmacyId;
+  // WO-CARE-KPI-PHARMACY-SCOPE-FIX-V1: Care는 pharmacist_id(=userId) 기준 개인 단위 모델
+  const isGlobal = !userId;
 
   // A. Total patients
   const totalResult = isGlobal
@@ -155,12 +157,13 @@ async function buildCarePreview(
     : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count
         FROM care_kpi_snapshots s
+        JOIN glucoseview_customers c ON s.patient_id = c.id
         INNER JOIN (
           SELECT patient_id, MAX(created_at) AS max_at
-          FROM care_kpi_snapshots WHERE pharmacy_id = $1 GROUP BY patient_id
+          FROM care_kpi_snapshots GROUP BY patient_id
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        WHERE s.pharmacy_id = $1 AND s.risk_level = 'high'
-      `, [pharmacyId]);
+        WHERE c.pharmacist_id = $1 AND s.risk_level = 'high'
+      `, [userId]);
   const highRiskCount = highRiskResult.rows[0]?.count ?? 0;
   const highRiskCountStatus = deriveStatus(highRiskResult.outcome, highRiskCount);
 
@@ -172,8 +175,8 @@ async function buildCarePreview(
       `)
     : await safeQuery(ds, `
         SELECT COUNT(*)::int AS count FROM care_coaching_sessions
-        WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
-      `, [pharmacyId]);
+        WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacist_id = $1
+      `, [userId]);
   const recentCoaching = coachingResult.rows[0]?.count ?? 0;
   const recentCoachingStatus = deriveStatus(coachingResult.outcome, recentCoaching);
 
@@ -184,9 +187,10 @@ async function buildCarePreview(
         WHERE created_at >= NOW() - INTERVAL '7 days'
       `)
     : await safeQuery(ds, `
-        SELECT COUNT(DISTINCT patient_id)::int AS count FROM care_kpi_snapshots
-        WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
-      `, [pharmacyId]);
+        SELECT COUNT(DISTINCT s.patient_id)::int AS count FROM care_kpi_snapshots s
+        JOIN glucoseview_customers c ON s.patient_id = c.id
+        WHERE s.created_at >= NOW() - INTERVAL '7 days' AND c.pharmacist_id = $1
+      `, [userId]);
   const recentAnalysis = analysisResult.rows[0]?.count ?? 0;
   const recentAnalysisStatus = deriveStatus(analysisResult.outcome, recentAnalysis);
 
@@ -213,10 +217,11 @@ async function buildCarePreview(
     `
     : `
       WITH ranked AS (
-        SELECT patient_id, tir, cv,
-               ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY created_at DESC) AS rn
-        FROM care_kpi_snapshots
-        WHERE pharmacy_id = $1
+        SELECT s.patient_id, s.tir, s.cv,
+               ROW_NUMBER() OVER (PARTITION BY s.patient_id ORDER BY s.created_at DESC) AS rn
+        FROM care_kpi_snapshots s
+        JOIN glucoseview_customers c ON s.patient_id = c.id
+        WHERE c.pharmacist_id = $1
       )
       SELECT
         r1.tir - r2.tir AS "tirChange",
@@ -233,7 +238,7 @@ async function buildCarePreview(
     `;
   const changesResult = isGlobal
     ? await safeQuery(ds, changesQuery)
-    : await safeQuery(ds, changesQuery, [pharmacyId]);
+    : await safeQuery(ds, changesQuery, [userId]);
 
   return {
     totalPatients,
