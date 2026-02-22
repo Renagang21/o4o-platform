@@ -3,32 +3,25 @@
  *
  * WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
  * WO-PLATFORM-ACTION-LOG-CORE-V1 (ActionLog integration)
+ * WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1: middleware pattern, resolve 단일화
  *
  * QuickAction 실행 엔드포인트.
  * Hub 카드의 액션 버튼 → 이 컨트롤러 → Care/Store API 실행.
  *
  * 보안:
- * - requireAuth + pharmacy context (requirePharmacyContext)
+ * - requireAuth + requirePharmacyContext (미들웨어)
  * - pharmacistId 서버 강제
  * - pharmacy_id 격리
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { runAIInsight } from '@o4o/ai-core';
-import type { AuthRequest } from '../../../types/auth.js';
+import { createPharmacyContextMiddleware } from '../../../modules/care/care-pharmacy-context.middleware.js';
+import type { PharmacyContextRequest } from '../../../modules/care/care-pharmacy-context.middleware.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 
 type AuthMiddleware = RequestHandler;
-
-/**
- * Resolve pharmacy from authenticated user
- */
-async function resolvePharmacy(dataSource: DataSource, userId: string) {
-  const pharmacyRepo = dataSource.getRepository(OrganizationStore);
-  return pharmacyRepo.findOne({ where: { created_by_user_id: userId } });
-}
 
 export function createHubTriggerController(
   dataSource: DataSource,
@@ -36,6 +29,7 @@ export function createHubTriggerController(
   actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
+  const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
 
   // ================================================================
   // POST /pharmacy/hub/trigger/care-review
@@ -44,22 +38,13 @@ export function createHubTriggerController(
   router.post(
     '/trigger/care-review',
     requireAuth,
+    requirePharmacyContext,
     async (req: Request, res: Response): Promise<void> => {
       const start = Date.now();
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
-
-        const pharmacy = await resolvePharmacy(dataSource, userId);
-        if (!pharmacy) {
-          res.status(403).json({ success: false, error: { code: 'NO_PHARMACY', message: '등록된 약국이 없습니다' } });
-          return;
-        }
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
+        const userId = pcReq.user!.id;
 
         // 고위험 환자 수 조회 (pharmacy-scoped)
         const result = await dataSource.query(`
@@ -71,12 +56,12 @@ export function createHubTriggerController(
             GROUP BY patient_id
           ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
           WHERE s.pharmacy_id = $1 AND s.risk_level = 'high'
-        `, [pharmacy.id]);
+        `, [pharmacyId]);
 
         const highRiskCount = result[0]?.count ?? 0;
 
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.care_review', {
-          organizationId: pharmacy.id, durationMs: Date.now() - start,
+          organizationId: pharmacyId, durationMs: Date.now() - start,
           meta: { highRiskCount },
         }).catch(() => {});
 
@@ -87,11 +72,11 @@ export function createHubTriggerController(
               ? `고위험 환자 ${highRiskCount}명 리뷰 대기열에 추가되었습니다`
               : '현재 고위험 환자가 없습니다',
             highRiskCount,
-            pharmacyId: pharmacy.id,
+            pharmacyId,
           },
         });
       } catch (error: any) {
-        const userId = (req as AuthRequest).user?.id;
+        const userId = (req as PharmacyContextRequest).user?.id;
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.care_review', error.message, {
             durationMs: Date.now() - start,
@@ -110,22 +95,13 @@ export function createHubTriggerController(
   router.post(
     '/trigger/coaching-auto-create',
     requireAuth,
+    requirePharmacyContext,
     async (req: Request, res: Response): Promise<void> => {
       const start = Date.now();
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
-
-        const pharmacy = await resolvePharmacy(dataSource, userId);
-        if (!pharmacy) {
-          res.status(403).json({ success: false, error: { code: 'NO_PHARMACY', message: '등록된 약국이 없습니다' } });
-          return;
-        }
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
+        const userId = pcReq.user!.id;
 
         // 최근 7일 코칭 없는 고위험 환자 (상위 5명)
         const patients = await dataSource.query(`
@@ -144,11 +120,11 @@ export function createHubTriggerController(
             )
           ORDER BY ls.created_at DESC
           LIMIT 5
-        `, [pharmacy.id]);
+        `, [pharmacyId]);
 
         if (patients.length === 0) {
           actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
-            organizationId: pharmacy.id, durationMs: Date.now() - start,
+            organizationId: pharmacyId, durationMs: Date.now() - start,
             meta: { createdCount: 0 },
           }).catch(() => {});
 
@@ -169,7 +145,7 @@ export function createHubTriggerController(
             WHERE pharmacy_id = $1 AND patient_id = $2
               AND created_at >= CURRENT_DATE
             LIMIT 1
-          `, [pharmacy.id, p.patient_id]);
+          `, [pharmacyId, p.patient_id]);
 
           if (existing.length > 0) {
             skippedCount++;
@@ -180,7 +156,7 @@ export function createHubTriggerController(
             INSERT INTO care_coaching_sessions (id, pharmacy_id, patient_id, pharmacist_id, summary, action_plan, created_at)
             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW())
           `, [
-            pharmacy.id,
+            pharmacyId,
             p.patient_id,
             userId,
             'AI 자동 생성: 고위험 환자 우선 상담 세션',
@@ -190,7 +166,7 @@ export function createHubTriggerController(
         }
 
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
-          organizationId: pharmacy.id, durationMs: Date.now() - start,
+          organizationId: pharmacyId, durationMs: Date.now() - start,
           meta: { createdCount, skippedCount },
         }).catch(() => {});
 
@@ -207,7 +183,7 @@ export function createHubTriggerController(
           },
         });
       } catch (error: any) {
-        const userId = (req as AuthRequest).user?.id;
+        const userId = (req as PharmacyContextRequest).user?.id;
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.create_session', error.message, {
             durationMs: Date.now() - start,
@@ -226,23 +202,21 @@ export function createHubTriggerController(
   router.post(
     '/trigger/ai-refresh',
     requireAuth,
+    requirePharmacyContext,
     async (req: Request, res: Response): Promise<void> => {
       const start = Date.now();
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        const userRoles: string[] = (authReq.user as any)?.roles || [];
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
+        const userId = pcReq.user!.id;
+        const userRoles: string[] = (pcReq.user as any)?.roles || [];
 
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-          return;
-        }
-
-        const pharmacy = await resolvePharmacy(dataSource, userId);
-        if (!pharmacy) {
-          res.status(403).json({ success: false, error: { code: 'NO_PHARMACY', message: '등록된 약국이 없습니다' } });
-          return;
-        }
+        // Look up pharmacy name for AI context
+        const orgResult = await dataSource.query(
+          `SELECT name FROM organizations WHERE id = $1`,
+          [pharmacyId],
+        );
+        const pharmacyName = orgResult[0]?.name || '약국';
 
         // Aggregate context (same as cockpit ai-summary but triggered on demand)
         const riskRows: Array<{ risk_level: string; count: number }> = await dataSource.query(`
@@ -255,7 +229,7 @@ export function createHubTriggerController(
           ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
           WHERE s.pharmacy_id = $1
           GROUP BY s.risk_level
-        `, [pharmacy.id]);
+        `, [pharmacyId]);
 
         let highRiskCount = 0, moderateRiskCount = 0, lowRiskCount = 0;
         for (const row of riskRows) {
@@ -267,7 +241,7 @@ export function createHubTriggerController(
 
         const coachingResult = await dataSource.query(
           `SELECT COUNT(*)::int AS count FROM care_coaching_sessions WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1`,
-          [pharmacy.id],
+          [pharmacyId],
         );
         const recentCoachingCount = coachingResult[0]?.count ?? 0;
 
@@ -283,13 +257,13 @@ export function createHubTriggerController(
             JOIN ranked r2 ON r1.patient_id = r2.patient_id AND r2.rn = 2
             WHERE r1.rn = 1 AND r1.tir > r2.tir
           ) improving
-        `, [pharmacy.id]);
+        `, [pharmacyId]);
         const improvingCount = improvingResult[0]?.count ?? 0;
 
         // Pending requests count
         const requestResult = await dataSource.query(
           `SELECT COUNT(*)::int AS count FROM glycopharm_customer_requests WHERE pharmacy_id = $1 AND status = 'pending'`,
-          [pharmacy.id],
+          [pharmacyId],
         );
         const pendingRequests = requestResult[0]?.count ?? 0;
 
@@ -297,7 +271,7 @@ export function createHubTriggerController(
           service: 'glycopharm',
           insightType: 'store-summary',
           contextData: {
-            pharmacyName: pharmacy.name,
+            pharmacyName,
             kpi: { totalPatients, highRiskCount, moderateRiskCount, lowRiskCount, improvingCount, recentCoachingCount },
             revenue: { currentMonth: 0, lastMonth: 0, growthRate: 0 },
             pendingRequests,
@@ -306,7 +280,7 @@ export function createHubTriggerController(
         });
 
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.refresh_ai', {
-          organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'ai',
+          organizationId: pharmacyId, durationMs: Date.now() - start, source: 'ai',
           meta: { totalPatients, highRiskCount },
         }).catch(() => {});
 
@@ -333,7 +307,7 @@ export function createHubTriggerController(
           });
         }
       } catch (error: any) {
-        const userId = (req as AuthRequest).user?.id;
+        const userId = (req as PharmacyContextRequest).user?.id;
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.refresh_ai', error.message, {
             durationMs: Date.now() - start, source: 'ai',

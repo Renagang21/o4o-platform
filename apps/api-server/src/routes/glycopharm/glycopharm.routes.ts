@@ -35,6 +35,7 @@ import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../.
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { createServiceScopeGuard, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
 import { ActionLogService } from '@o4o/action-log-core';
+import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -178,10 +179,14 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/pharmacy/hub', hubTriggerController);
 
+  // WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1: shared pharmacy context middleware
+  const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
+
   // Pharmacy-specific routes (products, orders, customers, categories)
   const pharmacyController = createPharmacyController(
     dataSource,
-    coreRequireAuth as any
+    coreRequireAuth as any,
+    requirePharmacyContext as any,
   );
   router.use('/pharmacy', pharmacyController);
 

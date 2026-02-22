@@ -1,23 +1,24 @@
 /**
  * Glycopharm Pharmacy Controller
  *
+ * WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1:
+ * - resolve 직접 호출 제거 → 미들웨어(requirePharmacyContext) 사용
+ * - 핸들러는 req.pharmacyId만 참조
+ *
  * Pharmacy-specific API endpoints for:
  * - Products management (my pharmacy's products)
  * - Categories
  * - Orders
  * - Customers
  * - B2B products
- * - Signage contents
- * - Market trials
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { resolveGlycopharmPharmacyId } from '../../../modules/glycopharm/resolve-pharmacy.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
-import type { AuthRequest } from '../../../types/auth.js';
+import type { PharmacyContextRequest } from '../../../modules/care/care-pharmacy-context.middleware.js';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 
 type AuthMiddleware = RequestHandler;
@@ -34,7 +35,8 @@ const PRODUCT_CATEGORIES = [
 
 export function createPharmacyController(
   dataSource: DataSource,
-  requireAuth: AuthMiddleware
+  requireAuth: AuthMiddleware,
+  requirePharmacyContext: AuthMiddleware,
 ): Router {
   const router = Router();
 
@@ -45,29 +47,11 @@ export function createPharmacyController(
   router.get(
     '/products',
     requireAuth,
+    requirePharmacyContext,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({
-            error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-          });
-          return;
-        }
-
-        // WO-ORG-RESOLUTION-UNIFICATION-V1: shared enrollment-checked resolution
-        const pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
-
-        if (!pharmacyId) {
-          res.status(403).json({
-            success: false,
-            error: 'GLYCOPHARM_NOT_ENROLLED',
-            message: 'No active glycopharm-enrolled pharmacy found for this user.',
-          });
-          return;
-        }
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
 
         // Get query params
         const page = parseInt(req.query.page as string) || 1;
@@ -212,33 +196,16 @@ export function createPharmacyController(
    * Get customers for the authenticated user's pharmacy
    *
    * WO-CARE-ORG-SCOPE-MIGRATION-V1: organization_id 기준 약국 단위 조회
-   * - organization_id = 로그인 사용자의 약국(organization) 기준
-   * - safeQuery: 테이블 미존재 시 빈 배열 반환 (TABLE_MISSING 방어)
+   * WO-GLYCOPHARM-SCOPE-SIMPLIFICATION-V1: resolve → middleware
    */
   router.get(
     '/customers',
     requireAuth,
+    requirePharmacyContext,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-
-        if (!userId) {
-          res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-
-        // WO-ORG-RESOLUTION-UNIFICATION-V1: shared enrollment-checked resolution
-        const pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
-
-        if (!pharmacyId) {
-          res.status(403).json({
-            success: false,
-            error: 'GLYCOPHARM_NOT_ENROLLED',
-            message: 'No active glycopharm-enrolled pharmacy found for this user.',
-          });
-          return;
-        }
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
 
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = Math.min(parseInt(req.query.pageSize as string) || 50, 100);
