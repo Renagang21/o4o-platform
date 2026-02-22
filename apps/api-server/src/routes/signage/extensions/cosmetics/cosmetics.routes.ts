@@ -177,12 +177,8 @@ export function createCosmeticsRouter(dataSource: DataSource): Router {
    */
   router.get('/global/contents', guards.storeRead, controller.getGlobalContents);
 
-  /**
-   * POST /global/contents/:id/clone
-   * Clone a global content to store
-   * All cosmetics content can be cloned (no Force restriction)
-   */
-  router.post('/global/contents/:id/clone', guards.store, controller.cloneContent);
+  // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone route removed
+  // Content copy is now handled via asset-snapshot-copy
 
   // ========================================================================
   // STATS ROUTES (Operator only)

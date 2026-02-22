@@ -3,6 +3,7 @@
  *
  * WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1
  * WO-KPA-A-ASSET-COPY-STABILIZATION-V1 (pagination)
+ * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: snapshot_type, lifecycle_status types
  */
 
 import { apiClient } from './client';
@@ -68,6 +69,10 @@ export const assetSnapshotApi = {
 
 export type AssetPublishStatus = 'draft' | 'published' | 'hidden';
 
+export type SnapshotType = 'user_copy' | 'hq_forced' | 'campaign_push' | 'template_seed';
+
+export type LifecycleStatus = 'active' | 'expired' | 'archived';
+
 export interface ChannelMap {
   [channelKey: string]: boolean;
 }
@@ -91,6 +96,9 @@ export interface StoreAssetItem {
   forcedStartAt: string | null;
   forcedEndAt: string | null;
   isLocked: boolean;
+  // V3 fields — WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1
+  snapshotType: SnapshotType;
+  lifecycleStatus: LifecycleStatus;
 }
 
 export interface PaginatedStoreAssets {
@@ -153,6 +161,8 @@ export interface PublishedAssetItem {
   isForced: boolean;
   forcedStartAt: string | null;
   forcedEndAt: string | null;
+  snapshotType: SnapshotType;
+  lifecycleStatus: LifecycleStatus;
 }
 
 export interface PaginatedPublishedAssets {

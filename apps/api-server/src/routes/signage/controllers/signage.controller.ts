@@ -39,8 +39,6 @@ import type {
   CreateGlobalMediaDto,
   UpdateGlobalPlaylistDto,
   UpdateGlobalMediaDto,
-  ClonePlaylistDto,
-  CloneMediaDto,
 } from '../dto/index.js';
 
 /**
@@ -1103,45 +1101,5 @@ export class SignageController {
 
   // ========== Clone Endpoints ==========
 
-  /**
-   * Clone a playlist to the store
-   */
-  clonePlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const scope = this.extractScope(req);
-      const userId = this.extractUserId(req);
-      const { id } = req.params;
-      const dto: ClonePlaylistDto = req.body;
-
-      const result = await this.service.clonePlaylist(id, dto, scope, userId);
-      res.status(201).json({ data: result });
-    } catch (error) {
-      if ((error as Error).message === 'Playlist not found') {
-        res.status(404).json({ error: 'Playlist not found' });
-        return;
-      }
-      next(error);
-    }
-  };
-
-  /**
-   * Clone media to the store
-   */
-  cloneMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const scope = this.extractScope(req);
-      const userId = this.extractUserId(req);
-      const { id } = req.params;
-      const dto: CloneMediaDto = req.body;
-
-      const result = await this.service.cloneMedia(id, dto, scope, userId);
-      res.status(201).json({ data: result });
-    } catch (error) {
-      if ((error as Error).message === 'Media not found') {
-        res.status(404).json({ error: 'Media not found' });
-        return;
-      }
-      next(error);
-    }
-  };
+  // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clonePlaylist, cloneMedia removed
 }

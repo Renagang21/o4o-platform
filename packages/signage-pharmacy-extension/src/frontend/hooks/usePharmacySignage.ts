@@ -169,16 +169,7 @@ export function usePlaylists() {
     return result.success;
   };
 
-  const clonePlaylist = async (playlistId: string, newName?: string) => {
-    const result = await fetchApi<PharmacyPlaylistDto>(`/playlists/${playlistId}/clone`, {
-      method: 'POST',
-      body: JSON.stringify({ newName }),
-    });
-    if (result.success) {
-      fetchPlaylists();
-    }
-    return result;
-  };
+  // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clonePlaylist removed
 
   return {
     playlists,
@@ -187,7 +178,6 @@ export function usePlaylists() {
     refresh: fetchPlaylists,
     createPlaylist,
     deletePlaylist,
-    clonePlaylist,
   };
 }
 

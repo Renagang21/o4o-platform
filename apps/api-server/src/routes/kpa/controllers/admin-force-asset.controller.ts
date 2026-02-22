@@ -2,6 +2,7 @@
  * Admin Force Asset Controller
  *
  * WO-KPA-A-ASSET-CONTROL-EXTENSION-V2
+ * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: snapshot_type auto-set
  *
  * Admin-only endpoints for forced asset injection.
  * Admin can:
@@ -21,7 +22,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { KpaStoreAssetControl } from '../entities/kpa-store-asset-control.entity.js';
-import type { ChannelMap } from '../entities/kpa-store-asset-control.entity.js';
+import type { ChannelMap, SnapshotType } from '../entities/kpa-store-asset-control.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -83,6 +84,8 @@ export function createAdminForceAssetController(
               c.forced_start_at AS "forcedStartAt",
               c.forced_end_at AS "forcedEndAt",
               c.is_locked AS "isLocked",
+              c.snapshot_type AS "snapshotType",
+              c.lifecycle_status AS "lifecycleStatus",
               c.created_at AS "createdAt",
               c.updated_at AS "updatedAt",
               s.title AS "snapshotTitle",
@@ -108,6 +111,8 @@ export function createAdminForceAssetController(
               c.forced_start_at AS "forcedStartAt",
               c.forced_end_at AS "forcedEndAt",
               c.is_locked AS "isLocked",
+              c.snapshot_type AS "snapshotType",
+              c.lifecycle_status AS "lifecycleStatus",
               c.created_at AS "createdAt",
               c.updated_at AS "updatedAt",
               s.title AS "snapshotTitle",
@@ -217,6 +222,8 @@ export function createAdminForceAssetController(
           control.is_forced = true;
           control.is_locked = true;
           control.publish_status = 'published';
+          control.snapshot_type = 'hq_forced';
+          control.lifecycle_status = 'active';
           control.forced_by_admin_id = adminUserId || null;
           control.forced_start_at = forcedStartAt ? new Date(forcedStartAt) : null;
           control.forced_end_at = forcedEndAt ? new Date(forcedEndAt) : null;
@@ -227,6 +234,8 @@ export function createAdminForceAssetController(
             snapshot_id: snapshotId,
             organization_id: organizationId,
             publish_status: 'published',
+            snapshot_type: 'hq_forced' as SnapshotType,
+            lifecycle_status: 'active',
             is_forced: true,
             is_locked: true,
             forced_by_admin_id: adminUserId || null,
@@ -339,6 +348,7 @@ export function createAdminForceAssetController(
 
         control.is_forced = false;
         control.is_locked = false;
+        control.snapshot_type = 'user_copy';
         control.forced_by_admin_id = null;
         control.forced_start_at = null;
         control.forced_end_at = null;

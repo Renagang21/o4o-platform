@@ -6,7 +6,10 @@
  * Responsibilities:
  * - Submit seller/partner decisions
  * - Check for duplicate decisions
- * - Trigger dropshipping application creation for CONTINUE decisions
+ * - Record decision only (판매 전환은 별도 수동 등록)
+ *
+ * WO-MARKET-TRIAL-DECOUPLE-DROPSHIPPING-V1:
+ * SellerListing 자동 생성 로직 제거. Market Trial은 "검증 도메인"으로 한정.
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -18,16 +21,6 @@ import {
   MarketTrialParticipant,
   ParticipantType,
 } from '../entities/index.js';
-
-// Import dropshipping-core entities for application creation
-import {
-  SellerListing,
-  ListingStatus,
-  ListingChannel,
-  SupplierProductOffer,
-  OfferStatus,
-  ProductMaster,
-} from '@o4o/dropshipping-core';
 
 export interface SellerDecisionDto {
   participantId: string;
@@ -50,9 +43,6 @@ export class MarketTrialDecisionService {
   private decisionRepo: Repository<MarketTrialDecision>;
   private trialRepo: Repository<MarketTrial>;
   private participantRepo: Repository<MarketTrialParticipant>;
-  private listingRepo: Repository<SellerListing>;
-  private offerRepo: Repository<SupplierProductOffer>;
-  private productRepo: Repository<ProductMaster>;
   private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
@@ -60,9 +50,6 @@ export class MarketTrialDecisionService {
     this.decisionRepo = dataSource.getRepository(MarketTrialDecision);
     this.trialRepo = dataSource.getRepository(MarketTrial);
     this.participantRepo = dataSource.getRepository(MarketTrialParticipant);
-    this.listingRepo = dataSource.getRepository(SellerListing);
-    this.offerRepo = dataSource.getRepository(SupplierProductOffer);
-    this.productRepo = dataSource.getRepository(ProductMaster);
   }
 
   /**
@@ -120,75 +107,11 @@ export class MarketTrialDecisionService {
   }
 
   /**
-   * Find or create offer for trial's product
-   */
-  private async findOrCreateOffer(trial: MarketTrial): Promise<SupplierProductOffer | null> {
-    // Try to find existing offer
-    let offer = await this.offerRepo.findOne({
-      where: {
-        supplierId: trial.supplierId,
-        productMasterId: trial.productId,
-      },
-    });
-
-    if (offer) {
-      return offer;
-    }
-
-    // Get product info for offer creation
-    const product = await this.productRepo.findOne({
-      where: { id: trial.productId },
-    });
-
-    if (!product) {
-      console.warn(`Product ${trial.productId} not found, cannot create offer`);
-      return null;
-    }
-
-    // Create new offer in ACTIVE status
-    offer = this.offerRepo.create({
-      supplierId: trial.supplierId,
-      productMasterId: trial.productId,
-      supplierPrice: trial.trialUnitPrice,
-      suggestedRetailPrice: trial.trialUnitPrice * 1.3, // 30% markup suggestion
-      stockQuantity: 100, // Default stock
-      status: OfferStatus.ACTIVE,
-    });
-
-    return await this.offerRepo.save(offer);
-  }
-
-  /**
-   * Create seller application (listing with DRAFT status)
-   */
-  private async createSellerApplication(
-    trial: MarketTrial,
-    sellerId: string,
-    offer: SupplierProductOffer
-  ): Promise<SellerListing> {
-    const listing = this.listingRepo.create({
-      sellerId: sellerId,
-      offerId: offer.id,
-      title: `[Trial] ${trial.title}`,
-      sellingPrice: Number(trial.trialUnitPrice) * 1.2, // Default 20% margin
-      channel: ListingChannel.CUSTOM,
-      status: ListingStatus.DRAFT, // DRAFT = 신청 상태
-      metadata: {
-        sourceType: 'market_trial',
-        marketTrialId: trial.id,
-        createdFrom: 'market_trial_decision',
-      },
-    });
-
-    return await this.listingRepo.save(listing);
-  }
-
-  /**
    * Submit seller decision
    */
   async submitSellerDecision(trialId: string, dto: SellerDecisionDto): Promise<DecisionResult> {
     // Validate trial status
-    const trial = await this.validateTrialStatus(trialId);
+    await this.validateTrialStatus(trialId);
 
     // Validate participant
     await this.validateParticipant(trialId, dto.participantId, ParticipantType.SELLER);
@@ -201,7 +124,6 @@ export class MarketTrialDecisionService {
     // Use transaction for atomicity
     return await this.dataSource.transaction(async (manager) => {
       const decisionRepo = manager.getRepository(MarketTrialDecision);
-      const listingRepo = manager.getRepository(SellerListing);
 
       // Create decision record
       const decision = decisionRepo.create({
@@ -214,36 +136,11 @@ export class MarketTrialDecisionService {
 
       const savedDecision = await decisionRepo.save(decision);
 
-      const applicationIds: string[] = [];
-
-      // If CONTINUE, create application in dropshipping-core
-      if (dto.decision === DecisionType.CONTINUE) {
-        const offer = await this.findOrCreateOffer(trial);
-
-        if (offer) {
-          const listing = listingRepo.create({
-            sellerId: dto.participantId,
-            offerId: offer.id,
-            title: `[Trial] ${trial.title}`,
-            sellingPrice: Number(trial.trialUnitPrice) * 1.2,
-            channel: ListingChannel.CUSTOM,
-            status: ListingStatus.DRAFT,
-            metadata: {
-              sourceType: 'market_trial',
-              marketTrialId: trial.id,
-              createdFrom: 'market_trial_decision',
-            },
-          });
-
-          const savedListing = await listingRepo.save(listing);
-          applicationIds.push(savedListing.id);
-        }
-      }
-
+      // Decision 기록만 수행. 판매 전환은 별도 수동 등록으로 처리.
       return {
         decision: savedDecision,
-        applicationsCreated: applicationIds.length,
-        applicationIds,
+        applicationsCreated: 0,
+        applicationIds: [],
       };
     });
   }
@@ -253,7 +150,7 @@ export class MarketTrialDecisionService {
    */
   async submitPartnerDecision(trialId: string, dto: PartnerDecisionDto): Promise<DecisionResult> {
     // Validate trial status
-    const trial = await this.validateTrialStatus(trialId);
+    await this.validateTrialStatus(trialId);
 
     // Validate participant
     await this.validateParticipant(trialId, dto.participantId, ParticipantType.PARTNER);
@@ -273,7 +170,6 @@ export class MarketTrialDecisionService {
     // Use transaction for atomicity
     return await this.dataSource.transaction(async (manager) => {
       const decisionRepo = manager.getRepository(MarketTrialDecision);
-      const listingRepo = manager.getRepository(SellerListing);
 
       // Create decision record
       const decision = decisionRepo.create({
@@ -286,39 +182,11 @@ export class MarketTrialDecisionService {
 
       const savedDecision = await decisionRepo.save(decision);
 
-      const applicationIds: string[] = [];
-
-      // If CONTINUE, create applications for each selected seller
-      if (dto.decision === DecisionType.CONTINUE && dto.sellerIds) {
-        const offer = await this.findOrCreateOffer(trial);
-
-        if (offer) {
-          for (const sellerId of dto.sellerIds) {
-            const listing = listingRepo.create({
-              sellerId: sellerId,
-              offerId: offer.id,
-              title: `[Trial] ${trial.title}`,
-              sellingPrice: Number(trial.trialUnitPrice) * 1.2,
-              channel: ListingChannel.CUSTOM,
-              status: ListingStatus.DRAFT,
-              metadata: {
-                sourceType: 'market_trial',
-                marketTrialId: trial.id,
-                partnerId: dto.participantId,
-                createdFrom: 'market_trial_partner_decision',
-              },
-            });
-
-            const savedListing = await listingRepo.save(listing);
-            applicationIds.push(savedListing.id);
-          }
-        }
-      }
-
+      // Decision 기록만 수행. 판매 전환은 별도 수동 등록으로 처리.
       return {
         decision: savedDecision,
-        applicationsCreated: applicationIds.length,
-        applicationIds,
+        applicationsCreated: 0,
+        applicationIds: [],
       };
     });
   }

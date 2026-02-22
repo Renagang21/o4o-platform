@@ -456,10 +456,16 @@ import aiQueryRoutes from './routes/ai-query.routes.js';
 // AI Admin Routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
 import aiAdminRoutes from './routes/ai-admin.routes.js';
 
+// Market Trial Controller (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
+import { MarketTrialController } from './controllers/market-trial/marketTrialController.js';
+
 // Trial Extensions (H8-2, H8-3)
 import trialShippingRoutes from './extensions/trial-shipping/index.js';
 import trialFulfillmentRoutes from './extensions/trial-fulfillment/index.js';
 import { TrialFulfillmentController } from './extensions/trial-fulfillment/trialFulfillment.controller.js';
+import { TrialShippingController } from './extensions/trial-shipping/trialShipping.controller.js';
+import { setDataSource as setShippingStoreDataSource } from './extensions/trial-shipping/trialShipping.store.js';
+import { setDataSource as setFulfillmentStoreDataSource } from './extensions/trial-fulfillment/trialFulfillment.store.js';
 
 // Partner Routes (Phase K)
 import partnerRoutes from './routes/partner.routes.js';
@@ -819,6 +825,8 @@ const startServer = async () => {
     logger.info('✅ Partner Application API registered at /api/v1/partner/applications');
 
     // 22. Register Market Trial routes (Phase L-1)
+    // WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1: DB 영속화
+    MarketTrialController.setDataSource(AppDataSource);
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
 
@@ -831,10 +839,13 @@ const startServer = async () => {
     logger.info('✅ AI Admin routes registered at /api/ai/admin');
 
     // 22-a. Register Trial Shipping Extension (H8-2)
+    setShippingStoreDataSource(AppDataSource);
+    TrialShippingController.setDataSource(AppDataSource);
     app.use('/api/trial-shipping', trialShippingRoutes);
     logger.info('✅ Trial Shipping Extension registered at /api/trial-shipping');
 
     // 22-b. Register Trial Fulfillment Extension (H8-3)
+    setFulfillmentStoreDataSource(AppDataSource);
     TrialFulfillmentController.setDataSource(AppDataSource);
     app.use('/api/trial-fulfillment', trialFulfillmentRoutes);
     logger.info('✅ Trial Fulfillment Extension registered at /api/trial-fulfillment');

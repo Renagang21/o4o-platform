@@ -4,12 +4,16 @@
  * WO-SIGNAGE-CONTENT-HUB-V1
  * - 디지털 사이니지 콘텐츠 허브 페이지
  * - 운영자/공급자/커뮤니티 콘텐츠를 탭별로 표시
- * - 보기 + 내 대시보드로 가져오기(Clone) 기능
+ * - 보기 전용 (browse-only)
+ *
+ * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 경로 제거
+ *
+ * ❌ globalContentApi.clone* 사용 금지
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Video as VideoIcon, List, AlertCircle, ExternalLink, Play } from 'lucide-react';
-import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { Video as VideoIcon, List, AlertCircle, ExternalLink, Play } from 'lucide-react';
+import { publicContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 import { getMediaThumbnailUrl, getMediaPlayUrl } from '@o4o/types/signage';
 
 type ContentType = 'playlists' | 'media';
@@ -23,7 +27,7 @@ export default function SignageContentHubPage() {
   const [media, setMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
+
 
   // Load content when source or type changes
   useEffect(() => {
@@ -56,34 +60,6 @@ export default function SignageContentHubPage() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
-    try {
-      const result = await globalContentApi.clonePlaylist(playlistId, 'neture');
-      if (result.success) {
-        setCloneSuccess(`"${playlistName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '플레이리스트를 복사하지 못했습니다.');
-      }
-    } catch (error) {
-      setError('플레이리스트 복사 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleCloneMedia = async (mediaId: string, mediaName: string) => {
-    try {
-      const result = await globalContentApi.cloneMedia(mediaId, 'neture');
-      if (result.success) {
-        setCloneSuccess(`"${mediaName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '미디어를 복사하지 못했습니다.');
-      }
-    } catch (error) {
-      setError('미디어 복사 중 오류가 발생했습니다.');
     }
   };
 
@@ -180,19 +156,12 @@ export default function SignageContentHubPage() {
               href={previewUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
             >
               <ExternalLink className="h-4 w-4" />
               보기
             </a>
           )}
-          <button
-            onClick={() => handleClonePlaylist(playlist.id, playlist.name)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-          >
-            <Download className="h-4 w-4" />
-            가져오기
-          </button>
         </div>
       </div>
     );
@@ -267,19 +236,12 @@ export default function SignageContentHubPage() {
               href={playUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
             >
               <ExternalLink className="h-4 w-4" />
               보기
             </a>
           )}
-          <button
-            onClick={() => handleCloneMedia(item.id, item.name)}
-            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-          >
-            <Download className="h-4 w-4" />
-            가져오기
-          </button>
         </div>
       </div>
     );
@@ -337,17 +299,9 @@ export default function SignageContentHubPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">디지털 사이니지 콘텐츠</h1>
         <p className="text-slate-500 mt-1">
-          동영상과 플레이리스트를 탐색하고 내 대시보드로 가져올 수 있습니다
+          동영상과 플레이리스트를 탐색할 수 있습니다
         </p>
       </div>
-
-      {/* Success Message */}
-      {cloneSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-700">
-          <Download className="h-4 w-4" />
-          <span>{cloneSuccess}</span>
-        </div>
-      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-xl border border-slate-200">

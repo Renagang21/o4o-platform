@@ -2,12 +2,15 @@
  * Store Signage Dashboard
  *
  * Sprint 2-6: Global Content
- * Main dashboard for store operators to browse and clone global content
+ * Main dashboard for store operators to browse global content
+ *
+ * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 경로 제거
  *
  * Features:
  * - 3-tab UI: HQ Content, Community, Supplier
- * - Clone playlists and media to store
- * - Preview global content before cloning
+ * - Preview global content
+ *
+ * ❌ clone 사용 금지
  */
 
 import { useState, useEffect } from 'react';
@@ -35,16 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useParams } from 'react-router-dom';
@@ -56,7 +49,6 @@ import {
   Download,
   Heart,
   Play,
-  Copy,
   Eye,
   Clock,
   ListMusic,
@@ -139,30 +131,6 @@ const fetchGlobalMedia = async (
   return response.json();
 };
 
-const clonePlaylist = async (
-  serviceKey: string,
-  playlistId: string,
-  options: { includeItems?: boolean; cloneMedia?: boolean },
-) => {
-  const response = await fetch(`/api/signage/${serviceKey}/playlists/${playlistId}/clone`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(options),
-  });
-  if (!response.ok) throw new Error('Failed to clone playlist');
-  return response.json();
-};
-
-const cloneMedia = async (serviceKey: string, mediaId: string) => {
-  const response = await fetch(`/api/signage/${serviceKey}/media/${mediaId}/clone`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({}),
-  });
-  if (!response.ok) throw new Error('Failed to clone media');
-  return response.json();
-};
-
 // Format duration in minutes:seconds
 const formatDuration = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -173,11 +141,9 @@ const formatDuration = (seconds: number): string => {
 // Playlist Card Component
 const PlaylistCard = ({
   playlist,
-  onClone,
   onPreview,
 }: {
   playlist: GlobalPlaylist;
-  onClone: (playlist: GlobalPlaylist) => void;
   onPreview: (playlist: GlobalPlaylist) => void;
 }) => {
   const sourceIcon = {
@@ -235,10 +201,6 @@ const PlaylistCard = ({
           <Eye className="h-4 w-4 mr-1" />
           Preview
         </Button>
-        <Button size="sm" onClick={() => onClone(playlist)}>
-          <Copy className="h-4 w-4 mr-1" />
-          Clone to Store
-        </Button>
       </CardFooter>
     </Card>
   );
@@ -247,11 +209,9 @@ const PlaylistCard = ({
 // Media Card Component
 const MediaCard = ({
   media,
-  onClone,
   onPreview,
 }: {
   media: GlobalMedia;
-  onClone: (media: GlobalMedia) => void;
   onPreview: (media: GlobalMedia) => void;
 }) => {
   const sourceIcon = {
@@ -296,87 +256,8 @@ const MediaCard = ({
           <Eye className="h-4 w-4 mr-1" />
           Preview
         </Button>
-        <Button size="sm" className="flex-1" onClick={() => onClone(media)}>
-          <Copy className="h-4 w-4 mr-1" />
-          Clone
-        </Button>
       </CardFooter>
     </Card>
-  );
-};
-
-// Clone Playlist Dialog
-const ClonePlaylistDialog = ({
-  playlist,
-  open,
-  onOpenChange,
-  onClone,
-}: {
-  playlist: GlobalPlaylist | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onClone: (options: { includeItems: boolean; cloneMedia: boolean }) => void;
-}) => {
-  const [includeItems, setIncludeItems] = useState(true);
-  const [cloneMediaOption, setCloneMediaOption] = useState(false);
-  const [isCloning, setIsCloning] = useState(false);
-
-  const handleClone = async () => {
-    setIsCloning(true);
-    try {
-      await onClone({ includeItems, cloneMedia: cloneMediaOption });
-    } finally {
-      setIsCloning(false);
-    }
-  };
-
-  if (!playlist) return null;
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Clone Playlist</DialogTitle>
-          <DialogDescription>
-            Clone &quot;{playlist.name}&quot; to your store. Choose what to include.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="includeItems"
-              checked={includeItems}
-              onCheckedChange={(checked) => setIncludeItems(checked as boolean)}
-            />
-            <Label htmlFor="includeItems">Include playlist items ({playlist.itemCount} items)</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="cloneMedia"
-              checked={cloneMediaOption}
-              onCheckedChange={(checked) => setCloneMediaOption(checked as boolean)}
-              disabled={!includeItems}
-            />
-            <Label htmlFor="cloneMedia" className={!includeItems ? 'text-muted-foreground' : ''}>
-              Clone media files (creates copies, not references)
-            </Label>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {cloneMediaOption
-              ? 'Media files will be copied to your store. You can edit them independently.'
-              : 'Media files will be referenced. Changes to original will reflect in your playlist.'}
-          </p>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleClone} disabled={isCloning}>
-            {isCloning ? 'Cloning...' : 'Clone to Store'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 };
 
@@ -396,8 +277,6 @@ const ContentTab = ({
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedPlaylist, setSelectedPlaylist] = useState<GlobalPlaylist | null>(null);
-  const [cloneDialogOpen, setCloneDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -426,42 +305,6 @@ const ContentTab = ({
 
     loadContent();
   }, [serviceKey, source, page, search, contentType, toast]);
-
-  const handleClonePlaylist = async (options: { includeItems: boolean; cloneMedia: boolean }) => {
-    if (!selectedPlaylist) return;
-
-    try {
-      await clonePlaylist(serviceKey, selectedPlaylist.id, options);
-      toast({
-        title: 'Success',
-        description: `Playlist "${selectedPlaylist.name}" cloned to your store`,
-      });
-      setCloneDialogOpen(false);
-      setSelectedPlaylist(null);
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Failed to clone playlist',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleCloneMedia = async (mediaItem: GlobalMedia) => {
-    try {
-      await cloneMedia(serviceKey, mediaItem.id);
-      toast({
-        title: 'Success',
-        description: `Media "${mediaItem.name}" cloned to your store`,
-      });
-    } catch {
-      toast({
-        title: 'Error',
-        description: 'Failed to clone media',
-        variant: 'destructive',
-      });
-    }
-  };
 
   const handlePreviewPlaylist = (playlist: GlobalPlaylist) => {
     // Open preview modal or navigate to preview page
@@ -524,10 +367,6 @@ const ContentTab = ({
               <PlaylistCard
                 key={playlist.id}
                 playlist={playlist}
-                onClone={(p) => {
-                  setSelectedPlaylist(p);
-                  setCloneDialogOpen(true);
-                }}
                 onPreview={handlePreviewPlaylist}
               />
             ))
@@ -544,7 +383,6 @@ const ContentTab = ({
               <MediaCard
                 key={m.id}
                 media={m}
-                onClone={handleCloneMedia}
                 onPreview={handlePreviewMedia}
               />
             ))
@@ -577,13 +415,6 @@ const ContentTab = ({
         </div>
       )}
 
-      {/* Clone Dialog */}
-      <ClonePlaylistDialog
-        playlist={selectedPlaylist}
-        open={cloneDialogOpen}
-        onOpenChange={setCloneDialogOpen}
-        onClone={handleClonePlaylist}
-      />
     </div>
   );
 };
@@ -604,7 +435,7 @@ export default function StoreSignageDashboard() {
         <div>
           <h1 className="text-2xl font-bold">Signage Content Library</h1>
           <p className="text-muted-foreground">
-            Browse and clone content from HQ, community, and suppliers
+            Browse content from HQ, community, and suppliers
           </p>
         </div>
         <Select value={contentType} onValueChange={(v) => setContentType(v as 'playlists' | 'media')}>

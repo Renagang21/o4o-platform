@@ -2,7 +2,7 @@
  * Market Trial Manifest
  *
  * Extension app for supplier product trial funding.
- * Depends on dropshipping-core for Supplier/Seller/Product infrastructure.
+ * WO-MARKET-TRIAL-DECOUPLE-DROPSHIPPING-V1: dropshipping-core 의존성 제거.
  */
 
 export const marketTrialManifest = {
@@ -15,7 +15,6 @@ export const marketTrialManifest = {
 
   // ===== Dependencies =====
   dependencies: {
-    core: ['dropshipping-core'],
     optional: ['forum-core'],
   },
 

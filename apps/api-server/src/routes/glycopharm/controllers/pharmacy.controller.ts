@@ -385,37 +385,6 @@ export function createB2BController(
   return router;
 }
 
-/**
- * Create market trials controller
- */
-export function createMarketTrialsController(
-  _dataSource: DataSource,
-  requireAuth: AuthMiddleware
-): Router {
-  const router = Router();
-
-  /**
-   * GET /market-trials
-   * Get market trial products
-   */
-  router.get(
-    '/',
-    requireAuth,
-    async (_req: Request, res: Response): Promise<void> => {
-      try {
-        // Return empty array for now - feature to be implemented
-        res.json({
-          success: true,
-          data: [],
-        });
-      } catch (error: any) {
-        console.error('Failed to get market trials:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
-      }
-    }
-  );
-
-  return router;
-}
+// WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1:
+// createMarketTrialsController removed.
+// Market Trial is now a platform-common B2B feature at GET /api/market-trial?serviceKey=glycopharm

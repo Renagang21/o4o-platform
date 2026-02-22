@@ -60,6 +60,18 @@ export class MarketTrialParticipant {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   contributionAmount!: number;
 
+  /**
+   * Selected reward type ('cash' | 'product')
+   */
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  rewardType?: string;
+
+  /**
+   * Reward fulfillment status ('pending' | 'fulfilled')
+   */
+  @Column({ type: 'varchar', length: 20, default: 'pending' })
+  rewardStatus!: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

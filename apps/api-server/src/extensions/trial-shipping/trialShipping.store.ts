@@ -1,53 +1,97 @@
 /**
- * TrialShippingExtension - In-Memory Store
+ * TrialShippingExtension - Repository Store
  *
- * H8-2: Trial 참여자 배송 주소 저장소
- * Phase 1: In-Memory Store (서버 재시작 시 데이터 유실)
- *
- * @package H8-2 - TrialShippingExtension
+ * WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1: In-Memory → DB 전환
  */
 
-import { NetureShippingAddress } from '../../routes/neture/entities/neture-order.entity.js';
+import { DataSource, Repository } from 'typeorm';
+import { MarketTrialShippingAddress } from './entities/MarketTrialShippingAddress.entity.js';
+
+let repo: Repository<MarketTrialShippingAddress>;
 
 /**
- * In-Memory Store
- * Key: participationId
- * Value: NetureShippingAddress
+ * DataSource 설정 (main.ts에서 호출)
  */
-const shippingAddressStore: Map<string, NetureShippingAddress> = new Map();
+export function setDataSource(ds: DataSource) {
+  repo = ds.getRepository(MarketTrialShippingAddress);
+}
 
 /**
  * 배송 주소 조회
  */
-export function getShippingAddress(
-    participationId: string
-): NetureShippingAddress | undefined {
-    return shippingAddressStore.get(participationId);
+export async function getShippingAddress(
+  participationId: string
+): Promise<MarketTrialShippingAddress | null> {
+  return await repo.findOne({ where: { participationId } });
 }
 
 /**
- * 배송 주소 저장
+ * 배송 주소 저장 (upsert)
  */
-export function setShippingAddress(
-    participationId: string,
-    address: NetureShippingAddress
-): void {
-    shippingAddressStore.set(participationId, address);
+export async function setShippingAddress(
+  participationId: string,
+  address: {
+    recipient_name: string;
+    phone: string;
+    postal_code: string;
+    address: string;
+    address_detail?: string;
+    delivery_note?: string;
+  }
+): Promise<MarketTrialShippingAddress> {
+  const existing = await repo.findOne({ where: { participationId } });
+
+  if (existing) {
+    existing.recipientName = address.recipient_name;
+    existing.phone = address.phone;
+    existing.postalCode = address.postal_code;
+    existing.address = address.address;
+    existing.addressDetail = address.address_detail;
+    existing.deliveryNote = address.delivery_note;
+    return await repo.save(existing);
+  }
+
+  const entity = repo.create({
+    participationId,
+    recipientName: address.recipient_name,
+    phone: address.phone,
+    postalCode: address.postal_code,
+    address: address.address,
+    addressDetail: address.address_detail,
+    deliveryNote: address.delivery_note,
+  });
+
+  return await repo.save(entity);
 }
 
 /**
  * 배송 주소 존재 여부 확인
  */
-export function hasShippingAddress(participationId: string): boolean {
-    return shippingAddressStore.has(participationId);
+export async function hasShippingAddress(participationId: string): Promise<boolean> {
+  const count = await repo.count({ where: { participationId } });
+  return count > 0;
 }
 
 /**
  * Store 통계 (디버깅용)
  */
-export function getStoreStats() {
-    return {
-        totalAddresses: shippingAddressStore.size,
-        participationIds: Array.from(shippingAddressStore.keys()),
-    };
+export async function getStoreStats() {
+  const totalAddresses = await repo.count();
+  return {
+    totalAddresses,
+  };
+}
+
+/**
+ * 배송 주소를 legacy NetureShippingAddress 형식으로 변환
+ */
+export function toNetureFormat(addr: MarketTrialShippingAddress) {
+  return {
+    recipient_name: addr.recipientName,
+    phone: addr.phone,
+    postal_code: addr.postalCode,
+    address: addr.address,
+    address_detail: addr.addressDetail,
+    delivery_note: addr.deliveryNote,
+  };
 }

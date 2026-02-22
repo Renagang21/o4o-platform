@@ -3,6 +3,7 @@
  *
  * WO-KPA-A-ASSET-RENDER-FILTER-INTEGRATION-V1
  * WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1: store content override (COALESCE)
+ * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: lifecycle_status execution gate
  *
  * Storefront / Signage / Promotion 화면에서 게시된 자산을 조회하는 공개 API.
  * kpa_store_asset_controls 기반 필터링:
@@ -113,6 +114,8 @@ export function createPublishedAssetsController(
             c.is_forced AS "isForced",
             c.forced_start_at AS "forcedStartAt",
             c.forced_end_at AS "forcedEndAt",
+            c.snapshot_type AS "snapshotType",
+            c.lifecycle_status AS "lifecycleStatus",
             CASE WHEN sc.id IS NOT NULL THEN true ELSE false END AS "hasStoreContent"
           FROM o4o_asset_snapshots s
           INNER JOIN kpa_store_asset_controls c
@@ -121,6 +124,7 @@ export function createPublishedAssetsController(
             ON sc.snapshot_id = s.id AND sc.organization_id = s.organization_id
           WHERE s.organization_id = $1
             AND s.id = $2
+            AND c.lifecycle_status = 'active'
             AND c.publish_status = 'published'
             AND (
               c.is_forced = false

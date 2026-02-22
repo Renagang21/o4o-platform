@@ -523,6 +523,48 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 
 ---
 
+## 22. STORE LAYER ARCHITECTURE (v1) — FROZEN
+
+> **WO-O4O-STORE-ARCHITECTURE-FREEZE-V1 (2026-02-22)**
+> **상세: `docs/architecture/STORE-LAYER-ARCHITECTURE.md`**
+
+Store 계층 5개 패키지의 책임 경계와 의존 방향을 고정한다:
+
+| 패키지 | 계층 | 역할 | 소비자 | 상태 |
+|--------|------|------|--------|------|
+| `@o4o/store-ui-core` | Shell | Layout + Menu + Config | web-* | Frozen |
+| `@o4o/store-asset-policy-core` | Policy UI | Snapshot 정책 해석 + UI | web-* | Frozen |
+| `@o4o/store-core` | KPI Engine | Summary + Insights | api-server | Frozen |
+| `@o4o/asset-copy-core` | Snapshot Engine | 복제 엔진 + Entity | api-server | Frozen |
+| `@o4o/hub-core` | Hub Layout | HubLayout + Signal | 일부 web-* | Frozen |
+
+### 의존 방향 (고정)
+
+```
+web-* → store-ui-core, store-asset-policy-core, hub-core
+api-server → store-core, asset-copy-core
+```
+
+### 금지된 의존
+
+- `store-ui-core` → `store-asset-policy-core` (Shell→Policy 역참조)
+- `store-asset-policy-core` → `store-core` (Frontend→Backend 참조)
+- `hub-core` → `store-asset-policy-core` (FROZEN→비동결 참조)
+
+### Snapshot 계약
+
+- **SnapshotType**: `user_copy | hq_forced | campaign_push | template_seed`
+- **LifecycleStatus**: `active | expired | archived`
+- 새 타입/상태 추가 시 policyGate + mapping + filter 동시 정의 필수
+
+### 허용/금지
+
+- 허용: 버그 수정, 성능 개선, 문서, 테스트
+- 금지: Public API 변경, 의존 방향 변경, 책임 경계 위반, 서비스별 분기
+- **금지 항목은 명시적 Work Order를 통해서만 승인**
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -546,9 +588,10 @@ KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
 | **Operator OS Baseline** | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
 | **UX Core Freeze (Operator+Admin)** | `docs/baseline/UX-CORE-FREEZE-V1.md` |
 | **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
+| **Store Layer Architecture** | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
 
 ---
 
-*Updated: 2026-02-20*
-*Version: 5.2*
+*Updated: 2026-02-22*
+*Version: 5.3*
 *Status: Active Constitution*

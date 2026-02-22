@@ -692,39 +692,8 @@ export interface GlobalMediaResponseDto extends MediaResponseDto {
   parentMediaId: string | null;
 }
 
-// ========== Clone DTOs ==========
-
-export interface ClonePlaylistDto {
-  /** New name for the cloned playlist (optional, defaults to "Copy of {originalName}") */
-  name?: string;
-  /** Target organization ID for the clone */
-  targetOrganizationId?: string;
-  /** Include items in the clone */
-  includeItems?: boolean;
-  /** Clone media as well (creates copies of media, not references) */
-  cloneMedia?: boolean;
-}
-
-export interface ClonePlaylistResponseDto {
-  /** The cloned playlist */
-  playlist: GlobalPlaylistResponseDto;
-  /** Number of items cloned */
-  itemsCloned: number;
-  /** Number of media cloned (if cloneMedia was true) */
-  mediaCloned: number;
-}
-
-export interface CloneMediaDto {
-  /** New name for the cloned media (optional, defaults to "Copy of {originalName}") */
-  name?: string;
-  /** Target organization ID for the clone */
-  targetOrganizationId?: string;
-}
-
-export interface CloneMediaResponseDto {
-  /** The cloned media */
-  media: GlobalMediaResponseDto;
-}
+// WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: Clone DTOs removed
+// Content copy is now handled via asset-snapshot-copy (@o4o/asset-copy-core)
 
 // ========== HQ Content Creation DTOs ==========
 

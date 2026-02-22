@@ -18,10 +18,9 @@ interface PlaylistCardProps {
   playlist: PharmacyPlaylistDto;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
-  onClone: (id: string) => void;
 }
 
-const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onSelect, onDelete, onClone }) => {
+const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onSelect, onDelete }) => {
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -68,15 +67,6 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ playlist, onSelect, onDelet
             className="flex-1 py-2 px-4 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600"
           >
             편집
-          </button>
-          <button
-            onClick={() => onClone(playlist.id)}
-            className="py-2 px-4 border border-blue-300 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50"
-            title="플레이리스트 복제"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
           </button>
           <button
             onClick={() => onDelete(playlist.id)}
@@ -398,7 +388,7 @@ const PlaylistEditor: React.FC<PlaylistEditorProps> = ({ playlistId, onBack }) =
 // ==================== Main Playlists Component ====================
 
 export const Playlists: React.FC = () => {
-  const { playlists, loading, error, refresh, createPlaylist, deletePlaylist, clonePlaylist } = usePlaylists();
+  const { playlists, loading, error, refresh, createPlaylist, deletePlaylist } = usePlaylists();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPlaylistId, setEditingPlaylistId] = useState<string | null>(null);
 
@@ -409,17 +399,6 @@ export const Playlists: React.FC = () => {
   const handleDelete = async (playlistId: string) => {
     if (window.confirm('이 플레이리스트를 삭제하시겠습니까?')) {
       await deletePlaylist(playlistId);
-    }
-  };
-
-  const handleClone = async (playlistId: string) => {
-    const playlist = playlists.find((p) => p.id === playlistId);
-    const newName = window.prompt(
-      '복제할 플레이리스트의 이름을 입력하세요:',
-      playlist ? `${playlist.name} (복사본)` : '복사본'
-    );
-    if (newName) {
-      await clonePlaylist(playlistId, newName);
     }
   };
 
@@ -478,7 +457,6 @@ export const Playlists: React.FC = () => {
               playlist={playlist}
               onSelect={setEditingPlaylistId}
               onDelete={handleDelete}
-              onClone={handleClone}
             />
           ))}
         </div>

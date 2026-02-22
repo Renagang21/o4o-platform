@@ -4,8 +4,8 @@
   "private": true,
   "description": "Market Trial App - Supplier product trial funding with seller/partner participation",
   "o4o:packageType": "extension",
-  "o4o:status": "experimental",
-  "o4o:note": "Experimental extension - No service template yet.",
+  "o4o:status": "active",
+  "o4o:note": "DB-persistent domain. WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -19,8 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/types": "workspace:*",
-    "@o4o/dropshipping-core": "workspace:*"
+    "@o4o/types": "workspace:*"
   },
   "peerDependencies": {
     "typeorm": "^0.3.0",

@@ -2492,9 +2492,6 @@ importers:
 
   packages/market-trial:
     dependencies:
-      '@o4o/dropshipping-core':
-        specifier: workspace:*
-        version: link:../dropshipping-core
       '@o4o/types':
         specifier: workspace:*
         version: link:../types
@@ -3127,6 +3124,25 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/store-asset-policy-core:
+    dependencies:
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/store-core: {}
 
   packages/store-ui-core:
@@ -3556,6 +3572,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-asset-policy-core':
+        specifier: workspace:*
+        version: link:../../packages/store-asset-policy-core
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
@@ -3708,15 +3727,15 @@ importers:
       '@o4o/forum-core':
         specifier: workspace:*
         version: link:../../packages/forum-core
-      '@o4o/hub-core':
-        specifier: workspace:*
-        version: link:../../packages/hub-core
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-asset-policy-core':
+        specifier: workspace:*
+        version: link:../../packages/store-asset-policy-core
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
@@ -18494,7 +18513,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
+      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:

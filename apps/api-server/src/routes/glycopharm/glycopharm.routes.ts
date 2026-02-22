@@ -23,7 +23,7 @@ import { createStoreController } from './controllers/store.controller.js'; // WO
 import { createTabletController } from './controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
 import { createBlogController } from './controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
 import { createLayoutController } from './controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
-import { createPharmacyController, createB2BController, createMarketTrialsController } from './controllers/pharmacy.controller.js';
+import { createPharmacyController, createB2BController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
 import { createFunnelController } from './controllers/funnel.controller.js'; // Phase 3-A: Funnel Visualization
@@ -262,12 +262,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/b2b', b2bController);
 
-  // Market trials routes
-  const marketTrialsController = createMarketTrialsController(
-    dataSource,
-    coreRequireAuth as any
-  );
-  router.use('/market-trials', marketTrialsController);
+  // Market trials: WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1
+  // Removed glycopharm-specific stub. Use common API: GET /api/market-trial?serviceKey=glycopharm
 
   // Forums list endpoint (for pharmacy forum extension)
   router.get('/forums', coreRequireAuth as any, async (_req, res) => {

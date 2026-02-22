@@ -3,6 +3,7 @@
  *
  * WO-KPA-A-ASSET-CONTROL-EXTENSION-V1: publish status
  * WO-KPA-A-ASSET-CONTROL-EXTENSION-V2: channel_map, forced restrictions
+ * WO-O4O-SNAPSHOT-POLICY-MIGRATION-V1: snapshot_type, lifecycle_status
  *
  * Extension layer for asset operational control.
  * Core(o4o_asset_snapshots) is FROZEN — this controller manages
@@ -113,7 +114,9 @@ export function createStoreAssetControlController(
             c.forced_by_admin_id AS "forcedByAdminId",
             c.forced_start_at AS "forcedStartAt",
             c.forced_end_at AS "forcedEndAt",
-            COALESCE(c.is_locked, false) AS "isLocked"
+            COALESCE(c.is_locked, false) AS "isLocked",
+            COALESCE(c.snapshot_type, 'user_copy') AS "snapshotType",
+            COALESCE(c.lifecycle_status, 'active') AS "lifecycleStatus"
           FROM o4o_asset_snapshots s
           LEFT JOIN kpa_store_asset_controls c
             ON c.snapshot_id = s.id AND c.organization_id = s.organization_id

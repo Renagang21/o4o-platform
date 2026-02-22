@@ -128,6 +128,44 @@ export class MarketTrial {
   @Index()
   status!: TrialStatus;
 
+  /**
+   * Supplier display name (denormalized for listing)
+   */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  supplierName?: string;
+
+  /**
+   * Roles eligible to participate (e.g. ['partner', 'seller'])
+   */
+  @Column({ type: 'jsonb', default: '["partner","seller"]' })
+  eligibleRoles!: string[];
+
+  /**
+   * Available reward options (e.g. ['cash', 'product'])
+   */
+  @Column({ type: 'jsonb', default: '["cash","product"]' })
+  rewardOptions!: string[];
+
+  /**
+   * Maximum number of participants (null = unlimited)
+   */
+  @Column({ type: 'int', nullable: true })
+  maxParticipants?: number;
+
+  /**
+   * Current participant count (denormalized for listing)
+   */
+  @Column({ type: 'int', default: 0 })
+  currentParticipants!: number;
+
+  /**
+   * Service keys this trial is visible to (e.g. ['glycopharm', 'k-cosmetics'])
+   * Empty array = visible to all (or unscoped)
+   * WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1
+   */
+  @Column({ type: 'jsonb', default: '[]' })
+  visibleServiceKeys!: string[];
+
   @CreateDateColumn()
   createdAt!: Date;
 

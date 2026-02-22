@@ -225,14 +225,8 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // DELETE /api/signage/:serviceKey/hq/media/:id - Delete HQ media (Operator only)
   router.delete('/hq/media/:id', requireSignageOperator, controller.deleteMedia);
 
-  // ========== Clone Routes (Store can clone global content) ==========
-  // Stores clone global content to create their own editable copies
-
-  // POST /api/signage/:serviceKey/playlists/:id/clone - Clone a playlist to store
-  router.post('/playlists/:id/clone', requireSignageStore, controller.clonePlaylist);
-
-  // POST /api/signage/:serviceKey/media/:id/clone - Clone media to store
-  router.post('/media/:id/clone', requireSignageStore, controller.cloneMedia);
+  // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
+  // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)
 
   return router;
 }

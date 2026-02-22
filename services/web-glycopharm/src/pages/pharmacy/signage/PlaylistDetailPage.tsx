@@ -2,12 +2,15 @@
  * PlaylistDetailPage - 플레이리스트 상세 페이지
  *
  * WO-SIGNAGE-PLAYLIST-DETAIL-V1
+ * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 경로 제거
+ *
+ * ❌ globalContentApi.clone* 사용 금지
  */
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Play, Clock, User, Calendar, Film, List } from 'lucide-react';
-import { publicContentApi, globalContentApi, type SignagePlaylist, type SignagePlaylistItem } from '@/lib/api/signageV2';
+import { ArrowLeft, Play, Clock, User, Calendar, Film, List } from 'lucide-react';
+import { publicContentApi, type SignagePlaylist, type SignagePlaylistItem } from '@/lib/api/signageV2';
 import type { ContentSource } from '@/lib/api/signageV2';
 import { extractYouTubeVideoId, getMediaPlayUrl, getMediaThumbnailUrl, SIGNAGE_SOURCE_LABELS, SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
 
@@ -32,7 +35,6 @@ export default function PlaylistDetailPage() {
   const [playlist, setPlaylist] = useState<SignagePlaylist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<SignagePlaylistItem | null>(null);
 
   useEffect(() => {
@@ -50,21 +52,6 @@ export default function PlaylistDetailPage() {
       .catch(() => setError('데이터를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [id]);
-
-  const handleClone = async () => {
-    if (!playlist) return;
-    try {
-      const result = await globalContentApi.clonePlaylist(playlist.id);
-      if (result.success) {
-        setCloneSuccess(`"${playlist.name}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '플레이리스트를 복사하지 못했습니다.');
-      }
-    } catch {
-      setError('플레이리스트 복사 중 오류가 발생했습니다.');
-    }
-  };
 
   const getEmbedContent = () => {
     const media = selectedItem?.media;
@@ -148,13 +135,6 @@ export default function PlaylistDetailPage() {
         <ArrowLeft className="h-4 w-4" /> 콘텐츠 허브
       </button>
 
-      {cloneSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-700">
-          <Download className="h-4 w-4" />
-          <span>{cloneSuccess}</span>
-        </div>
-      )}
-
       {/* Header */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
         <div className="flex items-start justify-between gap-4">
@@ -181,13 +161,6 @@ export default function PlaylistDetailPage() {
               <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {new Date(playlist.createdAt).toLocaleDateString()}</span>
             </div>
           </div>
-          <button
-            onClick={handleClone}
-            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Download className="h-4 w-4" />
-            가져오기
-          </button>
         </div>
       </div>
 

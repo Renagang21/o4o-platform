@@ -8,11 +8,12 @@
  * kpa_store_contents LEFT JOIN으로 매장 편집 콘텐츠 우선 적용.
  *
  * 필터링 정책:
- * 1. publish_status = 'published' (draft/hidden 제외)
- * 2. forced 항목: 기간 유효성 검증 (start/end)
- * 3. channel_map: 지정된 채널키가 true인 항목만
- * 4. control row 없음 → draft로 간주 → 렌더 제외
- * 5. store content 존재 시 title/content_json 우선 사용
+ * 1. lifecycle_status = 'active' (expired/archived 제외)
+ * 2. publish_status = 'published' (draft/hidden 제외)
+ * 3. forced 항목: 기간 유효성 검증 (start/end)
+ * 4. channel_map: 지정된 채널키가 true인 항목만
+ * 5. control row 없음 → draft로 간주 → 렌더 제외
+ * 6. store content 존재 시 title/content_json 우선 사용
  */
 
 /**
@@ -50,6 +51,8 @@ export function buildPublishedAssetQuery(
   // INNER JOIN required — control row must exist AND be published
   const conditions: string[] = [
     `s.organization_id = $1`,
+    // V3: lifecycle gate — only active assets are rendered
+    `c.lifecycle_status = 'active'`,
     `c.publish_status = 'published'`,
     // Forced period filter: exclude expired forced items
     `(
@@ -108,6 +111,8 @@ export function buildPublishedAssetQuery(
       c.is_forced AS "isForced",
       c.forced_start_at AS "forcedStartAt",
       c.forced_end_at AS "forcedEndAt",
+      c.snapshot_type AS "snapshotType",
+      c.lifecycle_status AS "lifecycleStatus",
       CASE WHEN sc.id IS NOT NULL THEN true ELSE false END AS "hasStoreContent"
     FROM o4o_asset_snapshots s
     INNER JOIN kpa_store_asset_controls c

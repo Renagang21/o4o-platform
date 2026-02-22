@@ -246,6 +246,20 @@ import {
 } from '../routes/siteguide/entities/index.js';
 
 // ============================================================================
+// MARKET-TRIAL CORE ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
+// ============================================================================
+import {
+  MarketTrial,
+  MarketTrialParticipant,
+  MarketTrialForum,
+  MarketTrialDecision,
+} from '@o4o/market-trial';
+
+// MARKET-TRIAL EXTENSION ENTITIES
+import { MarketTrialShippingAddress } from '../extensions/trial-shipping/entities/MarketTrialShippingAddress.entity.js';
+import { MarketTrialFulfillment } from '../extensions/trial-fulfillment/entities/MarketTrialFulfillment.entity.js';
+
+// ============================================================================
 // PLATFORM PHYSICAL STORE ENTITIES (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
 // ============================================================================
 import {
@@ -734,6 +748,15 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PlatformStorePolicy,
     PlatformStorePaymentConfig,
+    // ============================================================================
+    // MARKET-TRIAL ENTITIES (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
+    // ============================================================================
+    MarketTrial,
+    MarketTrialParticipant,
+    MarketTrialForum,
+    MarketTrialDecision,
+    MarketTrialShippingAddress,
+    MarketTrialFulfillment,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

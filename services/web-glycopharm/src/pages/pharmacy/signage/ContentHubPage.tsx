@@ -2,16 +2,17 @@
  * Content Hub Page
  *
  * WO-SIGNAGE-CONTENT-HUB-V1
+ * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 경로 제거, publicContentApi 단일 사용
+ *
  * - 디지털 사이니지 콘텐츠 허브 페이지
  * - 운영자/공급자/커뮤니티 콘텐츠를 탭별로 표시
- * - 보기 + 내 대시보드로 가져오기(Clone) 기능
- * WO-APP-CONTENT-DISCOVERY-PHASE1-V1: ContentPagination
+ * - ❌ globalContentApi.clone* 사용 금지
  */
 
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Download, Video as VideoIcon, List, AlertCircle } from 'lucide-react';
-import { globalContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
+import { Video as VideoIcon, List, AlertCircle } from 'lucide-react';
+import { publicContentApi, type SignagePlaylist, type SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 import { ContentPagination } from '@o4o/ui';
 
 type ContentType = 'playlists' | 'media';
@@ -27,7 +28,6 @@ export default function ContentHubPage() {
   const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Load content when source or type changes
@@ -42,14 +42,14 @@ export default function ContentHubPage() {
 
     try {
       if (contentType === 'playlists') {
-        const result = await globalContentApi.listPlaylists(activeSource, 'glycopharm', { page: 1, limit: 50 });
+        const result = await publicContentApi.listPlaylists(activeSource, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setAllPlaylists(result.data.items || []);
         } else {
           setError(result.error || 'Failed to load playlists');
         }
       } else {
-        const result = await globalContentApi.listMedia(activeSource, 'glycopharm', { page: 1, limit: 50 });
+        const result = await publicContentApi.listMedia(activeSource, 'glycopharm', { page: 1, limit: 50 });
         if (result.success && result.data) {
           setAllMedia(result.data.items || []);
         } else {
@@ -81,34 +81,6 @@ export default function ContentHubPage() {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
-    try {
-      const result = await globalContentApi.clonePlaylist(playlistId, 'glycopharm');
-      if (result.success) {
-        setCloneSuccess(`"${playlistName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '플레이리스트를 복사하지 못했습니다.');
-      }
-    } catch (error) {
-      setError('플레이리스트 복사 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleCloneMedia = async (mediaId: string, mediaName: string) => {
-    try {
-      const result = await globalContentApi.cloneMedia(mediaId, 'glycopharm');
-      if (result.success) {
-        setCloneSuccess(`"${mediaName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '미디어를 복사하지 못했습니다.');
-      }
-    } catch (error) {
-      setError('미디어 복사 중 오류가 발생했습니다.');
-    }
   };
 
   const getSourceLabel = (source: ContentSource): string => {
@@ -168,15 +140,6 @@ export default function ContentHubPage() {
           </div>
         </div>
       </div>
-      <div className="px-4 pb-4 flex gap-2">
-        <button
-          onClick={(e) => { e.stopPropagation(); handleClonePlaylist(playlist.id, playlist.name); }}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          내 대시보드에 가져오기
-        </button>
-      </div>
     </div>
   );
 
@@ -223,15 +186,6 @@ export default function ContentHubPage() {
             <span className="font-medium">{new Date(item.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
-      </div>
-      <div className="px-4 pb-4 flex gap-2">
-        <button
-          onClick={(e) => { e.stopPropagation(); handleCloneMedia(item.id, item.name); }}
-          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium text-primary-700 bg-primary-100 rounded-lg hover:bg-primary-200 transition-colors"
-        >
-          <Download className="h-4 w-4" />
-          내 대시보드에 가져오기
-        </button>
       </div>
     </div>
   );
@@ -301,17 +255,9 @@ export default function ContentHubPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-800">디지털 사이니지 콘텐츠</h1>
         <p className="text-slate-500 mt-1">
-          동영상과 플레이리스트를 탐색하고 내 대시보드로 가져올 수 있습니다
+          동영상과 플레이리스트를 탐색할 수 있습니다
         </p>
       </div>
-
-      {/* Success Message */}
-      {cloneSuccess && (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-700">
-          <Download className="h-4 w-4" />
-          <span>{cloneSuccess}</span>
-        </div>
-      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-xl border border-slate-200">

@@ -8,7 +8,7 @@
  * - Create global playlists and media
  * - Manage forced items
  * - Track content distribution
- * - Analytics on clone/download counts
+ * - Analytics on download counts
  */
 
 import { useState, useEffect } from 'react';
@@ -723,7 +723,7 @@ export default function HQContentManager() {
           title="Downloads"
           value={stats.totalDownloads}
           icon={Download}
-          description="Total clones"
+          description="Total downloads"
         />
         <StatsCard
           title="Likes"

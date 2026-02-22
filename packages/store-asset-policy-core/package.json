@@ -1,0 +1,20 @@
+{
+  "name": "@o4o/store-asset-policy-core",
+  "version": "1.0.0",
+  "description": "O4O Store Asset Policy Core - shared snapshot policy, types, and asset management components",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "lucide-react": ">=0.300.0"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

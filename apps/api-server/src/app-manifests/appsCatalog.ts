@@ -582,7 +582,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     tags: ['market-trial', '시범판매', 'trial', 'funding', '펀딩', 'supplier', 'seller', 'partner', 'experimental'],
     type: 'extension',
     status: 'experimental',
-    dependencies: { 'dropshipping-core': '>=1.0.0' },
+    dependencies: {},
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'supplierops', 'sellerops'],
   },

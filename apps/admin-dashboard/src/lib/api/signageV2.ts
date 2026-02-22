@@ -938,6 +938,8 @@ export const aiGenerationApi = {
 };
 
 // Global Content API (Content Hub)
+// WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 메서드 제거 (clonePlaylist, cloneMedia 삭제)
+// ❌ globalContentApi.clone* 사용 금지
 export type ContentSource = 'hq' | 'supplier' | 'community';
 
 export const globalContentApi = {
@@ -970,26 +972,6 @@ export const globalContentApi = {
     } catch (error) {
       console.error(`Failed to list ${source} media:`, error);
       return { success: false, error: `Failed to list ${source} media` };
-    }
-  },
-
-  async clonePlaylist(id: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/playlists/${id}/clone`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to clone playlist:', error);
-      return { success: false, error: 'Failed to clone playlist' };
-    }
-  },
-
-  async cloneMedia(id: string, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/media/${id}/clone`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to clone media:', error);
-      return { success: false, error: 'Failed to clone media' };
     }
   },
 };

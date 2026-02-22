@@ -1,10 +1,9 @@
 /**
  * MarketTrialListPage - Market Trial 목록 (Pharmacy)
  *
- * Trial 제품 열람 및 활용 연결
- * - Signage에 사용
- * - 판매 페이지 보기
- * - 관련 포럼 보기
+ * WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1:
+ * 공통 API (/api/market-trial?serviceKey=glycopharm) 사용.
+ * 독자 타입 제거, 공통 TrialStatus 기반 display group 매핑.
  */
 
 import { useState, useEffect } from 'react';
@@ -25,9 +24,47 @@ import {
 } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import { LoadingState, EmptyState } from '@/components/common';
-import type { TrialItem, TrialStatus } from '@/types';
 
-const statusFilters: { value: TrialStatus | 'all'; label: string }[] = [
+/** Common trial DTO from /api/market-trial */
+interface MarketTrialItem {
+  id: string;
+  title: string;
+  description: string | null;
+  supplierId: string;
+  supplierName?: string;
+  status: string;
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+  };
+  startDate?: string;
+  endDate?: string;
+  maxParticipants?: number;
+  currentParticipants: number;
+  createdAt: string;
+}
+
+type DisplayGroup = 'upcoming' | 'active' | 'ended';
+
+function getDisplayGroup(status: string): DisplayGroup {
+  switch (status) {
+    case 'draft':
+    case 'submitted':
+    case 'approved':
+      return 'upcoming';
+    case 'recruiting':
+    case 'development':
+    case 'outcome_confirming':
+      return 'active';
+    case 'fulfilled':
+    case 'closed':
+      return 'ended';
+    default:
+      return 'active';
+  }
+}
+
+const statusFilters: { value: DisplayGroup | 'all'; label: string }[] = [
   { value: 'all', label: '전체' },
   { value: 'active', label: '진행중' },
   { value: 'upcoming', label: '예정' },
@@ -36,24 +73,21 @@ const statusFilters: { value: TrialStatus | 'all'; label: string }[] = [
 
 export default function MarketTrialListPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<TrialStatus | 'all'>('all');
-  const [connectionModal, setConnectionModal] = useState<{ trial: TrialItem; type: 'signage' | 'store' | 'forum' } | null>(null);
+  const [statusFilter, setStatusFilter] = useState<DisplayGroup | 'all'>('all');
+  const [connectionModal, setConnectionModal] = useState<{ trial: MarketTrialItem; type: 'signage' | 'store' | 'forum' } | null>(null);
 
-  // API 상태
-  const [trials, setTrials] = useState<TrialItem[]>([]);
+  const [trials, setTrials] = useState<MarketTrialItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Trial 목록 로드
   useEffect(() => {
     const fetchTrials = async () => {
       setIsLoading(true);
       try {
-        const response = await apiClient.get<TrialItem[]>('/api/v1/glycopharm/market-trials');
+        const response = await apiClient.get<MarketTrialItem[]>('/api/market-trial?serviceKey=glycopharm');
         if (response.data) {
           setTrials(response.data);
         }
       } catch {
-        // API가 없거나 에러 시 빈 배열 유지
         setTrials([]);
       } finally {
         setIsLoading(false);
@@ -64,16 +98,17 @@ export default function MarketTrialListPage() {
 
   const filteredTrials = trials.filter((trial) => {
     const matchesSearch =
-      trial.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      trial.supplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      trial.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || trial.status === statusFilter;
-    const isVisible = trial.isActive || trial.status === 'ended';
-    return matchesSearch && matchesStatus && isVisible;
+      trial.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (trial.supplierName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (trial.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const group = getDisplayGroup(trial.status);
+    const matchesStatus = statusFilter === 'all' || group === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: TrialStatus) => {
-    switch (status) {
+  const getStatusBadge = (status: string) => {
+    const group = getDisplayGroup(status);
+    switch (group) {
       case 'active':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
@@ -98,21 +133,8 @@ export default function MarketTrialListPage() {
     }
   };
 
-  const handleConnection = (trial: TrialItem, type: 'signage' | 'store' | 'forum') => {
-    // 이미 연결된 경우 해당 페이지로 이동
-    if (type === 'signage' && trial.signageContentId) {
-      // Navigate to signage
-      setConnectionModal({ trial, type });
-    } else if (type === 'store' && trial.storeProductId) {
-      // Navigate to store
-      setConnectionModal({ trial, type });
-    } else if (type === 'forum' && trial.forumPostId) {
-      // Navigate to forum
-      setConnectionModal({ trial, type });
-    } else {
-      // 연결 모달 표시
-      setConnectionModal({ trial, type });
-    }
+  const handleConnection = (trial: MarketTrialItem, type: 'signage' | 'store' | 'forum') => {
+    setConnectionModal({ trial, type });
   };
 
   if (isLoading) {
@@ -132,7 +154,6 @@ export default function MarketTrialListPage() {
       {/* Search & Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-4 space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
@@ -144,7 +165,6 @@ export default function MarketTrialListPage() {
             />
           </div>
 
-          {/* Status Filter */}
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-slate-400" />
             {statusFilters.map((filter) => (
@@ -166,100 +186,92 @@ export default function MarketTrialListPage() {
 
       {/* Trial Cards */}
       <div className="grid md:grid-cols-2 gap-6">
-        {filteredTrials.map((trial) => (
-          <div
-            key={trial.id}
-            className={`bg-white rounded-2xl shadow-sm overflow-hidden ${
-              trial.status === 'ended' ? 'opacity-60' : ''
-            }`}
-          >
-            {/* Card Header */}
-            <div className="p-5 border-b border-slate-100">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    {getStatusBadge(trial.status)}
-                    <span className="text-xs text-slate-400 flex items-center gap-1">
-                      <Building2 className="w-3 h-3" />
-                      {trial.supplier}
-                    </span>
+        {filteredTrials.map((trial) => {
+          const group = getDisplayGroup(trial.status);
+          return (
+            <div
+              key={trial.id}
+              className={`bg-white rounded-2xl shadow-sm overflow-hidden ${
+                group === 'ended' ? 'opacity-60' : ''
+              }`}
+            >
+              {/* Card Header */}
+              <div className="p-5 border-b border-slate-100">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {getStatusBadge(trial.status)}
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Building2 className="w-3 h-3" />
+                        {trial.supplierName || '공급자'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-800 mb-1">
+                      {trial.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 line-clamp-2">
+                      {trial.description}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-800 mb-1">
-                    {trial.productName}
-                  </h3>
-                  <p className="text-sm text-slate-500 line-clamp-2">
-                    {trial.description}
+                  <div className="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    <Tag className="w-8 h-8 text-slate-300" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Trial Purpose / Outcome */}
+              {trial.outcomeSnapshot?.description && (
+                <div className="px-5 py-3 bg-primary-50">
+                  <p className="text-sm text-primary-700">
+                    <span className="font-medium">Trial 목적:</span> {trial.outcomeSnapshot.description}
                   </p>
                 </div>
-                {/* Product Image Placeholder */}
-                <div className="w-20 h-20 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-                  <Tag className="w-8 h-8 text-slate-300" />
+              )}
+
+              {/* Period */}
+              {(trial.startDate || trial.endDate) && (
+                <div className="px-5 py-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>
+                      {trial.startDate ? new Date(trial.startDate).toLocaleDateString() : '?'} ~{' '}
+                      {trial.endDate ? new Date(trial.endDate).toLocaleDateString() : '?'}
+                    </span>
+                  </div>
                 </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="p-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleConnection(trial, 'signage')}
+                  disabled={group === 'ended'}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Monitor className="w-4 h-4" />
+                  사이니지에 사용
+                </button>
+
+                <button
+                  onClick={() => handleConnection(trial, 'store')}
+                  disabled={group === 'ended'}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  판매 연결
+                </button>
+
+                <button
+                  onClick={() => handleConnection(trial, 'forum')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-slate-100 text-slate-600 hover:bg-slate-200"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  포럼 연결
+                </button>
               </div>
             </div>
-
-            {/* Trial Purpose */}
-            <div className="px-5 py-3 bg-primary-50">
-              <p className="text-sm text-primary-700">
-                <span className="font-medium">Trial 목적:</span> {trial.trialPurpose}
-              </p>
-            </div>
-
-            {/* Period */}
-            <div className="px-5 py-3 border-b border-slate-100">
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Calendar className="w-4 h-4" />
-                <span>
-                  {trial.startDate} ~ {trial.endDate}
-                </span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="p-4 flex flex-wrap gap-2">
-              {/* Signage 연결 */}
-              <button
-                onClick={() => handleConnection(trial, 'signage')}
-                disabled={trial.status === 'ended'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  trial.signageContentId
-                    ? 'bg-accent-100 text-accent-700 hover:bg-accent-200'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                <Monitor className="w-4 h-4" />
-                {trial.signageContentId ? '사이니지 보기' : '사이니지에 사용'}
-              </button>
-
-              {/* Store 연결 */}
-              <button
-                onClick={() => handleConnection(trial, 'store')}
-                disabled={trial.status === 'ended'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  trial.storeProductId
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                <ShoppingBag className="w-4 h-4" />
-                {trial.storeProductId ? '판매 페이지' : '판매 연결'}
-              </button>
-
-              {/* Forum 연결 */}
-              <button
-                onClick={() => handleConnection(trial, 'forum')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                  trial.forumPostId
-                    ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                {trial.forumPostId ? '포럼 보기' : '포럼 연결'}
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Empty State */}
@@ -284,14 +296,13 @@ export default function MarketTrialListPage() {
             </h3>
 
             <p className="text-slate-600 mb-6">
-              <span className="font-medium">{connectionModal.trial.productName}</span>을(를){' '}
+              <span className="font-medium">{connectionModal.trial.title}</span>을(를){' '}
               {connectionModal.type === 'signage' && '사이니지 콘텐츠로 등록하시겠습니까?'}
               {connectionModal.type === 'store' && '판매 상품으로 등록하시겠습니까?'}
               {connectionModal.type === 'forum' && '포럼에 소개하시겠습니까?'}
             </p>
 
-            {/* 연결된 경우 바로 이동 옵션 */}
-            {connectionModal.type === 'signage' && connectionModal.trial.signageContentId && (
+            {connectionModal.type === 'signage' && (
               <NavLink
                 to="/store/signage/library"
                 className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-accent-600 text-white rounded-xl font-medium hover:bg-accent-700 transition-colors mb-3"
@@ -301,7 +312,7 @@ export default function MarketTrialListPage() {
               </NavLink>
             )}
 
-            {connectionModal.type === 'forum' && connectionModal.trial.forumPostId && (
+            {connectionModal.type === 'forum' && (
               <NavLink
                 to="/forum"
                 className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors mb-3"
@@ -318,20 +329,6 @@ export default function MarketTrialListPage() {
               >
                 닫기
               </button>
-              {!((connectionModal.type === 'signage' && connectionModal.trial.signageContentId) ||
-                (connectionModal.type === 'store' && connectionModal.trial.storeProductId) ||
-                (connectionModal.type === 'forum' && connectionModal.trial.forumPostId)) && (
-                <button
-                  onClick={() => {
-                    // TODO: API 연동 시 실제 연결 로직
-                    alert(`${connectionModal.trial.productName} - ${connectionModal.type} 연결 완료 (Mock)`);
-                    setConnectionModal(null);
-                  }}
-                  className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition-colors"
-                >
-                  연결하기
-                </button>
-              )}
             </div>
           </div>
         </div>

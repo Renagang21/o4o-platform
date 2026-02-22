@@ -4,24 +4,26 @@
  * WO-SIGNAGE-CONTENT-HUB-V1
  * - 디지털 사이니지 콘텐츠 허브 페이지
  * - 운영자/공급자/커뮤니티 콘텐츠를 탭별로 표시
- * - 보기 + 내 대시보드로 가져오기(Clone) 기능
+ * - 보기 전용 (browse-only)
+ *
+ * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 경로 제거
+ *
+ * ❌ globalContentApi.clone* 사용 금지
  */
 
 import { useEffect, useState } from 'react';
-import { Download, Play, Image as ImageIcon, Video, List, AlertCircle } from 'lucide-react';
+import { Play, Image as ImageIcon, Video, List, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/hooks/use-toast';
 import { globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '@/lib/api/signageV2';
 
 type ContentType = 'playlists' | 'media';
 
 export default function ContentHub() {
-  const { toast } = useToast();
   const [activeSource, setActiveSource] = useState<ContentSource>('hq');
   const [contentType, setContentType] = useState<ContentType>('playlists');
 
@@ -61,54 +63,6 @@ export default function ContentHub() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
-    try {
-      const result = await globalContentApi.clonePlaylist(playlistId, 'neture');
-      if (result.success) {
-        toast({
-          title: '플레이리스트 복사 완료',
-          description: `"${playlistName}"를 내 대시보드로 가져왔습니다.`,
-        });
-      } else {
-        toast({
-          title: '복사 실패',
-          description: result.error || '플레이리스트를 복사하지 못했습니다.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: '오류',
-        description: '플레이리스트 복사 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleCloneMedia = async (mediaId: string, mediaName: string) => {
-    try {
-      const result = await globalContentApi.cloneMedia(mediaId, 'neture');
-      if (result.success) {
-        toast({
-          title: '미디어 복사 완료',
-          description: `"${mediaName}"를 내 대시보드로 가져왔습니다.`,
-        });
-      } else {
-        toast({
-          title: '복사 실패',
-          description: result.error || '미디어를 복사하지 못했습니다.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: '오류',
-        description: '미디어 복사 중 오류가 발생했습니다.',
-        variant: 'destructive',
-      });
     }
   };
 
@@ -165,17 +119,6 @@ export default function ContentHub() {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleClonePlaylist(playlist.id, playlist.name)}
-          className="flex-1"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          내 대시보드에 가져오기
-        </Button>
-      </CardFooter>
     </Card>
   );
 
@@ -219,17 +162,6 @@ export default function ContentHub() {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleCloneMedia(item.id, item.name)}
-          className="flex-1"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          내 대시보드에 가져오기
-        </Button>
-      </CardFooter>
     </Card>
   );
 
@@ -290,7 +222,7 @@ export default function ContentHub() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">디지털 사이니지 콘텐츠</h1>
         <p className="text-muted-foreground">
-          동영상과 플레이리스트를 탐색하고 내 대시보드로 가져올 수 있습니다
+          동영상과 플레이리스트를 탐색할 수 있습니다
         </p>
       </div>
 

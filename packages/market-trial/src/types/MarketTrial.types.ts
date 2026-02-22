@@ -56,6 +56,9 @@ export interface MarketTrialDTO {
   /** Trial 종료일 */
   endDate?: string;
 
+  /** 노출 서비스 목록 (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1) */
+  visibleServiceKeys?: string[];
+
   createdAt: string;
   updatedAt: string;
 }
@@ -89,3 +92,32 @@ export const TRIAL_STATUS_LABELS: Record<TrialStatus, string> = {
 
 // Re-export TrialStatus for convenience
 export { TrialStatus };
+
+/**
+ * WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1
+ *
+ * Frontend display group: 8-state TrialStatus → 3-state display
+ */
+export type TrialDisplayGroup = 'upcoming' | 'active' | 'ended';
+
+export function getTrialDisplayGroup(status: TrialStatus): TrialDisplayGroup {
+  switch (status) {
+    case TrialStatus.DRAFT:
+    case TrialStatus.SUBMITTED:
+    case TrialStatus.APPROVED:
+      return 'upcoming';
+    case TrialStatus.RECRUITING:
+    case TrialStatus.DEVELOPMENT:
+    case TrialStatus.OUTCOME_CONFIRMING:
+      return 'active';
+    case TrialStatus.FULFILLED:
+    case TrialStatus.CLOSED:
+      return 'ended';
+  }
+}
+
+export const DISPLAY_GROUP_LABELS: Record<TrialDisplayGroup, string> = {
+  upcoming: '예정',
+  active: '진행중',
+  ended: '종료',
+};

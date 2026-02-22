@@ -67,6 +67,9 @@ const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPag
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/store-ui-core';
 
+// Market Trial (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1)
+const MarketTrialListPage = lazy(() => import('@/pages/store/MarketTrialListPage'));
+
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
@@ -266,6 +269,7 @@ function AppRoutes() {
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
+        <Route path="market-trial" element={<MarketTrialListPage />} />
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 

@@ -107,6 +107,7 @@ const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
+const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
 
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
@@ -489,7 +490,7 @@ function AppRoutes() {
         {/* channels: 채널 관리 (WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 P3) */}
         <Route path="channels" element={<StorePlaceholderPage title="채널 관리" />} />
         <Route path="orders" element={<PharmacyOrders />} />
-        <Route path="content" element={<ContentHubPage />} />
+        <Route path="content" element={<StoreAssetsPage />} />
         <Route path="services" element={<PharmacyPatients />} />
         <Route path="settings" element={<PharmacySettings />} />
         <Route path="apply" element={<StoreApplyPage />} />
