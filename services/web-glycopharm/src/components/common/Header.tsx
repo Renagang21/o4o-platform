@@ -15,22 +15,20 @@ import {
   ChevronDown,
   Activity,
   Home,
+  HeartPulse,
   Users,
   Store,
   UserCircle,
 } from 'lucide-react';
 
 /**
- * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 4-메뉴
+ * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 5-메뉴
  * 로그인 여부와 무관하게 동일한 메뉴 구조.
  * 비로그인 시 접근하면 기능 안내 페이지(FeatureIntroPage)를 표시.
- *
- * Home 경로만 로그인 상태에 따라 다름:
- * - 비로그인: / (랜딩)
- * - pharmacy 로그인: /care (대시보드)
  */
 const menuItems = [
-  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/care', end: true },
+  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/', end: true },
+  { label: 'Care 관리', icon: HeartPulse, pathPublic: '/care', pathAuth: '/care', end: false },
   { label: '환자관리', icon: Users, pathPublic: '/care/patients', pathAuth: '/care/patients', end: false },
   { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },
   { label: '내정보', icon: UserCircle, pathPublic: '/mypage', pathAuth: '/mypage', end: false },
