@@ -220,29 +220,86 @@ export function createPharmacyController(
    * GET /pharmacy/customers
    * Get customers for the authenticated user's pharmacy
    *
-   * NOTE: Phase 4-A - Legacy Order System Deprecated
-   * Customer data was derived from orders. Returns empty until E-commerce Core integration.
+   * WO-CARE-CUSTOMERS-API-RESTORE-V1: stub 제거, glucoseview_customers 직접 조회
+   * - pharmacist_id = 로그인 userId 기준
+   * - safeQuery: 테이블 미존재 시 빈 배열 반환 (TABLE_MISSING 방어)
    */
   router.get(
     '/customers',
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const page = parseInt(req.query.page as string) || 1;
-        const pageSize = parseInt(req.query.pageSize as string) || 50;
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
 
-        // Phase 4-A: Legacy Order System removed
-        // Customer data was derived from orders - return empty until E-commerce Core integration
+        if (!userId) {
+          res.status(401).json({ error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
+          return;
+        }
+
+        const page = parseInt(req.query.page as string) || 1;
+        const pageSize = Math.min(parseInt(req.query.pageSize as string) || 50, 100);
+        const search = (req.query.search as string) || '';
+        const offset = (page - 1) * pageSize;
+
+        // Build WHERE clause
+        const conditions = ['c.pharmacist_id = $1'];
+        const params: any[] = [userId];
+
+        if (search.trim()) {
+          params.push(`%${search.trim()}%`);
+          conditions.push(`(c.name ILIKE $${params.length} OR c.phone ILIKE $${params.length})`);
+        }
+
+        const whereClause = conditions.join(' AND ');
+
+        // safeQuery: glucoseview_customers 테이블 미존재 시 빈 결과 반환
+        let items: any[] = [];
+        let total = 0;
+
+        try {
+          const [countResult, dataResult] = await Promise.all([
+            dataSource.query(
+              `SELECT COUNT(*)::int AS count FROM glucoseview_customers c WHERE ${whereClause}`,
+              params,
+            ),
+            dataSource.query(
+              `SELECT c.id, c.name, c.phone, c.email, c.birth_year, c.gender,
+                      c.visit_count, c.sync_status, c.last_visit, c.notes,
+                      c.created_at, c.updated_at
+               FROM glucoseview_customers c
+               WHERE ${whereClause}
+               ORDER BY c.created_at DESC
+               LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+              [...params, pageSize, offset],
+            ),
+          ]);
+
+          total = countResult[0]?.count ?? 0;
+          items = dataResult.map((row: any) => ({
+            id: row.id,
+            name: row.name,
+            phone: row.phone || '',
+            email: row.email || undefined,
+            totalOrders: 0,
+            totalSpent: 0,
+            status: 'active' as const,
+            createdAt: row.created_at?.toISOString?.() || row.created_at,
+          }));
+        } catch {
+          // Table missing — return empty (production may not have this table)
+          console.warn('[pharmacy/customers] glucoseview_customers table not available');
+        }
+
         res.json({
           success: true,
           data: {
-            items: [],
-            total: 0,
+            items,
+            total,
             page,
             pageSize,
-            totalPages: 0,
+            totalPages: Math.ceil(total / pageSize),
           },
-          _notice: 'Customer data migration in progress. Data will be available via E-commerce Core.',
         });
       } catch (error: any) {
         console.error('Failed to get pharmacy customers:', error);
