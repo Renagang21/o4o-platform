@@ -1108,6 +1108,15 @@ const startServer = async () => {
       logger.error('Failed to register Demo Seed routes:', seedDemoError);
     }
 
+    // 37-c. Register Care Diagnostic routes (WO-HOME-CGM-CARD-V1)
+    try {
+      const { createCareDiagnosticRouter } = await import('./modules/admin/care-diagnostic.controller.js');
+      app.use('/api/v1/ops/care-diagnostic', createCareDiagnosticRouter(AppDataSource));
+      logger.info('✅ Care Diagnostic routes registered at /api/v1/ops/care-diagnostic');
+    } catch (careDiagError) {
+      logger.error('Failed to register Care Diagnostic routes:', careDiagError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
