@@ -66,3 +66,51 @@ export async function fetchChannelOverview(): Promise<ChannelOverview[]> {
   );
   return response.data ?? [];
 }
+
+// ─────────────────────────────────────────────────────
+// Store KPI Summary (WO-O4O-STORE-KPI-REALDATA-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StoreKpiSummary {
+  todayOrders: number;
+  weekOrders: number;
+  monthOrders: number;
+  monthRevenue: number;
+  avgOrderValue: number;
+  lastMonthRevenue: number;
+}
+
+export async function fetchStoreKpiSummary(): Promise<StoreKpiSummary> {
+  const response = await apiClient.get<{ success: boolean; data: StoreKpiSummary }>(
+    '/store-hub/kpi-summary'
+  );
+  return response.data ?? {
+    todayOrders: 0, weekOrders: 0, monthOrders: 0,
+    monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0,
+  };
+}
+
+// ─────────────────────────────────────────────────────
+// Live Signals (WO-O4O-STORE-LIVE-SIGNAL-LAYER-V1)
+// ─────────────────────────────────────────────────────
+
+export interface LiveSignals {
+  newOrders: number;
+  pendingTabletRequests: number;
+  pendingSalesRequests: number;
+  surveyRequests: number;
+}
+
+const EMPTY_SIGNALS: LiveSignals = {
+  newOrders: 0,
+  pendingTabletRequests: 0,
+  pendingSalesRequests: 0,
+  surveyRequests: 0,
+};
+
+export async function fetchLiveSignals(): Promise<LiveSignals> {
+  const response = await apiClient.get<{ success: boolean; data: LiveSignals }>(
+    '/store-hub/live-signals'
+  );
+  return response.data ?? EMPTY_SIGNALS;
+}

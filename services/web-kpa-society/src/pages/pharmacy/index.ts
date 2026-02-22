@@ -59,5 +59,8 @@ export { StoreOrdersPage } from './StoreOrdersPage';
 // WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
 export { StoreBillingPage } from './StoreBillingPage';
 
+// WO-O4O-STORE-SIGNAGE-ENGINE-V1: 사이니지 운영 엔진
+export { StoreSignagePage } from './StoreSignagePage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

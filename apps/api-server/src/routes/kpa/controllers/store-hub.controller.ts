@@ -302,5 +302,207 @@ export function createStoreHubController(
     }
   );
 
+  /**
+   * GET /store-hub/kpi-summary
+   *
+   * WO-O4O-STORE-KPI-REALDATA-V1
+   *
+   * Returns order/revenue KPI summary from checkout_orders.
+   * Graceful degradation if table does not exist.
+   */
+  router.get(
+    '/kpi-summary',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(401).json({
+            success: false,
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+          });
+          return;
+        }
+
+        if (!isPharmacyOwnerRole(userRoles)) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
+          });
+          return;
+        }
+
+        const organizationId = await getUserOrganizationId(dataSource, userId);
+        if (!organizationId) {
+          res.json({
+            success: true,
+            data: {
+              todayOrders: 0, weekOrders: 0, monthOrders: 0,
+              monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0,
+            },
+          });
+          return;
+        }
+
+        // Single query aggregation — graceful degradation if checkout_orders missing
+        let kpi = {
+          todayOrders: 0,
+          weekOrders: 0,
+          monthOrders: 0,
+          monthRevenue: 0,
+          avgOrderValue: 0,
+          lastMonthRevenue: 0,
+        };
+
+        try {
+          const rows = await dataSource.query(
+            `SELECT
+               COUNT(*) FILTER (
+                 WHERE "createdAt" >= CURRENT_DATE AND status = 'paid'
+               )::int AS "todayOrders",
+               COUNT(*) FILTER (
+                 WHERE "createdAt" >= date_trunc('week', CURRENT_DATE) AND status = 'paid'
+               )::int AS "weekOrders",
+               COUNT(*) FILTER (
+                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
+               )::int AS "monthOrders",
+               COALESCE(SUM("totalAmount") FILTER (
+                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
+               ), 0)::numeric AS "monthRevenue",
+               COALESCE(SUM("totalAmount") FILTER (
+                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
+                   AND "createdAt" < date_trunc('month', CURRENT_DATE)
+                   AND status = 'paid'
+               ), 0)::numeric AS "lastMonthRevenue"
+             FROM checkout_orders
+             WHERE "sellerOrganizationId" = $1`,
+            [organizationId]
+          );
+
+          const row = rows[0];
+          if (row) {
+            const monthOrders = Number(row.todayOrders !== undefined ? row.monthOrders : 0);
+            const monthRevenue = Number(row.monthRevenue || 0);
+            kpi = {
+              todayOrders: Number(row.todayOrders || 0),
+              weekOrders: Number(row.weekOrders || 0),
+              monthOrders,
+              monthRevenue,
+              avgOrderValue: monthOrders > 0 ? Math.round(monthRevenue / monthOrders) : 0,
+              lastMonthRevenue: Number(row.lastMonthRevenue || 0),
+            };
+          }
+        } catch {
+          /* graceful degradation — checkout_orders table may not exist */
+        }
+
+        res.json({ success: true, data: kpi });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * GET /store-hub/live-signals
+   *
+   * WO-O4O-STORE-LIVE-SIGNAL-LAYER-V1
+   *
+   * Returns live operational signal counts for polling.
+   * Graceful degradation per data source.
+   */
+  router.get(
+    '/live-signals',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(401).json({
+            success: false,
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+          });
+          return;
+        }
+
+        if (!isPharmacyOwnerRole(userRoles)) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
+          });
+          return;
+        }
+
+        const organizationId = await getUserOrganizationId(dataSource, userId);
+
+        const signals = {
+          newOrders: 0,
+          pendingTabletRequests: 0,
+          pendingSalesRequests: 0,
+          surveyRequests: 0,
+        };
+
+        // 1. Unfulfilled paid orders — action signal, not daily stat
+        if (organizationId) {
+          try {
+            const rows = await dataSource.query(
+              `SELECT COUNT(*)::int AS count
+               FROM checkout_orders
+               WHERE "sellerOrganizationId" = $1
+                 AND status = 'paid'`,
+              [organizationId]
+            );
+            signals.newOrders = rows[0]?.count || 0;
+          } catch { /* checkout_orders may not exist */ }
+        }
+
+        // 2. Pending tablet requests (via pharmacy ownership)
+        try {
+          const rows = await dataSource.query(
+            `SELECT COUNT(*)::int AS count
+             FROM tablet_service_requests tsr
+             JOIN glycopharm_pharmacies gp ON gp.id = tsr.pharmacy_id
+             WHERE gp.created_by_user_id = $1
+               AND tsr.status = 'requested'`,
+            [userId]
+          );
+          signals.pendingTabletRequests = rows[0]?.count || 0;
+        } catch { /* table may not exist */ }
+
+        // 3. Pending customer requests — sales + survey (via pharmacy ownership)
+        try {
+          const rows = await dataSource.query(
+            `SELECT
+               COUNT(*) FILTER (WHERE purpose = 'order')::int AS "salesCount",
+               COUNT(*) FILTER (WHERE purpose = 'survey_followup')::int AS "surveyCount"
+             FROM glycopharm_customer_requests gcr
+             JOIN glycopharm_pharmacies gp ON gp.id = gcr.pharmacy_id
+             WHERE gp.created_by_user_id = $1
+               AND gcr.status = 'pending'`,
+            [userId]
+          );
+          signals.pendingSalesRequests = rows[0]?.salesCount || 0;
+          signals.surveyRequests = rows[0]?.surveyCount || 0;
+        } catch { /* table may not exist */ }
+
+        res.json({ success: true, data: signals });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
   return router;
 }

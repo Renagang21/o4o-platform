@@ -2,10 +2,11 @@
  * PharmacyDashboardPage - 매장 운영 OS (5-Block 표준)
  *
  * WO-O4O-STORE-DASHBOARD-RESTRUCTURE-V1
+ * WO-O4O-STORE-KPI-REALDATA-V1: 매출/주문 실데이터 KPI 추가
  *
  * 5-Block 구조 (@o4o/operator-ux-core 재사용):
- *  [1] KPI Grid       — 판매 중 상품, 승인 대기, 공개 콘텐츠, 활성 채널, 이용 서비스
- *  [2] AI Summary     — KPI 기반 Rule-based 인사이트 (하드코딩 제거)
+ *  [1] KPI Grid       — 운영 KPI + 매출 KPI (2줄 Grid)
+ *  [2] AI Summary     — 운영 + 매출 통합 인사이트
  *  [3] Action Queue   — 조건부 즉시 처리 항목
  *  [4] Activity Log   — 최근 자산/신청/채널 활동
  *  [5] Quick Actions  — 매장 운영 바로가기
@@ -24,7 +25,9 @@ import {
 import { useOrganization } from '../../contexts';
 import {
   fetchChannelOverview,
+  fetchStoreKpiSummary,
   type ChannelOverview,
+  type StoreKpiSummary,
 } from '../../api/storeHub';
 import {
   getApplications,
@@ -37,6 +40,15 @@ import {
   type StoreAssetItem,
 } from '../../api/assetSnapshot';
 import { listPlatformServices, type PlatformServiceItem } from '../../api/platform-services';
+import { StoreLiveSignalBar } from '../../components/pharmacy/StoreLiveSignalBar';
+
+// ─── Helpers ───
+
+function formatCurrency(n: number): string {
+  if (n >= 10000) return `${Math.round(n / 10000)}만`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}천`;
+  return String(n);
+}
 
 // ─── Data Shape ───
 
@@ -46,12 +58,13 @@ interface StoreDashboardData {
   listings: ProductListing[];
   assets: StoreAssetItem[];
   services: PlatformServiceItem[];
+  kpiSummary: StoreKpiSummary;
 }
 
 // ─── Config Builder ───
 
 function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardConfig {
-  const { channels, applications, listings, assets, services } = data;
+  const { channels, applications, listings, assets, services, kpiSummary } = data;
 
   const approvedChannels = channels.filter(ch => ch.status === 'APPROVED');
   const activeListings = listings.filter(l => l.is_active);
@@ -61,9 +74,10 @@ function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardC
   const unpublishedAssets = assets.filter(a => a.publishStatus !== 'published');
   const enrolledServices = services.filter(s => s.enrollmentStatus === 'approved');
 
-  // ── Block 1: KPI Grid ──
+  // ── Block 1: KPI Grid (운영 + 매출) ──
 
   const kpis: KpiItem[] = [
+    // Row 1: 운영 KPI
     {
       key: 'active-listings',
       label: '판매 중 상품',
@@ -94,12 +108,71 @@ function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardC
       value: enrolledServices.length,
       status: 'neutral',
     },
+    // Row 2: 매출 KPI
+    {
+      key: 'today-orders',
+      label: '오늘 주문',
+      value: kpiSummary.todayOrders,
+      status: 'neutral',
+    },
+    {
+      key: 'week-orders',
+      label: '이번 주 주문',
+      value: kpiSummary.weekOrders,
+      status: 'neutral',
+    },
+    {
+      key: 'month-orders',
+      label: '이번 달 주문',
+      value: kpiSummary.monthOrders,
+      status: 'neutral',
+    },
+    {
+      key: 'month-revenue',
+      label: '이번 달 매출',
+      value: kpiSummary.monthRevenue > 0 ? `${formatCurrency(kpiSummary.monthRevenue)}원` : '0원',
+      status: 'neutral',
+    },
+    {
+      key: 'avg-order-value',
+      label: '평균 객단가',
+      value: kpiSummary.avgOrderValue > 0 ? `${formatCurrency(kpiSummary.avgOrderValue)}원` : '-',
+      status: 'neutral',
+    },
   ];
 
-  // ── Block 2: AI Summary (Rule-based) ──
+  // ── Block 2: AI Summary (운영 + 매출 통합) ──
 
   const aiSummary: AiSummaryItem[] = [];
 
+  // 매출 인사이트
+  if (kpiSummary.monthRevenue === 0 && kpiSummary.monthOrders === 0) {
+    aiSummary.push({
+      id: 'ai-no-revenue',
+      message: '이번 달 매출이 아직 없습니다. 상품 진열과 채널을 확인해보세요.',
+      level: 'warning',
+      link: '/store/products',
+    });
+  } else if (kpiSummary.lastMonthRevenue > 0) {
+    const growthRate = ((kpiSummary.monthRevenue - kpiSummary.lastMonthRevenue) / kpiSummary.lastMonthRevenue) * 100;
+    if (growthRate >= 20) {
+      aiSummary.push({
+        id: 'ai-revenue-growth',
+        message: `지난달 대비 매출이 ${Math.round(growthRate)}% 증가했습니다. 좋은 흐름입니다!`,
+        level: 'info',
+        link: '/store/orders',
+      });
+    } else if (growthRate <= -20) {
+      aiSummary.push({
+        id: 'ai-revenue-decline',
+        message: `지난달 대비 매출이 ${Math.abs(Math.round(growthRate))}% 감소했습니다. 상품 믹스를 점검해보세요.`,
+        level: 'warning',
+        link: '/store/products',
+      });
+    }
+  }
+
+  // 운영 인사이트
   if (pendingApps.length > 0) {
     aiSummary.push({
       id: 'ai-pending-apps',
@@ -222,12 +295,18 @@ export function PharmacyDashboardPage() {
     setLoading(true);
     setError(null);
     try {
+      const defaultKpi: StoreKpiSummary = {
+        todayOrders: 0, weekOrders: 0, monthOrders: 0,
+        monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0,
+      };
+
       const results = await Promise.allSettled([
         fetchChannelOverview().catch(() => [] as ChannelOverview[]),
         getApplications({ limit: 200 }).then(res => res.data).catch(() => [] as ProductApplication[]),
         getListings().then(res => res.data).catch(() => [] as ProductListing[]),
         storeAssetControlApi.list({ limit: 200 }).then(res => res.data.items).catch(() => [] as StoreAssetItem[]),
         listPlatformServices().catch(() => [] as PlatformServiceItem[]),
+        fetchStoreKpiSummary().catch(() => defaultKpi),
       ]);
 
       const channels = results[0].status === 'fulfilled' ? results[0].value : [];
@@ -235,6 +314,7 @@ export function PharmacyDashboardPage() {
       const listings = results[2].status === 'fulfilled' ? results[2].value : [];
       const assets = results[3].status === 'fulfilled' ? results[3].value : [];
       const services = results[4].status === 'fulfilled' ? results[4].value : [];
+      const kpiSummary = results[5].status === 'fulfilled' ? results[5].value : defaultKpi;
 
       setConfig(buildStoreDashboardConfig({
         channels: channels as ChannelOverview[],
@@ -242,6 +322,7 @@ export function PharmacyDashboardPage() {
         listings: listings as ProductListing[],
         assets: assets as StoreAssetItem[],
         services: services as PlatformServiceItem[],
+        kpiSummary: kpiSummary as StoreKpiSummary,
       }));
     } catch (err) {
       setError('데이터를 불러오지 못했습니다.');
@@ -287,6 +368,7 @@ export function PharmacyDashboardPage() {
           </p>
         )}
       </div>
+      <StoreLiveSignalBar />
       <OperatorDashboardLayout config={config} />
     </div>
   );
