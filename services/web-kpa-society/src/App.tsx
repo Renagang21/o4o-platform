@@ -44,6 +44,7 @@ import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
 import ContentHubPage from './pages/signage/ContentHubPage';
 import PlaylistDetailPage from './pages/signage/PlaylistDetailPage';
 import MediaDetailPage from './pages/signage/MediaDetailPage';
+import PublicSignagePage from './pages/signage/PublicSignagePage';
 
 // Resources pages
 import { ResourcesListPage, ResourcesHomePage } from './pages/resources';
@@ -636,6 +637,9 @@ function App() {
           {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
           <Route path="/content/:snapshotId/print" element={<PrintContentPage />} />
           <Route path="/content/:snapshotId" element={<PublicContentViewPage />} />
+
+          {/* Public Signage Rendering (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) — public, no auth */}
+          <Route path="/public/signage" element={<PublicSignagePage />} />
 
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />

@@ -17,7 +17,14 @@
  *   - publicContentApi.listPlaylists() : 공개 플레이리스트 목록
  *   - assetSnapshotApi.copy()          : 내 매장에 복사
  *
- * ❌ globalContentApi.cloneMedia/clonePlaylist 사용 금지 (Hub 경로)
+ * ❌ globalContentApi.cloneMedia/clonePlaylist 사용 금지
+ *
+ * ── 사이니지 구조 원칙 (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) ──
+ * 1. Hub = 원본 (signage_media, signage_playlists)
+ * 2. Store = snapshot 조합 (o4o_asset_snapshots → store_playlist_items)
+ * 3. clone 사용 금지 — assetSnapshotApi.copy() 단일 경로만 사용
+ * 4. Playlist가 유일한 재생 단위 (store_playlists)
+ * 5. 공개 렌더링: /public/signage?playlist=:id
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';

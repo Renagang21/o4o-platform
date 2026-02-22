@@ -79,6 +79,7 @@ import { createStoreAssetControlController } from './controllers/store-asset-con
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
 import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
 import { createStoreContentController } from './controllers/store-content.controller.js';
+import { createStorePlaylistController } from './controllers/store-playlist.controller.js';
 import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
 import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
 import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
@@ -219,6 +220,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store Content routes (WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1)
   router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+
+  // Store Playlist routes (WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1)
+  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1

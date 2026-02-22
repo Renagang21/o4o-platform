@@ -2,21 +2,24 @@
  * Signage Content Hub Page - KPA-Society
  *
  * WO-SIGNAGE-CONTENT-HUB-V2
- * WO-KPA-A-HUB-TO-STORE-CLONE-FLOW-V2
+ * WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1: clone 경로 제거
+ *
  * 레이아웃:
  * ├─ Header (안내 영상 · 자료)
  * ├─ 최신 콘텐츠 / 추천 콘텐츠 (2열 하이라이트)
  * ├─ 카테고리 탭 (운영자 제공 / 공급자 제공 / 커뮤니티 공유)
  * │  ├─ 플레이리스트 리스트
  * │  └─ 동영상 리스트
- * ├─ Clone/가져오기 기능 유지
  * └─ + 내 매장에 추가 (asset snapshot copy → Store Assets)
+ *
+ * ❌ globalContentApi.clone* 사용 금지
+ *    모든 매장 추가는 assetSnapshotApi.copy() 단일 경로만 사용
  */
 
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus } from 'lucide-react';
-import { publicContentApi, globalContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
+import { publicContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
 import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 
@@ -49,9 +52,8 @@ function formatDuration(seconds: number): string {
 
 // ── Compact list-row components ──
 
-function PlaylistRow({ playlist, onClone, onAddToStore }: {
+function PlaylistRow({ playlist, onAddToStore }: {
   playlist: SignagePlaylist;
-  onClone: (id: string, name: string) => void;
   onAddToStore: (id: string, name: string) => void;
 }) {
   const navigate = useNavigate();
@@ -90,21 +92,13 @@ function PlaylistRow({ playlist, onClone, onAddToStore }: {
         >
           <Plus className="h-4 w-4" />
         </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onClone(playlist.id, playlist.name); }}
-          className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
-          title="가져오기"
-        >
-          <Download className="h-4 w-4" />
-        </button>
       </div>
     </div>
   );
 }
 
-function MediaRow({ item, onClone, onAddToStore }: {
+function MediaRow({ item, onAddToStore }: {
   item: SignageMedia;
-  onClone: (id: string, name: string) => void;
   onAddToStore: (id: string, name: string) => void;
 }) {
   const navigate = useNavigate();
@@ -139,13 +133,6 @@ function MediaRow({ item, onClone, onAddToStore }: {
           title="내 매장에 추가"
         >
           <Plus className="h-4 w-4" />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onClone(item.id, item.name); }}
-          className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
-          title="가져오기"
-        >
-          <Download className="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -224,7 +211,7 @@ export default function ContentHubPage() {
   const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
 
   // Load ALL content once (all sources)
   useEffect(() => {
@@ -294,9 +281,9 @@ export default function ContentHubPage() {
         sourceAssetId: sourceId,
         assetType: 'signage',
       });
-      setCloneSuccess(`"${name}" — 내 매장에 추가되었습니다.`);
+      setCopySuccess(`"${name}" — 내 매장에 추가되었습니다.`);
       setTimeout(() => {
-        setCloneSuccess(null);
+        setCopySuccess(null);
         navigate('/store/content?tab=signage');
       }, 1500);
     } catch (e: any) {
@@ -307,35 +294,6 @@ export default function ContentHubPage() {
         setError('매장 추가에 실패했습니다.');
       }
       setTimeout(() => setError(null), 3000);
-    }
-  };
-
-  // Clone handlers
-  const handleClonePlaylist = async (playlistId: string, playlistName: string) => {
-    try {
-      const result = await globalContentApi.clonePlaylist(playlistId, 'kpa-society');
-      if (result.success) {
-        setCloneSuccess(`"${playlistName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '플레이리스트를 복사하지 못했습니다.');
-      }
-    } catch {
-      setError('플레이리스트 복사 중 오류가 발생했습니다.');
-    }
-  };
-
-  const handleCloneMedia = async (mediaId: string, mediaName: string) => {
-    try {
-      const result = await globalContentApi.cloneMedia(mediaId, 'kpa-society');
-      if (result.success) {
-        setCloneSuccess(`"${mediaName}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
-      } else {
-        setError(result.error || '미디어를 복사하지 못했습니다.');
-      }
-    } catch {
-      setError('미디어 복사 중 오류가 발생했습니다.');
     }
   };
 
@@ -370,10 +328,10 @@ export default function ContentHubPage() {
       </div>
 
       {/* Toast Messages */}
-      {cloneSuccess && (
+      {copySuccess && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2 text-green-700 text-sm">
           <Download className="h-4 w-4" />
-          <span>{cloneSuccess}</span>
+          <span>{copySuccess}</span>
         </div>
       )}
       {error && (
@@ -458,7 +416,7 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 플레이리스트가 없습니다</div>
             ) : (
               filteredPlaylists.map((pl) => (
-                <PlaylistRow key={pl.id} playlist={pl} onClone={handleClonePlaylist} onAddToStore={handleAddToStore} />
+                <PlaylistRow key={pl.id} playlist={pl} onAddToStore={handleAddToStore} />
               ))
             )}
           </div>
@@ -499,7 +457,7 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 동영상이 없습니다</div>
             ) : (
               filteredMedia.map((m) => (
-                <MediaRow key={m.id} item={m} onClone={handleCloneMedia} onAddToStore={handleAddToStore} />
+                <MediaRow key={m.id} item={m} onAddToStore={handleAddToStore} />
               ))
             )}
           </div>

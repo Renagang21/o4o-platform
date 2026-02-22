@@ -2,17 +2,19 @@
  * StoreSignagePage — 사이니지 운영 엔진
  *
  * WO-O4O-STORE-SIGNAGE-ENGINE-V1
+ * WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1: Playlist 탭 추가
  *
- * /store/signage: StorePlaceholderPage → 실제 운영 화면
+ * /store/signage: 2탭 구조
+ *  [Tab 1] 플레이리스트 — Store Playlist CRUD + item 관리
+ *  [Tab 2] 자산 관리 — 기존 channel_map 기반 (점진적 축소)
  *
- * 구조:
- *  [A] Signage KPI (게시/초안/숨김/강제노출)
- *  [B] 필터 바 (게시상태, 채널)
- *  [C] 자산 리스트 (signage only) + 게시 토글 + 채널 on/off
- *  [D] Quick Actions
+ * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → Playlist에 추가
  *
- * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → 여기서 운영
- * globalContentApi.clone* 사용 금지
+ * ── 사이니지 구조 원칙 (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) ──
+ * 1. Hub = 원본, Store = snapshot 조합
+ * 2. clone 사용 금지 — assetSnapshotApi.copy() 단일 경로
+ * 3. Playlist = 유일한 재생 단위
+ * 4. 공개 렌더링: /public/signage?playlist=:id
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -34,6 +36,11 @@ import {
   EyeOff,
   Megaphone,
   Home,
+  Plus,
+  ListVideo,
+  Trash2,
+  GripVertical,
+  Play,
 } from 'lucide-react';
 import {
   storeAssetControlApi,
@@ -41,6 +48,18 @@ import {
   type AssetPublishStatus,
   type ChannelMap,
 } from '../../api/assetSnapshot';
+import {
+  fetchStorePlaylists,
+  createStorePlaylist,
+  updateStorePlaylist,
+  deleteStorePlaylist,
+  fetchPlaylistItems,
+  addPlaylistItem,
+  deletePlaylistItem,
+  reorderPlaylistItems,
+  type StorePlaylist,
+  type StorePlaylistItem,
+} from '../../api/storePlaylist';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -145,10 +164,15 @@ function applySort(items: StoreAssetItem[], sortKey: SortKey): StoreAssetItem[] 
   return sorted;
 }
 
+type ActiveTab = 'playlist' | 'assets';
+
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreSignagePage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ActiveTab>('playlist');
+
+  // ── Legacy asset state ──
   const [items, setItems] = useState<StoreAssetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -159,12 +183,28 @@ export function StoreSignagePage() {
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [page, setPage] = useState(1);
 
+  // ── Playlist state ──
+  const [playlists, setPlaylists] = useState<StorePlaylist[]>([]);
+  const [playlistLoading, setPlaylistLoading] = useState(true);
+  const [playlistError, setPlaylistError] = useState<string | null>(null);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
+  const [playlistItems, setPlaylistItems] = useState<StorePlaylistItem[]>([]);
+  const [playlistItemsLoading, setPlaylistItemsLoading] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+
+  // ── Signage snapshot list for "add to playlist" ──
+  const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
+  const [showAddPicker, setShowAddPicker] = useState(false);
+
   const fetchItems = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await storeAssetControlApi.list({ type: 'signage', limit: 200 });
-      setItems(res.data.items || []);
+      const loadedItems = res.data.items || [];
+      setItems(loadedItems);
+      setSignageSnapshots(loadedItems);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -172,7 +212,98 @@ export function StoreSignagePage() {
     }
   }, []);
 
-  useEffect(() => { fetchItems(); }, [fetchItems]);
+  const loadPlaylists = useCallback(async () => {
+    setPlaylistLoading(true);
+    setPlaylistError(null);
+    try {
+      const data = await fetchStorePlaylists();
+      setPlaylists(data);
+    } catch (e: any) {
+      setPlaylistError(e.message);
+    } finally {
+      setPlaylistLoading(false);
+    }
+  }, []);
+
+  const loadPlaylistItems = useCallback(async (playlistId: string) => {
+    setPlaylistItemsLoading(true);
+    try {
+      const data = await fetchPlaylistItems(playlistId);
+      setPlaylistItems(data);
+    } catch {
+      setPlaylistItems([]);
+    } finally {
+      setPlaylistItemsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchItems(); loadPlaylists(); }, [fetchItems, loadPlaylists]);
+
+  useEffect(() => {
+    if (selectedPlaylistId) loadPlaylistItems(selectedPlaylistId);
+  }, [selectedPlaylistId, loadPlaylistItems]);
+
+  // ── Playlist handlers ──
+  const handleCreatePlaylist = async () => {
+    if (!newPlaylistName.trim()) return;
+    try {
+      await createStorePlaylist(newPlaylistName.trim());
+      setNewPlaylistName('');
+      setShowCreateForm(false);
+      loadPlaylists();
+    } catch { /* user can retry */ }
+  };
+
+  const handleTogglePublish = async (pl: StorePlaylist) => {
+    const next = pl.publishStatus === 'draft' ? 'published' : 'draft';
+    try {
+      await updateStorePlaylist(pl.id, { publishStatus: next });
+      loadPlaylists();
+    } catch { /* user can retry */ }
+  };
+
+  const handleDeletePlaylist = async (pl: StorePlaylist) => {
+    if (!confirm(`"${pl.name}" 플레이리스트를 삭제하시겠습니까?`)) return;
+    try {
+      await deleteStorePlaylist(pl.id);
+      if (selectedPlaylistId === pl.id) {
+        setSelectedPlaylistId(null);
+        setPlaylistItems([]);
+      }
+      loadPlaylists();
+    } catch { /* user can retry */ }
+  };
+
+  const handleAddItem = async (snapshotId: string) => {
+    if (!selectedPlaylistId) return;
+    try {
+      await addPlaylistItem(selectedPlaylistId, snapshotId);
+      setShowAddPicker(false);
+      loadPlaylistItems(selectedPlaylistId);
+    } catch { /* user can retry */ }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!selectedPlaylistId) return;
+    try {
+      await deletePlaylistItem(selectedPlaylistId, itemId);
+      loadPlaylistItems(selectedPlaylistId);
+    } catch { /* user can retry */ }
+  };
+
+  const handleMoveItem = async (index: number, direction: -1 | 1) => {
+    if (!selectedPlaylistId) return;
+    const newItems = [...playlistItems];
+    const swapIdx = index + direction;
+    if (swapIdx < 0 || swapIdx >= newItems.length) return;
+    [newItems[index], newItems[swapIdx]] = [newItems[swapIdx], newItems[index]];
+    setPlaylistItems(newItems);
+    try {
+      await reorderPlaylistItems(selectedPlaylistId, newItems.map(i => i.id));
+    } catch {
+      loadPlaylistItems(selectedPlaylistId);
+    }
+  };
 
   // KPI
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
@@ -225,6 +356,8 @@ export function StoreSignagePage() {
     }
   };
 
+  const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
@@ -234,7 +367,7 @@ export function StoreSignagePage() {
             <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
           </div>
           <h1 className="text-2xl font-bold text-slate-900">사이니지 운영</h1>
-          <p className="text-sm text-slate-500 mt-1">매장 사이니지 콘텐츠의 게시 상태와 채널 배치를 관리합니다</p>
+          <p className="text-sm text-slate-500 mt-1">매장 사이니지 플레이리스트와 콘텐츠를 관리합니다</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -245,7 +378,7 @@ export function StoreSignagePage() {
             공용공간에서 가져오기
           </button>
           <button
-            onClick={fetchItems}
+            onClick={() => { fetchItems(); loadPlaylists(); }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
           >
             <RefreshCw className="w-4 h-4" />
@@ -253,6 +386,227 @@ export function StoreSignagePage() {
           </button>
         </div>
       </div>
+
+      {/* ─── Tab Bar ─────────────────────────────── */}
+      <div className="flex gap-1 mb-6 border-b border-slate-200">
+        <button
+          onClick={() => setActiveTab('playlist')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'playlist'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <ListVideo className="w-4 h-4" />
+          플레이리스트
+        </button>
+        <button
+          onClick={() => setActiveTab('assets')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'assets'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Monitor className="w-4 h-4" />
+          자산 관리
+        </button>
+      </div>
+
+      {/* ═══ Playlist Tab ═══════════════════════════ */}
+      {activeTab === 'playlist' && (
+        <div>
+          {/* Create + list */}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+            >
+              <Plus className="w-4 h-4" />
+              새 플레이리스트
+            </button>
+          </div>
+
+          {/* Create form */}
+          {showCreateForm && (
+            <div className="flex gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <input
+                type="text"
+                value={newPlaylistName}
+                onChange={e => setNewPlaylistName(e.target.value)}
+                placeholder="플레이리스트 이름"
+                className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                onKeyDown={e => e.key === 'Enter' && handleCreatePlaylist()}
+                autoFocus
+              />
+              <button onClick={handleCreatePlaylist} className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700">생성</button>
+              <button onClick={() => { setShowCreateForm(false); setNewPlaylistName(''); }} className="px-3 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50">취소</button>
+            </div>
+          )}
+
+          {/* Playlist list */}
+          {playlistLoading ? (
+            <div className="flex items-center justify-center py-12 text-slate-400">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" /> 플레이리스트 로딩 중...
+            </div>
+          ) : playlistError ? (
+            <div className="text-center py-12 text-red-500 text-sm">
+              <AlertCircle className="w-5 h-5 mx-auto mb-2" />
+              {playlistError}
+            </div>
+          ) : playlists.length === 0 ? (
+            <div className="text-center py-12 text-slate-400">
+              <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <p className="text-sm">플레이리스트가 없습니다.</p>
+              <p className="text-xs mt-1">새 플레이리스트를 만들고 Hub에서 가져온 콘텐츠를 추가하세요.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+              {playlists.map(pl => (
+                <div
+                  key={pl.id}
+                  onClick={() => setSelectedPlaylistId(pl.id)}
+                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                    selectedPlaylistId === pl.id
+                      ? 'border-blue-400 bg-blue-50/50'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <ListVideo className="w-4 h-4 text-slate-400" />
+                      <span className="font-medium text-slate-900 text-sm">{pl.name}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={e => { e.stopPropagation(); handleTogglePublish(pl); }}
+                        className={`px-2 py-0.5 rounded text-[11px] font-medium ${
+                          pl.publishStatus === 'published'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
+                      >
+                        {pl.publishStatus === 'published' ? '게시 중' : '초안'}
+                      </button>
+                      <button
+                        onClick={e => { e.stopPropagation(); handleDeletePlaylist(pl); }}
+                        className="p-1 text-slate-400 hover:text-red-500 rounded"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <span>{pl.playlistType === 'SINGLE' ? '단일' : '목록'}</span>
+                    <span>{pl.itemCount}개 항목</span>
+                    {pl.forcedCount > 0 && <span className="text-red-500">{pl.forcedCount}개 강제</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Selected playlist items */}
+          {selectedPlaylistId && selectedPlaylist && (
+            <div className="border border-slate-200 rounded-lg bg-white">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Play className="w-4 h-4 text-blue-600" />
+                  <span className="font-medium text-slate-800">{selectedPlaylist.name}</span>
+                  <span className="text-xs text-slate-400">({playlistItems.length}개 항목)</span>
+                </div>
+                <button
+                  onClick={() => setShowAddPicker(!showAddPicker)}
+                  className="flex items-center gap-1 px-2.5 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  항목 추가
+                </button>
+              </div>
+
+              {/* Add item picker */}
+              {showAddPicker && (
+                <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
+                  <p className="text-xs text-slate-500 mb-2">추가할 사이니지 자산을 선택하세요:</p>
+                  {signageSnapshots.length === 0 ? (
+                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. Hub에서 가져와주세요.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                      {signageSnapshots.map(snap => (
+                        <button
+                          key={snap.id}
+                          onClick={() => handleAddItem(snap.id)}
+                          className="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-md hover:bg-blue-50 hover:border-blue-300 truncate max-w-[200px]"
+                        >
+                          {snap.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Item list */}
+              {playlistItemsLoading ? (
+                <div className="py-8 text-center text-slate-400 text-sm">
+                  <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" /> 로딩 중...
+                </div>
+              ) : playlistItems.length === 0 ? (
+                <div className="py-8 text-center text-slate-400 text-sm">
+                  항목이 없습니다. "항목 추가"로 사이니지 콘텐츠를 추가하세요.
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-50">
+                  {playlistItems.map((item, idx) => (
+                    <div key={item.id} className={`flex items-center gap-3 px-4 py-2.5 ${item.isForced ? 'bg-red-50/30' : ''}`}>
+                      <span className="text-xs text-slate-400 w-5 text-right">{idx + 1}</span>
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          onClick={() => handleMoveItem(idx, -1)}
+                          disabled={idx === 0}
+                          className="text-slate-300 hover:text-slate-600 disabled:opacity-30"
+                        >
+                          <GripVertical className="w-3 h-3 rotate-180" />
+                        </button>
+                        <button
+                          onClick={() => handleMoveItem(idx, 1)}
+                          disabled={idx === playlistItems.length - 1}
+                          className="text-slate-300 hover:text-slate-600 disabled:opacity-30"
+                        >
+                          <GripVertical className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-slate-800 truncate">{item.title}</div>
+                        <div className="text-xs text-slate-400">{item.assetType}</div>
+                      </div>
+                      {item.isForced && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">강제</span>
+                      )}
+                      {item.isLocked ? (
+                        <Lock className="w-3.5 h-3.5 text-slate-300" />
+                      ) : (
+                        <button
+                          onClick={() => handleDeleteItem(item.id)}
+                          className="p-1 text-slate-300 hover:text-red-500 rounded"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Assets Tab (기존) ══════════════════════ */}
+      {activeTab === 'assets' && <>
 
       {/* ─── [A] Signage KPI ─────────────────────── */}
       {!loading && !error && (
@@ -416,6 +770,8 @@ export function StoreSignagePage() {
           )}
         </>
       )}
+      </>}
+
     </div>
   );
 }

@@ -2,17 +2,22 @@
  * PlaylistDetailPage - 플레이리스트 상세 페이지
  *
  * WO-SIGNAGE-PLAYLIST-DETAIL-V1
+ * WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1: clone → snapshot copy 전환
+ *
  * 구조:
  * ├─ 뒤로가기 링크
- * ├─ 헤더: 제목, 소스 뱃지, 설명, 등록자, 메타 정보, 가져오기 버튼
+ * ├─ 헤더: 제목, 소스 뱃지, 설명, 등록자, 메타 정보, 내 매장에 추가 버튼
  * ├─ 동영상 목록: 번호, 썸네일, 제목, 유형, 재생시간
  * └─ 미리보기 플레이어: 선택한 영상 임베드 재생
+ *
+ * ❌ globalContentApi.clone* 사용 금지
  */
 
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Download, Play, Clock, List, User, Calendar, RotateCw, Film } from 'lucide-react';
-import { publicContentApi, globalContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Download, Plus, Play, Clock, List, User, Calendar, RotateCw, Film } from 'lucide-react';
+import { publicContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import type { SignagePlaylistItemResponse, ContentSource } from '@o4o/types/signage';
 import { getMediaPlayUrl, extractYouTubeVideoId, SIGNAGE_SOURCE_LABELS, SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
 
@@ -38,11 +43,12 @@ function getSourceLabel(source?: ContentSource): string {
 
 export default function PlaylistDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [playlist, setPlaylist] = useState<SignagePlaylist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItemIndex, setSelectedItemIndex] = useState(0);
-  const [cloneSuccess, setCloneSuccess] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -59,18 +65,27 @@ export default function PlaylistDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleClone = async () => {
+  const handleAddToStore = async () => {
     if (!playlist) return;
     try {
-      const result = await globalContentApi.clonePlaylist(playlist.id, 'kpa-society');
-      if (result.success) {
-        setCloneSuccess(`"${playlist.name}"를 내 대시보드로 가져왔습니다.`);
-        setTimeout(() => setCloneSuccess(null), 3000);
+      await assetSnapshotApi.copy({
+        sourceService: 'kpa',
+        sourceAssetId: playlist.id,
+        assetType: 'signage',
+      });
+      setCopySuccess(`"${playlist.name}" — 내 매장에 추가되었습니다.`);
+      setTimeout(() => {
+        setCopySuccess(null);
+        navigate('/store/content?tab=signage');
+      }, 1500);
+    } catch (e: any) {
+      const msg = e?.message || '';
+      if (msg.includes('DUPLICATE') || msg.includes('already')) {
+        setError('이미 매장에 추가된 항목입니다.');
       } else {
-        setError(result.error || '플레이리스트를 복사하지 못했습니다.');
+        setError('매장 추가에 실패했습니다.');
       }
-    } catch {
-      setError('플레이리스트 복사 중 오류가 발생했습니다.');
+      setTimeout(() => setError(null), 3000);
     }
   };
 
@@ -181,10 +196,10 @@ export default function PlaylistDetailPage() {
       </Link>
 
       {/* Success Message */}
-      {cloneSuccess && (
+      {copySuccess && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-2 text-green-700">
           <Download className="h-4 w-4" />
-          <span>{cloneSuccess}</span>
+          <span>{copySuccess}</span>
         </div>
       )}
 
@@ -235,13 +250,13 @@ export default function PlaylistDetailPage() {
             </div>
           </div>
 
-          {/* Clone button */}
+          {/* Add to Store button */}
           <button
-            onClick={handleClone}
-            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            onClick={handleAddToStore}
+            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
           >
-            <Download className="h-4 w-4" />
-            가져오기
+            <Plus className="h-4 w-4" />
+            내 매장에 추가
           </button>
         </div>
       </div>

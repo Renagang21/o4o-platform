@@ -83,6 +83,7 @@ const menuItems: MenuItem[] = [
   { label: '공용공간', href: '/hub' },
   { label: '내 매장관리', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
+  { label: '매뉴얼', href: '/manual' },
   { label: '테스트 센터', href: '/test' },
 ];
 

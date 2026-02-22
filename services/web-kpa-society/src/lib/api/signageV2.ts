@@ -1,15 +1,16 @@
 /**
  * Signage V2 API Client - KPA-Society
  *
- * Global Content API for Digital Signage Content Hub
+ * Public Content API for Digital Signage Content Hub
  * APP-SIGNAGE Phase 1: Types from @o4o/types/signage
  *
  * WO-APP-SIGNAGE-PUBLIC-API-PHASE1-V1:
- * - publicContentApi: 인증 불필요 (공개 조회용) ← 우선 사용
- * - globalContentApi: 인증 필수 (Clone 등 관리용)
+ * - publicContentApi: 인증 불필요 (공개 조회용)
+ *
+ * WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1:
+ * - globalContentApi 삭제 (clone 경로 제거)
+ * - 매장 추가는 assetSnapshotApi.copy() 단일 경로만 사용
  */
-
-import { authClient } from '@o4o/auth-client';
 import type {
   SignageMediaResponse,
   SignagePlaylistResponse,
@@ -112,60 +113,3 @@ export const publicContentApi = {
   },
 };
 
-/**
- * Global Content API - 인증 필수
- * Clone 등 관리 기능에 사용
- */
-export const globalContentApi = {
-  async listPlaylists(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/global/playlists/${source}?${query}` : `${base}/global/playlists/${source}`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error(`Failed to list ${source} playlists:`, error);
-      return { success: false, error: `Failed to list ${source} playlists` };
-    }
-  },
-
-  async listMedia(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignageMedia>>> {
-    try {
-      const base = getBaseUrl(serviceKey);
-      const searchParams = new URLSearchParams();
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      const query = searchParams.toString();
-      const url = query ? `${base}/global/media/${source}?${query}` : `${base}/global/media/${source}`;
-      const response = await authClient.api.get(url);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error(`Failed to list ${source} media:`, error);
-      return { success: false, error: `Failed to list ${source} media` };
-    }
-  },
-
-  async clonePlaylist(id: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/playlists/${id}/clone`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to clone playlist:', error);
-      return { success: false, error: 'Failed to clone playlist' };
-    }
-  },
-
-  async cloneMedia(id: string, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
-    try {
-      const response = await authClient.api.post(`${getBaseUrl(serviceKey)}/media/${id}/clone`);
-      return { success: true, data: response.data };
-    } catch (error) {
-      console.error('Failed to clone media:', error);
-      return { success: false, error: 'Failed to clone media' };
-    }
-  },
-};
