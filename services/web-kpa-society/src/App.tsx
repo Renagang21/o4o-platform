@@ -101,7 +101,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, StorePlaceholderPage, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -377,7 +377,7 @@ function App() {
           <Route path="/pharmacy" element={<Layout serviceName={SERVICE_NAME}><PharmacyPage /></Layout>} />
           {/* /pharmacy/* → /store/* 리다이렉트 */}
           <Route path="/pharmacy/dashboard" element={<Navigate to="/store" replace />} />
-          <Route path="/pharmacy/hub" element={<Navigate to="/store/content/hub" replace />} />
+          <Route path="/pharmacy/hub" element={<Navigate to="/hub" replace />} />
           <Route path="/pharmacy/store" element={<Navigate to="/store" replace />} />
           <Route path="/pharmacy/store/layout" element={<Navigate to="/store/settings/layout" replace />} />
           <Route path="/pharmacy/store/template" element={<Navigate to="/store/settings/template" replace />} />
@@ -490,8 +490,11 @@ function App() {
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          {/* Hub → Operator 리다이렉트 (WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1) */}
-          <Route path="/hub" element={<Navigate to="/operator" replace />} />
+          {/* Hub = 약국 공용공간 (WO-O4O-HUB-MARKET-RESTRUCTURE-V1) */}
+          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubMarketPage /></PharmacyGuard></Layout>} />
+          {/* WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리 */}
+          <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubContentLibraryPage /></PharmacyGuard></Layout>} />
+          <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubB2BCatalogPage /></PharmacyGuard></Layout>} />
           {/* Operator Routes — 5-Block 대시보드 + 서브페이지 */}
           <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
@@ -591,10 +594,9 @@ function App() {
             <Route path="channels/tablet" element={<TabletRequestsPage />} />
             {/* orders: 주문 관리 (WO-STORE-ORDERS-FOUNDATION-V1) */}
             <Route path="orders" element={<StoreOrdersPage />} />
-            {/* content: 자산 + 블로그 + HUB */}
+            {/* content: 자산 + 블로그 */}
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
-            <Route path="content/hub" element={<PharmacyHubPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
             {/* signage: 사이니지 (WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 P2) */}
             <Route path="signage" element={<StorePlaceholderPage title="사이니지" />} />

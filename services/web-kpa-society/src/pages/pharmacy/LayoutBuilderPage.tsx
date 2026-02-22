@@ -261,13 +261,13 @@ export function LayoutBuilderPage() {
           ) : (
             <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
               매장 정보를 불러올 수 없습니다.<br />
-              약국 HUB에서 서비스를 확인해주세요.
+              공용공간에서 서비스를 확인해주세요.
             </p>
           )}
 
           <div style={{ marginTop: '20px' }}>
             <button
-              onClick={() => navigate('/store/content/hub')}
+              onClick={() => navigate('/hub')}
               style={{
                 padding: '8px 20px',
                 borderRadius: '8px',
@@ -279,7 +279,7 @@ export function LayoutBuilderPage() {
                 cursor: 'pointer',
               }}
             >
-              약국 HUB로 이동 →
+              공용공간으로 이동 →
             </button>
           </div>
         </div>

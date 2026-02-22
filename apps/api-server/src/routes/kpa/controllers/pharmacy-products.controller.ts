@@ -2,7 +2,9 @@
  * Pharmacy Products Controller
  *
  * WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1
+ * WO-O4O-API-PHARMACY-B2B-CATALOG-V1: GET /catalog 추가, POST /apply supplyProductId 확장
  *
+ * GET  /catalog             — 플랫폼 B2B 상품 카탈로그 (공용공간용)
  * POST /apply              — 상품 판매 신청
  * GET  /applications       — 내 신청 목록
  * GET  /approved           — 승인된 상품 목록
@@ -98,16 +100,139 @@ export function createPharmacyProductsController(
     next();
   });
 
+  // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
+  // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
+  // neture_supplier_products (PUBLIC + active) + 내 신청/진열 상태 조인
+  router.get('/catalog', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
+    const category = req.query.category as string | undefined;
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    let categoryFilter = '';
+    const params: any[] = [organizationId, limit, offset];
+
+    if (category) {
+      categoryFilter = `AND sp.category = $4`;
+      params.push(category);
+    }
+
+    const rows = await dataSource.query(
+      `SELECT
+         sp.id AS "id",
+         sp.name AS "name",
+         sp.category AS "category",
+         sp.description AS "description",
+         sp.purpose AS "purpose",
+         sp.distribution_type AS "distributionType",
+         sp.created_at AS "createdAt",
+         sp.updated_at AS "updatedAt",
+         s.id AS "supplierId",
+         s.name AS "supplierName",
+         s.logo_url AS "supplierLogoUrl",
+         s.category AS "supplierCategory",
+         -- 내 신청/진열 상태
+         (EXISTS(
+           SELECT 1 FROM organization_product_applications opa
+           WHERE opa.organization_id = $1
+             AND opa.external_product_id = sp.id::text
+             AND opa.status IN ('pending','approved')
+         )) AS "isApplied",
+         (EXISTS(
+           SELECT 1 FROM organization_product_applications opa
+           WHERE opa.organization_id = $1
+             AND opa.external_product_id = sp.id::text
+             AND opa.status = 'approved'
+         )) AS "isApproved",
+         (EXISTS(
+           SELECT 1 FROM organization_product_listings opl
+           WHERE opl.organization_id = $1
+             AND opl.external_product_id = sp.id::text
+         )) AS "isListed"
+       FROM neture_supplier_products sp
+       JOIN neture_suppliers s ON s.id = sp.supplier_id
+       WHERE sp.distribution_type = 'PUBLIC'
+         AND sp.is_active = true
+         AND s.status = 'ACTIVE'
+         ${categoryFilter}
+       ORDER BY sp.updated_at DESC
+       LIMIT $2 OFFSET $3`,
+      params,
+    );
+
+    // Total count (for pagination)
+    const countParams: any[] = [];
+    let countCategoryFilter = '';
+    if (category) {
+      countCategoryFilter = `AND sp.category = $1`;
+      countParams.push(category);
+    }
+
+    const countResult = await dataSource.query(
+      `SELECT COUNT(*)::int AS total
+       FROM neture_supplier_products sp
+       JOIN neture_suppliers s ON s.id = sp.supplier_id
+       WHERE sp.distribution_type = 'PUBLIC'
+         AND sp.is_active = true
+         AND s.status = 'ACTIVE'
+         ${countCategoryFilter}`,
+      countParams,
+    );
+
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total: countResult[0]?.total || 0,
+        limit,
+        offset,
+      },
+    });
+  }));
+
   // ─── POST /apply — 상품 판매 신청 ─────────────────────────────────
+  // WO-O4O-API-PHARMACY-B2B-CATALOG-V1: supplyProductId 지원 확장
   router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const user = (req as any).user;
     const organizationId = (req as any).organizationId;
-    const { externalProductId, productName, productMetadata } = req.body;
+    let { externalProductId, productName, productMetadata } = req.body;
+    const { supplyProductId } = req.body;
+
+    // WO-O4O-API-PHARMACY-B2B-CATALOG-V1: supplyProductId로 카탈로그 기반 신청
+    if (supplyProductId && !externalProductId) {
+      const catalogProduct = await dataSource.query(
+        `SELECT sp.id, sp.name, sp.category, sp.description, sp.distribution_type,
+                s.id AS supplier_id, s.name AS supplier_name
+         FROM neture_supplier_products sp
+         JOIN neture_suppliers s ON s.id = sp.supplier_id
+         WHERE sp.id = $1 AND sp.is_active = true AND sp.distribution_type = 'PUBLIC' AND s.status = 'ACTIVE'`,
+        [supplyProductId],
+      );
+
+      if (!catalogProduct || catalogProduct.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'CATALOG_PRODUCT_NOT_FOUND', message: 'Supply product not found or not available' },
+        });
+        return;
+      }
+
+      const cp = catalogProduct[0];
+      externalProductId = cp.id;
+      productName = cp.name;
+      productMetadata = {
+        ...productMetadata,
+        supplyProductId: cp.id,
+        supplierName: cp.supplier_name,
+        supplierId: cp.supplier_id,
+        category: cp.category,
+      };
+    }
 
     if (!externalProductId || !productName) {
       res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'externalProductId and productName are required' },
+        error: { code: 'VALIDATION_ERROR', message: 'externalProductId and productName are required (or provide supplyProductId)' },
       });
       return;
     }

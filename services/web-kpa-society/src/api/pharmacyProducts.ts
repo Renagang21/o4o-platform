@@ -2,7 +2,9 @@
  * Pharmacy Products API Client
  *
  * WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1
+ * WO-O4O-API-PHARMACY-B2B-CATALOG-V1: getCatalog + applyBySupplyProductId 추가
  *
+ * GET  /pharmacy/products/catalog        — 플랫폼 B2B 상품 카탈로그
  * POST /pharmacy/products/apply          — 상품 판매 신청
  * GET  /pharmacy/products/applications   — 내 신청 목록
  * GET  /pharmacy/products/approved       — 승인된 상품 목록
@@ -52,8 +54,54 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+// ─────────────────────────────────────────────────────
+// Catalog (WO-O4O-API-PHARMACY-B2B-CATALOG-V1)
+// ─────────────────────────────────────────────────────
+
+export interface CatalogProduct {
+  id: string;
+  name: string;
+  category: string | null;
+  description: string | null;
+  purpose: string;
+  distributionType: string;
+  createdAt: string;
+  updatedAt: string;
+  supplierId: string;
+  supplierName: string;
+  supplierLogoUrl: string | null;
+  supplierCategory: string | null;
+  isApplied: boolean;
+  isApproved: boolean;
+  isListed: boolean;
+}
+
+export interface CatalogResponse {
+  success: boolean;
+  data: CatalogProduct[];
+  pagination: { total: number; limit: number; offset: number };
+}
+
 /**
- * 상품 판매 신청
+ * 플랫폼 B2B 상품 카탈로그 조회
+ */
+export async function getCatalog(params?: {
+  category?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<CatalogResponse> {
+  return apiClient.get('/pharmacy/products/catalog', params);
+}
+
+/**
+ * 상품 판매 신청 (카탈로그 기반 — supplyProductId)
+ */
+export async function applyBySupplyProductId(supplyProductId: string): Promise<{ success: boolean; data: ProductApplication }> {
+  return apiClient.post('/pharmacy/products/apply', { supplyProductId });
+}
+
+/**
+ * 상품 판매 신청 (레거시 — 수동 입력)
  */
 export async function applyProduct(params: {
   externalProductId: string;

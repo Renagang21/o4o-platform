@@ -16,8 +16,14 @@ export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 // WO-KPA-A-PAGE-ROLE-CLEANUP-V1: Dashboard
 export { PharmacyDashboardPage } from './PharmacyDashboardPage';
 
-// WO-KPA-A-PHARMACY-HUB-MENU-ALIGNMENT-V1: 약국 HUB (공동 자원 탐색)
-export { PharmacyHubPage } from './PharmacyHubPage';
+// WO-O4O-HUB-MARKET-RESTRUCTURE-V1: 약국 공용공간 (Market Layer)
+export { PharmacyHubMarketPage } from './PharmacyHubMarketPage';
+
+// WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리
+export { HubContentLibraryPage } from './HubContentLibraryPage';
+
+// WO-O4O-HUB-B2B-CATALOG-V1: B2B 상품 카탈로그
+export { HubB2BCatalogPage } from './HubB2BCatalogPage';
 
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
 export { PharmacySellPage } from './PharmacySellPage';
