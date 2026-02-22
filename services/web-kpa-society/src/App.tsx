@@ -80,6 +80,9 @@ import { IntranetRoutes } from './routes/IntranetRoutes';
 // WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
 import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
+// Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
+import { ManualHomePage, ManualPlaceholderPage, ManualServicePage } from './pages/manual';
+
 // Test Guide Pages
 import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
 
@@ -328,6 +331,14 @@ function App() {
           <Route path="/forum/post/:id" element={<Layout serviceName={SERVICE_NAME}><ForumDetailPage /></Layout>} />
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
+
+          {/* Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1) */}
+          <Route path="/manual" element={<Layout serviceName={SERVICE_NAME}><ManualHomePage /></Layout>} />
+          <Route path="/manual/service" element={<Layout serviceName={SERVICE_NAME}><ManualServicePage /></Layout>} />
+          <Route path="/manual/general" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="일반 사용자 매뉴얼" description="커뮤니티, 포럼, 강의, 콘텐츠 등 기본 기능 사용법." /></Layout>} />
+          <Route path="/manual/pharmacy" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="약국 개설자 매뉴얼" description="매장 개설, 상품 등록, 채널 관리, 주문 처리 등." /></Layout>} />
+          <Route path="/manual/admin" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Admin) 매뉴얼" description="플랫폼 관리, 승인 처리, 사용자 관리 등 관리자 업무." /></Layout>} />
+          <Route path="/manual/operator" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Operator) 매뉴얼" description="콘텐츠 운영, 서비스 관리, 데이터 모니터링 등." /></Layout>} />
 
           {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
           <Route path="/test" element={<TestCenterPage />} />
