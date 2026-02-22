@@ -276,7 +276,7 @@ function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardC
     { id: 'qa-orders', label: '주문 관리', link: '/store/orders', icon: '📦' },
     { id: 'qa-channels', label: '채널 관리', link: '/store/channels', icon: '📡' },
     { id: 'qa-signage', label: '사이니지', link: '/store/signage', icon: '🖥️' },
-    { id: 'qa-hub', label: '공용공간', link: '/hub', icon: '🔍' },
+    { id: 'qa-hub', label: '약국 HUB', link: '/hub', icon: '🔍' },
     { id: 'qa-settings', label: '설정', link: '/store/settings', icon: '⚙️' },
   ];
 

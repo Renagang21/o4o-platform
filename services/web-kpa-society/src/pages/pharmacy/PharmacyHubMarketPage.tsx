@@ -138,7 +138,7 @@ export function PharmacyHubMarketPage() {
     <div style={styles.container}>
       {/* Hero */}
       <header style={styles.hero}>
-        <h1 style={styles.heroTitle}>약국 공용공간</h1>
+        <h1 style={styles.heroTitle}>약국 HUB</h1>
         <p style={styles.heroDesc}>
           {currentOrganization?.name || '내 약국'} — 플랫폼이 제공하는 자원을 탐색하고 내 매장으로 가져갑니다
         </p>

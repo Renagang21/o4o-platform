@@ -255,7 +255,7 @@ export function StoreChannelsPage() {
           onClick={() => navigate('/hub')}
           className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
         >
-          공용공간으로 이동
+          약국 HUB으로 이동
         </button>
         <button
           onClick={() => navigate('/store/content')}
@@ -286,7 +286,7 @@ export function StoreChannelsPage() {
         channelAssets.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm">이 채널에 배치된 콘텐츠가 없습니다.</p>
-            <p className="text-xs mt-1">자산 관리에서 채널 배치를 설정하거나, 공용공간에서 콘텐츠를 가져오세요.</p>
+            <p className="text-xs mt-1">자산 관리에서 채널 배치를 설정하거나, 약국 HUB에서 콘텐츠를 가져오세요.</p>
           </div>
         ) : (
           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">

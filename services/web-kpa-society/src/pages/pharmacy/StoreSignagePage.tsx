@@ -375,7 +375,7 @@ export function StoreSignagePage() {
             className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
           >
             <Monitor className="w-4 h-4" />
-            공용공간에서 가져오기
+            약국 HUB에서 가져오기
           </button>
           <button
             onClick={() => { fetchItems(); loadPlaylists(); }}
@@ -628,7 +628,7 @@ export function StoreSignagePage() {
             onClick={() => navigate('/hub/signage')}
             className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
           >
-            공용공간에서 가져오기
+            약국 HUB에서 가져오기
           </button>
           <button
             onClick={() => navigate('/store/content?tab=signage')}
@@ -707,12 +707,12 @@ export function StoreSignagePage() {
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               <p className="text-sm">사이니지 자산이 없습니다.</p>
-              <p className="text-xs mt-1">공용공간에서 사이니지 콘텐츠를 가져와주세요.</p>
+              <p className="text-xs mt-1">약국 HUB에서 사이니지 콘텐츠를 가져와주세요.</p>
               <button
                 onClick={() => navigate('/hub/signage')}
                 className="mt-4 px-4 py-2 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
               >
-                공용공간으로 이동
+                약국 HUB으로 이동
               </button>
             </>
           ) : (

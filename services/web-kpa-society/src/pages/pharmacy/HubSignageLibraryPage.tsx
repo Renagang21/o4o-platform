@@ -191,7 +191,7 @@ export function HubSignageLibraryPage() {
     <div style={styles.container}>
       {/* Breadcrumb */}
       <div style={styles.breadcrumb}>
-        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 공용공간</Link>
+        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
       </div>
 
       {/* Hero */}

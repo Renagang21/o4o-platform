@@ -156,7 +156,7 @@ export default function ProductApplicationManagementPage() {
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: 24 }}>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>상품 판매 신청 관리</h1>
       <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 24 }}>
-        약국이 공용공간에서 신청한 B2B 상품을 승인하거나 거절합니다.
+        약국이 약국 HUB에서 신청한 B2B 상품을 승인하거나 거절합니다.
       </p>
 
       {/* Toast */}
