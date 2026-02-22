@@ -13,3 +13,4 @@ export { default as MemberManagementPage } from './MemberManagementPage';
 export { default as ContentManagementPage } from './ContentManagementPage';
 export { default as AuditLogPage } from './AuditLogPage';
 export { default as PharmacyRequestManagementPage } from './PharmacyRequestManagementPage';
+export { default as ProductApplicationManagementPage } from './ProductApplicationManagementPage';

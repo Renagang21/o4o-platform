@@ -257,6 +257,7 @@ function buildDashboardConfig(data: KpaExtendedData, isAdmin: boolean): Operator
     { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
     { id: 'qa-requests', label: '조직 가입 요청', link: '/operator/organization-requests', icon: '👥' },
     { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: '💊' },
+    { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: '🛒' },
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },

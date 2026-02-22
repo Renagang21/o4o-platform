@@ -73,6 +73,7 @@ import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from './controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
 import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
+import { createOperatorProductApplicationsController } from './controllers/operator-product-applications.controller.js';
 import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
@@ -177,6 +178,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     signageService,
     forumService,
   }));
+
+  // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
+  router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));

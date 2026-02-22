@@ -25,6 +25,9 @@ export { HubContentLibraryPage } from './HubContentLibraryPage';
 // WO-O4O-HUB-B2B-CATALOG-V1: B2B 상품 카탈로그
 export { HubB2BCatalogPage } from './HubB2BCatalogPage';
 
+// WO-O4O-HUB-SIGNAGE-INTEGRATION-V1: 플랫폼 사이니지 라이브러리
+export { HubSignageLibraryPage } from './HubSignageLibraryPage';
+
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1: 상품 판매 관리
 export { PharmacySellPage } from './PharmacySellPage';
 

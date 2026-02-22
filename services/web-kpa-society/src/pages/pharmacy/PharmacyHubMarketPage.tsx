@@ -2,6 +2,7 @@
  * PharmacyHubMarketPage - 약국 공용공간 (Market Layer)
  *
  * WO-O4O-HUB-MARKET-RESTRUCTURE-V1
+ * WO-O4O-HUB-PLATFORM-ACTIVITY-SUMMARY-V1: 플랫폼 활동 요약 영역 추가
  *
  * 플랫폼 4공간 구조:
  *   /pharmacy → Gate
@@ -12,9 +13,13 @@
  * Hub = "여기서 가져간다" — 플랫폼이 제공하는 자원을 탐색·선택하여 내 매장으로 가져가는 공간
  */
 
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
+import { getCatalog } from '../../api/pharmacyProducts';
+import { cmsApi } from '../../api/cms';
+import { listPlatformServices } from '../../api/platform-services';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 
 // ============================================
@@ -35,8 +40,8 @@ const HUB_CARDS = [
     icon: '🖥️',
     title: '플랫폼 사이니지',
     desc: '디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.',
-    status: 'coming' as const,
-    link: undefined,
+    status: 'active' as const,
+    link: '/hub/signage',
   },
   {
     id: 'products',
@@ -57,11 +62,77 @@ const HUB_CARDS = [
 ] as const;
 
 // ============================================
+// KPI 정의 (WO-O4O-HUB-PLATFORM-ACTIVITY-SUMMARY-V1)
+// ============================================
+
+interface PlatformKpi {
+  productCount: number;
+  contentCount: number;
+  serviceCount: number;
+}
+
+// ============================================
 // 컴포넌트
 // ============================================
 
 export function PharmacyHubMarketPage() {
   const { currentOrganization } = useOrganization();
+  const [kpi, setKpi] = useState<PlatformKpi | null>(null);
+  const [kpiLoading, setKpiLoading] = useState(true);
+
+  // 플랫폼 활동 KPI 로드 (1회, 병렬)
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadKpi() {
+      const results = await Promise.allSettled([
+        getCatalog({ limit: 1, offset: 0 }),
+        cmsApi.getContents({ status: 'published', limit: 1, offset: 0 }),
+        listPlatformServices(),
+      ]);
+
+      if (cancelled) return;
+
+      const productTotal = results[0].status === 'fulfilled'
+        ? results[0].value.pagination.total : 0;
+
+      const contentTotal = results[1].status === 'fulfilled'
+        ? results[1].value.pagination.total : 0;
+
+      const serviceCount = results[2].status === 'fulfilled'
+        ? results[2].value.filter(s => s.isFeatured && s.enrollmentStatus !== 'approved').length
+        : 0;
+
+      // 실패 시 console.warn
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          const labels = ['상품 카탈로그', 'CMS 콘텐츠', '추천 서비스'];
+          console.warn(`[Hub KPI] ${labels[i]} 조회 실패:`, r.reason);
+        }
+      });
+
+      setKpi({ productCount: productTotal, contentCount: contentTotal, serviceCount });
+      setKpiLoading(false);
+    }
+
+    loadKpi();
+    return () => { cancelled = true; };
+  }, []);
+
+  const kpiCards = useMemo(() => {
+    if (!kpi) return [];
+    return [
+      { label: '공개 상품', count: kpi.productCount, link: '/hub/b2b' },
+      { label: '공개 콘텐츠', count: kpi.contentCount, link: '/hub/content' },
+      { label: '추천 서비스', count: kpi.serviceCount, link: '#services' },
+    ];
+  }, [kpi]);
+
+  const handleKpiClick = (link: string) => {
+    if (link === '#services') {
+      document.getElementById('hub-services-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -72,6 +143,38 @@ export function PharmacyHubMarketPage() {
           {currentOrganization?.name || '내 약국'} — 플랫폼이 제공하는 자원을 탐색하고 내 매장으로 가져갑니다
         </p>
       </header>
+
+      {/* 플랫폼 활동 요약 (WO-O4O-HUB-PLATFORM-ACTIVITY-SUMMARY-V1) */}
+      <div style={styles.kpiBar}>
+        <span style={styles.kpiBarTitle}>플랫폼 활동 요약</span>
+        <div style={styles.kpiPills}>
+          {kpiLoading ? (
+            <>
+              <div style={styles.kpiSkeleton} />
+              <div style={styles.kpiSkeleton} />
+              <div style={styles.kpiSkeleton} />
+            </>
+          ) : (
+            kpiCards.map(item => (
+              item.link.startsWith('#') ? (
+                <button
+                  key={item.label}
+                  onClick={() => handleKpiClick(item.link)}
+                  style={styles.kpiPill}
+                >
+                  <span style={styles.kpiCount}>{item.count}</span>
+                  <span style={styles.kpiLabel}>{item.label}</span>
+                </button>
+              ) : (
+                <Link key={item.label} to={item.link} style={styles.kpiPill}>
+                  <span style={styles.kpiCount}>{item.count}</span>
+                  <span style={styles.kpiLabel}>{item.label}</span>
+                </Link>
+              )
+            ))
+          )}
+        </div>
+      </div>
 
       {/* 카드 그리드 */}
       <div style={styles.cardGrid}>
@@ -92,7 +195,7 @@ export function PharmacyHubMarketPage() {
       </div>
 
       {/* 추천 서비스 (기존 RecommendedServicesSection 재사용) */}
-      <div style={styles.servicesSection}>
+      <div id="hub-services-section" style={styles.servicesSection}>
         <h2 style={styles.sectionTitle}>추천 서비스</h2>
         <p style={styles.sectionDesc}>플랫폼이 권하는 서비스를 발견하고 이용을 신청하세요.</p>
         <RecommendedServicesSection />
@@ -124,7 +227,7 @@ const styles: Record<string, React.CSSProperties> = {
 
   // Hero
   hero: {
-    marginBottom: '32px',
+    marginBottom: '24px',
     paddingBottom: '24px',
     borderBottom: '2px solid #e2e8f0',
   },
@@ -138,6 +241,61 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '8px 0 0',
     fontSize: '0.95rem',
     color: colors.neutral500,
+  },
+
+  // KPI Bar
+  kpiBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '16px 20px',
+    marginBottom: '28px',
+    backgroundColor: colors.white,
+    borderRadius: borderRadius.lg,
+    border: `1px solid ${colors.neutral200}`,
+    boxShadow: shadows.sm,
+    flexWrap: 'wrap' as const,
+  },
+  kpiBarTitle: {
+    fontSize: '0.8125rem',
+    fontWeight: 600,
+    color: colors.neutral500,
+    whiteSpace: 'nowrap' as const,
+  },
+  kpiPills: {
+    display: 'flex',
+    gap: '12px',
+    flexWrap: 'wrap' as const,
+  },
+  kpiPill: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '20px',
+    border: `1px solid ${colors.neutral200}`,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    fontSize: '0.8125rem',
+    color: colors.neutral600,
+    fontWeight: 500,
+    transition: 'border-color 0.15s, background-color 0.15s',
+  },
+  kpiCount: {
+    fontSize: '1rem',
+    fontWeight: 700,
+    color: colors.primary,
+  },
+  kpiLabel: {
+    fontSize: '0.8125rem',
+    color: colors.neutral500,
+  },
+  kpiSkeleton: {
+    width: '100px',
+    height: '36px',
+    backgroundColor: '#f1f5f9',
+    borderRadius: '20px',
   },
 
   // Card grid

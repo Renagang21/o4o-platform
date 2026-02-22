@@ -101,7 +101,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, StorePlaceholderPage, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -495,6 +495,7 @@ function App() {
           {/* WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리 */}
           <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubContentLibraryPage /></PharmacyGuard></Layout>} />
           <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubB2BCatalogPage /></PharmacyGuard></Layout>} />
+          <Route path="/hub/signage" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubSignageLibraryPage /></PharmacyGuard></Layout>} />
           {/* Operator Routes — 5-Block 대시보드 + 서브페이지 */}
           <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />

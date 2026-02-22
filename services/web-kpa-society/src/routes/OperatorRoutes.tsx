@@ -17,7 +17,7 @@
 
 import { Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage } from '../pages/operator';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
@@ -92,6 +92,9 @@ export function OperatorRoutes() {
 
           {/* 약국 서비스 신청 관리 (WO-KPA-A-PHARMACY-REQUEST-OPERATOR-UI-V1) */}
           <Route path="pharmacy-requests" element={<PharmacyRequestManagementPage />} />
+
+          {/* 상품 판매 신청 관리 (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1) */}
+          <Route path="product-applications" element={<ProductApplicationManagementPage />} />
 
           {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
           <Route path="operators" element={
