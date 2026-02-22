@@ -1,649 +1,293 @@
 /**
- * PharmacyDashboardPage - 내 매장관리 (운영 컨트롤 타워)
+ * PharmacyDashboardPage - 매장 운영 OS (5-Block 표준)
  *
- * WO-KPA-A-PAGE-ROLE-CLEANUP-V1
- * WO-KPA-A-DASHBOARD-OPERATIONAL-UPGRADE-V1
- * WO-KPA-A-B2B-SECTION-SIMPLIFICATION-V1
- * WO-KPA-A-PUBLIC-RENDER-INTEGRATION-V2 (노출 상태 실제 published-assets 연동)
+ * WO-O4O-STORE-DASHBOARD-RESTRUCTURE-V1
  *
- * Dashboard = "현재 상태 파악 → 문제 인지 → 바로 실행"
- *
- * [1] KPI 상단 고정
- * [2] 운영 신호 (Alert / Signal)
- * [3] B2B (도매 구매) — 단일 통합 블록
- * [4] B2C 상태 요약
- * [5] 노출 상태 요약
- * [6] 빠른 실행 버튼 (Quick Actions)
+ * 5-Block 구조 (@o4o/operator-ux-core 재사용):
+ *  [1] KPI Grid       — 판매 중 상품, 승인 대기, 공개 콘텐츠, 활성 채널, 이용 서비스
+ *  [2] AI Summary     — KPI 기반 Rule-based 인사이트 (하드코딩 제거)
+ *  [3] Action Queue   — 조건부 즉시 처리 항목
+ *  [4] Activity Log   — 최근 자산/신청/채널 활동
+ *  [5] Quick Actions  — 매장 운영 바로가기
  */
 
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import {
+  OperatorDashboardLayout,
+  type OperatorDashboardConfig,
+  type KpiItem,
+  type AiSummaryItem,
+  type ActionItem,
+  type ActivityItem,
+  type QuickActionItem,
+} from '@o4o/operator-ux-core';
 import { useOrganization } from '../../contexts';
 import {
   fetchChannelOverview,
-  fetchStoreHubOverview,
   type ChannelOverview,
-  type ChannelStatus,
-  type StoreHubOverview,
 } from '../../api/storeHub';
 import {
   getApplications,
+  getListings,
   type ProductApplication,
+  type ProductListing,
 } from '../../api/pharmacyProducts';
-import { publishedAssetsApi } from '../../api/assetSnapshot';
-import { computeStoreInsights } from '@o4o/store-ui-core';
+import {
+  storeAssetControlApi,
+  type StoreAssetItem,
+} from '../../api/assetSnapshot';
+import { listPlatformServices, type PlatformServiceItem } from '../../api/platform-services';
 
-// ── Channel status display ──
+// ─── Data Shape ───
 
-const CHANNEL_STATUS_LABEL: Record<ChannelStatus, string> = {
-  APPROVED: '활성',
-  PENDING: '대기',
-  REJECTED: '반려',
-  SUSPENDED: '정지',
-  EXPIRED: '만료',
-  TERMINATED: '해지',
-};
+interface StoreDashboardData {
+  channels: ChannelOverview[];
+  applications: ProductApplication[];
+  listings: ProductListing[];
+  assets: StoreAssetItem[];
+  services: PlatformServiceItem[];
+}
 
-const CHANNEL_STATUS_STYLE: Record<ChannelStatus, { bg: string; color: string }> = {
-  APPROVED: { bg: '#dcfce7', color: '#166534' },
-  PENDING: { bg: '#fef3c7', color: '#92400e' },
-  REJECTED: { bg: '#fecaca', color: '#991b1b' },
-  SUSPENDED: { bg: '#f1f5f9', color: '#64748b' },
-  EXPIRED: { bg: '#f1f5f9', color: '#64748b' },
-  TERMINATED: { bg: '#f1f5f9', color: '#64748b' },
-};
+// ─── Config Builder ───
 
-type LoadState = 'loading' | 'loaded' | 'error';
-
-// ── Main Content ──
-
-function PharmacyDashboardContent() {
-  const navigate = useNavigate();
-  const { currentOrganization } = useOrganization();
-  const [loadState, setLoadState] = useState<LoadState>('loading');
-  const [channels, setChannels] = useState<ChannelOverview[]>([]);
-  const [overview, setOverview] = useState<StoreHubOverview | null>(null);
-  const [applications, setApplications] = useState<ProductApplication[]>([]);
-  const [publishedCounts, setPublishedCounts] = useState<{ home: number; signage: number; promotion: number } | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all([
-      fetchChannelOverview().catch(() => [] as ChannelOverview[]),
-      fetchStoreHubOverview().catch(() => null),
-      getApplications({ limit: 200 }).then(res => res.data).catch(() => [] as ProductApplication[]),
-    ]).then(([ch, ov, apps]) => {
-      if (cancelled) return;
-      setChannels(ch);
-      setOverview(ov);
-      setApplications(apps);
-      setLoadState('loaded');
-    });
-    return () => { cancelled = true; };
-  }, []);
-
-  // Published-assets exposure counts (fire-and-forget, non-blocking)
-  useEffect(() => {
-    if (!currentOrganization?.id) return;
-    let cancelled = false;
-    const orgId = currentOrganization.id;
-    Promise.all([
-      publishedAssetsApi.list(orgId, { channel: 'home', limit: 1 }).then(r => r.data.total).catch(() => 0),
-      publishedAssetsApi.list(orgId, { channel: 'signage', limit: 1 }).then(r => r.data.total).catch(() => 0),
-      publishedAssetsApi.list(orgId, { channel: 'promotion', limit: 1 }).then(r => r.data.total).catch(() => 0),
-    ]).then(([home, signage, promotion]) => {
-      if (!cancelled) setPublishedCounts({ home, signage, promotion });
-    });
-    return () => { cancelled = true; };
-  }, [currentOrganization?.id]);
-
-  // ── Derived data ──
+function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardConfig {
+  const { channels, applications, listings, assets, services } = data;
 
   const approvedChannels = channels.filter(ch => ch.status === 'APPROVED');
-  const pendingChannels = channels.filter(ch => ch.status === 'PENDING');
-  const rejectedChannels = channels.filter(ch => ch.status === 'REJECTED');
-  const b2cChannel = channels.find(ch => ch.channelType === 'B2C');
+  const activeListings = listings.filter(l => l.is_active);
+  const pendingApps = applications.filter(a => a.status === 'pending');
+  const publishedAssets = assets.filter(a => a.publishStatus === 'published');
+  const inactiveListings = listings.filter(l => !l.is_active);
+  const unpublishedAssets = assets.filter(a => a.publishStatus !== 'published');
+  const enrolledServices = services.filter(s => s.enrollmentStatus === 'approved');
 
-  const totalVisibleProducts = approvedChannels.reduce((sum, ch) => sum + ch.visibleProductCount, 0);
-  const totalProducts = approvedChannels.reduce((sum, ch) => sum + ch.totalProductCount, 0);
+  // ── Block 1: KPI Grid ──
 
-  const contentCount = overview?.contents.totalSlotCount ?? 0;
-  const signageContentCount = overview?.signage.pharmacy.contentCount ?? 0;
-  const signageActiveCount = overview?.signage.pharmacy.activeCount ?? 0;
+  const kpis: KpiItem[] = [
+    {
+      key: 'active-listings',
+      label: '판매 중 상품',
+      value: activeListings.length,
+      status: activeListings.length === 0 && listings.length > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'pending-apps',
+      label: '승인 대기 상품',
+      value: pendingApps.length,
+      status: pendingApps.length > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'published-content',
+      label: '공개 콘텐츠',
+      value: publishedAssets.length,
+      status: publishedAssets.length === 0 && assets.length > 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'active-channels',
+      label: '활성 채널',
+      value: `${approvedChannels.length}/${channels.length}`,
+      status: channels.length > 0 && approvedChannels.length === 0 ? 'warning' : 'neutral',
+    },
+    {
+      key: 'enrolled-services',
+      label: '이용 서비스',
+      value: enrolledServices.length,
+      status: 'neutral',
+    },
+  ];
 
-  // ── B2B 통합 집계 ──
+  // ── Block 2: AI Summary (Rule-based) ──
 
-  const pendingApps = applications.filter(a => a.status === 'pending').length;
-  const approvedApps = applications.filter(a => a.status === 'approved').length;
-  const rejectedApps = applications.filter(a => a.status === 'rejected').length;
-  const glycopharmCount = overview?.products.glycopharm.totalCount ?? 0;
-  const cosmeticsCount = overview?.products.cosmetics.listedCount ?? 0;
-  const totalB2bProducts = glycopharmCount + cosmeticsCount;
+  const aiSummary: AiSummaryItem[] = [];
 
-  // ── AI Insights (WO-STORE-AI-INSIGHT-LAYER-V1) ──
-
-  const insights = computeStoreInsights({
-    monthlyRevenue: 0, // API 미연결
-    totalOrders: 0,
-    inProgressOrders: 0,
-    activeChannels: approvedChannels.length,
-    totalChannels: channels.length,
-    visibleProducts: totalVisibleProducts,
-  });
-
-  // ── Signals (조건 기반) ──
-
-  const signals: Array<{ type: 'warning' | 'error' | 'info'; message: string; actionPath?: string; actionLabel?: string }> = [];
-
-  if (channels.length > 0 && approvedChannels.length === 0) {
-    signals.push({ type: 'error', message: '승인된 채널이 없습니다. 채널 승인 후 상품 판매가 가능합니다' });
+  if (pendingApps.length > 0) {
+    aiSummary.push({
+      id: 'ai-pending-apps',
+      message: `승인 대기 상품이 ${pendingApps.length}건 있습니다. 운영자 승인 후 진열 가능합니다.`,
+      level: pendingApps.length > 3 ? 'warning' : 'info',
+      link: '/store/products',
+    });
   }
-  if (pendingChannels.length > 0) {
-    signals.push({ type: 'warning', message: `승인 대기 중인 채널이 ${pendingChannels.length}개 있습니다` });
-  }
-  if (rejectedChannels.length > 0) {
-    signals.push({ type: 'error', message: `반려된 채널이 ${rejectedChannels.length}개 있습니다. 재신청이 필요합니다` });
-  }
-  if (approvedChannels.length > 0 && totalVisibleProducts === 0) {
-    signals.push({ type: 'warning', message: '노출되는 상품이 없습니다. 상품 등록이 필요합니다' });
-  }
-  if (signageContentCount === 0) {
-    signals.push({ type: 'info', message: '등록된 영상/동영상 목록이 없습니다', actionPath: '/signage', actionLabel: '영상 등록하기' });
+
+  if (publishedAssets.length === 0 && assets.length > 0) {
+    aiSummary.push({
+      id: 'ai-no-published',
+      message: '공개된 콘텐츠가 없습니다. 콘텐츠를 게시하여 채널에 노출하세요.',
+      level: 'warning',
+      link: '/store/content',
+    });
   }
 
-  // ── Loading ──
+  if (channels.length > 0 && approvedChannels.length < 2) {
+    aiSummary.push({
+      id: 'ai-channels-low',
+      message: `활성 채널이 ${approvedChannels.length}개입니다. 채널을 확장하여 노출을 높여보세요.`,
+      level: 'info',
+      link: '/store/channels',
+    });
+  }
 
-  if (loadState === 'loading') {
+  if (inactiveListings.length > 0) {
+    aiSummary.push({
+      id: 'ai-inactive-listings',
+      message: `비활성 상품이 ${inactiveListings.length}건 있습니다. 진열을 활성화하세요.`,
+      level: 'info',
+      link: '/store/products',
+    });
+  }
+
+  // ── Block 3: Action Queue ──
+
+  const actionQueue: ActionItem[] = [];
+
+  if (pendingApps.length > 0) {
+    actionQueue.push({
+      id: 'aq-pending-apps',
+      label: '승인 대기 상품',
+      count: pendingApps.length,
+      link: '/store/products',
+    });
+  }
+
+  if (unpublishedAssets.length > 0) {
+    actionQueue.push({
+      id: 'aq-unpublished',
+      label: '미게시 콘텐츠',
+      count: unpublishedAssets.length,
+      link: '/store/content',
+    });
+  }
+
+  if (inactiveListings.length > 0) {
+    actionQueue.push({
+      id: 'aq-inactive-listings',
+      label: '비활성 상품 진열',
+      count: inactiveListings.length,
+      link: '/store/products',
+    });
+  }
+
+  // ── Block 4: Activity Log ──
+
+  const activityLog: ActivityItem[] = [];
+
+  // 최근 상품 신청
+  for (const app of applications.slice(0, 5)) {
+    activityLog.push({
+      id: `app-${app.id}`,
+      message: `상품 신청: ${app.product_name ?? '상품'} (${app.status === 'pending' ? '대기' : app.status === 'approved' ? '승인' : '거절'})`,
+      timestamp: app.created_at,
+    });
+  }
+
+  // 최근 콘텐츠 자산
+  for (const asset of assets.slice(0, 5)) {
+    activityLog.push({
+      id: `asset-${asset.id}`,
+      message: `콘텐츠: ${asset.title} (${asset.publishStatus === 'published' ? '게시됨' : '미게시'})`,
+      timestamp: asset.createdAt,
+    });
+  }
+
+  // 정렬 + 제한
+  activityLog.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
+  activityLog.splice(10);
+
+  // ── Block 5: Quick Actions ──
+
+  const quickActions: QuickActionItem[] = [
+    { id: 'qa-products', label: '상품 관리', link: '/store/products', icon: '🏪' },
+    { id: 'qa-content', label: '콘텐츠 관리', link: '/store/content', icon: '🗂️' },
+    { id: 'qa-orders', label: '주문 관리', link: '/store/orders', icon: '📦' },
+    { id: 'qa-channels', label: '채널 관리', link: '/store/channels', icon: '📡' },
+    { id: 'qa-signage', label: '사이니지', link: '/store/signage', icon: '🖥️' },
+    { id: 'qa-hub', label: '공용공간', link: '/hub', icon: '🔍' },
+    { id: 'qa-settings', label: '설정', link: '/store/settings', icon: '⚙️' },
+  ];
+
+  return { kpis, aiSummary, actionQueue, activityLog, quickActions };
+}
+
+// ─── Component ───
+
+export function PharmacyDashboardPage() {
+  const { currentOrganization } = useOrganization();
+  const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const results = await Promise.allSettled([
+        fetchChannelOverview().catch(() => [] as ChannelOverview[]),
+        getApplications({ limit: 200 }).then(res => res.data).catch(() => [] as ProductApplication[]),
+        getListings().then(res => res.data).catch(() => [] as ProductListing[]),
+        storeAssetControlApi.list({ limit: 200 }).then(res => res.data.items).catch(() => [] as StoreAssetItem[]),
+        listPlatformServices().catch(() => [] as PlatformServiceItem[]),
+      ]);
+
+      const channels = results[0].status === 'fulfilled' ? results[0].value : [];
+      const applications = results[1].status === 'fulfilled' ? results[1].value : [];
+      const listings = results[2].status === 'fulfilled' ? results[2].value : [];
+      const assets = results[3].status === 'fulfilled' ? results[3].value : [];
+      const services = results[4].status === 'fulfilled' ? results[4].value : [];
+
+      setConfig(buildStoreDashboardConfig({
+        channels: channels as ChannelOverview[],
+        applications: applications as ProductApplication[],
+        listings: listings as ProductListing[],
+        assets: assets as StoreAssetItem[],
+        services: services as PlatformServiceItem[],
+      }));
+    } catch (err) {
+      setError('데이터를 불러오지 못했습니다.');
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
     return (
-      <div style={S.page}>
-        <div style={S.loadingCard}>
-          <p style={{ margin: 0, color: '#94a3b8', fontSize: '14px' }}>운영 정보를 불러오는 중...</p>
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+      </div>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-slate-500 mb-4">{error || '데이터를 불러올 수 없습니다.'}</p>
+        <button
+          onClick={fetchData}
+          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium text-slate-700 transition-colors"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
 
   return (
-    <div style={S.page}>
-      {/* Header */}
-      <div style={S.header}>
-        <h1 style={S.headerTitle}>내 매장관리</h1>
-        <p style={S.headerSub}>{currentOrganization.name}</p>
-      </div>
-
-      {/* [1] KPI 상단 블록 */}
-      <section style={S.section}>
-        <div style={S.kpiGrid}>
-          <KpiCard label="활성 채널" value={`${approvedChannels.length}/${channels.length}`} />
-          <KpiCard
-            label="진열 상품"
-            value={totalVisibleProducts}
-            sub={totalProducts > 0 ? `/ ${totalProducts}` : undefined}
-          />
-          <KpiCard label="콘텐츠" value={contentCount} />
-          <KpiCard
-            label="사이니지"
-            value={signageActiveCount}
-            sub={signageContentCount > 0 ? `/ ${signageContentCount}` : undefined}
-          />
-          <KpiCard
-            label="승인 대기"
-            value={pendingChannels.length}
-            alert={pendingChannels.length > 0}
-          />
-        </div>
-      </section>
-
-      {/* AI 경영 인사이트 (WO-STORE-AI-INSIGHT-LAYER-V1 + WO-STORE-INSIGHT-ACTION-BRIDGE-V1) */}
-      {insights.length > 0 && (
-        <section style={S.section}>
-          <h2 style={S.sectionTitle}>경영 인사이트</h2>
-          <div style={S.insightCard}>
-            {insights.map((ins) => (
-              <div key={ins.code} style={S.insightRow}>
-                <span style={S.insightIcon}>
-                  {ins.level === 'critical' ? '🔴' : ins.level === 'warning' ? '🟡' : '🔵'}
-                </span>
-                <div style={{ flex: 1 }}>
-                  <p style={S.insightMsg}>{ins.message}</p>
-                  {ins.recommendation && (
-                    <p style={S.insightRec}>{ins.recommendation}</p>
-                  )}
-                </div>
-                {ins.action && (
-                  <button
-                    onClick={() => navigate(ins.action!.target)}
-                    style={S.insightActionBtn}
-                  >
-                    {ins.action.label} →
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* [2] 운영 신호 */}
-      {signals.length > 0 && (
-        <section style={S.section}>
-          <h2 style={S.sectionTitle}>운영 신호</h2>
-          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '8px' }}>
-            {signals.map((sig, i) => (
-              <SignalCard key={i} type={sig.type} message={sig.message} actionPath={sig.actionPath} actionLabel={sig.actionLabel} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* [3] B2B (도매 구매) */}
-      <section style={S.section}>
-        <h2 style={S.sectionTitle}>B2B (도매 구매)</h2>
-        <div style={S.statusCard}>
-          <StatusRow label="신청 건수" value={String(applications.length)} />
-          <StatusRow
-            label="승인 대기"
-            value={String(pendingApps)}
-            badge={pendingApps > 0 ? { bg: '#fef3c7', color: '#92400e' } : undefined}
-          />
-          <StatusRow label="승인 완료" value={String(approvedApps)} />
-          {rejectedApps > 0 && (
-            <StatusRow
-              label="반려"
-              value={String(rejectedApps)}
-              badge={{ bg: '#fecaca', color: '#991b1b' }}
-            />
-          )}
-          <StatusRow label="보유 상품" value={String(totalB2bProducts)} />
-          <StatusRow label="진열 상품" value={String(cosmeticsCount)} />
-        </div>
-        <button
-          onClick={() => navigate('/store/products')}
-          style={S.b2bLink}
-        >
-          B2B 관리 &rarr;
-        </button>
-      </section>
-
-      {/* [4] B2C 상태 요약 */}
-      <section style={S.section}>
-        <h2 style={S.sectionTitle}>B2C 현황</h2>
-        <div style={S.statusCard}>
-          <StatusRow
-            label="채널 상태"
-            value={b2cChannel ? CHANNEL_STATUS_LABEL[b2cChannel.status] : '미등록'}
-            badge={b2cChannel ? CHANNEL_STATUS_STYLE[b2cChannel.status] : undefined}
-          />
-          <StatusRow
-            label="진열 상품"
-            value={
-              b2cChannel?.status === 'APPROVED'
-                ? `${b2cChannel.visibleProductCount} / ${b2cChannel.totalProductCount}`
-                : '–'
-            }
-          />
-          <StatusRow label="오늘 주문" value="–" note="준비 중" />
-          <StatusRow label="배송 중" value="–" note="준비 중" />
-        </div>
-      </section>
-
-      {/* [5] 노출 상태 요약 — published-assets 실제 데이터 연동 */}
-      <section style={S.section}>
-        <h2 style={S.sectionTitle}>노출 상태</h2>
-        <div style={S.statusCard}>
-          <ExposureRow
-            label="홈 노출"
-            active={(publishedCounts?.home ?? 0) > 0}
-            desc={
-              publishedCounts
-                ? publishedCounts.home > 0
-                  ? `${publishedCounts.home}건 게시됨`
-                  : '게시된 콘텐츠 없음'
-                : '확인 중...'
-            }
-          />
-          <ExposureRow
-            label="사이니지"
-            active={(publishedCounts?.signage ?? 0) > 0}
-            desc={
-              publishedCounts
-                ? publishedCounts.signage > 0
-                  ? `${publishedCounts.signage}건 게시됨`
-                  : '게시된 콘텐츠 없음'
-                : '확인 중...'
-            }
-          />
-          <ExposureRow
-            label="프로모션"
-            active={(publishedCounts?.promotion ?? 0) > 0}
-            desc={
-              publishedCounts
-                ? publishedCounts.promotion > 0
-                  ? `${publishedCounts.promotion}건 게시됨`
-                  : '게시된 콘텐츠 없음'
-                : '확인 중...'
-            }
-          />
-        </div>
-      </section>
-
-      {/* [6] 빠른 실행 */}
-      <section>
-        <h2 style={S.sectionTitle}>빠른 실행</h2>
-        <div style={S.quickGrid}>
-          <QuickBtn icon="🏪" label="상품 관리" onClick={() => navigate('/store/products')} />
-          <QuickBtn icon="📦" label="주문 관리" onClick={() => navigate('/store/orders')} />
-          <QuickBtn icon="📡" label="채널 관리" onClick={() => navigate('/store/channels')} />
-          <QuickBtn icon="🗂️" label="콘텐츠" onClick={() => navigate('/store/content')} />
-          <QuickBtn icon="🖥️" label="사이니지" onClick={() => navigate('/store/signage')} />
-          <QuickBtn icon="⚙️" label="설정" onClick={() => navigate('/store/settings')} />
-        </div>
-      </section>
-    </div>
-  );
-}
-
-// ── Sub-components ──
-
-function KpiCard({ label, value, sub, alert }: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  alert?: boolean;
-}) {
-  return (
-    <div style={{
-      ...S.kpiCard,
-      borderColor: alert ? '#fbbf24' : '#e2e8f0',
-    }}>
-      <div style={{
-        fontSize: '24px',
-        fontWeight: 700,
-        color: alert ? '#d97706' : '#0f172a',
-      }}>
-        {value}
-        {sub && (
-          <span style={{ fontSize: '14px', fontWeight: 400, color: '#94a3b8', marginLeft: '2px' }}>
-            {sub}
-          </span>
+    <div style={{ maxWidth: '960px', margin: '0 auto', padding: '32px 20px' }}>
+      <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '2px solid #e2e8f0' }}>
+        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: '#0f172a' }}>
+          내 매장관리
+        </h1>
+        {currentOrganization?.name && (
+          <p style={{ margin: '6px 0 0', fontSize: '14px', color: '#64748b' }}>
+            {currentOrganization.name}
+          </p>
         )}
       </div>
-      <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>{label}</div>
+      <OperatorDashboardLayout config={config} />
     </div>
   );
 }
-
-function SignalCard({ type, message, actionPath, actionLabel }: {
-  type: 'warning' | 'error' | 'info';
-  message: string;
-  actionPath?: string;
-  actionLabel?: string;
-}) {
-  const navigate = useNavigate();
-  const config = {
-    warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', icon: '⚠️' },
-    error: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', icon: '🔴' },
-    info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1e40af', icon: 'ℹ️' },
-  }[type];
-
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      padding: '12px 16px',
-      background: config.bg,
-      border: `1px solid ${config.border}`,
-      borderRadius: '8px',
-    }}>
-      <span style={{ fontSize: '16px', flexShrink: 0 }}>{config.icon}</span>
-      <span style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: config.color }}>{message}</span>
-      {actionPath && actionLabel && (
-        <button
-          onClick={() => navigate(actionPath)}
-          style={{
-            flexShrink: 0,
-            padding: '4px 12px',
-            fontSize: '12px',
-            fontWeight: 600,
-            color: config.color,
-            background: 'transparent',
-            border: `1px solid ${config.color}`,
-            borderRadius: '6px',
-            cursor: 'pointer',
-          }}
-        >
-          {actionLabel} →
-        </button>
-      )}
-    </div>
-  );
-}
-
-function StatusRow({ label, value, note, badge }: {
-  label: string;
-  value: string;
-  note?: string;
-  badge?: { bg: string; color: string };
-}) {
-  return (
-    <div style={S.statusRow}>
-      <span style={{ fontSize: '14px', color: '#64748b' }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {badge ? (
-          <span style={{
-            padding: '2px 10px',
-            borderRadius: '4px',
-            fontSize: '12px',
-            fontWeight: 600,
-            background: badge.bg,
-            color: badge.color,
-          }}>
-            {value}
-          </span>
-        ) : (
-          <span style={{
-            fontSize: '14px',
-            fontWeight: 600,
-            color: value === '–' ? '#cbd5e1' : '#0f172a',
-          }}>
-            {value}
-          </span>
-        )}
-        {note && <span style={{ fontSize: '11px', color: '#94a3b8' }}>{note}</span>}
-      </div>
-    </div>
-  );
-}
-
-function ExposureRow({ label, active, desc }: {
-  label: string;
-  active?: boolean;
-  desc: string;
-}) {
-  return (
-    <div style={S.statusRow}>
-      <span style={{ fontSize: '14px', color: '#64748b' }}>{label}</span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{
-          display: 'inline-block',
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: active ? '#22c55e' : '#cbd5e1',
-          flexShrink: 0,
-        }} />
-        <span style={{ fontSize: '13px', color: active ? '#166534' : '#94a3b8' }}>
-          {desc}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function QuickBtn({ icon, label, onClick }: {
-  icon: string;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={S.quickBtn}
-      onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = '#ffffff'; }}
-    >
-      <span style={{ fontSize: '20px' }}>{icon}</span>
-      <span style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>{label}</span>
-    </button>
-  );
-}
-
-// ── Export ──
-
-export function PharmacyDashboardPage() {
-  return <PharmacyDashboardContent />;
-}
-
-// ── Styles ──
-
-const S: Record<string, React.CSSProperties> = {
-  page: {
-    maxWidth: '960px',
-    margin: '0 auto',
-    padding: '32px 20px',
-  },
-  header: {
-    marginBottom: '28px',
-    paddingBottom: '16px',
-    borderBottom: '2px solid #e2e8f0',
-  },
-  headerTitle: {
-    margin: 0,
-    fontSize: '24px',
-    fontWeight: 700,
-    color: '#0f172a',
-  },
-  headerSub: {
-    margin: '6px 0 0',
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  loadingCard: {
-    padding: '40px',
-    textAlign: 'center',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '12px',
-  },
-  section: {
-    marginBottom: '24px',
-  },
-  sectionTitle: {
-    margin: '0 0 12px',
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#0f172a',
-  },
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-    gap: '12px',
-  },
-  kpiCard: {
-    padding: '16px',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '10px',
-    textAlign: 'center',
-  },
-  statusCard: {
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '10px',
-    overflow: 'hidden',
-  },
-  statusRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 16px',
-    borderBottom: '1px solid #f1f5f9',
-  },
-  b2bLink: {
-    display: 'block',
-    width: '100%',
-    marginTop: '10px',
-    padding: '8px 0',
-    fontSize: '13px',
-    fontWeight: 500,
-    color: '#2563eb',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    textAlign: 'center',
-  },
-  quickGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-    gap: '10px',
-  },
-  quickBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '16px 12px',
-    background: '#ffffff',
-    border: '1px solid #e2e8f0',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    transition: 'background 0.15s',
-  },
-  // AI Insight styles (WO-STORE-AI-INSIGHT-LAYER-V1)
-  insightCard: {
-    background: '#f0f9ff',
-    border: '1px solid #bae6fd',
-    borderRadius: '10px',
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  } as React.CSSProperties,
-  insightRow: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '10px',
-  },
-  insightIcon: {
-    fontSize: '14px',
-    flexShrink: 0,
-    marginTop: '2px',
-  } as React.CSSProperties,
-  insightMsg: {
-    margin: 0,
-    fontSize: '13px',
-    fontWeight: 600,
-    color: '#0f172a',
-  },
-  insightRec: {
-    margin: '2px 0 0',
-    fontSize: '12px',
-    fontWeight: 400,
-    color: '#64748b',
-  },
-  insightActionBtn: {
-    flexShrink: 0,
-    alignSelf: 'center',
-    padding: '4px 12px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#2563eb',
-    background: 'transparent',
-    border: '1px solid #93c5fd',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-};
