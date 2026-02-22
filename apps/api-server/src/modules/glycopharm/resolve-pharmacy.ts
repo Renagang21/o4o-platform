@@ -18,6 +18,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import logger from '../../utils/logger.js';
 
 export async function resolveGlycopharmPharmacyId(
   dataSource: DataSource,
@@ -35,5 +36,7 @@ export async function resolveGlycopharmPharmacyId(
     [userId],
   );
 
-  return result.length > 0 ? result[0].id : null;
+  const pharmacyId = result.length > 0 ? result[0].id : null;
+  logger.info('[resolveGlycopharmPharmacyId] userId=%s → pharmacyId=%s', userId, pharmacyId);
+  return pharmacyId;
 }
