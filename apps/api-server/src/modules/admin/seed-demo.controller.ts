@@ -173,8 +173,8 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
   //    Care: 12, Hybrid: 7
   // ------------------------------------------------------------------
   const patientConfigs = [
-    { orgIdx: 1, userId: DEMO_IDS.userCare, count: 12, label: 'Care' },
-    { orgIdx: 3, userId: DEMO_IDS.userHybrid, count: 7, label: 'Hybrid' },
+    { orgIdx: 1, userId: DEMO_IDS.userCare, pharmacyId: DEMO_IDS.pharmCare, count: 12, label: 'Care' },
+    { orgIdx: 3, userId: DEMO_IDS.userHybrid, pharmacyId: DEMO_IDS.pharmHybrid, count: 7, label: 'Hybrid' },
   ];
 
   for (const pc of patientConfigs) {
@@ -182,9 +182,9 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
       const pid = demoUuid(DEMO_IDS.patientPrefix,pc.orgIdx, i);
       await insertIfNotExists(
         'glucoseview_customers', pid,
-        `INSERT INTO glucoseview_customers (id, pharmacist_id, name, phone, visit_count, sync_status, created_at, updated_at)
-         VALUES ($1, $2, $3, '010-0000-0000', $4, 'synced', NOW(), NOW())`,
-        [pid, pc.userId, `[DEMO] ${pc.label} 환자 ${i}`, i],
+        `INSERT INTO glucoseview_customers (id, pharmacist_id, organization_id, name, phone, visit_count, sync_status, created_at, updated_at)
+         VALUES ($1, $2, $5, $3, '010-0000-0000', $4, 'synced', NOW(), NOW())`,
+        [pid, pc.userId, `[DEMO] ${pc.label} 환자 ${i}`, i, pc.pharmacyId],
         `patient:${pc.label}-${i}`,
       );
     }

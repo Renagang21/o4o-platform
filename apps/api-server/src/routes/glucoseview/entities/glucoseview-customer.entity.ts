@@ -30,8 +30,16 @@ export class GlucoseViewCustomer {
   id!: string;
 
   /**
+   * The organization (pharmacy) that owns this customer record
+   * WO-CARE-ORG-SCOPE-MIGRATION-V1: primary scoping column
+   */
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  organization_id?: string;
+
+  /**
    * The pharmacist (user) who registered this customer
-   * This is the owner of this customer record
+   * Retained as "registered by" reference
    */
   @Column({ type: 'varchar', length: 255 })
   @Index()

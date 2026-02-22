@@ -220,8 +220,8 @@ export function createPharmacyController(
    * GET /pharmacy/customers
    * Get customers for the authenticated user's pharmacy
    *
-   * WO-CARE-CUSTOMERS-API-RESTORE-V1: stub 제거, glucoseview_customers 직접 조회
-   * - pharmacist_id = 로그인 userId 기준
+   * WO-CARE-ORG-SCOPE-MIGRATION-V1: organization_id 기준 약국 단위 조회
+   * - organization_id = 로그인 사용자의 약국(organization) 기준
    * - safeQuery: 테이블 미존재 시 빈 배열 반환 (TABLE_MISSING 방어)
    */
   router.get(
@@ -237,14 +237,25 @@ export function createPharmacyController(
           return;
         }
 
+        // Resolve organization (pharmacy) for the logged-in user
+        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
+        const pharmacy = await pharmacyRepo.findOne({
+          where: { created_by_user_id: userId },
+        });
+
+        if (!pharmacy) {
+          res.json({ success: true, data: { items: [], total: 0, page: 1, pageSize: 50, totalPages: 0 } });
+          return;
+        }
+
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = Math.min(parseInt(req.query.pageSize as string) || 50, 100);
         const search = (req.query.search as string) || '';
         const offset = (page - 1) * pageSize;
 
-        // Build WHERE clause
-        const conditions = ['c.pharmacist_id = $1'];
-        const params: any[] = [userId];
+        // Build WHERE clause — organization_id 기준
+        const conditions = ['c.organization_id = $1'];
+        const params: any[] = [pharmacy.id];
 
         if (search.trim()) {
           params.push(`%${search.trim()}%`);
