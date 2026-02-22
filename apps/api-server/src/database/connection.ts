@@ -434,12 +434,13 @@ export const AppDataSource = new DataSource({
   logging: ['error'], // 프로덕션에서는 에러만 로깅
   
   // 연결 풀 설정 (PostgreSQL에서만 사용)
+  // Cloud SQL Auth Proxy cold start 시 10초 이상 소요 가능 → 타임아웃 충분히 확보
   ...(DB_TYPE === 'postgres' ? {
     extra: {
       max: 20,           // 최대 연결 수
-      min: 5,            // 최소 연결 수
+      min: 2,            // 최소 연결 수 (cold start 부담 감소)
       idleTimeoutMillis: 30000,  // 유휴 연결 타임아웃
-      connectionTimeoutMillis: 2000, // 연결 타임아웃
+      connectionTimeoutMillis: 10000, // 연결 타임아웃 (Cloud SQL Auth Proxy 대응)
     }
   } : {}),
   
