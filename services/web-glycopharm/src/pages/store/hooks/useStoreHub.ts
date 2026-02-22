@@ -199,17 +199,17 @@ async function executeAction(key: string, _payload?: Record<string, unknown>): P
 
   switch (key) {
     case 'glycopharm.trigger.care_review': {
-      const res = await api.post('/api/v1/glycopharm/pharmacy/hub/trigger/care-review');
+      const res = await api.post('/glycopharm/pharmacy/hub/trigger/care-review');
       const body = res.data as any;
       return { success: body.success, message: body.data?.message || body.error?.message };
     }
     case 'glycopharm.trigger.create_session': {
-      const res = await api.post('/api/v1/glycopharm/pharmacy/hub/trigger/coaching-auto-create');
+      const res = await api.post('/glycopharm/pharmacy/hub/trigger/coaching-auto-create');
       const body = res.data as any;
       return { success: body.success, message: body.data?.message || body.error?.message };
     }
     case 'glycopharm.trigger.refresh_ai': {
-      const res = await api.post('/api/v1/glycopharm/pharmacy/hub/trigger/ai-refresh');
+      const res = await api.post('/glycopharm/pharmacy/hub/trigger/ai-refresh');
       const body = res.data as any;
       return { success: body.success, message: body.data?.message || body.error?.message };
     }
@@ -249,11 +249,11 @@ export function useStoreHub() {
 
     try {
       const [aiRes, actionsRes, careRes, signageRes, productsRes] = await Promise.allSettled([
-        api.get('/api/v1/glycopharm/pharmacy/cockpit/ai-summary'),
-        api.get('/api/v1/glycopharm/pharmacy/cockpit/today-actions'),
-        api.get('/api/v1/care/dashboard'),
-        api.get('/api/v1/glycopharm/pharmacy/cockpit/franchise-services'),
-        api.get('/api/v1/glycopharm/pharmacy/products?pageSize=1'),
+        api.get('/glycopharm/pharmacy/cockpit/ai-summary'),
+        api.get('/glycopharm/pharmacy/cockpit/today-actions'),
+        api.get('/care/dashboard'),
+        api.get('/glycopharm/pharmacy/cockpit/franchise-services'),
+        api.get('/glycopharm/pharmacy/products?pageSize=1'),
       ]);
 
       [aiRes, actionsRes, careRes, signageRes, productsRes].forEach((r, i) => {
