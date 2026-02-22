@@ -93,7 +93,7 @@ describe('Pharmacy Context Middleware', () => {
       );
     });
 
-    it('user with no pharmacy → 403 NO_PHARMACY', async () => {
+    it('user with no pharmacy → 403 GLYCOPHARM_NOT_ENROLLED', async () => {
       const ds = createMockDataSource([]); // empty result
       const middleware = createPharmacyContextMiddleware(ds);
 
@@ -106,10 +106,10 @@ describe('Pharmacy Context Middleware', () => {
 
       expect(next.called).toBe(false);
       expect(res.statusCode).toBe(403);
-      expect(res.body.error.code).toBe('NO_PHARMACY');
+      expect(res.body.error).toBe('GLYCOPHARM_NOT_ENROLLED');
     });
 
-    it('DB query returns null → 403 NO_PHARMACY', async () => {
+    it('DB query returns null → 403 GLYCOPHARM_NOT_ENROLLED', async () => {
       const ds = createMockDataSource(null); // null result
       const middleware = createPharmacyContextMiddleware(ds);
 
