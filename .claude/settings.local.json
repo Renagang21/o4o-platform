@@ -618,7 +618,10 @@
       "Bash(more:*)",
       "Bash(timeout:*)",
       "Bash(tr:*)",
-      "Bash(request \")"
+      "Bash(request \")",
+      "Bash(npm test:*)",
+      "Bash(head:*)",
+      "Bash(del \"c:\\\\Users\\\\sohae\\\\o4o-platform\\\\services\\\\web-glycopharm\\\\src\\\\types\\\\marketTrial.ts\")"
     ],
     "deny": []
   }
