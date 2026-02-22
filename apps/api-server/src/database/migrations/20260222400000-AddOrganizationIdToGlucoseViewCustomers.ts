@@ -16,12 +16,13 @@ export class AddOrganizationIdToGlucoseViewCustomers20260222400000 implements Mi
       ADD COLUMN IF NOT EXISTS organization_id UUID
     `);
 
-    // 2. Backfill: pharmacist_id → organization via created_by_user_id
+    // 2. Backfill: pharmacist_id(varchar) → organization via created_by_user_id(uuid)
+    //    CAST required: pharmacist_id is VARCHAR(255), created_by_user_id is UUID
     await queryRunner.query(`
       UPDATE glucoseview_customers gc
       SET organization_id = o.id
       FROM organizations o
-      WHERE o.created_by_user_id = gc.pharmacist_id
+      WHERE o.created_by_user_id = gc.pharmacist_id::uuid
         AND o."isActive" = true
         AND gc.organization_id IS NULL
     `);
