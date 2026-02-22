@@ -60,6 +60,8 @@ export interface HomePreviewData {
     recentCoachingStatus?: MetricStatus;
     recentAnalysis: number;
     recentAnalysisStatus?: MetricStatus;
+    avgTimeInRange?: number;
+    avgTimeInRangeStatus?: MetricStatus;
     recentChanges: Array<{
       tirChange?: number;
       cvChange?: number;

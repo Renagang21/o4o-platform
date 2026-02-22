@@ -143,6 +143,94 @@ function CareSnapshotSection({ care }: { care: HomePreviewData['care'] }) {
 }
 
 // ============================================================================
+// CGM Analysis Card Section
+// ============================================================================
+
+function CgmAnalysisSection({
+  care,
+  onNavigate,
+}: {
+  care: HomePreviewData['care'];
+  onNavigate: (path: string) => void;
+}) {
+  const avgTir = care.avgTimeInRange ?? 0;
+  const tirStatus = care.avgTimeInRangeStatus;
+  const isTableMissing = tirStatus === 'TABLE_MISSING';
+
+  // TIR quality color
+  const tirColor = isTableMissing
+    ? 'text-slate-300'
+    : avgTir >= 70
+      ? 'text-emerald-600'
+      : avgTir >= 50
+        ? 'text-amber-600'
+        : avgTir > 0
+          ? 'text-red-600'
+          : 'text-slate-300';
+
+  return (
+    <section className="pb-10 px-4 sm:px-6 max-w-7xl mx-auto">
+      <div className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-2xl p-6 border border-primary-100">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-primary-600" />
+              CGM 데이터 분석
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">연속혈당측정 기반 환자 분석 현황</p>
+          </div>
+          <button
+            onClick={() => onNavigate('/care/analysis')}
+            className="text-xs text-primary-600 font-medium flex items-center gap-1 hover:text-primary-700"
+          >
+            분석 보기
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          {/* 최근 7일 분석 환자 수 */}
+          <div className="bg-white/70 rounded-xl p-4">
+            <p className="text-xs text-slate-500 mb-1">최근 7일 분석</p>
+            {isTableMissing ? (
+              <p className="text-lg text-slate-300">--</p>
+            ) : (
+              <p className={`text-xl font-bold ${care.recentAnalysis > 0 ? 'text-slate-800' : 'text-slate-300'}`}>
+                {care.recentAnalysis}<span className="text-sm font-normal text-slate-400 ml-1">명</span>
+              </p>
+            )}
+          </div>
+
+          {/* 평균 Time-in-Range */}
+          <div className="bg-white/70 rounded-xl p-4">
+            <p className="text-xs text-slate-500 mb-1">평균 TIR</p>
+            {isTableMissing ? (
+              <p className="text-lg text-slate-300">--</p>
+            ) : (
+              <p className={`text-xl font-bold ${tirColor}`}>
+                {avgTir > 0 ? `${avgTir}` : '0'}<span className="text-sm font-normal text-slate-400 ml-1">%</span>
+              </p>
+            )}
+          </div>
+
+          {/* 고위험 패턴 감지 */}
+          <div className="bg-white/70 rounded-xl p-4">
+            <p className="text-xs text-slate-500 mb-1">고위험 패턴</p>
+            {isTableMissing ? (
+              <p className="text-lg text-slate-300">--</p>
+            ) : (
+              <p className={`text-xl font-bold ${care.highRiskCount > 0 ? 'text-red-600' : 'text-slate-300'}`}>
+                {care.highRiskCount}<span className="text-sm font-normal text-slate-400 ml-1">명</span>
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================================
 // Recent Changes Section
 // ============================================================================
 
@@ -266,7 +354,7 @@ function FeatureCardsSection({ onFeatureClick }: { onFeatureClick: (path: string
 // ============================================================================
 
 const emptyData: HomePreviewData = {
-  care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, recentChanges: [] },
+  care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, avgTimeInRange: 0, recentChanges: [] },
   store: { monthlyOrders: 0, pendingRequests: 0, activeProducts: 0, monthlyRevenue: 0 },
 };
 
@@ -315,6 +403,9 @@ export default function HomeLivePage() {
         <>
           {/* Block 2: Care Snapshot */}
           <CareSnapshotSection care={data.care} />
+
+          {/* Block 2.5: CGM Analysis Card */}
+          <CgmAnalysisSection care={data.care} onNavigate={handleFeatureClick} />
 
           {/* Block 3: Recent Changes */}
           <RecentChangesSection changes={data.care.recentChanges} />

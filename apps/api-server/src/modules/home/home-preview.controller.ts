@@ -41,6 +41,8 @@ interface HomePreviewCare {
   recentCoachingStatus: MetricStatus;
   recentAnalysis: number;
   recentAnalysisStatus: MetricStatus;
+  avgTimeInRange: number;
+  avgTimeInRangeStatus: MetricStatus;
   recentChanges: Array<{
     tirChange?: number;
     cvChange?: number;
@@ -177,7 +179,30 @@ async function buildCarePreview(
   const recentAnalysis = analysisResult.rows[0]?.count ?? 0;
   const recentAnalysisStatus = deriveStatus(analysisResult.outcome, recentAnalysis);
 
-  // E. Recent changes (anonymous, 3 most recent patients with 2+ snapshots)
+  // E. Average Time-in-Range (latest snapshot per patient)
+  const tirResult = isGlobal
+    ? await safeQuery(ds, `
+        SELECT COALESCE(AVG(s.tir), 0)::numeric(5,1) AS avg_tir
+        FROM care_kpi_snapshots s
+        INNER JOIN (
+          SELECT patient_id, MAX(created_at) AS max_at
+          FROM care_kpi_snapshots GROUP BY patient_id
+        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
+      `)
+    : await safeQuery(ds, `
+        SELECT COALESCE(AVG(s.tir), 0)::numeric(5,1) AS avg_tir
+        FROM care_kpi_snapshots s
+        JOIN glucoseview_customers c ON s.patient_id = c.id
+        INNER JOIN (
+          SELECT patient_id, MAX(created_at) AS max_at
+          FROM care_kpi_snapshots GROUP BY patient_id
+        ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
+        WHERE c.organization_id = $1
+      `, [pharmacyId]);
+  const avgTimeInRange = parseFloat(tirResult.rows[0]?.avg_tir ?? '0');
+  const avgTimeInRangeStatus = deriveStatus(tirResult.outcome, avgTimeInRange);
+
+  // F. Recent changes (anonymous, 3 most recent patients with 2+ snapshots)
   const changesQuery = isGlobal
     ? `
       WITH ranked AS (
@@ -232,6 +257,8 @@ async function buildCarePreview(
     recentCoachingStatus,
     recentAnalysis,
     recentAnalysisStatus,
+    avgTimeInRange,
+    avgTimeInRangeStatus,
     recentChanges: changesResult.rows.map((r: any) => ({
       tirChange: r.tirChange,
       cvChange: r.cvChange,
@@ -365,6 +392,7 @@ export function createHomePreviewRouter(dataSource: DataSource): Router {
             highRiskCount: 0, highRiskCountStatus: 'TABLE_MISSING',
             recentCoaching: 0, recentCoachingStatus: 'TABLE_MISSING',
             recentAnalysis: 0, recentAnalysisStatus: 'TABLE_MISSING',
+            avgTimeInRange: 0, avgTimeInRangeStatus: 'TABLE_MISSING',
             recentChanges: [],
           },
           store: {
