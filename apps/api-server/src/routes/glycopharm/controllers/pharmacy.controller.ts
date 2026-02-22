@@ -13,8 +13,8 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
+import { resolveGlycopharmPharmacyId } from '../../../modules/glycopharm/resolve-pharmacy.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 // Orders will be handled via E-commerce Core with OrderType.GLYCOPHARM
 import type { AuthRequest } from '../../../types/auth.js';
@@ -57,23 +57,14 @@ export function createPharmacyController(
           return;
         }
 
-        // Find pharmacy owned by user
-        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
-        const pharmacy = await pharmacyRepo.findOne({
-          where: { created_by_user_id: userId },
-        });
+        // WO-ORG-RESOLUTION-UNIFICATION-V1: shared enrollment-checked resolution
+        const pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
 
-        if (!pharmacy) {
-          // Return empty list if no pharmacy
-          res.json({
-            success: true,
-            data: {
-              items: [],
-              total: 0,
-              page: 1,
-              pageSize: 20,
-              totalPages: 0,
-            },
+        if (!pharmacyId) {
+          res.status(403).json({
+            success: false,
+            error: 'GLYCOPHARM_NOT_ENROLLED',
+            message: 'No active glycopharm-enrolled pharmacy found for this user.',
           });
           return;
         }
@@ -89,7 +80,7 @@ export function createPharmacyController(
         const productRepo = dataSource.getRepository(GlycopharmProduct);
         const queryBuilder = productRepo
           .createQueryBuilder('product')
-          .where('product.pharmacy_id = :pharmacyId', { pharmacyId: pharmacy.id });
+          .where('product.pharmacy_id = :pharmacyId', { pharmacyId });
 
         // Apply filters
         if (categoryId) {
@@ -237,14 +228,15 @@ export function createPharmacyController(
           return;
         }
 
-        // Resolve organization (pharmacy) for the logged-in user
-        const pharmacyRepo = dataSource.getRepository(OrganizationStore);
-        const pharmacy = await pharmacyRepo.findOne({
-          where: { created_by_user_id: userId },
-        });
+        // WO-ORG-RESOLUTION-UNIFICATION-V1: shared enrollment-checked resolution
+        const pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
 
-        if (!pharmacy) {
-          res.json({ success: true, data: { items: [], total: 0, page: 1, pageSize: 50, totalPages: 0 } });
+        if (!pharmacyId) {
+          res.status(403).json({
+            success: false,
+            error: 'GLYCOPHARM_NOT_ENROLLED',
+            message: 'No active glycopharm-enrolled pharmacy found for this user.',
+          });
           return;
         }
 
@@ -255,7 +247,7 @@ export function createPharmacyController(
 
         // Build WHERE clause — organization_id 기준
         const conditions = ['c.organization_id = $1'];
-        const params: any[] = [pharmacy.id];
+        const params: any[] = [pharmacyId];
 
         if (search.trim()) {
           params.push(`%${search.trim()}%`);

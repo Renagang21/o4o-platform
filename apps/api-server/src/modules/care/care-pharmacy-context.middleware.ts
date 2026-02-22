@@ -17,6 +17,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { hasAnyServiceRole } from '../../utils/role.utils.js';
+import { resolveGlycopharmPharmacyId } from '../glycopharm/resolve-pharmacy.js';
 
 export interface PharmacyContextRequest extends Request {
   user?: any;
@@ -51,26 +52,20 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
       return;
     }
 
-    // Look up pharmacy for this user
+    // WO-ORG-RESOLUTION-UNIFICATION-V1: shared enrollment-checked resolution
     try {
-      const result = await dataSource.query(
-        `SELECT o.id FROM organizations o
-         JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-         WHERE o.created_by_user_id = $1 AND o."isActive" = true LIMIT 1`,
-        [userId]
-      );
+      const pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
 
-      if (!result || result.length === 0) {
+      if (!pharmacyId) {
         res.status(403).json({
-          error: {
-            code: 'NO_PHARMACY',
-            message: 'No active pharmacy found for this user. Care access requires pharmacy registration.',
-          },
+          success: false,
+          error: 'GLYCOPHARM_NOT_ENROLLED',
+          message: 'No active glycopharm-enrolled pharmacy found for this user.',
         });
         return;
       }
 
-      pcReq.pharmacyId = result[0].id;
+      pcReq.pharmacyId = pharmacyId;
       next();
     } catch (error) {
       res.status(500).json({

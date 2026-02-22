@@ -46,12 +46,13 @@ async function buildDashboard(
 ): Promise<CareDashboardDto> {
   const isAdmin = pharmacyId === null;
 
-  // A. Total patients from glucoseview_customers (scoped by pharmacist_id)
+  // A. Total patients from glucoseview_customers
+  // WO-ORG-RESOLUTION-UNIFICATION-V1: organization_id 기준 (pharmacist_id → organization_id)
   const totalResult = isAdmin
     ? await ds.query(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
     : await ds.query(
-        `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE pharmacist_id = $1`,
-        [userId]
+        `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE organization_id = $1`,
+        [pharmacyId]
       );
   const totalPatients = totalResult[0]?.count ?? 0;
 

@@ -17,6 +17,7 @@ import type { DataSource } from 'typeorm';
 import jwt from 'jsonwebtoken';
 import logger from '../../utils/logger.js';
 import { cacheGetOrSet } from '../../infrastructure/cache.service.js';
+import { resolveGlycopharmPharmacyId } from '../glycopharm/resolve-pharmacy.js';
 
 // ============================================================================
 // Types
@@ -85,24 +86,6 @@ function optionalAuthenticate(req: Request, _res: Response, next: NextFunction) 
     // 토큰 검증 실패 — 무시하고 비인증으로 진행
   }
   next();
-}
-
-// ============================================================================
-// Pharmacy ID Resolution
-// ============================================================================
-
-async function resolvePharmacyId(ds: DataSource, userId: string): Promise<string | null> {
-  try {
-    const result = await ds.query(
-      `SELECT o.id FROM organizations o
-       JOIN organization_service_enrollments ose ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-       WHERE o.created_by_user_id = $1 AND o."isActive" = true LIMIT 1`,
-      [userId]
-    );
-    return result?.[0]?.id || null;
-  } catch {
-    return null;
-  }
 }
 
 // ============================================================================
@@ -343,7 +326,7 @@ export function createHomePreviewRouter(dataSource: DataSource): Router {
 
       if (user?.id) {
         userId = user.id;
-        pharmacyId = await resolvePharmacyId(dataSource, userId);
+        pharmacyId = await resolveGlycopharmPharmacyId(dataSource, userId);
       }
 
       // Global (비로그인) → Redis 캐시, Pharmacy-scoped → 실시간
