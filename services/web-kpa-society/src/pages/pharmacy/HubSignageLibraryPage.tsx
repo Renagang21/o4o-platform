@@ -32,9 +32,9 @@ import { Link } from 'react-router-dom';
 import { publicContentApi } from '../../lib/api/signageV2';
 import type { SignageMedia, SignagePlaylist } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { getMediaThumbnailUrl, SIGNAGE_MEDIA_TYPE_LABELS, SIGNAGE_SOURCE_LABELS } from '@o4o/types/signage';
+import { SIGNAGE_MEDIA_TYPE_LABELS, SIGNAGE_SOURCE_LABELS } from '@o4o/types/signage';
 import type { ContentSource } from '@o4o/types/signage';
-import { colors, shadows, borderRadius } from '../../styles/theme';
+import { colors, borderRadius } from '../../styles/theme';
 
 // ============================================
 // 필터 정의
@@ -278,63 +278,48 @@ export function HubSignageLibraryPage() {
             <div style={styles.resultCount}>
               미디어 {mediaTotalFiltered}건
             </div>
-            <div style={styles.cardGrid}>
+            {/* Simple list (no video thumbnail preview) */}
+            <div style={styles.listContainer}>
               {filteredMedia.map(media => {
-                const thumbUrl = getMediaThumbnailUrl(media);
                 const isCopying = copyingId === media.id;
                 const sourceLabel = (media as any).source
                   ? SIGNAGE_SOURCE_LABELS[(media as any).source as ContentSource] || (media as any).source
                   : '';
 
                 return (
-                  <div key={media.id} style={styles.card}>
-                    {/* Thumbnail */}
-                    {thumbUrl ? (
-                      <div style={{
-                        ...styles.cardImage,
-                        backgroundImage: `url(${thumbUrl})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                      }} />
-                    ) : (
-                      <div style={styles.cardImagePlaceholder}>
-                        <span style={{ fontSize: '24px' }}>🖥️</span>
+                  <div key={media.id} style={styles.listRow}>
+                    <div style={styles.listIcon}>🖥️</div>
+                    <div style={styles.listContent}>
+                      <div style={styles.listTitleRow}>
+                        <span style={styles.listTitle}>{media.name}</span>
+                        <div style={styles.listBadges}>
+                          <span style={styles.mediaTypeBadge}>
+                            {SIGNAGE_MEDIA_TYPE_LABELS[media.mediaType] || media.mediaType}
+                          </span>
+                          {sourceLabel && (
+                            <span style={styles.sourceBadge}>{sourceLabel}</span>
+                          )}
+                        </div>
                       </div>
-                    )}
-
-                    {/* Body */}
-                    <div style={styles.cardBody}>
-                      <div style={styles.cardMeta}>
-                        <span style={styles.mediaTypeBadge}>
-                          {SIGNAGE_MEDIA_TYPE_LABELS[media.mediaType] || media.mediaType}
-                        </span>
-                        {sourceLabel && (
-                          <span style={styles.sourceBadge}>{sourceLabel}</span>
-                        )}
-                      </div>
-                      <h3 style={styles.cardTitle}>{media.name}</h3>
-                      <div style={styles.cardInfo}>
+                      <div style={styles.listMeta}>
                         {media.duration != null && media.duration > 0 && (
                           <span>{formatDuration(media.duration)}</span>
                         )}
-                      </div>
-                      <div style={styles.cardFooter}>
-                        <span style={styles.cardDate}>
-                          {new Date(media.createdAt).toLocaleDateString('ko-KR')}
-                        </span>
-                        <button
-                          onClick={() => handleCopy(media.id, media.name)}
-                          disabled={isCopying}
-                          style={{
-                            ...styles.copyButton,
-                            opacity: isCopying ? 0.6 : 1,
-                            cursor: isCopying ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          {isCopying ? '추가 중...' : '내 매장에 추가'}
-                        </button>
+                        <span>{new Date(media.createdAt).toLocaleDateString('ko-KR')}</span>
                       </div>
                     </div>
+                    <button
+                      onClick={() => handleCopy(media.id, media.name)}
+                      disabled={isCopying}
+                      style={{
+                        ...styles.copyButton,
+                        opacity: isCopying ? 0.6 : 1,
+                        cursor: isCopying ? 'not-allowed' : 'pointer',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isCopying ? '추가 중...' : '내 매장에 추가'}
+                    </button>
                   </div>
                 );
               })}
@@ -382,7 +367,8 @@ export function HubSignageLibraryPage() {
             <div style={styles.resultCount}>
               플레이리스트 {playlistTotalFiltered}건
             </div>
-            <div style={styles.cardGrid}>
+            {/* Simple list (no thumbnail preview) */}
+            <div style={styles.listContainer}>
               {filteredPlaylists.map(pl => {
                 const isCopying = copyingId === pl.id;
                 const sourceLabel = (pl as any).source
@@ -390,44 +376,41 @@ export function HubSignageLibraryPage() {
                   : '';
 
                 return (
-                  <div key={pl.id} style={styles.card}>
-                    <div style={styles.cardImagePlaceholder}>
-                      <span style={{ fontSize: '24px' }}>📋</span>
-                    </div>
-                    <div style={styles.cardBody}>
-                      <div style={styles.cardMeta}>
-                        <span style={styles.playlistBadge}>플레이리스트</span>
-                        {sourceLabel && (
-                          <span style={styles.sourceBadge}>{sourceLabel}</span>
-                        )}
+                  <div key={pl.id} style={styles.listRow}>
+                    <div style={styles.listIcon}>📋</div>
+                    <div style={styles.listContent}>
+                      <div style={styles.listTitleRow}>
+                        <span style={styles.listTitle}>{pl.name}</span>
+                        <div style={styles.listBadges}>
+                          <span style={styles.playlistBadge}>플레이리스트</span>
+                          {sourceLabel && (
+                            <span style={styles.sourceBadge}>{sourceLabel}</span>
+                          )}
+                        </div>
                       </div>
-                      <h3 style={styles.cardTitle}>{pl.name}</h3>
                       {pl.description && (
-                        <p style={styles.cardSummary}>{pl.description}</p>
+                        <p style={styles.listDesc}>{pl.description}</p>
                       )}
-                      <div style={styles.cardInfo}>
+                      <div style={styles.listMeta}>
                         <span>{pl.itemCount}개 항목</span>
                         {pl.totalDuration > 0 && (
                           <span> · {formatDuration(pl.totalDuration)}</span>
                         )}
-                      </div>
-                      <div style={styles.cardFooter}>
-                        <span style={styles.cardDate}>
-                          {new Date(pl.createdAt).toLocaleDateString('ko-KR')}
-                        </span>
-                        <button
-                          onClick={() => handleCopy(pl.id, pl.name)}
-                          disabled={isCopying}
-                          style={{
-                            ...styles.copyButton,
-                            opacity: isCopying ? 0.6 : 1,
-                            cursor: isCopying ? 'not-allowed' : 'pointer',
-                          }}
-                        >
-                          {isCopying ? '추가 중...' : '내 매장에 추가'}
-                        </button>
+                        <span>{new Date(pl.createdAt).toLocaleDateString('ko-KR')}</span>
                       </div>
                     </div>
+                    <button
+                      onClick={() => handleCopy(pl.id, pl.name)}
+                      disabled={isCopying}
+                      style={{
+                        ...styles.copyButton,
+                        opacity: isCopying ? 0.6 : 1,
+                        cursor: isCopying ? 'not-allowed' : 'pointer',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isCopying ? '추가 중...' : '내 매장에 추가'}
+                    </button>
                   </div>
                 );
               })}
@@ -594,44 +577,68 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '12px',
   },
 
-  // Card grid
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-    gap: '20px',
+  // List view (replaces card grid — no video thumbnail preview)
+  listContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1px',
     marginBottom: '24px',
-  },
-  card: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.neutral200,
     borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.neutral200}`,
     overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
+    border: `1px solid ${colors.neutral200}`,
   },
-  cardImage: {
-    height: '140px',
-    backgroundColor: '#f1f5f9',
-  },
-  cardImagePlaceholder: {
-    height: '100px',
-    backgroundColor: '#f8fafc',
+  listRow: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: '14px',
+    padding: '14px 18px',
+    backgroundColor: colors.white,
   },
-  cardBody: {
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
+  listIcon: {
+    fontSize: '20px',
+    flexShrink: 0,
+    width: '32px',
+    textAlign: 'center' as const,
+  },
+  listContent: {
     flex: 1,
+    minWidth: 0,
   },
-  cardMeta: {
+  listTitleRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
+    gap: '8px',
+    flexWrap: 'wrap' as const,
+  },
+  listTitle: {
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    color: colors.neutral900,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  listBadges: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    flexShrink: 0,
+  },
+  listDesc: {
+    margin: '4px 0 0',
+    fontSize: '0.8125rem',
+    color: colors.neutral500,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  listMeta: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '4px',
+    fontSize: '0.75rem',
+    color: colors.neutral400,
   },
   mediaTypeBadge: {
     display: 'inline-block',
@@ -659,43 +666,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '4px',
     backgroundColor: '#f1f5f9',
     color: '#64748b',
-  },
-  cardTitle: {
-    margin: 0,
-    fontSize: '0.95rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    lineHeight: 1.4,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-  },
-  cardSummary: {
-    margin: 0,
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    lineHeight: 1.5,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-  },
-  cardInfo: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-  },
-  cardFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 'auto',
-    paddingTop: '8px',
-    borderTop: '1px solid #f1f5f9',
-  },
-  cardDate: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
   },
   copyButton: {
     padding: '5px 12px',

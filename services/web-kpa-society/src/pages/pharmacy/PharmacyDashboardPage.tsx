@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   OperatorDashboardLayout,
   type OperatorDashboardConfig,
@@ -368,6 +369,44 @@ export function PharmacyDashboardPage() {
           </p>
         )}
       </div>
+
+      {/* Hub 서비스 메뉴 */}
+      <nav style={{
+        display: 'flex',
+        gap: '10px',
+        marginBottom: '20px',
+        flexWrap: 'wrap' as const,
+      }}>
+        {[
+          { to: '/hub', label: '약국 HUB', icon: '🔍' },
+          { to: '/hub/content', label: '플랫폼 콘텐츠', icon: '📝' },
+          { to: '/hub/signage', label: '플랫폼 사이니지', icon: '🖥️' },
+          { to: '/hub/b2b', label: 'B2B 카탈로그', icon: '🛒' },
+        ].map(item => (
+          <Link
+            key={item.to}
+            to={item.to}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              color: '#475569',
+              backgroundColor: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              transition: 'all 0.15s',
+            }}
+          >
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+
       <StoreLiveSignalBar />
       <OperatorDashboardLayout config={config} />
     </div>

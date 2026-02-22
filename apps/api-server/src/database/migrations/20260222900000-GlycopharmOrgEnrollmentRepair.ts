@@ -59,7 +59,7 @@ export class GlycopharmOrgEnrollmentRepair20260222900000 implements MigrationInt
            '약국', 'gp-' || REPLACE($1::text, '-', ''),
            'pharmacy', 0, '/pharmacy/' || $1::text,
            true, 0,
-           $1, NOW(), NOW()
+           $1::uuid, NOW(), NOW()
          )
          RETURNING id`,
         [userId],
