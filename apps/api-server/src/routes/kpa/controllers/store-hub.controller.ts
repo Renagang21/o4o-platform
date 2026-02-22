@@ -31,8 +31,10 @@ async function getUserOrganizationId(
   return member?.organization_id || null;
 }
 
-function isPharmacyOwnerRole(roles: string[]): boolean {
-  // KPA pharmacy owner: has kpa:branch_admin or kpa:branch_operator or kpa:admin/operator
+function isPharmacyOwnerRole(roles: string[], user?: any): boolean {
+  // 1. pharmacistRole === 'pharmacy_owner' (DB column, carried in JWT)
+  if (user?.pharmacistRole === 'pharmacy_owner') return true;
+  // 2. KPA admin/operator roles also have store access
   return hasAnyServiceRole(roles, [
     'kpa:branch_admin', 'kpa:branch_operator', 'kpa:admin', 'kpa:operator',
   ]);
@@ -95,7 +97,7 @@ export function createStoreHubController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles)) {
+        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
           res.status(403).json({
             success: false,
             error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
@@ -251,7 +253,7 @@ export function createStoreHubController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles)) {
+        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
           res.status(403).json({
             success: false,
             error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
@@ -327,7 +329,7 @@ export function createStoreHubController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles)) {
+        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
           res.status(403).json({
             success: false,
             error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
@@ -434,7 +436,7 @@ export function createStoreHubController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles)) {
+        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
           res.status(403).json({
             success: false,
             error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
