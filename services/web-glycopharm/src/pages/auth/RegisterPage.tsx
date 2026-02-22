@@ -38,7 +38,8 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirm: '',
-    name: '',
+    lastName: '',
+    firstName: '',
     phone: '',
     businessName: '',
     businessNumber: '',
@@ -83,10 +84,16 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          name: formData.name,
+          passwordConfirm: formData.passwordConfirm,
+          lastName: formData.lastName,
+          firstName: formData.firstName,
+          nickname: `${formData.lastName}${formData.firstName}`,
           phone: formData.phone.replace(/\D/g, ''),
           role: selectedRole,
           service: 'glycopharm',
+          tos: formData.agreeTerms,
+          privacyAccepted: formData.agreePrivacy,
+          marketingAccepted: formData.agreeMarketing,
           businessName: formData.businessName || undefined,
           businessNumber: formData.businessNumber || undefined,
         }),
@@ -114,7 +121,8 @@ export default function RegisterPage() {
       formData.email &&
       isPasswordStrong &&
       formData.password === formData.passwordConfirm &&
-      formData.name &&
+      formData.lastName &&
+      formData.firstName &&
       isPhoneValid &&
       formData.agreeTerms &&
       formData.agreePrivacy
@@ -322,22 +330,40 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">성</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="lastName"
+                      value={formData.lastName}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="홍길동"
+                      placeholder="홍"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="길동"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">핸드폰 번호</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
