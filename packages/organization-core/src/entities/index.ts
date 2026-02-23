@@ -1,3 +1,4 @@
 export { Organization } from './Organization.js';
 export { OrganizationMember } from './OrganizationMember.js';
-export { RoleAssignment } from './RoleAssignment.js';
+// RoleAssignment는 interface only (Entity는 Auth module 소유)
+export type { RoleAssignment } from './RoleAssignment.js';

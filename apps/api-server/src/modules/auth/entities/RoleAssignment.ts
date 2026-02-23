@@ -93,6 +93,27 @@ export class RoleAssignment {
   assigner?: User;
 
   /**
+   * 권한 스코프 타입
+   *
+   * - global: 전역 권한 (모든 리소스에 대한 권한)
+   * - organization: 조직 권한 (특정 조직에 대한 권한)
+   *
+   * organization-core가 ALTER TABLE로 추가하는 컬럼이나,
+   * 단일 Entity 관리를 위해 여기서 명시적 선언.
+   */
+  @Column({ name: 'scope_type', type: 'varchar', length: 50, nullable: true, default: 'global' })
+  scopeType?: string;
+
+  /**
+   * 스코프 ID
+   *
+   * scopeType='organization'인 경우 조직 ID
+   * scopeType='global'인 경우 null
+   */
+  @Column({ name: 'scope_id', type: 'uuid', nullable: true })
+  scopeId?: string;
+
+  /**
    * 생성 시각
    */
   @CreateDateColumn({ name: 'created_at' })

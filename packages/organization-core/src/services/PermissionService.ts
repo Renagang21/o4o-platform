@@ -1,5 +1,5 @@
 import { DataSource, Repository, IsNull } from 'typeorm';
-import { RoleAssignment } from '../entities/RoleAssignment.js';
+import type { RoleAssignment } from '../entities/RoleAssignment.js';
 import { Organization } from '../entities/Organization.js';
 
 /**
@@ -91,7 +91,9 @@ export class PermissionService {
   private organizationRepo: Repository<Organization>;
 
   constructor(private dataSource: DataSource) {
-    this.roleAssignmentRepo = dataSource.getRepository(RoleAssignment);
+    // Auth module의 RoleAssignment Entity를 string name으로 참조
+    // (organization-core는 Entity class를 소유하지 않음)
+    this.roleAssignmentRepo = dataSource.getRepository('RoleAssignment') as Repository<RoleAssignment>;
     this.organizationRepo = dataSource.getRepository(Organization);
   }
 
@@ -246,7 +248,6 @@ export class PermissionService {
   async getUserRoles(userId: string): Promise<RoleAssignment[]> {
     return await this.roleAssignmentRepo.find({
       where: { userId, isActive: true },
-      relations: ['organization'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -265,7 +266,6 @@ export class PermissionService {
         scopeId: organizationId,
         isActive: true,
       },
-      relations: ['organization'],
     });
   }
 
@@ -314,12 +314,13 @@ export class PermissionService {
     }
 
     // 4. 역할 할당
-    const assignment = new RoleAssignment();
-    assignment.userId = userId;
-    assignment.role = role;
-    assignment.scopeType = scopeType;
-    assignment.scopeId = scopeId;
-    assignment.isActive = true;
+    const assignment = this.roleAssignmentRepo.create({
+      userId,
+      role,
+      scopeType,
+      scopeId,
+      isActive: true,
+    } as Partial<RoleAssignment>);
 
     return await this.roleAssignmentRepo.save(assignment);
   }

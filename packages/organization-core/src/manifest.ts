@@ -47,7 +47,8 @@ export const organizationCoreManifest = {
     entities: [
       './entities/Organization',
       './entities/OrganizationMember',
-      './entities/RoleAssignment',
+      // RoleAssignment Entity는 Auth module이 소유
+      // (organization-core는 interface만 제공, string-based repository 참조)
     ],
     services: [
       'OrganizationService',
