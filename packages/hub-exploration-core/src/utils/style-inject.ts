@@ -3,6 +3,7 @@
  * Inline styles cannot use @media queries or :hover, so we inject a <style> tag once.
  *
  * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: HubList hover, CoreService grid responsive
+ * WO-O4O-B2B-OPERATION-TABLE-STRUCTURE-V1: B2B table responsive
  */
 
 let injected = false;
@@ -26,12 +27,17 @@ export function injectExplorationStyles(): void {
       border-color: #94A3B8 !important;
     }
 
+    /* B2B table row hover */
+    .b2b-table-row:hover { background-color: #F8FAFC !important; }
+
     @media (max-width: 768px) {
       .hub-explore-ad-premium { grid-template-columns: 1fr !important; }
       .hub-explore-ad-normal { grid-template-columns: 1fr !important; }
       .hub-explore-productdev-grid { grid-template-columns: 1fr !important; }
       .hub-explore-promo-grid { grid-template-columns: 1fr !important; }
       .hub-explore-core-grid { grid-template-columns: 1fr !important; }
+      .b2b-table-desktop { display: none !important; }
+      .b2b-table-mobile { display: flex !important; }
     }
   `;
   document.head.appendChild(style);

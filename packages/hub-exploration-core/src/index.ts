@@ -33,6 +33,9 @@ export type {
   HubListProps,
   PlatformContentItem,
   PlatformContentSectionProps,
+  B2BTableItem,
+  B2BTableSortKey,
+  B2BTableListProps,
   AIPlaceholderProps,
   HubExplorationLayoutProps,
 } from './types.js';
@@ -52,6 +55,7 @@ export { PlatformContentSection } from './components/PlatformContentSection.js';
 export { CoreServiceBanners } from './components/CoreServiceBanners.js';
 export { ServicePromotionBanners } from './components/ServicePromotionBanners.js';
 export { AIPlaceholder } from './components/AIPlaceholder.js';
+export { B2BTableList } from './components/B2BTableList.js';
 
 // Theme defaults
 export { DEFAULT_THEME, NEUTRALS, SHADOWS } from './theme.js';

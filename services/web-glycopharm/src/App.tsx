@@ -105,6 +105,7 @@ const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 
 // Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1)
 const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').then(m => ({ default: m.GlycoPharmHubPage })));
+const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -305,6 +306,7 @@ function AppRoutes() {
         <Route path="signage" element={<ContentLibraryPage />} />
         {/* Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1) */}
         <Route path="hub" element={<GlycoPharmHubPage />} />
+        <Route path="hub/b2b" element={<HubB2BCatalogPage />} />
         <Route path="mypage" element={
           <SoftGuard feature="mypage">
             <MyPage />

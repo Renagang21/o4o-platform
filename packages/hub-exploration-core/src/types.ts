@@ -243,6 +243,54 @@ export interface AIPlaceholderProps {
 }
 
 // ──────────────────────────────────────────────
+// B2BTableList (운영용 테이블)
+// WO-O4O-B2B-OPERATION-TABLE-STRUCTURE-V1
+// ──────────────────────────────────────────────
+
+export interface B2BTableItem {
+  id: string;
+  name: string;
+  /** 상품명 아래 보조 설명 (1줄) */
+  description?: string;
+  unit?: string;
+  price?: number;
+  supplyPrice?: number;
+  /** 할인율 (0-100). 표시 준비용, 계산은 서비스 측 */
+  discountRate?: number;
+  supplierName?: string;
+  /** 공급처 인증 여부 — true이면 체크 아이콘 표시 */
+  supplierVerified?: boolean;
+  legalCategory?: string;
+  note?: string;
+  createdAt?: string;
+  /** 판매 신청 여부 */
+  isApplied?: boolean;
+  /** 승인 여부 */
+  isApproved?: boolean;
+  /** 상품 상태 */
+  status?: 'available' | 'pending' | 'soldout';
+  /** 잔여 재고 — ≤10이면 자동 limited 강조 */
+  stockRemaining?: number;
+  onApply?: () => void;
+  onClick?: () => void;
+}
+
+export type B2BTableSortKey = 'name' | 'supplierName' | 'createdAt';
+
+export interface B2BTableListProps {
+  items: B2BTableItem[];
+  categories?: string[];
+  activeCategory?: string;
+  onCategoryChange?: (category: string) => void;
+  sortKey?: B2BTableSortKey;
+  sortOrder?: 'asc' | 'desc';
+  onSortChange?: (key: B2BTableSortKey) => void;
+  pageSize?: number;
+  title?: string;
+  emptyMessage?: string;
+}
+
+// ──────────────────────────────────────────────
 // Orchestrator
 // ──────────────────────────────────────────────
 
