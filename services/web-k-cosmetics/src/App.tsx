@@ -46,6 +46,9 @@ const AdminManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ def
 const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.OperatorManualPage })));
 const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
 
+// Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1)
+const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
+
 // Forum Pages
 const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
 const ForumPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumPage })));
@@ -187,6 +190,9 @@ function AppRoutes() {
 
         {/* B2B Routes */}
         <Route path="b2b/supply" element={<SupplyPage />} />
+
+        {/* Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1) */}
+        <Route path="hub" element={<KCosmeticsHubPage />} />
 
         {/* Services Routes */}
         <Route path="services/tourists" element={<TouristHubPage />} />

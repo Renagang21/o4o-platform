@@ -12,6 +12,7 @@
   "dependencies": {
     "@o4o/auth-client": "workspace:*",
     "@o4o/content-editor": "workspace:*",
+    "@o4o/hub-exploration-core": "workspace:*",
     "@o4o/forum-core": "workspace:*",
     "@o4o/operator-core": "workspace:*",
     "@o4o/store-asset-policy-core": "workspace:*",

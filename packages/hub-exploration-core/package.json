@@ -1,0 +1,21 @@
+{
+  "name": "@o4o/hub-exploration-core",
+  "version": "1.0.0",
+  "description": "Hub Exploration UI core — market exploration layout for O4O Platform services",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}
