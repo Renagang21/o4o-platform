@@ -20,10 +20,13 @@ import {
   type RecentUpdateItem,
   type PromotionBanner,
   type AdItem,
+  type B2BPreviewItem,
+  type ProductDevItem,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
 import { getCatalog } from '../../api/pharmacyProducts';
+import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { cmsApi } from '../../api/cms';
 import type { CmsSlot } from '../../api/cms';
 import { listPlatformServices } from '../../api/platform-services';
@@ -82,6 +85,38 @@ function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (p
 }
 
 // ============================================
+// B2B Catalog → B2BPreviewItem 매핑
+// ============================================
+
+function catalogToB2BItem(p: CatalogProduct, navigate: (path: string) => void): B2BPreviewItem {
+  return {
+    id: p.id,
+    name: p.name,
+    imageUrl: p.supplierLogoUrl ?? undefined,
+    badge: p.category ?? undefined,
+    supplierName: p.supplierName,
+    onClick: () => navigate(`/hub/b2b`),
+  };
+}
+
+// ============================================
+// CMS Slot → ProductDevItem 매핑
+// ============================================
+
+function cmsSlotToProductDev(slot: CmsSlot, navigate: (path: string) => void): ProductDevItem {
+  return {
+    id: slot.content?.id ?? slot.id,
+    title: slot.content?.title ?? '',
+    description: slot.content?.summary ?? undefined,
+    imageUrl: slot.content?.imageUrl ?? undefined,
+    badge: (slot.content?.metadata?.badge as string) ?? undefined,
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
+// ============================================
 // Default Hero (fallback when CMS empty)
 // ============================================
 
@@ -108,6 +143,8 @@ export function PharmacyHubMarketPage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(defaultHero);
   const [promos, setPromos] = useState<PromotionBanner[]>([]);
   const [ads, setAds] = useState<AdItem[]>([]);
+  const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
+  const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -149,6 +186,26 @@ export function PharmacyHubMarketPage() {
         : [];
       setAds([...premium, ...normal]);
     });
+
+    // B2B 상품 카탈로그 미리보기
+    getCatalog({ limit: 6, offset: 0 })
+      .then(res => {
+        if (!cancelled) {
+          setB2bItems(res.data.map(p => catalogToB2BItem(p, navigate)));
+        }
+      })
+      .catch(() => {});
+
+    // 제품개발 참여 (CMS Slot)
+    cmsApi.getSlots('hub-product-dev', { serviceKey: 'kpa' })
+      .then(res => {
+        if (!cancelled) {
+          setProductDevItems(res.data
+            .filter(s => s.content)
+            .map(s => cmsSlotToProductDev(s, navigate)));
+        }
+      })
+      .catch(() => {});
 
     return () => { cancelled = true; };
   }, [navigate]);
@@ -249,8 +306,10 @@ export function PharmacyHubMarketPage() {
     <HubExplorationLayout
       theme={{ maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B 공급 기회', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
+      productDevelopment={productDevItems.length > 0 ? { items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' } : undefined}
+      recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
       aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}

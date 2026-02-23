@@ -19,6 +19,8 @@ import {
   type CoreServiceBanner,
   type PromotionBanner,
   type AdItem,
+  type B2BPreviewItem,
+  type ProductDevItem,
 } from '@o4o/hub-exploration-core';
 import { cmsApi } from '@/api/cms';
 import type { CmsSlot } from '@/api/cms';
@@ -64,6 +66,38 @@ function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (p
   };
 }
 
+// ── CMS Slot → B2BPreviewItem 매핑 (K-Cosmetics: CMS Slot 대체) ──
+
+function cmsSlotToB2BItem(slot: CmsSlot, navigate: (path: string) => void): B2BPreviewItem {
+  return {
+    id: slot.content?.id ?? slot.id,
+    name: slot.content?.title ?? '',
+    imageUrl: slot.content?.imageUrl ?? undefined,
+    badge: (slot.content?.metadata?.badge as string) ?? undefined,
+    badgeColor: (slot.content?.metadata?.badgeColor as string) ?? undefined,
+    price: (slot.content?.metadata?.price as string) ?? undefined,
+    supplierName: slot.content?.summary ?? undefined,
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
+// ── CMS Slot → ProductDevItem 매핑 ──
+
+function cmsSlotToProductDev(slot: CmsSlot, navigate: (path: string) => void): ProductDevItem {
+  return {
+    id: slot.content?.id ?? slot.id,
+    title: slot.content?.title ?? '',
+    description: slot.content?.summary ?? undefined,
+    imageUrl: slot.content?.imageUrl ?? undefined,
+    badge: (slot.content?.metadata?.badge as string) ?? undefined,
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
 // ── Default Hero (fallback) ──
 
 const DEFAULT_HERO: HeroSlide[] = [{
@@ -79,6 +113,8 @@ export function KCosmeticsHubPage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO);
   const [promos, setPromos] = useState<PromotionBanner[]>([]);
   const [ads, setAds] = useState<AdItem[]>([]);
+  const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
+  const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -119,6 +155,28 @@ export function KCosmeticsHubPage() {
       setAds([...premium, ...normal]);
     });
 
+    // B2B 공급 기회 (CMS Slot 대체 — K-Cosmetics는 카탈로그 API 없음)
+    cmsApi.getSlots('hub-b2b-feature', { serviceKey: 'cosmetics' })
+      .then(res => {
+        if (!cancelled) {
+          setB2bItems(res.data
+            .filter(s => s.content)
+            .map(s => cmsSlotToB2BItem(s, navigate)));
+        }
+      })
+      .catch(() => {});
+
+    // 제품개발 참여 (CMS Slot)
+    cmsApi.getSlots('hub-product-dev', { serviceKey: 'cosmetics' })
+      .then(res => {
+        if (!cancelled) {
+          setProductDevItems(res.data
+            .filter(s => s.content)
+            .map(s => cmsSlotToProductDev(s, navigate)));
+        }
+      })
+      .catch(() => {});
+
     return () => { cancelled = true; };
   }, [navigate]);
 
@@ -134,8 +192,10 @@ export function KCosmeticsHubPage() {
     <HubExplorationLayout
       theme={{ primaryColor: '#DB2777', maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B 공급 기회', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/b2b/supply') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
+      productDevelopment={productDevItems.length > 0 ? { items: productDevItems, title: '제품개발 참여' } : undefined}
+      recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
       aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}
