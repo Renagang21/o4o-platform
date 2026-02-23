@@ -1127,6 +1127,16 @@ const startServer = async () => {
       logger.error('Failed to register Platform Hub routes:', platformHubError);
     }
 
+    // 39. Register Hub Content routes (WO-O4O-HUB-CONTENT-QUERY-SERVICE-PHASE1-V2)
+    try {
+      const { createHubContentRouter } = await import('./modules/hub-content/hub-content.controller.js');
+      const hubContentRoutes = createHubContentRouter(AppDataSource);
+      app.use('/api/v1/hub', hubContentRoutes);
+      logger.info('✅ Hub Content routes registered at /api/v1/hub/contents');
+    } catch (hubContentError) {
+      logger.error('Failed to register Hub Content routes:', hubContentError);
+    }
+
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
     logger.info('✅ Routes registered via module loader');

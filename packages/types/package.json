@@ -31,6 +31,10 @@
     "./storefront-config": {
       "types": "./dist/storefront-config.d.ts",
       "import": "./dist/storefront-config.js"
+    },
+    "./hub-content": {
+      "types": "./dist/hub-content.d.ts",
+      "import": "./dist/hub-content.js"
     }
   },
   "sideEffects": false,

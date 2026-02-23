@@ -24,7 +24,6 @@ import {
   type B2BPreviewItem,
   type ProductDevItem,
   type PlatformContentItem,
-  type HubProducer,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
@@ -34,6 +33,7 @@ import { cmsApi } from '../../api/cms';
 import type { CmsSlot } from '../../api/cms';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { listPlatformServices } from '../../api/platform-services';
+import { hubContentApi } from '../../api/hubContent';
 
 // ============================================
 // KPI
@@ -213,33 +213,24 @@ export function PharmacyHubMarketPage() {
       })
       .catch(() => {});
 
-    // 플랫폼 콘텐츠
-    cmsApi.getContents({ status: 'published', limit: 20, offset: 0 })
+    // 플랫폼 콘텐츠 (HUB 통합 API — CMS + Signage 병합)
+    hubContentApi.list({ serviceKey: 'kpa', limit: 20 })
       .then(res => {
         if (!cancelled) {
-          setContentItems(res.data.map(c => ({
-            id: c.id,
-            icon: '📄',
-            title: c.title,
-            description: c.summary ?? undefined,
-            date: c.publishedAt
-              ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
+          setContentItems(res.data.map(item => ({
+            id: item.id,
+            icon: item.sourceDomain === 'cms' ? '📄' : item.sourceDomain === 'signage-media' ? '🖥️' : '📋',
+            title: item.title,
+            description: item.description ?? undefined,
+            date: item.createdAt
+              ? new Date(item.createdAt).toLocaleDateString('ko-KR')
               : undefined,
-            authorRole: c.authorRole,
-            producer: (
-              c.authorRole === 'admin' || c.authorRole === 'service_admin'
-                ? 'operator'
-                : c.authorRole === 'supplier'
-                  ? 'supplier'
-                  : c.authorRole === 'community'
-                    ? 'community'
-                    : undefined
-            ) as HubProducer | undefined,
+            producer: item.producer,
             onCopy: () => {
               assetSnapshotApi.copy({
                 sourceService: 'kpa',
-                sourceAssetId: c.id,
-                assetType: 'cms',
+                sourceAssetId: item.id,
+                assetType: item.sourceDomain === 'cms' ? 'cms' : 'signage',
               }).catch(() => {});
             },
           })));
@@ -264,7 +255,7 @@ export function PharmacyHubMarketPage() {
     async function loadKpi() {
       const results = await Promise.allSettled([
         getCatalog({ limit: 1, offset: 0 }),
-        cmsApi.getContents({ status: 'published', limit: 1, offset: 0 }),
+        hubContentApi.list({ serviceKey: 'kpa', limit: 1 }),
         listPlatformServices(),
       ]);
 

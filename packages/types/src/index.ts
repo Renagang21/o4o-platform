@@ -100,3 +100,6 @@ export type { SupplierStats as VendorSupplierStats } from './vendor-management.j
 
 // Export storefront config types (WO-O4O-STOREFRONT-STABILIZATION-V1)
 export * from './storefront-config.js';
+
+// Export hub content types (WO-O4O-HUB-CONTENT-QUERY-SERVICE-PHASE1-V2)
+export * from './hub-content.js';
