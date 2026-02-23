@@ -33,6 +33,7 @@ export type {
   HubListProps,
   PlatformContentItem,
   PlatformContentSectionProps,
+  ContentAuthorTab,
   B2BTableItem,
   B2BTableSortKey,
   B2BTableListProps,

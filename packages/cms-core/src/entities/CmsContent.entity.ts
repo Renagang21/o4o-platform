@@ -24,10 +24,15 @@ export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'e
 // Content lifecycle states
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
+// WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: Author role and visibility scope
+export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
+export type ContentVisibilityScope = 'platform' | 'service' | 'organization';
+
 @Entity('cms_contents')
 @Index(['serviceKey', 'organizationId', 'status'])
 @Index(['type', 'status'])
 @Index(['status', 'publishedAt'])
+@Index(['serviceKey', 'visibilityScope', 'authorRole', 'status'])
 export class CmsContent {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -87,6 +92,13 @@ export class CmsContent {
   // === Metadata (extensible data) ===
   @Column({ type: 'jsonb', default: '{}' })
   metadata!: Record<string, any>; // Background color, icon, etc.
+
+  // === Visibility (WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1) ===
+  @Column({ type: 'varchar', length: 20, default: 'admin' })
+  authorRole!: ContentAuthorRole; // Who created: admin, service_admin, supplier, community
+
+  @Column({ type: 'varchar', length: 20, default: 'platform' })
+  visibilityScope!: ContentVisibilityScope; // Where visible: platform, service, organization
 
   // === Audit ===
   @Column({ type: 'uuid', nullable: true })

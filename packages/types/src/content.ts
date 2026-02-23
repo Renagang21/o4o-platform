@@ -23,6 +23,12 @@ export type ContentSourceType = 'operator' | 'supplier' | 'pharmacist';
 /** CMS 콘텐츠 상태 */
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
+/** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 작성자 역할 */
+export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
+
+/** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 가시성 범위 */
+export type ContentVisibilityScope = 'platform' | 'service' | 'organization';
+
 // =============================================================================
 // Metadata
 // =============================================================================
@@ -57,6 +63,10 @@ export interface ContentItemResponse {
   metadata?: ContentMetadata | null;
   publishedAt?: string | null;
   createdAt: string;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 작성자 역할 */
+  authorRole?: ContentAuthorRole;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 가시성 범위 */
+  visibilityScope?: ContentVisibilityScope;
   /** Phase 3A: 조회수 */
   viewCount?: number;
   /** Phase 3A: 추천수 */
@@ -119,4 +129,19 @@ export const CONTENT_SOURCE_COLORS: Record<ContentSourceType, string> = {
   operator: '#1a5276',
   supplier: '#6c3483',
   pharmacist: '#1e8449',
+};
+
+/** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 작성자 역할별 한글 라벨 */
+export const CONTENT_AUTHOR_ROLE_LABELS: Record<ContentAuthorRole, string> = {
+  admin: '관리자',
+  service_admin: '서비스 운영자',
+  supplier: '공급자',
+  community: '커뮤니티',
+};
+
+/** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 가시성 범위별 한글 라벨 */
+export const CONTENT_VISIBILITY_SCOPE_LABELS: Record<ContentVisibilityScope, string> = {
+  platform: '플랫폼 전체',
+  service: '서비스 전용',
+  organization: '조직 전용',
 };

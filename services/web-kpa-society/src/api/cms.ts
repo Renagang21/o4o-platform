@@ -43,6 +43,8 @@ interface CmsContent {
   isPinned: boolean;
   isOperatorPicked: boolean;
   sortOrder: number;
+  authorRole?: string;
+  visibilityScope?: string;
   createdAt: string;
 }
 
@@ -134,6 +136,7 @@ export const cmsApi = {
     organizationId?: string;
     type?: string;
     status?: string;
+    authorRole?: string;
     limit?: number;
     offset?: number;
   }): Promise<ContentsResponse> => {
@@ -142,6 +145,7 @@ export const cmsApi = {
       organizationId: options?.organizationId || '',
       type: options?.type || '',
       status: options?.status || '',
+      authorRole: options?.authorRole || '',
       limit: String(options?.limit || 20),
       offset: String(options?.offset || 0),
     });
