@@ -3,6 +3,7 @@
  *
  * WO-O4O-HUB-EXPLORATION-CORE-V1
  * WO-O4O-HUB-DATA-UNIFICATION-V1: CMS 슬롯 연동
+ * WO-O4O-HUB-CMS-SLOT-STRUCTURE-ALIGNMENT-V1: 공통 슬롯 키 + 광고 연동
  *
  * hub-exploration-core thin wrapper.
  * 서비스별 데이터만 다르고 구조는 플랫폼 공통.
@@ -16,6 +17,7 @@ import {
   type HeroSlide,
   type CoreServiceBanner,
   type PromotionBanner,
+  type AdItem,
 } from '@o4o/hub-exploration-core';
 import { cmsApi } from '../../api/cms';
 import type { CmsSlot } from '../../api/cms';
@@ -49,6 +51,18 @@ function cmsSlotToPromo(slot: CmsSlot, navigate: (path: string) => void): Promot
   };
 }
 
+function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (path: string) => void): AdItem {
+  return {
+    id: slot.content?.id ?? slot.id,
+    tier,
+    imageUrl: slot.content?.imageUrl ?? '',
+    alt: slot.content?.title ?? '',
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
 // ── Default Hero (fallback) ──
 
 const DEFAULT_HERO: HeroSlide[] = [{
@@ -63,12 +77,13 @@ export function GlycoPharmHubPage() {
 
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO);
   const [promos, setPromos] = useState<PromotionBanner[]>([]);
+  const [ads, setAds] = useState<AdItem[]>([]);
 
-  // CMS 슬롯 로드 (1회)
+  // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
     let cancelled = false;
 
-    cmsApi.getSlots('glycopharm-hub-hero', { serviceKey: 'glycopharm' })
+    cmsApi.getSlots('hub-hero', { serviceKey: 'glycopharm' })
       .then(res => {
         if (!cancelled && res.data.length > 0) {
           setHeroSlides(res.data
@@ -78,7 +93,7 @@ export function GlycoPharmHubPage() {
       })
       .catch(() => {});
 
-    cmsApi.getSlots('glycopharm-hub-promo', { serviceKey: 'glycopharm' })
+    cmsApi.getSlots('hub-promotion', { serviceKey: 'glycopharm' })
       .then(res => {
         if (!cancelled) {
           setPromos(res.data
@@ -87,6 +102,21 @@ export function GlycoPharmHubPage() {
         }
       })
       .catch(() => {});
+
+    // Ads (premium + normal)
+    Promise.allSettled([
+      cmsApi.getSlots('hub-ad-premium', { serviceKey: 'glycopharm' }),
+      cmsApi.getSlots('hub-ad-normal', { serviceKey: 'glycopharm' }),
+    ]).then(results => {
+      if (cancelled) return;
+      const premium = results[0].status === 'fulfilled'
+        ? results[0].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'premium', navigate))
+        : [];
+      const normal = results[1].status === 'fulfilled'
+        ? results[1].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'normal', navigate))
+        : [];
+      setAds([...premium, ...normal]);
+    });
 
     return () => { cancelled = true; };
   }, [navigate]);
@@ -103,6 +133,7 @@ export function GlycoPharmHubPage() {
       theme={{ primaryColor: '#0d9488', maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
+      ads={ads.length > 0 ? { ads } : undefined}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
       aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}

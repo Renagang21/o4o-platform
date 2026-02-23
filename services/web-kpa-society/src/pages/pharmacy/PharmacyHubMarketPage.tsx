@@ -5,6 +5,7 @@
  * WO-O4O-HUB-PLATFORM-ACTIVITY-SUMMARY-V1
  * WO-O4O-HUB-EXPLORATION-CORE-V1: hub-exploration-core thin wrapper
  * WO-O4O-HUB-DATA-UNIFICATION-V1: CMS 슬롯 연동
+ * WO-O4O-HUB-CMS-SLOT-STRUCTURE-ALIGNMENT-V1: 공통 슬롯 키 + 광고 연동
  *
  * Hub = "여기서 가져간다" — 플랫폼이 제공하는 자원을 탐색·선택하여 내 매장으로 가져가는 공간
  */
@@ -18,6 +19,7 @@ import {
   type CoreServiceBanner,
   type RecentUpdateItem,
   type PromotionBanner,
+  type AdItem,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
@@ -67,6 +69,18 @@ function cmsSlotToPromo(slot: CmsSlot, navigate: (path: string) => void): Promot
   };
 }
 
+function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (path: string) => void): AdItem {
+  return {
+    id: slot.content?.id ?? slot.id,
+    tier,
+    imageUrl: slot.content?.imageUrl ?? '',
+    alt: slot.content?.title ?? '',
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
 // ============================================
 // Default Hero (fallback when CMS empty)
 // ============================================
@@ -93,13 +107,14 @@ export function PharmacyHubMarketPage() {
 
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(defaultHero);
   const [promos, setPromos] = useState<PromotionBanner[]>([]);
+  const [ads, setAds] = useState<AdItem[]>([]);
 
-  // CMS 슬롯 로드 (1회)
+  // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
     let cancelled = false;
 
     // Hero
-    cmsApi.getSlots('kpa-hub-hero', { serviceKey: 'kpa' })
+    cmsApi.getSlots('hub-hero', { serviceKey: 'kpa' })
       .then(res => {
         if (!cancelled && res.data.length > 0) {
           setHeroSlides(res.data
@@ -110,7 +125,7 @@ export function PharmacyHubMarketPage() {
       .catch(() => {}); // fallback to default
 
     // Promo
-    cmsApi.getSlots('kpa-hub-promo', { serviceKey: 'kpa' })
+    cmsApi.getSlots('hub-promotion', { serviceKey: 'kpa' })
       .then(res => {
         if (!cancelled) {
           setPromos(res.data
@@ -119,6 +134,21 @@ export function PharmacyHubMarketPage() {
         }
       })
       .catch(() => {});
+
+    // Ads (premium + normal)
+    Promise.allSettled([
+      cmsApi.getSlots('hub-ad-premium', { serviceKey: 'kpa' }),
+      cmsApi.getSlots('hub-ad-normal', { serviceKey: 'kpa' }),
+    ]).then(results => {
+      if (cancelled) return;
+      const premium = results[0].status === 'fulfilled'
+        ? results[0].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'premium', navigate))
+        : [];
+      const normal = results[1].status === 'fulfilled'
+        ? results[1].value.data.filter(s => s.content).map(s => cmsSlotToAdItem(s, 'normal', navigate))
+        : [];
+      setAds([...premium, ...normal]);
+    });
 
     return () => { cancelled = true; };
   }, [navigate]);
@@ -220,6 +250,7 @@ export function PharmacyHubMarketPage() {
       theme={{ maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
+      ads={ads.length > 0 ? { ads } : undefined}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
       aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}
