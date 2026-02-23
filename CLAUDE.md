@@ -565,6 +565,48 @@ api-server → store-core, asset-copy-core
 
 ---
 
+## 23. PLATFORM CONTENT POLICY (v1) — BASELINE
+
+> **IR-O4O-PLATFORM-CONTENT-POLICY-FINAL-V1 (2026-02-23)**
+> **상세: `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md`**
+
+HUB에 노출되는 모든 콘텐츠는 도메인(CMS, Signage 등)에 관계없이 **3축 모델**로 관리한다:
+
+| 축 | 값 | 설명 |
+|-----|-----|------|
+| **Producer** | `operator / supplier / community / store` | 제작 주체 |
+| **Visibility** | `global / service / store` | 가시성 범위 |
+| **Service Scope** | `serviceKey = current` | 서비스 격리 |
+
+### Producer 매핑 (도메인 → HUB)
+
+| HUB Producer | CMS `authorRole` | Signage `source` |
+|:---:|:---:|:---:|
+| operator | admin, service_admin | hq |
+| supplier | supplier | supplier |
+| community | community | community |
+| store | (organization scope) | store |
+
+### HUB 탭 정책
+
+```
+전체 | 운영자 | 공급자 | 커뮤니티
+```
+
+- **전체**: producer IN (operator, supplier, community), visibility=global
+- **운영자**: producer=operator, visibility IN (global, service)
+- **공급자**: producer=supplier, visibility=global
+- **커뮤니티**: producer=community, visibility=global
+- Store 콘텐츠는 HUB 탭에 포함되지 않음
+
+### 보안 원칙
+
+- producer/visibility 필드는 서버에서 강제 (클라이언트 입력 무시)
+- PATCH 시 producer/visibility 변경 불가
+- serviceKey는 URL param 기준, body 값 무시
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -589,9 +631,10 @@ api-server → store-core, asset-copy-core
 | **UX Core Freeze (Operator+Admin)** | `docs/baseline/UX-CORE-FREEZE-V1.md` |
 | **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
 | **Store Layer Architecture** | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
+| **Platform Content Policy** | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
 
 ---
 
-*Updated: 2026-02-22*
-*Version: 5.3*
+*Updated: 2026-02-23*
+*Version: 5.4*
 *Status: Active Constitution*
