@@ -81,7 +81,8 @@ const OperatorsPage: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: '',
+    lastName: '',
+    firstName: '',
     roles: [] as string[],
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -214,17 +215,22 @@ const OperatorsPage: React.FC = () => {
   // Modal handlers
   const openCreateModal = () => {
     setEditingOperator(null);
-    setFormData({ email: '', password: '', name: '', roles: [] });
+    setFormData({ email: '', password: '', lastName: '', firstName: '', roles: [] });
     setFormErrors({});
     setShowModal(true);
   };
 
   const openEditModal = (operator: Operator) => {
     setEditingOperator(operator);
+    // name에서 성/이름 분리 (첫 글자 = 성, 나머지 = 이름)
+    const nameParts = operator.name.trim();
+    const lastName = nameParts.length > 0 ? nameParts.charAt(0) : '';
+    const firstName = nameParts.length > 1 ? nameParts.slice(1) : '';
     setFormData({
       email: operator.email,
       password: '',
-      name: operator.name,
+      lastName,
+      firstName,
       roles: operator.roles,
     });
     setFormErrors({});
@@ -234,7 +240,7 @@ const OperatorsPage: React.FC = () => {
   const closeModal = () => {
     setShowModal(false);
     setEditingOperator(null);
-    setFormData({ email: '', password: '', name: '', roles: [] });
+    setFormData({ email: '', password: '', lastName: '', firstName: '', roles: [] });
     setFormErrors({});
   };
 
@@ -254,8 +260,11 @@ const OperatorsPage: React.FC = () => {
       errors.password = 'Password must be at least 8 characters';
     }
 
-    if (!formData.name) {
-      errors.name = 'Name is required';
+    if (!formData.lastName) {
+      errors.lastName = 'Last name is required';
+    }
+    if (!formData.firstName) {
+      errors.firstName = 'First name is required';
     }
 
     if (formData.roles.length === 0) {
@@ -277,7 +286,9 @@ const OperatorsPage: React.FC = () => {
       if (editingOperator) {
         // Update existing operator
         const updateData: any = {
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          name: `${formData.lastName}${formData.firstName}`,
           roles: formData.roles,
         };
         if (formData.password) {
@@ -291,7 +302,9 @@ const OperatorsPage: React.FC = () => {
         await authClient.api.post('/admin/users', {
           email: formData.email,
           password: formData.password,
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          name: `${formData.lastName}${formData.firstName}`,
           roles: formData.roles,
           role: formData.roles[0]?.split(':')[1] || 'operator', // Legacy role field
           isEmailVerified: true,
@@ -573,25 +586,47 @@ const OperatorsPage: React.FC = () => {
               </div>
 
               {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    formErrors.name ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Operator Name"
-                />
-                {formErrors.name && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.name}
-                  </p>
-                )}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    성 (Last Name) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formErrors.lastName ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="홍"
+                  />
+                  {formErrors.lastName && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {formErrors.lastName}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    이름 (First Name) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      formErrors.firstName ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="길동"
+                  />
+                  {formErrors.firstName && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {formErrors.firstName}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Roles */}
