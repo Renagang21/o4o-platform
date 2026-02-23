@@ -127,13 +127,19 @@ export class AdminUserController {
       const {
         email,
         password,
-        firstName,
-        lastName,
-        name,
+        firstName: rawFirstName,
+        lastName: rawLastName,
+        name: rawName,
         role = UserRole.USER,
         status = UserStatus.APPROVED,
         isActive = true
       } = req.body;
+
+      // name 단일 필드에서 firstName/lastName 도출 (operator 생성 시 name만 보냄)
+      const effectiveName = rawName || `${rawLastName || ''} ${rawFirstName || ''}`.trim() || '운영자';
+      const firstName = rawFirstName || effectiveName;
+      const lastName = rawLastName || '';
+      const name = effectiveName;
 
       const userRepo = AppDataSource.getRepository(User);
 
@@ -150,6 +156,12 @@ export class AdminUserController {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      // 프론트엔드에서 보낸 roles 배열 사용 (서비스 프리픽스 포함, e.g. "glycopharm:admin")
+      const frontendRoles = req.body.roles;
+      const effectiveRoles = Array.isArray(frontendRoles) && frontendRoles.length > 0
+        ? frontendRoles
+        : [role];
+
       const newUser = userRepo.create({
         email,
         password: hashedPassword,
@@ -159,7 +171,8 @@ export class AdminUserController {
         role,
         status,
         isActive,
-        roles: [role],
+        isEmailVerified: req.body.isEmailVerified ?? false,
+        roles: effectiveRoles,
         permissions: []
       });
 
