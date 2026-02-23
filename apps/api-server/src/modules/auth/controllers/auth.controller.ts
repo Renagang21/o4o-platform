@@ -202,10 +202,9 @@ export class AuthController extends BaseController {
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
 
-      // 트랜잭션: User + RoleAssignment + KPA Member 원자적 생성
+      // User 생성 (트랜잭션 내 KPA member 포함)
       const user = await AppDataSource.transaction(async (manager) => {
         const txUserRepo = manager.getRepository(User);
-        const txAssignRepo = manager.getRepository(RoleAssignment);
 
         // Create new user
         const newUser = new User();
@@ -226,23 +225,23 @@ export class AuthController extends BaseController {
         if (data.pharmacistRole) {
           newUser.pharmacistRole = data.pharmacistRole;
         }
-        if (data.businessName || data.businessNumber) {
-          newUser.businessInfo = {
-            businessName: data.businessName || '',
-            businessNumber: data.businessNumber || '',
-          };
+
+        // businessInfo: 사업자 정보 + 면허번호 저장
+        const businessInfo: Record<string, string> = {};
+        if (data.licenseNumber) {
+          businessInfo.licenseNumber = data.licenseNumber;
+        }
+        if (data.businessName) {
+          businessInfo.businessName = data.businessName;
+        }
+        if (data.businessNumber) {
+          businessInfo.businessNumber = data.businessNumber;
+        }
+        if (Object.keys(businessInfo).length > 0) {
+          newUser.businessInfo = businessInfo;
         }
 
         await txUserRepo.save(newUser);
-
-        // Create RoleAssignment
-        const assignment = new RoleAssignment();
-        assignment.userId = newUser.id;
-        assignment.role = effectiveRole;
-        assignment.isActive = true;
-        assignment.validFrom = new Date();
-        assignment.assignedAt = new Date();
-        await txAssignRepo.save(assignment);
 
         // KPA Society: auto-create KPA member with organization
         if (data.service === 'kpa-society' && data.organizationId) {
@@ -271,6 +270,24 @@ export class AuthController extends BaseController {
 
         return newUser;
       });
+
+      // RoleAssignment 생성 (비필수 - 테이블 스키마 불일치 시에도 회원가입은 성공)
+      try {
+        const assignRepo = AppDataSource.getRepository(RoleAssignment);
+        const assignment = new RoleAssignment();
+        assignment.userId = user.id;
+        assignment.role = effectiveRole;
+        assignment.isActive = true;
+        assignment.validFrom = new Date();
+        assignment.assignedAt = new Date();
+        await assignRepo.save(assignment);
+      } catch (roleError: any) {
+        logger.warn('[AuthController.register] RoleAssignment creation failed (non-fatal)', {
+          userId: user.id,
+          role: effectiveRole,
+          error: roleError.message,
+        });
+      }
 
       // Send email verification (optional - don't fail if email fails)
       try {

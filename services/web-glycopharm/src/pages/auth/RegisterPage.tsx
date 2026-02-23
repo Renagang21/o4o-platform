@@ -74,7 +74,7 @@ export default function RegisterPage() {
           firstName: formData.firstName,
           nickname: `${formData.lastName}${formData.firstName}`,
           phone: formData.phone.replace(/\D/g, ''),
-          role: 'business',
+          role: 'user',
           service: 'glycopharm',
           licenseNumber: formData.licenseNumber,
           tos: formData.agreeTerms,
