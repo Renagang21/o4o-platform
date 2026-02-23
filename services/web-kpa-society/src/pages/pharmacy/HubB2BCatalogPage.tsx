@@ -34,12 +34,6 @@ const CATEGORY_TABS: { key: string; label: string }[] = [
   { key: '생활용품', label: '생활용품' },
 ];
 
-const PURPOSE_LABELS: Record<string, { text: string; color: string; bg: string }> = {
-  CATALOG: { text: '정보', color: '#6b7280', bg: '#f3f4f6' },
-  APPLICATION: { text: '신청 가능', color: '#2563eb', bg: '#dbeafe' },
-  ACTIVE_SALES: { text: '판매 중', color: '#059669', bg: '#d1fae5' },
-};
-
 const PAGE_LIMIT = 20;
 
 // ============================================
@@ -235,32 +229,54 @@ export function HubB2BCatalogPage() {
         <>
           <div style={styles.resultCount}>총 {total}건</div>
 
-          <div style={styles.cardGrid}>
+          <div style={styles.tableCard}>
+            {/* Table Header */}
+            <div style={styles.tableHeader}>
+              <span style={{ ...styles.th, flex: 2 }}>상품명</span>
+              <span style={{ ...styles.th, flex: 1.2 }}>공급사</span>
+              <span style={{ ...styles.th, flex: 0.8 }}>카테고리</span>
+              <span style={{ ...styles.th, flex: 0.8 }}>상태</span>
+              <span style={{ ...styles.th, flex: 0.8 }}>등록일</span>
+              <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>액션</span>
+            </div>
+
+            {/* Table Rows */}
             {products.map(item => {
-              const purposeInfo = PURPOSE_LABELS[item.purpose] || PURPOSE_LABELS.CATALOG;
               const state = getProductState(item);
               const stateInfo = STATE_CONFIG[state];
               const isApplying = applyingId === item.id;
 
               return (
-                <div key={item.id} style={styles.card}>
-                  {/* Header: Supplier + Status Badge */}
-                  <div style={styles.cardHeader}>
-                    <div style={styles.cardSupplier}>
+                <div key={item.id} style={styles.tableRow}>
+                  {/* 상품명 */}
+                  <div style={{ ...styles.td, flex: 2, minWidth: 0 }}>
+                    <span style={styles.rowTitle}>{item.name}</span>
+                    {item.description && (
+                      <span style={styles.rowDesc}>{item.description}</span>
+                    )}
+                  </div>
+
+                  {/* 공급사 */}
+                  <div style={{ ...styles.td, flex: 1.2 }}>
+                    <div style={styles.supplierCell}>
                       {item.supplierLogoUrl ? (
-                        <img
-                          src={item.supplierLogoUrl}
-                          alt={item.supplierName}
-                          style={styles.supplierLogo}
-                        />
+                        <img src={item.supplierLogoUrl} alt={item.supplierName} style={styles.supplierLogo} />
                       ) : (
-                        <div style={styles.supplierLogoPlaceholder}>
-                          {item.supplierName.charAt(0)}
-                        </div>
+                        <div style={styles.supplierLogoPlaceholder}>{item.supplierName.charAt(0)}</div>
                       )}
                       <span style={styles.supplierName}>{item.supplierName}</span>
                     </div>
-                    {/* Status Badge (우상단) */}
+                  </div>
+
+                  {/* 카테고리 */}
+                  <div style={{ ...styles.td, flex: 0.8 }}>
+                    {item.category && (
+                      <span style={styles.categoryBadge}>{item.category}</span>
+                    )}
+                  </div>
+
+                  {/* 상태 */}
+                  <div style={{ ...styles.td, flex: 0.8 }}>
                     <span style={{
                       ...styles.stateBadge,
                       color: stateInfo.color,
@@ -271,46 +287,21 @@ export function HubB2BCatalogPage() {
                     </span>
                   </div>
 
-                  {/* Product info */}
-                  <h3 style={styles.cardTitle}>{item.name}</h3>
-                  {item.description && (
-                    <p style={styles.cardDesc}>{item.description}</p>
-                  )}
-
-                  {/* Meta */}
-                  <div style={styles.cardMeta}>
-                    {item.category && (
-                      <span style={styles.categoryBadge}>{item.category}</span>
-                    )}
-                    <span style={{
-                      ...styles.purposeBadge,
-                      backgroundColor: purposeInfo.bg,
-                      color: purposeInfo.color,
-                    }}>
-                      {purposeInfo.text}
+                  {/* 등록일 */}
+                  <div style={{ ...styles.td, flex: 0.8 }}>
+                    <span style={styles.rowDate}>
+                      {new Date(item.updatedAt).toLocaleDateString('ko-KR')}
                     </span>
                   </div>
 
-                  {/* Action Footer */}
-                  <div style={styles.cardFooter}>
-                    <span style={styles.cardDate}>
-                      {new Date(item.updatedAt).toLocaleDateString('ko-KR')}
-                    </span>
+                  {/* 액션 */}
+                  <div style={{ ...styles.td, flex: 1, justifyContent: 'flex-end' }}>
                     {state === 'listed' ? (
-                      <button disabled style={styles.buttonDisabled}>
-                        판매 중
-                      </button>
+                      <button disabled style={styles.buttonDisabled}>판매 중</button>
                     ) : state === 'approved' ? (
-                      <button
-                        onClick={() => navigate('/store/products/b2c')}
-                        style={styles.buttonNavigate}
-                      >
-                        매장 관리로 이동
-                      </button>
+                      <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
                     ) : state === 'pending' ? (
-                      <button disabled style={styles.buttonDisabled}>
-                        승인 대기 중
-                      </button>
+                      <button disabled style={styles.buttonDisabled}>승인 대기</button>
                     ) : (
                       <button
                         onClick={() => handleApply(item)}
@@ -479,58 +470,95 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: '12px',
   },
 
-  // Card Grid
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '20px',
-    marginBottom: '24px',
-  },
-  card: {
+  // Table
+  tableCard: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.lg,
     boxShadow: shadows.sm,
     border: `1px solid ${colors.neutral200}`,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
+    overflow: 'hidden',
+    marginBottom: '24px',
   },
-  cardHeader: {
+  tableHeader: {
+    display: 'flex',
+    padding: '10px 20px',
+    borderBottom: `1px solid ${colors.neutral200}`,
+    backgroundColor: colors.neutral50,
+  },
+  th: {
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: colors.neutral500,
+    textTransform: 'uppercase',
+    letterSpacing: '0.03em',
+  } as React.CSSProperties,
+  tableRow: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: '14px 20px',
+    borderBottom: `1px solid ${colors.neutral100}`,
+    transition: 'background-color 0.1s',
   },
-  cardSupplier: {
+  td: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    fontSize: '0.8125rem',
+    color: colors.neutral700,
+    paddingRight: '12px',
+  } as React.CSSProperties,
+  rowTitle: {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: colors.neutral900,
+    lineHeight: 1.4,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  rowDesc: {
+    fontSize: '0.75rem',
+    color: colors.neutral400,
+    lineHeight: 1.4,
+    marginTop: '2px',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  rowDate: {
+    fontSize: '0.75rem',
+    color: colors.neutral400,
+  },
+  supplierCell: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
   },
   supplierLogo: {
-    width: '28px',
-    height: '28px',
-    borderRadius: '6px',
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
     objectFit: 'cover' as const,
   },
   supplierLogoPlaceholder: {
-    width: '28px',
-    height: '28px',
-    borderRadius: '6px',
+    width: '24px',
+    height: '24px',
+    borderRadius: '4px',
     backgroundColor: colors.primary + '15',
     color: colors.primary,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '0.75rem',
+    fontSize: '0.625rem',
     fontWeight: 700,
   },
   supplierName: {
     fontSize: '0.8125rem',
-    color: colors.neutral500,
+    color: colors.neutral600,
     fontWeight: 500,
   },
 
-  // State Badge (카드 우상단)
+  // State Badge
   stateBadge: {
     display: 'inline-block',
     padding: '3px 10px',
@@ -541,30 +569,6 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap' as const,
   },
 
-  cardTitle: {
-    margin: 0,
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    lineHeight: 1.4,
-  },
-  cardDesc: {
-    margin: 0,
-    fontSize: '0.8125rem',
-    color: colors.neutral500,
-    lineHeight: 1.5,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
-    flex: 1,
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    flexWrap: 'wrap' as const,
-  },
   categoryBadge: {
     display: 'inline-block',
     padding: '2px 8px',
@@ -573,25 +577,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral600,
     backgroundColor: colors.neutral100,
     borderRadius: '4px',
-  },
-  purposeBadge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 600,
-    borderRadius: '4px',
-  },
-  cardFooter: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: '4px',
-    paddingTop: '10px',
-    borderTop: '1px solid #f1f5f9',
-  },
-  cardDate: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
   },
 
   // Buttons
