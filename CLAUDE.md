@@ -607,6 +607,44 @@ HUB에 노출되는 모든 콘텐츠는 도메인(CMS, Signage 등)에 관계없
 
 ---
 
+## 24. CONTENT STABLE (v1)
+
+> **IR-O4O-CONTENT-STABLE-DECLARATION-V1 (2026-02-23)**
+> **상세: `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md`**
+
+콘텐츠 계층(CMS + Signage + HUB 집계 레이어)은 **Stable 상태**이다.
+
+### Stable 구성 요소
+
+| 구성 요소 | 위치 | 상태 |
+|----------|------|------|
+| `HubProducer` / `HubVisibility` / `HubSourceDomain` 타입 | `@o4o/types/hub-content` | Stable |
+| `HubContentItemResponse` / `HubContentListResponse` | `@o4o/types/hub-content` | Stable |
+| Producer ↔ authorRole/source 매핑 | `hub-content.service.ts` | Stable |
+| `HubContentQueryService` 병합 로직 | `api-server/modules/hub-content/` | Stable |
+| `GET /api/v1/hub/contents` API 계약 | `hub-content.controller.ts` | Stable |
+| ServiceKey 격리 정책 | 컨트롤러 + 서비스 | Stable |
+| CMS `visibilityScope IN ('platform','service')` 필터 | 서비스 쿼리 | Stable |
+| Signage `scope = 'global'` 필터 | 서비스 쿼리 | Stable |
+
+### 금지되는 변경 (WO 필수)
+
+- `HubProducer` / `HubVisibility` / `HubSourceDomain` enum 구조 변경
+- Producer ↔ authorRole/source 매핑 변경
+- `HubContentQueryService` 병합 로직 변경
+- serviceKey 격리 정책 변경
+- scope/visibility 필터 정책 변경
+- API 응답 구조 (`HubContentItemResponse`) 변경
+
+### 허용되는 변경
+
+- 버그 수정, 성능 개선 (캐싱 등)
+- UI 표현 개선 (데이터 구조 내)
+- 새로운 `sourceDomain` 추가 (기존 정책 패턴 준수 시)
+- 문서, 테스트 추가
+
+---
+
 ## 상세 규칙 문서 목록
 
 | 영역 | 문서 |
@@ -632,9 +670,10 @@ HUB에 노출되는 모든 콘텐츠는 도메인(CMS, Signage 등)에 관계없
 | **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
 | **Store Layer Architecture** | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
 | **Platform Content Policy** | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
+| **Content Stable Declaration** | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
 
 ---
 
 *Updated: 2026-02-23*
-*Version: 5.4*
+*Version: 5.5*
 *Status: Active Constitution*
