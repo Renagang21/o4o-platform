@@ -142,6 +142,55 @@ export interface ProductDevelopmentSectionProps {
 }
 
 // ──────────────────────────────────────────────
+// HubList (공용 리스트 컴포넌트)
+// WO-O4O-HUB-LIST-UI-UNIFICATION-V1
+// ──────────────────────────────────────────────
+
+export interface HubListItem {
+  id: string;
+  thumbnail?: string;
+  primaryText: string;
+  secondaryText?: string;
+  tertiaryText?: string;
+  infoText?: string;
+  actionLabel?: string;
+  onAction?: () => void;
+  onClick?: () => void;
+}
+
+export interface HubListProps {
+  items: HubListItem[];
+  pageSize?: number;
+  title?: string;
+  ctaLabel?: string;
+  onCtaClick?: () => void;
+  backgroundColor?: string;
+  emptyMessage?: string;
+}
+
+// ──────────────────────────────────────────────
+// Section: PlatformContentSection (신규)
+// WO-O4O-HUB-LIST-UI-UNIFICATION-V1
+// ──────────────────────────────────────────────
+
+export interface PlatformContentItem {
+  id: string;
+  icon?: string;
+  title: string;
+  description?: string;
+  date?: string;
+  onCopy?: () => void;
+}
+
+export interface PlatformContentSectionProps {
+  items: PlatformContentItem[];
+  title?: string;
+  pageSize?: number;
+  ctaLabel?: string;
+  onCtaClick?: () => void;
+}
+
+// ──────────────────────────────────────────────
 // Section: CoreServiceBanners
 // ──────────────────────────────────────────────
 
@@ -195,6 +244,7 @@ export interface HubExplorationLayoutProps {
   theme?: HubExplorationTheme;
   hero: HeroCarouselProps;
   b2bRevenue?: B2BRevenueSectionProps;
+  platformContent?: PlatformContentSectionProps;
   ads?: AdSectionProps;
   productDevelopment?: ProductDevelopmentSectionProps;
   recentUpdates?: RecentUpdatesTabsProps;

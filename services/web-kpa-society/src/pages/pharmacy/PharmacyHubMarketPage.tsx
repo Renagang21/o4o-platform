@@ -22,6 +22,7 @@ import {
   type AdItem,
   type B2BPreviewItem,
   type ProductDevItem,
+  type PlatformContentItem,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
@@ -29,6 +30,7 @@ import { getCatalog } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { cmsApi } from '../../api/cms';
 import type { CmsSlot } from '../../api/cms';
+import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { listPlatformServices } from '../../api/platform-services';
 
 // ============================================
@@ -145,6 +147,7 @@ export function PharmacyHubMarketPage() {
   const [ads, setAds] = useState<AdItem[]>([]);
   const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
   const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
+  const [contentItems, setContentItems] = useState<PlatformContentItem[]>([]);
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -203,6 +206,30 @@ export function PharmacyHubMarketPage() {
           setProductDevItems(res.data
             .filter(s => s.content)
             .map(s => cmsSlotToProductDev(s, navigate)));
+        }
+      })
+      .catch(() => {});
+
+    // 플랫폼 콘텐츠
+    cmsApi.getContents({ status: 'published', limit: 20, offset: 0 })
+      .then(res => {
+        if (!cancelled) {
+          setContentItems(res.data.map(c => ({
+            id: c.id,
+            icon: '📄',
+            title: c.title,
+            description: c.summary ?? undefined,
+            date: c.publishedAt
+              ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
+              : undefined,
+            onCopy: () => {
+              assetSnapshotApi.copy({
+                sourceService: 'kpa',
+                sourceAssetId: c.id,
+                assetType: 'cms',
+              }).catch(() => {});
+            },
+          })));
         }
       })
       .catch(() => {});
@@ -289,7 +316,7 @@ export function PharmacyHubMarketPage() {
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: '본부/공급사가 제공하는 CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/hub/content') },
     { id: 'signage', icon: '🖥️', title: '플랫폼 사이니지', description: '디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.', onClick: () => navigate('/hub/signage') },
-    { id: 'products', icon: '🛒', title: 'B2B 상품 카탈로그', description: '공급사 상품을 서비스별로 탐색하고 신청·주문합니다.', onClick: () => navigate('/hub/b2b') },
+    { id: 'products', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 서비스별로 탐색하고 신청·주문합니다.', onClick: () => navigate('/hub/b2b') },
     { id: 'campaign', icon: '📋', title: '캠페인 · 설문', description: '약사회 캠페인에 참여하고 설문에 응답합니다.', badge: '준비중' },
   ], [navigate]);
 
@@ -306,9 +333,10 @@ export function PharmacyHubMarketPage() {
     <HubExplorationLayout
       theme={{ maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B 공급 기회', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
-      productDevelopment={productDevItems.length > 0 ? { items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' } : undefined}
+      productDevelopment={{ items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' }}
+      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content') }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}

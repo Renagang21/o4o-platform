@@ -21,6 +21,7 @@ import {
   type AdItem,
   type B2BPreviewItem,
   type ProductDevItem,
+  type PlatformContentItem,
 } from '@o4o/hub-exploration-core';
 import { cmsApi } from '@/api/cms';
 import type { CmsSlot } from '@/api/cms';
@@ -115,6 +116,7 @@ export function KCosmeticsHubPage() {
   const [ads, setAds] = useState<AdItem[]>([]);
   const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
   const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
+  const [contentItems, setContentItems] = useState<PlatformContentItem[]>([]);
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -177,12 +179,29 @@ export function KCosmeticsHubPage() {
       })
       .catch(() => {});
 
+    // 플랫폼 콘텐츠
+    cmsApi.getContents({ serviceKey: 'cosmetics', status: 'published', limit: 20, offset: 0 })
+      .then(res => {
+        if (!cancelled) {
+          setContentItems(res.data.map(c => ({
+            id: c.id,
+            icon: '📄',
+            title: c.title,
+            description: c.summary ?? undefined,
+            date: c.publishedAt
+              ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
+              : undefined,
+          })));
+        }
+      })
+      .catch(() => {});
+
     return () => { cancelled = true; };
   }, [navigate]);
 
   // ── Core Services ──
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
-    { id: 'b2b', icon: '🛒', title: 'B2B 상품 카탈로그', description: '공급사 상품을 탐색하고 매장에 신청합니다.', onClick: () => navigate('/b2b/supply') },
+    { id: 'b2b', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 탐색하고 매장에 신청합니다.', onClick: () => navigate('/b2b/supply') },
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: 'CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/store') },
     { id: 'signage', icon: '🖥️', title: '디지털 사이니지', description: '매장 디스플레이에 활용할 미디어를 탐색합니다.', badge: '준비중' },
     { id: 'campaign', icon: '📋', title: '캠페인 · 이벤트', description: '플랫폼 캠페인에 참여합니다.', badge: '준비중' },
@@ -192,9 +211,10 @@ export function KCosmeticsHubPage() {
     <HubExplorationLayout
       theme={{ primaryColor: '#DB2777', maxWidth: '1100px' }}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B 공급 기회', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/b2b/supply') } : undefined}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/b2b/supply') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
-      productDevelopment={productDevItems.length > 0 ? { items: productDevItems, title: '제품개발 참여' } : undefined}
+      productDevelopment={{ items: productDevItems, title: '제품개발 참여' }}
+      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠' }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}

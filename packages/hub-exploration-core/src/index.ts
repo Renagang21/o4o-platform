@@ -29,6 +29,10 @@ export type {
   B2BRevenueSectionProps,
   ProductDevItem,
   ProductDevelopmentSectionProps,
+  HubListItem,
+  HubListProps,
+  PlatformContentItem,
+  PlatformContentSectionProps,
   AIPlaceholderProps,
   HubExplorationLayoutProps,
 } from './types.js';
@@ -43,6 +47,8 @@ export { RecentUpdatesTabs } from './components/RecentUpdatesTabs.js';
 export { AdSection } from './components/AdSection.js';
 export { B2BRevenueSection } from './components/B2BRevenueSection.js';
 export { ProductDevelopmentSection } from './components/ProductDevelopmentSection.js';
+export { HubList } from './components/HubList.js';
+export { PlatformContentSection } from './components/PlatformContentSection.js';
 export { CoreServiceBanners } from './components/CoreServiceBanners.js';
 export { ServicePromotionBanners } from './components/ServicePromotionBanners.js';
 export { AIPlaceholder } from './components/AIPlaceholder.js';

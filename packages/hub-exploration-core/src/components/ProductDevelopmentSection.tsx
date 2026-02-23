@@ -4,7 +4,8 @@
  * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
  *
  * Neture 연동 제품개발 프로젝트 미리보기.
- * items가 비어있으면 null 반환 (optional section).
+ * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: 항상 표시 (empty state)
+ * items가 비어있으면 empty state 표시.
  */
 
 import type { ProductDevelopmentSectionProps } from '../types.js';
@@ -117,12 +118,17 @@ const styles = {
     textAlign: 'center' as const,
     fontFamily: 'inherit',
   } as const,
+  empty: {
+    padding: '40px 20px',
+    textAlign: 'center' as const,
+    color: NEUTRALS[400],
+    fontSize: '0.875rem',
+    lineHeight: 1.6,
+  } as const,
 };
 
 export function ProductDevelopmentSection({ items, title, ctaLabel, onCtaClick }: ProductDevelopmentSectionProps) {
   injectExplorationStyles();
-
-  if (items.length === 0) return null;
 
   return (
     <div style={styles.container}>
@@ -130,6 +136,12 @@ export function ProductDevelopmentSection({ items, title, ctaLabel, onCtaClick }
         <h2 style={styles.title}>{title || '제품개발 참여'}</h2>
       </div>
 
+      {items.length === 0 ? (
+        <div style={styles.empty}>
+          현재 참여 가능한 프로젝트가 준비 중입니다.<br />
+          곧 새로운 개발 프로젝트가 공개됩니다.
+        </div>
+      ) : (
       <div className="hub-explore-productdev-grid" style={styles.grid}>
         {items.slice(0, 3).map(item => (
           <button
@@ -151,6 +163,7 @@ export function ProductDevelopmentSection({ items, title, ctaLabel, onCtaClick }
           </button>
         ))}
       </div>
+      )}
 
       {ctaLabel && onCtaClick && (
         <button style={styles.cta} onClick={onCtaClick} type="button">

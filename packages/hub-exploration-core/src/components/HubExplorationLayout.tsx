@@ -4,15 +4,18 @@
  * WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1: 필수 섹션 항상 렌더링
  * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1: 매출 중심 섹션 재배치
  *
+ * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: Content 섹션 추가, 순서 조정
+ *
  * 섹션 순서:
  *   1. Hero (mandatory)
- *   2. B2B Revenue (optional)
- *   3. Ads (optional)
- *   4. Product Development (optional)
- *   5. Recent Updates (mandatory)
- *   6. Core Services (mandatory, 가로형)
- *   7. Promotions (optional)
- *   8. AI Placeholder (mandatory)
+ *   2. B2B (optional, 리스트형)
+ *   3. Platform Content (optional, 리스트형)
+ *   4. Ads (optional)
+ *   5. Product Development (항상 표시)
+ *   6. Recent Updates (mandatory)
+ *   7. Core Services (mandatory, 2x2 카드)
+ *   8. Promotions (optional)
+ *   9. AI Placeholder (mandatory)
  */
 
 import type { HubExplorationLayoutProps } from '../types.js';
@@ -22,6 +25,7 @@ import { HeroCarousel } from './HeroCarousel.js';
 import { B2BRevenueSection } from './B2BRevenueSection.js';
 import { AdSection } from './AdSection.js';
 import { ProductDevelopmentSection } from './ProductDevelopmentSection.js';
+import { PlatformContentSection } from './PlatformContentSection.js';
 import { RecentUpdatesTabs } from './RecentUpdatesTabs.js';
 import { CoreServiceBanners } from './CoreServiceBanners.js';
 import { ServicePromotionBanners } from './ServicePromotionBanners.js';
@@ -31,6 +35,7 @@ export function HubExplorationLayout({
   theme,
   hero,
   b2bRevenue,
+  platformContent,
   ads,
   productDevelopment,
   recentUpdates,
@@ -60,19 +65,22 @@ export function HubExplorationLayout({
           {/* Section 1: Hero (mandatory) */}
           <HeroCarousel {...hero} />
 
-          {/* Section 2: B2B Revenue (optional — revenue priority) */}
+          {/* Section 2: B2B (optional — 리스트형) */}
           {b2bRevenue && <B2BRevenueSection {...b2bRevenue} />}
 
-          {/* Section 3: Ads (optional — admin-controlled) */}
+          {/* Section 3: Platform Content (optional — 리스트형) */}
+          {platformContent && <PlatformContentSection {...platformContent} />}
+
+          {/* Section 4: Ads (optional — admin-controlled) */}
           {ads && <AdSection {...ads} />}
 
-          {/* Section 4: Product Development (optional — CMS-driven) */}
+          {/* Section 5: Product Development (항상 표시) */}
           {productDevelopment && <ProductDevelopmentSection {...productDevelopment} />}
 
-          {/* Section 5: Recent Updates (mandatory — fixed tabs) */}
+          {/* Section 6: Recent Updates (mandatory — fixed tabs) */}
           <RecentUpdatesTabs {...recentUpdatesProps} />
 
-          {/* Section 6: Core Services (mandatory — horizontal list) */}
+          {/* Section 7: Core Services (mandatory — 2x2 카드) */}
           <CoreServiceBanners {...coreServicesProps} />
 
           {/* Section 7: Promotions (optional — admin-controlled) */}

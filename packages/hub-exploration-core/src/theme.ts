@@ -7,7 +7,7 @@ export const DEFAULT_THEME = {
   primaryColor: '#2563EB',
   backgroundColor: '#ffffff',
   maxWidth: '1200px',
-  sectionGap: '40px',
+  sectionGap: '48px',
 } as const;
 
 export const NEUTRALS = {

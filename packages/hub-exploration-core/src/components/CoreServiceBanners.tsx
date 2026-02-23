@@ -1,31 +1,109 @@
 /**
- * CoreServiceBanners — 핵심 서비스 (가로형 리스트)
+ * CoreServiceBanners — 핵심 서비스 (2x2 카드 그리드)
  *
- * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1: 카드 → 가로형 전환
+ * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
+ * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: 가로리스트 → 2x2 카드 그리드
  *
- * 순서 고정: B2B → 사이니지 → 콘텐츠 → 캠페인
+ * 4개 핵심 서비스를 2열 카드 레이아웃으로 표시.
  */
 
 import type { CoreServiceBannersProps } from '../types.js';
-import { NEUTRALS } from '../theme.js';
+import { NEUTRALS, SHADOWS } from '../theme.js';
+import { injectExplorationStyles } from '../utils/style-inject.js';
 
-export function CoreServiceBanners({
-  banners,
-  title = '핵심 서비스',
-}: CoreServiceBannersProps) {
+const S = {
+  sectionTitle: {
+    margin: '0 0 16px',
+    fontSize: '1.25rem',
+    fontWeight: 700,
+    color: NEUTRALS[900],
+  } as const,
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '12px',
+  } as const,
+  card: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '12px',
+    padding: '16px',
+    background: '#ffffff',
+    border: `1px solid ${NEUTRALS[200]}`,
+    borderRadius: '12px',
+    cursor: 'pointer',
+    boxShadow: SHADOWS.sm,
+    textAlign: 'left' as const,
+    width: '100%',
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
+    transition: 'box-shadow 0.2s, border-color 0.2s',
+  } as const,
+  icon: {
+    flexShrink: 0,
+    width: '36px',
+    height: '36px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.25rem',
+    background: NEUTRALS[100],
+    borderRadius: '8px',
+  } as const,
+  content: {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+  } as const,
+  itemTitle: {
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: NEUTRALS[800],
+  } as const,
+  itemDesc: {
+    fontSize: '0.75rem',
+    color: NEUTRALS[500],
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  } as const,
+  badge: {
+    flexShrink: 0,
+    alignSelf: 'flex-start',
+    fontSize: '0.6875rem',
+    fontWeight: 600,
+    padding: '2px 8px',
+    borderRadius: '4px',
+    color: NEUTRALS[500],
+    background: NEUTRALS[100],
+  } as const,
+  empty: {
+    padding: '40px 20px',
+    textAlign: 'center' as const,
+    fontSize: '0.875rem',
+    color: NEUTRALS[400],
+  } as const,
+};
+
+export function CoreServiceBanners({ banners, title = '핵심 서비스' }: CoreServiceBannersProps) {
+  injectExplorationStyles();
+
   return (
     <div>
       <h2 style={S.sectionTitle}>{title}</h2>
       {banners.length === 0 ? (
         <div style={S.empty}>등록된 서비스가 없습니다.</div>
       ) : (
-        <div style={S.list}>
-          {banners.map((b, i) => (
+        <div className="hub-explore-core-grid" style={S.grid}>
+          {banners.map(b => (
             <button
               key={b.id}
+              className="hub-core-card"
               style={{
-                ...S.item,
-                borderBottom: i < banners.length - 1 ? `1px solid ${NEUTRALS[200]}` : 'none',
+                ...S.card,
+                cursor: b.onClick ? 'pointer' : 'default',
               }}
               onClick={b.onClick}
               disabled={!b.onClick}
@@ -33,7 +111,7 @@ export function CoreServiceBanners({
             >
               {b.icon && (
                 <span style={S.icon}>
-                  {typeof b.icon === 'string' ? b.icon : b.icon}
+                  {b.icon}
                 </span>
               )}
               <div style={S.content}>
@@ -41,7 +119,6 @@ export function CoreServiceBanners({
                 {b.description && <span style={S.itemDesc}>{b.description}</span>}
               </div>
               {b.badge && <span style={S.badge}>{b.badge}</span>}
-              {b.onClick && <span style={S.arrow}>&rarr;</span>}
             </button>
           ))}
         </div>
@@ -49,80 +126,3 @@ export function CoreServiceBanners({
     </div>
   );
 }
-
-const S: Record<string, React.CSSProperties> = {
-  sectionTitle: {
-    margin: '0 0 12px',
-    fontSize: '1.125rem',
-    fontWeight: 700,
-    color: NEUTRALS[900],
-  },
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#ffffff',
-    borderRadius: '12px',
-    border: `1px solid ${NEUTRALS[200]}`,
-    overflow: 'hidden',
-  },
-  item: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '14px 16px',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    textAlign: 'left',
-    width: '100%',
-    fontFamily: 'inherit',
-    fontSize: 'inherit',
-    transition: 'background 0.15s',
-  },
-  icon: {
-    fontSize: '24px',
-    flexShrink: 0,
-    width: '32px',
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-    minWidth: 0,
-  },
-  itemTitle: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: NEUTRALS[800],
-  },
-  itemDesc: {
-    fontSize: '0.75rem',
-    color: NEUTRALS[500],
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  badge: {
-    display: 'inline-block',
-    padding: '2px 8px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-    color: NEUTRALS[500],
-    backgroundColor: NEUTRALS[100],
-    borderRadius: '4px',
-    flexShrink: 0,
-  },
-  arrow: {
-    fontSize: '1rem',
-    color: NEUTRALS[400],
-    flexShrink: 0,
-  },
-  empty: {
-    padding: '40px 20px',
-    textAlign: 'center',
-    fontSize: '0.875rem',
-    color: NEUTRALS[400],
-  },
-};

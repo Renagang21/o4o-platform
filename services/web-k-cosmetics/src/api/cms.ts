@@ -62,6 +62,32 @@ async function fetchFromCms<T>(endpoint: string, params?: Record<string, string>
   return response.json();
 }
 
+export interface CmsContent {
+  id: string;
+  type: string;
+  title: string;
+  summary: string | null;
+  imageUrl: string | null;
+  linkUrl: string | null;
+  linkText: string | null;
+  status: string;
+  publishedAt: string | null;
+  isPinned: boolean;
+  isOperatorPicked: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
+interface ContentsResponse {
+  success: boolean;
+  data: CmsContent[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
 export const cmsApi = {
   getSlots: async (
     slotKey: string,
@@ -70,6 +96,22 @@ export const cmsApi = {
     return fetchFromCms<SlotsResponse>(`/slots/${slotKey}`, {
       serviceKey: options?.serviceKey || 'cosmetics',
       activeOnly: options?.activeOnly !== false ? 'true' : 'false',
+    });
+  },
+
+  getContents: async (options?: {
+    serviceKey?: string;
+    type?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<ContentsResponse> => {
+    return fetchFromCms<ContentsResponse>('/contents', {
+      serviceKey: options?.serviceKey || 'cosmetics',
+      type: options?.type || '',
+      status: options?.status || '',
+      limit: String(options?.limit || 20),
+      offset: String(options?.offset || 0),
     });
   },
 };
