@@ -195,9 +195,12 @@ export class AuthController extends BaseController {
       const hashedPassword = await bcrypt.hash(data.password, env.getNumber('BCRYPT_ROUNDS', 12));
 
       // Phase 3: membershipType에 따라 role 분기
-      const effectiveRole = data.membershipType === 'student'
-        ? 'student'
+      // Validate role against UserRole enum to prevent DB enum errors
+      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business', 'partner', 'supplier', 'manager', 'customer'];
+      const rawRole = data.membershipType === 'student'
+        ? 'user'
         : (data.role || 'customer');
+      const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
 
       // 트랜잭션: User + RoleAssignment + KPA Member 원자적 생성
       const user = await AppDataSource.transaction(async (manager) => {
