@@ -493,16 +493,21 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      // Check supplier role (e.g., glycopharm:supplier, neture:supplier, cosmetics:supplier)
+      // Check supplier role (plain 'supplier' or service-scoped e.g. 'neture:supplier')
       const userRoles: string[] = user.roles || [];
-      const supplierMatch = userRoles.find((r: string) => r.endsWith(':supplier'));
+      const supplierMatch = userRoles.find((r: string) => r === 'supplier' || r.endsWith(':supplier'));
       let isSupplier = !!supplierMatch;
 
       if (!isSupplier) {
         // Also check RoleAssignment table
-        const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
-        const hasSupplierRole = activeRoles.some(a => a.role.endsWith(':supplier'));
-        isSupplier = hasSupplierRole;
+        try {
+          const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+          const hasSupplierRole = activeRoles.some(a => a.role === 'supplier' || a.role.endsWith(':supplier'));
+          isSupplier = hasSupplierRole;
+        } catch (err) {
+          // role_assignments table may not exist yet — skip gracefully
+          logger.warn('[CMS] RoleAssignment check failed, skipping:', (err as Error).message);
+        }
       }
 
       if (!isSupplier) {
