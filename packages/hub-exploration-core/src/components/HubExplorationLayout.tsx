@@ -6,12 +6,14 @@
  *
  * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: Content 섹션 추가, 순서 조정
  *
+ * WO-O4O-HUB-STRATEGIC-DUAL-BLOCK-REALIGNMENT-V1: B2B+ProductDev 전략 블록 정렬
+ *
  * 섹션 순서:
  *   1. Hero (mandatory)
- *   2. B2B (optional, 리스트형)
- *   3. Platform Content (optional, 리스트형)
- *   4. Ads (optional)
- *   5. Product Development (항상 표시)
+ *   2. B2B (optional, 리스트형) — 단기 매출
+ *   3. Product Development (항상 표시) — 중기 전략
+ *   4. Platform Content (optional, 리스트형)
+ *   5. Ads (optional)
  *   6. Recent Updates (mandatory)
  *   7. Core Services (mandatory, 2x2 카드)
  *   8. Promotions (optional)
@@ -65,17 +67,17 @@ export function HubExplorationLayout({
           {/* Section 1: Hero (mandatory) */}
           <HeroCarousel {...hero} />
 
-          {/* Section 2: B2B (optional — 리스트형) */}
+          {/* Section 2: B2B (optional — 단기 매출) */}
           {b2bRevenue && <B2BRevenueSection {...b2bRevenue} />}
 
-          {/* Section 3: Platform Content (optional — 리스트형) */}
+          {/* Section 3: Product Development (항상 표시 — 중기 전략) */}
+          {productDevelopment && <ProductDevelopmentSection {...productDevelopment} />}
+
+          {/* Section 4: Platform Content (optional — 리스트형) */}
           {platformContent && <PlatformContentSection {...platformContent} />}
 
-          {/* Section 4: Ads (optional — admin-controlled) */}
+          {/* Section 5: Ads (optional — admin-controlled) */}
           {ads && <AdSection {...ads} />}
-
-          {/* Section 5: Product Development (항상 표시) */}
-          {productDevelopment && <ProductDevelopmentSection {...productDevelopment} />}
 
           {/* Section 6: Recent Updates (mandatory — fixed tabs) */}
           <RecentUpdatesTabs {...recentUpdatesProps} />

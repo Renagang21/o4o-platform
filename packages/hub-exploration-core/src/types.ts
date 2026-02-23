@@ -131,6 +131,12 @@ export interface ProductDevItem {
   description?: string;
   imageUrl?: string;
   badge?: string;
+  marginInfo?: string;
+  recruitmentStatus?: string;
+  detailLabel?: string;
+  onDetail?: () => void;
+  actionLabel?: string;
+  onAction?: () => void;
   onClick?: () => void;
 }
 

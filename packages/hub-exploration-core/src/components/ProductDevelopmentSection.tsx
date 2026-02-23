@@ -1,11 +1,12 @@
 /**
- * ProductDevelopmentSection — 제품개발 참여 블록
+ * ProductDevelopmentSection — 제품개발 참여 전략 블록
  *
  * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
- *
- * Neture 연동 제품개발 프로젝트 미리보기.
  * WO-O4O-HUB-LIST-UI-UNIFICATION-V1: 항상 표시 (empty state)
- * items가 비어있으면 empty state 표시.
+ * WO-O4O-HUB-STRATEGIC-DUAL-BLOCK-REALIGNMENT-V1: B2B 동급 전략 블록
+ *
+ * B2B와 동일한 시각 무게, 배경 색상만 차별화.
+ * 2열 grid, max 4개, 카드에 2 CTA 지원.
  */
 
 import type { ProductDevelopmentSectionProps } from '../types.js';
@@ -14,7 +15,7 @@ import { injectExplorationStyles } from '../utils/style-inject.js';
 
 const ACCENT = '#059669'; // Emerald-600
 
-const styles = {
+const S = {
   container: {
     background: `${ACCENT}08`,
     borderRadius: '16px',
@@ -40,58 +41,52 @@ const styles = {
   } as const,
   card: {
     display: 'flex',
-    gap: '12px',
+    flexDirection: 'column' as const,
     background: '#ffffff',
     border: `1px solid ${NEUTRALS[200]}`,
     borderRadius: '12px',
-    padding: '16px',
-    cursor: 'pointer',
+    padding: '0',
+    overflow: 'hidden',
     boxShadow: SHADOWS.sm,
     textAlign: 'left' as const,
     width: '100%',
-    fontFamily: 'inherit',
-    alignItems: 'center',
   } as const,
-  image: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '8px',
+  cardImage: {
+    width: '100%',
+    height: '120px',
     objectFit: 'cover' as const,
-    flexShrink: 0,
   } as const,
-  imagePlaceholder: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '8px',
-    background: `${ACCENT}15`,
+  cardImagePlaceholder: {
+    width: '100%',
+    height: '120px',
+    background: `${ACCENT}10`,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '1.5rem',
-    flexShrink: 0,
+    fontSize: '2rem',
   } as const,
-  cardContent: {
+  cardBody: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '4px',
-    minWidth: 0,
+    gap: '6px',
+    padding: '14px 16px',
+    flex: 1,
   } as const,
   cardTitle: {
-    fontSize: '0.875rem',
+    fontSize: '0.9375rem',
     fontWeight: 600,
     color: NEUTRALS[800],
     margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
   } as const,
   cardDesc: {
-    fontSize: '0.75rem',
+    fontSize: '0.8125rem',
     color: NEUTRALS[500],
     margin: 0,
+    lineHeight: 1.5,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical' as const,
     overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap' as const,
   } as const,
   badge: {
     display: 'inline-block',
@@ -102,6 +97,48 @@ const styles = {
     color: ACCENT,
     background: `${ACCENT}15`,
     alignSelf: 'flex-start',
+  } as const,
+  meta: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2px',
+    marginTop: '4px',
+  } as const,
+  metaText: {
+    fontSize: '0.75rem',
+    color: NEUTRALS[600],
+    margin: 0,
+  } as const,
+  cardActions: {
+    display: 'flex',
+    gap: '8px',
+    padding: '0 16px 14px',
+  } as const,
+  btnDetail: {
+    flex: 1,
+    padding: '7px 0',
+    background: 'transparent',
+    border: `1px solid ${NEUTRALS[300]}`,
+    borderRadius: '6px',
+    fontSize: '0.8125rem',
+    fontWeight: 500,
+    color: NEUTRALS[600],
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    textAlign: 'center' as const,
+  } as const,
+  btnAction: {
+    flex: 1,
+    padding: '7px 0',
+    background: ACCENT,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '0.8125rem',
+    fontWeight: 600,
+    color: '#ffffff',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    textAlign: 'center' as const,
   } as const,
   cta: {
     display: 'block',
@@ -131,42 +168,81 @@ export function ProductDevelopmentSection({ items, title, ctaLabel, onCtaClick }
   injectExplorationStyles();
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={styles.title}>{title || '제품개발 참여'}</h2>
+    <div style={S.container}>
+      <div style={S.header}>
+        <h2 style={S.title}>{title || '제품개발 참여'}</h2>
       </div>
 
       {items.length === 0 ? (
-        <div style={styles.empty}>
+        <div style={S.empty}>
           현재 참여 가능한 프로젝트가 준비 중입니다.<br />
           곧 새로운 개발 프로젝트가 공개됩니다.
         </div>
       ) : (
-      <div className="hub-explore-productdev-grid" style={styles.grid}>
-        {items.slice(0, 3).map(item => (
-          <button
-            key={item.id}
-            style={styles.card}
-            onClick={item.onClick}
-            type="button"
-          >
-            {item.imageUrl ? (
-              <img src={item.imageUrl} alt={item.title} style={styles.image} />
-            ) : (
-              <div style={styles.imagePlaceholder}>🧪</div>
-            )}
-            <div style={styles.cardContent}>
-              {item.badge && <span style={styles.badge}>{item.badge}</span>}
-              <p style={styles.cardTitle}>{item.title}</p>
-              {item.description && <p style={styles.cardDesc}>{item.description}</p>}
+        <div className="hub-explore-productdev-grid" style={S.grid}>
+          {items.slice(0, 4).map(item => (
+            <div key={item.id} style={S.card}>
+              {/* Image */}
+              {item.imageUrl ? (
+                <img src={item.imageUrl} alt={item.title} style={S.cardImage} />
+              ) : (
+                <div style={S.cardImagePlaceholder}>🧪</div>
+              )}
+
+              {/* Body */}
+              <div style={S.cardBody}>
+                {item.badge && <span style={S.badge}>{item.badge}</span>}
+                <p style={S.cardTitle}>{item.title}</p>
+                {item.description && <p style={S.cardDesc}>{item.description}</p>}
+
+                {/* Meta: margin + recruitment */}
+                {(item.marginInfo || item.recruitmentStatus) && (
+                  <div style={S.meta}>
+                    {item.marginInfo && <p style={S.metaText}>{item.marginInfo}</p>}
+                    {item.recruitmentStatus && (
+                      <p style={{ ...S.metaText, color: ACCENT, fontWeight: 600 }}>
+                        {item.recruitmentStatus}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Dual CTA */}
+              {(item.onDetail || item.onAction) && (
+                <div style={S.cardActions}>
+                  {item.onDetail && (
+                    <button style={S.btnDetail} onClick={item.onDetail} type="button">
+                      {item.detailLabel || '상세 보기'}
+                    </button>
+                  )}
+                  {item.onAction && (
+                    <button style={S.btnAction} onClick={item.onAction} type="button">
+                      {item.actionLabel || '참여 신청'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Fallback: single click */}
+              {!item.onDetail && !item.onAction && item.onClick && (
+                <div style={S.cardActions}>
+                  <button
+                    style={{ ...S.btnAction, flex: 'none', width: '100%' }}
+                    onClick={item.onClick}
+                    type="button"
+                  >
+                    자세히 보기
+                  </button>
+                </div>
+              )}
             </div>
-          </button>
-        ))}
-      </div>
+          ))}
+        </div>
       )}
 
       {ctaLabel && onCtaClick && (
-        <button style={styles.cta} onClick={onCtaClick} type="button">
+        <button style={S.cta} onClick={onCtaClick} type="button">
           {ctaLabel} →
         </button>
       )}
