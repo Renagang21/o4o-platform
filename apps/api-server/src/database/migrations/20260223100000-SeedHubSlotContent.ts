@@ -82,14 +82,14 @@ export class SeedHubSlotContent1708675200000 implements MigrationInterface {
   name = 'SeedHubSlotContent1708675200000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Insert hero contents
+    // Insert hero contents (camelCase column names — TypeORM default)
     for (const hero of HUB_HEROES) {
       await queryRunner.query(`
         INSERT INTO cms_contents (
-          id, service_key, organization_id, type, title, summary, body,
-          image_url, link_url, link_text,
-          status, published_at, sort_order, is_pinned, is_operator_picked,
-          metadata, created_at, updated_at
+          id, "serviceKey", "organizationId", type, title, summary, body,
+          "imageUrl", "linkUrl", "linkText",
+          status, "publishedAt", "sortOrder", "isPinned", "isOperatorPicked",
+          metadata, "createdAt", "updatedAt"
         ) VALUES (
           $1, $2, NULL, 'hero', $3, $4, NULL,
           $5, $6, $7,
@@ -108,14 +108,14 @@ export class SeedHubSlotContent1708675200000 implements MigrationInterface {
       ]);
     }
 
-    // Insert hero slots
+    // Insert hero slots (camelCase column names)
     for (const hero of HUB_HEROES) {
       await queryRunner.query(`
         INSERT INTO cms_content_slots (
-          id, service_key, organization_id, slot_key, content_id,
-          sort_order, is_active, starts_at, ends_at,
-          is_locked, locked_by, locked_reason, locked_until,
-          created_at, updated_at
+          id, "serviceKey", "organizationId", "slotKey", "contentId",
+          "sortOrder", "isActive", "startsAt", "endsAt",
+          "isLocked", "lockedBy", "lockedReason", "lockedUntil",
+          "createdAt", "updatedAt"
         ) VALUES (
           $1, $2, NULL, $3, $4,
           1, true, NULL, NULL,
