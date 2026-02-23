@@ -83,14 +83,7 @@ export default function RegisterPage() {
         throw new Error(data.error || '회원가입에 실패했습니다.');
       }
 
-      // 소비자는 바로 로그인 가능, 판매자는 승인 대기
-      if (selectedRole === 'consumer') {
-        navigate('/login');
-      } else {
-        // 판매자는 승인 대기 안내
-        alert('가입 신청이 완료되었습니다. 운영자 승인 후 서비스 이용이 가능합니다.');
-        navigate('/login');
-      }
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {

@@ -105,7 +105,7 @@ export default function RegisterPage() {
         throw new Error(errorMsg);
       }
 
-      navigate('/login', { state: { registered: true } });
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {

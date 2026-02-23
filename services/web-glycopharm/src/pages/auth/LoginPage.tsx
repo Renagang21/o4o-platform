@@ -24,8 +24,8 @@ export default function LoginPage() {
       const loggedInUser = await login(email, password);
       // WO-GLYCOPHARM-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
       navigate(returnUrl || getDefaultRouteByRole(loggedInUser.role));
-    } catch {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
       setIsSubmitting(false);
     }
   };

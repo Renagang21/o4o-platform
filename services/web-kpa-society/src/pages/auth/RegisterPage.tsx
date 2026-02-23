@@ -178,7 +178,7 @@ export default function RegisterPage() {
         }
         throw new Error(data.error || '회원가입에 실패했습니다.');
       }
-      navigate('/register/pending');
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
     } finally {
