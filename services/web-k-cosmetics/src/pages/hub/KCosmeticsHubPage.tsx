@@ -3,29 +3,94 @@
  *
  * WO-O4O-HUB-EXPLORATION-CORE-V1
  * WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1
+ * WO-O4O-HUB-DATA-UNIFICATION-V1: CMS 슬롯 연동
  *
  * hub-exploration-core thin wrapper.
  * 서비스별 데이터만 다르고 구조는 플랫폼 공통.
  */
 
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   HubExplorationLayout,
   HUB_FIXED_TABS,
   type HeroSlide,
   type CoreServiceBanner,
+  type PromotionBanner,
 } from '@o4o/hub-exploration-core';
+import { cmsApi } from '@/api/cms';
+import type { CmsSlot } from '@/api/cms';
+
+// ── CMS 매핑 ──
+
+function cmsSlotToHeroSlide(slot: CmsSlot, navigate: (path: string) => void): HeroSlide {
+  return {
+    id: slot.content?.id ?? slot.id,
+    title: slot.content?.title ?? '',
+    subtitle: slot.content?.summary ?? undefined,
+    backgroundImage: slot.content?.imageUrl ?? undefined,
+    backgroundColor: slot.content?.metadata?.backgroundColor ?? undefined,
+    ctaLabel: slot.content?.linkText ?? undefined,
+    onCtaClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
+function cmsSlotToPromo(slot: CmsSlot, navigate: (path: string) => void): PromotionBanner {
+  return {
+    id: slot.content?.id ?? slot.id,
+    imageUrl: slot.content?.imageUrl ?? '',
+    alt: slot.content?.title ?? '',
+    title: slot.content?.title,
+    subtitle: slot.content?.summary ?? undefined,
+    onClick: slot.content?.linkUrl
+      ? () => navigate(slot.content!.linkUrl!)
+      : undefined,
+  };
+}
+
+// ── Default Hero (fallback) ──
+
+const DEFAULT_HERO: HeroSlide[] = [{
+  id: 'main',
+  backgroundColor: '#DB2777',
+  title: 'K-Cosmetics HUB',
+  subtitle: 'K-뷰티 플랫폼이 제공하는 자원을 탐색하세요',
+}];
 
 export function KCosmeticsHubPage() {
   const navigate = useNavigate();
 
-  const heroSlides: HeroSlide[] = useMemo(() => [{
-    id: 'main',
-    backgroundColor: '#DB2777',
-    title: 'K-Cosmetics HUB',
-    subtitle: 'K-뷰티 플랫폼이 제공하는 자원을 탐색하세요',
-  }], []);
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(DEFAULT_HERO);
+  const [promos, setPromos] = useState<PromotionBanner[]>([]);
+
+  // CMS 슬롯 로드 (1회)
+  useEffect(() => {
+    let cancelled = false;
+
+    cmsApi.getSlots('kcos-hub-hero', { serviceKey: 'cosmetics' })
+      .then(res => {
+        if (!cancelled && res.data.length > 0) {
+          setHeroSlides(res.data
+            .filter(s => s.content)
+            .map(s => cmsSlotToHeroSlide(s, navigate)));
+        }
+      })
+      .catch(() => {});
+
+    cmsApi.getSlots('kcos-hub-promo', { serviceKey: 'cosmetics' })
+      .then(res => {
+        if (!cancelled) {
+          setPromos(res.data
+            .filter(s => s.content)
+            .map(s => cmsSlotToPromo(s, navigate)));
+        }
+      })
+      .catch(() => {});
+
+    return () => { cancelled = true; };
+  }, [navigate]);
 
   // ── Core Services ──
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
@@ -38,9 +103,10 @@ export function KCosmeticsHubPage() {
   return (
     <HubExplorationLayout
       theme={{ primaryColor: '#DB2777', maxWidth: '1100px' }}
-      hero={{ slides: heroSlides, autoInterval: 0 }}
+      hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: [] }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
+      promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
       aiPlaceholder={{ title: 'AI 추천 예정', description: 'AI 기반 맞춤 상품·콘텐츠 추천이 준비 중입니다' }}
       footerNote="여기서 선택한 콘텐츠·상품·서비스는 내 매장관리에서 관리할 수 있습니다."
     />

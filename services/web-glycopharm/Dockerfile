@@ -29,6 +29,7 @@ COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
+COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 
 # Copy service package.json
 COPY services/web-glycopharm/package.json ./services/web-glycopharm/
@@ -47,6 +48,7 @@ COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
+COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 
 # Copy service source
 COPY services/web-glycopharm/ ./services/web-glycopharm/

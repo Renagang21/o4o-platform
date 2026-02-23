@@ -25,6 +25,7 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
+COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -39,6 +40,7 @@ COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
+COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/
