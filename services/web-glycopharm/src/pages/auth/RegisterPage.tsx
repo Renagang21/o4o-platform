@@ -8,30 +8,14 @@ import {
   Phone,
   Eye,
   EyeOff,
-  Building2,
-  Check,
   CheckCircle2,
   Circle,
   ArrowRight,
-  ArrowLeft,
   X,
 } from 'lucide-react';
-import type { UserRole } from '@/types';
-
-// GlycoPharm은 약사 전용 서비스입니다
-const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2 }> = [
-  {
-    role: 'pharmacy',
-    label: '약사',
-    description: '약국을 운영하며 혈당관리 제품을 판매합니다',
-    icon: Building2,
-  },
-];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +26,7 @@ export default function RegisterPage() {
     lastName: '',
     firstName: '',
     phone: '',
+    licenseNumber: '',
     businessName: '',
     businessNumber: '',
     agreeTerms: false,
@@ -53,7 +38,7 @@ export default function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    const numericFields = ['phone', 'businessNumber'];
+    const numericFields = ['phone', 'businessNumber', 'licenseNumber'];
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : numericFields.includes(name) ? value.replace(/\D/g, '') : value,
@@ -65,15 +50,11 @@ export default function RegisterPage() {
     lowercase: /[a-z]/.test(formData.password),
     uppercase: /[A-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
-    special: /[@$!%*?&]/.test(formData.password),
+    special: /[^A-Za-z\d\s]/.test(formData.password),
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
-
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role);
-    setStep(2);
-  };
+  const isLicenseValid = formData.licenseNumber.length >= 4;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +74,9 @@ export default function RegisterPage() {
           firstName: formData.firstName,
           nickname: `${formData.lastName}${formData.firstName}`,
           phone: formData.phone.replace(/\D/g, ''),
-          role: selectedRole,
+          role: 'pharmacy',
           service: 'glycopharm',
+          licenseNumber: formData.licenseNumber,
           tos: formData.agreeTerms,
           privacyAccepted: formData.agreePrivacy,
           marketingAccepted: formData.agreeMarketing,
@@ -109,7 +91,18 @@ export default function RegisterPage() {
         if (response.status === 409) {
           throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
-        throw new Error(data.error || '회원가입에 실패했습니다.');
+        // Show detailed validation errors if available
+        let errorMsg = data.error || data.message || '회원가입에 실패했습니다.';
+        if (data.details && Array.isArray(data.details) && data.details.length > 0) {
+          const fieldErrors = data.details
+            .map((d: { property?: string; constraints?: Record<string, string> }) => {
+              const msgs = d.constraints ? Object.values(d.constraints).join(', ') : d.property;
+              return `${d.property}: ${msgs}`;
+            })
+            .join('\n');
+          errorMsg += '\n' + fieldErrors;
+        }
+        throw new Error(errorMsg);
       }
 
       navigate('/login', { state: { registered: true } });
@@ -128,6 +121,7 @@ export default function RegisterPage() {
       formData.lastName &&
       formData.firstName &&
       isPhoneValid &&
+      isLicenseValid &&
       formData.agreeTerms &&
       formData.agreePrivacy
     );
@@ -143,117 +137,23 @@ export default function RegisterPage() {
               <Activity className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-slate-800">회원가입</h1>
-          <p className="text-slate-500 mt-2">GlycoPharm과 함께 시작하세요</p>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-            step >= 1 ? 'bg-primary-600 text-white' : 'bg-slate-200 text-slate-500'
-          }`}>
-            {step > 1 ? <Check className="w-4 h-4" /> : '1'}
-          </div>
-          <div className={`w-12 h-1 rounded ${step >= 2 ? 'bg-primary-600' : 'bg-slate-200'}`} />
-          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-            step >= 2 ? 'bg-primary-600 text-white' : 'bg-slate-200 text-slate-500'
-          }`}>
-            {step > 2 ? <Check className="w-4 h-4" /> : '2'}
-          </div>
+          <h1 className="text-2xl font-bold text-slate-800">약사 회원가입</h1>
+          <p className="text-slate-500 mt-2">GlycoPharm은 약사 전용 서비스입니다</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          {/* Step 1: Role Selection */}
-          {step === 1 && (
-            <div className="space-y-6">
-              {/* 약사 전용 안내 메시지 */}
-              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 text-center">
-                <p className="text-sm font-medium text-primary-800">
-                  GlycoPharm은 <span className="font-bold">약사 전용</span> 서비스입니다
-                </p>
-                <p className="text-xs text-primary-600 mt-1">
-                  약국을 운영하시는 약사님만 가입하실 수 있습니다
-                </p>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm text-red-600 whitespace-pre-line">{error}</p>
               </div>
+            )}
 
-              {/* 약사 선택 카드 */}
-              <div className="flex justify-center">
-                {roleOptions.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <button
-                      key={option.role}
-                      onClick={() => handleRoleSelect(option.role)}
-                      className="w-full max-w-xs p-6 border-2 border-primary-500 bg-primary-50 rounded-xl text-center hover:bg-primary-100 transition-all group"
-                    >
-                      <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-xl bg-primary-100 group-hover:bg-primary-200 flex items-center justify-center transition-colors">
-                          <Icon className="w-8 h-8 text-primary-600" />
-                        </div>
-                      </div>
-                      <h3 className="text-lg font-bold text-slate-800 mb-2">{option.label}</h3>
-                      <p className="text-sm text-slate-600 mb-4">{option.description}</p>
-                      <div className="flex items-center justify-center gap-2 text-primary-600 font-medium">
-                        <span>약사 회원가입 시작하기</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <p className="text-center text-sm text-slate-500">
-                이미 계정이 있으신가요?{' '}
-                <NavLink to="/login" className="text-primary-600 font-medium hover:text-primary-700">
-                  로그인
-                </NavLink>
-              </p>
-            </div>
-          )}
-
-          {/* Step 2: Registration Form */}
-          {step === 2 && (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                역할 다시 선택
-              </button>
-
-              <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl mb-6">
-                {selectedRole && (
-                  <>
-                    {(() => {
-                      const roleOption = roleOptions.find(r => r.role === selectedRole);
-                      if (!roleOption) return null;
-                      const Icon = roleOption.icon;
-                      return (
-                        <>
-                          <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                            <Icon className="w-5 h-5 text-primary-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-800">{roleOption.label}</p>
-                            <p className="text-xs text-slate-500">으로 가입합니다</p>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </>
-                )}
-              </div>
-
-              {/* Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
+            {/* 계정 정보 */}
+            <div>
+              <h3 className="text-sm font-semibold text-slate-800 mb-3">계정 정보</h3>
+              <div className="space-y-4">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">이메일</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -269,7 +169,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -297,7 +197,7 @@ export default function RegisterPage() {
                         { key: 'lowercase' as const, label: '영문 소문자 포함' },
                         { key: 'uppercase' as const, label: '영문 대문자 포함' },
                         { key: 'number' as const, label: '숫자 포함' },
-                        { key: 'special' as const, label: '특수문자 포함 (@$!%*?&)' },
+                        { key: 'special' as const, label: '특수문자 포함' },
                       ].map(({ key, label }) => (
                         <div key={key} className="flex items-center gap-1.5">
                           {passwordChecks[key] ? (
@@ -314,7 +214,7 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                <div className="col-span-2">
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인</label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -332,52 +232,58 @@ export default function RegisterPage() {
                     <p className="text-xs text-red-500 mt-1">비밀번호가 일치하지 않습니다</p>
                   )}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">성</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="홍"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="길동"
-                      required
-                    />
-                  </div>
-                </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
+            {/* 약사 정보 */}
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-semibold text-slate-800 mb-3">약사 정보</h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">성</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="홍"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        placeholder="길동"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">핸드폰 번호</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="tel"
                       name="phone"
+                      inputMode="numeric"
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="하이픈(-) 없이 숫자만 입력"
+                      placeholder="숫자만 입력"
                       required
                     />
                   </div>
@@ -386,99 +292,128 @@ export default function RegisterPage() {
                     <p className="text-xs text-red-500 mt-1">핸드폰 번호는 10~11자리 숫자여야 합니다</p>
                   )}
                 </div>
-              </div>
 
-              {/* Business Info (약사 전용) */}
-              {selectedRole === 'pharmacy' && (
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">약국명</label>
-                    <input
-                      type="text"
-                      name="businessName"
-                      value={formData.businessName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="건강약국"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">사업자등록번호</label>
-                    <input
-                      type="text"
-                      name="businessNumber"
-                      inputMode="numeric"
-                      value={formData.businessNumber}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="숫자만 입력 (예: 1234567890)"
-                      maxLength={10}
-                    />
-                    <p className="text-xs text-slate-400 mt-1">숫자만 입력 (예: 1234567890)</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Agreements */}
-              <div className="space-y-3 pt-4 border-t">
-                <div className="flex items-start gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    약사 면허번호 <span className="text-red-500">*</span>
+                  </label>
                   <input
-                    type="checkbox"
-                    name="agreeTerms"
-                    checked={formData.agreeTerms}
+                    type="text"
+                    name="licenseNumber"
+                    inputMode="numeric"
+                    value={formData.licenseNumber}
                     onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="숫자만 입력"
                     required
                   />
-                  <span className="text-sm text-slate-600">
-                    <span className="text-red-500">* </span>
-                    <button type="button" onClick={() => setTermsModal('terms')} className="text-primary-600 underline hover:text-primary-700">
-                      이용약관
-                    </button>
-                    에 동의합니다
-                  </span>
+                  <p className="text-xs text-slate-400 mt-1">약사 면허증에 기재된 번호를 입력해 주세요</p>
+                  {formData.licenseNumber && !isLicenseValid && (
+                    <p className="text-xs text-red-500 mt-1">면허번호를 정확히 입력해 주세요</p>
+                  )}
                 </div>
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    name="agreePrivacy"
-                    checked={formData.agreePrivacy}
-                    onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                    required
-                  />
-                  <span className="text-sm text-slate-600">
-                    <span className="text-red-500">* </span>
-                    <button type="button" onClick={() => setTermsModal('privacy')} className="text-primary-600 underline hover:text-primary-700">
-                      개인정보처리방침
-                    </button>
-                    에 동의합니다
-                  </span>
-                </div>
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="agreeMarketing"
-                    checked={formData.agreeMarketing}
-                    onChange={handleInputChange}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
-                  />
-                  <span className="text-sm text-slate-600">
-                    마케팅 정보 수신에 동의합니다 (선택)
-                  </span>
-                </label>
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={!isFormValid() || isLoading}
-                className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2"
-              >
-                {isLoading ? '가입 신청 중...' : '가입하기'}
-                {!isLoading && <ArrowRight className="w-4 h-4" />}
-              </button>
-            </form>
-          )}
+            {/* 약국 정보 */}
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-semibold text-slate-800 mb-1">약국 정보</h3>
+              <p className="text-xs text-slate-400 mb-3">약국을 운영 중이신 경우 입력해 주세요</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">약국명</label>
+                  <input
+                    type="text"
+                    name="businessName"
+                    value={formData.businessName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="건강약국"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">사업자등록번호</label>
+                  <input
+                    type="text"
+                    name="businessNumber"
+                    inputMode="numeric"
+                    value={formData.businessNumber}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    placeholder="숫자만 입력 (예: 1234567890)"
+                    maxLength={10}
+                  />
+                  <p className="text-xs text-slate-400 mt-1">숫자만 입력 (예: 1234567890)</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Agreements */}
+            <div className="space-y-3 pt-4 border-t">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="agreeTerms"
+                  checked={formData.agreeTerms}
+                  onChange={handleInputChange}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                  required
+                />
+                <span className="text-sm text-slate-600">
+                  <span className="text-red-500">* </span>
+                  <button type="button" onClick={() => setTermsModal('terms')} className="text-primary-600 underline hover:text-primary-700">
+                    이용약관
+                  </button>
+                  에 동의합니다
+                </span>
+              </div>
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  name="agreePrivacy"
+                  checked={formData.agreePrivacy}
+                  onChange={handleInputChange}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+                  required
+                />
+                <span className="text-sm text-slate-600">
+                  <span className="text-red-500">* </span>
+                  <button type="button" onClick={() => setTermsModal('privacy')} className="text-primary-600 underline hover:text-primary-700">
+                    개인정보처리방침
+                  </button>
+                  에 동의합니다
+                </span>
+              </div>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="agreeMarketing"
+                  checked={formData.agreeMarketing}
+                  onChange={handleInputChange}
+                  className="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span className="text-sm text-slate-600">
+                  마케팅 정보 수신에 동의합니다 (선택)
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!isFormValid() || isLoading}
+              className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2"
+            >
+              {isLoading ? '가입 신청 중...' : '가입하기'}
+              {!isLoading && <ArrowRight className="w-4 h-4" />}
+            </button>
+
+            <p className="text-center text-sm text-slate-500">
+              이미 계정이 있으신가요?{' '}
+              <NavLink to="/login" className="text-primary-600 font-medium hover:text-primary-700">
+                로그인
+              </NavLink>
+            </p>
+          </form>
         </div>
 
         {/* Terms / Privacy Modal */}
@@ -537,7 +472,7 @@ export default function RegisterPage() {
                     <p>- 마케팅 및 광고: 신규 서비스 안내, 이벤트 정보 제공 (동의 시)</p>
 
                     <h3 className="font-bold text-base">2. 수집하는 개인정보 항목</h3>
-                    <p><strong>필수 항목:</strong> 이메일, 비밀번호, 성명, 핸드폰 번호</p>
+                    <p><strong>필수 항목:</strong> 이메일, 비밀번호, 성명, 핸드폰 번호, 약사 면허번호</p>
                     <p><strong>선택 항목:</strong> 약국명, 사업자등록번호</p>
 
                     <h3 className="font-bold text-base">3. 개인정보의 보유 및 이용 기간</h3>
