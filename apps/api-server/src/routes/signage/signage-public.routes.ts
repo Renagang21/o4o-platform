@@ -71,7 +71,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
         FROM signage_media m
         LEFT JOIN organizations o ON m."organizationId" = o.id
         LEFT JOIN users u ON m."createdByUserId" = u.id
-        WHERE m."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
+        WHERE m."serviceKey" = $1 AND m.scope = 'global' ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
         ORDER BY m."createdAt" DESC
         LIMIT $${limitIndex} OFFSET $${offsetIndex}
       `, params);
@@ -81,7 +81,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const countResult = await dataSource.query(`
         SELECT COUNT(*) as total
         FROM signage_media m
-        WHERE m."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
+        WHERE m."serviceKey" = $1 AND m.scope = 'global' ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
       `, countParams);
 
       const total = parseInt(countResult[0]?.total || '0', 10);
@@ -146,7 +146,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
         FROM signage_playlists p
         LEFT JOIN organizations o ON p."organizationId" = o.id
         LEFT JOIN users u ON p."createdByUserId" = u.id
-        WHERE p."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
+        WHERE p."serviceKey" = $1 AND p.scope = 'global' ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
         ORDER BY p."createdAt" DESC
         LIMIT $${limitIndex} OFFSET $${offsetIndex}
       `, params);
@@ -156,7 +156,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const countResult = await dataSource.query(`
         SELECT COUNT(*) as total
         FROM signage_playlists p
-        WHERE p."serviceKey" = $1 ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
+        WHERE p."serviceKey" = $1 AND p.scope = 'global' ${sourceFilter.replace(/source/g, 'p.source')} AND p.status = 'active'
       `, countParams);
 
       const total = parseInt(countResult[0]?.total || '0', 10);
@@ -194,6 +194,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
         LEFT JOIN organizations o ON m."organizationId" = o.id
         LEFT JOIN users u ON m."createdByUserId" = u.id
         WHERE m.id = $1 AND m."serviceKey" = $2
+          AND m.scope = 'global'
           AND m.source IN ('hq', 'supplier', 'community')
           AND m.status = 'active'
       `, [id, serviceKey]);
@@ -234,6 +235,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
         LEFT JOIN organizations o ON p."organizationId" = o.id
         LEFT JOIN users u ON p."createdByUserId" = u.id
         WHERE p.id = $1 AND p."serviceKey" = $2
+          AND p.scope = 'global'
           AND p.source IN ('hq', 'supplier', 'community')
           AND p.status = 'active'
       `, [id, serviceKey]);

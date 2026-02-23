@@ -135,7 +135,8 @@ export class SignageController {
     try {
       const scope = this.extractScope(req);
       const { id } = req.params;
-      const dto: UpdatePlaylistDto = req.body;
+      const { source: _s, scope: _sc, ...safeBody } = req.body;
+      const dto: UpdatePlaylistDto = safeBody;
 
       const playlist = await this.service.updatePlaylist(id, dto, scope);
       if (!playlist) {
@@ -338,7 +339,8 @@ export class SignageController {
     try {
       const scope = this.extractScope(req);
       const { id } = req.params;
-      const dto: UpdateMediaDto = req.body;
+      const { source: _s, scope: _sc, ...safeBody } = req.body;
+      const dto: UpdateMediaDto = safeBody;
 
       const media = await this.service.updateMedia(id, dto, scope);
       if (!media) {
@@ -1064,7 +1066,8 @@ export class SignageController {
     try {
       const scope = this.extractScope(req);
       const { id } = req.params;
-      const dto: UpdateGlobalPlaylistDto = req.body;
+      const { source: _s, scope: _sc, ...safeBody } = req.body;
+      const dto: UpdateGlobalPlaylistDto = safeBody;
 
       const playlist = await this.service.updateGlobalPlaylist(id, dto, scope);
       if (!playlist) {
@@ -1085,7 +1088,8 @@ export class SignageController {
     try {
       const scope = this.extractScope(req);
       const { id } = req.params;
-      const dto: UpdateGlobalMediaDto = req.body;
+      const { source: _s, scope: _sc, ...safeBody } = req.body;
+      const dto: UpdateGlobalMediaDto = safeBody;
 
       const media = await this.service.updateGlobalMedia(id, dto, scope);
       if (!media) {
