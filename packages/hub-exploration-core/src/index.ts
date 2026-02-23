@@ -25,6 +25,10 @@ export type {
   CoreServiceBannersProps,
   PromotionBanner,
   ServicePromotionBannersProps,
+  B2BPreviewItem,
+  B2BRevenueSectionProps,
+  ProductDevItem,
+  ProductDevelopmentSectionProps,
   AIPlaceholderProps,
   HubExplorationLayoutProps,
 } from './types.js';
@@ -37,6 +41,8 @@ export { HubExplorationLayout } from './components/HubExplorationLayout.js';
 export { HeroCarousel } from './components/HeroCarousel.js';
 export { RecentUpdatesTabs } from './components/RecentUpdatesTabs.js';
 export { AdSection } from './components/AdSection.js';
+export { B2BRevenueSection } from './components/B2BRevenueSection.js';
+export { ProductDevelopmentSection } from './components/ProductDevelopmentSection.js';
 export { CoreServiceBanners } from './components/CoreServiceBanners.js';
 export { ServicePromotionBanners } from './components/ServicePromotionBanners.js';
 export { AIPlaceholder } from './components/AIPlaceholder.js';

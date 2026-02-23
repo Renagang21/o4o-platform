@@ -17,7 +17,8 @@ export function injectExplorationStyles(): void {
     @media (max-width: 768px) {
       .hub-explore-ad-premium { grid-template-columns: 1fr !important; }
       .hub-explore-ad-normal { grid-template-columns: 1fr !important; }
-      .hub-explore-service-grid { grid-template-columns: 1fr !important; }
+      .hub-explore-b2b-grid { grid-template-columns: 1fr !important; }
+      .hub-explore-productdev-grid { grid-template-columns: 1fr !important; }
       .hub-explore-promo-grid { grid-template-columns: 1fr !important; }
     }
   `;

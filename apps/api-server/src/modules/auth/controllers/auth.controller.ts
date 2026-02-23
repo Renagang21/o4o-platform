@@ -223,6 +223,12 @@ export class AuthController extends BaseController {
         if (data.pharmacistRole) {
           newUser.pharmacistRole = data.pharmacistRole;
         }
+        if (data.businessName || data.businessNumber) {
+          newUser.businessInfo = {
+            businessName: data.businessName || '',
+            businessNumber: data.businessNumber || '',
+          };
+        }
 
         await txUserRepo.save(newUser);
 

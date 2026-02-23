@@ -1,25 +1,39 @@
+/**
+ * HubExplorationLayout — Orchestrator
+ *
+ * WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1: 필수 섹션 항상 렌더링
+ * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1: 매출 중심 섹션 재배치
+ *
+ * 섹션 순서:
+ *   1. Hero (mandatory)
+ *   2. B2B Revenue (optional)
+ *   3. Ads (optional)
+ *   4. Product Development (optional)
+ *   5. Recent Updates (mandatory)
+ *   6. Core Services (mandatory, 가로형)
+ *   7. Promotions (optional)
+ *   8. AI Placeholder (mandatory)
+ */
+
 import type { HubExplorationLayoutProps } from '../types.js';
 import { HUB_FIXED_TABS } from '../types.js';
 import { DEFAULT_THEME, NEUTRALS } from '../theme.js';
 import { HeroCarousel } from './HeroCarousel.js';
-import { RecentUpdatesTabs } from './RecentUpdatesTabs.js';
+import { B2BRevenueSection } from './B2BRevenueSection.js';
 import { AdSection } from './AdSection.js';
+import { ProductDevelopmentSection } from './ProductDevelopmentSection.js';
+import { RecentUpdatesTabs } from './RecentUpdatesTabs.js';
 import { CoreServiceBanners } from './CoreServiceBanners.js';
 import { ServicePromotionBanners } from './ServicePromotionBanners.js';
 import { AIPlaceholder } from './AIPlaceholder.js';
 
-/**
- * HubExplorationLayout — Orchestrator
- *
- * WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1:
- * 모든 필수 섹션(Hero, RecentUpdates, CoreServices, AIPlaceholder)은 항상 렌더링된다.
- * 데이터가 없어도 빈 상태 UI를 표시하며, 섹션을 제거하지 않는다.
- */
 export function HubExplorationLayout({
   theme,
   hero,
-  recentUpdates,
+  b2bRevenue,
   ads,
+  productDevelopment,
+  recentUpdates,
   coreServices,
   promotions,
   aiPlaceholder,
@@ -46,19 +60,25 @@ export function HubExplorationLayout({
           {/* Section 1: Hero (mandatory) */}
           <HeroCarousel {...hero} />
 
-          {/* Section 2: Recent Updates (mandatory — fixed tabs) */}
-          <RecentUpdatesTabs {...recentUpdatesProps} />
+          {/* Section 2: B2B Revenue (optional — revenue priority) */}
+          {b2bRevenue && <B2BRevenueSection {...b2bRevenue} />}
 
           {/* Section 3: Ads (optional — admin-controlled) */}
           {ads && <AdSection {...ads} />}
 
-          {/* Section 4: Core Services (mandatory) */}
+          {/* Section 4: Product Development (optional — CMS-driven) */}
+          {productDevelopment && <ProductDevelopmentSection {...productDevelopment} />}
+
+          {/* Section 5: Recent Updates (mandatory — fixed tabs) */}
+          <RecentUpdatesTabs {...recentUpdatesProps} />
+
+          {/* Section 6: Core Services (mandatory — horizontal list) */}
           <CoreServiceBanners {...coreServicesProps} />
 
-          {/* Section 5: Promotions (optional — admin-controlled) */}
+          {/* Section 7: Promotions (optional — admin-controlled) */}
           {promotions && <ServicePromotionBanners {...promotions} />}
 
-          {/* Section 6: AI Placeholder (mandatory) */}
+          {/* Section 8: AI Placeholder (mandatory) */}
           <AIPlaceholder {...(aiPlaceholder ?? {})} />
 
           {afterSections}

@@ -98,7 +98,51 @@ export interface AdSectionProps {
 }
 
 // ──────────────────────────────────────────────
-// Section 4: CoreServiceBanners
+// Section: B2BRevenueSection
+// WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
+// ──────────────────────────────────────────────
+
+export interface B2BPreviewItem {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  badge?: string;
+  badgeColor?: string;
+  price?: string;
+  supplierName?: string;
+  onClick?: () => void;
+}
+
+export interface B2BRevenueSectionProps {
+  items: B2BPreviewItem[];
+  title?: string;
+  ctaLabel?: string;
+  onCtaClick?: () => void;
+}
+
+// ──────────────────────────────────────────────
+// Section: ProductDevelopmentSection
+// WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
+// ──────────────────────────────────────────────
+
+export interface ProductDevItem {
+  id: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  badge?: string;
+  onClick?: () => void;
+}
+
+export interface ProductDevelopmentSectionProps {
+  items: ProductDevItem[];
+  title?: string;
+  ctaLabel?: string;
+  onCtaClick?: () => void;
+}
+
+// ──────────────────────────────────────────────
+// Section: CoreServiceBanners
 // ──────────────────────────────────────────────
 
 export interface CoreServiceBanner {
@@ -150,8 +194,10 @@ export interface AIPlaceholderProps {
 export interface HubExplorationLayoutProps {
   theme?: HubExplorationTheme;
   hero: HeroCarouselProps;
-  recentUpdates?: RecentUpdatesTabsProps;
+  b2bRevenue?: B2BRevenueSectionProps;
   ads?: AdSectionProps;
+  productDevelopment?: ProductDevelopmentSectionProps;
+  recentUpdates?: RecentUpdatesTabsProps;
   coreServices?: CoreServiceBannersProps;
   promotions?: ServicePromotionBannersProps;
   aiPlaceholder?: AIPlaceholderProps;
