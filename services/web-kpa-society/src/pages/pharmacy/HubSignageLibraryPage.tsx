@@ -29,12 +29,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { publicContentApi } from '../../lib/api/signageV2';
-import type { SignageMedia, SignagePlaylist } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { SIGNAGE_MEDIA_TYPE_LABELS, SIGNAGE_SOURCE_LABELS } from '@o4o/types/signage';
-import type { ContentSource } from '@o4o/types/signage';
+import { hubContentApi } from '../../api/hubContent';
+import type { HubContentItemResponse } from '@o4o/types/hub-content';
+import { SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
 import { HUB_PRODUCER_TABS, type HubProducer } from '@o4o/hub-exploration-core';
+import { HUB_PRODUCER_LABELS } from '@o4o/types/hub-content';
 import { colors, borderRadius } from '../../styles/theme';
 
 // ============================================
@@ -48,13 +48,6 @@ const VIEW_TABS: { key: ViewTab; label: string }[] = [
   { key: 'media', label: '미디어' },
   { key: 'playlist', label: '플레이리스트' },
 ];
-
-/** producer → signage source 역매핑 */
-const PRODUCER_TO_SOURCE: Record<string, string> = {
-  operator: 'hq',
-  supplier: 'supplier',
-  community: 'community',
-};
 
 const PAGE_LIMIT = 20;
 
@@ -73,13 +66,13 @@ export function HubSignageLibraryPage() {
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>('all');
 
   // Media state
-  const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
+  const [allMedia, setAllMedia] = useState<HubContentItemResponse[]>([]);
   const [mediaTotal, setMediaTotal] = useState(0);
   const [mediaPage, setMediaPage] = useState(1);
   const [mediaLoading, setMediaLoading] = useState(true);
 
   // Playlist state
-  const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
+  const [allPlaylists, setAllPlaylists] = useState<HubContentItemResponse[]>([]);
   const [playlistTotal, setPlaylistTotal] = useState(0);
   const [playlistPage, setPlaylistPage] = useState(1);
   const [playlistLoading, setPlaylistLoading] = useState(true);
@@ -88,15 +81,20 @@ export function HubSignageLibraryPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch media
+  // Fetch media (HUB 통합 API)
   const fetchMedia = useCallback(async (page: number) => {
     setMediaLoading(true);
     setError(null);
     try {
-      const res = await publicContentApi.listMedia(undefined, 'kpa-society', { page, limit: PAGE_LIMIT });
-      if (res.success && res.data) {
-        setAllMedia(res.data.items || []);
-        setMediaTotal(res.data.total || 0);
+      const res = await hubContentApi.list({
+        serviceKey: 'kpa-society',
+        sourceDomain: 'signage-media',
+        page,
+        limit: PAGE_LIMIT,
+      });
+      if (res.success) {
+        setAllMedia(res.data || []);
+        setMediaTotal(res.pagination?.total || 0);
       } else {
         setAllMedia([]);
         setMediaTotal(0);
@@ -108,15 +106,20 @@ export function HubSignageLibraryPage() {
     }
   }, []);
 
-  // Fetch playlists
+  // Fetch playlists (HUB 통합 API)
   const fetchPlaylists = useCallback(async (page: number) => {
     setPlaylistLoading(true);
     setError(null);
     try {
-      const res = await publicContentApi.listPlaylists(undefined, 'kpa-society', { page, limit: PAGE_LIMIT });
-      if (res.success && res.data) {
-        setAllPlaylists(res.data.items || []);
-        setPlaylistTotal(res.data.total || 0);
+      const res = await hubContentApi.list({
+        serviceKey: 'kpa-society',
+        sourceDomain: 'signage-playlist',
+        page,
+        limit: PAGE_LIMIT,
+      });
+      if (res.success) {
+        setAllPlaylists(res.data || []);
+        setPlaylistTotal(res.pagination?.total || 0);
       } else {
         setAllPlaylists([]);
         setPlaylistTotal(0);
@@ -136,17 +139,15 @@ export function HubSignageLibraryPage() {
     fetchPlaylists(playlistPage);
   }, [fetchPlaylists, playlistPage]);
 
-  // Source filtering (producer → signage source 역매핑)
+  // Producer filtering (서버가 producer 필드를 제공 — 역매핑 불필요)
   const filteredMedia = useMemo(() => {
     if (sourceFilter === 'all') return allMedia;
-    const source = PRODUCER_TO_SOURCE[sourceFilter] || sourceFilter;
-    return allMedia.filter(m => (m as any).source === source);
+    return allMedia.filter(m => m.producer === sourceFilter);
   }, [allMedia, sourceFilter]);
 
   const filteredPlaylists = useMemo(() => {
     if (sourceFilter === 'all') return allPlaylists;
-    const source = PRODUCER_TO_SOURCE[sourceFilter] || sourceFilter;
-    return allPlaylists.filter(p => (p as any).source === source);
+    return allPlaylists.filter(p => p.producer === sourceFilter);
   }, [allPlaylists, sourceFilter]);
 
   // Counts for tabs
@@ -285,8 +286,9 @@ export function HubSignageLibraryPage() {
             <div style={styles.listContainer}>
               {filteredMedia.map(media => {
                 const isCopying = copyingId === media.id;
-                const sourceLabel = (media as any).source
-                  ? SIGNAGE_SOURCE_LABELS[(media as any).source as ContentSource] || (media as any).source
+                const producerLabel = media.producer ? HUB_PRODUCER_LABELS[media.producer] : '';
+                const mediaTypeLabel = media.mediaType
+                  ? (SIGNAGE_MEDIA_TYPE_LABELS[media.mediaType as keyof typeof SIGNAGE_MEDIA_TYPE_LABELS] || media.mediaType)
                   : '';
 
                 return (
@@ -294,13 +296,13 @@ export function HubSignageLibraryPage() {
                     <div style={styles.listIcon}>🖥️</div>
                     <div style={styles.listContent}>
                       <div style={styles.listTitleRow}>
-                        <span style={styles.listTitle}>{media.name}</span>
+                        <span style={styles.listTitle}>{media.title}</span>
                         <div style={styles.listBadges}>
-                          <span style={styles.mediaTypeBadge}>
-                            {SIGNAGE_MEDIA_TYPE_LABELS[media.mediaType] || media.mediaType}
-                          </span>
-                          {sourceLabel && (
-                            <span style={styles.sourceBadge}>{sourceLabel}</span>
+                          {mediaTypeLabel && (
+                            <span style={styles.mediaTypeBadge}>{mediaTypeLabel}</span>
+                          )}
+                          {producerLabel && (
+                            <span style={styles.sourceBadge}>{producerLabel}</span>
                           )}
                         </div>
                       </div>
@@ -312,7 +314,7 @@ export function HubSignageLibraryPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleCopy(media.id, media.name)}
+                      onClick={() => handleCopy(media.id, media.title)}
                       disabled={isCopying}
                       style={{
                         ...styles.copyButton,
@@ -374,20 +376,18 @@ export function HubSignageLibraryPage() {
             <div style={styles.listContainer}>
               {filteredPlaylists.map(pl => {
                 const isCopying = copyingId === pl.id;
-                const sourceLabel = (pl as any).source
-                  ? SIGNAGE_SOURCE_LABELS[(pl as any).source as ContentSource] || (pl as any).source
-                  : '';
+                const producerLabel = pl.producer ? HUB_PRODUCER_LABELS[pl.producer] : '';
 
                 return (
                   <div key={pl.id} style={styles.listRow}>
                     <div style={styles.listIcon}>📋</div>
                     <div style={styles.listContent}>
                       <div style={styles.listTitleRow}>
-                        <span style={styles.listTitle}>{pl.name}</span>
+                        <span style={styles.listTitle}>{pl.title}</span>
                         <div style={styles.listBadges}>
                           <span style={styles.playlistBadge}>플레이리스트</span>
-                          {sourceLabel && (
-                            <span style={styles.sourceBadge}>{sourceLabel}</span>
+                          {producerLabel && (
+                            <span style={styles.sourceBadge}>{producerLabel}</span>
                           )}
                         </div>
                       </div>
@@ -395,15 +395,15 @@ export function HubSignageLibraryPage() {
                         <p style={styles.listDesc}>{pl.description}</p>
                       )}
                       <div style={styles.listMeta}>
-                        <span>{pl.itemCount}개 항목</span>
-                        {pl.totalDuration > 0 && (
-                          <span> · {formatDuration(pl.totalDuration)}</span>
+                        <span>{pl.itemCount ?? 0}개 항목</span>
+                        {(pl.totalDuration ?? 0) > 0 && (
+                          <span> · {formatDuration(pl.totalDuration!)}</span>
                         )}
                         <span>{new Date(pl.createdAt).toLocaleDateString('ko-KR')}</span>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleCopy(pl.id, pl.name)}
+                      onClick={() => handleCopy(pl.id, pl.title)}
                       disabled={isCopying}
                       style={{
                         ...styles.copyButton,
