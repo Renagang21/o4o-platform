@@ -7,6 +7,7 @@ import {
   requireSignageStore,
   requireSignageOperatorOrStore,
   allowSignageStoreRead,
+  requireSignageSupplier,
   validateServiceKey,
 } from '../../middleware/signage-role.middleware.js';
 import { ensureAuthenticated } from '../../middleware/permission.middleware.js';
@@ -224,6 +225,15 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // DELETE /api/signage/:serviceKey/hq/media/:id - Delete HQ media (Operator only)
   router.delete('/hq/media/:id', requireSignageOperator, controller.deleteMedia);
+
+  // ========== Supplier Content Creation Routes (WO-O4O-SIGNAGE-SUPPLIER-AUTHORSHIP-PHASE1-V1) ==========
+  // Supplier creates global content with source='supplier', scope='global'
+
+  // POST /api/signage/:serviceKey/supplier/media - Create supplier media (scope: global)
+  router.post('/supplier/media', requireSignageSupplier, controller.createSupplierMedia);
+
+  // POST /api/signage/:serviceKey/supplier/playlists - Create supplier playlist (scope: global)
+  router.post('/supplier/playlists', requireSignageSupplier, controller.createSupplierPlaylist);
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)

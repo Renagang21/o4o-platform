@@ -403,6 +403,89 @@ export const requireSignageOperatorOrStore = (
 };
 
 /**
+ * Check if user has Supplier permission
+ *
+ * Accepts:
+ * - 'supplier' role (legacy)
+ * - '*:supplier' prefixed role (e.g., 'neture:supplier')
+ * - Admin/Operator (always allowed)
+ */
+export function hasSignageSupplierPermission(user: any, serviceKey: string): boolean {
+  if (!user) return false;
+
+  // Admin can always act as supplier
+  if (hasSignageAdminPermission(user)) return true;
+
+  // Operator can also act as supplier
+  if (hasSignageOperatorPermission(user, serviceKey)) return true;
+
+  const userRoles: string[] = user.roles || [];
+
+  // Check for exact 'supplier' role
+  if (userRoles.includes('supplier')) return true;
+
+  // Check for prefixed supplier role (e.g., 'neture:supplier', 'kpa:supplier')
+  if (userRoles.some((r: string) => r.endsWith(':supplier'))) return true;
+
+  // Check database roles
+  if (user.dbRoles?.some((r: any) => r.name === 'supplier' || r.name?.endsWith(':supplier'))) return true;
+
+  return false;
+}
+
+/**
+ * Middleware: Require Signage Supplier permission
+ *
+ * Use for:
+ * - /api/signage/:serviceKey/supplier/* routes
+ * - Supplier content creation (media, playlists)
+ * - Created content is source='supplier', scope='global'
+ */
+export const requireSignageSupplier = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+      code: 'NOT_AUTHENTICATED',
+      message: 'Authentication required',
+    });
+  }
+
+  const { serviceKey } = req.params;
+
+  if (!serviceKey) {
+    return res.status(400).json({
+      success: false,
+      error: 'Bad Request',
+      code: 'SERVICE_KEY_REQUIRED',
+      message: 'Service key is required',
+    });
+  }
+
+  if (!hasSignageSupplierPermission(req.user, serviceKey)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden',
+      code: 'SIGNAGE_SUPPLIER_REQUIRED',
+      message: 'Supplier permission required',
+    });
+  }
+
+  // Set context
+  req.signageContext = {
+    role: 'operator', // Supplier acts at operator level for global content
+    serviceKey,
+    permissions: ['signage:supplier'],
+  };
+
+  next();
+};
+
+/**
  * Middleware: Validate service key from params
  *
  * Use as a pre-check before other role middlewares.
