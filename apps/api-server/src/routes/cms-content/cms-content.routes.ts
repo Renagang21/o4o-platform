@@ -5,11 +5,13 @@
  * WO-P3-CMS-ADMIN-CRUD-P0: CRUD endpoints for admin content management
  * WO-P3-CMS-SLOT-MANAGEMENT-P1: Slot CRUD and content assignment
  * WO-P7-CMS-SLOT-LOCK-P1: Slot lock fields for edit restrictions
+ * WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: author_role, visibility_scope, supplier endpoint
  *
  * Content Endpoints:
  * - GET /api/v1/cms/stats - Content statistics (for dashboards)
- * - GET /api/v1/cms/contents - List contents (with filters)
- * - POST /api/v1/cms/contents - Create new content (admin)
+ * - GET /api/v1/cms/contents - List contents (with filters, including authorRole)
+ * - POST /api/v1/cms/contents - Create new content (admin / service_admin)
+ * - POST /api/v1/cms/supplier/contents - Create content (supplier role)
  * - GET /api/v1/cms/contents/:id - Get single content
  * - PUT /api/v1/cms/contents/:id - Update content (admin)
  * - PATCH /api/v1/cms/contents/:id/status - Change status (admin)
@@ -26,7 +28,14 @@
 import { Router, Request, Response } from 'express';
 import { DataSource, In, IsNull, Not, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { CmsContent, CmsContentSlot, ContentType, ContentStatus } from '@o4o-apps/cms-core';
-import { optionalAuth, requireAdmin } from '../../middleware/auth.middleware.js';
+
+// WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: local type aliases (matches CmsContent entity)
+type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';
+type ContentVisibilityScope = 'platform' | 'service' | 'organization';
+import { optionalAuth, requireAdmin, requireAuth } from '../../middleware/auth.middleware.js';
+import type { AuthRequest } from '../../middleware/auth.middleware.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import logger from '../../utils/logger.js';
 
 /**
  * Create CMS Content routes
@@ -218,6 +227,8 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
    * - type: Filter by content type (hero, notice, news, etc.)
    * - status: Filter by status (draft, published, archived)
    * - isPinned: Filter pinned items
+   * - authorRole: Filter by author role (admin, service_admin, supplier, community)
+   * - visibilityScope: Filter by visibility scope (platform, service, organization)
    * - limit: Max items to return (default: 20)
    * - offset: Pagination offset (default: 0)
    */
@@ -229,6 +240,8 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         type,
         status,
         isPinned,
+        authorRole,
+        visibilityScope,
         limit = '20',
         offset = '0',
       } = req.query;
@@ -251,6 +264,13 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       }
       if (isPinned === 'true') {
         where.isPinned = true;
+      }
+      // WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: author_role + visibility_scope filters
+      if (authorRole) {
+        where.authorRole = authorRole as string;
+      }
+      if (visibilityScope) {
+        where.visibilityScope = visibilityScope as string;
       }
 
       const [contents, total] = await contentRepo.findAndCount({
@@ -275,6 +295,8 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
           isPinned: content.isPinned,
           isOperatorPicked: content.isOperatorPicked,
           sortOrder: content.sortOrder,
+          authorRole: (content as any).authorRole ?? 'admin',
+          visibilityScope: (content as any).visibilityScope ?? 'platform',
           createdAt: content.createdAt,
         })),
         pagination: {
@@ -328,10 +350,44 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
 
   /**
    * POST /cms/contents
-   * Create new content (admin only)
+   * Create new content (admin or service_admin)
+   *
+   * WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1:
+   * - Admin: author_role='admin', any visibility_scope
+   * - Service admin (e.g. glycopharm:admin): author_role='service_admin', visibility_scope='service'
    */
-  router.post('/contents', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+  router.post('/contents', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } });
+        return;
+      }
+
+      // Determine caller's author_role
+      const userRoles: string[] = user.roles || [];
+      const isPlatformAdmin = userRoles.some((r: string) =>
+        r === 'platform:admin' || r === 'platform:super_admin'
+      ) || await roleAssignmentService.hasAnyRole(user.id, ['platform:admin', 'platform:super_admin']);
+
+      // Check service admin roles (e.g., glycopharm:admin, kpa:admin)
+      const serviceAdminMatch = userRoles.find((r: string) => r.endsWith(':admin') && !r.startsWith('platform:'));
+      const isServiceAdminByRole = !!serviceAdminMatch;
+
+      if (!isPlatformAdmin && !isServiceAdminByRole) {
+        // Also check RoleAssignment table for service admin roles
+        const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+        const hasServiceAdmin = activeRoles.some(a => a.role.endsWith(':admin') && !a.role.startsWith('platform:'));
+
+        if (!hasServiceAdmin) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Admin or service admin privileges required' },
+          });
+          return;
+        }
+      }
+
       const {
         serviceKey,
         organizationId,
@@ -346,6 +402,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         isPinned = false,
         isOperatorPicked = false,
         metadata = {},
+        visibilityScope: reqVisibilityScope,
       } = req.body;
 
       // Validate required fields
@@ -366,6 +423,21 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // Determine author_role and visibility_scope
+      const authorRole: ContentAuthorRole = isPlatformAdmin ? 'admin' : 'service_admin';
+      const visibilityScope: ContentVisibilityScope = isPlatformAdmin
+        ? (reqVisibilityScope || 'platform')
+        : 'service';
+
+      // Service admin must provide serviceKey
+      if (!isPlatformAdmin && !serviceKey) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'serviceKey is required for service admin content' },
+        });
+        return;
+      }
+
       const contentRepo = dataSource.getRepository(CmsContent);
 
       const content = contentRepo.create({
@@ -382,8 +454,13 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         sortOrder,
         isPinned,
         isOperatorPicked,
-        metadata,
-      });
+        metadata: { ...metadata, creatorType: authorRole === 'admin' ? 'operator' : 'operator' },
+        createdBy: user.id,
+      } as any);
+
+      // Set new fields after create (until cms-core types are rebuilt)
+      (content as any).authorRole = authorRole;
+      (content as any).visibilityScope = visibilityScope;
 
       const saved = await contentRepo.save(content);
 
@@ -393,6 +470,118 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       });
     } catch (error: any) {
       console.error('Failed to create CMS content:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * POST /cms/supplier/contents
+   * Create new content (supplier role)
+   *
+   * WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1:
+   * Suppliers (e.g. glycopharm:supplier, neture:supplier) can submit content
+   * with author_role='supplier', visibility_scope='service', status='draft'
+   */
+  router.post('/supplier/contents', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ success: false, error: { code: 'AUTH_REQUIRED', message: 'Authentication required' } });
+        return;
+      }
+
+      // Check supplier role (e.g., glycopharm:supplier, neture:supplier, cosmetics:supplier)
+      const userRoles: string[] = user.roles || [];
+      const supplierMatch = userRoles.find((r: string) => r.endsWith(':supplier'));
+      let isSupplier = !!supplierMatch;
+
+      if (!isSupplier) {
+        // Also check RoleAssignment table
+        const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+        const hasSupplierRole = activeRoles.some(a => a.role.endsWith(':supplier'));
+        isSupplier = hasSupplierRole;
+      }
+
+      if (!isSupplier) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Supplier role required' },
+        });
+        return;
+      }
+
+      const {
+        serviceKey,
+        type,
+        title,
+        summary,
+        body,
+        imageUrl,
+        linkUrl,
+        linkText,
+        metadata = {},
+      } = req.body;
+
+      // Validate required fields
+      if (!serviceKey || !type || !title) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'serviceKey, type, and title are required' },
+        });
+        return;
+      }
+
+      // P0: Only hero and notice types allowed
+      if (!['hero', 'notice'].includes(type)) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Only hero and notice types are supported in P0' },
+        });
+        return;
+      }
+
+      const contentRepo = dataSource.getRepository(CmsContent);
+
+      const content = contentRepo.create({
+        serviceKey,
+        organizationId: null,
+        type: type as ContentType,
+        title,
+        summary: summary || null,
+        body: body || null,
+        imageUrl: imageUrl || null,
+        linkUrl: linkUrl || null,
+        linkText: linkText || null,
+        status: 'draft' as ContentStatus,
+        sortOrder: 0,
+        isPinned: false,
+        isOperatorPicked: false,
+        metadata: { ...metadata, creatorType: 'supplier', supplierUserId: user.id },
+        createdBy: user.id,
+      } as any);
+
+      // Set new fields after create (until cms-core types are rebuilt)
+      (content as any).authorRole = 'supplier';
+      (content as any).visibilityScope = 'service';
+
+      const saved = await contentRepo.save(content);
+
+      logger.info('[CMS] Supplier content created', {
+        contentId: (saved as any).id,
+        userId: user.id,
+        serviceKey,
+        type,
+      });
+
+      res.status(201).json({
+        success: true,
+        data: saved,
+      });
+    } catch (error: any) {
+      console.error('Failed to create supplier CMS content:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: error.message },

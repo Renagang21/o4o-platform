@@ -18,6 +18,10 @@ export interface ContentListParams {
   sort?: 'latest' | 'featured' | 'views';
   page?: number;
   limit?: number;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: filter by author role */
+  authorRole?: string;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: filter by visibility scope */
+  visibilityScope?: string;
 }
 
 export interface ContentListWithRecParams extends ContentListParams {
@@ -39,7 +43,7 @@ export class ContentQueryService {
    * 공개된 콘텐츠 목록 조회 (페이지네이션 + 정렬 + 타입 필터)
    */
   async listPublished(params: ContentListParams = {}) {
-    const { type, sort = 'latest', page = 1, limit = 20 } = params;
+    const { type, sort = 'latest', page = 1, limit = 20, authorRole, visibilityScope } = params;
 
     const where: any = {
       serviceKey: In(this.config.serviceKeys),
@@ -51,6 +55,14 @@ export class ContentQueryService {
       where.type = type.includes(',') ? In(type.split(',')) : type;
     } else if (this.config.defaultTypes?.length) {
       where.type = In(this.config.defaultTypes);
+    }
+
+    // WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: author_role + visibility_scope filters
+    if (authorRole) {
+      where.authorRole = authorRole.includes(',') ? In(authorRole.split(',')) : authorRole;
+    }
+    if (visibilityScope) {
+      where.visibilityScope = visibilityScope;
     }
 
     let order: any;
@@ -262,6 +274,8 @@ export class ContentQueryService {
       publishedAt: c.publishedAt,
       createdAt: c.createdAt,
       viewCount: c.viewCount || 0,
+      authorRole: c.authorRole || 'admin',
+      visibilityScope: c.visibilityScope || 'platform',
     };
   }
 

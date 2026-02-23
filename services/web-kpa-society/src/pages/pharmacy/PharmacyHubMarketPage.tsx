@@ -23,6 +23,7 @@ import {
   type B2BPreviewItem,
   type ProductDevItem,
   type PlatformContentItem,
+  type ContentAuthorTab,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
@@ -119,6 +120,17 @@ function cmsSlotToProductDev(slot: CmsSlot, navigate: (path: string) => void): P
 }
 
 // ============================================
+// Author tabs (WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1)
+// ============================================
+
+const CONTENT_AUTHOR_TABS: ContentAuthorTab[] = [
+  { key: 'all', label: '전체' },
+  { key: 'admin', label: '관리자' },
+  { key: 'service_admin', label: '운영자' },
+  { key: 'supplier', label: '공급자' },
+];
+
+// ============================================
 // Default Hero (fallback when CMS empty)
 // ============================================
 
@@ -148,6 +160,7 @@ export function PharmacyHubMarketPage() {
   const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
   const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
   const [contentItems, setContentItems] = useState<PlatformContentItem[]>([]);
+  const [activeAuthorTab, setActiveAuthorTab] = useState('all');
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -222,6 +235,7 @@ export function PharmacyHubMarketPage() {
             date: c.publishedAt
               ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
               : undefined,
+            authorRole: c.authorRole,
             onCopy: () => {
               assetSnapshotApi.copy({
                 sourceService: 'kpa',
@@ -336,7 +350,7 @@ export function PharmacyHubMarketPage() {
       b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
       productDevelopment={{ items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' }}
-      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content') }}
+      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content'), authorTabs: CONTENT_AUTHOR_TABS, activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}

@@ -185,7 +185,15 @@ export interface PlatformContentItem {
   title: string;
   description?: string;
   date?: string;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 작성자 역할 */
+  authorRole?: string;
   onCopy?: () => void;
+}
+
+/** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: author_role tab filter config */
+export interface ContentAuthorTab {
+  key: string;    // 'all' | 'admin' | 'service_admin' | 'supplier' | 'community'
+  label: string;  // '전체', '관리자', '운영자', '공급자', '커뮤니티'
 }
 
 export interface PlatformContentSectionProps {
@@ -194,6 +202,10 @@ export interface PlatformContentSectionProps {
   pageSize?: number;
   ctaLabel?: string;
   onCtaClick?: () => void;
+  /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: author_role tab filter */
+  authorTabs?: ContentAuthorTab[];
+  activeAuthorTab?: string;
+  onAuthorTabChange?: (tabKey: string) => void;
 }
 
 // ──────────────────────────────────────────────
