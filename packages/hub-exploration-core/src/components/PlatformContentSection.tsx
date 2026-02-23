@@ -44,10 +44,14 @@ export function PlatformContentSection({
   activeAuthorTab = 'all',
   onAuthorTabChange,
 }: PlatformContentSectionProps) {
-  // Filter items by active tab (client-side fallback if server filtering not used)
+  // Filter items by active tab (producer-first, authorRole fallback for backward compat)
   const filteredItems = useMemo(() => {
     if (!activeAuthorTab || activeAuthorTab === 'all') return items;
-    return items.filter(item => item.authorRole === activeAuthorTab);
+    return items.filter(item =>
+      item.producer
+        ? item.producer === activeAuthorTab
+        : item.authorRole === activeAuthorTab
+    );
   }, [items, activeAuthorTab]);
 
   const listItems: HubListItem[] = useMemo(() =>

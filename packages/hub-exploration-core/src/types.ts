@@ -175,6 +175,31 @@ export interface HubListProps {
 }
 
 // ──────────────────────────────────────────────
+// HUB Content Producer (통합 제작 주체)
+// IR-O4O-HUB-CONTENT-POLICY-UNIFICATION-V1
+// ──────────────────────────────────────────────
+
+export type HubProducer = 'operator' | 'supplier' | 'community';
+
+export interface HubContentItem {
+  id: string;
+  type: 'cms' | 'signage-media' | 'signage-playlist';
+  producer: HubProducer;
+  title: string;
+  description?: string;
+  date?: string;
+  thumbnail?: string;
+  onCopy?: () => void;
+}
+
+export const HUB_PRODUCER_TABS: readonly ContentAuthorTab[] = [
+  { key: 'all', label: '전체' },
+  { key: 'operator', label: '운영자' },
+  { key: 'supplier', label: '공급자' },
+  { key: 'community', label: '커뮤니티' },
+] as const;
+
+// ──────────────────────────────────────────────
 // Section: PlatformContentSection (신규)
 // WO-O4O-HUB-LIST-UI-UNIFICATION-V1
 // ──────────────────────────────────────────────
@@ -187,6 +212,8 @@ export interface PlatformContentItem {
   date?: string;
   /** WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: 작성자 역할 */
   authorRole?: string;
+  /** IR-O4O-HUB-CONTENT-POLICY-UNIFICATION-V1: 통합 제작 주체 */
+  producer?: HubProducer;
   onCopy?: () => void;
 }
 

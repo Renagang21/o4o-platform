@@ -31,6 +31,8 @@ export type {
   ProductDevelopmentSectionProps,
   HubListItem,
   HubListProps,
+  HubProducer,
+  HubContentItem,
   PlatformContentItem,
   PlatformContentSectionProps,
   ContentAuthorTab,
@@ -43,6 +45,9 @@ export type {
 
 // Fixed constants (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1)
 export { HUB_FIXED_TABS } from './types.js';
+
+// Producer tabs (IR-O4O-HUB-CONTENT-POLICY-UNIFICATION-V1)
+export { HUB_PRODUCER_TABS } from './types.js';
 
 // Components
 export { HubExplorationLayout } from './components/HubExplorationLayout.js';

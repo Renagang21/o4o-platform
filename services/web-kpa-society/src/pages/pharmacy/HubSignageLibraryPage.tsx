@@ -34,6 +34,7 @@ import type { SignageMedia, SignagePlaylist } from '../../lib/api/signageV2';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { SIGNAGE_MEDIA_TYPE_LABELS, SIGNAGE_SOURCE_LABELS } from '@o4o/types/signage';
 import type { ContentSource } from '@o4o/types/signage';
+import { HUB_PRODUCER_TABS, type HubProducer } from '@o4o/hub-exploration-core';
 import { colors, borderRadius } from '../../styles/theme';
 
 // ============================================
@@ -41,19 +42,19 @@ import { colors, borderRadius } from '../../styles/theme';
 // ============================================
 
 type ViewTab = 'media' | 'playlist';
-type SourceFilter = 'all' | ContentSource;
+type SourceFilter = 'all' | HubProducer;
 
 const VIEW_TABS: { key: ViewTab; label: string }[] = [
   { key: 'media', label: '미디어' },
   { key: 'playlist', label: '플레이리스트' },
 ];
 
-const SOURCE_FILTERS: { key: SourceFilter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'hq', label: '본부 제공' },
-  { key: 'supplier', label: '공급자 제공' },
-  { key: 'community', label: '커뮤니티 공유' },
-];
+/** producer → signage source 역매핑 */
+const PRODUCER_TO_SOURCE: Record<string, string> = {
+  operator: 'hq',
+  supplier: 'supplier',
+  community: 'community',
+};
 
 const PAGE_LIMIT = 20;
 
@@ -135,15 +136,17 @@ export function HubSignageLibraryPage() {
     fetchPlaylists(playlistPage);
   }, [fetchPlaylists, playlistPage]);
 
-  // Source filtering (client-side since public API doesn't filter by source)
+  // Source filtering (producer → signage source 역매핑)
   const filteredMedia = useMemo(() => {
     if (sourceFilter === 'all') return allMedia;
-    return allMedia.filter(m => (m as any).source === sourceFilter);
+    const source = PRODUCER_TO_SOURCE[sourceFilter] || sourceFilter;
+    return allMedia.filter(m => (m as any).source === source);
   }, [allMedia, sourceFilter]);
 
   const filteredPlaylists = useMemo(() => {
     if (sourceFilter === 'all') return allPlaylists;
-    return allPlaylists.filter(p => (p as any).source === sourceFilter);
+    const source = PRODUCER_TO_SOURCE[sourceFilter] || sourceFilter;
+    return allPlaylists.filter(p => (p as any).source === source);
   }, [allPlaylists, sourceFilter]);
 
   // Counts for tabs
@@ -234,12 +237,12 @@ export function HubSignageLibraryPage() {
         ))}
       </div>
 
-      {/* Source Filters */}
+      {/* Source Filters (HUB 통합 Producer 탭) */}
       <div style={styles.filterBar}>
-        {SOURCE_FILTERS.map(f => (
+        {HUB_PRODUCER_TABS.map(f => (
           <button
             key={f.key}
-            onClick={() => handleSourceChange(f.key)}
+            onClick={() => handleSourceChange(f.key as SourceFilter)}
             style={{
               ...styles.filterTab,
               ...(sourceFilter === f.key ? styles.filterTabActive : {}),
@@ -271,7 +274,7 @@ export function HubSignageLibraryPage() {
           <div style={styles.emptyState}>
             {sourceFilter === 'all'
               ? '현재 제공되는 사이니지 미디어가 없습니다.'
-              : `"${SOURCE_FILTERS.find(f => f.key === sourceFilter)?.label}" 출처의 미디어가 없습니다.`}
+              : `"${HUB_PRODUCER_TABS.find(f => f.key === sourceFilter)?.label}" 출처의 미디어가 없습니다.`}
           </div>
         ) : (
           <>
@@ -360,7 +363,7 @@ export function HubSignageLibraryPage() {
           <div style={styles.emptyState}>
             {sourceFilter === 'all'
               ? '현재 제공되는 플레이리스트가 없습니다.'
-              : `"${SOURCE_FILTERS.find(f => f.key === sourceFilter)?.label}" 출처의 플레이리스트가 없습니다.`}
+              : `"${HUB_PRODUCER_TABS.find(f => f.key === sourceFilter)?.label}" 출처의 플레이리스트가 없습니다.`}
           </div>
         ) : (
           <>

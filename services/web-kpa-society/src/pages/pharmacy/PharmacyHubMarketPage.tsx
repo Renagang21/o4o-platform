@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   HubExplorationLayout,
   HUB_FIXED_TABS,
+  HUB_PRODUCER_TABS,
   type HeroSlide,
   type CoreServiceBanner,
   type RecentUpdateItem,
@@ -23,7 +24,7 @@ import {
   type B2BPreviewItem,
   type ProductDevItem,
   type PlatformContentItem,
-  type ContentAuthorTab,
+  type HubProducer,
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
@@ -118,17 +119,6 @@ function cmsSlotToProductDev(slot: CmsSlot, navigate: (path: string) => void): P
       : undefined,
   };
 }
-
-// ============================================
-// Author tabs (WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1)
-// ============================================
-
-const CONTENT_AUTHOR_TABS: ContentAuthorTab[] = [
-  { key: 'all', label: '전체' },
-  { key: 'admin', label: '관리자' },
-  { key: 'service_admin', label: '운영자' },
-  { key: 'supplier', label: '공급자' },
-];
 
 // ============================================
 // Default Hero (fallback when CMS empty)
@@ -236,6 +226,15 @@ export function PharmacyHubMarketPage() {
               ? new Date(c.publishedAt).toLocaleDateString('ko-KR')
               : undefined,
             authorRole: c.authorRole,
+            producer: (
+              c.authorRole === 'admin' || c.authorRole === 'service_admin'
+                ? 'operator'
+                : c.authorRole === 'supplier'
+                  ? 'supplier'
+                  : c.authorRole === 'community'
+                    ? 'community'
+                    : undefined
+            ) as HubProducer | undefined,
             onCopy: () => {
               assetSnapshotApi.copy({
                 sourceService: 'kpa',
@@ -350,7 +349,7 @@ export function PharmacyHubMarketPage() {
       b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
       productDevelopment={{ items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' }}
-      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content'), authorTabs: CONTENT_AUTHOR_TABS, activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}
+      platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content'), authorTabs: [...HUB_PRODUCER_TABS], activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}
       recentUpdates={{ tabs: [...HUB_FIXED_TABS], items: updateItems }}
       coreServices={{ banners: coreServiceBanners, title: '핵심 서비스' }}
       promotions={promos.length > 0 ? { banners: promos, title: '프로모션' } : undefined}
