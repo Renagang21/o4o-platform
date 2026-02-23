@@ -366,9 +366,17 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
 
       // Determine caller's author_role
       const userRoles: string[] = user.roles || [];
-      const isPlatformAdmin = userRoles.some((r: string) =>
-        r === 'platform:admin' || r === 'platform:super_admin'
-      ) || await roleAssignmentService.hasAnyRole(user.id, ['platform:admin', 'platform:super_admin']);
+      let isPlatformAdmin = userRoles.some((r: string) =>
+        r === 'platform:admin' || r === 'platform:super_admin' || r === 'admin' || r === 'super_admin'
+      );
+
+      if (!isPlatformAdmin) {
+        try {
+          isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, ['platform:admin', 'platform:super_admin']);
+        } catch (err) {
+          logger.warn('[CMS] Platform admin RoleAssignment check failed, skipping:', (err as Error).message);
+        }
+      }
 
       // Check service admin roles (e.g., glycopharm:admin, kpa:admin)
       const serviceAdminMatch = userRoles.find((r: string) => r.endsWith(':admin') && !r.startsWith('platform:'));
@@ -376,8 +384,13 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
 
       if (!isPlatformAdmin && !isServiceAdminByRole) {
         // Also check RoleAssignment table for service admin roles
-        const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
-        const hasServiceAdmin = activeRoles.some(a => a.role.endsWith(':admin') && !a.role.startsWith('platform:'));
+        let hasServiceAdmin = false;
+        try {
+          const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
+          hasServiceAdmin = activeRoles.some(a => a.role.endsWith(':admin') && !a.role.startsWith('platform:'));
+        } catch (err) {
+          logger.warn('[CMS] Service admin RoleAssignment check failed, skipping:', (err as Error).message);
+        }
 
         if (!hasServiceAdmin) {
           res.status(403).json({
