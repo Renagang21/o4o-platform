@@ -85,6 +85,7 @@ const VALIDATION_ERRORS = {
   CHANNEL_NOT_APPROVED: '채널이 승인되지 않았습니다',
   PRODUCT_NOT_IN_CHANNEL: '채널에 노출되지 않은 상품입니다',
   SALES_LIMIT_EXCEEDED: '판매 한도를 초과했습니다',
+  DISTRIBUTION_FORBIDDEN: '유통 정책에 의해 차단된 상품입니다',
 } as const;
 
 /**
@@ -352,6 +353,33 @@ export function createCheckoutController(
         }
 
         // ================================================================
+        // 3-B. Distribution policy 검증 (WO-O4O-DISTRIBUTION-GAP-HARDENING-V1)
+        // PRIVATE 제품: allowed_seller_ids에 organizationId 포함 필수
+        // ================================================================
+        const privateDistProducts: Array<{
+          external_product_id: string;
+          allowed_seller_ids: string[] | null;
+        }> = await dataSource.query(
+          `SELECT opl.external_product_id, nsp.allowed_seller_ids
+           FROM organization_product_listings opl
+           JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
+           WHERE opl.organization_id = $1
+             AND opl.service_key = 'kpa'
+             AND opl.external_product_id = ANY($2::text[])
+             AND nsp.distribution_type = 'PRIVATE'`,
+          [pharmacy.id, productIds]
+        );
+
+        for (const pp of privateDistProducts) {
+          if (!pp.allowed_seller_ids || !pp.allowed_seller_ids.includes(pharmacy.id)) {
+            await queryRunner.release();
+            return errorResponse(res, 403, 'DISTRIBUTION_FORBIDDEN', VALIDATION_ERRORS.DISTRIBUTION_FORBIDDEN, {
+              productId: pp.external_product_id,
+            });
+          }
+        }
+
+        // ================================================================
         // 4. 상품-채널 매핑 검증 (Phase D)
         // ================================================================
         const channelMappings: Array<{
@@ -365,11 +393,14 @@ export function createCheckoutController(
            FROM organization_product_channels opc
            JOIN organization_product_listings opl
              ON opl.id = opc.product_listing_id
+           JOIN organization_channels oc
+             ON oc.id = opc.channel_id
            WHERE opc.channel_id = $1
              AND opl.organization_id = $2
              AND opl.service_key = 'kpa'
              AND opl.is_active = true
-             AND opc.is_active = true`,
+             AND opc.is_active = true
+             AND oc.status = 'APPROVED'`,
           [b2cChannelId, pharmacy.id]
         );
 

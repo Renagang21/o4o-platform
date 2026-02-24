@@ -283,10 +283,17 @@ export function createStoreHubController(
              SELECT
                opc.channel_id,
                COUNT(*) AS total_count,
-               COUNT(*) FILTER (WHERE opc.is_active = true AND opl.is_active = true) AS visible_count,
+               COUNT(*) FILTER (
+                 WHERE opc.is_active = true
+                   AND opl.is_active = true
+                   AND oc_sub.status = 'APPROVED'
+                   AND gp.status = 'active'
+               ) AS visible_count,
                COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count
              FROM organization_product_channels opc
              JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
+             JOIN organization_channels oc_sub ON oc_sub.id = opc.channel_id
+             LEFT JOIN glycopharm_products gp ON gp.id::text = opl.external_product_id
              GROUP BY opc.channel_id
            ) stats ON stats.channel_id = oc.id
            WHERE oc.organization_id = $1
