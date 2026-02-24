@@ -270,7 +270,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       if (type) {
         where.type = type as ContentType;
       }
-      if (status) {
+      // WO-O4O-CMS-PUBLIC-VISIBILITY-HARDENING-V1:
+      // 비인증 사용자는 published만 조회 가능
+      if (!(req as any).user) {
+        where.status = 'published';
+      } else if (status) {
         where.status = status as ContentStatus;
       }
       if (isPinned === 'true') {
@@ -338,7 +342,9 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         where: { id },
       });
 
-      if (!content) {
+      // WO-O4O-CMS-PUBLIC-VISIBILITY-HARDENING-V1:
+      // 비인증 사용자에게 미게시 콘텐츠는 404 반환 (존재 노출 방지)
+      if (!content || (!(req as any).user && content.status !== 'published')) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },
