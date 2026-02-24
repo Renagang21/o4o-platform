@@ -90,13 +90,17 @@ export class PaymentCoreService {
   /**
    * 결제 확인 — PG 승인 + 상태 전이 (CREATED → CONFIRMING → PAID)
    *
+   * WO-O4O-PAYMENT-CORE-AMOUNT-VERIFICATION-HARDEN-V1:
+   * 금액은 Core 내부에서 payment.amount (prepare 시 서버 설정값) 사용.
+   * 외부 amount 파라미터 제거 → 프론트엔드 금액 위변조 불가.
+   *
    * @param paymentId — 내부 결제 ID
    * @param paymentKey — PG 결제 키
    * @param orderId — PG에 전달할 주문 식별자 (orderNumber)
-   * @param amount — 결제 금액
    * @param internalOrderId — 내부 주문 UUID (이벤트용). 미지정 시 payment.orderId fallback
    *
    * @throws PAYMENT_NOT_FOUND — 결제 레코드 없음
+   * @throws PAYMENT_AMOUNT_MISSING — prepare 시 금액 미설정
    * @throws INVALID_PAYMENT_TRANSITION — 상태 전이 불가
    * @throws PAYMENT_ALREADY_PROCESSING — 동시 confirm 감지
    */
@@ -104,12 +108,18 @@ export class PaymentCoreService {
     paymentId: string,
     paymentKey: string,
     orderId: string,
-    amount: number,
     internalOrderId?: string,
   ): Promise<PaymentProps> {
     const payment = await this.repository.findById(paymentId);
     if (!payment) {
       throw new Error('PAYMENT_NOT_FOUND');
+    }
+
+    // Core 내부 금액 검증: prepare() 시 서버에서 설정한 payment.amount 사용
+    // 프론트엔드가 보낸 금액을 사용하지 않음 → 위변조 원천 차단
+    const verifiedAmount = payment.amount;
+    if (!verifiedAmount || verifiedAmount <= 0) {
+      throw new Error('PAYMENT_AMOUNT_MISSING');
     }
 
     // 이벤트 발행용 orderId: internalOrderId > payment.orderId > orderId
@@ -132,7 +142,8 @@ export class PaymentCoreService {
     }
 
     try {
-      const result = await this.provider.confirm(paymentKey, orderId, amount);
+      // PG 승인: Core 내부 verifiedAmount 사용 (프론트엔드 금액 미사용)
+      const result = await this.provider.confirm(paymentKey, orderId, verifiedAmount);
 
       // CONFIRMING → PAID
       assertTransition(payment.status, PaymentStatus.PAID);

@@ -166,7 +166,6 @@ export function createGlycopharmPaymentController(
       body('paymentId').notEmpty().isUUID(),
       body('paymentKey').notEmpty().isString(),
       body('orderId').notEmpty().isUUID(),
-      body('amount').isInt({ min: 1 }),
     ],
     async (req: Request, res: Response) => {
       try {
@@ -178,7 +177,7 @@ export function createGlycopharmPaymentController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
         }
 
-        const { paymentId, paymentKey, orderId, amount } = req.body;
+        const { paymentId, paymentKey, orderId } = req.body;
 
         // 주문 소유권 확인
         const order = await orderRepository.findOne({
@@ -189,22 +188,13 @@ export function createGlycopharmPaymentController(
           return errorResponse(res, 404, 'ORDER_NOT_FOUND', 'Order not found');
         }
 
-        // 금액 검증
-        if (Number(order.totalAmount) !== amount) {
-          return errorResponse(res, 400, 'AMOUNT_MISMATCH', 'Amount does not match order', {
-            expected: Number(order.totalAmount),
-            received: amount,
-          });
-        }
-
         // PaymentCoreService.confirm() 호출
+        // 금액 검증은 PaymentCore 내부에서 수행 (payment.amount 사용)
         // CREATED → CONFIRMING → PAID (+ Toss API + event emission)
-        // orderId: Toss API용 (orderNumber), internalOrderId: 이벤트용 (UUID)
         const payment = await paymentService.confirm(
           paymentId,
           paymentKey,
           order.orderNumber,
-          amount,
           order.id,
         );
 
@@ -240,6 +230,9 @@ export function createGlycopharmPaymentController(
         }
         if (err.message === 'PAYMENT_ALREADY_PROCESSING') {
           return errorResponse(res, 409, 'PAYMENT_ALREADY_PROCESSING', 'Payment is already being processed');
+        }
+        if (err.message === 'PAYMENT_AMOUNT_MISSING') {
+          return errorResponse(res, 400, 'PAYMENT_AMOUNT_MISSING', 'Payment amount not set during prepare');
         }
 
         // P0-2: paymentKey UNIQUE violation → idempotent 처리
