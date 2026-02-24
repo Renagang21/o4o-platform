@@ -119,6 +119,7 @@ const OWNERSHIP_POLICIES: PolicyItem[] = [
 /**
  * Status Policy 정의
  */
+// WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added pending
 const STATUS_POLICIES: PolicyItem[] = [
   {
     value: ContentStatus.DRAFT,
@@ -126,6 +127,13 @@ const STATUS_POLICIES: PolicyItem[] = [
     description: '아직 준비 중인 콘텐츠입니다. 외부 노출 및 사용이 불가능합니다.',
     example: '검토 대기 중인 새 영상, 수정 중인 문서',
     icon: <FileEdit className="w-5 h-5 text-gray-500" />,
+  },
+  {
+    value: ContentStatus.PENDING,
+    label: 'Pending (승인 대기)',
+    description: '승인 대기 중인 콘텐츠입니다. 관리자의 검토 후 게시 또는 반려됩니다.',
+    example: '운영자가 작성 완료 후 게시 승인을 요청한 콘텐츠',
+    icon: <AlertCircle className="w-5 h-5 text-blue-500" />,
   },
   {
     value: ContentStatus.PUBLISHED,
@@ -341,6 +349,8 @@ export default function ContentPoliciesPage() {
             <p className="text-xs text-gray-500 font-medium mb-3">상태 전이 흐름</p>
             <div className="flex items-center justify-center gap-2 text-sm">
               <span className="px-3 py-1 bg-gray-200 rounded text-gray-600">Draft</span>
+              <span className="text-gray-400">→</span>
+              <span className="px-3 py-1 bg-blue-100 rounded text-blue-700">Pending</span>
               <span className="text-gray-400">→</span>
               <span className="px-3 py-1 bg-green-100 rounded text-green-700">Published</span>
               <span className="text-gray-400">→</span>

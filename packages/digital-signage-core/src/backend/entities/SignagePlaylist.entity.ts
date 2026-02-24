@@ -45,13 +45,14 @@ export class SignagePlaylist {
   description!: string | null;
 
   // ========== Status ==========
+  // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: draft → pending → active → archived
   @Column({
     type: 'varchar',
     length: 20,
     default: 'draft',
   })
   @Index()
-  status!: 'active' | 'inactive' | 'draft';
+  status!: 'draft' | 'pending' | 'active' | 'archived';
 
   // ========== Playback Settings ==========
   @Column({ type: 'boolean', default: true })

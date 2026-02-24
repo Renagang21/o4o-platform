@@ -29,7 +29,7 @@ export class SignageQueryService {
     const media = await this.dataSource.query(`
       SELECT id, name, "mediaType", "sourceUrl" as url, "thumbnailUrl", duration, metadata
       FROM signage_media
-      WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active'
+      WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active' AND "deletedAt" IS NULL
       ORDER BY "createdAt" DESC
       LIMIT $${limitIndex}
     `, [this.config.serviceKey, ...sources, mediaLimit]);
@@ -37,7 +37,7 @@ export class SignageQueryService {
     const playlists = await this.dataSource.query(`
       SELECT id, name, description, "itemCount", "totalDuration"
       FROM signage_playlists
-      WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active'
+      WHERE "serviceKey" = $1 AND source IN (${sourcePlaceholders}) AND status = 'active' AND "deletedAt" IS NULL
       ORDER BY "createdAt" DESC
       LIMIT $${limitIndex}
     `, [this.config.serviceKey, ...sources, playlistLimit]);

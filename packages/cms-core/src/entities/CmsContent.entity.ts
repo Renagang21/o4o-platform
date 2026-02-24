@@ -22,7 +22,8 @@ import {
 export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event';
 
 // Content lifecycle states
-export type ContentStatus = 'draft' | 'published' | 'archived';
+// WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added 'pending' for approval workflow
+export type ContentStatus = 'draft' | 'pending' | 'published' | 'archived';
 
 // WO-O4O-CMS-VISIBILITY-EXTENSION-PHASE1-V1: Author role and visibility scope
 export type ContentAuthorRole = 'admin' | 'service_admin' | 'supplier' | 'community';

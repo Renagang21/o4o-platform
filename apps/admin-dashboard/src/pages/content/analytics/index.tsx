@@ -67,6 +67,7 @@ const TYPE_COLORS: Record<ContentType, string> = {
  */
 const STATUS_COLORS: Record<ContentStatus, string> = {
   [ContentStatus.DRAFT]: 'bg-gray-400',
+  [ContentStatus.PENDING]: 'bg-blue-500',
   [ContentStatus.PUBLISHED]: 'bg-green-500',
   [ContentStatus.ARCHIVED]: 'bg-amber-500',
 };
@@ -76,6 +77,7 @@ const STATUS_COLORS: Record<ContentStatus, string> = {
  */
 const STATUS_LABELS: Record<ContentStatus, string> = {
   [ContentStatus.DRAFT]: 'Draft',
+  [ContentStatus.PENDING]: 'Pending',
   [ContentStatus.PUBLISHED]: 'Published',
   [ContentStatus.ARCHIVED]: 'Archived',
 };
@@ -342,8 +344,10 @@ export default function ContentAnalyticsPage() {
     [ContentType.BLOCK]: stats.byType.block,
   } : {};
 
+  // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added pending
   const byStatusData = stats ? {
     [ContentStatus.DRAFT]: stats.byStatus.draft,
+    [ContentStatus.PENDING]: (stats.byStatus as Record<string, number>).pending || 0,
     [ContentStatus.PUBLISHED]: stats.byStatus.published,
     [ContentStatus.ARCHIVED]: stats.byStatus.archived,
   } : {};

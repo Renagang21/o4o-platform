@@ -1141,6 +1141,9 @@ router.post('/partner/applications/:id/approve', requireAuth, async (req: Authen
     if (msg === 'NOT_RECRUITMENT_OWNER') {
       return res.status(403).json({ success: false, error: 'FORBIDDEN', message: '모집 주체만 승인할 수 있습니다.' });
     }
+    if (msg === 'ACTIVE_CONTRACT_EXISTS') {
+      return res.status(409).json({ success: false, error: 'CONFLICT', message: '이미 활성 계약이 존재합니다.' });
+    }
     logger.error('[Neture API] Error approving partner application:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve application' });
   }
@@ -2126,6 +2129,133 @@ router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('netur
       error: 'INTERNAL_ERROR',
       message: 'Failed to revoke supplier request',
     });
+  }
+});
+
+// ==================== Seller-Partner Contracts (WO-NETURE-SELLER-PARTNER-CONTRACT-V1) ====================
+
+/**
+ * GET /api/v1/neture/seller/contracts
+ * Seller 계약 목록 조회
+ * Query: ?status=active|terminated|expired
+ */
+router.get('/seller/contracts', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = await getSupplierIdFromUser(req);
+    if (!sellerId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { status } = req.query;
+    const contracts = await netureService.getSellerContracts(sellerId, status as string | undefined);
+    res.json({ success: true, data: contracts });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching seller contracts:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch contracts' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/seller/contracts/:id/terminate
+ * Seller가 계약 해지
+ */
+router.post('/seller/contracts/:id/terminate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = await getSupplierIdFromUser(req);
+    if (!sellerId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+    const result = await netureService.terminateContract(id, sellerId, 'seller');
+    res.json({ success: true, data: result });
+  } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'CONTRACT_NOT_FOUND') {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '계약을 찾을 수 없습니다.' });
+    }
+    if (msg === 'CONTRACT_NOT_ACTIVE') {
+      return res.status(400).json({ success: false, error: 'INVALID_STATUS', message: '활성 상태의 계약만 해지할 수 있습니다.' });
+    }
+    logger.error('[Neture API] Error terminating contract (seller):', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to terminate contract' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/seller/contracts/:id/commission
+ * 수수료 변경 (기존 계약 terminated → 신규 계약 생성)
+ */
+router.post('/seller/contracts/:id/commission', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = await getSupplierIdFromUser(req);
+    if (!sellerId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+    const { commissionRate } = req.body;
+    if (commissionRate === undefined || typeof commissionRate !== 'number') {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'commissionRate (number) is required' });
+    }
+
+    const result = await netureService.updateCommissionRate(id, commissionRate, sellerId);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'ACTIVE_CONTRACT_NOT_FOUND') {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '활성 계약을 찾을 수 없습니다.' });
+    }
+    logger.error('[Neture API] Error updating commission rate:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update commission rate' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/contracts
+ * Partner 계약 목록 조회
+ * Query: ?status=active|terminated|expired
+ */
+router.get('/partner/contracts', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { status } = req.query;
+    const contracts = await netureService.getPartnerContracts(userId, status as string | undefined);
+    res.json({ success: true, data: contracts });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner contracts:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch contracts' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/partner/contracts/:id/terminate
+ * Partner가 계약 해지
+ */
+router.post('/partner/contracts/:id/terminate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { id } = req.params;
+    const result = await netureService.terminateContract(id, userId, 'partner');
+    res.json({ success: true, data: result });
+  } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'CONTRACT_NOT_FOUND') {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: '계약을 찾을 수 없습니다.' });
+    }
+    if (msg === 'CONTRACT_NOT_ACTIVE') {
+      return res.status(400).json({ success: false, error: 'INVALID_STATUS', message: '활성 상태의 계약만 해지할 수 있습니다.' });
+    }
+    logger.error('[Neture API] Error terminating contract (partner):', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to terminate contract' });
   }
 });
 

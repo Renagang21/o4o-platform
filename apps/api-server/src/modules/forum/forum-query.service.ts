@@ -339,15 +339,17 @@ export class ForumQueryService {
    * 3개 병렬 쿼리로 집계
    */
   async getForumAnalytics() {
-    const scopeFilter = this.config.scope === 'community'
+    const isCommunity = this.config.scope === 'community';
+    const params = isCommunity ? [] : [this.config.organizationId];
+    const scopeFilter = isCommunity
       ? 'p.organization_id IS NULL'
-      : `p.organization_id = '${this.config.organizationId}'`;
-    const catScopeFilter = this.config.scope === 'community'
+      : 'p.organization_id = $1';
+    const catScopeFilter = isCommunity
       ? 'c."organizationId" IS NULL'
-      : `c."organizationId" = '${this.config.organizationId}'`;
-    const commentScopeFilter = this.config.scope === 'community'
+      : 'c."organizationId" = $1';
+    const commentScopeFilter = isCommunity
       ? 'p.organization_id IS NULL'
-      : `p.organization_id = '${this.config.organizationId}'`;
+      : 'p.organization_id = $1';
 
     const [kpiRows, topRows, inactiveRows] = await Promise.all([
       // Query 1: KPI 4개
@@ -376,7 +378,7 @@ export class ForumQueryService {
            WHERE ${commentScopeFilter}
              AND fc.created_at >= NOW() - INTERVAL '7 days'
           ) AS "comments7d"
-      `),
+      `, params),
       // Query 2: Top 5 활성 포럼 (30일)
       this.dataSource.query(`
         SELECT
@@ -395,7 +397,7 @@ export class ForumQueryService {
           + COUNT(DISTINCT CASE WHEN fc.created_at >= NOW() - INTERVAL '30 days' THEN fc.id END)
         ) DESC
         LIMIT 5
-      `),
+      `, params),
       // Query 3: 30일 무활동 포럼
       this.dataSource.query(`
         SELECT c.id, c.name, c."iconEmoji",
@@ -407,7 +409,7 @@ export class ForumQueryService {
         HAVING MAX(p.created_at) IS NULL
             OR MAX(p.created_at) < NOW() - INTERVAL '30 days'
         ORDER BY MAX(p.created_at) ASC NULLS FIRST
-      `),
+      `, params),
     ]);
 
     const kpi = kpiRows[0] || {};

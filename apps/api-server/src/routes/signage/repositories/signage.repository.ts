@@ -187,7 +187,13 @@ export class SignageRepository {
   ): Promise<void> {
     await this.dataSource.transaction(async manager => {
       for (const item of items) {
-        await manager.update(SignagePlaylistItem, item.id, { sortOrder: item.sortOrder });
+        // Only update items that belong to the verified playlist (defense-in-depth)
+        await manager
+          .createQueryBuilder()
+          .update(SignagePlaylistItem)
+          .set({ sortOrder: item.sortOrder })
+          .where('id = :id AND playlistId = :playlistId', { id: item.id, playlistId })
+          .execute();
       }
     });
   }
@@ -1009,26 +1015,26 @@ export class SignageRepository {
   }
 
   /**
-   * Increment download count for a playlist
+   * Increment download count for a playlist (scoped by serviceKey for boundary safety)
    */
-  async incrementPlaylistDownloadCount(playlistId: string): Promise<void> {
+  async incrementPlaylistDownloadCount(playlistId: string, serviceKey: string): Promise<void> {
     await this.playlistRepo
       .createQueryBuilder()
       .update(SignagePlaylist)
       .set({ downloadCount: () => '"downloadCount" + 1' })
-      .where('id = :id', { id: playlistId })
+      .where('id = :id AND "serviceKey" = :serviceKey', { id: playlistId, serviceKey })
       .execute();
   }
 
   /**
-   * Increment like count for a playlist
+   * Increment like count for a playlist (scoped by serviceKey for boundary safety)
    */
-  async incrementPlaylistLikeCount(playlistId: string): Promise<void> {
+  async incrementPlaylistLikeCount(playlistId: string, serviceKey: string): Promise<void> {
     await this.playlistRepo
       .createQueryBuilder()
       .update(SignagePlaylist)
       .set({ likeCount: () => '"likeCount" + 1' })
-      .where('id = :id', { id: playlistId })
+      .where('id = :id AND "serviceKey" = :serviceKey', { id: playlistId, serviceKey })
       .execute();
   }
 }

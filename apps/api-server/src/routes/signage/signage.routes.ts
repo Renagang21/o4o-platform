@@ -213,6 +213,12 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // POST /api/signage/:serviceKey/hq/media - Create HQ media (scope: global)
   router.post('/hq/media', requireSignageOperator, controller.createHqMedia);
 
+  // PATCH /api/signage/:serviceKey/hq/playlists/:id/status - Transition HQ playlist status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
+  router.patch('/hq/playlists/:id/status', requireSignageOperator, controller.transitionHqPlaylistStatus);
+
+  // PATCH /api/signage/:serviceKey/hq/media/:id/status - Transition HQ media status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
+  router.patch('/hq/media/:id/status', requireSignageOperator, controller.transitionHqMediaStatus);
+
   // PATCH /api/signage/:serviceKey/hq/playlists/:id - Update HQ playlist
   router.patch('/hq/playlists/:id', requireSignageOperator, controller.updateHqPlaylist);
 

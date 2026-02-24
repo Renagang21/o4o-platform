@@ -92,6 +92,10 @@ import { createStorePolicyRoutes } from './routes/platform/store-policy.routes.j
 // Unified Public Store routes (WO-STORE-SLUG-UNIFICATION-V1)
 import { createUnifiedStorePublicRoutes } from './routes/platform/unified-store-public.routes.js';
 
+// Store Local Product & Tablet Display (WO-STORE-LOCAL-PRODUCT-DISPLAY-V1)
+import { createStoreLocalProductRoutes } from './routes/platform/store-local-product.routes.js';
+import { createStoreTabletRoutes } from './routes/platform/store-tablet.routes.js';
+
 // SiteGuide Entities (for DataSource registration)
 import {
   SiteGuideBusiness,
@@ -408,6 +412,10 @@ import HttpMetricsService from './middleware/metrics.middleware.js';
 const httpMetrics = HttpMetricsService.getInstance(prometheusMetrics.registry);
 app.use(httpMetrics.middleware());
 
+// Slow request threshold logging — WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
+import { slowThresholdMiddleware } from './middleware/slow-threshold.middleware.js';
+app.use(slowThresholdMiddleware);
+
 // ============================================================================
 // CORE ROUTES SETUP (Phase 8-4 - Core Routes Registration)
 // ============================================================================
@@ -552,6 +560,15 @@ app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/health', healthRoutes); // Cloud Run HEALTHCHECK compatibility
+
+// Internal ops metrics — WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
+try {
+  const { createOpsMetricsController } = await import('./routes/internal/ops-metrics.controller.js');
+  app.use('/internal/ops', createOpsMetricsController());
+  logger.info('✅ Internal ops metrics registered at /internal/ops/metrics');
+} catch (opsMetricsError) {
+  logger.warn('Internal ops metrics registration skipped:', opsMetricsError);
+}
 app.use('/api/v1/forum', forumRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/admin/apps', adminAppsRoutes);
@@ -771,6 +788,11 @@ const startServer = async () => {
     // 8.11b. Register Platform Store Policy routes (WO-CORE-STORE-POLICY-SYSTEM-V1)
     app.use('/api/v1/stores', createStorePolicyRoutes(AppDataSource));
     logger.info('✅ Platform Store Policy routes registered at /api/v1/stores/:slug/policies');
+
+    // 8.12. Register Store Local Product & Tablet Display routes (WO-STORE-LOCAL-PRODUCT-DISPLAY-V1)
+    app.use('/api/v1/store', createStoreLocalProductRoutes(AppDataSource));
+    app.use('/api/v1/store', createStoreTabletRoutes(AppDataSource));
+    logger.info('✅ Store Local Product & Tablet Display routes registered at /api/v1/store/*');
 
     // 9. Register User Role routes
     app.use('/api/v1/userRole', userRoleRoutes);

@@ -58,6 +58,8 @@ export function createOperatorSummaryController(
       forumPostTotalCount,
       // WO-KPA-OPERATOR-KPI-REALIGN-V1: Action Required counts
       contentDraftCount,
+      // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1
+      contentPendingCount,
       signagePendingMediaCount,
       signagePendingPlaylistCount,
       forumPendingRequestCount,
@@ -74,11 +76,11 @@ export function createOperatorSummaryController(
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM signage_media
-        WHERE "serviceKey" = 'kpa-society' AND status = 'active'
+        WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM signage_playlists
-        WHERE "serviceKey" = 'kpa-society' AND status = 'active'
+        WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM forum_post
@@ -89,13 +91,19 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM cms_contents
         WHERE "serviceKey" IN ('kpa', 'kpa-society') AND status = 'draft'
       `),
+      // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: pending approval count
+      dataSource.query(`
+        SELECT COUNT(*) as count FROM cms_contents
+        WHERE "serviceKey" IN ('kpa', 'kpa-society') AND status = 'pending'
+      `),
+      // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: pending = approval 대기 상태
       dataSource.query(`
         SELECT COUNT(*) as count FROM signage_media
-        WHERE "serviceKey" = 'kpa-society' AND status IN ('processing', 'inactive')
+        WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM signage_playlists
-        WHERE "serviceKey" = 'kpa-society' AND status = 'draft'
+        WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL
       `),
       dataSource.query(`
         SELECT COUNT(*) as count FROM forum_category_requests
@@ -117,6 +125,7 @@ export function createOperatorSummaryController(
         content: {
           totalPublished: parseInt(contentTotalCount[0]?.count || '0', 10),
           pendingDraft: parseInt(contentDraftCount[0]?.count || '0', 10),
+          pendingApproval: parseInt(contentPendingCount[0]?.count || '0', 10),
           recentItems: recentContent,
         },
         signage: {

@@ -28,7 +28,7 @@ export interface ScopeFilter {
 export interface CreatePlaylistDto {
   name: string;
   description?: string;
-  status?: 'active' | 'inactive' | 'draft';
+  status?: SignageStatus;
   loopEnabled?: boolean;
   defaultItemDuration?: number;
   transitionType?: 'none' | 'fade' | 'slide';
@@ -40,7 +40,7 @@ export interface CreatePlaylistDto {
 export interface UpdatePlaylistDto {
   name?: string;
   description?: string;
-  status?: 'active' | 'inactive' | 'draft';
+  status?: SignageStatus;
   loopEnabled?: boolean;
   defaultItemDuration?: number;
   transitionType?: 'none' | 'fade' | 'slide';
@@ -52,7 +52,7 @@ export interface UpdatePlaylistDto {
 export interface PlaylistQueryDto {
   page?: number;
   limit?: number;
-  status?: 'active' | 'inactive' | 'draft';
+  status?: SignageStatus;
   isPublic?: boolean;
   search?: string;
   sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'itemCount';
@@ -156,7 +156,7 @@ export interface UpdateMediaDto {
   content?: string;
   tags?: string[];
   category?: string;
-  status?: 'active' | 'inactive' | 'processing';
+  status?: SignageStatus;
   metadata?: Record<string, any>;
 }
 
@@ -165,7 +165,7 @@ export interface MediaQueryDto {
   limit?: number;
   mediaType?: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';
   sourceType?: 'upload' | 'youtube' | 'vimeo' | 'url' | 'cms';
-  status?: 'active' | 'inactive' | 'processing';
+  status?: SignageStatus;
   category?: string;
   tags?: string[];
   search?: string;
@@ -694,6 +694,29 @@ export interface GlobalMediaResponseDto extends MediaResponseDto {
 
 // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: Clone DTOs removed
 // Content copy is now handled via asset-snapshot-copy (@o4o/asset-copy-core)
+
+// ========== Signage Status Transition DTOs ==========
+// WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1
+
+export type SignageStatus = 'draft' | 'pending' | 'active' | 'archived';
+
+export interface UpdateSignageStatusDto {
+  status: SignageStatus;
+}
+
+/**
+ * Allowed status transitions:
+ *   draft   → pending | active (admin override)
+ *   pending → active | draft (reject → return to draft)
+ *   active  → archived
+ *   archived → draft (re-activate cycle)
+ */
+export const ALLOWED_STATUS_TRANSITIONS: Record<SignageStatus, SignageStatus[]> = {
+  draft: ['pending', 'active'],
+  pending: ['active', 'draft'],
+  active: ['archived'],
+  archived: ['draft'],
+};
 
 // ========== HQ Content Creation DTOs ==========
 

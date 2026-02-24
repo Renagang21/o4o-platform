@@ -198,6 +198,7 @@ import {
   NeturePartnerDashboardItemContent,
   NeturePartnerRecruitment,
   NeturePartnerApplication,
+  NetureSellerPartnerContract,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -265,6 +266,9 @@ import { MarketTrialFulfillment } from '../extensions/trial-fulfillment/entities
 import {
   PhysicalStore,
   PhysicalStoreLink,
+  StoreLocalProduct,
+  StoreTablet,
+  StoreTabletDisplay,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -626,6 +630,7 @@ export const AppDataSource = new DataSource({
     NeturePartnerDashboardItemContent,
     NeturePartnerRecruitment,
     NeturePartnerApplication,
+    NetureSellerPartnerContract,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
@@ -743,6 +748,12 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PhysicalStore,
     PhysicalStoreLink,
+    // ============================================================================
+    // STORE LOCAL PRODUCT & TABLET DISPLAY ENTITIES (WO-STORE-LOCAL-PRODUCT-DISPLAY-V1)
+    // ============================================================================
+    StoreLocalProduct,
+    StoreTablet,
+    StoreTabletDisplay,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================

@@ -686,7 +686,8 @@ export const cmsAPI = {
 // ========================================
 
 export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event';
-export type ContentStatus = 'draft' | 'published' | 'archived';
+// WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added 'pending' for approval workflow
+export type ContentStatus = 'draft' | 'pending' | 'published' | 'archived';
 
 export interface CmsContent {
   id: string;

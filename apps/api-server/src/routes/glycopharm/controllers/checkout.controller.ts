@@ -20,6 +20,7 @@ import { body, validationResult } from 'express-validator';
 import { DataSource, In, Brackets } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
@@ -256,6 +257,8 @@ export function createCheckoutController(
       await queryRunner.connect();
 
       try {
+        opsMetrics.inc(OPS.CHECKOUT_ATTEMPT, { service: 'glycopharm' });
+
         if (handleValidationErrors(req, res)) {
           await queryRunner.release();
           return;
@@ -312,6 +315,13 @@ export function createCheckoutController(
 
         // ================================================================
         // 3. 상품 검증 및 조회
+        //
+        // WO-STORE-LOCAL-PRODUCT-HARDENING-V1: Checkout Guard
+        // StoreLocalProduct(store_local_products)는 Display Domain이며
+        // Commerce Object가 아니다.
+        // 이 체크아웃은 GlycopharmProduct 엔티티(glycopharm_products)만 조회하므로
+        // store_local_products의 UUID는 구조적으로 PRODUCT_NOT_FOUND로 거부된다.
+        // → store_local_products ↔ ecommerce_order_items 교차 경로 없음 (검증 완료)
         // ================================================================
         const productIds = dto.items.map((item) => item.productId);
         const products = await productRepo.find({
@@ -329,6 +339,7 @@ export function createCheckoutController(
 
         const inactiveProducts = products.filter((p) => p.status !== 'active');
         if (inactiveProducts.length > 0) {
+          opsMetrics.inc(OPS.CHECKOUT_BLOCKED_PRODUCT, { service: 'glycopharm' });
           await queryRunner.release();
           return errorResponse(res, 400, 'PRODUCT_INACTIVE', VALIDATION_ERRORS.PRODUCT_INACTIVE, {
             inactiveProductIds: inactiveProducts.map((p) => p.id),
@@ -346,6 +357,7 @@ export function createCheckoutController(
         }
 
         if (outOfStockItems.length > 0) {
+          opsMetrics.inc(OPS.CHECKOUT_BLOCKED_STOCK, { service: 'glycopharm' });
           await queryRunner.release();
           return errorResponse(res, 400, 'PRODUCT_OUT_OF_STOCK', VALIDATION_ERRORS.PRODUCT_OUT_OF_STOCK, {
             outOfStockProductIds: outOfStockItems,
@@ -372,6 +384,7 @@ export function createCheckoutController(
 
         for (const pp of privateDistProducts) {
           if (!pp.allowed_seller_ids || !pp.allowed_seller_ids.includes(pharmacy.id)) {
+            opsMetrics.inc(OPS.CHECKOUT_BLOCKED_DISTRIBUTION, { service: 'glycopharm' });
             await queryRunner.release();
             return errorResponse(res, 403, 'DISTRIBUTION_FORBIDDEN', VALIDATION_ERRORS.DISTRIBUTION_FORBIDDEN, {
               productId: pp.external_product_id,
@@ -484,6 +497,7 @@ export function createCheckoutController(
 
               const currentSold = soldResult[0]?.sold || 0;
               if (currentSold + requestedItem.quantity > mapping.sales_limit!) {
+                opsMetrics.inc(OPS.CHECKOUT_BLOCKED_SALES_LIMIT, { service: 'glycopharm' });
                 await queryRunner.rollbackTransaction();
                 await queryRunner.release();
                 return errorResponse(res, 400, 'SALES_LIMIT_EXCEEDED', VALIDATION_ERRORS.SALES_LIMIT_EXCEEDED, {
@@ -531,6 +545,8 @@ export function createCheckoutController(
           // ================================================================
           // 7. 응답 (트랜잭션 외부)
           // ================================================================
+          opsMetrics.inc(OPS.CHECKOUT_SUCCESS, { service: 'glycopharm' });
+
           logger.info('[GlycoPharm Checkout] Order created:', {
             orderId: savedOrder.id,
             orderNumber: savedOrder.orderNumber,
@@ -576,6 +592,7 @@ export function createCheckoutController(
           throw txError;
         }
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.CHECKOUT_ERROR, { service: 'glycopharm' });
         const err = error as Error;
         logger.error('[GlycoPharm Checkout] Create order error:', err);
         errorResponse(res, 500, 'ORDER_CREATE_ERROR', 'Failed to create order', {

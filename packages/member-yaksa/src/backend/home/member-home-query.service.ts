@@ -278,6 +278,7 @@ export class MemberHomeQueryService {
         LEFT JOIN yaksa_communities c
           ON c.id = (p.metadata->'yaksa'->>'communityId')::uuid
         WHERE p.status = 'publish'
+          AND p.organization_id IS NULL
           AND (p.metadata->'yaksa'->>'isAnnouncement')::boolean IS NOT TRUE
         ORDER BY p."createdAt" DESC
         LIMIT 5

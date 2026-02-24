@@ -24,6 +24,7 @@ import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/T
 import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 
 function errorResponse(
   res: Response,
@@ -98,6 +99,8 @@ export function createCosmeticsPaymentController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
         }
 
+        opsMetrics.inc(OPS.PAYMENT_PREPARE, { service: 'cosmetics' });
+
         const { orderId, successUrl, failUrl } = req.body;
 
         // 주문 조회 및 소유권 확인
@@ -148,6 +151,7 @@ export function createCosmeticsPaymentController(
           },
         });
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.PAYMENT_PREPARE_ERROR, { service: 'cosmetics' });
         const err = error as Error;
         logger.error('[Cosmetics Payment] Prepare error:', err);
         errorResponse(res, 500, 'PAYMENT_PREPARE_ERROR', 'Failed to prepare payment');
@@ -204,6 +208,8 @@ export function createCosmeticsPaymentController(
           order.id,
         );
 
+        opsMetrics.inc(OPS.PAYMENT_CONFIRM_SUCCESS, { service: 'cosmetics' });
+
         logger.info('[Cosmetics Payment] Payment confirmed', {
           paymentId: payment.id,
           orderId: order.id,
@@ -225,6 +231,7 @@ export function createCosmeticsPaymentController(
           },
         });
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.PAYMENT_CONFIRM_FAILED, { service: 'cosmetics' });
         const err = error as Error;
         logger.error('[Cosmetics Payment] Confirm error:', err);
 
@@ -258,6 +265,7 @@ export function createCosmeticsPaymentController(
               },
             });
           }
+          opsMetrics.inc(OPS.PAYMENT_DUPLICATE_BLOCKED, { service: 'cosmetics' });
           return errorResponse(res, 409, 'DUPLICATE_PAYMENT', 'Payment with this key already exists');
         }
 

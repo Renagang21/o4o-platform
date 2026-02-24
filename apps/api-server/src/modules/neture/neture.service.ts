@@ -11,6 +11,9 @@ import {
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NeturePartnerDashboardItem,
+  NetureSellerPartnerContract,
+  ContractStatus,
+  ContractTerminatedBy,
   SupplierStatus,
   PartnershipStatus,
   SupplierRequestStatus,
@@ -36,6 +39,7 @@ export class NetureService {
   private _requestEventRepo?: Repository<NetureSupplierRequestEvent>;
   private _recruitmentRepo?: Repository<NeturePartnerRecruitment>;
   private _applicationRepo?: Repository<NeturePartnerApplication>;
+  private _contractRepo?: Repository<NetureSellerPartnerContract>;
 
   private get supplierRepo(): Repository<NetureSupplier> {
     if (!this._supplierRepo) {
@@ -98,6 +102,13 @@ export class NetureService {
       this._applicationRepo = AppDataSource.getRepository(NeturePartnerApplication);
     }
     return this._applicationRepo;
+  }
+
+  private get contractRepo(): Repository<NetureSellerPartnerContract> {
+    if (!this._contractRepo) {
+      this._contractRepo = AppDataSource.getRepository(NetureSellerPartnerContract);
+    }
+    return this._contractRepo;
   }
 
   // ==================== User-Supplier Linking ====================
@@ -2672,6 +2683,7 @@ export class NetureService {
    */
   async approvePartnerApplication(applicationId: string, sellerId: string) {
     try {
+      // 사전 검증 (트랜잭션 외부 — read-only 검증)
       const application = await this.applicationRepo.findOne({ where: { id: applicationId } });
       if (!application) {
         throw new Error('APPLICATION_NOT_FOUND');
@@ -2680,7 +2692,6 @@ export class NetureService {
         throw new Error('INVALID_STATUS');
       }
 
-      // 모집 주체 확인
       const recruitment = await this.recruitmentRepo.findOne({ where: { id: application.recruitmentId } });
       if (!recruitment) {
         throw new Error('RECRUITMENT_NOT_FOUND');
@@ -2689,28 +2700,53 @@ export class NetureService {
         throw new Error('NOT_RECRUITMENT_OWNER');
       }
 
-      // 승인 처리
-      application.status = ApplicationStatus.APPROVED;
-      application.decidedAt = new Date();
-      application.decidedBy = sellerId;
-      await this.applicationRepo.save(application);
-
-      // 파트너 대시보드에 자동 등록
-      const dashboardRepo = AppDataSource.getRepository(NeturePartnerDashboardItem);
-      const existingItem = await dashboardRepo.findOne({
-        where: { partnerUserId: application.partnerId, productId: recruitment.productId },
-      });
-
-      if (!existingItem) {
-        const item = dashboardRepo.create({
-          partnerUserId: application.partnerId,
-          productId: recruitment.productId,
-          serviceId: recruitment.serviceId || 'glycopharm',
-          status: 'active',
+      // 트랜잭션: 승인 + 계약 생성 + 대시보드 등록 (WO-NETURE-SELLER-PARTNER-CONTRACT-ATOMICITY-PATCH-V1)
+      await AppDataSource.transaction(async (manager) => {
+        // 1. Active 계약 중복 체크 (선행)
+        const txContractRepo = manager.getRepository(NetureSellerPartnerContract);
+        const existingContract = await txContractRepo.findOne({
+          where: { sellerId: recruitment.sellerId, partnerId: application.partnerId, contractStatus: ContractStatus.ACTIVE },
         });
-        await dashboardRepo.save(item);
-        logger.info(`[NetureService] Auto-added dashboard item for partner ${application.partnerId}`);
-      }
+        if (existingContract) {
+          throw new Error('ACTIVE_CONTRACT_EXISTS');
+        }
+
+        // 2. Application 승인
+        const txApplicationRepo = manager.getRepository(NeturePartnerApplication);
+        application.status = ApplicationStatus.APPROVED;
+        application.decidedAt = new Date();
+        application.decidedBy = sellerId;
+        await txApplicationRepo.save(application);
+
+        // 3. 계약 생성
+        const contract = txContractRepo.create({
+          sellerId: recruitment.sellerId,
+          partnerId: application.partnerId,
+          recruitmentId: recruitment.id,
+          applicationId: application.id,
+          commissionRate: recruitment.commissionRate,
+          startedAt: new Date(),
+        });
+        await txContractRepo.save(contract);
+        logger.info(`[NetureService] Contract created: ${contract.id} (seller=${recruitment.sellerId}, partner=${application.partnerId})`);
+
+        // 4. 파트너 대시보드에 자동 등록
+        const txDashboardRepo = manager.getRepository(NeturePartnerDashboardItem);
+        const existingItem = await txDashboardRepo.findOne({
+          where: { partnerUserId: application.partnerId, productId: recruitment.productId },
+        });
+
+        if (!existingItem) {
+          const item = txDashboardRepo.create({
+            partnerUserId: application.partnerId,
+            productId: recruitment.productId,
+            serviceId: recruitment.serviceId || 'glycopharm',
+            status: 'active',
+          });
+          await txDashboardRepo.save(item);
+          logger.info(`[NetureService] Auto-added dashboard item for partner ${application.partnerId}`);
+        }
+      });
 
       return { id: application.id, status: application.status };
     } catch (error) {
@@ -2752,5 +2788,91 @@ export class NetureService {
       logger.error('[NetureService] Error rejecting partner application:', error);
       throw error;
     }
+  }
+
+  // ==================== Seller-Partner Contracts (WO-NETURE-SELLER-PARTNER-CONTRACT-V1) ====================
+
+  /**
+   * 계약 해지 (seller 또는 partner)
+   */
+  async terminateContract(
+    contractId: string,
+    actorId: string,
+    actorType: 'seller' | 'partner',
+  ) {
+    const where =
+      actorType === 'seller'
+        ? { id: contractId, sellerId: actorId }
+        : { id: contractId, partnerId: actorId };
+
+    const contract = await this.contractRepo.findOne({ where });
+    if (!contract) {
+      throw new Error('CONTRACT_NOT_FOUND');
+    }
+    if (contract.contractStatus !== ContractStatus.ACTIVE) {
+      throw new Error('CONTRACT_NOT_ACTIVE');
+    }
+
+    contract.contractStatus = ContractStatus.TERMINATED;
+    contract.terminatedBy = actorType === 'seller' ? ContractTerminatedBy.SELLER : ContractTerminatedBy.PARTNER;
+    contract.endedAt = new Date();
+    const saved = await this.contractRepo.save(contract);
+
+    logger.info(`[NetureService] Contract terminated: ${contractId} by ${actorType} ${actorId}`);
+    return saved;
+  }
+
+  /**
+   * Seller 계약 목록 조회
+   */
+  async getSellerContracts(sellerId: string, status?: string) {
+    const where: Record<string, any> = { sellerId };
+    if (status && Object.values(ContractStatus).includes(status as ContractStatus)) {
+      where.contractStatus = status;
+    }
+    return this.contractRepo.find({ where, order: { createdAt: 'DESC' } });
+  }
+
+  /**
+   * Partner 계약 목록 조회
+   */
+  async getPartnerContracts(partnerId: string, status?: string) {
+    const where: Record<string, any> = { partnerId };
+    if (status && Object.values(ContractStatus).includes(status as ContractStatus)) {
+      where.contractStatus = status;
+    }
+    return this.contractRepo.find({ where, order: { createdAt: 'DESC' } });
+  }
+
+  /**
+   * 수수료 변경 (기존 계약 terminated → 신규 계약 생성)
+   */
+  async updateCommissionRate(contractId: string, newRate: number, sellerId: string) {
+    const existing = await this.contractRepo.findOne({
+      where: { id: contractId, sellerId, contractStatus: ContractStatus.ACTIVE },
+    });
+    if (!existing) {
+      throw new Error('ACTIVE_CONTRACT_NOT_FOUND');
+    }
+
+    // 기존 계약 종료
+    existing.contractStatus = ContractStatus.TERMINATED;
+    existing.terminatedBy = ContractTerminatedBy.SELLER;
+    existing.endedAt = new Date();
+    await this.contractRepo.save(existing);
+
+    // 신규 계약 생성 (새 commission_rate)
+    const newContract = this.contractRepo.create({
+      sellerId: existing.sellerId,
+      partnerId: existing.partnerId,
+      recruitmentId: existing.recruitmentId,
+      applicationId: existing.applicationId,
+      commissionRate: newRate,
+      startedAt: new Date(),
+    });
+    const saved = await this.contractRepo.save(newContract);
+
+    logger.info(`[NetureService] Commission updated: old=${contractId} terminated, new=${saved.id} rate=${newRate}`);
+    return { terminated: { id: existing.id }, created: saved };
   }
 }

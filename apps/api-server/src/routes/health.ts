@@ -1,5 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
+import { getRedisClient } from '../infrastructure/redis.guard.js';
+import { opsMetrics } from '../services/ops-metrics.service.js';
 import * as os from 'os';
 
 const router: Router = Router();
@@ -291,31 +293,33 @@ async function checkDatabaseHealth(): Promise<HealthComponent> {
   const start = Date.now();
   
   try {
-    // Test basic connectivity
+    // Ping for latency measurement
     await AppDataSource.query('SELECT 1');
-    
+    const pingMs = Date.now() - start;
+
     // Check database version
     const versionResult = await AppDataSource.query('SELECT version()');
-    
+
     // Check active connections
     const connectionsResult = await AppDataSource.query('SELECT count(*) FROM pg_stat_activity');
-    
+
     // Check for long-running queries
     const longQueriesResult = await AppDataSource.query(`
-      SELECT count(*) as count 
-      FROM pg_stat_activity 
+      SELECT count(*) as count
+      FROM pg_stat_activity
       WHERE state = 'active' AND query_start < now() - interval '5 minutes'
     `);
-    
+
     const responseTime = Date.now() - start;
     const longQueries = parseInt(longQueriesResult[0].count);
-    
+
     return {
       component: 'database',
-      status: longQueries > 5 ? 'degraded' : 'healthy',
+      status: longQueries > 5 ? 'degraded' : (pingMs > 500 ? 'degraded' : 'healthy'),
       responseTime,
       details: {
         version: versionResult[0].version.split(' ')[1],
+        pingMs,
         activeConnections: parseInt(connectionsResult[0].count),
         longRunningQueries: longQueries
       },
@@ -453,36 +457,50 @@ async function checkDiskHealth(): Promise<HealthComponent> {
 
 async function checkRedisHealth(): Promise<HealthComponent> {
   const start = Date.now();
-  
+
   try {
-    // Check if Redis environment variables are configured
-    const redisHost = process.env.REDIS_HOST;
-    const redisPort = process.env.REDIS_PORT;
-    
-    if (!redisHost || !redisPort) {
+    const client = getRedisClient();
+
+    if (!client) {
       return {
         component: 'redis',
         status: 'not_configured',
         responseTime: Date.now() - start,
         details: {
-          message: 'Redis is not configured. Set REDIS_HOST and REDIS_PORT environment variables.'
+          message: 'Redis not configured or not connected',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
-    
-    // For now, return not configured status since Redis is optional
-    // When Redis is implemented, add actual connection check here
+
+    // PING to measure actual latency
+    await client.ping();
+    const latencyMs = Date.now() - start;
+
+    // Cache hit ratio from OpsMetrics snapshot
+    const snapshot = opsMetrics.snapshot();
+    const hits = snapshot['cache.hit'] || 0;
+    const misses = snapshot['cache.miss'] || 0;
+    const errors = snapshot['cache.error'] || 0;
+    const total = hits + misses;
+    const hitRate = total > 0 ? Math.round((hits / total) * 10000) / 100 : null;
+
     return {
       component: 'redis',
-      status: 'not_configured',
-      responseTime: Date.now() - start,
+      status: latencyMs > 200 ? 'degraded' : 'healthy',
+      responseTime: latencyMs,
       details: {
-        host: redisHost,
-        port: redisPort,
-        message: 'Redis connection not implemented yet'
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        pingMs: latencyMs,
+        cache: {
+          hits,
+          misses,
+          errors,
+          hitRate,
+        },
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   } catch (error: any) {
     return {
@@ -490,7 +508,7 @@ async function checkRedisHealth(): Promise<HealthComponent> {
       status: 'unhealthy',
       responseTime: Date.now() - start,
       error: error instanceof Error ? error.message : 'Redis check failed',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }

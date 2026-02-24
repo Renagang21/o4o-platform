@@ -36,12 +36,16 @@ import { optionalAuth, requireAdmin, requireAuth } from '../../middleware/auth.m
 import type { AuthRequest } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-CMS-TRANSITION-CENTRALIZATION-V1
+import { CmsContentService, StatusValidationError, StatusTransitionError } from './cms-content.service.js';
 
 /**
  * Create CMS Content routes
  */
 export function createCmsContentRoutes(dataSource: DataSource): Router {
   const router = Router();
+  // WO-O4O-CMS-TRANSITION-CENTRALIZATION-V1: centralized status transition service
+  const cmsContentService = new CmsContentService(dataSource);
 
   /**
    * GET /cms/stats
@@ -100,6 +104,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         contentRepo.count({ where: { ...baseWhere, type: 'event', status: 'published' } }),
       ]);
 
+      // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: pending count across all types
+      const pendingTotal = await contentRepo.count({
+        where: { ...baseWhere, status: 'pending' as any },
+      });
+
       // Calculate combined stats
       const eventNoticeTotal = noticeTotal + eventTotal;
       const eventNoticeActive = noticeActive + eventActive;
@@ -115,6 +124,8 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
           event: { total: eventTotal, active: eventActive },
           // Combined for Glycopharm dashboard compatibility
           eventNotice: { total: eventNoticeTotal, active: eventNoticeActive },
+          // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1
+          pendingApproval: pendingTotal,
         },
         scope: {
           serviceKey: serviceKey || null,
@@ -691,26 +702,15 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
    * - published -> archived
    * - draft -> archived
    */
+  // WO-O4O-CMS-TRANSITION-CENTRALIZATION-V1: delegated to CmsContentService
   router.patch('/contents/:id/status', requireAdmin, async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const { status } = req.body;
 
-      if (!status || !['draft', 'published', 'archived'].includes(status)) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Valid status required: draft, published, or archived' },
-        });
-        return;
-      }
+      const updated = await cmsContentService.transitionContentStatus(id, status);
 
-      const contentRepo = dataSource.getRepository(CmsContent);
-
-      const content = await contentRepo.findOne({
-        where: { id },
-      });
-
-      if (!content) {
+      if (!updated) {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },
@@ -718,40 +718,25 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      // Validate status transitions
-      const currentStatus = content.status;
-      const validTransitions: Record<string, string[]> = {
-        draft: ['published', 'archived'],
-        published: ['archived'],
-        archived: [], // No transitions from archived
-      };
-
-      if (!validTransitions[currentStatus]?.includes(status)) {
-        res.status(400).json({
-          success: false,
-          error: {
-            code: 'INVALID_TRANSITION',
-            message: `Cannot transition from ${currentStatus} to ${status}`,
-          },
-        });
-        return;
-      }
-
-      // Update status
-      content.status = status as ContentStatus;
-
-      // Set publishedAt when publishing
-      if (status === 'published' && !content.publishedAt) {
-        content.publishedAt = new Date();
-      }
-
-      const updated = await contentRepo.save(content);
-
       res.json({
         success: true,
         data: updated,
       });
     } catch (error: any) {
+      if (error instanceof StatusValidationError) {
+        res.status(400).json({
+          success: false,
+          error: { code: error.code, message: error.message },
+        });
+        return;
+      }
+      if (error instanceof StatusTransitionError) {
+        res.status(400).json({
+          success: false,
+          error: { code: error.code, message: error.message },
+        });
+        return;
+      }
       console.error('Failed to update CMS content status:', error);
       res.status(500).json({
         success: false,

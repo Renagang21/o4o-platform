@@ -3,9 +3,11 @@
  *
  * WO-KCOS-STORES-PHASE2-ORDER-ATTRIBUTION-V1
  * WO-O4O-STORE-TEMPLATE-V1_1-EXTRACTION (refactored to use store-core)
+ * WO-KPI-SERVICE-KEY-ISOLATION-V1
  *
  * KPI aggregation for store dashboards.
  * Uses StoreSummaryEngine from @o4o/store-core with a Cosmetics-specific adapter.
+ * All queries filter by metadata->>'serviceKey' = 'cosmetics' to prevent cross-service KPI contamination.
  */
 
 import { DataSource } from 'typeorm';
@@ -49,6 +51,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
       `SELECT COUNT(*)::int as count, COALESCE(SUM("totalAmount"), 0)::numeric as revenue
        FROM ecommerce_orders
        WHERE store_id = $1
+         AND metadata->>'serviceKey' = 'cosmetics'
          ${dateFilter}
          AND status != 'cancelled'`,
       params,
@@ -68,6 +71,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
          COALESCE(SUM("totalAmount"), 0)::numeric as revenue
        FROM ecommerce_orders
        WHERE store_id = $1
+         AND metadata->>'serviceKey' = 'cosmetics'
          AND "createdAt" >= $2
          AND status != 'cancelled'
        GROUP BY channel
@@ -82,6 +86,13 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
     }));
   }
 
+  /**
+   * WO-STORE-LOCAL-PRODUCT-HARDENING-V1: KPI 오염 방지
+   * 이 쿼리는 ecommerce_order_items만 집계한다.
+   * StoreLocalProduct(store_local_products)는 Display Domain이며
+   * ecommerce_order_items에 진입할 수 없으므로 KPI에 포함되지 않는다.
+   * → store_local_products 오염 경로 없음 (구조적 보장)
+   */
   async getTopProducts(storeId: string, limit: number, from: Date): Promise<TopProduct[]> {
     const rows = await this.dataSource.query(
       `SELECT
@@ -92,6 +103,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
        FROM ecommerce_order_items oi
        INNER JOIN ecommerce_orders o ON o.id = oi."orderId"
        WHERE o.store_id = $1
+         AND o.metadata->>'serviceKey' = 'cosmetics'
          AND o."createdAt" >= $2
          AND o.status != 'cancelled'
        GROUP BY oi."productId", oi."productName"
@@ -113,6 +125,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
       `SELECT id, "orderNumber", "totalAmount", status, channel, "createdAt"
        FROM ecommerce_orders
        WHERE store_id = $1
+         AND metadata->>'serviceKey' = 'cosmetics'
        ORDER BY "createdAt" DESC
        LIMIT $2`,
       [storeId, limit],
@@ -133,6 +146,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
       `SELECT COUNT(*)::int as count
        FROM ecommerce_orders
        WHERE store_id = $1
+         AND metadata->>'serviceKey' = 'cosmetics'
          AND status != 'cancelled'`,
       [storeId],
     );
@@ -145,6 +159,7 @@ export class CosmeticsStoreDataAdapter implements StoreDataAdapter {
       `SELECT COALESCE(SUM("totalAmount"), 0)::numeric as revenue
        FROM ecommerce_orders
        WHERE store_id = $1
+         AND metadata->>'serviceKey' = 'cosmetics'
          AND "createdAt" >= $2
          AND "createdAt" < $3
          AND status != 'cancelled'`,
@@ -200,6 +215,7 @@ export class CosmeticsStoreSummaryService {
        FROM ecommerce_orders
        WHERE store_id IS NOT NULL
          AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
+         AND metadata->>'serviceKey' = 'cosmetics'
          AND status IN ('created', 'pending_payment', 'paid', 'confirmed', 'processing', 'shipped')`,
     );
 
@@ -208,6 +224,7 @@ export class CosmeticsStoreSummaryService {
        FROM ecommerce_orders
        WHERE store_id IS NOT NULL
          AND store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
+         AND metadata->>'serviceKey' = 'cosmetics'
          AND "createdAt" >= $1
          AND status != 'cancelled'`,
       [monthStart.toISOString()],
@@ -218,6 +235,7 @@ export class CosmeticsStoreSummaryService {
        FROM ecommerce_orders o
        WHERE o.store_id IS NOT NULL
          AND o.store_id IN (SELECT id FROM cosmetics.cosmetics_stores)
+         AND o.metadata->>'serviceKey' = 'cosmetics'
        ORDER BY o."createdAt" DESC
        LIMIT 5`,
     );

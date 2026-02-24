@@ -24,6 +24,7 @@ import { TossPaymentProviderAdapter } from '../../../services/payment/adapters/T
 import { EventHubPaymentPublisher } from '../../../services/payment/adapters/EventHubPaymentPublisher.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 
 function errorResponse(
   res: Response,
@@ -98,6 +99,8 @@ export function createGlycopharmPaymentController(
           return errorResponse(res, 401, 'UNAUTHORIZED', 'Authentication required');
         }
 
+        opsMetrics.inc(OPS.PAYMENT_PREPARE, { service: 'glycopharm' });
+
         const { orderId, successUrl, failUrl } = req.body;
 
         // 주문 조회 및 소유권 확인
@@ -148,6 +151,7 @@ export function createGlycopharmPaymentController(
           },
         });
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.PAYMENT_PREPARE_ERROR, { service: 'glycopharm' });
         const err = error as Error;
         logger.error('[GlycoPharm Payment] Prepare error:', err);
         errorResponse(res, 500, 'PAYMENT_PREPARE_ERROR', 'Failed to prepare payment');
@@ -198,6 +202,8 @@ export function createGlycopharmPaymentController(
           order.id,
         );
 
+        opsMetrics.inc(OPS.PAYMENT_CONFIRM_SUCCESS, { service: 'glycopharm' });
+
         logger.info('[GlycoPharm Payment] Payment confirmed', {
           paymentId: payment.id,
           orderId: order.id,
@@ -219,6 +225,7 @@ export function createGlycopharmPaymentController(
           },
         });
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.PAYMENT_CONFIRM_FAILED, { service: 'glycopharm' });
         const err = error as Error;
         logger.error('[GlycoPharm Payment] Confirm error:', err);
 
@@ -252,6 +259,7 @@ export function createGlycopharmPaymentController(
               },
             });
           }
+          opsMetrics.inc(OPS.PAYMENT_DUPLICATE_BLOCKED, { service: 'glycopharm' });
           return errorResponse(res, 409, 'DUPLICATE_PAYMENT', 'Payment with this key already exists');
         }
 

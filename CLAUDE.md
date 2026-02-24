@@ -1,117 +1,60 @@
-# CLAUDE.md – O4O Platform Development Constitution (v4.0)
+# CLAUDE.md – O4O Platform Development Constitution
 
 > **이 문서는 O4O Platform에서 모든 개발(사람/AI)을 지배하는 최상위 규칙이다.**
-> 다른 모든 문서, 가이드, 예시는 본 문서에 종속된다.
-> **충돌 시 항상 CLAUDE.md가 우선한다.**
+> 충돌 시 항상 CLAUDE.md가 우선한다.
 
 ---
 
-## 0. 이 문서의 지위 (중요)
+## 0. 환경 원칙 (CRITICAL)
 
-* CLAUDE.md는 **플랫폼 헌법(Constitution)** 이다.
-* App / Service / Core / Extension / Infra 구분 없이 **모든 코드 변경은 본 규칙을 따른다.**
-* 문서가 아닌 **실제 코드와 운영을 지배하는 규칙**이다.
-
----
-
-## 0.1. 환경 기본 원칙 (CRITICAL)
-
-> **⚠️ 2026-01-29부터 기본 환경은 프로덕션이다.**
-
-* **모든 작업은 프로덕션 환경 기준**
-* **모든 데이터는 프로덕션 데이터베이스에 등록**
-* **마이그레이션은 즉시 프로덕션 실행**
-* 로컬 개발/테스트는 명시적으로 요청된 경우에만
-
-### 프로덕션 데이터베이스
+> **기본 환경은 프로덕션이다.** (2026-01-29~)
 
 | 항목 | 값 |
 |------|------|
 | Instance | `o4o-platform-db` |
 | Host | `34.64.96.252` |
 | Database | `o4o_platform` |
-| Zone | `asia-northeast3-a` |
 
-### 프로덕션 DB 접근 정책 (STRICT)
+**DB 접근 정책:**
+- ✅ Cloud Run 내부 / Admin API / Google Cloud Console
+- ❌ 로컬 psql / 로컬 scripts — **절대 금지** (방화벽 차단)
 
-**⚠️ 로컬 → 프로덕션 DB 직접 연결 금지**
-
-| 접근 방법 | 허용 여부 | 이유 |
-|-----------|-----------|------|
-| 로컬 psql 클라이언트 | ❌ BLOCKED | 방화벽 차단, 보안 |
-| 로컬 migration scripts | ❌ BLOCKED | 타임아웃, 감사 불가 |
-| Cloud Run 내부 | ✅ ALLOWED | 안전, 로그 남음 |
-| Admin API 엔드포인트 | ✅ ALLOWED | 권한 체크, 감사 |
-| Google Cloud Console | ✅ ALLOWED | 공식 도구 |
-
-**이전 동작 (2026-01-29 이전):**
-- 로컬에서 `tsx src/scripts/*.ts` 실행 가능했음
-- 방화벽이 열려있었음
-- 이제는 보안상 차단됨 (**정상 동작**)
-
-### 로컬 환경 제약사항
-
-**로컬 개발 머신 (Windows):**
-- `psql` 클라이언트 없음
-- 프로덕션 DB 직접 연결 **불가능** (방화벽/타임아웃)
-- 로컬 스크립트로 프로덕션 DB 접근 **금지**
-
-**프로덕션 DB 작업 방법 (우선순위순):**
-1. **CI/CD 자동 실행** (TypeORM migration:run) — main 배포 시 자동
-2. **Admin API 엔드포인트** — 긴급 수동 실행
-3. **Google Cloud Console SQL Editor** — SQL 직접 실행
-4. ❌ ~~로컬 스크립트~~ — **절대 금지**
-
-### 마이그레이션 실행 원칙
-
-1. **자동 실행 (권장)**: main 브랜치 배포 → CI/CD가 자동 실행
-2. **수동 실행 (긴급)**: Admin API 엔드포인트 호출
-3. **SQL 직접**: Google Cloud Console SQL Editor
-4. ❌ 로컬 psql/scripts 사용 금지
+**마이그레이션:** main 배포 → CI/CD 자동 실행 (권장) | 긴급 시 Admin API 또는 Cloud Console SQL Editor
 
 > 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
 ---
 
-## 1. 브랜치 전략
+## 1. 개발 기본 규칙
 
-| 브랜치 | 역할 |
-|--------|------|
-| `main` | 프로덕션 안정 |
-| `develop` | 통합 테스트 |
-| `feature/*` | 모든 기능 개발 (**필수**) |
+### 브랜치 전략
 
-> ⚠ `develop` 브랜치에서 직접 기능 개발 금지
-> ⚠ 모든 작업은 반드시 `feature/*`에서 시작한다
+`main`(프로덕션) / `develop`(통합) / `feature/*`(모든 기능 개발 필수)
+- develop 직접 개발 금지. 모든 작업은 `feature/*`에서 시작
 
----
-
-## 2. 서비스 상태 체계
-
-| 상태 | 정의 |
-|------|------|
-| **Active** | Template 존재 + 실사용 |
-| **Development** | Template 존재 또는 핵심 앱 준비 |
-| **Experimental** | 명시적 experimental 표식 |
-| **Planned** | ServiceGroup만 정의 |
-| **Legacy** | 12개월 이상 비활성 |
-| **Deprecated** | 제거 일정 확정 |
-
----
-
-## 3. App 계층 구조 (절대 규칙)
+### App 계층 (절대 규칙)
 
 ```
 Core → Extension → Feature → Service
 ```
+역방향 의존 금지
 
-**금지**: Core → Extension, Core → Service, Extension → Service 방향 의존성
+### Work Order 필수 구조
+
+```
+조사 → 문제확정 → 최소 수정 → 검증 → 종료
+```
+
+### API 호출 규칙
+
+- `authClient.api.get()` / `authClient.api.post()` 필수
+- 환경변수 직접 사용 금지, 하드코딩 URL 금지
 
 ---
 
-## 4. TypeORM Entity – ESM Mandatory Rules (FROZEN)
+## 2. TypeORM Entity – ESM Rules (FROZEN)
 
-> **위반 시 API 서버 기동 실패 및 즉시 롤백 대상**
+> 위반 시 API 서버 기동 실패
 
 ```typescript
 // ❌ FORBIDDEN
@@ -123,31 +66,17 @@ import type { RelatedEntity } from './related.entity.js';
 @ManyToOne('RelatedEntity', 'property')
 ```
 
-> 📄 상세: `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md`
+---
+
+## 3. Core 동결 정책
+
+동결 Core: `cms-core`, `auth-core`, `platform-core`, `organization-core`
+
+구조/테이블 변경 금지. 명시적 WO 승인 필요.
 
 ---
 
-## 5. Core 동결 정책
-
-동결된 Core: `cms-core`, `auth-core`, `platform-core`, `organization-core`
-
-❌ 구조/테이블 변경 금지 | ⭕ 명시적 승인 필요
-
----
-
-## 6. Work Order 필수 구조
-
-```
-조사 → 문제확정 → 최소 수정 → 검증 → 종료
-```
-
-> 모든 WO는 위 5단계를 준수한다.
-
----
-
-## 7. E-commerce Core 절대 규칙
-
-> 주문/결제 기능이 있는 모든 서비스는 예외 없이 준수
+## 4. E-commerce Core 규칙
 
 | 원칙 | 설명 |
 |------|------|
@@ -155,19 +84,24 @@ import type { RelatedEntity } from './related.entity.js';
 | OrderType 불변 | 생성 시 결정, 이후 변경 금지 |
 | 금지 테이블 | `*_orders`, `*_payments` 생성 금지 |
 
-**OrderType**:
-| 서비스 | OrderType | 상태 |
-|--------|-----------|------|
-| Dropshipping | DROPSHIPPING | ✅ |
-| Cosmetics | COSMETICS | ✅ |
-| Tourism | TOURISM | ✅ |
-| GlycoPharm | GLYCOPHARM | ❌ BLOCKED |
+**OrderType**: DROPSHIPPING ✅ / COSMETICS ✅ / TOURISM ✅ / GLYCOPHARM ❌ BLOCKED
 
 > 📄 상세: `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md`
 
 ---
 
-## 8. 인프라 (GCP Cloud Run)
+## 5. O4O Store & Order
+
+- 모든 매장은 O4O Store Template 사용
+- 모든 주문은 `checkoutService.createOrder()`
+- 독립 주문 테이블 생성 금지
+- 3중 방어: 런타임 Guard + OrderType 계약 + 스키마 검사
+
+> 📄 상세: `docs/architecture/O4O-STORE-RULES.md`
+
+---
+
+## 6. 인프라 (GCP Cloud Run)
 
 | 서비스 | 역할 |
 |--------|------|
@@ -178,470 +112,108 @@ import type { RelatedEntity } from './related.entity.js';
 | `k-cosmetics-web` | K-화장품 |
 | `kpa-society-web` | 약사회 SaaS |
 
-**금지**: Source 배포, PM2, AWS EC2, `43.202.242.215` 참조
+금지: Source 배포, PM2, AWS EC2, `43.202.242.215` 참조
 
 ---
 
-## 9. 문서 정책
+## 7. Boundary Policy (FROZEN)
 
-* CLAUDE.md = 최상위 기준
-* 충돌 시 CLAUDE.md 우선
-* 상세 규칙은 별도 문서 참조
+> 📄 상세: `docs/architecture/O4O-BOUNDARY-POLICY-V1.md`
 
----
+| Domain | Primary Boundary | HUB 소비 |
+|--------|:----------------:|:---------:|
+| **Broadcast** (CMS, Signage) | `serviceKey` | YES |
+| **Community** (Forum) | `organizationId` | NO |
+| **Store Ops** (LocalProduct, Tablet, KPI) | `organizationId` | NO |
+| **Commerce** (Order, Payment) | `storeId` | NO |
 
-## 10. API 호출 규칙
+### Guard Rules — 모든 신규 개발 필수
 
-* **authClient 사용 필수**: `authClient.api.get()`, `authClient.api.post()`
-* 환경변수 직접 사용 금지
-* 하드코딩된 URL 금지
-
----
-
-## 11. Cosmetics Domain Rules
-
-> 📄 상세: `docs/architecture/COSMETICS-DOMAIN-RULES.md`
-
-핵심:
-- 독립 DB 스키마 (`cosmetics_` prefix)
-- 주문은 E-commerce Core 통해 처리 (OrderType: COSMETICS)
-- cosmetics-api: 비즈니스 로직만, JWT 발급 금지
-- cosmetics-web: UI만, DB 접근 금지
+1. **UUID 단독 조회 금지** — Domain Primary Boundary 복합 조건 필수
+2. **Raw SQL Parameter Binding 필수** — String Interpolation 금지
+3. **Domain Primary Boundary 필터 필수** — 모든 쿼리에 적용
+4. **serviceKey 스푸핑 금지** — URL 경로 파라미터에서만 추출
+5. **Cross-domain JOIN 금지** — 명시적 WO 예외 외
 
 ---
 
-## 12. Business Service Rules
-
-> 📄 상세: `docs/architecture/BUSINESS-SERVICE-RULES.md`
-
-핵심:
-- OpenAPI 계약 우선 (코드보다 스펙이 기준)
-- API/Web 템플릿에서 시작 필수
-- 서비스 간 직접 호출/DB 접근 금지
-- 각 서비스는 독립 배포/DB/스키마
-
----
-
-## 13. O4O Store & Order Guardrails
-
-> 📄 상세: `docs/architecture/O4O-STORE-RULES.md`
-
-### 핵심 원칙:
-- **모든 매장은 O4O Store Template 사용**
-- **모든 주문은 checkoutService.createOrder()**
-- **독립 주문 테이블 생성 금지**
-
-### 3중 방어:
-| 레이어 | 방어 수단 |
-|--------|----------|
-| 런타임 | OrderCreationGuard |
-| 계약 | OrderType 강제 |
-| 스키마 | 금지 테이블 검사 |
-
-### Reference Implementation:
-| 매장 | OrderType |
-|------|-----------|
-| Cosmetics | COSMETICS |
-| Tourism | TOURISM |
-
-### GlycoPharm Legacy (Phase 9-A):
-- `glycopharm_orders`: READ-ONLY
-- `OrderType.GLYCOPHARM`: BLOCKED
-- 📄 교훈: `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md`
-
----
-
-## 13-A. Retail Stable Rule (FROZEN)
-
-> **O4O Retail Stable v1.0은 구조적으로 고정된 폐쇄 루프이다.**
-
-> 📄 상세: `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md`
-
-다음 요소는 변경 시 반드시 **설계 Work Order → IR → WO → 구현 → IR 재검증** 절차를 따른다:
-
-1. **Visibility Gate 4중 정의** (`opl.is_active`, `opc.is_active`, `oc.status='APPROVED'`, `p.status='active'`)
-2. **Sales Limit 계산 기준** (`status='PAID'` only)
-3. **Payment atomic transition 방식** (`transitionStatus()` + `internalOrderId`)
-4. **TTL orphan 정리 정책** (15분, CREATED→CANCELLED)
-5. **PaymentCore ↔ Service 계층 분리 구조**
-
-직접 코드 수정 금지. 구조 변경 시 전 구간 게이트 일관성 재검증 필수.
-
-### 고정 계층:
-
-| Layer | 역할 | 인증 |
-|-------|------|------|
-| Hub | 운영 KPI | requireAuth + pharmacy owner |
-| Storefront | 소비자 노출 | Public (GET) |
-| Checkout | 주문 생성 | requireAuth |
-| Payment | 상태 전이 | requireAuth + buyer ownership |
-| Event | 주문 반영 | Internal |
-
----
-
-## 14. 화면 디버깅 규칙 (Alpha 기준)
-
-### 핵심 원칙
+## 8. 화면 디버깅
 
 ```
 ❌ AI가 브라우저 직접 테스트
 ✅ 사람이 관측 → AI가 JSON 분석 → 코드 위치 추적
 ```
 
-### 공식 진단 Entry Point (Alpha)
+진단 Entry Point: `/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
 
-| 분류 | URL / 엔드포인트 | 용도 |
-|------|------------------|------|
-| **Auth 진단** | `/__debug__/auth-bootstrap` | 로그인/세션/토큰 문제 |
-| **시스템 상태** | `/health/detailed` | 전체 컴포넌트 상태 |
-| **DB 상태** | `/health/database` | DB 연결, 버전, 쿼리 |
-| **인증 상태** | `/api/v1/auth/status` | 현재 인증 여부 확인 |
-
-### 표준 진단 루틴
-
-```
-1. 재현: 브라우저에서 문제 확인
-2. JSON 진단: 위 Entry Point 실행 → JSON 복사
-3. 원인 특정: success/error/code 필드 분석
-4. 코드 추적: error.code → 해당 컨트롤러/미들웨어
-5. 수정 후 동일 진단으로 검증
-```
-
-### JSON 응답 표준
-
-```typescript
-// 성공
-{ success: true, data: T }
-
-// 에러 (머신 리더블 code 필수)
-{ success: false, error: "message", code: "ERROR_CODE" }
-```
-
-### Alpha 단계 상태
-
-| 항목 | 상태 | 비고 |
-|------|------|------|
-| `/__debug__/auth-bootstrap` | ✅ 구현됨 | admin-dashboard |
-| `/__debug__/login` | 📋 참고 설계 | 필요 시 구현 |
-| `/__debug__/navigation` | 📋 참고 설계 | 필요 시 구현 |
-| `/__debug__/api` | 📋 참고 설계 | 필요 시 구현 |
-
-> 진단 Entry Point와 루틴은 위 표 참조.
+JSON 응답: `{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
 
 ---
 
-## 15. Design Core 규칙
+## 9. 도메인별 규칙 (참조)
 
-- **모든 신규 화면은 Design Core v1.0 사용**
-- App 내 독자적 디자인 시스템 생성 금지
-- 디자인 변경은 Work Order 통해서만
-
-> 📄 상세: `docs/rules/design-core-governance.md`
-
----
-
-## 16. 플랫폼 개발 기준 참조 규칙 (중요)
-
-> **Content / LMS / Signage / CMS / Extension 관련 개발을 수행할 경우,
-> 반드시 다음 문서를 선행 참조한다.**
-
-### 필수 참조 문서
-
-| 영역 | 문서 | 경로 |
-|------|------|------|
-| Content Core | Content Core 개요 | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| LMS Core | Core-Extension 원칙 + 데이터 소유권 | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
-| LMS Core | API 계약 + 이벤트 표준 | `docs/platform/lms/LMS-CORE-CONTRACT.md` |
-| Navigation | 운영자 대시보드 네비게이션 | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
-| Extension | 일반 가이드 | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
-| Extension | 파트너 가이드 | `docs/platform/extensions/EXTENSION-PARTNER-GUIDE.md` |
-
-### 적용 규칙
-
-1. **선행 참조 필수**: 위 영역 개발 시작 전 해당 문서 확인
-2. **기준 준수**: 문서에 명시된 원칙과 제약을 따름
-3. **일관성 유지**: 기존 패턴과 구조를 벗어나지 않음
-4. **변경 시 승인**: 기준 문서 변경 시 CLAUDE.md 규칙에 따라 승인 필요
-
-### 핵심 원칙 요약
-
-- **Content는 단일 출처**: 모든 콘텐츠는 Content Core를 통해 관리
-- **Core는 불변**: Extension이 Core를 수정하지 않음
-- **데이터 소유권 명확**: Core 데이터와 Extension 데이터 분리
-- **이벤트 기반 통신**: Core → Extension 방향으로 이벤트 발행
-- **통합 네비게이션**: Extension은 통합 사이드바에 메뉴 등록
+| 도메인 | 핵심 제약 | 상세 문서 |
+|--------|----------|----------|
+| **Cosmetics** | 독립 스키마 (`cosmetics_` prefix), E-commerce Core 통해 주문 | `docs/architecture/COSMETICS-DOMAIN-RULES.md` |
+| **Business Service** | OpenAPI 계약 우선, 서비스 간 직접 호출/DB 접근 금지 | `docs/architecture/BUSINESS-SERVICE-RULES.md` |
+| **Retail Stable** | Visibility Gate 4중 정의, Payment atomic transition | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
+| **Design Core** | 모든 신규 화면은 Design Core v1.0, 독자적 디자인 시스템 금지 | `docs/rules/design-core-governance.md` |
 
 ---
 
-## 17. KPA Society 구조 기준
+## 10. KPA Society 구조
 
-> kpa-society 관련 작업(기획, 조사, 개발, 정비)은
-> `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` 문서를 최상위 기준으로 참조한다.
+> 📄 기준: `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md`
 
-### 핵심 구조
+3개 서비스 공존: **커뮤니티**(유지) / **분회 서비스**(유지) / **데모**(제거 예정)
 
-kpa-society.co.kr에는 **3개 서비스**가 공존:
+- 라우트 위치 ≠ 서비스 소속 (Forum은 커뮤니티 서비스의 기능)
+- Account와 Service Membership 분리 원칙
 
-| 서비스 | 상태 | 설명 |
-|--------|------|------|
-| 커뮤니티 서비스 | 유지 | 약사/약대생 커뮤니티 (Forum 포함) |
-| 분회 서비스 | 유지 | 실제 분회 운영 서비스 |
-| 지부/분회 서비스 데모 | 제거 예정 | `/demo` 경로 |
+---
 
-### 준수 규칙
+## 11. 플랫폼 개발 참조
 
-- **라우트 위치 ≠ 서비스 소속**: Forum은 "커뮤니티 서비스"의 기능
-- **상단 메뉴**: 서비스 진입점만 노출 (기능 나열 금지)
-- **혼선 발생 시**: 기준 문서로 즉시 판단
+Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
-### KPA-Society Membership Architecture Reference
-
-kpa-society.co.kr은 하나의 사이트처럼 보이지만,
-회원 구조상 다음 3개의 독립 서비스로 구성된다:
-
-- **SVC-A**: 커뮤니티 (약사 / 약대생)
-- **SVC-B**: 지부/분회 서비스 데모 (제거 예정)
-- **SVC-C**: 분회 서비스 (실서비스)
-
-모든 회원/로그인/승인/권한 논의는
-**"Account와 Service Membership 분리"** 원칙을 따른다.
-
-자세한 기준은 다음 문서를 참조한다:
-
-| 문서 | 경로 |
+| 영역 | 문서 |
 |------|------|
-| 서비스 구조 기준 | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
-| Phase 0 현황 조사 | `docs/reference/kpa-society-auth-current-state.md` |
-| Phase 2 데이터 모델 | `docs/reference/KPA-SOCIETY-PHASE2-MEMBERSHIP-DATA-MODEL.md` |
-| Phase 2 가입/승인 흐름 | `docs/reference/KPA-SOCIETY-PHASE2-SIGNUP-AND-APPROVAL-FLOW.md` |
-| Phase 2 서비스 이동 규칙 | `docs/reference/KPA-SOCIETY-PHASE2-SERVICE-NAVIGATION-RULES.md` |
+| Content Core | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
+| LMS Core | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
+| Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
+| Extension | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
+
+핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신
 
 ---
 
-## 18. APP 표준화 규칙 (Baseline Lock · 2026-02)
+## 12. APP 표준화 (Baseline Lock)
 
-> **O4O 플랫폼은 APP 단위 표준화 구조를 기준선으로 고정한다.**
+모든 APP = `@o4o/types/{app}` + `{App}QueryService` + 표준 UI 패턴
 
-### 핵심 원칙
+| APP | 상태 |
+|-----|------|
+| APP-CONTENT | Frozen |
+| APP-SIGNAGE | Frozen |
+| APP-FORUM | Frozen |
 
-1. **APP 단위가 최상위 기준이다**
-   - O4O는 서비스가 아니라 **APP 단위**로 설계·구현한다
-   - 서비스는 APP를 조합·설정하여 구성한다
-
-2. **표준 APP 구조** — 모든 APP은 아래 3요소를 가진다
-   - `@o4o/types/{app}` : 공통 타입·라벨·상수
-   - `{App}QueryService` : 공통 조회/정렬 로직 (`apps/api-server/src/modules/{app}/`)
-   - 표준 UI 패턴 : APP별 1종 고정
-
-3. **서비스 코드는 얇게 유지한다**
-   - 서비스 라우트/컨트롤러는 **QueryService 호출 + 설정(serviceKey, scope, limit)만** 담당
-   - Raw SQL / 중복 로직 금지
-
-4. **서비스별 UI 예외를 허용하지 않는다**
-   - UI 차이가 필요하면 **APP를 분리**한다
-   - 기존 APP에 조건 분기 추가 금지
-
-### 기준선 APP (Frozen Baseline)
-
-| APP | Types | QueryService | 상태 |
-|-----|-------|-------------|------|
-| APP-CONTENT | `@o4o/types/content` | `ContentQueryService` | Frozen |
-| APP-SIGNAGE | `@o4o/types/signage` | `SignageQueryService` | Frozen |
-| APP-FORUM | `@o4o/types/forum` | `ForumQueryService` | Frozen |
-
-- 이 APP들은 **변경 없는 기준선**으로 취급한다
-- 추가 리팩토링 금지, 예외적 서비스 분기 금지
-- 신규 서비스/앱은 **이 패턴을 그대로 사용**
+서비스 코드는 QueryService 호출 + 설정만. Raw SQL/중복 로직/서비스별 UI 분기 금지.
 
 ---
 
-## 19. 최종 원칙
+## 13. Frozen Baselines
 
-> **새 앱을 만들기 전에,
-> "이게 위 기준을 모두 만족하는가?"를 먼저 확인하라.**
+모든 Freeze 항목 공통: **버그 수정·성능 개선·문서·테스트는 허용. 구조 변경은 명시적 WO 필수.**
 
----
-
-## 20. OPERATOR OS BASELINE (v1) — FROZEN
-
-> **Tag: `o4o-operator-os-baseline-v1` (2026-02-16)**
-> **상세: `docs/baseline/BASELINE-OPERATOR-OS-V1.md`**
-
-다음 Core 패키지는 **구조 동결(Frozen)** 상태이다:
-
-| 패키지 | 역할 | 상태 |
-|--------|------|------|
-| `@o4o/security-core` | 서비스 Scope Guard, 역할 검증 | Frozen |
-| `@o4o/hub-core` | Hub 레이아웃, Signal, QuickAction 체계 | Frozen |
-| `@o4o/ai-core` | AI Insight 오케스트레이터 | Frozen |
-| `@o4o/action-log-core` | 실행 이력 기록 | Frozen |
-| `@o4o/asset-copy-core` | CMS 콘텐츠 복제 | Frozen |
-| `@o4o/operator-ux-core` | 5-Block Operator 대시보드 표준 | Frozen |
-| `@o4o/admin-ux-core` | 4-Block Admin 대시보드 표준 | Frozen |
-
-### 허용되는 변경
-
-- 버그 수정 (Bug fix)
-- 성능 개선 (Performance improvement)
-- 문서 추가 (Documentation)
-- 테스트 추가 (Test addition)
-
-### 금지되는 변경
-
-- 타입/인터페이스 구조 변경
-- 새로운 export 추가
-- 의존성 변경
-- **위 금지 항목은 명시적 Work Order를 통해서만 승인**
-
----
-
-## 21. KPA UX BASELINE (v1) — FROZEN
-
-> **Tag: `v1.00-kpa-ux-baseline` (2026-02-17)**
-> **상세: `docs/baseline/KPA_UX_BASELINE_V1.md`**
-
-KPA Society 3개 서비스 영역 모두 **통합 UX 전환 완료**:
-
-| 영역 | Operator (5-Block) | Admin (4-Block) | 특이사항 |
-|------|-------------------|-----------------|----------|
-| KPA-a (커뮤니티) | Frozen | - | Admin 대시보드 없음 |
-| KPA-b (분회 서비스) | Frozen | Frozen | 4-Block 외부 회계 섹션 |
-| KPA-c (조직관리 데모) | Frozen | Frozen | - |
-
-### 금지 사항
-
-- 커스텀 UI로 회귀
-- Block 구조 변경 (Core Freeze 위반)
-- 독자적 레이아웃 생성
-
-### 허용 사항
-
-- KPI/Quick Actions 항목 조정
-- AI Summary 규칙 추가
-- 4-Block 외부 서비스 고유 섹션 추가
-- 버그 수정, 성능 개선
-
----
-
-## 22. STORE LAYER ARCHITECTURE (v1) — FROZEN
-
-> **WO-O4O-STORE-ARCHITECTURE-FREEZE-V1 (2026-02-22)**
-> **상세: `docs/architecture/STORE-LAYER-ARCHITECTURE.md`**
-
-Store 계층 5개 패키지의 책임 경계와 의존 방향을 고정한다:
-
-| 패키지 | 계층 | 역할 | 소비자 | 상태 |
-|--------|------|------|--------|------|
-| `@o4o/store-ui-core` | Shell | Layout + Menu + Config | web-* | Frozen |
-| `@o4o/store-asset-policy-core` | Policy UI | Snapshot 정책 해석 + UI | web-* | Frozen |
-| `@o4o/store-core` | KPI Engine | Summary + Insights | api-server | Frozen |
-| `@o4o/asset-copy-core` | Snapshot Engine | 복제 엔진 + Entity | api-server | Frozen |
-| `@o4o/hub-core` | Hub Layout | HubLayout + Signal | 일부 web-* | Frozen |
-
-### 의존 방향 (고정)
-
-```
-web-* → store-ui-core, store-asset-policy-core, hub-core
-api-server → store-core, asset-copy-core
-```
-
-### 금지된 의존
-
-- `store-ui-core` → `store-asset-policy-core` (Shell→Policy 역참조)
-- `store-asset-policy-core` → `store-core` (Frontend→Backend 참조)
-- `hub-core` → `store-asset-policy-core` (FROZEN→비동결 참조)
-
-### Snapshot 계약
-
-- **SnapshotType**: `user_copy | hq_forced | campaign_push | template_seed`
-- **LifecycleStatus**: `active | expired | archived`
-- 새 타입/상태 추가 시 policyGate + mapping + filter 동시 정의 필수
-
-### 허용/금지
-
-- 허용: 버그 수정, 성능 개선, 문서, 테스트
-- 금지: Public API 변경, 의존 방향 변경, 책임 경계 위반, 서비스별 분기
-- **금지 항목은 명시적 Work Order를 통해서만 승인**
-
----
-
-## 23. PLATFORM CONTENT POLICY (v1) — BASELINE
-
-> **IR-O4O-PLATFORM-CONTENT-POLICY-FINAL-V1 (2026-02-23)**
-> **상세: `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md`**
-
-HUB에 노출되는 모든 콘텐츠는 도메인(CMS, Signage 등)에 관계없이 **3축 모델**로 관리한다:
-
-| 축 | 값 | 설명 |
-|-----|-----|------|
-| **Producer** | `operator / supplier / community / store` | 제작 주체 |
-| **Visibility** | `global / service / store` | 가시성 범위 |
-| **Service Scope** | `serviceKey = current` | 서비스 격리 |
-
-### Producer 매핑 (도메인 → HUB)
-
-| HUB Producer | CMS `authorRole` | Signage `source` |
-|:---:|:---:|:---:|
-| operator | admin, service_admin | hq |
-| supplier | supplier | supplier |
-| community | community | community |
-| store | (organization scope) | store |
-
-### HUB 탭 정책
-
-```
-전체 | 운영자 | 공급자 | 커뮤니티
-```
-
-- **전체**: producer IN (operator, supplier, community), visibility=global
-- **운영자**: producer=operator, visibility IN (global, service)
-- **공급자**: producer=supplier, visibility=global
-- **커뮤니티**: producer=community, visibility=global
-- Store 콘텐츠는 HUB 탭에 포함되지 않음
-
-### 보안 원칙
-
-- producer/visibility 필드는 서버에서 강제 (클라이언트 입력 무시)
-- PATCH 시 producer/visibility 변경 불가
-- serviceKey는 URL param 기준, body 값 무시
-
----
-
-## 24. CONTENT STABLE (v1)
-
-> **IR-O4O-CONTENT-STABLE-DECLARATION-V1 (2026-02-23)**
-> **상세: `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md`**
-
-콘텐츠 계층(CMS + Signage + HUB 집계 레이어)은 **Stable 상태**이다.
-
-### Stable 구성 요소
-
-| 구성 요소 | 위치 | 상태 |
-|----------|------|------|
-| `HubProducer` / `HubVisibility` / `HubSourceDomain` 타입 | `@o4o/types/hub-content` | Stable |
-| `HubContentItemResponse` / `HubContentListResponse` | `@o4o/types/hub-content` | Stable |
-| Producer ↔ authorRole/source 매핑 | `hub-content.service.ts` | Stable |
-| `HubContentQueryService` 병합 로직 | `api-server/modules/hub-content/` | Stable |
-| `GET /api/v1/hub/contents` API 계약 | `hub-content.controller.ts` | Stable |
-| ServiceKey 격리 정책 | 컨트롤러 + 서비스 | Stable |
-| CMS `visibilityScope IN ('platform','service')` 필터 | 서비스 쿼리 | Stable |
-| Signage `scope = 'global'` 필터 | 서비스 쿼리 | Stable |
-
-### 금지되는 변경 (WO 필수)
-
-- `HubProducer` / `HubVisibility` / `HubSourceDomain` enum 구조 변경
-- Producer ↔ authorRole/source 매핑 변경
-- `HubContentQueryService` 병합 로직 변경
-- serviceKey 격리 정책 변경
-- scope/visibility 필터 정책 변경
-- API 응답 구조 (`HubContentItemResponse`) 변경
-
-### 허용되는 변경
-
-- 버그 수정, 성능 개선 (캐싱 등)
-- UI 표현 개선 (데이터 구조 내)
-- 새로운 `sourceDomain` 추가 (기존 정책 패턴 준수 시)
-- 문서, 테스트 추가
+| # | 대상 | Freeze 일자 | 상세 문서 |
+|---|------|-----------|----------|
+| F1 | **Operator OS** — security-core, hub-core, ai-core, action-log-core, asset-copy-core, operator-ux-core, admin-ux-core | 2026-02-16 | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
+| F2 | **KPA UX** — 3개 서비스 영역 5-Block/4-Block 통합 UX | 2026-02-17 | `docs/baseline/KPA_UX_BASELINE_V1.md` |
+| F3 | **Store Layer** — store-ui-core, store-asset-policy-core, store-core, asset-copy-core, hub-core 의존 방향 | 2026-02-22 | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
+| F4 | **Platform Content Policy** — HUB 3축 모델 (Producer/Visibility/ServiceScope) | 2026-02-23 | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
+| F5 | **Content Stable** — HUB 콘텐츠 타입·매핑·병합 로직·API 계약 | 2026-02-23 | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
+| F6 | **Boundary Policy** — Domain Boundary Matrix + Guard Rules 5개 | 2026-02-24 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
+| F7 | **Neture Partner Contract** — 계약 테이블·ENUM·트랜잭션·Commission 불변 | 2026-02-24 | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
 
 ---
 
@@ -654,26 +226,28 @@ HUB에 노출되는 모든 콘텐츠는 도메인(CMS, Signage 등)에 관계없
 | O4O Store/Order | `docs/architecture/O4O-STORE-RULES.md` |
 | E-commerce 계약 | `docs/baseline/E-COMMERCE-ORDER-CONTRACT.md` |
 | GlycoPharm Legacy | `docs/baseline/legacy/GLYCOPHARM-LEGACY-POSTMORTEM.md` |
-| Store Template | `docs/templates/o4o-store-template/` |
 | ESM Entity 규칙 | `docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md` |
+| Content Core | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
+| LMS Core | `docs/platform/lms/` |
+| Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
+| Extension | `docs/platform/extensions/` |
+| KPA Society 구조 | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
+| KPA 권한 매트릭스 | `docs/baseline/KPA-ROLE-MATRIX-V1.md` |
+| Hub UX 규칙 | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
+| Retail Stable v1.0 | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
+| Operator OS Baseline | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
+| UX Core Freeze | `docs/baseline/UX-CORE-FREEZE-V1.md` |
+| KPA UX Baseline | `docs/baseline/KPA_UX_BASELINE_V1.md` |
+| Store Layer Architecture | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
+| Platform Content Policy | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
+| Content Stable | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
+| Boundary Policy | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
+| Neture Partner Contract | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
 | Design Core | `docs/rules/design-core-governance.md` |
-| **Content Core** | `docs/platform/content-core/CONTENT-CORE-OVERVIEW.md` |
-| **LMS Core** | `docs/platform/lms/` |
-| **Navigation** | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
-| **Extension** | `docs/platform/extensions/` |
-| **KPA Society 구조** | `docs/baseline/KPA-SOCIETY-SERVICE-STRUCTURE.md` |
-| **KPA 권한 매트릭스** | `docs/baseline/KPA-ROLE-MATRIX-V1.md` |
-| **Hub UX 규칙** | `docs/platform/hub/HUB-UX-GUIDELINES-V1.md` |
-| **Retail Stable v1.0** | `docs/platform/architecture/O4O-RETAIL-STABLE-V1.md` |
-| **Operator OS Baseline** | `docs/baseline/BASELINE-OPERATOR-OS-V1.md` |
-| **UX Core Freeze (Operator+Admin)** | `docs/baseline/UX-CORE-FREEZE-V1.md` |
-| **KPA UX Baseline** | `docs/baseline/KPA_UX_BASELINE_V1.md` |
-| **Store Layer Architecture** | `docs/architecture/STORE-LAYER-ARCHITECTURE.md` |
-| **Platform Content Policy** | `docs/baseline/PLATFORM-CONTENT-POLICY-V1.md` |
-| **Content Stable Declaration** | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
+| Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
 
 ---
 
-*Updated: 2026-02-23*
-*Version: 5.5*
+*Updated: 2026-02-24*
+*Version: 6.0*
 *Status: Active Constitution*

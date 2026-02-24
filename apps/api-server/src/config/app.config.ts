@@ -268,6 +268,27 @@ export const paymentConfig = {
 };
 
 /**
+ * B) Beta Configuration — WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
+ *
+ * Controls internal beta features:
+ * - Dev Dashboard periodic log output
+ * - /internal/ops/metrics endpoint
+ * - Slow threshold warn logging
+ */
+export const betaConfig = {
+  enabled: getEnvBoolean('BETA_MODE', false),
+
+  isEnabled: () => betaConfig.enabled,
+
+  getStatus: (): FeatureStatus => ({
+    enabled: betaConfig.enabled,
+    reason: betaConfig.enabled
+      ? 'Internal Beta mode ON — ops metrics active'
+      : 'Beta mode OFF — ops features dormant',
+  }),
+};
+
+/**
  * C) Operational Configuration - Nice-to-have with sensible defaults
  */
 export const operationalConfig = {
@@ -466,6 +487,7 @@ export default {
   queue: queueConfig,
   monitoring: monitoringConfig,
   operational: operationalConfig,
+  beta: betaConfig,
   getStatus: getConfigStatus,
   logStatus: logConfigStatus,
   getEnabledFeatures

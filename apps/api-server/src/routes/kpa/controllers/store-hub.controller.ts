@@ -129,6 +129,11 @@ export function createStoreHubController(
         // ── Section A: Products ──────────────────────────
         // Phase 1: No direct org→pharmacy mapping exists across services.
         // Provide link-only with 0 count (graceful degradation).
+        //
+        // WO-STORE-LOCAL-PRODUCT-HARDENING-V1: KPI 오염 방지
+        // 이 Hub Overview는 서비스별 Commerce Product만 집계한다.
+        // StoreLocalProduct(store_local_products)는 Display Domain이며
+        // 이 KPI 집계에 포함되지 않는다. (별도 Display 관리 API로 조회)
         const products = {
           glycopharm: {
             totalCount: 0,

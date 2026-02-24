@@ -889,10 +889,10 @@ async function copySignageMedia(
     content: original.content,
     tags: original.tags,
     category: original.category,
-    // New media is store-specific and inactive (draft)
+    // New media is store-specific and starts as draft
     source: 'store',
     scope: 'store',
-    status: 'inactive',
+    status: 'draft',
     parentMediaId: original.id,
     // Metadata with source reference and template type
     metadata: {

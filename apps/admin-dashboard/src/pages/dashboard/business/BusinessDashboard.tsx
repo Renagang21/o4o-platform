@@ -174,6 +174,7 @@ const ContentListItem: React.FC<{
 
   const statusColors: Record<ContentStatus, string> = {
     [ContentStatus.DRAFT]: 'bg-gray-100 text-gray-600',
+    [ContentStatus.PENDING]: 'bg-blue-100 text-blue-700',
     [ContentStatus.PUBLISHED]: 'bg-green-100 text-green-700',
     [ContentStatus.ARCHIVED]: 'bg-amber-100 text-amber-700',
   };

@@ -96,12 +96,13 @@ export class SignageMedia {
   category!: string | null;
 
   // ========== Status ==========
+  // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: draft → pending → active → archived
   @Column({
     type: 'varchar',
     length: 20,
-    default: 'active',
+    default: 'draft',
   })
-  status!: 'active' | 'inactive' | 'processing';
+  status!: 'draft' | 'pending' | 'active' | 'archived';
 
   // ========== Global Content (Sprint 2-6) ==========
   /**

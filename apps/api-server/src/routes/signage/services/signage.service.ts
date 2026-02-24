@@ -70,6 +70,8 @@ import type {
   ContentSource,
   ContentScope,
 } from '../dto/index.js';
+import { ALLOWED_STATUS_TRANSITIONS } from '../dto/index.js';
+import type { SignageStatus } from '../dto/index.js';
 
 /**
  * Signage Service
@@ -1176,6 +1178,7 @@ export class SignageService {
   ): Promise<GlobalPlaylistResponseDto> {
     const playlist = await this.repository.createPlaylist({
       ...dto,
+      status: 'draft', // WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: HQ content starts as draft
       serviceKey: scope.serviceKey,
       organizationId: null, // Global content has no organization
       createdByUserId: userId || null,
@@ -1203,7 +1206,7 @@ export class SignageService {
       serviceKey: scope.serviceKey,
       organizationId: null, // Global content has no organization
       createdByUserId: userId || null,
-      status: 'active',
+      status: 'draft',
       source: dto.source,
       scope: dto.scope,
       parentMediaId: null,
@@ -1219,13 +1222,15 @@ export class SignageService {
     dto: UpdateGlobalPlaylistDto,
     scope: ScopeFilter,
   ): Promise<GlobalPlaylistResponseDto | null> {
-    // For global content, we don't filter by organizationId
+    // WO-O4O-SIGNAGE-APPROVAL-HOTFIX-V1: status 변경은 /status 전용 엔드포인트만 허용
+    const { status, ...safeDto } = dto;
+
     const globalScope: ScopeFilter = {
       serviceKey: scope.serviceKey,
       organizationId: undefined,
     };
 
-    const playlist = await this.repository.updatePlaylist(id, dto, globalScope);
+    const playlist = await this.repository.updatePlaylist(id, safeDto, globalScope);
     if (!playlist) return null;
     return this.toGlobalPlaylistResponse(playlist);
   }
@@ -1238,15 +1243,73 @@ export class SignageService {
     dto: UpdateGlobalMediaDto,
     scope: ScopeFilter,
   ): Promise<GlobalMediaResponseDto | null> {
-    // For global content, we don't filter by organizationId
+    // WO-O4O-SIGNAGE-APPROVAL-HOTFIX-V1: status 변경은 /status 전용 엔드포인트만 허용
+    const { status, ...safeDto } = dto;
+
     const globalScope: ScopeFilter = {
       serviceKey: scope.serviceKey,
       organizationId: undefined,
     };
 
-    const media = await this.repository.updateMedia(id, dto, globalScope);
+    const media = await this.repository.updateMedia(id, safeDto, globalScope);
     if (!media) return null;
     return this.toGlobalMediaResponse(media);
+  }
+
+  // ========== WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1: Status Transition ==========
+
+  /**
+   * Transition HQ media status with guard validation
+   */
+  async transitionHqMediaStatus(
+    id: string,
+    newStatus: SignageStatus,
+    scope: ScopeFilter,
+  ): Promise<GlobalMediaResponseDto | null> {
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const media = await this.repository.findMediaById(id, globalScope);
+    if (!media) return null;
+
+    const currentStatus = media.status as SignageStatus;
+    const allowed = ALLOWED_STATUS_TRANSITIONS[currentStatus];
+    if (!allowed || !allowed.includes(newStatus)) {
+      throw new Error(`Invalid status transition: ${currentStatus} → ${newStatus}`);
+    }
+
+    const updated = await this.repository.updateMedia(id, { status: newStatus }, globalScope);
+    if (!updated) return null;
+    return this.toGlobalMediaResponse(updated);
+  }
+
+  /**
+   * Transition HQ playlist status with guard validation
+   */
+  async transitionHqPlaylistStatus(
+    id: string,
+    newStatus: SignageStatus,
+    scope: ScopeFilter,
+  ): Promise<GlobalPlaylistResponseDto | null> {
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const playlist = await this.repository.findPlaylistById(id, globalScope);
+    if (!playlist) return null;
+
+    const currentStatus = playlist.status as SignageStatus;
+    const allowed = ALLOWED_STATUS_TRANSITIONS[currentStatus];
+    if (!allowed || !allowed.includes(newStatus)) {
+      throw new Error(`Invalid status transition: ${currentStatus} → ${newStatus}`);
+    }
+
+    const updated = await this.repository.updatePlaylist(id, { status: newStatus }, globalScope);
+    if (!updated) return null;
+    return this.toGlobalPlaylistResponse(updated);
   }
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clonePlaylist, cloneMedia removed

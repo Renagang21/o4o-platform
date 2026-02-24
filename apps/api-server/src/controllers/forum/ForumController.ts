@@ -171,15 +171,26 @@ export class ForumController {
   async getPost(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+      const ctx = this.getForumContext(req);
 
       // Support both UUID and slug-based lookup
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-      const where = isUuid ? { id } : { slug: id };
 
-      const post = await this.postRepository.findOne({
-        where,
-        relations: ['category', 'author'],
-      });
+      const qb = this.postRepository
+        .createQueryBuilder('post')
+        .leftJoinAndSelect('post.category', 'category')
+        .leftJoinAndSelect('post.author', 'author');
+
+      if (isUuid) {
+        qb.where('post.id = :id', { id });
+      } else {
+        qb.where('post.slug = :slug', { slug: id });
+      }
+
+      // WO-FORUM-SECURITY-HARDENING-V1: scope filter prevents cross-org access via UUID
+      this.applyContextFilter(qb, 'post', ctx);
+
+      const post = await qb.getOne();
 
       if (!post) {
         res.status(404).json({
@@ -786,9 +797,25 @@ export class ForumController {
   async listComments(req: Request, res: Response): Promise<void> {
     try {
       const { postId } = req.params;
+      const ctx = this.getForumContext(req);
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const skip = (page - 1) * limit;
+
+      // WO-FORUM-SECURITY-HARDENING-V1: verify parent post is within scope
+      const postQb = this.postRepository
+        .createQueryBuilder('post')
+        .where('post.id = :postId', { postId });
+      this.applyContextFilter(postQb, 'post', ctx);
+      const parentPost = await postQb.getOne();
+
+      if (!parentPost) {
+        res.status(404).json({
+          success: false,
+          error: 'Post not found',
+        });
+        return;
+      }
 
       const [comments, totalCount] = await this.commentRepository.findAndCount({
         where: {

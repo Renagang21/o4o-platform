@@ -217,27 +217,22 @@ const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
 // CGM Pharmacist App (Phase 1 - Development)
-// Note: Package not yet implemented, using fallback placeholders
 const CGMPatientListPage = lazy(() =>
-  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
     .then((m: any) => ({ default: m.PatientListPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Patient List - Coming Soon</div> }))
 );
 const CGMPatientDetailPage = lazy(() =>
-  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
     .then((m: any) => ({ default: m.PatientDetailPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Patient Detail - Coming Soon</div> }))
 );
 const CGMCoachingPage = lazy(() =>
-  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
     .then((m: any) => ({ default: m.CoachingPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Coaching - Coming Soon</div> }))
 );
 const CGMAlertsPage = lazy(() =>
-  // @ts-expect-error Package not yet implemented
   import('@o4o/cgm-pharmacist-app')
     .then((m: any) => ({ default: m.AlertsPage }))
     .catch(() => ({ default: () => <div className="p-6">CGM Alerts - Coming Soon</div> }))

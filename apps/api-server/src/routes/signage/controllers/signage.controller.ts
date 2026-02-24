@@ -40,6 +40,9 @@ import type {
   UpdateGlobalPlaylistDto,
   UpdateGlobalMediaDto,
 } from '../dto/index.js';
+// WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1
+import { ALLOWED_STATUS_TRANSITIONS } from '../dto/index.js';
+import type { SignageStatus } from '../dto/index.js';
 
 /**
  * Signage Controller
@@ -56,10 +59,11 @@ export class SignageController {
 
   /**
    * Extract scope filter from request
-   * serviceKey is from route param, organizationId from headers/query
+   * serviceKey MUST come from route param only (header fallback removed for security)
+   * organizationId from query param or header
    */
   private extractScope(req: Request): ScopeFilter {
-    const serviceKey = req.params.serviceKey || req.headers['x-service-key'] as string;
+    const serviceKey = req.params.serviceKey;
     const organizationId = req.query.organizationId as string || req.headers['x-organization-id'] as string;
 
     if (!serviceKey) {
@@ -1053,6 +1057,68 @@ export class SignageController {
       const media = await this.service.createGlobalMedia(dto, scope, userId);
       res.status(201).json({ data: media });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Transition HQ media status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
+   * PATCH /api/signage/:serviceKey/hq/media/:id/status
+   */
+  transitionHqMediaStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const { status } = req.body as { status: SignageStatus };
+
+      if (!status || !ALLOWED_STATUS_TRANSITIONS[status as SignageStatus]) {
+        res.status(400).json({ error: `Invalid status: ${status}. Allowed: draft, pending, active, archived` });
+        return;
+      }
+
+      const media = await this.service.transitionHqMediaStatus(id, status, scope);
+      if (!media) {
+        res.status(404).json({ error: 'Media not found' });
+        return;
+      }
+
+      res.json({ data: media });
+    } catch (error: any) {
+      if (error.message?.startsWith('Invalid status transition')) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      next(error);
+    }
+  };
+
+  /**
+   * Transition HQ playlist status (WO-O4O-SIGNAGE-APPROVAL-IMPLEMENTATION-V1)
+   * PATCH /api/signage/:serviceKey/hq/playlists/:id/status
+   */
+  transitionHqPlaylistStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const { id } = req.params;
+      const { status } = req.body as { status: SignageStatus };
+
+      if (!status || !ALLOWED_STATUS_TRANSITIONS[status as SignageStatus]) {
+        res.status(400).json({ error: `Invalid status: ${status}. Allowed: draft, pending, active, archived` });
+        return;
+      }
+
+      const playlist = await this.service.transitionHqPlaylistStatus(id, status, scope);
+      if (!playlist) {
+        res.status(404).json({ error: 'Playlist not found' });
+        return;
+      }
+
+      res.json({ data: playlist });
+    } catch (error: any) {
+      if (error.message?.startsWith('Invalid status transition')) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
       next(error);
     }
   };

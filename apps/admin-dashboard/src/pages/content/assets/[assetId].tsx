@@ -68,6 +68,7 @@ const TYPE_LABELS: Record<ContentType, string> = {
  */
 const STATUS_STYLES: Record<ContentStatus, { bg: string; text: string; label: string }> = {
   [ContentStatus.DRAFT]: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Draft' },
+  [ContentStatus.PENDING]: { bg: 'bg-blue-100', text: 'text-blue-600', label: 'Pending' },
   [ContentStatus.PUBLISHED]: { bg: 'bg-green-100', text: 'text-green-700', label: 'Published' },
   [ContentStatus.ARCHIVED]: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Archived' },
 };

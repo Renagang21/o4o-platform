@@ -29,8 +29,10 @@ export enum ContentType {
  * - published: 게시됨
  * - archived: 보관됨
  */
+// WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added PENDING for approval workflow
 export enum ContentStatus {
   DRAFT = 'draft',
+  PENDING = 'pending',
   PUBLISHED = 'published',
   ARCHIVED = 'archived',
 }

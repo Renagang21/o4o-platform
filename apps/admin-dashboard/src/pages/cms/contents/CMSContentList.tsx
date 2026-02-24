@@ -44,9 +44,11 @@ const CONTENT_TYPES: { value: ContentType | ''; label: string }[] = [
 ];
 
 // Status options
+// WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added pending
 const STATUSES: { value: ContentStatus | ''; label: string }[] = [
   { value: '', label: 'All Status' },
   { value: 'draft', label: 'Draft' },
+  { value: 'pending', label: 'Pending' },
   { value: 'published', label: 'Published' },
   { value: 'archived', label: 'Archived' },
 ];
@@ -129,9 +131,11 @@ export default function CMSContentList() {
     }
   };
 
+  // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added pending
   const getStatusBadge = (status: ContentStatus) => {
     const badges: Record<ContentStatus, string> = {
       draft: 'bg-gray-100 text-gray-800',
+      pending: 'bg-blue-100 text-blue-800',
       published: 'bg-green-100 text-green-800',
       archived: 'bg-yellow-100 text-yellow-800',
     };

@@ -29,6 +29,7 @@ import {
 } from '@o4o/ecommerce-core/entities';
 import type { AuthRequest } from '../../../types/auth.js';
 import logger from '../../../utils/logger.js';
+import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 
 // ============================================================================
@@ -430,6 +431,8 @@ export function createCosmeticsOrderController(
     ],
     async (req: Request, res: Response) => {
       try {
+        opsMetrics.inc(OPS.CHECKOUT_ATTEMPT, { service: 'cosmetics' });
+
         if (handleValidationErrors(req, res)) return;
 
         const authReq = req as AuthRequest;
@@ -456,6 +459,13 @@ export function createCosmeticsOrderController(
         // ================================================================
         // 제품 존재/활성 검증 (WO-O4O-DISTRIBUTION-GAP-HARDENING-V1)
         // cosmetics_store_listings + cosmetics_products 기반
+        //
+        // WO-STORE-LOCAL-PRODUCT-HARDENING-V1: Checkout Guard
+        // StoreLocalProduct(store_local_products)는 Display Domain이며
+        // Commerce Object가 아니다.
+        // 이 체크아웃은 cosmetics.cosmetics_products / cosmetics_store_listings만 조회하므로
+        // store_local_products의 UUID는 구조적으로 PRODUCT_NOT_AVAILABLE로 거부된다.
+        // → store_local_products ↔ ecommerce_order_items 교차 경로 없음 (검증 완료)
         // ================================================================
         const productIds = dto.items.map((item) => item.productId);
 
@@ -475,6 +485,7 @@ export function createCosmeticsOrderController(
           const invalidProducts = productIds.filter((pid) => !validProductIds.has(pid));
 
           if (invalidProducts.length > 0) {
+            opsMetrics.inc(OPS.CHECKOUT_BLOCKED_PRODUCT, { service: 'cosmetics' });
             return errorResponse(res, 409, 'PRODUCT_NOT_AVAILABLE', VALIDATION_ERRORS.PRODUCT_NOT_AVAILABLE, {
               invalidProductIds: invalidProducts,
             });
@@ -492,6 +503,7 @@ export function createCosmeticsOrderController(
           const invalidProducts = productIds.filter((pid) => !validProductIds.has(pid));
 
           if (invalidProducts.length > 0) {
+            opsMetrics.inc(OPS.CHECKOUT_BLOCKED_PRODUCT, { service: 'cosmetics' });
             return errorResponse(res, 409, 'PRODUCT_NOT_AVAILABLE', VALIDATION_ERRORS.PRODUCT_NOT_AVAILABLE, {
               invalidProductIds: invalidProducts,
             });
@@ -555,6 +567,8 @@ export function createCosmeticsOrderController(
           }
         }
 
+        opsMetrics.inc(OPS.CHECKOUT_SUCCESS, { service: 'cosmetics' });
+
         logger.info('[Cosmetics Order] Created order:', logData);
 
         res.status(201).json({
@@ -584,6 +598,7 @@ export function createCosmeticsOrderController(
           message: `${dto.metadata.channel.toUpperCase()} channel order created successfully`,
         });
       } catch (error: unknown) {
+        opsMetrics.inc(OPS.CHECKOUT_ERROR, { service: 'cosmetics' });
         const err = error as Error;
         logger.error('[Cosmetics Order] Create order error:', err);
         errorResponse(res, 500, 'ORDER_CREATE_ERROR', 'Failed to create order');

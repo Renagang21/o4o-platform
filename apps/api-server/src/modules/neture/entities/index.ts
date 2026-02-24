@@ -9,3 +9,4 @@ export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './N
 export { NeturePartnerDashboardItemContent, type ContentSource } from './NeturePartnerDashboardItemContent.entity.js';
 export { NeturePartnerRecruitment, RecruitmentStatus } from './NeturePartnerRecruitment.entity.js';
 export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerApplication.entity.js';
+export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } from './NetureSellerPartnerContract.entity.js';

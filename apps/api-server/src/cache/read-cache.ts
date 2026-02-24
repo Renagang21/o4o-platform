@@ -15,6 +15,7 @@
 import { createHash } from 'crypto';
 import { getRedisClient } from '../infrastructure/redis.guard.js';
 import logger from '../utils/logger.js';
+import { opsMetrics, OPS } from '../services/ops-metrics.service.js';
 
 const RC_PREFIX = 'rc';
 
@@ -71,11 +72,14 @@ export async function cacheAside<T>(
     try {
       const cached = await client.get(fullKey);
       if (cached !== null) {
+        opsMetrics.inc(OPS.CACHE_HIT);
         logger.debug(`[ReadCache] HIT ${key}`);
         return JSON.parse(cached) as T;
       }
+      opsMetrics.inc(OPS.CACHE_MISS);
       logger.debug(`[ReadCache] MISS ${key}`);
     } catch (err) {
+      opsMetrics.inc(OPS.CACHE_ERROR);
       logger.warn('[ReadCache] GET error, falling back to DB', {
         key,
         error: err instanceof Error ? err.message : String(err),
@@ -91,6 +95,7 @@ export async function cacheAside<T>(
     client
       .setex(fullKey, ttlSeconds, JSON.stringify(data))
       .catch((err) => {
+        opsMetrics.inc(OPS.CACHE_ERROR);
         logger.warn('[ReadCache] SET error', {
           key,
           error: err instanceof Error ? err.message : String(err),
