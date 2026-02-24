@@ -99,13 +99,27 @@ export const CacheKeys = {
   SUPPLIER_STATS_BATCH: (supplierId: string, date: string) =>
     `batch:supplier:${supplierId}:stats:${date}`,
 
+  // Read Cache: Storefront (TTL: 60s) — WO-O4O-REDIS-READ-CACHE-LAYER-V1
+  STOREFRONT_PRODUCTS: (storeId: string, paramsHash: string) =>
+    `sf:products:${storeId}:${paramsHash}`,
+  STOREFRONT_TABLET: (storeId: string, paramsHash: string) =>
+    `sf:tablet:${storeId}:${paramsHash}`,
+  STOREFRONT_CATEGORIES: (storeId: string, serviceKey: string) =>
+    `sf:cat:${storeId}:${serviceKey}`,
+
+  // Read Cache: Hub (TTL: 30s) — WO-O4O-REDIS-READ-CACHE-LAYER-V1
+  HUB_CHANNELS: (orgId: string) => `hub:ch:${orgId}`,
+  HUB_KPI_SUMMARY: (orgId: string) => `hub:kpi:${orgId}`,
+
   // Cache invalidation patterns
   PATTERN: {
     SELLER_ALL: (sellerId: string) => `*:seller:${sellerId}:*`,
     SUPPLIER_ALL: (supplierId: string) => `*:supplier:${supplierId}:*`,
     CUSTOMER_ALL: (customerId: string) => `*customer:${customerId}:*`,
     SETTLEMENT_ALL: (partyType: string, partyId: string) =>
-      `settlement:*:${partyType}:${partyId}*`
+      `settlement:*:${partyType}:${partyId}*`,
+    RC_STOREFRONT_ALL: (storeId: string) => `rc:sf:*${storeId}*`,
+    RC_HUB_ALL: (orgId: string) => `rc:hub:*${orgId}*`,
   }
 } as const;
 

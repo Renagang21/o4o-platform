@@ -15,6 +15,7 @@ import { DataSource } from 'typeorm';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -267,38 +268,42 @@ export function createStoreHubController(
           return;
         }
 
-        // Fetch channels with KPI metrics per channel
-        const channels = await dataSource.query(
-          `SELECT
-             oc.id,
-             oc.channel_type AS "channelType",
-             oc.status,
-             oc.approved_at AS "approvedAt",
-             oc.created_at AS "createdAt",
-             COALESCE(stats.visible_count, 0)::int AS "visibleProductCount",
-             COALESCE(stats.total_count, 0)::int AS "totalProductCount",
-             COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount"
-           FROM organization_channels oc
-           LEFT JOIN (
-             SELECT
-               opc.channel_id,
-               COUNT(*) AS total_count,
-               COUNT(*) FILTER (
-                 WHERE opc.is_active = true
-                   AND opl.is_active = true
-                   AND oc_sub.status = 'APPROVED'
-                   AND gp.status = 'active'
-               ) AS visible_count,
-               COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count
-             FROM organization_product_channels opc
-             JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
-             JOIN organization_channels oc_sub ON oc_sub.id = opc.channel_id
-             LEFT JOIN glycopharm_products gp ON gp.id::text = opl.external_product_id
-             GROUP BY opc.channel_id
-           ) stats ON stats.channel_id = oc.id
-           WHERE oc.organization_id = $1
-           ORDER BY oc.created_at ASC`,
-          [organizationId]
+        // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: cache-aside (TTL 30s)
+        const channels = await cacheAside(
+          hashCacheKey(`hub:ch:${organizationId}`, {}),
+          READ_CACHE_TTL.HUB_KPI,
+          () => dataSource.query(
+            `SELECT
+               oc.id,
+               oc.channel_type AS "channelType",
+               oc.status,
+               oc.approved_at AS "approvedAt",
+               oc.created_at AS "createdAt",
+               COALESCE(stats.visible_count, 0)::int AS "visibleProductCount",
+               COALESCE(stats.total_count, 0)::int AS "totalProductCount",
+               COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount"
+             FROM organization_channels oc
+             LEFT JOIN (
+               SELECT
+                 opc.channel_id,
+                 COUNT(*) AS total_count,
+                 COUNT(*) FILTER (
+                   WHERE opc.is_active = true
+                     AND opl.is_active = true
+                     AND oc_sub.status = 'APPROVED'
+                     AND gp.status = 'active'
+                 ) AS visible_count,
+                 COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count
+               FROM organization_product_channels opc
+               JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
+               JOIN organization_channels oc_sub ON oc_sub.id = opc.channel_id
+               LEFT JOIN glycopharm_products gp ON gp.id::text = opl.external_product_id
+               GROUP BY opc.channel_id
+             ) stats ON stats.channel_id = oc.id
+             WHERE oc.organization_id = $1
+             ORDER BY oc.created_at ASC`,
+            [organizationId],
+          ),
         );
 
         res.json({ success: true, data: channels });
@@ -356,57 +361,65 @@ export function createStoreHubController(
           return;
         }
 
-        // Single query aggregation — graceful degradation if checkout_orders missing
-        let kpi = {
-          todayOrders: 0,
-          weekOrders: 0,
-          monthOrders: 0,
-          monthRevenue: 0,
-          avgOrderValue: 0,
-          lastMonthRevenue: 0,
-        };
-
-        try {
-          const rows = await dataSource.query(
-            `SELECT
-               COUNT(*) FILTER (
-                 WHERE "createdAt" >= CURRENT_DATE AND status = 'paid'
-               )::int AS "todayOrders",
-               COUNT(*) FILTER (
-                 WHERE "createdAt" >= date_trunc('week', CURRENT_DATE) AND status = 'paid'
-               )::int AS "weekOrders",
-               COUNT(*) FILTER (
-                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
-               )::int AS "monthOrders",
-               COALESCE(SUM("totalAmount") FILTER (
-                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
-               ), 0)::numeric AS "monthRevenue",
-               COALESCE(SUM("totalAmount") FILTER (
-                 WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
-                   AND "createdAt" < date_trunc('month', CURRENT_DATE)
-                   AND status = 'paid'
-               ), 0)::numeric AS "lastMonthRevenue"
-             FROM checkout_orders
-             WHERE "sellerOrganizationId" = $1`,
-            [organizationId]
-          );
-
-          const row = rows[0];
-          if (row) {
-            const monthOrders = Number(row.todayOrders !== undefined ? row.monthOrders : 0);
-            const monthRevenue = Number(row.monthRevenue || 0);
-            kpi = {
-              todayOrders: Number(row.todayOrders || 0),
-              weekOrders: Number(row.weekOrders || 0),
-              monthOrders,
-              monthRevenue,
-              avgOrderValue: monthOrders > 0 ? Math.round(monthRevenue / monthOrders) : 0,
-              lastMonthRevenue: Number(row.lastMonthRevenue || 0),
+        // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: cache-aside (TTL 30s)
+        const kpi = await cacheAside(
+          hashCacheKey(`hub:kpi:${organizationId}`, {}),
+          READ_CACHE_TTL.HUB_KPI,
+          async () => {
+            let result = {
+              todayOrders: 0,
+              weekOrders: 0,
+              monthOrders: 0,
+              monthRevenue: 0,
+              avgOrderValue: 0,
+              lastMonthRevenue: 0,
             };
-          }
-        } catch {
-          /* graceful degradation — checkout_orders table may not exist */
-        }
+
+            try {
+              const rows = await dataSource.query(
+                `SELECT
+                   COUNT(*) FILTER (
+                     WHERE "createdAt" >= CURRENT_DATE AND status = 'paid'
+                   )::int AS "todayOrders",
+                   COUNT(*) FILTER (
+                     WHERE "createdAt" >= date_trunc('week', CURRENT_DATE) AND status = 'paid'
+                   )::int AS "weekOrders",
+                   COUNT(*) FILTER (
+                     WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
+                   )::int AS "monthOrders",
+                   COALESCE(SUM("totalAmount") FILTER (
+                     WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) AND status = 'paid'
+                   ), 0)::numeric AS "monthRevenue",
+                   COALESCE(SUM("totalAmount") FILTER (
+                     WHERE "createdAt" >= date_trunc('month', CURRENT_DATE) - INTERVAL '1 month'
+                       AND "createdAt" < date_trunc('month', CURRENT_DATE)
+                       AND status = 'paid'
+                   ), 0)::numeric AS "lastMonthRevenue"
+                 FROM checkout_orders
+                 WHERE "sellerOrganizationId" = $1`,
+                [organizationId],
+              );
+
+              const row = rows[0];
+              if (row) {
+                const monthOrders = Number(row.todayOrders !== undefined ? row.monthOrders : 0);
+                const monthRevenue = Number(row.monthRevenue || 0);
+                result = {
+                  todayOrders: Number(row.todayOrders || 0),
+                  weekOrders: Number(row.weekOrders || 0),
+                  monthOrders,
+                  monthRevenue,
+                  avgOrderValue: monthOrders > 0 ? Math.round(monthRevenue / monthOrders) : 0,
+                  lastMonthRevenue: Number(row.lastMonthRevenue || 0),
+                };
+              }
+            } catch {
+              /* graceful degradation — checkout_orders table may not exist */
+            }
+
+            return result;
+          },
+        );
 
         res.json({ success: true, data: kpi });
       } catch (error: any) {

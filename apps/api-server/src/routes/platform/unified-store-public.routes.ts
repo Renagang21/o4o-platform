@@ -29,6 +29,7 @@ import { Router, Request, Response } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
 import rateLimit from 'express-rate-limit';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../cache/read-cache.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { OrganizationStore } from '../kpa/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
@@ -111,102 +112,117 @@ async function queryVisibleProducts(
     productId?: string;
   } = {},
 ): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
-  const page = options.page || 1;
-  const limit = options.limit || 20;
-  const offset = (page - 1) * limit;
+  // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: SHA1 hash key (collision-safe)
+  const ck = hashCacheKey(`sf:${pharmacyId}`, {
+    sk: serviceKeys.sort().join(','),
+    p: options.page || 1,
+    l: options.limit || 20,
+    cat: options.category,
+    q: options.q,
+    s: options.sort,
+    o: options.order,
+    f: options.isFeatured,
+    pid: options.productId,
+  });
 
-  const conditions: string[] = [];
-  const params: any[] = [pharmacyId, serviceKeys];
-  let paramIdx = 3;
+  return cacheAside(ck, READ_CACHE_TTL.STOREFRONT, async () => {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const offset = (page - 1) * limit;
 
-  if (options.category) {
-    conditions.push(`p.category = $${paramIdx}`);
-    params.push(options.category);
-    paramIdx++;
-  }
-  if (options.q && options.q.length >= 2) {
-    conditions.push(`(p.name ILIKE $${paramIdx} OR p.sku ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
-    params.push(`%${options.q}%`);
-    paramIdx++;
-  }
-  if (options.isFeatured !== undefined) {
-    conditions.push(`p.is_featured = $${paramIdx}`);
-    params.push(options.isFeatured);
-    paramIdx++;
-  }
-  if (options.productId) {
-    conditions.push(`p.id = $${paramIdx}`);
-    params.push(options.productId);
-    paramIdx++;
-  }
+    const conditions: string[] = [];
+    const params: any[] = [pharmacyId, serviceKeys];
+    let paramIdx = 3;
 
-  const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
+    if (options.category) {
+      conditions.push(`p.category = $${paramIdx}`);
+      params.push(options.category);
+      paramIdx++;
+    }
+    if (options.q && options.q.length >= 2) {
+      conditions.push(`(p.name ILIKE $${paramIdx} OR p.sku ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
+      params.push(`%${options.q}%`);
+      paramIdx++;
+    }
+    if (options.isFeatured !== undefined) {
+      conditions.push(`p.is_featured = $${paramIdx}`);
+      params.push(options.isFeatured);
+      paramIdx++;
+    }
+    if (options.productId) {
+      conditions.push(`p.id = $${paramIdx}`);
+      params.push(options.productId);
+      paramIdx++;
+    }
 
-  const sortMap: Record<string, string> = {
-    created_at: 'p.created_at',
-    name: 'p.name',
-    price: 'p.price',
-    sort_order: 'p.sort_order',
-  };
-  const sortField = sortMap[options.sort || 'created_at'] || 'p.created_at';
-  const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
 
-  const countResult: Array<{ count: string }> = await dataSource.query(
-    `SELECT COUNT(DISTINCT p.id)::int AS count
-     FROM glycopharm_products p
-     INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
-       AND opl.organization_id = $1
-       AND opl.service_key = ANY($2::text[])
-       AND opl.is_active = true
-     INNER JOIN organization_product_channels opc
-       ON opc.product_listing_id = opl.id
-       AND opc.is_active = true
-     INNER JOIN organization_channels oc
-       ON oc.id = opc.channel_id
-       AND oc.channel_type = 'B2C'
-       AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
-       ${whereExtra}`,
-    params,
-  );
-  const total = Number(countResult[0]?.count || 0);
+    const sortMap: Record<string, string> = {
+      created_at: 'p.created_at',
+      name: 'p.name',
+      price: 'p.price',
+      sort_order: 'p.sort_order',
+    };
+    const sortField = sortMap[options.sort || 'created_at'] || 'p.created_at';
+    const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-  const data = await dataSource.query(
-    `SELECT DISTINCT ON (p.id)
-       p.id, p.name, p.sku, p.category, p.price, p.sale_price,
-       p.stock_quantity, p.images, p.status, p.is_featured,
-       p.manufacturer, p.description, p.short_description,
-       p.sort_order, p.created_at, p.updated_at,
-       p.pharmacy_id,
-       opc.sales_limit,
-       opc.channel_price
-     FROM glycopharm_products p
-     INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
-       AND opl.organization_id = $1
-       AND opl.service_key = ANY($2::text[])
-       AND opl.is_active = true
-     INNER JOIN organization_product_channels opc
-       ON opc.product_listing_id = opl.id
-       AND opc.is_active = true
-     INNER JOIN organization_channels oc
-       ON oc.id = opc.channel_id
-       AND oc.channel_type = 'B2C'
-       AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
-       ${whereExtra}
-     ORDER BY p.id, ${sortField} ${sortOrder}
-     LIMIT ${limit} OFFSET ${offset}`,
-    params,
-  );
+    const countResult: Array<{ count: string }> = await dataSource.query(
+      `SELECT COUNT(DISTINCT p.id)::int AS count
+       FROM glycopharm_products p
+       INNER JOIN organization_product_listings opl
+         ON opl.external_product_id = p.id::text
+         AND opl.organization_id = $1
+         AND opl.service_key = ANY($2::text[])
+         AND opl.is_active = true
+       INNER JOIN organization_product_channels opc
+         ON opc.product_listing_id = opl.id
+         AND opc.is_active = true
+       INNER JOIN organization_channels oc
+         ON oc.id = opc.channel_id
+         AND oc.channel_type = 'B2C'
+         AND oc.status = 'APPROVED'
+       WHERE p.pharmacy_id = $1
+         AND p.status = 'active'
+         ${whereExtra}`,
+      params,
+    );
+    const total = Number(countResult[0]?.count || 0);
 
-  return {
-    data,
-    meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  };
+    const data = await dataSource.query(
+      `SELECT DISTINCT ON (p.id)
+         p.id, p.name, p.sku, p.category, p.price, p.sale_price,
+         p.stock_quantity, p.images, p.status, p.is_featured,
+         p.manufacturer, p.description, p.short_description,
+         p.sort_order, p.created_at, p.updated_at,
+         p.pharmacy_id,
+         opc.sales_limit,
+         opc.channel_price
+       FROM glycopharm_products p
+       INNER JOIN organization_product_listings opl
+         ON opl.external_product_id = p.id::text
+         AND opl.organization_id = $1
+         AND opl.service_key = ANY($2::text[])
+         AND opl.is_active = true
+       INNER JOIN organization_product_channels opc
+         ON opc.product_listing_id = opl.id
+         AND opc.is_active = true
+       INNER JOIN organization_channels oc
+         ON oc.id = opc.channel_id
+         AND oc.channel_type = 'B2C'
+         AND oc.status = 'APPROVED'
+       WHERE p.pharmacy_id = $1
+         AND p.status = 'active'
+         ${whereExtra}
+       ORDER BY p.id, ${sortField} ${sortOrder}
+       LIMIT ${limit} OFFSET ${offset}`,
+      params,
+    );
+
+    return {
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
+  });
 }
 
 // ============================================================================
@@ -226,91 +242,104 @@ async function queryTabletVisibleProducts(
     limit?: number;
   } = {},
 ): Promise<{ data: any[]; meta: { page: number; limit: number; total: number; totalPages: number } }> {
-  const page = options.page || 1;
-  const limit = options.limit || 20;
-  const offset = (page - 1) * limit;
+  // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: SHA1 hash key (collision-safe)
+  const ck = hashCacheKey(`sf:tablet:${pharmacyId}`, {
+    sk: serviceKey,
+    p: options.page || 1,
+    l: options.limit || 20,
+    cat: options.category,
+    q: options.q,
+    s: options.sort,
+    o: options.order,
+  });
 
-  const conditions: string[] = [];
-  const params: any[] = [pharmacyId, serviceKey];
-  let paramIdx = 3;
+  return cacheAside(ck, READ_CACHE_TTL.STOREFRONT, async () => {
+    const page = options.page || 1;
+    const limit = options.limit || 20;
+    const offset = (page - 1) * limit;
 
-  if (options.category) {
-    conditions.push(`p.category = $${paramIdx}`);
-    params.push(options.category);
-    paramIdx++;
-  }
-  if (options.q && options.q.length >= 2) {
-    conditions.push(`(p.name ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
-    params.push(`%${options.q}%`);
-    paramIdx++;
-  }
+    const conditions: string[] = [];
+    const params: any[] = [pharmacyId, serviceKey];
+    let paramIdx = 3;
 
-  const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
+    if (options.category) {
+      conditions.push(`p.category = $${paramIdx}`);
+      params.push(options.category);
+      paramIdx++;
+    }
+    if (options.q && options.q.length >= 2) {
+      conditions.push(`(p.name ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
+      params.push(`%${options.q}%`);
+      paramIdx++;
+    }
 
-  const sortMap: Record<string, string> = {
-    created_at: 'p.created_at',
-    name: 'p.name',
-    price: 'p.price',
-    sort_order: 'p.sort_order',
-  };
-  const sortField = sortMap[options.sort || 'sort_order'] || 'p.sort_order';
-  const sortOrder = options.order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+    const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
 
-  const countResult: Array<{ count: string }> = await dataSource.query(
-    `SELECT COUNT(DISTINCT p.id)::int AS count
-     FROM glycopharm_products p
-     INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
-       AND opl.organization_id = $1
-       AND opl.service_key = $2
-       AND opl.is_active = true
-     INNER JOIN organization_product_channels opc
-       ON opc.product_listing_id = opl.id
-       AND opc.is_active = true
-     INNER JOIN organization_channels oc
-       ON oc.id = opc.channel_id
-       AND oc.channel_type = 'TABLET'
-       AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
-       ${whereExtra}`,
-    params,
-  );
-  const total = Number(countResult[0]?.count || 0);
+    const sortMap: Record<string, string> = {
+      created_at: 'p.created_at',
+      name: 'p.name',
+      price: 'p.price',
+      sort_order: 'p.sort_order',
+    };
+    const sortField = sortMap[options.sort || 'sort_order'] || 'p.sort_order';
+    const sortOrder = options.order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
-  const data = await dataSource.query(
-    `SELECT DISTINCT ON (p.id)
-       p.id, p.name, p.sku, p.category, p.price, p.sale_price,
-       p.stock_quantity, p.images, p.status, p.is_featured,
-       p.manufacturer, p.description, p.short_description,
-       p.sort_order, p.created_at, p.updated_at,
-       p.pharmacy_id,
-       opc.channel_price
-     FROM glycopharm_products p
-     INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
-       AND opl.organization_id = $1
-       AND opl.service_key = $2
-       AND opl.is_active = true
-     INNER JOIN organization_product_channels opc
-       ON opc.product_listing_id = opl.id
-       AND opc.is_active = true
-     INNER JOIN organization_channels oc
-       ON oc.id = opc.channel_id
-       AND oc.channel_type = 'TABLET'
-       AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
-       ${whereExtra}
-     ORDER BY p.id, ${sortField} ${sortOrder}
-     LIMIT ${limit} OFFSET ${offset}`,
-    params,
-  );
+    const countResult: Array<{ count: string }> = await dataSource.query(
+      `SELECT COUNT(DISTINCT p.id)::int AS count
+       FROM glycopharm_products p
+       INNER JOIN organization_product_listings opl
+         ON opl.external_product_id = p.id::text
+         AND opl.organization_id = $1
+         AND opl.service_key = $2
+         AND opl.is_active = true
+       INNER JOIN organization_product_channels opc
+         ON opc.product_listing_id = opl.id
+         AND opc.is_active = true
+       INNER JOIN organization_channels oc
+         ON oc.id = opc.channel_id
+         AND oc.channel_type = 'TABLET'
+         AND oc.status = 'APPROVED'
+       WHERE p.pharmacy_id = $1
+         AND p.status = 'active'
+         ${whereExtra}`,
+      params,
+    );
+    const total = Number(countResult[0]?.count || 0);
 
-  return {
-    data,
-    meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  };
+    const data = await dataSource.query(
+      `SELECT DISTINCT ON (p.id)
+         p.id, p.name, p.sku, p.category, p.price, p.sale_price,
+         p.stock_quantity, p.images, p.status, p.is_featured,
+         p.manufacturer, p.description, p.short_description,
+         p.sort_order, p.created_at, p.updated_at,
+         p.pharmacy_id,
+         opc.channel_price
+       FROM glycopharm_products p
+       INNER JOIN organization_product_listings opl
+         ON opl.external_product_id = p.id::text
+         AND opl.organization_id = $1
+         AND opl.service_key = $2
+         AND opl.is_active = true
+       INNER JOIN organization_product_channels opc
+         ON opc.product_listing_id = opl.id
+         AND opc.is_active = true
+       INNER JOIN organization_channels oc
+         ON oc.id = opc.channel_id
+         AND oc.channel_type = 'TABLET'
+         AND oc.status = 'APPROVED'
+       WHERE p.pharmacy_id = $1
+         AND p.status = 'active'
+         ${whereExtra}
+       ORDER BY p.id, ${sortField} ${sortOrder}
+       LIMIT ${limit} OFFSET ${offset}`,
+      params,
+    );
+
+    return {
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
+  });
 }
 
 // ============================================================================
@@ -544,26 +573,31 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
       const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
       if (!resolved) return;
 
-      const categories: Array<{ category: string; productCount: number }> = await dataSource.query(
-        `SELECT p.category, COUNT(DISTINCT p.id)::int AS "productCount"
-         FROM glycopharm_products p
-         INNER JOIN organization_product_listings opl
-           ON opl.external_product_id = p.id::text
-           AND opl.organization_id = $1
-           AND opl.service_key = $2
-           AND opl.is_active = true
-         INNER JOIN organization_product_channels opc
-           ON opc.product_listing_id = opl.id
-           AND opc.is_active = true
-         INNER JOIN organization_channels oc
-           ON oc.id = opc.channel_id
-           AND oc.channel_type = 'B2C'
-           AND oc.status = 'APPROVED'
-         WHERE p.pharmacy_id = $1
-           AND p.status = 'active'
-         GROUP BY p.category
-         ORDER BY "productCount" DESC`,
-        [resolved.storeId, resolved.serviceKey],
+      // WO-O4O-GA-PRELAUNCH-VERIFICATION-V1: SHA1 hash key (collision-safe)
+      const categories: Array<{ category: string; productCount: number }> = await cacheAside(
+        hashCacheKey(`sf:cat:${resolved.storeId}`, { sk: resolved.serviceKey }),
+        READ_CACHE_TTL.STOREFRONT,
+        () => dataSource.query(
+          `SELECT p.category, COUNT(DISTINCT p.id)::int AS "productCount"
+           FROM glycopharm_products p
+           INNER JOIN organization_product_listings opl
+             ON opl.external_product_id = p.id::text
+             AND opl.organization_id = $1
+             AND opl.service_key = $2
+             AND opl.is_active = true
+           INNER JOIN organization_product_channels opc
+             ON opc.product_listing_id = opl.id
+             AND opc.is_active = true
+           INNER JOIN organization_channels oc
+             ON oc.id = opc.channel_id
+             AND oc.channel_type = 'B2C'
+             AND oc.status = 'APPROVED'
+           WHERE p.pharmacy_id = $1
+             AND p.status = 'active'
+           GROUP BY p.category
+           ORDER BY "productCount" DESC`,
+          [resolved.storeId, resolved.serviceKey],
+        ),
       );
 
       const data = categories.map((c: any, idx: number) => ({
