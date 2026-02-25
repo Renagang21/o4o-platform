@@ -142,11 +142,11 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
 
 // ─── Signal Data ───
 
-interface AiInsightData {
-  summary: string;
-  riskLevel: string;
-  recommendedActions: string[];
-  confidenceScore: number;
+interface SellerInsightData {
+  products: { accessible: number; newThisWeek: number; notRequested: number; actionUrl: string };
+  requests: { pending: number; approved: number; rejected: number; actionUrl: string };
+  exposure: { approvedButNotExposed: number; actionUrl: string };
+  operations: { recentOrders7d: number; trend: string; actionUrl: string };
 }
 
 interface DashboardStats {
@@ -171,7 +171,7 @@ interface AdminStats {
 interface NetureSignalData {
   hasApprovedSupplier: boolean;
   hasApprovedSeller: boolean;
-  aiInsight?: AiInsightData;
+  sellerInsight?: SellerInsightData;
   dashboardStats?: DashboardStats;
   adminStats?: AdminStats;
 }
@@ -282,20 +282,22 @@ function buildNetureSignals(data: NetureSignalData | null): Record<string, HubSi
     }
   }
 
-  // --- AI signal ---
-  const ai = data.aiInsight;
-  if (ai) {
-    const aiLevel: HubSignal['level'] = ai.riskLevel === 'high' ? 'critical'
-      : ai.riskLevel === 'medium' ? 'warning' : 'info';
-    signals.ai = createActionSignal(aiLevel, {
-      label: ai.riskLevel === 'high' ? '주의 필요'
-        : ai.riskLevel === 'medium' ? '검토 권장' : '양호',
-      pulse: ai.riskLevel === 'high',
-      action: {
-        key: NETURE_KEYS.REFRESH_AI,
-        buttonLabel: 'AI 재분석',
-      },
-    });
+  // --- AI signal (seller insight 4카드 기반) ---
+  const si = data.sellerInsight;
+  if (si) {
+    if (si.products.accessible === 0) {
+      signals.ai = createActionSignal('warning', {
+        label: '접근 가능 상품 없음',
+        action: { key: NETURE_KEYS.REFRESH_AI, buttonLabel: 'AI 재분석' },
+      });
+    } else if (si.requests.pending > 0) {
+      signals.ai = createActionSignal('info', {
+        label: `신청 대기 ${si.requests.pending}건`,
+        action: { key: NETURE_KEYS.REFRESH_AI, buttonLabel: 'AI 재분석' },
+      });
+    } else {
+      signals.ai = createSignal('info', { label: '양호' });
+    }
   }
 
   // --- Admin signals ---
@@ -344,43 +346,71 @@ function buildNetureSignals(data: NetureSignalData | null): Record<string, HubSi
   return signals;
 }
 
-// ─── AI Insight Card ───
+// ─── Seller Insight Cards (4카드 구조) ───
 
-function AiInsightCard({ insight }: { insight?: AiInsightData }) {
+function SellerInsightCards({ insight }: { insight?: SellerInsightData }) {
   if (!insight) return null;
-  const bg = insight.riskLevel === 'high' ? '#fef2f2'
-    : insight.riskLevel === 'medium' ? '#fffbeb' : '#f0fdf4';
-  const border = insight.riskLevel === 'high' ? '#fecaca'
-    : insight.riskLevel === 'medium' ? '#fde68a' : '#bbf7d0';
-  const icon = insight.riskLevel === 'high' ? '🚨'
-    : insight.riskLevel === 'medium' ? '⚠️' : '✅';
+
+  const cards: { title: string; items: { label: string; value: number | string }[]; actionUrl: string }[] = [
+    {
+      title: '접근 가능 상품',
+      items: [
+        { label: '전체', value: insight.products.accessible },
+        { label: '이번 주 신규', value: insight.products.newThisWeek },
+        { label: '미신청', value: insight.products.notRequested },
+      ],
+      actionUrl: insight.products.actionUrl,
+    },
+    {
+      title: '공급 신청 현황',
+      items: [
+        { label: '대기', value: insight.requests.pending },
+        { label: '승인', value: insight.requests.approved },
+        { label: '거절', value: insight.requests.rejected },
+      ],
+      actionUrl: insight.requests.actionUrl,
+    },
+    {
+      title: '노출 점검',
+      items: [
+        { label: '승인 후 미노출', value: insight.exposure.approvedButNotExposed },
+      ],
+      actionUrl: insight.exposure.actionUrl,
+    },
+    {
+      title: '운영 현황',
+      items: [
+        { label: '최근 7일 주문', value: insight.operations.recentOrders7d },
+        { label: '추세', value: insight.operations.trend === 'none' ? '-' : insight.operations.trend },
+      ],
+      actionUrl: insight.operations.actionUrl,
+    },
+  ];
 
   return (
     <div style={{
-      background: bg, border: `1px solid ${border}`,
-      borderRadius: 12, padding: '16px 20px', marginBottom: 24,
+      display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+      gap: 12, marginBottom: 24,
     }}>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-        <span>{icon}</span>
-        <span style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>
-          AI 운영 인사이트
-        </span>
-        {insight.confidenceScore < 1 && (
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: 'auto' }}>
-            신뢰도 {Math.round(insight.confidenceScore * 100)}%
-          </span>
-        )}
-      </div>
-      <p style={{ fontSize: '0.875rem', color: '#334155', margin: '0 0 8px' }}>
-        {insight.summary}
-      </p>
-      {insight.recommendedActions.length > 0 && (
-        <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.813rem', color: '#475569' }}>
-          {insight.recommendedActions.slice(0, 3).map((action, i) => (
-            <li key={i} style={{ marginBottom: 2 }}>{action}</li>
+      {cards.map((card) => (
+        <div key={card.title} style={{
+          background: '#f8fafc', border: '1px solid #e2e8f0',
+          borderRadius: 12, padding: '14px 16px',
+        }}>
+          <div style={{ fontWeight: 600, fontSize: '0.813rem', color: '#475569', marginBottom: 8 }}>
+            {card.title}
+          </div>
+          {card.items.map((item) => (
+            <div key={item.label} style={{
+              display: 'flex', justifyContent: 'space-between',
+              fontSize: '0.813rem', color: '#334155', marginBottom: 2,
+            }}>
+              <span>{item.label}</span>
+              <span style={{ fontWeight: 600 }}>{item.value}</span>
+            </div>
           ))}
-        </ul>
-      )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -420,7 +450,7 @@ export default function HubPage() {
         contentAssetApi.getSupplierSignal(),
         dashboardApi.getSellerSignal(),
         dashboardApi.getSupplierDashboardSummary(),
-        fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/ai-insight`, {
+        fetch(`${API_BASE_URL}/api/v1/neture/seller/dashboard/ai-insight`, {
           credentials: 'include',
         }).then(r => r.ok ? r.json() : null).catch(() => null),
       ];
@@ -462,9 +492,9 @@ export default function HubPage() {
         };
       }
 
-      // AI insight
-      if (aiRes?.success && aiRes?.data?.insight) {
-        data.aiInsight = aiRes.data.insight;
+      // Seller insight (4카드)
+      if (aiRes?.success && aiRes?.data) {
+        data.sellerInsight = aiRes.data;
       }
 
       // Admin stats
@@ -567,7 +597,7 @@ export default function HubPage() {
       signals={signals}
       onCardClick={(href) => navigate(href)}
       onActionTrigger={handleActionTrigger}
-      beforeSections={<AiInsightCard insight={signalData?.aiInsight} />}
+      beforeSections={<SellerInsightCards insight={signalData?.sellerInsight} />}
       footerNote="허브는 각 기능의 진입점입니다. 상세 작업은 각 페이지에서 진행해주세요."
     />
   );

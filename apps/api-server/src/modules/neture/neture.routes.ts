@@ -2132,6 +2132,29 @@ router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('netur
   }
 });
 
+// ==================== Seller Dashboard AI Insight (WO-STORE-AI-V1-SELLER-INSIGHT) ====================
+
+/**
+ * GET /api/v1/neture/seller/dashboard/ai-insight
+ * Seller 대시보드 AI 인사이트 (4카드 구조)
+ */
+router.get('/seller/dashboard/ai-insight', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    if (!sellerId) {
+      return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    const data = await netureService.getSellerDashboardInsight(sellerId);
+    return res.json({ success: true, data });
+  } catch (error) {
+    logger.error('[Neture Route] Error fetching seller dashboard insight:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch seller dashboard insight',
+    });
+  }
+});
+
 // ==================== Seller-Partner Contracts (WO-NETURE-SELLER-PARTNER-CONTRACT-V1) ====================
 
 /**

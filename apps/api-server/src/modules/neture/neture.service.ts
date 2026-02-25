@@ -2875,4 +2875,99 @@ export class NetureService {
     logger.info(`[NetureService] Commission updated: old=${contractId} terminated, new=${saved.id} rate=${newRate}`);
     return { terminated: { id: existing.id }, created: saved };
   }
+
+  /**
+   * Seller Dashboard AI Insight — 4카드 구조
+   *
+   * WO-STORE-AI-V1-SELLER-INSIGHT
+   *
+   * ① 접근 가능 상품 (accessible / newThisWeek / notRequested)
+   * ② 공급 신청 상태 (pending / approved / rejected)
+   * ③ 노출 점검 (approvedButNotExposed) — Neture에 채널 없으므로 0 고정
+   * ④ 운영 신호 (recentOrders7d / trend) — Neture에 주문 없으므로 0/'none' 고정
+   */
+  async getSellerDashboardInsight(sellerId: string) {
+    try {
+      // ① 접근 가능 상품
+      const [accessibleRows, newThisWeekRows, notRequestedRows] = await Promise.all([
+        AppDataSource.query(`
+          SELECT COUNT(*)::int AS cnt
+          FROM neture_supplier_products sp
+          WHERE sp.is_active = true
+            AND (
+              sp.distribution_type = 'PUBLIC'
+              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+            )
+        `, [sellerId]),
+        AppDataSource.query(`
+          SELECT COUNT(*)::int AS cnt
+          FROM neture_supplier_products sp
+          WHERE sp.is_active = true
+            AND sp.created_at >= NOW() - INTERVAL '7 days'
+            AND (
+              sp.distribution_type = 'PUBLIC'
+              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+            )
+        `, [sellerId]),
+        AppDataSource.query(`
+          SELECT COUNT(*)::int AS cnt
+          FROM neture_supplier_products sp
+          WHERE sp.is_active = true
+            AND (
+              sp.distribution_type = 'PUBLIC'
+              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+            )
+            AND sp.id NOT IN (
+              SELECT sr.product_id FROM neture_supplier_requests sr
+              WHERE sr.seller_id = $1
+            )
+        `, [sellerId]),
+      ]);
+
+      const accessible = accessibleRows[0]?.cnt ?? 0;
+      const newThisWeek = newThisWeekRows[0]?.cnt ?? 0;
+      const notRequested = notRequestedRows[0]?.cnt ?? 0;
+
+      // ② 공급 신청 상태
+      const [pending, approved, rejected] = await Promise.all([
+        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.PENDING } }),
+        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.APPROVED } }),
+        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.REJECTED } }),
+      ]);
+
+      // ③ 노출 점검 — Neture에 채널 시스템 없음, 향후 확장 대비 0 고정
+      const approvedButNotExposed = 0;
+
+      // ④ 운영 신호 — Neture에 주문 시스템 없음, 향후 서비스별 연동 시 확장
+      const recentOrders7d = 0;
+      const trend = 'none';
+
+      return {
+        products: {
+          accessible,
+          newThisWeek,
+          notRequested,
+          actionUrl: '/neture/seller/available-supply-products',
+        },
+        requests: {
+          pending,
+          approved,
+          rejected,
+          actionUrl: '/neture/seller/supply-requests',
+        },
+        exposure: {
+          approvedButNotExposed,
+          actionUrl: '/neture/seller/my-products',
+        },
+        operations: {
+          recentOrders7d,
+          trend,
+          actionUrl: '/neture/seller/orders',
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching seller dashboard insight:', error);
+      throw error;
+    }
+  }
 }
