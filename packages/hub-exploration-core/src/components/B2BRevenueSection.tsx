@@ -72,8 +72,8 @@ export function B2BRevenueSection({ items, title, ctaLabel, onCtaClick }: B2BRev
   };
 
   const sortIndicator = (key: SortKey) => {
-    if (sortKey !== key) return ' ↕';
-    return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    if (sortKey !== key) return ' \u2195';
+    return sortOrder === 'asc' ? ' \u2191' : ' \u2193';
   };
 
   return (
@@ -94,11 +94,11 @@ export function B2BRevenueSection({ items, title, ctaLabel, onCtaClick }: B2BRev
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="상품명, 공급사, 카테고리 검색..."
+          placeholder="\uC0C1\uD488\uBA85, \uACF5\uAE09\uC0AC, \uCE74\uD14C\uACE0\uB9AC \uAC80\uC0C9..."
           style={styles.searchInput}
         />
         <span style={styles.resultCount}>
-          총 {filteredAndSorted.length}건
+          \uCD1D {filteredAndSorted.length}\uAC74
         </span>
       </div>
 
@@ -107,27 +107,27 @@ export function B2BRevenueSection({ items, title, ctaLabel, onCtaClick }: B2BRev
         {/* Table Header */}
         <div style={styles.tableHeader}>
           <span style={{ ...styles.th, flex: 2, cursor: 'pointer' }} onClick={() => handleSort('name')}>
-            상품명{sortIndicator('name')}
+            \uC0C1\uD488\uBA85{sortIndicator('name')}
           </span>
           <span style={{ ...styles.th, flex: 1.2, cursor: 'pointer' }} onClick={() => handleSort('supplier')}>
-            공급사{sortIndicator('supplier')}
+            \uACF5\uAE09\uC0AC{sortIndicator('supplier')}
           </span>
           <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('category')}>
-            카테고리{sortIndicator('category')}
+            \uCE74\uD14C\uACE0\uB9AC{sortIndicator('category')}
           </span>
           <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('status')}>
-            상태{sortIndicator('status')}
+            \uC0C1\uD0DC{sortIndicator('status')}
           </span>
           <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('date')}>
-            등록일{sortIndicator('date')}
+            \uB4F1\uB85D\uC77C{sortIndicator('date')}
           </span>
-          <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>액션</span>
+          <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>\uC561\uC158</span>
         </div>
 
         {/* Table Rows */}
         {filteredAndSorted.length === 0 ? (
           <div style={styles.emptyRow}>
-            검색 결과가 없습니다.
+            \uAC80\uC0C9 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.
           </div>
         ) : (
           filteredAndSorted.map(item => (
