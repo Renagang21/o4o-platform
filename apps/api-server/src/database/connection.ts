@@ -21,6 +21,7 @@ import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
+import { ProductApproval } from '../entities/ProductApproval.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
 import { UserActivityLog } from '../entities/UserActivityLog.js';
@@ -476,6 +477,7 @@ export const AppDataSource = new DataSource({
     PasswordResetToken,
     EmailVerificationToken,
     ApprovalLog,
+    ProductApproval, // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
     LinkedAccount,
     AccountActivity,
     UserActivityLog,

@@ -311,6 +311,7 @@ jobs:
           --set-env-vars="REDIS_HOST=10.165.134.11" \
           --set-env-vars="REDIS_PORT=6379" \
           --set-env-vars="REDIS_ENABLED=true" \
+          --set-env-vars="ENABLE_INTERNAL_V2=true" \
           --vpc-connector=o4o-vpc-connector \
           --vpc-egress=private-ranges-only \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db

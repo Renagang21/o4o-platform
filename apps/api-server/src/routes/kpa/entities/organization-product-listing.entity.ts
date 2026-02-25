@@ -16,6 +16,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import type { OrganizationStore } from './organization-store.entity.js';
+import type { NetureSupplierProduct } from '../../../modules/neture/entities/NetureSupplierProduct.entity.js';
 
 @Entity('organization_product_listings')
 @Index('IDX_org_product_listing_org_id', ['organization_id'])
@@ -51,6 +52,15 @@ export class OrganizationProductListing {
 
   @Column({ type: 'int', default: 0 })
   display_order: number;
+
+  // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
+  @Column({ type: 'uuid', nullable: true })
+  product_id: string | null;
+
+  // ESM §4: string-based relation
+  @ManyToOne('NetureSupplierProduct')
+  @JoinColumn({ name: 'product_id' })
+  product?: NetureSupplierProduct;
 
   @CreateDateColumn()
   created_at: Date;
