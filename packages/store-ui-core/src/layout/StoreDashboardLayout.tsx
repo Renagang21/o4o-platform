@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import type { StoreDashboardConfig } from '../config/storeMenuConfig';
 import { StoreTopBar } from '../components/StoreTopBar';
+import type { StoreNavItem } from '../components/StoreTopBar';
 import { StoreSidebar } from '../components/StoreSidebar';
 
 interface StoreDashboardLayoutProps {
@@ -23,6 +24,8 @@ interface StoreDashboardLayoutProps {
   homeLink?: string;
   onLogout?: () => void;
   banner?: React.ReactNode;
+  /** 서비스 네비게이션 링크 (TopBar 중앙에 표시) */
+  navItems?: StoreNavItem[];
 }
 
 export function StoreDashboardLayout({
@@ -32,6 +35,7 @@ export function StoreDashboardLayout({
   homeLink = '/',
   onLogout,
   banner,
+  navItems,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -45,6 +49,7 @@ export function StoreDashboardLayout({
         homeLink={homeLink}
         onLogout={onLogout}
         onMenuToggle={() => setSidebarOpen(true)}
+        navItems={navItems}
       />
 
       {/* ──── Body: sidebar + content ──── */}

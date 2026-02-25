@@ -264,8 +264,17 @@ function FunctionGateRedirect() {
 
 /**
  * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 3
+ * WO-O4O-STORE-ADMIN-LAYOUT-STANDARDIZATION-V1: navItems 추가
  * Store Core v1.0 — KPA-a Store Dashboard Layout Wrapper
  */
+const KPA_STORE_NAV_ITEMS = [
+  { label: '홈', href: '/' },
+  { label: '포럼', href: '/forum' },
+  { label: '강의', href: '/lms' },
+  { label: '콘텐츠', href: '/news' },
+  { label: '약국 HUB', href: '/hub' },
+];
+
 function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -275,6 +284,7 @@ function KpaStoreLayoutWrapper() {
       userName={user?.name || user?.email || ''}
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}
+      navItems={KPA_STORE_NAV_ITEMS}
     />
   );
 }

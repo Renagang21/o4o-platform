@@ -9,6 +9,11 @@ import { NavLink } from 'react-router-dom';
 import { Store, Home, LogOut, Menu } from 'lucide-react';
 import type { StoreDashboardConfig } from '../config/storeMenuConfig';
 
+export interface StoreNavItem {
+  label: string;
+  href: string;
+}
+
 export interface StoreTopBarProps {
   config: StoreDashboardConfig;
   userName?: string;
@@ -16,6 +21,8 @@ export interface StoreTopBarProps {
   homeLink?: string;
   onLogout?: () => void;
   onMenuToggle?: () => void;
+  /** 서비스 네비게이션 링크 (TopBar 중앙에 표시) */
+  navItems?: StoreNavItem[];
 }
 
 export function StoreTopBar({
@@ -25,6 +32,7 @@ export function StoreTopBar({
   homeLink = '/',
   onLogout,
   onMenuToggle,
+  navItems,
 }: StoreTopBarProps) {
   const initial = userInitial || userName?.charAt(0) || '?';
 
@@ -45,6 +53,27 @@ export function StoreTopBar({
             내 매장
           </span>
         </div>
+
+        {/* Center: Service Navigation */}
+        {navItems && navItems.length > 0 && (
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                className={({ isActive }) =>
+                  `px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-teal-50 text-teal-700'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
 
         {/* Right: Home + User + Mobile Menu */}
         <div className="flex items-center gap-3">
