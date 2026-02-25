@@ -205,8 +205,9 @@ export function StoreSignagePage() {
       const loadedItems = res.data.items || [];
       setItems(loadedItems);
       setSignageSnapshots(loadedItems);
-    } catch (e: any) {
-      setError(e.message);
+    } catch {
+      setItems([]);
+      setSignageSnapshots([]);
     } finally {
       setLoading(false);
     }
@@ -218,8 +219,8 @@ export function StoreSignagePage() {
     try {
       const data = await fetchStorePlaylists();
       setPlaylists(data);
-    } catch (e: any) {
-      setPlaylistError(e.message);
+    } catch {
+      setPlaylists([]);
     } finally {
       setPlaylistLoading(false);
     }

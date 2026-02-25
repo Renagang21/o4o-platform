@@ -102,6 +102,13 @@ export interface User {
   // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role (SSOT)
   membershipRole?: string;  // 'member' | 'operator' | 'admin' | undefined (비소속)
 
+  // WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: membership organization 정보
+  membershipOrgId?: string;
+  membershipOrgName?: string;
+  membershipOrgType?: string;   // 'association' | 'branch' | 'group'
+  membershipParentId?: string;
+  membershipStatus?: string;    // 'pending' | 'active' | 'suspended' | 'withdrawn'
+
   // ============================================
   // P2-T4: Super Operator 확장 지점
   // WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
@@ -279,8 +286,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const membershipRes = await authClient.api.get('/kpa/me/membership');
           const membershipData = (membershipRes.data as any);
-          if (membershipData?.success && membershipData?.data?.role) {
-            userData.membershipRole = membershipData.data.role;
+          if (membershipData?.success && membershipData?.data) {
+            const md = membershipData.data;
+            userData.membershipRole = md.role;
+            // WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1
+            userData.membershipOrgId = md.organizationId;
+            userData.membershipOrgName = md.organizationName;
+            userData.membershipOrgType = md.organizationType;
+            userData.membershipParentId = md.parentId;
+            userData.membershipStatus = md.status;
           }
         } catch {
           // non-critical: 비소속 사용자는 membership 없음

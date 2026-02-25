@@ -80,6 +80,7 @@ import { createAdminForceAssetController } from './controllers/admin-force-asset
 import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
 import { createStoreContentController } from './controllers/store-content.controller.js';
 import { createStorePlaylistController } from './controllers/store-playlist.controller.js';
+import { createStoreChannelProductsController } from './controllers/store-channel-products.controller.js';
 import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
 import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
 import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
@@ -205,6 +206,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store Hub routes (WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1)
   router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
+
+  // Channel Product Management (WO-CHANNEL-EXECUTION-CONSOLE-V1)
+  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));

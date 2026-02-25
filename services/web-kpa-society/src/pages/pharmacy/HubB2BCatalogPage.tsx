@@ -71,6 +71,12 @@ export function HubB2BCatalogPage() {
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
+  // 정렬 상태
+  type SortKey = 'name' | 'supplier' | 'category' | 'status' | 'date';
+  type SortOrder = 'asc' | 'desc';
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
   const fetchCatalog = useCallback(async (category: string, pageOffset: number) => {
     setLoading(true);
     setError(null);
@@ -134,6 +140,41 @@ export function HubB2BCatalogPage() {
     }
     return { listed, approved, pending };
   }, [products]);
+
+  // 정렬 적용
+  const sortedProducts = useMemo(() => {
+    if (!sortKey) return products;
+    const dir = sortOrder === 'asc' ? 1 : -1;
+    return [...products].sort((a, b) => {
+      let va = '';
+      let vb = '';
+      switch (sortKey) {
+        case 'name': va = a.name || ''; vb = b.name || ''; break;
+        case 'supplier': va = a.supplierName || ''; vb = b.supplierName || ''; break;
+        case 'category': va = a.category || ''; vb = b.category || ''; break;
+        case 'status': {
+          const order: Record<ProductState, number> = { listed: 0, approved: 1, pending: 2, available: 3 };
+          return (order[getProductState(a)] - order[getProductState(b)]) * dir;
+        }
+        case 'date': va = a.updatedAt || ''; vb = b.updatedAt || ''; break;
+      }
+      return va.localeCompare(vb, 'ko') * dir;
+    });
+  }, [products, sortKey, sortOrder]);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
+
+  const sortIndicator = (key: SortKey) => {
+    if (sortKey !== key) return ' \u2195';
+    return sortOrder === 'asc' ? ' \u2191' : ' \u2193';
+  };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
   const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
@@ -232,16 +273,26 @@ export function HubB2BCatalogPage() {
           <div style={styles.tableCard}>
             {/* Table Header */}
             <div style={styles.tableHeader}>
-              <span style={{ ...styles.th, flex: 2 }}>상품명</span>
-              <span style={{ ...styles.th, flex: 1.2 }}>공급사</span>
-              <span style={{ ...styles.th, flex: 0.8 }}>카테고리</span>
-              <span style={{ ...styles.th, flex: 0.8 }}>상태</span>
-              <span style={{ ...styles.th, flex: 0.8 }}>등록일</span>
+              <span style={{ ...styles.th, flex: 2, cursor: 'pointer' }} onClick={() => handleSort('name')}>
+                상품명{sortIndicator('name')}
+              </span>
+              <span style={{ ...styles.th, flex: 1.2, cursor: 'pointer' }} onClick={() => handleSort('supplier')}>
+                공급사{sortIndicator('supplier')}
+              </span>
+              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('category')}>
+                카테고리{sortIndicator('category')}
+              </span>
+              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('status')}>
+                상태{sortIndicator('status')}
+              </span>
+              <span style={{ ...styles.th, flex: 0.8, cursor: 'pointer' }} onClick={() => handleSort('date')}>
+                등록일{sortIndicator('date')}
+              </span>
               <span style={{ ...styles.th, flex: 1, textAlign: 'right' }}>액션</span>
             </div>
 
             {/* Table Rows */}
-            {products.map(item => {
+            {sortedProducts.map(item => {
               const state = getProductState(item);
               const stateInfo = STATE_CONFIG[state];
               const isApplying = applyingId === item.id;
@@ -484,6 +535,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: '10px 20px',
     borderBottom: `1px solid ${colors.neutral200}`,
     backgroundColor: colors.neutral50,
+    userSelect: 'none' as const,
   },
   th: {
     fontSize: '0.75rem',
@@ -491,6 +543,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     textTransform: 'uppercase',
     letterSpacing: '0.03em',
+    transition: 'color 0.15s',
   } as React.CSSProperties,
   tableRow: {
     display: 'flex',

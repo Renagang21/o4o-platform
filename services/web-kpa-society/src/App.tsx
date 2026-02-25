@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
+import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
@@ -303,6 +304,8 @@ function App() {
       <LoginModalProvider>
       <OrganizationProvider>
       <BrowserRouter>
+        {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
+        <ServiceProvider>
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
@@ -654,6 +657,7 @@ function App() {
           {/* 404 - 알 수 없는 경로 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </ServiceProvider>
       </BrowserRouter>
       </OrganizationProvider>
       </LoginModalProvider>
