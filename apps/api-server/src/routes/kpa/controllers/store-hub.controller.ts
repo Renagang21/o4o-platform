@@ -3,6 +3,7 @@
  *
  * WO-STORE-HUB-UNIFIED-RENDERING-PHASE1-V1
  * WO-PHARMACY-HUB-CHANNEL-LAYER-UI-V1 (channels endpoint)
+ * WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1 (channel creation)
  *
  * Aggregates Products / Contents / Signage summaries from multiple services
  * into a single response for the pharmacy owner's "cyber store" dashboard.
@@ -16,6 +17,7 @@ import { KpaMember } from '../entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
+import { OrganizationChannel } from '../entities/organization-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -311,8 +313,117 @@ export function createStoreHubController(
           ),
         );
 
-        res.json({ success: true, data: channels });
+        // WO-CHANNEL-EXECUTION-CONSOLE-V1: attach org code for storefront preview
+        let organizationCode: string | null = null;
+        try {
+          const orgRow = await dataSource.query(
+            `SELECT code FROM organizations WHERE id = $1`,
+            [organizationId]
+          );
+          organizationCode = orgRow[0]?.code || null;
+        } catch { /* graceful degradation */ }
+
+        res.json({ success: true, data: channels, organizationCode });
       } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
+   * POST /store-hub/channels
+   *
+   * WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1
+   *
+   * Creates a new channel for the user's organization.
+   * TABLET/SIGNAGE → APPROVED immediately.
+   * B2C/KIOSK → PENDING (requires Gate activation).
+   */
+  router.post(
+    '/channels',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(401).json({
+            success: false,
+            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
+          });
+          return;
+        }
+
+        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
+          });
+          return;
+        }
+
+        const organizationId = await getUserOrganizationId(dataSource, userId);
+        if (!organizationId) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'NO_ORGANIZATION', message: 'No organization found' },
+          });
+          return;
+        }
+
+        const { channelType } = req.body;
+        const VALID_TYPES = ['B2C', 'KIOSK', 'TABLET', 'SIGNAGE'];
+
+        if (!channelType || !VALID_TYPES.includes(channelType)) {
+          res.status(400).json({
+            success: false,
+            error: { code: 'INVALID_INPUT', message: `channelType must be one of: ${VALID_TYPES.join(', ')}` },
+          });
+          return;
+        }
+
+        // Determine initial status based on channel type
+        const INSTANT_CHANNELS = ['TABLET', 'SIGNAGE'];
+        const status = INSTANT_CHANNELS.includes(channelType) ? 'APPROVED' : 'PENDING';
+        const approvedAt = status === 'APPROVED' ? new Date() : null;
+
+        const channelRepo = dataSource.getRepository(OrganizationChannel);
+        const newChannel = channelRepo.create({
+          organization_id: organizationId,
+          channel_type: channelType,
+          status,
+          approved_at: approvedAt,
+        });
+
+        const saved = await channelRepo.save(newChannel);
+
+        res.status(201).json({
+          success: true,
+          data: {
+            id: saved.id,
+            channelType: saved.channel_type,
+            status: saved.status,
+            approvedAt: saved.approved_at?.toISOString() ?? null,
+            createdAt: saved.created_at.toISOString(),
+            visibleProductCount: 0,
+            totalProductCount: 0,
+            salesLimitConfiguredCount: 0,
+          },
+        });
+      } catch (error: any) {
+        // Handle unique constraint violation (organization_id, channel_type)
+        if (error.code === '23505') {
+          res.status(409).json({
+            success: false,
+            error: { code: 'ALREADY_EXISTS', message: 'This channel type already exists for your organization' },
+          });
+          return;
+        }
         res.status(500).json({
           success: false,
           error: { code: 'INTERNAL_ERROR', message: error.message },

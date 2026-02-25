@@ -245,9 +245,11 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Neture Partner Contract | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
 | Design Core | `docs/rules/design-core-governance.md` |
 | Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
+| Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
+| Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
 
 ---
 
-*Updated: 2026-02-24*
-*Version: 6.0*
+*Updated: 2026-02-25*
+*Version: 6.2*
 *Status: Active Constitution*

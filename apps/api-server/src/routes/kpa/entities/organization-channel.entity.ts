@@ -47,6 +47,9 @@ export class OrganizationChannel {
   @Column({ type: 'timestamp', nullable: true })
   approved_at: Date | null;
 
+  @Column({ type: 'jsonb', default: () => "'{}'" })
+  config: Record<string, any>;
+
   @CreateDateColumn()
   created_at: Date;
 

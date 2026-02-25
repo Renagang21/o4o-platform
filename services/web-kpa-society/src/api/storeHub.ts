@@ -67,6 +67,36 @@ export async function fetchChannelOverview(): Promise<ChannelOverview[]> {
   return response.data ?? [];
 }
 
+/** WO-CHANNEL-EXECUTION-CONSOLE-V1: includes organizationCode for storefront preview */
+export interface ChannelOverviewWithCode {
+  channels: ChannelOverview[];
+  organizationCode: string | null;
+}
+
+export async function fetchChannelOverviewWithCode(): Promise<ChannelOverviewWithCode> {
+  const response = await apiClient.get<{
+    success: boolean;
+    data: ChannelOverview[];
+    organizationCode?: string | null;
+  }>('/store-hub/channels');
+  return {
+    channels: response.data ?? [],
+    organizationCode: response.organizationCode ?? null,
+  };
+}
+
+// ─────────────────────────────────────────────────────
+// Channel Creation (WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1)
+// ─────────────────────────────────────────────────────
+
+export async function createChannel(channelType: ChannelType): Promise<ChannelOverview> {
+  const response = await apiClient.post<{ success: boolean; data: ChannelOverview }>(
+    '/store-hub/channels',
+    { channelType }
+  );
+  return response.data;
+}
+
 // ─────────────────────────────────────────────────────
 // Store KPI Summary (WO-O4O-STORE-KPI-REALDATA-V1)
 // ─────────────────────────────────────────────────────
