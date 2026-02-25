@@ -2,8 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
-import { ServiceProvider } from './contexts/ServiceContext';
+import { ServiceProvider, useService } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
+import { getDisplayOrganizationName } from './lib/org-display';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -278,7 +279,11 @@ const KPA_STORE_NAV_ITEMS = [
 
 function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
+  const { currentService } = useService();
   const navigate = useNavigate();
+
+  const orgName = getDisplayOrganizationName(currentService, user) || undefined;
+
   return (
     <StoreDashboardLayout
       config={KPA_SOCIETY_STORE_CONFIG}
@@ -286,6 +291,9 @@ function KpaStoreLayoutWrapper() {
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}
       navItems={KPA_STORE_NAV_ITEMS}
+      serviceLabel="약사 네트워크"
+      serviceBadge="KPA"
+      orgName={orgName}
     />
   );
 }

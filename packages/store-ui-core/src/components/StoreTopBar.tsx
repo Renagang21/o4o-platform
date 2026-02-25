@@ -23,6 +23,12 @@ export interface StoreTopBarProps {
   onMenuToggle?: () => void;
   /** 서비스 네비게이션 링크 (TopBar 중앙에 표시) */
   navItems?: StoreNavItem[];
+  /** 활성 서비스 이름 (제공 시 2-line 모드) */
+  serviceLabel?: string;
+  /** 서비스 뱃지 텍스트 (미제공 시 "내 매장") */
+  serviceBadge?: string;
+  /** 소속 조직명 (2-line 모드 2번째 줄에 표시) */
+  orgName?: string;
 }
 
 export function StoreTopBar({
@@ -33,24 +39,38 @@ export function StoreTopBar({
   onLogout,
   onMenuToggle,
   navItems,
+  serviceLabel,
+  serviceBadge,
+  orgName,
 }: StoreTopBarProps) {
   const initial = userInitial || userName?.charAt(0) || '?';
 
   return (
     <header className="sticky top-0 z-50 shrink-0 bg-white/95 backdrop-blur-lg border-b border-slate-200/50">
       <div className="flex items-center justify-between px-4 h-14">
-        {/* Left: Logo + Badge */}
+        {/* Left: Logo + Badge (2-line when serviceLabel provided) */}
         <div className="flex items-center gap-3">
           <NavLink to={homeLink} className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center shadow-md">
               <Store className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-lg text-slate-800 hidden sm:inline">
-              {config.serviceName}
-            </span>
+            {serviceLabel ? (
+              <div className="hidden sm:flex flex-col leading-tight">
+                <span className="font-bold text-base text-slate-800">
+                  {serviceLabel}
+                </span>
+                <span className="text-xs text-slate-500">
+                  {orgName ? `${orgName} · ${config.serviceName}` : config.serviceName}
+                </span>
+              </div>
+            ) : (
+              <span className="font-bold text-lg text-slate-800 hidden sm:inline">
+                {config.serviceName}
+              </span>
+            )}
           </NavLink>
           <span className="px-3 py-1.5 rounded-lg text-sm font-medium bg-teal-100 text-teal-700">
-            내 매장
+            {serviceBadge || '내 매장'}
           </span>
         </div>
 

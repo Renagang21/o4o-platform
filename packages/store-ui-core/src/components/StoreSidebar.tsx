@@ -40,6 +40,8 @@ export interface StoreSidebarProps {
   onLogout?: () => void;
   onItemClick?: () => void;
   onClose?: () => void;
+  /** 소속 조직명 (제공 시 "조직명 매장", 미제공 시 "내 매장 관리") */
+  orgName?: string;
 }
 
 export function StoreSidebar({
@@ -47,6 +49,7 @@ export function StoreSidebar({
   onLogout,
   onItemClick,
   onClose,
+  orgName,
 }: StoreSidebarProps) {
   const enabledMenuItems = ALL_STORE_MENUS.filter((item) =>
     config.enabledMenus.includes(item.key),
@@ -60,7 +63,7 @@ export function StoreSidebar({
           <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
             <Store className="w-5 h-5 text-teal-700" />
           </div>
-          <h2 className="font-bold text-slate-800">내 매장 관리</h2>
+          <h2 className="font-bold text-slate-800">{orgName ? `${orgName} 매장` : '내 매장 관리'}</h2>
         </div>
         {onClose && (
           <button

@@ -26,6 +26,12 @@ interface StoreDashboardLayoutProps {
   banner?: React.ReactNode;
   /** 서비스 네비게이션 링크 (TopBar 중앙에 표시) */
   navItems?: StoreNavItem[];
+  /** 활성 서비스 이름 (제공 시 2-line 모드) */
+  serviceLabel?: string;
+  /** 서비스 뱃지 텍스트 (미제공 시 "내 매장") */
+  serviceBadge?: string;
+  /** 소속 조직명 */
+  orgName?: string;
 }
 
 export function StoreDashboardLayout({
@@ -36,6 +42,9 @@ export function StoreDashboardLayout({
   onLogout,
   banner,
   navItems,
+  serviceLabel,
+  serviceBadge,
+  orgName,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -50,6 +59,9 @@ export function StoreDashboardLayout({
         onLogout={onLogout}
         onMenuToggle={() => setSidebarOpen(true)}
         navItems={navItems}
+        serviceLabel={serviceLabel}
+        serviceBadge={serviceBadge}
+        orgName={orgName}
       />
 
       {/* ──── Body: sidebar + content ──── */}
@@ -73,6 +85,7 @@ export function StoreDashboardLayout({
             onLogout={onLogout}
             onItemClick={() => setSidebarOpen(false)}
             onClose={() => setSidebarOpen(false)}
+            orgName={orgName}
           />
         </aside>
 
