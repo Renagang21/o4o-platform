@@ -18,6 +18,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { ProductApprovalV2Service } from './product-approval-v2.service.js';
 import { OrganizationProductListing } from '../../routes/kpa/entities/organization-product-listing.entity.js';
+import { NetureSupplierProduct } from '../neture/entities/NetureSupplierProduct.entity.js';
+import { ProductApproval } from '../../entities/ProductApproval.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -273,6 +275,69 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
       });
     } catch (err: any) {
       logger.error('[v2-internal] listings query error:', err);
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // ========================================================================
+  // GET /products — 테스트용 제품 조회 (distribution_type별)
+  // ========================================================================
+  router.get('/products', async (req: Request, res: Response) => {
+    try {
+      const { distributionType, limit } = req.query;
+      const productRepo = dataSource.getRepository(NetureSupplierProduct);
+
+      const qb = productRepo.createQueryBuilder('p')
+        .where('p.isActive = :active', { active: true })
+        .orderBy('p.createdAt', 'DESC')
+        .take(Number(limit) || 5);
+
+      if (distributionType) {
+        qb.andWhere('p.distributionType = :dt', { dt: distributionType as string });
+      }
+
+      const products = await qb.getMany();
+
+      res.json({
+        success: true,
+        data: products.map(p => ({
+          id: p.id,
+          name: p.name,
+          supplierId: p.supplierId,
+          distributionType: p.distributionType,
+          isActive: p.isActive,
+          allowedSellerIds: p.allowedSellerIds,
+        })),
+        count: products.length,
+      });
+    } catch (err: any) {
+      logger.error('[v2-internal] products query error:', err);
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // ========================================================================
+  // GET /approvals — 테스트용 승인 목록 조회
+  // ========================================================================
+  router.get('/approvals', async (req: Request, res: Response) => {
+    try {
+      const { productId, organizationId, status } = req.query;
+      const approvalRepo = dataSource.getRepository(ProductApproval);
+
+      const where: Record<string, any> = {};
+      if (productId) where.product_id = productId as string;
+      if (organizationId) where.organization_id = organizationId as string;
+      if (status) where.approval_status = status as string;
+
+      const approvals = await approvalRepo.find({
+        where,
+        order: { created_at: 'DESC' },
+        take: 20,
+      });
+
+      res.json({ success: true, data: approvals, count: approvals.length });
+    } catch (err: any) {
+      logger.error('[v2-internal] approvals query error:', err);
       res.status(500).json({ success: false, error: err.message });
     }
   });
