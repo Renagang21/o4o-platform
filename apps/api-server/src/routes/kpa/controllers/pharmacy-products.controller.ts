@@ -147,7 +147,7 @@ export function createPharmacyProductsController(
          (EXISTS(
            SELECT 1 FROM organization_product_listings opl
            WHERE opl.organization_id = $1
-             AND opl.external_product_id = sp.id::text
+             AND (opl.external_product_id = sp.id::text OR opl.product_id = sp.id)
          )) AS "isListed"
        FROM neture_supplier_products sp
        JOIN neture_suppliers s ON s.id = sp.supplier_id
