@@ -183,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isApproved = user?.approvalStatus === 'approved';
-  const isAdmin = user?.roles.includes('admin') && isApproved;
+  const isAdmin = !!(user?.roles.includes('admin') && isApproved);
   const isPending = user?.approvalStatus === 'pending';
   const isRejected = user?.approvalStatus === 'rejected';
 
