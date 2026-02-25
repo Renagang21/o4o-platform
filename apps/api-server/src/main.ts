@@ -1159,6 +1159,18 @@ const startServer = async () => {
       logger.error('Failed to register Hub Content routes:', hubContentError);
     }
 
+    // 40. Register Product Policy v2 Internal routes (WO-PRODUCT-POLICY-V2-INTERNAL-TEST-ENDPOINT-V1)
+    if (process.env.ENABLE_INTERNAL_V2 === 'true') {
+      try {
+        const { createProductPolicyV2InternalRouter } = await import('./modules/product-policy-v2/product-policy-v2.internal.routes.js');
+        const v2InternalRoutes = createProductPolicyV2InternalRouter(AppDataSource);
+        app.use('/api/internal/v2/product-policy', v2InternalRoutes);
+        logger.info('✅ Product Policy v2 internal routes registered at /api/internal/v2/product-policy');
+      } catch (v2InternalError) {
+        logger.error('Failed to register Product Policy v2 internal routes:', v2InternalError);
+      }
+    }
+
     // 6. Core routes now registered via dynamic module loader
     // setupRoutes removed - legacy routes.config.js deleted
     logger.info('✅ Routes registered via module loader');

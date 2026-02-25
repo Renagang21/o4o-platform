@@ -22,7 +22,8 @@ export enum ProductPurpose {
  * 유통 정책 (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1)
  */
 export enum DistributionType {
-  PUBLIC = 'PUBLIC',   // HUB 공개 (모든 운영자에게 노출)
+  PUBLIC = 'PUBLIC',   // HUB 공개 (모든 운영자에게 노출), 승인 불필요
+  SERVICE = 'SERVICE', // 서비스 범위 공개, 운영자 승인 필요
   PRIVATE = 'PRIVATE', // 지정 판매자 전용
 }
 
