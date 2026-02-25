@@ -1635,6 +1635,74 @@ export class NetureService {
   }
 
   /**
+   * POST /supplier/products - 공급자 상품 생성
+   *
+   * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
+   * 기본값: distributionType=PRIVATE, purpose=CATALOG, isActive=true, acceptsApplications=true
+   */
+  async createSupplierProduct(
+    supplierId: string,
+    data: {
+      name: string;
+      category?: string;
+      description?: string;
+      purpose?: ProductPurpose;
+      distributionType?: DistributionType;
+      acceptsApplications?: boolean;
+    }
+  ) {
+    try {
+      if (!data.name || !data.name.trim()) {
+        return { success: false, error: 'MISSING_NAME' };
+      }
+
+      // Supplier ACTIVE guard
+      const supplier = await this.supplierRepo.findOne({
+        where: { id: supplierId },
+        select: ['id', 'status'],
+      });
+      if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
+        return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
+      }
+
+      const product = this.productRepo.create({
+        supplierId,
+        name: data.name.trim(),
+        category: data.category || null,
+        description: data.description || null,
+        purpose: data.purpose || ProductPurpose.CATALOG,
+        distributionType: data.distributionType || DistributionType.PRIVATE,
+        isActive: true,
+        acceptsApplications: data.acceptsApplications ?? true,
+        allowedSellerIds: [],
+      });
+
+      const savedProduct = await this.productRepo.save(product);
+
+      logger.info(`[NetureService] Created product ${savedProduct.id} by supplier ${supplierId}`);
+
+      return {
+        success: true,
+        data: {
+          id: savedProduct.id,
+          name: savedProduct.name,
+          category: savedProduct.category,
+          description: savedProduct.description,
+          purpose: savedProduct.purpose,
+          isActive: savedProduct.isActive,
+          acceptsApplications: savedProduct.acceptsApplications,
+          distributionType: savedProduct.distributionType,
+          allowedSellerIds: savedProduct.allowedSellerIds,
+          createdAt: savedProduct.createdAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error creating supplier product:', error);
+      throw error;
+    }
+  }
+
+  /**
    * PATCH /supplier/products/:id - 제품 상태 업데이트
    *
    * 허용 액션:

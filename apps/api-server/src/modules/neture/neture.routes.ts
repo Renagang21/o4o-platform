@@ -405,6 +405,50 @@ router.post('/supplier/requests', requireAuth, async (req: AuthenticatedRequest,
 // ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
 
 /**
+ * POST /api/v1/neture/supplier/products
+ * Create a new product for authenticated supplier
+ * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
+ */
+router.post('/supplier/products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = await getSupplierIdFromUser(req);
+
+    if (!supplierId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { name, category, description, purpose, distributionType, acceptsApplications } = req.body;
+
+    const result = await netureService.createSupplierProduct(supplierId, {
+      name,
+      category,
+      description,
+      purpose,
+      distributionType,
+      acceptsApplications,
+    });
+
+    if (!result.success) {
+      const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403 : 400;
+      return res.status(statusCode).json(result);
+    }
+
+    res.status(201).json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error creating supplier product:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to create supplier product',
+    });
+  }
+});
+
+/**
  * GET /api/v1/neture/supplier/products
  * Get products for authenticated supplier
  */
