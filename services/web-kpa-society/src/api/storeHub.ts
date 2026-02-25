@@ -55,6 +55,7 @@ export interface ChannelOverview {
   status: ChannelStatus;
   approvedAt: string | null;
   createdAt: string;
+  updatedAt: string;
   visibleProductCount: number;
   totalProductCount: number;
   salesLimitConfiguredCount: number;

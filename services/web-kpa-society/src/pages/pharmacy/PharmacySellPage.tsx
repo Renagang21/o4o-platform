@@ -53,14 +53,24 @@ const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: stri
 };
 
 export function PharmacySellPage() {
-  const [activeTab, setActiveTab] = useState<TabId>('applications');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab: TabId = searchParams.get('tab') === 'listings' ? 'listings' : 'applications';
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    setSearchParams(
+      tab === 'applications' ? {} : { tab },
+      { replace: true },
+    );
+  };
 
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px' }}>
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <Link to="/store" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
-          &larr; 대시보드
+        <Link to="/store/products" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
+          &larr; 상품 관리
         </Link>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>
           상품 판매 관리
@@ -78,7 +88,7 @@ export function PharmacySellPage() {
         ]).map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabChange(tab.id)}
             style={{
               padding: '12px 24px',
               fontSize: '0.95rem',

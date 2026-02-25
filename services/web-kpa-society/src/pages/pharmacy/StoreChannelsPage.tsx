@@ -108,6 +108,7 @@ function isForcedActive(item: StoreAssetItem): boolean {
 
 function AddProductModal({
   open,
+  onError,
   onClose,
   channelId,
   onProductAdded,
@@ -116,6 +117,7 @@ function AddProductModal({
   onClose: () => void;
   channelId: string;
   onProductAdded: () => void;
+  onError?: (message: string) => void;
 }) {
   const [available, setAvailable] = useState<AvailableProduct[]>([]);
   const [loadingList, setLoadingList] = useState(false);
@@ -139,7 +141,7 @@ function AddProductModal({
       setAvailable(prev => prev.filter(p => p.id !== productListingId));
       onProductAdded();
     } catch {
-      // Error handled silently — user can retry
+      onError?.('제품 추가에 실패했습니다.');
     } finally {
       setAddingId(null);
     }
@@ -243,6 +245,15 @@ export function StoreChannelsPage() {
   const [orgCode, setOrgCode] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
 
+  // WO-STORE-CHANNEL-BETA-READINESS-V1: user feedback + operational visibility
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [lastFetched, setLastFetched] = useState<Date | null>(null);
+
+  const showToast = useCallback((type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     const results = await Promise.allSettled([
@@ -255,8 +266,14 @@ export function StoreChannelsPage() {
     setChannels(chResult.channels);
     setOrgCode(chResult.organizationCode);
     setAssets(results[1].status === 'fulfilled' ? results[1].value as StoreAssetItem[] : []);
+    setLastFetched(new Date());
     setLoading(false);
-  }, []);
+
+    // WO-STORE-CHANNEL-BETA-READINESS-V1: error feedback
+    if (chResult.channels.length === 0 && results[0].status === 'rejected') {
+      showToast('error', '채널 정보를 불러오지 못했습니다.');
+    }
+  }, [showToast]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -274,10 +291,11 @@ export function StoreChannelsPage() {
       setChannelProducts(products);
     } catch {
       setChannelProducts([]);
+      showToast('error', '제품 목록을 불러오지 못했습니다.');
     } finally {
       setProductLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     if (isProductChannel && currentChannel?.id) {
@@ -320,7 +338,9 @@ export function StoreChannelsPage() {
       setAssets(prev => prev.map(a =>
         a.id === item.id ? { ...a, channelMap: res.data.channelMap } : a,
       ));
-    } catch { /* retry manually */ } finally {
+    } catch {
+      showToast('error', '채널 설정 변경에 실패했습니다.');
+    } finally {
       setUpdatingId(null);
     }
   };
@@ -337,7 +357,9 @@ export function StoreChannelsPage() {
       setAssets(prev => prev.map(a =>
         a.id === item.id ? { ...a, publishStatus: res.data.publishStatus } : a,
       ));
-    } catch { /* retry manually */ } finally {
+    } catch {
+      showToast('error', '게시 상태 변경에 실패했습니다.');
+    } finally {
       setUpdatingId(null);
     }
   };
@@ -349,9 +371,11 @@ export function StoreChannelsPage() {
     try {
       await deactivateChannelProduct(currentChannel.id, productChannelId);
       await loadChannelProducts(currentChannel.id);
-      // Refresh KPI
       fetchChannelOverview().then(setChannels).catch(() => {});
-    } catch { /* retry manually */ } finally {
+      showToast('success', '제품이 채널에서 제거되었습니다.');
+    } catch {
+      showToast('error', '제품 제거에 실패했습니다.');
+    } finally {
       setDeactivatingId(null);
     }
   };
@@ -360,8 +384,8 @@ export function StoreChannelsPage() {
   const handleProductAdded = () => {
     if (currentChannel) {
       loadChannelProducts(currentChannel.id);
-      // Refresh KPI
       fetchChannelOverview().then(setChannels).catch(() => {});
+      showToast('success', '제품이 채널에 추가되었습니다.');
     }
   };
 
@@ -385,7 +409,7 @@ export function StoreChannelsPage() {
       await reorderChannelProducts(currentChannel.id, items);
       await loadChannelProducts(currentChannel.id);
     } catch {
-      // Revert on failure — refetch
+      showToast('error', '순서 변경에 실패했습니다.');
       await loadChannelProducts(currentChannel.id);
     } finally {
       setReordering(false);
@@ -398,7 +422,10 @@ export function StoreChannelsPage() {
     try {
       await createChannel(activeTab);
       await fetchData();
-    } catch { /* error handled — user can retry */ } finally {
+      showToast('success', `${CHANNEL_TABS.find(t => t.type === activeTab)?.label ?? activeTab} 채널이 생성되었습니다.`);
+    } catch {
+      showToast('error', '채널 생성에 실패했습니다.');
+    } finally {
       setCreating(false);
     }
   };
@@ -407,6 +434,30 @@ export function StoreChannelsPage() {
     return (
       <div className="flex items-center justify-center py-20 text-slate-400">
         <Loader2 className="w-5 h-5 animate-spin mr-2" /> 채널 정보를 불러오는 중...
+      </div>
+    );
+  }
+
+  if (!loading && channels.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="text-sm text-slate-500 mb-1">
+          <Link to="/store" className="text-blue-600 hover:underline">&larr; 대시보드</Link>
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900 mb-8">채널 관리</h1>
+        <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
+          <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+          <p className="text-sm text-slate-500">아직 등록된 채널이 없습니다.</p>
+          <p className="text-xs text-slate-400 mt-1">아래 버튼으로 첫 채널을 생성하세요.</p>
+          <button
+            onClick={handleCreateChannel}
+            disabled={creating}
+            className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+            B2C 채널 만들기
+          </button>
+        </div>
       </div>
     );
   }
@@ -422,12 +473,19 @@ export function StoreChannelsPage() {
           <h1 className="text-2xl font-bold text-slate-900">채널 관리</h1>
           <p className="text-sm text-slate-500 mt-1">각 채널의 제품 진열과 콘텐츠 노출을 관리합니다</p>
         </div>
-        <button
-          onClick={fetchData}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
-        >
-          <RefreshCw className="w-4 h-4" /> 새로고침
-        </button>
+        <div className="flex items-center gap-3">
+          {lastFetched && (
+            <span className="text-xs text-slate-400">
+              {lastFetched.toLocaleTimeString('ko-KR')} 조회
+            </span>
+          )}
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
+          >
+            <RefreshCw className="w-4 h-4" /> 새로고침
+          </button>
+        </div>
       </div>
 
       {/* ─── [A] Channel Tabs ────────────────────── */}
@@ -463,17 +521,37 @@ export function StoreChannelsPage() {
         </div>
       </div>
 
+      {/* ─── Toast Feedback (WO-STORE-CHANNEL-BETA-READINESS-V1) ─── */}
+      {toast && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '8px',
+          padding: '12px 16px', borderRadius: '8px', border: '1px solid',
+          fontSize: '0.875rem', marginBottom: '16px',
+          backgroundColor: toast.type === 'success' ? '#f0fdf4' : '#fef2f2',
+          borderColor: toast.type === 'success' ? '#86efac' : '#fecaca',
+          color: toast.type === 'success' ? '#166534' : '#991b1b',
+        }}>
+          <span>{toast.type === 'success' ? '\u2705' : '\u274C'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       {/* ─── [B] Channel KPI ─────────────────────── */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="rounded-lg border border-slate-200 p-4 bg-white">
           <div className="text-xs text-slate-500 mb-1">채널 상태</div>
           {currentChannel ? (
-            <span
-              className="inline-flex px-2.5 py-1 rounded text-sm font-semibold"
-              style={{ background: st!.bg, color: st!.color }}
-            >
-              {st!.label}
-            </span>
+            <>
+              <span
+                className="inline-flex px-2.5 py-1 rounded text-sm font-semibold"
+                style={{ background: st!.bg, color: st!.color }}
+              >
+                {st!.label}
+              </span>
+              <div className="text-[10px] text-slate-400 mt-2">
+                수정: {formatDate(currentChannel.updatedAt)}
+              </div>
+            </>
           ) : (
             <button
               onClick={handleCreateChannel}
@@ -822,6 +900,7 @@ export function StoreChannelsPage() {
           onClose={() => setShowAddModal(false)}
           channelId={currentChannel.id}
           onProductAdded={handleProductAdded}
+          onError={(msg) => showToast('error', msg)}
         />
       )}
     </div>

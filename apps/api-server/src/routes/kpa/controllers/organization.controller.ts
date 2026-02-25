@@ -6,7 +6,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../entities/index.js';
+import { OrganizationStore, OrganizationChannel } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;
@@ -144,6 +144,31 @@ export function createOrganizationController(
         });
 
         const saved = await orgRepo.save(org);
+
+        // WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1:
+        // Auto-seed base-right channels (B2C, KIOSK) for new organizations.
+        try {
+          const channelRepo = dataSource.getRepository(OrganizationChannel);
+          const BASE_CHANNELS: Array<'B2C' | 'KIOSK'> = ['B2C', 'KIOSK'];
+          const now = new Date();
+
+          for (const channelType of BASE_CHANNELS) {
+            const exists = await channelRepo.findOne({
+              where: { organization_id: saved.id, channel_type: channelType },
+            });
+            if (!exists) {
+              await channelRepo.save(channelRepo.create({
+                organization_id: saved.id,
+                channel_type: channelType,
+                status: 'APPROVED',
+                approved_at: now,
+              }));
+            }
+          }
+        } catch (seedErr: any) {
+          console.warn('[OrgCreate] Failed to seed base channels:', seedErr.message);
+        }
+
         res.status(201).json({ data: saved });
       } catch (error: any) {
         console.error('Failed to create organization:', error);

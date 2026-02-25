@@ -23,12 +23,12 @@
 
 | channel_type | 생성 시 status | 승인 필요 | 비고 |
 |-------------|:---:|:---:|------|
-| **B2C** | PENDING | 예 (Gate) | 기존 유지 |
-| **KIOSK** | PENDING | 예 (Gate) | B2C와 동일 |
+| **B2C** | APPROVED | 없음 | Base-right 채널 (WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1) |
+| **KIOSK** | APPROVED | 없음 | Base-right 채널 (WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1) |
 | **TABLET** | APPROVED | 없음 | 즉시 생성 |
 | **SIGNAGE** | APPROVED | 없음 | 즉시 생성 |
 
-코드 강제: `INSTANT_CHANNELS = ['TABLET', 'SIGNAGE']`
+코드 강제: 4개 기본 채널 모두 즉시 APPROVED. 향후 외부/파트너 채널은 PENDING 흐름 사용.
 
 ---
 
@@ -55,8 +55,7 @@ Body: { channelType: "B2C" | "KIOSK" | "TABLET" | "SIGNAGE" }
 
 | 조건 | 응답 |
 |------|------|
-| TABLET/SIGNAGE | 201 — status: APPROVED, approved_at: NOW() |
-| B2C/KIOSK | 201 — status: PENDING |
+| 모든 채널 | 201 — status: APPROVED, approved_at: NOW() |
 | 중복 | 409 — ALREADY_EXISTS |
 | 잘못된 타입 | 400 — INVALID_INPUT |
 
@@ -65,7 +64,7 @@ Body: { channelType: "B2C" | "KIOSK" | "TABLET" | "SIGNAGE" }
 - Cross-Org 방어: `organization_id` 인증 컨텍스트에서 강제
 - channel_type ENUM 강제: 4개만 허용
 - `UQ_org_channel_type (organization_id, channel_type)` DB 제약 활용
-- B2C/KIOSK 자동 승인 금지
+- 신규 Organization 생성 시 B2C/KIOSK 자동 시드 (APPROVED)
 
 ---
 
@@ -109,6 +108,7 @@ Body: { channelType: "B2C" | "KIOSK" | "TABLET" | "SIGNAGE" }
 ## 8. 관련 WO
 
 - **WO-CHANNEL-EXECUTION-CONSOLE-V1**: 채널 실행 콘솔 (선행, 완료)
+- **WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1**: B2C/KIOSK base-right 활성화 (적용됨, 2026-02-25)
 - **WO-TABLET-DOMAIN-SIMPLIFICATION-V1**: TABLET 도메인 분리 (별도 진행)
 
 ---

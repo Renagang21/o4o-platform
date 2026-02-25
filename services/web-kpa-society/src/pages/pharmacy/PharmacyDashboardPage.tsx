@@ -90,6 +90,7 @@ function buildStoreDashboardConfig(data: StoreDashboardData): OperatorDashboardC
       label: '승인 대기 상품',
       value: pendingApps.length,
       status: pendingApps.length > 0 ? 'warning' : 'neutral',
+      link: '/store/products/b2c?tab=applications',
     },
     {
       key: 'published-content',

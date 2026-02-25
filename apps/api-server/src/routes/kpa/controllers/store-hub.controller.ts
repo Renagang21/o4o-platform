@@ -286,6 +286,7 @@ export function createStoreHubController(
                oc.status,
                oc.approved_at AS "approvedAt",
                oc.created_at AS "createdAt",
+               oc.updated_at AS "updatedAt",
                COALESCE(stats.visible_count, 0)::int AS "visibleProductCount",
                COALESCE(stats.total_count, 0)::int AS "totalProductCount",
                COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount"
@@ -337,10 +338,10 @@ export function createStoreHubController(
    * POST /store-hub/channels
    *
    * WO-CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1
+   * WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1
    *
    * Creates a new channel for the user's organization.
-   * TABLET/SIGNAGE → APPROVED immediately.
-   * B2C/KIOSK → PENDING (requires Gate activation).
+   * All 4 base-right channels (B2C/KIOSK/TABLET/SIGNAGE) → APPROVED immediately.
    */
   router.post(
     '/channels',
@@ -387,10 +388,11 @@ export function createStoreHubController(
           return;
         }
 
-        // Determine initial status based on channel type
-        const INSTANT_CHANNELS = ['TABLET', 'SIGNAGE'];
-        const status = INSTANT_CHANNELS.includes(channelType) ? 'APPROVED' : 'PENDING';
-        const approvedAt = status === 'APPROVED' ? new Date() : null;
+        // WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1:
+        // All 4 channel types are base-right channels → APPROVED immediately.
+        // External/partner channels (future) will use PENDING flow.
+        const status = 'APPROVED';
+        const approvedAt = new Date();
 
         const channelRepo = dataSource.getRepository(OrganizationChannel);
         const newChannel = channelRepo.create({

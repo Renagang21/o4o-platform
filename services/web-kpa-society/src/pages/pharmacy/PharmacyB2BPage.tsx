@@ -112,14 +112,20 @@ export function PharmacyB2BPage() {
     <div style={styles.container}>
       {/* 헤더 */}
       <header style={styles.header}>
-        <Link to="/store" style={styles.backLink}>&larr; 약국 경영지원</Link>
+        <Link to="/store" style={styles.backLink}>&larr; 내 매장</Link>
         <div style={styles.headerMain}>
           <div>
-            <h1 style={styles.pageTitle}>B2B 구매</h1>
+            <h1 style={styles.pageTitle}>상품 관리</h1>
             <p style={styles.pageDesc}>매장에서 취급하는 상품을 서비스별로 탐색합니다</p>
           </div>
         </div>
       </header>
+
+      {/* 상품 도메인 서브 네비게이션 (WO-STORE-IA-ALIGNMENT-V1) */}
+      <div style={styles.productNav}>
+        <Link to="/store/products" style={styles.productNavActive}>B2B 구매</Link>
+        <Link to="/store/products/b2c" style={styles.productNavLink}>판매 신청</Link>
+      </div>
 
       {/* 도메인 탭 (WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1) */}
       <div style={styles.tabBar}>
@@ -291,6 +297,36 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral500,
     margin: 0,
   },
+
+  // Product Domain Sub-Navigation (WO-STORE-IA-ALIGNMENT-V1)
+  productNav: {
+    display: 'flex',
+    gap: '4px',
+    marginBottom: '20px',
+    padding: '4px',
+    backgroundColor: '#F1F5F9',
+    borderRadius: '10px',
+    width: 'fit-content',
+  } as React.CSSProperties,
+  productNavActive: {
+    padding: '8px 20px',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    color: colors.primary,
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+  } as React.CSSProperties,
+  productNavLink: {
+    padding: '8px 20px',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    color: '#64748B',
+    backgroundColor: 'transparent',
+    borderRadius: '8px',
+    textDecoration: 'none',
+  } as React.CSSProperties,
 
   // Domain Tabs (WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1)
   tabBar: {

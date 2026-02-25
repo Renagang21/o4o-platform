@@ -16,6 +16,8 @@ export interface KpiItem {
   /** 전월 대비 변동 (양수=증가, 음수=감소) */
   delta?: number;
   status?: 'neutral' | 'warning' | 'critical';
+  /** 클릭 시 이동할 링크 (없으면 클릭 불가) */
+  link?: string;
 }
 
 // ─── Block 2: AI Summary ───
