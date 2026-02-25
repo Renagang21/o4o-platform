@@ -313,12 +313,24 @@ export function createTabletController(
 
   // ============================================================================
   // GET /stores/:slug/tablet/requests/:id — 요청 상태 조회 (public)
+  // WO-TABLET-BOUNDARY-FIX-V1: slug → pharmacyId 복합 조건 (Boundary Policy §7 Rule 1)
   // ============================================================================
   router.get('/:slug/tablet/requests/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-      const { id } = req.params;
+      const { slug, id } = req.params;
 
-      const request = await requestRepo.findOne({ where: { id } });
+      const pharmacy = await service.getPharmacyEntityBySlug(slug);
+      if (!pharmacy) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'STORE_NOT_FOUND', message: 'Store not found' },
+        });
+        return;
+      }
+
+      const request = await requestRepo.findOne({
+        where: { id, pharmacyId: pharmacy.id },
+      });
       if (!request) {
         res.status(404).json({
           success: false,

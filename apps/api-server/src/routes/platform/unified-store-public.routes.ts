@@ -915,11 +915,17 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
   });
 
   // GET /:slug/tablet/requests/:id — Tablet request status
+  // WO-TABLET-BOUNDARY-FIX-V1: slug → pharmacyId 복합 조건 (Boundary Policy §7 Rule 1)
   router.get('/:slug/tablet/requests/:id', async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
 
-      const request = await requestRepo.findOne({ where: { id } });
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      const request = await requestRepo.findOne({
+        where: { id, pharmacyId: resolved.pharmacy.id },
+      });
       if (!request) {
         res.status(404).json({
           success: false,

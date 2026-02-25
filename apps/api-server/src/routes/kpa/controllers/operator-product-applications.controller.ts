@@ -130,48 +130,56 @@ export function createOperatorProductApplicationsController(
       return;
     }
 
-    // 1. 승인 처리
-    application.status = 'approved';
-    application.reviewed_by = user.id;
-    application.reviewed_at = new Date();
-    await appRepo.save(application);
+    // 1. 승인 + listing 생성을 단일 트랜잭션으로 처리
+    const { approvedApplication, listing } = await dataSource.transaction(async (manager) => {
+      const txAppRepo = manager.getRepository(OrganizationProductApplication);
+      const txListingRepo = manager.getRepository(OrganizationProductListing);
 
-    // 2. listing 자동 생성 (중복 방지)
-    const existingListing = await listingRepo.findOne({
-      where: {
-        organization_id: application.organization_id,
-        external_product_id: application.external_product_id,
-        service_key: application.service_key,
-      },
+      // 승인 처리
+      application.status = 'approved';
+      application.reviewed_by = user.id;
+      application.reviewed_at = new Date();
+      await txAppRepo.save(application);
+
+      // listing 자동 생성 (중복 방지)
+      const existingListing = await txListingRepo.findOne({
+        where: {
+          organization_id: application.organization_id,
+          external_product_id: application.external_product_id,
+          service_key: application.service_key,
+        },
+      });
+
+      let newListing = existingListing;
+      if (!existingListing) {
+        newListing = txListingRepo.create({
+          organization_id: application.organization_id,
+          service_key: application.service_key,
+          external_product_id: application.external_product_id,
+          product_name: application.product_name,
+          product_metadata: application.product_metadata,
+          retail_price: null,
+          is_active: false,
+          display_order: 0,
+        });
+        newListing = await txListingRepo.save(newListing);
+      }
+
+      return { approvedApplication: application, listing: newListing };
     });
 
-    let listing = existingListing;
-    if (!existingListing) {
-      listing = listingRepo.create({
-        organization_id: application.organization_id,
-        service_key: application.service_key,
-        external_product_id: application.external_product_id,
-        product_name: application.product_name,
-        product_metadata: application.product_metadata,
-        retail_price: null,
-        is_active: false,
-        display_order: 0,
-      });
-      listing = await listingRepo.save(listing);
-    }
-
-    // 3. Audit log
+    // 2. Audit log (트랜잭션 외부 — 실패해도 승인 유지)
     try {
       await auditRepo.save(auditRepo.create({
         operator_id: user.id,
         operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'kpa:operator',
         action_type: 'CONTENT_UPDATED' as any,
         target_type: 'application' as any,
-        target_id: application.id,
+        target_id: approvedApplication.id,
         metadata: {
           action: 'product_application_approved',
-          organizationId: application.organization_id,
-          productName: application.product_name,
+          organizationId: approvedApplication.organization_id,
+          productName: approvedApplication.product_name,
           listingId: listing?.id,
         },
       }));
@@ -182,7 +190,7 @@ export function createOperatorProductApplicationsController(
     res.json({
       success: true,
       data: {
-        application: { ...application },
+        application: { ...approvedApplication },
         listing,
       },
     });
