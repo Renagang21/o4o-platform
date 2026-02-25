@@ -10,7 +10,7 @@
  * Hub = "여기서 가져간다" — 플랫폼이 제공하는 자원을 탐색·선택하여 내 매장으로 가져가는 공간
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   HubExplorationLayout,
@@ -27,7 +27,7 @@ import {
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
-import { getCatalog } from '../../api/pharmacyProducts';
+import { getCatalog, applyBySupplyProductId } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { cmsApi } from '../../api/cms';
 import type { CmsSlot } from '../../api/cms';
@@ -89,17 +89,71 @@ function cmsSlotToAdItem(slot: CmsSlot, tier: 'premium' | 'normal', navigate: (p
 }
 
 // ============================================
-// B2B Catalog → B2BPreviewItem 매핑
+// B2B 상태 정의 (HubB2BCatalogPage와 동일)
 // ============================================
 
-function catalogToB2BItem(p: CatalogProduct, navigate: (path: string) => void): B2BPreviewItem {
+type ProductState = 'listed' | 'approved' | 'pending' | 'available';
+
+const STATE_CONFIG: Record<ProductState, { label: string; color: string; bg: string; border: string }> = {
+  listed:    { label: '판매 중',  color: '#065f46', bg: '#d1fae5', border: '#6ee7b7' },
+  approved:  { label: '승인 완료', color: '#1e40af', bg: '#dbeafe', border: '#93c5fd' },
+  pending:   { label: '승인 대기', color: '#92400e', bg: '#fef3c7', border: '#fcd34d' },
+  available: { label: '신청 가능', color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db' },
+};
+
+function getProductState(item: CatalogProduct): ProductState {
+  if (item.isListed) return 'listed';
+  if (item.isApproved) return 'approved';
+  if (item.isApplied) return 'pending';
+  return 'available';
+}
+
+function catalogToB2BItem(
+  p: CatalogProduct,
+  navigate: (path: string) => void,
+  onApply?: (product: CatalogProduct) => void,
+): B2BPreviewItem {
+  const state = getProductState(p);
+  const stateInfo = STATE_CONFIG[state];
+
+  let actionLabel: string | undefined;
+  let actionStyle: 'primary' | 'disabled' | 'navigate' | undefined;
+  let onAction: (() => void) | undefined;
+
+  switch (state) {
+    case 'available':
+      actionLabel = '판매 신청';
+      actionStyle = 'primary';
+      onAction = onApply ? () => onApply(p) : () => navigate('/hub/b2b');
+      break;
+    case 'pending':
+      actionLabel = '승인 대기';
+      actionStyle = 'disabled';
+      break;
+    case 'approved':
+      actionLabel = '매장 관리';
+      actionStyle = 'navigate';
+      onAction = () => navigate('/store/products/b2c');
+      break;
+    case 'listed':
+      actionLabel = '판매 중';
+      actionStyle = 'disabled';
+      break;
+  }
+
   return {
     id: p.id,
     name: p.name,
+    description: p.description ?? undefined,
     imageUrl: p.supplierLogoUrl ?? undefined,
     badge: p.category ?? undefined,
     supplierName: p.supplierName,
-    onClick: () => navigate(`/hub/b2b`),
+    status: stateInfo,
+    date: new Date(p.updatedAt).toLocaleDateString('ko-KR'),
+    actionLabel,
+    actionStyle,
+    onAction,
+    onClick: () => navigate('/hub/b2b'),
   };
 }
 
@@ -147,10 +201,28 @@ export function PharmacyHubMarketPage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(defaultHero);
   const [promos, setPromos] = useState<PromotionBanner[]>([]);
   const [ads, setAds] = useState<AdItem[]>([]);
-  const [b2bItems, setB2bItems] = useState<B2BPreviewItem[]>([]);
+  const [b2bCatalog, setB2bCatalog] = useState<CatalogProduct[]>([]);
   const [productDevItems, setProductDevItems] = useState<ProductDevItem[]>([]);
   const [contentItems, setContentItems] = useState<PlatformContentItem[]>([]);
   const [activeAuthorTab, setActiveAuthorTab] = useState('all');
+
+  // ── B2B Apply Handler ──
+  const handleB2BApply = useCallback(async (product: CatalogProduct) => {
+    try {
+      await applyBySupplyProductId(product.id);
+      setB2bCatalog(prev => prev.map(p =>
+        p.id === product.id ? { ...p, isApplied: true } : p,
+      ));
+    } catch {
+      // 에러 시 전체 페이지로 안내
+      navigate('/hub/b2b');
+    }
+  }, [navigate]);
+
+  const b2bItems: B2BPreviewItem[] = useMemo(
+    () => b2bCatalog.map(p => catalogToB2BItem(p, navigate, handleB2BApply)),
+    [b2bCatalog, navigate, handleB2BApply],
+  );
 
   // CMS 슬롯 로드 (1회) — 공통 슬롯 키, serviceKey로 분기
   useEffect(() => {
@@ -197,7 +269,7 @@ export function PharmacyHubMarketPage() {
     getCatalog({ limit: 6, offset: 0 })
       .then(res => {
         if (!cancelled) {
-          setB2bItems(res.data.map(p => catalogToB2BItem(p, navigate)));
+          setB2bCatalog(res.data);
         }
       })
       .catch(() => {});

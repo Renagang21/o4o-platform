@@ -105,11 +105,22 @@ export interface AdSectionProps {
 export interface B2BPreviewItem {
   id: string;
   name: string;
+  description?: string;
   imageUrl?: string;
   badge?: string;
   badgeColor?: string;
   price?: string;
   supplierName?: string;
+  /** 상태 배지 */
+  status?: { label: string; color: string; bg: string; border: string };
+  /** 등록일 (포맷된 문자열) */
+  date?: string;
+  /** 액션 버튼 라벨 */
+  actionLabel?: string;
+  /** 액션 버튼 스타일 */
+  actionStyle?: 'primary' | 'disabled' | 'navigate';
+  /** 액션 버튼 클릭 핸들러 */
+  onAction?: () => void;
   onClick?: () => void;
 }
 
