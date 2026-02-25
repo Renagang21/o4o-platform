@@ -317,6 +317,41 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   });
 
   // ========================================================================
+  // PATCH /products/:id — 테스트용 제품 distributionType/allowedSellerIds 변경
+  // ========================================================================
+  router.patch('/products/:id', async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { distributionType, allowedSellerIds } = req.body;
+      const productRepo = dataSource.getRepository(NetureSupplierProduct);
+
+      const product = await productRepo.findOne({ where: { id } });
+      if (!product) {
+        res.status(404).json({ success: false, error: 'PRODUCT_NOT_FOUND' });
+        return;
+      }
+
+      if (distributionType) product.distributionType = distributionType;
+      if (allowedSellerIds !== undefined) product.allowedSellerIds = allowedSellerIds;
+
+      const saved = await productRepo.save(product);
+      res.json({
+        success: true,
+        data: {
+          id: saved.id,
+          name: saved.name,
+          distributionType: saved.distributionType,
+          allowedSellerIds: saved.allowedSellerIds,
+          isActive: saved.isActive,
+        },
+      });
+    } catch (err: any) {
+      logger.error('[v2-internal] product update error:', err);
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // ========================================================================
   // GET /approvals — 테스트용 승인 목록 조회
   // ========================================================================
   router.get('/approvals', async (req: Request, res: Response) => {
