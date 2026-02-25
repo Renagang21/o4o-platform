@@ -131,7 +131,11 @@ export function createOperatorProductApplicationsController(
     }
 
     // 1. 승인 + listing 생성을 단일 트랜잭션으로 처리
-    const { approvedApplication, listing } = await dataSource.transaction(async (manager) => {
+    let approvedApplication: typeof application;
+    let listing: OrganizationProductListing | null;
+
+    try {
+    ({ approvedApplication, listing } = await dataSource.transaction(async (manager) => {
       const txAppRepo = manager.getRepository(OrganizationProductApplication);
       const txListingRepo = manager.getRepository(OrganizationProductListing);
 
@@ -140,6 +144,18 @@ export function createOperatorProductApplicationsController(
       application.reviewed_by = user.id;
       application.reviewed_at = new Date();
       await txAppRepo.save(application);
+
+      // Supplier ACTIVE 재검증 (external_product_id → neture_supplier_products → neture_suppliers)
+      const supplierCheck = await manager.query(
+        `SELECT ns.status
+         FROM neture_supplier_products nsp
+         JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+         WHERE nsp.id = $1::uuid`,
+        [application.external_product_id],
+      );
+      if (supplierCheck.length > 0 && supplierCheck[0].status !== 'ACTIVE') {
+        throw new Error('SUPPLIER_NOT_ACTIVE');
+      }
 
       // listing 자동 생성 (중복 방지)
       const existingListing = await txListingRepo.findOne({
@@ -166,7 +182,17 @@ export function createOperatorProductApplicationsController(
       }
 
       return { approvedApplication: application, listing: newListing };
-    });
+    }));
+    } catch (e: any) {
+      if (e.message === 'SUPPLIER_NOT_ACTIVE') {
+        res.status(400).json({
+          success: false,
+          error: { code: 'SUPPLIER_NOT_ACTIVE', message: 'Supplier is not active. Cannot approve application.' },
+        });
+        return;
+      }
+      throw e;
+    }
 
     // 2. Audit log (트랜잭션 외부 — 실패해도 승인 유지)
     try {

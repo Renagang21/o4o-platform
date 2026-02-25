@@ -11,12 +11,15 @@ import {
   SupplierProductOffer,
   OfferStatus,
 } from '../entities/SupplierProductOffer.entity.js';
+import { Supplier, SupplierStatus } from '../entities/Supplier.entity.js';
 
 @Injectable()
 export class OfferService {
   constructor(
     @InjectRepository(SupplierProductOffer)
-    private readonly offerRepository: Repository<SupplierProductOffer>
+    private readonly offerRepository: Repository<SupplierProductOffer>,
+    @InjectRepository(Supplier)
+    private readonly supplierRepository: Repository<Supplier>,
   ) {}
 
   /**
@@ -25,6 +28,16 @@ export class OfferService {
   async createOffer(
     data: Partial<SupplierProductOffer>
   ): Promise<SupplierProductOffer> {
+    // Supplier ACTIVE guard
+    if (data.supplierId) {
+      const supplier = await this.supplierRepository.findOne({
+        where: { id: data.supplierId },
+      });
+      if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
+        throw new Error('SUPPLIER_NOT_ACTIVE');
+      }
+    }
+
     const offer = this.offerRepository.create({
       ...data,
       status: data.status || OfferStatus.ACTIVE,
