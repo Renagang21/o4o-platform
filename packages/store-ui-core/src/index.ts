@@ -29,6 +29,10 @@ export { StoreDashboardLayout } from './layout/StoreDashboardLayout';
 
 // Components
 export { StorePlaceholderPage } from './components/StorePlaceholderPage';
+export { StoreTopBar } from './components/StoreTopBar';
+export type { StoreTopBarProps } from './components/StoreTopBar';
+export { StoreSidebar } from './components/StoreSidebar';
+export type { StoreSidebarProps } from './components/StoreSidebar';
 
 // Engine (WO-STORE-AI-INSIGHT-LAYER-V1)
 export type { StoreInsight, StoreInsightAction, StoreInsightInput, InsightLevel } from './engine/storeInsightEngine';
