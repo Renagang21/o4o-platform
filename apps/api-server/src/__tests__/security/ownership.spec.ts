@@ -30,8 +30,12 @@ describe('Neture Ownership: sellerId override protection', () => {
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // The guard pattern: sellerId = userId (server-enforced)
-    expect(content).toContain('const sellerId = userId');
+    // The guard pattern: sellerId from authenticated user (server-enforced)
+    // Accepts: `const sellerId = userId` OR `const sellerId = req.user?.id`
+    const hasServerEnforced =
+      content.includes('const sellerId = userId') ||
+      content.includes('const sellerId = req.user?.id');
+    expect(hasServerEnforced).toBe(true);
     // Must NOT use client-provided sellerId
     expect(content).not.toMatch(/sellerId\s*=\s*(?:req\.body|data)\.sellerId/);
   });
