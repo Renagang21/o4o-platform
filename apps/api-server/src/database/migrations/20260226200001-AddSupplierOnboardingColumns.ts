@@ -18,9 +18,9 @@ export class AddSupplierOnboardingColumns20260226200001
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'PENDING'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_suppliers_status_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_status_enum'))
         THEN
-          ALTER TYPE neture_suppliers_status_enum ADD VALUE 'PENDING';
+          ALTER TYPE neture_supplier_status_enum ADD VALUE 'PENDING';
         END IF;
       END $$;
     `);
@@ -30,9 +30,9 @@ export class AddSupplierOnboardingColumns20260226200001
       DO $$
       BEGIN
         IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = 'REJECTED'
-          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_suppliers_status_enum'))
+          AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'neture_supplier_status_enum'))
         THEN
-          ALTER TYPE neture_suppliers_status_enum ADD VALUE 'REJECTED';
+          ALTER TYPE neture_supplier_status_enum ADD VALUE 'REJECTED';
         END IF;
       END $$;
     `);
