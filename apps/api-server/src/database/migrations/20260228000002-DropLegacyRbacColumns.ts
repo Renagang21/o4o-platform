@@ -47,27 +47,52 @@ export class DropLegacyRbacColumns20260228000002
     `);
 
     if (hasUserRoles[0]?.exists) {
-      const hasRolesTable = await queryRunner.query(`
-        SELECT EXISTS (
-          SELECT 1 FROM information_schema.tables
-          WHERE table_name = 'roles'
-        ) AS exists
-      `);
-
-      if (hasRolesTable[0]?.exists) {
-        await queryRunner.query(`
-          INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
-          SELECT gen_random_uuid(), ur."usersId", r.name, true, NOW(), NOW(), 'global'
-          FROM user_roles ur
-          JOIN roles r ON r.id = ur."rolesId"
-          WHERE NOT EXISTS (
-            SELECT 1 FROM role_assignments ra
-            WHERE ra.user_id = ur."usersId" AND ra.role = r.name AND ra.is_active = true
-          )
-          ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING
+      // Try to backfill user_roles → role_assignments
+      // Column names vary depending on when synchronize created the table
+      try {
+        // Discover actual column names from information_schema
+        const columns = await queryRunner.query(`
+          SELECT column_name FROM information_schema.columns
+          WHERE table_name = 'user_roles'
+          ORDER BY ordinal_position
         `);
+        const colNames = columns.map((c: any) => c.column_name);
         // eslint-disable-next-line no-console
-        console.log('[Migration] DropLegacyRbacColumns: Backfilled user_roles → role_assignments');
+        console.log('[Migration] DropLegacyRbacColumns: user_roles columns:', colNames.join(', '));
+
+        // Find user FK column (usersId or users_id)
+        const userCol = colNames.find((c: string) => c.toLowerCase().includes('user'));
+        // Find role FK column (rolesId or roles_id)
+        const roleCol = colNames.find((c: string) => c.toLowerCase().includes('role'));
+
+        const hasRolesTable = await queryRunner.query(`
+          SELECT EXISTS (
+            SELECT 1 FROM information_schema.tables
+            WHERE table_name = 'roles'
+          ) AS exists
+        `);
+
+        if (userCol && roleCol && hasRolesTable[0]?.exists) {
+          await queryRunner.query(`
+            INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
+            SELECT gen_random_uuid(), ur."${userCol}", r.name, true, NOW(), NOW(), 'global'
+            FROM user_roles ur
+            JOIN roles r ON r.id = ur."${roleCol}"
+            WHERE NOT EXISTS (
+              SELECT 1 FROM role_assignments ra
+              WHERE ra.user_id = ur."${userCol}" AND ra.role = r.name AND ra.is_active = true
+            )
+            ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING
+          `);
+          // eslint-disable-next-line no-console
+          console.log('[Migration] DropLegacyRbacColumns: Backfilled user_roles → role_assignments');
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn('[Migration] DropLegacyRbacColumns: Skipped backfill - columns or roles table not found');
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('[Migration] DropLegacyRbacColumns: Backfill skipped due to error:', (err as Error).message);
       }
 
       // ── 2. DROP user_roles bridge table ──
