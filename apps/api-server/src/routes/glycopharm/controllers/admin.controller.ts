@@ -17,6 +17,7 @@ import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -390,17 +391,22 @@ export function createAdminController(
             }
           }
 
-          // Auto-assign glycopharm:store_owner role (WO-STOREFRONT-STABILIZATION Phase 2)
+          // WO-ROLE-NORMALIZATION-PHASE3-A-V1: relation-based ownership via organization_members
           if (createdOrg) {
-            const userRepo = dataSource.getRepository(User);
-            const applicantUser = await userRepo.findOne({ where: { id: application.userId } });
-            if (applicantUser && !applicantUser.roles.includes('glycopharm:store_owner')) {
-              applicantUser.roles = [...applicantUser.roles, 'glycopharm:store_owner'];
-              await userRepo.save(applicantUser);
-              logger.info(
-                `[Glycopharm Admin] Role 'glycopharm:store_owner' assigned to user ${application.userId}`
-              );
-            }
+            await dataSource.query(
+              `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+               VALUES (uuid_generate_v4(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
+               ON CONFLICT (organization_id, user_id) DO NOTHING`,
+              [createdOrg.id, application.userId]
+            );
+            logger.info(
+              `[Glycopharm Admin] organization_members owner record created for user ${application.userId} → org ${createdOrg.id}`
+            );
+
+            // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
+            autoListPublicProductsForOrg(dataSource, createdOrg.id, 'glycopharm')
+              .then((count) => logger.info(`[Glycopharm Admin] Auto-listed ${count} PUBLIC products for org ${createdOrg.id}`))
+              .catch((err) => logger.error('[Glycopharm Admin] Auto-listing failed:', err));
           }
         }
 

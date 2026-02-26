@@ -13,35 +13,12 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import { OrganizationChannel } from '../entities/organization-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
-
-// ─────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────
-
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
-function isPharmacyOwnerRole(roles: string[], user?: any): boolean {
-  // 1. pharmacistRole === 'pharmacy_owner' (DB column, carried in JWT)
-  if (user?.pharmacistRole === 'pharmacy_owner') return true;
-  // 2. KPA admin/operator roles also have store access
-  return hasAnyServiceRole(roles, [
-    'kpa:branch_admin', 'kpa:branch_operator', 'kpa:admin', 'kpa:operator',
-  ]);
-}
 
 // ─────────────────────────────────────────────────────
 // Response types
@@ -88,33 +65,17 @@ export function createStoreHubController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
-
         if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
-          });
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
           return;
         }
-
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
-          });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const userRoles: string[] = authReq.user?.roles || [];
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.json({
-            success: true,
-            data: null,
-            message: 'User not associated with an organization',
-          });
+          res.json({ success: true, data: null, message: 'User not associated with an organization' });
           return;
         }
 
@@ -249,27 +210,15 @@ export function createStoreHubController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
-
         if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
-          });
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
           return;
         }
-
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
-          });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const userRoles: string[] = authReq.user?.roles || [];
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -289,7 +238,10 @@ export function createStoreHubController(
                oc.updated_at AS "updatedAt",
                COALESCE(stats.visible_count, 0)::int AS "visibleProductCount",
                COALESCE(stats.total_count, 0)::int AS "totalProductCount",
-               COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount"
+               COALESCE(stats.limit_count, 0)::int AS "salesLimitConfiguredCount",
+               COALESCE(stats.public_count, 0)::int AS "publicProductCount",
+               COALESCE(stats.service_count, 0)::int AS "serviceProductCount",
+               COALESCE(stats.private_count, 0)::int AS "privateProductCount"
              FROM organization_channels oc
              LEFT JOIN (
                SELECT
@@ -299,19 +251,30 @@ export function createStoreHubController(
                    WHERE opc.is_active = true
                      AND opl.is_active = true
                      AND oc_sub.status = 'APPROVED'
-                     AND (
-                       (opl.product_id IS NULL AND gp.status = 'active')
-                       OR
-                       (opl.product_id IS NOT NULL AND nsp.is_active = true AND ns.status = 'ACTIVE')
-                     )
+                     AND nsp.is_active = true
+                     AND ns.status = 'ACTIVE'
                  ) AS visible_count,
-                 COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count
+                 COUNT(*) FILTER (WHERE opc.sales_limit IS NOT NULL) AS limit_count,
+                 COUNT(*) FILTER (
+                   WHERE opc.is_active = true AND opl.is_active = true
+                     AND oc_sub.status = 'APPROVED' AND nsp.is_active = true
+                     AND ns.status = 'ACTIVE' AND nsp.distribution_type = 'PUBLIC'
+                 ) AS public_count,
+                 COUNT(*) FILTER (
+                   WHERE opc.is_active = true AND opl.is_active = true
+                     AND oc_sub.status = 'APPROVED' AND nsp.is_active = true
+                     AND ns.status = 'ACTIVE' AND nsp.distribution_type = 'SERVICE'
+                 ) AS service_count,
+                 COUNT(*) FILTER (
+                   WHERE opc.is_active = true AND opl.is_active = true
+                     AND oc_sub.status = 'APPROVED' AND nsp.is_active = true
+                     AND ns.status = 'ACTIVE' AND nsp.distribution_type = 'PRIVATE'
+                 ) AS private_count
                FROM organization_product_channels opc
                JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
                JOIN organization_channels oc_sub ON oc_sub.id = opc.channel_id
-               LEFT JOIN glycopharm_products gp ON gp.id::text = opl.external_product_id AND opl.product_id IS NULL
-               LEFT JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
-               LEFT JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+               JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
+               JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
                GROUP BY opc.channel_id
              ) stats ON stats.channel_id = oc.id
              WHERE oc.organization_id = $1
@@ -354,32 +317,17 @@ export function createStoreHubController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
-
         if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
-          });
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
           return;
         }
-
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
-          });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const userRoles: string[] = authReq.user?.roles || [];
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'NO_ORGANIZATION', message: 'No organization found' },
-          });
+          res.status(403).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization found' } });
           return;
         }
 
@@ -453,27 +401,15 @@ export function createStoreHubController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
-
         if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
-          });
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
           return;
         }
-
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
-          });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const userRoles: string[] = authReq.user?.roles || [];
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.json({
             success: true,
@@ -568,27 +504,15 @@ export function createStoreHubController(
     requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
         const authReq = req as AuthRequest;
         const userId = authReq.user?.id;
-        const userRoles = authReq.user?.roles || [];
-
         if (!userId) {
-          res.status(401).json({
-            success: false,
-            error: { code: 'UNAUTHORIZED', message: 'User ID not found' },
-          });
+          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
           return;
         }
-
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' },
-          });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const userRoles: string[] = authReq.user?.roles || [];
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
 
         const signals = {
           newOrders: 0,

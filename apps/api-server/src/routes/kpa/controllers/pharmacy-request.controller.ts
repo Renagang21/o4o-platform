@@ -3,8 +3,10 @@
  *
  * WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
  *
- * pharmacy_join은 조직 가입이 아니라 개인 속성(pharmacist_role) 변경.
+ * pharmacy_join은 조직 가입이 아니라 개인 속성 변경.
  * OrganizationJoinRequest와 완전 분리.
+ *
+ * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 relation-based ownership
  *
  * POST /                — 신청 생성
  * GET  /pending         — 대기 목록 (operator)
@@ -47,12 +49,12 @@ export function createPharmacyRequestRoutes(
         });
       }
 
-      // Check if user already has pharmacy_owner role
-      const [existingUser] = await dataSource.query(
-        `SELECT pharmacist_role FROM users WHERE id = $1`,
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 중복 체크
+      const [existingOwner] = await dataSource.query(
+        `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
         [user.id]
       );
-      if (existingUser?.pharmacist_role === 'pharmacy_owner') {
+      if (existingOwner) {
         return res.status(409).json({
           success: false,
           error: '이미 약국 개설자로 승인된 계정입니다.',
@@ -174,11 +176,19 @@ export function createPharmacyRequestRoutes(
       request.review_note = req.body.reviewNote || null;
       await repo.save(request);
 
-      // Set User.pharmacist_role = 'pharmacy_owner'
-      await dataSource.query(
-        `UPDATE users SET pharmacist_role = 'pharmacy_owner' WHERE id = $1`,
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: relation-based ownership via organization_members
+      const [kpaMember] = await dataSource.query(
+        `SELECT organization_id FROM kpa_members WHERE user_id = $1 LIMIT 1`,
         [request.user_id]
       );
+      if (kpaMember?.organization_id) {
+        await dataSource.query(
+          `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+           VALUES (uuid_generate_v4(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
+           ON CONFLICT (organization_id, user_id) DO NOTHING`,
+          [kpaMember.organization_id, request.user_id]
+        );
+      }
 
       return res.json({ success: true, data: request });
     } catch (error: any) {

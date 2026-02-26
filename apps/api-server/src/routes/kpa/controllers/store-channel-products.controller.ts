@@ -16,35 +16,14 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
 import { OrganizationProductChannel } from '../entities/organization-product-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 // Channels that support product management
 const PRODUCT_CHANNELS = ['B2C', 'KIOSK'] as const;
-
-// ─────────────────────────────────────────────────────
-// Helpers (same pattern as store-hub.controller.ts)
-// ─────────────────────────────────────────────────────
-
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
-function isPharmacyOwnerRole(roles: string[], user?: any): boolean {
-  if (user?.pharmacistRole === 'pharmacy_owner') return true;
-  return hasAnyServiceRole(roles, [
-    'kpa:branch_admin', 'kpa:branch_operator', 'kpa:admin', 'kpa:operator',
-  ]);
-}
 
 // ─────────────────────────────────────────────────────
 // Controller
@@ -58,25 +37,20 @@ export function createStoreChannelProductsController(
 
   /**
    * Auth guard: pharmacy owner + resolve organizationId
+   * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
    */
   async function resolveOrgContext(req: Request, res: Response): Promise<{ userId: string; organizationId: string } | null> {
     const authReq = req as AuthRequest;
     const userId = authReq.user?.id;
-    const userRoles = authReq.user?.roles || [];
-
     if (!userId) {
       res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
       return null;
     }
 
-    if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' } });
-      return null;
-    }
-
-    const organizationId = await getUserOrganizationId(dataSource, userId);
+    const userRoles: string[] = authReq.user?.roles || [];
+    const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
     if (!organizationId) {
-      res.status(403).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization found' } });
+      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' } });
       return null;
     }
 

@@ -22,40 +22,22 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../kpa/entities/kpa-member.entity.js';
 import { StoreTablet } from './entities/store-tablet.entity.js';
 import { StoreTabletDisplay } from './entities/store-tablet-display.entity.js';
 import type { AuthRequest } from '../../types/auth.js';
-import { hasAnyServiceRole } from '../../utils/role.utils.js';
+import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
 // ─────────────────────────────────────────────────────
-// Helpers (shared with store-local-product.routes.ts)
+// Helpers
 // ─────────────────────────────────────────────────────
-
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
-function isStoreOwnerRole(roles: string[], user?: any): boolean {
-  if (user?.pharmacistRole === 'pharmacy_owner') return true;
-  return hasAnyServiceRole(roles, [
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-    'kpa:admin',
-    'kpa:operator',
-  ]);
-}
 
 /**
  * Authenticates request and extracts organizationId.
  * Returns null if auth fails (response already sent).
+ *
+ * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
  */
 async function authenticateAndGetOrg(
   dataSource: DataSource,
@@ -73,9 +55,7 @@ async function authenticateAndGetOrg(
 
   const authReq = req as AuthRequest;
   const userId = authReq.user?.id;
-  const userRoles = authReq.user?.roles || [];
-
-  if (!userId || !isStoreOwnerRole(userRoles, authReq.user)) {
+  if (!userId) {
     res.status(403).json({
       success: false,
       error: 'Store owner or operator role required',
@@ -84,12 +64,13 @@ async function authenticateAndGetOrg(
     return null;
   }
 
-  const organizationId = await getUserOrganizationId(dataSource, userId);
+  const userRoles: string[] = authReq.user?.roles || [];
+  const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
   if (!organizationId) {
-    res.status(400).json({
+    res.status(403).json({
       success: false,
-      error: 'User not associated with an organization',
-      code: 'NO_ORGANIZATION',
+      error: 'Store owner or operator role required',
+      code: 'FORBIDDEN',
     });
     return null;
   }
@@ -488,7 +469,7 @@ export function createStoreTabletRoutes(
       // Fetch supplier products (organization_product_listings)
       const [supplierProducts, localProducts] = await Promise.all([
         dataSource.query(
-          `SELECT id, external_product_id, product_name, retail_price, is_active,
+          `SELECT id, product_id, product_name, retail_price, is_active,
                   display_order, product_metadata, service_key
            FROM organization_product_listings
            WHERE organization_id = $1 AND is_active = true
