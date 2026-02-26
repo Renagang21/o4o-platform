@@ -19,6 +19,22 @@ export class DropUsersPharmacistColumns20260227000002
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // SAFETY GUARD: only drop columns if organization_members table exists.
+    // derivePharmacistQualification() in auth.controller.ts depends on
+    // organization_members. Without it, dropping these columns removes
+    // the only source of pharmacist role data.
+    const hasTable = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'organization_members'
+      ) AS exists
+    `);
+    if (!hasTable[0]?.exists) {
+      // eslint-disable-next-line no-console
+      console.warn('[Migration] SKIPPED DropUsersPharmacistColumns: organization_members table not yet created');
+      return;
+    }
+
     await queryRunner.query(`
       ALTER TABLE users DROP COLUMN IF EXISTS pharmacist_role
     `);
