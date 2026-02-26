@@ -403,6 +403,94 @@ export const requireSignageOperatorOrStore = (
 };
 
 /**
+ * Check if user has Community permission
+ *
+ * Accepts:
+ * - 'community' role (legacy)
+ * - '*:community' prefixed role (e.g., 'kpa:community')
+ * - Any authenticated user (community is open contribution)
+ * - Admin/Operator (always allowed)
+ */
+export function hasSignageCommunityPermission(user: any, serviceKey: string): boolean {
+  if (!user) return false;
+
+  // Admin can always act as community
+  if (hasSignageAdminPermission(user)) return true;
+
+  // Operator can also act as community
+  if (hasSignageOperatorPermission(user, serviceKey)) return true;
+
+  const userRoles: string[] = user.roles || [];
+
+  // Check for exact 'community' role
+  if (userRoles.includes('community')) return true;
+
+  // Check for prefixed community role (e.g., 'kpa:community')
+  if (userRoles.some((r: string) => r.endsWith(':community'))) return true;
+
+  // Check database roles
+  if (user.dbRoles?.some((r: any) => r.name === 'community' || r.name?.endsWith(':community'))) return true;
+
+  // Community is open to any authenticated user with a service-related role
+  // Check if user has any role for the service key
+  if (userRoles.some((r: string) => r.startsWith(`${serviceKey}:`))) return true;
+
+  return false;
+}
+
+/**
+ * Middleware: Require Signage Community permission
+ *
+ * Use for:
+ * - /api/signage/:serviceKey/community/* routes
+ * - Community content creation (media, playlists)
+ * - Created content is source='community', scope='global'
+ */
+export const requireSignageCommunity = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+      code: 'NOT_AUTHENTICATED',
+      message: 'Authentication required',
+    });
+  }
+
+  const { serviceKey } = req.params;
+
+  if (!serviceKey) {
+    return res.status(400).json({
+      success: false,
+      error: 'Bad Request',
+      code: 'SERVICE_KEY_REQUIRED',
+      message: 'Service key is required',
+    });
+  }
+
+  if (!hasSignageCommunityPermission(req.user, serviceKey)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden',
+      code: 'SIGNAGE_COMMUNITY_REQUIRED',
+      message: 'Community permission required',
+    });
+  }
+
+  // Set context
+  req.signageContext = {
+    role: 'operator', // Community acts at operator level for global content
+    serviceKey,
+    permissions: ['signage:community'],
+  };
+
+  next();
+};
+
+/**
  * Middleware: Validate service key from params
  *
  * Use as a pre-check before other role middlewares.

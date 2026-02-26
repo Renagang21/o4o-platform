@@ -1165,6 +1165,62 @@ export class SignageController {
     }
   };
 
+  // ========== Community Content Creation Endpoints ==========
+
+  /**
+   * Create Community playlist (global scope)
+   *
+   * WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1
+   * Strips source/scope/organizationId/serviceKey from body
+   * and enforces: source='community', scope='global', organizationId=null
+   */
+  createCommunityPlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+
+      // Strip immutable fields from body, enforce community authorship
+      const { source: _s, scope: _sc, organizationId: _oid, serviceKey: _sk, ...safeBody } = req.body;
+      const dto: CreateGlobalPlaylistDto = {
+        ...safeBody,
+        source: 'community',
+        scope: 'global',
+      };
+
+      const playlist = await this.service.createGlobalPlaylist(dto, scope, userId);
+      res.status(201).json({ data: playlist });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Create Community media (global scope)
+   *
+   * WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1
+   * Strips source/scope/organizationId/serviceKey from body
+   * and enforces: source='community', scope='global', organizationId=null
+   */
+  createCommunityMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = this.extractScope(req);
+      const userId = this.extractUserId(req);
+
+      // Strip immutable fields from body, enforce community authorship
+      const { source: _s, scope: _sc, organizationId: _oid, serviceKey: _sk, ...safeBody } = req.body;
+      const dto: CreateGlobalMediaDto = {
+        ...safeBody,
+        source: 'community',
+        scope: 'global',
+      };
+
+      const media = await this.service.createGlobalMedia(dto, scope, userId);
+      res.status(201).json({ data: media });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   // ========== Clone Endpoints ==========
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clonePlaylist, cloneMedia removed

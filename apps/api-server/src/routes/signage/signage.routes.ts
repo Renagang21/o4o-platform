@@ -7,6 +7,7 @@ import {
   requireSignageStore,
   requireSignageOperatorOrStore,
   allowSignageStoreRead,
+  requireSignageCommunity,
   validateServiceKey,
 } from '../../middleware/signage-role.middleware.js';
 import { ensureAuthenticated } from '../../middleware/permission.middleware.js';
@@ -230,6 +231,15 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // DELETE /api/signage/:serviceKey/hq/media/:id - Delete HQ media (Operator only)
   router.delete('/hq/media/:id', requireSignageOperator, controller.deleteMedia);
+
+  // ========== Community Content Creation Routes (WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1) ==========
+  // Community creates global content with source='community', scope='global'
+
+  // POST /api/signage/:serviceKey/community/media - Create community media (scope: global)
+  router.post('/community/media', requireSignageCommunity, controller.createCommunityMedia);
+
+  // POST /api/signage/:serviceKey/community/playlists - Create community playlist (scope: global)
+  router.post('/community/playlists', requireSignageCommunity, controller.createCommunityPlaylist);
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)
