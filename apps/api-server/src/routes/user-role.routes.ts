@@ -1,6 +1,7 @@
 /**
  * User Role Routes
  * Routes for user role and permission management
+ * Phase3-E: Uses RoleAssignment service instead of dbRoles
  */
 import { Router, Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
@@ -12,7 +13,7 @@ const router: Router = Router();
 
 /**
  * GET /api/v1/userRole/:userId/permissions
- * Get user's permissions based on their roles
+ * Get user's permissions based on their roles (via RoleAssignment)
  * Requires authentication
  */
 router.get('/:userId/permissions', authenticate, async (req: Request, res: Response) => {
@@ -22,7 +23,6 @@ router.get('/:userId/permissions', authenticate, async (req: Request, res: Respo
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: userId },
-      relations: ['dbRoles', 'dbRoles.permissions'],
     });
 
     if (!user) {
@@ -32,33 +32,20 @@ router.get('/:userId/permissions', authenticate, async (req: Request, res: Respo
       });
     }
 
-    // Collect all unique permissions from user's roles
-    const permissionSet = new Set<string>();
-
-    if (user.dbRoles) {
-      for (const role of user.dbRoles) {
-        if (role.permissions) {
-          for (const permission of role.permissions) {
-            if (permission.isActive) {
-              permissionSet.add(permission.key);
-            }
-          }
-        }
-      }
-    }
-
-    const permissions = Array.from(permissionSet);
+    // Phase3-E: Use RoleAssignment service for permissions
+    const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+    const assignments = await roleAssignmentService.getActiveRoles(userId);
+    const permissions = await roleAssignmentService.getPermissions(userId);
 
     res.json({
       success: true,
       data: {
         userId,
         permissions,
-        roles: user.dbRoles?.map(r => ({
-          id: r.id,
-          name: r.name,
-          displayName: r.displayName,
-        })) || [],
+        roles: assignments.map(a => ({
+          role: a.role,
+          assignedAt: a.assignedAt,
+        })),
       },
     });
   } catch (error: any) {

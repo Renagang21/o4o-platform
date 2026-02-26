@@ -36,12 +36,11 @@ export class UserManagementController extends BaseController {
           'user.id',
           'user.email',
           'user.name',
-          'user.role',
           'user.status',
           'user.createdAt',
           'user.updatedAt',
         ])
-        .leftJoinAndSelect('user.dbRoles', 'roles');
+        ; // Phase3-E: dbRoles relation removed
 
       // Apply filters
       if (query.search) {
@@ -51,7 +50,7 @@ export class UserManagementController extends BaseController {
       }
 
       if (query.role) {
-        queryBuilder.andWhere('user.role = :role', { role: query.role });
+        queryBuilder.andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role: query.role });
       }
 
       if (query.status) {
@@ -72,9 +71,9 @@ export class UserManagementController extends BaseController {
           id: u.id,
           email: u.email,
           name: u.name,
-          role: u.role,
+          role: u.roles?.[0] || 'user', // Phase3-E: role is getter
           status: u.status,
-          roles: u.dbRoles?.map(r => r.name) || [],
+          roles: u.roles || [], // Phase3-D: RoleAssignment 오버라이드
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         })),
@@ -104,7 +103,6 @@ export class UserManagementController extends BaseController {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
         where: { id },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
@@ -118,13 +116,9 @@ export class UserManagementController extends BaseController {
           name: user.name,
           phone: user.phone,
           avatar: user.avatar,
-          role: user.role,
+          role: user.roles?.[0] || 'user', // Phase3-E: role is getter
           status: user.status,
-          roles: user.dbRoles?.map(r => ({
-            id: r.id,
-            name: r.name,
-            displayName: r.displayName,
-          })) || [],
+          roles: (user.roles || []).map((r: string) => ({ name: r })), // Phase3-E
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -158,10 +152,24 @@ export class UserManagementController extends BaseController {
       if (data.name) user.name = data.name;
       if (data.email) user.email = data.email;
       if (data.status) user.status = data.status as any;
-      if (data.role) user.role = data.role as any;
+      // Phase3-E: user.role is a read-only getter — role changes via RoleAssignment only
 
       user.updatedAt = new Date();
       await userRepository.save(user);
+
+      // Phase3-D: Dual-write RoleAssignment
+      if (data.role) {
+        try {
+          const { roleAssignmentService } = await import('../../../modules/auth/services/role-assignment.service.js');
+          await roleAssignmentService.assignRole({
+            userId: user.id,
+            role: data.role,
+            assignedBy: (req as any).user?.id,
+          });
+        } catch {
+          // Non-fatal
+        }
+      }
 
       return BaseController.ok(res, {
         message: 'User updated successfully',
@@ -169,7 +177,7 @@ export class UserManagementController extends BaseController {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: user.roles?.[0] || 'user', // Phase3-E: role is getter
           status: user.status,
         },
       });

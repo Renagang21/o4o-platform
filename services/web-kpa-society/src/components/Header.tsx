@@ -99,8 +99,8 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   // 운영 대시보드: kpa:admin 또는 kpa:operator만 노출
   const isOperatorOrAdmin = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
-  // 내 매장관리: pharmacy_owner만 노출 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
-  const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
+  // 내 매장관리: isStoreOwner만 노출 (WO-ROLE-NORMALIZATION-PHASE3-C-V1)
+  const isPharmacyOwner = user?.isStoreOwner === true;
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/operator') return isOperatorOrAdmin;
     if (item.href === '/store') return isPharmacyOwner;

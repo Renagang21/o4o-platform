@@ -132,7 +132,7 @@ export class RefreshTokenService extends BaseService<RefreshToken> {
         {
           userId: verification.user.id,
           email: verification.user.email,
-          role: verification.user.role,
+          role: verification.user.roles?.[0] || 'user',
         },
         process.env.JWT_SECRET || 'default-jwt-secret',
         { expiresIn: '15m' }

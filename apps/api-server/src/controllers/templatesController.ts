@@ -252,7 +252,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || user.role !== 'admin') {
+        if (!user || !user.roles?.includes('admin')) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to edit this template'
@@ -327,7 +327,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || user.role !== 'admin') {
+        if (!user || !user.roles?.includes('admin')) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to delete this template'
@@ -369,7 +369,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || user.role !== 'admin') {
+        if (!user || !user.roles?.includes('admin')) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to publish this template'
@@ -415,7 +415,7 @@ export class TemplatesController {
       // Check if user owns the template or is admin
       if (template.authorId !== userId) {
         const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || user.role !== 'admin') {
+        if (!user || !user.roles?.includes('admin')) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to unpublish this template'

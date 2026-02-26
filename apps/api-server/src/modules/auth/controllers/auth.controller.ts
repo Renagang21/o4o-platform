@@ -44,6 +44,7 @@ async function derivePharmacistQualification(userId: string): Promise<{
   pharmacistRole: string | null;
   pharmacistFunction: string | null;
   isStoreOwner: boolean;
+  activityType: string | null;
 }> {
   // 1. Check organization_members for owner status
   const [ownerRecord] = await AppDataSource.query(
@@ -84,7 +85,7 @@ async function derivePharmacistQualification(userId: string): Promise<{
     pharmacistFunction = funcMap[profile.activity_type] || null;
   }
 
-  return { pharmacistRole, pharmacistFunction, isStoreOwner };
+  return { pharmacistRole, pharmacistFunction, isStoreOwner, activityType: profile?.activity_type || null };
 }
 
 /**
@@ -266,7 +267,7 @@ export class AuthController extends BaseController {
         newUser.firstName = data.firstName;
         newUser.name = `${data.lastName}${data.firstName}`;
         newUser.nickname = data.nickname;
-        newUser.role = effectiveRole as UserRole;
+        // Phase3-E: role is a read-only getter — DB column has default; RoleAssignment handles role
         newUser.serviceKey = data.service || 'platform';
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
@@ -522,8 +523,9 @@ export class AuthController extends BaseController {
       const roles = deriveRoles(req.user);
 
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
+      const primaryRole = roles[0] || 'user'; // Phase3-E: role is getter
       const scopes = deriveUserScopes({
-        role: req.user.role,
+        role: primaryRole,
         roles,
       });
 
@@ -531,7 +533,7 @@ export class AuthController extends BaseController {
         id: req.user.id,
         email: req.user.email,
         name: req.user.name,
-        role: req.user.role,
+        role: primaryRole,
         roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
         scopes: [] as string[],
@@ -547,6 +549,7 @@ export class AuthController extends BaseController {
       ud.pharmacistRole = qualification.pharmacistRole;
       ud.pharmacistFunction = qualification.pharmacistFunction;
       ud.isStoreOwner = qualification.isStoreOwner;
+      ud.activityType = qualification.activityType;
 
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {
@@ -602,20 +605,30 @@ export class AuthController extends BaseController {
       return BaseController.unauthorized(res, 'Not authenticated');
     }
 
-    const { pharmacistFunction } = req.body;
-    const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
-    if (pharmacistFunction && !validFunctions.includes(pharmacistFunction)) {
-      return BaseController.error(res, 'Invalid pharmacistFunction', 400);
-    }
-    if (!pharmacistFunction) {
-      return BaseController.error(res, 'No fields to update', 400);
-    }
+    const { pharmacistFunction, activityType: rawActivityType } = req.body;
 
+    // Phase3-C: activityType 직접 수신 또는 pharmacistFunction → activityType 매핑
+    const validActivities = [
+      'pharmacy_owner', 'pharmacy_employee', 'hospital',
+      'manufacturer', 'importer', 'wholesaler', 'other_industry',
+      'government', 'school', 'other', 'inactive',
+    ];
+    const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
     const functionToActivity: Record<string, string> = {
       pharmacy: 'pharmacy_employee', hospital: 'hospital',
       industry: 'other_industry', other: 'other',
     };
-    const activityType = functionToActivity[pharmacistFunction] || 'other';
+
+    let activityType: string | null = null;
+    if (rawActivityType && validActivities.includes(rawActivityType)) {
+      activityType = rawActivityType;
+    } else if (pharmacistFunction && validFunctions.includes(pharmacistFunction)) {
+      activityType = functionToActivity[pharmacistFunction] || 'other';
+    }
+
+    if (!activityType) {
+      return BaseController.error(res, 'activityType or pharmacistFunction is required', 400);
+    }
 
     try {
       await AppDataSource.query(
@@ -630,6 +643,7 @@ export class AuthController extends BaseController {
         pharmacistFunction: qualification.pharmacistFunction,
         pharmacistRole: qualification.pharmacistRole,
         isStoreOwner: qualification.isStoreOwner,
+        activityType: qualification.activityType,
       });
     } catch (error: any) {
       logger.error('[AuthController.updateProfile] Update failed', {
@@ -655,7 +669,7 @@ export class AuthController extends BaseController {
       userData.roles = roles;
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       const scopes = deriveUserScopes({
-        role: req.user.role,
+        role: roles[0] || 'user', // Phase3-E: role is getter
         roles,
       });
       userData.scopes = scopes;
@@ -666,6 +680,7 @@ export class AuthController extends BaseController {
       ud.pharmacistRole = qualification.pharmacistRole;
       ud.pharmacistFunction = qualification.pharmacistFunction;
       ud.isStoreOwner = qualification.isStoreOwner;
+      ud.activityType = qualification.activityType;
     }
 
     return BaseController.ok(res, {

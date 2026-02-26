@@ -49,7 +49,6 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
 
     const user = await userRepo.findOne({
       where: { email: targetEmail },
-      relations: ['dbRoles']
     });
 
     if (!user) {
@@ -64,14 +63,21 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
             email: targetEmail,
             password: hashedPassword,
             name: 'System Administrator',
-            role: UserRole.SUPER_ADMIN,
-            roles: [UserRole.SUPER_ADMIN],
             status: UserStatus.ACTIVE,
             isEmailVerified: true,
             isActive: true,
             permissions: []
           });
           await userRepo.save(newUser);
+          // Phase3-E: Create RoleAssignment for the new user
+          try {
+            const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+            await roleAssignmentService.assignRole({
+              userId: newUser.id,
+              role: UserRole.SUPER_ADMIN,
+              assignedBy: 'system:diagnose-script',
+            });
+          } catch { /* RoleAssignment table may not exist yet */ }
           logger.info('✅ Admin user created with password: Admin123!');
         }
       });
@@ -233,15 +239,12 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     // STEP 7: Check role assignment
     // =====================================================
     logger.info('─── STEP 7: Role Assignment Check ───');
-    logger.info(`   role (legacy): ${user.role}`);
-    logger.info(`   roles (legacy): ${user.roles?.join(', ') || 'none'}`);
-    logger.info(`   dbRoles: ${user.dbRoles?.map(r => r.name).join(', ') || 'none'}`);
+    logger.info(`   roles: ${user.roles?.join(', ') || 'none'}`);
+    logger.info(`   (Authoritative source: role_assignments table)`);
 
-    const hasAdminRole = user.role === UserRole.ADMIN ||
-                         user.role === UserRole.SUPER_ADMIN ||
-                         user.roles?.includes(UserRole.ADMIN) ||
-                         user.roles?.includes(UserRole.SUPER_ADMIN) ||
-                         user.dbRoles?.some(r => r.name === 'admin' || r.name === 'super_admin');
+    // Phase3-E: Check roles[] (populated from RoleAssignment at runtime)
+    const hasAdminRole = user.roles?.includes(UserRole.ADMIN) ||
+                         user.roles?.includes(UserRole.SUPER_ADMIN);
 
     if (!hasAdminRole) {
       results.push({
@@ -249,17 +252,25 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
         status: 'WARN',
         message: 'User does not have admin role (may limit access after login)',
         fix: async () => {
-          user.role = UserRole.SUPER_ADMIN;
-          user.roles = [UserRole.SUPER_ADMIN];
-          await userRepo.save(user);
-          logger.info('✅ Role set to SUPER_ADMIN');
+          // Phase3-E: Only create RoleAssignment (role is a read-only getter)
+          try {
+            const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+            await roleAssignmentService.assignRole({
+              userId: user.id,
+              role: UserRole.SUPER_ADMIN,
+              assignedBy: 'system:diagnose-script',
+            });
+            logger.info('✅ RoleAssignment created for SUPER_ADMIN');
+          } catch (err: any) {
+            logger.warn('⚠️  RoleAssignment creation failed:', err.message);
+          }
         }
       });
     } else {
       results.push({
         step: '7. Role Assignment',
         status: 'OK',
-        message: `Has admin role: ${user.role}`
+        message: `Has admin role: ${user.roles?.[0]}`
       });
     }
 

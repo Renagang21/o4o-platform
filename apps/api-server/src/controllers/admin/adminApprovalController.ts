@@ -13,7 +13,7 @@ export class AdminApprovalController {
       const userId = req.user?.id;
 
       // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('super_admin')) { // Phase3-D
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -53,7 +53,7 @@ export class AdminApprovalController {
         entityName: log.metadata?.entityName || log.user?.fullName || 'Unknown',
         requesterId: log.user_id,
         requesterName: log.user?.fullName || log.user?.email || 'Unknown',
-        requesterRole: log.user?.role || 'customer',
+        requesterRole: log.user?.roles?.[0] || 'user',
         status: log.action === 'pending' ? 'pending' : log.action,
         changes: log.metadata?.changes || {},
         currentValues: log.metadata?.currentValues || {},
@@ -100,7 +100,7 @@ export class AdminApprovalController {
       const adminName = req.user?.name || req.user?.email || 'Admin';
 
       // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('super_admin')) { // Phase3-D
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -159,7 +159,7 @@ export class AdminApprovalController {
       const adminName = req.user?.name || req.user?.email || 'Admin';
 
       // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('super_admin')) { // Phase3-D
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -219,7 +219,7 @@ export class AdminApprovalController {
   static async getApprovalStats(req: AuthRequest, res: Response) {
     try {
       // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('super_admin')) { // Phase3-D
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -287,7 +287,7 @@ export class AdminApprovalController {
       const { id } = req.params;
 
       // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
+      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('super_admin')) { // Phase3-D
         return res.status(403).json({
           success: false,
           message: 'Admin access required'
@@ -316,7 +316,7 @@ export class AdminApprovalController {
         entityName: approvalLog.metadata?.entityName || approvalLog.user?.fullName || 'Unknown',
         requesterId: approvalLog.user_id,
         requesterName: approvalLog.user?.fullName || 'Unknown',
-        requesterRole: approvalLog.user?.role || 'customer',
+        requesterRole: approvalLog.user?.roles?.[0] || 'user',
         requesterEmail: approvalLog.user?.email || 'unknown@example.com',
         status: approvalLog.action === 'pending' ? 'pending' : approvalLog.action,
         priority: approvalLog.metadata?.priority || 'medium',

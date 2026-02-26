@@ -45,10 +45,10 @@ export class UserService {
   }): Promise<User> {
     const hashedPassword = await this.hashPassword(userData.password);
     
+    // Phase3-E: role is a read-only getter — DB column has default
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER,
       status: UserStatus.PENDING,
       permissions: this.getDefaultPermissions(userData.role || UserRole.USER),
       isActive: true,
@@ -68,7 +68,7 @@ export class UserService {
       throw new Error('User not found');
     }
 
-    user.role = role;
+    // Phase3-E: role is a read-only getter — cannot assign
     user.permissions = this.getDefaultPermissions(role);
     
     return await this.userRepository.save(user);

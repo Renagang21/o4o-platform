@@ -73,20 +73,22 @@ const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
 // ============================================================================
 
 /**
- * 약사 직능 (Function) - WO-KPA-FUNCTION-GATE-V1
- * 직능은 권한(Role)이 아닌 화면/업무 흐름을 위한 속성
+ * WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 기반 라벨 매핑
+ * kpa_pharmacist_profiles.activity_type → 표시명
  */
-export type PharmacistFunction = 'pharmacy' | 'hospital' | 'industry' | 'other';
-
-/**
- * 약사 직역 (Role) - WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1
- * 직역은 안내/온보딩 용도 메타데이터 (권한과 무관)
- * - general: 일반 약사 (근무약사/산업약사 등)
- * - pharmacy_owner: 약국 개설자 (약국 경영)
- * - hospital: 병원 약사
- * - other: 기타
- */
-export type PharmacistRole = 'general' | 'pharmacy_owner' | 'hospital' | 'other';
+export const ACTIVITY_TYPE_LABELS: Record<string, string> = {
+  pharmacy_owner: '약국 개설자',
+  pharmacy_employee: '약국 근무 약사',
+  hospital: '병원 약사',
+  manufacturer: '제조업',
+  importer: '수입업',
+  wholesaler: '도매업',
+  other_industry: '산업체',
+  government: '공무원',
+  school: '학교',
+  other: '기타',
+  inactive: '비활동',
+};
 
 export type MembershipType = 'pharmacist' | 'student';
 
@@ -97,8 +99,9 @@ export interface User {
   role?: string;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   roles: string[];  // Primary role array
   membershipType?: MembershipType;  // Phase 3: 약사/약대생 구분
-  pharmacistFunction?: PharmacistFunction;  // 직능 (최초 1회 선택)
-  pharmacistRole?: PharmacistRole;          // 직역 (최초 1회 선택, 프로필에서 수정 가능)
+  // WO-ROLE-NORMALIZATION-PHASE3-C-V1: qualification + business 기반
+  isStoreOwner: boolean;
+  activityType?: string;  // kpa_pharmacist_profiles.activity_type
   // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role (SSOT)
   membershipRole?: string;  // 'member' | 'operator' | 'admin' | undefined (비소속)
 
@@ -153,6 +156,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     name: '김지부 (지부운영자)',
     role: 'kpa:district_admin',
     roles: ['kpa:district_admin'],
+    isStoreOwner: false,
   },
   branch_admin: {
     id: 'test-branch-admin-001',
@@ -160,6 +164,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     name: '이분회 (분회운영자)',
     role: 'kpa:branch_admin',
     roles: ['kpa:branch_admin'],
+    isStoreOwner: false,
   },
   district_officer: {
     id: 'test-district-officer-001',
@@ -167,6 +172,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     name: '박임원 (지부임원)',
     role: 'pharmacist',  // 권한은 일반 회원
     roles: ['pharmacist'],
+    isStoreOwner: false,
     position: 'vice_president',  // 직책: 부회장
   },
   branch_officer: {
@@ -175,6 +181,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     name: '최임원 (분회임원)',
     role: 'pharmacist',  // 권한은 일반 회원
     roles: ['pharmacist'],
+    isStoreOwner: false,
     position: 'director',  // 직책: 이사
   },
   pharmacist: {
@@ -183,6 +190,7 @@ export const TEST_ACCOUNTS: Record<TestAccountType, TestUser> = {
     name: '홍길동 (약사)',
     role: 'pharmacist',
     roles: ['pharmacist'],
+    isStoreOwner: false,
   },
 };
 
@@ -196,10 +204,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  setPharmacistFunction: (fn: PharmacistFunction) => void;
-  setPharmacistRole: (role: PharmacistRole) => void;
-  /** WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 한 번에 설정 (1회 API, 1회 리렌더) */
-  setPharmacistProfile: (fn: PharmacistFunction, role: PharmacistRole) => void;
+  /** WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 설정 (API PATCH + 상태 업데이트) */
+  setActivityType: (activityType: string) => Promise<void>;
   // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -247,8 +253,9 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     role, // 매핑 없이 그대로 사용 (Backward compatibility)
     roles: apiUser.roles || [role], // P2-T1: Phase 4 support
     membershipType: (role === 'student' ? 'student' : 'pharmacist') as MembershipType,
-    pharmacistFunction: (apiUser as any).pharmacistFunction as PharmacistFunction | undefined,
-    pharmacistRole: (apiUser as any).pharmacistRole as PharmacistRole | undefined,
+    // WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner + activityType
+    isStoreOwner: !!(apiUser as any).isStoreOwner,
+    activityType: (apiUser as any).activityType || undefined,
   };
 }
 
@@ -367,54 +374,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * P1-T3: 약사 직능 설정
-   * - DB에 저장 (localStorage 제거)
-   * - API 호출하여 서버에 업데이트
+   * WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 설정
+   * - API PATCH로 서버 저장 → 서버가 isStoreOwner 재계산
+   * - checkAuth()로 서버 응답 기반 상태 동기화
    */
-  const setPharmacistFunction = async (fn: PharmacistFunction) => {
-    if (user) {
-      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
-      try {
-        await authClient.api.patch('/auth/me/profile', { pharmacistFunction: fn });
-      } catch (err) {
-        console.error('Failed to save pharmacistFunction:', err);
-      }
-      setUser({ ...user, pharmacistFunction: fn });
-    }
-  };
-
-  /**
-   * P1-T3: 약사 직역 설정
-   * - DB에 저장 (localStorage 제거)
-   * - API 호출하여 서버에 업데이트
-   */
-  const setPharmacistRole = async (role: PharmacistRole) => {
-    if (user) {
-      // WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1: DB 영속화
-      try {
-        await authClient.api.patch('/auth/me/profile', { pharmacistRole: role });
-      } catch (err) {
-        console.error('Failed to save pharmacistRole:', err);
-      }
-      setUser({ ...user, pharmacistRole: role });
-    }
-  };
-
-  /**
-   * WO-KPA-PHARMACY-PATH-COMPLEXITY-AUDIT-V1: 직능+직역 통합 설정
-   * FunctionGateModal에서 1회 API + 1회 setUser로 불필요한 중간 리렌더 제거
-   */
-  const setPharmacistProfile = async (fn: PharmacistFunction, role: PharmacistRole) => {
+  const setActivityType = async (activityType: string) => {
     if (user) {
       try {
-        await authClient.api.patch('/auth/me/profile', {
-          pharmacistFunction: fn,
-          pharmacistRole: role,
-        });
+        await authClient.api.patch('/auth/me/profile', { activityType });
       } catch (err) {
-        console.error('Failed to save pharmacist profile:', err);
+        console.error('Failed to save activityType:', err);
       }
-      setUser({ ...user, pharmacistFunction: fn, pharmacistRole: role });
+      // 서버가 derive한 최신 상태를 가져옴 (isStoreOwner 재계산 포함)
+      await checkAuth();
     }
   };
 
@@ -482,9 +454,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         logoutAll,
         checkAuth,
-        setPharmacistFunction,
-        setPharmacistRole,
-        setPharmacistProfile,
+        setActivityType,
         // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
         serviceUser,
         isServiceUserAuthenticated: !!serviceUser,

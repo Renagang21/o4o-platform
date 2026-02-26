@@ -53,10 +53,10 @@ export class UserService extends BaseService<User> {
   }): Promise<User> {
     const hashedPassword = await hashPassword(userData.password);
 
+    // Phase3-E: role is a read-only getter — DB column has default; RoleAssignment handles role
     const user = this.repository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER,
       status: UserStatus.PENDING,
       permissions: getDefaultPermissions(userData.role || UserRole.USER),
       isActive: true,
@@ -64,7 +64,21 @@ export class UserService extends BaseService<User> {
       loginAttempts: 0,
     });
 
-    return await this.repository.save(user);
+    const savedUser = await this.repository.save(user);
+
+    // Phase3-D: RoleAssignment 생성 (non-fatal)
+    try {
+      const { roleAssignmentService } = await import('./role-assignment.service.js');
+      await roleAssignmentService.assignRole({
+        userId: savedUser.id,
+        role: userData.role || UserRole.USER,
+        assignedBy: 'system:createUser',
+      });
+    } catch {
+      // Non-fatal: backfill migration covers existing users
+    }
+
+    return savedUser;
   }
 
   /**
@@ -80,7 +94,7 @@ export class UserService extends BaseService<User> {
       throw new Error('User not found');
     }
 
-    user.role = role;
+    // Phase3-E: role is a read-only getter — cannot assign
     user.permissions = getDefaultPermissions(role);
 
     return await this.repository.save(user);

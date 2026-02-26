@@ -376,6 +376,18 @@ export class AuthenticationService {
 
     await this.userRepository.save(newUser);
 
+    // Phase3-D: RoleAssignment 생성 (non-fatal)
+    try {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      await roleAssignmentService.assignRole({
+        userId: newUser.id,
+        role: UserRole.USER,
+        assignedBy: 'system:oauth',
+      });
+    } catch (roleErr: any) {
+      console.warn('[OAuth] RoleAssignment creation failed (non-fatal)', roleErr.message);
+    }
+
     // Create linked account
     const linkedAccount = this.linkedAccountRepository.create({
       userId: newUser.id,
@@ -1140,12 +1152,12 @@ export class AuthenticationService {
     for (const role of targetRoles) {
       let user = await this.userRepository
         .createQueryBuilder('user')
-        .where('user.role = :role', { role })
+        .where(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role })
         .andWhere(
           '(user.email LIKE :pattern1 OR user.email LIKE :pattern2)',
           { pattern1: '%@test.com', pattern2: '%test%' }
         )
-        .select(['user.id', 'user.email', 'user.role', 'user.password'])
+        .select(['user.id', 'user.email', 'user.password'])
         .limit(1)
         .getOne();
 
@@ -1156,8 +1168,6 @@ export class AuthenticationService {
           email: testEmail,
           name: `Test ${this.getRoleLabel(role)}`,
           password: await hashPassword(testPassword),
-          role: role,
-          roles: [role],
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
           permissions: []

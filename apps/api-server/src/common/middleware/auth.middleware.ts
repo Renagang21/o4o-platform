@@ -6,7 +6,7 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import { verifyAccessToken, isServiceToken, isPlatformUserToken, isGuestToken, isGuestOrServiceToken } from '../../utils/token.utils.js';
 import type { AccessTokenPayload, TokenType } from '../../types/auth.js';
 import logger from '../../utils/logger.js';
-import { hasPlatformRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
+import { hasPlatformRole } from '../../utils/role.utils.js';
 
 /**
  * Extended Request interface with authenticated user
@@ -125,16 +125,10 @@ export const requireAuth = async (
 /**
  * Require Admin Role Middleware
  *
- * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 2
+ * WO-OPERATOR-ROLE-CLEANUP-V1: Only platform:super_admin accepted.
  *
- * Requires the user to be authenticated AND have platform-level admin role.
+ * Requires the user to be authenticated AND have platform:super_admin role.
  * This should be chained after requireAuth or used standalone (it calls requireAuth internally).
- *
- * Only accepts prefixed platform roles:
- * - platform:super_admin
- * - platform:admin
- *
- * Legacy roles (admin, super_admin, operator) are logged and DENIED.
  *
  * Returns 403 if user lacks admin privileges.
  *
@@ -157,70 +151,18 @@ export const requireAdmin = async (
   const userRoles = user.roles || [];
 
   try {
-    // Check prefixed platform roles first (Priority 1)
-    if (hasPlatformRole(userRoles, 'super_admin') || hasPlatformRole(userRoles, 'admin')) {
+    // Check platform:super_admin in User.roles
+    if (hasPlatformRole(userRoles, 'super_admin')) {
       return next();
     }
 
-    // Check RoleAssignment table for prefixed platform roles (Priority 2)
+    // Check RoleAssignment table for platform:super_admin
     const hasPlatformRoleAssignment = await roleAssignmentService.hasAnyRole(user.id, [
       'platform:super_admin',
-      'platform:admin'
     ]);
 
     if (hasPlatformRoleAssignment) {
       return next();
-    }
-
-    // Check for legacy roles in User.roles and log/deny
-    const legacyRoles = ['admin', 'super_admin', 'operator'];
-    const hasLegacyRole = legacyRoles.some(role => userRoles.includes(role));
-
-    if (hasLegacyRole) {
-      // Log legacy role usage
-      legacyRoles.forEach(role => {
-        if (userRoles.includes(role)) {
-          logLegacyRoleUsage(user.id, role, 'common/auth.middleware:requireAdmin');
-        }
-      });
-
-      logger.warn('[requireAdmin] Legacy role format detected and denied', {
-        userId: user.id,
-        email: user.email,
-        legacyRoles: userRoles.filter(r => legacyRoles.includes(r)),
-        path: req.path,
-        method: req.method,
-      });
-
-      return res.status(403).json({
-        success: false,
-        error: 'Admin privileges required (platform:admin or platform:super_admin)',
-        code: 'FORBIDDEN',
-      });
-    }
-
-    // Check for legacy roles in RoleAssignment table and log/deny
-    const hasLegacyRoleAssignment = await roleAssignmentService.hasAnyRole(user.id, [
-      'admin',
-      'super_admin',
-      'operator'
-    ]);
-
-    if (hasLegacyRoleAssignment) {
-      logLegacyRoleUsage(user.id, 'legacy_role_assignment', 'common/auth.middleware:requireAdmin');
-
-      logger.warn('[requireAdmin] Legacy role assignment detected and denied', {
-        userId: user.id,
-        email: user.email,
-        path: req.path,
-        method: req.method,
-      });
-
-      return res.status(403).json({
-        success: false,
-        error: 'Admin privileges required (platform:admin or platform:super_admin)',
-        code: 'FORBIDDEN',
-      });
     }
 
     // No admin role found - deny access
@@ -233,11 +175,9 @@ export const requireAdmin = async (
 
     return res.status(403).json({
       success: false,
-      error: 'Admin privileges required',
+      error: 'Admin privileges required (platform:super_admin)',
       code: 'FORBIDDEN',
     });
-
-    next();
   } catch (error) {
     logger.error('[requireAdmin] Error checking admin role', {
       error: error instanceof Error ? error.message : String(error),

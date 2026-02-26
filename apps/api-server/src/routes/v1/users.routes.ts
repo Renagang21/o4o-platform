@@ -33,7 +33,7 @@ router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) 
     }
 
     if (role) {
-      queryBuilder.andWhere('user.role = :role', { role });
+      queryBuilder.andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role });
     }
 
     // Get total count
@@ -51,7 +51,7 @@ router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) 
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      role: user.roles?.[0] || 'user', // Phase3-E: role is getter
       status: user.status,
       provider: user.provider,
       businessInfo: user.businessInfo,
@@ -152,13 +152,13 @@ router.post('/', authenticate, requireAdmin, async (req: Request, res: Response)
     }
 
     // Create new user
+    // Phase3-E: role is a read-only getter — DB column has default
     const newUser = userRepository.create({
       email: req.body.email,
       password: req.body.password, // Should be hashed in the entity
       name: req.body.firstName && req.body.lastName
         ? `${req.body.firstName} ${req.body.lastName}`
         : req.body.firstName || req.body.lastName || req.body.email.split('@')[0],
-      role: req.body.role || 'customer',
       status: req.body.status || 'active',
       provider: 'local'
     });
@@ -213,26 +213,34 @@ router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Respons
         : req.body.firstName || req.body.lastName || user.name;
     }
 
-    // Handle both single role and roles array
+    // Phase3-E: role is a read-only getter, roles not persisted
+    // Role changes are handled via RoleAssignment dual-write below
     if (req.body.roles && Array.isArray(req.body.roles) && req.body.roles.length > 0) {
-      // Update both role (first one) and roles array for backward compatibility
-      logger.info('Setting user roles:', { roles: req.body.roles });
-      user.roles = req.body.roles;
-      user.role = req.body.roles[0]; // Set first role as primary
+      logger.info('Roles will be synced via RoleAssignment:', { roles: req.body.roles });
     } else if (req.body.role) {
-      logger.info('Setting single role:', { role: req.body.role });
-      user.role = req.body.role;
-      user.roles = [req.body.role];
+      logger.info('Role will be synced via RoleAssignment:', { role: req.body.role });
     }
-
-    logger.info('User before save:', {
-      roles: user.roles,
-      role: user.role
-    });
 
     if (req.body.status) user.status = req.body.status;
 
     const updatedUser = await userRepository.save(user);
+
+    // Phase3-D: Dual-write RoleAssignment
+    const rolesToSync = req.body.roles || (req.body.role ? [req.body.role] : null);
+    if (rolesToSync) {
+      try {
+        const { roleAssignmentService } = await import('../../modules/auth/services/role-assignment.service.js');
+        for (const r of rolesToSync) {
+          await roleAssignmentService.assignRole({
+            userId: user.id,
+            role: r,
+            assignedBy: (req as any).user?.id,
+          });
+        }
+      } catch {
+        // Non-fatal
+      }
+    }
 
     // Remove password from response
     const { password, ...userWithoutPassword } = updatedUser;
@@ -264,7 +272,7 @@ router.patch('/:id', authenticate, requireAdmin, async (req: Request, res: Respo
     }
 
     // Update allowed fields
-    if (req.body.role) user.role = req.body.role;
+    // Phase3-E: user.role is a read-only getter — skip role assignment
     if (req.body.status) user.status = req.body.status;
     if (req.body.name) user.name = req.body.name;
 

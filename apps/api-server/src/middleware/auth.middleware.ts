@@ -84,7 +84,18 @@ export const requireAuth = async (
       });
     }
 
-    logger.info('[requireAuth] Authentication successful', { userId: user.id, role: user.role });
+    // Phase3-E: RoleAssignment에서 권한 있는 역할 로드 → user.roles 오버라이드
+    // role is now a getter computed from roles[0], so only set roles
+    try {
+      const roleNames = await roleAssignmentService.getRoleNames(user.id);
+      if (roleNames.length > 0) {
+        user.roles = roleNames;
+      }
+    } catch {
+      // RoleAssignment 테이블 미존재 시 무시
+    }
+
+    logger.info('[requireAuth] Authentication successful', { userId: user.id, roles: user.roles });
     // Attach user to request
     req.user = user as any;
     next();
@@ -256,6 +267,16 @@ export const optionalAuth = async (
     });
 
     if (user && user.isActive) {
+      // Phase3-E: RoleAssignment에서 역할 오버라이드
+      // role is now a getter computed from roles[0], so only set roles
+      try {
+        const roleNames = await roleAssignmentService.getRoleNames(user.id);
+        if (roleNames.length > 0) {
+          user.roles = roleNames;
+        }
+      } catch {
+        // RoleAssignment 테이블 미존재 시 무시
+      }
       // Attach user to request
       req.user = user as any;
     }

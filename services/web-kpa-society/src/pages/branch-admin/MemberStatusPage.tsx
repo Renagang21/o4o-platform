@@ -10,17 +10,15 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AdminHeader } from '../../components/branch-admin';
+import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
-
-// 직능 타입
-type PharmacistFunction = 'pharmacy' | 'hospital' | 'industry' | 'other';
 
 // 회원 현황 데이터 타입
 interface MemberStatus {
   id: string;
   name: string;
   licenseNumber: string;        // 약사 면허번호
-  pharmacistFunction: PharmacistFunction;
+  activityType: string;         // WO-ROLE-NORMALIZATION-PHASE3-C-V1
   pharmacyName: string;         // 근무지
   phone: string;
   email: string;
@@ -45,12 +43,7 @@ interface MemberStatus {
   };
 }
 
-const FUNCTION_LABELS: Record<PharmacistFunction, string> = {
-  pharmacy: '약국',
-  hospital: '병원',
-  industry: '산업',
-  other: '기타',
-};
+// WO-ROLE-NORMALIZATION-PHASE3-C-V1: ACTIVITY_TYPE_LABELS 사용
 
 // 샘플 데이터
 const sampleMembers: MemberStatus[] = [
@@ -58,7 +51,7 @@ const sampleMembers: MemberStatus[] = [
     id: '1',
     name: '홍길동',
     licenseNumber: '12345',
-    pharmacistFunction: 'pharmacy',
+    activityType: 'pharmacy_employee',
     pharmacyName: '행복약국',
     phone: '010-1234-5678',
     email: 'hong@example.com',
@@ -70,7 +63,7 @@ const sampleMembers: MemberStatus[] = [
     id: '2',
     name: '김약사',
     licenseNumber: '23456',
-    pharmacistFunction: 'pharmacy',
+    activityType: 'pharmacy_employee',
     pharmacyName: '건강약국',
     phone: '010-2345-6789',
     email: 'kim@example.com',
@@ -82,7 +75,7 @@ const sampleMembers: MemberStatus[] = [
     id: '3',
     name: '이병원',
     licenseNumber: '34567',
-    pharmacistFunction: 'hospital',
+    activityType: 'hospital',
     pharmacyName: '서울대병원',
     phone: '010-3456-7890',
     email: 'lee@example.com',
@@ -94,7 +87,7 @@ const sampleMembers: MemberStatus[] = [
     id: '4',
     name: '박산업',
     licenseNumber: '45678',
-    pharmacistFunction: 'industry',
+    activityType: 'other_industry',
     pharmacyName: '한국제약',
     phone: '010-4567-8901',
     email: 'park@example.com',
@@ -106,7 +99,7 @@ const sampleMembers: MemberStatus[] = [
     id: '5',
     name: '최기타',
     licenseNumber: '56789',
-    pharmacistFunction: 'other',
+    activityType: 'other',
     pharmacyName: '프리랜서',
     phone: '010-5678-9012',
     email: 'choi@example.com',
@@ -185,7 +178,7 @@ export function MemberStatusPage() {
     const rows = filteredMembers.map(m => [
       m.licenseNumber,
       m.name,
-      FUNCTION_LABELS[m.pharmacistFunction],
+      ACTIVITY_TYPE_LABELS[m.activityType] || m.activityType,
       m.pharmacyName,
       m.phone,
       m.email,
@@ -340,7 +333,7 @@ export function MemberStatusPage() {
                   </td>
                   <td style={styles.td}>
                     <span style={styles.functionBadge}>
-                      {FUNCTION_LABELS[member.pharmacistFunction]}
+                      {ACTIVITY_TYPE_LABELS[member.activityType] || member.activityType}
                     </span>
                   </td>
                   <td style={styles.td}>{member.pharmacyName}</td>

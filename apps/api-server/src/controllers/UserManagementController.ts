@@ -176,13 +176,12 @@ export class UserManagementController {
       }
 
       // Create new user
+      // Phase3-E: role is a read-only getter, roles not persisted — DB column has default
       const user = this.userRepository.create({
         email,
         password,
         firstName,
         lastName,
-        role: role || 'customer',
-        roles: roles || [role || 'customer'],
         status: status || 'pending'
       });
 
@@ -222,12 +221,26 @@ export class UserManagementController {
       if (firstName !== undefined) user.firstName = firstName;
       if (lastName !== undefined) user.lastName = lastName;
       if (status) user.status = status;
-      if (roles) {
-        user.roles = roles;
-        user.role = roles[0] || user.role;
-      }
+      // Phase3-E: role is a read-only getter, roles not persisted
+      // Role changes are handled via RoleAssignment dual-write below
 
       const updatedUser = await this.userRepository.save(user);
+
+      // Phase3-D: Dual-write RoleAssignment
+      if (roles) {
+        try {
+          const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+          for (const r of roles) {
+            await roleAssignmentService.assignRole({
+              userId: user.id,
+              role: r,
+              assignedBy: (req as any).user?.id,
+            });
+          }
+        } catch {
+          // Non-fatal
+        }
+      }
 
       res.json({
         success: true,

@@ -2,8 +2,9 @@
  * PharmacyOnboardingBanner
  * WO-PHARMACIST-PROFILE-ROLE-ONBOARDING-V1
  * WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
+ * WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner 기반 전환
  *
- * 조건: pharmacistRole === 'pharmacy_owner' AND pharmacy 승인 없음
+ * 조건: isStoreOwner === true AND pharmacy 승인 없음
  * CTA: /pharmacy/approval 페이지로 이동 (신청 폼 작성 필요)
  */
 
@@ -14,8 +15,8 @@ export function PharmacyOnboardingBanner() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Guard: pharmacy_owner만 대상
-  const isPharmacyOwner = user?.pharmacistRole === 'pharmacy_owner';
+  // Guard: isStoreOwner만 대상 (WO-ROLE-NORMALIZATION-PHASE3-C-V1)
+  const isPharmacyOwner = user?.isStoreOwner === true;
 
   if (!isPharmacyOwner) {
     return null;

@@ -32,7 +32,7 @@ export class AdminUserController {
 
       // Apply role filter
       if (role && role !== 'all') {
-        queryBuilder.andWhere('user.role = :role', { role });
+        queryBuilder.andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role });
       }
 
       // Apply status filter
@@ -156,10 +156,8 @@ export class AdminUserController {
         firstName,
         lastName,
         name,
-        role,
         status,
         isActive,
-        roles: [role],
         permissions: []
       });
 
@@ -235,10 +233,8 @@ export class AdminUserController {
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (name) user.name = name;
-      if (role) {
-        user.role = role;
-        user.roles = [role];
-      }
+      // Phase3-E: role is a read-only getter, roles is not persisted
+      // Role changes are handled via RoleAssignment dual-write below
       if (status !== undefined) user.status = status;
       if (isActive !== undefined) user.isActive = isActive;
 
@@ -248,6 +244,20 @@ export class AdminUserController {
       }
 
       const updatedUser = await userRepo.save(user);
+
+      // Phase3-D: Dual-write RoleAssignment
+      if (role) {
+        try {
+          const { roleAssignmentService } = await import('../../modules/auth/services/role-assignment.service.js');
+          await roleAssignmentService.assignRole({
+            userId: user.id,
+            role,
+            assignedBy: (req as any).user?.id,
+          });
+        } catch {
+          // Non-fatal
+        }
+      }
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = updatedUser;
@@ -345,8 +355,9 @@ export class AdminUserController {
         userRepo.count({ where: { isActive: true } }),
         userRepo
           .createQueryBuilder('user')
-          .select('user.role as role, COUNT(*) as count')
-          .groupBy('user.role')
+          .innerJoin('role_assignments', 'ra', 'ra.user_id = user.id AND ra.is_active = true')
+          .select('ra.role as role, COUNT(DISTINCT user.id) as count')
+          .groupBy('ra.role')
           .getRawMany(),
         userRepo
           .createQueryBuilder('user')
@@ -356,7 +367,7 @@ export class AdminUserController {
         userRepo.find({
           order: { createdAt: 'DESC' },
           take: 10,
-          select: ['id', 'firstName', 'lastName', 'email', 'role', 'createdAt']
+          select: ['id', 'firstName', 'lastName', 'email', 'createdAt']
         })
       ]);
 

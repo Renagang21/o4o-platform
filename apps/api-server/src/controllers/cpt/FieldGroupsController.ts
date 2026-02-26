@@ -88,7 +88,7 @@ export class FieldGroupsController {
       const { title, description, location, rules, options, placement, fields = [] } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -147,7 +147,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -215,7 +215,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -264,7 +264,7 @@ export class FieldGroupsController {
       const { title } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -331,7 +331,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -369,7 +369,7 @@ export class FieldGroupsController {
       const { fieldGroups } = req.body; // Array of { id, order }
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }

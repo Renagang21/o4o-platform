@@ -29,9 +29,8 @@ export const getPendingUsers = async (req: Request, res: Response) => {
     const [users, total] = await queryBuilder
       .select([
         'user.id',
-        'user.email', 
+        'user.email',
         'user.name',
-        'user.role',
         'user.status',
         'user.businessInfo',
         'user.createdAt',
@@ -103,8 +102,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
       .select([
         'user.id',
         'user.email',
-        'user.name', 
-        'user.role',
+        'user.name',
         'user.status',
         'user.businessInfo',
         'user.createdAt',

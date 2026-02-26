@@ -57,7 +57,7 @@ function getServiceContext(req: Request): ServiceContext {
   const authReq = req as AuthRequest;
   return {
     userId: authReq.user?.id || authReq.authUser?.id,
-    userType: authReq.user?.role || authReq.authUser?.role || 'admin',
+    userType: authReq.user?.roles?.[0] || authReq.authUser?.role || 'admin', // Phase3-D
     ipAddress: req.ip || req.socket.remoteAddress,
     userAgent: req.headers['user-agent'],
   };

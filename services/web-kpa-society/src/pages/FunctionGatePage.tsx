@@ -2,56 +2,51 @@
  * FunctionGatePage - 약사 직능 선택 게이트 (단일 단계)
  *
  * WO-KPA-FUNCTION-GATE-V1: 직능 선택 (최초 1회)
+ * WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 기반 전환
  *
- * 5개 선택지, 한 번 선택으로 pharmacistFunction + pharmacistRole 동시 설정:
- * - 근무 약사 → pharmacy + general
- * - 개설 약사 → pharmacy + pharmacy_owner
- * - 병원 약사 → hospital + hospital
- * - 산업 약사 → industry + general
- * - 기타 약사 → other + other
+ * 5개 선택지 → activityType 설정:
+ * - 근무 약사 → pharmacy_employee
+ * - 개설 약사 → pharmacy_owner
+ * - 병원 약사 → hospital
+ * - 산업 약사 → other_industry
+ * - 기타 약사 → other
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  useAuth,
-  type PharmacistFunction,
-  type PharmacistRole,
-} from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface FunctionOption {
   key: string;
   label: string;
   description: string;
-  pharmacistFunction: PharmacistFunction;
-  pharmacistRole: PharmacistRole;
+  activityType: string;
 }
 
 const options: FunctionOption[] = [
-  { key: 'pharmacy_worker', label: '근무 약사', description: '약국 근무', pharmacistFunction: 'pharmacy', pharmacistRole: 'general' },
-  { key: 'pharmacy_owner', label: '개설 약사', description: '약국 경영', pharmacistFunction: 'pharmacy', pharmacistRole: 'pharmacy_owner' },
-  { key: 'hospital', label: '병원 약사', description: '의료기관 근무', pharmacistFunction: 'hospital', pharmacistRole: 'hospital' },
-  { key: 'industry', label: '산업 약사', description: '제약/바이오 등', pharmacistFunction: 'industry', pharmacistRole: 'general' },
-  { key: 'other', label: '기타 약사', description: '', pharmacistFunction: 'other', pharmacistRole: 'other' },
+  { key: 'pharmacy_worker', label: '근무 약사', description: '약국 근무', activityType: 'pharmacy_employee' },
+  { key: 'pharmacy_owner', label: '개설 약사', description: '약국 경영', activityType: 'pharmacy_owner' },
+  { key: 'hospital', label: '병원 약사', description: '의료기관 근무', activityType: 'hospital' },
+  { key: 'industry', label: '산업 약사', description: '제약/바이오 등', activityType: 'other_industry' },
+  { key: 'other', label: '기타 약사', description: '', activityType: 'other' },
 ];
 
 export function FunctionGatePage() {
   const navigate = useNavigate();
-  const { user, setPharmacistFunction, setPharmacistRole } = useAuth();
+  const { user, setActivityType } = useAuth();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   // Already set → go to dashboard
   useEffect(() => {
-    if (user?.pharmacistFunction && user?.pharmacistRole) {
+    if (user?.activityType) {
       navigate('/dashboard');
     }
   }, [user, navigate]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const selected = options.find(o => o.key === selectedKey);
     if (selected) {
-      setPharmacistFunction(selected.pharmacistFunction);
-      setPharmacistRole(selected.pharmacistRole);
+      await setActivityType(selected.activityType);
       navigate('/dashboard');
     }
   };

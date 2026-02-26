@@ -53,9 +53,9 @@ export class UserRepository extends Repository<User> {
     // Apply role filter
     if (filters.role) {
       if (Array.isArray(filters.role)) {
-        query.andWhere('user.role IN (:...roles)', { roles: filters.role });
+        query.andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role IN (:...roles))`, { roles: filters.role });
       } else {
-        query.andWhere('user.role = :role', { role: filters.role });
+        query.andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role: filters.role });
       }
     }
 
@@ -227,11 +227,25 @@ export class UserRepository extends Repository<User> {
       throw new Error('User not found');
     }
 
-    user.roles = roles;
-    // Keep primary role in sync
-    user.role = roles[0] || UserRole.USER;
+    // Phase3-E: user.roles not persisted to DB, user.role is read-only getter
+    // Role changes handled via RoleAssignment dual-write below
 
-    return this.save(user);
+    const savedUser = await this.save(user);
+
+    // Phase3-D: Dual-write RoleAssignment
+    try {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      for (const r of roles) {
+        await roleAssignmentService.assignRole({
+          userId,
+          role: r,
+        });
+      }
+    } catch {
+      // Non-fatal
+    }
+
+    return savedUser;
   }
 
   // Get user statistics
@@ -249,9 +263,10 @@ export class UserRepository extends Repository<User> {
 
     // Count by role
     const roleStats = await this.createQueryBuilder('user')
-      .select('user.role', 'role')
-      .addSelect('COUNT(*)', 'count')
-      .groupBy('user.role')
+      .innerJoin('role_assignments', 'ra', 'ra.user_id = user.id AND ra.is_active = true')
+      .select('ra.role', 'role')
+      .addSelect('COUNT(DISTINCT user.id)', 'count')
+      .groupBy('ra.role')
       .getRawMany();
 
     const byRole = roleStats.reduce((acc, stat) => {

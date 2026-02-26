@@ -260,7 +260,7 @@ export class ForumRecommendationController {
     // Build user context from authenticated user and query params
     const context: UserContext = {
       userId: user?.id,
-      role: user?.role,
+      role: user?.roles?.[0],
       organizationId: user?.organizationId || (req.query.organizationId as string),
     };
 
@@ -283,7 +283,7 @@ export class ForumRecommendationController {
     }
 
     // Yaksa-specific context
-    if (req.query.isPharmacist === 'true' || user?.role === 'pharmacist') {
+    if (req.query.isPharmacist === 'true' || user?.roles?.includes('pharmacist')) {
       context.isPharmacist = true;
     }
 

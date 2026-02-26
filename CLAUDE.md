@@ -214,6 +214,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | F5 | **Content Stable** — HUB 콘텐츠 타입·매핑·병합 로직·API 계약 | 2026-02-23 | `docs/baseline/CONTENT-STABLE-DECLARATION-V1.md` |
 | F6 | **Boundary Policy** — Domain Boundary Matrix + Guard Rules 5개 | 2026-02-24 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
 | F7 | **Neture Partner Contract** — 계약 테이블·ENUM·트랜잭션·Commission 불변 | 2026-02-24 | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
+| F8 | **Neture Distribution Engine** — Distribution Tier 3단계·SERVICE 상태 머신·Checkout Guard 3계층·Listing 캐스케이드 | 2026-02-27 | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
 
 ---
 
@@ -247,9 +248,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Production Migration | `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md` |
 | Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
 | Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
+| Neture Distribution Engine | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
 
 ---
 
-*Updated: 2026-02-25*
-*Version: 6.2*
+*Updated: 2026-02-27*
+*Version: 6.3*
 *Status: Active Constitution*

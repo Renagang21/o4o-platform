@@ -81,6 +81,19 @@ export class SocialAuthService {
     });
 
     await userRepo.save(user);
+
+    // Phase3-D: RoleAssignment 생성 (non-fatal)
+    try {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      await roleAssignmentService.assignRole({
+        userId: user.id,
+        role: UserRole.USER,
+        assignedBy: 'system:social-auth',
+      });
+    } catch {
+      // Non-fatal: backfill migration covers existing users
+    }
+
     logger.info('[SOCIAL AUTH] New user created', { userId: user.id, isNewUser: true });
 
     // Send welcome email

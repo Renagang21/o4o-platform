@@ -34,6 +34,10 @@ const REFRESH_TOKEN_EXPIRES_IN = 7 * 24 * 60 * 60; // 7 days in seconds
  * - user.getRoleNames()가 있으면 우선 사용
  * - user.roles 배열이 있으면 사용
  * - 그 외 user.role 단일값을 배열로 래핑
+ *
+ * @deprecated Phase3-D: requireAuth 미들웨어에서 user.roles를 RoleAssignment 데이터로
+ * 오버라이드하므로 이 함수의 fallback 체인은 실질적으로 사용되지 않음.
+ * Phase3-E에서 간소화 예정.
  */
 export function deriveRoles(user: { role?: string; roles?: string[]; getRoleNames?: () => string[] }): string[] {
   if (user.getRoleNames) {
@@ -96,10 +100,12 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
 
   // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: 다중 역할 배열 도출
   const userRoles = deriveRoles(user);
+  // Phase3-D: RoleAssignment 오버라이드된 roles에서 primary role 추출
+  const primaryRole = userRoles[0] || 'user';
 
   // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: 역할 기반 스코프 도출
   const userScopes = deriveUserScopes({
-    role: user.role,
+    role: primaryRole,
     roles: userRoles,
   });
 
@@ -107,7 +113,7 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
     userId: user.id,
     sub: user.id,
     email: user.email,
-    role: user.role,
+    role: primaryRole, // Phase3-D: user.role → roles[0] (from RoleAssignment)
     roles: userRoles, // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1

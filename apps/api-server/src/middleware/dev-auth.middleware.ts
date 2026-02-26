@@ -96,13 +96,11 @@ export const devTestTokenMiddleware = async (
                 return res.status(500).json({ code: 'DEV_CONFIG_ERROR', message: 'Admin user missing' });
             }
         } else if (roleHeader === 'seller') {
-            // Find a valid seller user (e.g. the one used for testing)
-            // For Phase 1, we can search for ANY user with 'seller' role or a specific one if defined
-            // Strategy: Look for a known test seller or the first available active seller
-            // This query depends on RBAC structure, but assuming role column exists on User for MVP
-            targetUser = await userRepo.findOne({
-                where: { role: UserRole.SELLER, isActive: true } // MVP approach
-            });
+            // Phase3-E: role is no longer a DB column, use RoleAssignment EXISTS subquery
+            targetUser = await userRepo.createQueryBuilder('user')
+                .where('user."isActive" = true')
+                .andWhere(`EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :role)`, { role: UserRole.SELLER })
+                .getOne();
 
             if (!targetUser) {
                 // Fallback: try to find admin and pretend? No, seller verification needs seller data.

@@ -3,12 +3,13 @@
  *
  * WO-KPA-A-PHARMACY-ROUTE-GUARD-HARDENING-V1
  * WO-KPA-A-PHARMACY-TOKEN-STALE-FIX-V1: API fallback 추가
+ * WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner 기반 전환
  *
  * 정책:
  * - 미인증 → /login
  * - admin/operator → /operator
- * - pharmacistRole === 'pharmacy_owner' → 즉시 통과 (토큰 기준)
- * - pharmacistRole 없음 → API로 승인 상태 확인 (토큰 스테일 대응)
+ * - isStoreOwner === true → 즉시 통과
+ * - isStoreOwner 없음 → API로 승인 상태 확인 (스테일 대응)
  *   - approved → 통과
  *   - 그 외 → /pharmacy (게이트 페이지로 안내)
  */
@@ -28,8 +29,8 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
   const location = useLocation();
   const [apiCheck, setApiCheck] = useState<'idle' | 'loading' | 'approved' | 'denied'>('idle');
 
-  // 토큰에 pharmacistRole이 없을 때 API로 확인 (모듈 레벨 캐시 사용)
-  const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && user.pharmacistRole !== 'pharmacy_owner';
+  // isStoreOwner가 아닐 때 API로 확인 (모듈 레벨 캐시 사용)
+  const needsApiCheck = !!user && !hasAnyRole(user.roles, PLATFORM_ROLES) && !user.isStoreOwner;
 
   useEffect(() => {
     if (!needsApiCheck) return;
@@ -69,8 +70,8 @@ export function PharmacyGuard({ children }: PharmacyGuardProps) {
     return <Navigate to="/operator" replace />;
   }
 
-  // Fast path: 토큰에 pharmacy_owner가 있으면 즉시 통과
-  if (user.pharmacistRole === 'pharmacy_owner') {
+  // Fast path: isStoreOwner면 즉시 통과
+  if (user.isStoreOwner) {
     return <>{children}</>;
   }
 

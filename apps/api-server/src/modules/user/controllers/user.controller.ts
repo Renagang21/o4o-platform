@@ -37,7 +37,6 @@ export class UserController extends BaseController {
       const user = await userRepository.findOne({
         where: { id: req.user.id },
         select: ['id', 'email', 'name', 'firstName', 'lastName', 'nickname', 'phone', 'avatar', 'status', 'createdAt', 'updatedAt'],
-        relations: ['dbRoles'],
       });
 
       if (!user) {
@@ -56,11 +55,7 @@ export class UserController extends BaseController {
           phone: user.phone || null,
           avatar: user.avatar || null,
           status: user.status,
-          roles: user.dbRoles?.map(r => ({
-            id: r.id,
-            name: r.name,
-            displayName: r.displayName,
-          })) || [],
+          roles: (user.roles || []).map((r: string) => ({ name: r })), // Phase3-E: dbRoles removed
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },

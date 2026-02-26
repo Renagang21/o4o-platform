@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi, type ProfileResponse } from '../../api';
-import { useAuth, type PharmacistRole } from '../../contexts';
+import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 
 /**
@@ -31,12 +31,12 @@ function getServicePrefix(pathname: string): string {
   return '';
 }
 
-const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
-  general: '일반 약사',
-  pharmacy_owner: '약국 개설자',
-  hospital: '병원 약사',
-  other: '기타',
-};
+/** 프로필 편집에 사용할 activityType 옵션 (편집 가능한 값만 필터) */
+const EDITABLE_ACTIVITY_TYPES = [
+  'pharmacy_owner', 'pharmacy_employee', 'hospital',
+  'manufacturer', 'importer', 'wholesaler', 'other_industry',
+  'government', 'school', 'other', 'inactive',
+] as const;
 
 const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
   admin: '관리자',
@@ -49,7 +49,7 @@ const ORGANIZATION_ROLE_LABELS: Record<string, string> = {
 export function MyProfilePage() {
   const location = useLocation();
   const servicePrefix = getServicePrefix(location.pathname);
-  const { user, setPharmacistRole, checkAuth } = useAuth();
+  const { user, setActivityType, checkAuth } = useAuth();
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,7 +73,7 @@ export function MyProfilePage() {
     email: '',
     university: '',
     workplace: '',
-    pharmacistRole: '' as PharmacistRole | '',
+    activityType: '' as string,
   });
 
   useEffect(() => {
@@ -95,7 +95,7 @@ export function MyProfilePage() {
         email: data.email || '',
         university: data.pharmacist?.university || '',
         workplace: data.pharmacist?.workplace || '',
-        pharmacistRole: user?.pharmacistRole || '',
+        activityType: user?.activityType || '',
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
@@ -117,7 +117,7 @@ export function MyProfilePage() {
         email: profile.email || '',
         university: profile.pharmacist?.university || '',
         workplace: profile.pharmacist?.workplace || '',
-        pharmacistRole: user?.pharmacistRole || '',
+        activityType: user?.activityType || '',
       });
     }
     setIsEditMode(false);
@@ -128,10 +128,10 @@ export function MyProfilePage() {
 
     try {
       setSaving(true);
-      const { pharmacistRole: roleValue, ...apiFormData } = formData;
+      const { activityType: activityValue, ...apiFormData } = formData;
       await mypageApi.updateProfile(apiFormData);
-      if (roleValue) {
-        setPharmacistRole(roleValue as PharmacistRole);
+      if (activityValue) {
+        await setActivityType(activityValue);
       }
 
       // AuthContext user 갱신
@@ -294,12 +294,12 @@ export function MyProfilePage() {
                   <label style={styles.label}>직역</label>
                   <select
                     style={styles.input}
-                    value={formData.pharmacistRole}
-                    onChange={e => setFormData({ ...formData, pharmacistRole: e.target.value as PharmacistRole })}
+                    value={formData.activityType}
+                    onChange={e => setFormData({ ...formData, activityType: e.target.value })}
                   >
                     <option value="">선택하세요</option>
-                    {(Object.entries(PHARMACIST_ROLE_LABELS) as [PharmacistRole, string][]).map(([value, label]) => (
-                      <option key={value} value={value}>{label}</option>
+                    {EDITABLE_ACTIVITY_TYPES.map(value => (
+                      <option key={value} value={value}>{ACTIVITY_TYPE_LABELS[value]}</option>
                     ))}
                   </select>
                 </div>
@@ -428,7 +428,7 @@ export function MyProfilePage() {
                 <div style={styles.infoRow}>
                   <span style={styles.infoLabel}>직역</span>
                   <span style={styles.infoValue}>
-                    {user?.pharmacistRole ? PHARMACIST_ROLE_LABELS[user.pharmacistRole] : '-'}
+                    {user?.activityType ? ACTIVITY_TYPE_LABELS[user.activityType] : '-'}
                   </span>
                 </div>
 

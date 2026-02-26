@@ -25,27 +25,26 @@ import PageHeader from '@/components/common/PageHeader';
 import DataTable, { Column } from '@/components/common/DataTable';
 
 // Service role definitions
+// WO-OPERATOR-ROLE-CLEANUP-V1: Super Admin = 전체 접근, 각 서비스 = Admin + Operator만
 const SERVICE_ROLES = {
   platform: [
-    { value: 'platform:super_admin', label: 'Super Admin', description: '최상위 권한, 전체 서비스 접근' },
-    { value: 'platform:admin', label: 'Admin', description: '플랫폼 관리자' },
-    { value: 'platform:operator', label: 'Operator', description: '플랫폼 운영자' },
+    { value: 'platform:super_admin', label: 'Super Admin', description: '모든 서비스 접근 가능' },
   ],
   'kpa-a': [
-    { value: 'kpa:admin', label: 'KPA 관리자', description: 'KPA 전체 관리자 (공통)' },
-    { value: 'kpa:operator', label: 'KPA 운영자', description: 'KPA 전체 운영자 (공통)' },
-    { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
+    { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
+    { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
   ],
   'kpa-b': [
-    { value: 'kpa-b:district', label: '지부 운영자', description: '데모 서비스 지부 운영자 (/demo)' },
-    { value: 'kpa-b:branch', label: '분회 운영자', description: '데모 서비스 분회 운영자 (/demo)' },
+    { value: 'kpa-b:district', label: '지부 운영자', description: '데모 서비스 지부 운영자' },
+    { value: 'kpa-b:branch', label: '분회 운영자', description: '데모 서비스 분회 운영자' },
   ],
-  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:* 제거 — 분회 역할은 KpaMember.role이 SSOT
-  'kpa-c': [] as { value: string; label: string; description: string }[],
+  'kpa-c': [
+    { value: 'kpa-c:admin', label: 'Admin', description: '분회서비스 관리자' },
+    { value: 'kpa-c:operator', label: 'Operator', description: '분회서비스 운영자' },
+  ],
   neture: [
     { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
-    { value: 'neture:supplier', label: 'Supplier', description: 'Neture 공급사' },
-    { value: 'neture:partner', label: 'Partner', description: 'Neture 파트너' },
+    { value: 'neture:operator', label: 'Operator', description: 'Neture 운영자' },
   ],
   glycopharm: [
     { value: 'glycopharm:admin', label: 'Admin', description: 'GlycoPharm 관리자' },

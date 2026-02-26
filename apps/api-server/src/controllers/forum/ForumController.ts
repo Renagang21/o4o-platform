@@ -309,7 +309,7 @@ export class ForumController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role || 'customer';
+      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
 
       if (!userId) {
         res.status(401).json({
@@ -394,7 +394,7 @@ export class ForumController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role || 'customer';
+      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
 
       if (!userId) {
         res.status(401).json({
@@ -927,7 +927,7 @@ export class ForumController {
   async updateComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role || 'customer';
+      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -980,7 +980,7 @@ export class ForumController {
   async deleteComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role || 'customer';
+      const userRole = (req as any).user?.roles?.[0] || 'user'; // Phase3-D
       if (!userId) {
         res.status(401).json({ success: false, error: 'Unauthorized' });
         return;
@@ -1302,7 +1302,7 @@ export class ForumController {
       const { type, id } = req.params;
       const { action } = req.body; // action: 'approve' | 'reject'
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role;
+      const userRole = (req as any).user?.roles?.[0]; // Phase3-D
 
       if (!userId) {
         res.status(401).json({

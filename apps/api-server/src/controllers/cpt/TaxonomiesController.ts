@@ -108,7 +108,7 @@ export class TaxonomiesController {
 
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -164,7 +164,7 @@ export class TaxonomiesController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -211,7 +211,7 @@ export class TaxonomiesController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || user.role !== 'admin') {
+      if (!user || !user.roles?.includes('admin')) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }

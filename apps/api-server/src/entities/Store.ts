@@ -70,6 +70,6 @@ export class Store {
   }
 
   canBeAccessedBy(user: User): boolean {
-    return user.role === 'admin' || this.managerId === user.id;
+    return user.roles?.includes('admin') || user.roles?.includes('super_admin') || this.managerId === user.id; // Phase3-D
   }
 }

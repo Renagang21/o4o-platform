@@ -33,8 +33,7 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
 
     // Find all users
     const users = await userRepo.find({
-      select: ['id', 'email', 'name', 'role', 'roles', 'isActive'],
-      relations: ['dbRoles']
+      select: ['id', 'email', 'name', 'roles', 'isActive'],
     });
 
     if (users.length === 0) {
@@ -56,13 +55,8 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
       logger.info(`📧 Email: ${user.email}`);
       logger.info(`👤 Name: ${user.name || 'N/A'}`);
       logger.info(`🆔 ID: ${user.id}`);
-      logger.info(`🏷️  Legacy Role: ${user.role}`);
-      logger.info(`🏷️  Legacy Roles Array: ${JSON.stringify(user.roles)}`);
-
-      if (user.dbRoles && user.dbRoles.length > 0) {
-        logger.info(`🛡️  DB Roles: ${user.dbRoles.map(r => r.name).join(', ')}`);
-      }
-
+      logger.info(`🏷️  Roles: ${JSON.stringify(user.roles)}`);
+      logger.info(`   (Authoritative source: role_assignments table)`);
       logger.info(`✅ Active: ${user.isActive}`);
 
       // Update password
@@ -93,7 +87,7 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
     for (const user of users) {
       logger.info(`Email: ${user.email}`);
       logger.info(`Password: ${newPassword}`);
-      logger.info(`Role: ${user.role}`);
+      logger.info(`Roles: ${user.roles?.join(', ') || 'none'}`);
       logger.info('');
     }
 
