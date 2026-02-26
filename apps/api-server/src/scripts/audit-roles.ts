@@ -66,6 +66,8 @@ async function auditRoles(): Promise<RoleAuditResult> {
     serviceDistribution: {
       platform: 0,
       kpa: 0,
+      'kpa-b': 0,
+      'kpa-c': 0,
       neture: 0,
       glycopharm: 0,
       cosmetics: 0,
@@ -80,6 +82,8 @@ async function auditRoles(): Promise<RoleAuditResult> {
     usersByService: {
       platform: 0,
       kpa: 0,
+      'kpa-b': 0,
+      'kpa-c': 0,
       neture: 0,
       glycopharm: 0,
       cosmetics: 0,
