@@ -19,6 +19,15 @@ export enum ProductPurpose {
 }
 
 /**
+ * 상품 승인 상태 (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1)
+ */
+export enum ProductApprovalStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
+/**
  * 유통 정책 (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1)
  */
 export enum DistributionType {
@@ -51,7 +60,7 @@ export class NetureSupplierProduct {
   })
   purpose: ProductPurpose;
 
-  @Column({ name: 'is_active', default: true })
+  @Column({ name: 'is_active', default: false })
   isActive: boolean;
 
   @Column({ name: 'accepts_applications', default: false })
@@ -72,6 +81,18 @@ export class NetureSupplierProduct {
     nullable: true,
   })
   allowedSellerIds: string[] | null;
+
+  /** WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1: 상품 승인 상태 */
+  @Column({
+    name: 'approval_status',
+    type: 'enum',
+    enum: ProductApprovalStatus,
+    default: ProductApprovalStatus.PENDING,
+  })
+  approvalStatus: ProductApprovalStatus;
+
+  @Column({ name: 'approval_note', type: 'text', nullable: true })
+  approvalNote: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

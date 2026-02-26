@@ -1,13 +1,11 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import {
   NetureSupplier,
   NetureSupplierProduct,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
-  NetureSupplierRequest,
   NetureSupplierContent,
-  NetureSupplierRequestEvent,
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NeturePartnerDashboardItem,
@@ -16,17 +14,17 @@ import {
   ContractTerminatedBy,
   SupplierStatus,
   PartnershipStatus,
-  SupplierRequestStatus,
   RecruitmentStatus,
   ApplicationStatus,
   ProductPurpose,
   DistributionType,
+  ProductApprovalStatus,
   ContentType,
   ContentStatus,
-  RequestEventType,
   ContactVisibility,
 } from './entities/index.js';
 import logger from '../../utils/logger.js';
+import { autoExpandPublicProduct } from '../../utils/auto-listing.utils.js';
 
 export class NetureService {
   // Lazy initialization: repositories are created on first access
@@ -34,9 +32,7 @@ export class NetureService {
   private _productRepo?: Repository<NetureSupplierProduct>;
   private _partnershipRepo?: Repository<NeturePartnershipRequest>;
   private _partnershipProductRepo?: Repository<NeturePartnershipProduct>;
-  private _supplierRequestRepo?: Repository<NetureSupplierRequest>;
   private _contentRepo?: Repository<NetureSupplierContent>;
-  private _requestEventRepo?: Repository<NetureSupplierRequestEvent>;
   private _recruitmentRepo?: Repository<NeturePartnerRecruitment>;
   private _applicationRepo?: Repository<NeturePartnerApplication>;
   private _contractRepo?: Repository<NetureSellerPartnerContract>;
@@ -69,25 +65,11 @@ export class NetureService {
     return this._partnershipProductRepo;
   }
 
-  private get supplierRequestRepo(): Repository<NetureSupplierRequest> {
-    if (!this._supplierRequestRepo) {
-      this._supplierRequestRepo = AppDataSource.getRepository(NetureSupplierRequest);
-    }
-    return this._supplierRequestRepo;
-  }
-
   private get contentRepo(): Repository<NetureSupplierContent> {
     if (!this._contentRepo) {
       this._contentRepo = AppDataSource.getRepository(NetureSupplierContent);
     }
     return this._contentRepo;
-  }
-
-  private get requestEventRepo(): Repository<NetureSupplierRequestEvent> {
-    if (!this._requestEventRepo) {
-      this._requestEventRepo = AppDataSource.getRepository(NetureSupplierRequestEvent);
-    }
-    return this._requestEventRepo;
   }
 
   private get recruitmentRepo(): Repository<NeturePartnerRecruitment> {
@@ -145,6 +127,393 @@ export class NetureService {
     }
   }
 
+  // ==================== Supplier Onboarding (WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1) ====================
+
+  /**
+   * POST /supplier/register — 공급자 신청 (status = PENDING)
+   */
+  async registerSupplier(
+    userId: string,
+    data: { name: string; slug: string; contactEmail?: string },
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const name = data.name?.trim();
+      if (!name) {
+        return { success: false, error: 'MISSING_NAME' };
+      }
+
+      const slug = data.slug?.trim().toLowerCase();
+      if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+        return { success: false, error: 'INVALID_SLUG' };
+      }
+
+      // 중복 체크: userId 이미 연결된 supplier 존재
+      const existingByUser = await this.supplierRepo.findOne({
+        where: { userId },
+        select: ['id'],
+      });
+      if (existingByUser) {
+        return { success: false, error: 'USER_ALREADY_HAS_SUPPLIER' };
+      }
+
+      // 중복 체크: slug
+      const existingBySlug = await this.supplierRepo.findOne({
+        where: { slug },
+        select: ['id'],
+      });
+      if (existingBySlug) {
+        return { success: false, error: 'SLUG_ALREADY_EXISTS' };
+      }
+
+      const supplier = this.supplierRepo.create({
+        name,
+        slug,
+        userId,
+        contactEmail: data.contactEmail || null,
+        status: SupplierStatus.PENDING,
+      });
+      const saved = await this.supplierRepo.save(supplier);
+
+      logger.info(`[NetureService] Supplier registered: ${saved.id} (PENDING) by user ${userId}`);
+
+      return {
+        success: true,
+        data: {
+          id: saved.id,
+          name: saved.name,
+          slug: saved.slug,
+          status: saved.status,
+          createdAt: saved.createdAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error registering supplier:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /admin/suppliers/:id/approve — 운영자 승인 (PENDING → ACTIVE)
+   */
+  async approveSupplier(
+    supplierId: string,
+    approvedByUserId: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) {
+        return { success: false, error: 'SUPPLIER_NOT_FOUND' };
+      }
+      if (supplier.status !== SupplierStatus.PENDING) {
+        return { success: false, error: 'INVALID_STATUS' };
+      }
+
+      supplier.status = SupplierStatus.ACTIVE;
+      supplier.approvedBy = approvedByUserId;
+      supplier.approvedAt = new Date();
+      await this.supplierRepo.save(supplier);
+
+      logger.info(`[NetureService] Supplier approved: ${supplierId} by ${approvedByUserId}`);
+
+      return {
+        success: true,
+        data: {
+          id: supplier.id,
+          name: supplier.name,
+          status: supplier.status,
+          approvedBy: supplier.approvedBy,
+          approvedAt: supplier.approvedAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error approving supplier:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /admin/suppliers/:id/reject — 운영자 거절 (PENDING → REJECTED)
+   */
+  async rejectSupplier(
+    supplierId: string,
+    rejectedByUserId: string,
+    reason?: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) {
+        return { success: false, error: 'SUPPLIER_NOT_FOUND' };
+      }
+      if (supplier.status !== SupplierStatus.PENDING) {
+        return { success: false, error: 'INVALID_STATUS' };
+      }
+
+      supplier.status = SupplierStatus.REJECTED;
+      supplier.approvedBy = rejectedByUserId;
+      supplier.approvedAt = new Date();
+      supplier.rejectedReason = reason || null;
+      await this.supplierRepo.save(supplier);
+
+      logger.info(`[NetureService] Supplier rejected: ${supplierId} by ${rejectedByUserId}`);
+
+      return {
+        success: true,
+        data: {
+          id: supplier.id,
+          name: supplier.name,
+          status: supplier.status,
+          rejectedReason: supplier.rejectedReason,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error rejecting supplier:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /admin/suppliers/pending — 승인 대기 공급자 목록
+   */
+  async getPendingSuppliers(): Promise<Array<{ id: string; name: string; slug: string; contactEmail: string | null; userId: string; createdAt: Date }>> {
+    try {
+      const suppliers = await this.supplierRepo.find({
+        where: { status: SupplierStatus.PENDING },
+        order: { createdAt: 'ASC' },
+      });
+      return suppliers.map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        contactEmail: s.contactEmail || null,
+        userId: s.userId,
+        createdAt: s.createdAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching pending suppliers:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Admin: Supplier Management (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1) ====================
+
+  /**
+   * POST /admin/suppliers/:id/deactivate — ACTIVE → INACTIVE
+   */
+  async deactivateSupplier(
+    supplierId: string,
+    adminUserId: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
+      if (!supplier) {
+        return { success: false, error: 'SUPPLIER_NOT_FOUND' };
+      }
+      if (supplier.status !== SupplierStatus.ACTIVE) {
+        return { success: false, error: 'INVALID_STATUS' };
+      }
+
+      supplier.status = SupplierStatus.INACTIVE;
+      await this.supplierRepo.save(supplier);
+
+      logger.info(`[NetureService] Supplier deactivated: ${supplierId} by ${adminUserId}`);
+
+      return {
+        success: true,
+        data: { id: supplier.id, name: supplier.name, status: supplier.status },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error deactivating supplier:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /admin/suppliers — 전체 공급자 목록 (필터)
+   */
+  async getAllSuppliers(
+    filters?: { status?: SupplierStatus },
+  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; createdAt: Date; updatedAt: Date }>> {
+    try {
+      const where: { status?: SupplierStatus } = {};
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      const suppliers = await this.supplierRepo.find({
+        where,
+        order: { createdAt: 'DESC' },
+      });
+
+      return suppliers.map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        status: s.status,
+        contactEmail: s.contactEmail || '',
+        userId: s.userId,
+        createdAt: s.createdAt,
+        updatedAt: s.updatedAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching all suppliers:', error);
+      throw error;
+    }
+  }
+
+  // ==================== Admin: Product Management (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1) ====================
+
+  /**
+   * GET /admin/products/pending — 승인 대기 상품 목록
+   */
+  async getPendingProducts(): Promise<Array<{ id: string; name: string; supplierName: string; supplierId: string; distributionType: DistributionType; createdAt: Date; approvalStatus: ProductApprovalStatus }>> {
+    try {
+      const products = await this.productRepo.find({
+        where: { approvalStatus: ProductApprovalStatus.PENDING },
+        relations: ['supplier'],
+        order: { createdAt: 'ASC' },
+      });
+
+      return products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        supplierName: p.supplier?.name || '',
+        supplierId: p.supplierId,
+        distributionType: p.distributionType,
+        createdAt: p.createdAt,
+        approvalStatus: p.approvalStatus,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching pending products:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /admin/products/:id/approve — 상품 승인 (isActive=true)
+   * WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: PUBLIC 상품은 승인 시 모든 활성 조직에 자동 listing
+   */
+  async approveProduct(
+    productId: string,
+    adminUserId: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const product = await this.productRepo.findOne({ where: { id: productId } });
+      if (!product) {
+        return { success: false, error: 'PRODUCT_NOT_FOUND' };
+      }
+      if (product.approvalStatus !== ProductApprovalStatus.PENDING) {
+        return { success: false, error: 'INVALID_APPROVAL_STATUS' };
+      }
+
+      // 트랜잭션: 상품 승인 + PUBLIC 자동 확산 (원자적)
+      const queryRunner = AppDataSource.createQueryRunner();
+      await queryRunner.startTransaction();
+      try {
+        product.approvalStatus = ProductApprovalStatus.APPROVED;
+        product.isActive = true;
+        await queryRunner.manager.save(product);
+
+        // Tier 1 (PUBLIC) 자동 확산: 모든 활성 조직에 listing 생성
+        let autoListedCount = 0;
+        if (product.distributionType === DistributionType.PUBLIC) {
+          autoListedCount = await autoExpandPublicProduct(queryRunner, productId, product.name);
+        }
+
+        await queryRunner.commitTransaction();
+
+        logger.info(`[NetureService] Product approved: ${productId} by ${adminUserId} (autoListed: ${autoListedCount})`);
+
+        return {
+          success: true,
+          data: {
+            id: product.id,
+            name: product.name,
+            isActive: product.isActive,
+            approvalStatus: product.approvalStatus,
+            autoListedCount,
+          },
+        };
+      } catch (txError) {
+        await queryRunner.rollbackTransaction();
+        throw txError;
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      logger.error('[NetureService] Error approving product:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * POST /admin/products/:id/reject — 상품 반려 (isActive 유지 false)
+   */
+  async rejectProduct(
+    productId: string,
+    adminUserId: string,
+    reason?: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    try {
+      const product = await this.productRepo.findOne({ where: { id: productId } });
+      if (!product) {
+        return { success: false, error: 'PRODUCT_NOT_FOUND' };
+      }
+      if (product.approvalStatus !== ProductApprovalStatus.PENDING) {
+        return { success: false, error: 'INVALID_APPROVAL_STATUS' };
+      }
+
+      product.approvalStatus = ProductApprovalStatus.REJECTED;
+      product.approvalNote = reason || null;
+      await this.productRepo.save(product);
+
+      logger.info(`[NetureService] Product rejected: ${productId} by ${adminUserId}`);
+
+      return {
+        success: true,
+        data: { id: product.id, name: product.name, isActive: product.isActive, approvalStatus: product.approvalStatus, approvalNote: product.approvalNote },
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error rejecting product:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * GET /admin/products — 전체 상품 목록 (필터)
+   */
+  async getAllProducts(
+    filters?: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus },
+  ): Promise<Array<{ id: string; name: string; supplierName: string; supplierId: string; category: string; distributionType: DistributionType; isActive: boolean; approvalStatus: ProductApprovalStatus; createdAt: Date }>> {
+    try {
+      const where: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus } = {};
+      if (filters?.supplierId) where.supplierId = filters.supplierId;
+      if (filters?.distributionType) where.distributionType = filters.distributionType;
+      if (filters?.isActive !== undefined) where.isActive = filters.isActive;
+      if (filters?.approvalStatus) where.approvalStatus = filters.approvalStatus;
+
+      const products = await this.productRepo.find({
+        where,
+        relations: ['supplier'],
+        order: { createdAt: 'DESC' },
+      });
+
+      return products.map((p) => ({
+        id: p.id,
+        name: p.name,
+        supplierName: p.supplier?.name || '',
+        supplierId: p.supplierId,
+        category: p.category || '',
+        distributionType: p.distributionType,
+        isActive: p.isActive,
+        approvalStatus: p.approvalStatus,
+        createdAt: p.createdAt,
+      }));
+    } catch (error) {
+      logger.error('[NetureService] Error fetching all products:', error);
+      throw error;
+    }
+  }
+
   // ==================== Suppliers ====================
 
   /**
@@ -162,20 +531,25 @@ export class NetureService {
       supplier.contactKakao && supplier.contactKakaoVisibility === ContactVisibility.PUBLIC,
     ].filter(Boolean).length;
 
-    // Has approved partners
-    const approvedCount = await this.supplierRequestRepo.count({
-      where: { supplierId, status: SupplierRequestStatus.APPROVED },
-    });
+    // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
+    const [{ count: approvedCount }] = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS count FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+      [supplierId],
+    );
 
     // Recent activity (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const recentCount = await this.supplierRequestRepo
-      .createQueryBuilder('request')
-      .where('request.supplierId = :supplierId', { supplierId })
-      .andWhere('request.createdAt >= :since', { since: thirtyDaysAgo })
-      .getCount();
+    const [{ count: recentCount }] = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS count FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+         AND pa.created_at >= $2`,
+      [supplierId, thirtyDaysAgo],
+    );
 
     return {
       contactCompleteness: publicContacts,
@@ -238,11 +612,16 @@ export class NetureService {
   /**
    * GET /suppliers/:slug - Get supplier detail
    */
+  // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
   async hasApprovedPartnership(supplierId: string, viewerId: string): Promise<boolean> {
     try {
-      const count = await this.supplierRequestRepo.count({
-        where: { supplierId, sellerId: viewerId, status: SupplierRequestStatus.APPROVED },
-      });
+      const [{ count }] = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS count FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.organization_id = $2
+           AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+        [supplierId, viewerId],
+      );
       return count > 0;
     } catch (error) {
       logger.error('[NetureService] Error checking partnership:', error);
@@ -495,23 +874,29 @@ export class NetureService {
         missing.push('kakao');
       }
 
-      // 7. hasApprovedPartners (1+ approved request)
-      const approvedCount = await this.supplierRequestRepo.count({
-        where: { supplierId, status: SupplierRequestStatus.APPROVED },
-      });
-      if (approvedCount === 0) {
+      // 7. hasApprovedPartners (1+ approved PRIVATE approval)
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
+      const [{ count: pApprovedCount }] = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS count FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+        [supplierId],
+      );
+      if (pApprovedCount === 0) {
         missing.push('partnerApproval');
       }
 
       // 8. recentActivity (30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const recentCount = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .where('request.supplierId = :supplierId', { supplierId })
-        .andWhere('request.createdAt >= :since', { since: thirtyDaysAgo })
-        .getCount();
-      if (recentCount === 0) {
+      const [{ count: pRecentCount }] = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS count FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+           AND pa.created_at >= $2`,
+        [supplierId, thirtyDaysAgo],
+      );
+      if (pRecentCount === 0) {
         missing.push('recentActivity');
       }
 
@@ -723,853 +1108,12 @@ export class NetureService {
     }
   }
 
-  // ==================== Supplier Requests (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
-
-  /**
-   * GET /supplier/requests - 공급자에게 들어온 신청 목록
-   */
-  async getSupplierRequests(
-    supplierId: string,
-    filters?: { status?: SupplierRequestStatus; serviceId?: string }
-  ) {
-    try {
-      const query = this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .where('request.supplierId = :supplierId', { supplierId });
-
-      if (filters?.status) {
-        query.andWhere('request.status = :status', { status: filters.status });
-      }
-
-      if (filters?.serviceId) {
-        query.andWhere('request.serviceId = :serviceId', { serviceId: filters.serviceId });
-      }
-
-      query.orderBy('request.createdAt', 'DESC');
-
-      const requests = await query.getMany();
-
-      return requests.map((req) => ({
-        id: req.id,
-        status: req.status,
-        sellerName: req.sellerName,
-        sellerEmail: req.sellerEmail,
-        serviceName: req.serviceName,
-        serviceId: req.serviceId,
-        productName: req.productName,
-        productId: req.productId,
-        productPurpose: req.productPurpose,
-        requestedAt: req.createdAt,
-      }));
-    } catch (error) {
-      logger.error('[NetureService] Error fetching supplier requests:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * GET /supplier/requests/:id - 신청 상세 조회
-   */
-  async getSupplierRequestById(id: string, supplierId: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return null;
-      }
-
-      return {
-        id: request.id,
-        status: request.status,
-        seller: {
-          id: request.sellerId,
-          name: request.sellerName,
-          email: request.sellerEmail,
-          phone: request.sellerPhone,
-          storeUrl: request.sellerStoreUrl,
-        },
-        service: {
-          id: request.serviceId,
-          name: request.serviceName,
-        },
-        product: {
-          id: request.productId,
-          name: request.productName,
-          category: request.productCategory,
-          purpose: request.productPurpose,
-        },
-        decidedBy: request.decidedBy,
-        decidedAt: request.decidedAt,
-        rejectReason: request.rejectReason,
-        createdAt: request.createdAt,
-        metadata: request.metadata,
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error fetching supplier request by ID:', error);
-      throw error;
-    }
-  }
-
-  // ==================== State Transition Guard (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
-
-  /**
-   * 허용 상태 전이 맵
-   */
-  private static readonly VALID_TRANSITIONS: Record<string, string[]> = {
-    [SupplierRequestStatus.PENDING]: [SupplierRequestStatus.APPROVED, SupplierRequestStatus.REJECTED],
-    [SupplierRequestStatus.APPROVED]: [SupplierRequestStatus.SUSPENDED, SupplierRequestStatus.REVOKED, SupplierRequestStatus.EXPIRED],
-    [SupplierRequestStatus.SUSPENDED]: [SupplierRequestStatus.APPROVED, SupplierRequestStatus.REVOKED],
-    [SupplierRequestStatus.REJECTED]: [],
-    [SupplierRequestStatus.REVOKED]: [],
-    [SupplierRequestStatus.EXPIRED]: [],
-  };
-
-  private validateTransition(from: string, to: string): boolean {
-    return NetureService.VALID_TRANSITIONS[from]?.includes(to) ?? false;
-  }
-
-  /**
-   * POST /supplier/requests/:id/approve - 신청 승인
-   *
-   * 상태 전이: pending → approved, suspended → approved (재활성화)
-   * 이벤트 로그 기록 (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2)
-   */
-  async approveSupplierRequest(id: string, supplierId: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      // 상태 전이 규칙 검증 (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1)
-      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot approve request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      // 승인 처리
-      request.status = SupplierRequestStatus.APPROVED;
-      request.decidedBy = supplierId;
-      request.decidedAt = new Date();
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      // 이벤트 로그 기록
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.APPROVED,
-        actorId: supplierId,
-        actorName: actorName || '',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.APPROVED,
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Approved supplier request ${id} by ${supplierId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          decidedBy: updatedRequest.decidedBy,
-          decidedAt: updatedRequest.decidedAt,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error approving supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * POST /supplier/requests/:id/reject - 신청 거절
-   *
-   * 상태 전이: pending → rejected
-   * 이벤트 로그 기록 (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2)
-   */
-  async rejectSupplierRequest(id: string, supplierId: string, reason?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      // 상태 전이 규칙 검증 (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1)
-      if (!this.validateTransition(request.status, SupplierRequestStatus.REJECTED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot reject request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      // 거절 처리
-      request.status = SupplierRequestStatus.REJECTED;
-      request.decidedBy = supplierId;
-      request.decidedAt = new Date();
-      request.rejectReason = reason || '';
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      // 이벤트 로그 기록
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.REJECTED,
-        actorId: supplierId,
-        actorName: actorName || '',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.REJECTED,
-        reason: reason || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Rejected supplier request ${id} by ${supplierId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          decidedBy: updatedRequest.decidedBy,
-          decidedAt: updatedRequest.decidedAt,
-          rejectReason: updatedRequest.rejectReason,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error rejecting supplier request:', error);
-      throw error;
-    }
-  }
-
-  // ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1) ====================
-
-  /**
-   * Admin override: 소유권 검증 없이 승인
-   * 상태 전이: pending → approved
-   */
-  async approveSupplierRequestAsAdmin(id: string, actorId: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({ where: { id } });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot approve request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.APPROVED;
-      request.decidedBy = actorId;
-      request.decidedAt = new Date();
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.APPROVED,
-        actorId,
-        actorName: actorName || 'Admin',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.APPROVED,
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Admin approved supplier request ${id} by ${actorId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          decidedBy: updatedRequest.decidedBy,
-          decidedAt: updatedRequest.decidedAt,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error admin-approving supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Admin override: 소유권 검증 없이 거절
-   * 상태 전이: pending → rejected
-   */
-  async rejectSupplierRequestAsAdmin(id: string, actorId: string, reason?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({ where: { id } });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.REJECTED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot reject request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.REJECTED;
-      request.decidedBy = actorId;
-      request.decidedAt = new Date();
-      request.rejectReason = reason || '';
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.REJECTED,
-        actorId,
-        actorName: actorName || 'Admin',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.REJECTED,
-        reason: reason || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Admin rejected supplier request ${id} by ${actorId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          decidedBy: updatedRequest.decidedBy,
-          decidedAt: updatedRequest.decidedAt,
-          rejectReason: updatedRequest.rejectReason,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error admin-rejecting supplier request:', error);
-      throw error;
-    }
-  }
-
-  // ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
-
-  /**
-   * POST /supplier/requests/:id/suspend — 공급 일시 중단
-   * 상태 전이: approved → suspended
-   */
-  async suspendSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.SUSPENDED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot suspend request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.SUSPENDED;
-      request.suspendedAt = new Date();
-      request.relationNote = note || null;
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.SUSPENDED,
-        actorId: supplierId,
-        actorName: actorName || '',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.SUSPENDED,
-        reason: note || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Suspended supplier request ${id} by ${supplierId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          suspendedAt: updatedRequest.suspendedAt,
-          relationNote: updatedRequest.relationNote,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error suspending supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * POST /supplier/requests/:id/reactivate — 재활성화
-   * 상태 전이: suspended → approved
-   */
-  async reactivateSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.APPROVED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot reactivate request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.APPROVED;
-      request.suspendedAt = null;
-      request.relationNote = note || null;
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.REACTIVATED,
-        actorId: supplierId,
-        actorName: actorName || '',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.APPROVED,
-        reason: note || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Reactivated supplier request ${id} by ${supplierId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          relationNote: updatedRequest.relationNote,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error reactivating supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * POST /supplier/requests/:id/revoke — 공급 종료
-   * 상태 전이: approved|suspended → revoked
-   */
-  async revokeSupplierRequest(id: string, supplierId: string, note?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.REVOKED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot revoke request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.REVOKED;
-      request.revokedAt = new Date();
-      request.relationNote = note || null;
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.REVOKED,
-        actorId: supplierId,
-        actorName: actorName || '',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.REVOKED,
-        reason: note || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Revoked supplier request ${id} by ${supplierId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          revokedAt: updatedRequest.revokedAt,
-          relationNote: updatedRequest.relationNote,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error revoking supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Admin override: 소유권 검증 없이 일시 중단
-   * 상태 전이: approved → suspended
-   */
-  async suspendSupplierRequestAsAdmin(id: string, actorId: string, note?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({ where: { id } });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.SUSPENDED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot suspend request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.SUSPENDED;
-      request.suspendedAt = new Date();
-      request.relationNote = note || null;
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.SUSPENDED,
-        actorId,
-        actorName: actorName || 'Admin',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.SUSPENDED,
-        reason: note || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Admin suspended supplier request ${id} by ${actorId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          suspendedAt: updatedRequest.suspendedAt,
-          relationNote: updatedRequest.relationNote,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error admin-suspending supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Admin override: 소유권 검증 없이 공급 종료
-   * 상태 전이: approved|suspended → revoked
-   */
-  async revokeSupplierRequestAsAdmin(id: string, actorId: string, note?: string, actorName?: string) {
-    try {
-      const request = await this.supplierRequestRepo.findOne({ where: { id } });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      if (!this.validateTransition(request.status, SupplierRequestStatus.REVOKED)) {
-        return {
-          success: false,
-          error: 'INVALID_STATUS_TRANSITION',
-          message: `Cannot revoke request with status: ${request.status}`,
-        };
-      }
-
-      const fromStatus = request.status;
-
-      request.status = SupplierRequestStatus.REVOKED;
-      request.revokedAt = new Date();
-      request.relationNote = note || null;
-
-      const updatedRequest = await this.supplierRequestRepo.save(request);
-
-      const event = this.requestEventRepo.create({
-        requestId: id,
-        eventType: RequestEventType.REVOKED,
-        actorId,
-        actorName: actorName || 'Admin',
-        sellerId: request.sellerId,
-        sellerName: request.sellerName,
-        productId: request.productId,
-        productName: request.productName,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        fromStatus,
-        toStatus: SupplierRequestStatus.REVOKED,
-        reason: note || '',
-      });
-      await this.requestEventRepo.save(event);
-
-      logger.info(`[NetureService] Admin revoked supplier request ${id} by ${actorId} (event: ${event.id})`);
-
-      return {
-        success: true,
-        data: {
-          id: updatedRequest.id,
-          status: updatedRequest.status,
-          revokedAt: updatedRequest.revokedAt,
-          relationNote: updatedRequest.relationNote,
-          eventId: event.id,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error admin-revoking supplier request:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Admin: 전체 취급 요청 목록 조회 (cross-supplier)
-   */
-  async getAllSupplierRequests(filters?: { status?: string; supplierId?: string; serviceId?: string }) {
-    try {
-      const query = this.supplierRequestRepo.createQueryBuilder('request');
-
-      if (filters?.status) {
-        query.andWhere('request.status = :status', { status: filters.status });
-      }
-      if (filters?.supplierId) {
-        query.andWhere('request.supplierId = :supplierId', { supplierId: filters.supplierId });
-      }
-      if (filters?.serviceId) {
-        query.andWhere('request.serviceId = :serviceId', { serviceId: filters.serviceId });
-      }
-
-      query.orderBy('request.createdAt', 'DESC');
-
-      const requests = await query.getMany();
-
-      return requests.map((req) => ({
-        id: req.id,
-        status: req.status,
-        supplierId: req.supplierId,
-        supplierName: req.supplierName,
-        sellerName: req.sellerName,
-        sellerEmail: req.sellerEmail,
-        serviceName: req.serviceName,
-        serviceId: req.serviceId,
-        productName: req.productName,
-        productId: req.productId,
-        productPurpose: req.productPurpose,
-        requestedAt: req.createdAt,
-      }));
-    } catch (error) {
-      logger.error('[NetureService] Error fetching all supplier requests:', error);
-      throw error;
-    }
-  }
-
-  // ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
-
-  /**
-   * 판매자의 승인된 취급 상품 목록 조회
-   * sellerId로 APPROVED 상태인 요청만 반환
-   */
-  async getSellerApprovedProducts(sellerId: string) {
-    try {
-      const requests = await this.supplierRequestRepo.find({
-        where: {
-          sellerId,
-          status: SupplierRequestStatus.APPROVED,
-        },
-        order: { decidedAt: 'DESC' },
-      });
-
-      return {
-        success: true,
-        data: requests.map((r) => ({
-          id: r.id,
-          supplierId: r.supplierId,
-          supplierName: r.supplierName,
-          productId: r.productId,
-          productName: r.productName,
-          productCategory: r.productCategory,
-          productPurpose: r.productPurpose,
-          serviceId: r.serviceId,
-          serviceName: r.serviceName,
-          approvedAt: r.decidedAt,
-        })),
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error fetching seller approved products:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * 테스트용 신청 생성 (서비스에서 호출)
-   */
-  async createSupplierRequest(data: {
-    supplierId: string;
-    supplierName?: string;
-    sellerId: string;
-    sellerName: string;
-    sellerEmail?: string;
-    sellerPhone?: string;
-    sellerStoreUrl?: string;
-    serviceId: string;
-    serviceName: string;
-    productId: string;
-    productName: string;
-    productCategory?: string;
-    productPurpose?: string;
-  }) {
-    try {
-      // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 중복 요청 방지
-      // 동일 supplier + seller + product에 pending 또는 approved 상태가 존재하면 차단
-      const existing = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .where('request.supplierId = :supplierId', { supplierId: data.supplierId })
-        .andWhere('request.sellerId = :sellerId', { sellerId: data.sellerId })
-        .andWhere('request.productId = :productId', { productId: data.productId })
-        .andWhere('request.status IN (:...statuses)', {
-          statuses: [SupplierRequestStatus.PENDING, SupplierRequestStatus.APPROVED],
-        })
-        .getOne();
-
-      if (existing) {
-        const error = new Error('DUPLICATE_REQUEST');
-        (error as any).existingStatus = existing.status;
-        throw error;
-      }
-
-      const request = this.supplierRequestRepo.create({
-        supplierId: data.supplierId,
-        supplierName: data.supplierName || '',
-        sellerId: data.sellerId,
-        sellerName: data.sellerName,
-        sellerEmail: data.sellerEmail || '',
-        sellerPhone: data.sellerPhone ? data.sellerPhone.replace(/\D/g, '') : '',
-        sellerStoreUrl: data.sellerStoreUrl || '',
-        serviceId: data.serviceId,
-        serviceName: data.serviceName,
-        productId: data.productId,
-        productName: data.productName,
-        productCategory: data.productCategory || '',
-        productPurpose: data.productPurpose || 'APPLICATION',
-        status: SupplierRequestStatus.PENDING,
-      });
-
-      const savedRequest = await this.supplierRequestRepo.save(request);
-
-      logger.info(`[NetureService] Created supplier request: ${savedRequest.id}`);
-
-      return {
-        id: savedRequest.id,
-        status: savedRequest.status,
-        createdAt: savedRequest.createdAt,
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error creating supplier request:', error);
-      throw error;
-    }
-  }
-
   // ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
+
+  // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: Supplier Request methods removed.
+  // All read paths migrated to inline v2 raw SQL on product_approvals.
+  // All write paths deprecated to 410 Gone.
+  // See: neture.routes.ts, hub-trigger.controller.ts
 
   /**
    * GET /supplier/products - 공급자의 제품 목록
@@ -1581,35 +1125,28 @@ export class NetureService {
         order: { createdAt: 'DESC' },
       });
 
-      // 각 제품별 신청 대기 건수 조회
-      const pendingCounts = await Promise.all(
-        products.map(async (product) => {
-          const count = await this.supplierRequestRepo.count({
-            where: {
-              supplierId,
-              productId: product.id,
-              status: SupplierRequestStatus.PENDING,
-            },
-          });
-          return { productId: product.id, count };
-        })
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const pendingCountRows: Array<{ product_id: string; cnt: number }> = await AppDataSource.query(
+        `SELECT pa.product_id, COUNT(*)::int AS cnt
+         FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'
+         GROUP BY pa.product_id`,
+        [supplierId],
       );
+      const pendingCounts = pendingCountRows.map((r) => ({ productId: r.product_id, count: r.cnt }));
 
       const pendingMap = new Map(pendingCounts.map((p) => [p.productId, p.count]));
 
-      // 각 제품별 사용 서비스 수 (approved 상태 기준)
-      const serviceCounts = await Promise.all(
-        products.map(async (product) => {
-          const count = await this.supplierRequestRepo
-            .createQueryBuilder('request')
-            .where('request.supplierId = :supplierId', { supplierId })
-            .andWhere('request.productId = :productId', { productId: product.id })
-            .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
-            .select('COUNT(DISTINCT request.serviceId)', 'count')
-            .getRawOne();
-          return { productId: product.id, count: parseInt(count?.count || '0', 10) };
-        })
+      const serviceCountRows: Array<{ product_id: string; cnt: number }> = await AppDataSource.query(
+        `SELECT pa.product_id, COUNT(DISTINCT pa.service_key)::int AS cnt
+         FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         GROUP BY pa.product_id`,
+        [supplierId],
       );
+      const serviceCounts = serviceCountRows.map((r) => ({ productId: r.product_id, count: r.cnt }));
 
       const serviceMap = new Map(serviceCounts.map((s) => [s.productId, s.count]));
 
@@ -1672,14 +1209,15 @@ export class NetureService {
         description: data.description || null,
         purpose: data.purpose || ProductPurpose.CATALOG,
         distributionType: data.distributionType || DistributionType.PRIVATE,
-        isActive: true,
+        isActive: false,
+        approvalStatus: ProductApprovalStatus.PENDING,
         acceptsApplications: data.acceptsApplications ?? true,
         allowedSellerIds: [],
       });
 
       const savedProduct = await this.productRepo.save(product);
 
-      logger.info(`[NetureService] Created product ${savedProduct.id} by supplier ${supplierId}`);
+      logger.info(`[NetureService] Created product ${savedProduct.id} by supplier ${supplierId} (PENDING approval)`);
 
       return {
         success: true,
@@ -1690,6 +1228,7 @@ export class NetureService {
           description: savedProduct.description,
           purpose: savedProduct.purpose,
           isActive: savedProduct.isActive,
+          approvalStatus: savedProduct.approvalStatus,
           acceptsApplications: savedProduct.acceptsApplications,
           distributionType: savedProduct.distributionType,
           allowedSellerIds: savedProduct.allowedSellerIds,
@@ -1786,18 +1325,17 @@ export class NetureService {
    */
   async getSupplierOrdersSummary(supplierId: string) {
     try {
-      // 서비스별 승인된 신청 수 집계
-      const approvedByService = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .select('request.serviceId', 'serviceId')
-        .addSelect('request.serviceName', 'serviceName')
-        .addSelect('COUNT(*)', 'approvedCount')
-        .addSelect('MAX(request.decidedAt)', 'lastApprovedAt')
-        .where('request.supplierId = :supplierId', { supplierId })
-        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
-        .groupBy('request.serviceId')
-        .addGroupBy('request.serviceName')
-        .getRawMany();
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const approvedByService: Array<{ serviceId: string; serviceName: string; approvedCount: string; lastApprovedAt: string }> = await AppDataSource.query(
+        `SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
+                COUNT(*)::text AS "approvedCount",
+                MAX(pa.decided_at)::text AS "lastApprovedAt"
+         FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         GROUP BY pa.service_key`,
+        [supplierId],
+      );
 
       // 서비스 설정 (실제로는 DB나 설정에서 가져와야 함)
       const serviceConfig: Record<string, {
@@ -1839,22 +1377,16 @@ export class NetureService {
         approvedByService.map(async (svc) => {
           const config = serviceConfig[svc.serviceId] || defaultConfig;
 
-          // 최근 승인/거절 이벤트 (최신 5건)
-          const recentEvents = await this.requestEventRepo
-            .createQueryBuilder('event')
-            .where('event.actorId = :supplierId', { supplierId })
-            .andWhere('event.serviceId = :serviceId', { serviceId: svc.serviceId })
-            .orderBy('event.createdAt', 'DESC')
-            .limit(5)
-            .getMany();
+          // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: event table dropped
+          const recentEvents: Array<{ eventType: string; sellerName: string; productName: string; createdAt: Date }> = [];
 
-          const pendingCount = await this.supplierRequestRepo.count({
-            where: {
-              supplierId,
-              serviceId: svc.serviceId,
-              status: SupplierRequestStatus.PENDING,
-            },
-          });
+          const [{ cnt: pendingCount }] = await AppDataSource.query(
+            `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
+             JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+             WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+               AND pa.approval_status = 'pending' AND pa.service_key = $2`,
+            [supplierId, svc.serviceId],
+          );
 
           return {
             serviceId: svc.serviceId,
@@ -1870,12 +1402,7 @@ export class NetureService {
               supportEmail: config.supportEmail || null,
             },
             features: config.features || [],
-            recentActivity: recentEvents.map((e) => ({
-              eventType: e.eventType,
-              sellerName: e.sellerName,
-              productName: e.productName,
-              createdAt: e.createdAt,
-            })),
+            recentActivity: recentEvents,
             notice: 'Neture에서는 주문을 직접 처리하지 않습니다. 해당 서비스에서 주문을 관리하세요.',
           };
         })
@@ -2109,111 +1636,75 @@ export class NetureService {
    */
   async getSupplierDashboardSummary(supplierId: string) {
     try {
-      // 요청 통계
-      const totalRequests = await this.supplierRequestRepo.count({
-        where: { supplierId },
-      });
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const [reqStats] = await AppDataSource.query(`
+        SELECT COUNT(*)::int AS "totalRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS "pendingRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS "approvedRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS "rejectedRequests"
+        FROM product_approvals pa
+        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+      `, [supplierId]);
 
-      const pendingRequests = await this.supplierRequestRepo.count({
-        where: { supplierId, status: SupplierRequestStatus.PENDING },
-      });
-
-      const approvedRequests = await this.supplierRequestRepo.count({
-        where: { supplierId, status: SupplierRequestStatus.APPROVED },
-      });
-
-      const rejectedRequests = await this.supplierRequestRepo.count({
-        where: { supplierId, status: SupplierRequestStatus.REJECTED },
-      });
-
-      // 최근 7일 승인
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      const recentApprovals = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .where('request.supplierId = :supplierId', { supplierId })
-        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
-        .andWhere('request.decidedAt >= :sevenDaysAgo', { sevenDaysAgo })
-        .getCount();
+      const [{ count: recentApprovals }] = await AppDataSource.query(`
+        SELECT COUNT(*)::int AS count FROM product_approvals pa
+        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+          AND pa.approval_status = 'approved' AND pa.decided_at >= $2
+      `, [supplierId, sevenDaysAgo]);
 
       // 제품 통계
-      const products = await this.productRepo.find({
-        where: { supplierId },
-      });
-
+      const products = await this.productRepo.find({ where: { supplierId } });
       const activeProducts = products.filter((p) => p.isActive).length;
       const totalProducts = products.length;
 
       // 콘텐츠 통계
-      const totalContents = await this.contentRepo.count({
-        where: { supplierId },
-      });
+      const totalContents = await this.contentRepo.count({ where: { supplierId } });
+      const publishedContents = await this.contentRepo.count({ where: { supplierId, status: ContentStatus.PUBLISHED } });
 
-      const publishedContents = await this.contentRepo.count({
-        where: { supplierId, status: ContentStatus.PUBLISHED },
-      });
-
-      // 연결된 서비스 수 (승인된 요청 기준)
-      const connectedServices = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .select('COUNT(DISTINCT request.serviceId)', 'count')
-        .where('request.supplierId = :supplierId', { supplierId })
-        .andWhere('request.status = :status', { status: SupplierRequestStatus.APPROVED })
-        .getRawOne();
+      // 연결된 서비스 수
+      const [{ count: connectedCount }] = await AppDataSource.query(`
+        SELECT COUNT(DISTINCT pa.service_key)::int AS count FROM product_approvals pa
+        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+      `, [supplierId]);
 
       // 서비스별 통계
-      const serviceStats = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .select('request.serviceId', 'serviceId')
-        .addSelect('request.serviceName', 'serviceName')
-        .addSelect('SUM(CASE WHEN request.status = :pending THEN 1 ELSE 0 END)', 'pending')
-        .addSelect('SUM(CASE WHEN request.status = :approved THEN 1 ELSE 0 END)', 'approved')
-        .addSelect('SUM(CASE WHEN request.status = :rejected THEN 1 ELSE 0 END)', 'rejected')
-        .where('request.supplierId = :supplierId', { supplierId })
-        .setParameter('pending', SupplierRequestStatus.PENDING)
-        .setParameter('approved', SupplierRequestStatus.APPROVED)
-        .setParameter('rejected', SupplierRequestStatus.REJECTED)
-        .groupBy('request.serviceId')
-        .addGroupBy('request.serviceName')
-        .getRawMany();
-
-      // 최근 활동 (이벤트)
-      const recentEvents = await this.requestEventRepo
-        .createQueryBuilder('event')
-        .where('event.actorId = :supplierId', { supplierId })
-        .orderBy('event.createdAt', 'DESC')
-        .limit(10)
-        .getMany();
+      const serviceStats: Array<{ serviceId: string; serviceName: string; pending: number; approved: number; rejected: number }> = await AppDataSource.query(`
+        SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
+          SUM(CASE WHEN pa.approval_status = 'pending' THEN 1 ELSE 0 END)::int AS pending,
+          SUM(CASE WHEN pa.approval_status = 'approved' THEN 1 ELSE 0 END)::int AS approved,
+          SUM(CASE WHEN pa.approval_status = 'rejected' THEN 1 ELSE 0 END)::int AS rejected
+        FROM product_approvals pa
+        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        GROUP BY pa.service_key
+      `, [supplierId]);
 
       return {
         stats: {
-          totalRequests,
-          pendingRequests,
-          approvedRequests,
-          rejectedRequests,
-          recentApprovals,
+          totalRequests: reqStats.totalRequests,
+          pendingRequests: reqStats.pendingRequests,
+          approvedRequests: reqStats.approvedRequests,
+          rejectedRequests: reqStats.rejectedRequests,
+          recentApprovals: Number(recentApprovals),
           totalProducts,
           activeProducts,
           totalContents,
           publishedContents,
-          connectedServices: parseInt(connectedServices?.count || '0', 10),
+          connectedServices: Number(connectedCount),
         },
         serviceStats: serviceStats.map((s) => ({
           serviceId: s.serviceId,
           serviceName: s.serviceName,
-          pending: parseInt(s.pending, 10),
-          approved: parseInt(s.approved, 10),
-          rejected: parseInt(s.rejected, 10),
+          pending: s.pending,
+          approved: s.approved,
+          rejected: s.rejected,
         })),
-        recentActivity: recentEvents.map((e) => ({
-          id: e.id,
-          type: e.eventType,
-          sellerName: e.sellerName,
-          productName: e.productName,
-          serviceName: e.serviceName,
-          timestamp: e.createdAt,
-        })),
+        recentActivity: [], // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: event table dropped
       };
     } catch (error) {
       logger.error('[NetureService] Error fetching supplier dashboard summary:', error);
@@ -2231,18 +1722,41 @@ export class NetureService {
       const activeSuppliers = await this.supplierRepo.count({
         where: { status: SupplierStatus.ACTIVE },
       });
+      const pendingSuppliers = await this.supplierRepo.count({
+        where: { status: SupplierStatus.PENDING },
+      });
 
-      // 요청 통계
-      const totalRequests = await this.supplierRequestRepo.count();
-      const pendingRequests = await this.supplierRequestRepo.count({
-        where: { status: SupplierRequestStatus.PENDING },
+      // 상품 통계 (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1)
+      const totalProducts = await this.productRepo.count();
+      const pendingProducts = await this.productRepo.count({
+        where: { approvalStatus: ProductApprovalStatus.PENDING },
       });
-      const approvedRequests = await this.supplierRequestRepo.count({
-        where: { status: SupplierRequestStatus.APPROVED },
-      });
-      const rejectedRequests = await this.supplierRequestRepo.count({
-        where: { status: SupplierRequestStatus.REJECTED },
-      });
+      const publicProducts = await this.productRepo.count({ where: { distributionType: DistributionType.PUBLIC } });
+      const serviceProducts = await this.productRepo.count({ where: { distributionType: DistributionType.SERVICE } });
+      const privateProducts = await this.productRepo.count({ where: { distributionType: DistributionType.PRIVATE } });
+
+      // WO-NETURE-DISTRIBUTION-TIER-REALIGN-BETA-V1: 전체 approval 통계 (SERVICE + PRIVATE)
+      const [adminReqStats] = await AppDataSource.query(`
+        SELECT COUNT(*)::int AS "totalRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS "pendingRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS "approvedRequests",
+          COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS "rejectedRequests"
+        FROM product_approvals
+      `);
+
+      // Tier별 approval 분해 통계
+      const tierStats: Array<{ approval_type: string; total: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(`
+        SELECT approval_type,
+          COUNT(*)::int AS total,
+          COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS pending,
+          COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS approved,
+          COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS rejected
+        FROM product_approvals
+        GROUP BY approval_type
+      `);
+      const emptyTier = { total: 0, pending: 0, approved: 0, rejected: 0 };
+      const serviceTier = tierStats.find((t) => t.approval_type === 'service') || emptyTier;
+      const privateTier = tierStats.find((t) => t.approval_type === 'PRIVATE') || emptyTier;
 
       // 파트너십 요청 통계
       const totalPartnershipRequests = await this.partnershipRepo.count();
@@ -2256,54 +1770,57 @@ export class NetureService {
         where: { status: ContentStatus.PUBLISHED },
       });
 
-      // 서비스별 공급자/파트너 통계
-      const serviceStats = await this.supplierRequestRepo
-        .createQueryBuilder('request')
-        .select('request.serviceId', 'serviceId')
-        .addSelect('request.serviceName', 'serviceName')
-        .addSelect('COUNT(DISTINCT CASE WHEN request.status = :approved THEN request.supplierId END)', 'suppliers')
-        .addSelect('COUNT(DISTINCT CASE WHEN request.status = :approved THEN request.sellerId END)', 'partners')
-        .setParameter('approved', SupplierRequestStatus.APPROVED)
-        .groupBy('request.serviceId')
-        .addGroupBy('request.serviceName')
-        .getRawMany();
+      // 서비스별 공급자/파트너 통계 (SERVICE + PRIVATE 모두 포함)
+      const serviceStats: Array<{ serviceId: string; serviceName: string; suppliers: number; partners: number }> = await AppDataSource.query(`
+        SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
+          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN nsp.supplier_id END)::int AS suppliers,
+          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN pa.organization_id END)::int AS partners
+        FROM product_approvals pa
+        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        GROUP BY pa.service_key
+      `);
 
-      // 최근 요청 (대기 중)
-      const recentPendingRequests = await this.supplierRequestRepo.find({
-        where: { status: SupplierRequestStatus.PENDING },
-        order: { createdAt: 'DESC' },
-        take: 5,
-      });
+      // 최근 요청 (대기 중 — SERVICE + PRIVATE)
+      const recentPending: Array<{ id: string; sellerId: string; createdAt: Date }> = await AppDataSource.query(`
+        SELECT pa.id, pa.organization_id AS "sellerId", pa.created_at AS "createdAt"
+        FROM product_approvals pa WHERE pa.approval_status = 'pending'
+        ORDER BY pa.created_at DESC LIMIT 5
+      `);
 
-      // 최근 활동
-      const recentEvents = await this.requestEventRepo.find({
-        order: { createdAt: 'DESC' },
-        take: 10,
-      });
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: event table dropped
+      const recentEvents: Array<{ id: string; eventType: string; sellerName: string; productName: string; serviceName: string; createdAt: Date }> = [];
 
       return {
         stats: {
           totalSuppliers,
           activeSuppliers,
-          totalRequests,
-          pendingRequests,
-          approvedRequests,
-          rejectedRequests,
+          pendingSuppliers,
+          totalRequests: adminReqStats.totalRequests,
+          pendingRequests: adminReqStats.pendingRequests,
+          approvedRequests: adminReqStats.approvedRequests,
+          rejectedRequests: adminReqStats.rejectedRequests,
           totalPartnershipRequests,
           openPartnershipRequests,
           totalContents,
           publishedContents,
+          totalProducts,
+          pendingProducts,
+          distributionTypeBreakdown: { PUBLIC: publicProducts, SERVICE: serviceProducts, PRIVATE: privateProducts },
+          approvalByTier: {
+            SERVICE: { total: serviceTier.total, pending: serviceTier.pending, approved: serviceTier.approved, rejected: serviceTier.rejected },
+            PRIVATE: { total: privateTier.total, pending: privateTier.pending, approved: privateTier.approved, rejected: privateTier.rejected },
+          },
         },
         serviceStatus: serviceStats.map((s) => ({
           serviceId: s.serviceId,
           serviceName: s.serviceName,
-          suppliers: parseInt(s.suppliers, 10),
-          partners: parseInt(s.partners, 10),
-          status: 'active',
+          suppliers: s.suppliers,
+          partners: s.partners,
+          status: 'active' as const,
         })),
-        recentApplications: recentPendingRequests.map((r) => ({
+        recentApplications: recentPending.map((r) => ({
           id: r.id,
-          name: r.sellerName,
+          name: r.sellerId,
           type: '공급자 신청',
           date: r.createdAt,
           status: '대기중',
@@ -2336,10 +1853,13 @@ export class NetureService {
       const matchedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.MATCHED).length;
       const closedRequests = partnershipRequests.filter((r) => r.status === PartnershipStatus.CLOSED).length;
 
-      // 파트너 역할로 참여 중인 서비스 (공급자 요청에서 seller로 등록된 경우)
-      const sellerRequests = await this.supplierRequestRepo.find({
-        where: { sellerId: userId, status: SupplierRequestStatus.APPROVED },
-      });
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const sellerApprovals: Array<{ id: string; serviceId: string; serviceName: string; createdAt: string }> = await AppDataSource.query(`
+        SELECT pa.id, pa.service_key AS "serviceId", pa.service_key AS "serviceName",
+               pa.created_at AS "createdAt"
+        FROM product_approvals pa
+        WHERE pa.organization_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+      `, [userId]);
 
       // 연결된 서비스 (중복 제거)
       const connectedServicesMap = new Map<string, {
@@ -2349,7 +1869,7 @@ export class NetureService {
         lastActivity: Date;
       }>();
 
-      sellerRequests.forEach((r) => {
+      sellerApprovals.forEach((r) => {
         const existing = connectedServicesMap.get(r.serviceId);
         if (existing) {
           existing.supplierCount++;
@@ -2397,7 +1917,7 @@ export class NetureService {
           matchedRequests,
           closedRequests,
           connectedServiceCount: connectedServices.length,
-          totalSupplierCount: sellerRequests.length,
+          totalSupplierCount: sellerApprovals.length,
         },
         connectedServices: connectedServices.map((s) => ({
           ...s,
@@ -2426,115 +1946,6 @@ export class NetureService {
     return `${days}일 전`;
   }
 
-  // ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
-
-  /**
-   * GET /supplier/requests/:id/events - 신청에 대한 이벤트 로그 조회
-   */
-  async getRequestEvents(requestId: string, supplierId: string) {
-    try {
-      // 먼저 해당 신청이 이 공급자 소유인지 확인
-      const request = await this.supplierRequestRepo.findOne({
-        where: { id: requestId, supplierId },
-      });
-
-      if (!request) {
-        return { success: false, error: 'REQUEST_NOT_FOUND' };
-      }
-
-      const events = await this.requestEventRepo.find({
-        where: { requestId },
-        order: { createdAt: 'DESC' },
-      });
-
-      return {
-        success: true,
-        data: events.map((e) => ({
-          id: e.id,
-          eventType: e.eventType,
-          actor: {
-            id: e.actorId,
-            name: e.actorName,
-          },
-          seller: {
-            id: e.sellerId,
-            name: e.sellerName,
-          },
-          product: {
-            id: e.productId,
-            name: e.productName,
-          },
-          service: {
-            id: e.serviceId,
-            name: e.serviceName,
-          },
-          fromStatus: e.fromStatus,
-          toStatus: e.toStatus,
-          reason: e.reason,
-          createdAt: e.createdAt,
-        })),
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error fetching request events:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * GET /supplier/events - 공급자의 모든 이벤트 로그 조회
-   *
-   * 필터 옵션:
-   * - eventType: 이벤트 유형 (approved, rejected)
-   * - limit: 최대 개수
-   */
-  async getSupplierEvents(
-    supplierId: string,
-    filters?: { eventType?: RequestEventType; limit?: number }
-  ) {
-    try {
-      const query = this.requestEventRepo
-        .createQueryBuilder('event')
-        .where('event.actorId = :supplierId', { supplierId });
-
-      if (filters?.eventType) {
-        query.andWhere('event.eventType = :eventType', { eventType: filters.eventType });
-      }
-
-      query.orderBy('event.createdAt', 'DESC');
-
-      if (filters?.limit) {
-        query.limit(filters.limit);
-      }
-
-      const events = await query.getMany();
-
-      return events.map((e) => ({
-        id: e.id,
-        eventType: e.eventType,
-        requestId: e.requestId,
-        seller: {
-          id: e.sellerId,
-          name: e.sellerName,
-        },
-        product: {
-          id: e.productId,
-          name: e.productName,
-        },
-        service: {
-          id: e.serviceId,
-          name: e.serviceName,
-        },
-        fromStatus: e.fromStatus,
-        toStatus: e.toStatus,
-        reason: e.reason,
-        createdAt: e.createdAt,
-      }));
-    } catch (error) {
-      logger.error('[NetureService] Error fetching supplier events:', error);
-      throw error;
-    }
-  }
-
   // ==================== Operator Supply Dashboard (WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1) ====================
 
   /**
@@ -2542,31 +1953,38 @@ export class NetureService {
    */
   async getOperatorSupplyProducts(operatorUserId: string) {
     try {
-      // 1. 모든 활성 PUBLIC 공급자 제품 조회 (HUB = PUBLIC only)
-      const products = await this.productRepo.find({
-        where: { isActive: true, distributionType: DistributionType.PUBLIC },
+      // 1. 활성 PUBLIC + SERVICE 공급자 제품 조회 (Tier 1 + Tier 2)
+      const allProducts = await this.productRepo.find({
+        where: { isActive: true, distributionType: In([DistributionType.PUBLIC, DistributionType.SERVICE]) },
         relations: ['supplier'],
         order: { createdAt: 'DESC' },
       });
 
-      // 2. 해당 운영자가 보낸 모든 공급요청 조회
-      const myRequests = await this.supplierRequestRepo.find({
-        where: { sellerId: operatorUserId },
-      });
+      // Supplier ACTIVE 검증 (Tier 공통)
+      const products = allProducts.filter((p) => p.supplier?.status === SupplierStatus.ACTIVE);
+
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const myApprovals: Array<{ product_id: string; supplier_id: string; status: string; id: string; reason: string | null }> = await AppDataSource.query(
+        `SELECT pa.product_id, nsp.supplier_id, pa.approval_status AS status, pa.id, pa.reason
+         FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
+        [operatorUserId],
+      );
 
       // 3. productId → 가장 관련성 높은 요청 상태 매핑
       // 우선순위: pending/approved > rejected (같은 supplier+product)
       const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
-      for (const req of myRequests) {
-        const key = `${req.supplierId}:${req.productId}`;
+      for (const req of myApprovals) {
+        const key = `${req.supplier_id}:${req.product_id}`;
         const existing = requestMap.get(key);
         if (!existing ||
-            req.status === SupplierRequestStatus.PENDING ||
-            req.status === SupplierRequestStatus.APPROVED) {
+            req.status === 'pending' ||
+            req.status === 'approved') {
           requestMap.set(key, {
             status: req.status,
             requestId: req.id,
-            rejectReason: req.rejectReason || undefined,
+            rejectReason: req.reason || undefined,
           });
         }
       }
@@ -2580,8 +1998,9 @@ export class NetureService {
           name: product.name,
           category: product.category || '',
           description: product.description || '',
+          distributionType: product.distributionType,
           supplierId: product.supplierId,
-          supplierName: (product as any).supplier?.name || '',
+          supplierName: product.supplier?.name || '',
           supplyStatus: request?.status || 'available',
           requestId: request?.requestId || null,
           rejectReason: request?.rejectReason || null,
@@ -2589,80 +2008,6 @@ export class NetureService {
       });
     } catch (error) {
       logger.error('[NetureService] Error fetching operator supply products:', error);
-      throw error;
-    }
-  }
-
-  // ==================== Seller Available Supply Products (WO-NETURE-PRODUCT-DISTRIBUTION-POLICY-V1) ====================
-
-  /**
-   * 판매자용 공급 가능 제품 목록 (PUBLIC + PRIVATE 중 본인에게 배정된 것)
-   */
-  async getSellerAvailableSupplyProducts(sellerId: string) {
-    try {
-      // 1. PUBLIC + PRIVATE(본인 배정) 제품 조회
-      const products: Array<{
-        id: string;
-        name: string;
-        category: string;
-        description: string;
-        supplier_id: string;
-        supplier_name: string;
-        distribution_type: string;
-      }> = await AppDataSource.query(`
-        SELECT sp.id, sp.name, sp.category, sp.description,
-               sp.supplier_id, s.name AS supplier_name,
-               sp.distribution_type
-        FROM neture_supplier_products sp
-        JOIN neture_suppliers s ON s.id = sp.supplier_id
-        WHERE sp.is_active = true
-          AND (
-            sp.distribution_type = 'PUBLIC'
-            OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
-          )
-        ORDER BY sp.created_at DESC
-      `, [sellerId]);
-
-      // 2. 해당 판매자의 기존 공급요청 조회
-      const myRequests = await this.supplierRequestRepo.find({
-        where: { sellerId },
-      });
-
-      // 3. productId → 요청 상태 매핑
-      const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
-      for (const req of myRequests) {
-        const key = `${req.supplierId}:${req.productId}`;
-        const existing = requestMap.get(key);
-        if (!existing ||
-            req.status === SupplierRequestStatus.PENDING ||
-            req.status === SupplierRequestStatus.APPROVED) {
-          requestMap.set(key, {
-            status: req.status,
-            requestId: req.id,
-            rejectReason: req.rejectReason || undefined,
-          });
-        }
-      }
-
-      // 4. 머지하여 반환
-      return products.map((product) => {
-        const key = `${product.supplier_id}:${product.id}`;
-        const request = requestMap.get(key);
-        return {
-          id: product.id,
-          name: product.name,
-          category: product.category || '',
-          description: product.description || '',
-          distributionType: product.distribution_type,
-          supplierId: product.supplier_id,
-          supplierName: product.supplier_name || '',
-          supplyStatus: request?.status || 'available',
-          requestId: request?.requestId || null,
-          rejectReason: request?.rejectReason || null,
-        };
-      });
-    } catch (error) {
-      logger.error('[NetureService] Error fetching seller available supply products:', error);
       throw error;
     }
   }
@@ -2894,9 +2239,9 @@ export class NetureService {
    * Seller 계약 목록 조회
    */
   async getSellerContracts(sellerId: string, status?: string) {
-    const where: Record<string, any> = { sellerId };
+    const where: { sellerId: string; contractStatus?: ContractStatus } = { sellerId };
     if (status && Object.values(ContractStatus).includes(status as ContractStatus)) {
-      where.contractStatus = status;
+      where.contractStatus = status as ContractStatus;
     }
     return this.contractRepo.find({ where, order: { createdAt: 'DESC' } });
   }
@@ -2905,9 +2250,9 @@ export class NetureService {
    * Partner 계약 목록 조회
    */
   async getPartnerContracts(partnerId: string, status?: string) {
-    const where: Record<string, any> = { partnerId };
+    const where: { partnerId: string; contractStatus?: ContractStatus } = { partnerId };
     if (status && Object.values(ContractStatus).includes(status as ContractStatus)) {
-      where.contractStatus = status;
+      where.contractStatus = status as ContractStatus;
     }
     return this.contractRepo.find({ where, order: { createdAt: 'DESC' } });
   }
@@ -2986,8 +2331,8 @@ export class NetureService {
               OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
             )
             AND sp.id NOT IN (
-              SELECT sr.product_id FROM neture_supplier_requests sr
-              WHERE sr.seller_id = $1
+              SELECT pa.product_id FROM product_approvals pa
+              WHERE pa.organization_id = $1 AND pa.approval_type = 'PRIVATE'
             )
         `, [sellerId]),
       ]);
@@ -2996,12 +2341,24 @@ export class NetureService {
       const newThisWeek = newThisWeekRows[0]?.cnt ?? 0;
       const notRequested = notRequestedRows[0]?.cnt ?? 0;
 
-      // ② 공급 신청 상태
-      const [pending, approved, rejected] = await Promise.all([
-        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.PENDING } }),
-        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.APPROVED } }),
-        this.supplierRequestRepo.count({ where: { sellerId, status: SupplierRequestStatus.REJECTED } }),
+      // ② 공급 신청 상태 — WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
+      const [pendingRows, approvedRows, rejectedRows] = await Promise.all([
+        AppDataSource.query(
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'pending'`,
+          [sellerId],
+        ),
+        AppDataSource.query(
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'approved'`,
+          [sellerId],
+        ),
+        AppDataSource.query(
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'rejected'`,
+          [sellerId],
+        ),
       ]);
+      const pending = pendingRows[0]?.cnt ?? 0;
+      const approved = approvedRows[0]?.cnt ?? 0;
+      const rejected = rejectedRows[0]?.cnt ?? 0;
 
       // ③ 노출 점검 — Neture에 채널 시스템 없음, 향후 확장 대비 0 고정
       const approvedButNotExposed = 0;

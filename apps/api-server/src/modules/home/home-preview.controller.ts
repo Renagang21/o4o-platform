@@ -287,15 +287,15 @@ async function buildStorePreview(
   const monthlyOrders = ordersResult.rows[0]?.count ?? 0;
   const monthlyOrdersStatus = deriveStatus(ordersResult.outcome, monthlyOrders);
 
-  // B. Pending requests (organization_product_applications)
+  // B. Pending requests (v2: product_approvals)
   const pendingResult = isGlobal
     ? await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count FROM organization_product_applications
-        WHERE status = 'pending'
+        SELECT COUNT(*)::int AS count FROM product_approvals
+        WHERE approval_status = 'pending'
       `)
     : await safeQuery(ds, `
-        SELECT COUNT(*)::int AS count FROM organization_product_applications
-        WHERE status = 'pending' AND requested_by = $1
+        SELECT COUNT(*)::int AS count FROM product_approvals
+        WHERE approval_status = 'pending' AND requested_by = $1
       `, [userId]);
   const pendingRequests = pendingResult.rows[0]?.count ?? 0;
   const pendingRequestsStatus = deriveStatus(pendingResult.outcome, pendingRequests);

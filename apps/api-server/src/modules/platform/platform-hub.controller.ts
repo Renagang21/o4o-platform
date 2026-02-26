@@ -101,12 +101,14 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
       FROM neture_suppliers
     `);
 
+    // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
     const [requestStats] = await ds.query(`
       SELECT
         COUNT(*) as "totalRequests",
-        COUNT(*) FILTER (WHERE status = 'pending') as "pendingRequests",
-        COUNT(*) FILTER (WHERE status = 'approved') as "approvedRequests"
-      FROM neture_supplier_requests
+        COUNT(*) FILTER (WHERE approval_status = 'pending') as "pendingRequests",
+        COUNT(*) FILTER (WHERE approval_status = 'approved') as "approvedRequests"
+      FROM product_approvals
+      WHERE approval_type = 'PRIVATE'
     `);
 
     const [contentStats] = await ds.query(`

@@ -11,7 +11,8 @@
     "types": ["node"],
     "composite": true,
     "declaration": true,
-    "outDir": "./dist-node"
+    "outDir": "./dist-node",
+    "rootDir": "../.."
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "../../vite.config.shared.ts"]
 }

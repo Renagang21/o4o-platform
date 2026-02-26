@@ -9,8 +9,10 @@ import {
 import type { NetureSupplierProduct } from './NetureSupplierProduct.entity.js';
 
 export enum SupplierStatus {
+  PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
+  REJECTED = 'REJECTED',
 }
 
 export enum ContactVisibility {
@@ -90,7 +92,7 @@ export class NetureSupplier {
   @Column({
     type: 'enum',
     enum: SupplierStatus,
-    default: SupplierStatus.ACTIVE,
+    default: SupplierStatus.PENDING,
   })
   status: SupplierStatus;
 
@@ -100,6 +102,16 @@ export class NetureSupplier {
    */
   @Column({ name: 'user_id', type: 'uuid', nullable: true })
   userId: string;
+
+  /** WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: 승인/거절 메타데이터 */
+  @Column({ name: 'approved_by', type: 'uuid', nullable: true })
+  approvedBy: string | null;
+
+  @Column({ name: 'approved_at', type: 'timestamp', nullable: true })
+  approvedAt: Date | null;
+
+  @Column({ name: 'rejected_reason', type: 'text', nullable: true })
+  rejectedReason: string | null;
 
   @OneToMany('NetureSupplierProduct', 'supplier')
   products: NetureSupplierProduct[];

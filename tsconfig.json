@@ -45,15 +45,12 @@
   ],
   "references": [
     { "path": "./apps/api-server" },
-    { "path": "./apps/main-site" },
-    { "path": "./apps/admin-dashboard" },
     { "path": "./packages/auth-client" },
     { "path": "./packages/auth-context" },
     { "path": "./packages/types" },
     { "path": "./packages/ui" },
     { "path": "./packages/utils" },
     { "path": "./packages/forum-core" },
-    { "path": "./packages/forum-neture" },
     { "path": "./packages/forum-yaksa" }
   ]
 }

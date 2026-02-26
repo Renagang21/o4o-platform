@@ -16,7 +16,6 @@ export * from './kpa-branch-settings.entity.js';
 export * from './kpa-member-service.entity.js';
 export * from './kpa-audit-log.entity.js';
 // WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1
-export * from './organization-product-application.entity.js';
 export * from './organization-product-listing.entity.js';
 // WO-PHARMACY-HUB-OWNERSHIP-RESTRUCTURE-PHASE1-V1
 export * from './organization-channel.entity.js';

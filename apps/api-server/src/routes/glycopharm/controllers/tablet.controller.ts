@@ -51,13 +51,13 @@ async function queryTabletVisibleProducts(
   let paramIdx = 3;
 
   if (options.category) {
-    conditions.push(`p.category = $${paramIdx}`);
+    conditions.push(`sp.category = $${paramIdx}`);
     params.push(options.category);
     paramIdx++;
   }
 
   if (options.q && options.q.length >= 2) {
-    conditions.push(`(p.name ILIKE $${paramIdx} OR p.description ILIKE $${paramIdx})`);
+    conditions.push(`(sp.name ILIKE $${paramIdx} OR sp.description ILIKE $${paramIdx})`);
     params.push(`%${options.q}%`);
     paramIdx++;
   }
@@ -65,19 +65,20 @@ async function queryTabletVisibleProducts(
   const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
 
   const sortMap: Record<string, string> = {
-    created_at: 'p.created_at',
-    name: 'p.name',
-    price: 'p.price',
-    sort_order: 'p.sort_order',
+    created_at: 'sp.created_at',
+    name: 'sp.name',
+    price: 'opl.retail_price',
+    sort_order: 'opl.display_order',
   };
-  const sortField = sortMap[options.sort || 'sort_order'] || 'p.sort_order';
+  const sortField = sortMap[options.sort || 'sort_order'] || 'opl.display_order';
   const sortOrder = options.order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
   const countResult: Array<{ count: string }> = await dataSource.query(
-    `SELECT COUNT(DISTINCT p.id)::int AS count
-     FROM glycopharm_products p
+    `SELECT COUNT(DISTINCT sp.id)::int AS count
+     FROM neture_supplier_products sp
+     JOIN neture_suppliers s ON s.id = sp.supplier_id
      INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
+       ON opl.product_id = sp.id
        AND opl.organization_id = $1
        AND opl.service_key = $2
        AND opl.is_active = true
@@ -88,24 +89,31 @@ async function queryTabletVisibleProducts(
        ON oc.id = opc.channel_id
        AND oc.channel_type = 'TABLET'
        AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
+     WHERE sp.is_active = true
+       AND s.status = 'ACTIVE'
        ${whereExtra}`,
     params,
   );
   const total = Number(countResult[0]?.count || 0);
 
   const data = await dataSource.query(
-    `SELECT DISTINCT ON (p.id)
-       p.id, p.name, p.sku, p.category, p.price, p.sale_price,
-       p.stock_quantity, p.images, p.status, p.is_featured,
-       p.manufacturer, p.description, p.short_description,
-       p.sort_order, p.created_at, p.updated_at,
-       p.pharmacy_id,
+    `SELECT DISTINCT ON (sp.id)
+       sp.id, COALESCE(opl.product_name, sp.name) AS name,
+       '' AS sku, sp.category,
+       opl.retail_price AS price, opc.channel_price AS sale_price,
+       0 AS stock_quantity, '[]'::jsonb AS images,
+       CASE WHEN sp.is_active THEN 'active' ELSE 'inactive' END AS status,
+       false AS is_featured,
+       s.name AS manufacturer, sp.description,
+       '' AS short_description,
+       opl.display_order AS sort_order,
+       sp.created_at, sp.updated_at,
+       opl.organization_id AS pharmacy_id,
        opc.channel_price
-     FROM glycopharm_products p
+     FROM neture_supplier_products sp
+     JOIN neture_suppliers s ON s.id = sp.supplier_id
      INNER JOIN organization_product_listings opl
-       ON opl.external_product_id = p.id::text
+       ON opl.product_id = sp.id
        AND opl.organization_id = $1
        AND opl.service_key = $2
        AND opl.is_active = true
@@ -116,10 +124,10 @@ async function queryTabletVisibleProducts(
        ON oc.id = opc.channel_id
        AND oc.channel_type = 'TABLET'
        AND oc.status = 'APPROVED'
-     WHERE p.pharmacy_id = $1
-       AND p.status = 'active'
+     WHERE sp.is_active = true
+       AND s.status = 'ACTIVE'
        ${whereExtra}
-     ORDER BY p.id, ${sortField} ${sortOrder}
+     ORDER BY sp.id, ${sortField} ${sortOrder}
      LIMIT ${limit} OFFSET ${offset}`,
     params,
   );

@@ -35,9 +35,6 @@ export class OrganizationProductListing {
   @Column({ type: 'varchar', length: 50, default: 'kpa' })
   service_key: string;
 
-  @Column({ type: 'varchar', length: 200 })
-  external_product_id: string;
-
   @Column({ type: 'varchar', length: 300 })
   product_name: string;
 
@@ -53,9 +50,9 @@ export class OrganizationProductListing {
   @Column({ type: 'int', default: 0 })
   display_order: number;
 
-  // WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
-  @Column({ type: 'uuid', nullable: true })
-  product_id: string | null;
+  // WO-PRODUCT-POLICY-V2-LISTING-EXTERNAL-ID-REMOVAL-V1: NOT NULL confirmed
+  @Column({ type: 'uuid' })
+  product_id: string;
 
   // ESM §4: string-based relation
   @ManyToOne('NetureSupplierProduct')

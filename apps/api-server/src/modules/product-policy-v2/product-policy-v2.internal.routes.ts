@@ -50,43 +50,17 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   router.use(requireAdminSecret);
 
   // ========================================================================
-  // POST /public-listing — PUBLIC 즉시 Listing 생성
+  // POST /public-listing — 410 DEPRECATED (WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1)
+  // PUBLIC listing은 상품 승인 시 자동 생성됨. 수동 생성 불필요.
   // ========================================================================
-  router.post('/public-listing', async (req: Request, res: Response) => {
-    try {
-      const { productId, organizationId, serviceKey } = req.body;
-
-      if (!productId || !organizationId) {
-        res.status(400).json({
-          success: false,
-          error: 'productId and organizationId are required',
-        });
-        return;
-      }
-
-      const result = await service.createPublicListing(
-        productId,
-        organizationId,
-        serviceKey || 'kpa',
-      );
-
-      logger.info('[v2-internal] createPublicListing:', {
-        productId,
-        organizationId,
-        success: result.success,
-        error: result.error,
-      });
-
-      if (!result.success) {
-        res.status(400).json(result);
-        return;
-      }
-
-      res.json(result);
-    } catch (err: any) {
-      logger.error('[v2-internal] createPublicListing error:', err);
-      res.status(500).json({ success: false, error: err.message });
-    }
+  router.post('/public-listing', (_req: Request, res: Response) => {
+    res.status(410).json({
+      success: false,
+      error: {
+        code: 'ENDPOINT_DEPRECATED',
+        message: 'PUBLIC listing is now auto-created on product approval. Manual creation is no longer needed.',
+      },
+    });
   });
 
   // ========================================================================
@@ -125,6 +99,10 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
 
       res.json(result);
     } catch (err: any) {
+      if (err.code === '23505' || err.driverError?.code === '23505') {
+        res.status(409).json({ success: false, error: { code: 'ALREADY_EXISTS', message: 'Approval already exists' } });
+        return;
+      }
       logger.error('[v2-internal] createServiceApproval error:', err);
       res.status(500).json({ success: false, error: err.message });
     }
@@ -156,6 +134,10 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
 
       res.json(result);
     } catch (err: any) {
+      if (err.code === '23505' || err.driverError?.code === '23505') {
+        res.status(409).json({ success: false, error: { code: 'ALREADY_EXISTS', message: 'Listing already exists' } });
+        return;
+      }
       logger.error('[v2-internal] approveServiceProduct error:', err);
       res.status(500).json({ success: false, error: err.message });
     }
@@ -196,6 +178,10 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
 
       res.json(result);
     } catch (err: any) {
+      if (err.code === '23505' || err.driverError?.code === '23505') {
+        res.status(409).json({ success: false, error: { code: 'ALREADY_EXISTS', message: 'Approval already exists' } });
+        return;
+      }
       logger.error('[v2-internal] createPrivateApproval error:', err);
       res.status(500).json({ success: false, error: err.message });
     }
@@ -227,6 +213,10 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
 
       res.json(result);
     } catch (err: any) {
+      if (err.code === '23505' || err.driverError?.code === '23505') {
+        res.status(409).json({ success: false, error: { code: 'ALREADY_EXISTS', message: 'Listing already exists' } });
+        return;
+      }
       logger.error('[v2-internal] approvePrivateProduct error:', err);
       res.status(500).json({ success: false, error: err.message });
     }
@@ -249,7 +239,7 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
 
       const listingRepo = dataSource.getRepository(OrganizationProductListing);
 
-      // product_id 기반 조회만 (external_product_id 기반 제외)
+      // product_id 기반 조회
       const where: Record<string, any> = {
         product_id: productId as string,
       };

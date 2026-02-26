@@ -863,7 +863,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         serviceKey: listing.service_key,
         productListingId: listing.id,
         productName: listing.product_name,
-        externalProductId: listing.external_product_id,
+        productId: listing.product_id,
       };
 
       // 4. ecommerce_orders에 주문 생성 (GlycoPharm createCoreOrder 패턴)
@@ -892,7 +892,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
       const orderItem = orderItemRepo.create({
         orderId: savedOrder.id,
-        productId: listing.external_product_id || listing.id,
+        productId: listing.product_id,
         productName: listing.product_name,
         quantity,
         unitPrice,
