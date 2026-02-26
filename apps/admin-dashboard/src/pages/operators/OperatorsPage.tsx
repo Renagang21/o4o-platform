@@ -27,33 +27,50 @@ import DataTable, { Column } from '@/components/common/DataTable';
 // Service role definitions
 const SERVICE_ROLES = {
   platform: [
-    { value: 'platform:super_admin', label: 'Platform Super Admin', description: 'Highest privilege, cross-service access' },
-    { value: 'platform:admin', label: 'Platform Admin', description: 'Platform administrator' },
-    { value: 'platform:operator', label: 'Platform Operator', description: 'Platform operator' },
+    { value: 'platform:super_admin', label: 'Super Admin', description: '최상위 권한, 전체 서비스 접근' },
+    { value: 'platform:admin', label: 'Admin', description: '플랫폼 관리자' },
+    { value: 'platform:operator', label: 'Operator', description: '플랫폼 운영자' },
   ],
-  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:operator 제거 — 분회 역할은 KpaMember.role이 SSOT
-  kpa: [
+  'kpa-a': [
+    { value: 'kpa:admin', label: 'KPA 관리자', description: 'KPA 전체 관리자 (공통)' },
+    { value: 'kpa:operator', label: 'KPA 운영자', description: 'KPA 전체 운영자 (공통)' },
     { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
-    { value: 'kpa-b:district', label: '데모서비스 지부 운영자', description: '지부/분회 데모 서비스 지부 운영자 (/demo)' },
-    { value: 'kpa-b:branch', label: '데모서비스 분회 운영자', description: '지부/분회 데모 서비스 분회 운영자 (/demo)' },
   ],
+  'kpa-b': [
+    { value: 'kpa-b:district', label: '지부 운영자', description: '데모 서비스 지부 운영자 (/demo)' },
+    { value: 'kpa-b:branch', label: '분회 운영자', description: '데모 서비스 분회 운영자 (/demo)' },
+  ],
+  // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:* 제거 — 분회 역할은 KpaMember.role이 SSOT
+  'kpa-c': [] as { value: string; label: string; description: string }[],
   neture: [
-    { value: 'neture:admin', label: 'Neture Admin', description: 'Neture administrator' },
-    { value: 'neture:supplier', label: 'Neture Supplier', description: 'Neture supplier' },
-    { value: 'neture:partner', label: 'Neture Partner', description: 'Neture partner' },
+    { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
+    { value: 'neture:supplier', label: 'Supplier', description: 'Neture 공급사' },
+    { value: 'neture:partner', label: 'Partner', description: 'Neture 파트너' },
   ],
   glycopharm: [
-    { value: 'glycopharm:admin', label: 'GlycoPharm Admin', description: 'GlycoPharm administrator' },
-    { value: 'glycopharm:operator', label: 'GlycoPharm Operator', description: 'GlycoPharm operator' },
+    { value: 'glycopharm:admin', label: 'Admin', description: 'GlycoPharm 관리자' },
+    { value: 'glycopharm:operator', label: 'Operator', description: 'GlycoPharm 운영자' },
   ],
   cosmetics: [
-    { value: 'cosmetics:admin', label: 'K-Cosmetics Admin', description: 'K-Cosmetics administrator' },
-    { value: 'cosmetics:operator', label: 'K-Cosmetics Operator', description: 'K-Cosmetics operator' },
+    { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
+    { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
   glucoseview: [
-    { value: 'glucoseview:admin', label: 'GlucoseView Admin', description: 'GlucoseView administrator' },
-    { value: 'glucoseview:operator', label: 'GlucoseView Operator', description: 'GlucoseView operator' },
+    { value: 'glucoseview:admin', label: 'Admin', description: 'GlucoseView 관리자' },
+    { value: 'glucoseview:operator', label: 'Operator', description: 'GlucoseView 운영자' },
   ],
+};
+
+// Section header display names
+const SERVICE_DISPLAY_NAMES: Record<string, string> = {
+  platform: 'Platform',
+  'kpa-a': 'KPA-a 커뮤니티',
+  'kpa-b': 'KPA-b 데모서비스',
+  'kpa-c': 'KPA-c 분회서비스',
+  neture: 'Neture',
+  glycopharm: 'GlycoPharm',
+  cosmetics: 'K-Cosmetics',
+  glucoseview: 'GlucoseView',
 };
 
 const ALL_ROLES = Object.values(SERVICE_ROLES).flat();
@@ -99,7 +116,7 @@ const OperatorsPage: React.FC = () => {
       const userData = response.data?.users || response.data?.data?.users || response.data?.data || response.data || [];
 
       if (Array.isArray(userData)) {
-        const OPERATOR_ROLE_KEYWORDS = ['admin', 'operator', 'super_admin', 'district', 'branch'];
+        const OPERATOR_ROLE_KEYWORDS = ['admin', 'operator', 'super_admin', 'district', 'branch', 'supplier', 'partner'];
         const isOperatorRole = (role: string) =>
           OPERATOR_ROLE_KEYWORDS.some(kw => role.toLowerCase().includes(kw));
 
@@ -132,15 +149,21 @@ const OperatorsPage: React.FC = () => {
   // Filter operators
   const filteredOperators = useMemo(() => {
     return operators.filter(op => {
-      // Service filter - 서비스 프리픽스로만 필터링 (깔끔하게)
+      // Service filter - 서비스 프리픽스로만 필터링
       if (serviceFilter !== 'all') {
         const hasServiceRole = op.roles.some(role => {
           const roleLower = role.toLowerCase();
           if (serviceFilter === 'platform') {
             return roleLower.startsWith('platform:');
           }
-          if (serviceFilter === 'kpa') {
-            return roleLower.startsWith('kpa-') || roleLower.startsWith('kpa:');
+          if (serviceFilter === 'kpa-a') {
+            return roleLower.startsWith('kpa:') || roleLower.startsWith('kpa-a:');
+          }
+          if (serviceFilter === 'kpa-b') {
+            return roleLower.startsWith('kpa-b:');
+          }
+          if (serviceFilter === 'kpa-c') {
+            return roleLower.startsWith('kpa-c:');
           }
           return roleLower.startsWith(`${serviceFilter}:`);
         });
@@ -430,7 +453,9 @@ const OperatorsPage: React.FC = () => {
   const serviceTabs = [
     { id: 'all' as ServiceFilter, label: 'All', icon: Users },
     { id: 'platform' as ServiceFilter, label: 'Platform', icon: Shield },
-    { id: 'kpa' as ServiceFilter, label: 'KPA Society', icon: Shield },
+    { id: 'kpa-a' as ServiceFilter, label: 'KPA 커뮤니티', icon: Shield },
+    { id: 'kpa-b' as ServiceFilter, label: 'KPA 데모', icon: Shield },
+    { id: 'kpa-c' as ServiceFilter, label: 'KPA 분회', icon: Shield },
     { id: 'neture' as ServiceFilter, label: 'Neture', icon: Shield },
     { id: 'glycopharm' as ServiceFilter, label: 'GlycoPharm', icon: Shield },
     { id: 'cosmetics' as ServiceFilter, label: 'K-Cosmetics', icon: Shield },
@@ -645,31 +670,37 @@ const OperatorsPage: React.FC = () => {
                   {Object.entries(SERVICE_ROLES).map(([service, roles]) => (
                     <div key={service} className="border-b pb-3 last:border-0 last:pb-0">
                       <h4 className="text-sm font-medium text-gray-700 mb-2 uppercase">
-                        {service === 'kpa' ? 'KPA Society' : service.charAt(0).toUpperCase() + service.slice(1)}
+                        {SERVICE_DISPLAY_NAMES[service] || service}
                       </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {roles.map(role => (
-                          <label
-                            key={role.value}
-                            className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
-                              formData.roles.includes(role.value)
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={formData.roles.includes(role.value)}
-                              onChange={() => toggleRole(role.value)}
-                              className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{role.label}</div>
-                              <div className="text-xs text-gray-500">{role.description}</div>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
+                      {roles.length === 0 ? (
+                        <p className="text-xs text-gray-400 italic">
+                          분회서비스 역할은 조직 멤버십(KpaMember.role)으로 관리됩니다
+                        </p>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {roles.map(role => (
+                            <label
+                              key={role.value}
+                              className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                                formData.roles.includes(role.value)
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={formData.roles.includes(role.value)}
+                                onChange={() => toggleRole(role.value)}
+                                className="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{role.label}</div>
+                                <div className="text-xs text-gray-500">{role.description}</div>
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
