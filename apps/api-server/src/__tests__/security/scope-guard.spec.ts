@@ -187,11 +187,12 @@ describe('Neture Scope Guard', () => {
   });
 
   describe('platform bypass ENABLED', () => {
-    it('platform:admin → allowed', async () => {
+    it('platform:admin → denied (only super_admin bypasses)', async () => {
       const guard = requireNetureScope('neture:operator');
       const user = createMockUser({ roles: ['platform:admin'] });
       const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(403);
     });
 
     it('platform:super_admin → allowed', async () => {
@@ -236,11 +237,12 @@ describe('GlycoPharm Scope Guard', () => {
   });
 
   describe('platform bypass ENABLED', () => {
-    it('platform:admin → allowed', async () => {
+    it('platform:admin → denied (only super_admin bypasses)', async () => {
       const guard = requireGlycopharmScope('glycopharm:admin');
       const user = createMockUser({ roles: ['platform:admin'] });
       const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(403);
     });
 
     it('platform:super_admin → allowed', async () => {
