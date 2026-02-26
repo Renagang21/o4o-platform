@@ -135,10 +135,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     },
     // modulepreload 설정 추가 - WordPress 청크 제외
     modulePreload: {
-      resolveDependencies: (filename, deps, { hostId, hostType }) => {
+      resolveDependencies: (filename: string, deps: string[], { hostId, hostType }: { hostId: string; hostType: string }) => {
         // WordPress 관련 청크는 modulepreload에서 제외
-        return deps.filter(dep => 
-          !dep.includes('wp-') && 
+        return deps.filter((dep: string) =>
+          !dep.includes('wp-') &&
           !dep.includes('page-gutenberg') &&
           !dep.includes('@wordpress')
         )
@@ -147,7 +147,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
     rollupOptions: {
       ...sharedViteConfig.build?.rollupOptions,
       // External dependencies that should not be bundled
-      external: (id) => {
+      external: (id: string) => {
         // Exclude invalid zod import path
         if (id === 'zod/v4/core') {
           return true;
@@ -177,9 +177,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
         // Fix ES Module initialization order
         exports: 'named',
         interop: 'auto',
-        manualChunks: (id) => {
+        manualChunks: (id: string) => {
           // 공통 설정 먼저 적용 - React 처리 포함
-          const sharedChunk = sharedViteConfig.build?.rollupOptions?.output?.manualChunks?.(id);
+          const output = sharedViteConfig.build?.rollupOptions?.output as Record<string, any> | undefined;
+          const sharedChunk = typeof output?.manualChunks === 'function' ? output.manualChunks(id) : undefined;
           if (sharedChunk) return sharedChunk;
 
           // WordPress 관련 모듈

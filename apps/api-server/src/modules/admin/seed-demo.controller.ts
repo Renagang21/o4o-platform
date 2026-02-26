@@ -54,8 +54,6 @@ const DEMO_IDS = {
   // KPI snapshots
   snapshotPrefix: 'd0000000-de07-4000',
 
-  // Product applications
-  appPrefix: 'd0000000-de08-4000',
 };
 
 // UUID format: 8-4-4-4-12
@@ -311,30 +309,6 @@ async function seedDemoData(ds: DataSource): Promise<{ created: string[]; skippe
     }
   }
 
-  // ------------------------------------------------------------------
-  // 8. Product Applications (organization_product_applications)
-  //    Store: 5, Hybrid: 3
-  // ------------------------------------------------------------------
-  const appConfigs = [
-    { orgIdx: 2, orgId: DEMO_IDS.orgStore, userId: DEMO_IDS.userStore, count: 5, label: 'Store' },
-    { orgIdx: 3, orgId: DEMO_IDS.orgHybrid, userId: DEMO_IDS.userHybrid, count: 3, label: 'Hybrid' },
-  ];
-
-  for (const ac of appConfigs) {
-    for (let i = 1; i <= ac.count; i++) {
-      const aid = demoUuid(DEMO_IDS.appPrefix,ac.orgIdx, i);
-      const status = i <= Math.ceil(ac.count * 0.4) ? 'approved' : 'pending';
-      await insertIfNotExists(
-        'organization_product_applications', aid,
-        `INSERT INTO organization_product_applications (
-           id, organization_id, service_key, external_product_id, product_name, status, requested_by, created_at, updated_at
-         ) VALUES ($1, $2, 'glycopharm', $3, $4, $5, $6, NOW(), NOW())`,
-        [aid, ac.orgId, `DEMO-EXT-${i}`, `[DEMO] ${ac.label} 신청 상품 ${i}`, status, ac.userId],
-        `app:${ac.label}-${i}`,
-      );
-    }
-  }
-
   return { created, skipped };
 }
 
@@ -347,7 +321,6 @@ async function cleanupDemoData(ds: DataSource): Promise<{ deleted: string[] }> {
 
   // Delete in reverse dependency order
   const tables = [
-    { table: 'organization_product_applications', pattern: DEMO_IDS.appPrefix },
     { table: 'checkout_orders', pattern: DEMO_IDS.orderPrefix },
     { table: 'glycopharm_products', pattern: DEMO_IDS.productPrefix },
     { table: 'care_coaching_sessions', pattern: DEMO_IDS.coachingPrefix },

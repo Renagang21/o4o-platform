@@ -8,6 +8,7 @@ import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { OrganizationStore, OrganizationChannel } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -168,6 +169,11 @@ export function createOrganizationController(
         } catch (seedErr: any) {
           console.warn('[OrgCreate] Failed to seed base channels:', seedErr.message);
         }
+
+        // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
+        autoListPublicProductsForOrg(dataSource, saved.id, 'kpa')
+          .then((count) => { if (count > 0) console.log(`[OrgCreate] Auto-listed ${count} PUBLIC products for org ${saved.id}`); })
+          .catch((err) => console.warn('[OrgCreate] Auto-listing failed:', err));
 
         res.status(201).json({ data: saved });
       } catch (error: any) {

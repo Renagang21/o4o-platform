@@ -18,35 +18,12 @@
  *     GET    /store-playlists/public/:id   — 렌더링용 플레이리스트
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../entities/kpa-member.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
 
-type AuthMiddleware = import('express').RequestHandler;
-
-// ─────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────
-
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
-function isPharmacyOwnerRole(roles: string[], user?: any): boolean {
-  // 1. pharmacistRole === 'pharmacy_owner' (DB column, carried in JWT)
-  if (user?.pharmacistRole === 'pharmacy_owner') return true;
-  // 2. KPA admin/operator roles also have store access
-  return hasAnyServiceRole(roles, [
-    'kpa:branch_admin', 'kpa:branch_operator', 'kpa:admin', 'kpa:operator',
-  ]);
-}
+type AuthMiddleware = RequestHandler;
 
 // ─────────────────────────────────────────────────────
 // Controller
@@ -153,12 +130,8 @@ export function createStorePlaylistController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -215,14 +188,10 @@ export function createStorePlaylistController(
           return;
         }
 
-        if (!isPharmacyOwnerRole(userRoles, authReq.user)) {
-          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
-          return;
-        }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization associated' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
@@ -262,14 +231,14 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
@@ -335,14 +304,14 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
@@ -384,12 +353,12 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -447,14 +416,14 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
@@ -536,14 +505,14 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 
@@ -594,14 +563,14 @@ export function createStorePlaylistController(
         const userId = authReq.user?.id;
         const userRoles = authReq.user?.roles || [];
 
-        if (!userId || !isPharmacyOwnerRole(userRoles, authReq.user)) {
+        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
+        if (!userId) {
           res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
-
-        const organizationId = await getUserOrganizationId(dataSource, userId);
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
         if (!organizationId) {
-          res.status(400).json({ success: false, error: { code: 'NO_ORG', message: 'No organization' } });
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
           return;
         }
 

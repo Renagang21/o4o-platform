@@ -18,37 +18,13 @@
  * └──────────────────────────────────────────────────────┘
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { KpaMember } from '../kpa/entities/kpa-member.entity.js';
+
+type AuthMiddleware = RequestHandler;
 import { StoreLocalProduct } from './entities/store-local-product.entity.js';
 import type { AuthRequest } from '../../types/auth.js';
-import { hasAnyServiceRole } from '../../utils/role.utils.js';
-
-type AuthMiddleware = import('express').RequestHandler;
-
-// ─────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────
-
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string,
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({ where: { user_id: userId } });
-  return member?.organization_id || null;
-}
-
-function isStoreOwnerRole(roles: string[], user?: any): boolean {
-  if (user?.pharmacistRole === 'pharmacy_owner') return true;
-  return hasAnyServiceRole(roles, [
-    'kpa:branch_admin',
-    'kpa:branch_operator',
-    'kpa:admin',
-    'kpa:operator',
-  ]);
-}
+import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 
 // ─────────────────────────────────────────────────────
 // Content Helpers
@@ -93,20 +69,15 @@ export function createStoreLocalProductRoutes(
         (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
       });
 
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id;
-      const userRoles = authReq.user?.roles || [];
-
-      if (!userId || !isStoreOwnerRole(userRoles, authReq.user)) {
-        res.status(403).json({
-          success: false,
-          error: 'Store owner or operator role required',
-          code: 'FORBIDDEN',
-        });
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
-
-      const organizationId = await getUserOrganizationId(dataSource, userId);
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
       if (!organizationId) {
         res.json({ success: true, data: { items: [], total: 0 } });
         return;
@@ -184,26 +155,17 @@ export function createStoreLocalProductRoutes(
         (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
       });
 
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id;
-      const userRoles = authReq.user?.roles || [];
-
-      if (!userId || !isStoreOwnerRole(userRoles, authReq.user)) {
-        res.status(403).json({
-          success: false,
-          error: 'Store owner or operator role required',
-          code: 'FORBIDDEN',
-        });
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
-
-      const organizationId = await getUserOrganizationId(dataSource, userId);
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
       if (!organizationId) {
-        res.status(400).json({
-          success: false,
-          error: 'User not associated with an organization',
-          code: 'NO_ORGANIZATION',
-        });
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
 
@@ -274,26 +236,17 @@ export function createStoreLocalProductRoutes(
         (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
       });
 
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id;
-      const userRoles = authReq.user?.roles || [];
-
-      if (!userId || !isStoreOwnerRole(userRoles, authReq.user)) {
-        res.status(403).json({
-          success: false,
-          error: 'Store owner or operator role required',
-          code: 'FORBIDDEN',
-        });
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
-
-      const organizationId = await getUserOrganizationId(dataSource, userId);
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
       if (!organizationId) {
-        res.status(400).json({
-          success: false,
-          error: 'User not associated with an organization',
-          code: 'NO_ORGANIZATION',
-        });
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
 
@@ -366,26 +319,17 @@ export function createStoreLocalProductRoutes(
         (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
       });
 
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
       const authReq = req as AuthRequest;
       const userId = authReq.user?.id;
-      const userRoles = authReq.user?.roles || [];
-
-      if (!userId || !isStoreOwnerRole(userRoles, authReq.user)) {
-        res.status(403).json({
-          success: false,
-          error: 'Store owner or operator role required',
-          code: 'FORBIDDEN',
-        });
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
-
-      const organizationId = await getUserOrganizationId(dataSource, userId);
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
       if (!organizationId) {
-        res.status(400).json({
-          success: false,
-          error: 'User not associated with an organization',
-          code: 'NO_ORGANIZATION',
-        });
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
         return;
       }
 

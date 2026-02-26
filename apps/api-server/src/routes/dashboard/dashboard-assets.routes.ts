@@ -511,12 +511,15 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       let hasApprovedSupplier = false;
       try {
         const rows = await dataSource.query(
           `SELECT EXISTS(
-            SELECT 1 FROM neture_supplier_requests
-            WHERE seller_id = $1 AND status = 'approved'
+            SELECT 1 FROM product_approvals
+            WHERE organization_id = $1
+              AND approval_type = 'PRIVATE'
+              AND approval_status = 'approved'
             LIMIT 1
           ) AS "exists"`,
           [user.id],
@@ -547,12 +550,16 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       let hasApprovedSeller = false;
       try {
         const rows = await dataSource.query(
           `SELECT EXISTS(
-            SELECT 1 FROM neture_supplier_requests
-            WHERE supplier_id = $1 AND status = 'approved'
+            SELECT 1 FROM product_approvals pa
+            JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+            WHERE nsp.supplier_id = $1
+              AND pa.approval_type = 'PRIVATE'
+              AND pa.approval_status = 'approved'
             LIMIT 1
           ) AS "exists"`,
           [user.id],

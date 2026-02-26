@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
-import type { Router as ExpressRouter } from 'express';
+import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
-import { SupplierStatus, PartnershipStatus, SupplierRequestStatus, RecruitmentStatus } from './entities/index.js';
+import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, ProductApprovalStatus, DistributionType } from './entities/index.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glycopharm.repository.js';
+import type { GlycopharmProduct } from '../../routes/glycopharm/entities/glycopharm-product.entity.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
 import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
 import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
@@ -16,6 +17,7 @@ import { ActionLogService } from '@o4o/action-log-core';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
+const netureActionLogService = new ActionLogService(AppDataSource);
 
 // Extended Request type with user info
 type AuthenticatedRequest = Request & {
@@ -24,6 +26,11 @@ type AuthenticatedRequest = Request & {
     role: string;
     supplierId?: string;
   };
+};
+
+/** Request with supplierId set by requireActiveSupplier / requireLinkedSupplier middleware */
+type SupplierRequest = AuthenticatedRequest & {
+  supplierId: string;
 };
 
 /**
@@ -150,60 +157,363 @@ router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: R
 
 /**
  * Helper: Get supplier ID from authenticated user
- * First checks userId -> supplier mapping, then falls back to user.id
+ * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: fallback 제거 — user_id 매핑만 허용
  */
 async function getSupplierIdFromUser(req: AuthenticatedRequest): Promise<string | null> {
   if (!req.user?.id) return null;
-
-  // First try to find supplier linked to this user
-  const linkedSupplierId = await netureService.getSupplierIdByUserId(req.user.id);
-  if (linkedSupplierId) {
-    return linkedSupplierId;
-  }
-
-  // Fallback: use user ID directly (for backwards compatibility)
-  return req.user.id;
+  return netureService.getSupplierIdByUserId(req.user.id);
 }
 
 /**
- * GET /api/v1/neture/supplier/requests
- * Get supplier requests for authenticated supplier
- *
- * Query Parameters:
- * - status (optional): Filter by status ('pending', 'approved', 'rejected')
- * - serviceId (optional): Filter by service
+ * Middleware: Require authenticated user to be an ACTIVE supplier
+ * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1
+ * 쓰기 작업용 — PENDING/REJECTED/INACTIVE 차단
  */
-router.get('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    // 인증 확인 및 supplierId 조회
-    const supplierId = await getSupplierIdFromUser(req);
+async function requireActiveSupplier(req: Request, res: Response, next: () => void): Promise<void> {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user?.id) {
+    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    return;
+  }
+  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
+  if (!supplier) {
+    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+    return;
+  }
+  if (supplier.status !== SupplierStatus.ACTIVE) {
+    res.status(403).json({
+      success: false,
+      error: { code: 'SUPPLIER_NOT_ACTIVE', message: `Supplier account is ${supplier.status}. Only ACTIVE suppliers can perform this action.` },
+      currentStatus: supplier.status,
+    });
+    return;
+  }
+  (req as SupplierRequest).supplierId = supplier.id;
+  next();
+}
 
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
+/**
+ * Middleware: Require authenticated user to be a linked supplier (any status)
+ * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1
+ * 읽기 작업용 — PENDING/REJECTED도 자신의 프로필/대시보드 조회 허용
+ */
+async function requireLinkedSupplier(req: Request, res: Response, next: () => void): Promise<void> {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user?.id) {
+    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    return;
+  }
+  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
+  if (!supplier) {
+    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+    return;
+  }
+  (req as SupplierRequest).supplierId = supplier.id;
+  next();
+}
+
+// ==================== Supplier Onboarding (WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1) ====================
+
+/**
+ * POST /api/v1/neture/supplier/register
+ * 공급자 신청 — Supplier 생성 (status = PENDING)
+ */
+router.post('/supplier/register', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
     }
+
+    const { name, slug, contactEmail } = req.body || {};
+    const result = await netureService.registerSupplier(userId, { name, slug, contactEmail });
+
+    if (!result.success) {
+      const statusMap: Record<string, number> = {
+        MISSING_NAME: 400,
+        INVALID_SLUG: 400,
+        USER_ALREADY_HAS_SUPPLIER: 409,
+        SLUG_ALREADY_EXISTS: 409,
+      };
+      return res.status(statusMap[result.error!] || 400).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.status(201).json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error registering supplier:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to register supplier' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/suppliers/pending
+ * 승인 대기 공급자 목록 (관리자 전용)
+ */
+router.get('/admin/suppliers/pending', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  try {
+    const suppliers = await netureService.getPendingSuppliers();
+    res.json({ success: true, data: suppliers });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching pending suppliers:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pending suppliers' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/suppliers/:id/approve
+ * 공급자 승인 (PENDING → ACTIVE)
+ */
+router.post('/admin/suppliers/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const approvedBy = req.user?.id;
+    if (!approvedBy) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const result = await netureService.approveSupplier(id, approvedBy);
+    if (!result.success) {
+      const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', approvedBy, 'neture.admin.supplier_approve', {
+      meta: { supplierId: id },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error approving supplier:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to approve supplier' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/suppliers/:id/reject
+ * 공급자 거절 (PENDING → REJECTED)
+ */
+router.post('/admin/suppliers/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const rejectedBy = req.user?.id;
+    if (!rejectedBy) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const { reason } = req.body || {};
+    const result = await netureService.rejectSupplier(id, rejectedBy, reason);
+    if (!result.success) {
+      const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', rejectedBy, 'neture.admin.supplier_reject', {
+      meta: { supplierId: id, reason },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error rejecting supplier:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reject supplier' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/suppliers/:id/deactivate
+ * WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1
+ * 공급자 비활성화 (ACTIVE → INACTIVE)
+ */
+router.post('/admin/suppliers/:id/deactivate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const result = await netureService.deactivateSupplier(id, adminUserId);
+    if (!result.success) {
+      const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.supplier_deactivate', {
+      meta: { supplierId: id },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error deactivating supplier:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to deactivate supplier' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/suppliers
+ * WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1
+ * 전체 공급자 목록 (상태 필터)
+ */
+router.get('/admin/suppliers', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { status } = req.query;
+    const filters: { status?: SupplierStatus } = {};
+    if (status && typeof status === 'string' && Object.values(SupplierStatus).includes(status as SupplierStatus)) {
+      filters.status = status as SupplierStatus;
+    }
+
+    const suppliers = await netureService.getAllSuppliers(filters);
+    res.json({ success: true, data: suppliers });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching all suppliers:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch suppliers' } });
+  }
+});
+
+// ==================== Admin: Product Management (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1) ====================
+
+/**
+ * GET /api/v1/neture/admin/products/pending
+ * 승인 대기 상품 목록
+ */
+router.get('/admin/products/pending', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
+  try {
+    const products = await netureService.getPendingProducts();
+    res.json({ success: true, data: products });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching pending products:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch pending products' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/products/:id/approve
+ * 상품 승인 (isActive = true)
+ */
+router.post('/admin/products/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const result = await netureService.approveProduct(id, adminUserId);
+    if (!result.success) {
+      const status = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_approve', {
+      meta: { productId: id },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error approving product:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to approve product' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/products/:id/reject
+ * 상품 반려 (isActive 유지 false)
+ */
+router.post('/admin/products/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const { reason } = req.body || {};
+    const result = await netureService.rejectProduct(id, adminUserId, reason);
+    if (!result.success) {
+      const status = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.product_reject', {
+      meta: { productId: id, reason },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error rejecting product:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reject product' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/products
+ * 전체 상품 목록 (필터: supplierId, distributionType, isActive, approvalStatus)
+ */
+router.get('/admin/products', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { supplierId, distributionType, isActive, approvalStatus } = req.query;
+    const filters: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus } = {};
+
+    if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
+    if (distributionType && typeof distributionType === 'string' && Object.values(DistributionType).includes(distributionType as DistributionType)) {
+      filters.distributionType = distributionType as DistributionType;
+    }
+    if (isActive === 'true') filters.isActive = true;
+    if (isActive === 'false') filters.isActive = false;
+    if (approvalStatus && typeof approvalStatus === 'string' && Object.values(ProductApprovalStatus).includes(approvalStatus as ProductApprovalStatus)) {
+      filters.approvalStatus = approvalStatus as ProductApprovalStatus;
+    }
+
+    const products = await netureService.getAllProducts(filters);
+    res.json({ success: true, data: products });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching all products:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch products' } });
+  }
+});
+
+// ==================== Supplier Requests (v2) ====================
+
+/**
+ * GET /api/v1/neture/supplier/requests
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals 읽기
+ */
+router.get('/supplier/requests', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { status, serviceId } = req.query;
-
-    const filters: { status?: SupplierRequestStatus; serviceId?: string } = {};
+    const params: unknown[] = [supplierId];
+    let statusFilter = '';
+    let serviceFilter = '';
 
     if (status && typeof status === 'string') {
-      filters.status = status as SupplierRequestStatus;
+      params.push(status);
+      statusFilter = ` AND pa.approval_status = $${params.length}`;
     }
-
     if (serviceId && typeof serviceId === 'string') {
-      filters.serviceId = serviceId;
+      params.push(serviceId);
+      serviceFilter = ` AND pa.service_key = $${params.length}`;
     }
 
-    const requests = await netureService.getSupplierRequests(supplierId, filters);
+    const rows = await AppDataSource.query(
+      `SELECT pa.id, pa.approval_status AS status,
+              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              pa.organization_id AS "sellerId",
+              pa.service_key AS "serviceId",
+              nsp.name AS "productName", pa.product_id AS "productId",
+              pa.reason AS "rejectReason",
+              pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",
+              pa.created_at AS "requestedAt"
+       FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       WHERE pa.approval_type = 'PRIVATE'
+         AND nsp.supplier_id = $1${statusFilter}${serviceFilter}
+       ORDER BY pa.created_at DESC`,
+      params,
+    );
 
-    res.json({
-      success: true,
-      data: requests,
-    });
+    res.json({ success: true, data: rows });
   } catch (error) {
     logger.error('[Neture API] Error fetching supplier requests:', error);
     res.status(500).json({
@@ -216,25 +526,34 @@ router.get('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, 
 
 /**
  * GET /api/v1/neture/supplier/requests/:id
- * Get supplier request detail
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals 읽기
  */
-router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/requests/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
 
-    const request = await netureService.getSupplierRequestById(id, supplierId);
+    const rows = await AppDataSource.query(
+      `SELECT pa.id, pa.approval_status AS status,
+              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              pa.organization_id AS "sellerId",
+              pa.service_key AS "serviceId",
+              nsp.name AS "productName", pa.product_id AS "productId",
+              nsp.category AS "productCategory",
+              pa.reason AS "rejectReason",
+              pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",
+              pa.requested_by AS "requestedBy",
+              pa.metadata, pa.created_at AS "requestedAt"
+       FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       WHERE pa.id = $1 AND pa.approval_type = 'PRIVATE'
+         AND nsp.supplier_id = $2`,
+      [id, supplierId],
+    );
 
-    if (!request) {
+    if (rows.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'NOT_FOUND',
@@ -242,10 +561,7 @@ router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedReque
       });
     }
 
-    res.json({
-      success: true,
-      data: request,
-    });
+    res.json({ success: true, data: rows[0] });
   } catch (error) {
     logger.error('[Neture API] Error fetching supplier request detail:', error);
     res.status(500).json({
@@ -258,148 +574,35 @@ router.get('/supplier/requests/:id', requireAuth, async (req: AuthenticatedReque
 
 /**
  * POST /api/v1/neture/supplier/requests/:id/approve
- * Approve a supplier request
- *
- * State transition: pending → approved
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests/:id/approve', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-
-    const result = await netureService.approveSupplierRequest(id, supplierId);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error approving supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to approve supplier request',
-    });
-  }
+router.post('/supplier/requests/:id/approve', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval/:id/approve' },
+  });
 });
 
 /**
  * POST /api/v1/neture/supplier/requests/:id/reject
- * Reject a supplier request
- *
- * State transition: pending → rejected
- *
- * Body:
- * - reason (optional): Rejection reason
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests/:id/reject', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-    const { reason } = req.body;
-
-    const result = await netureService.rejectSupplierRequest(id, supplierId, reason);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error rejecting supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to reject supplier request',
-    });
-  }
+router.post('/supplier/requests/:id/reject', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval/:id/approve or reject' },
+  });
 });
 
 /**
  * POST /api/v1/neture/supplier/requests
- * Create a new supplier request (판매자 취급 요청)
- *
- * WO-S2S-FLOW-RECOVERY-PHASE1-V1:
- * - requireAuth 추가 (인증 필수)
- * - 인증된 사용자 정보를 sellerId/sellerName으로 자동 설정
- * - 중복 요청 시 409 Conflict
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const data = req.body;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    // WO-NETURE-OWNERSHIP-GUARD-PHASE3-V1: Force authenticated user as seller (no client override)
-    const sellerId = userId;
-    const sellerName = data.sellerName || req.user?.name || '';
-
-    // 필수 필드 검증
-    if (!data.supplierId || !data.serviceId || !data.serviceName ||
-        !data.productId || !data.productName) {
-      return res.status(400).json({
-        success: false,
-        error: 'VALIDATION_ERROR',
-        message: 'Missing required fields: supplierId, serviceId, serviceName, productId, productName',
-      });
-    }
-
-    const result = await netureService.createSupplierRequest({
-      ...data,
-      sellerId,
-      sellerName,
-    });
-
-    res.status(201).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    // WO-S2S-FLOW-RECOVERY-PHASE1-V1: 중복 요청 처리
-    if ((error as Error).message === 'DUPLICATE_REQUEST') {
-      return res.status(409).json({
-        success: false,
-        error: 'DUPLICATE_REQUEST',
-        message: '이미 동일한 취급 요청이 존재합니다.',
-        existingStatus: (error as any).existingStatus,
-      });
-    }
-
-    logger.error('[Neture API] Error creating supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to create supplier request',
-    });
-  }
+router.post('/supplier/requests', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval' },
+  });
 });
 
 // ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
@@ -409,17 +612,9 @@ router.post('/supplier/requests', requireAuth, async (req: AuthenticatedRequest,
  * Create a new product for authenticated supplier
  * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
  */
-router.post('/supplier/products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/products', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { name, category, description, purpose, distributionType, acceptsApplications } = req.body;
 
@@ -452,17 +647,9 @@ router.post('/supplier/products', requireAuth, async (req: AuthenticatedRequest,
  * GET /api/v1/neture/supplier/products
  * Get products for authenticated supplier
  */
-router.get('/supplier/products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/products', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const products = await netureService.getSupplierProducts(supplierId);
 
@@ -484,17 +671,9 @@ router.get('/supplier/products', requireAuth, async (req: AuthenticatedRequest, 
  * PATCH /api/v1/neture/supplier/products/:id
  * Update product status (activation, applications toggle)
  */
-router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/supplier/products/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
     const { isActive, acceptsApplications, distributionType, allowedSellerIds } = req.body;
@@ -531,17 +710,9 @@ router.patch('/supplier/products/:id', requireAuth, async (req: AuthenticatedReq
  * NOTE: Neture does NOT process orders.
  * This endpoint provides summary and links to navigate to each service.
  */
-router.get('/supplier/orders/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/orders/summary', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const summary = await netureService.getSupplierOrdersSummary(supplierId);
 
@@ -566,25 +737,17 @@ router.get('/supplier/orders/summary', requireAuth, async (req: AuthenticatedReq
  * GET /api/v1/neture/supplier/contents
  * Get contents for authenticated supplier
  */
-router.get('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/contents', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { type, status } = req.query;
 
-    const filters: { type?: string; status?: string } = {};
-    if (type && typeof type === 'string') filters.type = type;
-    if (status && typeof status === 'string') filters.status = status;
+    const filters: { type?: ContentType; status?: ContentStatus } = {};
+    if (type && typeof type === 'string') filters.type = type as ContentType;
+    if (status && typeof status === 'string') filters.status = status as ContentStatus;
 
-    const contents = await netureService.getSupplierContents(supplierId, filters as any);
+    const contents = await netureService.getSupplierContents(supplierId, filters);
 
     res.json({
       success: true,
@@ -604,17 +767,9 @@ router.get('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, 
  * GET /api/v1/neture/supplier/contents/:id
  * Get content detail
  */
-router.get('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/contents/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
 
@@ -646,17 +801,9 @@ router.get('/supplier/contents/:id', requireAuth, async (req: AuthenticatedReque
  * POST /api/v1/neture/supplier/contents
  * Create new content
  */
-router.post('/supplier/contents', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/supplier/contents', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { type, title, description, body, imageUrl, availableServices, availableAreas } = req.body;
 
@@ -696,17 +843,9 @@ router.post('/supplier/contents', requireAuth, async (req: AuthenticatedRequest,
  * PATCH /api/v1/neture/supplier/contents/:id
  * Update content
  */
-router.patch('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/supplier/contents/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
     const updates = req.body;
@@ -733,17 +872,9 @@ router.patch('/supplier/contents/:id', requireAuth, async (req: AuthenticatedReq
  * DELETE /api/v1/neture/supplier/contents/:id
  * Delete content
  */
-router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/supplier/contents/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
 
@@ -771,17 +902,9 @@ router.delete('/supplier/contents/:id', requireAuth, async (req: AuthenticatedRe
  * GET /api/v1/neture/supplier/dashboard/summary
  * Get dashboard summary for authenticated supplier
  */
-router.get('/supplier/dashboard/summary', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/dashboard/summary', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const summary = await netureService.getSupplierDashboardSummary(supplierId);
 
@@ -810,17 +933,9 @@ router.get('/supplier/dashboard/summary', requireAuth, async (req: Authenticated
  * - Aggregated stats only (no cross-supplier data)
  * - AI failure → graceful fallback
  */
-router.get('/supplier/dashboard/ai-insight', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/dashboard/ai-insight', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     // Collect aggregated context from existing service
     const dashboardSummary = await netureService.getSupplierDashboardSummary(supplierId);
@@ -921,12 +1036,9 @@ router.get('/supplier/dashboard/ai-insight', requireAuth, async (req: Authentica
  * GET /api/v1/neture/supplier/profile
  * Get supplier profile for authenticated supplier (contact info etc.)
  */
-router.get('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/profile', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-    if (!supplierId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const profile = await netureService.getSupplierProfile(supplierId);
     if (!profile) {
@@ -945,12 +1057,9 @@ router.get('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, r
  * Get profile completeness indicator (internal, supplier-only)
  * WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1
  */
-router.get('/supplier/profile/completeness', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/supplier/profile/completeness', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-    if (!supplierId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const result = await netureService.computeProfileCompleteness(supplierId);
     if (!result) {
@@ -968,12 +1077,9 @@ router.get('/supplier/profile/completeness', requireAuth, async (req: Authentica
  * PATCH /api/v1/neture/supplier/profile
  * Update supplier contact info
  */
-router.patch('/supplier/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/supplier/profile', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const supplierId = await getSupplierIdFromUser(req);
-    if (!supplierId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
-    }
+    const supplierId = (req as SupplierRequest).supplierId;
 
     const {
       contactEmail, contactPhone, contactWebsite, contactKakao,
@@ -1294,7 +1400,7 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
     // Batch-fetch product details
     const productIds = items.map((item) => item.productId);
     const glycopharmRepo = new GlycopharmRepository(AppDataSource);
-    const productMap = new Map<string, any>();
+    const productMap = new Map<string, GlycopharmProduct>();
 
     for (const id of productIds) {
       const product = await glycopharmRepo.findProductById(id);
@@ -1461,7 +1567,7 @@ router.get('/partner/contents', requireAuth, async (req: Request, res: Response)
     if (source === 'all' || source === 'supplier') {
       const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
       const supplierContents = await supplierRepo.find({
-        where: { status: 'published' as any },
+        where: { status: ContentStatus.PUBLISHED },
         order: { createdAt: 'DESC' },
         take: 100,
       });
@@ -1783,91 +1889,35 @@ router.get('/partner/dashboard/summary', requireAuth, async (req: AuthenticatedR
   }
 });
 
-// ==================== Request Events (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.2) ====================
+// ==================== Request Events — DEPRECATED (WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1) ====================
 
 /**
- * GET /api/v1/neture/supplier/requests/:id/events
- * Get event logs for a specific request
+ * GET /api/v1/neture/supplier/requests/:id/events → 410 Gone
+ * Event table dropped by migration.
  */
-router.get('/supplier/requests/:id/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-
-    const result = await netureService.getRequestEvents(id, supplierId);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error fetching request events:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to fetch request events',
-    });
-  }
+router.get('/supplier/requests/:id/events', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Request events have been removed. Event data is no longer available.' },
+  });
 });
 
 /**
- * GET /api/v1/neture/supplier/events
- * Get all events for the supplier
- *
- * Query Parameters:
- * - eventType (optional): Filter by event type ('approved', 'rejected')
- * - limit (optional): Limit number of results
+ * GET /api/v1/neture/supplier/events → 410 Gone
+ * Event table dropped by migration.
  */
-router.get('/supplier/events', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { eventType, limit } = req.query;
-
-    const filters: { eventType?: string; limit?: number } = {};
-    if (eventType && typeof eventType === 'string') filters.eventType = eventType as any;
-    if (limit && typeof limit === 'string') filters.limit = parseInt(limit, 10);
-
-    const events = await netureService.getSupplierEvents(supplierId, filters as any);
-
-    res.json({
-      success: true,
-      data: events,
-    });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching supplier events:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to fetch supplier events',
-    });
-  }
+router.get('/supplier/events', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier events have been removed. Event data is no longer available.' },
+  });
 });
 
 // ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
 
 /**
  * GET /api/v1/neture/seller/my-products
- * 판매자의 승인된 취급 상품 목록 조회
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals 읽기
  */
 router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -1880,8 +1930,24 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
       });
     }
 
-    const result = await netureService.getSellerApprovedProducts(sellerId);
-    res.json(result);
+    const rows = await AppDataSource.query(
+      `SELECT pa.id,
+              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              pa.product_id AS "productId", nsp.name AS "productName",
+              nsp.category AS "productCategory",
+              pa.service_key AS "serviceId",
+              pa.decided_at AS "approvedAt"
+       FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       WHERE pa.organization_id = $1
+         AND pa.approval_type = 'PRIVATE'
+         AND pa.approval_status = 'approved'
+       ORDER BY pa.decided_at DESC`,
+      [sellerId],
+    );
+
+    res.json({ success: true, data: rows });
   } catch (error) {
     logger.error('[Neture API] Error fetching seller approved products:', error);
     res.status(500).json({
@@ -1896,7 +1962,7 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
 
 /**
  * GET /api/v1/neture/seller/available-supply-products
- * 판매자용 공급 가능 제품 목록 (PUBLIC + PRIVATE 중 본인 배정)
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals 읽기
  */
 router.get('/seller/available-supply-products', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -1909,7 +1975,64 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
       });
     }
 
-    const data = await netureService.getSellerAvailableSupplyProducts(sellerId);
+    // Step 1: PUBLIC/SERVICE + PRIVATE(본인 배정) 제품 조회 (Tier 1+2+3)
+    const products: Array<{
+      id: string; name: string; category: string; description: string;
+      supplier_id: string; supplier_name: string; distribution_type: string;
+    }> = await AppDataSource.query(
+      `SELECT sp.id, sp.name, sp.category, sp.description,
+              sp.supplier_id, s.name AS supplier_name,
+              sp.distribution_type
+       FROM neture_supplier_products sp
+       JOIN neture_suppliers s ON s.id = sp.supplier_id
+       WHERE sp.is_active = true
+         AND s.status = 'ACTIVE'
+         AND (sp.distribution_type IN ('PUBLIC', 'SERVICE')
+           OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids)))
+       ORDER BY sp.created_at DESC`,
+      [sellerId],
+    );
+
+    // Step 2: v2 product_approvals에서 seller의 기존 approval 조회 (SERVICE + PRIVATE)
+    const approvals: Array<{
+      product_id: string; status: string; approval_id: string; reason: string | null;
+    }> = await AppDataSource.query(
+      `SELECT pa.product_id, pa.approval_status AS status, pa.id AS approval_id, pa.reason
+       FROM product_approvals pa
+       WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
+      [sellerId],
+    );
+
+    // Step 3: productId → approval 상태 매핑
+    const approvalMap = new Map<string, { status: string; approvalId: string; reason?: string }>();
+    for (const a of approvals) {
+      const existing = approvalMap.get(a.product_id);
+      if (!existing || a.status === 'pending' || a.status === 'approved') {
+        approvalMap.set(a.product_id, {
+          status: a.status,
+          approvalId: a.approval_id,
+          reason: a.reason || undefined,
+        });
+      }
+    }
+
+    // Step 4: 머지하여 반환
+    const data = products.map((product) => {
+      const approval = approvalMap.get(product.id);
+      return {
+        id: product.id,
+        name: product.name,
+        category: product.category || '',
+        description: product.description || '',
+        distributionType: product.distribution_type,
+        supplierId: product.supplier_id,
+        supplierName: product.supplier_name || '',
+        supplyStatus: approval?.status || 'available',
+        requestId: approval?.approvalId || null,
+        rejectReason: approval?.reason || null,
+      };
+    });
+
     res.json({ success: true, data });
   } catch (error) {
     logger.error('[Neture API] Error fetching seller available supply products:', error);
@@ -1925,19 +2048,43 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
 
 /**
  * GET /api/v1/neture/admin/requests
- * Admin: 전체 취급 요청 목록 조회 (cross-supplier)
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals 읽기
  */
 router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, supplierId, serviceId } = req.query;
-    const filters: { status?: string; supplierId?: string; serviceId?: string } = {};
-    if (status && typeof status === 'string') filters.status = status;
-    if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
-    if (serviceId && typeof serviceId === 'string') filters.serviceId = serviceId;
+    const params: unknown[] = [];
+    const conditions: string[] = [`pa.approval_type = 'PRIVATE'`];
 
-    const requests = await netureService.getAllSupplierRequests(filters);
+    if (status && typeof status === 'string') {
+      params.push(status);
+      conditions.push(`pa.approval_status = $${params.length}`);
+    }
+    if (supplierId && typeof supplierId === 'string') {
+      params.push(supplierId);
+      conditions.push(`nsp.supplier_id = $${params.length}`);
+    }
+    if (serviceId && typeof serviceId === 'string') {
+      params.push(serviceId);
+      conditions.push(`pa.service_key = $${params.length}`);
+    }
 
-    res.json({ success: true, data: requests });
+    const rows = await AppDataSource.query(
+      `SELECT pa.id, pa.approval_status AS status,
+              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              pa.organization_id AS "sellerId",
+              pa.service_key AS "serviceId",
+              nsp.name AS "productName", pa.product_id AS "productId",
+              pa.created_at AS "requestedAt"
+       FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY pa.created_at DESC`,
+      params,
+    );
+
+    res.json({ success: true, data: rows });
   } catch (error) {
     logger.error('[Neture API] Error fetching admin requests:', error);
     res.status(500).json({
@@ -1950,230 +2097,81 @@ router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), a
 
 /**
  * POST /api/v1/neture/admin/requests/:id/approve
- * Admin override: 소유권 무관 승인
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/admin/requests/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const actorId = req.user?.id || '';
-    const actorName = req.user?.name || 'Admin';
-
-    const result = await netureService.approveSupplierRequestAsAdmin(id, actorId, actorName);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error admin-approving supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to approve supplier request',
-    });
-  }
+router.post('/admin/requests/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Use POST /api/v1/product-policy-v2/private-approval/:id/approve' },
+  });
 });
 
 /**
  * POST /api/v1/neture/admin/requests/:id/reject
- * Admin override: 소유권 무관 거절
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { reason } = req.body;
-    const actorId = req.user?.id || '';
-    const actorName = req.user?.name || 'Admin';
-
-    const result = await netureService.rejectSupplierRequestAsAdmin(id, actorId, reason, actorName);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error admin-rejecting supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to reject supplier request',
-    });
-  }
+router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Use v2 approval API for rejection.' },
+  });
 });
 
 // ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
 
 /**
  * POST /api/v1/neture/supplier/requests/:id/suspend
- * 공급 일시 중단 (approved → suspended)
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests/:id/suspend', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-    const { note } = req.body;
-
-    const result = await netureService.suspendSupplierRequest(id, supplierId, note);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error suspending supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to suspend supplier request',
-    });
-  }
+router.post('/supplier/requests/:id/suspend', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
+  });
 });
 
 /**
  * POST /api/v1/neture/supplier/requests/:id/reactivate
- * 공급 재활성화 (suspended → approved)
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests/:id/reactivate', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-    const { note } = req.body;
-
-    const result = await netureService.reactivateSupplierRequest(id, supplierId, note);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error reactivating supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to reactivate supplier request',
-    });
-  }
+router.post('/supplier/requests/:id/reactivate', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
+  });
 });
 
 /**
  * POST /api/v1/neture/supplier/requests/:id/revoke
- * 공급 종료 (approved|suspended → revoked)
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/supplier/requests/:id/revoke', requireRole('supplier'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = await getSupplierIdFromUser(req);
-
-    if (!supplierId) {
-      return res.status(401).json({
-        success: false,
-        error: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-
-    const { id } = req.params;
-    const { note } = req.body;
-
-    const result = await netureService.revokeSupplierRequest(id, supplierId, note);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error revoking supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to revoke supplier request',
-    });
-  }
+router.post('/supplier/requests/:id/revoke', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
+  });
 });
 
 /**
  * POST /api/v1/neture/admin/requests/:id/suspend
- * Admin override: 소유권 무관 일시 중단
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/admin/requests/:id/suspend', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { note } = req.body;
-    const actorId = req.user?.id || '';
-    const actorName = req.user?.name || 'Admin';
-
-    const result = await netureService.suspendSupplierRequestAsAdmin(id, actorId, note, actorName);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error admin-suspending supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to suspend supplier request',
-    });
-  }
+router.post('/admin/requests/:id/suspend', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
+  });
 });
 
 /**
  * POST /api/v1/neture/admin/requests/:id/revoke
- * Admin override: 소유권 무관 공급 종료
+ * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
  */
-router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { note } = req.body;
-    const actorId = req.user?.id || '';
-    const actorName = req.user?.name || 'Admin';
-
-    const result = await netureService.revokeSupplierRequestAsAdmin(id, actorId, note, actorName);
-
-    if (!result.success) {
-      const statusCode = result.error === 'REQUEST_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error admin-revoking supplier request:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to revoke supplier request',
-    });
-  }
+router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  res.status(410).json({
+    success: false,
+    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
+  });
 });
 
 // ==================== Seller Dashboard AI Insight (WO-STORE-AI-V1-SELLER-INSIGHT) ====================
@@ -2206,12 +2204,9 @@ router.get('/seller/dashboard/ai-insight', requireAuth, async (req: Authenticate
  * Seller 계약 목록 조회
  * Query: ?status=active|terminated|expired
  */
-router.get('/seller/contracts', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/seller/contracts', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const sellerId = await getSupplierIdFromUser(req);
-    if (!sellerId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-    }
+    const sellerId = (req as SupplierRequest).supplierId;
 
     const { status } = req.query;
     const contracts = await netureService.getSellerContracts(sellerId, status as string | undefined);
@@ -2226,12 +2221,9 @@ router.get('/seller/contracts', requireAuth, async (req: AuthenticatedRequest, r
  * POST /api/v1/neture/seller/contracts/:id/terminate
  * Seller가 계약 해지
  */
-router.post('/seller/contracts/:id/terminate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/seller/contracts/:id/terminate', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const sellerId = await getSupplierIdFromUser(req);
-    if (!sellerId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-    }
+    const sellerId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
     const result = await netureService.terminateContract(id, sellerId, 'seller');
@@ -2253,12 +2245,9 @@ router.post('/seller/contracts/:id/terminate', requireAuth, async (req: Authenti
  * POST /api/v1/neture/seller/contracts/:id/commission
  * 수수료 변경 (기존 계약 terminated → 신규 계약 생성)
  */
-router.post('/seller/contracts/:id/commission', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/seller/contracts/:id/commission', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const sellerId = await getSupplierIdFromUser(req);
-    if (!sellerId) {
-      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
-    }
+    const sellerId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
     const { commissionRate } = req.body;
@@ -2327,7 +2316,6 @@ router.post('/partner/contracts/:id/terminate', requireAuth, async (req: Authent
 });
 
 // Hub Trigger routes (WO-NETURE-HUB-ACTION-TRIGGER-EXPANSION-V1)
-const netureActionLogService = new ActionLogService(AppDataSource);
 const hubTriggerController = createNetureHubTriggerController({
   dataSource: AppDataSource,
   requireAuth,
@@ -2339,6 +2327,6 @@ const hubTriggerController = createNetureHubTriggerController({
 router.use('/hub/trigger', hubTriggerController);
 
 // Asset Snapshot routes (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
-router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as any));
+router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as RequestHandler));
 
 export default router;

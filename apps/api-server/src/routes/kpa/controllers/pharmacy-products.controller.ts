@@ -11,20 +11,19 @@
  * GET  /listings           — 내 매장 진열 상품
  * PUT  /listings/:id       — 진열 상품 수정 (가격/순서/활성)
  *
- * 인증: requireAuth + pharmacy_owner 체크
- * 조직: getUserOrganizationId()로 자동 결정
+ * 인증: requireAuth + store owner 체크 (WO-ROLE-NORMALIZATION-PHASE3-A-V1)
+ * 조직: organization_members 기반 자동 결정
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationProductApplication } from '../entities/organization-product-application.entity.js';
 import { OrganizationProductListing } from '../entities/organization-product-listing.entity.js';
 import { OrganizationProductChannel } from '../entities/organization-product-channel.entity.js';
-import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import { ApiError } from '../../../utils/api-error.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -44,61 +43,16 @@ function resolveServiceKeyFromBody(body: any): string {
   throw new ApiError(400, `Invalid service_key: ${requested}`, 'INVALID_SERVICE_KEY');
 }
 
-/**
- * Get user's organization ID from KPA membership
- */
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({
-    where: { user_id: userId },
-  });
-  return member?.organization_id || null;
-}
-
-/**
- * Verify pharmacy_owner role
- */
-function getPharmacistRole(user: any): string | null {
-  return user?.pharmacistRole || user?.pharmacist_role || null;
-}
-
 export function createPharmacyProductsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
-  const appRepo = dataSource.getRepository(OrganizationProductApplication);
   const listingRepo = dataSource.getRepository(OrganizationProductListing);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
-  /**
-   * Middleware: pharmacy_owner 체크 + organization_id 주입
-   */
-  const requirePharmacyOwner = asyncHandler(async (req: Request, res: Response, next: any) => {
-    const user = (req as any).user;
-    if (!user?.id) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-      return;
-    }
-
-    const pharmacistRole = getPharmacistRole(user);
-    if (pharmacistRole !== 'pharmacy_owner') {
-      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'pharmacy_owner role required' } });
-      return;
-    }
-
-    const organizationId = await getUserOrganizationId(dataSource, user.id);
-    if (!organizationId) {
-      res.status(404).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization membership found' } });
-      return;
-    }
-
-    (req as any).organizationId = organizationId;
-    next();
-  });
+  // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
 
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
@@ -131,27 +85,27 @@ export function createPharmacyProductsController(
          s.name AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
          s.category AS "supplierCategory",
-         -- 내 신청/진열 상태
+         -- 내 신청/진열 상태 (v2: product_approvals)
          (EXISTS(
-           SELECT 1 FROM organization_product_applications opa
-           WHERE opa.organization_id = $1
-             AND opa.external_product_id = sp.id::text
-             AND opa.status IN ('pending','approved')
+           SELECT 1 FROM product_approvals pa2
+           WHERE pa2.organization_id = $1
+             AND pa2.product_id = sp.id
+             AND pa2.approval_status IN ('pending','approved')
          )) AS "isApplied",
          (EXISTS(
-           SELECT 1 FROM organization_product_applications opa
-           WHERE opa.organization_id = $1
-             AND opa.external_product_id = sp.id::text
-             AND opa.status = 'approved'
+           SELECT 1 FROM product_approvals pa2
+           WHERE pa2.organization_id = $1
+             AND pa2.product_id = sp.id
+             AND pa2.approval_status = 'approved'
          )) AS "isApproved",
          (EXISTS(
            SELECT 1 FROM organization_product_listings opl
            WHERE opl.organization_id = $1
-             AND (opl.external_product_id = sp.id::text OR opl.product_id = sp.id)
+             AND opl.product_id = sp.id
          )) AS "isListed"
        FROM neture_supplier_products sp
        JOIN neture_suppliers s ON s.id = sp.supplier_id
-       WHERE sp.distribution_type = 'PUBLIC'
+       WHERE sp.distribution_type IN ('PUBLIC', 'SERVICE')
          AND sp.is_active = true
          AND s.status = 'ACTIVE'
          ${categoryFilter}
@@ -172,7 +126,7 @@ export function createPharmacyProductsController(
       `SELECT COUNT(*)::int AS total
        FROM neture_supplier_products sp
        JOIN neture_suppliers s ON s.id = sp.supplier_id
-       WHERE sp.distribution_type = 'PUBLIC'
+       WHERE sp.distribution_type IN ('PUBLIC', 'SERVICE')
          AND sp.is_active = true
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}`,
@@ -190,161 +144,59 @@ export function createPharmacyProductsController(
     });
   }));
 
-  // ─── POST /apply — 상품 판매 신청 ─────────────────────────────────
-  // WO-O4O-API-PHARMACY-B2B-CATALOG-V1: supplyProductId 지원 확장
-  router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
-    const user = (req as any).user;
-    const organizationId = (req as any).organizationId;
-    let { externalProductId, productName, productMetadata } = req.body;
-    const { supplyProductId } = req.body;
-
-    // WO-O4O-API-PHARMACY-B2B-CATALOG-V1: supplyProductId로 카탈로그 기반 신청
-    if (supplyProductId && !externalProductId) {
-      const catalogProduct = await dataSource.query(
-        `SELECT sp.id, sp.name, sp.category, sp.description, sp.distribution_type,
-                s.id AS supplier_id, s.name AS supplier_name
-         FROM neture_supplier_products sp
-         JOIN neture_suppliers s ON s.id = sp.supplier_id
-         WHERE sp.id = $1 AND sp.is_active = true AND sp.distribution_type = 'PUBLIC' AND s.status = 'ACTIVE'`,
-        [supplyProductId],
-      );
-
-      if (!catalogProduct || catalogProduct.length === 0) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'CATALOG_PRODUCT_NOT_FOUND', message: 'Supply product not found or not available' },
-        });
-        return;
-      }
-
-      const cp = catalogProduct[0];
-      externalProductId = cp.id;
-      productName = cp.name;
-      productMetadata = {
-        ...productMetadata,
-        supplyProductId: cp.id,
-        supplierName: cp.supplier_name,
-        supplierId: cp.supplier_id,
-        category: cp.category,
-      };
-    }
-
-    if (!externalProductId || !productName) {
-      res.status(400).json({
-        success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'externalProductId and productName are required (or provide supplyProductId)' },
-      });
-      return;
-    }
-
-    const serviceKey = resolveServiceKeyFromBody(req.body);
-
-    // 중복 체크: 동일 조직 + 동일 상품 pending/approved 신청 존재 여부
-    const existing = await appRepo.findOne({
-      where: {
-        organization_id: organizationId,
-        external_product_id: externalProductId,
-        service_key: serviceKey,
+  // ─── POST /apply — 410 DEPRECATED ────────────────────────────────
+  // WO-PRODUCT-POLICY-V2-APPLICATION-REMOVAL-V1: v1 application 생성 완전 차단
+  router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (_req: Request, res: Response) => {
+    res.status(410).json({
+      success: false,
+      error: {
+        code: 'ENDPOINT_DEPRECATED',
+        message: 'Product applications are handled by v2 approval system. Use POST /api/v1/product-policy-v2/public-listing, /service-approval, or /private-approval',
       },
     });
-
-    if (existing && (existing.status === 'pending' || existing.status === 'approved')) {
-      res.status(409).json({
-        success: false,
-        error: {
-          code: 'DUPLICATE_APPLICATION',
-          message: existing.status === 'pending'
-            ? 'Application already pending for this product'
-            : 'Product already approved',
-        },
-      });
-      return;
-    }
-
-    // 기존 rejected 신청이 있으면 업데이트 (재신청)
-    if (existing && existing.status === 'rejected') {
-      existing.status = 'pending';
-      existing.product_name = productName;
-      existing.product_metadata = productMetadata || {};
-      existing.reject_reason = null;
-      existing.requested_by = user.id;
-      existing.requested_at = new Date();
-      existing.reviewed_by = null;
-      existing.reviewed_at = null;
-      const updated = await appRepo.save(existing);
-
-      // Audit log
-      try {
-        const log = auditRepo.create({
-          operator_id: user.id,
-          operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'pharmacy_owner',
-          action_type: 'CONTENT_CREATED' as any,
-          target_type: 'application' as any,
-          target_id: updated.id,
-          metadata: { action: 'product_reapply', externalProductId, productName },
-        });
-        await auditRepo.save(log);
-      } catch (e) {
-        console.error('[KPA AuditLog] Failed to write product apply audit:', e);
-      }
-
-      res.status(201).json({ success: true, data: updated });
-      return;
-    }
-
-    // 신규 신청
-    const application = appRepo.create({
-      organization_id: organizationId,
-      service_key: serviceKey,
-      external_product_id: externalProductId,
-      product_name: productName,
-      product_metadata: productMetadata || {},
-      status: 'pending',
-      requested_by: user.id,
-      requested_at: new Date(),
-    });
-
-    const saved = await appRepo.save(application);
-
-    // Audit log
-    try {
-      const log = auditRepo.create({
-        operator_id: user.id,
-        operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'pharmacy_owner',
-        action_type: 'CONTENT_CREATED' as any,
-        target_type: 'application' as any,
-        target_id: saved.id,
-        metadata: { action: 'product_apply', externalProductId, productName },
-      });
-      await auditRepo.save(log);
-    } catch (e) {
-      console.error('[KPA AuditLog] Failed to write product apply audit:', e);
-    }
-
-    res.status(201).json({ success: true, data: saved });
   }));
 
-  // ─── GET /applications — 내 신청 목록 ──────────────────────────────
+  // ─── GET /applications — 내 신청 목록 (v2: product_approvals) ───────
   router.get('/applications', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const status = req.query.status as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
-
     const serviceKey = resolveServiceKeyFromQuery(req.query);
-    const qb = appRepo.createQueryBuilder('app')
-      .where('app.organization_id = :organizationId', { organizationId })
-      .andWhere('app.service_key = :serviceKey', { serviceKey });
 
-    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
-      qb.andWhere('app.status = :status', { status });
-    }
+    const hasStatus = status && ['pending', 'approved', 'rejected'].includes(status);
+    const statusFilter = hasStatus ? `AND pa.approval_status = $3` : '';
+    const baseParams: any[] = hasStatus ? [organizationId, serviceKey, status] : [organizationId, serviceKey];
 
-    qb.orderBy('app.requested_at', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
+    const countResult = await dataSource.query(
+      `SELECT COUNT(*)::int AS total
+       FROM product_approvals pa
+       WHERE pa.organization_id = $1 AND pa.service_key = $2 ${statusFilter}`,
+      baseParams,
+    );
+    const total = countResult[0]?.total || 0;
 
-    const [data, total] = await qb.getManyAndCount();
+    const limitIdx = baseParams.length + 1;
+    const offsetIdx = baseParams.length + 2;
+    const data = await dataSource.query(
+      `SELECT pa.id, pa.organization_id, pa.service_key,
+              pa.product_id,
+              nsp.name AS product_name,
+              pa.metadata AS product_metadata,
+              pa.approval_status AS status,
+              pa.reason AS reject_reason,
+              pa.requested_by,
+              pa.created_at AS requested_at,
+              pa.decided_by AS reviewed_by,
+              pa.decided_at AS reviewed_at,
+              pa.created_at, pa.updated_at
+       FROM product_approvals pa
+       LEFT JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       WHERE pa.organization_id = $1 AND pa.service_key = $2 ${statusFilter}
+       ORDER BY pa.created_at DESC
+       LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+      [...baseParams, limit, (page - 1) * limit],
+    );
 
     res.json({
       success: true,
@@ -356,21 +208,33 @@ export function createPharmacyProductsController(
     });
   }));
 
-  // ─── GET /approved — 승인된 상품 목록 (진열 가능 상품) ────────────
+  // ─── GET /approved — 승인된 상품 목록 (v2: product_approvals) ──────
   router.get('/approved', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const serviceKey = resolveServiceKeyFromQuery(req.query);
 
-    const approved = await appRepo.find({
-      where: {
-        organization_id: organizationId,
-        service_key: serviceKey,
-        status: 'approved' as any,
-      },
-      order: { requested_at: 'DESC' },
-    });
+    const data = await dataSource.query(
+      `SELECT pa.id, pa.organization_id, pa.service_key,
+              pa.product_id,
+              nsp.name AS product_name,
+              pa.metadata AS product_metadata,
+              pa.approval_status AS status,
+              pa.reason AS reject_reason,
+              pa.requested_by,
+              pa.created_at AS requested_at,
+              pa.decided_by AS reviewed_by,
+              pa.decided_at AS reviewed_at,
+              pa.created_at, pa.updated_at
+       FROM product_approvals pa
+       LEFT JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       WHERE pa.organization_id = $1
+         AND pa.service_key = $2
+         AND pa.approval_status = 'approved'
+       ORDER BY pa.created_at DESC`,
+      [organizationId, serviceKey],
+    );
 
-    res.json({ success: true, data: approved });
+    res.json({ success: true, data });
   }));
 
   // ─── GET /listings — 내 매장 진열 상품 ─────────────────────────────

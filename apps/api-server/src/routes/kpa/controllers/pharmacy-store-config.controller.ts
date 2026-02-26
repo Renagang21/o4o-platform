@@ -2,36 +2,23 @@
  * Pharmacy Store Config Controller
  *
  * WO-PHARMACY-HUB-REALIGN-PHASEH2-V1
+ * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
  *
  * GET  /pharmacy/store/config — 현재 매장 설정 조회
  * PUT  /pharmacy/store/config — 매장 설정 저장 (JSON 전체 overwrite)
  *
- * 인증: requireAuth + pharmacistRole 체크
- * 조직: getUserOrganizationId()로 자동 결정
+ * 인증: requireAuth + store owner 체크
+ * 조직: organization_members 기반 자동 결정
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../entities/organization-store.entity.js';
-import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 
 type AuthMiddleware = RequestHandler;
-
-/**
- * Get user's organization ID from KPA membership
- */
-async function getUserOrganizationId(
-  dataSource: DataSource,
-  userId: string
-): Promise<string | null> {
-  const memberRepo = dataSource.getRepository(KpaMember);
-  const member = await memberRepo.findOne({
-    where: { user_id: userId },
-  });
-  return member?.organization_id || null;
-}
 
 export function createPharmacyStoreConfigController(
   dataSource: DataSource,
@@ -41,26 +28,12 @@ export function createPharmacyStoreConfigController(
   const orgRepo = dataSource.getRepository(OrganizationStore);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
 
+  // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반 middleware
+  const requireStoreOwner = createRequireStoreOwner(dataSource);
+
   // GET /config — 매장 설정 조회
-  router.get('/config', requireAuth, asyncHandler(async (req: Request, res: Response) => {
-    const user = (req as any).user;
-    if (!user?.id) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-      return;
-    }
-
-    // pharmacy_owner 체크
-    const pharmacistRole = user.pharmacistRole || user.pharmacist_role;
-    if (pharmacistRole !== 'pharmacy_owner') {
-      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'pharmacy_owner role required' } });
-      return;
-    }
-
-    const organizationId = await getUserOrganizationId(dataSource, user.id);
-    if (!organizationId) {
-      res.status(404).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization membership found' } });
-      return;
-    }
+  router.get('/config', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {
+    const organizationId = (req as any).organizationId;
 
     const org = await orgRepo.findOne({ where: { id: organizationId } });
     if (!org) {
@@ -79,25 +52,9 @@ export function createPharmacyStoreConfigController(
   }));
 
   // PUT /config — 매장 설정 저장
-  router.put('/config', requireAuth, asyncHandler(async (req: Request, res: Response) => {
+  router.put('/config', requireAuth, requireStoreOwner, asyncHandler(async (req: Request, res: Response) => {
     const user = (req as any).user;
-    if (!user?.id) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-      return;
-    }
-
-    // pharmacy_owner 체크
-    const pharmacistRole = user.pharmacistRole || user.pharmacist_role;
-    if (pharmacistRole !== 'pharmacy_owner') {
-      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'pharmacy_owner role required' } });
-      return;
-    }
-
-    const organizationId = await getUserOrganizationId(dataSource, user.id);
-    if (!organizationId) {
-      res.status(404).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization membership found' } });
-      return;
-    }
+    const organizationId = (req as any).organizationId;
 
     const config = req.body;
     if (!config || typeof config !== 'object') {
@@ -117,7 +74,7 @@ export function createPharmacyStoreConfigController(
     try {
       const log = auditRepo.create({
         operator_id: user.id,
-        operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'pharmacy_owner',
+        operator_role: (user.roles || []).find((r: string) => r.startsWith('kpa:')) || 'store_owner',
         action_type: 'STOREFRONT_CONFIG_UPDATED' as any,
         target_type: 'content' as any,
         target_id: organizationId,

@@ -369,15 +369,15 @@ export function createCheckoutController(
         // PRIVATE 제품: allowed_seller_ids에 organizationId 포함 필수
         // ================================================================
         const privateDistProducts: Array<{
-          external_product_id: string;
+          product_id: string;
           allowed_seller_ids: string[] | null;
         }> = await dataSource.query(
-          `SELECT opl.external_product_id, nsp.allowed_seller_ids
+          `SELECT opl.product_id::text AS product_id, nsp.allowed_seller_ids
            FROM organization_product_listings opl
            JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
            WHERE opl.organization_id = $1
              AND opl.service_key = 'kpa'
-             AND opl.external_product_id = ANY($2::text[])
+             AND opl.product_id::text = ANY($2::text[])
              AND nsp.distribution_type = 'PRIVATE'`,
           [pharmacy.id, productIds]
         );
@@ -387,7 +387,7 @@ export function createCheckoutController(
             opsMetrics.inc(OPS.CHECKOUT_BLOCKED_DISTRIBUTION, { service: 'glycopharm' });
             await queryRunner.release();
             return errorResponse(res, 403, 'DISTRIBUTION_FORBIDDEN', VALIDATION_ERRORS.DISTRIBUTION_FORBIDDEN, {
-              productId: pp.external_product_id,
+              productId: pp.product_id,
             });
           }
         }
@@ -397,11 +397,11 @@ export function createCheckoutController(
         // ================================================================
         const channelMappings: Array<{
           product_listing_id: string;
-          external_product_id: string;
+          product_id: string;
           sales_limit: number | null;
         }> = await dataSource.query(
           `SELECT opl.id AS product_listing_id,
-                  opl.external_product_id,
+                  opl.product_id::text AS product_id,
                   opc.sales_limit
            FROM organization_product_channels opc
            JOIN organization_product_listings opl
@@ -419,7 +419,7 @@ export function createCheckoutController(
 
         // Soft check: only enforce if mappings exist for this channel
         if (channelMappings.length > 0) {
-          const mappedProductIds = new Set(channelMappings.map((m) => m.external_product_id));
+          const mappedProductIds = new Set(channelMappings.map((m) => m.product_id));
 
           const unmappedProducts = productIds.filter((pid) => !mappedProductIds.has(pid));
           if (unmappedProducts.length > 0) {
@@ -480,7 +480,7 @@ export function createCheckoutController(
             const productsWithLimit = channelMappings.filter((m) => m.sales_limit !== null);
 
             for (const mapping of productsWithLimit) {
-              const requestedItem = dto.items.find((i) => i.productId === mapping.external_product_id);
+              const requestedItem = dto.items.find((i) => i.productId === mapping.product_id);
               if (!requestedItem) continue;
 
               // PAID 주문만 카운트 + FOR UPDATE로 동시성 보호
@@ -492,7 +492,7 @@ export function createCheckoutController(
                    AND o."sellerId" = $2
                    AND o.status = 'PAID'
                  FOR UPDATE OF o`,
-                [mapping.external_product_id, pharmacy.id]
+                [mapping.product_id, pharmacy.id]
               );
 
               const currentSold = soldResult[0]?.sold || 0;
@@ -501,7 +501,7 @@ export function createCheckoutController(
                 await queryRunner.rollbackTransaction();
                 await queryRunner.release();
                 return errorResponse(res, 400, 'SALES_LIMIT_EXCEEDED', VALIDATION_ERRORS.SALES_LIMIT_EXCEEDED, {
-                  productId: mapping.external_product_id,
+                  productId: mapping.product_id,
                   salesLimit: mapping.sales_limit,
                   currentSold,
                   requestedQuantity: requestedItem.quantity,

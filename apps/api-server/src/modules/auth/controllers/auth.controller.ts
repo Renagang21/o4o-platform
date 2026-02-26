@@ -476,6 +476,18 @@ export class AuthController extends BaseController {
       userData.roles = roles;
       userData.scopes = scopes;
 
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: derive pharmacy_owner from organization_members
+      const ud = userData as Record<string, unknown>;
+      if (ud.pharmacistRole !== 'pharmacy_owner') {
+        const [ownerRecord] = await AppDataSource.query(
+          `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+          [req.user.id]
+        );
+        if (ownerRecord) {
+          ud.pharmacistRole = 'pharmacy_owner';
+        }
+      }
+
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {
       logger.error('[AuthController.me] Get user error', {
@@ -533,7 +545,8 @@ export class AuthController extends BaseController {
     const { pharmacistFunction, pharmacistRole } = req.body;
 
     const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
-    const validRoles = ['general', 'pharmacy_owner', 'hospital', 'other'];
+    // WO-ROLE-NORMALIZATION-PHASE3-A-V1: pharmacy_owner는 승인 기반만 허용 (셀프 설정 차단)
+    const validRoles = ['general', 'hospital', 'other'];
 
     if (pharmacistFunction && !validFunctions.includes(pharmacistFunction)) {
       return BaseController.error(res, 'Invalid pharmacistFunction', 400);
@@ -594,6 +607,18 @@ export class AuthController extends BaseController {
         roles,
       });
       userData.scopes = scopes;
+
+      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: derive pharmacy_owner from organization_members
+      const ud = userData as Record<string, unknown>;
+      if (ud.pharmacistRole !== 'pharmacy_owner') {
+        const [ownerRecord] = await AppDataSource.query(
+          `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+          [req.user.id]
+        );
+        if (ownerRecord) {
+          ud.pharmacistRole = 'pharmacy_owner';
+        }
+      }
     }
 
     return BaseController.ok(res, {

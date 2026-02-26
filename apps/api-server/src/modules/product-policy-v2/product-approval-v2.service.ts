@@ -8,7 +8,7 @@
  * 격리 원칙:
  * - organization_product_applications 참조 ❌
  * - supplier_requests 참조 ❌
- * - external_product_id 입력 사용 ❌ (product_id만 사용)
+ * - external_product_id 제거 완료 (product_id만 사용)
  * - 기존 controller import ❌
  */
 
@@ -156,18 +156,31 @@ export class ProductApprovalV2Service {
 
       let listing = existingListing;
       if (!existingListing) {
-        listing = txListingRepo.create({
-          organization_id: approval.organization_id,
-          service_key: approval.service_key,
-          external_product_id: product.id, // 하위호환: 기존 쿼리와 공존
-          product_name: product.name,
-          product_metadata: {},
-          product_id: product.id, // v2: proper FK
-          retail_price: null,
-          is_active: false, // 승인 후에도 비활성 (운영자가 수동 활성화)
-          display_order: 0,
-        });
-        listing = await txListingRepo.save(listing);
+        try {
+          listing = txListingRepo.create({
+            organization_id: approval.organization_id,
+            service_key: approval.service_key,
+            product_name: product.name,
+            product_metadata: {},
+            product_id: product.id,
+            retail_price: null,
+            is_active: false, // 승인 후에도 비활성 (운영자가 수동 활성화)
+            display_order: 0,
+          });
+          listing = await txListingRepo.save(listing);
+        } catch (err: any) {
+          if (err.code === '23505' || err.driverError?.code === '23505') {
+            listing = await txListingRepo.findOne({
+              where: {
+                organization_id: approval.organization_id,
+                product_id: approval.product_id,
+                service_key: approval.service_key,
+              },
+            });
+          } else {
+            throw err;
+          }
+        }
       }
 
       return { success: true, data: { approval, listing: listing! } };
@@ -183,10 +196,8 @@ export class ProductApprovalV2Service {
     sellerOrgId: string,
     serviceKey: string,
   ): Promise<{ success: boolean; data?: ProductApproval; error?: string }> {
+    // 1. 제품 조회 + distributionType 검증 (TX 외부 — early validation)
     const productRepo = this.dataSource.getRepository(NetureSupplierProduct);
-    const approvalRepo = this.dataSource.getRepository(ProductApproval);
-
-    // 1. 제품 조회 + distributionType 검증
     const product = await productRepo.findOne({ where: { id: productId } });
     if (!product) {
       return { success: false, error: 'PRODUCT_NOT_FOUND' };
@@ -206,29 +217,38 @@ export class ProductApprovalV2Service {
       return { success: false, error: 'SELLER_NOT_IN_ALLOWED_LIST' };
     }
 
-    // 3. 중복 검사
-    const existing = await approvalRepo.findOne({
-      where: {
-        product_id: productId,
-        organization_id: sellerOrgId,
-        approval_type: ProductApprovalType.PRIVATE,
-      },
-    });
-    if (existing) {
-      return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
-    }
+    // 3. TX 내에서 중복 검사 + 승인 생성
+    return this.dataSource.transaction(async (manager) => {
+      const txApprovalRepo = manager.getRepository(ProductApproval);
 
-    // 4. 승인 요청 생성 (Listing 생성 ❌)
-    const approval = approvalRepo.create({
-      product_id: productId,
-      organization_id: sellerOrgId,
-      service_key: serviceKey,
-      approval_type: ProductApprovalType.PRIVATE,
-      approval_status: ProductApprovalStatus.PENDING,
-    });
-    const saved = await approvalRepo.save(approval);
+      const existing = await txApprovalRepo.findOne({
+        where: {
+          product_id: productId,
+          organization_id: sellerOrgId,
+          approval_type: ProductApprovalType.PRIVATE,
+        },
+      });
+      if (existing) {
+        return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
+      }
 
-    return { success: true, data: saved };
+      try {
+        const approval = txApprovalRepo.create({
+          product_id: productId,
+          organization_id: sellerOrgId,
+          service_key: serviceKey,
+          approval_type: ProductApprovalType.PRIVATE,
+          approval_status: ProductApprovalStatus.PENDING,
+        });
+        const saved = await txApprovalRepo.save(approval);
+        return { success: true, data: saved };
+      } catch (err: any) {
+        if (err.code === '23505' || err.driverError?.code === '23505') {
+          return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
+        }
+        throw err;
+      }
+    });
   }
 
   // ========================================================================
@@ -285,18 +305,31 @@ export class ProductApprovalV2Service {
 
       let listing = existingListing;
       if (!existingListing) {
-        listing = txListingRepo.create({
-          organization_id: approval.organization_id,
-          service_key: approval.service_key,
-          external_product_id: product.id, // 하위호환
-          product_name: product.name,
-          product_metadata: {},
-          product_id: product.id, // v2: proper FK
-          retail_price: null,
-          is_active: false,
-          display_order: 0,
-        });
-        listing = await txListingRepo.save(listing);
+        try {
+          listing = txListingRepo.create({
+            organization_id: approval.organization_id,
+            service_key: approval.service_key,
+            product_name: product.name,
+            product_metadata: {},
+            product_id: product.id,
+            retail_price: null,
+            is_active: false,
+            display_order: 0,
+          });
+          listing = await txListingRepo.save(listing);
+        } catch (err: any) {
+          if (err.code === '23505' || err.driverError?.code === '23505') {
+            listing = await txListingRepo.findOne({
+              where: {
+                organization_id: approval.organization_id,
+                product_id: approval.product_id,
+                service_key: approval.service_key,
+              },
+            });
+          } else {
+            throw err;
+          }
+        }
       }
 
       return { success: true, data: { approval, listing: listing! } };
@@ -316,10 +349,8 @@ export class ProductApprovalV2Service {
     data?: OrganizationProductListing;
     error?: string;
   }> {
+    // 1. 제품 조회 + distributionType 검증 (TX 외부 — early validation)
     const productRepo = this.dataSource.getRepository(NetureSupplierProduct);
-    const listingRepo = this.dataSource.getRepository(OrganizationProductListing);
-
-    // 1. 제품 조회 + distributionType 검증
     const product = await productRepo.findOne({ where: { id: productId } });
     if (!product) {
       return { success: false, error: 'PRODUCT_NOT_FOUND' };
@@ -331,7 +362,7 @@ export class ProductApprovalV2Service {
       return { success: false, error: 'PRODUCT_INACTIVE' };
     }
 
-    // 2. Supplier ACTIVE 검증
+    // 2. Supplier ACTIVE 검증 (TX 외부 — early validation)
     const supplierCheck = await this.dataSource.query(
       `SELECT ns.status
        FROM neture_supplier_products nsp
@@ -343,32 +374,49 @@ export class ProductApprovalV2Service {
       return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
     }
 
-    // 3. 중복 Listing 방지
-    const existingListing = await listingRepo.findOne({
-      where: {
-        organization_id: organizationId,
-        product_id: productId,
-        service_key: serviceKey,
-      },
-    });
-    if (existingListing) {
-      return { success: true, data: existingListing };
-    }
+    // 3. TX 내에서 중복 방지 + Listing 생성
+    return this.dataSource.transaction(async (manager) => {
+      const txListingRepo = manager.getRepository(OrganizationProductListing);
 
-    // 4. Listing 즉시 생성 (approval 없음)
-    const listing = listingRepo.create({
-      organization_id: organizationId,
-      service_key: serviceKey,
-      external_product_id: product.id, // 하위호환
-      product_name: product.name,
-      product_metadata: {},
-      product_id: product.id, // v2: proper FK
-      retail_price: null,
-      is_active: false,
-      display_order: 0,
-    });
-    const saved = await listingRepo.save(listing);
+      const existingListing = await txListingRepo.findOne({
+        where: {
+          organization_id: organizationId,
+          product_id: productId,
+          service_key: serviceKey,
+        },
+      });
+      if (existingListing) {
+        return { success: true, data: existingListing };
+      }
 
-    return { success: true, data: saved };
+      try {
+        const listing = txListingRepo.create({
+          organization_id: organizationId,
+          service_key: serviceKey,
+          product_name: product.name,
+          product_metadata: {},
+          product_id: product.id, // v2: proper FK
+          retail_price: null,
+          is_active: false,
+          display_order: 0,
+        });
+        const saved = await txListingRepo.save(listing);
+        return { success: true, data: saved };
+      } catch (err: any) {
+        if (err.code === '23505' || err.driverError?.code === '23505') {
+          const existing = await txListingRepo.findOne({
+            where: {
+              organization_id: organizationId,
+              product_id: productId,
+              service_key: serviceKey,
+            },
+          });
+          if (existing) {
+            return { success: true, data: existing };
+          }
+        }
+        throw err;
+      }
+    });
   }
 }

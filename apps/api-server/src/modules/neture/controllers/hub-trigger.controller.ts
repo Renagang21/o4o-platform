@@ -15,10 +15,14 @@
  */
 
 import { Router } from 'express';
-import type { Request, Response, Router as ExpressRouter } from 'express';
+import type { Request, Response, RequestHandler, Router as ExpressRouter } from 'express';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
+import { AppDataSource } from '../../../database/connection.js';
 import type { ActionLogService } from '@o4o/action-log-core';
+import type { NetureService } from '../neture.service.js';
+import { ContentStatus } from '../entities/NetureSupplierContent.entity.js';
+import { PartnershipStatus } from '../entities/NeturePartnershipRequest.entity.js';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -31,10 +35,10 @@ type AuthenticatedRequest = Request & {
 
 interface TriggerDeps {
   dataSource: DataSource;
-  requireAuth: any;
-  requireNetureScope: (scope: string) => any;
+  requireAuth: RequestHandler;
+  requireNetureScope: (scope: string) => RequestHandler;
   getSupplierIdFromUser: (req: AuthenticatedRequest) => Promise<string | null>;
-  netureService: any;
+  netureService: NetureService;
   actionLogService?: ActionLogService;
 }
 
@@ -45,6 +49,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
   // Helper: extract userId from req
   function getUserId(req: Request): string | undefined {
     return (req as AuthenticatedRequest).user?.id;
+  }
+
+  function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
   }
 
   // ============================================================================
@@ -65,8 +73,21 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
-      const pendingRequests = await netureService.getSupplierRequests(supplierId, { status: 'pending' });
-      const count = pendingRequests?.length ?? 0;
+      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
+      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
+      if (!supplier || supplier.status !== 'ACTIVE') {
+        res.status(403).json({ success: false, message: 'Supplier account is not active' });
+        return;
+      }
+
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const pendingRows = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
+         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'`,
+        [supplierId],
+      );
+      const count = pendingRows[0]?.cnt ?? 0;
 
       const userId = getUserId(req);
       if (userId) {
@@ -86,10 +107,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `대기 중인 요청 ${count}건이 있습니다. 요청 관리 페이지에서 검토하세요.`,
         data: { pendingCount: count },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.review_pending', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.review_pending', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -112,8 +133,15 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
+      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
+      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
+      if (!supplier || supplier.status !== 'ACTIVE') {
+        res.status(403).json({ success: false, message: 'Supplier account is not active' });
+        return;
+      }
+
       const products = await netureService.getSupplierProducts(supplierId);
-      const inactive = (products || []).filter((p: any) => !p.isActive);
+      const inactive = (products || []).filter((p) => !p.isActive);
 
       if (inactive.length === 0) {
         const userId = getUserId(req);
@@ -150,10 +178,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `${activated}개 상품을 활성화했습니다.${inactive.length > 5 ? ` (${inactive.length - 5}개 추가 비활성 상품 존재)` : ''}`,
         data: { activated, remaining: Math.max(0, inactive.length - 5) },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.auto_product', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.auto_product', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -176,7 +204,14 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
-      const contents = await netureService.getSupplierContents(supplierId, { status: 'draft' });
+      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
+      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
+      if (!supplier || supplier.status !== 'ACTIVE') {
+        res.status(403).json({ success: false, message: 'Supplier account is not active' });
+        return;
+      }
+
+      const contents = await netureService.getSupplierContents(supplierId, { status: ContentStatus.DRAFT });
       const drafts = contents || [];
 
       const userId = getUserId(req);
@@ -200,10 +235,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `발행 가능한 초안 ${drafts.length}건이 있습니다. 콘텐츠 관리에서 발행하세요.`,
         data: { draftCount: drafts.length },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.copy_best_content', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.copy_best_content', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -226,6 +261,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         return;
       }
 
+      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
+      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
+      if (!supplier || supplier.status !== 'ACTIVE') {
+        res.status(403).json({ success: false, message: 'Supplier account is not active' });
+        return;
+      }
+
       const summary = await netureService.getSupplierOrdersSummary(supplierId);
       const services = summary?.services || [];
 
@@ -245,10 +287,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           totalApprovedSellers: summary?.totalApprovedSellers || 0,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_settlement', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_settlement', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -268,6 +310,13 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       const supplierId = await getSupplierIdFromUser(authReq);
       if (!supplierId) {
         res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
+      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
+      if (!supplier || supplier.status !== 'ACTIVE') {
+        res.status(403).json({ success: false, message: 'Supplier account is not active' });
         return;
       }
 
@@ -335,10 +384,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           message: 'AI 분석을 완료했습니다 (규칙 기반 결과).',
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_ai', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.refresh_ai', getErrorMessage(error), {
           durationMs: Date.now() - start, source: 'ai',
         }).catch(() => {});
       }
@@ -358,8 +407,12 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
   router.post('/approve-supplier', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     const start = Date.now();
     try {
-      const allRequests = await netureService.getAllSupplierRequests({ status: 'pending' });
-      const count = allRequests?.length ?? 0;
+      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
+      const allPendingRows = await AppDataSource.query(
+        `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
+         WHERE pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'`,
+      );
+      const count = allPendingRows[0]?.cnt ?? 0;
 
       const userId = getUserId(req);
       if (userId) {
@@ -379,10 +432,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `대기 중인 공급자 요청 ${count}건. 관리자 페이지에서 검토하세요.`,
         data: { pendingCount: count },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.approve_supplier', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.approve_supplier', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -398,7 +451,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
   router.post('/manage-partnership', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     const start = Date.now();
     try {
-      const openRequests = await netureService.getPartnershipRequests({ status: 'OPEN' });
+      const openRequests = await netureService.getPartnershipRequests({ status: PartnershipStatus.OPEN });
       const count = openRequests?.length ?? 0;
 
       const userId = getUserId(req);
@@ -419,10 +472,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         message: `열린 제휴 요청 ${count}건. 파트너십 관리에서 확인하세요.`,
         data: { openCount: count },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.manage_partnership', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.manage_partnership', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
@@ -459,10 +512,10 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
           pendingRequests: stats?.pendingRequests || 0,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const userId = getUserId(req);
       if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.audit_review', error.message, {
+        actionLogService?.logFailure('neture', userId, 'neture.trigger.audit_review', getErrorMessage(error), {
           durationMs: Date.now() - start,
         }).catch(() => {});
       }
