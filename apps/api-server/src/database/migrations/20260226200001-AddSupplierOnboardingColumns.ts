@@ -37,6 +37,10 @@ export class AddSupplierOnboardingColumns20260226200001
       END $$;
     `);
 
+    // Commit enum additions so new values are visible in subsequent statements
+    await queryRunner.query('COMMIT');
+    await queryRunner.query('BEGIN');
+
     // Step 3: Add approval metadata columns
     await queryRunner.query(`
       ALTER TABLE neture_suppliers
