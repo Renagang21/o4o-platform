@@ -3,13 +3,14 @@
  *
  * WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1
  * WO-PRODUCT-POLICY-V2-APPLICATION-DEPRECATION-V1: v2 product_approvals 전환
+ * WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1: approve/reject 복원 (v2 service 호출)
  *
- * Operator 전용 — 상품 승인 조회 (v2: product_approvals)
+ * Operator 전용 — 상품 승인 조회 + 승인/거절 (v2: product_approvals)
  *
  * GET   /                — 전체 승인 목록 (필터: status)
  * GET   /stats           — 상태별 통계
- * PATCH /:id/approve     — 410 DEPRECATED (v2 API 사용)
- * PATCH /:id/reject      — 410 DEPRECATED (v2 API 사용)
+ * PATCH /:id/approve     — SERVICE 승인 처리 (v2 service)
+ * PATCH /:id/reject      — SERVICE 거절 처리 (v2 service)
  *
  * 권한: kpa:admin 또는 kpa:operator
  */
@@ -17,6 +18,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
+import { ProductApprovalV2Service } from '../../../modules/product-policy-v2/product-approval-v2.service.js';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -27,6 +30,7 @@ export function createOperatorProductApplicationsController(
   requireScope: ScopeMiddleware,
 ): Router {
   const router = Router();
+  const approvalV2Service = new ProductApprovalV2Service(dataSource);
 
   // All routes require kpa:operator scope
   router.use(requireAuth, requireScope('kpa:operator'));
@@ -114,26 +118,41 @@ export function createOperatorProductApplicationsController(
     res.json({ success: true, data: stats });
   }));
 
-  // ─── PATCH /:id/approve — 410 DEPRECATED ─────────────────────────────
-  router.patch('/:id/approve', asyncHandler(async (_req: Request, res: Response) => {
-    res.status(410).json({
-      success: false,
-      error: {
-        code: 'ENDPOINT_DEPRECATED',
-        message: 'Use v2 approval API: POST /api/v1/product-policy-v2/service-approval/:id/approve',
-      },
-    });
+  // ─── PATCH /:id/approve — SERVICE 승인 처리 (v2 service) ──────────────
+  router.patch('/:id/approve', asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const approvedBy = (req as any).user?.id || 'unknown';
+
+    const result = await approvalV2Service.approveServiceProduct(id, approvedBy);
+    if (!result.success) {
+      const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
+      return res.status(status).json({
+        success: false,
+        error: { code: result.error, message: result.error },
+      });
+    }
+
+    logger.info(`[OperatorProductApplications] SERVICE approval approved: ${id} by ${approvedBy}`);
+    res.json({ success: true, data: result.data });
   }));
 
-  // ─── PATCH /:id/reject — 410 DEPRECATED ──────────────────────────────
-  router.patch('/:id/reject', asyncHandler(async (_req: Request, res: Response) => {
-    res.status(410).json({
-      success: false,
-      error: {
-        code: 'ENDPOINT_DEPRECATED',
-        message: 'Use v2 approval API for rejection',
-      },
-    });
+  // ─── PATCH /:id/reject — SERVICE 거절 처리 (v2 service) ───────────────
+  router.patch('/:id/reject', asyncHandler(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const rejectedBy = (req as any).user?.id || 'unknown';
+    const { reason } = req.body || {};
+
+    const result = await approvalV2Service.rejectServiceApproval(id, rejectedBy, reason);
+    if (!result.success) {
+      const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
+      return res.status(status).json({
+        success: false,
+        error: { code: result.error, message: result.error },
+      });
+    }
+
+    logger.info(`[OperatorProductApplications] SERVICE approval rejected: ${id} by ${rejectedBy}`);
+    res.json({ success: true, data: result.data });
   }));
 
   return router;

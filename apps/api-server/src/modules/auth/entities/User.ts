@@ -172,14 +172,9 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'service_key' })
   serviceKey?: string;
 
-  // P1-T3: Pharmacist function and role (for KPA society workflow)
-  // pharmacistFunction: pharmacy/hospital/industry/other
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'pharmacist_function' })
-  pharmacistFunction?: string;
-
-  // pharmacistRole: general/pharmacy_owner/hospital/other
-  @Column({ type: 'varchar', length: 50, nullable: true, name: 'pharmacist_role' })
-  pharmacistRole?: string;
+  // WO-ROLE-NORMALIZATION-PHASE3-B-V1: pharmacistFunction, pharmacistRole 제거됨
+  // Qualification 데이터는 kpa_pharmacist_profiles 테이블로 이전
+  // API 응답에서는 derivePharmacistQualification()으로 compute
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -512,9 +507,10 @@ export class User {
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes placeholder
       // 실제 scopes는 서비스 레이어에서 deriveUserScopes로 계산하여 덮어씀
       scopes: [] as string[],
-      // P1-T3: Pharmacist function and role
-      pharmacistFunction: this.pharmacistFunction,
-      pharmacistRole: this.pharmacistRole,
+      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: DB에서 제거됨, 컨트롤러에서 derive
+      pharmacistFunction: null as string | null,
+      pharmacistRole: null as string | null,
+      isStoreOwner: false,
       isActive: this.isActive,
       isEmailVerified: this.isEmailVerified,
       lastLoginAt: this.lastLoginAt,

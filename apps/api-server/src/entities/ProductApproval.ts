@@ -26,6 +26,7 @@ export enum ProductApprovalStatus {
   PENDING = 'pending',
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  REVOKED = 'revoked',
 }
 
 @Entity('product_approvals')

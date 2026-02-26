@@ -315,7 +315,33 @@ export class NetureService {
       supplier.status = SupplierStatus.INACTIVE;
       await this.supplierRepo.save(supplier);
 
-      logger.info(`[NetureService] Supplier deactivated: ${supplierId} by ${adminUserId}`);
+      // WO-NETURE-TIER2-SERVICE-STATE-POLICY-REALIGN-V1: 캐스케이드
+      // Supplier 비활성화 → APPROVED approval → REVOKED + listing 비활성화
+      const revokeResult = await AppDataSource.query(
+        `UPDATE product_approvals
+         SET approval_status = 'revoked',
+             decided_by = $2::uuid,
+             decided_at = NOW(),
+             reason = 'Supplier deactivated',
+             updated_at = NOW()
+         WHERE product_id IN (
+           SELECT id FROM neture_supplier_products WHERE supplier_id = $1
+         )
+         AND approval_status = 'approved'`,
+        [supplierId, adminUserId],
+      );
+      const revokedCount = revokeResult?.[1] ?? 0;
+
+      await AppDataSource.query(
+        `UPDATE organization_product_listings
+         SET is_active = false, updated_at = NOW()
+         WHERE product_id IN (
+           SELECT id FROM neture_supplier_products WHERE supplier_id = $1
+         )`,
+        [supplierId],
+      );
+
+      logger.info(`[NetureService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${revokedCount} approvals, deactivated listings)`);
 
       return {
         success: true,
@@ -466,7 +492,27 @@ export class NetureService {
       product.approvalNote = reason || null;
       await this.productRepo.save(product);
 
-      logger.info(`[NetureService] Product rejected: ${productId} by ${adminUserId}`);
+      // WO-NETURE-TIER2-SERVICE-STATE-POLICY-REALIGN-V1: 캐스케이드
+      // Product 반려 → APPROVED approval → REVOKED + listing 비활성화
+      await AppDataSource.query(
+        `UPDATE product_approvals
+         SET approval_status = 'revoked',
+             decided_by = $2::uuid,
+             decided_at = NOW(),
+             reason = 'Product rejected by admin',
+             updated_at = NOW()
+         WHERE product_id = $1 AND approval_status = 'approved'`,
+        [productId, adminUserId],
+      );
+
+      await AppDataSource.query(
+        `UPDATE organization_product_listings
+         SET is_active = false, updated_at = NOW()
+         WHERE product_id = $1`,
+        [productId],
+      );
+
+      logger.info(`[NetureService] Product rejected with cascade: ${productId} by ${adminUserId}`);
 
       return {
         success: true,

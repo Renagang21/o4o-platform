@@ -64,7 +64,7 @@ export class ProductApprovalV2Service {
       return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
     }
 
-    // 3. 중복 검사
+    // 3. 중복 검사 + 재신청 처리
     const existing = await approvalRepo.findOne({
       where: {
         product_id: productId,
@@ -73,10 +73,23 @@ export class ProductApprovalV2Service {
       },
     });
     if (existing) {
-      return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
+      if (existing.approval_status === ProductApprovalStatus.PENDING) {
+        return { success: false, error: 'APPROVAL_ALREADY_PENDING' };
+      }
+      if (existing.approval_status === ProductApprovalStatus.APPROVED) {
+        return { success: false, error: 'APPROVAL_ALREADY_APPROVED' };
+      }
+      // REJECTED / REVOKED → 재신청 (기존 row 재사용, UNIQUE 충돌 방지)
+      existing.approval_status = ProductApprovalStatus.PENDING;
+      existing.requested_by = requestedBy;
+      existing.decided_by = null;
+      existing.decided_at = null;
+      existing.reason = null;
+      const saved = await approvalRepo.save(existing);
+      return { success: true, data: saved };
     }
 
-    // 4. 승인 요청 생성 (Listing 생성 ❌)
+    // 4. 신규 승인 요청 생성 (Listing 생성 ❌)
     const approval = approvalRepo.create({
       product_id: productId,
       organization_id: organizationId,
@@ -337,7 +350,87 @@ export class ProductApprovalV2Service {
   }
 
   // ========================================================================
-  // 5. createPublicListing — PUBLIC 분배 제품 즉시 Listing 생성 (승인 불필요)
+  // 5. rejectServiceApproval — SERVICE 승인 거절
+  // ========================================================================
+
+  async rejectServiceApproval(
+    approvalId: string,
+    rejectedBy: string,
+    reason?: string,
+  ): Promise<{ success: boolean; data?: ProductApproval; error?: string }> {
+    const approvalRepo = this.dataSource.getRepository(ProductApproval);
+
+    // 1. Approval 조회 (PENDING + SERVICE)
+    const approval = await approvalRepo.findOne({
+      where: {
+        id: approvalId,
+        approval_status: ProductApprovalStatus.PENDING,
+        approval_type: ProductApprovalType.SERVICE,
+      },
+    });
+    if (!approval) {
+      return { success: false, error: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' };
+    }
+
+    // 2. 상태 전이: PENDING → REJECTED (Listing 생성 ❌)
+    approval.approval_status = ProductApprovalStatus.REJECTED;
+    approval.decided_by = rejectedBy;
+    approval.decided_at = new Date();
+    if (reason) {
+      approval.reason = reason;
+    }
+    const saved = await approvalRepo.save(approval);
+
+    return { success: true, data: saved };
+  }
+
+  // ========================================================================
+  // 6. revokeServiceApproval — SERVICE 승인 철회 (APPROVED → REVOKED)
+  // ========================================================================
+
+  async revokeServiceApproval(
+    approvalId: string,
+    revokedBy: string,
+    reason?: string,
+  ): Promise<{ success: boolean; data?: ProductApproval; error?: string }> {
+    return this.dataSource.transaction(async (manager) => {
+      const txApprovalRepo = manager.getRepository(ProductApproval);
+
+      // 1. APPROVED + SERVICE만 revoke 가능
+      const approval = await txApprovalRepo.findOne({
+        where: {
+          id: approvalId,
+          approval_status: ProductApprovalStatus.APPROVED,
+          approval_type: ProductApprovalType.SERVICE,
+        },
+      });
+      if (!approval) {
+        return { success: false, error: 'APPROVAL_NOT_FOUND_OR_NOT_APPROVED' };
+      }
+
+      // 2. 상태 전이: APPROVED → REVOKED
+      approval.approval_status = ProductApprovalStatus.REVOKED;
+      approval.decided_by = revokedBy;
+      approval.decided_at = new Date();
+      if (reason) {
+        approval.reason = reason;
+      }
+      await txApprovalRepo.save(approval);
+
+      // 3. 해당 listing is_active=false 강제
+      await manager.query(
+        `UPDATE organization_product_listings
+         SET is_active = false, updated_at = NOW()
+         WHERE organization_id = $1 AND product_id = $2 AND service_key = $3`,
+        [approval.organization_id, approval.product_id, approval.service_key],
+      );
+
+      return { success: true, data: approval };
+    });
+  }
+
+  // ========================================================================
+  // 7. createPublicListing — PUBLIC 분배 제품 즉시 Listing 생성 (승인 불필요)
   // ========================================================================
 
   async createPublicListing(

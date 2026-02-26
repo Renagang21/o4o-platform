@@ -36,6 +36,58 @@ function classifyAuthError(error: Error): string {
 }
 
 /**
+ * WO-ROLE-NORMALIZATION-PHASE3-B-V1
+ * organization_members + kpa_pharmacist_profiles에서 약사 자격 derive.
+ * users.pharmacist_role / pharmacist_function 컬럼 제거 후 대체 로직.
+ */
+async function derivePharmacistQualification(userId: string): Promise<{
+  pharmacistRole: string | null;
+  pharmacistFunction: string | null;
+  isStoreOwner: boolean;
+}> {
+  // 1. Check organization_members for owner status
+  const [ownerRecord] = await AppDataSource.query(
+    `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+    [userId]
+  );
+  const isStoreOwner = !!ownerRecord;
+
+  // 2. Query kpa_pharmacist_profiles for activity_type
+  const [profile] = await AppDataSource.query(
+    `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
+    [userId]
+  );
+
+  // 3. Derive pharmacistRole (backward compatible mapping)
+  let pharmacistRole: string | null = null;
+  if (isStoreOwner) {
+    pharmacistRole = 'pharmacy_owner';
+  } else if (profile?.activity_type) {
+    const roleMap: Record<string, string> = {
+      pharmacy_owner: 'pharmacy_owner', pharmacy_employee: 'general',
+      hospital: 'hospital', manufacturer: 'general', importer: 'general',
+      wholesaler: 'general', other_industry: 'general', government: 'general',
+      school: 'general', other: 'other', inactive: 'general',
+    };
+    pharmacistRole = roleMap[profile.activity_type] || 'general';
+  }
+
+  // 4. Derive pharmacistFunction from activity_type
+  let pharmacistFunction: string | null = null;
+  if (profile?.activity_type) {
+    const funcMap: Record<string, string> = {
+      pharmacy_owner: 'pharmacy', pharmacy_employee: 'pharmacy',
+      hospital: 'hospital', manufacturer: 'industry', importer: 'industry',
+      wholesaler: 'industry', other_industry: 'industry', government: 'other',
+      school: 'other', other: 'other', inactive: 'other',
+    };
+    pharmacistFunction = funcMap[profile.activity_type] || null;
+  }
+
+  return { pharmacistRole, pharmacistFunction, isStoreOwner };
+}
+
+/**
  * Auth Controller - NextGen Pattern
  *
  * Handles authentication operations:
@@ -219,12 +271,8 @@ export class AuthController extends BaseController {
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
         }
-        if (data.pharmacistFunction) {
-          newUser.pharmacistFunction = data.pharmacistFunction;
-        }
-        if (data.pharmacistRole) {
-          newUser.pharmacistRole = data.pharmacistRole;
-        }
+        // WO-ROLE-NORMALIZATION-PHASE3-B-V1: pharmacistFunction/pharmacistRole removed from users
+        // Qualification data now stored in kpa_pharmacist_profiles (created below)
 
         // businessInfo: 사업자 정보 + 면허번호 저장
         const businessInfo: Record<string, string> = {};
@@ -266,6 +314,23 @@ export class AuthController extends BaseController {
               VALUES ($1, 'kpa-a', 'pending')
             `, [memberResult[0].id]);
           }
+        }
+
+        // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
+        if (data.service === 'kpa-society' && (data.pharmacistFunction || data.licenseNumber)) {
+          const functionToActivity: Record<string, string> = {
+            pharmacy: 'pharmacy_employee', hospital: 'hospital',
+            industry: 'other_industry', other: 'other',
+          };
+          await manager.query(
+            `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
+             VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`,
+            [
+              newUser.id,
+              data.licenseNumber || null,
+              data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
+            ]
+          );
         }
 
         return newUser;
@@ -476,17 +541,12 @@ export class AuthController extends BaseController {
       userData.roles = roles;
       userData.scopes = scopes;
 
-      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: derive pharmacy_owner from organization_members
+      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: derive from kpa_pharmacist_profiles + organization_members
+      const qualification = await derivePharmacistQualification(req.user.id);
       const ud = userData as Record<string, unknown>;
-      if (ud.pharmacistRole !== 'pharmacy_owner') {
-        const [ownerRecord] = await AppDataSource.query(
-          `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
-          [req.user.id]
-        );
-        if (ownerRecord) {
-          ud.pharmacistRole = 'pharmacy_owner';
-        }
-      }
+      ud.pharmacistRole = qualification.pharmacistRole;
+      ud.pharmacistFunction = qualification.pharmacistFunction;
+      ud.isStoreOwner = qualification.isStoreOwner;
 
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {
@@ -531,10 +591,10 @@ export class AuthController extends BaseController {
 
   /**
    * PATCH /api/v1/auth/me/profile
-   * Update pharmacist profile (pharmacistFunction, pharmacistRole)
+   * Update pharmacist profile (pharmacistFunction)
    *
-   * WO-KPA-PHARMACY-GATE-SIMPLIFICATION-V1:
-   * FunctionGateModal 선택값을 DB에 영속화
+   * WO-ROLE-NORMALIZATION-PHASE3-B-V1:
+   * kpa_pharmacist_profiles에 UPSERT (users 테이블 대신)
    */
   static async updateProfile(req: AuthRequest, res: Response): Promise<any> {
     const userId = req.user?.id;
@@ -542,43 +602,35 @@ export class AuthController extends BaseController {
       return BaseController.unauthorized(res, 'Not authenticated');
     }
 
-    const { pharmacistFunction, pharmacistRole } = req.body;
-
+    const { pharmacistFunction } = req.body;
     const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
-    // WO-ROLE-NORMALIZATION-PHASE3-A-V1: pharmacy_owner는 승인 기반만 허용 (셀프 설정 차단)
-    const validRoles = ['general', 'hospital', 'other'];
-
     if (pharmacistFunction && !validFunctions.includes(pharmacistFunction)) {
       return BaseController.error(res, 'Invalid pharmacistFunction', 400);
     }
-    if (pharmacistRole && !validRoles.includes(pharmacistRole)) {
-      return BaseController.error(res, 'Invalid pharmacistRole', 400);
-    }
-
-    const updates: string[] = [];
-    const params: any[] = [];
-    let idx = 1;
-    if (pharmacistFunction) {
-      updates.push(`pharmacist_function = $${idx++}`);
-      params.push(pharmacistFunction);
-    }
-    if (pharmacistRole) {
-      updates.push(`pharmacist_role = $${idx++}`);
-      params.push(pharmacistRole);
-    }
-
-    if (updates.length === 0) {
+    if (!pharmacistFunction) {
       return BaseController.error(res, 'No fields to update', 400);
     }
 
+    const functionToActivity: Record<string, string> = {
+      pharmacy: 'pharmacy_employee', hospital: 'hospital',
+      industry: 'other_industry', other: 'other',
+    };
+    const activityType = functionToActivity[pharmacistFunction] || 'other';
+
     try {
-      params.push(userId);
       await AppDataSource.query(
-        `UPDATE users SET ${updates.join(', ')} WHERE id = $${idx}`,
-        params
+        `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+        [userId, activityType]
       );
 
-      return BaseController.ok(res, { pharmacistFunction, pharmacistRole });
+      const qualification = await derivePharmacistQualification(userId);
+      return BaseController.ok(res, {
+        pharmacistFunction: qualification.pharmacistFunction,
+        pharmacistRole: qualification.pharmacistRole,
+        isStoreOwner: qualification.isStoreOwner,
+      });
     } catch (error: any) {
       logger.error('[AuthController.updateProfile] Update failed', {
         error: error.message,
@@ -608,17 +660,12 @@ export class AuthController extends BaseController {
       });
       userData.scopes = scopes;
 
-      // WO-ROLE-NORMALIZATION-PHASE3-A-V1: derive pharmacy_owner from organization_members
+      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: derive from kpa_pharmacist_profiles + organization_members
+      const qualification = await derivePharmacistQualification(req.user.id);
       const ud = userData as Record<string, unknown>;
-      if (ud.pharmacistRole !== 'pharmacy_owner') {
-        const [ownerRecord] = await AppDataSource.query(
-          `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
-          [req.user.id]
-        );
-        if (ownerRecord) {
-          ud.pharmacistRole = 'pharmacy_owner';
-        }
-      }
+      ud.pharmacistRole = qualification.pharmacistRole;
+      ud.pharmacistFunction = qualification.pharmacistFunction;
+      ud.isStoreOwner = qualification.isStoreOwner;
     }
 
     return BaseController.ok(res, {

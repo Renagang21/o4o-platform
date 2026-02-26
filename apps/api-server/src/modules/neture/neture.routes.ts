@@ -14,10 +14,13 @@ import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.j
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { ActionLogService } from '@o4o/action-log-core';
+import { ProductApprovalV2Service } from '../product-policy-v2/product-approval-v2.service.js';
+import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
 const netureActionLogService = new ActionLogService(AppDataSource);
+const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
 
 // Extended Request type with user info
 type AuthenticatedRequest = Request & {
@@ -1941,7 +1944,7 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
        JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
        WHERE pa.organization_id = $1
-         AND pa.approval_type = 'PRIVATE'
+         AND pa.approval_type IN ('PRIVATE', 'service')
          AND pa.approval_status = 'approved'
        ORDER BY pa.decided_at DESC`,
       [sellerId],
@@ -2044,6 +2047,126 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
   }
 });
 
+// ==================== Seller SERVICE Application (WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1) ====================
+
+/**
+ * POST /api/v1/neture/seller/service-products/:productId/apply
+ * 판매자가 SERVICE 상품 취급 신청
+ */
+router.post('/seller/service-products/:productId/apply', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const { productId } = req.params;
+    const userRoles: string[] = (req.user as any)?.roles || [];
+
+    // user → organization 매핑
+    const organizationId = await resolveStoreAccess(AppDataSource, sellerId, userRoles);
+    if (!organizationId) {
+      return res.status(403).json({
+        success: false,
+        error: 'NO_ORGANIZATION',
+        message: 'Store owner or KPA operator role required',
+      });
+    }
+
+    // serviceKey: organization_service_enrollments에서 조회, 없으면 'kpa' 기본값
+    const enrollment = await AppDataSource.query(
+      `SELECT service_code FROM organization_service_enrollments
+       WHERE organization_id = $1 AND status = 'active' LIMIT 1`,
+      [organizationId],
+    );
+    const serviceKey = enrollment[0]?.service_code || 'kpa';
+
+    const result = await approvalV2Service.createServiceApproval(
+      productId, organizationId, serviceKey, sellerId,
+    );
+
+    if (!result.success) {
+      const status = result.error === 'PRODUCT_NOT_FOUND' ? 404
+        : result.error === 'APPROVAL_ALREADY_EXISTS' ? 409
+        : 400;
+      return res.status(status).json({
+        success: false,
+        error: result.error,
+        message: result.error,
+      });
+    }
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error creating SERVICE application:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to create SERVICE application',
+    });
+  }
+});
+
+/**
+ * GET /api/v1/neture/seller/service-applications
+ * 판매자의 SERVICE 승인 신청 목록 조회
+ */
+router.get('/seller/service-applications', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const sellerId = req.user?.id;
+    if (!sellerId) {
+      return res.status(401).json({
+        success: false,
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const userRoles: string[] = (req.user as any)?.roles || [];
+    const organizationId = await resolveStoreAccess(AppDataSource, sellerId, userRoles);
+    if (!organizationId) {
+      return res.status(403).json({
+        success: false,
+        error: 'NO_ORGANIZATION',
+        message: 'Store owner or KPA operator role required',
+      });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT pa.id, pa.approval_status AS status,
+              pa.product_id AS "productId",
+              nsp.name AS "productName",
+              nsp.category AS "productCategory",
+              ns.name AS "supplierName",
+              nsp.supplier_id AS "supplierId",
+              pa.reason AS "rejectReason",
+              pa.requested_by AS "requestedBy",
+              pa.decided_by AS "decidedBy",
+              pa.decided_at AS "decidedAt",
+              pa.created_at AS "requestedAt"
+       FROM product_approvals pa
+       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       WHERE pa.organization_id = $1 AND pa.approval_type = 'service'
+       ORDER BY pa.created_at DESC`,
+      [organizationId],
+    );
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching seller service applications:', error);
+    res.status(500).json({
+      success: false,
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch service applications',
+    });
+  }
+});
+
 // ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1 T2) ====================
 
 /**
@@ -2115,6 +2238,98 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
     success: false,
     error: { code: 'ENDPOINT_DEPRECATED', message: 'Use v2 approval API for rejection.' },
   });
+});
+
+// ==================== Admin SERVICE Approval Management (WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1) ====================
+
+/**
+ * POST /api/v1/neture/admin/service-approvals/:id/approve
+ * SERVICE 승인 처리 + Listing 자동 생성
+ */
+router.post('/admin/service-approvals/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const result = await approvalV2Service.approveServiceProduct(id, adminUserId);
+    if (!result.success) {
+      const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.service_approval_approve', {
+      meta: { approvalId: id },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error approving SERVICE approval:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to approve SERVICE approval' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/service-approvals/:id/reject
+ * SERVICE 승인 거절 (Listing 생성 없음)
+ */
+router.post('/admin/service-approvals/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const { reason } = req.body || {};
+    const result = await approvalV2Service.rejectServiceApproval(id, adminUserId, reason);
+    if (!result.success) {
+      const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.service_approval_reject', {
+      meta: { approvalId: id, reason },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error rejecting SERVICE approval:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reject SERVICE approval' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/service-approvals/:id/revoke
+ * WO-NETURE-TIER2-SERVICE-STATE-POLICY-REALIGN-V1
+ * SERVICE 승인 철회 (APPROVED → REVOKED + listing 비활성화)
+ */
+router.post('/admin/service-approvals/:id/revoke', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const adminUserId = req.user?.id;
+    if (!adminUserId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const { reason } = req.body || {};
+    const result = await approvalV2Service.revokeServiceApproval(id, adminUserId, reason);
+    if (!result.success) {
+      const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_APPROVED' ? 404 : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.service_approval_revoke', {
+      meta: { approvalId: id, reason },
+    }).catch(() => {});
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error revoking SERVICE approval:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to revoke SERVICE approval' } });
+  }
 });
 
 // ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================

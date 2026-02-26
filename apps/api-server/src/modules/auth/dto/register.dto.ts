@@ -66,10 +66,12 @@ export class RegisterRequestDto {
   @IsString()
   organizationId?: string;
 
+  /** @deprecated WO-ROLE-NORMALIZATION-PHASE3-B-V1: now stored in kpa_pharmacist_profiles */
   @IsOptional()
   @IsString()
   pharmacistFunction?: string;
 
+  /** @deprecated WO-ROLE-NORMALIZATION-PHASE3-B-V1: derived from organization_members + kpa_pharmacist_profiles */
   @IsOptional()
   @IsString()
   pharmacistRole?: string;

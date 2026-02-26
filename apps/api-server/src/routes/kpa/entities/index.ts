@@ -29,3 +29,5 @@ export * from './kpa-pharmacy-request.entity.js';
 // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase B-1a
 export { OrganizationStore } from './organization-store.entity.js';
 export { OrganizationServiceEnrollment } from './organization-service-enrollment.entity.js';
+// WO-ROLE-NORMALIZATION-PHASE3-B-V1
+export { KpaPharmacistProfile } from './kpa-pharmacist-profile.entity.js';
