@@ -28,7 +28,7 @@ const DEFAULT_ROLES = [
   { role: 'seller', label: '판매자', defaultPath: '/seller/dashboard' },
   { role: 'vendor', label: '벤더', defaultPath: '/vendor/console' },
   { role: 'partner', label: '파트너', defaultPath: '/partner/portal' },
-  { role: 'operator', label: '운영자', defaultPath: '/admin' },
+  { role: 'operator', label: '서비스운영자', defaultPath: '/admin' },
   { role: 'admin', label: '관리자', defaultPath: '/admin' },
 ];
 
