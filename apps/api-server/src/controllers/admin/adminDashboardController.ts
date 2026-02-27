@@ -32,13 +32,6 @@ export class AdminDashboardController {
    */
   async getSalesSummary(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const { period = '30d' } = req.query;
 
@@ -114,13 +107,6 @@ export class AdminDashboardController {
    */
   async getOrderStatus(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Query Neture order status distribution
       const netureRepo = AppDataSource.getRepository(NetureOrder);
@@ -191,13 +177,6 @@ export class AdminDashboardController {
    */
   async getUserGrowth(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const { period = '30d' } = req.query;
 
@@ -276,13 +255,6 @@ export class AdminDashboardController {
    */
   async getSystemHealth(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Check database health
       const dbHealth = await checkDatabaseHealth();
@@ -346,13 +318,6 @@ export class AdminDashboardController {
    */
   async getPartners(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const { page = 1, limit = 20 } = req.query;
       const skip = (Number(page) - 1) * Number(limit);
@@ -392,13 +357,6 @@ export class AdminDashboardController {
    */
   async getPartnerSummary(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const { id } = req.params;
 
@@ -454,13 +412,6 @@ export class AdminDashboardController {
    */
   async getCosmeticsPartnerMetrics(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Get cosmetics product and brand counts
       const productRepo = AppDataSource.getRepository(CosmeticsProduct);

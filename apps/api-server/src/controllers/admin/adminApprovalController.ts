@@ -12,13 +12,6 @@ export class AdminApprovalController {
       const { status = 'all', page = 1, limit = 20 } = req.query;
       const userId = req.user?.id;
 
-      // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Get approval requests from database
       const approvalLogRepo = getRepository(ApprovalLog);
@@ -53,7 +46,7 @@ export class AdminApprovalController {
         entityName: log.metadata?.entityName || log.user?.fullName || 'Unknown',
         requesterId: log.user_id,
         requesterName: log.user?.fullName || log.user?.email || 'Unknown',
-        requesterRole: log.user?.role || 'customer',
+        requesterRole: log.user?.roles?.[0] || 'customer',
         status: log.action === 'pending' ? 'pending' : log.action,
         changes: log.metadata?.changes || {},
         currentValues: log.metadata?.currentValues || {},
@@ -99,13 +92,6 @@ export class AdminApprovalController {
       const adminId = req.user?.id;
       const adminName = req.user?.name || req.user?.email || 'Admin';
 
-      // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Update the actual approval request in database
       const approvalLogRepository = getRepository(ApprovalLog);
@@ -158,13 +144,6 @@ export class AdminApprovalController {
       const adminId = req.user?.id;
       const adminName = req.user?.name || req.user?.email || 'Admin';
 
-      // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       if (!reason || reason.trim().length === 0) {
         return res.status(400).json({
@@ -218,13 +197,6 @@ export class AdminApprovalController {
   // Get approval statistics
   static async getApprovalStats(req: AuthRequest, res: Response) {
     try {
-      // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Mock statistics
       const stats = {
@@ -286,13 +258,6 @@ export class AdminApprovalController {
     try {
       const { id } = req.params;
 
-      // Check admin permission
-      if (req.user?.role !== 'admin' && req.user?.role !== 'administrator') {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Get request details from database
       const approvalLogRepo = getRepository(ApprovalLog);
@@ -316,7 +281,7 @@ export class AdminApprovalController {
         entityName: approvalLog.metadata?.entityName || approvalLog.user?.fullName || 'Unknown',
         requesterId: approvalLog.user_id,
         requesterName: approvalLog.user?.fullName || 'Unknown',
-        requesterRole: approvalLog.user?.role || 'customer',
+        requesterRole: approvalLog.user?.roles?.[0] || 'customer',
         requesterEmail: approvalLog.user?.email || 'unknown@example.com',
         status: approvalLog.action === 'pending' ? 'pending' : approvalLog.action,
         priority: approvalLog.metadata?.priority || 'medium',

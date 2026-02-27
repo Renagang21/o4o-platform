@@ -262,13 +262,6 @@ export class ApprovalController {
     try {
       const { status = 'pending' } = req.query;
 
-      // Check if user is admin
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const requests = await approvalWorkflowService.getApprovalQueue(status as string);
 

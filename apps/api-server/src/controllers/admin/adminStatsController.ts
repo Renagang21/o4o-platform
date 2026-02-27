@@ -9,13 +9,6 @@ export class AdminStatsController {
    */
   async getPlatformStats(req: Request, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       // Generate mock data for now - replace with actual database queries
       const stats = {
@@ -98,13 +91,6 @@ export class AdminStatsController {
    */
   async getRevenueSummary(req: Request, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const { period = '30d' } = req.query;
 
@@ -145,13 +131,6 @@ export class AdminStatsController {
    */
   async getPendingSettlements(req: Request, res: Response) {
     try {
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       const settlements = [
         {
@@ -213,13 +192,6 @@ export class AdminStatsController {
       const { id } = req.params;
       const { action } = req.body; // 'approve' or 'defer'
 
-      // Check admin permission
-      if (!req.user?.roles?.includes('admin') && !req.user?.roles?.includes('administrator')) {
-        return res.status(403).json({
-          success: false,
-          message: 'Admin access required'
-        });
-      }
 
       if (!['approve', 'defer'].includes(action)) {
         return res.status(400).json({
