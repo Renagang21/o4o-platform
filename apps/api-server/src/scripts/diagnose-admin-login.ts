@@ -14,6 +14,7 @@ import { User, UserStatus } from '../entities/User.js';
 import { UserRole } from '../types/auth.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 interface DiagnosisResult {
   step: string;
@@ -62,13 +63,15 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
             email: targetEmail,
             password: hashedPassword,
             name: 'System Administrator',
-            roles: [UserRole.SUPER_ADMIN],
             status: UserStatus.ACTIVE,
             isEmailVerified: true,
             isActive: true,
             permissions: []
           });
           await userRepo.save(newUser);
+          await roleAssignmentService.assignRole({
+            userId: newUser.id, role: UserRole.SUPER_ADMIN
+          });
           logger.info('✅ Admin user created with password: Admin123!');
         }
       });
@@ -247,9 +250,11 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
         status: 'WARN',
         message: 'User does not have admin role (may limit access after login)',
         fix: async () => {
-          user.roles = [UserRole.SUPER_ADMIN];
-          await userRepo.save(user);
-          logger.info('✅ Role set to SUPER_ADMIN');
+          await roleAssignmentService.removeAllRoles(user.id);
+          await roleAssignmentService.assignRole({
+            userId: user.id, role: UserRole.SUPER_ADMIN
+          });
+          logger.info('✅ Role set to SUPER_ADMIN via role_assignments');
         }
       });
     } else {

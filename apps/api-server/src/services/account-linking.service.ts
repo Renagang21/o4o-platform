@@ -3,6 +3,7 @@ import { User } from '../modules/auth/entities/User.js';
 import { LinkedAccount } from '../entities/LinkedAccount.js';
 import { LinkingSession } from '../modules/auth/entities/LinkingSession.js';
 import { AccountActivity } from '../entities/AccountActivity.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import { 
   AuthProvider, 
   LinkAccountRequest, 
@@ -565,14 +566,14 @@ export class AccountLinkingService {
           targetUser.permissions = Array.from(allPermissions);
         }
         
-        // Merge roles (keep higher role)
+        // Merge roles via role_assignments (SSOT)
         if (mergeFields.roles) {
-          // Merge roles array (role column removed)
-          const allRoles = new Set([
-            ...(targetUser.roles || []),
-            ...(sourceUser.roles || [])
-          ]);
-          targetUser.roles = Array.from(allRoles);
+          const sourceRoles = await roleAssignmentService.getRoleNames(sourceUser.id);
+          for (const role of sourceRoles) {
+            await roleAssignmentService.assignRole({
+              userId: targetUser.id, role, assignedBy: 'system:account-link'
+            });
+          }
         }
       }
 

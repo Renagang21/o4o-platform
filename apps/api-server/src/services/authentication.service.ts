@@ -371,7 +371,6 @@ export class AuthenticationService {
       lastName: profile.lastName,
       avatar: profile.avatar,
       password: await hashPassword(generateRandomToken()), // Random password for OAuth users
-      roles: [UserRole.USER],
       status: UserStatus.ACTIVE,
       isEmailVerified: profile.emailVerified || false,
       provider: provider,
@@ -380,6 +379,11 @@ export class AuthenticationService {
     });
 
     await this.userRepository.save(newUser);
+
+    // Write to role_assignments (SSOT)
+    await roleAssignmentService.assignRole({
+      userId: newUser.id, role: UserRole.USER
+    });
 
     // Create linked account
     const linkedAccount = this.linkedAccountRepository.create({
@@ -1164,12 +1168,12 @@ export class AuthenticationService {
           email: testEmail,
           name: `Test ${this.getRoleLabel(role)}`,
           password: await hashPassword(testPassword),
-          roles: [role],
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
           permissions: []
         });
         await this.userRepository.save(user);
+        await roleAssignmentService.assignRole({ userId: user.id, role });
         logger.info(`Created test account: ${testEmail} (${role})`);
       } else {
         // Update password and status if needed

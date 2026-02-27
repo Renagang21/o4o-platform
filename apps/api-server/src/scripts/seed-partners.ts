@@ -256,11 +256,12 @@ async function seedPartners() {
         createdCount++;
         console.log(`Created partner: ${user.email} (${tier}, ${status}) -> Seller: ${seller.name}`);
 
-        // 사용자 role 업데이트
-        await pool.query(
-          `UPDATE users SET role = 'partner' WHERE id = $1`,
-          [user.id]
-        );
+        // 사용자 role 업데이트 (role_assignments SSOT)
+        await pool.query(`
+          INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
+          VALUES (gen_random_uuid(), $1, 'neture:partner', true, NOW(), NOW(), 'global')
+          ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING
+        `, [user.id]);
 
       } catch (error) {
         console.error(`Failed to create partner for ${user.email}:`, error.message);

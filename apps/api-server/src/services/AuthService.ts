@@ -187,12 +187,11 @@ class AuthService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      roles: [userData.role || UserRole.USER]
     });
 
     const savedUser = await this.userRepository.save(user);
 
-    // Phase3-D: RoleAssignment 생성 (non-fatal)
+    // Write to role_assignments (SSOT)
     try {
       const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
       await roleAssignmentService.assignRole({
@@ -201,7 +200,7 @@ class AuthService {
         assignedBy: 'system:createUser',
       });
     } catch {
-      // Non-fatal: backfill migration covers existing users
+      // Non-fatal: service may not be initialized during startup
     }
 
     return savedUser;
@@ -268,12 +267,16 @@ class AuthService {
       throw new Error('User not found');
     }
 
-    await this.userRepository.update(userId, { roles: [role] });
+    // Write to role_assignments (SSOT)
+    const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+    await roleAssignmentService.removeAllRoles(userId);
+    await roleAssignmentService.assignRole({ userId, role });
+
     const updatedUser = await this.getUserById(userId);
     if (!updatedUser) {
       throw new Error('Failed to update user role');
     }
-    
+
     return updatedUser;
   }
 

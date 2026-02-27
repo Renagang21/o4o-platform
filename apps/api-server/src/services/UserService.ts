@@ -46,18 +46,31 @@ export class UserService {
   }): Promise<User> {
     const hashedPassword = await this.hashPassword(userData.password);
     
+    const role = userData.role || UserRole.USER;
+
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      roles: [userData.role || UserRole.USER],
       status: UserStatus.PENDING,
-      permissions: this.getDefaultPermissions(userData.role || UserRole.USER),
+      permissions: this.getDefaultPermissions(role),
       isActive: true,
       isEmailVerified: false,
       loginAttempts: 0
     });
 
-    return await this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+
+    // Write to role_assignments (SSOT)
+    try {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      await roleAssignmentService.assignRole({
+        userId: saved.id, role, assignedBy: 'system:createUser',
+      });
+    } catch {
+      // Non-fatal: service may not be initialized during startup
+    }
+
+    return saved;
   }
 
   /**

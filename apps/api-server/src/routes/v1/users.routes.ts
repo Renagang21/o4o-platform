@@ -160,12 +160,16 @@ router.post('/', authenticate, requireAdmin, async (req: Request, res: Response)
       name: req.body.firstName && req.body.lastName
         ? `${req.body.firstName} ${req.body.lastName}`
         : req.body.firstName || req.body.lastName || req.body.email.split('@')[0],
-      roles: [req.body.role || 'customer'],
       status: req.body.status || 'active',
       provider: 'local'
     });
 
     const savedUser = await userRepository.save(newUser);
+
+    // Write to role_assignments (SSOT)
+    await roleAssignmentService.assignRole({
+      userId: savedUser.id, role: req.body.role || 'customer'
+    });
 
     // Remove password from response
     const { password, ...userWithoutPassword } = savedUser;

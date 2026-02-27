@@ -74,7 +74,6 @@ export class SocialAuthService {
       avatar: profile.avatar,
       provider: profile.provider,
       provider_id: profile.providerId,
-      roles: [UserRole.USER],
       status: UserStatus.ACTIVE, // Auto-approve social logins
       isEmailVerified: true,
       password: '', // No password for social logins

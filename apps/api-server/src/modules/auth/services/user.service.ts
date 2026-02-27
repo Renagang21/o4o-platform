@@ -54,18 +54,24 @@ export class UserService extends BaseService<User> {
   }): Promise<User> {
     const hashedPassword = await hashPassword(userData.password);
 
+    const role = userData.role || UserRole.USER;
+
     const user = this.repository.create({
       ...userData,
       password: hashedPassword,
-      roles: [userData.role || UserRole.USER],
       status: UserStatus.PENDING,
-      permissions: getDefaultPermissions(userData.role || UserRole.USER),
+      permissions: getDefaultPermissions(role),
       isActive: true,
       isEmailVerified: false,
       loginAttempts: 0,
     });
 
-    return await this.repository.save(user);
+    const saved = await this.repository.save(user);
+
+    // Write to role_assignments (SSOT)
+    await roleAssignmentService.assignRole({ userId: saved.id, role });
+
+    return saved;
   }
 
   /**

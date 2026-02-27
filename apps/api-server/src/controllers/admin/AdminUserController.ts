@@ -159,11 +159,13 @@ export class AdminUserController {
         name,
         status,
         isActive,
-        roles: [role],
         permissions: []
       });
 
       const savedUser = await userRepo.save(newUser);
+
+      // Write to role_assignments (SSOT)
+      await roleAssignmentService.assignRole({ userId: savedUser.id, role });
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = savedUser;
