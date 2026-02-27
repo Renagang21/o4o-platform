@@ -25,8 +25,8 @@ router.post('/',
     body('firstName').notEmpty().withMessage('First name is required'),
     body('lastName').notEmpty().withMessage('Last name is required'),
     body('role').optional().isIn([
-      'super_admin', 'admin', 'manager', 'moderator', 'vendor', 'vendor_manager',
-      'seller', 'customer', 'business', 'partner', 'supplier', 'affiliate', 'beta_user'
+      'super_admin', 'admin', 'operator', 'manager', 'moderator',
+      'vendor', 'seller', 'customer', 'business', 'partner', 'supplier', 'affiliate'
     ]).withMessage('Invalid role'),
     body('status').optional().isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],
@@ -42,8 +42,8 @@ router.put('/:id',
     body('firstName').optional().notEmpty().withMessage('First name cannot be empty'),
     body('lastName').optional().notEmpty().withMessage('Last name cannot be empty'),
     body('role').optional().isIn([
-      'super_admin', 'admin', 'manager', 'moderator', 'vendor', 'vendor_manager',
-      'seller', 'customer', 'business', 'partner', 'supplier', 'affiliate', 'beta_user'
+      'super_admin', 'admin', 'operator', 'manager', 'moderator',
+      'vendor', 'seller', 'customer', 'business', 'partner', 'supplier', 'affiliate'
     ]).withMessage('Invalid role'),
     body('status').optional().isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],

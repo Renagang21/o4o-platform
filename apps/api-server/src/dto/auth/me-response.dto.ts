@@ -17,7 +17,7 @@ export interface RoleAssignmentDto {
   id: string;
 
   /** Role name */
-  role: 'customer' | 'seller' | 'supplier' | 'partner' | 'admin' | 'administrator' | 'manager';
+  role: 'super_admin' | 'admin' | 'operator' | 'manager' | 'vendor' | 'seller' | 'supplier' | 'partner' | 'affiliate' | 'business' | 'user' | 'customer';
 
   /** Whether this assignment is currently active */
   isActive: boolean;
