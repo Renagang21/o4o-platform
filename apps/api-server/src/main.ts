@@ -1149,6 +1149,15 @@ const startServer = async () => {
       logger.error('Failed to register RBAC DB Audit routes:', rbacAuditError);
     }
 
+    // 37-e. Register RBAC Backfill User Role endpoint (WO-RBAC-DATA-NORMALIZATION-EXECUTION-V1)
+    try {
+      const { createRbacBackfillUserRoleRouter } = await import('./routes/debug/rbac-backfill-user-role.controller.js');
+      app.use('/__debug__/rbac-backfill-user-role', createRbacBackfillUserRoleRouter(AppDataSource));
+      logger.info('✅ RBAC Backfill User Role endpoint registered at /__debug__/rbac-backfill-user-role');
+    } catch (rbacBackfillError) {
+      logger.error('Failed to register RBAC Backfill User Role routes:', rbacBackfillError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
