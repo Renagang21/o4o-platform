@@ -33,7 +33,7 @@ const requireAdmin = (req: Request, res: Response, next: Function) => {
     // Remove curly braces from PostgreSQL array format
     roleName = roleName?.replace(/[{}]/g, '');
     logger.info('[Sites API] Checking role:', { roleName, originalRole: role, type: typeof role });
-    return ['admin', 'superadmin', 'super_admin', 'manager'].includes(roleName);
+    return ['admin', 'super_admin', 'manager'].includes(roleName);
   });
 
   if (!hasAdminRole) {
