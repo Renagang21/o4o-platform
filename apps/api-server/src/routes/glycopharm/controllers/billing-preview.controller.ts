@@ -13,29 +13,17 @@ import { DataSource } from 'typeorm';
 import { BillingPreviewService } from '../services/billing-preview.service.js';
 import type { BillingUnit } from '../services/billing-preview.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
-function isOperatorOrAdmin(roles: string[] = [], userId: string = 'unknown'): boolean {
-  const hasGlycopharmRole = hasAnyServiceRole(roles, [
+function isOperatorOrAdmin(roles: string[] = []): boolean {
+  return hasAnyServiceRole(roles, [
     'glycopharm:admin',
     'glycopharm:operator',
     'platform:admin',
     'platform:super_admin',
   ]);
-  if (hasGlycopharmRole) return true;
-
-  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-  const detectedLegacyRoles = roles.filter((r) => legacyRoles.includes(r));
-  if (detectedLegacyRoles.length > 0) {
-    detectedLegacyRoles.forEach((role) => {
-      logLegacyRoleUsage(userId, role, 'glycopharm/billing-preview.controller:isOperatorOrAdmin');
-    });
-    return false;
-  }
-
-  return false;
 }
 
 export function createBillingPreviewController(
@@ -67,7 +55,7 @@ export function createBillingPreviewController(
           return;
         }
 
-        if (!isOperatorOrAdmin(user.roles || [], user.id)) {
+        if (!isOperatorOrAdmin(user.roles || [])) {
           res.status(403).json({
             success: false,
             error: 'Operator or administrator role required',

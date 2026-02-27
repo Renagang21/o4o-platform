@@ -12,32 +12,20 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { ReportService } from '../services/report.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 
 type AuthMiddleware = RequestHandler;
 
 /**
  * Check if user has operator/admin role (same pattern as operator.controller.ts)
  */
-function isOperatorOrAdmin(roles: string[] = [], userId: string = 'unknown'): boolean {
-  const hasGlycopharmRole = hasAnyServiceRole(roles, [
+function isOperatorOrAdmin(roles: string[] = []): boolean {
+  return hasAnyServiceRole(roles, [
     'glycopharm:admin',
     'glycopharm:operator',
     'platform:admin',
     'platform:super_admin',
   ]);
-  if (hasGlycopharmRole) return true;
-
-  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-  const detectedLegacyRoles = roles.filter((r) => legacyRoles.includes(r));
-  if (detectedLegacyRoles.length > 0) {
-    detectedLegacyRoles.forEach((role) => {
-      logLegacyRoleUsage(userId, role, 'glycopharm/report.controller:isOperatorOrAdmin');
-    });
-    return false;
-  }
-
-  return false;
 }
 
 export function createReportController(
@@ -69,7 +57,7 @@ export function createReportController(
           return;
         }
 
-        if (!isOperatorOrAdmin(user.roles || [], user.id)) {
+        if (!isOperatorOrAdmin(user.roles || [])) {
           res.status(403).json({
             success: false,
             error: 'Operator or administrator role required',
@@ -136,7 +124,7 @@ export function createReportController(
           return;
         }
 
-        if (!isOperatorOrAdmin(user.roles || [], user.id)) {
+        if (!isOperatorOrAdmin(user.roles || [])) {
           res.status(403).json({
             success: false,
             error: 'Operator or administrator role required',
