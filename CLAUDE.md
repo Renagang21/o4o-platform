@@ -215,6 +215,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | F6 | **Boundary Policy** — Domain Boundary Matrix + Guard Rules 5개 | 2026-02-24 | `docs/architecture/O4O-BOUNDARY-POLICY-V1.md` |
 | F7 | **Neture Partner Contract** — 계약 테이블·ENUM·트랜잭션·Commission 불변 | 2026-02-24 | `docs/baseline/NETURE-PARTNER-CONTRACT-FREEZE-V1.md` |
 | F8 | **Neture Distribution Engine** — Distribution Tier 3단계·SERVICE 상태 머신·Checkout Guard 3계층·Listing 캐스케이드 | 2026-02-27 | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
+| F9 | **RBAC SSOT** — role_assignments 단일 소스, users.role/roles/user_roles 제거, write-path 통일 | 2026-02-27 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
 
 ---
 
@@ -249,9 +250,12 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
 | Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
 | Neture Distribution Engine | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
+| RBAC Freeze Declaration | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
+| RBAC Runbook | `docs/rbac/RBAC-RUNBOOK-V1.md` |
+| RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
 
 ---
 
 *Updated: 2026-02-27*
-*Version: 6.3*
+*Version: 6.4*
 *Status: Active Constitution*
