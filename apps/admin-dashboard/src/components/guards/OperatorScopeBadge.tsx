@@ -170,7 +170,7 @@ export function OperatorPolicySummary({ className = '' }: OperatorPolicySummaryP
     <div className={`p-4 rounded-lg border bg-card ${className}`}>
       <div className="flex items-center gap-2 mb-3">
         <Shield className="w-5 h-5 text-muted-foreground" />
-        <h3 className="font-medium">운영자 권한</h3>
+        <h3 className="font-medium">서비스운영자 권한</h3>
       </div>
 
       <div className="space-y-2">

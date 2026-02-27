@@ -127,14 +127,14 @@ export function getContentTypeUnavailableMessage(
 }
 
 /**
- * 운영자 아님 메시지 생성
+ * 서비스운영자 아님 메시지 생성
  */
 export function getNotOperatorMessage(): PolicyNoticeMessage {
   return {
     type: 'not_operator',
-    title: '운영자 권한 필요',
-    description: '이 기능은 운영자 권한이 있는 사용자만 이용할 수 있습니다.',
-    guidance: '운영자 권한이 필요하시면 관리자에게 문의하세요.',
+    title: '서비스운영자 권한 필요',
+    description: '이 기능은 서비스운영자 권한이 있는 사용자만 이용할 수 있습니다.',
+    guidance: '서비스운영자 권한이 필요하시면 관리자에게 문의하세요.',
   };
 }
 

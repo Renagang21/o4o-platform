@@ -48,10 +48,10 @@ export default function MyPolicyPage() {
       <div className="container max-w-3xl py-8">
         <Alert>
           <Info className="h-4 w-4" />
-          <AlertTitle>운영자 권한 없음</AlertTitle>
+          <AlertTitle>서비스운영자 권한 없음</AlertTitle>
           <AlertDescription>
-            이 페이지는 운영자 권한이 있는 사용자만 접근할 수 있습니다.
-            운영자 권한이 필요하시면 관리자에게 문의하세요.
+            이 페이지는 서비스운영자 권한이 있는 사용자만 접근할 수 있습니다.
+            서비스운영자 권한이 필요하시면 관리자에게 문의하세요.
           </AlertDescription>
         </Alert>
       </div>
@@ -96,7 +96,7 @@ export default function MyPolicyPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">내 운영자 정책</h1>
+          <h1 className="text-2xl font-bold tracking-tight">내 서비스운영자 정책</h1>
           <p className="text-muted-foreground">
             현재 할당된 스코프와 권한을 확인합니다.
           </p>
@@ -176,7 +176,7 @@ export default function MyPolicyPage() {
             스코프 정보
           </CardTitle>
           <CardDescription>
-            운영자 스코프는 서비스별 권한 범위를 정의합니다.
+            서비스운영자 스코프는 서비스별 권한 범위를 정의합니다.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

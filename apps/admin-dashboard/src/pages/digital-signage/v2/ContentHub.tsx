@@ -69,7 +69,7 @@ export default function ContentHub() {
   const getSourceLabel = (source: ContentSource): string => {
     switch (source) {
       case 'hq':
-        return '운영자 콘텐츠';
+        return '서비스운영자 콘텐츠';
       case 'supplier':
         return '공급자 콘텐츠';
       case 'community':
@@ -80,7 +80,7 @@ export default function ContentHub() {
   const getSourceDescription = (source: ContentSource): string => {
     switch (source) {
       case 'hq':
-        return 'HQ 및 서비스 운영자가 제작한 공식 콘텐츠';
+        return 'HQ 및 서비스운영자가 제작한 공식 콘텐츠';
       case 'supplier':
         return '네뚜레 공급자 대시보드에서 등록한 콘텐츠';
       case 'community':
@@ -228,7 +228,7 @@ export default function ContentHub() {
 
       <Tabs value={activeSource} onValueChange={(v) => setActiveSource(v as ContentSource)} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="hq">운영자 콘텐츠</TabsTrigger>
+          <TabsTrigger value="hq">서비스운영자 콘텐츠</TabsTrigger>
           <TabsTrigger value="supplier">공급자 콘텐츠</TabsTrigger>
           <TabsTrigger value="community">커뮤니티 콘텐츠</TabsTrigger>
         </TabsList>
