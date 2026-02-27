@@ -29,13 +29,13 @@ const SERVICE_ROLES = {
   platform: [
     { value: 'platform:super_admin', label: 'Platform Super Admin', description: 'Highest privilege, cross-service access' },
     { value: 'platform:admin', label: 'Platform Admin', description: 'Platform administrator' },
-    { value: 'platform:operator', label: 'Platform Operator', description: 'Platform operator' },
+    { value: 'platform:operator', label: 'Platform 서비스운영자', description: 'Platform-wide service operator' },
   ],
   // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:operator 제거 — 분회 역할은 KpaMember.role이 SSOT
   kpa: [
-    { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
-    { value: 'kpa-b:district', label: '데모서비스 지부 운영자', description: '지부/분회 데모 서비스 지부 운영자 (/demo)' },
-    { value: 'kpa-b:branch', label: '데모서비스 분회 운영자', description: '지부/분회 데모 서비스 분회 운영자 (/demo)' },
+    { value: 'kpa-a:operator', label: 'KPA 서비스운영자', description: 'KPA 커뮤니티 서비스운영자 (kpa-society.co.kr)' },
+    { value: 'kpa-b:district', label: '데모서비스 지부 서비스운영자', description: '지부/분회 데모 서비스 지부 서비스운영자 (/demo)' },
+    { value: 'kpa-b:branch', label: '데모서비스 분회 서비스운영자', description: '지부/분회 데모 서비스 분회 서비스운영자 (/demo)' },
   ],
   neture: [
     { value: 'neture:admin', label: 'Neture Admin', description: 'Neture administrator' },
@@ -44,15 +44,15 @@ const SERVICE_ROLES = {
   ],
   glycopharm: [
     { value: 'glycopharm:admin', label: 'GlycoPharm Admin', description: 'GlycoPharm administrator' },
-    { value: 'glycopharm:operator', label: 'GlycoPharm Operator', description: 'GlycoPharm operator' },
+    { value: 'glycopharm:operator', label: 'GlycoPharm 서비스운영자', description: 'GlycoPharm 서비스운영자' },
   ],
   cosmetics: [
     { value: 'cosmetics:admin', label: 'K-Cosmetics Admin', description: 'K-Cosmetics administrator' },
-    { value: 'cosmetics:operator', label: 'K-Cosmetics Operator', description: 'K-Cosmetics operator' },
+    { value: 'cosmetics:operator', label: 'K-Cosmetics 서비스운영자', description: 'K-Cosmetics 서비스운영자' },
   ],
   glucoseview: [
     { value: 'glucoseview:admin', label: 'GlucoseView Admin', description: 'GlucoseView administrator' },
-    { value: 'glucoseview:operator', label: 'GlucoseView Operator', description: 'GlucoseView operator' },
+    { value: 'glucoseview:operator', label: 'GlucoseView 서비스운영자', description: 'GlucoseView 서비스운영자' },
   ],
 };
 
@@ -440,8 +440,8 @@ const OperatorsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="Operators Management"
-        subtitle="Manage service administrators and operators"
+        title="서비스운영자 관리"
+        subtitle="서비스운영자 및 관리자를 관리합니다"
         backUrl="/"
         backLabel="Dashboard"
         showSearch
@@ -449,7 +449,7 @@ const OperatorsPage: React.FC = () => {
         actions={[
           {
             id: 'add',
-            label: 'Add Operator',
+            label: '서비스운영자 추가',
             onClick: openCreateModal,
             variant: 'primary',
             icon: <Plus className="w-4 h-4" />
@@ -486,7 +486,7 @@ const OperatorsPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="text-2xl font-bold text-gray-900">{operators.length}</div>
-          <div className="text-sm text-gray-500">Total Operators</div>
+          <div className="text-sm text-gray-500">전체 서비스운영자</div>
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <div className="text-2xl font-bold text-green-600">
@@ -504,7 +504,7 @@ const OperatorsPage: React.FC = () => {
           <div className="text-2xl font-bold text-blue-600">
             {operators.filter(o => o.roles.some(r => r.includes('operator') && !r.includes('admin'))).length}
           </div>
-          <div className="text-sm text-gray-500">Operators</div>
+          <div className="text-sm text-gray-500">서비스운영자</div>
         </div>
       </div>
 
@@ -528,7 +528,7 @@ const OperatorsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {editingOperator ? 'Edit Operator' : 'Add New Operator'}
+                {editingOperator ? '서비스운영자 수정' : '서비스운영자 추가'}
               </h2>
               <button onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />

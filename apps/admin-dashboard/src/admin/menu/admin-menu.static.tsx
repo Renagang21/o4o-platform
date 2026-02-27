@@ -96,7 +96,7 @@ export const adminMenuStatic: MenuItem[] = [
       },
       {
         id: 'core-operators',
-        label: 'Operators',
+        label: 'Service Operators',
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },
