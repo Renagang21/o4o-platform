@@ -81,3 +81,19 @@ export function hasAnyRole(userRoles: string[], group: readonly string[]): boole
 export function hasBranchRole(membershipRole?: string): boolean {
   return membershipRole === 'admin' || membershipRole === 'operator';
 }
+
+/**
+ * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
+ * 직능 선택 면제 판정 — 단일 진입점
+ * admin, operator, student, 분회 admin/operator → 직능 선택 불필요
+ */
+export function isActivityTypeExempt(
+  roles: string[],
+  membershipRole?: string,
+  membershipType?: string,
+): boolean {
+  if (hasAnyRole(roles, FUNCTION_GATE_EXEMPT_ROLES)) return true;
+  if (hasBranchRole(membershipRole)) return true;
+  if (membershipType === 'student') return true;
+  return false;
+}

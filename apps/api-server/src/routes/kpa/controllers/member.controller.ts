@@ -8,6 +8,7 @@ import { body, param, query, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -161,6 +162,20 @@ export function createMemberController(
 
         const saved = await memberRepo.save(member);
 
+        // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: SSOT sync → kpa_pharmacist_profiles
+        if (req.body.activity_type) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+              [req.user!.id, req.body.activity_type]
+            );
+          } catch (syncErr) {
+            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync on apply:', syncErr);
+          }
+        }
+
         // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
         const svcRecord = serviceRepo.create({
           member_id: saved.id,
@@ -286,54 +301,51 @@ export function createMemberController(
         const saved = await memberRepo.save(member);
 
         // ============================================================
-        // WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1: Sync User entity
-        // Uses raw SQL to avoid importing User entity (ESM rule compliance)
+        // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1: Sync User + role_assignments
+        // users.status/isActive via raw SQL (ESM rule compliance)
+        // role via roleAssignmentService (RBAC SSOT)
         // ============================================================
         try {
           const kpaRole = member.membership_type === 'student' ? 'kpa:student' : 'kpa:pharmacist';
 
           if (oldStatus === 'pending' && newStatus === 'active') {
-            // APPROVAL: Activate user + add KPA role
+            // APPROVAL: Activate user + assign KPA role
             await dataSource.query(
               `UPDATE users
                SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
                WHERE id = $1`,
               [member.user_id, req.user!.id]
             );
-            await dataSource.query(
-              `UPDATE users SET roles = array_append(roles, $2)
-               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
-              [member.user_id, kpaRole]
-            );
+            await roleAssignmentService.assignRole({
+              userId: member.user_id,
+              role: kpaRole,
+              assignedBy: req.user!.id,
+            });
           } else if (newStatus === 'suspended') {
-            // SUSPENSION: Remove KPA role + suspend user
+            // SUSPENSION: Suspend user + remove KPA role
             await dataSource.query(
-              `UPDATE users SET roles = array_remove(roles, $2), status = 'suspended'
-               WHERE id = $1`,
-              [member.user_id, kpaRole]
+              `UPDATE users SET status = 'suspended' WHERE id = $1`,
+              [member.user_id]
             );
+            await roleAssignmentService.removeRole(member.user_id, kpaRole);
           } else if (newStatus === 'withdrawn') {
-            // WITHDRAWAL: Remove KPA role only
-            await dataSource.query(
-              `UPDATE users SET roles = array_remove(roles, $2)
-               WHERE id = $1`,
-              [member.user_id, kpaRole]
-            );
+            // WITHDRAWAL: Remove KPA role
+            await roleAssignmentService.removeRole(member.user_id, kpaRole);
           } else if (oldStatus === 'suspended' && newStatus === 'active') {
-            // REACTIVATION: Restore user + re-add KPA role
+            // REACTIVATION: Restore user + re-assign KPA role
             await dataSource.query(
               `UPDATE users SET status = 'active', "isActive" = true
                WHERE id = $1`,
               [member.user_id]
             );
-            await dataSource.query(
-              `UPDATE users SET roles = array_append(roles, $2)
-               WHERE id = $1 AND NOT ($2 = ANY(roles))`,
-              [member.user_id, kpaRole]
-            );
+            await roleAssignmentService.assignRole({
+              userId: member.user_id,
+              role: kpaRole,
+              assignedBy: req.user!.id,
+            });
           }
         } catch (syncError) {
-          console.error('[WO-KPA-A-ROLE-APPROVAL-ALIGNMENT-V1] User sync failed:', syncError);
+          console.error('[WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1] User/role sync failed:', syncError);
         }
 
         // 서비스 레코드 동기화 (kpa-a)
@@ -420,6 +432,21 @@ export function createMemberController(
         if (req.body.pharmacy_address !== undefined) member.pharmacy_address = req.body.pharmacy_address || null;
 
         const saved = await memberRepo.save(member);
+
+        // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: SSOT sync → kpa_pharmacist_profiles
+        if (req.body.activity_type !== undefined) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+              [req.user!.id, req.body.activity_type]
+            );
+          } catch (syncErr) {
+            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync failed:', syncErr);
+          }
+        }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update profession info:', error);

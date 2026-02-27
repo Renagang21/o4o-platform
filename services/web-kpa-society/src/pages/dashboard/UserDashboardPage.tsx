@@ -1,29 +1,24 @@
 /**
  * UserDashboardPage - 사용자 대시보드
  *
- * Phase 4: WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1
+ * WO-KPA-A-ACTIVITY-BASED-DASHBOARD-DIFF-V1
  *
- * 구조:
- * - Welcome 헤더 (사용자 이름 + 회원 유형)
- * - 탭 바: 커뮤니티 (항상) + 약국경영 (pharmacy_owner만)
- * - 탭 콘텐츠 영역
+ * activityType 기반 카드 레이아웃:
+ * - getDashboardLayout()로 카드 key 배열 결정
+ * - CARD_REGISTRY에서 카드 컴포넌트 조회/렌더링
+ * - 하드코딩 탭 제거, activityType에 따라 자동 구성
  *
  * 라우트: /dashboard
  */
 
-import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, typography } from '../../styles/theme';
-import { CommunityDashboardTab } from './CommunityDashboardTab';
-import { PharmacyDashboardTab } from './PharmacyDashboardTab';
-import { ActivityTypePrompt } from '../../components/ActivityTypePrompt';
-
-type TabKey = 'community' | 'pharmacy';
+import { getDashboardLayout } from './activity-dashboard-map';
+import { CARD_REGISTRY } from './dashboard-cards';
 
 export function UserDashboardPage() {
   const { user, isLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabKey>('community');
 
   if (isLoading) {
     return (
@@ -37,14 +32,9 @@ export function UserDashboardPage() {
     return <Navigate to="/" replace />;
   }
 
-  const isPharmacyOwner = user.isStoreOwner === true;
   const isStudent = user.membershipType === 'student';
   const roleLabel = user.activityType ? ACTIVITY_TYPE_LABELS[user.activityType] : null;
-
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: 'community', label: '커뮤니티' },
-    ...(isPharmacyOwner ? [{ key: 'pharmacy' as TabKey, label: '약국경영' }] : []),
-  ];
+  const cardKeys = getDashboardLayout(user.activityType, user.membershipType);
 
   return (
     <div style={styles.page}>
@@ -67,31 +57,12 @@ export function UserDashboardPage() {
         </div>
       </section>
 
-      {/* 직능 분류 미설정 시 안내 배너 (Phase 6) */}
-      {!isStudent && <ActivityTypePrompt />}
-
-      {/* 탭 바 */}
-      <nav style={styles.tabBar}>
-        <div style={styles.tabList}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              style={{
-                ...styles.tabButton,
-                ...(activeTab === tab.key ? styles.tabButtonActive : {}),
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* 탭 콘텐츠 */}
-      <main style={styles.tabContent}>
-        {activeTab === 'community' && <CommunityDashboardTab user={user} />}
-        {activeTab === 'pharmacy' && isPharmacyOwner && <PharmacyDashboardTab />}
+      {/* activityType 기반 카드 레이아웃 */}
+      <main style={styles.cardContainer}>
+        {cardKeys.map(key => {
+          const Card = CARD_REGISTRY[key];
+          return Card ? <Card key={key} user={user} /> : null;
+        })}
       </main>
     </div>
   );
@@ -160,34 +131,11 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.md,
   } as React.CSSProperties,
 
-  // 탭 바
-  tabBar: {
-    borderBottom: `1px solid ${colors.neutral200}`,
-    marginBottom: spacing.xl,
-  },
-  tabList: {
+  // 카드 컨테이너
+  cardContainer: {
     display: 'flex',
-    gap: spacing.xs,
-  },
-  tabButton: {
-    ...typography.bodyL,
-    padding: `${spacing.md} ${spacing.lg}`,
-    border: 'none',
-    borderBottom: '3px solid transparent',
-    background: 'none',
-    color: colors.neutral500,
-    fontWeight: 500,
-    cursor: 'pointer',
-    transition: 'color 0.2s, border-color 0.2s',
-  } as React.CSSProperties,
-  tabButtonActive: {
-    color: colors.primary,
-    borderBottomColor: colors.primary,
-    fontWeight: 600,
-  },
-
-  // 탭 콘텐츠
-  tabContent: {
+    flexDirection: 'column',
+    gap: spacing.sectionGap,
     minHeight: '400px',
   },
 };

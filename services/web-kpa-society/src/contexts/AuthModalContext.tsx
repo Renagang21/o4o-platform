@@ -12,7 +12,8 @@
 
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
-type ModalType = 'login' | 'register' | 'forgotPassword' | 'functionGate' | null;
+// WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: functionGate 제거 (AuthGate 페이지로 대체)
+type ModalType = 'login' | 'register' | 'forgotPassword' | null;
 
 interface AuthModalContextType {
   /** 현재 열린 모달 타입 */
@@ -23,8 +24,6 @@ interface AuthModalContextType {
   openRegisterModal: () => void;
   /** 비밀번호 찾기 모달 열기 */
   openForgotPasswordModal: () => void;
-  /** 직능/직역 선택 모달 열기 */
-  openFunctionGateModal: () => void;
   /** 모달 닫기 */
   closeModal: () => void;
   /** 로그인 성공 후 실행할 콜백 */
@@ -54,10 +53,6 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
     setActiveModal('forgotPassword');
   }, []);
 
-  const openFunctionGateModal = useCallback(() => {
-    setActiveModal('functionGate');
-  }, []);
-
   const closeModal = useCallback(() => {
     setActiveModal(null);
     setOnLoginSuccessState(undefined);
@@ -78,7 +73,6 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
         openLoginModal,
         openRegisterModal,
         openForgotPasswordModal,
-        openFunctionGateModal,
         closeModal,
         onLoginSuccess,
         setOnLoginSuccess,
