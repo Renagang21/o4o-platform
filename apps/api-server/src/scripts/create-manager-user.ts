@@ -8,8 +8,6 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import { Role } from '../entities/Role.js';
-import { UserRole } from '../types/auth.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
 
@@ -28,7 +26,6 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
     }
 
     const userRepo = AppDataSource.getRepository(User);
-    const roleRepo = AppDataSource.getRepository(Role);
 
     // Default manager credentials
     const managerEmail = options.email || 'manager@neture.co.kr';
@@ -50,20 +47,18 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
       logger.info(`   Name: ${existingUser.name}`);
       logger.info(`   ID: ${existingUser.id}`);
 
-      // Load user with roles
-      const userWithRoles = await userRepo.findOne({
-        where: { id: existingUser.id },
-        relations: ['dbRoles']
-      });
-
-      if (userWithRoles?.dbRoles && userWithRoles.dbRoles.length > 0) {
-        logger.info(`\n   Current roles:`);
-        for (const role of userWithRoles.dbRoles) {
-          logger.info(`   - ${role.name} (${role.displayName})`);
+      // Phase3-E: Query role_assignments (dbRoles ManyToMany dropped)
+      const raRows: { role: string }[] = await AppDataSource.query(
+        `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true ORDER BY assigned_at ASC`,
+        [existingUser.id]
+      );
+      if (raRows && raRows.length > 0) {
+        logger.info(`\n   Current roles (role_assignments):`);
+        for (const row of raRows) {
+          logger.info(`   - ${row.role}`);
         }
       } else {
-        logger.info(`\n   ⚠️  User has no roles assigned!`);
-        logger.info(`   Legacy roles array: ${existingUser.roles?.join(', ')}`);
+        logger.info(`\n   ⚠️  User has no active role_assignments!`);
       }
 
       return existingUser;
@@ -79,7 +74,6 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
       email: managerEmail,
       password: hashedPassword,
       name: managerName,
-      roles: [UserRole.ADMIN],
       isEmailVerified: true,
       isActive: true
     });
@@ -90,34 +84,14 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
     logger.info(`   Email: ${newUser.email}`);
     logger.info(`   Name: ${newUser.name}`);
 
-    // Find admin role
-    logger.info('\n🔍 Finding admin role...');
-    let adminRole = await roleRepo.findOne({
-      where: { name: 'admin' }
-    });
-
-    if (!adminRole) {
-      logger.info('⚠️  No admin role found. Creating admin role...');
-      adminRole = roleRepo.create({
-        name: 'admin',
-        displayName: 'Admin',
-        description: 'System administrator',
-        isActive: true,
-        isSystem: true
-      });
-      await roleRepo.save(adminRole);
-      logger.info('✅ Admin role created');
-    } else {
-      logger.info(`✅ Found role: ${adminRole.name} (${adminRole.displayName})`);
-    }
-
-    // Assign role to user via dbRoles relation
-    logger.info('\n🔗 Assigning role to user...');
-    if (!newUser.dbRoles) {
-      newUser.dbRoles = [];
-    }
-    newUser.dbRoles.push(adminRole);
-    await userRepo.save(newUser);
+    // Phase3-E: Insert role_assignments (roles/user_roles tables dropped)
+    logger.info('\n🔗 Assigning admin role via role_assignments...');
+    await AppDataSource.query(
+      `INSERT INTO role_assignments (id, user_id, role, is_active, valid_from, assigned_at, scope_type)
+       VALUES (gen_random_uuid(), $1, $2, true, NOW(), NOW(), 'global')
+       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user" DO NOTHING`,
+      [newUser.id, 'admin']
+    );
     logger.info('✅ Role assigned successfully!');
 
     // Summary
@@ -127,7 +101,7 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
     logger.info('📧 Email:    ' + managerEmail);
     logger.info('👤 Name:     ' + managerName);
     logger.info('🔑 Password: ' + managerPassword);
-    logger.info('🛡️  Role:     ' + adminRole.displayName + ' (' + adminRole.name + ')');
+    logger.info('🛡️  Role:     admin (role_assignments)');
     logger.info('\n⚠️  IMPORTANT: Change the password after first login!\n');
 
     return newUser;

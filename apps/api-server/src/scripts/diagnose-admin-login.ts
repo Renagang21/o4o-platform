@@ -11,7 +11,6 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User, UserStatus } from '../entities/User.js';
-import { Role } from '../entities/Role.js';
 import { UserRole } from '../types/auth.js';
 import bcrypt from 'bcrypt';
 import logger from '../utils/logger.js';
@@ -34,7 +33,6 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     }
 
     const userRepo = AppDataSource.getRepository(User);
-    const roleRepo = AppDataSource.getRepository(Role);
 
     logger.info('\n╔═══════════════════════════════════════════════════════════╗');
     logger.info('║         Admin Login Diagnosis                             ║');
@@ -47,9 +45,9 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     // =====================================================
     logger.info('─── STEP 1: User Existence Check ───');
 
+    // Phase3-E: dbRoles ManyToMany dropped — load without relations
     const user = await userRepo.findOne({
       where: { email: targetEmail },
-      relations: ['dbRoles']
     });
 
     if (!user) {
@@ -232,13 +230,16 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     // STEP 7: Check role assignment
     // =====================================================
     logger.info('─── STEP 7: Role Assignment Check ───');
-    logger.info(`   roles (legacy): ${user.roles?.join(', ') || 'none'}`);
-    logger.info(`   dbRoles: ${user.dbRoles?.map(r => r.name).join(', ') || 'none'}`);
+    // Phase3-E: roles from role_assignments (users.roles column + dbRoles ManyToMany dropped)
+    const raCheck: { role: string }[] = await AppDataSource.query(
+      `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true`,
+      [user.id]
+    );
+    logger.info(`   role_assignments: ${raCheck.map(r => r.role).join(', ') || 'none'}`);
 
-    // role column removed - Phase3-E: check roles array and dbRoles
-    const hasAdminRole = user.roles?.includes(UserRole.ADMIN) ||
-                         user.roles?.includes(UserRole.SUPER_ADMIN) ||
-                         user.dbRoles?.some(r => r.name === 'admin' || r.name === 'super_admin');
+    const hasAdminRole = raCheck.some(r =>
+      r.role === 'admin' || r.role === 'super_admin' || r.role === UserRole.ADMIN || r.role === UserRole.SUPER_ADMIN
+    );
 
     if (!hasAdminRole) {
       results.push({

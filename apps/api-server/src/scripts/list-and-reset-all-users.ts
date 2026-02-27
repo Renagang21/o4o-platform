@@ -32,9 +32,9 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
     logger.info('╚═══════════════════════════════════════════════════════════╝\n');
 
     // Find all users
+    // Phase3-E: dbRoles ManyToMany dropped — no relations needed
     const users = await userRepo.find({
-      select: ['id', 'email', 'name', 'roles', 'isActive'],
-      relations: ['dbRoles']
+      select: ['id', 'email', 'name', 'isActive'],
     });
 
     if (users.length === 0) {
@@ -56,12 +56,6 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
       logger.info(`📧 Email: ${user.email}`);
       logger.info(`👤 Name: ${user.name || 'N/A'}`);
       logger.info(`🆔 ID: ${user.id}`);
-      logger.info(`🏷️  Legacy Roles Array: ${JSON.stringify(user.roles)}`);
-
-      if (user.dbRoles && user.dbRoles.length > 0) {
-        logger.info(`🛡️  DB Roles: ${user.dbRoles.map(r => r.name).join(', ')}`);
-      }
-
       logger.info(`✅ Active: ${user.isActive}`);
 
       // Update password

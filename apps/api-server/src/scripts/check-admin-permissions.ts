@@ -19,10 +19,9 @@ async function checkAdminPermissions() {
 
     const userRepo = AppDataSource.getRepository(User);
 
-    // Find admin user
+    // Find admin user (Phase3-E: dbRoles ManyToMany dropped — use role_assignments)
     const adminUser = await userRepo.findOne({
       where: { email: 'admin@neture.co.kr' },
-      relations: ['dbRoles', 'dbRoles.permissions']
     });
 
     if (!adminUser) {
@@ -36,23 +35,19 @@ async function checkAdminPermissions() {
     logger.info(`📧 Email: ${adminUser.email}`);
     logger.info(`👤 Name: ${adminUser.name}`);
     logger.info(`🆔 ID: ${adminUser.id}`);
-    logger.info(`🏷️  Legacy roles array: ${JSON.stringify(adminUser.roles)}`);
 
-    if (adminUser.dbRoles && adminUser.dbRoles.length > 0) {
-      logger.info(`\n🛡️  Database roles (${adminUser.dbRoles.length}):`);
-      for (const role of adminUser.dbRoles) {
-        logger.info(`   - ${role.name} (${role.displayName})`);
-        if (role.permissions && role.permissions.length > 0) {
-          logger.info(`     Permissions from role:`);
-          for (const perm of role.permissions) {
-            logger.info(`       • ${perm.key} - ${perm.description}`);
-          }
-        } else {
-          logger.info(`     ⚠️  No permissions assigned to this role`);
-        }
+    // Phase3-E: roles from role_assignments (users.roles column dropped)
+    const raRows: { role: string }[] = await AppDataSource.query(
+      `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true ORDER BY assigned_at ASC`,
+      [adminUser.id]
+    );
+    if (raRows && raRows.length > 0) {
+      logger.info(`\n🛡️  role_assignments (${raRows.length}):`);
+      for (const row of raRows) {
+        logger.info(`   - ${row.role}`);
       }
     } else {
-      logger.info(`\n⚠️  No database roles assigned`);
+      logger.info(`\n⚠️  No active role_assignments found`);
     }
 
     logger.info(`\n📋 Direct user permissions: ${JSON.stringify(adminUser.permissions || [])}`);
