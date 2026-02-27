@@ -13,6 +13,7 @@ import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashb
 import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
+import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { ProductApprovalV2Service } from '../product-policy-v2/product-approval-v2.service.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
@@ -2543,5 +2544,13 @@ router.use('/hub/trigger', hubTriggerController);
 
 // Asset Snapshot routes (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
 router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as RequestHandler));
+
+// Tier1 JSON Test Center (WO-NETURE-TIER1-PUBLIC-JSON-TEST-CENTER-V1)
+router.use(createNeureTier1TestController({
+  dataSource: AppDataSource,
+  requireAuth: requireAuth as RequestHandler,
+  requireNetureScope,
+  netureService,
+}));
 
 export default router;

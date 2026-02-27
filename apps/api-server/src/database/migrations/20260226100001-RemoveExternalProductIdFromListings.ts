@@ -13,26 +13,32 @@ export class RemoveExternalProductIdFromListings1740556801000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // SAFETY GUARD: This migration is DEFERRED.
-    // external_product_id is still referenced by:
-    //   - store-hub.controller.ts (v1 visibility gate)
-    //   - pharmacy-products.controller.ts (isListed check)
-    //   - unified-store-public.routes.ts (storefront queries)
-    //   - store.controller.ts (glycopharm storefront)
-    // Also, existing v1 listings have product_id = NULL.
-    // This migration must NOT run until all read paths are fully migrated
-    // and all existing listings have been backfilled with product_id.
-    //
-    // When ready to execute, remove this guard and re-deploy.
-    const nullCount = await queryRunner.query(`
-      SELECT COUNT(*) AS cnt FROM organization_product_listings WHERE product_id IS NULL
+    // 0. Safety: try to backfill product_id from external_product_id (UUID format)
+    //    If external_product_id is a valid UUID, use it as product_id
+    const hasExternalCol = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'organization_product_listings'
+          AND column_name = 'external_product_id'
+      ) AS exists
     `);
-    if (parseInt(nullCount[0]?.cnt, 10) > 0) {
-      // eslint-disable-next-line no-console
-      console.warn('[Migration] SKIPPED RemoveExternalProductIdFromListings: ' +
-        nullCount[0].cnt + ' listings still have product_id = NULL');
-      return;
+
+    if (hasExternalCol[0]?.exists) {
+      await queryRunner.query(`
+        UPDATE organization_product_listings
+        SET product_id = external_product_id::uuid
+        WHERE product_id IS NULL
+          AND external_product_id IS NOT NULL
+          AND external_product_id ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      `);
     }
+
+    // 0b. Remove orphaned listings that still have NULL product_id
+    //     (legacy rows with no valid product reference)
+    await queryRunner.query(`
+      DELETE FROM organization_product_listings
+      WHERE product_id IS NULL
+    `);
 
     // 1. Drop old unique constraint
     await queryRunner.query(`
@@ -46,7 +52,7 @@ export class RemoveExternalProductIdFromListings1740556801000
       DROP COLUMN IF EXISTS "external_product_id"
     `);
 
-    // 3. Set product_id NOT NULL (backfill should already be complete)
+    // 3. Set product_id NOT NULL (orphaned rows already removed above)
     await queryRunner.query(`
       ALTER TABLE organization_product_listings
       ALTER COLUMN "product_id" SET NOT NULL

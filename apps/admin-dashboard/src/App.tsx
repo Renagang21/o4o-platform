@@ -284,6 +284,7 @@ const AppDisabled = lazy(() => import('@/pages/error/AppDisabled'));
 const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
 const AuthStateJsonDebug = lazy(() => import('@/pages/__debug__/AuthStateJsonDebug'));
 const LoginDiagnostic = lazy(() => import('@/pages/__debug__/LoginDiagnostic'));
+const NeureTier1TestPage = lazy(() => import('@/pages/neture/Tier1TestPage'));
 
 // CPT Engine
 const CPTEngine = lazy(() => import('@/pages/cpt-engine'));
@@ -533,6 +534,13 @@ function App() {
             <Route path="/__debug__/login" element={
               <Suspense fallback={<PageLoader />}>
                 <LoginDiagnostic />
+              </Suspense>
+            } />
+
+            {/* Neture Tier1 JSON Test Center - WO-NETURE-TIER1-PUBLIC-JSON-TEST-CENTER-V1 */}
+            <Route path="/__debug__/neture-tier1" element={
+              <Suspense fallback={<PageLoader />}>
+                <NeureTier1TestPage />
               </Suspense>
             } />
 

@@ -50,7 +50,7 @@ async function migrateUserRoles(): Promise<MigrationStats> {
 
     // Get all users with roles
     const users = await userRepo.find({
-      select: ['id', 'email', 'role', 'roles', 'createdAt']
+      select: ['id', 'email', 'roles', 'createdAt']
     });
 
     stats.totalUsers = users.length;
@@ -61,12 +61,8 @@ async function migrateUserRoles(): Promise<MigrationStats> {
         // Collect all roles for this user
         const userRoles: string[] = [];
 
-        // Add primary role
-        if (user.role) {
-          userRoles.push(user.role);
-        }
-
-        // Add additional roles (simple-array field)
+        // role column removed - Phase3-E: use roles array only
+        // Add roles from roles array
         if (user.roles && Array.isArray(user.roles)) {
           userRoles.push(...user.roles);
         }

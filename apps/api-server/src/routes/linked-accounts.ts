@@ -37,7 +37,7 @@ router.get('/sso/check', async (req: Request, res: Response) => {
       user: {
         id: session.userId,
         email: session.email,
-        role: session.role,
+        roles: session.roles,
         status: session.status
       },
       sessionId: sessionId

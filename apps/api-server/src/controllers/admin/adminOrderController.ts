@@ -19,7 +19,7 @@ import logger from '../../utils/logger.js';
  * Admin 권한 체크
  */
 function isAdmin(user: any): boolean {
-  return user && ['admin', 'operator'].includes(user.role);
+  return user && user.roles?.some((r: string) => ['admin', 'operator'].includes(r));
 }
 
 export class AdminOrderController {
@@ -186,7 +186,7 @@ export class AdminOrderController {
           reason,
           amount,
           performedBy: user.id,
-          performerType: user.role,
+          performerType: user.roles?.[0],
         });
 
       logger.info('Admin refund processed:', {

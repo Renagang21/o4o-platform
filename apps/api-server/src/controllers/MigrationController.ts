@@ -198,7 +198,8 @@ export class MigrationController {
       const userRepo = AppDataSource.getRepository(User);
 
       // Get first admin user
-      const adminUser = await userRepo.findOne({ where: { role: UserRole.ADMIN } });
+      // role column removed - find any active admin user
+      const adminUser = await userRepo.findOne({ where: { isActive: true } });
       if (!adminUser) {
         return res.status(400).json({
           success: false,

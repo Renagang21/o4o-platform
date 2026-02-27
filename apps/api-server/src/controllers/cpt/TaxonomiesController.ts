@@ -355,7 +355,7 @@ export class TaxonomiesController {
       const { name, slug, description, parentId, meta } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !['admin', 'manager'].includes(user.role)) {
+      if (!user || !user.roles?.some(r => ['admin', 'manager'].includes(r))) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin or manager access required' }
@@ -427,7 +427,7 @@ export class TaxonomiesController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !['admin', 'manager'].includes(user.role)) {
+      if (!user || !user.roles?.some(r => ['admin', 'manager'].includes(r))) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin or manager access required' }
@@ -488,7 +488,7 @@ export class TaxonomiesController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !['admin', 'manager'].includes(user.role)) {
+      if (!user || !user.roles?.some(r => ['admin', 'manager'].includes(r))) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin or manager access required' }
@@ -541,7 +541,7 @@ export class TaxonomiesController {
       const { objectId, objectType, termIds } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !['admin', 'manager', 'business'].includes(user.role)) {
+      if (!user || !user.roles?.some(r => ['admin', 'manager', 'business'].includes(r))) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Insufficient permissions' }

@@ -50,24 +50,20 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
       logger.info(`   Name: ${existingUser.name}`);
       logger.info(`   ID: ${existingUser.id}`);
 
-      // Log current roles from roles[] property
-      logger.info(`\n   Current roles: ${existingUser.roles?.join(', ') || 'none'}`);
-      logger.info(`   (Authoritative source: role_assignments table)`);
+      // Load user with roles
+      const userWithRoles = await userRepo.findOne({
+        where: { id: existingUser.id },
+        relations: ['dbRoles']
+      });
 
-      // Check RoleAssignment table
-      try {
-        const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
-        const assignments = await roleAssignmentService.getActiveRoles(existingUser.id);
-        if (assignments.length > 0) {
-          logger.info(`   RoleAssignments:`);
-          for (const a of assignments) {
-            logger.info(`   - ${a.role} (assigned: ${a.assignedAt})`);
-          }
-        } else {
-          logger.info(`   ⚠️  No active RoleAssignments found`);
+      if (userWithRoles?.dbRoles && userWithRoles.dbRoles.length > 0) {
+        logger.info(`\n   Current roles:`);
+        for (const role of userWithRoles.dbRoles) {
+          logger.info(`   - ${role.name} (${role.displayName})`);
         }
-      } catch {
-        logger.info(`   (RoleAssignment lookup skipped)`);
+      } else {
+        logger.info(`\n   ⚠️  User has no roles assigned!`);
+        logger.info(`   Legacy roles array: ${existingUser.roles?.join(', ')}`);
       }
 
       return existingUser;
@@ -83,6 +79,7 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
       email: managerEmail,
       password: hashedPassword,
       name: managerName,
+      roles: [UserRole.ADMIN],
       isEmailVerified: true,
       isActive: true
     });
@@ -114,18 +111,14 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
       logger.info(`✅ Found role: ${adminRole.name} (${adminRole.displayName})`);
     }
 
-    // Phase3-E: Create RoleAssignment record (authoritative role source)
-    try {
-      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
-      await roleAssignmentService.assignRole({
-        userId: newUser.id,
-        role: UserRole.ADMIN,
-        assignedBy: 'system:create-manager-script',
-      });
-      logger.info('✅ RoleAssignment created');
-    } catch (raErr: any) {
-      logger.warn('⚠️  RoleAssignment creation skipped:', raErr.message);
+    // Assign role to user via dbRoles relation
+    logger.info('\n🔗 Assigning role to user...');
+    if (!newUser.dbRoles) {
+      newUser.dbRoles = [];
     }
+    newUser.dbRoles.push(adminRole);
+    await userRepo.save(newUser);
+    logger.info('✅ Role assigned successfully!');
 
     // Summary
     logger.info('\n╔═══════════════════════════════════════════════════════════╗');

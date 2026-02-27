@@ -5,7 +5,7 @@ import crypto from 'crypto';
 interface SessionData {
   userId: string;
   email: string;
-  role: string;
+  roles?: string[];
   status: string;
   loginAt: Date;
   expiresAt: Date;
@@ -67,7 +67,7 @@ export class SessionSyncService {
     const sessionData: SessionData = {
       userId: user.id,
       email: user.email,
-      role: user.role,
+      roles: user.roles,
       status: user.status,
       loginAt: new Date(),
       expiresAt: new Date(Date.now() + this.SESSION_TTL * 1000),

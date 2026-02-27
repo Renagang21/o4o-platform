@@ -59,7 +59,7 @@ async function verifyRBACMigration(): Promise<VerificationResult> {
 
     // Get all users
     const users = await userRepo.find({
-      select: ['id', 'email', 'role', 'roles', 'isActive']
+      select: ['id', 'email', 'roles', 'isActive']
     });
     result.totalUsers = users.length;
 
@@ -80,8 +80,8 @@ async function verifyRBACMigration(): Promise<VerificationResult> {
 
     for (const user of users) {
       // Get expected roles from legacy fields
+      // role column removed - Phase3-E: use roles array only
       const expectedRoles = new Set<string>();
-      if (user.role) expectedRoles.add(user.role);
       if (user.roles && Array.isArray(user.roles)) {
         user.roles.forEach(r => r && expectedRoles.add(r));
       }

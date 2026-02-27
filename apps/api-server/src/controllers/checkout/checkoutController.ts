@@ -271,7 +271,7 @@ export class CheckoutController {
       const user = (req as any).user;
 
       // Phase N-2: 운영자만 환불 가능
-      if (!user || !['admin', 'operator'].includes(user.role)) {
+      if (!user || !user.roles?.some((r: string) => ['admin', 'operator'].includes(r))) {
         return res.status(403).json({
           success: false,
           message: 'Only operators can process refunds',
@@ -326,7 +326,7 @@ export class CheckoutController {
           reason,
           amount,
           performedBy: user.id,
-          performerType: user.role,
+          performerType: user.roles?.[0],
         }
       );
 
@@ -367,7 +367,7 @@ export class CheckoutController {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
-      const userRole = (req as any).user?.role;
+      const userRoles = (req as any).user?.roles as string[] | undefined;
 
       // UUID 또는 orderNumber로 조회
       let order = await checkoutService.findById(id);
@@ -386,7 +386,7 @@ export class CheckoutController {
       // 본인 주문인지 확인 (admin/operator는 모두 조회 가능)
       if (
         order.buyerId !== userId &&
-        !['admin', 'operator'].includes(userRole)
+        !userRoles?.some((r: string) => ['admin', 'operator'].includes(r))
       ) {
         return res.status(403).json({
           success: false,

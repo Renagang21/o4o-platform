@@ -40,8 +40,7 @@ export class UserManagementController extends BaseController {
           'user.status',
           'user.createdAt',
           'user.updatedAt',
-        ])
-        .leftJoinAndSelect('user.dbRoles', 'roles');
+        ]);
 
       // Apply filters
       if (query.search) {
@@ -74,7 +73,7 @@ export class UserManagementController extends BaseController {
           email: u.email,
           name: u.name,
           status: u.status,
-          roles: u.dbRoles?.map(r => r.name) || u.roles || [],
+          roles: u.roles || [],
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         })),
@@ -104,7 +103,6 @@ export class UserManagementController extends BaseController {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
         where: { id },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
@@ -119,11 +117,7 @@ export class UserManagementController extends BaseController {
           phone: user.phone,
           avatar: user.avatar,
           status: user.status,
-          roles: user.dbRoles?.map(r => ({
-            id: r.id,
-            name: r.name,
-            displayName: r.displayName,
-          })) || (user.roles?.map(role => ({ id: '', name: role, displayName: role })) || []),
+          roles: user.roles?.map(role => ({ id: '', name: role, displayName: role })) || [],
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },

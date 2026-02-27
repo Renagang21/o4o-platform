@@ -551,7 +551,8 @@
       "Bash(for f in \"docs/baseline/OPERATOR_UX_CORE_FREEZE_V1.md\" \"docs/baseline/ADMIN_UX_CORE_FREEZE_V1.md\" \"docs/platform/lms/LMS-CORE-DATA-OWNERSHIP.md\" \"docs/platform/lms/LMS-EVENT-STANDARD.md\")",
       "Bash(if [ -e \"$f\" ])",
       "Bash(then echo \"EXISTS: $f\")",
-      "Bash(else echo \"MISSING: $f\")"
+      "Bash(else echo \"MISSING: $f\")",
+      "Bash(source:*)"
     ],
     "deny": []
   }

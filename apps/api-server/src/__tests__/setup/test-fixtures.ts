@@ -65,7 +65,7 @@ export async function createTestUser(data: Partial<User> = {}): Promise<TestUser
     id: user.id,
     username: user.username,
     email: user.email,
-    role: user.role
+    role: user.roles?.[0]
   };
 }
 

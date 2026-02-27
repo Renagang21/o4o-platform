@@ -44,9 +44,7 @@ export function createBranchScopeGuard(dataSource: DataSource) {
 
     // Super admin / district admin bypass
     const roles: string[] = user.roles || [];
-    const singleRole: string = user.role || '';
     if (
-      BRANCH_BYPASS_ROLES.includes(singleRole) ||
       roles.some((r: string) => BRANCH_BYPASS_ROLES.includes(r))
     ) {
       next();

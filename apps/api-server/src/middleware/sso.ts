@@ -40,7 +40,7 @@ export const validateSSOSession = async (
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: sessionData.userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'permissions']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'permissions']
     });
 
     if (!user) {
@@ -96,7 +96,7 @@ export const optionalSSOSession = async (
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: sessionData.userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'permissions']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'permissions']
     });
 
     if (user) {

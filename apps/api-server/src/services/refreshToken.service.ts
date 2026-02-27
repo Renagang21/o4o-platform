@@ -102,7 +102,7 @@ export class RefreshTokenService {
         {
           userId: verification.user.id,
           email: verification.user.email,
-          role: verification.user.role
+          roles: verification.user.roles
         },
         process.env.JWT_SECRET || 'default-jwt-secret',
         { expiresIn: '15m' }

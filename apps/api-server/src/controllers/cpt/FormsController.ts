@@ -180,7 +180,7 @@ export class FormsController {
 
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.some((r: string) => ['admin', 'manager', 'business'].includes(r))) { // Phase3-D
+      if (!user || !user.roles?.some(r => ['admin', 'manager', 'business'].includes(r))) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Insufficient permissions' }

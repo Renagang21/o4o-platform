@@ -22,7 +22,7 @@ export class PartnerController {
         where: { id: userId }
       });
 
-      if (!partner || partner.role !== 'partner') {
+      if (!partner || !partner.roles?.includes('partner')) {
         return res.status(403).json({ 
           success: false, 
           message: 'Partner access only' 
@@ -276,7 +276,7 @@ export class PartnerController {
         where: { id: userId }
       });
 
-      if (!partner || partner.role !== 'partner') {
+      if (!partner || !partner.roles?.includes('partner')) {
         return res.status(403).json({ 
           success: false, 
           message: 'Partner access only' 

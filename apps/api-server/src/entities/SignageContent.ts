@@ -83,7 +83,7 @@ export class SignageContent {
 
   // Business logic methods
   canBeApprovedBy(user: User): boolean {
-    return user.roles?.includes('admin') || user.roles?.includes('super_admin'); // Phase3-D
+    return user.roles?.includes('admin') ?? false;
   }
 
   isApproved(): boolean {

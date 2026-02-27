@@ -34,7 +34,7 @@ export class UserController {
         data: {
           id: user.id,
           provider: user.provider,
-          role: user.role,
+          role: user.roles?.[0],
           status: user.status,
           businessInfo: user.businessInfo,
           createdAt: user.createdAt,

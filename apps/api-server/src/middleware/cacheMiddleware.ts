@@ -97,8 +97,8 @@ function generateCacheKey(req: Request, config?: CacheConfig): string {
   const user = (req as any).user;
   if (user) {
     components.push(`user:${user.id}`);
-    if (user.role) {
-      components.push(`role:${user.role}`);
+    if (user.roles?.[0]) {
+      components.push(`role:${user.roles[0]}`);
     }
   }
   

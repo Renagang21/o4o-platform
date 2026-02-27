@@ -163,9 +163,9 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
 
     const userRepository = AppDataSource.getRepository(User);
     
-    const user = await userRepository.findOne({ 
+    const user = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
 
     if (!user) {
@@ -196,7 +196,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
         await emailService.sendUserApprovalEmail(user.email, {
           userName: user.name || user.email,
           userEmail: user.email,
-          userRole: user.role,
+          userRole: user.roles?.[0],
           approvalDate: new Date().toLocaleString('ko-KR'),
           notes
         });
@@ -209,7 +209,7 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'approvedAt', 'approvedBy']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'updatedAt', 'approvedAt', 'approvedBy']
     });
 
     res.json({
@@ -282,7 +282,7 @@ export const rejectUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
 
     res.json({
@@ -349,7 +349,7 @@ export const suspendUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
 
     res.json({
@@ -415,7 +415,7 @@ export const reactivateUser = async (req: Request, res: Response) => {
     // Get updated user
     const updatedUser = await userRepository.findOne({
       where: { id: userId },
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'updatedAt']
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'updatedAt']
     });
 
     res.json({
@@ -468,7 +468,7 @@ export const getDashboardStats = async (req: Request, res: Response) => {
 
     // Get recent users
     const recentUsers = await userRepository.find({
-      select: ['id', 'email', 'name', 'role', 'status', 'businessInfo', 'createdAt', 'approvedBy'],
+      select: ['id', 'email', 'name', 'status', 'businessInfo', 'createdAt', 'approvedBy'],
       order: { createdAt: 'DESC' },
       take: 5
     });
