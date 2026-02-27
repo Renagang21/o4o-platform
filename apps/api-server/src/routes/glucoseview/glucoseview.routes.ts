@@ -17,7 +17,7 @@ import { createGlucoseViewApplicationController } from './controllers/applicatio
 import { createGlucoseViewPharmacyController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import { GlucoseViewPharmacist } from './entities/index.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
+import { hasAnyServiceRole } from '../../utils/role.utils.js';
 
 /**
  * Scope verification middleware factory for GlucoseView
@@ -31,7 +31,6 @@ import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js
 function requireGlucoseViewScope(scope: string): RequestHandler {
   return (req, res, next) => {
     const user = (req as any).user;
-    const userId = user?.id || user?.userId || 'unknown';
     const userRoles = user?.roles || [];
 
     // Priority 1: Check GlucoseView-specific prefixed roles + platform admin
@@ -39,7 +38,7 @@ function requireGlucoseViewScope(scope: string): RequestHandler {
       'glucoseview:admin',
       'glucoseview:operator',
       'platform:admin',
-      'platform:super_admin'
+      'platform:super_admin',
     ]);
 
     // Check for specific scope
@@ -48,25 +47,6 @@ function requireGlucoseViewScope(scope: string): RequestHandler {
 
     if (hasScope || hasGlucoseViewRole) {
       next();
-      return;
-    }
-
-    // Priority 2: Detect legacy roles and DENY with detailed error
-    const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-    const detectedLegacyRoles = userRoles.filter((r: string) => legacyRoles.includes(r));
-
-    if (detectedLegacyRoles.length > 0) {
-      // Log legacy role usage
-      detectedLegacyRoles.forEach((role: string) => {
-        logLegacyRoleUsage(userId, role, 'glucoseview.routes:requireGlucoseViewScope');
-      });
-
-      res.status(403).json({
-        error: {
-          code: 'FORBIDDEN',
-          message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use glucoseview:* or platform:* prefixed roles.`,
-        },
-      });
       return;
     }
 

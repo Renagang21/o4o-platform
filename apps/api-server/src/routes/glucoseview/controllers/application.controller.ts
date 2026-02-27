@@ -16,7 +16,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import logger from '../../../utils/logger.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../../utils/role.utils.js';
+import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -38,45 +38,13 @@ interface AuthRequest extends Request {
  * - Priority 2: Legacy role detection → Log + DENY
  * - Cross-service isolation: Other service roles DENY
  */
-function isOperatorOrAdmin(roles: string[] = [], userId: string = 'unknown'): boolean {
-  // Priority 1: Check GlucoseView-specific prefixed roles + platform admin
-  const hasGlucoseViewRole = hasAnyServiceRole(roles, [
+function isOperatorOrAdmin(roles: string[] = []): boolean {
+  return hasAnyServiceRole(roles, [
     'glucoseview:admin',
     'glucoseview:operator',
     'platform:admin',
-    'platform:super_admin'
+    'platform:super_admin',
   ]);
-
-  if (hasGlucoseViewRole) {
-    return true;
-  }
-
-  // Priority 2: Detect legacy roles and DENY access
-  const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-  const detectedLegacyRoles = roles.filter(r => legacyRoles.includes(r));
-
-  if (detectedLegacyRoles.length > 0) {
-    // Log legacy role usage and deny access
-    detectedLegacyRoles.forEach(role => {
-      logLegacyRoleUsage(userId, role, 'application.controller:isOperatorOrAdmin');
-    });
-    return false; // ❌ DENY - Legacy roles no longer grant access
-  }
-
-  // Detect other service roles and deny
-  const hasOtherServiceRole = roles.some(r =>
-    r.startsWith('kpa:') ||
-    r.startsWith('neture:') ||
-    r.startsWith('glycopharm:') ||
-    r.startsWith('cosmetics:')
-  );
-
-  if (hasOtherServiceRole) {
-    // Other service admins do NOT have GlucoseView access
-    return false; // ❌ DENY - GlucoseView requires glucoseview:* or platform:* roles
-  }
-
-  return false;
 }
 
 /**
@@ -348,7 +316,7 @@ export function createGlucoseViewApplicationController(
         }
 
         // Only allow access if owner or admin
-        const isAdmin = isOperatorOrAdmin(userRoles, userId);
+        const isAdmin = isOperatorOrAdmin(userRoles);
         if (application.userId !== userId && !isAdmin) {
           res.status(403).json({
             error: 'Forbidden',
@@ -399,7 +367,7 @@ export function createGlucoseViewApplicationController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles, userId)) {
+        if (!isOperatorOrAdmin(userRoles)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -497,7 +465,7 @@ export function createGlucoseViewApplicationController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles, userId)) {
+        if (!isOperatorOrAdmin(userRoles)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
@@ -721,7 +689,7 @@ export function createGlucoseViewApplicationController(
         const userRoles = user?.roles || [];
 
         // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles, userId)) {
+        if (!isOperatorOrAdmin(userRoles)) {
           res.status(403).json({
             error: 'Forbidden',
             code: 'FORBIDDEN',
