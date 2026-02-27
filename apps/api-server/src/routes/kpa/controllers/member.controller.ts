@@ -162,6 +162,20 @@ export function createMemberController(
 
         const saved = await memberRepo.save(member);
 
+        // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: SSOT sync → kpa_pharmacist_profiles
+        if (req.body.activity_type) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+              [req.user!.id, req.body.activity_type]
+            );
+          } catch (syncErr) {
+            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync on apply:', syncErr);
+          }
+        }
+
         // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
         const svcRecord = serviceRepo.create({
           member_id: saved.id,
@@ -418,6 +432,21 @@ export function createMemberController(
         if (req.body.pharmacy_address !== undefined) member.pharmacy_address = req.body.pharmacy_address || null;
 
         const saved = await memberRepo.save(member);
+
+        // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: SSOT sync → kpa_pharmacist_profiles
+        if (req.body.activity_type !== undefined) {
+          try {
+            await dataSource.query(
+              `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
+               VALUES ($1, $2)
+               ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
+              [req.user!.id, req.body.activity_type]
+            );
+          } catch (syncErr) {
+            console.error('[SSOT-SYNC] kpa_pharmacist_profiles sync failed:', syncErr);
+          }
+        }
+
         res.json({ data: saved });
       } catch (error: any) {
         console.error('Failed to update profession info:', error);

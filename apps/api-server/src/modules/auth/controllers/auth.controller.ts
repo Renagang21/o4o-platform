@@ -602,27 +602,44 @@ export class AuthController extends BaseController {
       return BaseController.unauthorized(res, 'Not authenticated');
     }
 
-    const { pharmacistFunction } = req.body;
-    const validFunctions = ['pharmacy', 'hospital', 'industry', 'other'];
-    if (pharmacistFunction && !validFunctions.includes(pharmacistFunction)) {
-      return BaseController.error(res, 'Invalid pharmacistFunction', 400);
-    }
-    if (!pharmacistFunction) {
-      return BaseController.error(res, 'No fields to update', 400);
-    }
+    // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1:
+    // activityType 직접 수용 (프론트 계약) + pharmacistFunction 하위 호환
+    const { pharmacistFunction, activityType: rawActivityType } = req.body;
 
+    const validActivityTypes = [
+      'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
+      'importer', 'wholesaler', 'other_industry', 'government', 'school', 'other', 'inactive',
+    ];
     const functionToActivity: Record<string, string> = {
       pharmacy: 'pharmacy_employee', hospital: 'hospital',
       industry: 'other_industry', other: 'other',
     };
-    const activityType = functionToActivity[pharmacistFunction] || 'other';
+
+    // activityType 직접 전송 우선, pharmacistFunction 레거시 매핑 폴백
+    let resolvedActivityType: string | null = null;
+    if (rawActivityType && validActivityTypes.includes(rawActivityType)) {
+      resolvedActivityType = rawActivityType;
+    } else if (pharmacistFunction && functionToActivity[pharmacistFunction]) {
+      resolvedActivityType = functionToActivity[pharmacistFunction];
+    }
+
+    if (!resolvedActivityType) {
+      return BaseController.error(res, 'No fields to update', 400);
+    }
 
     try {
+      // 1. SSOT: kpa_pharmacist_profiles
       await AppDataSource.query(
         `INSERT INTO kpa_pharmacist_profiles (user_id, activity_type)
          VALUES ($1, $2)
          ON CONFLICT (user_id) DO UPDATE SET activity_type = $2, updated_at = NOW()`,
-        [userId, activityType]
+        [userId, resolvedActivityType]
+      );
+
+      // 2. Mirror: kpa_members.activity_type (denormalized sync)
+      await AppDataSource.query(
+        `UPDATE kpa_members SET activity_type = $2 WHERE user_id = $1`,
+        [userId, resolvedActivityType]
       );
 
       const qualification = await derivePharmacistQualification(userId);
@@ -630,6 +647,7 @@ export class AuthController extends BaseController {
         pharmacistFunction: qualification.pharmacistFunction,
         pharmacistRole: qualification.pharmacistRole,
         isStoreOwner: qualification.isStoreOwner,
+        activityType: resolvedActivityType,
       });
     } catch (error: any) {
       logger.error('[AuthController.updateProfile] Update failed', {

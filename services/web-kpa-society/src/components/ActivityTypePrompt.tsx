@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const ACTIVITY_OPTIONS = [
   { value: 'pharmacy_owner', label: '약국 개설약사' },
@@ -24,6 +25,7 @@ interface MemberInfo {
 }
 
 export function ActivityTypePrompt() {
+  const { setActivityType } = useAuth();
   const [member, setMember] = useState<MemberInfo | null>(null);
   const [selected, setSelected] = useState('');
   const [saving, setSaving] = useState(false);
@@ -49,16 +51,10 @@ export function ActivityTypePrompt() {
     if (!selected) return;
     setSaving(true);
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/kpa/members/me/profession`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activity_type: selected }),
-      });
-      if (res.ok) {
-        setMember({ ...member, activity_type: selected });
-      }
+      // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1: 단일 진입점 사용
+      // setActivityType → PATCH /auth/me/profile → SSOT(profiles) + mirror(members) 동시 갱신
+      await setActivityType(selected);
+      setMember({ ...member, activity_type: selected });
     } catch {
       // 실패해도 배너만 닫음
     } finally {
