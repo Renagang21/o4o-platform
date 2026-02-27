@@ -6,7 +6,6 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import { verifyAccessToken, isServiceToken, isPlatformUserToken, isGuestToken, isGuestOrServiceToken } from '../../utils/token.utils.js';
 import type { AccessTokenPayload, TokenType } from '../../types/auth.js';
 import logger from '../../utils/logger.js';
-import { hasPlatformRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 
 /**
  * Extended Request interface with authenticated user
@@ -106,6 +105,9 @@ export const requireAuth = async (
       });
     }
 
+    // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
+    user.roles = payload.roles || [];
+
     // Attach user to request
     req.user = user;
     next();
@@ -154,62 +156,17 @@ export const requireAdmin = async (
   }
 
   const user = req.user as User;
-  const userRoles = user.roles || [];
 
   try {
-    // Check prefixed platform roles first (Priority 1)
-    if (hasPlatformRole(userRoles, 'super_admin') || hasPlatformRole(userRoles, 'admin')) {
-      return next();
-    }
-
-    // Check RoleAssignment table for prefixed platform roles (Priority 2)
-    const hasPlatformRoleAssignment = await roleAssignmentService.hasAnyRole(user.id, [
-      'platform:super_admin',
-      'platform:admin'
-    ]);
-
-    if (hasPlatformRoleAssignment) {
-      return next();
-    }
-
-    // Check for legacy roles in User.roles and log/deny
-    const legacyRoles = ['admin', 'super_admin', 'operator'];
-    const hasLegacyRole = legacyRoles.some(role => userRoles.includes(role));
-
-    if (hasLegacyRole) {
-      // Log legacy role usage
-      legacyRoles.forEach(role => {
-        if (userRoles.includes(role)) {
-          logLegacyRoleUsage(user.id, role, 'common/auth.middleware:requireAdmin');
-        }
-      });
-
-      logger.warn('[requireAdmin] Legacy role format detected and denied', {
-        userId: user.id,
-        email: user.email,
-        legacyRoles: userRoles.filter(r => legacyRoles.includes(r)),
-        path: req.path,
-        method: req.method,
-      });
-
-      return res.status(403).json({
-        success: false,
-        error: 'Admin privileges required (platform:admin or platform:super_admin)',
-        code: 'FORBIDDEN',
-      });
-    }
-
-    // Check for legacy roles in RoleAssignment table and log/deny
-    const hasLegacyRoleAssignment = await roleAssignmentService.hasAnyRole(user.id, [
+    // Phase3-E: Pure RA-based admin check. role_assignments is the single source of truth.
+    const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
       'admin',
       'super_admin',
-      'operator'
+      'operator',
     ]);
 
-    if (hasLegacyRoleAssignment) {
-      logLegacyRoleUsage(user.id, 'legacy_role_assignment', 'common/auth.middleware:requireAdmin');
-
-      logger.warn('[requireAdmin] Legacy role assignment detected and denied', {
+    if (!isAdmin) {
+      logger.warn('[requireAdmin] Unauthorized admin access attempt', {
         userId: user.id,
         email: user.email,
         path: req.path,
@@ -218,30 +175,16 @@ export const requireAdmin = async (
 
       return res.status(403).json({
         success: false,
-        error: 'Admin privileges required (platform:admin or platform:super_admin)',
+        error: 'Admin privileges required',
         code: 'FORBIDDEN',
       });
     }
 
-    // No admin role found - deny access
-    logger.warn('[requireAdmin] Unauthorized admin access attempt', {
-      userId: user.id,
-      email: user.email,
-      path: req.path,
-      method: req.method,
-    });
-
-    return res.status(403).json({
-      success: false,
-      error: 'Admin privileges required',
-      code: 'FORBIDDEN',
-    });
-
-    next();
+    return next();
   } catch (error) {
     logger.error('[requireAdmin] Error checking admin role', {
       error: error instanceof Error ? error.message : String(error),
-      userId: user.id
+      userId: user.id,
     });
 
     return res.status(500).json({
@@ -374,6 +317,8 @@ export const optionalAuth = async (
     });
 
     if (user && user.isActive) {
+      // Phase3-E: Assign roles from JWT payload
+      user.roles = payload.roles || [];
       req.user = user;
     }
 
@@ -627,6 +572,9 @@ export const requirePlatformUser = async (
         code: 'USER_INACTIVE',
       });
     }
+
+    // Phase3-E: Assign roles from JWT payload
+    user.roles = payload.roles || [];
 
     req.user = user;
     next();

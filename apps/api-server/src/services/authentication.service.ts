@@ -43,6 +43,7 @@ import { LoginSecurityService } from './LoginSecurityService.js';
 import { AccountLinkingService } from './account-linking.service.js';
 import { emailService } from './email.service.js';
 import logger from '../utils/logger.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 /**
  * AuthenticationService - SSOT (Single Source of Truth) for Authentication
@@ -190,9 +191,12 @@ export class AuthenticationService {
       logger.warn('Failed to log login attempt (non-critical):', err)
     );
 
+    // Phase3-E: Query RoleAssignment table for current roles
+    const userRoles = await roleAssignmentService.getRoleNames(user.id);
+
     // Generate session ID and tokens first (critical path)
     const sessionId = SessionSyncService.generateSessionId();
-    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+    const tokens = tokenUtils.generateTokens(user, userRoles, 'neture.co.kr');
 
     // Prepare user updates
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
@@ -288,7 +292,8 @@ export class AuthenticationService {
       }
 
       // Generate tokens
-      const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+      const userRoles0 = await roleAssignmentService.getRoleNames(user.id);
+      const tokens = tokenUtils.generateTokens(user, userRoles0, 'neture.co.kr');
 
       // Log successful login
       await this.logLoginAttempt(user.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -334,7 +339,8 @@ export class AuthenticationService {
       }
 
       // Generate tokens
-      const tokens = tokenUtils.generateTokens(existingUserByEmail, 'neture.co.kr');
+      const existingUserRoles = await roleAssignmentService.getRoleNames(existingUserByEmail.id);
+      const tokens = tokenUtils.generateTokens(existingUserByEmail, existingUserRoles, 'neture.co.kr');
 
       // Log successful login
       await this.logLoginAttempt(existingUserByEmail.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -365,7 +371,6 @@ export class AuthenticationService {
       lastName: profile.lastName,
       avatar: profile.avatar,
       password: await hashPassword(generateRandomToken()), // Random password for OAuth users
-      role: UserRole.USER,
       roles: [UserRole.USER],
       status: UserStatus.ACTIVE,
       isEmailVerified: profile.emailVerified || false,
@@ -393,7 +398,8 @@ export class AuthenticationService {
     await this.linkedAccountRepository.save(linkedAccount);
 
     // Generate tokens
-    const tokens = tokenUtils.generateTokens(newUser, 'neture.co.kr');
+    const newUserRoles = await roleAssignmentService.getRoleNames(newUser.id);
+    const tokens = tokenUtils.generateTokens(newUser, newUserRoles, 'neture.co.kr');
 
     // Log new user creation and login
     await this.logLoginAttempt(newUser.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -858,7 +864,8 @@ export class AuthenticationService {
     }
 
     // Generate new tokens (with rotation)
-    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+    const refreshedRoles = await roleAssignmentService.getRoleNames(user.id);
+    const tokens = tokenUtils.generateTokens(user, refreshedRoles, 'neture.co.kr');
 
     // Update token family
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
@@ -1138,14 +1145,15 @@ export class AuthenticationService {
 
     // Find or create one user for each role
     for (const role of targetRoles) {
+      // role column removed - find test user by email pattern only
       let user = await this.userRepository
         .createQueryBuilder('user')
-        .where('user.role = :role', { role })
         .andWhere(
           '(user.email LIKE :pattern1 OR user.email LIKE :pattern2)',
           { pattern1: '%@test.com', pattern2: '%test%' }
         )
-        .select(['user.id', 'user.email', 'user.role', 'user.password'])
+        .andWhere('user.email LIKE :rolePattern', { rolePattern: `%${role}%` })
+        .select(['user.id', 'user.email', 'user.password', 'user.status', 'user.isEmailVerified'])
         .limit(1)
         .getOne();
 
@@ -1156,7 +1164,6 @@ export class AuthenticationService {
           email: testEmail,
           name: `Test ${this.getRoleLabel(role)}`,
           password: await hashPassword(testPassword),
-          role: role,
           roles: [role],
           status: UserStatus.ACTIVE,
           isEmailVerified: true,
@@ -1187,7 +1194,7 @@ export class AuthenticationService {
       }
 
       testAccounts.push({
-        role: this.getRoleLabel(user.role),
+        role: this.getRoleLabel(user.roles?.[0] || role),
         email: user.email,
         password: testPassword
       });

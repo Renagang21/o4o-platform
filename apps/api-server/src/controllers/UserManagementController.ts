@@ -5,6 +5,7 @@ import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
 import * as bcrypt from 'bcryptjs';
 import { Parser } from 'json2csv';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export class UserManagementController {
   private userRepository: UserRepository;
@@ -181,7 +182,6 @@ export class UserManagementController {
         password,
         firstName,
         lastName,
-        role: role || 'customer',
         roles: roles || [role || 'customer'],
         status: status || 'pending'
       });
@@ -223,8 +223,8 @@ export class UserManagementController {
       if (lastName !== undefined) user.lastName = lastName;
       if (status) user.status = status;
       if (roles) {
-        user.roles = roles;
-        user.role = roles[0] || user.role;
+        await roleAssignmentService.removeAllRoles(user.id);
+        await roleAssignmentService.assignRoles(user.id, roles);
       }
 
       const updatedUser = await this.userRepository.save(user);
@@ -462,7 +462,7 @@ export class UserManagementController {
         'First Name': user.firstName || '',
         'Last Name': user.lastName || '',
         'Full Name': user.fullName,
-        Role: user.role,
+        Role: user.roles?.[0],
         Roles: user.roles.join(', '),
         Status: user.status,
         'Email Verified': user.isEmailVerified ? 'Yes' : 'No',

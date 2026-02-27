@@ -11,7 +11,7 @@ import { LoginRequestDto, RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
-import { deriveRoles } from '../../../utils/token.utils.js';
+import { roleAssignmentService } from '../services/role-assignment.service.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -266,7 +266,7 @@ export class AuthController extends BaseController {
         newUser.firstName = data.firstName;
         newUser.name = `${data.lastName}${data.firstName}`;
         newUser.nickname = data.nickname;
-        newUser.role = effectiveRole as UserRole;
+        // role column removed - Phase3-E: roles is populated from role_assignments
         newUser.serviceKey = data.service || 'platform';
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
@@ -518,12 +518,12 @@ export class AuthController extends BaseController {
     }
 
     try {
-      // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: roles 도출
-      const roles = deriveRoles(req.user);
+      // Phase3-E: roles from JWT payload (set at login from role_assignments)
+      const roles = req.user.roles || [];
 
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 계산
       const scopes = deriveUserScopes({
-        role: req.user.role,
+        role: roles[0] || 'user',
         roles,
       });
 
@@ -531,7 +531,7 @@ export class AuthController extends BaseController {
         id: req.user.id,
         email: req.user.email,
         name: req.user.name,
-        role: req.user.role,
+        role: roles[0] || 'user',
         roles,  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
         status: req.user.status,
         scopes: [] as string[],
@@ -650,12 +650,12 @@ export class AuthController extends BaseController {
     let userData = null;
     if (authenticated && req.user) {
       userData = req.user.toPublicData?.() || req.user;
-      // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: roles 주입
-      const roles = deriveRoles(req.user);
+      // Phase3-E: Fresh RA query for current roles on status check
+      const roles = await roleAssignmentService.getRoleNames(req.user.id);
       userData.roles = roles;
       // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes 주입
       const scopes = deriveUserScopes({
-        role: req.user.role,
+        role: roles[0] || 'user',
         roles,
       });
       userData.scopes = scopes;

@@ -29,19 +29,11 @@ const REFRESH_TOKEN_EXPIRES_IN = 7 * 24 * 60 * 60; // 7 days in seconds
 /**
  * Derive roles array from user data
  *
- * WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1:
- * 하위 호환 유지하며 roles[] 배열 도출.
- * - user.getRoleNames()가 있으면 우선 사용
- * - user.roles 배열이 있으면 사용
- * - 그 외 user.role 단일값을 배열로 래핑
+ * Phase3-E PR3: role 단일 속성 제거됨.
+ * user.roles (shim으로 채워짐)만 사용.
  */
-export function deriveRoles(user: { role?: string; roles?: string[]; getRoleNames?: () => string[] }): string[] {
-  if (user.getRoleNames) {
-    const names = user.getRoleNames();
-    if (names.length > 0) return names;
-  }
+export function deriveRoles(user: { roles?: string[] }): string[] {
   if (Array.isArray(user.roles) && user.roles.length > 0) return user.roles;
-  if (user.role) return [user.role];
   return [];
 }
 
@@ -91,15 +83,16 @@ function getJwtSecrets() {
  * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
  * Token includes tokenType: 'user' to distinguish from service tokens
  */
-export function generateAccessToken(user: User, domain: string = 'neture.co.kr'): string {
+export function generateAccessToken(user: User, roles: string[], domain: string = 'neture.co.kr'): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
-  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1: 다중 역할 배열 도출
-  const userRoles = deriveRoles(user);
+  // Phase3-E PR3: roles from RoleAssignment table (explicit parameter)
+  const userRoles = roles;
+  const primaryRole = userRoles[0] || 'user';
 
   // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: 역할 기반 스코프 도출
   const userScopes = deriveUserScopes({
-    role: user.role,
+    role: primaryRole,
     roles: userRoles,
   });
 
@@ -107,8 +100,8 @@ export function generateAccessToken(user: User, domain: string = 'neture.co.kr')
     userId: user.id,
     sub: user.id,
     email: user.email,
-    role: user.role,
-    roles: userRoles, // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1
+    role: primaryRole,
+    roles: userRoles, // Phase3-E: from RoleAssignment
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     domain,
@@ -252,10 +245,10 @@ export function generateRefreshToken(user: User, tokenFamily?: string): string {
  * @param domain - Domain for the token (default: neture.co.kr)
  * @returns AuthTokens object with both tokens
  */
-export function generateTokens(user: User, domain: string = 'neture.co.kr'): AuthTokens {
+export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr'): AuthTokens {
   const tokenFamily = uuidv4();
 
-  const accessToken = generateAccessToken(user, domain);
+  const accessToken = generateAccessToken(user, roles, domain);
   const refreshToken = generateRefreshToken(user, tokenFamily);
 
   return {

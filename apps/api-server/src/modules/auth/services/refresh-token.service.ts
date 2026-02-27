@@ -2,9 +2,10 @@ import { BaseService } from '../../../common/base.service.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { RefreshToken } from '../entities/RefreshToken.js';
 import type { User } from '../entities/User.js';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import logger from '../../../utils/logger.js';
+import { generateAccessToken } from '../../../utils/token.utils.js';
+import { roleAssignmentService } from './role-assignment.service.js';
 
 /**
  * RefreshTokenService - Manages RefreshToken entity
@@ -127,16 +128,11 @@ export class RefreshTokenService extends BaseService<RefreshToken> {
         return { error: verification.reason || 'Invalid refresh token' };
       }
 
-      // Generate new access token (short-lived)
-      const accessToken = jwt.sign(
-        {
-          userId: verification.user.id,
-          email: verification.user.email,
-          role: verification.user.role,
-        },
-        process.env.JWT_SECRET || 'default-jwt-secret',
-        { expiresIn: '15m' }
-      );
+      // Phase3-E: Query RoleAssignment table for current roles
+      const roles = await roleAssignmentService.getRoleNames(verification.user.id);
+
+      // Generate new access token via standard token utils
+      const accessToken = generateAccessToken(verification.user, roles);
 
       // Update last used timestamp
       await this.repository.update(

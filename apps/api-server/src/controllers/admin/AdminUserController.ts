@@ -3,6 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 export class AdminUserController {
   
@@ -30,10 +31,10 @@ export class AdminUserController {
         );
       }
 
-      // Apply role filter
-      if (role && role !== 'all') {
-        queryBuilder.andWhere('user.role = :role', { role });
-      }
+      // Apply role filter - role column removed, skip role filtering
+      // if (role && role !== 'all') {
+      //   queryBuilder.andWhere('user.role = :role', { role });
+      // }
 
       // Apply status filter
       if (status && status !== 'all') {
@@ -156,7 +157,6 @@ export class AdminUserController {
         firstName,
         lastName,
         name,
-        role,
         status,
         isActive,
         roles: [role],
@@ -236,8 +236,8 @@ export class AdminUserController {
       if (lastName) user.lastName = lastName;
       if (name) user.name = name;
       if (role) {
-        user.role = role;
-        user.roles = [role];
+        await roleAssignmentService.removeAllRoles(user.id);
+        await roleAssignmentService.assignRole({ userId: user.id, role });
       }
       if (status !== undefined) user.status = status;
       if (isActive !== undefined) user.isActive = isActive;
@@ -343,11 +343,8 @@ export class AdminUserController {
       ] = await Promise.all([
         userRepo.count(),
         userRepo.count({ where: { isActive: true } }),
-        userRepo
-          .createQueryBuilder('user')
-          .select('user.role as role, COUNT(*) as count')
-          .groupBy('user.role')
-          .getRawMany(),
+        // role column removed - return empty array for role stats
+        Promise.resolve([]),
         userRepo
           .createQueryBuilder('user')
           .select('user.status as status, COUNT(*) as count')
@@ -356,7 +353,7 @@ export class AdminUserController {
         userRepo.find({
           order: { createdAt: 'DESC' },
           take: 10,
-          select: ['id', 'firstName', 'lastName', 'email', 'role', 'createdAt']
+          select: ['id', 'firstName', 'lastName', 'email', 'createdAt']
         })
       ]);
 

@@ -2,6 +2,7 @@ import { Repository, SelectQueryBuilder, Brackets } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { ApprovalLog } from '../entities/ApprovalLog.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export interface UserFilters {
   search?: string;
@@ -50,14 +51,8 @@ export class UserRepository extends Repository<User> {
       );
     }
 
-    // Apply role filter
-    if (filters.role) {
-      if (Array.isArray(filters.role)) {
-        query.andWhere('user.role IN (:...roles)', { roles: filters.role });
-      } else {
-        query.andWhere('user.role = :role', { role: filters.role });
-      }
-    }
+    // Phase3-E PR3: role 컬럼 제거됨. role_assignments 기반 필터는 별도 구현 필요.
+    // filters.role 필터는 무시됨.
 
     // Apply status filter
     if (filters.status) {
@@ -227,11 +222,11 @@ export class UserRepository extends Repository<User> {
       throw new Error('User not found');
     }
 
-    user.roles = roles;
-    // Keep primary role in sync
-    user.role = roles[0] || UserRole.USER;
+    // Phase3-E: update via role_assignments table
+    await roleAssignmentService.removeAllRoles(userId);
+    await roleAssignmentService.assignRoles(userId, roles.map(r => r.toString()));
 
-    return this.save(user);
+    return user;
   }
 
   // Get user statistics
@@ -247,17 +242,8 @@ export class UserRepository extends Repository<User> {
     const active = await this.count({ where: { status: UserStatus.ACTIVE } });
     const rejected = await this.count({ where: { status: UserStatus.REJECTED } });
 
-    // Count by role
-    const roleStats = await this.createQueryBuilder('user')
-      .select('user.role', 'role')
-      .addSelect('COUNT(*)', 'count')
-      .groupBy('user.role')
-      .getRawMany();
-
-    const byRole = roleStats.reduce((acc, stat) => {
-      acc[stat.role] = parseInt(stat.count);
-      return acc;
-    }, {} as Record<string, number>);
+    // Phase3-E PR3: role 컬럼 제거됨. byRole은 빈 객체 반환.
+    const byRole: Record<string, number> = {};
 
     return { total, pending, active, rejected, byRole };
   }

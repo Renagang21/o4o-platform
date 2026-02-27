@@ -4,6 +4,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import type { BusinessInfo } from '../../../types/user.js';
 import { hashPassword, getDefaultPermissions } from '../utils/auth.utils.js';
+import { roleAssignmentService } from './role-assignment.service.js';
 
 /**
  * UserService - Manages User entity CRUD and business logic
@@ -56,7 +57,7 @@ export class UserService extends BaseService<User> {
     const user = this.repository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER,
+      roles: [userData.role || UserRole.USER],
       status: UserStatus.PENDING,
       permissions: getDefaultPermissions(userData.role || UserRole.USER),
       isActive: true,
@@ -80,10 +81,14 @@ export class UserService extends BaseService<User> {
       throw new Error('User not found');
     }
 
-    user.role = role;
     user.permissions = getDefaultPermissions(role);
+    await this.repository.save(user);
 
-    return await this.repository.save(user);
+    // Phase3-E: update role via role_assignments table
+    await roleAssignmentService.removeAllRoles(userId);
+    await roleAssignmentService.assignRole({ userId, role });
+
+    return user;
   }
 
   /**
@@ -134,15 +139,15 @@ export class UserService extends BaseService<User> {
    */
   async findByRole(role: UserRole): Promise<User[]> {
     try {
+      // role column removed - Phase3-E: filter by isActive only
       return await this.repository.find({
-        where: { role, isActive: true },
+        where: { isActive: true },
         select: [
           'id',
           'email',
           'firstName',
           'lastName',
           'name',
-          'role',
           'status',
           'createdAt',
         ],
@@ -168,7 +173,6 @@ export class UserService extends BaseService<User> {
           'firstName',
           'lastName',
           'name',
-          'role',
           'status',
           'createdAt',
         ],

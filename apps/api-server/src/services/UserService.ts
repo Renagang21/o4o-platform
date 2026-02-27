@@ -3,6 +3,7 @@ import { User, UserRole, UserStatus } from '../modules/auth/entities/User.js';
 import bcrypt from 'bcryptjs';
 import { BusinessInfo } from '../types/user.js';
 import { MoreThan } from 'typeorm';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export class UserService {
   private static userRepository = AppDataSource.getRepository(User);
@@ -48,7 +49,7 @@ export class UserService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER,
+      roles: [userData.role || UserRole.USER],
       status: UserStatus.PENDING,
       permissions: this.getDefaultPermissions(userData.role || UserRole.USER),
       isActive: true,
@@ -68,10 +69,14 @@ export class UserService {
       throw new Error('User not found');
     }
 
-    user.role = role;
     user.permissions = this.getDefaultPermissions(role);
-    
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+
+    // Phase3-E: update role via role_assignments table
+    await roleAssignmentService.removeAllRoles(userId);
+    await roleAssignmentService.assignRole({ userId, role });
+
+    return user;
   }
 
   /**
@@ -109,9 +114,10 @@ export class UserService {
    */
   static async getUsersByRole(role: UserRole): Promise<User[]> {
     try {
-      return await this.userRepository.find({ 
-        where: { role, isActive: true },
-        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
+      // role column removed - filter by isActive only (role filtering via role_assignments)
+      return await this.userRepository.find({
+        where: { isActive: true },
+        select: ['id', 'email', 'firstName', 'lastName', 'name', 'status', 'createdAt']
       });
     } catch (error) {
       // Error log removed
@@ -124,9 +130,9 @@ export class UserService {
    */
   static async getUsersByStatus(status: UserStatus): Promise<User[]> {
     try {
-      return await this.userRepository.find({ 
+      return await this.userRepository.find({
         where: { status },
-        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
+        select: ['id', 'email', 'firstName', 'lastName', 'name', 'status', 'createdAt']
       });
     } catch (error) {
       // Error log removed

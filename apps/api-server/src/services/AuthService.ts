@@ -18,6 +18,7 @@ import {
 import { RefreshTokenService } from './RefreshTokenService.js';
 import * as tokenUtils from '../utils/token.utils.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import {
   InvalidCredentialsError,
   AccountLockedError,
@@ -112,7 +113,8 @@ class AuthService {
   // JWT 토큰 생성 (Refactored to use token.utils)
   async generateTokens(user: User, domain: string): Promise<AuthTokens> {
     // Use centralized token generation
-    const tokens = tokenUtils.generateTokens(user, domain);
+    const roles = await roleAssignmentService.getRoleNames(user.id);
+    const tokens = tokenUtils.generateTokens(user, roles, domain);
 
     // Extract token family from refresh token for backward compatibility
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
@@ -185,7 +187,7 @@ class AuthService {
     const user = this.userRepository.create({
       ...userData,
       password: hashedPassword,
-      role: userData.role || UserRole.USER
+      roles: [userData.role || UserRole.USER]
     });
 
     return await this.userRepository.save(user);
@@ -252,7 +254,7 @@ class AuthService {
       throw new Error('User not found');
     }
 
-    await this.userRepository.update(userId, { role });
+    await this.userRepository.update(userId, { roles: [role] });
     const updatedUser = await this.getUserById(userId);
     if (!updatedUser) {
       throw new Error('Failed to update user role');
@@ -280,9 +282,10 @@ class AuthService {
   // 역할별 사용자 목록 조회
   async getUsersByRole(role: UserRole): Promise<User[]> {
     try {
-      return await this.userRepository.find({ 
-        where: { role, isActive: true },
-        select: ['id', 'email', 'firstName', 'lastName', 'name', 'role', 'status', 'createdAt']
+      // role column removed - filter by isActive only (role filtering via role_assignments)
+      return await this.userRepository.find({
+        where: { isActive: true },
+        select: ['id', 'email', 'firstName', 'lastName', 'name', 'status', 'createdAt']
       });
     } catch (error) {
       // Error log removed

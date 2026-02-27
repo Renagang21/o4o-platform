@@ -15,6 +15,7 @@ import { SessionSyncService } from './sessionSyncService.js';
 import { LoginSecurityService } from './LoginSecurityService.js';
 import * as tokenUtils from '../utils/token.utils.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import { comparePassword } from '../modules/auth/utils/auth.utils.js';
 import {
   InvalidCredentialsError,
@@ -174,7 +175,7 @@ export class AuthServiceV2 {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          role: (user.roles?.[0] as UserRole) || UserRole.USER,
           status: user.status,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
@@ -198,7 +199,8 @@ export class AuthServiceV2 {
     metadata?: TokenMetadata
   ): Promise<AuthTokens> {
     // Use centralized token generation
-    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+    const roles = await roleAssignmentService.getRoleNames(user.id);
+    const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr');
 
     // Note: RefreshTokenService integration can be done separately if needed
     // For now, using the centralized token generation

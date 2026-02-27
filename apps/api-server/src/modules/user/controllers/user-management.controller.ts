@@ -4,6 +4,7 @@ import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../auth/entities/User.js';
 import { UserQueryDto, UpdateUserDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
+import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 
 /**
  * User Management Controller - NextGen Pattern
@@ -36,7 +37,6 @@ export class UserManagementController extends BaseController {
           'user.id',
           'user.email',
           'user.name',
-          'user.role',
           'user.status',
           'user.createdAt',
           'user.updatedAt',
@@ -50,9 +50,10 @@ export class UserManagementController extends BaseController {
         });
       }
 
-      if (query.role) {
-        queryBuilder.andWhere('user.role = :role', { role: query.role });
-      }
+      // role column removed - Phase3-E: role filter via role_assignments
+      // if (query.role) {
+      //   queryBuilder.andWhere('user.role = :role', { role: query.role });
+      // }
 
       if (query.status) {
         queryBuilder.andWhere('user.status = :status', { status: query.status });
@@ -72,9 +73,8 @@ export class UserManagementController extends BaseController {
           id: u.id,
           email: u.email,
           name: u.name,
-          role: u.role,
           status: u.status,
-          roles: u.dbRoles?.map(r => r.name) || [],
+          roles: u.dbRoles?.map(r => r.name) || u.roles || [],
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         })),
@@ -118,13 +118,12 @@ export class UserManagementController extends BaseController {
           name: user.name,
           phone: user.phone,
           avatar: user.avatar,
-          role: user.role,
           status: user.status,
           roles: user.dbRoles?.map(r => ({
             id: r.id,
             name: r.name,
             displayName: r.displayName,
-          })) || [],
+          })) || (user.roles?.map(role => ({ id: '', name: role, displayName: role })) || []),
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -158,7 +157,11 @@ export class UserManagementController extends BaseController {
       if (data.name) user.name = data.name;
       if (data.email) user.email = data.email;
       if (data.status) user.status = data.status as any;
-      if (data.role) user.role = data.role as any;
+      // Phase3-E: use role_assignments table
+      if (data.role) {
+        await roleAssignmentService.removeAllRoles(user.id);
+        await roleAssignmentService.assignRole({ userId: user.id, role: data.role as string });
+      }
 
       user.updatedAt = new Date();
       await userRepository.save(user);
@@ -169,7 +172,7 @@ export class UserManagementController extends BaseController {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
+          roles: user.roles || [],
           status: user.status,
         },
       });

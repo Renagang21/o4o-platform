@@ -4,6 +4,7 @@ import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js'
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';
 import logger from '../../utils/logger.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 const router: Router = Router();
 
@@ -32,9 +33,10 @@ router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) 
       queryBuilder.andWhere('user.status = :status', { status });
     }
 
-    if (role) {
-      queryBuilder.andWhere('user.role = :role', { role });
-    }
+    // role column removed - Phase3-E: role filter via role_assignments
+    // if (role) {
+    //   queryBuilder.andWhere('user.role = :role', { role });
+    // }
 
     // Get total count
     const total = await queryBuilder.getCount();
@@ -51,7 +53,7 @@ router.get('/', authenticate, requireAdmin, async (req: Request, res: Response) 
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
+      roles: user.roles || [],
       status: user.status,
       provider: user.provider,
       businessInfo: user.businessInfo,
@@ -158,7 +160,7 @@ router.post('/', authenticate, requireAdmin, async (req: Request, res: Response)
       name: req.body.firstName && req.body.lastName
         ? `${req.body.firstName} ${req.body.lastName}`
         : req.body.firstName || req.body.lastName || req.body.email.split('@')[0],
-      role: req.body.role || 'customer',
+      roles: [req.body.role || 'customer'],
       status: req.body.status || 'active',
       provider: 'local'
     });
@@ -213,22 +215,16 @@ router.put('/:id', authenticate, requireAdmin, async (req: Request, res: Respons
         : req.body.firstName || req.body.lastName || user.name;
     }
 
-    // Handle both single role and roles array
+    // Handle both single role and roles array — Phase3-E: use role_assignments table
     if (req.body.roles && Array.isArray(req.body.roles) && req.body.roles.length > 0) {
-      // Update both role (first one) and roles array for backward compatibility
       logger.info('Setting user roles:', { roles: req.body.roles });
-      user.roles = req.body.roles;
-      user.role = req.body.roles[0]; // Set first role as primary
+      await roleAssignmentService.removeAllRoles(user.id);
+      await roleAssignmentService.assignRoles(user.id, req.body.roles);
     } else if (req.body.role) {
       logger.info('Setting single role:', { role: req.body.role });
-      user.role = req.body.role;
-      user.roles = [req.body.role];
+      await roleAssignmentService.removeAllRoles(user.id);
+      await roleAssignmentService.assignRole({ userId: user.id, role: req.body.role });
     }
-
-    logger.info('User before save:', {
-      roles: user.roles,
-      role: user.role
-    });
 
     if (req.body.status) user.status = req.body.status;
 
@@ -263,8 +259,11 @@ router.patch('/:id', authenticate, requireAdmin, async (req: Request, res: Respo
       });
     }
 
-    // Update allowed fields
-    if (req.body.role) user.role = req.body.role;
+    // Update role — Phase3-E: use role_assignments table
+    if (req.body.role) {
+      await roleAssignmentService.removeAllRoles(user.id);
+      await roleAssignmentService.assignRole({ userId: user.id, role: req.body.role });
+    }
     if (req.body.status) user.status = req.body.status;
     if (req.body.name) user.name = req.body.name;
 

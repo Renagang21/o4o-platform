@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import logger from '../utils/logger.js';
 import * as tokenUtils from '../utils/token.utils.js';
 import * as cookieUtils from '../utils/cookie.utils.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 interface SocialProfile {
   provider: 'google' | 'kakao' | 'naver';
@@ -73,7 +74,7 @@ export class SocialAuthService {
       avatar: profile.avatar,
       provider: profile.provider,
       provider_id: profile.providerId,
-      role: UserRole.USER,
+      roles: [UserRole.USER],
       status: UserStatus.ACTIVE, // Auto-approve social logins
       isEmailVerified: true,
       password: '', // No password for social logins
@@ -104,7 +105,8 @@ export class SocialAuthService {
     sessionId: string;
   }> {
     // Generate tokens using tokenUtils (SSOT for token generation)
-    const tokens = tokenUtils.generateTokens(user, 'neture.co.kr');
+    const roles = await roleAssignmentService.getRoleNames(user.id);
+    const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr');
 
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();
