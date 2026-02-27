@@ -10,83 +10,93 @@
  * 3. Set Super Admin to platform:super_admin only
  * 4. Remove platform:admin and platform:operator from remaining users
  * 5. Deactivate legacy role_assignments
+ *
+ * Safety: users.roles column may already be dropped (DropLegacyRbacColumns20260228000002
+ * ran in a prior deployment before this migration was added). Steps 1-4 are
+ * skipped when users.roles does not exist; step 5 (role_assignments sync) always runs.
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CleanupLegacyRoles20260228000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // ── 1. Remove unprefixed legacy roles from all users ──
-    const legacyRoles = [
-      'admin',
-      'super_admin',
-      'operator',
-      'administrator',
-      'manager',
-      'seller',
-      'vendor',
-      'business',
-    ];
+    // Guard: check if users.roles column still exists
+    const hasRolesCol = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'roles'
+      ) AS exists
+    `);
+    const rolesColExists = hasRolesCol[0]?.exists === true;
 
-    for (const role of legacyRoles) {
-      await queryRunner.query(
-        `UPDATE users SET roles = array_remove(roles, $1) WHERE $1 = ANY(roles)`,
-        [role]
-      );
+    if (rolesColExists) {
+      // ── 1. Remove unprefixed legacy roles from all users ──
+      const legacyRoles = [
+        'admin',
+        'super_admin',
+        'operator',
+        'administrator',
+        'manager',
+        'seller',
+        'vendor',
+        'business',
+      ];
+
+      for (const role of legacyRoles) {
+        await queryRunner.query(
+          `UPDATE users SET roles = array_remove(roles, $1) WHERE $1 = ANY(roles)`,
+          [role]
+        );
+      }
+
+      // eslint-disable-next-line no-console
+      console.log('[Migration] CleanupLegacyRoles: Removed unprefixed legacy roles');
+
+      // ── 2. Convert known platform:admin users to service-specific admin ──
+      await queryRunner.query(`
+        UPDATE users SET roles = ARRAY['neture:admin']::text[]
+        WHERE email = 'admin-neture@o4o.com'
+      `);
+      await queryRunner.query(`
+        UPDATE users SET roles = ARRAY['glycopharm:admin']::text[]
+        WHERE email = 'admin-glycopharm@o4o.com'
+      `);
+      await queryRunner.query(`
+        UPDATE users SET roles = ARRAY['glucoseview:admin']::text[]
+        WHERE email = 'admin-glucoseview@o4o.com'
+      `);
+      await queryRunner.query(`
+        UPDATE users SET roles = ARRAY['kpa:admin']::text[]
+        WHERE email = 'admin-kpa-society@o4o.com'
+      `);
+
+      // ── 3. Super Admin → platform:super_admin only ──
+      await queryRunner.query(`
+        UPDATE users SET roles = ARRAY['platform:super_admin']::text[]
+        WHERE email = 'sohae2100@gmail.com'
+      `);
+
+      // eslint-disable-next-line no-console
+      console.log('[Migration] CleanupLegacyRoles: Converted platform:admin users to service-specific roles');
+
+      // ── 4. Remove platform:admin and platform:operator from remaining users ──
+      await queryRunner.query(`
+        UPDATE users SET roles = array_remove(roles, 'platform:admin')
+        WHERE 'platform:admin' = ANY(roles)
+      `);
+      await queryRunner.query(`
+        UPDATE users SET roles = array_remove(roles, 'platform:operator')
+        WHERE 'platform:operator' = ANY(roles)
+      `);
+
+      // eslint-disable-next-line no-console
+      console.log('[Migration] CleanupLegacyRoles: Removed platform:admin and platform:operator');
+    } else {
+      // eslint-disable-next-line no-console
+      console.log('[Migration] CleanupLegacyRoles: users.roles column already dropped — skipping steps 1-4');
     }
 
-    // eslint-disable-next-line no-console
-    console.log('[Migration] CleanupLegacyRoles: Removed unprefixed legacy roles');
-
-    // ── 2. Convert known platform:admin users to service-specific admin ──
-    // NetureAdmin → neture:admin
-    await queryRunner.query(`
-      UPDATE users SET roles = ARRAY['neture:admin']::text[]
-      WHERE email = 'admin-neture@o4o.com'
-    `);
-
-    // GlycopharmAdmin → glycopharm:admin
-    await queryRunner.query(`
-      UPDATE users SET roles = ARRAY['glycopharm:admin']::text[]
-      WHERE email = 'admin-glycopharm@o4o.com'
-    `);
-
-    // GlucoseViewAdmin → glucoseview:admin
-    await queryRunner.query(`
-      UPDATE users SET roles = ARRAY['glucoseview:admin']::text[]
-      WHERE email = 'admin-glucoseview@o4o.com'
-    `);
-
-    // KPA 서 관리자 → kpa:admin
-    await queryRunner.query(`
-      UPDATE users SET roles = ARRAY['kpa:admin']::text[]
-      WHERE email = 'admin-kpa-society@o4o.com'
-    `);
-
-    // ── 3. Super Admin → platform:super_admin only ──
-    await queryRunner.query(`
-      UPDATE users SET roles = ARRAY['platform:super_admin']::text[]
-      WHERE email = 'sohae2100@gmail.com'
-    `);
-
-    // eslint-disable-next-line no-console
-    console.log('[Migration] CleanupLegacyRoles: Converted platform:admin users to service-specific roles');
-
-    // ── 4. Remove platform:admin and platform:operator from remaining users ──
-    await queryRunner.query(`
-      UPDATE users SET roles = array_remove(roles, 'platform:admin')
-      WHERE 'platform:admin' = ANY(roles)
-    `);
-
-    await queryRunner.query(`
-      UPDATE users SET roles = array_remove(roles, 'platform:operator')
-      WHERE 'platform:operator' = ANY(roles)
-    `);
-
-    // eslint-disable-next-line no-console
-    console.log('[Migration] CleanupLegacyRoles: Removed platform:admin and platform:operator');
-
-    // ── 5. Sync to role_assignments (new RBAC source) ──
+    // ── 5. Sync to role_assignments (runs regardless of users.roles existence) ──
     const hasRoleAssignments = await queryRunner.query(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
@@ -129,25 +139,31 @@ export class CleanupLegacyRoles20260228000001 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Reversibility: restore platform:admin to known admin users
-    // Note: unprefixed roles are intentionally NOT restored (they were deprecated)
-
-    await queryRunner.query(`
-      UPDATE users SET roles = array_append(roles, 'platform:admin')
-      WHERE email IN (
-        'admin-neture@o4o.com',
-        'admin-glycopharm@o4o.com',
-        'admin-glucoseview@o4o.com',
-        'admin-kpa-society@o4o.com'
-      )
+    const hasRolesCol = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'roles'
+      ) AS exists
     `);
 
-    await queryRunner.query(`
-      UPDATE users SET roles = array_append(roles, 'platform:super_admin')
-      WHERE email = 'sohae2100@gmail.com'
-        AND NOT ('platform:super_admin' = ANY(roles))
-    `);
+    if (hasRolesCol[0]?.exists) {
+      await queryRunner.query(`
+        UPDATE users SET roles = array_append(roles, 'platform:admin')
+        WHERE email IN (
+          'admin-neture@o4o.com',
+          'admin-glycopharm@o4o.com',
+          'admin-glucoseview@o4o.com',
+          'admin-kpa-society@o4o.com'
+        )
+      `);
 
-    // Re-activate role_assignments
+      await queryRunner.query(`
+        UPDATE users SET roles = array_append(roles, 'platform:super_admin')
+        WHERE email = 'sohae2100@gmail.com'
+          AND NOT ('platform:super_admin' = ANY(roles))
+      `);
+    }
+
     const hasRoleAssignments = await queryRunner.query(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
