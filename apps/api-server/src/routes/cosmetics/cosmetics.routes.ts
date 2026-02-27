@@ -15,7 +15,7 @@ import { createCosmeticsPaymentController } from './controllers/cosmetics-paymen
 import { createCosmeticsStoreController } from './controllers/cosmetics-store.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../types/auth.js';
-import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
+import { hasAnyServiceRole } from '../../utils/role.utils.js';
 
 /**
  * Cosmetics scope verification middleware
@@ -29,7 +29,6 @@ import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js
 function requireCosmeticsScope(requiredScope: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const authReq = req as AuthRequest;
-    const userId = authReq.user?.id || 'unknown';
     const userRoles = authReq.user?.roles || [];
 
     // Get scopes from user object (set by auth middleware)
@@ -45,29 +44,11 @@ function requireCosmeticsScope(requiredScope: string) {
       'cosmetics:admin',
       'cosmetics:operator',
       'platform:admin',
-      'platform:super_admin'
+      'platform:super_admin',
     ]);
 
     if (hasScope || hasCosmeticsRole) {
       return next();
-    }
-
-    // Priority 2: Detect legacy roles and DENY with detailed error
-    const legacyRoles = ['admin', 'operator', 'administrator', 'super_admin'];
-    const detectedLegacyRoles = userRoles.filter((r: string) => legacyRoles.includes(r));
-
-    if (detectedLegacyRoles.length > 0) {
-      // Log legacy role usage
-      detectedLegacyRoles.forEach((role: string) => {
-        logLegacyRoleUsage(userId, role, 'cosmetics.routes:requireCosmeticsScope');
-      });
-
-      return res.status(403).json({
-        error: {
-          code: 'COSMETICS_403',
-          message: `Required scope: ${requiredScope}. Legacy roles are no longer supported. Please use cosmetics:* or platform:* prefixed roles.`,
-        },
-      });
     }
 
     // Detect other service roles and deny
