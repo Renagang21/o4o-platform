@@ -62,25 +62,51 @@ AND NOT EXISTS (
 
 ## 3. Dry Run 결과
 
-> Cloud Console에서 실행 후 결과를 아래에 기록
+> 실행: `/__debug__/rbac-db-audit` 엔드포인트 | 2026-02-27T12:46:21Z
 
 ### A. 비표준 role 값
 
-| role | total | active_count | inactive_count |
-|------|-------|-------------|----------------|
-| *(실행 후 기록)* | | | |
+**0건** — `administrator`, `superadmin`, `staff`, `business`, `vendor_manager`, `beta_user` 모두 존재하지 않음.
 
-### B. 전체 role 분포
+### B. 전체 role 분포 (실행 전 스냅샷)
 
 | role | total | active | inactive |
 |------|-------|--------|----------|
-| *(실행 후 기록)* | | | |
+| `kpa:pharmacist` | 65 | 65 | 0 |
+| `kpa:student` | 5 | 5 | 0 |
+| `pharmacist` | 3 | 3 | 0 |
+| `kpa:admin` | 2 | 2 | 0 |
+| `supplier` | 1 | 1 | 0 |
+| `glucoseview:admin` | 1 | 1 | 0 |
+| `glycopharm:admin` | 1 | 1 | 0 |
+| `partner` | 1 | 1 | 0 |
+| `neture:admin` | 1 | 1 | 0 |
+| `platform:super_admin` | 1 | 1 | 0 |
+| `super_admin` | 1 | 0 | 1 |
+| `platform:admin` | 4 | 0 | 4 |
+| `admin` | 5 | 0 | 5 |
 
 ### C. RA 없는 활성 사용자
 
-| orphaned_users |
-|---------------|
-| *(실행 후 기록)* |
+| orphaned_users | 상세 |
+|---------------|------|
+| 4 | `admin@o4o.com`, `admin@kpa.test`, `kpa-a-operator@o4o.com`, `sohae21@naver.com` |
+
+### D. 마이그레이션 상태
+
+- `users.role` 컬럼: **DROP 완료**
+- `users.roles` 컬럼: **DROP 완료**
+- 해석: `DropLegacyRbacColumns EXECUTED`
+
+### E. 요약
+
+| 항목 | 값 |
+|------|-----|
+| 활성 사용자 | 85 |
+| RA 보유 사용자 | 81 |
+| RA 없는 활성 사용자 | 4 |
+| active RA 레코드 | 81 |
+| distinct active role | 10 |
 
 ---
 

@@ -4,11 +4,19 @@
 
 ---
 
-## 1. 전제 조건
+## 1. 전제 조건 및 판정
 
 - STEP 1 Dry Run 완료 (`RBAC-DATA-NORMALIZATION-DRYRUN-V1.md`)
-- Dry Run에서 비표준 role 존재 확인됨
 - RBAC Freeze 선언 유효 (구조 변경 금지)
+
+### Dry Run 판정 결과
+
+| 항목 | 결과 | 조치 |
+|------|------|------|
+| Rename 대상 (administrator/superadmin/staff) | **0건** | 실행 불필요 |
+| Deactivate 대상 (business/vendor_manager/beta_user) | **0건** | 실행 불필요 |
+| 접두어 없는 활성 role (pharmacist/supplier/partner) | 존재 | Commerce Role로 정상 — 변경 없음 |
+| RA 없는 활성 사용자 | **4명** | `user` role 부여 |
 
 ---
 
@@ -126,42 +134,62 @@ ORDER BY role;
 
 ## 4. 실행 결과
 
-> Cloud Console 실행 후 결과를 아래에 기록
+> 실행: `/__debug__/rbac-backfill-user-role/execute` | 2026-02-27T13:05:48Z
 
-### A. Rename 결과
+### A. Rename/Deactivate
 
-| SQL | affected_rows |
-|-----|--------------|
-| administrator → admin | *(기록)* |
-| superadmin → super_admin | *(기록)* |
-| staff → operator | *(기록)* |
+**실행 안 함** — Dry Run에서 대상 0건 확인됨.
 
-### B. Deactivate 결과
+### B. RA 없는 사용자 backfill 결과
 
-| SQL | affected_rows |
-|-----|--------------|
-| business → deactivate | *(기록)* |
-| vendor_manager → deactivate | *(기록)* |
-| beta_user → deactivate | *(기록)* |
+| email | user_id | 부여 role |
+|-------|---------|----------|
+| `admin@o4o.com` | `99990002-0002-...` | `user` |
+| `admin@kpa.test` | `6658c9b7-722f-...` | `user` |
+| `kpa-a-operator@o4o.com` | `e7225cfb-795a-...` | `user` |
+| `sohae21@naver.com` | `e709bcd9-6db2-...` | `user` |
 
-### C. 검증 결과
+### C. 검증 결과 (실행 후 `/__debug__/rbac-db-audit` 2026-02-27T13:06:03Z)
 
 | 항목 | 결과 |
 |------|------|
-| 비표준 active role 잔여 | *(0건 기대)* |
-| RA 없는 활성 사용자 | *(기록)* |
-| /auth/status 정상 | *(확인)* |
+| 비표준 active role 잔여 | **0건** |
+| RA 없는 활성 사용자 | **0명** |
+| 활성 사용자 총수 | 85 |
+| RA 보유 사용자 | 85 (100%) |
+| active RA 레코드 | 85 |
+| distinct active role | 11 |
+
+### D. 실행 후 전체 role 분포
+
+| role | total | active | inactive |
+|------|-------|--------|----------|
+| `kpa:pharmacist` | 65 | 65 | 0 |
+| `kpa:student` | 5 | 5 | 0 |
+| `user` | 4 | 4 | 0 |
+| `pharmacist` | 3 | 3 | 0 |
+| `kpa:admin` | 2 | 2 | 0 |
+| `glycopharm:admin` | 1 | 1 | 0 |
+| `neture:admin` | 1 | 1 | 0 |
+| `partner` | 1 | 1 | 0 |
+| `supplier` | 1 | 1 | 0 |
+| `glucoseview:admin` | 1 | 1 | 0 |
+| `platform:super_admin` | 1 | 1 | 0 |
+| `super_admin` | 1 | 0 | 1 |
+| `platform:admin` | 4 | 0 | 4 |
+| `admin` | 5 | 0 | 5 |
 
 ---
 
 ## 5. 완료 기준 체크리스트
 
-- [ ] 비표준 active role 0건
-- [ ] business active 0건
-- [ ] 기존 admin/operator 접근 정상
-- [ ] Guard 이상 없음
-- [ ] /auth/status 정상 응답
-- [ ] RBAC-ROLE-CATALOG-V1.md와 정합
+- [x] 비표준 active role 0건
+- [x] business active 0건
+- [x] RA 없는 활성 사용자 0명 (4명 → 0명)
+- [x] 활성 사용자 = RA 보유 사용자 (85 = 85)
+- [x] RBAC-ROLE-CATALOG-V1.md와 정합
+- [ ] 기존 admin/operator 접근 정상 *(수동 확인 필요)*
+- [ ] /auth/status 정상 응답 *(수동 확인 필요)*
 
 ---
 
@@ -184,5 +212,6 @@ UPDATE role_assignments SET is_active = true WHERE role = 'beta_user' AND is_act
 
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Created: 2026-02-27*
+*Executed: 2026-02-27T13:05:48Z*
