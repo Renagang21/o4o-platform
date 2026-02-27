@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToMany, ManyToOne, JoinTable, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { UserRole, UserStatus } from '../../../types/auth.js';
 import type { BusinessInfo } from '../../../types/user.js';
 import type { Role } from './Role.js';
@@ -9,7 +9,6 @@ export { UserRole, UserStatus };
 
 @Entity('users')
 @Index(['email'], { unique: true })
-@Index(['role'])
 @Index(['isActive'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -66,55 +65,16 @@ export class User {
   businessInfo?: BusinessInfo;
 
   /**
-   * @deprecated Phase P0: DO NOT USE for authorization
-   *
-   * This field is kept for backward compatibility only.
-   * Use role_assignments table for RBAC instead.
-   *
-   * @see RoleAssignment entity
-   * @see docs/dev/investigations/user-refactor_2025-11/zerodata/01_schema_baseline.md
-   * @see docs/dev/investigations/user-refactor_2025-11/zerodata/04_rbac_policy.md
+   * Phase3-E PR3: DB 컬럼 제거됨. in-memory only.
+   * requireAuth에서 JWT payload.roles로 채워진다.
+   * 권한 확인은 roleAssignmentService 사용.
    */
-  @Column({
-    type: 'enum',
-    enum: UserRole,
-    default: UserRole.USER
-  })
-  // @IsEnum(UserRole)
-  role!: UserRole;
+  roles?: string[];
 
   /**
-   * @deprecated Phase P0: DO NOT USE for authorization
-   *
-   * Legacy string array for multiple roles.
-   * Use role_assignments table for RBAC instead.
-   *
-   * Updated to PostgreSQL text[] array for Phase 4 role prefix support.
-   * Migration: 20260205035000-ConvertRolesToArrayType.ts
-   *
-   * @see RoleAssignment entity
+   * @deprecated Phase3-E PR3: user_roles 테이블 제거됨.
+   * DB Join 없이 plain 프로퍼티로만 유지.
    */
-  @Column({
-    type: 'text',
-    array: true,
-    default: () => `ARRAY['${UserRole.USER}']::text[]`
-  })
-  roles!: string[];
-
-  /**
-   * @deprecated Phase P0: DO NOT USE for authorization
-   *
-   * Legacy ManyToMany relation with roles table.
-   * Use role_assignments table for RBAC instead.
-   *
-   * @see RoleAssignment entity
-   */
-  @ManyToMany('Role', 'users', { eager: true })
-  @JoinTable({
-    name: 'user_roles',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
-  })
   dbRoles?: Role[];
 
   /**
@@ -277,13 +237,9 @@ export class User {
    * @see RoleAssignmentService
    */
   hasRole(role: UserRole | string): boolean {
-    // Check database roles first
     const hasDbRole = this.dbRoles?.some(r => r.name === role) || false;
-    // Check legacy roles array
     const hasLegacyRoles = this.roles?.includes(role) || false;
-    // Check legacy role field
-    const hasLegacyRole = this.role === role;
-    return hasDbRole || hasLegacyRoles || hasLegacyRole;
+    return hasDbRole || hasLegacyRoles;
   }
 
   /**
@@ -376,7 +332,7 @@ export class User {
     if (this.dbRoles && this.dbRoles.length > 0) {
       return this.dbRoles.map(r => r.name);
     }
-    return this.roles || [this.role];
+    return this.roles ?? [];
   }
 
   isPending(): boolean {
@@ -489,7 +445,8 @@ export class User {
       kakaoOpenChatUrl: this.kakaoOpenChatUrl,
       kakaoChannelUrl: this.kakaoChannelUrl,
       // Note: role/roles/dbRoles are deprecated - use RoleAssignment data
-      role: this.role,
+      // Phase3-E PR3: role 제거, roles[0] 기반으로 파생
+      role: (this.roles?.[0] as UserRole) || UserRole.USER,
       roles: this.getRoleNames(), // Return role names as string array
       activeRole: activeRole ? {
         id: activeRole.id,
