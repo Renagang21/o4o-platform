@@ -1139,6 +1139,16 @@ const startServer = async () => {
       logger.error('Failed to register Care Diagnostic routes:', careDiagError);
     }
 
+    // 37-d. Register RBAC DB Audit debug endpoint (WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1)
+    // READ-ONLY: SELECT queries only. No auth required. Phase 5B Step 1 전용.
+    try {
+      const { createRbacDbAuditRouter } = await import('./routes/debug/rbac-db-audit.controller.js');
+      app.use('/__debug__/rbac-db-audit', createRbacDbAuditRouter(AppDataSource));
+      logger.info('✅ RBAC DB Audit endpoint registered at /__debug__/rbac-db-audit');
+    } catch (rbacAuditError) {
+      logger.error('Failed to register RBAC DB Audit routes:', rbacAuditError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
