@@ -116,9 +116,10 @@ import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
 import { WorkPage, WorkTasksPage, WorkLearningPage, WorkDisplayPage, WorkCommunityPage } from './pages/work';
 
-// Function Gate (WO-KPA-FUNCTION-GATE-V1)
-import { FunctionGatePage } from './pages/FunctionGatePage';
-import FunctionGateModal from './components/FunctionGateModal';
+// WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 AuthGate
+import { AuthGate } from './components/auth/AuthGate';
+import { ActivitySetupPage } from './pages/ActivitySetupPage';
+import { PendingApprovalPage } from './pages/PendingApprovalPage';
 
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
 import { UserDashboardPage, MyContentPage } from './pages/dashboard';
@@ -252,17 +253,8 @@ function DashboardRoute() {
   return <Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>;
 }
 
-function FunctionGateRedirect() {
-  const navigate = useNavigate();
-  const { openFunctionGateModal } = useAuthModal();
-
-  useEffect(() => {
-    navigate('/dashboard', { replace: true });
-    openFunctionGateModal();
-  }, [navigate, openFunctionGateModal]);
-
-  return null;
-}
+// FunctionGateRedirect removed — WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
+// /select-function → /setup-activity 리다이렉트로 대체
 
 /**
  * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 3
@@ -317,7 +309,6 @@ function App() {
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
-        <FunctionGateModal />
         <Routes>
           {/* =========================================================
            * SVC-A: 커뮤니티 서비스 (Community Service)
@@ -338,8 +329,12 @@ function App() {
            * WO-KPA-DEMO-SCOPE-SEPARATION-AND-IMPLEMENTATION-V1
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
-          <Route path="/" element={<RoleBasedHome />} />
-          <Route path="/dashboard" element={<DashboardRoute />} />
+          <Route path="/" element={<AuthGate><RoleBasedHome /></AuthGate>} />
+          <Route path="/dashboard" element={<AuthGate><DashboardRoute /></AuthGate>} />
+
+          {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
+          <Route path="/setup-activity" element={<ActivitySetupPage />} />
+          <Route path="/pending-approval" element={<PendingApprovalPage />} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
@@ -482,8 +477,8 @@ function App() {
           <Route path="/demo/register" element={<RegisterRedirect />} />
           <Route path="/demo/register/pending" element={<RegisterPendingPage />} />
 
-          {/* Function Gate (WO-KPA-FUNCTION-GATE-V1) */}
-          <Route path="/demo/select-function" element={<FunctionGatePage />} />
+          {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
+          <Route path="/demo/select-function" element={<Navigate to="/setup-activity" replace />} />
 
           {/* Test Guide (레이아웃 없음) */}
           <Route path="/demo/test-guide" element={<TestGuidePage />} />
@@ -599,8 +594,8 @@ function App() {
           <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><KpaGroupbuyPage /></Layout>} />
           <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
 
-          {/* Function Gate - SVC-A: 직능/직역 선택 모달로 전환 (WO-KPA-FUNCTION-GATE-V1) */}
-          <Route path="/select-function" element={<FunctionGateRedirect />} />
+          {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
+          <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
 
           {/* Legal (이용약관/개인정보처리방침) - WO-KPA-LEGAL-PAGES-V1 */}
           <Route path="/policy" element={<Layout serviceName={SERVICE_NAME}><PolicyPage /></Layout>} />
