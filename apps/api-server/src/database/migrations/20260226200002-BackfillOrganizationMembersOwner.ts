@@ -18,6 +18,17 @@ export class BackfillOrganizationMembersOwner20260226200002
   name = 'BackfillOrganizationMembersOwner20260226200002';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // Guard: skip if organization_members table does not exist
+    const hasTable = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'organization_members'
+      ) AS exists
+    `);
+    if (!hasTable[0]?.exists) {
+      return; // Table not yet created — skip backfill
+    }
+
     // 1. GlycoPharm store owners → organization_members
     // Find all pharmacy-type organizations with a created_by_user_id
     const hasCreatedByCol = await queryRunner.query(`

@@ -25,7 +25,7 @@ export function KpaGroupbuyPage() {
 
   const currentPage = parseInt(searchParams.get('page') || '1');
 
-  const hasStore = user?.pharmacistRole === 'pharmacy_owner';
+  const hasStore = user?.isStoreOwner === true;
   const isOperator = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
 
   useEffect(() => {

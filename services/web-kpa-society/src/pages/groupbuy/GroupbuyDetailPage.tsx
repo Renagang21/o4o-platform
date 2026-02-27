@@ -21,7 +21,7 @@ export function GroupbuyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const hasStore = user?.pharmacistRole === 'pharmacy_owner';
+  const hasStore = user?.isStoreOwner === true;
 
   useEffect(() => {
     if (id) loadData();

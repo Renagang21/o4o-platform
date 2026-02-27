@@ -87,13 +87,10 @@ export function partnerContextGuard(
       return;
     }
 
-    // Check if user has partner role
+    // Phase3-D: user.roles는 RoleAssignment 데이터로 오버라이드됨
     const hasPartnerRole =
-      user.role === UserRole.PARTNER ||
-      user.role === 'partner' ||
       user.roles?.includes(UserRole.PARTNER) ||
-      user.roles?.includes('partner') ||
-      (typeof user.hasRole === 'function' && user.hasRole('partner'));
+      user.roles?.includes('partner');
 
     if (!hasPartnerRole) {
       res.status(403).json({

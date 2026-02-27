@@ -14,7 +14,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
+import { hasPlatformRole } from '../utils/role.utils.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -31,18 +31,15 @@ declare module 'express' {
 /**
  * Check if user has Admin permission for Signage
  *
- * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 2
- * - Only platform:admin or platform:super_admin allowed
- * - Legacy roles (admin, super_admin) logged and denied
+ * WO-OPERATOR-ROLE-CLEANUP-V1: Only platform:super_admin allowed.
  */
 export function hasSignageAdminPermission(user: any): boolean {
   if (!user) return false;
 
-  const userId = user.id || 'unknown';
   const userRoles: string[] = user.roles || [];
 
-  // Check for platform-level admin roles (Priority 1)
-  if (hasPlatformRole(userRoles, 'super_admin') || hasPlatformRole(userRoles, 'admin')) {
+  // Check for platform:super_admin
+  if (hasPlatformRole(userRoles, 'super_admin')) {
     return true;
   }
 
@@ -51,20 +48,9 @@ export function hasSignageAdminPermission(user: any): boolean {
     return true;
   }
 
-  // Check database roles for signage-specific admin
-  if (user.dbRoles?.some((r: any) => r.name === 'signage-admin')) {
+  // Check roles for signage-specific admin
+  if (user.roles?.includes('signage-admin')) {
     return true;
-  }
-
-  // Legacy role detection - log but deny access
-  if (user.role === 'admin' || user.role === 'super_admin') {
-    logLegacyRoleUsage(userId, user.role, 'signage-role.middleware:hasSignageAdminPermission');
-    return false; // Deny access for legacy roles
-  }
-
-  if (user.dbRoles?.some((r: any) => r.name === 'admin')) {
-    logLegacyRoleUsage(userId, 'admin', 'signage-role.middleware:hasSignageAdminPermission (dbRoles)');
-    return false; // Deny access for legacy dbRoles
   }
 
   return false;
@@ -87,11 +73,8 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
     return true;
   }
 
-  // Check database roles for operator role
-  if (user.dbRoles?.some((r: any) =>
-    r.name === `signage-${serviceKey}-operator` ||
-    r.permissions?.includes(operatorPermission)
-  )) {
+  // Check roles for operator role
+  if (user.roles?.includes(`signage-${serviceKey}-operator`)) {
     return true;
   }
 
@@ -428,8 +411,8 @@ export function hasSignageCommunityPermission(user: any, serviceKey: string): bo
   // Check for prefixed community role (e.g., 'kpa:community')
   if (userRoles.some((r: string) => r.endsWith(':community'))) return true;
 
-  // Check database roles
-  if (user.dbRoles?.some((r: any) => r.name === 'community' || r.name?.endsWith(':community'))) return true;
+  // Check roles for community
+  if (user.roles?.some((r: string) => r === 'community' || r.endsWith(':community'))) return true;
 
   // Community is open to any authenticated user with a service-related role
   // Check if user has any role for the service key
@@ -463,8 +446,8 @@ export function hasSignageSupplierPermission(user: any, serviceKey: string): boo
   // Check for prefixed supplier role (e.g., 'neture:supplier', 'kpa:supplier')
   if (userRoles.some((r: string) => r.endsWith(':supplier'))) return true;
 
-  // Check database roles
-  if (user.dbRoles?.some((r: any) => r.name === 'supplier' || r.name?.endsWith(':supplier'))) return true;
+  // Check roles for supplier
+  if (user.roles?.some((r: string) => r === 'supplier' || r.endsWith(':supplier'))) return true;
 
   return false;
 }

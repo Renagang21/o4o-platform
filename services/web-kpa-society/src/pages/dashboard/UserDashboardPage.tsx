@@ -13,20 +13,13 @@
 
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth, type PharmacistRole } from '../../contexts/AuthContext';
+import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, typography } from '../../styles/theme';
 import { CommunityDashboardTab } from './CommunityDashboardTab';
 import { PharmacyDashboardTab } from './PharmacyDashboardTab';
 import { ActivityTypePrompt } from '../../components/ActivityTypePrompt';
 
 type TabKey = 'community' | 'pharmacy';
-
-const ROLE_LABELS: Record<PharmacistRole, string> = {
-  general: '일반 약사',
-  pharmacy_owner: '약국 개설자',
-  hospital: '병원 약사',
-  other: '기타',
-};
 
 export function UserDashboardPage() {
   const { user, isLoading } = useAuth();
@@ -44,9 +37,9 @@ export function UserDashboardPage() {
     return <Navigate to="/" replace />;
   }
 
-  const isPharmacyOwner = user.pharmacistRole === 'pharmacy_owner';
+  const isPharmacyOwner = user.isStoreOwner === true;
   const isStudent = user.membershipType === 'student';
-  const roleLabel = user.pharmacistRole ? ROLE_LABELS[user.pharmacistRole] : null;
+  const roleLabel = user.activityType ? ACTIVITY_TYPE_LABELS[user.activityType] : null;
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'community', label: '커뮤니티' },

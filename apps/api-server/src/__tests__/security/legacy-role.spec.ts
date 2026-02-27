@@ -1,14 +1,15 @@
 /**
  * Legacy Role Blocking Tests
  *
- * WO-PLATFORM-SECURITY-TEST-HARNESS-V1 — Phase 4
+ * WO-OPERATOR-ROLE-CLEANUP-V1 — Updated
  *
- * Validates that unprefixed legacy roles (e.g., 'admin', 'operator')
- * are detected, logged, and DENIED by all service scope guards.
+ * After WO-OPERATOR-ROLE-CLEANUP-V1, legacy detection logic was removed from
+ * the scope guard. Unprefixed roles (e.g., 'admin', 'operator') are now
+ * treated as unknown roles — they simply fail the standard role check
+ * and get a generic 403 denial.
  *
- * Security model:
- *   Legacy role detected → console.warn [ROLE_MIGRATION] + 403
- *   Error message instructs user to use service:* prefixed roles
+ * The DB migration removes all unprefixed roles from production,
+ * so special detection is no longer needed.
  */
 
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -19,7 +20,7 @@ const requireNetureScope = createServiceScopeGuard(NETURE_SCOPE_CONFIG);
 const requireGlycopharmScope = createServiceScopeGuard(GLYCOPHARM_SCOPE_CONFIG);
 
 // ─────────────────────────────────────────────────────
-// KPA Legacy Roles
+// KPA Legacy Roles → Standard Denial
 // ─────────────────────────────────────────────────────
 
 describe('KPA Legacy Role Denial', () => {
@@ -32,33 +33,18 @@ describe('KPA Legacy Role Denial', () => {
     'branch_operator',
   ];
 
-  let warnSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    warnSpy.mockRestore();
-  });
-
-  it.each(kpaLegacyRoles)('legacy "%s" → KPA guard 403 + warn log', async (role) => {
+  it.each(kpaLegacyRoles)('unprefixed "%s" → KPA guard 403 (standard denial)', async (role) => {
     const guard = requireKpaScope('kpa:admin');
     const user = createMockUser({ roles: [role] });
     const result = await executeGuard(guard, user);
 
     expect(result.allowed).toBe(false);
     expect(result.statusCode).toBe(403);
-    expect(result.body.error.message).toContain('Legacy roles are no longer supported');
-    expect(result.body.error.message).toContain('kpa:*');
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[ROLE_MIGRATION]')
-    );
   });
 });
 
 // ─────────────────────────────────────────────────────
-// Neture Legacy Roles
+// Neture Legacy Roles → Standard Denial
 // ─────────────────────────────────────────────────────
 
 describe('Neture Legacy Role Denial', () => {
@@ -72,33 +58,18 @@ describe('Neture Legacy Role Denial', () => {
     'partner',
   ];
 
-  let warnSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    warnSpy.mockRestore();
-  });
-
-  it.each(netureLegacyRoles)('legacy "%s" → Neture guard 403 + warn log', async (role) => {
+  it.each(netureLegacyRoles)('unprefixed "%s" → Neture guard 403 (standard denial)', async (role) => {
     const guard = requireNetureScope('neture:admin');
     const user = createMockUser({ roles: [role] });
     const result = await executeGuard(guard, user);
 
     expect(result.allowed).toBe(false);
     expect(result.statusCode).toBe(403);
-    expect(result.body.error.message).toContain('Legacy roles are no longer supported');
-    expect(result.body.error.message).toContain('neture:*');
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[ROLE_MIGRATION]')
-    );
   });
 });
 
 // ─────────────────────────────────────────────────────
-// GlycoPharm Legacy Roles
+// GlycoPharm Legacy Roles → Standard Denial
 // ─────────────────────────────────────────────────────
 
 describe('GlycoPharm Legacy Role Denial', () => {
@@ -109,28 +80,13 @@ describe('GlycoPharm Legacy Role Denial', () => {
     'administrator',
   ];
 
-  let warnSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    warnSpy.mockRestore();
-  });
-
-  it.each(glycopharmLegacyRoles)('legacy "%s" → GlycoPharm guard 403 + warn log', async (role) => {
+  it.each(glycopharmLegacyRoles)('unprefixed "%s" → GlycoPharm guard 403 (standard denial)', async (role) => {
     const guard = requireGlycopharmScope('glycopharm:admin');
     const user = createMockUser({ roles: [role] });
     const result = await executeGuard(guard, user);
 
     expect(result.allowed).toBe(false);
     expect(result.statusCode).toBe(403);
-    expect(result.body.error.message).toContain('Legacy roles are no longer supported');
-    expect(result.body.error.message).toContain('glycopharm:*');
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[ROLE_MIGRATION]')
-    );
   });
 });
 
@@ -138,58 +94,21 @@ describe('GlycoPharm Legacy Role Denial', () => {
 // Legacy + Service Role combination
 // ─────────────────────────────────────────────────────
 
-describe('Legacy role takes priority over no-role', () => {
-  let warnSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    warnSpy.mockRestore();
-  });
-
-  it('user with both legacy "admin" and valid service role → allowed (service role wins at Priority 1)', async () => {
+describe('Unprefixed role with valid service role', () => {
+  it('user with both unprefixed "admin" and valid service role → allowed (service role matches)', async () => {
     const guard = requireKpaScope('kpa:admin');
     const user = createMockUser({ roles: ['admin', 'kpa:admin'] });
     const result = await executeGuard(guard, user);
 
-    // Service-prefixed role is checked at Priority 1, before legacy check
     expect(result.allowed).toBe(true);
   });
 
-  it('user with only legacy "admin" (no service role) → denied with legacy message', async () => {
+  it('user with only unprefixed "admin" (no service role) → denied', async () => {
     const guard = requireKpaScope('kpa:admin');
     const user = createMockUser({ roles: ['admin'] });
     const result = await executeGuard(guard, user);
 
     expect(result.allowed).toBe(false);
-    expect(result.body.error.message).toContain('Legacy roles are no longer supported');
-  });
-});
-
-// ─────────────────────────────────────────────────────
-// Warn log format verification
-// ─────────────────────────────────────────────────────
-
-describe('Legacy role warn log format', () => {
-  let warnSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    warnSpy.mockRestore();
-  });
-
-  it('log contains user ID, role, and service context', async () => {
-    const guard = requireKpaScope('kpa:admin');
-    const user = createMockUser({ id: 'user-legacy-test', roles: ['admin'] });
-    await executeGuard(guard, user);
-
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/\[ROLE_MIGRATION\].*"admin".*user-legacy-test.*kpa/)
-    );
+    expect(result.statusCode).toBe(403);
   });
 });

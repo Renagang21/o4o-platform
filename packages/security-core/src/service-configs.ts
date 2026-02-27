@@ -1,8 +1,10 @@
 /**
  * Pre-built Service Scope Guard Configurations
  *
+ * WO-OPERATOR-ROLE-CLEANUP-V1: Legacy roles removed, platformBypass = platform:super_admin only
+ *
  * Each O4O service has its own security configuration based on its
- * role hierarchy, organizational isolation requirements, and legacy roles.
+ * role hierarchy and organizational isolation requirements.
  */
 
 import type { ServiceScopeGuardConfig } from './types.js';
@@ -10,7 +12,7 @@ import type { ServiceScopeGuardConfig } from './types.js';
 /**
  * KPA Service Configuration
  *
- * Organizational isolation: platform:admin does NOT bypass.
+ * Organizational isolation: platform:super_admin does NOT bypass.
  * KPA organizations are fully isolated from platform-level access.
  */
 export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
@@ -23,21 +25,14 @@ export const KPA_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'kpa:branch_operator',
   ],
   platformBypass: false,
-  legacyRoles: [
-    'admin',
-    'super_admin',
-    'operator',
-    'district_admin',
-    'branch_admin',
-    'branch_operator',
-  ],
+  legacyRoles: [],
   blockedServicePrefixes: ['platform', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
 };
 
 /**
  * Neture Service Configuration
  *
- * Platform bypass enabled: platform:admin can access.
+ * Platform bypass enabled: platform:super_admin can access.
  * Scope-level role mapping for hierarchical access control.
  */
 export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
@@ -49,15 +44,7 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'neture:partner',
   ],
   platformBypass: true,
-  legacyRoles: [
-    'admin',
-    'super_admin',
-    'operator',
-    'manager',
-    'seller',
-    'supplier',
-    'partner',
-  ],
+  legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'glycopharm', 'cosmetics', 'glucoseview'],
   scopeRoleMapping: {
     'neture:admin': ['neture:admin'],
@@ -70,28 +57,24 @@ export const NETURE_SCOPE_CONFIG: ServiceScopeGuardConfig = {
 /**
  * Platform Service Configuration
  *
- * Platform-level admin scope guard.
- * Only platform:admin and platform:super_admin have access.
- * No platform bypass (self-referencing), no legacy roles accepted.
+ * Platform-level scope guard.
+ * Only platform:super_admin has access.
+ * No platform bypass (self-referencing).
  */
 export const PLATFORM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   serviceKey: 'platform',
   allowedRoles: [
-    'platform:admin',
     'platform:super_admin',
   ],
   platformBypass: false,
-  legacyRoles: [
-    'admin',
-    'super_admin',
-  ],
+  legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics', 'glucoseview'],
 };
 
 /**
  * GlycoPharm Service Configuration
  *
- * Platform bypass enabled: platform:admin can access.
+ * Platform bypass enabled: platform:super_admin can access.
  * Medical data service with pharmacy-level isolation.
  */
 export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
@@ -101,11 +84,6 @@ export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
     'glycopharm:operator',
   ],
   platformBypass: true,
-  legacyRoles: [
-    'admin',
-    'super_admin',
-    'operator',
-    'administrator',
-  ],
+  legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'glucoseview'],
 };

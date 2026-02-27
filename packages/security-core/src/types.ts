@@ -7,6 +7,8 @@
 /** All known service keys in the O4O platform */
 export type ServiceKey =
   | 'kpa'
+  | 'kpa-b'
+  | 'kpa-c'
   | 'neture'
   | 'glycopharm'
   | 'cosmetics'
@@ -37,16 +39,15 @@ export interface ServiceScopeGuardConfig {
   allowedRoles: string[];
 
   /**
-   * Whether platform:admin and platform:super_admin bypass this guard.
-   * - true: platform admins can access (typical for non-organizational services)
-   * - false: KPA-style organizational isolation (platform admins denied)
+   * Whether platform:super_admin bypasses this guard.
+   * - true: platform super admin can access (typical for non-organizational services)
+   * - false: KPA-style organizational isolation (platform admin denied)
    */
   platformBypass: boolean;
 
   /**
-   * Legacy unprefixed roles to detect and deny.
-   * When detected, logged via logLegacyRoleUsage and access denied.
-   * e.g., ['admin', 'operator', 'super_admin']
+   * Legacy unprefixed roles (deprecated, kept for interface compatibility).
+   * WO-OPERATOR-ROLE-CLEANUP-V1: All configs now use empty arrays.
    */
   legacyRoles: string[];
 

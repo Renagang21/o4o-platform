@@ -566,27 +566,10 @@ export class AccountLinkingService {
         }
         
         // Merge roles (keep higher role)
+        // Phase3-E: role is a read-only getter, roles not persisted
+        // Role merging should be handled via RoleAssignment service
         if (mergeFields.roles) {
-          const roleHierarchy = {
-            SUPER_ADMIN: 4,
-            ADMIN: 3,
-            VENDOR: 2,
-            CUSTOMER: 1
-          };
-          
-          const targetRoleValue = roleHierarchy[targetUser.role] || 0;
-          const sourceRoleValue = roleHierarchy[sourceUser.role] || 0;
-          
-          if (sourceRoleValue > targetRoleValue) {
-            targetUser.role = sourceUser.role;
-          }
-          
-          // Merge roles array
-          const allRoles = new Set([
-            ...(targetUser.roles || []),
-            ...(sourceUser.roles || [])
-          ]);
-          targetUser.roles = Array.from(allRoles);
+          // No-op: role/roles cannot be directly assigned on User entity
         }
       }
 

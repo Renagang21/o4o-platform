@@ -199,8 +199,7 @@ export class UserController {
 
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
-        where: { id: (authReq.user as any).id || (authReq.user as any).userId },
-        relations: ['dbRoles', 'activeRole']
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
       });
 
       if (!user) {
@@ -210,16 +209,17 @@ export class UserController {
         });
       }
 
-      const activeRole = user.getActiveRole();
-      const defaultRole = user.dbRoles && user.dbRoles.length > 0 ? user.dbRoles[0] : null;
+      // Phase3-E: dbRoles/activeRole/getActiveRole()/hasMultipleRoles() removed
+      const currentRole = user.roles?.[0] || 'user';
+      const defaultRole = user.roles?.[0] || null;
 
       res.json({
         success: true,
         data: {
-          currentRole: activeRole ? activeRole.name : null,
-          defaultRole: defaultRole ? defaultRole.name : null,
-          availableRoles: user.getRoleNames(),
-          canSwitchRoles: user.hasMultipleRoles()
+          currentRole,
+          defaultRole,
+          availableRoles: user.roles || [],
+          canSwitchRoles: user.roles.length > 1
         }
       });
     } catch (error) {
@@ -252,8 +252,7 @@ export class UserController {
 
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
-        where: { id: (authReq.user as any).id || (authReq.user as any).userId },
-        relations: ['dbRoles', 'activeRole']
+        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
       });
 
       if (!user) {
@@ -263,29 +262,26 @@ export class UserController {
         });
       }
 
-      // 요청된 역할이 사용자의 역할 목록에 있는지 확인
-      const targetRole = user.dbRoles?.find(r => r.name === currentRole);
-      if (!targetRole) {
+      // Phase3-E: dbRoles/activeRole removed — check roles array directly
+      const hasRole = user.roles?.includes(currentRole);
+      if (!hasRole) {
         return res.status(403).json({
           success: false,
           message: 'You do not have permission to switch to this role'
         });
       }
 
-      // activeRole 업데이트
-      user.activeRole = targetRole;
-      await userRepository.save(user);
+      // Phase3-E: activeRole assignment removed (no longer a persisted relation)
 
-      const activeRole = user.getActiveRole();
-      const defaultRole = user.dbRoles && user.dbRoles.length > 0 ? user.dbRoles[0] : null;
+      const defaultRole = user.roles?.[0] || null;
 
       res.json({
         success: true,
         data: {
-          currentRole: activeRole ? activeRole.name : null,
-          defaultRole: defaultRole ? defaultRole.name : null,
-          availableRoles: user.getRoleNames(),
-          canSwitchRoles: user.hasMultipleRoles()
+          currentRole,
+          defaultRole,
+          availableRoles: user.roles || [],
+          canSwitchRoles: user.roles.length > 1
         },
         message: 'Role switched successfully'
       });

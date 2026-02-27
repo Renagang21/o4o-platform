@@ -190,7 +190,21 @@ class AuthService {
       roles: [userData.role || UserRole.USER]
     });
 
-    return await this.userRepository.save(user);
+    const savedUser = await this.userRepository.save(user);
+
+    // Phase3-D: RoleAssignment 생성 (non-fatal)
+    try {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      await roleAssignmentService.assignRole({
+        userId: savedUser.id,
+        role: userData.role || UserRole.USER,
+        assignedBy: 'system:createUser',
+      });
+    } catch {
+      // Non-fatal: backfill migration covers existing users
+    }
+
+    return savedUser;
   }
 
   // 역할별 기본 권한

@@ -8,14 +8,14 @@ import { AssignRoleDto, RemoveRoleDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 
 /**
- * User Role Controller - NextGen Pattern
+ * User Role Controller - NextGen Pattern (Phase3-E)
  *
- * Handles user role management operations:
+ * Handles user role management operations via RoleAssignment service:
  * - Get all available roles
- * - Get user roles
- * - Assign role to user
- * - Remove role from user
- * - Update role validity period
+ * - Get user roles (from role_assignments table)
+ * - Assign role to user (via RoleAssignment)
+ * - Remove role from user (via RoleAssignment)
+ * - Update role validity period (via RoleAssignment)
  */
 export class UserRoleController extends BaseController {
   /**
@@ -50,7 +50,7 @@ export class UserRoleController extends BaseController {
 
   /**
    * GET /api/v1/users/:userId/roles
-   * Get roles for a specific user
+   * Get roles for a specific user (via RoleAssignment)
    */
   static async getUserRoles(req: Request, res: Response): Promise<any> {
     const { userId } = req.params;
@@ -59,21 +59,25 @@ export class UserRoleController extends BaseController {
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOne({
         where: { id: userId },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
         return BaseController.notFound(res, 'User not found');
       }
 
+      // Phase3-E: Use RoleAssignment service for authoritative role data
+      const { roleAssignmentService } = await import('../../auth/services/role-assignment.service.js');
+      const assignments = await roleAssignmentService.getActiveRoles(userId);
+
       return BaseController.ok(res, {
         userId: user.id,
-        roles: user.dbRoles?.map(role => ({
-          id: role.id,
-          name: role.name,
-          displayName: role.displayName,
-          description: role.description || null,
-        })) || [],
+        roles: assignments.map(a => ({
+          role: a.role,
+          assignedAt: a.assignedAt,
+          assignedBy: a.assignedBy,
+          validFrom: a.validFrom,
+          validUntil: a.validUntil,
+        })),
       });
     } catch (error: any) {
       logger.error('[UserRoleController.getUserRoles] Error', {
@@ -86,7 +90,7 @@ export class UserRoleController extends BaseController {
 
   /**
    * POST /api/v1/users/:userId/roles
-   * Assign a role to a user (admin only)
+   * Assign a role to a user (admin only, via RoleAssignment)
    */
   static async assignRole(req: AuthRequest, res: Response): Promise<any> {
     // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin-only guard
@@ -109,52 +113,43 @@ export class UserRoleController extends BaseController {
 
     try {
       const userRepository = AppDataSource.getRepository(User);
-      const roleRepository = AppDataSource.getRepository(Role);
 
       // Check if user exists
       const user = await userRepository.findOne({
         where: { id: userId },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
         return BaseController.notFound(res, 'User not found');
       }
 
-      // Check if role exists
-      const role = await roleRepository.findOne({
-        where: { name: data.role },
-      });
-
-      if (!role) {
-        return BaseController.notFound(res, 'Role not found');
-      }
+      // Phase3-E: Use RoleAssignment service to assign role
+      const { roleAssignmentService } = await import('../../auth/services/role-assignment.service.js');
 
       // Check if user already has this role
-      const hasRole = user.dbRoles?.some(r => r.id === role.id);
+      const hasRole = await roleAssignmentService.hasRole(userId, data.role);
       if (hasRole) {
         return BaseController.error(res, 'User already has this role', 400);
       }
 
-      // Assign role using ManyToMany relationship
-      if (!user.dbRoles) {
-        user.dbRoles = [];
-      }
-      user.dbRoles.push(role);
-      await userRepository.save(user);
+      const assignment = await roleAssignmentService.assignRole({
+        userId,
+        role: data.role,
+        assignedBy: (currentUser as any).id || 'system',
+      });
 
-      logger.info('[UserRoleController.assignRole] Role assigned', {
+      logger.info('[UserRoleController.assignRole] Role assigned via RoleAssignment', {
         userId: user.id,
-        roleId: role.id,
-        assignedBy: req.user?.id,
+        role: data.role,
+        assignedBy: (currentUser as any).id,
       });
 
       return BaseController.created(res, {
         message: 'Role assigned successfully',
         userRole: {
           userId: user.id,
-          roleId: role.id,
-          roleName: role.name,
+          role: assignment.role,
+          assignedAt: assignment.assignedAt,
         },
       });
     } catch (error: any) {
@@ -169,7 +164,9 @@ export class UserRoleController extends BaseController {
 
   /**
    * DELETE /api/v1/users/:userId/roles/:roleId
-   * Remove a role from a user (admin only)
+   * Remove a role from a user (admin only, via RoleAssignment)
+   *
+   * Note: roleId param is now treated as the role name string for RoleAssignment compatibility
    */
   static async removeRole(req: Request, res: Response): Promise<any> {
     // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Admin-only guard
@@ -194,26 +191,24 @@ export class UserRoleController extends BaseController {
 
       const user = await userRepository.findOne({
         where: { id: userId },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
         return BaseController.notFound(res, 'User not found');
       }
 
-      // Find the role in user's roles
-      const roleIndex = user.dbRoles?.findIndex(r => r.id === roleId) ?? -1;
-      if (roleIndex === -1) {
+      // Phase3-E: Use RoleAssignment service to remove role
+      // roleId param may be a role name or UUID - try both
+      const { roleAssignmentService } = await import('../../auth/services/role-assignment.service.js');
+      const removed = await roleAssignmentService.removeRole(userId, roleId);
+
+      if (!removed) {
         return BaseController.notFound(res, 'User does not have this role');
       }
 
-      // Remove role from user's roles
-      user.dbRoles?.splice(roleIndex, 1);
-      await userRepository.save(user);
-
-      logger.info('[UserRoleController.removeRole] Role removed', {
+      logger.info('[UserRoleController.removeRole] Role removed via RoleAssignment', {
         userId,
-        roleId,
+        role: roleId,
       });
 
       return BaseController.ok(res, {
@@ -231,37 +226,46 @@ export class UserRoleController extends BaseController {
 
   /**
    * PUT /api/v1/users/:userId/roles/:roleId
-   * Update role validity period (admin only)
-   *
-   * Note: Role validity is not currently supported with the ManyToMany relationship.
-   * This endpoint is kept for API compatibility but will return a not implemented error.
-   * To support role validity, the RoleAssignment entity should be used instead.
+   * Update role validity period (admin only, via RoleAssignment)
    */
   static async updateRoleValidity(req: Request, res: Response): Promise<any> {
     const { userId, roleId } = req.params;
+    const { validFrom, validUntil } = req.body;
 
     try {
       const userRepository = AppDataSource.getRepository(User);
 
       const user = await userRepository.findOne({
         where: { id: userId },
-        relations: ['dbRoles'],
       });
 
       if (!user) {
         return BaseController.notFound(res, 'User not found');
       }
 
-      const hasRole = user.dbRoles?.some(r => r.id === roleId);
+      // Phase3-E: Use RoleAssignment service for validity control
+      const { roleAssignmentService } = await import('../../auth/services/role-assignment.service.js');
+      const hasRole = await roleAssignmentService.hasRole(userId, roleId);
       if (!hasRole) {
         return BaseController.notFound(res, 'User does not have this role');
       }
 
-      return BaseController.error(
-        res,
-        'Role validity is not supported with the current ManyToMany relationship. Use RoleAssignment entity for validity control.',
-        501
-      );
+      // Re-assign with validity period
+      const assignment = await roleAssignmentService.assignRole({
+        userId,
+        role: roleId,
+        validFrom: validFrom ? new Date(validFrom) : undefined,
+        validUntil: validUntil ? new Date(validUntil) : undefined,
+      });
+
+      return BaseController.ok(res, {
+        message: 'Role validity updated successfully',
+        assignment: {
+          role: assignment.role,
+          validFrom: assignment.validFrom,
+          validUntil: assignment.validUntil,
+        },
+      });
     } catch (error: any) {
       logger.error('[UserRoleController.updateRoleValidity] Error', {
         error: error.message,

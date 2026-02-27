@@ -13,15 +13,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { type User, type PharmacistRole } from '../../contexts/AuthContext';
+import { type User, ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
-
-const PHARMACIST_ROLE_LABELS: Record<PharmacistRole, string> = {
-  general: '일반 약사',
-  pharmacy_owner: '약국 개설자',
-  hospital: '병원 약사',
-  other: '기타',
-};
 
 const shortcuts = [
   { label: '포럼', icon: '💬', href: '/forum' },
@@ -36,7 +29,7 @@ interface CommunityDashboardTabProps {
 
 export function CommunityDashboardTab({ user }: CommunityDashboardTabProps) {
   const isStudent = user.membershipType === 'student';
-  const roleLabel = user.pharmacistRole ? PHARMACIST_ROLE_LABELS[user.pharmacistRole] : null;
+  const roleLabel = user.activityType ? ACTIVITY_TYPE_LABELS[user.activityType] : null;
 
   return (
     <div style={styles.container}>

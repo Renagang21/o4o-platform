@@ -1,7 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import { UserRole, UserStatus } from '../../../types/auth.js';
 import type { BusinessInfo } from '../../../types/user.js';
-import type { Role } from './Role.js';
 import bcrypt from 'bcryptjs';
 
 // Re-export types for external use
@@ -15,18 +14,15 @@ export class User {
   id!: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  // @IsEmail()
   email!: string;
 
   @Column({ type: 'varchar', length: 255 })
   password!: string; // bcrypt hashed
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  // @IsOptional()
   firstName?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  // @IsOptional()
   lastName?: string;
 
   @Column({ type: 'varchar', length: 200, default: '운영자' })
@@ -44,7 +40,6 @@ export class User {
   phone?: string;
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: External contact settings
-  // 사용자가 외부 연락 수단(카카오톡)을 선택적으로 등록
   @Column({ type: 'boolean', default: false, name: 'contact_enabled' })
   contactEnabled!: boolean;
 
@@ -65,38 +60,24 @@ export class User {
   businessInfo?: BusinessInfo;
 
   /**
-   * Phase3-E PR3: DB 컬럼 제거됨. in-memory only.
-   * requireAuth에서 JWT payload.roles로 채워진다.
-   * 권한 확인은 roleAssignmentService 사용.
+   * Phase3-E: Runtime-only roles array.
+   * Set by requireAuth middleware from RoleAssignment table.
+   * NOT a database column — TypeORM ignores this property.
+   * DB column still exists temporarily (will be dropped in Phase3-E migration).
    */
-  roles?: string[];
+  roles: string[] = [];
 
   /**
-   * @deprecated Phase3-E PR3: user_roles 테이블 제거됨.
-   * DB Join 없이 plain 프로퍼티로만 유지.
+   * Phase3-E: Computed primary role from roles[0].
+   * Backward compatibility getter — replaces the old @Column role field.
    */
-  dbRoles?: Role[];
-
-  /**
-   * @deprecated Phase P0: DO NOT USE for authorization
-   *
-   * Legacy active role selector.
-   * Use role_assignments table to query active roles instead.
-   *
-   * @see RoleAssignment entity
-   * @see RoleAssignment.isActive
-   */
-  @ManyToOne('Role', { nullable: true, eager: true })
-  @JoinColumn({ name: 'active_role_id' })
-  activeRole?: Role | null;
+  get role(): UserRole {
+    return (this.roles?.[0] as UserRole) || UserRole.USER;
+  }
 
   // Direct permissions (in addition to role permissions)
   @Column({ type: 'json', default: () => "'[]'" })
-  // @IsArray()
   permissions!: string[];
-
-  // @Column({ type: 'json', nullable: true })
-  // metadata?: Record<string, any>;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
@@ -105,22 +86,18 @@ export class User {
   isEmailVerified!: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  // @IsOptional()
-  refreshTokenFamily?: string; // 토큰 계열 관리
+  refreshTokenFamily?: string;
 
   @Column({ type: 'timestamp', nullable: true })
-  // @IsOptional()
   lastLoginAt?: Date;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
-  // @IsOptional()
   lastLoginIp?: string;
 
   @Column({ type: 'integer', default: 0 })
   loginAttempts!: number;
 
   @Column({ type: 'timestamp', nullable: true })
-  // @IsOptional()
   lockedUntil?: Date;
 
   // Domain for multi-tenant support
@@ -128,13 +105,11 @@ export class User {
   domain?: string;
 
   // P0-T2: Service key for data isolation
-  // Ensures users from different pharmacy societies/services don't mix
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'service_key' })
   serviceKey?: string;
 
   // WO-ROLE-NORMALIZATION-PHASE3-B-V1: pharmacistFunction, pharmacistRole 제거됨
   // Qualification 데이터는 kpa_pharmacist_profiles 테이블로 이전
-  // API 응답에서는 derivePharmacistQualification()으로 compute
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -144,21 +119,17 @@ export class User {
 
   // 승인 관련 필드
   @Column({ type: 'timestamp', nullable: true })
-  // @IsOptional()
   approvedAt?: Date;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  // @IsOptional()
-  approvedBy?: string; // 승인한 관리자 ID
+  approvedBy?: string;
 
   // 소셜 로그인 제공자 정보
   @Column({ type: 'varchar', length: 100, nullable: true })
-  // @IsOptional()
-  provider?: string; // 'local', 'google', 'kakao' 등
+  provider?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  // @IsOptional()
-  provider_id?: string; // 외부 제공자 사용자 ID
+  provider_id?: string;
 
   // 비밀번호 재설정 토큰
   @Column({ type: 'varchar', length: 255, nullable: true, name: 'reset_password_token' })
@@ -181,14 +152,12 @@ export class User {
    * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: 한국식 표시 (성+이름)
    */
   get fullName(): string {
-    // 한국식: lastName + firstName (성 + 이름)
     const koreanName = `${this.lastName || ''}${this.firstName || ''}`.trim();
     return koreanName || this.email;
   }
 
   /**
    * UI 표시 전용 이름
-   * name 필드는 기본값 '운영자'가 있으므로 항상 값이 존재
    */
   get displayName(): string {
     return this.name;
@@ -211,9 +180,9 @@ export class User {
   accountActivities?: any[];
 
   // Dropshipping relationships
-  supplier?: any; // Will be set via OneToOne in Supplier entity
-  seller?: any;   // Will be set via OneToOne in Seller entity
-  partner?: any;  // Will be set via OneToOne in Partner entity
+  supplier?: any;
+  seller?: any;
+  partner?: any;
 
 
   // Password hashing
@@ -230,109 +199,49 @@ export class User {
     return await bcrypt.compare(password, this.password);
   }
 
-  // Role helper methods
-  /**
-   * @deprecated Phase P0: Use RoleAssignmentService.hasRole() instead
-   * This method relies on deprecated dbRoles, roles, role fields.
-   * @see RoleAssignmentService
-   */
+  // Role helper methods (use this.roles — set by middleware from RoleAssignment)
   hasRole(role: UserRole | string): boolean {
-    const hasDbRole = this.dbRoles?.some(r => r.name === role) || false;
-    const hasLegacyRoles = this.roles?.includes(role) || false;
-    return hasDbRole || hasLegacyRoles;
+    return this.roles?.includes(role as string) || false;
   }
 
-  /**
-   * @deprecated Phase P0: Use RoleAssignmentService.hasAnyRole() instead
-   * @see RoleAssignmentService
-   */
   hasAnyRole(roles: (UserRole | string)[]): boolean {
     return roles.some((role: any) => this.hasRole(role));
   }
 
-  /**
-   * @deprecated Phase P0: Use RoleAssignmentService.isAdmin() instead
-   * @see RoleAssignmentService
-   */
   isAdmin(): boolean {
     return this.hasAnyRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
   }
 
-  /**
-   * Get all permissions from database roles and direct permissions
-   * @deprecated Phase P0: Use RoleAssignmentService.getPermissions() instead
-   * @see RoleAssignmentService
-   */
   getAllPermissions(): string[] {
-    // Legacy admin users (role = 'admin' or 'super_admin') get all permissions
     if (this.isAdmin()) {
-      // Return all available permissions for admins
-      const allPermissions = [
-        // Users
+      return [
         'users.view', 'users.create', 'users.edit', 'users.delete', 'users.suspend', 'users.approve',
-        // Content
         'content.view', 'content.create', 'content.edit', 'content.delete', 'content.publish', 'content.moderate',
-        // Categories & Tags
         'categories:write', 'categories:read', 'tags:write', 'tags:read',
-        // Admin
         'admin.settings', 'admin.analytics', 'admin.logs', 'admin.backup',
-        // ACF
-        'acf.manage',
-        // CPT
-        'cpt.manage',
-        // Shortcodes
-        'shortcodes.manage',
-        // API
+        'acf.manage', 'cpt.manage', 'shortcodes.manage',
         'api.access', 'api.admin'
       ];
-      return allPermissions;
     }
-
-    const rolePermissions = this.dbRoles?.flatMap(role => role.getPermissionKeys()) || [];
-    const directPermissions = this.permissions || [];
-    // Remove duplicates
-    return [...new Set([...rolePermissions, ...directPermissions])];
+    return [...new Set([...(this.permissions || [])])];
   }
 
-  /**
-   * Check if user has a specific permission
-   * @deprecated Phase P0: Use RoleAssignmentService.hasPermission() instead
-   * @see RoleAssignmentService
-   */
   hasPermission(permission: string): boolean {
     return this.getAllPermissions().includes(permission);
   }
 
-  /**
-   * Check if user has any of the permissions
-   * @deprecated Phase P0: Use RoleAssignmentService.hasAnyPermission() instead
-   * @see RoleAssignmentService
-   */
   hasAnyPermission(permissions: string[]): boolean {
     const userPermissions = this.getAllPermissions();
     return permissions.some(p => userPermissions.includes(p));
   }
 
-  /**
-   * Check if user has all of the permissions
-   * @deprecated Phase P0: Use RoleAssignmentService.hasAllPermissions() instead
-   * @see RoleAssignmentService
-   */
   hasAllPermissions(permissions: string[]): boolean {
     const userPermissions = this.getAllPermissions();
     return permissions.every(p => userPermissions.includes(p));
   }
 
-  /**
-   * Get role names as string array (for backward compatibility)
-   * @deprecated Phase P0: Use RoleAssignmentService.getRoleNames() instead
-   * @see RoleAssignmentService
-   */
   getRoleNames(): string[] {
-    if (this.dbRoles && this.dbRoles.length > 0) {
-      return this.dbRoles.map(r => r.name);
-    }
-    return this.roles ?? [];
+    return this.roles?.length > 0 ? [...this.roles] : [];
   }
 
   isPending(): boolean {
@@ -343,95 +252,31 @@ export class User {
     return this.status === UserStatus.ACTIVE || this.status === UserStatus.APPROVED;
   }
 
-  /**
-   * Check if user is a supplier
-   * @deprecated Phase P0: Use RoleAssignmentService.isSupplier() instead
-   * @see RoleAssignmentService
-   */
   isSupplier(): boolean {
     return this.hasRole('supplier') || !!this.supplier;
   }
 
-  /**
-   * Check if user is a seller
-   * @deprecated Phase P0: Use RoleAssignmentService.isSeller() instead
-   * @see RoleAssignmentService
-   */
   isSeller(): boolean {
     return this.hasRole('seller') || !!this.seller;
   }
 
-  /**
-   * Check if user is a partner
-   * @deprecated Phase P0: Use RoleAssignmentService.isPartner() instead
-   * @see RoleAssignmentService
-   */
   isPartner(): boolean {
     return this.hasRole('partner') || !!this.partner;
   }
 
-  /**
-   * Get active dropshipping roles
-   * @deprecated Phase P0: Use RoleAssignmentService.getRoleNames() instead
-   * @see RoleAssignmentService
-   */
   getDropshippingRoles(): string[] {
-    const roles: string[] = [];
-    if (this.isSupplier()) roles.push('supplier');
-    if (this.isSeller()) roles.push('seller');
-    if (this.isPartner()) roles.push('partner');
-    return roles;
-  }
-
-  /**
-   * Get active role (with fallback to first dbRole)
-   * @deprecated Phase P0: Use RoleAssignmentService.getActiveRoles() instead
-   * @see RoleAssignmentService
-   */
-  getActiveRole(): Role | null {
-    // If activeRole is explicitly set, use it
-    if (this.activeRole) {
-      return this.activeRole;
-    }
-
-    // Fallback: return first dbRole if available
-    if (this.dbRoles && this.dbRoles.length > 0) {
-      return this.dbRoles[0];
-    }
-
-    return null;
-  }
-
-  /**
-   * Check if user can switch to a specific role
-   * @deprecated Phase P0: Use RoleAssignmentService.hasRole() instead
-   * @see RoleAssignmentService
-   */
-  canSwitchToRole(roleId: string): boolean {
-    if (!this.dbRoles || this.dbRoles.length === 0) {
-      return false;
-    }
-    return this.dbRoles.some(r => r.id === roleId);
-  }
-
-  /**
-   * Check if user has multiple roles
-   * @deprecated Phase P0: Use RoleAssignmentService.getActiveRoles() instead
-   * @see RoleAssignmentService
-   */
-  hasMultipleRoles(): boolean {
-    return this.dbRoles ? this.dbRoles.length > 1 : false;
+    const dRoles: string[] = [];
+    if (this.isSupplier()) dRoles.push('supplier');
+    if (this.isSeller()) dRoles.push('seller');
+    if (this.isPartner()) dRoles.push('partner');
+    return dRoles;
   }
 
   /**
    * 민감 정보 제거한 공개 데이터
-   *
-   * Note: role, roles, dbRoles, activeRole fields are deprecated.
-   * Use RoleAssignmentService to get accurate role information.
-   * @see RoleAssignmentService
+   * Phase3-E: roles는 requireAuth 미들웨어에서 RoleAssignment 데이터로 설정됨.
    */
   toPublicData() {
-    const activeRole = this.getActiveRole();
     return {
       id: this.id,
       email: this.email,
@@ -439,32 +284,15 @@ export class User {
       firstName: this.firstName,
       lastName: this.lastName,
       fullName: this.fullName,
-      phone: this.phone, // Phase 3-3: Include phone for checkout auto-fill
-      // WO-NETURE-EXTERNAL-CONTACT-V1: External contact settings
+      phone: this.phone,
       contactEnabled: this.contactEnabled,
       kakaoOpenChatUrl: this.kakaoOpenChatUrl,
       kakaoChannelUrl: this.kakaoChannelUrl,
-      // Note: role/roles/dbRoles are deprecated - use RoleAssignment data
-      // Phase3-E PR3: role 제거, roles[0] 기반으로 파생
       role: (this.roles?.[0] as UserRole) || UserRole.USER,
-      roles: this.getRoleNames(), // Return role names as string array
-      activeRole: activeRole ? {
-        id: activeRole.id,
-        name: activeRole.name,
-        displayName: activeRole.displayName
-      } : null,
-      dbRoles: this.dbRoles?.map(r => ({
-        id: r.id,
-        name: r.name,
-        displayName: r.displayName
-      })) || [],
-      canSwitchRoles: this.hasMultipleRoles(),
+      roles: this.roles?.length > 0 ? [...this.roles] : [],
       status: this.status,
-      permissions: this.getAllPermissions(), // Include all permissions from roles and direct
-      // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: scopes placeholder
-      // 실제 scopes는 서비스 레이어에서 deriveUserScopes로 계산하여 덮어씀
+      permissions: this.getAllPermissions(),
       scopes: [] as string[],
-      // WO-ROLE-NORMALIZATION-PHASE3-B-V1: DB에서 제거됨, 컨트롤러에서 derive
       pharmacistFunction: null as string | null,
       pharmacistRole: null as string | null,
       isStoreOwner: false,

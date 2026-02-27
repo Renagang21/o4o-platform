@@ -13,6 +13,27 @@ export class RemoveExternalProductIdFromListings1740556801000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // SAFETY GUARD: This migration is DEFERRED.
+    // external_product_id is still referenced by:
+    //   - store-hub.controller.ts (v1 visibility gate)
+    //   - pharmacy-products.controller.ts (isListed check)
+    //   - unified-store-public.routes.ts (storefront queries)
+    //   - store.controller.ts (glycopharm storefront)
+    // Also, existing v1 listings have product_id = NULL.
+    // This migration must NOT run until all read paths are fully migrated
+    // and all existing listings have been backfilled with product_id.
+    //
+    // When ready to execute, remove this guard and re-deploy.
+    const nullCount = await queryRunner.query(`
+      SELECT COUNT(*) AS cnt FROM organization_product_listings WHERE product_id IS NULL
+    `);
+    if (parseInt(nullCount[0]?.cnt, 10) > 0) {
+      // eslint-disable-next-line no-console
+      console.warn('[Migration] SKIPPED RemoveExternalProductIdFromListings: ' +
+        nullCount[0].cnt + ' listings still have product_id = NULL');
+      return;
+    }
+
     // 1. Drop old unique constraint
     await queryRunner.query(`
       ALTER TABLE organization_product_listings

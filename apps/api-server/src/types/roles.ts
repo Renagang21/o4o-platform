@@ -15,7 +15,9 @@
  */
 export type ServiceKey =
   | 'platform'      // Platform-wide roles
-  | 'kpa'          // KPA-Society service
+  | 'kpa'          // KPA-a 커뮤니티 서비스
+  | 'kpa-b'        // KPA-b 데모 서비스
+  | 'kpa-c'        // KPA-c 분회서비스
   | 'neture'       // Neture service
   | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
@@ -45,10 +47,26 @@ export type KpaRole =
   | 'kpa:pharmacist';      // General pharmacist/member
 
 /**
+ * KPA-b 데모 서비스 roles
+ */
+export type KpaBRole =
+  | 'kpa-b:district'  // 지부 운영자
+  | 'kpa-b:branch';   // 분회 운영자
+
+/**
+ * KPA-c 분회서비스 roles
+ */
+export type KpaCRole =
+  | 'kpa-c:admin'       // 분회서비스 관리자
+  | 'kpa-c:operator'    // 분회서비스 운영자
+  | 'kpa-c:pharmacist'; // 분회서비스 약사
+
+/**
  * Neture service roles
  */
 export type NetureRole =
   | 'neture:admin'    // Neture admin
+  | 'neture:operator' // Neture operator
   | 'neture:supplier' // Neture supplier
   | 'neture:partner'  // Neture partner
   | 'neture:user';    // Neture user
@@ -68,18 +86,22 @@ export type GlycoPharmRole =
  * K-Cosmetics service roles
  */
 export type CosmeticsRole =
-  | 'cosmetics:admin'    // K-Cosmetics admin
-  | 'cosmetics:operator' // K-Cosmetics operator
-  | 'cosmetics:supplier' // K-Cosmetics supplier
-  | 'cosmetics:seller'   // K-Cosmetics seller/retailer
-  | 'cosmetics:partner'; // K-Cosmetics partner
+  | 'cosmetics:admin'      // K-Cosmetics admin
+  | 'cosmetics:operator'   // K-Cosmetics operator
+  | 'cosmetics:pharmacist' // K-Cosmetics 약사
+  | 'cosmetics:user'       // K-Cosmetics 사용자
+  | 'cosmetics:supplier'   // K-Cosmetics supplier
+  | 'cosmetics:seller'     // K-Cosmetics seller/retailer
+  | 'cosmetics:partner';   // K-Cosmetics partner
 
 /**
  * GlucoseView service roles
  */
 export type GlucoseViewRole =
-  | 'glucoseview:admin'     // GlucoseView admin
-  | 'glucoseview:operator'; // GlucoseView operator
+  | 'glucoseview:admin'      // GlucoseView admin
+  | 'glucoseview:operator'   // GlucoseView operator
+  | 'glucoseview:pharmacist' // GlucoseView 약사
+  | 'glucoseview:user';      // GlucoseView 사용자
 
 /**
  * Union of all service-prefixed roles
@@ -87,59 +109,18 @@ export type GlucoseViewRole =
 export type PrefixedRole =
   | PlatformRole
   | KpaRole
+  | KpaBRole
+  | KpaCRole
   | NetureRole
   | GlycoPharmRole
   | CosmeticsRole
   | GlucoseViewRole;
 
 /**
- * Legacy unprefixed roles (to be deprecated)
- *
- * ⚠️ MIGRATION PERIOD ONLY - Remove after migration complete
- *
- * These are the old role formats that will be replaced by PrefixedRole.
- * Kept for backward compatibility during migration.
- *
- * @deprecated Use PrefixedRole instead
+ * WO-OPERATOR-ROLE-CLEANUP-V1: All roles are now prefixed.
+ * AnyRole is kept as an alias for backward compatibility.
  */
-export type LegacyRole =
-  // Platform roles (legacy)
-  | 'super_admin'
-  | 'admin'
-  | 'operator'
-  | 'manager'
-  | 'administrator'
-  | 'vendor'
-  | 'member'
-  | 'contributor'
-  // KPA roles (legacy)
-  | 'district_admin'
-  | 'branch_admin'
-  | 'branch_operator'
-  | 'pharmacist'
-  // Commerce roles (legacy)
-  | 'seller'
-  | 'supplier'
-  | 'partner'
-  | 'business'
-  // Base user roles (legacy)
-  | 'user'
-  | 'customer'
-  // Service-specific (legacy)
-  | 'pharmacy'
-  | 'consumer';
-
-/**
- * Combined role type for migration period
- *
- * ⚠️ MIGRATION PERIOD ONLY - Remove after migration complete
- *
- * During migration, a user's roles array may contain both prefixed and legacy formats.
- * After migration complete, use only PrefixedRole.
- *
- * @deprecated Use PrefixedRole after migration complete
- */
-export type AnyRole = PrefixedRole | LegacyRole;
+export type AnyRole = PrefixedRole;
 
 /**
  * Role category for grouping and analysis
@@ -148,22 +129,7 @@ export type RoleCategory =
   | 'platform'    // Platform-level roles
   | 'service'     // Service-specific roles
   | 'organization' // Organization-level roles (KpaMember, etc.)
-  | 'commerce'    // Commerce-related roles
-  | 'legacy';     // Deprecated roles
-
-/**
- * Role migration status
- */
-export interface RoleMigrationStatus {
-  /** Number of roles in prefixed format */
-  prefixed: number;
-  /** Number of roles in legacy format */
-  legacy: number;
-  /** Total number of roles */
-  total: number;
-  /** True if all roles are in prefixed format */
-  migrationComplete: boolean;
-}
+  | 'commerce';   // Commerce-related roles
 
 /**
  * Parsed service role components
@@ -253,18 +219,18 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'platform:admin': {
     role: 'platform:admin',
     label: 'Platform Admin',
-    description: 'Platform administrator',
+    description: 'Platform administrator (deprecated — use service-specific admin)',
     service: 'platform',
     category: 'platform',
-    deprecated: false
+    deprecated: true
   },
   'platform:operator': {
     role: 'platform:operator',
     label: 'Platform Operator',
-    description: 'Platform operator',
+    description: 'Platform operator (deprecated — use service-specific operator)',
     service: 'platform',
     category: 'platform',
-    deprecated: false
+    deprecated: true
   },
   'platform:manager': {
     role: 'platform:manager',
@@ -349,11 +315,63 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     deprecated: false
   },
 
+  // KPA-b 데모 roles
+  'kpa-b:district': {
+    role: 'kpa-b:district',
+    label: 'District Operator',
+    description: '데모 서비스 지부 운영자',
+    service: 'kpa-b',
+    category: 'service',
+    deprecated: false
+  },
+  'kpa-b:branch': {
+    role: 'kpa-b:branch',
+    label: 'Branch Operator',
+    description: '데모 서비스 분회 운영자',
+    service: 'kpa-b',
+    category: 'service',
+    deprecated: false
+  },
+
+  // KPA-c 분회서비스 roles
+  'kpa-c:admin': {
+    role: 'kpa-c:admin',
+    label: 'KPA-c Admin',
+    description: '분회서비스 관리자',
+    service: 'kpa-c',
+    category: 'service',
+    deprecated: false
+  },
+  'kpa-c:operator': {
+    role: 'kpa-c:operator',
+    label: 'KPA-c Operator',
+    description: '분회서비스 운영자',
+    service: 'kpa-c',
+    category: 'service',
+    deprecated: false
+  },
+  'kpa-c:pharmacist': {
+    role: 'kpa-c:pharmacist',
+    label: 'KPA-c Pharmacist',
+    description: '분회서비스 약사',
+    service: 'kpa-c',
+    category: 'service',
+    deprecated: false
+  },
+
   // Neture roles
   'neture:admin': {
     role: 'neture:admin',
     label: 'Neture Admin',
     description: 'Neture administrator',
+    service: 'neture',
+    category: 'service',
+    deprecated: false
+  },
+  'neture:operator': {
+    role: 'neture:operator',
+    label: 'Neture Operator',
+    description: 'Neture operator',
     service: 'neture',
     category: 'service',
     deprecated: false
@@ -450,6 +468,22 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
+  'cosmetics:pharmacist': {
+    role: 'cosmetics:pharmacist',
+    label: 'K-Cosmetics Pharmacist',
+    description: 'K-Cosmetics 약사',
+    service: 'cosmetics',
+    category: 'service',
+    deprecated: false
+  },
+  'cosmetics:user': {
+    role: 'cosmetics:user',
+    label: 'K-Cosmetics User',
+    description: 'K-Cosmetics 사용자',
+    service: 'cosmetics',
+    category: 'service',
+    deprecated: false
+  },
   'cosmetics:supplier': {
     role: 'cosmetics:supplier',
     label: 'K-Cosmetics Supplier',
@@ -488,6 +522,22 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     role: 'glucoseview:operator',
     label: 'GlucoseView Operator',
     description: 'GlucoseView operator',
+    service: 'glucoseview',
+    category: 'service',
+    deprecated: false
+  },
+  'glucoseview:pharmacist': {
+    role: 'glucoseview:pharmacist',
+    label: 'GlucoseView Pharmacist',
+    description: 'GlucoseView 약사',
+    service: 'glucoseview',
+    category: 'service',
+    deprecated: false
+  },
+  'glucoseview:user': {
+    role: 'glucoseview:user',
+    label: 'GlucoseView User',
+    description: 'GlucoseView 사용자',
     service: 'glucoseview',
     category: 'service',
     deprecated: false

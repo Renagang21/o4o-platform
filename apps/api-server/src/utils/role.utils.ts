@@ -1,14 +1,8 @@
 /**
  * Role Utilities - Service-Specific Role Prefix Support
  *
- * WO-P1-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 0
- *
- * Supports dual-format role checking during migration period:
- * - Legacy format: "admin", "operator", etc.
- * - Prefixed format: "service:role" (e.g., "kpa:admin", "platform:super_admin")
- *
- * IMPORTANT: This utility provides backward compatibility.
- * After migration complete, remove hasRoleCompat() and use only prefixed format.
+ * WO-OPERATOR-ROLE-CLEANUP-V1: Legacy compatibility helpers removed.
+ * All roles are now in prefixed format: "service:role" (e.g., "kpa:admin", "platform:super_admin")
  */
 
 import type { ServiceKey, PrefixedRole } from '../types/roles.js';
@@ -59,32 +53,6 @@ export function hasAllServiceRoles(userRoles: string[], serviceRoles: PrefixedRo
 }
 
 /**
- * Backward compatibility helper: Check both old and new role formats
- *
- * ⚠️ MIGRATION PERIOD ONLY - Remove after migration complete
- *
- * @param userRoles - Array of user roles
- * @param legacyRole - Old unprefixed role (e.g., "admin", "district_admin")
- * @param prefixedRole - New service-prefixed role (e.g., "kpa:admin")
- * @returns true if user has either format
- *
- * @example
- * // During migration, user might have old or new format
- * hasRoleCompat(['admin'], 'admin', 'kpa:admin') // true (legacy)
- * hasRoleCompat(['kpa:admin'], 'admin', 'kpa:admin') // true (new)
- * hasRoleCompat(['pharmacist'], 'admin', 'kpa:admin') // false (neither)
- *
- * @deprecated Remove after migration complete (Phase 7)
- */
-export function hasRoleCompat(
-  userRoles: string[],
-  legacyRole: string,
-  prefixedRole: PrefixedRole
-): boolean {
-  return userRoles.includes(legacyRole) || userRoles.includes(prefixedRole);
-}
-
-/**
  * Check if user has admin access for a specific service
  *
  * Checks for:
@@ -105,7 +73,6 @@ export function isServiceAdmin(userRoles: string[], serviceKey: ServiceKey): boo
   const serviceAdmin = `${serviceKey}:admin` as PrefixedRole;
   return hasAnyServiceRole(userRoles, [
     serviceAdmin,
-    'platform:admin',
     'platform:super_admin'
   ]);
 }
@@ -135,7 +102,6 @@ export function isServiceOperator(userRoles: string[], serviceKey: ServiceKey): 
   return hasAnyServiceRole(userRoles, [
     serviceOperator,
     serviceAdmin,
-    'platform:admin',
     'platform:super_admin'
   ]);
 }

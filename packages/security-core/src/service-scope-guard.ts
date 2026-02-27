@@ -1,13 +1,14 @@
 /**
  * Service Scope Guard Factory
  *
+ * WO-OPERATOR-ROLE-CLEANUP-V1: Legacy detection removed, platformBypass = platform:super_admin only
+ *
  * Creates Express middleware that enforces service-specific role-based access control.
  *
- * Security model (3-priority):
- * 1. Check service-prefixed roles → ALLOW
- * 2. Detect legacy unprefixed roles → LOG + DENY
- * 3. Detect cross-service roles → DENY
- * 4. Default → DENY
+ * Security model (2-priority):
+ * 1. Check service-prefixed roles (+ platform:super_admin bypass) → ALLOW
+ * 2. Detect cross-service roles → DENY
+ * 3. Default → DENY
  *
  * Usage:
  *   const requireScope = createServiceScopeGuard(kpaConfig);
@@ -27,7 +28,7 @@ import type { ServiceScopeGuardConfig, SecurityUser } from './types.js';
  *   serviceKey: 'kpa',
  *   allowedRoles: ['kpa:admin', 'kpa:operator'],
  *   platformBypass: false,
- *   legacyRoles: ['admin', 'operator'],
+ *   legacyRoles: [],
  *   blockedServicePrefixes: ['neture', 'glycopharm', 'cosmetics', 'glucoseview'],
  * });
  *
@@ -40,7 +41,6 @@ export function createServiceScopeGuard(
     serviceKey,
     allowedRoles,
     platformBypass,
-    legacyRoles,
     blockedServicePrefixes,
     scopeRoleMapping,
   } = config;
@@ -56,7 +56,6 @@ export function createServiceScopeGuard(
         return;
       }
 
-      const userId = user.id || 'unknown';
       const userScopes: string[] = user.scopes || [];
       const userRoles: string[] = user.roles || [];
 
@@ -75,9 +74,9 @@ export function createServiceScopeGuard(
         rolesToCheck = allowedRoles;
       }
 
-      // Add platform bypass if enabled
+      // platform:super_admin bypass if enabled
       if (platformBypass) {
-        rolesToCheck = [...rolesToCheck, 'platform:admin', 'platform:super_admin'];
+        rolesToCheck = [...rolesToCheck, 'platform:super_admin'];
       }
 
       const hasServiceRole = userRoles.some(r => rolesToCheck.includes(r));
@@ -87,25 +86,7 @@ export function createServiceScopeGuard(
         return;
       }
 
-      // --- Priority 2: Detect legacy roles → LOG + DENY ---
-      const detectedLegacyRoles = userRoles.filter(r => legacyRoles.includes(r));
-
-      if (detectedLegacyRoles.length > 0) {
-        detectedLegacyRoles.forEach(role => {
-          console.warn(
-            `[ROLE_MIGRATION] Legacy role format used: "${role}" | User: ${userId} | Context: ${serviceKey}:requireScope(${scope})`
-          );
-        });
-        res.status(403).json({
-          error: {
-            code: 'FORBIDDEN',
-            message: `Required scope: ${scope}. Legacy roles are no longer supported. Please use ${serviceKey}:* prefixed roles.`,
-          },
-        });
-        return;
-      }
-
-      // --- Priority 3: Detect cross-service roles → DENY ---
+      // --- Priority 2: Detect cross-service roles → DENY ---
       const hasBlockedServiceRole = userRoles.some(r => {
         for (const prefix of blockedServicePrefixes) {
           if (r.startsWith(`${prefix}:`)) return true;

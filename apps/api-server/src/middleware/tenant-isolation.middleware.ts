@@ -136,7 +136,8 @@ function isAdminRequest(req: Request): boolean {
   // Check for admin-specific headers or auth
   const isAdmin = req.headers['x-admin-access'] === 'true';
   const user = (req as any).user;
-  const hasAdminRole = user?.role === 'admin' || user?.roles?.includes('admin');
+  // Phase3-D: user.roles는 RoleAssignment 데이터로 오버라이드됨
+  const hasAdminRole = user?.roles?.includes('admin') || user?.roles?.includes('super_admin');
 
   return isAdmin || hasAdminRole;
 }
