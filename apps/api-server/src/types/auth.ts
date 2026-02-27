@@ -4,17 +4,17 @@ import { Request } from 'express';
 
 export enum UserRole {
   SUPER_ADMIN = 'super_admin',
-  ADMIN = 'admin',
-  VENDOR = 'vendor',
-  SELLER = 'seller',
-  USER = 'user',  // General user role (previously CUSTOMER)
-  BUSINESS = 'business',
-  PARTNER = 'partner',  // 파트너: 제휴 마케팅, 커미션 (AFFILIATE와 통합)
-  // Dropshipping roles
-  SUPPLIER = 'supplier',  // 공급자: 상품 제공, 재고 관리
-  // Legacy roles kept for backward compatibility
-  MANAGER = 'manager',
-  CUSTOMER = 'customer'  // Deprecated: Use USER instead
+  ADMIN       = 'admin',
+  OPERATOR    = 'operator',    // 서비스운영자 (Platform Service Operator)
+  MANAGER     = 'manager',
+  VENDOR      = 'vendor',
+  SELLER      = 'seller',
+  SUPPLIER    = 'supplier',    // 공급자: 상품 제공, 재고 관리
+  PARTNER     = 'partner',     // 파트너: 제휴 마케팅, 커미션
+  AFFILIATE   = 'affiliate',   // 제휴 파트너 (content-assets 접근 권한에서 사용)
+  BUSINESS    = 'business',
+  USER        = 'user',        // 일반 회원 (previously CUSTOMER)
+  CUSTOMER    = 'customer',    // Deprecated: Use USER instead
 }
 
 export enum UserStatus {
