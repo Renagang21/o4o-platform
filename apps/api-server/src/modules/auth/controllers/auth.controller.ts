@@ -283,13 +283,19 @@ export class AuthController extends BaseController {
     const data = req.body as RegisterRequestDto;
 
     try {
-      // Check password confirmation
-      if (data.password !== data.passwordConfirm) {
+      // Check password confirmation (optional: some frontends validate client-side only)
+      if (data.passwordConfirm && data.password !== data.passwordConfirm) {
         return BaseController.error(res, 'Passwords do not match', 400);
       }
 
-      // Check TOS acceptance
-      if (!data.tos) {
+      // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Normalize consent fields
+      // KPA/GlycoPharm use tos/privacyAccepted/marketingAccepted
+      // Neture/K-Cosmetics use agreeTerms/agreePrivacy/agreeMarketing
+      const tosAccepted = data.tos === true || data.agreeTerms === true;
+      const privacyAccepted = data.privacyAccepted === true || data.agreePrivacy === true;
+      const marketingAccepted = data.marketingAccepted === true || data.agreeMarketing === true;
+
+      if (!tosAccepted) {
         return BaseController.error(res, 'Terms of service must be accepted', 400);
       }
 
@@ -312,7 +318,23 @@ export class AuthController extends BaseController {
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
 
-      // User 생성 (트랜잭션 내 KPA member 포함)
+      // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization (before transaction)
+      // KPA/GlycoPharm: lastName + firstName → name
+      // Neture/K-Cosmetics: single name field
+      let resolvedName: string;
+      let resolvedLastName: string | undefined;
+      let resolvedFirstName: string | undefined;
+      if (data.lastName && data.firstName) {
+        resolvedName = `${data.lastName}${data.firstName}`;
+        resolvedLastName = data.lastName;
+        resolvedFirstName = data.firstName;
+      } else if (data.name) {
+        resolvedName = data.name;
+      } else {
+        return BaseController.error(res, 'Name is required (provide name or lastName+firstName)', 400);
+      }
+
+      // User 생성 (트랜잭션 내 KPA member + RoleAssignment 포함)
       const user = await AppDataSource.transaction(async (manager) => {
         const txUserRepo = manager.getRepository(User);
 
@@ -320,10 +342,11 @@ export class AuthController extends BaseController {
         const newUser = new User();
         newUser.email = data.email;
         newUser.password = hashedPassword;
-        newUser.lastName = data.lastName;
-        newUser.firstName = data.firstName;
-        newUser.name = `${data.lastName}${data.firstName}`;
-        newUser.nickname = data.nickname;
+        newUser.name = resolvedName;
+        newUser.lastName = resolvedLastName;
+        newUser.firstName = resolvedFirstName;
+        newUser.nickname = data.nickname || resolvedName;
+
         // role column removed - Phase3-E: roles is populated from role_assignments
         newUser.serviceKey = data.service || 'platform';
         if (data.phone) {
@@ -332,16 +355,26 @@ export class AuthController extends BaseController {
         // WO-ROLE-NORMALIZATION-PHASE3-B-V1: pharmacistFunction/pharmacistRole removed from users
         // Qualification data now stored in kpa_pharmacist_profiles (created below)
 
+        // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Consent timestamps
+        newUser.tosAcceptedAt = tosAccepted ? new Date() : undefined;
+        newUser.privacyAcceptedAt = privacyAccepted ? new Date() : undefined;
+        newUser.marketingAccepted = marketingAccepted;
+
         // businessInfo: 사업자 정보 + 면허번호 저장
+        // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: companyName → businessName fallback
+        const effectiveBusinessName = data.businessName || data.companyName;
         const businessInfo: Record<string, string> = {};
         if (data.licenseNumber) {
           businessInfo.licenseNumber = data.licenseNumber;
         }
-        if (data.businessName) {
-          businessInfo.businessName = data.businessName;
+        if (effectiveBusinessName) {
+          businessInfo.businessName = effectiveBusinessName;
         }
         if (data.businessNumber) {
           businessInfo.businessNumber = data.businessNumber;
+        }
+        if (data.businessType) {
+          businessInfo.businessType = data.businessType;
         }
         if (Object.keys(businessInfo).length > 0) {
           newUser.businessInfo = businessInfo;
@@ -391,26 +424,18 @@ export class AuthController extends BaseController {
           );
         }
 
-        return newUser;
-      });
-
-      // RoleAssignment 생성 (비필수 - 테이블 스키마 불일치 시에도 회원가입은 성공)
-      try {
-        const assignRepo = AppDataSource.getRepository(RoleAssignment);
+        // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: RoleAssignment inside transaction
+        const txAssignRepo = manager.getRepository(RoleAssignment);
         const assignment = new RoleAssignment();
-        assignment.userId = user.id;
+        assignment.userId = newUser.id;
         assignment.role = effectiveRole;
         assignment.isActive = true;
         assignment.validFrom = new Date();
         assignment.assignedAt = new Date();
-        await assignRepo.save(assignment);
-      } catch (roleError: any) {
-        logger.warn('[AuthController.register] RoleAssignment creation failed (non-fatal)', {
-          userId: user.id,
-          role: effectiveRole,
-          error: roleError.message,
-        });
-      }
+        await txAssignRepo.save(assignment);
+
+        return newUser;
+      });
 
       // Send email verification (optional - don't fail if email fails)
       try {

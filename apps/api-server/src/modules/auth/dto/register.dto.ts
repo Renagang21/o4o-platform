@@ -3,8 +3,10 @@ import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, IsIn, IsInt, Min, 
 /**
  * Register Request DTO
  *
- * Validates user registration data
- * Phase 3: membershipType으로 약사/약대생 분기
+ * WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1
+ * 5개 서비스(KPA, GlycoPharm, Neture, K-Cosmetics, GlucoseView) 공유 DTO.
+ * 서비스별 필드 차이를 수용하기 위해 이름/동의 필드는 optional.
+ * Controller에서 서비스별 정규화 수행.
  */
 export class RegisterRequestDto {
   @IsEmail({}, { message: 'Valid email is required' })
@@ -17,20 +19,31 @@ export class RegisterRequestDto {
   })
   password: string;
 
+  @IsOptional()
   @IsString()
-  passwordConfirm: string;
+  passwordConfirm?: string;
 
-  @IsString()
-  @MinLength(1, { message: 'Last name is required' })
-  lastName: string;
+  // --- 이름 필드 (서비스별 택일) ---
 
+  /** KPA/GlycoPharm: 성 */
+  @IsOptional()
   @IsString()
-  @MinLength(1, { message: 'First name is required' })
-  firstName: string;
+  lastName?: string;
 
+  /** KPA/GlycoPharm: 이름 */
+  @IsOptional()
   @IsString()
-  @MinLength(2, { message: 'Nickname must be at least 2 characters' })
-  nickname: string; // P1-T2: Nickname for forum/public display
+  firstName?: string;
+
+  /** Neture/K-Cosmetics: 단일 이름 필드 */
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  /** KPA/GlycoPharm: 닉네임 (포럼 표시용) */
+  @IsOptional()
+  @IsString()
+  nickname?: string;
 
   @IsOptional()
   @IsString()
@@ -42,7 +55,7 @@ export class RegisterRequestDto {
 
   @IsOptional()
   @IsString()
-  service?: string; // P0-T2: Service key for data isolation
+  service?: string;
 
   @IsOptional()
   @IsIn(['pharmacist', 'student'])
@@ -76,6 +89,8 @@ export class RegisterRequestDto {
   @IsString()
   pharmacistRole?: string;
 
+  // --- 사업자 정보 ---
+
   @IsOptional()
   @IsString()
   businessName?: string;
@@ -84,13 +99,44 @@ export class RegisterRequestDto {
   @IsString()
   businessNumber?: string;
 
-  @IsBoolean()
-  tos: boolean;
+  /** Neture: 회사명 (Controller에서 businessName으로 정규화) */
+  @IsOptional()
+  @IsString()
+  companyName?: string;
 
+  /** Neture: 사업 유형 (cosmetics, health, medical, food, other) */
+  @IsOptional()
+  @IsString()
+  businessType?: string;
+
+  // --- 동의 필드 (서비스별 택일) ---
+
+  /** KPA/GlycoPharm: 약관 동의 */
+  @IsOptional()
+  @IsBoolean()
+  tos?: boolean;
+
+  /** Neture/K-Cosmetics: 약관 동의 (Controller에서 tos와 통합) */
+  @IsOptional()
+  @IsBoolean()
+  agreeTerms?: boolean;
+
+  /** Neture/K-Cosmetics: 개인정보 동의 (Controller에서 privacyAccepted와 통합) */
+  @IsOptional()
+  @IsBoolean()
+  agreePrivacy?: boolean;
+
+  /** GlycoPharm: 개인정보 동의 */
   @IsOptional()
   @IsBoolean()
   privacyAccepted?: boolean;
 
+  /** Neture/K-Cosmetics: 마케팅 동의 (Controller에서 marketingAccepted와 통합) */
+  @IsOptional()
+  @IsBoolean()
+  agreeMarketing?: boolean;
+
+  /** GlycoPharm: 마케팅 동의 */
   @IsOptional()
   @IsBoolean()
   marketingAccepted?: boolean;

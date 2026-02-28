@@ -142,6 +142,16 @@ export class User {
   @Column({ type: 'boolean', default: false, name: 'onboarding_completed' })
   onboardingCompleted!: boolean;
 
+  // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Consent tracking
+  @Column({ type: 'timestamp', nullable: true, name: 'tos_accepted_at' })
+  tosAcceptedAt?: Date;
+
+  @Column({ type: 'timestamp', nullable: true, name: 'privacy_accepted_at' })
+  privacyAcceptedAt?: Date;
+
+  @Column({ type: 'boolean', default: false, name: 'marketing_accepted' })
+  marketingAccepted!: boolean;
+
   // 계정 잠금 상태 확인
   get isLocked(): boolean {
     return !!(this.lockedUntil && this.lockedUntil > new Date());
