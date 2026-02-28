@@ -249,6 +249,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   // Membership Query — /api/v1/kpa/me/membership
   // WO-KPA-BRANCH-SCOPE-VALIDATION-V1: User's KPA membership info for branch scope validation
+  // @deprecated WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: /auth/me의 kpaMembership 필드로 대체됨
+  //   프론트 호출 제거 완료. API는 외부 호환성을 위해 유지.
   // ============================================================================
   router.get('/me/membership', authenticate, asyncHandler(async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
