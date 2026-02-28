@@ -169,6 +169,88 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Branch Public routes — read-only endpoints for /branch-services/:branchId pages
   router.use('/branches', createBranchPublicController(dataSource));
 
+  // ──────────────────────────────────────────────────────────────────────
+  // WO-KPA-B-ORG-HIERARCHY-VISUALIZATION-V1
+  // District hierarchy — 산하 분회 요약 (district:admin 전용)
+  // N+1 free: 단일 SQL로 분회 + 회원수 + 대기수 + 최근활동수 조회
+  // ──────────────────────────────────────────────────────────────────────
+  router.get(
+    '/district/:districtId/branches-summary',
+    coreRequireAuth as any,
+    requireKpaScope('kpa:admin'),
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { districtId } = req.params;
+
+      // UUID 검증
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!UUID_RE.test(districtId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid district ID' } });
+        return;
+      }
+
+      // 지부(district) 존재 확인
+      const orgRepo = dataSource.getRepository(OrganizationStore);
+      const district = await orgRepo.findOne({ where: { id: districtId, isActive: true } });
+      if (!district) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'District not found' } });
+        return;
+      }
+
+      // N+1 free 단일 쿼리: 산하 분회 + 회원/대기/최근활동 집계
+      const branches: Array<{
+        id: string;
+        name: string;
+        type: string;
+        memberCount: string;
+        pendingCount: string;
+        recentActivityCount: string;
+      }> = await dataSource.query(`
+        SELECT
+          o.id,
+          o.name,
+          o.type,
+          COALESCE(ms.active_count, 0) AS "memberCount",
+          COALESCE(ms.pending_count, 0) AS "pendingCount",
+          COALESCE(ns.recent_count, 0) AS "recentActivityCount"
+        FROM organizations o
+        LEFT JOIN (
+          SELECT organization_id,
+            COUNT(*) FILTER (WHERE status = 'active') AS active_count,
+            COUNT(*) FILTER (WHERE status = 'pending') AS pending_count
+          FROM kpa_members
+          GROUP BY organization_id
+        ) ms ON ms.organization_id = o.id
+        LEFT JOIN (
+          SELECT organization_id,
+            COUNT(*) AS recent_count
+          FROM kpa_branch_news
+          WHERE is_deleted = false AND created_at > NOW() - INTERVAL '30 days'
+          GROUP BY organization_id
+        ) ns ON ns.organization_id = o.id
+        WHERE o."parentId" = $1
+          AND o."isActive" = true
+        ORDER BY o.name ASC
+      `, [districtId]);
+
+      res.json({
+        success: true,
+        data: {
+          districtId: district.id,
+          districtName: district.name,
+          branches: branches.map(b => ({
+            id: b.id,
+            name: b.name,
+            type: b.type,
+            memberCount: Number(b.memberCount),
+            pendingCount: Number(b.pendingCount),
+            recentActivityCount: Number(b.recentActivityCount),
+          })),
+          totalBranches: branches.length,
+        },
+      });
+    }),
+  );
+
   // ============================================================================
   // OPERATOR ROUTES — requireKpaScope('kpa:operator') enforced
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Operations/Content → Operator

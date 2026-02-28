@@ -1,17 +1,67 @@
 /**
- * PendingApprovalPage - 승인 대기 / 정지 안내 페이지
+ * PendingApprovalPage - 승인 대기 / 정지 / 탈퇴 안내 페이지
  *
  * WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
+ * WO-KPA-B-WITHDRAWN-UX-REFINEMENT-V1: 상태별 메시지 분기
  *
- * AuthGate가 pending/suspended 상태 사용자를 이 페이지로 리다이렉트.
+ * AuthGate가 pending/blocked(suspended/withdrawn) 상태 사용자를 이 페이지로 리다이렉트.
+ * kpaMembership.status 기반 3분기:
  * - pending: 가입 승인 대기 안내
  * - suspended: 계정 정지 안내
+ * - withdrawn: 탈퇴 계정 안내
  * 이미 active인 사용자가 직접 URL 접근 시 /dashboard로 리다이렉트.
  */
 
 import { Navigate } from 'react-router-dom';
-import { Clock, AlertTriangle } from 'lucide-react';
+import { Clock, AlertTriangle, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+
+type StatusVariant = 'pending' | 'suspended' | 'withdrawn';
+
+const ICON_SIZE = { width: '40px', height: '40px' } as const;
+
+const STATUS_TEXT: Record<StatusVariant, { title: string; subtitle: string; showSteps: boolean }> = {
+  pending: {
+    title: '승인 대기 중입니다',
+    subtitle: '운영자 검토 후 승인이 완료되면 서비스 이용이 가능합니다. 일반적으로 1~2 영업일 내에 처리됩니다.',
+    showSteps: true,
+  },
+  suspended: {
+    title: '이용이 정지된 계정입니다',
+    subtitle: '계정이 일시적으로 정지되어 서비스 이용이 제한됩니다. 자세한 사항은 소속 약사회에 문의해주세요.',
+    showSteps: false,
+  },
+  withdrawn: {
+    title: '탈퇴 처리된 계정입니다',
+    subtitle: 'KPA 서비스에서 탈퇴되었습니다. 재가입을 원하시면 소속 약사회에 문의해주세요.',
+    showSteps: false,
+  },
+};
+
+const ICON_COLORS: Record<StatusVariant, { icon: string; bg: string }> = {
+  pending: { icon: '#2563eb', bg: '#eff6ff' },
+  suspended: { icon: '#dc2626', bg: '#fef2f2' },
+  withdrawn: { icon: '#ca8a04', bg: '#fefce8' },
+};
+
+function StatusIcon({ variant }: { variant: StatusVariant }) {
+  const color = ICON_COLORS[variant].icon;
+  switch (variant) {
+    case 'suspended': return <AlertTriangle style={{ ...ICON_SIZE, color }} />;
+    case 'withdrawn': return <LogOut style={{ ...ICON_SIZE, color }} />;
+    default: return <Clock style={{ ...ICON_SIZE, color }} />;
+  }
+}
+
+function getStatusVariant(kpaStatus?: string | null, legacyStatus?: string): StatusVariant {
+  // kpaMembership.status 우선
+  if (kpaStatus === 'withdrawn') return 'withdrawn';
+  if (kpaStatus === 'suspended') return 'suspended';
+  if (kpaStatus === 'pending') return 'pending';
+  // 하위 호환: legacyStatus 폴백
+  if (legacyStatus === 'suspended') return 'suspended';
+  return 'pending';
+}
 
 export function PendingApprovalPage() {
   const { user, isLoading, logout } = useAuth();
@@ -22,33 +72,25 @@ export function PendingApprovalPage() {
   if (!user) return <Navigate to="/" replace />;
 
   // active → dashboard
-  if (user.membershipStatus === 'active' || user.membershipStatus === 'approved') {
+  const kpaStatus = user.kpaMembership?.status;
+  if (kpaStatus === 'active' || user.membershipStatus === 'active' || user.membershipStatus === 'approved') {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const isSuspended = user.membershipStatus === 'suspended';
+  const variant = getStatusVariant(kpaStatus, user.membershipStatus);
+  const config = STATUS_TEXT[variant];
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <div style={styles.iconWrapper}>
-          {isSuspended ? (
-            <AlertTriangle style={styles.iconSuspended} />
-          ) : (
-            <Clock style={styles.iconPending} />
-          )}
+        <div style={{ ...styles.iconWrapper, backgroundColor: ICON_COLORS[variant].bg }}>
+          <StatusIcon variant={variant} />
         </div>
 
-        <h1 style={styles.title}>
-          {isSuspended ? '계정이 정지되었습니다' : '승인 대기 중입니다'}
-        </h1>
-        <p style={styles.subtitle}>
-          {isSuspended
-            ? '계정이 일시적으로 정지되어 서비스 이용이 제한됩니다. 자세한 사항은 소속 약사회에 문의해주세요.'
-            : '운영자 검토 후 승인이 완료되면 서비스 이용이 가능합니다. 일반적으로 1~2 영업일 내에 처리됩니다.'}
-        </p>
+        <h1 style={styles.title}>{config.title}</h1>
+        <p style={styles.subtitle}>{config.subtitle}</p>
 
-        {!isSuspended && (
+        {config.showSteps && (
           <div style={styles.stepsBox}>
             <div style={styles.step}>
               <div style={{ ...styles.stepDot, backgroundColor: '#16a34a' }} />
@@ -103,17 +145,6 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     margin: '0 auto 24px',
-    backgroundColor: '#eff6ff',
-  },
-  iconPending: {
-    width: '40px',
-    height: '40px',
-    color: '#2563eb',
-  },
-  iconSuspended: {
-    width: '40px',
-    height: '40px',
-    color: '#dc2626',
   },
   title: {
     fontSize: '22px',

@@ -3,12 +3,12 @@
  *
  * SVC-C: 분회 서비스 홈
  * WO-KPA-SOCIETY-PHASE6-BRANCH-UX-STANDARD-V1
+ * WO-KPA-B-ORG-LEVEL-DASHBOARD-DIFF-V1: organizationType × organizationRole 카드 차등 렌더링
  *
- * 표준 섹션 구성:
- * 1. Hero — 분회명, 한 줄 소개, "커뮤니티 소속 분회" 배지
+ * 구조:
+ * 1. Hero — 조직명, 조직 유형 + 역할 배지
  * 2. 공지 영역 — 최근 공지 3건 (empty state 포함)
- * 3. 빠른 이동 카드 — 소식, 자료실, 커뮤니티(포럼), 문의/연락처
- * 4. 분회 안내 — 소개, 임원, 연락처, 본부 이동
+ * 3. Registry 기반 카드 — organizationType × organizationRole에 따라 차등 렌더링
  *
  * NOTE: /demo/* 링크 금지. basePath는 BranchContext에서 가져옴.
  */
@@ -17,7 +17,10 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { colors, shadows, borderRadius } from '../../styles/theme';
 import { useBranchContext } from '../../contexts/BranchContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { branchApi } from '../../api/branch';
+import { getOrgDashboardLayout } from './organization-dashboard-map';
+import { ORG_CARD_REGISTRY } from './organization-dashboard-cards';
 
 interface NewsItem {
   id: string;
@@ -25,9 +28,21 @@ interface NewsItem {
   date: string;
 }
 
+const ORG_TYPE_LABELS: Record<string, string> = {
+  district: '지부',
+  branch: '분회',
+};
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: '관리자',
+  operator: '운영자',
+  member: '회원',
+};
+
 export function BranchDashboardPage() {
   const { branchId } = useParams<{ branchId: string }>();
   const { branchName, basePath } = useBranchContext();
+  const { user } = useAuth();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
 
@@ -49,13 +64,12 @@ export function BranchDashboardPage() {
       .finally(() => setNewsLoading(false));
   }, [branchId]);
 
-  // 빠른 이동 카드 (WO T6-1 표준: 소식, 자료실, 커뮤니티, 문의)
-  const shortcuts = [
-    { icon: '📢', label: '소식', href: `${basePath}/news` },
-    { icon: '📁', label: '자료실', href: `${basePath}/docs` },
-    { icon: '💬', label: '커뮤니티', href: `${basePath}/forum` },
-    { icon: '📞', label: '연락처', href: `${basePath}/about/contact` },
-  ];
+  // organizationType × organizationRole 기반 카드 레이아웃 결정
+  const organizationType = user?.kpaMembership?.organizationType;
+  const organizationRole = user?.kpaMembership?.organizationRole;
+  const cardKeys = getOrgDashboardLayout(organizationType, organizationRole);
+  const orgTypeLabel = organizationType ? ORG_TYPE_LABELS[organizationType] || null : null;
+  const roleLabel = organizationRole ? ROLE_LABELS[organizationRole] || null : null;
 
   return (
     <div style={styles.container}>
@@ -63,9 +77,16 @@ export function BranchDashboardPage() {
       <section style={styles.heroSection}>
         <div style={styles.heroOverlay} />
         <div style={styles.heroContent}>
-          <div style={styles.heroBadge}>커뮤니티 소속 분회</div>
+          <div style={styles.badgeRow}>
+            <div style={styles.heroBadge}>
+              {orgTypeLabel ? `커뮤니티 소속 ${orgTypeLabel}` : '커뮤니티 소속 분회'}
+            </div>
+            {roleLabel && (
+              <div style={styles.roleBadge}>{roleLabel}</div>
+            )}
+          </div>
           <h1 style={styles.heroTitle}>
-            {branchName} 분회
+            {branchName}
           </h1>
           <p style={styles.heroSubtitle}>
             분회 공지사항, 자료, 회원 소통을 한 곳에서
@@ -107,41 +128,19 @@ export function BranchDashboardPage() {
         )}
       </section>
 
-      {/* 빠른 이동 카드 */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>바로가기</h2>
-        <div style={styles.shortcutGrid}>
-          {shortcuts.map((item) => (
-            <Link key={item.label} to={item.href} style={styles.shortcutCard}>
-              <span style={styles.shortcutIcon}>{item.icon}</span>
-              <span style={styles.shortcutLabel}>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* 분회 안내 */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>분회 안내</h2>
-        <div style={styles.infoGrid}>
-          <Link to={`${basePath}/about`} style={styles.infoCard}>
-            <span style={styles.infoIcon}>🏢</span>
-            <span style={styles.infoLabel}>분회 소개</span>
-          </Link>
-          <Link to={`${basePath}/about/officers`} style={styles.infoCard}>
-            <span style={styles.infoIcon}>👥</span>
-            <span style={styles.infoLabel}>임원 안내</span>
-          </Link>
-          <Link to={`${basePath}/about/contact`} style={styles.infoCard}>
-            <span style={styles.infoIcon}>📞</span>
-            <span style={styles.infoLabel}>연락처</span>
-          </Link>
-          <Link to="/" style={styles.infoCard}>
-            <span style={styles.infoIcon}>🏛️</span>
-            <span style={styles.infoLabel}>본부 이동</span>
-          </Link>
-        </div>
-      </section>
+      {/* Registry 기반 카드 렌더링 */}
+      <div style={styles.cardsContainer}>
+        {cardKeys.map((key) => {
+          const CardComponent = ORG_CARD_REGISTRY[key];
+          return (
+            <CardComponent
+              key={key}
+              basePath={basePath}
+              orgName={branchName}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -185,6 +184,12 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     textAlign: 'center',
   },
+  badgeRow: {
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'center',
+    marginBottom: '20px',
+  },
   heroBadge: {
     display: 'inline-block',
     padding: '6px 16px',
@@ -192,8 +197,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '20px',
     fontSize: '0.8125rem',
     fontWeight: 600,
-    marginBottom: '20px',
     border: '1px solid rgba(255,255,255,0.3)',
+  },
+  roleBadge: {
+    display: 'inline-block',
+    padding: '6px 16px',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    borderRadius: '20px',
+    fontSize: '0.8125rem',
+    fontWeight: 600,
+    border: '1px solid rgba(255,255,255,0.5)',
   },
   heroTitle: {
     fontSize: '2rem',
@@ -301,60 +314,11 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
   },
 
-  // Shortcuts (4-column)
-  shortcutGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '12px',
-    marginTop: '16px',
-  },
-  shortcutCard: {
+  // Cards container
+  cardsContainer: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '20px 12px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.gray200}`,
-    textDecoration: 'none',
-    transition: 'border-color 0.2s',
-  },
-  shortcutIcon: {
-    fontSize: '1.5rem',
-  },
-  shortcutLabel: {
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: colors.neutral700,
-  },
-
-  // Info Grid
-  infoGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-    gap: '12px',
-    marginTop: '16px',
-  },
-  infoCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px 12px',
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.md,
-    boxShadow: shadows.sm,
-    border: `1px solid ${colors.gray200}`,
-    textDecoration: 'none',
-  },
-  infoIcon: {
-    fontSize: '28px',
-    marginBottom: '8px',
-  },
-  infoLabel: {
-    fontSize: '0.8125rem',
-    fontWeight: 500,
-    color: colors.neutral700,
+    gap: '24px',
+    marginTop: '32px',
   },
 };

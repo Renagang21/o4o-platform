@@ -137,16 +137,25 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
-## 8. 화면 디버깅
+## 8. 화면 디버깅 & 배포 후 검증
 
-```
-❌ AI가 브라우저 직접 테스트
-✅ 사람이 관측 → AI가 JSON 분석 → 코드 위치 추적
-```
+### 검증 방식
 
-진단 Entry Point: `/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
+| 방식 | 허용 | 설명 |
+|------|------|------|
+| API 직접 호출 (curl/httpie) | ✅ | 배포된 엔드포인트에 직접 요청하여 응답 검증 |
+| 코드 경로 정적 분석 | ✅ | 코드 흐름 추적으로 논리 정합성 검증 |
+| Health/Debug 엔드포인트 | ✅ | 진단용 API로 상태 확인 |
+| 사람 관측 → AI JSON 분석 | ✅ | 사람이 스크린샷/네트워크 로그 제공 → AI가 분석 |
+| 브라우저 자동화 (Playwright 등) | ⚠️ | 로컬 환경에서만, 명시적 WO 승인 필요 |
 
-JSON 응답: `{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
+### 진단 Entry Point
+
+`/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
+
+### JSON 응답 표준
+
+`{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
 
 ---
 
