@@ -283,9 +283,8 @@ export function createPharmacyProductsController(
       return;
     }
 
-    const { retailPrice, isActive, displayOrder } = req.body;
+    const { isActive, displayOrder } = req.body;
 
-    if (retailPrice !== undefined) listing.retail_price = retailPrice;
     if (isActive !== undefined) listing.is_active = isActive;
     if (displayOrder !== undefined) listing.display_order = displayOrder;
 
@@ -299,7 +298,7 @@ export function createPharmacyProductsController(
         action_type: 'CONTENT_UPDATED' as any,
         target_type: 'content' as any,
         target_id: updated.id,
-        metadata: { action: 'listing_updated', changes: { retailPrice, isActive, displayOrder } },
+        metadata: { action: 'listing_updated', changes: { isActive, displayOrder } },
       });
       await auditRepo.save(log);
     } catch (e) {

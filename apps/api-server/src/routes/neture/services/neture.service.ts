@@ -252,7 +252,7 @@ export class NetureService {
   // Partner Operations
   // ============================================================================
 
-  private toPartnerDto(partner: NeturePartner): PartnerDto {
+  private toPartnerDto(partner: NeturePartner, userInfo?: { status: string; email: string } | null): PartnerDto {
     return {
       id: partner.id,
       name: partner.name,
@@ -265,6 +265,8 @@ export class NetureService {
       website: partner.website || null,
       contact: partner.contact || null,
       address: partner.address || null,
+      identity_status: userInfo?.status || null,
+      user_email: userInfo?.email || null,
       created_at: partner.createdAt.toISOString(),
       updated_at: partner.updatedAt.toISOString(),
     };
@@ -283,8 +285,21 @@ export class NetureService {
       order: query.order,
     });
 
+    // WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: batch-fetch user identity statuses
+    const userIds = partners.map((p) => p.userId).filter(Boolean) as string[];
+    const userStatusMap = new Map<string, { status: string; email: string }>();
+    if (userIds.length > 0) {
+      const rows: Array<{ id: string; status: string; email: string }> = await this.dataSource.query(
+        `SELECT id, status, email FROM users WHERE id = ANY($1)`,
+        [userIds],
+      );
+      for (const row of rows) {
+        userStatusMap.set(row.id, { status: row.status, email: row.email });
+      }
+    }
+
     return {
-      data: partners.map((p) => this.toPartnerDto(p)),
+      data: partners.map((p) => this.toPartnerDto(p, p.userId ? userStatusMap.get(p.userId) : null)),
       meta: {
         page,
         limit,
@@ -297,7 +312,18 @@ export class NetureService {
   async getPartner(id: string): Promise<PartnerDto | null> {
     const partner = await this.repository.findPartnerById(id);
     if (!partner) return null;
-    return this.toPartnerDto(partner);
+
+    // WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: fetch user identity status
+    let userInfo: { status: string; email: string } | null = null;
+    if (partner.userId) {
+      const rows: Array<{ status: string; email: string }> = await this.dataSource.query(
+        `SELECT status, email FROM users WHERE id = $1`,
+        [partner.userId],
+      );
+      userInfo = rows[0] || null;
+    }
+
+    return this.toPartnerDto(partner, userInfo);
   }
 
   async createPartner(
@@ -447,17 +473,23 @@ export class NetureService {
     };
   }
 
+  /**
+   * WO-NETURE-B2B-ORDER-SERVER-PRICE-ENFORCEMENT-V1
+   *
+   * B2B 주문 생성 — 서버 가격 강제
+   * 클라이언트 가격 필드 완전 무시, product.price_general 직접 조회
+   */
   async createOrder(
     data: CreateOrderRequestDto,
     userId: string
   ): Promise<OrderDto> {
-    // 1. 상품 조회 및 검증
+    // 1. B2B 공급자 상품 조회 (supplier 관계 포함)
     const productIds = data.items.map((item) => item.product_id);
-    const products = await this.repository.findProductsByIds(productIds);
+    const supplierProducts = await this.repository.findSupplierProductsByIds(productIds);
 
-    const productMap = new Map(products.map((p) => [p.id, p]));
+    const productMap = new Map(supplierProducts.map((p) => [p.id, p]));
 
-    // 2. 재고 확인 및 가격 계산
+    // 2. 검증 게이트 + 서버 가격 계산
     let totalAmount = 0;
     const orderItems: Partial<NetureOrderItem>[] = [];
 
@@ -466,18 +498,35 @@ export class NetureService {
       if (!product) {
         throw new Error(`Product not found: ${item.product_id}`);
       }
-      if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product: ${product.name}`);
+
+      // Gate 1: 상품 활성 상태
+      if (!product.isActive) {
+        throw new Error(`Product is not active: ${product.name}`);
       }
 
-      const unitPrice = product.salePrice || product.basePrice;
+      // Gate 2: 상품 승인 상태
+      if (product.approvalStatus !== 'APPROVED') {
+        throw new Error(`Product is not approved: ${product.name}`);
+      }
+
+      // Gate 3: 공급자 활성 상태
+      if (!product.supplier || product.supplier.status !== 'ACTIVE') {
+        throw new Error(`Supplier is not active for product: ${product.name}`);
+      }
+
+      // 서버 강제 가격: price_general (클라이언트 가격 절대 사용 금지)
+      const unitPrice = product.priceGeneral;
+      if (unitPrice <= 0) {
+        throw new Error(`Invalid price for product: ${product.name}`);
+      }
+
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
       orderItems.push({
         productId: product.id,
         productName: product.name,
-        productImage: product.images?.[0] || null,
+        productImage: null,
         quantity: item.quantity,
         unitPrice,
         totalPrice: itemTotal,
@@ -514,11 +563,6 @@ export class NetureService {
     }));
     const savedItems = await this.repository.createOrderItems(itemsWithOrderId);
     order.items = savedItems;
-
-    // 6. 재고 차감
-    for (const item of data.items) {
-      await this.repository.decrementStock(item.product_id, item.quantity);
-    }
 
     return this.toOrderDto(order);
   }

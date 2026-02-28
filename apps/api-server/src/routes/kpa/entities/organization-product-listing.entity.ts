@@ -41,9 +41,6 @@ export class OrganizationProductListing {
   @Column({ type: 'jsonb', default: '{}' })
   product_metadata: Record<string, unknown>;
 
-  @Column({ type: 'int', nullable: true })
-  retail_price: number | null;
-
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 

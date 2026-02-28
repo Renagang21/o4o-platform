@@ -32,7 +32,7 @@ export async function autoExpandPublicProduct(
     const result = await executor.query(
       `INSERT INTO organization_product_listings
         (id, organization_id, service_key, product_name, product_metadata,
-         product_id, retail_price, is_active, display_order, created_at, updated_at)
+         product_id, is_active, display_order, created_at, updated_at)
        SELECT
          gen_random_uuid(),
          ose.organization_id,
@@ -40,7 +40,6 @@ export async function autoExpandPublicProduct(
          $2,
          '{}'::jsonb,
          $1,
-         NULL,
          false,
          0,
          NOW(), NOW()
@@ -78,7 +77,7 @@ export async function autoListPublicProductsForOrg(
     const result = await dataSource.query(
       `INSERT INTO organization_product_listings
         (id, organization_id, service_key, product_name, product_metadata,
-         product_id, retail_price, is_active, display_order, created_at, updated_at)
+         product_id, is_active, display_order, created_at, updated_at)
        SELECT
          gen_random_uuid(),
          $1,
@@ -86,7 +85,6 @@ export async function autoListPublicProductsForOrg(
          sp.name,
          '{}'::jsonb,
          sp.id,
-         NULL,
          false,
          0,
          NOW(), NOW()

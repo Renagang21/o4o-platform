@@ -116,6 +116,9 @@ import { LessonController } from '../../modules/lms/controllers/LessonController
 import { EnrollmentController } from '../../modules/lms/controllers/EnrollmentController.js';
 import { CertificateController } from '../../modules/lms/controllers/CertificateController.js';
 import { InstructorPublicController } from '../../modules/lms/controllers/InstructorPublicController.js';
+// WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import { CourseService } from '../../modules/lms/services/CourseService.js';
 
 /**
  * KPA Scope Guard — powered by @o4o/security-core
@@ -165,6 +168,189 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Branch Admin Dashboard routes (WO-KPA-OPERATOR-DASHBOARD-IMPROVEMENT-V1)
   router.use('/branch-admin', createBranchAdminDashboardController(dataSource, coreRequireAuth as any));
+
+  // ──────────────────────────────────────────────────────────────────────
+  // WO-KPA-B-BRANCH-ADMIN-MEMBER-WORKFLOW-V1
+  // Branch member approval workflow — pending list / approve / reject
+  // branch:admin 전용: 분회 소속 관리자 또는 kpa:admin bypass
+  // ──────────────────────────────────────────────────────────────────────
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  /** Branch admin 권한 검증 helper */
+  async function verifyBranchAdmin(
+    ds: DataSource,
+    userId: string,
+    branchId: string,
+    userRoles: string[],
+  ): Promise<boolean> {
+    // kpa:admin / kpa:district_admin → bypass
+    if (userRoles.some(r => r === 'kpa:admin' || r === 'kpa:district_admin')) return true;
+    // 분회 소속 admin 확인
+    const [member] = await ds.query(
+      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' AND role = 'admin' LIMIT 1`,
+      [userId, branchId],
+    );
+    return !!member;
+  }
+
+  // 1) GET /branches/:branchId/pending-members
+  router.get(
+    '/branches/:branchId/pending-members',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } });
+        return;
+      }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } });
+        return;
+      }
+
+      const rows: Array<{
+        requestId: string;
+        userId: string;
+        name: string;
+        contactEmail: string;
+        requestedRole: string;
+        requestType: string;
+        requestedAt: string;
+        activityType: string | null;
+      }> = await dataSource.query(`
+        SELECT
+          r.id            AS "requestId",
+          r.user_id       AS "userId",
+          u.name,
+          u.email         AS "contactEmail",
+          r.requested_role AS "requestedRole",
+          r.request_type  AS "requestType",
+          r.created_at    AS "requestedAt",
+          m.activity_type AS "activityType"
+        FROM kpa_organization_join_requests r
+        JOIN users u ON u.id = r.user_id
+        LEFT JOIN kpa_members m ON m.user_id = r.user_id AND m.organization_id = r.organization_id
+        WHERE r.organization_id = $1
+          AND r.status = 'pending'
+        ORDER BY r.created_at ASC
+      `, [branchId]);
+
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // 2) PATCH /branches/:branchId/pending-members/:requestId/approve
+  router.patch(
+    '/branches/:branchId/pending-members/:requestId/approve',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, requestId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } });
+        return;
+      }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } });
+        return;
+      }
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 1. 요청 확인 (pending + branchId 복합 조건)
+        const [request] = await queryRunner.query(
+          `SELECT id, user_id, organization_id, requested_role, request_type, status
+           FROM kpa_organization_join_requests
+           WHERE id = $1 AND organization_id = $2 AND status = 'pending'`,
+          [requestId, branchId],
+        );
+        if (!request) {
+          await queryRunner.rollbackTransaction();
+          res.status(409).json({ success: false, error: { code: 'NOT_PENDING', message: 'Request not found or already processed' } });
+          return;
+        }
+
+        // 2. kpa_organization_join_requests 상태 갱신
+        await queryRunner.query(
+          `UPDATE kpa_organization_join_requests
+           SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW()
+           WHERE id = $2`,
+          [user.id, requestId],
+        );
+
+        // 3. organization_members 생성 (중복 방지)
+        const [existingMember] = await queryRunner.query(
+          `SELECT id FROM organization_members
+           WHERE "organizationId" = $1 AND "userId" = $2 AND "leftAt" IS NULL`,
+          [branchId, request.user_id],
+        );
+        if (!existingMember) {
+          await queryRunner.query(
+            `INSERT INTO organization_members (id, "organizationId", "userId", role, "isPrimary", "joinedAt", "createdAt", "updatedAt")
+             VALUES (gen_random_uuid(), $1, $2, $3, false, NOW(), NOW(), NOW())`,
+            [branchId, request.user_id, request.requested_role || 'member'],
+          );
+        }
+
+        // 4. users.status → active (best-effort within transaction)
+        await queryRunner.query(
+          `UPDATE users SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
+           WHERE id = $1 AND status != 'active'`,
+          [request.user_id, user.id],
+        );
+
+        await queryRunner.commitTransaction();
+        res.json({ success: true, data: { requestId, status: 'approved' } });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }),
+  );
+
+  // 3) PATCH /branches/:branchId/pending-members/:requestId/reject
+  router.patch(
+    '/branches/:branchId/pending-members/:requestId/reject',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, requestId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(requestId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } });
+        return;
+      }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } });
+        return;
+      }
+
+      // 요청 확인 (pending + branchId 복합 조건)
+      const [request] = await dataSource.query(
+        `SELECT id FROM kpa_organization_join_requests
+         WHERE id = $1 AND organization_id = $2 AND status = 'pending'`,
+        [requestId, branchId],
+      );
+      if (!request) {
+        res.status(409).json({ success: false, error: { code: 'NOT_PENDING', message: 'Request not found or already processed' } });
+        return;
+      }
+
+      // 상태 갱신 (organization_members 생성 금지)
+      await dataSource.query(
+        `UPDATE kpa_organization_join_requests
+         SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), updated_at = NOW()
+         WHERE id = $2`,
+        [user.id, requestId],
+      );
+
+      res.json({ success: true, data: { requestId, status: 'rejected' } });
+    }),
+  );
 
   // Branch Public routes — read-only endpoints for /branch-services/:branchId pages
   router.use('/branches', createBranchPublicController(dataSource));
@@ -248,6 +434,687 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           totalBranches: branches.length,
         },
       });
+    }),
+  );
+
+  // ──────────────────────────────────────────────────────────────────────
+  // WO-KPA-B-DISTRICT-OVERVIEW-KPI-V1
+  // District overview — 지부 통합 관제 KPI (district:admin 전용)
+  // N+1 free: 단일 SQL로 산하 분회 집계 totals 조회
+  // ──────────────────────────────────────────────────────────────────────
+  router.get(
+    '/district/:districtId/overview-summary',
+    coreRequireAuth as any,
+    requireKpaScope('kpa:admin'),
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { districtId } = req.params;
+
+      // UUID 검증
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!UUID_RE.test(districtId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid district ID' } });
+        return;
+      }
+
+      // 지부(district) 존재 확인
+      const orgRepo = dataSource.getRepository(OrganizationStore);
+      const district = await orgRepo.findOne({ where: { id: districtId, isActive: true } });
+      if (!district) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'District not found' } });
+        return;
+      }
+
+      // N+1 free 단일 쿼리: 산하 분회 집계 totals
+      const [totals] = await dataSource.query(`
+        SELECT
+          COUNT(DISTINCT o.id) AS "totalBranches",
+          COALESCE(SUM(ms.active_count), 0) AS "totalMembers",
+          COALESCE(SUM(ms.pending_count), 0) AS "totalPending",
+          COALESCE(SUM(ns.recent_count), 0) AS "totalRecentActivity"
+        FROM organizations o
+        LEFT JOIN (
+          SELECT organization_id,
+            COUNT(*) FILTER (WHERE status = 'active') AS active_count,
+            COUNT(*) FILTER (WHERE status = 'pending') AS pending_count
+          FROM kpa_members
+          GROUP BY organization_id
+        ) ms ON ms.organization_id = o.id
+        LEFT JOIN (
+          SELECT organization_id,
+            COUNT(*) AS recent_count
+          FROM kpa_branch_news
+          WHERE is_deleted = false AND created_at > NOW() - INTERVAL '30 days'
+          GROUP BY organization_id
+        ) ns ON ns.organization_id = o.id
+        WHERE o."parentId" = $1
+          AND o."isActive" = true
+      `, [districtId]);
+
+      res.json({
+        success: true,
+        data: {
+          district: {
+            id: district.id,
+            name: district.name,
+          },
+          totals: {
+            totalBranches: Number(totals?.totalBranches || 0),
+            totalMembers: Number(totals?.totalMembers || 0),
+            totalPending: Number(totals?.totalPending || 0),
+            totalRecentActivity: Number(totals?.totalRecentActivity || 0),
+          },
+        },
+      });
+    }),
+  );
+
+  // ──────────────────────────────────────────────────────────────────────
+  // WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1
+  // Stage 1: 강사 자격 (Instructor Qualification) API
+  // Stage 2: 강좌 생성 요청 (Course Request) API
+  // ──────────────────────────────────────────────────────────────────────
+
+  /** 강사 자격 — active KPA 회원 확인 helper */
+  async function verifyActiveMember(
+    ds: DataSource,
+    userId: string,
+    organizationId: string,
+  ): Promise<{ memberId: string } | null> {
+    const [member] = await ds.query(
+      `SELECT id FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
+      [userId, organizationId],
+    );
+    return member ? { memberId: member.id } : null;
+  }
+
+  /** 강사 자격 — approved qualification 확인 helper */
+  async function verifyQualifiedInstructor(
+    ds: DataSource,
+    userId: string,
+    organizationId: string,
+    userRoles: string[],
+  ): Promise<{ qualificationId: string } | null> {
+    if (userRoles.some(r => r === 'kpa:admin')) return { qualificationId: 'admin-bypass' };
+    const [q] = await ds.query(
+      `SELECT id FROM kpa_instructor_qualifications WHERE user_id = $1 AND organization_id = $2 AND status = 'approved' LIMIT 1`,
+      [userId, organizationId],
+    );
+    return q ? { qualificationId: q.id } : null;
+  }
+
+  // ── Stage 1: Instructor Qualification ──
+
+  // Q1: POST /instructor-qualifications — 강사 자격 신청
+  router.post(
+    '/instructor-qualifications',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const user = (req as any).user;
+      const { organizationId, qualificationType, licenseNumber, specialtyArea, teachingExperienceYears, supportingDocuments, applicantNote } = req.body;
+
+      if (!organizationId || !UUID_RE.test(organizationId)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_ORG', message: 'Valid organizationId required' } });
+        return;
+      }
+      if (!qualificationType || !['pharmacist_instructor', 'student_instructor'].includes(qualificationType)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_TYPE', message: 'qualificationType must be pharmacist_instructor or student_instructor' } });
+        return;
+      }
+
+      // 활성 회원 확인
+      const memberCheck = await verifyActiveMember(dataSource, user.id, organizationId);
+      if (!memberCheck) {
+        res.status(403).json({ success: false, error: { code: 'NOT_ACTIVE_MEMBER', message: '해당 분회의 활성 회원만 강사 자격을 신청할 수 있습니다' } });
+        return;
+      }
+
+      // 중복 확인 (pending/approved 존재 시 거부)
+      const [existing] = await dataSource.query(
+        `SELECT id, status FROM kpa_instructor_qualifications WHERE user_id = $1 AND organization_id = $2 AND status IN ('pending', 'approved') LIMIT 1`,
+        [user.id, organizationId],
+      );
+      if (existing) {
+        const msg = existing.status === 'pending' ? '이미 대기 중인 신청이 있습니다' : '이미 승인된 자격이 있습니다';
+        res.status(409).json({ success: false, error: { code: 'DUPLICATE', message: msg } });
+        return;
+      }
+
+      const [inserted] = await dataSource.query(
+        `INSERT INTO kpa_instructor_qualifications
+          (user_id, organization_id, member_id, qualification_type, license_number, specialty_area, teaching_experience_years, supporting_documents, applicant_note, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, 'pending')
+         RETURNING id, status, created_at`,
+        [user.id, organizationId, memberCheck.memberId, qualificationType, licenseNumber || null, specialtyArea || null, teachingExperienceYears || 0, JSON.stringify(supportingDocuments || []), applicantNote || null],
+      );
+
+      res.status(201).json({ success: true, data: { qualificationId: inserted.id, status: 'pending' } });
+    }),
+  );
+
+  // Q2: GET /instructor-qualifications/me — 내 자격 현황
+  router.get(
+    '/instructor-qualifications/me',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const user = (req as any).user;
+      const rows = await dataSource.query(
+        `SELECT id, organization_id, qualification_type, status, license_number, specialty_area, teaching_experience_years, reviewed_at, rejection_reason, revoke_reason, created_at
+         FROM kpa_instructor_qualifications WHERE user_id = $1 ORDER BY created_at DESC`,
+        [user.id],
+      );
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // Q3: GET /branches/:branchId/instructor-qualifications — 분회 내 자격 목록
+  router.get(
+    '/branches/:branchId/instructor-qualifications',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const { status } = req.query;
+      let sql = `SELECT q.id, q.user_id, q.qualification_type, q.status, q.license_number, q.specialty_area,
+                        q.teaching_experience_years, q.applicant_note, q.reviewed_at, q.rejection_reason, q.created_at,
+                        u.name AS user_name, u.email AS user_email
+                 FROM kpa_instructor_qualifications q
+                 LEFT JOIN users u ON u.id = q.user_id
+                 WHERE q.organization_id = $1`;
+      const params: any[] = [branchId];
+
+      if (status && typeof status === 'string' && ['pending', 'approved', 'rejected', 'revoked'].includes(status)) {
+        sql += ` AND q.status = $2`;
+        params.push(status);
+      }
+      sql += ` ORDER BY q.created_at DESC`;
+
+      const rows = await dataSource.query(sql, params);
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // Q4: GET /branches/:branchId/instructor-qualifications/pending — 대기 중 자격만
+  router.get(
+    '/branches/:branchId/instructor-qualifications/pending',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT q.id, q.user_id, q.qualification_type, q.license_number, q.specialty_area,
+                q.teaching_experience_years, q.supporting_documents, q.applicant_note, q.created_at,
+                u.name AS user_name, u.email AS user_email
+         FROM kpa_instructor_qualifications q
+         LEFT JOIN users u ON u.id = q.user_id
+         WHERE q.organization_id = $1 AND q.status = 'pending'
+         ORDER BY q.created_at ASC`,
+        [branchId],
+      );
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // Q5: PATCH /branches/:branchId/instructor-qualifications/:id/approve — 승인
+  router.patch(
+    '/branches/:branchId/instructor-qualifications/:id/approve',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      // Boundary: id + organization_id 복합 조건
+      const [qual] = await dataSource.query(
+        `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!qual) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Qualification not found' } }); return; }
+      if (qual.status !== 'pending') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${qual.status})에서는 승인할 수 없습니다` } }); return; }
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 1. qualification 승인
+        await queryRunner.query(
+          `UPDATE kpa_instructor_qualifications SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
+          [user.id, req.body.reviewComment || null, id],
+        );
+
+        // 2. lms:instructor 역할 부여
+        await roleAssignmentService.assignRole({
+          userId: qual.user_id,
+          role: 'lms:instructor',
+          assignedBy: user.id,
+        });
+
+        await queryRunner.commitTransaction();
+        res.json({ success: true, data: { qualificationId: id, status: 'approved', roleAssigned: 'lms:instructor' } });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }),
+  );
+
+  // Q6: PATCH /branches/:branchId/instructor-qualifications/:id/reject — 거절
+  router.patch(
+    '/branches/:branchId/instructor-qualifications/:id/reject',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      const { rejectionReason } = req.body;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!rejectionReason) { res.status(400).json({ success: false, error: { code: 'REASON_REQUIRED', message: 'rejectionReason is required' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const [qual] = await dataSource.query(
+        `SELECT id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!qual) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Qualification not found' } }); return; }
+      if (qual.status !== 'pending') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${qual.status})에서는 거절할 수 없습니다` } }); return; }
+
+      await dataSource.query(
+        `UPDATE kpa_instructor_qualifications SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_reason = $2, updated_at = NOW() WHERE id = $3`,
+        [user.id, rejectionReason, id],
+      );
+      res.json({ success: true, data: { qualificationId: id, status: 'rejected' } });
+    }),
+  );
+
+  // Q7: PATCH /branches/:branchId/instructor-qualifications/:id/revoke — 해지
+  router.patch(
+    '/branches/:branchId/instructor-qualifications/:id/revoke',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      const { revokeReason } = req.body;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!revokeReason) { res.status(400).json({ success: false, error: { code: 'REASON_REQUIRED', message: 'revokeReason is required' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const [qual] = await dataSource.query(
+        `SELECT id, user_id, status FROM kpa_instructor_qualifications WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!qual) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Qualification not found' } }); return; }
+      if (qual.status !== 'approved') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${qual.status})에서는 해지할 수 없습니다` } }); return; }
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        await queryRunner.query(
+          `UPDATE kpa_instructor_qualifications SET status = 'revoked', revoked_by = $1, revoked_at = NOW(), revoke_reason = $2, updated_at = NOW() WHERE id = $3`,
+          [user.id, revokeReason, id],
+        );
+        // lms:instructor 역할 제거
+        await roleAssignmentService.removeRole(qual.user_id, 'lms:instructor');
+        await queryRunner.commitTransaction();
+        res.json({ success: true, data: { qualificationId: id, status: 'revoked' } });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }),
+  );
+
+  // ── Stage 2: Course Request ──
+
+  // C1: POST /course-requests — 강좌 기획안 생성 (draft)
+  router.post(
+    '/course-requests',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const user = (req as any).user;
+      const { organizationId, proposedTitle, proposedDescription, proposedLevel, proposedDuration, proposedCredits, proposedTags, proposedMetadata } = req.body;
+
+      if (!organizationId || !UUID_RE.test(organizationId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ORG', message: 'Valid organizationId required' } }); return; }
+      if (!proposedTitle || !proposedDescription || !proposedDuration) { res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'proposedTitle, proposedDescription, proposedDuration are required' } }); return; }
+
+      // qualification 확인
+      const qualCheck = await verifyQualifiedInstructor(dataSource, user.id, organizationId, user.roles || []);
+      if (!qualCheck) { res.status(403).json({ success: false, error: { code: 'NOT_QUALIFIED', message: '승인된 강사 자격이 필요합니다' } }); return; }
+
+      const [inserted] = await dataSource.query(
+        `INSERT INTO kpa_course_requests
+          (instructor_id, organization_id, qualification_id, proposed_title, proposed_description, proposed_level, proposed_duration, proposed_credits, proposed_tags, proposed_metadata, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, 'draft')
+         RETURNING id, status, created_at`,
+        [user.id, organizationId, qualCheck.qualificationId, proposedTitle, proposedDescription, proposedLevel || 'beginner', proposedDuration, proposedCredits || 0, proposedTags ? `{${proposedTags.join(',')}}` : '{}', JSON.stringify(proposedMetadata || {})],
+      );
+
+      res.status(201).json({ success: true, data: { requestId: inserted.id, status: 'draft' } });
+    }),
+  );
+
+  // C2: GET /course-requests/me — 내 기획안 목록
+  router.get(
+    '/course-requests/me',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const user = (req as any).user;
+      const rows = await dataSource.query(
+        `SELECT id, organization_id, proposed_title, proposed_level, proposed_duration, status, created_course_id, submitted_at, reviewed_at, rejection_reason, revision_note, created_at
+         FROM kpa_course_requests WHERE instructor_id = $1 ORDER BY created_at DESC`,
+        [user.id],
+      );
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // C3: GET /course-requests/:id — 기획안 상세
+  router.get(
+    '/course-requests/:id',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+
+      const [row] = await dataSource.query(
+        `SELECT * FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+        [id],
+      );
+      if (!row) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+
+      // owner 또는 branch admin 확인
+      const userRoles: string[] = user.roles || [];
+      if (row.instructor_id !== user.id) {
+        if (!(await verifyBranchAdmin(dataSource, user.id, row.organization_id, userRoles))) {
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Access denied' } }); return;
+        }
+      }
+
+      res.json({ success: true, data: row });
+    }),
+  );
+
+  // C4: PATCH /course-requests/:id — 기획안 수정 (draft/revision_requested에서만)
+  router.patch(
+    '/course-requests/:id',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+
+      const [row] = await dataSource.query(
+        `SELECT id, instructor_id, status FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+        [id],
+      );
+      if (!row) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (row.instructor_id !== user.id) { res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Only owner can edit' } }); return; }
+      if (!['draft', 'revision_requested'].includes(row.status)) { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${row.status})에서는 수정할 수 없습니다` } }); return; }
+
+      const { proposedTitle, proposedDescription, proposedLevel, proposedDuration, proposedCredits, proposedTags, proposedMetadata } = req.body;
+      const setClauses: string[] = ['updated_at = NOW()'];
+      const params: any[] = [];
+      let pi = 1;
+
+      if (proposedTitle) { setClauses.push(`proposed_title = $${pi++}`); params.push(proposedTitle); }
+      if (proposedDescription) { setClauses.push(`proposed_description = $${pi++}`); params.push(proposedDescription); }
+      if (proposedLevel) { setClauses.push(`proposed_level = $${pi++}`); params.push(proposedLevel); }
+      if (proposedDuration) { setClauses.push(`proposed_duration = $${pi++}`); params.push(proposedDuration); }
+      if (proposedCredits !== undefined) { setClauses.push(`proposed_credits = $${pi++}`); params.push(proposedCredits); }
+      if (proposedTags) { setClauses.push(`proposed_tags = $${pi++}`); params.push(`{${proposedTags.join(',')}}`); }
+      if (proposedMetadata) { setClauses.push(`proposed_metadata = $${pi++}::jsonb`); params.push(JSON.stringify(proposedMetadata)); }
+
+      params.push(id);
+      await dataSource.query(`UPDATE kpa_course_requests SET ${setClauses.join(', ')} WHERE id = $${pi}`, params);
+      res.json({ success: true, data: { requestId: id, message: 'Updated' } });
+    }),
+  );
+
+  // C5: POST /course-requests/:id/submit — 제출
+  router.post(
+    '/course-requests/:id/submit',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+
+      const [row] = await dataSource.query(
+        `SELECT id, instructor_id, status FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+        [id],
+      );
+      if (!row) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (row.instructor_id !== user.id) { res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Only owner can submit' } }); return; }
+      if (!['draft', 'revision_requested'].includes(row.status)) { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${row.status})에서는 제출할 수 없습니다` } }); return; }
+
+      await dataSource.query(
+        `UPDATE kpa_course_requests SET status = 'submitted', submitted_at = NOW(), updated_at = NOW() WHERE id = $1`,
+        [id],
+      );
+      res.json({ success: true, data: { requestId: id, status: 'submitted' } });
+    }),
+  );
+
+  // C6: POST /course-requests/:id/cancel — 취소
+  router.post(
+    '/course-requests/:id/cancel',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+
+      const [row] = await dataSource.query(
+        `SELECT id, instructor_id, status FROM kpa_course_requests WHERE id = $1 LIMIT 1`,
+        [id],
+      );
+      if (!row) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (row.instructor_id !== user.id) { res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Only owner can cancel' } }); return; }
+      if (['approved', 'cancelled'].includes(row.status)) { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${row.status})에서는 취소할 수 없습니다` } }); return; }
+
+      await dataSource.query(
+        `UPDATE kpa_course_requests SET status = 'cancelled', updated_at = NOW() WHERE id = $1`,
+        [id],
+      );
+      res.json({ success: true, data: { requestId: id, status: 'cancelled' } });
+    }),
+  );
+
+  // C7: GET /branches/:branchId/course-requests — 분회 내 기획안 목록
+  router.get(
+    '/branches/:branchId/course-requests',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT cr.id, cr.instructor_id, cr.proposed_title, cr.proposed_level, cr.proposed_duration, cr.proposed_credits,
+                cr.status, cr.created_course_id, cr.submitted_at, cr.reviewed_at, cr.rejection_reason, cr.revision_note, cr.created_at,
+                u.name AS instructor_name, u.email AS instructor_email
+         FROM kpa_course_requests cr
+         LEFT JOIN users u ON u.id = cr.instructor_id
+         WHERE cr.organization_id = $1
+         ORDER BY cr.created_at DESC`,
+        [branchId],
+      );
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // C8: GET /branches/:branchId/course-requests/pending — 제출된 기획안만
+  router.get(
+    '/branches/:branchId/course-requests/pending',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid branch ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const rows = await dataSource.query(
+        `SELECT cr.id, cr.instructor_id, cr.proposed_title, cr.proposed_description, cr.proposed_level, cr.proposed_duration,
+                cr.proposed_credits, cr.proposed_tags, cr.proposed_metadata, cr.submitted_at, cr.created_at,
+                u.name AS instructor_name, u.email AS instructor_email
+         FROM kpa_course_requests cr
+         LEFT JOIN users u ON u.id = cr.instructor_id
+         WHERE cr.organization_id = $1 AND cr.status = 'submitted'
+         ORDER BY cr.submitted_at ASC`,
+        [branchId],
+      );
+      res.json({ success: true, data: rows });
+    }),
+  );
+
+  // C9: PATCH /branches/:branchId/course-requests/:id/approve — 승인 → Course 생성
+  router.patch(
+    '/branches/:branchId/course-requests/:id/approve',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const [cr] = await dataSource.query(
+        `SELECT * FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!cr) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (cr.status !== 'submitted') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${cr.status})에서는 승인할 수 없습니다` } }); return; }
+
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 1. request 승인
+        await queryRunner.query(
+          `UPDATE kpa_course_requests SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(), review_comment = $2, updated_at = NOW() WHERE id = $3`,
+          [user.id, req.body.reviewComment || null, id],
+        );
+
+        // 2. LMS Core Course 생성 (Extension → Core 호출)
+        const courseService = CourseService.getInstance();
+        const course = await courseService.createCourse({
+          title: cr.proposed_title,
+          description: cr.proposed_description,
+          level: cr.proposed_level?.toUpperCase() as any || 'BEGINNER',
+          duration: cr.proposed_duration,
+          credits: Number(cr.proposed_credits) || 0,
+          tags: cr.proposed_tags || [],
+          instructorId: cr.instructor_id,
+          organizationId: branchId,
+          isOrganizationExclusive: true,
+          metadata: { kpaCourseRequestId: id, createdVia: 'kpa_extension' },
+        });
+
+        // 3. created_course_id 기록
+        await queryRunner.query(
+          `UPDATE kpa_course_requests SET created_course_id = $1 WHERE id = $2`,
+          [course.id, id],
+        );
+
+        await queryRunner.commitTransaction();
+        res.json({
+          success: true,
+          data: {
+            requestId: id,
+            status: 'approved',
+            createdCourseId: course.id,
+          },
+        });
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+    }),
+  );
+
+  // C10: PATCH /branches/:branchId/course-requests/:id/reject — 거절
+  router.patch(
+    '/branches/:branchId/course-requests/:id/reject',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      const { rejectionReason } = req.body;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!rejectionReason) { res.status(400).json({ success: false, error: { code: 'REASON_REQUIRED', message: 'rejectionReason is required' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const [cr] = await dataSource.query(
+        `SELECT id, status FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!cr) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (cr.status !== 'submitted') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${cr.status})에서는 거절할 수 없습니다` } }); return; }
+
+      await dataSource.query(
+        `UPDATE kpa_course_requests SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(), rejection_reason = $2, updated_at = NOW() WHERE id = $3`,
+        [user.id, rejectionReason, id],
+      );
+      res.json({ success: true, data: { requestId: id, status: 'rejected' } });
+    }),
+  );
+
+  // C11: PATCH /branches/:branchId/course-requests/:id/request-revision — 보완 요청
+  router.patch(
+    '/branches/:branchId/course-requests/:id/request-revision',
+    coreRequireAuth as any,
+    asyncHandler(async (req: Request, res: Response): Promise<void> => {
+      const { branchId, id } = req.params;
+      const user = (req as any).user;
+      const { revisionNote } = req.body;
+      if (!UUID_RE.test(branchId) || !UUID_RE.test(id)) { res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid ID' } }); return; }
+      if (!revisionNote) { res.status(400).json({ success: false, error: { code: 'NOTE_REQUIRED', message: 'revisionNote is required' } }); return; }
+      if (!(await verifyBranchAdmin(dataSource, user.id, branchId, user.roles || []))) {
+        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Branch admin access required' } }); return;
+      }
+
+      const [cr] = await dataSource.query(
+        `SELECT id, status FROM kpa_course_requests WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [id, branchId],
+      );
+      if (!cr) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Course request not found' } }); return; }
+      if (cr.status !== 'submitted') { res.status(400).json({ success: false, error: { code: 'INVALID_STATUS', message: `현재 상태(${cr.status})에서는 보완 요청할 수 없습니다` } }); return; }
+
+      await dataSource.query(
+        `UPDATE kpa_course_requests SET status = 'revision_requested', reviewed_by = $1, reviewed_at = NOW(), revision_note = $2, updated_at = NOW() WHERE id = $3`,
+        [user.id, revisionNote, id],
+      );
+      res.json({ success: true, data: { requestId: id, status: 'revision_requested' } });
     }),
   );
 
@@ -937,9 +1804,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      // 2. 수량 (기본 1)
+      // 2. 수량 (기본 1) + 가격 조회 (WO-NETURE-PRICE-ARCHITECTURE-FREEZE-V1: product 기준)
       const quantity = Math.max(1, parseInt(req.body?.quantity) || 1);
-      const unitPrice = Number(listing.retail_price ?? 0);
+      const priceRows = await dataSource.query(
+        `SELECT price_general FROM neture_supplier_products WHERE id = $1`,
+        [listing.product_id],
+      );
+      const unitPrice = Number(priceRows[0]?.price_general ?? 0);
       const subtotal = quantity * unitPrice;
 
       // 3. metadata.serviceKey 전파 — listing.service_key → Order.metadata.serviceKey

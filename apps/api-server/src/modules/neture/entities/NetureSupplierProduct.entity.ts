@@ -94,6 +94,19 @@ export class NetureSupplierProduct {
   @Column({ name: 'approval_note', type: 'text', nullable: true })
   approvalNote: string | null;
 
+  /** WO-NETURE-PRICE-ARCHITECTURE-FREEZE-V1: B2B 가격 필드 */
+  @Column({ name: 'price_general', type: 'int', default: 0 })
+  priceGeneral: number;
+
+  @Column({ name: 'price_gold', type: 'int', nullable: true })
+  priceGold: number | null;
+
+  @Column({ name: 'price_platinum', type: 'int', nullable: true })
+  pricePlatinum: number | null;
+
+  @Column({ name: 'consumer_reference_price', type: 'int', nullable: true })
+  consumerReferencePrice: number | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

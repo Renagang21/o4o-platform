@@ -115,12 +115,13 @@ export function createStoreChannelProductsController(
              opc.created_at AS "createdAt",
              opl.id AS "productListingId",
              opl.product_name AS "productName",
-             opl.retail_price AS "retailPrice",
+             sp.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.is_active AS "listingActive"
            FROM organization_product_channels opc
            JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
            JOIN organization_channels oc ON oc.id = opc.channel_id
+           LEFT JOIN neture_supplier_products sp ON sp.id = opl.product_id
            WHERE opc.channel_id = $1
              AND oc.organization_id = $2
            ORDER BY opc.display_order ASC, opc.created_at ASC`,
@@ -151,10 +152,11 @@ export function createStoreChannelProductsController(
           `SELECT
              opl.id,
              opl.product_name AS "productName",
-             opl.retail_price AS "retailPrice",
+             sp.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.created_at AS "createdAt"
            FROM organization_product_listings opl
+           LEFT JOIN neture_supplier_products sp ON sp.id = opl.product_id
            WHERE opl.organization_id = $1
              AND opl.is_active = true
              AND opl.id NOT IN (

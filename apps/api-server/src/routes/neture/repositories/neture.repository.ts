@@ -23,6 +23,7 @@ import {
 } from '../entities/neture-product-log.entity.js';
 import { NetureOrder, NetureOrderStatus } from '../entities/neture-order.entity.js';
 import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
+import { NetureSupplierProduct } from '../../../modules/neture/entities/NetureSupplierProduct.entity.js';
 
 export class NetureRepository {
   private productRepo: Repository<NetureProduct>;
@@ -30,6 +31,7 @@ export class NetureRepository {
   private logRepo: Repository<NetureProductLog>;
   private orderRepo: Repository<NetureOrder>;
   private orderItemRepo: Repository<NetureOrderItem>;
+  private supplierProductRepo: Repository<NetureSupplierProduct>;
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository(NetureProduct);
@@ -37,6 +39,7 @@ export class NetureRepository {
     this.logRepo = dataSource.getRepository(NetureProductLog);
     this.orderRepo = dataSource.getRepository(NetureOrder);
     this.orderItemRepo = dataSource.getRepository(NetureOrderItem);
+    this.supplierProductRepo = dataSource.getRepository(NetureSupplierProduct);
   }
 
   // ============================================================================
@@ -285,6 +288,18 @@ export class NetureRepository {
   async findProductsByIds(ids: string[]): Promise<NetureProduct[]> {
     if (ids.length === 0) return [];
     return this.productRepo.findByIds(ids);
+  }
+
+  /**
+   * WO-NETURE-B2B-ORDER-SERVER-PRICE-ENFORCEMENT-V1
+   * B2B 주문용 공급자 상품 조회 (supplier relation 포함)
+   */
+  async findSupplierProductsByIds(ids: string[]): Promise<NetureSupplierProduct[]> {
+    if (ids.length === 0) return [];
+    return this.supplierProductRepo.find({
+      where: ids.map(id => ({ id })),
+      relations: ['supplier'],
+    });
   }
 
   async decrementStock(productId: string, quantity: number): Promise<void> {

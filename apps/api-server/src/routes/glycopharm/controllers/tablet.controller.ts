@@ -67,7 +67,7 @@ async function queryTabletVisibleProducts(
   const sortMap: Record<string, string> = {
     created_at: 'sp.created_at',
     name: 'sp.name',
-    price: 'opl.retail_price',
+    price: 'sp.price_general',
     sort_order: 'opl.display_order',
   };
   const sortField = sortMap[options.sort || 'sort_order'] || 'opl.display_order';
@@ -100,7 +100,7 @@ async function queryTabletVisibleProducts(
     `SELECT DISTINCT ON (sp.id)
        sp.id, COALESCE(opl.product_name, sp.name) AS name,
        '' AS sku, sp.category,
-       opl.retail_price AS price, opc.channel_price AS sale_price,
+       sp.price_general AS price, NULL::int AS sale_price,
        0 AS stock_quantity, '[]'::jsonb AS images,
        CASE WHEN sp.is_active THEN 'active' ELSE 'inactive' END AS status,
        false AS is_featured,
@@ -108,8 +108,7 @@ async function queryTabletVisibleProducts(
        '' AS short_description,
        opl.display_order AS sort_order,
        sp.created_at, sp.updated_at,
-       opl.organization_id AS pharmacy_id,
-       opc.channel_price
+       opl.organization_id AS pharmacy_id
      FROM neture_supplier_products sp
      JOIN neture_suppliers s ON s.id = sp.supplier_id
      INNER JOIN organization_product_listings opl

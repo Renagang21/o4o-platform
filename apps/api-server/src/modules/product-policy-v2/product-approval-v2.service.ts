@@ -176,7 +176,6 @@ export class ProductApprovalV2Service {
             product_name: product.name,
             product_metadata: {},
             product_id: product.id,
-            retail_price: null,
             is_active: false, // 승인 후에도 비활성 (운영자가 수동 활성화)
             display_order: 0,
           });
@@ -325,7 +324,6 @@ export class ProductApprovalV2Service {
             product_name: product.name,
             product_metadata: {},
             product_id: product.id,
-            retail_price: null,
             is_active: false,
             display_order: 0,
           });
@@ -489,7 +487,6 @@ export class ProductApprovalV2Service {
           product_name: product.name,
           product_metadata: {},
           product_id: product.id, // v2: proper FK
-          retail_price: null,
           is_active: false,
           display_order: 0,
         });

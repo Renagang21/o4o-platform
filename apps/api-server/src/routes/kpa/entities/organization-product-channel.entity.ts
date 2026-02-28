@@ -39,9 +39,6 @@ export class OrganizationProductChannel {
   display_order: number;
 
   @Column({ type: 'int', nullable: true })
-  channel_price: number | null;
-
-  @Column({ type: 'int', nullable: true })
   sales_limit: number | null;
 
   @CreateDateColumn()

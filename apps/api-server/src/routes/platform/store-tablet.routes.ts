@@ -469,11 +469,12 @@ export function createStoreTabletRoutes(
       // Fetch supplier products (organization_product_listings)
       const [supplierProducts, localProducts] = await Promise.all([
         dataSource.query(
-          `SELECT id, product_id, product_name, retail_price, is_active,
-                  display_order, product_metadata, service_key
-           FROM organization_product_listings
-           WHERE organization_id = $1 AND is_active = true
-           ORDER BY display_order ASC, product_name ASC`,
+          `SELECT opl.id, opl.product_id, opl.product_name, sp.price_general AS retail_price,
+                  opl.is_active, opl.display_order, opl.product_metadata, opl.service_key
+           FROM organization_product_listings opl
+           LEFT JOIN neture_supplier_products sp ON sp.id = opl.product_id
+           WHERE opl.organization_id = $1 AND opl.is_active = true
+           ORDER BY opl.display_order ASC, opl.product_name ASC`,
           [organizationId],
         ),
         dataSource.query(

@@ -23,6 +23,7 @@ import {
   ContentStatus,
   ContactVisibility,
 } from './entities/index.js';
+import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { autoExpandPublicProduct } from '../../utils/auto-listing.utils.js';
 
@@ -93,6 +94,15 @@ export class NetureService {
     return this._contractRepo;
   }
 
+  private _partnerEntityRepo?: Repository<NeturePartner>;
+
+  private get partnerEntityRepo(): Repository<NeturePartner> {
+    if (!this._partnerEntityRepo) {
+      this._partnerEntityRepo = AppDataSource.getRepository(NeturePartner);
+    }
+    return this._partnerEntityRepo;
+  }
+
   // ==================== User-Supplier Linking ====================
 
   /**
@@ -123,6 +133,22 @@ export class NetureService {
       });
     } catch (error) {
       logger.error('[NetureService] Error finding supplier by user ID:', error);
+      return null;
+    }
+  }
+
+  // ==================== User-Partner Linking (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) ====================
+
+  /**
+   * Get partner by user ID
+   */
+  async getPartnerByUserId(userId: string): Promise<NeturePartner | null> {
+    try {
+      return await this.partnerEntityRepo.findOne({
+        where: { userId },
+      });
+    } catch (error) {
+      logger.error('[NetureService] Error finding partner by user ID:', error);
       return null;
     }
   }
@@ -274,20 +300,39 @@ export class NetureService {
   /**
    * GET /admin/suppliers/pending — 승인 대기 공급자 목록
    */
-  async getPendingSuppliers(): Promise<Array<{ id: string; name: string; slug: string; contactEmail: string | null; userId: string; createdAt: Date }>> {
+  async getPendingSuppliers(): Promise<Array<{ id: string; name: string; slug: string; contactEmail: string | null; userId: string; identityStatus: string | null; userEmail: string | null; createdAt: Date }>> {
     try {
       const suppliers = await this.supplierRepo.find({
         where: { status: SupplierStatus.PENDING },
         order: { createdAt: 'ASC' },
       });
-      return suppliers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        slug: s.slug,
-        contactEmail: s.contactEmail || null,
-        userId: s.userId,
-        createdAt: s.createdAt,
-      }));
+
+      // Batch-fetch user identity statuses (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1)
+      const userIds = suppliers.map((s) => s.userId).filter(Boolean);
+      const userStatusMap = new Map<string, { status: string; email: string }>();
+      if (userIds.length > 0) {
+        const rows: Array<{ id: string; status: string; email: string }> = await AppDataSource.query(
+          `SELECT id, status, email FROM users WHERE id = ANY($1)`,
+          [userIds],
+        );
+        for (const row of rows) {
+          userStatusMap.set(row.id, { status: row.status, email: row.email });
+        }
+      }
+
+      return suppliers.map((s) => {
+        const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
+        return {
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          contactEmail: s.contactEmail || null,
+          userId: s.userId,
+          identityStatus: userInfo?.status || null,
+          userEmail: userInfo?.email || null,
+          createdAt: s.createdAt,
+        };
+      });
     } catch (error) {
       logger.error('[NetureService] Error fetching pending suppliers:', error);
       throw error;
@@ -355,10 +400,11 @@ export class NetureService {
 
   /**
    * GET /admin/suppliers — 전체 공급자 목록 (필터)
+   * WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: identityStatus 추가
    */
   async getAllSuppliers(
     filters?: { status?: SupplierStatus },
-  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; createdAt: Date; updatedAt: Date }>> {
+  ): Promise<Array<{ id: string; name: string; slug: string; status: SupplierStatus; contactEmail: string; userId: string; identityStatus: string | null; userEmail: string | null; createdAt: Date; updatedAt: Date }>> {
     try {
       const where: { status?: SupplierStatus } = {};
       if (filters?.status) {
@@ -370,16 +416,34 @@ export class NetureService {
         order: { createdAt: 'DESC' },
       });
 
-      return suppliers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        slug: s.slug,
-        status: s.status,
-        contactEmail: s.contactEmail || '',
-        userId: s.userId,
-        createdAt: s.createdAt,
-        updatedAt: s.updatedAt,
-      }));
+      // Batch-fetch user identity statuses
+      const userIds = suppliers.map((s) => s.userId).filter(Boolean);
+      const userStatusMap = new Map<string, { status: string; email: string }>();
+      if (userIds.length > 0) {
+        const rows: Array<{ id: string; status: string; email: string }> = await AppDataSource.query(
+          `SELECT id, status, email FROM users WHERE id = ANY($1)`,
+          [userIds],
+        );
+        for (const row of rows) {
+          userStatusMap.set(row.id, { status: row.status, email: row.email });
+        }
+      }
+
+      return suppliers.map((s) => {
+        const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
+        return {
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          status: s.status,
+          contactEmail: s.contactEmail || '',
+          userId: s.userId,
+          identityStatus: userInfo?.status || null,
+          userEmail: userInfo?.email || null,
+          createdAt: s.createdAt,
+          updatedAt: s.updatedAt,
+        };
+      });
     } catch (error) {
       logger.error('[NetureService] Error fetching all suppliers:', error);
       throw error;
@@ -552,6 +616,10 @@ export class NetureService {
         distributionType: p.distributionType,
         isActive: p.isActive,
         approvalStatus: p.approvalStatus,
+        priceGeneral: p.priceGeneral,
+        priceGold: p.priceGold,
+        pricePlatinum: p.pricePlatinum,
+        consumerReferencePrice: p.consumerReferencePrice,
         createdAt: p.createdAt,
       }));
     } catch (error) {
@@ -1206,6 +1274,10 @@ export class NetureService {
         acceptsApplications: product.acceptsApplications,
         distributionType: product.distributionType,
         allowedSellerIds: product.allowedSellerIds,
+        priceGeneral: product.priceGeneral,
+        priceGold: product.priceGold,
+        pricePlatinum: product.pricePlatinum,
+        consumerReferencePrice: product.consumerReferencePrice,
         pendingRequestCount: pendingMap.get(product.id) || 0,
         activeServiceCount: serviceMap.get(product.id) || 0,
         createdAt: product.createdAt,
@@ -1232,6 +1304,10 @@ export class NetureService {
       purpose?: ProductPurpose;
       distributionType?: DistributionType;
       acceptsApplications?: boolean;
+      priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
+      consumerReferencePrice?: number | null;
     }
   ) {
     try {
@@ -1259,6 +1335,10 @@ export class NetureService {
         approvalStatus: ProductApprovalStatus.PENDING,
         acceptsApplications: data.acceptsApplications ?? true,
         allowedSellerIds: [],
+        priceGeneral: data.priceGeneral ?? 0,
+        priceGold: data.priceGold ?? null,
+        pricePlatinum: data.pricePlatinum ?? null,
+        consumerReferencePrice: data.consumerReferencePrice ?? null,
       });
 
       const savedProduct = await this.productRepo.save(product);
@@ -1278,6 +1358,10 @@ export class NetureService {
           acceptsApplications: savedProduct.acceptsApplications,
           distributionType: savedProduct.distributionType,
           allowedSellerIds: savedProduct.allowedSellerIds,
+          priceGeneral: savedProduct.priceGeneral,
+          priceGold: savedProduct.priceGold,
+          pricePlatinum: savedProduct.pricePlatinum,
+          consumerReferencePrice: savedProduct.consumerReferencePrice,
           createdAt: savedProduct.createdAt,
         },
       };
@@ -1302,6 +1386,10 @@ export class NetureService {
       acceptsApplications?: boolean;
       distributionType?: DistributionType;
       allowedSellerIds?: string[] | null;
+      priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
+      consumerReferencePrice?: number | null;
     }
   ) {
     try {
@@ -1329,6 +1417,19 @@ export class NetureService {
         product.allowedSellerIds = updates.allowedSellerIds;
       }
 
+      if (updates.priceGeneral !== undefined) {
+        product.priceGeneral = updates.priceGeneral;
+      }
+      if (updates.priceGold !== undefined) {
+        product.priceGold = updates.priceGold;
+      }
+      if (updates.pricePlatinum !== undefined) {
+        product.pricePlatinum = updates.pricePlatinum;
+      }
+      if (updates.consumerReferencePrice !== undefined) {
+        product.consumerReferencePrice = updates.consumerReferencePrice;
+      }
+
       // Validation: PRIVATE requires at least one seller ID
       if (product.distributionType === DistributionType.PRIVATE &&
           (!product.allowedSellerIds || product.allowedSellerIds.length === 0)) {
@@ -1347,6 +1448,10 @@ export class NetureService {
           acceptsApplications: savedProduct.acceptsApplications,
           distributionType: savedProduct.distributionType,
           allowedSellerIds: savedProduct.allowedSellerIds,
+          priceGeneral: savedProduct.priceGeneral,
+          priceGold: savedProduct.priceGold,
+          pricePlatinum: savedProduct.pricePlatinum,
+          consumerReferencePrice: savedProduct.consumerReferencePrice,
           updatedAt: savedProduct.updatedAt,
         },
       };
