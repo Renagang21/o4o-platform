@@ -259,12 +259,13 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | Channel Execution Console | `docs/baseline/CHANNEL-EXECUTION-CONSOLE-V1.md` |
 | Channel Creation Flow | `docs/baseline/CHANNEL-CREATION-FLOW-SIMPLIFICATION-V1.md` |
 | Neture Distribution Engine | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
+| **Neture Domain Architecture** | `docs/baseline/NETURE-DOMAIN-ARCHITECTURE-FREEZE-V1.md` |
 | RBAC Freeze Declaration | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
 | RBAC Runbook | `docs/rbac/RBAC-RUNBOOK-V1.md` |
 | RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
 
 ---
 
-*Updated: 2026-02-27*
-*Version: 6.4*
+*Updated: 2026-02-28*
+*Version: 6.5*
 *Status: Active Constitution*

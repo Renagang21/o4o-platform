@@ -63,6 +63,10 @@ export function createOperatorSummaryController(
       signagePendingMediaCount,
       signagePendingPlaylistCount,
       forumPendingRequestCount,
+      // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: 통합 승인 카운트
+      instructorPendingCount,
+      coursePendingCount,
+      membershipPendingCount,
       // WO-HUB-RISK-LOOP-COMPLETION-V1
       forcedExpirySoonCount,
     ] = await Promise.all([
@@ -105,9 +109,37 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM signage_playlists
         WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL
       `),
+      // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: 통합 승인 카운트 (4 entity_type + legacy dual-query)
       dataSource.query(`
-        SELECT COUNT(*) as count FROM forum_category_requests
-        WHERE status = 'pending' AND service_code = 'kpa-society'
+        SELECT
+          (SELECT COUNT(*) FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society')
+          +
+          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'forum_category')
+          AS count
+      `),
+      // Instructor qualification pending (unified + legacy)
+      dataSource.query(`
+        SELECT
+          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'instructor_qualification')
+          +
+          (SELECT COUNT(*) FROM kpa_instructor_qualifications WHERE status = 'pending')
+          AS count
+      `),
+      // Course request pending (unified + legacy)
+      dataSource.query(`
+        SELECT
+          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'submitted' AND entity_type = 'course')
+          +
+          (SELECT COUNT(*) FROM kpa_course_requests WHERE status = 'submitted')
+          AS count
+      `),
+      // Membership pending (unified + legacy)
+      dataSource.query(`
+        SELECT
+          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'membership')
+          +
+          (SELECT COUNT(*) FROM kpa_organization_join_requests WHERE status = 'pending')
+          AS count
       `),
       // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 (7일 이내)
       dataSource.query(`
@@ -141,6 +173,12 @@ export function createOperatorSummaryController(
           pendingRequests: parseInt(forumPendingRequestCount[0]?.count || '0', 10),
           recentPosts,
         },
+        // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1
+        approval: {
+          instructorPending: parseInt(instructorPendingCount[0]?.count || '0', 10),
+          coursePending: parseInt(coursePendingCount[0]?.count || '0', 10),
+          membershipPending: parseInt(membershipPendingCount[0]?.count || '0', 10),
+        },
         store: {
           forcedExpirySoon: parseInt(forcedExpirySoonCount[0]?.count || '0', 10),
         },
@@ -173,13 +211,14 @@ export function createOperatorSummaryController(
 
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
 
-    // Parallel fetch: org stats + member stats + pending approvals + pending join requests
+    // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: dual-query (unified + legacy)
     const [
       branchCount,
       groupCount,
       totalMembers,
       pendingApprovals,
       pendingJoinResult,
+      pendingJoinUnifiedRows,
     ] = await Promise.all([
       orgRepo.count({ where: { type: 'branch', isActive: true } }),
       orgRepo.count({ where: { type: 'group', isActive: true } }),
@@ -191,9 +230,24 @@ export function createOperatorSummaryController(
         .orderBy('r.created_at', 'ASC')
         .take(limit)
         .getManyAndCount(),
+      dataSource.query(
+        `SELECT ar.id, ar.requester_id AS user_id, ar.organization_id,
+                ar.payload->>'requested_role' AS requested_role,
+                ar.payload->>'request_type' AS request_type,
+                ar.status, ar.created_at
+         FROM kpa_approval_requests ar
+         WHERE ar.entity_type = 'membership' AND ar.status = 'pending'
+         ORDER BY ar.created_at ASC
+         LIMIT $1`,
+        [limit],
+      ),
     ]);
 
-    const [pendingItems, pendingTotal] = pendingJoinResult;
+    const [pendingLegacyItems, pendingLegacyTotal] = pendingJoinResult;
+    const pendingItems = [...pendingJoinUnifiedRows, ...pendingLegacyItems]
+      .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .slice(0, limit);
+    const pendingTotal = pendingLegacyTotal + pendingJoinUnifiedRows.length;
 
     res.json({
       success: true,

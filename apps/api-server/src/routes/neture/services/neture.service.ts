@@ -475,13 +475,16 @@ export class NetureService {
 
   /**
    * WO-NETURE-B2B-ORDER-SERVER-PRICE-ENFORCEMENT-V1
+   * WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
    *
    * B2B 주문 생성 — 서버 가격 강제
    * 클라이언트 가격 필드 완전 무시, product.price_general 직접 조회
+   * 활성 캠페인이 존재하면 campaign_price 오버라이드 적용
    */
   async createOrder(
     data: CreateOrderRequestDto,
-    userId: string
+    userId: string,
+    organizationId?: string | null
   ): Promise<OrderDto> {
     // 1. B2B 공급자 상품 조회 (supplier 관계 포함)
     const productIds = data.items.map((item) => item.product_id);
@@ -489,9 +492,27 @@ export class NetureService {
 
     const productMap = new Map(supplierProducts.map((p) => [p.id, p]));
 
+    // 1-B. 활성 캠페인 타겟 조회 (존재하면 적용, 없으면 무시)
+    const campaignTargets = await this.repository.findActiveCampaignTargets(productIds, organizationId);
+    // productId → campaignTarget (org-specific 우선, null fallback)
+    const campaignMap = new Map<string, { campaignId: string; targetId: string; campaignPrice: number; organizationId: string | null }>();
+    for (const ct of campaignTargets) {
+      const existing = campaignMap.get(ct.productId);
+      // org-specific 타겟이 null 타겟보다 우선
+      if (!existing || (ct.organizationId && !existing.organizationId)) {
+        campaignMap.set(ct.productId, {
+          campaignId: ct.campaignId,
+          targetId: ct.id,
+          campaignPrice: ct.campaignPrice,
+          organizationId: ct.organizationId,
+        });
+      }
+    }
+
     // 2. 검증 게이트 + 서버 가격 계산
     let totalAmount = 0;
     const orderItems: Partial<NetureOrderItem>[] = [];
+    const campaignHits: { campaignId: string; targetId: string; productId: string; organizationId: string | null; quantity: number; amount: number }[] = [];
 
     for (const item of data.items) {
       const product = productMap.get(item.product_id);
@@ -514,8 +535,9 @@ export class NetureService {
         throw new Error(`Supplier is not active for product: ${product.name}`);
       }
 
-      // 서버 강제 가격: price_general (클라이언트 가격 절대 사용 금지)
-      const unitPrice = product.priceGeneral;
+      // 가격 결정: 캠페인 가격 > 기본 가격 (서버 강제, 클라이언트 가격 절대 사용 금지)
+      const campaignHit = campaignMap.get(product.id);
+      const unitPrice = campaignHit ? campaignHit.campaignPrice : product.priceGeneral;
       if (unitPrice <= 0) {
         throw new Error(`Invalid price for product: ${product.name}`);
       }
@@ -532,6 +554,18 @@ export class NetureService {
         totalPrice: itemTotal,
         options: item.options,
       });
+
+      // 캠페인 집계 대상 기록
+      if (campaignHit) {
+        campaignHits.push({
+          campaignId: campaignHit.campaignId,
+          targetId: campaignHit.targetId,
+          productId: product.id,
+          organizationId: campaignHit.organizationId,
+          quantity: item.quantity,
+          amount: itemTotal,
+        });
+      }
     }
 
     // 3. 배송비 계산 (5만원 이상 무료배송)
@@ -563,6 +597,15 @@ export class NetureService {
     }));
     const savedItems = await this.repository.createOrderItems(itemsWithOrderId);
     order.items = savedItems;
+
+    // 6. 캠페인 집계 increment (fire-and-forget, 주문 실패 아님)
+    for (const hit of campaignHits) {
+      try {
+        await this.repository.incrementCampaignAggregation(hit);
+      } catch (e) {
+        console.error('[Campaign Aggregation] Failed to increment:', e);
+      }
+    }
 
     return this.toOrderDto(order);
   }

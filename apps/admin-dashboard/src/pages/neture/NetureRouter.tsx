@@ -19,6 +19,7 @@ const PartnerListPage = React.lazy(() => import('./PartnerListPage'));
 const PartnerDetailPage = React.lazy(() => import('./PartnerDetailPage'));
 const PartnershipRequestListPage = React.lazy(() => import('./PartnershipRequestListPage'));
 const PartnershipRequestDetailPage = React.lazy(() => import('./PartnershipRequestDetailPage'));
+const SupplierListPage = React.lazy(() => import('./SupplierListPage'));
 
 const NetureRouter: React.FC = () => {
   return (
@@ -33,6 +34,9 @@ const NetureRouter: React.FC = () => {
         {/* Products */}
         <Route path="products" element={<ProductListPage />} />
         <Route path="products/:productId" element={<ProductDetailPage />} />
+
+        {/* Suppliers (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) */}
+        <Route path="suppliers" element={<SupplierListPage />} />
 
         {/* Partners */}
         <Route path="partners" element={<PartnerListPage />} />

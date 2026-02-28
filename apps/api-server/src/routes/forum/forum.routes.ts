@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ForumController } from '../../controllers/forum/ForumController.js';
-import { createForumCategoryRequestRoutes } from '../../controllers/forum/ForumCategoryRequestController.js';
+// @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: Forum category request approval moved to KPA Extension (/api/v1/kpa/forum-requests/*)
+// import { createForumCategoryRequestRoutes } from '../../controllers/forum/ForumCategoryRequestController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
@@ -121,8 +122,9 @@ router.use('/ai', aiRoutes);
 router.use('/recommendations', recommendationRoutes);
 
 // ============================================================================
-// Category Requests (서비스 운영자 포럼 개설 요청)
+// Category Requests — @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
+// Moved to KPA Extension: /api/v1/kpa/forum-requests/*
+// Old endpoint /api/v1/forum/category-requests/* is no longer active.
 // ============================================================================
-router.use('/category-requests', createForumCategoryRequestRoutes());
 
 export default router;

@@ -22,6 +22,10 @@ import {
   ContentType,
   ContentStatus,
   ContactVisibility,
+  NetureTimeLimitedPriceCampaign,
+  CampaignStatus,
+  NetureCampaignTarget,
+  NetureCampaignAggregation,
 } from './entities/index.js';
 import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
@@ -2545,5 +2549,149 @@ export class NetureService {
       logger.error('[NetureService] Error fetching seller dashboard insight:', error);
       throw error;
     }
+  }
+
+  // ============================================================================
+  // Campaign Operations (WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1)
+  // ============================================================================
+
+  private _campaignRepo?: Repository<NetureTimeLimitedPriceCampaign>;
+  private _campaignTargetRepo?: Repository<NetureCampaignTarget>;
+  private _campaignAggregationRepo?: Repository<NetureCampaignAggregation>;
+
+  private get campaignRepo(): Repository<NetureTimeLimitedPriceCampaign> {
+    if (!this._campaignRepo) {
+      this._campaignRepo = AppDataSource.getRepository(NetureTimeLimitedPriceCampaign);
+    }
+    return this._campaignRepo;
+  }
+
+  private get campaignTargetRepo(): Repository<NetureCampaignTarget> {
+    if (!this._campaignTargetRepo) {
+      this._campaignTargetRepo = AppDataSource.getRepository(NetureCampaignTarget);
+    }
+    return this._campaignTargetRepo;
+  }
+
+  private get campaignAggregationRepo(): Repository<NetureCampaignAggregation> {
+    if (!this._campaignAggregationRepo) {
+      this._campaignAggregationRepo = AppDataSource.getRepository(NetureCampaignAggregation);
+    }
+    return this._campaignAggregationRepo;
+  }
+
+  /** 캠페인 목록 조회 (공급자용) */
+  async getCampaigns(supplierId: string, filters?: { status?: CampaignStatus }) {
+    const qb = this.campaignRepo.createQueryBuilder('c')
+      .leftJoinAndSelect('c.targets', 'targets')
+      .where('c.supplierId = :supplierId', { supplierId });
+
+    if (filters?.status) {
+      qb.andWhere('c.status = :status', { status: filters.status });
+    }
+
+    qb.orderBy('c.createdAt', 'DESC');
+    return qb.getMany();
+  }
+
+  /** 캠페인 상세 조회 */
+  async getCampaignById(campaignId: string, supplierId?: string) {
+    const where: any = { id: campaignId };
+    if (supplierId) where.supplierId = supplierId;
+
+    return this.campaignRepo.findOne({
+      where,
+      relations: ['targets'],
+    });
+  }
+
+  /** 캠페인 생성 */
+  async createCampaign(data: {
+    name: string;
+    description?: string | null;
+    supplierId: string;
+    startAt: Date;
+    endAt: Date;
+    createdBy?: string | null;
+    targets: Array<{
+      productId: string;
+      campaignPrice: number;
+      organizationId?: string | null;
+    }>;
+  }) {
+    const campaign = this.campaignRepo.create({
+      name: data.name,
+      description: data.description || null,
+      supplierId: data.supplierId,
+      status: CampaignStatus.DRAFT,
+      startAt: data.startAt,
+      endAt: data.endAt,
+      createdBy: data.createdBy || null,
+    });
+    const savedCampaign = await this.campaignRepo.save(campaign);
+
+    // Create targets
+    if (data.targets.length > 0) {
+      const targets = data.targets.map(t => this.campaignTargetRepo.create({
+        campaignId: savedCampaign.id,
+        productId: t.productId,
+        campaignPrice: t.campaignPrice,
+        organizationId: t.organizationId || null,
+      }));
+      savedCampaign.targets = await this.campaignTargetRepo.save(targets);
+    }
+
+    return savedCampaign;
+  }
+
+  /** 캠페인 상태 변경 */
+  async updateCampaignStatus(campaignId: string, supplierId: string, status: CampaignStatus) {
+    const campaign = await this.campaignRepo.findOne({
+      where: { id: campaignId, supplierId },
+    });
+    if (!campaign) throw new Error('CAMPAIGN_NOT_FOUND');
+
+    campaign.status = status;
+    return this.campaignRepo.save(campaign);
+  }
+
+  /** 캠페인 수정 */
+  async updateCampaign(campaignId: string, supplierId: string, data: {
+    name?: string;
+    description?: string | null;
+    startAt?: Date;
+    endAt?: Date;
+  }) {
+    const campaign = await this.campaignRepo.findOne({
+      where: { id: campaignId, supplierId },
+    });
+    if (!campaign) throw new Error('CAMPAIGN_NOT_FOUND');
+    if (campaign.status !== CampaignStatus.DRAFT) throw new Error('CAMPAIGN_NOT_EDITABLE');
+
+    if (data.name !== undefined) campaign.name = data.name;
+    if (data.description !== undefined) campaign.description = data.description;
+    if (data.startAt !== undefined) campaign.startAt = data.startAt;
+    if (data.endAt !== undefined) campaign.endAt = data.endAt;
+
+    return this.campaignRepo.save(campaign);
+  }
+
+  /** 캠페인 집계 조회 */
+  async getCampaignAggregations(campaignId: string) {
+    return this.campaignAggregationRepo.find({
+      where: { campaignId },
+    });
+  }
+
+  /** 활성 캠페인 목록 — KPA-b/c 통합용 (모든 공급자, ACTIVE 상태) */
+  async getActiveCampaigns() {
+    const now = new Date();
+    return this.campaignRepo.createQueryBuilder('c')
+      .leftJoinAndSelect('c.targets', 'targets')
+      .where('c.status = :status', { status: CampaignStatus.ACTIVE })
+      .andWhere('c.startAt <= :now', { now })
+      .andWhere('c.endAt > :now', { now })
+      .orderBy('c.endAt', 'ASC')
+      .getMany();
   }
 }

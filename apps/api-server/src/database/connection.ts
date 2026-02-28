@@ -92,7 +92,7 @@ import {
   ForumCategory,
   ForumComment,
   ForumTag,
-  ForumCategoryRequest,
+  // WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: ForumCategoryRequest removed — approval moved to KpaApprovalRequest
 } from '@o4o/forum-core/entities';
 
 // Forum Notification entity (Phase 13)
@@ -198,6 +198,9 @@ import {
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NetureSellerPartnerContract,
+  NetureTimeLimitedPriceCampaign,
+  NetureCampaignTarget,
+  NetureCampaignAggregation,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -535,7 +538,7 @@ export const AppDataSource = new DataSource({
     ForumCategory,
     ForumComment,
     ForumTag,
-    ForumCategoryRequest,
+    // WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: ForumCategoryRequest removed — approval moved to KpaApprovalRequest
     // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
     // Digital Signage entities
@@ -629,6 +632,10 @@ export const AppDataSource = new DataSource({
     NeturePartnerRecruitment,
     NeturePartnerApplication,
     NetureSellerPartnerContract,
+    // WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
+    NetureTimeLimitedPriceCampaign,
+    NetureCampaignTarget,
+    NetureCampaignAggregation,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================

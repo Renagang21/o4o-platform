@@ -2,6 +2,9 @@
  * ForumManagementPage - KPA Society 포럼 카테고리 요청 관리
  * 분회/지부 운영자가 포럼 생성 요청을 검토/승인/거절
  *
+ * WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1:
+ * KPA Extension 레이어(/api/v1/kpa/forum-requests) 사용
+ *
  * organizationId 기반 범위 필터링:
  * - 분회 운영자: 자기 분회 소속 요청만
  * - 지부 운영자: 소속 지부 산하 모든 분회 요청
@@ -19,38 +22,43 @@ import {
   Loader2,
   AlertCircle,
   Plus,
+  RotateCcw,
 } from 'lucide-react';
+import { apiClient } from '../../api/client';
 import { getAccessToken } from '../../contexts/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-
-type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
+type ApprovalRequestStatus = 'pending' | 'approved' | 'rejected' | 'revision_requested';
 
 interface RequestData {
   id: string;
-  name: string;
-  description: string;
-  reason?: string;
-  status: CategoryRequestStatus;
-  serviceCode: string;
-  organizationId?: string;
-  requesterId: string;
-  requesterName: string;
-  requesterEmail?: string;
-  reviewerId?: string;
-  reviewerName?: string;
-  reviewComment?: string;
-  reviewedAt?: string;
-  createdCategoryId?: string;
-  createdCategorySlug?: string;
-  createdAt: string;
-  updatedAt: string;
+  entity_type: string;
+  organization_id: string;
+  payload: {
+    name: string;
+    description: string;
+    reason?: string;
+    iconEmoji?: string;
+  };
+  status: ApprovalRequestStatus;
+  requester_id: string;
+  requester_name: string;
+  requester_email: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_comment: string | null;
+  revision_note: string | null;
+  result_entity_id: string | null;
+  result_metadata: Record<string, any> | null;
+  submitted_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-const statusConfig: Record<CategoryRequestStatus, { label: string; color: string; bgColor: string }> = {
+const statusConfig: Record<ApprovalRequestStatus, { label: string; color: string; bgColor: string }> = {
   pending: { label: '대기 중', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
   approved: { label: '승인됨', color: 'text-green-700', bgColor: 'bg-green-100' },
   rejected: { label: '거절됨', color: 'text-red-700', bgColor: 'bg-red-100' },
+  revision_requested: { label: '보완 요청', color: 'text-orange-700', bgColor: 'bg-orange-100' },
 };
 
 function formatDate(dateString: string): string {
@@ -63,26 +71,12 @@ function formatDate(dateString: string): string {
   });
 }
 
-async function fetchApi(path: string, options?: RequestInit) {
-  const token = getAccessToken();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    credentials: 'include',
-    headers: { ...headers, ...options?.headers },
-  });
-  return res.json();
-}
-
 export default function ForumManagementPage() {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<CategoryRequestStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<ApprovalRequestStatus | 'all'>('all');
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(null);
   const [reviewComment, setReviewComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -100,9 +94,12 @@ export default function ForumManagementPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const query = new URLSearchParams({ serviceCode: 'kpa-society' });
-      if (statusFilter !== 'all') query.set('status', statusFilter);
-      const data = await fetchApi(`/api/v1/forum/category-requests?${query}`);
+      const params: Record<string, string> = {};
+      if (statusFilter !== 'all') params.status = statusFilter;
+      const data = await apiClient.get<{ success: boolean; data: RequestData[]; error?: string }>(
+        '/forum-requests',
+        params,
+      );
       if (data.success) {
         setRequests(data.data || []);
       } else {
@@ -117,18 +114,22 @@ export default function ForumManagementPage() {
 
   const filteredRequests = requests.filter((r) => {
     const q = searchQuery.toLowerCase();
-    return r.name.toLowerCase().includes(q) || r.requesterName.toLowerCase().includes(q);
+    return r.payload.name.toLowerCase().includes(q) || r.requester_name.toLowerCase().includes(q);
   });
 
   const pendingCount = requests.filter((r) => r.status === 'pending').length;
 
-  const handleReview = async (action: 'approve' | 'reject') => {
+  const handleReview = async (action: 'approve' | 'reject' | 'request-revision') => {
     if (!selectedRequest) return;
     setIsProcessing(true);
     try {
-      const data = await fetchApi(
-        `/api/v1/forum/category-requests/${selectedRequest.id}/${action}`,
-        { method: 'PATCH', body: JSON.stringify({ review_comment: reviewComment || undefined }) }
+      const body: Record<string, string> = {};
+      if (reviewComment) body.review_comment = reviewComment;
+      if (action === 'request-revision' && !reviewComment) body.revision_note = '신청서 보완이 필요합니다';
+
+      const data = await apiClient.patch<{ success: boolean; data: RequestData; error?: string }>(
+        `/branches/${selectedRequest.organization_id}/forum-requests/${selectedRequest.id}/${action}`,
+        body,
       );
       if (data.success) {
         setRequests((prev) =>
@@ -150,14 +151,21 @@ export default function ForumManagementPage() {
     if (!createName.trim() || !createDescription.trim()) return;
     setIsProcessing(true);
     try {
-      const data = await fetchApi('/api/v1/forum/categories', {
+      // Core Forum CRUD (not part of KPA Extension — POST /api/v1/forum/categories)
+      const token = getAccessToken();
+      const res = await fetch('/api/v1/forum/categories', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           name: createName.trim(),
           description: createDescription.trim(),
           accessLevel: 'all',
         }),
       });
+      const data = await res.json();
       if (data.success) {
         setShowCreateModal(false);
         setCreateName('');
@@ -242,13 +250,14 @@ export default function ForumManagementPage() {
         <div className="relative">
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as CategoryRequestStatus | 'all')}
+            onChange={(e) => setStatusFilter(e.target.value as ApprovalRequestStatus | 'all')}
             className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
           >
             <option value="all">모든 상태</option>
             <option value="pending">대기 중</option>
             <option value="approved">승인됨</option>
             <option value="rejected">거절됨</option>
+            <option value="revision_requested">보완 요청</option>
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
         </div>
@@ -272,17 +281,19 @@ export default function ForumManagementPage() {
               return (
                 <tr key={request.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-slate-800">{request.name}</div>
-                    <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
+                    <div className="font-medium text-slate-800">
+                      {request.payload.iconEmoji ? `${request.payload.iconEmoji} ` : ''}{request.payload.name}
+                    </div>
+                    <div className="text-sm text-slate-500 line-clamp-1">{request.payload.description}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-slate-800">{request.requesterName}</div>
-                    {request.requesterEmail && (
-                      <div className="text-sm text-slate-500">{request.requesterEmail}</div>
+                    <div className="text-slate-800">{request.requester_name}</div>
+                    {request.requester_email && (
+                      <div className="text-sm text-slate-500">{request.requester_email}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">
-                    {formatDate(request.createdAt)}
+                    {formatDate(request.created_at)}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.color}`}>
@@ -346,53 +357,62 @@ export default function ForumManagementPage() {
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
-                <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
+                <p className="text-slate-800 font-medium">
+                  {selectedRequest.payload.iconEmoji ? `${selectedRequest.payload.iconEmoji} ` : ''}{selectedRequest.payload.name}
+                </p>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
-                <p className="text-slate-800">{selectedRequest.description}</p>
+                <p className="text-slate-800">{selectedRequest.payload.description}</p>
               </div>
-              {selectedRequest.reason && (
+              {selectedRequest.payload.reason && (
                 <div>
                   <h4 className="text-sm font-medium text-slate-500 mb-1">신청 사유</h4>
-                  <p className="text-slate-800">{selectedRequest.reason}</p>
+                  <p className="text-slate-800">{selectedRequest.payload.reason}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-medium text-slate-500 mb-1">신청자</h4>
-                  <p className="text-slate-800">{selectedRequest.requesterName}</p>
+                  <p className="text-slate-800">{selectedRequest.requester_name}</p>
                 </div>
                 <div>
                   <h4 className="text-sm font-medium text-slate-500 mb-1">신청일</h4>
-                  <p className="text-slate-800">{formatDate(selectedRequest.createdAt)}</p>
+                  <p className="text-slate-800">{formatDate(selectedRequest.created_at)}</p>
                 </div>
               </div>
 
-              {selectedRequest.status === 'pending' && (
+              {(selectedRequest.status === 'pending' || selectedRequest.status === 'revision_requested') && (
                 <div className="pt-4 border-t border-slate-200">
                   <label className="block text-sm font-medium text-slate-700 mb-2">검토 의견</label>
                   <textarea
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
-                    placeholder="승인 또는 거절 사유를 입력하세요 (선택)"
+                    placeholder="승인, 거절 또는 보완 요청 사유를 입력하세요 (선택)"
                     rows={3}
                     className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
                 </div>
               )}
 
-              {selectedRequest.status !== 'pending' && selectedRequest.reviewComment && (
+              {selectedRequest.revision_note && selectedRequest.status === 'revision_requested' && (
+                <div className="p-4 rounded-lg bg-orange-50">
+                  <h4 className="text-sm font-medium mb-1 text-orange-700">보완 요청 사유</h4>
+                  <p className="text-orange-600">{selectedRequest.revision_note}</p>
+                </div>
+              )}
+
+              {selectedRequest.status !== 'pending' && selectedRequest.status !== 'revision_requested' && selectedRequest.review_comment && (
                 <div className={`p-4 rounded-lg ${selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'}`}>
                   <h4 className={`text-sm font-medium mb-1 ${selectedRequest.status === 'approved' ? 'text-green-700' : 'text-red-700'}`}>
                     검토 의견
                   </h4>
                   <p className={selectedRequest.status === 'approved' ? 'text-green-600' : 'text-red-600'}>
-                    {selectedRequest.reviewComment}
+                    {selectedRequest.review_comment}
                   </p>
-                  {selectedRequest.reviewedAt && (
+                  {selectedRequest.reviewed_at && (
                     <p className="text-xs text-slate-500 mt-2">
-                      {selectedRequest.reviewerName} | {formatDate(selectedRequest.reviewedAt)}
+                      {formatDate(selectedRequest.reviewed_at)}
                     </p>
                   )}
                 </div>
@@ -406,7 +426,7 @@ export default function ForumManagementPage() {
               >
                 닫기
               </button>
-              {selectedRequest.status === 'pending' && (
+              {(selectedRequest.status === 'pending' || selectedRequest.status === 'revision_requested') && (
                 <>
                   <button
                     onClick={() => handleReview('reject')}
@@ -415,6 +435,14 @@ export default function ForumManagementPage() {
                   >
                     <XCircle className="w-4 h-4" />
                     거절
+                  </button>
+                  <button
+                    onClick={() => handleReview('request-revision')}
+                    disabled={isProcessing}
+                    className="flex-1 px-4 py-2 text-orange-700 bg-orange-100 rounded-lg hover:bg-orange-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    보완
                   </button>
                   <button
                     onClick={() => handleReview('approve')}

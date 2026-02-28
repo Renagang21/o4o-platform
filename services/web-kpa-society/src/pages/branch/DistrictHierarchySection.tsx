@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { apiClient } from '../../api/client';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
@@ -30,6 +30,35 @@ interface BranchesSummaryResponse {
     branches: BranchSummary[];
     totalBranches: number;
   };
+}
+
+/** Skeleton 카드 1개 */
+function SkeletonCard() {
+  return (
+    <div style={s.branchCard}>
+      <div style={s.branchHeader}>
+        <div style={{ ...s.skeletonBox, width: '1.25rem', height: '1.25rem', borderRadius: '4px' }} />
+        <div style={{ ...s.skeletonBox, width: '60%', height: '1rem' }} />
+      </div>
+      <div style={s.statsRow}>
+        <div style={s.stat}>
+          <div style={{ ...s.skeletonBox, width: '2rem', height: '1.25rem', marginBottom: '4px' }} />
+          <div style={{ ...s.skeletonBox, width: '1.5rem', height: '0.75rem' }} />
+        </div>
+        <div style={s.statDivider} />
+        <div style={s.stat}>
+          <div style={{ ...s.skeletonBox, width: '2rem', height: '1.25rem', marginBottom: '4px' }} />
+          <div style={{ ...s.skeletonBox, width: '1.5rem', height: '0.75rem' }} />
+        </div>
+        <div style={s.statDivider} />
+        <div style={s.stat}>
+          <div style={{ ...s.skeletonBox, width: '2rem', height: '1.25rem', marginBottom: '4px' }} />
+          <div style={{ ...s.skeletonBox, width: '2.5rem', height: '0.75rem' }} />
+        </div>
+      </div>
+      <div style={{ ...s.skeletonBox, width: '100%', height: '2rem', marginTop: spacing.md }} />
+    </div>
+  );
 }
 
 export function DistrictHierarchySection() {
@@ -55,11 +84,14 @@ export function DistrictHierarchySection() {
 
   return (
     <section>
+      <style>{skeletonKeyframes}</style>
       <h3 style={s.sectionTitle}>산하 분회 현황</h3>
 
       {loading ? (
-        <div style={s.loadingBox}>
-          <span style={s.loadingText}>분회 정보를 불러오는 중...</span>
+        <div style={s.grid}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       ) : error ? (
         <div style={s.emptyBox}>
@@ -108,6 +140,12 @@ export function DistrictHierarchySection() {
                     <span style={s.statLabel}>최근 활동</span>
                   </div>
                 </div>
+                <Link
+                  to={`/branch-services/${branch.id}/`}
+                  style={s.manageButton}
+                >
+                  관리하기 →
+                </Link>
               </div>
             ))}
           </div>
@@ -116,6 +154,14 @@ export function DistrictHierarchySection() {
     </section>
   );
 }
+
+// ─── Skeleton keyframes ─────────────────────────────
+const skeletonKeyframes = `
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+`;
 
 // ─── Styles ──────────────────────────────────────────
 const s: Record<string, React.CSSProperties> = {
@@ -199,18 +245,29 @@ const s: Record<string, React.CSSProperties> = {
     background: colors.neutral200,
   },
 
-  // Loading / empty states
-  loadingBox: {
-    padding: spacing.xl,
+  // Manage button
+  manageButton: {
+    display: 'block',
     textAlign: 'center',
+    padding: `${spacing.sm} ${spacing.lg}`,
     background: colors.neutral50,
+    color: '#059669',
     borderRadius: borderRadius.md,
+    textDecoration: 'none',
+    fontWeight: 600,
+    fontSize: '0.875rem',
     border: `1px solid ${colors.neutral200}`,
-  },
-  loadingText: {
-    ...typography.bodyM,
-    color: colors.neutral400,
+    marginTop: spacing.md,
   } as React.CSSProperties,
+
+  // Skeleton
+  skeletonBox: {
+    background: colors.neutral200,
+    borderRadius: borderRadius.sm,
+    animation: 'skeleton-pulse 1.5s ease-in-out infinite',
+  },
+
+  // Empty / error states
   emptyBox: {
     padding: spacing.xl,
     textAlign: 'center',

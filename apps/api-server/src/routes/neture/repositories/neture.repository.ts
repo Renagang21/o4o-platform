@@ -24,6 +24,8 @@ import {
 import { NetureOrder, NetureOrderStatus } from '../entities/neture-order.entity.js';
 import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
 import { NetureSupplierProduct } from '../../../modules/neture/entities/NetureSupplierProduct.entity.js';
+import { NetureCampaignTarget } from '../../../modules/neture/entities/NetureCampaignTarget.entity.js';
+import { NetureCampaignAggregation } from '../../../modules/neture/entities/NetureCampaignAggregation.entity.js';
 
 export class NetureRepository {
   private productRepo: Repository<NetureProduct>;
@@ -32,6 +34,8 @@ export class NetureRepository {
   private orderRepo: Repository<NetureOrder>;
   private orderItemRepo: Repository<NetureOrderItem>;
   private supplierProductRepo: Repository<NetureSupplierProduct>;
+  private campaignTargetRepo: Repository<NetureCampaignTarget>;
+  private campaignAggregationRepo: Repository<NetureCampaignAggregation>;
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository(NetureProduct);
@@ -40,6 +44,8 @@ export class NetureRepository {
     this.orderRepo = dataSource.getRepository(NetureOrder);
     this.orderItemRepo = dataSource.getRepository(NetureOrderItem);
     this.supplierProductRepo = dataSource.getRepository(NetureSupplierProduct);
+    this.campaignTargetRepo = dataSource.getRepository(NetureCampaignTarget);
+    this.campaignAggregationRepo = dataSource.getRepository(NetureCampaignAggregation);
   }
 
   // ============================================================================
@@ -308,5 +314,72 @@ export class NetureRepository {
 
   async restoreStock(productId: string, quantity: number): Promise<void> {
     await this.productRepo.increment({ id: productId }, 'stock', quantity);
+  }
+
+  // ============================================================================
+  // Campaign Operations (WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1)
+  // ============================================================================
+
+  /**
+   * 활성 캠페인 타겟 조회 — 주어진 상품 ID 목록에 대해
+   * 현재 시점에 ACTIVE 상태이고 기간 내인 캠페인 타겟을 반환.
+   * organizationId가 null인 타겟 = 모든 조직에 적용.
+   */
+  async findActiveCampaignTargets(
+    productIds: string[],
+    organizationId?: string | null,
+  ): Promise<NetureCampaignTarget[]> {
+    if (productIds.length === 0) return [];
+
+    const now = new Date().toISOString();
+
+    // Raw SQL for campaign join + time range filter
+    const rows = await this.dataSource.query(
+      `SELECT ct.*
+       FROM neture_campaign_targets ct
+       JOIN neture_time_limited_price_campaigns c ON c.id = ct.campaign_id
+       WHERE ct.product_id = ANY($1)
+         AND c.status = 'ACTIVE'
+         AND c.start_at <= $2
+         AND c.end_at > $2
+         AND (ct.organization_id IS NULL OR ct.organization_id = $3)
+       ORDER BY ct.organization_id DESC NULLS LAST`,
+      [productIds, now, organizationId || null],
+    );
+
+    // Map raw rows to entity shape
+    return rows.map((r: any) => ({
+      id: r.id,
+      campaignId: r.campaign_id,
+      productId: r.product_id,
+      campaignPrice: Number(r.campaign_price),
+      organizationId: r.organization_id,
+      createdAt: r.created_at,
+    })) as NetureCampaignTarget[];
+  }
+
+  /**
+   * 캠페인 집계 atomic increment — 주문 생성 후 호출.
+   * UPSERT: (campaign_id, target_id) 기준 ON CONFLICT 증가.
+   */
+  async incrementCampaignAggregation(params: {
+    campaignId: string;
+    targetId: string;
+    productId: string;
+    organizationId: string | null;
+    quantity: number;
+    amount: number;
+  }): Promise<void> {
+    await this.dataSource.query(
+      `INSERT INTO neture_campaign_aggregations
+         (campaign_id, target_id, product_id, organization_id, total_orders, total_quantity, total_amount, updated_at)
+       VALUES ($1, $2, $3, $4, 1, $5, $6, NOW())
+       ON CONFLICT (campaign_id, target_id) DO UPDATE SET
+         total_orders = neture_campaign_aggregations.total_orders + 1,
+         total_quantity = neture_campaign_aggregations.total_quantity + $5,
+         total_amount = neture_campaign_aggregations.total_amount + $6,
+         updated_at = NOW()`,
+      [params.campaignId, params.targetId, params.productId, params.organizationId, params.quantity, params.amount],
+    );
   }
 }

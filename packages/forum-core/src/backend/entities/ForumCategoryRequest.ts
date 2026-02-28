@@ -1,5 +1,11 @@
 /**
- * ForumCategoryRequest Entity
+ * @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
+ * 이 Entity는 더 이상 사용되지 않습니다.
+ * 승인 워크플로우가 KPA Extension 레이어의 KpaApprovalRequest로 이관되었습니다.
+ * DB 테이블(forum_category_requests)은 유지됩니다 (기존 데이터 보존).
+ * 후속 cleanup WO에서 파일 삭제 예정.
+ *
+ * ForumCategoryRequest Entity (DEPRECATED)
  * 포럼 카테고리 생성 요청 (서비스 공통)
  *
  * serviceCode로 서비스별 격리

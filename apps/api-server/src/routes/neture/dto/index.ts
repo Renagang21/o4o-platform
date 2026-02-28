@@ -145,6 +145,9 @@ export interface PartnerDto {
   website: string | null;
   contact: NeturePartnerContact | null;
   address: NeturePartnerAddress | null;
+  /** WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: Identity(users.status) */
+  identity_status: string | null;
+  user_email: string | null;
   created_at: string;
   updated_at: string;
 }

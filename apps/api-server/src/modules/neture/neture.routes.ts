@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
-import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, ProductApprovalStatus, DistributionType } from './entities/index.js';
+import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, ProductApprovalStatus, DistributionType, CampaignStatus } from './entities/index.js';
+import { NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
@@ -35,6 +36,11 @@ type AuthenticatedRequest = Request & {
 /** Request with supplierId set by requireActiveSupplier / requireLinkedSupplier middleware */
 type SupplierRequest = AuthenticatedRequest & {
   supplierId: string;
+};
+
+/** Request with partnerId set by requireActivePartner / requireLinkedPartner middleware */
+type PartnerRequest = AuthenticatedRequest & {
+  partnerId: string;
 };
 
 /**
@@ -213,6 +219,54 @@ async function requireLinkedSupplier(req: Request, res: Response, next: () => vo
     return;
   }
   (req as SupplierRequest).supplierId = supplier.id;
+  next();
+}
+
+// ==================== Partner Domain Gate (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) ====================
+
+/**
+ * Middleware: Require authenticated user to be an ACTIVE partner
+ * 쓰기 작업용 — PENDING/SUSPENDED/INACTIVE 차단
+ */
+async function requireActivePartner(req: Request, res: Response, next: () => void): Promise<void> {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user?.id) {
+    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    return;
+  }
+  const partner = await netureService.getPartnerByUserId(authReq.user.id);
+  if (!partner) {
+    res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
+    return;
+  }
+  if (partner.status !== NeturePartnerStatus.ACTIVE) {
+    res.status(403).json({
+      success: false,
+      error: { code: 'PARTNER_NOT_ACTIVE', message: `Partner account is ${partner.status}. Only ACTIVE partners can perform this action.` },
+      currentStatus: partner.status,
+    });
+    return;
+  }
+  (req as PartnerRequest).partnerId = partner.id;
+  next();
+}
+
+/**
+ * Middleware: Require authenticated user to be a linked partner (any status)
+ * 읽기 작업용 — PENDING/SUSPENDED도 자신의 대시보드 조회 허용
+ */
+async function requireLinkedPartner(req: Request, res: Response, next: () => void): Promise<void> {
+  const authReq = req as AuthenticatedRequest;
+  if (!authReq.user?.id) {
+    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    return;
+  }
+  const partner = await netureService.getPartnerByUserId(authReq.user.id);
+  if (!partner) {
+    res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
+    return;
+  }
+  (req as PartnerRequest).partnerId = partner.id;
   next();
 }
 
@@ -1273,7 +1327,7 @@ router.post('/partner/applications', requireAuth, async (req: AuthenticatedReque
  * POST /api/v1/neture/partner/applications/:id/approve
  * 파트너 신청 승인 (모집 주체 판매자)
  */
-router.post('/partner/applications/:id/approve', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/partner/applications/:id/approve', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -1307,7 +1361,7 @@ router.post('/partner/applications/:id/approve', requireAuth, async (req: Authen
  * POST /api/v1/neture/partner/applications/:id/reject
  * 파트너 신청 거절 (모집 주체 판매자)
  */
-router.post('/partner/applications/:id/reject', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/partner/applications/:id/reject', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -1340,7 +1394,7 @@ router.post('/partner/applications/:id/reject', requireAuth, async (req: Authent
  * Add a product to partner's dashboard
  * WO-PARTNER-DASHBOARD-PHASE1-V1
  */
-router.post('/partner/dashboard/items', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/partner/dashboard/items', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -1384,7 +1438,7 @@ router.post('/partner/dashboard/items', requireAuth, async (req: AuthenticatedRe
  * Get partner's dashboard items with product details
  * WO-PARTNER-DASHBOARD-PHASE1-V1
  */
-router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/partner/dashboard/items', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -1502,7 +1556,7 @@ router.get('/partner/dashboard/items', requireAuth, async (req: AuthenticatedReq
  * Toggle status of a partner dashboard item
  * WO-PARTNER-DASHBOARD-UX-PHASE2-V1
  */
-router.patch('/partner/dashboard/items/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/partner/dashboard/items/:id', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -1538,7 +1592,7 @@ router.patch('/partner/dashboard/items/:id', requireAuth, async (req: Authentica
  * Browse available content (CMS + supplier) for partners
  * WO-PARTNER-CONTENT-LINK-PHASE1-V1
  */
-router.get('/partner/contents', requireAuth, async (req: Request, res: Response) => {
+router.get('/partner/contents', requireAuth, requireLinkedPartner, async (req: Request, res: Response) => {
   try {
     const source = (req.query.source as string) || 'all';
 
@@ -2508,7 +2562,7 @@ router.get('/partner/contracts', requireAuth, async (req: AuthenticatedRequest, 
  * POST /api/v1/neture/partner/contracts/:id/terminate
  * Partner가 계약 해지
  */
-router.post('/partner/contracts/:id/terminate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/partner/contracts/:id/terminate', requireAuth, requireActivePartner, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -2552,5 +2606,146 @@ router.use(createNeureTier1TestController({
   requireNetureScope,
   netureService,
 }));
+
+// ============================================================================
+// Campaign Routes (WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1)
+// 기간 한정 가격 캠페인 CRUD — 공급자용
+// ============================================================================
+
+// GET /campaigns — 공급자의 캠페인 목록
+router.get('/campaigns', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const status = req.query.status as CampaignStatus | undefined;
+    const campaigns = await netureService.getCampaigns(supplierId, status ? { status } : undefined);
+    res.json({ success: true, data: campaigns });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching campaigns:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaigns' });
+  }
+});
+
+// GET /campaigns/active — 활성 캠페인 목록 (KPA-b/c 통합용)
+router.get('/campaigns/active', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const campaigns = await netureService.getActiveCampaigns();
+    res.json({ success: true, data: campaigns });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching active campaigns:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch active campaigns' });
+  }
+});
+
+// GET /campaigns/:id — 캠페인 상세
+router.get('/campaigns/:id', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const campaign = await netureService.getCampaignById(req.params.id);
+    if (!campaign) {
+      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
+      return;
+    }
+    res.json({ success: true, data: campaign });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching campaign:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaign' });
+  }
+});
+
+// POST /campaigns — 캠페인 생성
+router.post('/campaigns', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const userId = (req as AuthenticatedRequest).user?.id;
+    const { name, description, startAt, endAt, targets } = req.body;
+
+    if (!name || !startAt || !endAt || !targets || !Array.isArray(targets) || targets.length === 0) {
+      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'name, startAt, endAt, and targets are required' });
+      return;
+    }
+
+    const campaign = await netureService.createCampaign({
+      name,
+      description: description || null,
+      supplierId,
+      startAt: new Date(startAt),
+      endAt: new Date(endAt),
+      createdBy: userId || null,
+      targets: targets.map((t: any) => ({
+        productId: t.productId || t.product_id,
+        campaignPrice: t.campaignPrice || t.campaign_price,
+        organizationId: t.organizationId || t.organization_id || null,
+      })),
+    });
+
+    res.status(201).json({ success: true, data: campaign });
+  } catch (error) {
+    logger.error('[Neture API] Error creating campaign:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create campaign' });
+  }
+});
+
+// PATCH /campaigns/:id — 캠페인 수정 (DRAFT 상태만)
+router.patch('/campaigns/:id', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { name, description, startAt, endAt } = req.body;
+
+    const campaign = await netureService.updateCampaign(req.params.id, supplierId, {
+      name,
+      description,
+      startAt: startAt ? new Date(startAt) : undefined,
+      endAt: endAt ? new Date(endAt) : undefined,
+    });
+
+    res.json({ success: true, data: campaign });
+  } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'CAMPAIGN_NOT_FOUND') {
+      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
+      return;
+    }
+    if (msg === 'CAMPAIGN_NOT_EDITABLE') {
+      res.status(400).json({ success: false, error: 'NOT_EDITABLE', message: 'Only DRAFT campaigns can be edited' });
+      return;
+    }
+    logger.error('[Neture API] Error updating campaign:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update campaign' });
+  }
+});
+
+// POST /campaigns/:id/status — 캠페인 상태 변경
+router.post('/campaigns/:id/status', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { status } = req.body;
+
+    if (!status || !Object.values(CampaignStatus).includes(status)) {
+      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: `status must be one of: ${Object.values(CampaignStatus).join(', ')}` });
+      return;
+    }
+
+    const campaign = await netureService.updateCampaignStatus(req.params.id, supplierId, status);
+    res.json({ success: true, data: campaign });
+  } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'CAMPAIGN_NOT_FOUND') {
+      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
+      return;
+    }
+    logger.error('[Neture API] Error updating campaign status:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update campaign status' });
+  }
+});
+
+// GET /campaigns/:id/aggregations — 캠페인 집계 조회
+router.get('/campaigns/:id/aggregations', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const aggregations = await netureService.getCampaignAggregations(req.params.id);
+    res.json({ success: true, data: aggregations });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching campaign aggregations:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaign aggregations' });
+  }
+});
 
 export default router;

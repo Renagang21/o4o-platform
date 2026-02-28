@@ -15,6 +15,7 @@
 /** 조직 대시보드 카드 식별자 */
 export type OrgDashboardCardKey =
   // ── District (지부) 전용 ──
+  | 'district-overview-kpi'
   | 'district-kpi'
   | 'district-hierarchy'
   | 'branch-management'
@@ -31,6 +32,7 @@ export type OrgDashboardCardKey =
   // ── Branch (분회) 전용 ──
   | 'branch-status'
   | 'member-approval'
+  | 'branch-member-approval'
   | 'operator-management'
   | 'branch-stats'
   | 'branch-events-mgmt'
@@ -38,7 +40,12 @@ export type OrgDashboardCardKey =
   | 'branch-events'
   | 'branch-info'
   | 'branch-announcements'
-  | 'branch-community';
+  | 'branch-community'
+  // ── Instructor/Course Approval (WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1) ──
+  | 'branch-instructor-qualifications'
+  | 'branch-course-requests'
+  // ── Forum Approval (WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1) ──
+  | 'branch-forum-requests';
 
 /**
  * organizationType:organizationRole → 카드 배열 매핑
@@ -56,7 +63,7 @@ export type OrgDashboardCardKey =
 export const ORG_DASHBOARD_LAYOUT: Record<string, OrgDashboardCardKey[]> = {
   // ── District ──
   'district:admin': [
-    'district-kpi',
+    'district-overview-kpi',
     'district-hierarchy',
     'branch-management',
     'district-operators',
@@ -79,7 +86,10 @@ export const ORG_DASHBOARD_LAYOUT: Record<string, OrgDashboardCardKey[]> = {
   // ── Branch ──
   'branch:admin': [
     'branch-status',
-    'member-approval',
+    'branch-member-approval',
+    'branch-instructor-qualifications',
+    'branch-course-requests',
+    'branch-forum-requests',
     'operator-management',
     'branch-stats',
     'branch-events-mgmt',

@@ -429,6 +429,8 @@ import guestAuthRoutes from './modules/auth/routes/guest-auth.routes.js';
 // import cmsRoutes from './modules/cms/routes/cms.routes.js';
 // LMS routes - RE-ENABLED (WO-LMS-PAID-COURSE-V1)
 import lmsRoutes from './modules/lms/routes/lms.routes.js';
+// WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1: KPA org scope guard
+import { kpaLmsScopeGuard } from './middleware/kpa-lms-scope-guard.js';
 import usersRoutes from './routes/users.routes.js';
 import cptRoutes from './routes/cpt.js';
 import healthRoutes from './routes/health.js';
@@ -555,6 +557,8 @@ app.use('/api/v1/auth/guest', guestAuthRoutes);
 // CMS routes - REMOVED (Phase R1: Domain separation)
 // app.use('/api/v1/cms', cmsRoutes);
 // LMS routes - RE-ENABLED (WO-LMS-PAID-COURSE-V1)
+// WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1: KPA org scope guard (BEFORE lmsRoutes)
+app.use('/api/v1/lms', kpaLmsScopeGuard);
 app.use('/api/v1/lms', lmsRoutes);
 app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);

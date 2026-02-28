@@ -14,6 +14,11 @@ import { Link } from 'react-router-dom';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 import type { OrgDashboardCardKey } from './organization-dashboard-map';
 import { DistrictHierarchySection } from './DistrictHierarchySection';
+import { DistrictOverviewKPISection } from './DistrictOverviewKPISection';
+import { BranchMemberApprovalPanel } from './BranchMemberApprovalPanel';
+import { InstructorQualificationPanel } from './InstructorQualificationPanel';
+import { CourseRequestPanel } from './CourseRequestPanel';
+import { ForumRequestPanel } from './ForumRequestPanel';
 
 // ─── 공통 Props ───────────────────────────────────
 interface CardProps {
@@ -547,6 +552,7 @@ function BranchCommunityCard({ basePath }: CardProps) {
 // ─── Card Registry ──────────────────────────────────
 export const ORG_CARD_REGISTRY: Record<OrgDashboardCardKey, React.FC<CardProps>> = {
   // District
+  'district-overview-kpi': DistrictOverviewKPISection as React.FC<CardProps>,
   'district-kpi': DistrictKpiCard,
   'district-hierarchy': DistrictHierarchySection as React.FC<CardProps>,
   'branch-management': BranchManagementCard,
@@ -563,6 +569,10 @@ export const ORG_CARD_REGISTRY: Record<OrgDashboardCardKey, React.FC<CardProps>>
   // Branch
   'branch-status': BranchStatusCard,
   'member-approval': MemberApprovalCard,
+  'branch-member-approval': BranchMemberApprovalPanel as React.FC<CardProps>,
+  'branch-instructor-qualifications': InstructorQualificationPanel as React.FC<CardProps>,
+  'branch-course-requests': CourseRequestPanel as React.FC<CardProps>,
+  'branch-forum-requests': ForumRequestPanel as React.FC<CardProps>,
   'operator-management': OperatorManagementCard,
   'branch-stats': BranchStatsCard,
   'branch-events-mgmt': BranchEventsMgmtCard,

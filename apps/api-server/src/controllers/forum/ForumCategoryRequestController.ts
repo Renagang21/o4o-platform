@@ -1,5 +1,11 @@
 /**
- * ForumCategoryRequestController
+ * @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
+ * 이 Controller는 더 이상 라우트에 마운트되지 않습니다.
+ * 승인 워크플로우가 KPA Extension 레이어로 이관되었습니다.
+ * 새 엔드포인트: /api/v1/kpa/forum-requests/*
+ * 후속 cleanup WO에서 파일 삭제 예정.
+ *
+ * ForumCategoryRequestController (DEPRECATED)
  * 포럼 카테고리 생성 요청 API (서비스 공통)
  *
  * serviceCode 기반 서비스 격리

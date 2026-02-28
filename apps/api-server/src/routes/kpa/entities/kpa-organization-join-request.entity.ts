@@ -1,5 +1,10 @@
 /**
- * KPA Organization Join Request Entity
+ * @deprecated WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1
+ * 이 엔티티는 더 이상 신규 데이터 기록에 사용되지 않습니다.
+ * 신규 요청은 KpaApprovalRequest (entity_type='membership')로 기록됩니다.
+ * 기존 데이터 읽기 전용으로 유지. 후속 cleanup WO에서 삭제 예정.
+ *
+ * KPA Organization Join Request Entity (LEGACY)
  *
  * WO-CONTEXT-JOIN-REQUEST-MVP-V1
  *

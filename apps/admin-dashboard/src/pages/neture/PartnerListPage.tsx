@@ -17,6 +17,9 @@ interface Partner {
   business_number: string | null;
   type: string;
   status: string;
+  /** WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1 */
+  identity_status: string | null;
+  user_email: string | null;
   description: string | null;
   logo: string | null;
   website: string | null;
@@ -68,6 +71,23 @@ const TYPE_LABELS: Record<string, string> = {
   seller: '판매자',
   supplier: '공급자',
   partner: '파트너',
+};
+
+/** WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1: Identity(users.status) 표시 */
+const IDENTITY_STATUS_COLORS: Record<string, string> = {
+  ACTIVE: 'bg-green-100 text-green-700',
+  APPROVED: 'bg-green-100 text-green-700',
+  PENDING: 'bg-yellow-100 text-yellow-700',
+  SUSPENDED: 'bg-red-100 text-red-700',
+  INACTIVE: 'bg-gray-100 text-gray-700',
+};
+
+const IDENTITY_STATUS_LABELS: Record<string, string> = {
+  ACTIVE: '활성',
+  APPROVED: '승인됨',
+  PENDING: '대기중',
+  SUSPENDED: '정지',
+  INACTIVE: '비활성',
 };
 
 async function fetchPartners(params: {
@@ -194,7 +214,8 @@ const PartnerListPage: React.FC = () => {
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">파트너명</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">사업자명</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">유형</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">상태</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Identity 상태</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Domain 상태</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">등록일</th>
                   <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">작업</th>
                 </tr>
@@ -225,6 +246,20 @@ const PartnerListPage: React.FC = () => {
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
                         {TYPE_LABELS[partner.type] || partner.type}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {partner.identity_status ? (
+                        <span className={`px-2 py-1 text-xs rounded ${IDENTITY_STATUS_COLORS[partner.identity_status] || 'bg-gray-100 text-gray-700'}`}>
+                          {IDENTITY_STATUS_LABELS[partner.identity_status] || partner.identity_status}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
+                      {partner.user_email && (
+                        <p className="text-[10px] text-gray-400 mt-0.5 truncate max-w-[120px]" title={partner.user_email}>
+                          {partner.user_email}
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <select
