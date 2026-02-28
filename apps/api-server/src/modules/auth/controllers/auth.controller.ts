@@ -88,6 +88,64 @@ async function derivePharmacistQualification(userId: string): Promise<{
 }
 
 /**
+ * WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1
+ * KPA 회원 + 조직 소속 정보를 단일 컨텍스트로 derive.
+ * /auth/me 응답에 kpaMembership 필드로 포함.
+ */
+interface KpaMembershipContext {
+  status: string | null;           // kpa_members.status
+  role: string | null;             // kpa_members.role
+  organizationId: string | null;   // kpa_members.organization_id
+  organizationName: string | null;
+  organizationType: string | null;
+  organizationRole: string | null; // organization_members.role (있는 경우)
+  serviceAccess: 'full' | 'community-only' | 'pending' | 'blocked' | null;
+}
+
+async function deriveKpaMembershipContext(userId: string): Promise<KpaMembershipContext | null> {
+  // 1. kpa_members 조회
+  const [member] = await AppDataSource.query(
+    `SELECT m.status, m.role, m.organization_id,
+            o.name AS org_name, o.type AS org_type
+     FROM kpa_members m
+     LEFT JOIN organizations o ON o.id = m.organization_id
+     WHERE m.user_id = $1
+     LIMIT 1`,
+    [userId]
+  );
+
+  if (!member) return null;
+
+  // 2. organization_members 조회 (활성 소속)
+  const [orgMember] = await AppDataSource.query(
+    `SELECT role FROM organization_members
+     WHERE user_id = $1 AND left_at IS NULL
+     LIMIT 1`,
+    [userId]
+  );
+
+  // 3. serviceAccess 매트릭스 계산
+  let serviceAccess: KpaMembershipContext['serviceAccess'] = null;
+  if (member.status === 'pending') {
+    serviceAccess = 'pending';
+  } else if (member.status === 'suspended' || member.status === 'withdrawn') {
+    serviceAccess = 'blocked';
+  } else if (member.status === 'active') {
+    serviceAccess = orgMember ? 'full' : 'community-only';
+  }
+
+  return {
+    status: member.status,
+    role: member.role,
+    organizationId: member.organization_id || null,
+    organizationName: member.org_name || null,
+    organizationType: member.org_type || null,
+    organizationRole: orgMember?.role || null,
+    serviceAccess,
+  };
+}
+
+/**
  * Auth Controller - NextGen Pattern
  *
  * Handles authentication operations:
@@ -547,6 +605,10 @@ export class AuthController extends BaseController {
       ud.pharmacistRole = qualification.pharmacistRole;
       ud.pharmacistFunction = qualification.pharmacistFunction;
       ud.isStoreOwner = qualification.isStoreOwner;
+
+      // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: KPA membership context 통합
+      const kpaMembership = await deriveKpaMembershipContext(req.user.id);
+      ud.kpaMembership = kpaMembership;
 
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {

@@ -92,6 +92,20 @@ export const ACTIVITY_TYPE_LABELS: Record<string, string> = {
 
 export type MembershipType = 'pharmacist' | 'student';
 
+/**
+ * WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: KPA Membership Context
+ * /auth/me 응답의 kpaMembership 필드와 1:1 대응
+ */
+export interface KpaMembershipContext {
+  status: string | null;           // kpa_members.status
+  role: string | null;             // kpa_members.role
+  organizationId: string | null;   // kpa_members.organization_id
+  organizationName: string | null;
+  organizationType: string | null;
+  organizationRole: string | null; // organization_members.role
+  serviceAccess: 'full' | 'community-only' | 'pending' | 'blocked' | null;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -102,26 +116,18 @@ export interface User {
   // WO-ROLE-NORMALIZATION-PHASE3-C-V1: qualification + business 기반
   isStoreOwner: boolean;
   activityType?: string;  // kpa_pharmacist_profiles.activity_type
+
+  // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: 통합 KPA membership context
+  kpaMembership?: KpaMembershipContext;
+
+  // ── 하위 호환 필드 (kpaMembership에서 derive) ──
   // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role (SSOT)
   membershipRole?: string;  // 'member' | 'operator' | 'admin' | undefined (비소속)
-
-  // WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: membership organization 정보
   membershipOrgId?: string;
   membershipOrgName?: string;
   membershipOrgType?: string;   // 'association' | 'branch' | 'group'
   membershipParentId?: string;
   membershipStatus?: string;    // 'pending' | 'active' | 'suspended' | 'withdrawn'
-
-  // ============================================
-  // P2-T4: Super Operator 확장 지점
-  // WO-KPA-SOCIETY-P2-STRUCTURE-REFINE-V1
-  // ============================================
-  // 향후 Super Operator 개념 도입 시:
-  // - isSuperOperator?: boolean;
-  // - operatorScopes?: string[];  // 서비스별 운영 권한
-  // - operatorLevel?: 'platform' | 'service' | 'branch';
-  // 구현 없음 (확장 지점만 표시)
-  // ============================================
 }
 
 /**
@@ -289,22 +295,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.success && data.data) {
         const userData = createUserFromApiResponse(data.data);
 
-        // WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: KpaMember.role fetch
-        try {
-          const membershipRes = await authClient.api.get('/kpa/me/membership');
-          const membershipData = (membershipRes.data as any);
-          if (membershipData?.success && membershipData?.data) {
-            const md = membershipData.data;
-            userData.membershipRole = md.role;
-            // WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1
-            userData.membershipOrgId = md.organizationId;
-            userData.membershipOrgName = md.organizationName;
-            userData.membershipOrgType = md.organizationType;
-            userData.membershipParentId = md.parentId;
-            userData.membershipStatus = md.status;
-          }
-        } catch {
-          // non-critical: 비소속 사용자는 membership 없음
+        // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership from /auth/me (단일 호출)
+        const km = (data.data as any).kpaMembership;
+        if (km) {
+          userData.kpaMembership = km;
+          // 하위 호환 필드 populate
+          userData.membershipRole = km.role || undefined;
+          userData.membershipOrgId = km.organizationId || undefined;
+          userData.membershipOrgName = km.organizationName || undefined;
+          userData.membershipOrgType = km.organizationType || undefined;
+          userData.membershipStatus = km.status || undefined;
         }
 
         setUser(userData);
