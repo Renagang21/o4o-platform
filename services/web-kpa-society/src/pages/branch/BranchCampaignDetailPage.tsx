@@ -1,22 +1,27 @@
 /**
- * BranchGroupbuyDetailPage - 분회 공동구매 상세
+ * BranchCampaignDetailPage - 분회 공동구매 상세
+ *
+ * WO-KPA-CAMPAIGN-GROUPBUY-VIEW-API-V1
+ * URL :id = listingId (기존 라우트 호환).
+ * 서버 조인 API에서 listingId로 매칭하여 캠페인 정보 표시.
+ * 참여(주문)는 branchApi.participateCampaign() 사용 — 서버가 campaignPrice 자동 적용.
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-
 import { useAuth } from '../../contexts';
 import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
+import { campaignApi } from '../../api/campaignApi';
+import type { CampaignGroupbuyView } from '../../api/campaignApi';
 import { colors } from '../../styles/theme';
-import type { Groupbuy } from '../../types';
 
-export function BranchGroupbuyDetailPage() {
+export function BranchCampaignDetailPage() {
   const { branchId, id } = useParams<{ branchId: string; id: string }>();
   const { basePath } = useBranchContext();
   const { user } = useAuth();
-  const [groupbuy, setGroupbuy] = useState<Groupbuy | null>(null);
+  const [item, setItem] = useState<CampaignGroupbuyView | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -30,8 +35,11 @@ export function BranchGroupbuyDetailPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await branchApi.getGroupbuyDetail(branchId!, id!);
-      setGroupbuy(res.data);
+
+      // 서버 조인 API에서 listingId로 매칭
+      const res = await campaignApi.getCampaignGroupbuys();
+      const match = res.data.find(r => r.listingId === id);
+      setItem(match || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
@@ -47,7 +55,7 @@ export function BranchGroupbuyDetailPage() {
 
     try {
       setSubmitting(true);
-      await branchApi.participateGroupbuy(branchId!, id!, { quantity });
+      await branchApi.participateCampaign(branchId!, id!, { quantity });
       alert('참여가 완료되었습니다.');
       loadData();
     } catch (err) {
@@ -57,24 +65,27 @@ export function BranchGroupbuyDetailPage() {
     }
   };
 
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   if (loading) {
     return <LoadingSpinner message="공동구매 정보를 불러오는 중..." />;
   }
 
-  if (error || !groupbuy) {
+  if (error || !item) {
     return (
       <div style={styles.container}>
         <EmptyState
           icon="⚠️"
           title="공동구매를 찾을 수 없습니다"
-          description={error || '요청하신 공동구매가 존재하지 않습니다.'}
+          description={error || '요청하신 공동구매가 존재하지 않거나 캠페인이 종료되었습니다.'}
           action={{ label: '목록으로', onClick: () => window.history.back() }}
         />
       </div>
     );
   }
-
-  const progress = Math.round(groupbuy.currentQuantity / groupbuy.targetQuantity * 100);
 
   return (
     <div style={styles.container}>
@@ -83,7 +94,7 @@ export function BranchGroupbuyDetailPage() {
         breadcrumb={[
           { label: '홈', href: `${basePath}` },
           { label: '공동구매', href: `${basePath}/groupbuy` },
-          { label: groupbuy.title },
+          { label: item.campaignName },
         ]}
       />
 
@@ -97,66 +108,53 @@ export function BranchGroupbuyDetailPage() {
 
         {/* Right: Info */}
         <div style={styles.infoSection}>
-          <span style={styles.statusBadge}>
-            {groupbuy.status === 'active' ? '진행중' : groupbuy.status === 'upcoming' ? '예정' : '종료'}
+          <span style={{
+            ...styles.statusBadge,
+            backgroundColor: colors.accentGreen,
+          }}>
+            진행중
           </span>
-          <h1 style={styles.title}>{groupbuy.title}</h1>
-          <div style={styles.price}>{groupbuy.price?.toLocaleString()}원</div>
-
-          {/* Progress */}
-          <div style={styles.progressSection}>
-            <div style={styles.progressHeader}>
-              <span>참여 현황</span>
-              <span style={styles.progressPercent}>{progress}%</span>
-            </div>
-            <div style={styles.progressBar}>
-              <div style={{ ...styles.progressFill, width: `${Math.min(progress, 100)}%` }} />
-            </div>
-            <div style={styles.progressStats}>
-              <span>{groupbuy.currentQuantity}명 참여</span>
-              <span>목표 {groupbuy.targetQuantity}명</span>
-            </div>
-          </div>
+          <h1 style={styles.title}>{item.campaignName}</h1>
+          <div style={styles.productName}>{item.productName}</div>
+          <div style={styles.price}>{Number(item.campaignPrice).toLocaleString()}원</div>
 
           {/* Dates */}
           <div style={styles.dates}>
             <div style={styles.dateItem}>
               <span style={styles.dateLabel}>시작일</span>
-              <span style={styles.dateValue}>{groupbuy.startDate}</span>
+              <span style={styles.dateValue}>{formatDate(item.startAt)}</span>
             </div>
             <div style={styles.dateItem}>
               <span style={styles.dateLabel}>종료일</span>
-              <span style={styles.dateValue}>{groupbuy.endDate}</span>
+              <span style={styles.dateValue}>{formatDate(item.endAt)}</span>
             </div>
           </div>
 
           {/* Participate */}
-          {groupbuy.status === 'active' && (
-            <div style={styles.participateSection}>
-              <div style={styles.quantityControl}>
-                <button
-                  style={styles.quantityBtn}
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  -
-                </button>
-                <span style={styles.quantity}>{quantity}</span>
-                <button
-                  style={styles.quantityBtn}
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  +
-                </button>
-              </div>
+          <div style={styles.participateSection}>
+            <div style={styles.quantityControl}>
               <button
-                style={styles.participateButton}
-                onClick={handleParticipate}
-                disabled={submitting}
+                style={styles.quantityBtn}
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
               >
-                {submitting ? '처리 중...' : '참여하기'}
+                -
+              </button>
+              <span style={styles.quantity}>{quantity}</span>
+              <button
+                style={styles.quantityBtn}
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                +
               </button>
             </div>
-          )}
+            <button
+              style={styles.participateButton}
+              onClick={handleParticipate}
+              disabled={submitting}
+            >
+              {submitting ? '처리 중...' : '참여하기'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -164,7 +162,7 @@ export function BranchGroupbuyDetailPage() {
       <Card padding="large" style={{ marginTop: '32px' }}>
         <h2 style={styles.sectionTitle}>상세 정보</h2>
         <div style={styles.description}>
-          {groupbuy.description || '상세 정보가 없습니다.'}
+          {item.campaignDescription || '상세 정보가 없습니다.'}
         </div>
       </Card>
 
@@ -204,7 +202,6 @@ const styles: Record<string, React.CSSProperties> = {
   statusBadge: {
     display: 'inline-block',
     padding: '6px 14px',
-    backgroundColor: colors.accentGreen,
     color: colors.white,
     borderRadius: '6px',
     fontSize: '13px',
@@ -215,49 +212,19 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '24px',
     fontWeight: 600,
     color: colors.neutral900,
-    marginBottom: '12px',
+    marginBottom: '4px',
     lineHeight: 1.4,
+  },
+  productName: {
+    fontSize: '14px',
+    color: colors.neutral500,
+    marginBottom: '12px',
   },
   price: {
     fontSize: '28px',
     fontWeight: 700,
     color: colors.primary,
     marginBottom: '24px',
-  },
-  progressSection: {
-    padding: '20px',
-    backgroundColor: colors.neutral50,
-    borderRadius: '12px',
-    marginBottom: '20px',
-  },
-  progressHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    fontSize: '14px',
-    color: colors.neutral700,
-  },
-  progressPercent: {
-    fontWeight: 700,
-    color: colors.accentGreen,
-  },
-  progressBar: {
-    height: '10px',
-    backgroundColor: colors.neutral200,
-    borderRadius: '5px',
-    overflow: 'hidden',
-    marginBottom: '10px',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.accentGreen,
-    borderRadius: '5px',
-  },
-  progressStats: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '13px',
-    color: colors.neutral500,
   },
   dates: {
     display: 'flex',
@@ -310,7 +277,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     fontWeight: 600,
     minWidth: '24px',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   participateButton: {
     flex: 1,
@@ -333,7 +300,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '15px',
     lineHeight: 1.8,
     color: colors.neutral700,
-    whiteSpace: 'pre-wrap',
+    whiteSpace: 'pre-wrap' as const,
   },
   actions: {
     marginTop: '24px',

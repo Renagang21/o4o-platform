@@ -21,8 +21,8 @@ import {
   BranchForumListPage,
   BranchForumDetailPage,
   BranchForumWritePage,
-  BranchGroupbuyListPage,
-  BranchGroupbuyDetailPage,
+  BranchCampaignListPage,
+  BranchCampaignDetailPage,
   BranchAboutPage,
   BranchOfficersPage,
   BranchContactPage,
@@ -108,10 +108,10 @@ export function BranchRoutes() {
           <Route path="forum/write" element={<BranchForumWritePage />} />
           <Route path="forum/edit/:id" element={<BranchForumWritePage />} />
 
-          {/* Groupbuy */}
-          <Route path="groupbuy" element={<BranchGroupbuyListPage />} />
-          <Route path="groupbuy/history" element={<BranchGroupbuyListPage />} />
-          <Route path="groupbuy/:id" element={<BranchGroupbuyDetailPage />} />
+          {/* Campaign (공동구매) — 라우트 경로 /groupbuy 유지 (URL 안정성) */}
+          <Route path="groupbuy" element={<BranchCampaignListPage />} />
+          <Route path="groupbuy/history" element={<BranchCampaignListPage />} />
+          <Route path="groupbuy/:id" element={<BranchCampaignDetailPage />} />
 
           {/* Docs */}
           <Route path="docs" element={<BranchDocsPage />} />

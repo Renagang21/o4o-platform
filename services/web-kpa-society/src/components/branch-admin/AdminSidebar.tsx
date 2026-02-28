@@ -19,6 +19,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { icon: '📊', label: '대시보드', path: '' },
   { icon: '👔', label: '임원 관리', path: '/officers' },
+  { icon: '🛒', label: '공동구매 현황', path: '/groupbuy-status' },
   { icon: '⚙️', label: '분회 설정', path: '/settings' },
 ];
 

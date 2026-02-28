@@ -86,7 +86,7 @@ export const branchApi = {
   getGroupbuyDetail: (branchId: string, id: string) =>
     apiClient.get<{ data: Groupbuy }>(`/branches/${branchId}/groupbuys/${id}`),
 
-  participateGroupbuy: (branchId: string, id: string, data: { quantity: number }) =>
+  participateCampaign: (branchId: string, id: string, data: { quantity: number }) =>
     apiClient.post<{ success: boolean }>(`/branches/${branchId}/groupbuys/${id}/participate`, data),
 
   getGroupbuyHistory: (branchId: string, params: { page?: number; limit?: number }) =>

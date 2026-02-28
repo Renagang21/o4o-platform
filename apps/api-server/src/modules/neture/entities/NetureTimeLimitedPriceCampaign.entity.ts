@@ -1,9 +1,9 @@
 /**
  * NetureTimeLimitedPriceCampaign Entity
  *
- * WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
- * 기간 한정 가격 캠페인 — product.priceGeneral 위에 올라가는 선택적 가격 오버라이드 레이어.
- * 캠페인이 존재하면 적용, 없으면 무시 (기존 가격 흐름 불변).
+ * WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
+ * 상품 단위 기간 특가 — 1 Campaign = 1 product_id.
+ * 동일 product_id에 ACTIVE 캠페인은 DB partial unique index로 1개만 허용.
  */
 
 import {
@@ -13,9 +13,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToMany,
 } from 'typeorm';
-import type { NetureCampaignTarget } from './NetureCampaignTarget.entity.js';
 
 export enum CampaignStatus {
   DRAFT = 'DRAFT',
@@ -30,6 +28,7 @@ export enum CampaignStatus {
 @Index(['supplierId'])
 @Index(['status'])
 @Index(['startAt', 'endAt'])
+@Index(['productId'])
 export class NetureTimeLimitedPriceCampaign {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -42,6 +41,12 @@ export class NetureTimeLimitedPriceCampaign {
 
   @Column({ name: 'supplier_id', type: 'uuid' })
   supplierId: string;
+
+  @Column({ name: 'product_id', type: 'uuid' })
+  productId: string;
+
+  @Column({ name: 'campaign_price', type: 'int' })
+  campaignPrice: number;
 
   @Column({
     type: 'enum',
@@ -64,7 +69,4 @@ export class NetureTimeLimitedPriceCampaign {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  @OneToMany('NetureCampaignTarget', 'campaign')
-  targets: NetureCampaignTarget[];
 }

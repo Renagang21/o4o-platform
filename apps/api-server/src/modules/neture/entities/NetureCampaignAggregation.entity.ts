@@ -1,9 +1,9 @@
 /**
  * NetureCampaignAggregation Entity
  *
- * WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
+ * WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
  * 캠페인 실적 집계 — 주문 생성 시 atomic increment.
- * (campaign_id, target_id) 쌍으로 집계.
+ * (campaign_id, product_id) 쌍으로 집계.
  */
 
 import {
@@ -17,17 +17,13 @@ import {
 
 @Entity('neture_campaign_aggregations')
 @Index(['campaignId'])
-@Index(['targetId'])
-@Unique(['campaignId', 'targetId'])
+@Unique(['campaignId', 'productId'])
 export class NetureCampaignAggregation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ name: 'campaign_id', type: 'uuid' })
   campaignId: string;
-
-  @Column({ name: 'target_id', type: 'uuid' })
-  targetId: string;
 
   @Column({ name: 'product_id', type: 'uuid' })
   productId: string;

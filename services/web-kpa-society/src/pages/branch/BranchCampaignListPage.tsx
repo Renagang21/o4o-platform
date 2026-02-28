@@ -1,41 +1,47 @@
 /**
- * BranchGroupbuyListPage - 분회 공동구매 목록
+ * BranchCampaignListPage - 분회 공동구매 목록
+ *
+ * WO-KPA-CAMPAIGN-GROUPBUY-VIEW-API-V1
+ * 서버 조인 API(/campaign-groupbuys) 사용 — 프론트 조인 제거.
+ * 참여는 기존 branchApi.participateCampaign() 사용 (listingId 기반).
  */
 
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination } from '../../components/common';
-
+import { PageHeader, LoadingSpinner, EmptyState } from '../../components/common';
 import { useBranchContext } from '../../contexts/BranchContext';
-import { branchApi } from '../../api/branch';
+import { campaignApi } from '../../api/campaignApi';
+import type { CampaignGroupbuyView } from '../../api/campaignApi';
 import { colors, borderRadius } from '../../styles/theme';
-import type { Groupbuy } from '../../types';
 
-export function BranchGroupbuyListPage() {
+export function BranchCampaignListPage() {
   const { branchId } = useParams<{ branchId: string }>();
   const { basePath } = useBranchContext();
-  const [groupbuys, setGroupbuys] = useState<Groupbuy[]>([]);
+  const [items, setItems] = useState<CampaignGroupbuyView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     loadData();
-  }, [branchId, page]);
+  }, [branchId]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await branchApi.getGroupbuys(branchId!, { page, limit: 12 });
-      setGroupbuys(res.data.items);
-      setTotalPages(res.data.totalPages);
+
+      const res = await campaignApi.getCampaignGroupbuys();
+      setItems(res.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   };
 
   if (loading) {
@@ -75,7 +81,7 @@ export function BranchGroupbuyListPage() {
         </Link>
       </div>
 
-      {groupbuys.length === 0 ? (
+      {items.length === 0 ? (
         <EmptyState
           icon="🛒"
           title="진행중인 공동구매가 없습니다"
@@ -83,10 +89,10 @@ export function BranchGroupbuyListPage() {
         />
       ) : (
         <div style={styles.grid}>
-          {groupbuys.map((gb) => (
+          {items.map((item) => (
             <Link
-              key={gb.id}
-              to={`${basePath}/groupbuy/${gb.id}`}
+              key={`${item.campaignId}-${item.productId}`}
+              to={`${basePath}/groupbuy/${item.listingId}`}
               style={styles.card}
             >
               <div style={styles.cardImage}>
@@ -94,39 +100,16 @@ export function BranchGroupbuyListPage() {
               </div>
               <div style={styles.cardContent}>
                 <div style={styles.cardHeader}>
-                  <span style={styles.statusBadge}>
-                    {gb.status === 'active' ? '진행중' : gb.status === 'upcoming' ? '예정' : '종료'}
-                  </span>
-                  <span style={styles.endDate}>~{gb.endDate}</span>
+                  <span style={styles.statusBadge}>진행중</span>
+                  <span style={styles.endDate}>~{formatDate(item.endAt)}</span>
                 </div>
-                <h3 style={styles.cardTitle}>{gb.title}</h3>
-                <div style={styles.cardPrice}>{gb.price?.toLocaleString()}원</div>
-                <div style={styles.progressSection}>
-                  <div style={styles.progressBar}>
-                    <div
-                      style={{
-                        ...styles.progressFill,
-                        width: `${Math.min(gb.currentQuantity / gb.targetQuantity * 100, 100)}%`,
-                      }}
-                    />
-                  </div>
-                  <div style={styles.progressInfo}>
-                    <span>{gb.currentQuantity}명 참여</span>
-                    <span>{Math.round(gb.currentQuantity / gb.targetQuantity * 100)}%</span>
-                  </div>
-                </div>
+                <h3 style={styles.cardTitle}>{item.campaignName}</h3>
+                <div style={styles.productName}>{item.productName}</div>
+                <div style={styles.cardPrice}>{Number(item.campaignPrice).toLocaleString()}원</div>
               </div>
             </Link>
           ))}
         </div>
-      )}
-
-      {totalPages > 1 && (
-        <Pagination
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
       )}
     </div>
   );
@@ -205,33 +188,17 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     fontWeight: 600,
     color: colors.neutral900,
-    marginBottom: '8px',
+    marginBottom: '4px',
     lineHeight: 1.4,
+  },
+  productName: {
+    fontSize: '13px',
+    color: colors.neutral500,
+    marginBottom: '8px',
   },
   cardPrice: {
     fontSize: '18px',
     fontWeight: 700,
     color: colors.primary,
-    marginBottom: '12px',
-  },
-  progressSection: {},
-  progressBar: {
-    height: '8px',
-    backgroundColor: colors.neutral200,
-    borderRadius: '4px',
-    overflow: 'hidden',
-    marginBottom: '6px',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.accentGreen,
-    borderRadius: '4px',
-    transition: 'width 0.3s',
-  },
-  progressInfo: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '13px',
-    color: colors.neutral500,
   },
 };

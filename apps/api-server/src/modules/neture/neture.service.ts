@@ -24,7 +24,6 @@ import {
   ContactVisibility,
   NetureTimeLimitedPriceCampaign,
   CampaignStatus,
-  NetureCampaignTarget,
   NetureCampaignAggregation,
 } from './entities/index.js';
 import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
@@ -2552,11 +2551,11 @@ export class NetureService {
   }
 
   // ============================================================================
-  // Campaign Operations (WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1)
+  // Campaign Operations (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2)
+  // 1 Campaign = 1 product_id. 동일 product_id에 ACTIVE 1개만 (DB 강제).
   // ============================================================================
 
   private _campaignRepo?: Repository<NetureTimeLimitedPriceCampaign>;
-  private _campaignTargetRepo?: Repository<NetureCampaignTarget>;
   private _campaignAggregationRepo?: Repository<NetureCampaignAggregation>;
 
   private get campaignRepo(): Repository<NetureTimeLimitedPriceCampaign> {
@@ -2564,13 +2563,6 @@ export class NetureService {
       this._campaignRepo = AppDataSource.getRepository(NetureTimeLimitedPriceCampaign);
     }
     return this._campaignRepo;
-  }
-
-  private get campaignTargetRepo(): Repository<NetureCampaignTarget> {
-    if (!this._campaignTargetRepo) {
-      this._campaignTargetRepo = AppDataSource.getRepository(NetureCampaignTarget);
-    }
-    return this._campaignTargetRepo;
   }
 
   private get campaignAggregationRepo(): Repository<NetureCampaignAggregation> {
@@ -2583,7 +2575,6 @@ export class NetureService {
   /** 캠페인 목록 조회 (공급자용) */
   async getCampaigns(supplierId: string, filters?: { status?: CampaignStatus }) {
     const qb = this.campaignRepo.createQueryBuilder('c')
-      .leftJoinAndSelect('c.targets', 'targets')
       .where('c.supplierId = :supplierId', { supplierId });
 
     if (filters?.status) {
@@ -2599,63 +2590,79 @@ export class NetureService {
     const where: any = { id: campaignId };
     if (supplierId) where.supplierId = supplierId;
 
-    return this.campaignRepo.findOne({
-      where,
-      relations: ['targets'],
-    });
+    return this.campaignRepo.findOne({ where });
   }
 
-  /** 캠페인 생성 */
+  /** 캠페인 생성 — 1 campaign = 1 product_id */
   async createCampaign(data: {
     name: string;
     description?: string | null;
     supplierId: string;
+    productId: string;
+    campaignPrice: number;
     startAt: Date;
     endAt: Date;
     createdBy?: string | null;
-    targets: Array<{
-      productId: string;
-      campaignPrice: number;
-      organizationId?: string | null;
-    }>;
   }) {
+    // 기간 역전 방지 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
+    if (data.startAt >= data.endAt) {
+      throw new Error('INVALID_CAMPAIGN_PERIOD');
+    }
+
+    // Supplier ↔ Product 소유 검증 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
+    const product = await this.productRepo.findOne({
+      where: { id: data.productId, supplierId: data.supplierId },
+    });
+    if (!product) {
+      throw new Error('PRODUCT_NOT_OWNED_BY_SUPPLIER');
+    }
+
     const campaign = this.campaignRepo.create({
       name: data.name,
       description: data.description || null,
       supplierId: data.supplierId,
+      productId: data.productId,
+      campaignPrice: data.campaignPrice,
       status: CampaignStatus.DRAFT,
       startAt: data.startAt,
       endAt: data.endAt,
       createdBy: data.createdBy || null,
     });
-    const savedCampaign = await this.campaignRepo.save(campaign);
-
-    // Create targets
-    if (data.targets.length > 0) {
-      const targets = data.targets.map(t => this.campaignTargetRepo.create({
-        campaignId: savedCampaign.id,
-        productId: t.productId,
-        campaignPrice: t.campaignPrice,
-        organizationId: t.organizationId || null,
-      }));
-      savedCampaign.targets = await this.campaignTargetRepo.save(targets);
-    }
-
-    return savedCampaign;
+    return this.campaignRepo.save(campaign);
   }
 
-  /** 캠페인 상태 변경 */
+  /** 허용 상태 전이 맵 */
+  private static ALLOWED_TRANSITIONS: Record<string, CampaignStatus[]> = {
+    [CampaignStatus.DRAFT]: [CampaignStatus.ACTIVE, CampaignStatus.CANCELLED],
+    [CampaignStatus.ACTIVE]: [CampaignStatus.COMPLETED, CampaignStatus.CANCELLED],
+  };
+
+  /** 캠페인 상태 변경 — 전이 규칙 + DB UNIQUE로 ACTIVE 중복 차단 */
   async updateCampaignStatus(campaignId: string, supplierId: string, status: CampaignStatus) {
     const campaign = await this.campaignRepo.findOne({
       where: { id: campaignId, supplierId },
     });
     if (!campaign) throw new Error('CAMPAIGN_NOT_FOUND');
 
+    // 상태 전이 규칙 검증
+    const allowed = NetureService.ALLOWED_TRANSITIONS[campaign.status];
+    if (!allowed || !allowed.includes(status)) {
+      throw new Error('CAMPAIGN_INVALID_TRANSITION');
+    }
+
     campaign.status = status;
-    return this.campaignRepo.save(campaign);
+    try {
+      return await this.campaignRepo.save(campaign);
+    } catch (err: any) {
+      // DB partial unique index 위반 → 동일 product_id에 ACTIVE 중복
+      if (err?.code === '23505' && status === CampaignStatus.ACTIVE) {
+        throw new Error('CAMPAIGN_ACTIVE_ALREADY_EXISTS');
+      }
+      throw err;
+    }
   }
 
-  /** 캠페인 수정 */
+  /** 캠페인 수정 (DRAFT 상태만) */
   async updateCampaign(campaignId: string, supplierId: string, data: {
     name?: string;
     description?: string | null;
@@ -2673,6 +2680,11 @@ export class NetureService {
     if (data.startAt !== undefined) campaign.startAt = data.startAt;
     if (data.endAt !== undefined) campaign.endAt = data.endAt;
 
+    // 기간 역전 방지 — 변경 후 결과 기준 검증 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
+    if (campaign.startAt >= campaign.endAt) {
+      throw new Error('INVALID_CAMPAIGN_PERIOD');
+    }
+
     return this.campaignRepo.save(campaign);
   }
 
@@ -2683,11 +2695,10 @@ export class NetureService {
     });
   }
 
-  /** 활성 캠페인 목록 — KPA-b/c 통합용 (모든 공급자, ACTIVE 상태) */
+  /** 활성 캠페인 목록 — KPA-b/c 통합용 (모든 공급자, ACTIVE + 기간 내) */
   async getActiveCampaigns() {
     const now = new Date();
     return this.campaignRepo.createQueryBuilder('c')
-      .leftJoinAndSelect('c.targets', 'targets')
       .where('c.status = :status', { status: CampaignStatus.ACTIVE })
       .andWhere('c.startAt <= :now', { now })
       .andWhere('c.endAt > :now', { now })

@@ -2651,15 +2651,15 @@ router.get('/campaigns/:id', requireAuth, async (req: Request, res: Response) =>
   }
 });
 
-// POST /campaigns — 캠페인 생성
+// POST /campaigns — 캠페인 생성 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: 1 campaign = 1 product)
 router.post('/campaigns', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
   try {
     const supplierId = (req as SupplierRequest).supplierId;
     const userId = (req as AuthenticatedRequest).user?.id;
-    const { name, description, startAt, endAt, targets } = req.body;
+    const { name, description, startAt, endAt, productId, campaignPrice } = req.body;
 
-    if (!name || !startAt || !endAt || !targets || !Array.isArray(targets) || targets.length === 0) {
-      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'name, startAt, endAt, and targets are required' });
+    if (!name || !startAt || !endAt || !productId || !campaignPrice) {
+      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'name, startAt, endAt, productId, and campaignPrice are required' });
       return;
     }
 
@@ -2667,18 +2667,24 @@ router.post('/campaigns', requireAuth, requireActiveSupplier, async (req: Reques
       name,
       description: description || null,
       supplierId,
+      productId,
+      campaignPrice: Number(campaignPrice),
       startAt: new Date(startAt),
       endAt: new Date(endAt),
       createdBy: userId || null,
-      targets: targets.map((t: any) => ({
-        productId: t.productId || t.product_id,
-        campaignPrice: t.campaignPrice || t.campaign_price,
-        organizationId: t.organizationId || t.organization_id || null,
-      })),
     });
 
     res.status(201).json({ success: true, data: campaign });
   } catch (error) {
+    const msg = (error as Error).message;
+    if (msg === 'INVALID_CAMPAIGN_PERIOD') {
+      res.status(400).json({ success: false, error: 'INVALID_CAMPAIGN_PERIOD', message: 'startAt must be before endAt' });
+      return;
+    }
+    if (msg === 'PRODUCT_NOT_OWNED_BY_SUPPLIER') {
+      res.status(400).json({ success: false, error: 'PRODUCT_NOT_OWNED_BY_SUPPLIER', message: 'Product does not belong to this supplier' });
+      return;
+    }
     logger.error('[Neture API] Error creating campaign:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create campaign' });
   }
@@ -2708,12 +2714,16 @@ router.patch('/campaigns/:id', requireAuth, requireActiveSupplier, async (req: R
       res.status(400).json({ success: false, error: 'NOT_EDITABLE', message: 'Only DRAFT campaigns can be edited' });
       return;
     }
+    if (msg === 'INVALID_CAMPAIGN_PERIOD') {
+      res.status(400).json({ success: false, error: 'INVALID_CAMPAIGN_PERIOD', message: 'startAt must be before endAt' });
+      return;
+    }
     logger.error('[Neture API] Error updating campaign:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update campaign' });
   }
 });
 
-// POST /campaigns/:id/status — 캠페인 상태 변경
+// POST /campaigns/:id/status — 캠페인 상태 변경 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: 전이 규칙 + ACTIVE 중복 차단)
 router.post('/campaigns/:id/status', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
   try {
     const supplierId = (req as SupplierRequest).supplierId;
@@ -2730,6 +2740,14 @@ router.post('/campaigns/:id/status', requireAuth, requireActiveSupplier, async (
     const msg = (error as Error).message;
     if (msg === 'CAMPAIGN_NOT_FOUND') {
       res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
+      return;
+    }
+    if (msg === 'CAMPAIGN_INVALID_TRANSITION') {
+      res.status(400).json({ success: false, error: 'INVALID_TRANSITION', message: 'This status transition is not allowed' });
+      return;
+    }
+    if (msg === 'CAMPAIGN_ACTIVE_ALREADY_EXISTS') {
+      res.status(409).json({ success: false, error: 'ACTIVE_ALREADY_EXISTS', message: 'Another ACTIVE campaign already exists for this product' });
       return;
     }
     logger.error('[Neture API] Error updating campaign status:', error);

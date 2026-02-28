@@ -199,7 +199,6 @@ import {
   NeturePartnerApplication,
   NetureSellerPartnerContract,
   NetureTimeLimitedPriceCampaign,
-  NetureCampaignTarget,
   NetureCampaignAggregation,
 } from '../modules/neture/entities/index.js';
 
@@ -632,9 +631,8 @@ export const AppDataSource = new DataSource({
     NeturePartnerRecruitment,
     NeturePartnerApplication,
     NetureSellerPartnerContract,
-    // WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
+    // WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
     NetureTimeLimitedPriceCampaign,
-    NetureCampaignTarget,
     NetureCampaignAggregation,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)

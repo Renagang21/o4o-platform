@@ -492,27 +492,20 @@ export class NetureService {
 
     const productMap = new Map(supplierProducts.map((p) => [p.id, p]));
 
-    // 1-B. 활성 캠페인 타겟 조회 (존재하면 적용, 없으면 무시)
-    const campaignTargets = await this.repository.findActiveCampaignTargets(productIds, organizationId);
-    // productId → campaignTarget (org-specific 우선, null fallback)
-    const campaignMap = new Map<string, { campaignId: string; targetId: string; campaignPrice: number; organizationId: string | null }>();
-    for (const ct of campaignTargets) {
-      const existing = campaignMap.get(ct.productId);
-      // org-specific 타겟이 null 타겟보다 우선
-      if (!existing || (ct.organizationId && !existing.organizationId)) {
-        campaignMap.set(ct.productId, {
-          campaignId: ct.campaignId,
-          targetId: ct.id,
-          campaignPrice: ct.campaignPrice,
-          organizationId: ct.organizationId,
-        });
-      }
+    // 1-B. 활성 캠페인 조회 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: campaign = product 직접)
+    const activeCampaigns = await this.repository.findActiveCampaignsByProducts(productIds);
+    const campaignMap = new Map<string, { campaignId: string; campaignPrice: number }>();
+    for (const c of activeCampaigns) {
+      campaignMap.set(c.productId, {
+        campaignId: c.id,
+        campaignPrice: c.campaignPrice,
+      });
     }
 
     // 2. 검증 게이트 + 서버 가격 계산
     let totalAmount = 0;
     const orderItems: Partial<NetureOrderItem>[] = [];
-    const campaignHits: { campaignId: string; targetId: string; productId: string; organizationId: string | null; quantity: number; amount: number }[] = [];
+    const campaignHits: { campaignId: string; productId: string; organizationId: string | null; quantity: number; amount: number }[] = [];
 
     for (const item of data.items) {
       const product = productMap.get(item.product_id);
@@ -559,9 +552,8 @@ export class NetureService {
       if (campaignHit) {
         campaignHits.push({
           campaignId: campaignHit.campaignId,
-          targetId: campaignHit.targetId,
           productId: product.id,
-          organizationId: campaignHit.organizationId,
+          organizationId: organizationId || null,
           quantity: item.quantity,
           amount: itemTotal,
         });

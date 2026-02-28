@@ -11,4 +11,5 @@ export { NewsManagementPage } from './NewsManagementPage';
 export { ForumManagementPage } from './ForumManagementPage';
 export { DocsManagementPage } from './DocsManagementPage';
 export { OfficersPage } from './OfficersPage';
+export { BranchCampaignStatusPage } from './BranchCampaignStatusPage';
 export { SettingsPage } from './SettingsPage';

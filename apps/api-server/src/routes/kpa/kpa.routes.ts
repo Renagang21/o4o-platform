@@ -2466,31 +2466,55 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       }
 
       // 2. 수량 (기본 1) + 가격 조회
-      // WO-NETURE-PRICE-ARCHITECTURE-FREEZE-V1: product 기준
-      // WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1: 캠페인 가격 오버라이드
+      // WO-KPA-CAMPAIGN-PARTICIPATE-ENFORCEMENT-V1: 서버 강제 가격 + 검증 게이트
       const quantity = Math.max(1, parseInt(req.body?.quantity) || 1);
-      const priceRows = await dataSource.query(
-        `SELECT price_general FROM neture_supplier_products WHERE id = $1`,
+
+      // Gate 1: Supplier product 활성/승인 검증
+      const productRows = await dataSource.query(
+        `SELECT sp.price_general, sp.is_active, sp.approval_status, s.status AS supplier_status
+         FROM neture_supplier_products sp
+         JOIN neture_suppliers s ON s.id = sp.supplier_id
+         WHERE sp.id = $1`,
         [listing.product_id],
       );
-      const basePrice = Number(priceRows[0]?.price_general ?? 0);
+      if (!productRows.length) {
+        res.status(404).json({ success: false, error: { message: 'Supplier product not found' } });
+        return;
+      }
+      const product = productRows[0];
+      if (!product.is_active) {
+        res.status(400).json({ success: false, error: { message: 'Product is not active', code: 'PRODUCT_INACTIVE' } });
+        return;
+      }
+      if (product.approval_status !== 'APPROVED') {
+        res.status(400).json({ success: false, error: { message: 'Product is not approved', code: 'PRODUCT_NOT_APPROVED' } });
+        return;
+      }
+      if (product.supplier_status !== 'ACTIVE') {
+        res.status(400).json({ success: false, error: { message: 'Supplier is not active', code: 'SUPPLIER_INACTIVE' } });
+        return;
+      }
+      const basePrice = Number(product.price_general ?? 0);
 
-      // 캠페인 가격 조회 (존재하면 적용, 없으면 basePrice)
+      // Gate 2: 캠페인 가격 조회 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: campaign 직접 조회)
       const campaignRows = await dataSource.query(
-        `SELECT ct.campaign_price, ct.id AS target_id, ct.campaign_id
-         FROM neture_campaign_targets ct
-         JOIN neture_time_limited_price_campaigns c ON c.id = ct.campaign_id
-         WHERE ct.product_id = $1
+        `SELECT c.campaign_price, c.id AS campaign_id
+         FROM neture_time_limited_price_campaigns c
+         WHERE c.product_id = $1
            AND c.status = 'ACTIVE'
            AND c.start_at <= NOW()
            AND c.end_at > NOW()
-           AND (ct.organization_id IS NULL OR ct.organization_id = $2)
-         ORDER BY ct.organization_id DESC NULLS LAST
          LIMIT 1`,
-        [listing.product_id, listing.organization_id],
+        [listing.product_id],
       );
       const campaignHit = campaignRows.length > 0 ? campaignRows[0] : null;
       const unitPrice = campaignHit ? Number(campaignHit.campaign_price) : basePrice;
+
+      // Gate 3: 가격 유효성
+      if (unitPrice <= 0) {
+        res.status(400).json({ success: false, error: { message: 'Invalid product price', code: 'INVALID_PRICE' } });
+        return;
+      }
       const subtotal = quantity * unitPrice;
 
       // 3. metadata.serviceKey 전파 — listing.service_key → Order.metadata.serviceKey
@@ -2499,7 +2523,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         productListingId: listing.id,
         productName: listing.product_name,
         productId: listing.product_id,
-        ...(campaignHit ? { campaignId: campaignHit.campaign_id, campaignTargetId: campaignHit.target_id } : {}),
+        ...(campaignHit ? { campaignId: campaignHit.campaign_id } : {}),
       };
 
       // 4. ecommerce_orders에 주문 생성 (GlycoPharm createCoreOrder 패턴)
@@ -2571,6 +2595,36 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   );
 
   router.use('/groupbuy', groupbuyRouter);
+
+  // ============================================================================
+  // Campaign-Groupbuys View API — WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
+  // 캠페인 + 리스팅 서버 조인: campaign.product_id 직접 사용 (targets 제거됨)
+  // ============================================================================
+  router.get('/campaign-groupbuys', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const rows = await dataSource.query(`
+      SELECT
+        c.id AS "campaignId",
+        c.name AS "campaignName",
+        c.description AS "campaignDescription",
+        c.start_at AS "startAt",
+        c.end_at AS "endAt",
+        c.product_id AS "productId",
+        c.campaign_price AS "campaignPrice",
+        opl.id AS "listingId",
+        opl.product_name AS "productName"
+      FROM neture_time_limited_price_campaigns c
+      JOIN organization_product_listings opl
+        ON opl.product_id = c.product_id
+        AND opl.service_key = 'kpa-groupbuy'
+        AND opl.is_active = true
+      WHERE c.status = 'ACTIVE'
+        AND c.start_at <= NOW()
+        AND c.end_at > NOW()
+      ORDER BY c.end_at ASC, opl.display_order ASC
+    `);
+
+    res.json({ success: true, data: rows });
+  }));
 
   // ============================================================================
   // MyPage Routes - /api/v1/kpa/mypage/*
