@@ -191,6 +191,7 @@ import {
   NetureSupplier,
   ProductMaster,
   SupplierProductOffer,
+  StoreProductProfile,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
   NetureSupplierContent,
@@ -199,6 +200,8 @@ import {
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NetureSellerPartnerContract,
+  SupplierCsvImportBatch,
+  SupplierCsvImportRow,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -269,6 +272,7 @@ import {
   StoreLocalProduct,
   StoreTablet,
   StoreTabletDisplay,
+  TabletInterestRequest,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -623,6 +627,7 @@ export const AppDataSource = new DataSource({
     NetureSupplier,
     ProductMaster,
     SupplierProductOffer,
+    StoreProductProfile,
     NeturePartnershipRequest,
     NeturePartnershipProduct,
     NetureSupplierContent,
@@ -631,6 +636,8 @@ export const AppDataSource = new DataSource({
     NeturePartnerRecruitment,
     NeturePartnerApplication,
     NetureSellerPartnerContract,
+    SupplierCsvImportBatch,
+    SupplierCsvImportRow,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
@@ -755,6 +762,10 @@ export const AppDataSource = new DataSource({
     StoreLocalProduct,
     StoreTablet,
     StoreTabletDisplay,
+    // ============================================================================
+    // TABLET INTEREST REQUEST (WO-O4O-TABLET-MODULE-V1)
+    // ============================================================================
+    TabletInterestRequest,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================

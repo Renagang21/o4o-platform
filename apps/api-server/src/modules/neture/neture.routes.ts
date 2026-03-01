@@ -18,11 +18,14 @@ import { createNeureTier1TestController } from './controllers/neture-tier1-test.
 import { ActionLogService } from '@o4o/action-log-core';
 import { ProductApprovalV2Service } from '../product-policy-v2/product-approval-v2.service.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
+import { CsvImportService } from './services/csv-import.service.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
+const csvImportService = new CsvImportService(AppDataSource);
 
 // Extended Request type with user info
 type AuthenticatedRequest = Request & {
@@ -529,6 +532,90 @@ router.get('/admin/products', requireAuth, requireNetureScope('neture:admin'), a
   }
 });
 
+// ==================== Admin: ProductMaster SSOT (WO-O4O-PRODUCT-MASTER-CORE-RESET-V1) ====================
+
+/**
+ * GET /api/v1/neture/admin/masters
+ * ProductMaster 전체 목록 (Admin 전용)
+ */
+router.get('/admin/masters', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
+  try {
+    const masters = await netureService.getAllProductMasters();
+    res.json({ success: true, data: masters });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching product masters:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch product masters' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/masters/barcode/:barcode
+ * barcode로 ProductMaster 조회
+ */
+router.get('/admin/masters/barcode/:barcode', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+  try {
+    const { barcode } = req.params;
+    const master = await netureService.getProductMasterByBarcode(barcode);
+    if (!master) {
+      return res.status(404).json({ success: false, error: { code: 'MASTER_NOT_FOUND', message: 'ProductMaster not found for barcode' } });
+    }
+    res.json({ success: true, data: master });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching product master by barcode:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch product master' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/masters/resolve
+ * Master 생성 파이프라인: barcode → GTIN 검증 → 내부 조회 → MFDS → create
+ *
+ * Body: { barcode, manualData?: { regulatoryName, manufacturerName, regulatoryType?, marketingName?, mfdsPermitNumber? } }
+ */
+router.post('/admin/masters/resolve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { barcode, manualData } = req.body;
+    if (!barcode || typeof barcode !== 'string') {
+      return res.status(400).json({ success: false, error: { code: 'MISSING_BARCODE', message: 'barcode is required' } });
+    }
+
+    const result = await netureService.resolveOrCreateMaster(barcode.trim(), manualData);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.status(200).json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error resolving product master:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to resolve product master' } });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/masters/:id
+ * ProductMaster 수정 (immutable 필드 변경 차단)
+ *
+ * 허용: marketingName, brandName
+ * 차단: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
+ */
+router.patch('/admin/masters/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await netureService.updateProductMaster(id, req.body);
+    if (!result.success) {
+      const status = result.error === 'MASTER_NOT_FOUND' ? 404
+        : result.error?.startsWith('IMMUTABLE_FIELD_VIOLATION') ? 403
+        : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.json({ success: true, data: result.data });
+  } catch (error) {
+    logger.error('[Neture API] Error updating product master:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update product master' } });
+  }
+});
+
 // ==================== Supplier Requests (v2) ====================
 
 /**
@@ -665,21 +752,123 @@ router.post('/supplier/requests', requireAuth, async (_req: AuthenticatedRequest
   });
 });
 
+// ==================== Supplier CSV Import (WO-O4O-B2B-CSV-INGEST-PIPELINE-V1) ====================
+
+/**
+ * POST /api/v1/neture/supplier/csv-import/upload
+ * CSV 업로드 + 검증 (2-Phase: upload+validate)
+ */
+router.post('/supplier/csv-import/upload', requireAuth, requireActiveSupplier, uploadSingleMiddleware('file'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+    }
+
+    const file = (req as any).file as Express.Multer.File | undefined;
+    if (!file) {
+      return res.status(400).json({ success: false, error: { code: 'NO_FILE', message: 'CSV file is required' } });
+    }
+
+    const result = await csvImportService.uploadAndValidate(supplierId, userId, {
+      buffer: file.buffer,
+      originalname: file.originalname,
+    });
+
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error uploading CSV:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to process CSV upload' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/csv-import/batches
+ * 공급자별 CSV import batch 목록
+ */
+router.get('/supplier/csv-import/batches', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const batches = await csvImportService.listBatches(supplierId);
+    res.json({ success: true, data: batches });
+  } catch (error) {
+    logger.error('[Neture API] Error listing CSV batches:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to list CSV batches' } });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/csv-import/batches/:id
+ * Batch 상세 조회 (rows 포함)
+ */
+router.get('/supplier/csv-import/batches/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { id } = req.params;
+
+    const result = await csvImportService.getBatch(id, supplierId);
+    if (!result.success) {
+      return res.status(404).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error fetching CSV batch:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch CSV batch' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/supplier/csv-import/batches/:id/apply
+ * 2-Phase Apply — 검증 완료 batch를 실제 반영
+ */
+router.post('/supplier/csv-import/batches/:id/apply', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { id } = req.params;
+
+    const result = await csvImportService.applyBatch(id, supplierId);
+    if (!result.success) {
+      const status = result.error === 'BATCH_NOT_FOUND' ? 404
+        : result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
+        : 400;
+      return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+    }
+
+    res.json(result);
+  } catch (error) {
+    logger.error('[Neture API] Error applying CSV batch:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to apply CSV batch' } });
+  }
+});
+
 // ==================== Supplier Products (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.2) ====================
 
 /**
  * POST /api/v1/neture/supplier/products
- * Create a new product for authenticated supplier
- * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
+ * Create a new offer for authenticated supplier
+ *
+ * WO-NETURE-LAYER2-MASTER-PIPELINE-ENFORCEMENT-V1
+ * barcode 기반 — masterId 직접 전달 금지
  */
 router.post('/supplier/products', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = (req as SupplierRequest).supplierId;
 
-    const { masterId, distributionType } = req.body;
+    const { barcode, distributionType, manualData } = req.body;
+
+    if (!barcode) {
+      return res.status(400).json({ success: false, error: 'MISSING_BARCODE', message: 'barcode is required' });
+    }
 
     const result = await netureService.createSupplierOffer(supplierId, {
-      masterId,
+      barcode,
+      manualData,
       distributionType,
     });
 
@@ -2607,17 +2796,5 @@ router.use(createNeureTier1TestController({
   requireNetureScope,
   netureService,
 }));
-
-// Campaign Routes — DEPRECATED (WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: tables dropped)
-const campaignGone = (_req: Request, res: Response) => {
-  res.status(410).json({ success: false, error: 'GONE', message: 'Campaign feature has been removed' });
-};
-router.get('/campaigns', campaignGone);
-router.get('/campaigns/active', campaignGone);
-router.get('/campaigns/:id', campaignGone);
-router.post('/campaigns', campaignGone);
-router.patch('/campaigns/:id', campaignGone);
-router.post('/campaigns/:id/status', campaignGone);
-router.get('/campaigns/:id/aggregations', campaignGone);
 
 export default router;

@@ -6,7 +6,7 @@
  *
  * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1
  *
- * Immutable fields: barcode, regulatory_name, manufacturer_name, mfds_product_id
+ * Immutable fields: barcode, regulatory_type, regulatory_name, manufacturer_name, mfds_permit_number, mfds_product_id
  */
 
 import {
@@ -24,11 +24,15 @@ export class ProductMaster {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** GTIN barcode (8/12/13/14자리, check digit 포함) */
+  /** GTIN barcode (8/12/13/14자리, check digit 포함) — immutable */
   @Column({ type: 'varchar', length: 14 })
   barcode: string;
 
-  /** 식약처 공식 제품명 (immutable) */
+  /** MFDS 기반 규제 유형 (자동 설정) — immutable */
+  @Column({ name: 'regulatory_type', type: 'varchar', length: 50 })
+  regulatoryType: string;
+
+  /** 식약처 공식 제품명 — immutable */
   @Column({ name: 'regulatory_name', type: 'varchar', length: 255 })
   regulatoryName: string;
 
@@ -40,11 +44,15 @@ export class ProductMaster {
   @Column({ name: 'brand_name', type: 'varchar', length: 255, nullable: true })
   brandName: string | null;
 
-  /** 제조사명 (immutable) */
+  /** 제조사명 — immutable */
   @Column({ name: 'manufacturer_name', type: 'varchar', length: 255 })
   manufacturerName: string;
 
-  /** 식약처 제품 ID (immutable) */
+  /** 식약처 허가 번호 — immutable */
+  @Column({ name: 'mfds_permit_number', type: 'varchar', length: 100, nullable: true })
+  mfdsPermitNumber: string | null;
+
+  /** 식약처 제품 ID — immutable */
   @Column({ name: 'mfds_product_id', type: 'varchar', length: 100 })
   mfdsProductId: string;
 
@@ -53,8 +61,8 @@ export class ProductMaster {
   isMfdsVerified: boolean;
 
   /** 식약처 동기화 시각 */
-  @Column({ name: 'mfds_synced_at', type: 'timestamp', default: () => 'NOW()' })
-  mfdsSyncedAt: Date;
+  @Column({ name: 'mfds_synced_at', type: 'timestamp', nullable: true })
+  mfdsSyncedAt: Date | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

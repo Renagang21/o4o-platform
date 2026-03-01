@@ -2498,8 +2498,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       }
       const basePrice = Number(product.price_general ?? 0);
 
-      // WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: campaign tables dropped
-      const campaignHit = null;
       const unitPrice = basePrice;
 
       // Gate 3: 가격 유효성
@@ -2515,7 +2513,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         productListingId: listing.id,
         productName: product.marketing_name || '',
         productId: listing.offer_id,
-        ...(campaignHit ? { campaignId: campaignHit.campaign_id } : {}),
       };
 
       // 4. ecommerce_orders에 주문 생성 (GlycoPharm createCoreOrder 패턴)
@@ -2555,25 +2552,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
       await orderItemRepo.save(orderItem);
 
-      // WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1: 캠페인 집계 increment
-      if (campaignHit) {
-        try {
-          await dataSource.query(
-            `INSERT INTO neture_campaign_aggregations
-               (campaign_id, target_id, product_id, organization_id, total_orders, total_quantity, total_amount, updated_at)
-             VALUES ($1, $2, $3, $4, 1, $5, $6, NOW())
-             ON CONFLICT (campaign_id, target_id) DO UPDATE SET
-               total_orders = neture_campaign_aggregations.total_orders + 1,
-               total_quantity = neture_campaign_aggregations.total_quantity + $5,
-               total_amount = neture_campaign_aggregations.total_amount + $6,
-               updated_at = NOW()`,
-            [campaignHit.campaign_id, campaignHit.target_id, listing.offer_id, listing.organization_id, quantity, subtotal],
-          );
-        } catch (e) {
-          console.error('[Campaign Aggregation] Failed to increment:', e);
-        }
-      }
-
       res.status(201).json({
         success: true,
         data: {
@@ -2588,12 +2566,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   router.use('/groupbuy', groupbuyRouter);
 
-  // ============================================================================
-  // Campaign-Groupbuys View API — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: campaign tables dropped
-  // ============================================================================
-  router.get('/campaign-groupbuys', optionalAuth, asyncHandler(async (_req: Request, res: Response) => {
-    res.json({ success: true, data: [] });
-  }));
 
   // ============================================================================
   // MyPage Routes - /api/v1/kpa/mypage/*

@@ -22,6 +22,7 @@
  *   GET  /:slug/hero                 — Hero contents
  *   GET  /:slug/tablet/products      — Tablet channel products
  *   POST /:slug/tablet/requests      — Tablet request submission (rate-limited)
+ *   POST /:slug/tablet/interest      — Interest request creation (rate-limited, WO-O4O-TABLET-MODULE-V1)
  *   GET  /:slug/tablet/requests/:id  — Tablet request status
  */
 
@@ -38,6 +39,8 @@ import type { StoreBlogPostStatus } from '../glycopharm/entities/store-blog-post
 import { GlycopharmProduct } from '../glycopharm/entities/glycopharm-product.entity.js';
 import { TabletServiceRequest } from '../glycopharm/entities/tablet-service-request.entity.js';
 import type { TabletServiceRequestStatus, TabletRequestItem } from '../glycopharm/entities/tablet-service-request.entity.js';
+import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-interest-request.entity.js';
+import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
 import type { StoreBlock, TemplateProfile } from '../glycopharm/entities/glycopharm-pharmacy.entity.js';
 
 // ============================================================================
@@ -928,6 +931,68 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: '요청 생성에 실패했습니다.' },
+      });
+    }
+  });
+
+  // POST /:slug/tablet/interest — Interest request creation (public, rate-limited)
+  // WO-O4O-TABLET-MODULE-V1: 고객이 개별 상품에 관심 표시
+  router.post('/:slug/tablet/interest', tabletRequestLimiter as any, async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      const { masterId, customerName, customerNote } = req.body;
+
+      if (!masterId || typeof masterId !== 'string') {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_MASTER_ID', message: '상품 ID가 필요합니다.' },
+        });
+        return;
+      }
+
+      // Master 존재 확인
+      const masterRepo = dataSource.getRepository(ProductMaster);
+      const master = await masterRepo.findOne({
+        where: { id: masterId },
+        select: ['id', 'marketingName'],
+      });
+      if (!master) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'PRODUCT_NOT_FOUND', message: '상품을 찾을 수 없습니다.' },
+        });
+        return;
+      }
+
+      // 관심 요청 생성
+      const interestRepo = dataSource.getRepository(TabletInterestRequest);
+      const interest = interestRepo.create({
+        organizationId: resolved.storeId,
+        masterId: master.id,
+        productName: master.marketingName,
+        customerName: customerName?.trim() || undefined,
+        customerNote: customerNote?.trim() || undefined,
+        status: InterestRequestStatus.REQUESTED,
+      });
+
+      const saved = await interestRepo.save(interest);
+
+      res.status(201).json({
+        success: true,
+        data: {
+          requestId: saved.id,
+          status: saved.status,
+          productName: saved.productName,
+          createdAt: saved.createdAt,
+        },
+      });
+    } catch (error: any) {
+      console.error('[UnifiedStore] POST /:slug/tablet/interest error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: '관심 요청 생성에 실패했습니다.' },
       });
     }
   });

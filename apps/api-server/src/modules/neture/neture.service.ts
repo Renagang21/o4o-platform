@@ -30,6 +30,7 @@ import { autoExpandPublicProduct } from '../../utils/auto-listing.utils.js';
 export class NetureService {
   // Lazy initialization: repositories are created on first access
   private _supplierRepo?: Repository<NetureSupplier>;
+  private _masterRepo?: Repository<ProductMaster>;
   private _offerRepo?: Repository<SupplierProductOffer>;
   private _partnershipRepo?: Repository<NeturePartnershipRequest>;
   private _partnershipProductRepo?: Repository<NeturePartnershipProduct>;
@@ -43,6 +44,13 @@ export class NetureService {
       this._supplierRepo = AppDataSource.getRepository(NetureSupplier);
     }
     return this._supplierRepo;
+  }
+
+  private get masterRepo(): Repository<ProductMaster> {
+    if (!this._masterRepo) {
+      this._masterRepo = AppDataSource.getRepository(ProductMaster);
+    }
+    return this._masterRepo;
   }
 
   private get offerRepo(): Repository<SupplierProductOffer> {
@@ -1284,15 +1292,22 @@ export class NetureService {
   }
 
   /**
-   * POST /supplier/products - 공급자 상품 생성
+   * POST /supplier/products - 공급자 Offer 생성
    *
-   * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
-   * 기본값: distributionType=PRIVATE, purpose=CATALOG, isActive=true, acceptsApplications=true
+   * WO-NETURE-LAYER2-MASTER-PIPELINE-ENFORCEMENT-V1
+   * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
    */
   async createSupplierOffer(
     supplierId: string,
     data: {
-      masterId: string;
+      barcode: string;
+      manualData?: {
+        regulatoryType?: string;
+        regulatoryName: string;
+        manufacturerName: string;
+        marketingName?: string;
+        mfdsPermitNumber?: string | null;
+      };
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
       priceGold?: number | null;
@@ -1301,8 +1316,13 @@ export class NetureService {
     }
   ) {
     try {
-      if (!data.masterId) {
-        return { success: false, error: 'MISSING_MASTER_ID' };
+      if (!data.barcode) {
+        return { success: false, error: 'MISSING_BARCODE' };
+      }
+
+      // masterId 직접 주입 차단
+      if ('masterId' in (data as any)) {
+        return { success: false, error: 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED' };
       }
 
       // Supplier ACTIVE guard
@@ -1314,9 +1334,15 @@ export class NetureService {
         return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
       }
 
+      // Master 파이프라인 강제 경유
+      const masterResult = await this.resolveOrCreateMaster(data.barcode, data.manualData);
+      if (!masterResult.success || !masterResult.data) {
+        return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
+      }
+
       const offer = this.offerRepo.create({
         supplierId,
-        masterId: data.masterId,
+        masterId: masterResult.data.id,
         distributionType: data.distributionType || OfferDistributionType.PRIVATE,
         isActive: false,
         approvalStatus: OfferApprovalStatus.PENDING,
@@ -1329,7 +1355,7 @@ export class NetureService {
 
       const savedOffer = await this.offerRepo.save(offer);
 
-      logger.info(`[NetureService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${data.masterId} (PENDING approval)`);
+      logger.info(`[NetureService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterResult.data.id} (PENDING approval)`);
 
       return {
         success: true,
@@ -1354,11 +1380,9 @@ export class NetureService {
   }
 
   /**
-   * PATCH /supplier/products/:id - 제품 상태 업데이트
+   * PATCH /supplier/products/:id - Offer 상태 업데이트
    *
-   * 허용 액션:
-   * - isActive 토글 (활성/비활성)
-   * - acceptsApplications 토글 (신청 가능/불가)
+   * 허용: isActive, distributionType, allowedSellerIds, 가격 필드
    */
   async updateSupplierOffer(
     offerId: string,
@@ -1435,6 +1459,158 @@ export class NetureService {
       logger.error('[NetureService] Error updating supplier offer:', error);
       throw error;
     }
+  }
+
+  // ==================== ProductMaster — SSOT 관리 (WO-O4O-PRODUCT-MASTER-CORE-RESET-V1) ====================
+
+  /** Immutable 필드 목록 — UPDATE 시 변경 차단 */
+  private static readonly MASTER_IMMUTABLE_FIELDS: (keyof ProductMaster)[] = [
+    'barcode',
+    'regulatoryType',
+    'regulatoryName',
+    'manufacturerName',
+    'mfdsPermitNumber',
+    'mfdsProductId',
+  ];
+
+  /**
+   * Master 조회 — barcode 기준
+   */
+  async getProductMasterByBarcode(barcode: string): Promise<ProductMaster | null> {
+    return this.masterRepo.findOne({ where: { barcode } });
+  }
+
+  /**
+   * Master 조회 — ID 기준
+   */
+  async getProductMasterById(id: string): Promise<ProductMaster | null> {
+    return this.masterRepo.findOne({ where: { id } });
+  }
+
+  /**
+   * Master 생성 파이프라인
+   *
+   * 1. GTIN 검증
+   * 2. 내부 barcode 조회 → 이미 존재하면 반환
+   * 3. MFDS stub 호출
+   * 4a. MFDS 검증 성공 → MFDS 데이터로 생성 (isMfdsVerified = true)
+   * 4b. MFDS 미연동(stub) + manualData 제공 → 수동 데이터로 생성 (isMfdsVerified = false)
+   * 4c. 둘 다 없으면 → 에러
+   *
+   * 공급자가 직접 호출 불가. Admin/시스템 전용.
+   */
+  async resolveOrCreateMaster(
+    barcode: string,
+    manualData?: {
+      regulatoryType?: string;
+      regulatoryName: string;
+      manufacturerName: string;
+      marketingName?: string;
+      mfdsPermitNumber?: string | null;
+    }
+  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+    // 1. GTIN 검증
+    const { validateGtin } = await import('../../utils/gtin.js');
+    const gtinError = validateGtin(barcode);
+    if (gtinError) {
+      return { success: false, error: `INVALID_GTIN: ${gtinError}` };
+    }
+
+    // 2. 내부 조회 — 이미 존재하면 반환
+    const existing = await this.masterRepo.findOne({ where: { barcode } });
+    if (existing) {
+      return { success: true, data: existing };
+    }
+
+    // 3. MFDS 조회 (stub)
+    const { verifyProductByBarcode } = await import('./services/mfds.service.js');
+    const mfdsResult = await verifyProductByBarcode(barcode);
+
+    // 4a. MFDS 검증 성공 → MFDS 데이터로 생성
+    if (mfdsResult.verified && mfdsResult.product) {
+      const master = this.masterRepo.create({
+        barcode,
+        regulatoryType: mfdsResult.product.regulatoryType,
+        regulatoryName: mfdsResult.product.regulatoryName,
+        marketingName: mfdsResult.product.regulatoryName,
+        manufacturerName: mfdsResult.product.manufacturerName,
+        mfdsPermitNumber: mfdsResult.product.permitNumber || null,
+        mfdsProductId: mfdsResult.product.productId || barcode,
+        isMfdsVerified: true,
+        mfdsSyncedAt: new Date(),
+      });
+
+      const saved = await this.masterRepo.save(master);
+      logger.info(`[NetureService] Created ProductMaster ${saved.id} for barcode ${barcode} (MFDS verified)`);
+      return { success: true, data: saved };
+    }
+
+    // 4b. MFDS 미연동 + manualData 제공 → 수동 생성
+    if (manualData) {
+      const master = this.masterRepo.create({
+        barcode,
+        regulatoryType: manualData.regulatoryType || 'UNKNOWN',
+        regulatoryName: manualData.regulatoryName,
+        marketingName: manualData.marketingName || manualData.regulatoryName,
+        manufacturerName: manualData.manufacturerName,
+        mfdsPermitNumber: manualData.mfdsPermitNumber ?? null,
+        mfdsProductId: barcode, // MFDS 미연동 시 barcode를 ID로 사용
+        isMfdsVerified: false,
+        mfdsSyncedAt: null,
+      });
+
+      const saved = await this.masterRepo.save(master);
+      logger.info(`[NetureService] Created ProductMaster ${saved.id} for barcode ${barcode} (manual, MFDS unverified)`);
+      return { success: true, data: saved };
+    }
+
+    // 4c. 둘 다 없음 → 에러
+    return { success: false, error: mfdsResult.error || 'MFDS_VERIFICATION_FAILED' };
+  }
+
+  /**
+   * Master 업데이트 — immutable 필드 변경 차단 (런타임 Guard)
+   *
+   * 변경 가능: marketingName, brandName
+   * 변경 불가: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
+   */
+  async updateProductMaster(
+    masterId: string,
+    updates: Record<string, unknown>
+  ): Promise<{ success: boolean; data?: ProductMaster; error?: string }> {
+    // Immutable Guard — 런타임 보호
+    const violatedFields = NetureService.MASTER_IMMUTABLE_FIELDS.filter(
+      (field) => field in updates
+    );
+    if (violatedFields.length > 0) {
+      return {
+        success: false,
+        error: `IMMUTABLE_FIELD_VIOLATION: ${violatedFields.join(', ')}`,
+      };
+    }
+
+    const master = await this.masterRepo.findOne({ where: { id: masterId } });
+    if (!master) {
+      return { success: false, error: 'MASTER_NOT_FOUND' };
+    }
+
+    // 허용 필드만 적용
+    if ('marketingName' in updates && typeof updates.marketingName === 'string') {
+      master.marketingName = updates.marketingName;
+    }
+    if ('brandName' in updates) {
+      master.brandName = updates.brandName as string | null;
+    }
+
+    const saved = await this.masterRepo.save(master);
+    return { success: true, data: saved };
+  }
+
+  /**
+   * Master 전체 목록 (Admin 전용)
+   */
+  async getAllProductMasters() {
+    return this.masterRepo.find({ order: { createdAt: 'DESC' } });
   }
 
   // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4, P1 §3.3) ====================
@@ -2520,7 +2696,5 @@ export class NetureService {
       throw error;
     }
   }
-
-  // Campaign Operations removed — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1 (tables dropped)
 
 }

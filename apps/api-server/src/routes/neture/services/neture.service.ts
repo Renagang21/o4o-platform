@@ -474,12 +474,18 @@ export class NetureService {
   }
 
   /**
-   * WO-NETURE-B2B-ORDER-SERVER-PRICE-ENFORCEMENT-V1
-   * WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1
+   * WO-NETURE-LAYER4-ORDER-GATE-HARDENING-V1
    *
-   * B2B 주문 생성 — 서버 가격 강제
-   * 클라이언트 가격 필드 완전 무시, product.price_general 직접 조회
-   * 활성 캠페인이 존재하면 campaign_price 오버라이드 적용
+   * B2B 주문 생성 — 서버 가격 강제 + 6중 게이트
+   *
+   * Gate 1: offer.isActive
+   * Gate 2: offer.approvalStatus === 'APPROVED'
+   * Gate 3: supplier.status === 'ACTIVE'
+   * Gate 4: distributionType 재검증 (PRIVATE→allowedSellerIds, SERVICE→organizationId 필수)
+   * Gate 5: quantity 런타임 검증 (정수, 1~1000)
+   * Gate 6: unitPrice > 0 (서버 DB값)
+   *
+   * order + items 단일 트랜잭션
    */
   async createOrder(
     data: CreateOrderRequestDto,
@@ -519,7 +525,27 @@ export class NetureService {
         throw new Error(`Supplier is not active for product: ${productName}`);
       }
 
-      // 가격 결정 (서버 강제, 클라이언트 가격 절대 사용 금지)
+      // Gate 4: DistributionType 재검증
+      if (offer.distributionType === 'PRIVATE') {
+        if (!offer.allowedSellerIds || !offer.allowedSellerIds.includes(userId)) {
+          throw new Error(`Distribution access denied: ${productName}`);
+        }
+      }
+      if (offer.distributionType === 'SERVICE') {
+        if (!organizationId) {
+          throw new Error(`Distribution access denied: SERVICE offer requires organization context`);
+        }
+      }
+
+      // Gate 5: 수량 런타임 검증
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0) {
+        throw new Error(`Invalid quantity for product: ${productName}`);
+      }
+      if (item.quantity > 1000) {
+        throw new Error(`Quantity too large for product: ${productName}`);
+      }
+
+      // Gate 6: 가격 결정 (서버 강제, 클라이언트 가격 절대 사용 금지)
       const unitPrice = offer.priceGeneral;
       if (unitPrice <= 0) {
         throw new Error(`Invalid price for product: ${productName}`);
@@ -543,31 +569,39 @@ export class NetureService {
     const shippingFee = totalAmount >= 50000 ? 0 : 3000;
     const finalAmount = totalAmount + shippingFee;
 
-    // 4. 주문 생성
+    // 4. 주문 생성 (단일 트랜잭션: order + items 원자성 보장)
     const orderNumber = await this.repository.generateOrderNumber();
-    const order = await this.repository.createOrder({
-      orderNumber,
-      userId,
-      status: NetureOrderStatus.CREATED,
-      totalAmount,
-      discountAmount: 0,
-      shippingFee,
-      finalAmount,
-      currency: NetureCurrency.KRW,
-      shipping: data.shipping ? { ...data.shipping, phone: data.shipping.phone?.replace(/\D/g, '') || data.shipping.phone } : data.shipping,
-      ordererName: data.orderer_name,
-      ordererPhone: data.orderer_phone ? data.orderer_phone.replace(/\D/g, '') : data.orderer_phone,
-      ordererEmail: data.orderer_email,
-      note: data.note,
-    });
 
-    // 5. 주문 항목 생성
-    const itemsWithOrderId = orderItems.map((item) => ({
-      ...item,
-      orderId: order.id,
-    }));
-    const savedItems = await this.repository.createOrderItems(itemsWithOrderId);
-    order.items = savedItems;
+    const order = await this.dataSource.transaction(async (manager) => {
+      const orderRepo = manager.getRepository(NetureOrder);
+      const orderItemRepo = manager.getRepository(NetureOrderItem);
+
+      const newOrder = orderRepo.create({
+        orderNumber,
+        userId,
+        status: NetureOrderStatus.CREATED,
+        totalAmount,
+        discountAmount: 0,
+        shippingFee,
+        finalAmount,
+        currency: NetureCurrency.KRW,
+        shipping: data.shipping ? { ...data.shipping, phone: data.shipping.phone?.replace(/\D/g, '') || data.shipping.phone } : data.shipping,
+        ordererName: data.orderer_name,
+        ordererPhone: data.orderer_phone ? data.orderer_phone.replace(/\D/g, '') : data.orderer_phone,
+        ordererEmail: data.orderer_email,
+        note: data.note,
+      });
+      const savedOrder = await orderRepo.save(newOrder);
+
+      const itemsWithOrderId = orderItems.map((item) => ({
+        ...item,
+        orderId: savedOrder.id,
+      }));
+      const savedItems = orderItemRepo.create(itemsWithOrderId);
+      savedOrder.items = await orderItemRepo.save(savedItems);
+
+      return savedOrder;
+    });
 
     return this.toOrderDto(order);
   }

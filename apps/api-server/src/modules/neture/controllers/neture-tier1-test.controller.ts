@@ -63,16 +63,17 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
         supplierId = rows[0].id;
       }
 
-      const masterId = req.body?.masterId;
-      if (!masterId) {
+      const barcode = req.body?.barcode;
+      if (!barcode) {
         return res.status(400).json({
           success: false,
-          error: { code: 'MISSING_MASTER_ID', message: 'masterId is required' },
+          error: { code: 'MISSING_BARCODE', message: 'barcode is required' },
         });
       }
 
       const result = await netureService.createSupplierOffer(supplierId, {
-        masterId,
+        barcode,
+        manualData: req.body?.manualData,
         distributionType: OfferDistributionType.PUBLIC,
       });
 

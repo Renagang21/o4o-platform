@@ -1,29 +1,43 @@
 /**
- * Store Tablet Routes — Tablet Device & Display Management
+ * Store Tablet Routes — Tablet Device & Display Management + Interest Requests
  *
  * WO-STORE-LOCAL-PRODUCT-DISPLAY-V1
+ * WO-O4O-TABLET-MODULE-V1
  *
  * Tablet은 상품을 "소유"하지 않는다. 상품을 "선택하여 진열"한다.
  * 상품 풀: supplier (organization_product_listings) + local (store_local_products)
  *
- * API Namespace: /api/v1/store/tablets
+ * API Namespace: /api/v1/store
  *
- * ┌──────────────────────────────────────────────────────┐
- * │ AUTHENTICATED (requireAuth + pharmacy owner)         │
- * │  GET    /tablets                 — 태블릿 목록       │
- * │  POST   /tablets                 — 태블릿 등록       │
- * │  PUT    /tablets/:id             — 태블릿 수정       │
- * │  DELETE /tablets/:id             — 태블릿 비활성화    │
- * │  GET    /tablets/:id/displays    — 진열 구성 조회    │
- * │  PUT    /tablets/:id/displays    — 진열 구성 저장    │
- * │  GET    /tablets/:id/product-pool — 상품 풀 조회     │
- * └──────────────────────────────────────────────────────┘
+ * ┌──────────────────────────────────────────────────────────┐
+ * │ AUTHENTICATED (requireAuth + pharmacy owner)             │
+ * │  GET    /tablets                     — 태블릿 목록       │
+ * │  POST   /tablets                     — 태블릿 등록       │
+ * │  PUT    /tablets/:id                 — 태블릿 수정       │
+ * │  DELETE /tablets/:id                 — 태블릿 비활성화    │
+ * │  GET    /tablets/:id/displays        — 진열 구성 조회    │
+ * │  PUT    /tablets/:id/displays        — 진열 구성 저장    │
+ * │  GET    /tablets/:id/product-pool    — 상품 풀 조회      │
+ * │                                                          │
+ * │  POST   /products/register-by-barcode — 바코드 등록      │
+ * │                                                          │
+ * │  GET    /interest/pending-count      — 미확인 건수       │
+ * │  GET    /interest/recent             — 최근 요청 목록    │
+ * │  GET    /interest/stats              — 대시보드 통계     │
+ * │  PATCH  /interest/:id/acknowledge    — 확인 처리         │
+ * │  PATCH  /interest/:id/complete       — 완료 처리         │
+ * │  PATCH  /interest/:id/cancel         — 취소 처리         │
+ * └──────────────────────────────────────────────────────────┘
  */
 
 import { Router, Request, Response } from 'express';
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { StoreTablet } from './entities/store-tablet.entity.js';
 import { StoreTabletDisplay } from './entities/store-tablet-display.entity.js';
+import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-interest-request.entity.js';
+import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
+import { StoreProductProfile } from '../../modules/neture/entities/StoreProductProfile.entity.js';
+import { validateGtin } from '../../utils/gtin.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 
@@ -506,5 +520,336 @@ export function createStoreTabletRoutes(
     }
   });
 
+  // ─── Barcode Product Registration (WO-O4O-TABLET-MODULE-V1) ──
+
+  /**
+   * POST /products/register-by-barcode
+   * 바코드 스캔 → Master 조회 → StoreProductProfile upsert
+   *
+   * Body: { barcode: string }
+   */
+  router.post('/products/register-by-barcode', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
+      if (!organizationId) return;
+
+      const { barcode } = req.body;
+      if (!barcode || typeof barcode !== 'string') {
+        res.status(400).json({
+          success: false,
+          error: 'barcode is required',
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
+
+      const trimmed = barcode.trim();
+
+      // GTIN 검증
+      const gtinError = validateGtin(trimmed);
+      if (gtinError) {
+        res.status(400).json({
+          success: false,
+          error: `INVALID_GTIN: ${gtinError}`,
+          code: 'VALIDATION_ERROR',
+        });
+        return;
+      }
+
+      // Master 조회
+      const masterRepo = dataSource.getRepository(ProductMaster);
+      const master = await masterRepo.findOne({ where: { barcode: trimmed } });
+      if (!master) {
+        res.status(404).json({
+          success: false,
+          error: 'MASTER_NOT_FOUND',
+          code: 'NOT_FOUND',
+        });
+        return;
+      }
+
+      // StoreProductProfile upsert (UNIQUE: organization_id + master_id)
+      const profileRepo = dataSource.getRepository(StoreProductProfile);
+      let profile = await profileRepo.findOne({
+        where: { organizationId, masterId: master.id },
+      });
+
+      if (!profile) {
+        profile = profileRepo.create({
+          organizationId,
+          masterId: master.id,
+          displayName: master.marketingName,
+          isActive: true,
+        });
+        profile = await profileRepo.save(profile);
+      }
+
+      res.status(201).json({
+        success: true,
+        data: {
+          profileId: profile.id,
+          masterId: master.id,
+          barcode: master.barcode,
+          marketingName: master.marketingName,
+          regulatoryName: master.regulatoryName,
+          manufacturerName: master.manufacturerName,
+          displayName: profile.displayName,
+          isActive: profile.isActive,
+          isNew: !profile.updatedAt || profile.createdAt.getTime() === profile.updatedAt.getTime(),
+        },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] POST /products/register-by-barcode error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to register product by barcode',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  // ─── Interest Request Staff Routes (WO-O4O-TABLET-MODULE-V1) ──
+
+  // Valid status transitions
+  const INTEREST_TRANSITIONS: Record<string, InterestRequestStatus[]> = {
+    [InterestRequestStatus.REQUESTED]: [InterestRequestStatus.ACKNOWLEDGED, InterestRequestStatus.COMPLETED, InterestRequestStatus.CANCELLED],
+    [InterestRequestStatus.ACKNOWLEDGED]: [InterestRequestStatus.COMPLETED, InterestRequestStatus.CANCELLED],
+    [InterestRequestStatus.COMPLETED]: [],
+    [InterestRequestStatus.CANCELLED]: [],
+  };
+
+  /**
+   * GET /interest/pending-count
+   * 미확인 관심 요청 건수 (3초 폴링용 — 경량 COUNT)
+   */
+  router.get('/interest/pending-count', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
+      if (!organizationId) return;
+
+      const result: Array<{ count: string }> = await dataSource.query(
+        `SELECT COUNT(*)::int AS count
+         FROM tablet_interest_requests
+         WHERE organization_id = $1 AND status = 'REQUESTED'`,
+        [organizationId],
+      );
+
+      res.json({
+        success: true,
+        data: { count: Number(result[0]?.count || 0) },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /interest/pending-count error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch pending count',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  /**
+   * GET /interest/recent
+   * 최근 관심 요청 목록 (REQUESTED + ACKNOWLEDGED, 최신 50건)
+   */
+  router.get('/interest/recent', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
+      if (!organizationId) return;
+
+      const interestRepo = dataSource.getRepository(TabletInterestRequest);
+      const requests = await interestRepo.find({
+        where: {
+          organizationId,
+          status: In([InterestRequestStatus.REQUESTED, InterestRequestStatus.ACKNOWLEDGED]),
+        },
+        order: { createdAt: 'DESC' },
+        take: 50,
+      });
+
+      res.json({
+        success: true,
+        data: requests.map((r) => ({
+          id: r.id,
+          masterId: r.masterId,
+          productName: r.productName,
+          customerName: r.customerName,
+          customerNote: r.customerNote,
+          status: r.status,
+          createdAt: r.createdAt,
+          acknowledgedAt: r.acknowledgedAt,
+        })),
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /interest/recent error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch recent interest requests',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  /**
+   * GET /interest/stats
+   * 대시보드용 관심 요청 통계
+   */
+  router.get('/interest/stats', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
+      if (!organizationId) return;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const [pendingResult, todayResult, completedTodayResult, topProducts] = await Promise.all([
+        dataSource.query(
+          `SELECT COUNT(*)::int AS count
+           FROM tablet_interest_requests
+           WHERE organization_id = $1 AND status = 'REQUESTED'`,
+          [organizationId],
+        ) as Promise<Array<{ count: number }>>,
+        dataSource.query(
+          `SELECT COUNT(*)::int AS count
+           FROM tablet_interest_requests
+           WHERE organization_id = $1 AND created_at >= $2`,
+          [organizationId, today],
+        ) as Promise<Array<{ count: number }>>,
+        dataSource.query(
+          `SELECT COUNT(*)::int AS count
+           FROM tablet_interest_requests
+           WHERE organization_id = $1 AND status = 'COMPLETED' AND completed_at >= $2`,
+          [organizationId, today],
+        ) as Promise<Array<{ count: number }>>,
+        dataSource.query(
+          `SELECT master_id, product_name, COUNT(*)::int AS count
+           FROM tablet_interest_requests
+           WHERE organization_id = $1 AND created_at >= $2
+           GROUP BY master_id, product_name
+           ORDER BY count DESC
+           LIMIT 5`,
+          [organizationId, today],
+        ) as Promise<Array<{ master_id: string; product_name: string; count: number }>>,
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          pendingCount: Number(pendingResult[0]?.count || 0),
+          todayCount: Number(todayResult[0]?.count || 0),
+          completedTodayCount: Number(completedTodayResult[0]?.count || 0),
+          topProducts: topProducts.map((p) => ({
+            masterId: p.master_id,
+            productName: p.product_name,
+            count: Number(p.count),
+          })),
+        },
+      });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /interest/stats error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch interest stats',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  /**
+   * PATCH /interest/:id/acknowledge
+   * 관심 요청 확인 처리
+   */
+  router.patch('/interest/:id/acknowledge', async (req: Request, res: Response): Promise<void> => {
+    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.ACKNOWLEDGED, INTEREST_TRANSITIONS);
+  });
+
+  /**
+   * PATCH /interest/:id/complete
+   * 관심 요청 완료 처리
+   */
+  router.patch('/interest/:id/complete', async (req: Request, res: Response): Promise<void> => {
+    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.COMPLETED, INTEREST_TRANSITIONS);
+  });
+
+  /**
+   * PATCH /interest/:id/cancel
+   * 관심 요청 취소 처리
+   */
+  router.patch('/interest/:id/cancel', async (req: Request, res: Response): Promise<void> => {
+    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.CANCELLED, INTEREST_TRANSITIONS);
+  });
+
   return router;
+}
+
+// ─────────────────────────────────────────────────────
+// Interest Request Transition Helper
+// ─────────────────────────────────────────────────────
+
+async function handleInterestTransition(
+  dataSource: DataSource,
+  req: Request,
+  res: Response,
+  getAuth: () => Promise<import('express').RequestHandler>,
+  targetStatus: InterestRequestStatus,
+  transitions: Record<string, InterestRequestStatus[]>,
+): Promise<void> {
+  try {
+    const auth = await getAuth();
+    const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
+    if (!organizationId) return;
+
+    const { id } = req.params;
+    const interestRepo = dataSource.getRepository(TabletInterestRequest);
+
+    const request = await interestRepo.findOne({
+      where: { id, organizationId },
+    });
+    if (!request) {
+      res.status(404).json({
+        success: false,
+        error: 'Interest request not found',
+        code: 'NOT_FOUND',
+      });
+      return;
+    }
+
+    const allowed = transitions[request.status] || [];
+    if (!allowed.includes(targetStatus)) {
+      res.status(400).json({
+        success: false,
+        error: `Cannot transition from '${request.status}' to '${targetStatus}'`,
+        code: 'INVALID_TRANSITION',
+      });
+      return;
+    }
+
+    request.status = targetStatus;
+    const now = new Date();
+    if (targetStatus === InterestRequestStatus.ACKNOWLEDGED) request.acknowledgedAt = now;
+    if (targetStatus === InterestRequestStatus.COMPLETED) request.completedAt = now;
+    if (targetStatus === InterestRequestStatus.CANCELLED) request.cancelledAt = now;
+
+    const saved = await interestRepo.save(request);
+
+    res.json({
+      success: true,
+      data: {
+        id: saved.id,
+        status: saved.status,
+        updatedAt: saved.updatedAt,
+      },
+    });
+  } catch (error: any) {
+    console.error(`[StoreTablet] PATCH /interest/:id transition error:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update interest request',
+      code: 'INTERNAL_ERROR',
+    });
+  }
 }
