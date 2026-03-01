@@ -114,14 +114,15 @@ export function createStoreChannelProductsController(
              opc.display_order AS "displayOrder",
              opc.created_at AS "createdAt",
              opl.id AS "productListingId",
-             opl.product_name AS "productName",
-             sp.price_general AS "retailPrice",
+             pm.marketing_name AS "productName",
+             spo.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.is_active AS "listingActive"
            FROM organization_product_channels opc
            JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
            JOIN organization_channels oc ON oc.id = opc.channel_id
-           LEFT JOIN neture_supplier_products sp ON sp.id = opl.product_id
+           LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+           LEFT JOIN product_masters pm ON pm.id = spo.master_id
            WHERE opc.channel_id = $1
              AND oc.organization_id = $2
            ORDER BY opc.display_order ASC, opc.created_at ASC`,
@@ -151,12 +152,13 @@ export function createStoreChannelProductsController(
         const available = await dataSource.query(
           `SELECT
              opl.id,
-             opl.product_name AS "productName",
-             sp.price_general AS "retailPrice",
+             pm.marketing_name AS "productName",
+             spo.price_general AS "retailPrice",
              opl.service_key AS "serviceKey",
              opl.created_at AS "createdAt"
            FROM organization_product_listings opl
-           LEFT JOIN neture_supplier_products sp ON sp.id = opl.product_id
+           LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+           LEFT JOIN product_masters pm ON pm.id = spo.master_id
            WHERE opl.organization_id = $1
              AND opl.is_active = true
              AND opl.id NOT IN (
@@ -164,7 +166,7 @@ export function createStoreChannelProductsController(
                FROM organization_product_channels
                WHERE channel_id = $2 AND is_active = true
              )
-           ORDER BY opl.product_name ASC`,
+           ORDER BY pm.marketing_name ASC`,
           [ctx.organizationId, channelId]
         );
 

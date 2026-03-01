@@ -23,9 +23,7 @@ import {
 } from '../entities/neture-product-log.entity.js';
 import { NetureOrder, NetureOrderStatus } from '../entities/neture-order.entity.js';
 import { NetureOrderItem } from '../entities/neture-order-item.entity.js';
-import { NetureSupplierProduct } from '../../../modules/neture/entities/NetureSupplierProduct.entity.js';
-import { NetureTimeLimitedPriceCampaign } from '../../../modules/neture/entities/NetureTimeLimitedPriceCampaign.entity.js';
-import { NetureCampaignAggregation } from '../../../modules/neture/entities/NetureCampaignAggregation.entity.js';
+import { SupplierProductOffer } from '../../../modules/neture/entities/SupplierProductOffer.entity.js';
 
 export class NetureRepository {
   private productRepo: Repository<NetureProduct>;
@@ -33,9 +31,7 @@ export class NetureRepository {
   private logRepo: Repository<NetureProductLog>;
   private orderRepo: Repository<NetureOrder>;
   private orderItemRepo: Repository<NetureOrderItem>;
-  private supplierProductRepo: Repository<NetureSupplierProduct>;
-  private campaignRepo: Repository<NetureTimeLimitedPriceCampaign>;
-  private campaignAggregationRepo: Repository<NetureCampaignAggregation>;
+  private supplierOfferRepo: Repository<SupplierProductOffer>;
 
   constructor(private dataSource: DataSource) {
     this.productRepo = dataSource.getRepository(NetureProduct);
@@ -43,9 +39,7 @@ export class NetureRepository {
     this.logRepo = dataSource.getRepository(NetureProductLog);
     this.orderRepo = dataSource.getRepository(NetureOrder);
     this.orderItemRepo = dataSource.getRepository(NetureOrderItem);
-    this.supplierProductRepo = dataSource.getRepository(NetureSupplierProduct);
-    this.campaignRepo = dataSource.getRepository(NetureTimeLimitedPriceCampaign);
-    this.campaignAggregationRepo = dataSource.getRepository(NetureCampaignAggregation);
+    this.supplierOfferRepo = dataSource.getRepository(SupplierProductOffer);
   }
 
   // ============================================================================
@@ -300,11 +294,11 @@ export class NetureRepository {
    * WO-NETURE-B2B-ORDER-SERVER-PRICE-ENFORCEMENT-V1
    * B2B 주문용 공급자 상품 조회 (supplier relation 포함)
    */
-  async findSupplierProductsByIds(ids: string[]): Promise<NetureSupplierProduct[]> {
+  async findSupplierOffersByIds(ids: string[]): Promise<SupplierProductOffer[]> {
     if (ids.length === 0) return [];
-    return this.supplierProductRepo.find({
+    return this.supplierOfferRepo.find({
       where: ids.map(id => ({ id })),
-      relations: ['supplier'],
+      relations: ['supplier', 'master'],
     });
   }
 
@@ -316,61 +310,5 @@ export class NetureRepository {
     await this.productRepo.increment({ id: productId }, 'stock', quantity);
   }
 
-  // ============================================================================
-  // Campaign Operations (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2)
-  // 1 Campaign = 1 product_id. targets 테이블 제거됨.
-  // ============================================================================
-
-  /**
-   * 활성 캠페인 조회 — 주어진 상품 ID 목록에 대해
-   * 현재 시점에 ACTIVE 상태이고 기간 내인 캠페인을 반환.
-   */
-  async findActiveCampaignsByProducts(
-    productIds: string[],
-  ): Promise<NetureTimeLimitedPriceCampaign[]> {
-    if (productIds.length === 0) return [];
-
-    const now = new Date().toISOString();
-
-    const rows = await this.dataSource.query(
-      `SELECT c.id, c.product_id, c.campaign_price, c.supplier_id
-       FROM neture_time_limited_price_campaigns c
-       WHERE c.product_id = ANY($1)
-         AND c.status = 'ACTIVE'
-         AND c.start_at <= $2
-         AND c.end_at > $2`,
-      [productIds, now],
-    );
-
-    return rows.map((r: any) => ({
-      id: r.id,
-      productId: r.product_id,
-      campaignPrice: Number(r.campaign_price),
-      supplierId: r.supplier_id,
-    })) as NetureTimeLimitedPriceCampaign[];
-  }
-
-  /**
-   * 캠페인 집계 atomic increment — 주문 생성 후 호출.
-   * UPSERT: (campaign_id, product_id) 기준 ON CONFLICT 증가.
-   */
-  async incrementCampaignAggregation(params: {
-    campaignId: string;
-    productId: string;
-    organizationId: string | null;
-    quantity: number;
-    amount: number;
-  }): Promise<void> {
-    await this.dataSource.query(
-      `INSERT INTO neture_campaign_aggregations
-         (campaign_id, product_id, organization_id, total_orders, total_quantity, total_amount, updated_at)
-       VALUES ($1, $2, $3, 1, $4, $5, NOW())
-       ON CONFLICT (campaign_id, product_id) DO UPDATE SET
-         total_orders = neture_campaign_aggregations.total_orders + 1,
-         total_quantity = neture_campaign_aggregations.total_quantity + $4,
-         total_amount = neture_campaign_aggregations.total_amount + $5,
-         updated_at = NOW()`,
-      [params.campaignId, params.productId, params.organizationId, params.quantity, params.amount],
-    );
-  }
+  // Campaign Operations removed — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1 (tables dropped)
 }

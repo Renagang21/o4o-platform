@@ -197,10 +197,10 @@ export class GlycopharmPaymentEventHandler {
 
     // 해당 채널의 sales_limit 매핑 조회
     const channelMappings: Array<{
-      product_id: string;
+      offer_id: string;
       sales_limit: number | null;
     }> = await this.dataSource.query(
-      `SELECT opl.product_id::text AS product_id, opc.sales_limit
+      `SELECT opl.offer_id::text AS offer_id, opc.sales_limit
        FROM organization_product_channels opc
        JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
        WHERE opc.channel_id = $1
@@ -213,7 +213,7 @@ export class GlycopharmPaymentEventHandler {
 
     if (channelMappings.length === 0) return null;
 
-    const limitMap = new Map(channelMappings.map((m) => [m.product_id, m.sales_limit!]));
+    const limitMap = new Map(channelMappings.map((m) => [m.offer_id, m.sales_limit!]));
 
     for (const item of items) {
       if (!item.productId) continue;

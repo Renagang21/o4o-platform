@@ -2346,7 +2346,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     const [data, total] = await groupbuyListingRepo.findAndCount({
       where: { service_key: SERVICE_KEYS.KPA_GROUPBUY, is_active: true },
-      order: { display_order: 'ASC', created_at: 'DESC' },
+      order: { created_at: 'ASC' },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -2471,11 +2471,13 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
       // Gate 1: Supplier product 활성/승인 검증
       const productRows = await dataSource.query(
-        `SELECT sp.price_general, sp.is_active, sp.approval_status, s.status AS supplier_status
-         FROM neture_supplier_products sp
-         JOIN neture_suppliers s ON s.id = sp.supplier_id
-         WHERE sp.id = $1`,
-        [listing.product_id],
+        `SELECT spo.price_general, spo.is_active, spo.approval_status, s.status AS supplier_status,
+                pm.marketing_name
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers s ON s.id = spo.supplier_id
+         JOIN product_masters pm ON pm.id = spo.master_id
+         WHERE spo.id = $1`,
+        [listing.offer_id],
       );
       if (!productRows.length) {
         res.status(404).json({ success: false, error: { message: 'Supplier product not found' } });
@@ -2496,19 +2498,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       }
       const basePrice = Number(product.price_general ?? 0);
 
-      // Gate 2: 캠페인 가격 조회 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: campaign 직접 조회)
-      const campaignRows = await dataSource.query(
-        `SELECT c.campaign_price, c.id AS campaign_id
-         FROM neture_time_limited_price_campaigns c
-         WHERE c.product_id = $1
-           AND c.status = 'ACTIVE'
-           AND c.start_at <= NOW()
-           AND c.end_at > NOW()
-         LIMIT 1`,
-        [listing.product_id],
-      );
-      const campaignHit = campaignRows.length > 0 ? campaignRows[0] : null;
-      const unitPrice = campaignHit ? Number(campaignHit.campaign_price) : basePrice;
+      // WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: campaign tables dropped
+      const campaignHit = null;
+      const unitPrice = basePrice;
 
       // Gate 3: 가격 유효성
       if (unitPrice <= 0) {
@@ -2521,8 +2513,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const metadata: Record<string, unknown> = {
         serviceKey: listing.service_key,
         productListingId: listing.id,
-        productName: listing.product_name,
-        productId: listing.product_id,
+        productName: product.marketing_name || '',
+        productId: listing.offer_id,
         ...(campaignHit ? { campaignId: campaignHit.campaign_id } : {}),
       };
 
@@ -2552,8 +2544,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
       const orderItem = orderItemRepo.create({
         orderId: savedOrder.id,
-        productId: listing.product_id,
-        productName: listing.product_name,
+        productId: listing.offer_id,
+        productName: product.marketing_name || '',
         quantity,
         unitPrice,
         discount: 0,
@@ -2575,7 +2567,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
                total_quantity = neture_campaign_aggregations.total_quantity + $5,
                total_amount = neture_campaign_aggregations.total_amount + $6,
                updated_at = NOW()`,
-            [campaignHit.campaign_id, campaignHit.target_id, listing.product_id, listing.organization_id, quantity, subtotal],
+            [campaignHit.campaign_id, campaignHit.target_id, listing.offer_id, listing.organization_id, quantity, subtotal],
           );
         } catch (e) {
           console.error('[Campaign Aggregation] Failed to increment:', e);
@@ -2597,33 +2589,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/groupbuy', groupbuyRouter);
 
   // ============================================================================
-  // Campaign-Groupbuys View API — WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
-  // 캠페인 + 리스팅 서버 조인: campaign.product_id 직접 사용 (targets 제거됨)
+  // Campaign-Groupbuys View API — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: campaign tables dropped
   // ============================================================================
-  router.get('/campaign-groupbuys', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
-    const rows = await dataSource.query(`
-      SELECT
-        c.id AS "campaignId",
-        c.name AS "campaignName",
-        c.description AS "campaignDescription",
-        c.start_at AS "startAt",
-        c.end_at AS "endAt",
-        c.product_id AS "productId",
-        c.campaign_price AS "campaignPrice",
-        opl.id AS "listingId",
-        opl.product_name AS "productName"
-      FROM neture_time_limited_price_campaigns c
-      JOIN organization_product_listings opl
-        ON opl.product_id = c.product_id
-        AND opl.service_key = 'kpa-groupbuy'
-        AND opl.is_active = true
-      WHERE c.status = 'ACTIVE'
-        AND c.start_at <= NOW()
-        AND c.end_at > NOW()
-      ORDER BY c.end_at ASC, opl.display_order ASC
-    `);
-
-    res.json({ success: true, data: rows });
+  router.get('/campaign-groupbuys', optionalAuth, asyncHandler(async (_req: Request, res: Response) => {
+    res.json({ success: true, data: [] });
   }));
 
   // ============================================================================

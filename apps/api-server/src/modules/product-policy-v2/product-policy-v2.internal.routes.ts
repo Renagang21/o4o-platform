@@ -2,6 +2,7 @@
  * Product Policy v2 — Internal Test Endpoints
  *
  * WO-PRODUCT-POLICY-V2-INTERNAL-TEST-ENDPOINT-V1
+ * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: offer_id 기준 구조 반영
  *
  * Admin 전용 테스트 엔드포인트. X-Admin-Secret 헤더 필수.
  * 기존 API 변경 없음, 기존 승인 흐름 변경 없음.
@@ -11,14 +12,14 @@
  * POST /service-approval/:id/approve — SERVICE 승인 처리 + Listing 생성
  * POST /private-approval            — PRIVATE 승인 생성
  * POST /private-approval/:id/approve — PRIVATE 승인 처리 + Listing 생성
- * GET  /listings                    — product_id 기반 Listing 조회
+ * GET  /listings                    — offer_id 기반 Listing 조회
  */
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { ProductApprovalV2Service } from './product-approval-v2.service.js';
 import { OrganizationProductListing } from '../../routes/kpa/entities/organization-product-listing.entity.js';
-import { NetureSupplierProduct } from '../neture/entities/NetureSupplierProduct.entity.js';
+import { SupplierProductOffer } from '../neture/entities/SupplierProductOffer.entity.js';
 import { ProductApproval } from '../../entities/ProductApproval.js';
 import logger from '../../utils/logger.js';
 
@@ -68,25 +69,25 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   // ========================================================================
   router.post('/service-approval', async (req: Request, res: Response) => {
     try {
-      const { productId, organizationId, serviceKey, requestedBy } = req.body;
+      const { offerId, organizationId, serviceKey, requestedBy } = req.body;
 
-      if (!productId || !organizationId) {
+      if (!offerId || !organizationId) {
         res.status(400).json({
           success: false,
-          error: 'productId and organizationId are required',
+          error: 'offerId and organizationId are required',
         });
         return;
       }
 
       const result = await service.createServiceApproval(
-        productId,
+        offerId,
         organizationId,
         serviceKey || 'kpa',
         requestedBy || 'internal-test',
       );
 
       logger.info('[v2-internal] createServiceApproval:', {
-        productId,
+        offerId,
         organizationId,
         success: result.success,
         error: result.error,
@@ -148,24 +149,24 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   // ========================================================================
   router.post('/private-approval', async (req: Request, res: Response) => {
     try {
-      const { productId, sellerOrgId, serviceKey } = req.body;
+      const { offerId, sellerOrgId, serviceKey } = req.body;
 
-      if (!productId || !sellerOrgId) {
+      if (!offerId || !sellerOrgId) {
         res.status(400).json({
           success: false,
-          error: 'productId and sellerOrgId are required',
+          error: 'offerId and sellerOrgId are required',
         });
         return;
       }
 
       const result = await service.createPrivateApproval(
-        productId,
+        offerId,
         sellerOrgId,
         serviceKey || 'kpa',
       );
 
       logger.info('[v2-internal] createPrivateApproval:', {
-        productId,
+        offerId,
         sellerOrgId,
         success: result.success,
         error: result.error,
@@ -223,25 +224,25 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   });
 
   // ========================================================================
-  // GET /listings — product_id 기반 Listing 조회
+  // GET /listings — offer_id 기반 Listing 조회
   // ========================================================================
   router.get('/listings', async (req: Request, res: Response) => {
     try {
-      const { productId, organizationId, serviceKey } = req.query;
+      const { offerId, organizationId, serviceKey } = req.query;
 
-      if (!productId) {
+      if (!offerId) {
         res.status(400).json({
           success: false,
-          error: 'productId query parameter is required',
+          error: 'offerId query parameter is required',
         });
         return;
       }
 
       const listingRepo = dataSource.getRepository(OrganizationProductListing);
 
-      // product_id 기반 조회
+      // offer_id 기반 조회
       const where: Record<string, any> = {
-        product_id: productId as string,
+        offer_id: offerId as string,
       };
       if (organizationId) where.organization_id = organizationId as string;
       if (serviceKey) where.service_key = serviceKey as string;
@@ -252,7 +253,7 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
       });
 
       logger.info('[v2-internal] listings query:', {
-        productId,
+        offerId,
         organizationId,
         serviceKey,
         count: listings.length,
@@ -270,35 +271,37 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   });
 
   // ========================================================================
-  // GET /products — 테스트용 제품 조회 (distribution_type별)
+  // GET /products — 테스트용 Offer 조회 (distribution_type별)
   // ========================================================================
   router.get('/products', async (req: Request, res: Response) => {
     try {
       const { distributionType, limit } = req.query;
-      const productRepo = dataSource.getRepository(NetureSupplierProduct);
+      const offerRepo = dataSource.getRepository(SupplierProductOffer);
 
-      const qb = productRepo.createQueryBuilder('p')
-        .where('p.isActive = :active', { active: true })
-        .orderBy('p.createdAt', 'DESC')
+      const qb = offerRepo.createQueryBuilder('o')
+        .leftJoinAndSelect('o.master', 'master')
+        .where('o.isActive = :active', { active: true })
+        .orderBy('o.createdAt', 'DESC')
         .take(Number(limit) || 5);
 
       if (distributionType) {
-        qb.andWhere('p.distributionType = :dt', { dt: distributionType as string });
+        qb.andWhere('o.distributionType = :dt', { dt: distributionType as string });
       }
 
-      const products = await qb.getMany();
+      const offers = await qb.getMany();
 
       res.json({
         success: true,
-        data: products.map(p => ({
-          id: p.id,
-          name: p.name,
-          supplierId: p.supplierId,
-          distributionType: p.distributionType,
-          isActive: p.isActive,
-          allowedSellerIds: p.allowedSellerIds,
+        data: offers.map(o => ({
+          id: o.id,
+          masterId: o.masterId,
+          masterName: o.master?.marketingName ?? null,
+          supplierId: o.supplierId,
+          distributionType: o.distributionType,
+          isActive: o.isActive,
+          allowedSellerIds: o.allowedSellerIds,
         })),
-        count: products.length,
+        count: offers.length,
       });
     } catch (err: any) {
       logger.error('[v2-internal] products query error:', err);
@@ -307,29 +310,29 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   });
 
   // ========================================================================
-  // PATCH /products/:id — 테스트용 제품 distributionType/allowedSellerIds 변경
+  // PATCH /products/:id — 테스트용 Offer distributionType/allowedSellerIds 변경
   // ========================================================================
   router.patch('/products/:id', async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const { distributionType, allowedSellerIds } = req.body;
-      const productRepo = dataSource.getRepository(NetureSupplierProduct);
+      const offerRepo = dataSource.getRepository(SupplierProductOffer);
 
-      const product = await productRepo.findOne({ where: { id } });
-      if (!product) {
+      const offer = await offerRepo.findOne({ where: { id } });
+      if (!offer) {
         res.status(404).json({ success: false, error: 'PRODUCT_NOT_FOUND' });
         return;
       }
 
-      if (distributionType) product.distributionType = distributionType;
-      if (allowedSellerIds !== undefined) product.allowedSellerIds = allowedSellerIds;
+      if (distributionType) offer.distributionType = distributionType;
+      if (allowedSellerIds !== undefined) offer.allowedSellerIds = allowedSellerIds;
 
-      const saved = await productRepo.save(product);
+      const saved = await offerRepo.save(offer);
       res.json({
         success: true,
         data: {
           id: saved.id,
-          name: saved.name,
+          masterId: saved.masterId,
           distributionType: saved.distributionType,
           allowedSellerIds: saved.allowedSellerIds,
           isActive: saved.isActive,
@@ -346,11 +349,11 @@ export function createProductPolicyV2InternalRouter(dataSource: DataSource): Rou
   // ========================================================================
   router.get('/approvals', async (req: Request, res: Response) => {
     try {
-      const { productId, organizationId, status } = req.query;
+      const { offerId, organizationId, status } = req.query;
       const approvalRepo = dataSource.getRepository(ProductApproval);
 
       const where: Record<string, any> = {};
-      if (productId) where.product_id = productId as string;
+      if (offerId) where.offer_id = offerId as string;
       if (organizationId) where.organization_id = organizationId as string;
       if (status) where.approval_status = status as string;
 

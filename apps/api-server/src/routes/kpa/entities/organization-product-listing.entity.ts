@@ -3,6 +3,7 @@
  * 약국 매장 진열 상품
  *
  * WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1
+ * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: product_id → master_id + offer_id
  */
 
 import {
@@ -16,7 +17,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 import type { OrganizationStore } from './organization-store.entity.js';
-import type { NetureSupplierProduct } from '../../../modules/neture/entities/NetureSupplierProduct.entity.js';
+import type { ProductMaster } from '../../../modules/neture/entities/ProductMaster.entity.js';
+import type { SupplierProductOffer } from '../../../modules/neture/entities/SupplierProductOffer.entity.js';
 
 @Entity('organization_product_listings')
 @Index('IDX_org_product_listing_org_id', ['organization_id'])
@@ -35,26 +37,25 @@ export class OrganizationProductListing {
   @Column({ type: 'varchar', length: 50, default: 'kpa' })
   service_key: string;
 
-  @Column({ type: 'varchar', length: 300 })
-  product_name: string;
-
-  @Column({ type: 'jsonb', default: '{}' })
-  product_metadata: Record<string, unknown>;
-
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 
-  @Column({ type: 'int', default: 0 })
-  display_order: number;
+  @Column({ name: 'master_id', type: 'uuid' })
+  master_id: string;
 
-  // WO-PRODUCT-POLICY-V2-LISTING-EXTERNAL-ID-REMOVAL-V1: NOT NULL confirmed
-  @Column({ type: 'uuid' })
-  product_id: string;
+  @ManyToOne('ProductMaster')
+  @JoinColumn({ name: 'master_id' })
+  master?: ProductMaster;
 
-  // ESM §4: string-based relation
-  @ManyToOne('NetureSupplierProduct')
-  @JoinColumn({ name: 'product_id' })
-  product?: NetureSupplierProduct;
+  @Column({ name: 'offer_id', type: 'uuid' })
+  offer_id: string;
+
+  @ManyToOne('SupplierProductOffer', { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'offer_id' })
+  offer?: SupplierProductOffer;
+
+  @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true })
+  price: number | null;
 
   @CreateDateColumn()
   created_at: Date;

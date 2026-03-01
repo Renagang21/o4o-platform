@@ -83,8 +83,8 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
       const pendingRows = await AppDataSource.query(
         `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'`,
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'`,
         [supplierId],
       );
       const count = pendingRows[0]?.cnt ?? 0;
@@ -158,7 +158,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       let activated = 0;
       for (const product of inactive.slice(0, 5)) {
         try {
-          await netureService.updateSupplierProduct(product.id, supplierId, { isActive: true });
+          await netureService.updateSupplierOffer(product.id, supplierId, { isActive: true });
           activated++;
         } catch {
           // Skip individual failures

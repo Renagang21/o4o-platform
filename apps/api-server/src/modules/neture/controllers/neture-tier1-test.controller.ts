@@ -2,8 +2,9 @@
  * Neture Tier1 JSON Test Center
  *
  * WO-NETURE-TIER1-PUBLIC-JSON-TEST-CENTER-V1
+ * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: SupplierProductOffer 구조 반영
  *
- * Admin-only test endpoints for verifying PUBLIC product
+ * Admin-only test endpoints for verifying PUBLIC offer
  * approval → auto-expand → listing → supplier cascade flow.
  * NOT for production use.
  *
@@ -15,7 +16,7 @@ import type { Request, Response, RequestHandler, Router as ExpressRouter } from 
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
 import type { NetureService } from '../neture.service.js';
-import { SupplierStatus, DistributionType } from '../entities/index.js';
+import { SupplierStatus, OfferDistributionType } from '../entities/index.js';
 
 type AuthenticatedRequest = Request & {
   user?: {
@@ -37,7 +38,7 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
   const adminGuard = requireNetureScope('neture:admin');
 
   // ============================================================================
-  // POST /__test__/tier1/create — Create test PUBLIC product
+  // POST /__test__/tier1/create — Create test PUBLIC offer (requires existing master)
   // ============================================================================
   router.post('/__test__/tier1/create', requireAuth, adminGuard, async (req: Request, res: Response) => {
     try {
@@ -62,40 +63,43 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
         supplierId = rows[0].id;
       }
 
-      const testName = req.body?.name || `[TEST] PUBLIC Product ${Date.now()}`;
+      const masterId = req.body?.masterId;
+      if (!masterId) {
+        return res.status(400).json({
+          success: false,
+          error: { code: 'MISSING_MASTER_ID', message: 'masterId is required' },
+        });
+      }
 
-      const result = await netureService.createSupplierProduct(supplierId, {
-        name: testName,
-        category: 'test',
-        description: 'Tier1 JSON Test Center auto-created product',
-        distributionType: DistributionType.PUBLIC,
-        acceptsApplications: false,
+      const result = await netureService.createSupplierOffer(supplierId, {
+        masterId,
+        distributionType: OfferDistributionType.PUBLIC,
       });
 
       if (!result.success) {
         return res.status(400).json({ success: false, error: { code: result.error } });
       }
 
-      logger.info(`[Tier1Test] Created test product ${result.data?.id} via ${adminUserId}`);
+      logger.info(`[Tier1Test] Created test offer ${result.data?.id} via ${adminUserId}`);
       return res.status(201).json({ success: true, data: result.data });
     } catch (error) {
-      logger.error('[Tier1Test] Error creating test product:', error);
+      logger.error('[Tier1Test] Error creating test offer:', error);
       return res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
     }
   });
 
   // ============================================================================
-  // POST /__test__/tier1/approve/:productId — Approve and verify auto-expand
+  // POST /__test__/tier1/approve/:offerId — Approve and verify auto-expand
   // ============================================================================
-  router.post('/__test__/tier1/approve/:productId', requireAuth, adminGuard, async (req: Request, res: Response) => {
+  router.post('/__test__/tier1/approve/:offerId', requireAuth, adminGuard, async (req: Request, res: Response) => {
     try {
       const adminUserId = (req as AuthenticatedRequest).user?.id;
       if (!adminUserId) {
         return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
       }
 
-      const { productId } = req.params;
-      const result = await netureService.approveProduct(productId, adminUserId);
+      const { offerId } = req.params;
+      const result = await netureService.approveProduct(offerId, adminUserId);
 
       if (!result.success) {
         const status = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
@@ -108,11 +112,11 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
            COUNT(*)::int AS total_listings,
            COUNT(DISTINCT organization_id)::int AS active_org_count
          FROM organization_product_listings
-         WHERE product_id = $1`,
-        [productId],
+         WHERE offer_id = $1`,
+        [offerId],
       );
 
-      logger.info(`[Tier1Test] Approved product ${productId}, listings: ${listingStats[0]?.total_listings}`);
+      logger.info(`[Tier1Test] Approved offer ${offerId}, listings: ${listingStats[0]?.total_listings}`);
 
       return res.json({
         success: true,
@@ -124,30 +128,29 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
         },
       });
     } catch (error) {
-      logger.error('[Tier1Test] Error approving test product:', error);
+      logger.error('[Tier1Test] Error approving test offer:', error);
       return res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR' } });
     }
   });
 
   // ============================================================================
-  // GET /__test__/tier1/listings/:productId — Check listing state
+  // GET /__test__/tier1/listings/:offerId — Check listing state
   // ============================================================================
-  router.get('/__test__/tier1/listings/:productId', requireAuth, adminGuard, async (req: Request, res: Response) => {
+  router.get('/__test__/tier1/listings/:offerId', requireAuth, adminGuard, async (req: Request, res: Response) => {
     try {
-      const { productId } = req.params;
+      const { offerId } = req.params;
 
       const rows = await dataSource.query(
         `SELECT
            id,
            organization_id,
            service_key,
-           product_name,
            is_active,
            created_at
          FROM organization_product_listings
-         WHERE product_id = $1
+         WHERE offer_id = $1
          ORDER BY created_at ASC`,
-        [productId],
+        [offerId],
       );
 
       const activeListings = rows.filter((r: { is_active: boolean }) => r.is_active).length;
@@ -188,16 +191,16 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
       const [approvalStats] = await dataSource.query(
         `SELECT COUNT(*)::int AS revoked_count
          FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_status = 'revoked'`,
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_status = 'revoked'`,
         [supplierId],
       );
 
       const [listingStats] = await dataSource.query(
         `SELECT COUNT(*)::int AS disabled_count
          FROM organization_product_listings opl
-         JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
-         WHERE nsp.supplier_id = $1 AND opl.is_active = false`,
+         JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+         WHERE spo.supplier_id = $1 AND opl.is_active = false`,
         [supplierId],
       );
 
@@ -218,40 +221,37 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
   });
 
   // ============================================================================
-  // GET /__test__/tier1/hub-kpi/:productId — Hub KPI snapshot for one product
+  // GET /__test__/tier1/hub-kpi/:offerId — Hub KPI snapshot for one offer
   // ============================================================================
-  router.get('/__test__/tier1/hub-kpi/:productId', requireAuth, adminGuard, async (req: Request, res: Response) => {
+  router.get('/__test__/tier1/hub-kpi/:offerId', requireAuth, adminGuard, async (req: Request, res: Response) => {
     try {
-      const { productId } = req.params;
+      const { offerId } = req.params;
 
-      // PUBLIC listing count for this product
       const [listingStat] = await dataSource.query(
         `SELECT COUNT(*)::int AS listing_count
          FROM organization_product_listings
-         WHERE product_id = $1`,
-        [productId],
+         WHERE offer_id = $1`,
+        [offerId],
       );
 
-      // How many distinct orgs have this product (any listing)
       const [orgStat] = await dataSource.query(
         `SELECT COUNT(DISTINCT organization_id)::int AS active_orgs
          FROM organization_product_listings
-         WHERE product_id = $1`,
-        [productId],
+         WHERE offer_id = $1`,
+        [offerId],
       );
 
-      // Total PUBLIC products in neture_supplier_products (simple KPI counter)
       const [publicStat] = await dataSource.query(
-        `SELECT COUNT(*)::int AS public_product_count
-         FROM neture_supplier_products
+        `SELECT COUNT(*)::int AS public_offer_count
+         FROM supplier_product_offers
          WHERE distribution_type = 'PUBLIC' AND approval_status = 'APPROVED'`,
       );
 
       return res.json({
         success: true,
         data: {
-          productId,
-          publicProductCount: publicStat?.public_product_count ?? 0,
+          offerId,
+          publicOfferCount: publicStat?.public_offer_count ?? 0,
           listingCount: listingStat?.listing_count ?? 0,
           activeOrgs: orgStat?.active_orgs ?? 0,
         },

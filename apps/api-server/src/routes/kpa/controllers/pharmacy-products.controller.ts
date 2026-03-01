@@ -56,7 +56,7 @@ export function createPharmacyProductsController(
 
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
-  // neture_supplier_products (PUBLIC + active) + 내 신청/진열 상태 조인
+  // supplier_product_offers (PUBLIC + active) + 내 신청/진열 상태 조인
   router.get('/catalog', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const category = req.query.category as string | undefined;
@@ -67,20 +67,19 @@ export function createPharmacyProductsController(
     const params: any[] = [organizationId, limit, offset];
 
     if (category) {
-      categoryFilter = `AND sp.category = $4`;
+      categoryFilter = `AND pm.brand_name = $4`;
       params.push(category);
     }
 
     const rows = await dataSource.query(
       `SELECT
-         sp.id AS "id",
-         sp.name AS "name",
-         sp.category AS "category",
-         sp.description AS "description",
-         sp.purpose AS "purpose",
-         sp.distribution_type AS "distributionType",
-         sp.created_at AS "createdAt",
-         sp.updated_at AS "updatedAt",
+         spo.id AS "id",
+         pm.marketing_name AS "name",
+         pm.brand_name AS "category",
+         '' AS "description",
+         spo.distribution_type AS "distributionType",
+         spo.created_at AS "createdAt",
+         spo.updated_at AS "updatedAt",
          s.id AS "supplierId",
          s.name AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
@@ -89,27 +88,28 @@ export function createPharmacyProductsController(
          (EXISTS(
            SELECT 1 FROM product_approvals pa2
            WHERE pa2.organization_id = $1
-             AND pa2.product_id = sp.id
+             AND pa2.offer_id = spo.id
              AND pa2.approval_status IN ('pending','approved')
          )) AS "isApplied",
          (EXISTS(
            SELECT 1 FROM product_approvals pa2
            WHERE pa2.organization_id = $1
-             AND pa2.product_id = sp.id
+             AND pa2.offer_id = spo.id
              AND pa2.approval_status = 'approved'
          )) AS "isApproved",
          (EXISTS(
            SELECT 1 FROM organization_product_listings opl
            WHERE opl.organization_id = $1
-             AND opl.product_id = sp.id
+             AND opl.offer_id = spo.id
          )) AS "isListed"
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
-       WHERE sp.distribution_type IN ('PUBLIC', 'SERVICE')
-         AND sp.is_active = true
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
+       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
+         AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${categoryFilter}
-       ORDER BY sp.updated_at DESC
+       ORDER BY spo.updated_at DESC
        LIMIT $2 OFFSET $3`,
       params,
     );
@@ -118,16 +118,17 @@ export function createPharmacyProductsController(
     const countParams: any[] = [];
     let countCategoryFilter = '';
     if (category) {
-      countCategoryFilter = `AND sp.category = $1`;
+      countCategoryFilter = `AND pm.brand_name = $1`;
       countParams.push(category);
     }
 
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS total
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
-       WHERE sp.distribution_type IN ('PUBLIC', 'SERVICE')
-         AND sp.is_active = true
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
+       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
+         AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}`,
       countParams,
@@ -180,8 +181,8 @@ export function createPharmacyProductsController(
     const offsetIdx = baseParams.length + 2;
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
-              pa.product_id,
-              nsp.name AS product_name,
+              pa.offer_id,
+              pm.marketing_name AS product_name,
               pa.metadata AS product_metadata,
               pa.approval_status AS status,
               pa.reason AS reject_reason,
@@ -191,7 +192,8 @@ export function createPharmacyProductsController(
               pa.decided_at AS reviewed_at,
               pa.created_at, pa.updated_at
        FROM product_approvals pa
-       LEFT JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       LEFT JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
        WHERE pa.organization_id = $1 AND pa.service_key = $2 ${statusFilter}
        ORDER BY pa.created_at DESC
        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
@@ -215,8 +217,8 @@ export function createPharmacyProductsController(
 
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
-              pa.product_id,
-              nsp.name AS product_name,
+              pa.offer_id,
+              pm.marketing_name AS product_name,
               pa.metadata AS product_metadata,
               pa.approval_status AS status,
               pa.reason AS reject_reason,
@@ -226,7 +228,8 @@ export function createPharmacyProductsController(
               pa.decided_at AS reviewed_at,
               pa.created_at, pa.updated_at
        FROM product_approvals pa
-       LEFT JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+       LEFT JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
        WHERE pa.organization_id = $1
          AND pa.service_key = $2
          AND pa.approval_status = 'approved'
@@ -258,7 +261,7 @@ export function createPharmacyProductsController(
 
     const listings = await listingRepo.find({
       where,
-      order: { display_order: 'ASC', created_at: 'DESC' },
+      order: { created_at: 'DESC' },
     });
 
     res.json({ success: true, data: listings });
@@ -283,10 +286,9 @@ export function createPharmacyProductsController(
       return;
     }
 
-    const { isActive, displayOrder } = req.body;
+    const { isActive } = req.body;
 
     if (isActive !== undefined) listing.is_active = isActive;
-    if (displayOrder !== undefined) listing.display_order = displayOrder;
 
     const updated = await listingRepo.save(listing);
 
@@ -298,7 +300,7 @@ export function createPharmacyProductsController(
         action_type: 'CONTENT_UPDATED' as any,
         target_type: 'content' as any,
         target_id: updated.id,
-        metadata: { action: 'listing_updated', changes: { isActive, displayOrder } },
+        metadata: { action: 'listing_updated', changes: { isActive } },
       });
       await auditRepo.save(log);
     } catch (e) {

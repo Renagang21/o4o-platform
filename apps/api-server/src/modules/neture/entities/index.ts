@@ -1,5 +1,6 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
-export { NetureSupplierProduct, ProductPurpose, DistributionType, ProductApprovalStatus } from './NetureSupplierProduct.entity.js';
+export { ProductMaster } from './ProductMaster.entity.js';
+export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 export { NetureSupplierContent, ContentType, ContentStatus } from './NetureSupplierContent.entity.js';
@@ -8,5 +9,3 @@ export { NeturePartnerDashboardItemContent, type ContentSource } from './NetureP
 export { NeturePartnerRecruitment, RecruitmentStatus } from './NeturePartnerRecruitment.entity.js';
 export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerApplication.entity.js';
 export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } from './NetureSellerPartnerContract.entity.js';
-export { NetureTimeLimitedPriceCampaign, CampaignStatus } from './NetureTimeLimitedPriceCampaign.entity.js';
-export { NetureCampaignAggregation } from './NetureCampaignAggregation.entity.js';

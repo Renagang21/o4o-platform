@@ -488,76 +488,55 @@ export class NetureService {
   ): Promise<OrderDto> {
     // 1. B2B 공급자 상품 조회 (supplier 관계 포함)
     const productIds = data.items.map((item) => item.product_id);
-    const supplierProducts = await this.repository.findSupplierProductsByIds(productIds);
+    const supplierProducts = await this.repository.findSupplierOffersByIds(productIds);
 
     const productMap = new Map(supplierProducts.map((p) => [p.id, p]));
-
-    // 1-B. 활성 캠페인 조회 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: campaign = product 직접)
-    const activeCampaigns = await this.repository.findActiveCampaignsByProducts(productIds);
-    const campaignMap = new Map<string, { campaignId: string; campaignPrice: number }>();
-    for (const c of activeCampaigns) {
-      campaignMap.set(c.productId, {
-        campaignId: c.id,
-        campaignPrice: c.campaignPrice,
-      });
-    }
 
     // 2. 검증 게이트 + 서버 가격 계산
     let totalAmount = 0;
     const orderItems: Partial<NetureOrderItem>[] = [];
-    const campaignHits: { campaignId: string; productId: string; organizationId: string | null; quantity: number; amount: number }[] = [];
 
     for (const item of data.items) {
-      const product = productMap.get(item.product_id);
-      if (!product) {
+      const offer = productMap.get(item.product_id);
+      if (!offer) {
         throw new Error(`Product not found: ${item.product_id}`);
       }
 
+      const productName = offer.master?.marketingName || '';
+
       // Gate 1: 상품 활성 상태
-      if (!product.isActive) {
-        throw new Error(`Product is not active: ${product.name}`);
+      if (!offer.isActive) {
+        throw new Error(`Product is not active: ${productName}`);
       }
 
       // Gate 2: 상품 승인 상태
-      if (product.approvalStatus !== 'APPROVED') {
-        throw new Error(`Product is not approved: ${product.name}`);
+      if (offer.approvalStatus !== 'APPROVED') {
+        throw new Error(`Product is not approved: ${productName}`);
       }
 
       // Gate 3: 공급자 활성 상태
-      if (!product.supplier || product.supplier.status !== 'ACTIVE') {
-        throw new Error(`Supplier is not active for product: ${product.name}`);
+      if (!offer.supplier || offer.supplier.status !== 'ACTIVE') {
+        throw new Error(`Supplier is not active for product: ${productName}`);
       }
 
-      // 가격 결정: 캠페인 가격 > 기본 가격 (서버 강제, 클라이언트 가격 절대 사용 금지)
-      const campaignHit = campaignMap.get(product.id);
-      const unitPrice = campaignHit ? campaignHit.campaignPrice : product.priceGeneral;
+      // 가격 결정 (서버 강제, 클라이언트 가격 절대 사용 금지)
+      const unitPrice = offer.priceGeneral;
       if (unitPrice <= 0) {
-        throw new Error(`Invalid price for product: ${product.name}`);
+        throw new Error(`Invalid price for product: ${productName}`);
       }
 
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
       orderItems.push({
-        productId: product.id,
-        productName: product.name,
+        productId: offer.id,
+        productName,
         productImage: null,
         quantity: item.quantity,
         unitPrice,
         totalPrice: itemTotal,
         options: item.options,
       });
-
-      // 캠페인 집계 대상 기록
-      if (campaignHit) {
-        campaignHits.push({
-          campaignId: campaignHit.campaignId,
-          productId: product.id,
-          organizationId: organizationId || null,
-          quantity: item.quantity,
-          amount: itemTotal,
-        });
-      }
     }
 
     // 3. 배송비 계산 (5만원 이상 무료배송)
@@ -589,15 +568,6 @@ export class NetureService {
     }));
     const savedItems = await this.repository.createOrderItems(itemsWithOrderId);
     order.items = savedItems;
-
-    // 6. 캠페인 집계 increment (fire-and-forget, 주문 실패 아님)
-    for (const hit of campaignHits) {
-      try {
-        await this.repository.incrementCampaignAggregation(hit);
-      } catch (e) {
-        console.error('[Campaign Aggregation] Failed to increment:', e);
-      }
-    }
 
     return this.toOrderDto(order);
   }

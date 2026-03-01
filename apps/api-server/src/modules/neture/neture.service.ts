@@ -2,7 +2,10 @@ import { In, Repository } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
 import {
   NetureSupplier,
-  NetureSupplierProduct,
+  ProductMaster,
+  SupplierProductOffer,
+  OfferDistributionType,
+  OfferApprovalStatus,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
   NetureSupplierContent,
@@ -16,15 +19,9 @@ import {
   PartnershipStatus,
   RecruitmentStatus,
   ApplicationStatus,
-  ProductPurpose,
-  DistributionType,
-  ProductApprovalStatus,
   ContentType,
   ContentStatus,
   ContactVisibility,
-  NetureTimeLimitedPriceCampaign,
-  CampaignStatus,
-  NetureCampaignAggregation,
 } from './entities/index.js';
 import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
@@ -33,7 +30,7 @@ import { autoExpandPublicProduct } from '../../utils/auto-listing.utils.js';
 export class NetureService {
   // Lazy initialization: repositories are created on first access
   private _supplierRepo?: Repository<NetureSupplier>;
-  private _productRepo?: Repository<NetureSupplierProduct>;
+  private _offerRepo?: Repository<SupplierProductOffer>;
   private _partnershipRepo?: Repository<NeturePartnershipRequest>;
   private _partnershipProductRepo?: Repository<NeturePartnershipProduct>;
   private _contentRepo?: Repository<NetureSupplierContent>;
@@ -48,11 +45,11 @@ export class NetureService {
     return this._supplierRepo;
   }
 
-  private get productRepo(): Repository<NetureSupplierProduct> {
-    if (!this._productRepo) {
-      this._productRepo = AppDataSource.getRepository(NetureSupplierProduct);
+  private get offerRepo(): Repository<SupplierProductOffer> {
+    if (!this._offerRepo) {
+      this._offerRepo = AppDataSource.getRepository(SupplierProductOffer);
     }
-    return this._productRepo;
+    return this._offerRepo;
   }
 
   private get partnershipRepo(): Repository<NeturePartnershipRequest> {
@@ -372,8 +369,8 @@ export class NetureService {
              decided_at = NOW(),
              reason = 'Supplier deactivated',
              updated_at = NOW()
-         WHERE product_id IN (
-           SELECT id FROM neture_supplier_products WHERE supplier_id = $1
+         WHERE offer_id IN (
+           SELECT id FROM supplier_product_offers WHERE supplier_id = $1
          )
          AND approval_status = 'approved'`,
         [supplierId, adminUserId],
@@ -383,8 +380,8 @@ export class NetureService {
       await AppDataSource.query(
         `UPDATE organization_product_listings
          SET is_active = false, updated_at = NOW()
-         WHERE product_id IN (
-           SELECT id FROM neture_supplier_products WHERE supplier_id = $1
+         WHERE offer_id IN (
+           SELECT id FROM supplier_product_offers WHERE supplier_id = $1
          )`,
         [supplierId],
       );
@@ -458,25 +455,26 @@ export class NetureService {
   /**
    * GET /admin/products/pending — 승인 대기 상품 목록
    */
-  async getPendingProducts(): Promise<Array<{ id: string; name: string; supplierName: string; supplierId: string; distributionType: DistributionType; createdAt: Date; approvalStatus: ProductApprovalStatus }>> {
+  async getPendingProducts(): Promise<Array<{ id: string; supplierName: string; supplierId: string; distributionType: OfferDistributionType; createdAt: Date; approvalStatus: OfferApprovalStatus }>> {
     try {
-      const products = await this.productRepo.find({
-        where: { approvalStatus: ProductApprovalStatus.PENDING },
-        relations: ['supplier'],
+      const offers = await this.offerRepo.find({
+        where: { approvalStatus: OfferApprovalStatus.PENDING },
+        relations: ['supplier', 'master'],
         order: { createdAt: 'ASC' },
       });
 
-      return products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        supplierName: p.supplier?.name || '',
-        supplierId: p.supplierId,
-        distributionType: p.distributionType,
-        createdAt: p.createdAt,
-        approvalStatus: p.approvalStatus,
+      return offers.map((o) => ({
+        id: o.id,
+        masterId: o.masterId,
+        masterName: o.master?.marketingName || '',
+        supplierName: o.supplier?.name || '',
+        supplierId: o.supplierId,
+        distributionType: o.distributionType,
+        createdAt: o.createdAt,
+        approvalStatus: o.approvalStatus,
       }));
     } catch (error) {
-      logger.error('[NetureService] Error fetching pending products:', error);
+      logger.error('[NetureService] Error fetching pending offers:', error);
       throw error;
     }
   }
@@ -486,43 +484,43 @@ export class NetureService {
    * WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: PUBLIC 상품은 승인 시 모든 활성 조직에 자동 listing
    */
   async approveProduct(
-    productId: string,
+    offerId: string,
     adminUserId: string,
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     try {
-      const product = await this.productRepo.findOne({ where: { id: productId } });
-      if (!product) {
+      const offer = await this.offerRepo.findOne({ where: { id: offerId } });
+      if (!offer) {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
-      if (product.approvalStatus !== ProductApprovalStatus.PENDING) {
+      if (offer.approvalStatus !== OfferApprovalStatus.PENDING) {
         return { success: false, error: 'INVALID_APPROVAL_STATUS' };
       }
 
-      // 트랜잭션: 상품 승인 + PUBLIC 자동 확산 (원자적)
+      // 트랜잭션: Offer 승인 + PUBLIC 자동 확산 (원자적)
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        product.approvalStatus = ProductApprovalStatus.APPROVED;
-        product.isActive = true;
-        await queryRunner.manager.save(product);
+        offer.approvalStatus = OfferApprovalStatus.APPROVED;
+        offer.isActive = true;
+        await queryRunner.manager.save(offer);
 
         // Tier 1 (PUBLIC) 자동 확산: 모든 활성 조직에 listing 생성
         let autoListedCount = 0;
-        if (product.distributionType === DistributionType.PUBLIC) {
-          autoListedCount = await autoExpandPublicProduct(queryRunner, productId, product.name);
+        if (offer.distributionType === OfferDistributionType.PUBLIC) {
+          autoListedCount = await autoExpandPublicProduct(queryRunner, offerId, offer.masterId);
         }
 
         await queryRunner.commitTransaction();
 
-        logger.info(`[NetureService] Product approved: ${productId} by ${adminUserId} (autoListed: ${autoListedCount})`);
+        logger.info(`[NetureService] Offer approved: ${offerId} by ${adminUserId} (autoListed: ${autoListedCount})`);
 
         return {
           success: true,
           data: {
-            id: product.id,
-            name: product.name,
-            isActive: product.isActive,
-            approvalStatus: product.approvalStatus,
+            id: offer.id,
+            masterId: offer.masterId,
+            isActive: offer.isActive,
+            approvalStatus: offer.approvalStatus,
             autoListedCount,
           },
         };
@@ -533,7 +531,7 @@ export class NetureService {
         await queryRunner.release();
       }
     } catch (error) {
-      logger.error('[NetureService] Error approving product:', error);
+      logger.error('[NetureService] Error approving offer:', error);
       throw error;
     }
   }
@@ -542,51 +540,49 @@ export class NetureService {
    * POST /admin/products/:id/reject — 상품 반려 (isActive 유지 false)
    */
   async rejectProduct(
-    productId: string,
+    offerId: string,
     adminUserId: string,
     reason?: string,
   ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
     try {
-      const product = await this.productRepo.findOne({ where: { id: productId } });
-      if (!product) {
+      const offer = await this.offerRepo.findOne({ where: { id: offerId } });
+      if (!offer) {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
-      if (product.approvalStatus !== ProductApprovalStatus.PENDING) {
+      if (offer.approvalStatus !== OfferApprovalStatus.PENDING) {
         return { success: false, error: 'INVALID_APPROVAL_STATUS' };
       }
 
-      product.approvalStatus = ProductApprovalStatus.REJECTED;
-      product.approvalNote = reason || null;
-      await this.productRepo.save(product);
+      offer.approvalStatus = OfferApprovalStatus.REJECTED;
+      await this.offerRepo.save(offer);
 
-      // WO-NETURE-TIER2-SERVICE-STATE-POLICY-REALIGN-V1: 캐스케이드
-      // Product 반려 → APPROVED approval → REVOKED + listing 비활성화
+      // 캐스케이드: Offer 반려 → APPROVED approval → REVOKED + listing 비활성화
       await AppDataSource.query(
         `UPDATE product_approvals
          SET approval_status = 'revoked',
              decided_by = $2::uuid,
              decided_at = NOW(),
-             reason = 'Product rejected by admin',
+             reason = 'Offer rejected by admin',
              updated_at = NOW()
-         WHERE product_id = $1 AND approval_status = 'approved'`,
-        [productId, adminUserId],
+         WHERE offer_id = $1 AND approval_status = 'approved'`,
+        [offerId, adminUserId],
       );
 
       await AppDataSource.query(
         `UPDATE organization_product_listings
          SET is_active = false, updated_at = NOW()
-         WHERE product_id = $1`,
-        [productId],
+         WHERE offer_id = $1`,
+        [offerId],
       );
 
-      logger.info(`[NetureService] Product rejected with cascade: ${productId} by ${adminUserId}`);
+      logger.info(`[NetureService] Offer rejected with cascade: ${offerId} by ${adminUserId}`);
 
       return {
         success: true,
-        data: { id: product.id, name: product.name, isActive: product.isActive, approvalStatus: product.approvalStatus, approvalNote: product.approvalNote },
+        data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus },
       };
     } catch (error) {
-      logger.error('[NetureService] Error rejecting product:', error);
+      logger.error('[NetureService] Error rejecting offer:', error);
       throw error;
     }
   }
@@ -595,38 +591,38 @@ export class NetureService {
    * GET /admin/products — 전체 상품 목록 (필터)
    */
   async getAllProducts(
-    filters?: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus },
-  ): Promise<Array<{ id: string; name: string; supplierName: string; supplierId: string; category: string; distributionType: DistributionType; isActive: boolean; approvalStatus: ProductApprovalStatus; createdAt: Date }>> {
+    filters?: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus },
+  ) {
     try {
-      const where: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus } = {};
+      const where: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus } = {};
       if (filters?.supplierId) where.supplierId = filters.supplierId;
       if (filters?.distributionType) where.distributionType = filters.distributionType;
       if (filters?.isActive !== undefined) where.isActive = filters.isActive;
       if (filters?.approvalStatus) where.approvalStatus = filters.approvalStatus;
 
-      const products = await this.productRepo.find({
+      const offers = await this.offerRepo.find({
         where,
-        relations: ['supplier'],
+        relations: ['supplier', 'master'],
         order: { createdAt: 'DESC' },
       });
 
-      return products.map((p) => ({
-        id: p.id,
-        name: p.name,
-        supplierName: p.supplier?.name || '',
-        supplierId: p.supplierId,
-        category: p.category || '',
-        distributionType: p.distributionType,
-        isActive: p.isActive,
-        approvalStatus: p.approvalStatus,
-        priceGeneral: p.priceGeneral,
-        priceGold: p.priceGold,
-        pricePlatinum: p.pricePlatinum,
-        consumerReferencePrice: p.consumerReferencePrice,
-        createdAt: p.createdAt,
+      return offers.map((o) => ({
+        id: o.id,
+        masterId: o.masterId,
+        masterName: o.master?.marketingName || '',
+        supplierName: o.supplier?.name || '',
+        supplierId: o.supplierId,
+        distributionType: o.distributionType,
+        isActive: o.isActive,
+        approvalStatus: o.approvalStatus,
+        priceGeneral: o.priceGeneral,
+        priceGold: o.priceGold,
+        pricePlatinum: o.pricePlatinum,
+        consumerReferencePrice: o.consumerReferencePrice,
+        createdAt: o.createdAt,
       }));
     } catch (error) {
-      logger.error('[NetureService] Error fetching all products:', error);
+      logger.error('[NetureService] Error fetching all offers:', error);
       throw error;
     }
   }
@@ -651,8 +647,8 @@ export class NetureService {
     // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
     const [{ count: approvedCount }] = await AppDataSource.query(
       `SELECT COUNT(*)::int AS count FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
       [supplierId],
     );
 
@@ -662,8 +658,8 @@ export class NetureService {
 
     const [{ count: recentCount }] = await AppDataSource.query(
       `SELECT COUNT(*)::int AS count FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
          AND pa.created_at >= $2`,
       [supplierId, thirtyDaysAgo],
     );
@@ -685,7 +681,7 @@ export class NetureService {
     try {
       const query = this.supplierRepo
         .createQueryBuilder('supplier')
-        .leftJoinAndSelect('supplier.products', 'products');
+        .leftJoinAndSelect('supplier.offers', 'products');
 
       // Apply filters
       if (filters?.category) {
@@ -713,7 +709,7 @@ export class NetureService {
             logo: supplier.logoUrl,
             category: supplier.category,
             shortDescription: supplier.shortDescription,
-            productCount: supplier.products?.length || 0,
+            productCount: supplier.offers?.length || 0,
             trustSignals,
           };
         })
@@ -734,8 +730,8 @@ export class NetureService {
     try {
       const [{ count }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.organization_id = $2
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.organization_id = $2
            AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
         [supplierId, viewerId],
       );
@@ -833,11 +829,11 @@ export class NetureService {
         category: supplier.category,
         shortDescription: supplier.shortDescription,
         description: supplier.description,
-        products: supplier.products.map((p) => ({
+        products: supplier.offers.map((p) => ({
           id: p.id,
-          name: p.name,
-          category: p.category,
-          description: p.description,
+          name: p.master?.marketingName || '',
+          category: p.master?.brandName || '',
+          description: '',
         })),
         pricingPolicy: supplier.pricingPolicy,
         moq: supplier.moq,
@@ -995,8 +991,8 @@ export class NetureService {
       // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       const [{ count: pApprovedCount }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
         [supplierId],
       );
       if (pApprovedCount === 0) {
@@ -1008,8 +1004,8 @@ export class NetureService {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const [{ count: pRecentCount }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
            AND pa.created_at >= $2`,
         [supplierId, thirtyDaysAgo],
       );
@@ -1237,57 +1233,52 @@ export class NetureService {
    */
   async getSupplierProducts(supplierId: string) {
     try {
-      const products = await this.productRepo.find({
+      const offers = await this.offerRepo.find({
         where: { supplierId },
+        relations: ['master'],
         order: { createdAt: 'DESC' },
       });
 
-      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
-      const pendingCountRows: Array<{ product_id: string; cnt: number }> = await AppDataSource.query(
-        `SELECT pa.product_id, COUNT(*)::int AS cnt
+      // v2 product_approvals — offer_id 기준
+      const pendingCountRows: Array<{ offer_id: string; cnt: number }> = await AppDataSource.query(
+        `SELECT pa.offer_id, COUNT(*)::int AS cnt
          FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'
-         GROUP BY pa.product_id`,
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'
+         GROUP BY pa.offer_id`,
         [supplierId],
       );
-      const pendingCounts = pendingCountRows.map((r) => ({ productId: r.product_id, count: r.cnt }));
+      const pendingMap = new Map(pendingCountRows.map((r) => [r.offer_id, r.cnt]));
 
-      const pendingMap = new Map(pendingCounts.map((p) => [p.productId, p.count]));
-
-      const serviceCountRows: Array<{ product_id: string; cnt: number }> = await AppDataSource.query(
-        `SELECT pa.product_id, COUNT(DISTINCT pa.service_key)::int AS cnt
+      const serviceCountRows: Array<{ offer_id: string; cnt: number }> = await AppDataSource.query(
+        `SELECT pa.offer_id, COUNT(DISTINCT pa.service_key)::int AS cnt
          FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
-         GROUP BY pa.product_id`,
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         GROUP BY pa.offer_id`,
         [supplierId],
       );
-      const serviceCounts = serviceCountRows.map((r) => ({ productId: r.product_id, count: r.cnt }));
+      const serviceMap = new Map(serviceCountRows.map((r) => [r.offer_id, r.cnt]));
 
-      const serviceMap = new Map(serviceCounts.map((s) => [s.productId, s.count]));
-
-      return products.map((product) => ({
-        id: product.id,
-        name: product.name,
-        category: product.category,
-        description: product.description,
-        purpose: product.purpose,
-        isActive: product.isActive,
-        acceptsApplications: product.acceptsApplications,
-        distributionType: product.distributionType,
-        allowedSellerIds: product.allowedSellerIds,
-        priceGeneral: product.priceGeneral,
-        priceGold: product.priceGold,
-        pricePlatinum: product.pricePlatinum,
-        consumerReferencePrice: product.consumerReferencePrice,
-        pendingRequestCount: pendingMap.get(product.id) || 0,
-        activeServiceCount: serviceMap.get(product.id) || 0,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
+      return offers.map((o) => ({
+        id: o.id,
+        masterId: o.masterId,
+        masterName: o.master?.marketingName || '',
+        isActive: o.isActive,
+        distributionType: o.distributionType,
+        allowedSellerIds: o.allowedSellerIds,
+        approvalStatus: o.approvalStatus,
+        priceGeneral: o.priceGeneral,
+        priceGold: o.priceGold,
+        pricePlatinum: o.pricePlatinum,
+        consumerReferencePrice: o.consumerReferencePrice,
+        pendingRequestCount: pendingMap.get(o.id) || 0,
+        activeServiceCount: serviceMap.get(o.id) || 0,
+        createdAt: o.createdAt,
+        updatedAt: o.updatedAt,
       }));
     } catch (error) {
-      logger.error('[NetureService] Error fetching supplier products:', error);
+      logger.error('[NetureService] Error fetching supplier offers:', error);
       throw error;
     }
   }
@@ -1298,15 +1289,11 @@ export class NetureService {
    * WO-NETURE-SUPPLIER-PRODUCT-CREATE-MINIMUM-V2
    * 기본값: distributionType=PRIVATE, purpose=CATALOG, isActive=true, acceptsApplications=true
    */
-  async createSupplierProduct(
+  async createSupplierOffer(
     supplierId: string,
     data: {
-      name: string;
-      category?: string;
-      description?: string;
-      purpose?: ProductPurpose;
-      distributionType?: DistributionType;
-      acceptsApplications?: boolean;
+      masterId: string;
+      distributionType?: OfferDistributionType;
       priceGeneral?: number;
       priceGold?: number | null;
       pricePlatinum?: number | null;
@@ -1314,8 +1301,8 @@ export class NetureService {
     }
   ) {
     try {
-      if (!data.name || !data.name.trim()) {
-        return { success: false, error: 'MISSING_NAME' };
+      if (!data.masterId) {
+        return { success: false, error: 'MISSING_MASTER_ID' };
       }
 
       // Supplier ACTIVE guard
@@ -1327,16 +1314,12 @@ export class NetureService {
         return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
       }
 
-      const product = this.productRepo.create({
+      const offer = this.offerRepo.create({
         supplierId,
-        name: data.name.trim(),
-        category: data.category || null,
-        description: data.description || null,
-        purpose: data.purpose || ProductPurpose.CATALOG,
-        distributionType: data.distributionType || DistributionType.PRIVATE,
+        masterId: data.masterId,
+        distributionType: data.distributionType || OfferDistributionType.PRIVATE,
         isActive: false,
-        approvalStatus: ProductApprovalStatus.PENDING,
-        acceptsApplications: data.acceptsApplications ?? true,
+        approvalStatus: OfferApprovalStatus.PENDING,
         allowedSellerIds: [],
         priceGeneral: data.priceGeneral ?? 0,
         priceGold: data.priceGold ?? null,
@@ -1344,32 +1327,28 @@ export class NetureService {
         consumerReferencePrice: data.consumerReferencePrice ?? null,
       });
 
-      const savedProduct = await this.productRepo.save(product);
+      const savedOffer = await this.offerRepo.save(offer);
 
-      logger.info(`[NetureService] Created product ${savedProduct.id} by supplier ${supplierId} (PENDING approval)`);
+      logger.info(`[NetureService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${data.masterId} (PENDING approval)`);
 
       return {
         success: true,
         data: {
-          id: savedProduct.id,
-          name: savedProduct.name,
-          category: savedProduct.category,
-          description: savedProduct.description,
-          purpose: savedProduct.purpose,
-          isActive: savedProduct.isActive,
-          approvalStatus: savedProduct.approvalStatus,
-          acceptsApplications: savedProduct.acceptsApplications,
-          distributionType: savedProduct.distributionType,
-          allowedSellerIds: savedProduct.allowedSellerIds,
-          priceGeneral: savedProduct.priceGeneral,
-          priceGold: savedProduct.priceGold,
-          pricePlatinum: savedProduct.pricePlatinum,
-          consumerReferencePrice: savedProduct.consumerReferencePrice,
-          createdAt: savedProduct.createdAt,
+          id: savedOffer.id,
+          masterId: savedOffer.masterId,
+          isActive: savedOffer.isActive,
+          approvalStatus: savedOffer.approvalStatus,
+          distributionType: savedOffer.distributionType,
+          allowedSellerIds: savedOffer.allowedSellerIds,
+          priceGeneral: savedOffer.priceGeneral,
+          priceGold: savedOffer.priceGold,
+          pricePlatinum: savedOffer.pricePlatinum,
+          consumerReferencePrice: savedOffer.consumerReferencePrice,
+          createdAt: savedOffer.createdAt,
         },
       };
     } catch (error) {
-      logger.error('[NetureService] Error creating supplier product:', error);
+      logger.error('[NetureService] Error creating supplier offer:', error);
       throw error;
     }
   }
@@ -1381,13 +1360,12 @@ export class NetureService {
    * - isActive 토글 (활성/비활성)
    * - acceptsApplications 토글 (신청 가능/불가)
    */
-  async updateSupplierProduct(
-    productId: string,
+  async updateSupplierOffer(
+    offerId: string,
     supplierId: string,
     updates: {
       isActive?: boolean;
-      acceptsApplications?: boolean;
-      distributionType?: DistributionType;
+      distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
       priceGold?: number | null;
@@ -1396,70 +1374,65 @@ export class NetureService {
     }
   ) {
     try {
-      const product = await this.productRepo.findOne({
-        where: { id: productId, supplierId },
+      const offer = await this.offerRepo.findOne({
+        where: { id: offerId, supplierId },
       });
 
-      if (!product) {
+      if (!offer) {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
 
       if (updates.isActive !== undefined) {
-        product.isActive = updates.isActive;
-      }
-
-      if (updates.acceptsApplications !== undefined) {
-        product.acceptsApplications = updates.acceptsApplications;
+        offer.isActive = updates.isActive;
       }
 
       if (updates.distributionType !== undefined) {
-        product.distributionType = updates.distributionType;
+        offer.distributionType = updates.distributionType;
       }
 
       if (updates.allowedSellerIds !== undefined) {
-        product.allowedSellerIds = updates.allowedSellerIds;
+        offer.allowedSellerIds = updates.allowedSellerIds;
       }
 
       if (updates.priceGeneral !== undefined) {
-        product.priceGeneral = updates.priceGeneral;
+        offer.priceGeneral = updates.priceGeneral;
       }
       if (updates.priceGold !== undefined) {
-        product.priceGold = updates.priceGold;
+        offer.priceGold = updates.priceGold;
       }
       if (updates.pricePlatinum !== undefined) {
-        product.pricePlatinum = updates.pricePlatinum;
+        offer.pricePlatinum = updates.pricePlatinum;
       }
       if (updates.consumerReferencePrice !== undefined) {
-        product.consumerReferencePrice = updates.consumerReferencePrice;
+        offer.consumerReferencePrice = updates.consumerReferencePrice;
       }
 
       // Validation: PRIVATE requires at least one seller ID
-      if (product.distributionType === DistributionType.PRIVATE &&
-          (!product.allowedSellerIds || product.allowedSellerIds.length === 0)) {
+      if (offer.distributionType === OfferDistributionType.PRIVATE &&
+          (!offer.allowedSellerIds || offer.allowedSellerIds.length === 0)) {
         return { success: false, error: 'PRIVATE_REQUIRES_SELLER_IDS' };
       }
 
-      const savedProduct = await this.productRepo.save(product);
+      const savedOffer = await this.offerRepo.save(offer);
 
-      logger.info(`[NetureService] Updated product ${productId} by supplier ${supplierId}`);
+      logger.info(`[NetureService] Updated offer ${offerId} by supplier ${supplierId}`);
 
       return {
         success: true,
         data: {
-          id: savedProduct.id,
-          isActive: savedProduct.isActive,
-          acceptsApplications: savedProduct.acceptsApplications,
-          distributionType: savedProduct.distributionType,
-          allowedSellerIds: savedProduct.allowedSellerIds,
-          priceGeneral: savedProduct.priceGeneral,
-          priceGold: savedProduct.priceGold,
-          pricePlatinum: savedProduct.pricePlatinum,
-          consumerReferencePrice: savedProduct.consumerReferencePrice,
-          updatedAt: savedProduct.updatedAt,
+          id: savedOffer.id,
+          isActive: savedOffer.isActive,
+          distributionType: savedOffer.distributionType,
+          allowedSellerIds: savedOffer.allowedSellerIds,
+          priceGeneral: savedOffer.priceGeneral,
+          priceGold: savedOffer.priceGold,
+          pricePlatinum: savedOffer.pricePlatinum,
+          consumerReferencePrice: savedOffer.consumerReferencePrice,
+          updatedAt: savedOffer.updatedAt,
         },
       };
     } catch (error) {
-      logger.error('[NetureService] Error updating supplier product:', error);
+      logger.error('[NetureService] Error updating supplier offer:', error);
       throw error;
     }
   }
@@ -1485,8 +1458,8 @@ export class NetureService {
                 COUNT(*)::text AS "approvedCount",
                 MAX(pa.decided_at)::text AS "lastApprovedAt"
          FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-         WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
          GROUP BY pa.service_key`,
         [supplierId],
       );
@@ -1536,8 +1509,8 @@ export class NetureService {
 
           const [{ cnt: pendingCount }] = await AppDataSource.query(
             `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
-             JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-             WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+             JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+             WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
                AND pa.approval_status = 'pending' AND pa.service_key = $2`,
             [supplierId, svc.serviceId],
           );
@@ -1797,23 +1770,23 @@ export class NetureService {
           COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS "approvedRequests",
           COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS "rejectedRequests"
         FROM product_approvals pa
-        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
       `, [supplierId]);
 
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       const [{ count: recentApprovals }] = await AppDataSource.query(`
         SELECT COUNT(*)::int AS count FROM product_approvals pa
-        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
           AND pa.approval_status = 'approved' AND pa.decided_at >= $2
       `, [supplierId, sevenDaysAgo]);
 
       // 제품 통계
-      const products = await this.productRepo.find({ where: { supplierId } });
-      const activeProducts = products.filter((p) => p.isActive).length;
-      const totalProducts = products.length;
+      const offers = await this.offerRepo.find({ where: { supplierId } });
+      const activeProducts = offers.filter((o) => o.isActive).length;
+      const totalProducts = offers.length;
 
       // 콘텐츠 통계
       const totalContents = await this.contentRepo.count({ where: { supplierId } });
@@ -1822,8 +1795,8 @@ export class NetureService {
       // 연결된 서비스 수
       const [{ count: connectedCount }] = await AppDataSource.query(`
         SELECT COUNT(DISTINCT pa.service_key)::int AS count FROM product_approvals pa
-        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
       `, [supplierId]);
 
       // 서비스별 통계
@@ -1833,8 +1806,8 @@ export class NetureService {
           SUM(CASE WHEN pa.approval_status = 'approved' THEN 1 ELSE 0 END)::int AS approved,
           SUM(CASE WHEN pa.approval_status = 'rejected' THEN 1 ELSE 0 END)::int AS rejected
         FROM product_approvals pa
-        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-        WHERE nsp.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
         GROUP BY pa.service_key
       `, [supplierId]);
 
@@ -1880,14 +1853,14 @@ export class NetureService {
         where: { status: SupplierStatus.PENDING },
       });
 
-      // 상품 통계 (WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1)
-      const totalProducts = await this.productRepo.count();
-      const pendingProducts = await this.productRepo.count({
-        where: { approvalStatus: ProductApprovalStatus.PENDING },
+      // Offer 통계 (WO-O4O-PRODUCT-MASTER-CORE-RESET-V1)
+      const totalProducts = await this.offerRepo.count();
+      const pendingProducts = await this.offerRepo.count({
+        where: { approvalStatus: OfferApprovalStatus.PENDING },
       });
-      const publicProducts = await this.productRepo.count({ where: { distributionType: DistributionType.PUBLIC } });
-      const serviceProducts = await this.productRepo.count({ where: { distributionType: DistributionType.SERVICE } });
-      const privateProducts = await this.productRepo.count({ where: { distributionType: DistributionType.PRIVATE } });
+      const publicProducts = await this.offerRepo.count({ where: { distributionType: OfferDistributionType.PUBLIC } });
+      const serviceProducts = await this.offerRepo.count({ where: { distributionType: OfferDistributionType.SERVICE } });
+      const privateProducts = await this.offerRepo.count({ where: { distributionType: OfferDistributionType.PRIVATE } });
 
       // WO-NETURE-DISTRIBUTION-TIER-REALIGN-BETA-V1: 전체 approval 통계 (SERVICE + PRIVATE)
       const [adminReqStats] = await AppDataSource.query(`
@@ -1927,10 +1900,10 @@ export class NetureService {
       // 서비스별 공급자/파트너 통계 (SERVICE + PRIVATE 모두 포함)
       const serviceStats: Array<{ serviceId: string; serviceName: string; suppliers: number; partners: number }> = await AppDataSource.query(`
         SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
-          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN nsp.supplier_id END)::int AS suppliers,
+          COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN spo.supplier_id END)::int AS suppliers,
           COUNT(DISTINCT CASE WHEN pa.approval_status = 'approved' THEN pa.organization_id END)::int AS partners
         FROM product_approvals pa
-        JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
         GROUP BY pa.service_key
       `);
 
@@ -2107,30 +2080,29 @@ export class NetureService {
    */
   async getOperatorSupplyProducts(operatorUserId: string) {
     try {
-      // 1. 활성 PUBLIC + SERVICE 공급자 제품 조회 (Tier 1 + Tier 2)
-      const allProducts = await this.productRepo.find({
-        where: { isActive: true, distributionType: In([DistributionType.PUBLIC, DistributionType.SERVICE]) },
-        relations: ['supplier'],
+      // 1. 활성 PUBLIC + SERVICE Offer 조회 (Tier 1 + Tier 2)
+      const allOffers = await this.offerRepo.find({
+        where: { isActive: true, distributionType: In([OfferDistributionType.PUBLIC, OfferDistributionType.SERVICE]) },
+        relations: ['supplier', 'master'],
         order: { createdAt: 'DESC' },
       });
 
       // Supplier ACTIVE 검증 (Tier 공통)
-      const products = allProducts.filter((p) => p.supplier?.status === SupplierStatus.ACTIVE);
+      const activeOffers = allOffers.filter((o) => o.supplier?.status === SupplierStatus.ACTIVE);
 
-      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
-      const myApprovals: Array<{ product_id: string; supplier_id: string; status: string; id: string; reason: string | null }> = await AppDataSource.query(
-        `SELECT pa.product_id, nsp.supplier_id, pa.approval_status AS status, pa.id, pa.reason
+      // v2 product_approvals — offer_id 기준
+      const myApprovals: Array<{ offer_id: string; supplier_id: string; status: string; id: string; reason: string | null }> = await AppDataSource.query(
+        `SELECT pa.offer_id, spo.supplier_id, pa.approval_status AS status, pa.id, pa.reason
          FROM product_approvals pa
-         JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
         [operatorUserId],
       );
 
-      // 3. productId → 가장 관련성 높은 요청 상태 매핑
-      // 우선순위: pending/approved > rejected (같은 supplier+product)
+      // offerId → 가장 관련성 높은 요청 상태 매핑
       const requestMap = new Map<string, { status: string; requestId: string; rejectReason?: string }>();
       for (const req of myApprovals) {
-        const key = `${req.supplier_id}:${req.product_id}`;
+        const key = `${req.supplier_id}:${req.offer_id}`;
         const existing = requestMap.get(key);
         if (!existing ||
             req.status === 'pending' ||
@@ -2143,18 +2115,17 @@ export class NetureService {
         }
       }
 
-      // 4. 머지하여 반환
-      return products.map((product) => {
-        const key = `${product.supplierId}:${product.id}`;
+      // 머지하여 반환
+      return activeOffers.map((o) => {
+        const key = `${o.supplierId}:${o.id}`;
         const request = requestMap.get(key);
         return {
-          id: product.id,
-          name: product.name,
-          category: product.category || '',
-          description: product.description || '',
-          distributionType: product.distributionType,
-          supplierId: product.supplierId,
-          supplierName: product.supplier?.name || '',
+          id: o.id,
+          masterId: o.masterId,
+          masterName: o.master?.marketingName || '',
+          distributionType: o.distributionType,
+          supplierId: o.supplierId,
+          supplierName: o.supplier?.name || '',
           supplyStatus: request?.status || 'available',
           requestId: request?.requestId || null,
           rejectReason: request?.rejectReason || null,
@@ -2459,33 +2430,33 @@ export class NetureService {
       const [accessibleRows, newThisWeekRows, notRequestedRows] = await Promise.all([
         AppDataSource.query(`
           SELECT COUNT(*)::int AS cnt
-          FROM neture_supplier_products sp
-          WHERE sp.is_active = true
+          FROM supplier_product_offers spo
+          WHERE spo.is_active = true
             AND (
-              sp.distribution_type = 'PUBLIC'
-              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+              spo.distribution_type = 'PUBLIC'
+              OR (spo.distribution_type = 'PRIVATE' AND $1 = ANY(spo.allowed_seller_ids))
             )
         `, [sellerId]),
         AppDataSource.query(`
           SELECT COUNT(*)::int AS cnt
-          FROM neture_supplier_products sp
-          WHERE sp.is_active = true
-            AND sp.created_at >= NOW() - INTERVAL '7 days'
+          FROM supplier_product_offers spo
+          WHERE spo.is_active = true
+            AND spo.created_at >= NOW() - INTERVAL '7 days'
             AND (
-              sp.distribution_type = 'PUBLIC'
-              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+              spo.distribution_type = 'PUBLIC'
+              OR (spo.distribution_type = 'PRIVATE' AND $1 = ANY(spo.allowed_seller_ids))
             )
         `, [sellerId]),
         AppDataSource.query(`
           SELECT COUNT(*)::int AS cnt
-          FROM neture_supplier_products sp
-          WHERE sp.is_active = true
+          FROM supplier_product_offers spo
+          WHERE spo.is_active = true
             AND (
-              sp.distribution_type = 'PUBLIC'
-              OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids))
+              spo.distribution_type = 'PUBLIC'
+              OR (spo.distribution_type = 'PRIVATE' AND $1 = ANY(spo.allowed_seller_ids))
             )
-            AND sp.id NOT IN (
-              SELECT pa.product_id FROM product_approvals pa
+            AND spo.id NOT IN (
+              SELECT pa.offer_id FROM product_approvals pa
               WHERE pa.organization_id = $1 AND pa.approval_type = 'PRIVATE'
             )
         `, [sellerId]),
@@ -2550,159 +2521,6 @@ export class NetureService {
     }
   }
 
-  // ============================================================================
-  // Campaign Operations (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2)
-  // 1 Campaign = 1 product_id. 동일 product_id에 ACTIVE 1개만 (DB 강제).
-  // ============================================================================
+  // Campaign Operations removed — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1 (tables dropped)
 
-  private _campaignRepo?: Repository<NetureTimeLimitedPriceCampaign>;
-  private _campaignAggregationRepo?: Repository<NetureCampaignAggregation>;
-
-  private get campaignRepo(): Repository<NetureTimeLimitedPriceCampaign> {
-    if (!this._campaignRepo) {
-      this._campaignRepo = AppDataSource.getRepository(NetureTimeLimitedPriceCampaign);
-    }
-    return this._campaignRepo;
-  }
-
-  private get campaignAggregationRepo(): Repository<NetureCampaignAggregation> {
-    if (!this._campaignAggregationRepo) {
-      this._campaignAggregationRepo = AppDataSource.getRepository(NetureCampaignAggregation);
-    }
-    return this._campaignAggregationRepo;
-  }
-
-  /** 캠페인 목록 조회 (공급자용) */
-  async getCampaigns(supplierId: string, filters?: { status?: CampaignStatus }) {
-    const qb = this.campaignRepo.createQueryBuilder('c')
-      .where('c.supplierId = :supplierId', { supplierId });
-
-    if (filters?.status) {
-      qb.andWhere('c.status = :status', { status: filters.status });
-    }
-
-    qb.orderBy('c.createdAt', 'DESC');
-    return qb.getMany();
-  }
-
-  /** 캠페인 상세 조회 */
-  async getCampaignById(campaignId: string, supplierId?: string) {
-    const where: any = { id: campaignId };
-    if (supplierId) where.supplierId = supplierId;
-
-    return this.campaignRepo.findOne({ where });
-  }
-
-  /** 캠페인 생성 — 1 campaign = 1 product_id */
-  async createCampaign(data: {
-    name: string;
-    description?: string | null;
-    supplierId: string;
-    productId: string;
-    campaignPrice: number;
-    startAt: Date;
-    endAt: Date;
-    createdBy?: string | null;
-  }) {
-    // 기간 역전 방지 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
-    if (data.startAt >= data.endAt) {
-      throw new Error('INVALID_CAMPAIGN_PERIOD');
-    }
-
-    // Supplier ↔ Product 소유 검증 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
-    const product = await this.productRepo.findOne({
-      where: { id: data.productId, supplierId: data.supplierId },
-    });
-    if (!product) {
-      throw new Error('PRODUCT_NOT_OWNED_BY_SUPPLIER');
-    }
-
-    const campaign = this.campaignRepo.create({
-      name: data.name,
-      description: data.description || null,
-      supplierId: data.supplierId,
-      productId: data.productId,
-      campaignPrice: data.campaignPrice,
-      status: CampaignStatus.DRAFT,
-      startAt: data.startAt,
-      endAt: data.endAt,
-      createdBy: data.createdBy || null,
-    });
-    return this.campaignRepo.save(campaign);
-  }
-
-  /** 허용 상태 전이 맵 */
-  private static ALLOWED_TRANSITIONS: Record<string, CampaignStatus[]> = {
-    [CampaignStatus.DRAFT]: [CampaignStatus.ACTIVE, CampaignStatus.CANCELLED],
-    [CampaignStatus.ACTIVE]: [CampaignStatus.COMPLETED, CampaignStatus.CANCELLED],
-  };
-
-  /** 캠페인 상태 변경 — 전이 규칙 + DB UNIQUE로 ACTIVE 중복 차단 */
-  async updateCampaignStatus(campaignId: string, supplierId: string, status: CampaignStatus) {
-    const campaign = await this.campaignRepo.findOne({
-      where: { id: campaignId, supplierId },
-    });
-    if (!campaign) throw new Error('CAMPAIGN_NOT_FOUND');
-
-    // 상태 전이 규칙 검증
-    const allowed = NetureService.ALLOWED_TRANSITIONS[campaign.status];
-    if (!allowed || !allowed.includes(status)) {
-      throw new Error('CAMPAIGN_INVALID_TRANSITION');
-    }
-
-    campaign.status = status;
-    try {
-      return await this.campaignRepo.save(campaign);
-    } catch (err: any) {
-      // DB partial unique index 위반 → 동일 product_id에 ACTIVE 중복
-      if (err?.code === '23505' && status === CampaignStatus.ACTIVE) {
-        throw new Error('CAMPAIGN_ACTIVE_ALREADY_EXISTS');
-      }
-      throw err;
-    }
-  }
-
-  /** 캠페인 수정 (DRAFT 상태만) */
-  async updateCampaign(campaignId: string, supplierId: string, data: {
-    name?: string;
-    description?: string | null;
-    startAt?: Date;
-    endAt?: Date;
-  }) {
-    const campaign = await this.campaignRepo.findOne({
-      where: { id: campaignId, supplierId },
-    });
-    if (!campaign) throw new Error('CAMPAIGN_NOT_FOUND');
-    if (campaign.status !== CampaignStatus.DRAFT) throw new Error('CAMPAIGN_NOT_EDITABLE');
-
-    if (data.name !== undefined) campaign.name = data.name;
-    if (data.description !== undefined) campaign.description = data.description;
-    if (data.startAt !== undefined) campaign.startAt = data.startAt;
-    if (data.endAt !== undefined) campaign.endAt = data.endAt;
-
-    // 기간 역전 방지 — 변경 후 결과 기준 검증 (WO-NETURE-CAMPAIGN-INTEGRITY-FIX-V3)
-    if (campaign.startAt >= campaign.endAt) {
-      throw new Error('INVALID_CAMPAIGN_PERIOD');
-    }
-
-    return this.campaignRepo.save(campaign);
-  }
-
-  /** 캠페인 집계 조회 */
-  async getCampaignAggregations(campaignId: string) {
-    return this.campaignAggregationRepo.find({
-      where: { campaignId },
-    });
-  }
-
-  /** 활성 캠페인 목록 — KPA-b/c 통합용 (모든 공급자, ACTIVE + 기간 내) */
-  async getActiveCampaigns() {
-    const now = new Date();
-    return this.campaignRepo.createQueryBuilder('c')
-      .where('c.status = :status', { status: CampaignStatus.ACTIVE })
-      .andWhere('c.startAt <= :now', { now })
-      .andWhere('c.endAt > :now', { now })
-      .orderBy('c.endAt', 'ASC')
-      .getMany();
-  }
 }

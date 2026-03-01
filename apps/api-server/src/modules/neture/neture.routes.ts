@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
-import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, ProductApprovalStatus, DistributionType, CampaignStatus } from './entities/index.js';
+import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, OfferDistributionType, OfferApprovalStatus } from './entities/index.js';
 import { NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
@@ -509,16 +509,16 @@ router.post('/admin/products/:id/reject', requireAuth, requireNetureScope('netur
 router.get('/admin/products', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { supplierId, distributionType, isActive, approvalStatus } = req.query;
-    const filters: { supplierId?: string; distributionType?: DistributionType; isActive?: boolean; approvalStatus?: ProductApprovalStatus } = {};
+    const filters: { supplierId?: string; distributionType?: OfferDistributionType; isActive?: boolean; approvalStatus?: OfferApprovalStatus } = {};
 
     if (supplierId && typeof supplierId === 'string') filters.supplierId = supplierId;
-    if (distributionType && typeof distributionType === 'string' && Object.values(DistributionType).includes(distributionType as DistributionType)) {
-      filters.distributionType = distributionType as DistributionType;
+    if (distributionType && typeof distributionType === 'string' && Object.values(OfferDistributionType).includes(distributionType as OfferDistributionType)) {
+      filters.distributionType = distributionType as OfferDistributionType;
     }
     if (isActive === 'true') filters.isActive = true;
     if (isActive === 'false') filters.isActive = false;
-    if (approvalStatus && typeof approvalStatus === 'string' && Object.values(ProductApprovalStatus).includes(approvalStatus as ProductApprovalStatus)) {
-      filters.approvalStatus = approvalStatus as ProductApprovalStatus;
+    if (approvalStatus && typeof approvalStatus === 'string' && Object.values(OfferApprovalStatus).includes(approvalStatus as OfferApprovalStatus)) {
+      filters.approvalStatus = approvalStatus as OfferApprovalStatus;
     }
 
     const products = await netureService.getAllProducts(filters);
@@ -555,18 +555,19 @@ router.get('/supplier/requests', requireAuth, requireLinkedSupplier, async (req:
 
     const rows = await AppDataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
-              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              spo.supplier_id AS "supplierId", ns.name AS "supplierName",
               pa.organization_id AS "sellerId",
               pa.service_key AS "serviceId",
-              nsp.name AS "productName", pa.product_id AS "productId",
+              pm.marketing_name AS "productName", pa.offer_id AS "offerId",
               pa.reason AS "rejectReason",
               pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",
               pa.created_at AS "requestedAt"
        FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE pa.approval_type = 'PRIVATE'
-         AND nsp.supplier_id = $1${statusFilter}${serviceFilter}
+         AND spo.supplier_id = $1${statusFilter}${serviceFilter}
        ORDER BY pa.created_at DESC`,
       params,
     );
@@ -594,20 +595,21 @@ router.get('/supplier/requests/:id', requireAuth, requireLinkedSupplier, async (
 
     const rows = await AppDataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
-              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              spo.supplier_id AS "supplierId", ns.name AS "supplierName",
               pa.organization_id AS "sellerId",
               pa.service_key AS "serviceId",
-              nsp.name AS "productName", pa.product_id AS "productId",
-              nsp.category AS "productCategory",
+              pm.marketing_name AS "productName", pa.offer_id AS "offerId",
+              pm.brand_name AS "productCategory",
               pa.reason AS "rejectReason",
               pa.decided_by AS "decidedBy", pa.decided_at AS "decidedAt",
               pa.requested_by AS "requestedBy",
               pa.metadata, pa.created_at AS "requestedAt"
        FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE pa.id = $1 AND pa.approval_type = 'PRIVATE'
-         AND nsp.supplier_id = $2`,
+         AND spo.supplier_id = $2`,
       [id, supplierId],
     );
 
@@ -674,15 +676,11 @@ router.post('/supplier/products', requireAuth, requireActiveSupplier, async (req
   try {
     const supplierId = (req as SupplierRequest).supplierId;
 
-    const { name, category, description, purpose, distributionType, acceptsApplications } = req.body;
+    const { masterId, distributionType } = req.body;
 
-    const result = await netureService.createSupplierProduct(supplierId, {
-      name,
-      category,
-      description,
-      purpose,
+    const result = await netureService.createSupplierOffer(supplierId, {
+      masterId,
       distributionType,
-      acceptsApplications,
     });
 
     if (!result.success) {
@@ -734,11 +732,10 @@ router.patch('/supplier/products/:id', requireAuth, requireActiveSupplier, async
     const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
-    const { isActive, acceptsApplications, distributionType, allowedSellerIds } = req.body;
+    const { isActive, distributionType, allowedSellerIds } = req.body;
 
-    const result = await netureService.updateSupplierProduct(id, supplierId, {
+    const result = await netureService.updateSupplierOffer(id, supplierId, {
       isActive,
-      acceptsApplications,
       distributionType,
       allowedSellerIds,
     });
@@ -1990,14 +1987,15 @@ router.get('/seller/my-products', requireAuth, async (req: AuthenticatedRequest,
 
     const rows = await AppDataSource.query(
       `SELECT pa.id,
-              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
-              pa.product_id AS "productId", nsp.name AS "productName",
-              nsp.category AS "productCategory",
+              spo.supplier_id AS "supplierId", ns.name AS "supplierName",
+              pa.offer_id AS "offerId", pm.marketing_name AS "productName",
+              pm.brand_name AS "productCategory",
               pa.service_key AS "serviceId",
               pa.decided_at AS "approvedAt"
        FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE pa.organization_id = $1
          AND pa.approval_type IN ('PRIVATE', 'service')
          AND pa.approval_status = 'approved'
@@ -2038,35 +2036,36 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
       id: string; name: string; category: string; description: string;
       supplier_id: string; supplier_name: string; distribution_type: string;
     }> = await AppDataSource.query(
-      `SELECT sp.id, sp.name, sp.category, sp.description,
-              sp.supplier_id, s.name AS supplier_name,
-              sp.distribution_type
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
-       WHERE sp.is_active = true
+      `SELECT spo.id, pm.marketing_name AS name, pm.brand_name AS category, '' AS description,
+              spo.supplier_id, s.name AS supplier_name,
+              spo.distribution_type
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
+       WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
-         AND (sp.distribution_type IN ('PUBLIC', 'SERVICE')
-           OR (sp.distribution_type = 'PRIVATE' AND $1 = ANY(sp.allowed_seller_ids)))
-       ORDER BY sp.created_at DESC`,
+         AND (spo.distribution_type IN ('PUBLIC', 'SERVICE')
+           OR (spo.distribution_type = 'PRIVATE' AND $1 = ANY(spo.allowed_seller_ids)))
+       ORDER BY spo.created_at DESC`,
       [sellerId],
     );
 
     // Step 2: v2 product_approvals에서 seller의 기존 approval 조회 (SERVICE + PRIVATE)
     const approvals: Array<{
-      product_id: string; status: string; approval_id: string; reason: string | null;
+      offer_id: string; status: string; approval_id: string; reason: string | null;
     }> = await AppDataSource.query(
-      `SELECT pa.product_id, pa.approval_status AS status, pa.id AS approval_id, pa.reason
+      `SELECT pa.offer_id, pa.approval_status AS status, pa.id AS approval_id, pa.reason
        FROM product_approvals pa
        WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
       [sellerId],
     );
 
-    // Step 3: productId → approval 상태 매핑
+    // Step 3: offerId → approval 상태 매핑
     const approvalMap = new Map<string, { status: string; approvalId: string; reason?: string }>();
     for (const a of approvals) {
-      const existing = approvalMap.get(a.product_id);
+      const existing = approvalMap.get(a.offer_id);
       if (!existing || a.status === 'pending' || a.status === 'approved') {
-        approvalMap.set(a.product_id, {
+        approvalMap.set(a.offer_id, {
           status: a.status,
           approvalId: a.approval_id,
           reason: a.reason || undefined,
@@ -2193,19 +2192,20 @@ router.get('/seller/service-applications', requireAuth, async (req: Authenticate
 
     const rows = await AppDataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
-              pa.product_id AS "productId",
-              nsp.name AS "productName",
-              nsp.category AS "productCategory",
+              pa.offer_id AS "offerId",
+              pm.marketing_name AS "productName",
+              pm.brand_name AS "productCategory",
               ns.name AS "supplierName",
-              nsp.supplier_id AS "supplierId",
+              spo.supplier_id AS "supplierId",
               pa.reason AS "rejectReason",
               pa.requested_by AS "requestedBy",
               pa.decided_by AS "decidedBy",
               pa.decided_at AS "decidedAt",
               pa.created_at AS "requestedAt"
        FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE pa.organization_id = $1 AND pa.approval_type = 'service'
        ORDER BY pa.created_at DESC`,
       [organizationId],
@@ -2240,7 +2240,7 @@ router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), a
     }
     if (supplierId && typeof supplierId === 'string') {
       params.push(supplierId);
-      conditions.push(`nsp.supplier_id = $${params.length}`);
+      conditions.push(`spo.supplier_id = $${params.length}`);
     }
     if (serviceId && typeof serviceId === 'string') {
       params.push(serviceId);
@@ -2249,14 +2249,15 @@ router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), a
 
     const rows = await AppDataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
-              nsp.supplier_id AS "supplierId", ns.name AS "supplierName",
+              spo.supplier_id AS "supplierId", ns.name AS "supplierName",
               pa.organization_id AS "sellerId",
               pa.service_key AS "serviceId",
-              nsp.name AS "productName", pa.product_id AS "productId",
+              pm.marketing_name AS "productName", pa.offer_id AS "offerId",
               pa.created_at AS "requestedAt"
        FROM product_approvals pa
-       JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE ${conditions.join(' AND ')}
        ORDER BY pa.created_at DESC`,
       params,
@@ -2607,163 +2608,16 @@ router.use(createNeureTier1TestController({
   netureService,
 }));
 
-// ============================================================================
-// Campaign Routes (WO-NETURE-TIME-LIMITED-PRICE-CAMPAIGN-V1)
-// 기간 한정 가격 캠페인 CRUD — 공급자용
-// ============================================================================
-
-// GET /campaigns — 공급자의 캠페인 목록
-router.get('/campaigns', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-    const status = req.query.status as CampaignStatus | undefined;
-    const campaigns = await netureService.getCampaigns(supplierId, status ? { status } : undefined);
-    res.json({ success: true, data: campaigns });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching campaigns:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaigns' });
-  }
-});
-
-// GET /campaigns/active — 활성 캠페인 목록 (KPA-b/c 통합용)
-router.get('/campaigns/active', requireAuth, async (req: Request, res: Response) => {
-  try {
-    const campaigns = await netureService.getActiveCampaigns();
-    res.json({ success: true, data: campaigns });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching active campaigns:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch active campaigns' });
-  }
-});
-
-// GET /campaigns/:id — 캠페인 상세
-router.get('/campaigns/:id', requireAuth, async (req: Request, res: Response) => {
-  try {
-    const campaign = await netureService.getCampaignById(req.params.id);
-    if (!campaign) {
-      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
-      return;
-    }
-    res.json({ success: true, data: campaign });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching campaign:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaign' });
-  }
-});
-
-// POST /campaigns — 캠페인 생성 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: 1 campaign = 1 product)
-router.post('/campaigns', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-    const userId = (req as AuthenticatedRequest).user?.id;
-    const { name, description, startAt, endAt, productId, campaignPrice } = req.body;
-
-    if (!name || !startAt || !endAt || !productId || !campaignPrice) {
-      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'name, startAt, endAt, productId, and campaignPrice are required' });
-      return;
-    }
-
-    const campaign = await netureService.createCampaign({
-      name,
-      description: description || null,
-      supplierId,
-      productId,
-      campaignPrice: Number(campaignPrice),
-      startAt: new Date(startAt),
-      endAt: new Date(endAt),
-      createdBy: userId || null,
-    });
-
-    res.status(201).json({ success: true, data: campaign });
-  } catch (error) {
-    const msg = (error as Error).message;
-    if (msg === 'INVALID_CAMPAIGN_PERIOD') {
-      res.status(400).json({ success: false, error: 'INVALID_CAMPAIGN_PERIOD', message: 'startAt must be before endAt' });
-      return;
-    }
-    if (msg === 'PRODUCT_NOT_OWNED_BY_SUPPLIER') {
-      res.status(400).json({ success: false, error: 'PRODUCT_NOT_OWNED_BY_SUPPLIER', message: 'Product does not belong to this supplier' });
-      return;
-    }
-    logger.error('[Neture API] Error creating campaign:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create campaign' });
-  }
-});
-
-// PATCH /campaigns/:id — 캠페인 수정 (DRAFT 상태만)
-router.patch('/campaigns/:id', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-    const { name, description, startAt, endAt } = req.body;
-
-    const campaign = await netureService.updateCampaign(req.params.id, supplierId, {
-      name,
-      description,
-      startAt: startAt ? new Date(startAt) : undefined,
-      endAt: endAt ? new Date(endAt) : undefined,
-    });
-
-    res.json({ success: true, data: campaign });
-  } catch (error) {
-    const msg = (error as Error).message;
-    if (msg === 'CAMPAIGN_NOT_FOUND') {
-      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
-      return;
-    }
-    if (msg === 'CAMPAIGN_NOT_EDITABLE') {
-      res.status(400).json({ success: false, error: 'NOT_EDITABLE', message: 'Only DRAFT campaigns can be edited' });
-      return;
-    }
-    if (msg === 'INVALID_CAMPAIGN_PERIOD') {
-      res.status(400).json({ success: false, error: 'INVALID_CAMPAIGN_PERIOD', message: 'startAt must be before endAt' });
-      return;
-    }
-    logger.error('[Neture API] Error updating campaign:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update campaign' });
-  }
-});
-
-// POST /campaigns/:id/status — 캠페인 상태 변경 (WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2: 전이 규칙 + ACTIVE 중복 차단)
-router.post('/campaigns/:id/status', requireAuth, requireActiveSupplier, async (req: Request, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-    const { status } = req.body;
-
-    if (!status || !Object.values(CampaignStatus).includes(status)) {
-      res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: `status must be one of: ${Object.values(CampaignStatus).join(', ')}` });
-      return;
-    }
-
-    const campaign = await netureService.updateCampaignStatus(req.params.id, supplierId, status);
-    res.json({ success: true, data: campaign });
-  } catch (error) {
-    const msg = (error as Error).message;
-    if (msg === 'CAMPAIGN_NOT_FOUND') {
-      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Campaign not found' });
-      return;
-    }
-    if (msg === 'CAMPAIGN_INVALID_TRANSITION') {
-      res.status(400).json({ success: false, error: 'INVALID_TRANSITION', message: 'This status transition is not allowed' });
-      return;
-    }
-    if (msg === 'CAMPAIGN_ACTIVE_ALREADY_EXISTS') {
-      res.status(409).json({ success: false, error: 'ACTIVE_ALREADY_EXISTS', message: 'Another ACTIVE campaign already exists for this product' });
-      return;
-    }
-    logger.error('[Neture API] Error updating campaign status:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update campaign status' });
-  }
-});
-
-// GET /campaigns/:id/aggregations — 캠페인 집계 조회
-router.get('/campaigns/:id/aggregations', requireAuth, async (req: Request, res: Response) => {
-  try {
-    const aggregations = await netureService.getCampaignAggregations(req.params.id);
-    res.json({ success: true, data: aggregations });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching campaign aggregations:', error);
-    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch campaign aggregations' });
-  }
-});
+// Campaign Routes — DEPRECATED (WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: tables dropped)
+const campaignGone = (_req: Request, res: Response) => {
+  res.status(410).json({ success: false, error: 'GONE', message: 'Campaign feature has been removed' });
+};
+router.get('/campaigns', campaignGone);
+router.get('/campaigns/active', campaignGone);
+router.get('/campaigns/:id', campaignGone);
+router.post('/campaigns', campaignGone);
+router.patch('/campaigns/:id', campaignGone);
+router.post('/campaigns/:id/status', campaignGone);
+router.get('/campaigns/:id/aggregations', campaignGone);
 
 export default router;

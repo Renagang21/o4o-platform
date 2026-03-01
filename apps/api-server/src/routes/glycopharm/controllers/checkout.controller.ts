@@ -372,13 +372,13 @@ export function createCheckoutController(
           product_id: string;
           allowed_seller_ids: string[] | null;
         }> = await dataSource.query(
-          `SELECT opl.product_id::text AS product_id, nsp.allowed_seller_ids
+          `SELECT opl.offer_id::text AS product_id, spo.allowed_seller_ids
            FROM organization_product_listings opl
-           JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
+           JOIN supplier_product_offers spo ON spo.id = opl.offer_id
            WHERE opl.organization_id = $1
              AND opl.service_key = 'kpa'
-             AND opl.product_id::text = ANY($2::text[])
-             AND nsp.distribution_type = 'PRIVATE'`,
+             AND opl.offer_id::text = ANY($2::text[])
+             AND spo.distribution_type = 'PRIVATE'`,
           [pharmacy.id, productIds]
         );
 
@@ -401,7 +401,7 @@ export function createCheckoutController(
           sales_limit: number | null;
         }> = await dataSource.query(
           `SELECT opl.id AS product_listing_id,
-                  opl.product_id::text AS product_id,
+                  opl.offer_id::text AS product_id,
                   opc.sales_limit
            FROM organization_product_channels opc
            JOIN organization_product_listings opl

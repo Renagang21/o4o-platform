@@ -273,7 +273,7 @@ export function createStoreHubController(
                FROM organization_product_channels opc
                JOIN organization_product_listings opl ON opl.id = opc.product_listing_id
                JOIN organization_channels oc_sub ON oc_sub.id = opc.channel_id
-               JOIN neture_supplier_products nsp ON nsp.id = opl.product_id
+               JOIN supplier_product_offers nsp ON nsp.id = opl.offer_id
                JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
                GROUP BY opc.channel_id
              ) stats ON stats.channel_id = oc.id

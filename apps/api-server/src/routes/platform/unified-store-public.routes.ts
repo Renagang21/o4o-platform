@@ -135,12 +135,12 @@ async function queryVisibleProducts(
     let paramIdx = 3;
 
     if (options.category) {
-      conditions.push(`sp.category = $${paramIdx}`);
+      conditions.push(`pm.brand_name = $${paramIdx}`);
       params.push(options.category);
       paramIdx++;
     }
     if (options.q && options.q.length >= 2) {
-      conditions.push(`(sp.name ILIKE $${paramIdx} OR opl.product_name ILIKE $${paramIdx} OR sp.description ILIKE $${paramIdx})`);
+      conditions.push(`(pm.marketing_name ILIKE $${paramIdx})`);
       params.push(`%${options.q}%`);
       paramIdx++;
     }
@@ -148,7 +148,7 @@ async function queryVisibleProducts(
       // is_featured not applicable in v2 — filter ignored
     }
     if (options.productId) {
-      conditions.push(`sp.id = $${paramIdx}`);
+      conditions.push(`spo.id = $${paramIdx}`);
       params.push(options.productId);
       paramIdx++;
     }
@@ -156,20 +156,21 @@ async function queryVisibleProducts(
     const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
 
     const sortMap: Record<string, string> = {
-      created_at: 'sp.created_at',
-      name: 'sp.name',
-      price: 'sp.price_general',
-      sort_order: 'opl.display_order',
+      created_at: 'spo.created_at',
+      name: 'pm.marketing_name',
+      price: 'spo.price_general',
+      sort_order: 'opl.created_at',
     };
-    const sortField = sortMap[options.sort || 'created_at'] || 'sp.created_at';
+    const sortField = sortMap[options.sort || 'created_at'] || 'spo.created_at';
     const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
     const countResult: Array<{ count: string }> = await dataSource.query(
-      `SELECT COUNT(DISTINCT sp.id)::int AS count
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
+      `SELECT COUNT(DISTINCT spo.id)::int AS count
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
        INNER JOIN organization_product_listings opl
-         ON opl.product_id = sp.id
+         ON opl.offer_id = spo.id
          AND opl.organization_id = $1
          AND opl.service_key = ANY($2::text[])
          AND opl.is_active = true
@@ -180,7 +181,7 @@ async function queryVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'B2C'
          AND oc.status = 'APPROVED'
-       WHERE sp.is_active = true
+       WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}`,
       params,
@@ -188,23 +189,24 @@ async function queryVisibleProducts(
     const total = Number(countResult[0]?.count || 0);
 
     const data = await dataSource.query(
-      `SELECT DISTINCT ON (sp.id)
-         sp.id, COALESCE(opl.product_name, sp.name) AS name,
-         '' AS sku, sp.category,
-         sp.price_general AS price, NULL::int AS sale_price,
+      `SELECT DISTINCT ON (spo.id)
+         spo.id, pm.marketing_name AS name,
+         '' AS sku, pm.brand_name AS category,
+         spo.price_general AS price, NULL::int AS sale_price,
          0 AS stock_quantity, '[]'::jsonb AS images,
-         CASE WHEN sp.is_active THEN 'active' ELSE 'inactive' END AS status,
+         CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
-         s.name AS manufacturer, sp.description,
+         s.name AS manufacturer, '' AS description,
          '' AS short_description,
-         opl.display_order AS sort_order,
-         sp.created_at, sp.updated_at,
+         opl.created_at AS sort_order,
+         spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id,
          opc.sales_limit
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
        INNER JOIN organization_product_listings opl
-         ON opl.product_id = sp.id
+         ON opl.offer_id = spo.id
          AND opl.organization_id = $1
          AND opl.service_key = ANY($2::text[])
          AND opl.is_active = true
@@ -215,10 +217,10 @@ async function queryVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'B2C'
          AND oc.status = 'APPROVED'
-       WHERE sp.is_active = true
+       WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
-       ORDER BY sp.id, ${sortField} ${sortOrder}
+       ORDER BY spo.id, ${sortField} ${sortOrder}
        LIMIT ${limit} OFFSET ${offset}`,
       params,
     );
@@ -268,12 +270,12 @@ async function queryTabletVisibleProducts(
     let paramIdx = 3;
 
     if (options.category) {
-      conditions.push(`sp.category = $${paramIdx}`);
+      conditions.push(`pm.brand_name = $${paramIdx}`);
       params.push(options.category);
       paramIdx++;
     }
     if (options.q && options.q.length >= 2) {
-      conditions.push(`(sp.name ILIKE $${paramIdx} OR sp.description ILIKE $${paramIdx})`);
+      conditions.push(`(pm.marketing_name ILIKE $${paramIdx})`);
       params.push(`%${options.q}%`);
       paramIdx++;
     }
@@ -281,20 +283,21 @@ async function queryTabletVisibleProducts(
     const whereExtra = conditions.length > 0 ? 'AND ' + conditions.join(' AND ') : '';
 
     const sortMap: Record<string, string> = {
-      created_at: 'sp.created_at',
-      name: 'sp.name',
-      price: 'sp.price_general',
-      sort_order: 'opl.display_order',
+      created_at: 'spo.created_at',
+      name: 'pm.marketing_name',
+      price: 'spo.price_general',
+      sort_order: 'opl.created_at',
     };
-    const sortField = sortMap[options.sort || 'sort_order'] || 'opl.display_order';
+    const sortField = sortMap[options.sort || 'sort_order'] || 'opl.created_at';
     const sortOrder = options.order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
     const countResult: Array<{ count: string }> = await dataSource.query(
-      `SELECT COUNT(DISTINCT sp.id)::int AS count
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
+      `SELECT COUNT(DISTINCT spo.id)::int AS count
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
        INNER JOIN organization_product_listings opl
-         ON opl.product_id = sp.id
+         ON opl.offer_id = spo.id
          AND opl.organization_id = $1
          AND opl.service_key = $2
          AND opl.is_active = true
@@ -305,7 +308,7 @@ async function queryTabletVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'TABLET'
          AND oc.status = 'APPROVED'
-       WHERE sp.is_active = true
+       WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}`,
       params,
@@ -313,22 +316,23 @@ async function queryTabletVisibleProducts(
     const total = Number(countResult[0]?.count || 0);
 
     const data = await dataSource.query(
-      `SELECT DISTINCT ON (sp.id)
-         sp.id, COALESCE(opl.product_name, sp.name) AS name,
-         '' AS sku, sp.category,
-         sp.price_general AS price, NULL::int AS sale_price,
+      `SELECT DISTINCT ON (spo.id)
+         spo.id, pm.marketing_name AS name,
+         '' AS sku, pm.brand_name AS category,
+         spo.price_general AS price, NULL::int AS sale_price,
          0 AS stock_quantity, '[]'::jsonb AS images,
-         CASE WHEN sp.is_active THEN 'active' ELSE 'inactive' END AS status,
+         CASE WHEN spo.is_active THEN 'active' ELSE 'inactive' END AS status,
          false AS is_featured,
-         s.name AS manufacturer, sp.description,
+         s.name AS manufacturer, '' AS description,
          '' AS short_description,
-         opl.display_order AS sort_order,
-         sp.created_at, sp.updated_at,
+         opl.created_at AS sort_order,
+         spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id
-       FROM neture_supplier_products sp
-       JOIN neture_suppliers s ON s.id = sp.supplier_id
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       JOIN neture_suppliers s ON s.id = spo.supplier_id
        INNER JOIN organization_product_listings opl
-         ON opl.product_id = sp.id
+         ON opl.offer_id = spo.id
          AND opl.organization_id = $1
          AND opl.service_key = $2
          AND opl.is_active = true
@@ -339,10 +343,10 @@ async function queryTabletVisibleProducts(
          ON oc.id = opc.channel_id
          AND oc.channel_type = 'TABLET'
          AND oc.status = 'APPROVED'
-       WHERE sp.is_active = true
+       WHERE spo.is_active = true
          AND s.status = 'ACTIVE'
          ${whereExtra}
-       ORDER BY sp.id, ${sortField} ${sortOrder}
+       ORDER BY spo.id, ${sortField} ${sortOrder}
        LIMIT ${limit} OFFSET ${offset}`,
       params,
     );
@@ -590,11 +594,12 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
         hashCacheKey(`sf:cat:${resolved.storeId}`, { sk: resolved.serviceKey }),
         READ_CACHE_TTL.STOREFRONT,
         () => dataSource.query(
-          `SELECT sp.category, COUNT(DISTINCT sp.id)::int AS "productCount"
-           FROM neture_supplier_products sp
-           JOIN neture_suppliers s ON s.id = sp.supplier_id
+          `SELECT pm.brand_name AS category, COUNT(DISTINCT spo.id)::int AS "productCount"
+           FROM supplier_product_offers spo
+           JOIN product_masters pm ON pm.id = spo.master_id
+           JOIN neture_suppliers s ON s.id = spo.supplier_id
            INNER JOIN organization_product_listings opl
-             ON opl.product_id = sp.id
+             ON opl.offer_id = spo.id
              AND opl.organization_id = $1
              AND opl.service_key = $2
              AND opl.is_active = true
@@ -605,9 +610,9 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
              ON oc.id = opc.channel_id
              AND oc.channel_type = 'B2C'
              AND oc.status = 'APPROVED'
-           WHERE sp.is_active = true
+           WHERE spo.is_active = true
              AND s.status = 'ACTIVE'
-           GROUP BY sp.category
+           GROUP BY pm.brand_name
            ORDER BY "productCount" DESC`,
           [resolved.storeId, resolved.serviceKey],
         ),

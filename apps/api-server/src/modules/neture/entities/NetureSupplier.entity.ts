@@ -6,7 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import type { NetureSupplierProduct } from './NetureSupplierProduct.entity.js';
+import type { SupplierProductOffer } from './SupplierProductOffer.entity.js';
 
 export enum SupplierStatus {
   PENDING = 'PENDING',
@@ -113,6 +113,6 @@ export class NetureSupplier {
   @Column({ name: 'rejected_reason', type: 'text', nullable: true })
   rejectedReason: string | null;
 
-  @OneToMany('NetureSupplierProduct', 'supplier')
-  products: NetureSupplierProduct[];
+  @OneToMany('SupplierProductOffer', 'supplier')
+  offers: SupplierProductOffer[];
 }
