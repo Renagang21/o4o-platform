@@ -310,5 +310,4 @@ export class NetureRepository {
     await this.productRepo.increment({ id: productId }, 'stock', quantity);
   }
 
-  // Campaign Operations removed — WO-O4O-PRODUCT-MASTER-CORE-RESET-V1 (tables dropped)
 }
