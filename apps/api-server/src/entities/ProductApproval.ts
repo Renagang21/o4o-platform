@@ -1,8 +1,9 @@
 /**
  * ProductApproval Entity
- * 제품 승인 (공급자 제품 → 약국 리스팅 승인 추적)
+ * 제품 승인 (공급자 Offer → 약국 리스팅 승인 추적)
  *
  * WO-PRODUCT-POLICY-V2-DATA-LAYER-INTRODUCTION-V1
+ * WO-O4O-PRODUCT-MASTER-CORE-RESET-V1: product_id → offer_id
  */
 
 import {
@@ -15,7 +16,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { NetureSupplierProduct } from '../modules/neture/entities/NetureSupplierProduct.entity.js';
+import type { SupplierProductOffer } from '../modules/neture/entities/SupplierProductOffer.entity.js';
 
 export enum ProductApprovalType {
   SERVICE = 'service',
@@ -30,7 +31,6 @@ export enum ProductApprovalStatus {
 }
 
 @Entity('product_approvals')
-@Index('IDX_product_approvals_product', ['product_id'])
 @Index('IDX_product_approvals_org', ['organization_id'])
 @Index('IDX_product_approvals_status', ['approval_status'])
 @Index('IDX_product_approvals_service_key', ['service_key'])
@@ -38,13 +38,12 @@ export class ProductApproval {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
-  product_id: string;
+  @Column({ name: 'offer_id', type: 'uuid', nullable: true })
+  offer_id: string | null;
 
-  // ESM §4: string-based relation
-  @ManyToOne('NetureSupplierProduct')
-  @JoinColumn({ name: 'product_id' })
-  product?: NetureSupplierProduct;
+  @ManyToOne('SupplierProductOffer', { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'offer_id' })
+  offer?: SupplierProductOffer;
 
   @Column({ type: 'uuid' })
   organization_id: string;

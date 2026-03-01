@@ -556,8 +556,8 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
         const rows = await dataSource.query(
           `SELECT EXISTS(
             SELECT 1 FROM product_approvals pa
-            JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-            WHERE nsp.supplier_id = $1
+            JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+            WHERE spo.supplier_id = $1
               AND pa.approval_type = 'PRIVATE'
               AND pa.approval_status = 'approved'
             LIMIT 1

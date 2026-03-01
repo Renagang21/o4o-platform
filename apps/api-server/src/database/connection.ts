@@ -189,7 +189,8 @@ import { ActionLog } from '@o4o/action-log-core';
 // ============================================================================
 import {
   NetureSupplier,
-  NetureSupplierProduct,
+  ProductMaster,
+  SupplierProductOffer,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
   NetureSupplierContent,
@@ -198,8 +199,6 @@ import {
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NetureSellerPartnerContract,
-  NetureTimeLimitedPriceCampaign,
-  NetureCampaignAggregation,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -622,7 +621,8 @@ export const AppDataSource = new DataSource({
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
     NetureSupplier,
-    NetureSupplierProduct,
+    ProductMaster,
+    SupplierProductOffer,
     NeturePartnershipRequest,
     NeturePartnershipProduct,
     NetureSupplierContent,
@@ -631,9 +631,6 @@ export const AppDataSource = new DataSource({
     NeturePartnerRecruitment,
     NeturePartnerApplication,
     NetureSellerPartnerContract,
-    // WO-NETURE-CAMPAIGN-SIMPLIFICATION-V2
-    NetureTimeLimitedPriceCampaign,
-    NetureCampaignAggregation,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================

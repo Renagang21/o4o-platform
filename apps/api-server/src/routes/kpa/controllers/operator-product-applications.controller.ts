@@ -55,8 +55,8 @@ export function createOperatorProductApplicationsController(
     const offsetIdx = baseParams.length + 2;
     const data = await dataSource.query(
       `SELECT pa.id, pa.organization_id, pa.service_key,
-              pa.product_id,
-              nsp.name AS product_name,
+              pa.offer_id,
+              pm.marketing_name AS product_name,
               pa.metadata AS product_metadata,
               pa.approval_status AS status,
               pa.reason AS reject_reason,
@@ -68,8 +68,9 @@ export function createOperatorProductApplicationsController(
               pa.approval_type,
               ns.name AS supplier_name
        FROM product_approvals pa
-       LEFT JOIN neture_supplier_products nsp ON nsp.id = pa.product_id
-       LEFT JOIN neture_suppliers ns ON ns.id = nsp.supplier_id
+       LEFT JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        ${statusFilter}
        ORDER BY pa.created_at DESC
        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
