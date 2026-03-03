@@ -62,5 +62,8 @@ export { StoreBillingPage } from './StoreBillingPage';
 // WO-O4O-STORE-SIGNAGE-ENGINE-V1: 사이니지 운영 엔진
 export { StoreSignagePage } from './StoreSignagePage';
 
+// WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1: 매장 자료실 등록 (Neture 프리필)
+export { StoreLibraryNewPage } from './StoreLibraryNewPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';
