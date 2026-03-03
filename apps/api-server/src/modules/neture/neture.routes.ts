@@ -2789,6 +2789,40 @@ router.use('/hub/trigger', hubTriggerController);
 // Asset Snapshot routes (WO-O4O-ASSET-COPY-NETURE-PILOT-V1)
 router.use('/assets', createNetureAssetSnapshotController(AppDataSource, requireAuth as RequestHandler));
 
+// ==================== Public Library Item (WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1) ====================
+
+/**
+ * GET /api/v1/neture/library/public/:id
+ * 공개 자료 단건 조회 (인증 불필요, published 상태만)
+ * Store에서 fromNeture prefill용으로 사용
+ */
+router.get('/library/public/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const repo = AppDataSource.getRepository(NetureSupplierContent);
+    const item = await repo.findOne({ where: { id, status: 'published' as any } });
+
+    if (!item) {
+      res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Library item not found' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        type: item.type,
+        imageUrl: item.imageUrl,
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching public library item:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch library item' });
+  }
+});
+
 // Tier1 JSON Test Center (WO-NETURE-TIER1-PUBLIC-JSON-TEST-CENTER-V1)
 router.use(createNeureTier1TestController({
   dataSource: AppDataSource,

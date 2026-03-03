@@ -30,6 +30,7 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
+  Store,
 } from 'lucide-react';
 import {
   supplierApi,
@@ -159,7 +160,23 @@ export default function SupplierContentsPage() {
         ),
       },
       actions: (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {content.status === 'published' && (
+            <>
+              <button
+                onClick={() => {
+                  const kpaUrl = import.meta.env.VITE_KPA_SOCIETY_URL || '';
+                  window.open(`${kpaUrl}/store/library/new?fromNeture=${content.id}`, '_blank');
+                }}
+                style={styles.storeUseButton}
+                title="매장 자료실에 등록"
+              >
+                <Store size={13} />
+                매장에서 사용
+              </button>
+              <span className="text-gray-400">|</span>
+            </>
+          )}
           <button
             onClick={() => handleToggleStatus(content.id, content.status)}
             className="text-sm text-blue-600 hover:text-blue-800"
@@ -286,6 +303,7 @@ export default function SupplierContentsPage() {
           <li>등록된 콘텐츠는 판매자/파트너가 자유롭게 참고할 수 있습니다.</li>
           <li>"임시저장" 상태의 콘텐츠는 공개되지 않습니다.</li>
           <li>콘텐츠는 각 서비스에서 자동으로 적용되지 않으며, 참고 자료로만 활용됩니다.</li>
+          <li>매장에서 사용하려면 파일을 다운로드 후 매장 자료실에 업로드하세요.</li>
         </ul>
       </div>
     </div>
@@ -526,6 +544,20 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     cursor: 'pointer',
   },
+  storeUseButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 10px',
+    backgroundColor: '#f0fdf4',
+    border: '1px solid #bbf7d0',
+    borderRadius: '6px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#16a34a',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  } as React.CSSProperties,
   infoBox: {
     backgroundColor: '#f8fafc',
     borderRadius: '12px',
