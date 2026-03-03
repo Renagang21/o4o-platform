@@ -91,7 +91,7 @@ interface PaginatedResponse<T> {
   hasPrev: boolean;
 }
 
-export type ContentSource = 'hq' | 'supplier' | 'community';
+export type ContentSource = 'hq' | 'community';
 
 // WO-FIX-SIGNAGE-API: Use direct API URL to avoid nginx proxy issues on Cloud Run
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';

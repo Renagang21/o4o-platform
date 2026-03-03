@@ -80,7 +80,7 @@ export default function SupplierOpsLayout() {
               <Link
                 to="/workspace/content"
                 className={`px-3 py-2 text-sm font-medium transition-colors ${
-                  isActive('/workspace/content') || isActive('/workspace/supplier/contents')
+                  isActive('/workspace/content')
                     ? 'text-primary-600'
                     : 'text-gray-700 hover:text-primary-600'
                 }`}

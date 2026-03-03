@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
-import { SupplierStatus, PartnershipStatus, RecruitmentStatus, ContentType, ContentStatus, OfferDistributionType, OfferApprovalStatus } from './entities/index.js';
+import { SupplierStatus, PartnershipStatus, RecruitmentStatus, OfferDistributionType, OfferApprovalStatus } from './entities/index.js';
 import { NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
@@ -11,7 +11,6 @@ import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glyco
 import type { GlycopharmProduct } from '../../routes/glycopharm/entities/glycopharm-product.entity.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
 import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
-import { NetureSupplierContent } from './entities/NetureSupplierContent.entity.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -975,171 +974,6 @@ router.get('/supplier/orders/summary', requireAuth, requireLinkedSupplier, async
   }
 });
 
-// ==================== Supplier Contents (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.1) ====================
-
-/**
- * GET /api/v1/neture/supplier/contents
- * Get contents for authenticated supplier
- */
-router.get('/supplier/contents', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-
-    const { type, status } = req.query;
-
-    const filters: { type?: ContentType; status?: ContentStatus } = {};
-    if (type && typeof type === 'string') filters.type = type as ContentType;
-    if (status && typeof status === 'string') filters.status = status as ContentStatus;
-
-    const contents = await netureService.getSupplierContents(supplierId, filters);
-
-    res.json({
-      success: true,
-      data: contents,
-    });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching supplier contents:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to fetch supplier contents',
-    });
-  }
-});
-
-/**
- * GET /api/v1/neture/supplier/contents/:id
- * Get content detail
- */
-router.get('/supplier/contents/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-
-    const { id } = req.params;
-
-    const content = await netureService.getSupplierContentById(id, supplierId);
-
-    if (!content) {
-      return res.status(404).json({
-        success: false,
-        error: 'NOT_FOUND',
-        message: 'Content not found',
-      });
-    }
-
-    res.json({
-      success: true,
-      data: content,
-    });
-  } catch (error) {
-    logger.error('[Neture API] Error fetching supplier content:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to fetch supplier content',
-    });
-  }
-});
-
-/**
- * POST /api/v1/neture/supplier/contents
- * Create new content
- */
-router.post('/supplier/contents', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-
-    const { type, title, description, body, imageUrl, availableServices, availableAreas } = req.body;
-
-    if (!type || !title) {
-      return res.status(400).json({
-        success: false,
-        error: 'VALIDATION_ERROR',
-        message: 'type and title are required',
-      });
-    }
-
-    const result = await netureService.createSupplierContent(supplierId, {
-      type,
-      title,
-      description,
-      body,
-      imageUrl,
-      availableServices,
-      availableAreas,
-    });
-
-    res.status(201).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    logger.error('[Neture API] Error creating supplier content:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to create supplier content',
-    });
-  }
-});
-
-/**
- * PATCH /api/v1/neture/supplier/contents/:id
- * Update content
- */
-router.patch('/supplier/contents/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-
-    const { id } = req.params;
-    const updates = req.body;
-
-    const result = await netureService.updateSupplierContent(id, supplierId, updates);
-
-    if (!result.success) {
-      const statusCode = result.error === 'CONTENT_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error updating supplier content:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to update supplier content',
-    });
-  }
-});
-
-/**
- * DELETE /api/v1/neture/supplier/contents/:id
- * Delete content
- */
-router.delete('/supplier/contents/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const supplierId = (req as SupplierRequest).supplierId;
-
-    const { id } = req.params;
-
-    const result = await netureService.deleteSupplierContent(id, supplierId);
-
-    if (!result.success) {
-      const statusCode = result.error === 'CONTENT_NOT_FOUND' ? 404 : 400;
-      return res.status(statusCode).json(result);
-    }
-
-    res.json(result);
-  } catch (error) {
-    logger.error('[Neture API] Error deleting supplier content:', error);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to delete supplier content',
-    });
-  }
-});
-
 // ==================== Dashboard Summary API ====================
 
 /**
@@ -1676,7 +1510,6 @@ router.get('/partner/dashboard/items', requireAuth, requireLinkedPartner, async 
 
       // Fetch titles for primary contents
       const cmsPrimaryIds = primaryLinks.filter((l) => l.content_source === 'cms').map((l) => l.content_id);
-      const supplierPrimaryIds = primaryLinks.filter((l) => l.content_source === 'supplier').map((l) => l.content_id);
       const titleMap = new Map<string, { title: string; type: string }>();
 
       if (cmsPrimaryIds.length > 0) {
@@ -1686,16 +1519,6 @@ router.get('/partner/dashboard/items', requireAuth, requireLinkedPartner, async 
         );
         for (const row of cmsRows) {
           titleMap.set(`cms:${row.id}`, { title: row.title, type: row.type });
-        }
-      }
-
-      if (supplierPrimaryIds.length > 0) {
-        const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
-        for (const sid of supplierPrimaryIds) {
-          const sc = await supplierRepo.findOne({ where: { id: sid } });
-          if (sc) {
-            titleMap.set(`supplier:${sc.id}`, { title: sc.title, type: sc.type });
-          }
         }
       }
 
@@ -1807,27 +1630,6 @@ router.get('/partner/contents', requireAuth, requireLinkedPartner, async (req: R
       }
     }
 
-    // Supplier contents
-    if (source === 'all' || source === 'supplier') {
-      const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
-      const supplierContents = await supplierRepo.find({
-        where: { status: ContentStatus.PUBLISHED },
-        order: { createdAt: 'DESC' },
-        take: 100,
-      });
-      for (const sc of supplierContents) {
-        results.push({
-          id: sc.id,
-          title: sc.title,
-          summary: sc.description || null,
-          type: sc.type,
-          source: 'supplier',
-          imageUrl: sc.imageUrl || null,
-          createdAt: sc.createdAt instanceof Date ? sc.createdAt.toISOString() : String(sc.createdAt),
-        });
-      }
-    }
-
     res.json({ success: true, data: results });
   } catch (error) {
     logger.error('[Neture API] Error browsing partner contents:', error);
@@ -1850,8 +1652,8 @@ router.post('/partner/dashboard/items/:itemId/contents', requireAuth, async (req
     const { itemId } = req.params;
     const { contentId, contentSource } = req.body;
 
-    if (!contentId || !contentSource || !['cms', 'supplier'].includes(contentSource)) {
-      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'contentId and contentSource (cms|supplier) are required' });
+    if (!contentId || !contentSource || !['cms'].includes(contentSource)) {
+      return res.status(400).json({ success: false, error: 'BAD_REQUEST', message: 'contentId and contentSource (cms) are required' });
     }
 
     // Ownership check
@@ -1949,7 +1751,6 @@ router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req:
 
     // Batch-fetch content details
     const cmsIds = links.filter((l) => l.contentSource === 'cms').map((l) => l.contentId);
-    const supplierIds = links.filter((l) => l.contentSource === 'supplier').map((l) => l.contentId);
 
     const contentMap = new Map<string, { title: string; summary: string | null; type: string; imageUrl: string | null; createdAt: string }>();
 
@@ -1966,22 +1767,6 @@ router.get('/partner/dashboard/items/:itemId/contents', requireAuth, async (req:
           imageUrl: row.image_url,
           createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
         });
-      }
-    }
-
-    if (supplierIds.length > 0) {
-      const supplierRepo = AppDataSource.getRepository(NetureSupplierContent);
-      for (const sid of supplierIds) {
-        const sc = await supplierRepo.findOne({ where: { id: sid } });
-        if (sc) {
-          contentMap.set(`supplier:${sc.id}`, {
-            title: sc.title,
-            summary: sc.description || null,
-            type: sc.type,
-            imageUrl: sc.imageUrl || null,
-            createdAt: sc.createdAt instanceof Date ? sc.createdAt.toISOString() : String(sc.createdAt),
-          });
-        }
       }
     }
 

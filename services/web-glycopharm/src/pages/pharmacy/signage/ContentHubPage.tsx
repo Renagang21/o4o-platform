@@ -87,8 +87,6 @@ export default function ContentHubPage() {
     switch (source) {
       case 'hq':
         return '운영자 콘텐츠';
-      case 'supplier':
-        return '공급자 콘텐츠';
       case 'community':
         return '커뮤니티 콘텐츠';
     }
@@ -98,8 +96,6 @@ export default function ContentHubPage() {
     switch (source) {
       case 'hq':
         return 'HQ 및 서비스 운영자가 제작한 공식 콘텐츠';
-      case 'supplier':
-        return '네뚜레 공급자 대시보드에서 등록한 콘텐츠';
       case 'community':
         return '포럼 및 커뮤니티에서 공유된 콘텐츠';
     }
@@ -263,7 +259,7 @@ export default function ContentHubPage() {
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
-            {(['community', 'hq', 'supplier'] as ContentSource[]).map((source) => (
+            {(['community', 'hq'] as ContentSource[]).map((source) => (
               <button
                 key={source}
                 onClick={() => setActiveSource(source)}

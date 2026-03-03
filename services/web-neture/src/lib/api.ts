@@ -958,132 +958,6 @@ export const supplierApi = {
     }
   },
 
-  // ==================== Content CRUD (P1) ====================
-
-  /**
-   * GET /api/v1/neture/supplier/contents
-   * 콘텐츠 목록
-   */
-  async getContents(filters?: { type?: ContentType; status?: ContentStatus }): Promise<SupplierContentItem[]> {
-    try {
-      const params = new URLSearchParams();
-      if (filters?.type) params.append('type', filters.type);
-      if (filters?.status) params.append('status', filters.status);
-
-      const url = `${API_BASE_URL}/api/v1/neture/supplier/contents${params.toString() ? `?${params}` : ''}`;
-
-      const response = await fetch(url, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        console.warn('[Supplier API] Contents API not available');
-        return [];
-      }
-
-      const result = await response.json();
-      return result.data || [];
-    } catch (error) {
-      console.warn('[Supplier API] Failed to fetch contents:', error);
-      return [];
-    }
-  },
-
-  /**
-   * GET /api/v1/neture/supplier/contents/:id
-   * 콘텐츠 상세
-   */
-  async getContentById(id: string): Promise<SupplierContentDetail | null> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/contents/${id}`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const result = await response.json();
-      return result.data;
-    } catch (error) {
-      console.warn('[Supplier API] Failed to fetch content detail:', error);
-      return null;
-    }
-  },
-
-  /**
-   * POST /api/v1/neture/supplier/contents
-   * 콘텐츠 생성
-   */
-  async createContent(data: {
-    type: ContentType;
-    title: string;
-    description?: string;
-    body?: string;
-    imageUrl?: string;
-    availableServices?: string[];
-    availableAreas?: string[];
-  }): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/contents`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-
-      return response.json();
-    } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
-    }
-  },
-
-  /**
-   * PATCH /api/v1/neture/supplier/contents/:id
-   * 콘텐츠 수정
-   */
-  async updateContent(
-    id: string,
-    updates: {
-      title?: string;
-      description?: string;
-      body?: string;
-      imageUrl?: string;
-      status?: ContentStatus;
-      availableServices?: string[];
-      availableAreas?: string[];
-    }
-  ): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/contents/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(updates),
-      });
-
-      return response.json();
-    } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
-    }
-  },
-
-  /**
-   * DELETE /api/v1/neture/supplier/contents/:id
-   * 콘텐츠 삭제
-   */
-  async deleteContent(id: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/contents/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      return response.json();
-    } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
-    }
-  },
 };
 
 // ==================== Seller API (WO-S2S-FLOW-RECOVERY-PHASE1-V1) ====================
@@ -1287,28 +1161,6 @@ interface OrderSummary {
   approvedSellerCount: number;
   serviceUrl: string | null;
   message: string;
-}
-
-// Content types (P1)
-export type ContentType = 'description' | 'image' | 'banner' | 'guide';
-export type ContentStatus = 'draft' | 'published';
-
-interface SupplierContentItem {
-  id: string;
-  type: ContentType;
-  title: string;
-  description: string;
-  status: ContentStatus;
-  availableServices: string[];
-  availableAreas: string[];
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string | null;
-}
-
-interface SupplierContentDetail extends SupplierContentItem {
-  body: string;
-  imageUrl: string;
 }
 
 // ==================== Dashboard Summary API ====================
@@ -1638,8 +1490,6 @@ export type {
   OrderSummary,
   OrderSummaryResponse,
   ServiceSummary,
-  SupplierContentItem,
-  SupplierContentDetail,
   SupplierDashboardSummary,
   SupplierDashboardStats,
   ServiceStat,

@@ -70,8 +70,6 @@ export default function ContentHub() {
     switch (source) {
       case 'hq':
         return '서비스운영자 콘텐츠';
-      case 'supplier':
-        return '공급자 콘텐츠';
       case 'community':
         return '커뮤니티 콘텐츠';
     }
@@ -81,8 +79,6 @@ export default function ContentHub() {
     switch (source) {
       case 'hq':
         return 'HQ 및 서비스운영자가 제작한 공식 콘텐츠';
-      case 'supplier':
-        return '네뚜레 공급자 대시보드에서 등록한 콘텐츠';
       case 'community':
         return '포럼 및 커뮤니티에서 공유된 콘텐츠';
     }
@@ -233,7 +229,7 @@ export default function ContentHub() {
           <TabsTrigger value="community">커뮤니티 콘텐츠</TabsTrigger>
         </TabsList>
 
-        {(['hq', 'supplier', 'community'] as ContentSource[]).map((source) => (
+        {(['hq', 'community'] as ContentSource[]).map((source) => (
           <TabsContent key={source} value={source} className="space-y-6">
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">{getSourceDescription(source)}</p>

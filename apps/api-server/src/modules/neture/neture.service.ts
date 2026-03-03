@@ -8,7 +8,6 @@ import {
   OfferApprovalStatus,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
-  NetureSupplierContent,
   NeturePartnerRecruitment,
   NeturePartnerApplication,
   NeturePartnerDashboardItem,
@@ -19,8 +18,6 @@ import {
   PartnershipStatus,
   RecruitmentStatus,
   ApplicationStatus,
-  ContentType,
-  ContentStatus,
   ContactVisibility,
 } from './entities/index.js';
 import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
@@ -34,7 +31,6 @@ export class NetureService {
   private _offerRepo?: Repository<SupplierProductOffer>;
   private _partnershipRepo?: Repository<NeturePartnershipRequest>;
   private _partnershipProductRepo?: Repository<NeturePartnershipProduct>;
-  private _contentRepo?: Repository<NetureSupplierContent>;
   private _recruitmentRepo?: Repository<NeturePartnerRecruitment>;
   private _applicationRepo?: Repository<NeturePartnerApplication>;
   private _contractRepo?: Repository<NetureSellerPartnerContract>;
@@ -72,13 +68,6 @@ export class NetureService {
       this._partnershipProductRepo = AppDataSource.getRepository(NeturePartnershipProduct);
     }
     return this._partnershipProductRepo;
-  }
-
-  private get contentRepo(): Repository<NetureSupplierContent> {
-    if (!this._contentRepo) {
-      this._contentRepo = AppDataSource.getRepository(NetureSupplierContent);
-    }
-    return this._contentRepo;
   }
 
   private get recruitmentRepo(): Repository<NeturePartnerRecruitment> {
@@ -1722,216 +1711,6 @@ export class NetureService {
     }
   }
 
-  // ==================== Supplier Contents (WO-NETURE-SUPPLIER-DASHBOARD-P1 §3.1) ====================
-
-  /**
-   * GET /supplier/contents - 공급자 콘텐츠 목록
-   */
-  async getSupplierContents(
-    supplierId: string,
-    filters?: { type?: ContentType; status?: ContentStatus }
-  ) {
-    try {
-      const query = this.contentRepo
-        .createQueryBuilder('content')
-        .where('content.supplierId = :supplierId', { supplierId });
-
-      if (filters?.type) {
-        query.andWhere('content.type = :type', { type: filters.type });
-      }
-
-      if (filters?.status) {
-        query.andWhere('content.status = :status', { status: filters.status });
-      }
-
-      query.orderBy('content.updatedAt', 'DESC');
-
-      const contents = await query.getMany();
-
-      return contents.map((c) => ({
-        id: c.id,
-        type: c.type,
-        title: c.title,
-        description: c.description,
-        status: c.status,
-        availableServices: c.availableServices || [],
-        availableAreas: c.availableAreas || [],
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-        publishedAt: c.publishedAt,
-      }));
-    } catch (error) {
-      logger.error('[NetureService] Error fetching supplier contents:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * GET /supplier/contents/:id - 콘텐츠 상세 조회
-   */
-  async getSupplierContentById(id: string, supplierId: string) {
-    try {
-      const content = await this.contentRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!content) {
-        return null;
-      }
-
-      return {
-        id: content.id,
-        type: content.type,
-        title: content.title,
-        description: content.description,
-        body: content.body,
-        imageUrl: content.imageUrl,
-        status: content.status,
-        availableServices: content.availableServices || [],
-        availableAreas: content.availableAreas || [],
-        createdAt: content.createdAt,
-        updatedAt: content.updatedAt,
-        publishedAt: content.publishedAt,
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error fetching supplier content:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * POST /supplier/contents - 콘텐츠 생성
-   */
-  async createSupplierContent(
-    supplierId: string,
-    data: {
-      type: ContentType;
-      title: string;
-      description?: string;
-      body?: string;
-      imageUrl?: string;
-      availableServices?: string[];
-      availableAreas?: string[];
-    }
-  ) {
-    try {
-      const content = this.contentRepo.create({
-        supplierId,
-        type: data.type,
-        title: data.title,
-        description: data.description || '',
-        body: data.body || '',
-        imageUrl: data.imageUrl || '',
-        status: ContentStatus.DRAFT,
-        availableServices: data.availableServices || [],
-        availableAreas: data.availableAreas || [],
-      });
-
-      const savedContent = await this.contentRepo.save(content);
-
-      logger.info(`[NetureService] Created content ${savedContent.id} for supplier ${supplierId}`);
-
-      return {
-        id: savedContent.id,
-        type: savedContent.type,
-        title: savedContent.title,
-        status: savedContent.status,
-        createdAt: savedContent.createdAt,
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error creating supplier content:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * PATCH /supplier/contents/:id - 콘텐츠 수정
-   */
-  async updateSupplierContent(
-    id: string,
-    supplierId: string,
-    updates: {
-      title?: string;
-      description?: string;
-      body?: string;
-      imageUrl?: string;
-      status?: ContentStatus;
-      availableServices?: string[];
-      availableAreas?: string[];
-    }
-  ) {
-    try {
-      const content = await this.contentRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!content) {
-        return { success: false, error: 'CONTENT_NOT_FOUND' };
-      }
-
-      // 필드 업데이트
-      if (updates.title !== undefined) content.title = updates.title;
-      if (updates.description !== undefined) content.description = updates.description;
-      if (updates.body !== undefined) content.body = updates.body;
-      if (updates.imageUrl !== undefined) content.imageUrl = updates.imageUrl;
-      if (updates.availableServices !== undefined) content.availableServices = updates.availableServices;
-      if (updates.availableAreas !== undefined) content.availableAreas = updates.availableAreas;
-
-      // 상태 전환 처리
-      if (updates.status !== undefined) {
-        const oldStatus = content.status;
-        content.status = updates.status;
-
-        // draft → published 전환 시 publishedAt 설정
-        if (oldStatus === ContentStatus.DRAFT && updates.status === ContentStatus.PUBLISHED) {
-          content.publishedAt = new Date();
-        }
-      }
-
-      const savedContent = await this.contentRepo.save(content);
-
-      logger.info(`[NetureService] Updated content ${id} by supplier ${supplierId}`);
-
-      return {
-        success: true,
-        data: {
-          id: savedContent.id,
-          title: savedContent.title,
-          status: savedContent.status,
-          updatedAt: savedContent.updatedAt,
-          publishedAt: savedContent.publishedAt,
-        },
-      };
-    } catch (error) {
-      logger.error('[NetureService] Error updating supplier content:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * DELETE /supplier/contents/:id - 콘텐츠 삭제
-   */
-  async deleteSupplierContent(id: string, supplierId: string) {
-    try {
-      const content = await this.contentRepo.findOne({
-        where: { id, supplierId },
-      });
-
-      if (!content) {
-        return { success: false, error: 'CONTENT_NOT_FOUND' };
-      }
-
-      await this.contentRepo.remove(content);
-
-      logger.info(`[NetureService] Deleted content ${id} by supplier ${supplierId}`);
-
-      return { success: true };
-    } catch (error) {
-      logger.error('[NetureService] Error deleting supplier content:', error);
-      throw error;
-    }
-  }
-
   // ==================== Dashboard Summary API ====================
 
   /**
@@ -1964,10 +1743,6 @@ export class NetureService {
       const activeProducts = offers.filter((o) => o.isActive).length;
       const totalProducts = offers.length;
 
-      // 콘텐츠 통계
-      const totalContents = await this.contentRepo.count({ where: { supplierId } });
-      const publishedContents = await this.contentRepo.count({ where: { supplierId, status: ContentStatus.PUBLISHED } });
-
       // 연결된 서비스 수
       const [{ count: connectedCount }] = await AppDataSource.query(`
         SELECT COUNT(DISTINCT pa.service_key)::int AS count FROM product_approvals pa
@@ -1996,8 +1771,8 @@ export class NetureService {
           recentApprovals: Number(recentApprovals),
           totalProducts,
           activeProducts,
-          totalContents,
-          publishedContents,
+          totalContents: 0,
+          publishedContents: 0,
           connectedServices: Number(connectedCount),
         },
         serviceStats: serviceStats.map((s) => ({
@@ -2067,12 +1842,6 @@ export class NetureService {
         where: { status: PartnershipStatus.OPEN },
       });
 
-      // 콘텐츠 통계
-      const totalContents = await this.contentRepo.count();
-      const publishedContents = await this.contentRepo.count({
-        where: { status: ContentStatus.PUBLISHED },
-      });
-
       // 서비스별 공급자/파트너 통계 (SERVICE + PRIVATE 모두 포함)
       const serviceStats: Array<{ serviceId: string; serviceName: string; suppliers: number; partners: number }> = await AppDataSource.query(`
         SELECT pa.service_key AS "serviceId", pa.service_key AS "serviceName",
@@ -2104,8 +1873,8 @@ export class NetureService {
           rejectedRequests: adminReqStats.rejectedRequests,
           totalPartnershipRequests,
           openPartnershipRequests,
-          totalContents,
-          publishedContents,
+          totalContents: 0,
+          publishedContents: 0,
           totalProducts,
           pendingProducts,
           distributionTypeBreakdown: { PUBLIC: publicProducts, SERVICE: serviceProducts, PRIVATE: privateProducts },

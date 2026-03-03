@@ -21,7 +21,6 @@ import logger from '../../../utils/logger.js';
 import { AppDataSource } from '../../../database/connection.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import type { NetureService } from '../neture.service.js';
-import { ContentStatus } from '../entities/NetureSupplierContent.entity.js';
 import { PartnershipStatus } from '../entities/NeturePartnershipRequest.entity.js';
 
 type AuthenticatedRequest = Request & {
@@ -187,63 +186,6 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
       }
       logger.error('[Neture Hub Trigger] auto-product error:', error);
       res.status(500).json({ success: false, message: '상품 자동 활성화 실패' });
-    }
-  });
-
-  /**
-   * POST /hub/trigger/copy-best-content
-   * 우수 콘텐츠 복제 제안 — 발행 가능한 초안 목록 반환
-   */
-  router.post('/copy-best-content', requireAuth, async (req: Request, res: Response) => {
-    const start = Date.now();
-    try {
-      const authReq = req as AuthenticatedRequest;
-      const supplierId = await getSupplierIdFromUser(authReq);
-      if (!supplierId) {
-        res.status(401).json({ success: false, message: 'Authentication required' });
-        return;
-      }
-
-      // WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: ACTIVE 검증
-      const supplier = await netureService.getSupplierByUserId(authReq.user!.id);
-      if (!supplier || supplier.status !== 'ACTIVE') {
-        res.status(403).json({ success: false, message: 'Supplier account is not active' });
-        return;
-      }
-
-      const contents = await netureService.getSupplierContents(supplierId, { status: ContentStatus.DRAFT });
-      const drafts = contents || [];
-
-      const userId = getUserId(req);
-      if (userId) {
-        actionLogService?.logSuccess('neture', userId, 'neture.trigger.copy_best_content', {
-          organizationId: supplierId, durationMs: Date.now() - start,
-          meta: { draftCount: drafts.length },
-        }).catch(() => {});
-      }
-
-      if (drafts.length === 0) {
-        res.json({
-          success: true,
-          message: '발행 대기 중인 초안이 없습니다. 새 콘텐츠를 작성해보세요.',
-        });
-        return;
-      }
-
-      res.json({
-        success: true,
-        message: `발행 가능한 초안 ${drafts.length}건이 있습니다. 콘텐츠 관리에서 발행하세요.`,
-        data: { draftCount: drafts.length },
-      });
-    } catch (error: unknown) {
-      const userId = getUserId(req);
-      if (userId) {
-        actionLogService?.logFailure('neture', userId, 'neture.trigger.copy_best_content', getErrorMessage(error), {
-          durationMs: Date.now() - start,
-        }).catch(() => {});
-      }
-      logger.error('[Neture Hub Trigger] copy-best-content error:', error);
-      res.status(500).json({ success: false, message: '콘텐츠 분석 실패' });
     }
   });
 

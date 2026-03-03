@@ -3,51 +3,23 @@
  *
  * WO-O4O-ASSET-COPY-CORE-EXTRACTION-V1
  *
- * Resolves Neture supplier content (CMS) and signage assets
- * into the standard ResolvedContent format.
+ * Resolves Neture signage assets into the standard ResolvedContent format.
  *
  * Source tables:
- * - CMS: neture_supplier_contents
  * - Signage: signage_media (shared platform table)
  */
 
 import { DataSource } from 'typeorm';
-import { NetureSupplierContent } from '../../neture/entities/NetureSupplierContent.entity.js';
 import type { ContentResolver, ResolvedContent } from '@o4o/asset-copy-core';
 
 export class NetureAssetResolver implements ContentResolver {
   constructor(private dataSource: DataSource) {}
 
   async resolve(sourceAssetId: string, assetType: string): Promise<ResolvedContent | null> {
-    if (assetType === 'cms') {
-      return this.resolveCms(sourceAssetId);
-    }
     if (assetType === 'signage') {
       return this.resolveSignage(sourceAssetId);
     }
     return null;
-  }
-
-  private async resolveCms(id: string): Promise<ResolvedContent | null> {
-    const repo = this.dataSource.getRepository(NetureSupplierContent);
-    const content = await repo.findOne({ where: { id } });
-    if (!content) return null;
-
-    return {
-      title: content.title,
-      type: 'cms',
-      sourceService: 'neture',
-      contentJson: {
-        title: content.title,
-        type: content.type,
-        description: content.description,
-        body: content.body,
-        imageUrl: content.imageUrl,
-        status: content.status,
-        availableServices: content.availableServices,
-        availableAreas: content.availableAreas,
-      },
-    };
   }
 
   private async resolveSignage(id: string): Promise<ResolvedContent | null> {

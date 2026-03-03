@@ -111,13 +111,6 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
       WHERE approval_type = 'PRIVATE'
     `);
 
-    const [contentStats] = await ds.query(`
-      SELECT
-        COUNT(*) as "totalContents",
-        COUNT(*) FILTER (WHERE status = 'published') as "publishedContents"
-      FROM neture_supplier_contents
-    `);
-
     const totalReq = parseInt(requestStats?.totalRequests || '0');
     const approvedReq = parseInt(requestStats?.approvedRequests || '0');
     const approvalRate = totalReq > 0 ? Math.round((approvedReq / totalReq) * 100) : 100;
@@ -133,10 +126,6 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
         total: totalReq,
         pending: parseInt(requestStats?.pendingRequests || '0'),
         approvalRate,
-      },
-      content: {
-        total: parseInt(contentStats?.totalContents || '0'),
-        published: parseInt(contentStats?.publishedContents || '0'),
       },
       riskLevel: approvalRate < 50 ? 'critical'
         : parseInt(requestStats?.pendingRequests || '0') > 5 ? 'warning' : 'healthy',
