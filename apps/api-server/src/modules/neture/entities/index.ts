@@ -12,3 +12,4 @@ export { NeturePartnerApplication, ApplicationStatus } from './NeturePartnerAppl
 export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } from './NetureSellerPartnerContract.entity.js';
 export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImportBatch.entity.js';
 export { SupplierCsvImportRow, CsvRowValidationStatus, CsvRowActionType } from './SupplierCsvImportRow.entity.js';
+export { NetureSupplierLibraryItem } from './NetureSupplierLibraryItem.entity.js';

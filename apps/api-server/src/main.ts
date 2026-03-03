@@ -516,6 +516,9 @@ import { createNetureRoutes } from './routes/neture/neture.routes.js';
 // Neture Supplier Routes (modules/neture - supplier dashboard APIs)
 import netureSupplierRoutes from './modules/neture/neture.routes.js';
 
+// Neture Library Routes (WO-O4O-NETURE-LIBRARY-FOUNDATION-V1)
+import netureLibraryRoutes from './modules/neture/neture-library.routes.js';
+
 // Dropshipping Admin Routes (DS-3)
 import { createDropshippingAdminRoutes } from './routes/dropshipping-admin/dropshipping-admin.routes.js';
 
@@ -1001,6 +1004,14 @@ const startServer = async () => {
       logger.info('✅ Neture Supplier routes registered at /api/v1/neture/supplier/*');
     } catch (netureSupplierError) {
       logger.error('Failed to register Neture Supplier routes:', netureSupplierError);
+    }
+
+    // 29c. Register Neture Library routes (WO-O4O-NETURE-LIBRARY-FOUNDATION-V1)
+    try {
+      app.use('/api/v1/neture', netureLibraryRoutes);
+      logger.info('✅ Neture Library routes registered at /api/v1/neture/library/*');
+    } catch (netureLibraryError) {
+      logger.error('Failed to register Neture Library routes:', netureLibraryError);
     }
 
     // 30. Register Dropshipping Admin routes (DS-3)
