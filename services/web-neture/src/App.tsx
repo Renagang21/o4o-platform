@@ -153,6 +153,14 @@ const SupplierProfilePage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierProfilePage }))
 );
 
+// Supplier Library (WO-O4O-NETURE-LIBRARY-UI-V1)
+const SupplierLibraryPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryPage }))
+);
+const SupplierLibraryFormPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryFormPage }))
+);
+
 // Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
 
@@ -475,6 +483,10 @@ function App() {
               <Route path="/workspace/supplier/profile" element={<SupplierProfilePage />} />
               {/* Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1) */}
               <Route path="/workspace/supplier/signage/content" element={<SignageContentHubPage />} />
+              {/* Supplier Library (WO-O4O-NETURE-LIBRARY-UI-V1) */}
+              <Route path="/workspace/supplier/library" element={<SupplierLibraryPage />} />
+              <Route path="/workspace/supplier/library/new" element={<SupplierLibraryFormPage />} />
+              <Route path="/workspace/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
             </Route>
 
             {/* ================================================================

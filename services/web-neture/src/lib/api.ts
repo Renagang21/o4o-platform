@@ -737,6 +737,22 @@ interface SupplierRequestDetail {
   createdAt: string;
 }
 
+// WO-O4O-NETURE-LIBRARY-UI-V1
+export interface SupplierLibraryItem {
+  id: string;
+  supplierId: string;
+  title: string;
+  description: string | null;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  category: string | null;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const supplierApi = {
   /**
    * GET /api/v1/neture/supplier/requests
@@ -1079,6 +1095,104 @@ export const supplierApi = {
         credentials: 'include',
       });
 
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  // ==================== Library API (WO-O4O-NETURE-LIBRARY-UI-V1) ====================
+
+  /**
+   * GET /api/v1/neture/library
+   * 공급자 자료실 목록 조회
+   */
+  async getLibraryItems(opts?: { category?: string; page?: number; limit?: number }): Promise<SupplierLibraryItem[]> {
+    try {
+      const params = new URLSearchParams();
+      if (opts?.category) params.append('category', opts.category);
+      if (opts?.page) params.append('page', String(opts.page));
+      if (opts?.limit) params.append('limit', String(opts.limit));
+      const query = params.toString();
+      const url = `${API_BASE_URL}/api/v1/neture/library${query ? `?${query}` : ''}`;
+
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Supplier API] Library API not available');
+        return [];
+      }
+      const result = await response.json();
+      return result.data?.items || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch library items:', error);
+      return [];
+    }
+  },
+
+  /**
+   * POST /api/v1/neture/library
+   * 자료 등록
+   */
+  async createLibraryItem(data: {
+    title: string;
+    description?: string;
+    fileUrl: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    category?: string;
+    isPublic?: boolean;
+  }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * PATCH /api/v1/neture/library/:id
+   * 자료 수정
+   */
+  async updateLibraryItem(id: string, data: {
+    title?: string;
+    description?: string | null;
+    fileUrl?: string;
+    fileName?: string;
+    fileSize?: number;
+    mimeType?: string;
+    category?: string | null;
+    isPublic?: boolean;
+  }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * DELETE /api/v1/neture/library/:id
+   * 자료 삭제
+   */
+  async deleteLibraryItem(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
       return response.json();
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
