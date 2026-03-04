@@ -3,18 +3,21 @@
  *
  * WO-O4O-QR-LANDING-PAGE-V1
  * WO-O4O-QR-SCAN-ANALYTICS-V1
+ * WO-O4O-QR-PRINT-MODULE-V2
  *
- * QR 코드 CRUD + 공개 랜딩 데이터 조회 + 스캔 이벤트 추적.
+ * QR 코드 CRUD + 공개 랜딩 데이터 조회 + 스캔 이벤트 추적 + 출력.
  *
  * PUBLIC (no auth):
  *   GET  /qr/public/:slug  — QR 랜딩 데이터 조회 + scan event 기록
  *
  * AUTHENTICATED (requireAuth + requirePharmacyOwner):
  *   GET    /pharmacy/qr              — 내 QR 코드 목록 (scanCount 포함)
+ *   POST   /pharmacy/qr/print        — 선택 QR 일괄 PDF 출력
  *   POST   /pharmacy/qr              — QR 코드 생성
  *   PUT    /pharmacy/qr/:id          — QR 코드 수정
  *   DELETE /pharmacy/qr/:id          — soft-delete
  *   GET    /pharmacy/qr/:id/analytics — QR 스캔 통계
+ *   GET    /pharmacy/qr/:id/image    — QR 이미지 다운로드 (PNG/SVG)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -23,8 +26,12 @@ import { createHash } from 'crypto';
 import { StoreQrCode } from '../../platform/entities/store-qr-code.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { generateQrPng, generateQrSvg, generateQrPrintPdf } from '../../../services/qr-print.service.js';
+import type { QrPrintItem } from '../../../services/qr-print.service.js';
 
 type AuthMiddleware = RequestHandler;
+
+const PUBLIC_DOMAIN = process.env.PUBLIC_DOMAIN || 'o4o.kr';
 
 function detectDeviceType(ua: string | undefined): string {
   if (!ua) return 'desktop';
@@ -230,6 +237,96 @@ export function createStoreQrLandingController(
         success: true,
         data: { ...stats, deviceStats },
       });
+    }),
+  );
+
+  // ─── GET /pharmacy/qr/:id/image — QR 이미지 다운로드 (PNG/SVG) ─
+  router.get(
+    '/pharmacy/qr/:id/image',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const { id } = req.params;
+      const format = (req.query.format as string) || 'png';
+      const size = Math.min(1024, Math.max(128, parseInt(req.query.size as string) || 512));
+
+      const qr = await qrRepo.findOne({ where: { id, organizationId } });
+      if (!qr) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'QR_NOT_FOUND', message: 'QR code not found' },
+        });
+        return;
+      }
+
+      const qrUrl = `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`;
+
+      if (format === 'svg') {
+        const svg = await generateQrSvg(qrUrl, size);
+        res.setHeader('Content-Type', 'image/svg+xml');
+        res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}.svg"`);
+        res.send(svg);
+      } else {
+        const png = await generateQrPng(qrUrl, size);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', `attachment; filename="qr-${qr.slug}.png"`);
+        res.send(png);
+      }
+    }),
+  );
+
+  // ─── POST /pharmacy/qr/print — 선택 QR 일괄 PDF 출력 ─────────
+  router.post(
+    '/pharmacy/qr/print',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+      const { qrIds } = req.body;
+
+      if (!Array.isArray(qrIds) || qrIds.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'qrIds array is required' },
+        });
+        return;
+      }
+      if (qrIds.length > 24) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: 'Maximum 24 QR codes per print' },
+        });
+        return;
+      }
+
+      // 소유권 확인 + 데이터 로드
+      const qrCodes = await qrRepo
+        .createQueryBuilder('qr')
+        .where('qr.organization_id = :organizationId', { organizationId })
+        .andWhere('qr.id IN (:...ids)', { ids: qrIds })
+        .andWhere('qr.is_active = true')
+        .getMany();
+
+      if (qrCodes.length === 0) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'QR_NOT_FOUND', message: 'No matching QR codes found' },
+        });
+        return;
+      }
+
+      const printItems: QrPrintItem[] = qrCodes.map((qr) => ({
+        url: `https://${PUBLIC_DOMAIN}/qr/${qr.slug}`,
+        title: qr.title,
+        subtitle: `/qr/${qr.slug}`,
+      }));
+
+      const pdfBuffer = await generateQrPrintPdf(printItems);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="qr-print.pdf"');
+      res.send(pdfBuffer);
     }),
   );
 

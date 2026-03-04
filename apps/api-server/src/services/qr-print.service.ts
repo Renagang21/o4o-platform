@@ -2,11 +2,14 @@
  * QR Print Service
  *
  * WO-O4O-QR-PRINT-MODULE-V1
+ * WO-O4O-QR-PRINT-MODULE-V2
  *
  * QR 코드 생성 + A4 8분할 PDF 즉시 다운로드.
  * QR은 DB에 저장하지 않음 (온디맨드 생성).
  *
  * - generateQrDataUrl: QR PNG → base64 data URL
+ * - generateQrPng: QR PNG → Buffer (지정 크기)
+ * - generateQrSvg: QR SVG → string (지정 크기)
  * - generateQrPrintPdf: A4 8분할 (2열×4행) PDF Buffer
  */
 
@@ -48,6 +51,29 @@ export interface QrPrintItem {
 export async function generateQrDataUrl(url: string): Promise<string> {
   return QRCode.toDataURL(url, {
     width: 300,
+    margin: 1,
+    errorCorrectionLevel: 'M',
+  });
+}
+
+/**
+ * QR PNG Buffer 생성 (지정 크기)
+ */
+export async function generateQrPng(url: string, size?: number): Promise<Buffer> {
+  return QRCode.toBuffer(url, {
+    width: size || 512,
+    margin: 1,
+    errorCorrectionLevel: 'M',
+  });
+}
+
+/**
+ * QR SVG 문자열 생성 (지정 크기)
+ */
+export async function generateQrSvg(url: string, size?: number): Promise<string> {
+  return QRCode.toString(url, {
+    type: 'svg',
+    width: size || 512,
     margin: 1,
     errorCorrectionLevel: 'M',
   });

@@ -3,14 +3,16 @@
  *
  * WO-O4O-QR-LANDING-PAGE-V1
  * WO-O4O-QR-SCAN-ANALYTICS-V1
+ * WO-O4O-QR-PRINT-MODULE-V2
  *
  * Library에서 자료를 선택 → slug/landingType/landingTargetId 설정 → 백엔드 저장.
  * QR URL: /qr/{slug} (공개)
  * 스캔 통계: totalScans / todayScans / weeklyScans / deviceStats
+ * 출력: PNG/SVG 개별 다운로드 + 선택 QR A4 PDF 일괄 출력
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet } from 'lucide-react';
+import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet, Download, Printer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
@@ -59,6 +61,11 @@ export function StoreQRPage() {
   const [analyticsId, setAnalyticsId] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<QrAnalyticsData | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  // Print / download state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [printing, setPrinting] = useState(false);
+  const [downloadMenuId, setDownloadMenuId] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -159,6 +166,60 @@ export function StoreQRPage() {
     }
   };
 
+  const apiBase = import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/kpa`
+    : '/api/v1/kpa';
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === items.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(items.map((i) => i.id)));
+    }
+  };
+
+  const handleDownload = (id: string, format: 'png' | 'svg') => {
+    const url = `${apiBase}/pharmacy/qr/${id}/image?format=${format}`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setDownloadMenuId(null);
+  };
+
+  const handleBatchPrint = async () => {
+    if (selectedIds.size === 0) return;
+    setPrinting(true);
+    try {
+      const resp = await fetch(`${apiBase}/pharmacy/qr/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ qrIds: Array.from(selectedIds) }),
+      });
+      if (!resp.ok) throw new Error('Print failed');
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      alert('PDF 생성에 실패했습니다');
+    } finally {
+      setPrinting(false);
+    }
+  };
+
   const qrBaseUrl = `${window.location.origin}/qr/`;
 
   return (
@@ -181,6 +242,31 @@ export function StoreQRPage() {
           QR 코드 생성
         </button>
       </div>
+
+      {/* Batch Print Toolbar */}
+      {items.length > 0 && (
+        <div style={styles.printToolbar}>
+          <label style={styles.selectAllLabel}>
+            <input
+              type="checkbox"
+              checked={selectedIds.size === items.length && items.length > 0}
+              onChange={handleSelectAll}
+              style={styles.checkbox}
+            />
+            전체 선택 ({selectedIds.size}/{items.length})
+          </label>
+          {selectedIds.size > 0 && (
+            <button
+              onClick={handleBatchPrint}
+              disabled={printing}
+              style={{ ...styles.printBtn, opacity: printing ? 0.7 : 1 }}
+            >
+              <Printer size={14} />
+              {printing ? 'PDF 생성 중...' : `선택 QR 출력 (${selectedIds.size})`}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Create Form */}
       {creating && selectedLibrary && (
@@ -270,6 +356,12 @@ export function StoreQRPage() {
             {items.map((item) => (
               <div key={item.id}>
                 <div style={styles.card}>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(item.id)}
+                    onChange={() => handleToggleSelect(item.id)}
+                    style={styles.checkbox}
+                  />
                   <div style={styles.cardIcon}>
                     <QrCode size={24} style={{ color: colors.primary }} />
                   </div>
@@ -286,6 +378,31 @@ export function StoreQRPage() {
                     </div>
                   </div>
                   <div style={styles.cardActions}>
+                    <div style={{ position: 'relative' }}>
+                      <button
+                        onClick={() => setDownloadMenuId(downloadMenuId === item.id ? null : item.id)}
+                        style={styles.iconBtn}
+                        title="QR 다운로드"
+                      >
+                        <Download size={16} />
+                      </button>
+                      {downloadMenuId === item.id && (
+                        <div style={styles.downloadMenu}>
+                          <button
+                            onClick={() => handleDownload(item.id, 'png')}
+                            style={styles.downloadMenuItem}
+                          >
+                            PNG 다운로드
+                          </button>
+                          <button
+                            onClick={() => handleDownload(item.id, 'svg')}
+                            style={styles.downloadMenuItem}
+                          >
+                            SVG 다운로드
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     <button
                       onClick={() => handleShowAnalytics(item.id)}
                       style={{
@@ -656,5 +773,69 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '12px',
     color: colors.neutral600,
     padding: '2px 0',
+  },
+
+  // Print / download
+  printToolbar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 16px',
+    marginBottom: '12px',
+    backgroundColor: colors.neutral50,
+    borderRadius: '8px',
+    border: `1px solid ${colors.neutral200}`,
+  },
+  selectAllLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '13px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+  },
+  checkbox: {
+    width: '16px',
+    height: '16px',
+    cursor: 'pointer',
+    accentColor: colors.primary,
+    flexShrink: 0,
+  },
+  printBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 14px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  downloadMenu: {
+    position: 'absolute',
+    top: '34px',
+    right: 0,
+    zIndex: 10,
+    backgroundColor: '#fff',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+    overflow: 'hidden',
+    minWidth: '130px',
+  },
+  downloadMenuItem: {
+    display: 'block',
+    width: '100%',
+    padding: '8px 14px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    fontSize: '13px',
+    color: colors.neutral700,
+    cursor: 'pointer',
+    textAlign: 'left',
   },
 };
