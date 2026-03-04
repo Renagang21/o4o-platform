@@ -133,9 +133,15 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
 
     // Role hierarchy: super_admin > admin > other roles
     // super_admin has all admin privileges
+    // Phase3-E: Support both unprefixed and domain-prefixed role names
     const expandedRequiredRoles = [...requiredRoles];
-    if (requiredRoles.includes('admin') && !requiredRoles.includes('super_admin')) {
-      expandedRequiredRoles.push('super_admin');
+    if (requiredRoles.includes('admin') || requiredRoles.includes('platform:admin')) {
+      if (!expandedRequiredRoles.includes('super_admin')) expandedRequiredRoles.push('super_admin');
+      if (!expandedRequiredRoles.includes('platform:admin')) expandedRequiredRoles.push('platform:admin');
+      if (!expandedRequiredRoles.includes('platform:super_admin')) expandedRequiredRoles.push('platform:super_admin');
+    }
+    if (requiredRoles.includes('super_admin') && !expandedRequiredRoles.includes('platform:super_admin')) {
+      expandedRequiredRoles.push('platform:super_admin');
     }
 
     const hasRequiredRole =
