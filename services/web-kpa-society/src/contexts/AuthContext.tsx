@@ -290,13 +290,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await authClient.api.get('/auth/me');
-      const data = response.data as { success: boolean; data: ApiUser };
+      const data = response.data as { success: boolean; data: any };
 
       if (data.success && data.data) {
-        const userData = createUserFromApiResponse(data.data);
+        // /auth/me returns {success, data: {user: {...}}} — unwrap user object
+        const apiUser: ApiUser = data.data.user || data.data;
+        const userData = createUserFromApiResponse(apiUser);
 
         // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership from /auth/me (단일 호출)
-        const km = (data.data as any).kpaMembership;
+        const km = (apiUser as any).kpaMembership;
         if (km) {
           userData.kpaMembership = km;
           // 하위 호환 필드 populate
