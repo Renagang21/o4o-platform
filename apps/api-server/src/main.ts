@@ -1124,15 +1124,7 @@ const startServer = async () => {
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
     }
 
-    // 37-b. Register Demo Seed routes (WO-DEMO-SEED-SCRIPT-V1)
-    // Path: /api/v1/ops/seed-demo (NOT /api/v1/admin/* to avoid adminDashboardRoutes auth middleware)
-    try {
-      const { createSeedDemoRouter } = await import('./modules/admin/seed-demo.controller.js');
-      app.use('/api/v1/ops/seed-demo', createSeedDemoRouter(AppDataSource));
-      logger.info('✅ Demo Seed routes registered at /api/v1/ops/seed-demo');
-    } catch (seedDemoError) {
-      logger.error('Failed to register Demo Seed routes:', seedDemoError);
-    }
+    // 37-b. Demo Seed routes removed (WO-O4O-STORE-LIBRARY-EDIT-V1: 상품 데모 데이터 정리)
 
     // 37-c. Register Care Diagnostic routes (WO-HOME-CGM-CARD-V1)
     try {
