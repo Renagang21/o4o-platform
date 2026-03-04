@@ -11,6 +11,7 @@ import { GlycopharmRepository } from '../../routes/glycopharm/repositories/glyco
 import type { GlycopharmProduct } from '../../routes/glycopharm/entities/glycopharm-product.entity.js';
 import { NeturePartnerDashboardItem } from './entities/NeturePartnerDashboardItem.entity.js';
 import { NeturePartnerDashboardItemContent } from './entities/NeturePartnerDashboardItemContent.entity.js';
+import { NetureSupplierLibrary } from './entities/NetureSupplierLibrary.entity.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -2584,7 +2585,7 @@ router.use('/assets', createNetureAssetSnapshotController(AppDataSource, require
 router.get('/library/public/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const repo = AppDataSource.getRepository(NetureSupplierContent);
+    const repo = AppDataSource.getRepository(NetureSupplierLibrary);
     const item = await repo.findOne({ where: { id, status: 'published' as any } });
 
     if (!item) {
