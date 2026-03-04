@@ -2,17 +2,19 @@
  * StorePopPage — 매장 POP 자료 관리
  *
  * WO-O4O-POP-LIBRARY-INTEGRATION-V1
+ * WO-O4O-QR-POP-AUTO-GENERATOR-V1
  *
- * Library에서 자료를 선택하여 POP(Point of Purchase) 디스플레이에
- * 사용할 인쇄/디지털 자료를 관리하는 페이지.
+ * Library에서 자료를 선택 → QR 코드 연결(선택) → A4/A5 레이아웃 → POP PDF 자동 생성.
  */
 
-import { useState } from 'react';
-import { Megaphone, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Megaphone, Plus, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
+import { getStoreQrCodes } from '../../api/storeQr';
+import type { StoreQrCode } from '../../api/storeQr';
 
 interface PopItem {
   id: string;
@@ -25,6 +27,29 @@ export function StorePopPage() {
   const [popItems, setPopItems] = useState<PopItem[]>([]);
   const [showSelector, setShowSelector] = useState(false);
 
+  // QR selection
+  const [qrCodes, setQrCodes] = useState<StoreQrCode[]>([]);
+  const [selectedQrId, setSelectedQrId] = useState<string>('');
+
+  // Layout + generate
+  const [layout, setLayout] = useState<'A4' | 'A5'>('A4');
+  const [generating, setGenerating] = useState(false);
+
+  const fetchQrCodes = useCallback(async () => {
+    try {
+      const res = await getStoreQrCodes({ limit: 100 });
+      if (res.success && res.data) {
+        setQrCodes(res.data.items);
+      }
+    } catch {
+      // silent
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchQrCodes();
+  }, [fetchQrCodes]);
+
   const handleSelect = (item: LibrarySelectorResult) => {
     if (popItems.some((p) => p.id === item.id)) {
       setShowSelector(false);
@@ -36,6 +61,36 @@ export function StorePopPage() {
 
   const handleRemove = (id: string) => {
     setPopItems((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const apiBase = import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/kpa`
+    : '/api/v1/kpa';
+
+  const handleGenerate = async () => {
+    if (popItems.length === 0) return;
+    setGenerating(true);
+    try {
+      const resp = await fetch(`${apiBase}/pharmacy/pop/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          libraryItemIds: popItems.map((p) => p.id),
+          qrId: selectedQrId || undefined,
+          layout,
+        }),
+      });
+      if (!resp.ok) throw new Error('Generate failed');
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      alert('POP PDF 생성에 실패했습니다');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
@@ -51,7 +106,7 @@ export function StorePopPage() {
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>POP 자료</span>
           </div>
           <h1 style={styles.title}>POP 자료 관리</h1>
-          <p style={styles.subtitle}>매장 내 POP 디스플레이에 사용할 자료를 관리합니다</p>
+          <p style={styles.subtitle}>Library 자료를 선택하고 QR 코드를 연결하여 POP 광고를 PDF로 출력합니다</p>
         </div>
         <button onClick={() => setShowSelector(true)} style={styles.addBtn}>
           <Plus size={16} />
@@ -72,34 +127,99 @@ export function StorePopPage() {
             </p>
           </div>
         ) : (
-          <div style={styles.list}>
-            {popItems.map((item) => (
-              <div key={item.id} style={styles.card}>
-                <div style={styles.cardIcon}>
-                  <Megaphone size={24} style={{ color: '#f59e0b' }} />
+          <>
+            <div style={styles.list}>
+              {popItems.map((item) => (
+                <div key={item.id} style={styles.card}>
+                  <div style={styles.cardIcon}>
+                    <Megaphone size={24} style={{ color: '#f59e0b' }} />
+                  </div>
+                  <div style={styles.cardInfo}>
+                    <p style={styles.cardTitle}>{item.title}</p>
+                    {item.category && (
+                      <span style={styles.cardCategory}>{item.category}</span>
+                    )}
+                    {item.fileUrl && (
+                      <a
+                        href={item.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.cardLink}
+                      >
+                        <ExternalLink size={12} /> URL 열기
+                      </a>
+                    )}
+                  </div>
+                  <button onClick={() => handleRemove(item.id)} style={styles.removeBtn}>
+                    <Trash2 size={16} />
+                  </button>
                 </div>
-                <div style={styles.cardInfo}>
-                  <p style={styles.cardTitle}>{item.title}</p>
-                  {item.category && (
-                    <span style={styles.cardCategory}>{item.category}</span>
-                  )}
-                  {item.fileUrl && (
-                    <a
-                      href={item.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={styles.cardLink}
-                    >
-                      <ExternalLink size={12} /> URL 열기
-                    </a>
-                  )}
-                </div>
-                <button onClick={() => handleRemove(item.id)} style={styles.removeBtn}>
-                  <Trash2 size={16} />
-                </button>
+              ))}
+            </div>
+
+            {/* Generate Settings */}
+            <div style={styles.settingsPanel}>
+              <h3 style={styles.settingsTitle}>POP 생성 설정</h3>
+
+              {/* QR Selection */}
+              <div style={styles.settingRow}>
+                <label style={styles.settingLabel}>
+                  <QrCode size={14} style={{ marginRight: '6px' }} />
+                  QR 코드 연결 (선택사항)
+                </label>
+                <select
+                  value={selectedQrId}
+                  onChange={(e) => setSelectedQrId(e.target.value)}
+                  style={styles.select}
+                >
+                  <option value="">QR 코드 없음</option>
+                  {qrCodes.map((qr) => (
+                    <option key={qr.id} value={qr.id}>
+                      {qr.title} (/qr/{qr.slug})
+                    </option>
+                  ))}
+                </select>
               </div>
-            ))}
-          </div>
+
+              {/* Layout Selection */}
+              <div style={styles.settingRow}>
+                <label style={styles.settingLabel}>레이아웃</label>
+                <div style={styles.layoutToggle}>
+                  <button
+                    onClick={() => setLayout('A4')}
+                    style={{
+                      ...styles.layoutBtn,
+                      ...(layout === 'A4' ? styles.layoutBtnActive : {}),
+                    }}
+                  >
+                    A4 (1장 1개)
+                  </button>
+                  <button
+                    onClick={() => setLayout('A5')}
+                    style={{
+                      ...styles.layoutBtn,
+                      ...(layout === 'A5' ? styles.layoutBtnActive : {}),
+                    }}
+                  >
+                    A5 (1장 2개)
+                  </button>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={handleGenerate}
+                disabled={generating || popItems.length === 0}
+                style={{
+                  ...styles.generateBtn,
+                  opacity: generating ? 0.7 : 1,
+                }}
+              >
+                <FileDown size={16} />
+                {generating ? 'PDF 생성 중...' : `POP PDF 생성 (${popItems.length}개)`}
+              </button>
+            </div>
+          </>
         )}
       </div>
 
@@ -149,6 +269,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     fontWeight: 500,
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   body: {
     minHeight: '300px',
@@ -167,6 +288,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
+    marginBottom: '20px',
   },
   card: {
     display: 'flex',
@@ -227,5 +349,74 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     borderRadius: '6px',
     flexShrink: 0,
+  },
+
+  // Settings panel
+  settingsPanel: {
+    padding: '20px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '12px',
+    backgroundColor: '#fff',
+  },
+  settingsTitle: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colors.neutral800,
+    margin: '0 0 16px',
+  },
+  settingRow: {
+    marginBottom: '16px',
+  },
+  settingLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '13px',
+    fontWeight: 500,
+    color: colors.neutral600,
+    marginBottom: '6px',
+  },
+  select: {
+    width: '100%',
+    padding: '8px 10px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: colors.neutral800,
+    backgroundColor: '#fff',
+    outline: 'none',
+  },
+  layoutToggle: {
+    display: 'flex',
+    gap: '8px',
+  },
+  layoutBtn: {
+    padding: '8px 16px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    backgroundColor: '#fff',
+    fontSize: '13px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+  },
+  layoutBtnActive: {
+    backgroundColor: colors.primary,
+    color: '#fff',
+    borderColor: colors.primary,
+  },
+  generateBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    width: '100%',
+    padding: '12px',
+    marginTop: '20px',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
   },
 };
