@@ -8,6 +8,7 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 export class AdminUserController {
   
   // Get all users with pagination and filters
+  // WO-OPERATOR-FIX-V1: JOIN role_assignments to include roles in response
   getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
       const {
@@ -31,10 +32,13 @@ export class AdminUserController {
         );
       }
 
-      // Apply role filter - role column removed, skip role filtering
-      // if (role && role !== 'all') {
-      //   queryBuilder.andWhere('user.role = :role', { role });
-      // }
+      // WO-OPERATOR-FIX-V1: role filter via role_assignments
+      if (role && role !== 'all') {
+        queryBuilder.andWhere(
+          `EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = user.id AND ra.is_active = true AND ra.role = :filterRole)`,
+          { filterRole: role }
+        );
+      }
 
       // Apply status filter
       if (status && status !== 'all') {
@@ -53,10 +57,30 @@ export class AdminUserController {
 
       const [users, totalCount] = await queryBuilder.getManyAndCount();
 
-      // Remove password from response
+      // WO-OPERATOR-FIX-V1: Fetch roles for all users in batch
+      const userIds = users.map(u => u.id);
+      let roleMap: Record<string, string[]> = {};
+      if (userIds.length > 0) {
+        const roleRows = await AppDataSource.query(
+          `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles
+           FROM role_assignments
+           WHERE user_id = ANY($1) AND is_active = true
+           GROUP BY user_id`,
+          [userIds]
+        );
+        for (const row of roleRows) {
+          roleMap[row.user_id] = row.roles || [];
+        }
+      }
+
+      // Remove password from response, add roles
       const sanitizedUsers = users.map(user => {
         const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        return {
+          ...userWithoutPassword,
+          roles: roleMap[user.id] || [],
+          role: (roleMap[user.id] || [])[0] || 'user'
+        };
       });
 
       const totalPages = Math.ceil(totalCount / Number(limit));
@@ -132,6 +156,7 @@ export class AdminUserController {
         lastName,
         name,
         role = UserRole.USER,
+        roles: rolesArray,
         status = UserStatus.APPROVED,
         isActive = true
       } = req.body;
@@ -164,8 +189,15 @@ export class AdminUserController {
 
       const savedUser = await userRepo.save(newUser);
 
+      // WO-OPERATOR-FIX-V1: Support multiple roles from frontend
       // Write to role_assignments (SSOT)
-      await roleAssignmentService.assignRole({ userId: savedUser.id, role });
+      if (Array.isArray(rolesArray) && rolesArray.length > 0) {
+        for (const r of rolesArray) {
+          await roleAssignmentService.assignRole({ userId: savedUser.id, role: r });
+        }
+      } else {
+        await roleAssignmentService.assignRole({ userId: savedUser.id, role });
+      }
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = savedUser;
@@ -216,6 +248,7 @@ export class AdminUserController {
         lastName,
         name,
         role,
+        roles: rolesArray,
         status,
         isActive
       } = req.body;
@@ -237,7 +270,13 @@ export class AdminUserController {
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (name) user.name = name;
-      if (role) {
+      // WO-OPERATOR-FIX-V1: Support multiple roles from frontend
+      if (Array.isArray(rolesArray) && rolesArray.length > 0) {
+        await roleAssignmentService.removeAllRoles(user.id);
+        for (const r of rolesArray) {
+          await roleAssignmentService.assignRole({ userId: user.id, role: r });
+        }
+      } else if (role) {
         await roleAssignmentService.removeAllRoles(user.id);
         await roleAssignmentService.assignRole({ userId: user.id, role });
       }

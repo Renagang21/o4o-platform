@@ -183,9 +183,10 @@ export const requireAnyRole = (roles: (UserRole | string)[]) => {
 
 /**
  * Shorthand for requiring admin role
- * Checks for both ADMIN and SUPER_ADMIN roles
+ * WO-OPERATOR-FIX-V1: Aligned with common/middleware/auth.middleware.ts
+ * Checks for ADMIN, SUPER_ADMIN, and OPERATOR roles
  */
-export const requireAdmin = requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN]);
+export const requireAdmin = requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.OPERATOR]);
 
 /**
  * Shorthand for requiring super admin role

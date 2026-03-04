@@ -254,21 +254,29 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     };
   };
 
-  // Check both user.role and user.roles array for admin access
+  // Check both user.role and user.roles array for admin/operator access
   // Support both string roles and object roles with name field
   // Phase3-E: Support both unprefixed and domain-prefixed role names
-  const adminRoleNames = ['admin', 'administrator', 'super_admin', 'platform:admin', 'platform:super_admin'];
+  // WO-OPERATOR-FIX-V1: Include operator roles for dashboard access
+  const isDashboardRole = (role: string): boolean => {
+    const exactRoles = ['admin', 'administrator', 'super_admin', 'operator',
+      'platform:admin', 'platform:super_admin'];
+    if (exactRoles.includes(role)) return true;
+    // Service-prefixed admin/operator roles (e.g., kpa:admin, neture:operator)
+    if (role.includes(':') && (role.endsWith(':admin') || role.endsWith(':operator'))) return true;
+    return false;
+  };
 
   const isAdmin = user ? (
     // Check user.role (string)
-    (user.role && adminRoleNames.includes(user.role)) ||
+    (user.role && isDashboardRole(user.role)) ||
     // Check user.activeRole.name (object)
-    ((user as any).activeRole?.name && adminRoleNames.includes((user as any).activeRole.name)) ||
+    ((user as any).activeRole?.name && isDashboardRole((user as any).activeRole.name)) ||
     // Check user.roles array (can be strings or objects)
     (Array.isArray((user as any).roles) && (user as any).roles.some((r: any) =>
       typeof r === 'string'
-        ? adminRoleNames.includes(r)
-        : r?.name && adminRoleNames.includes(r.name)
+        ? isDashboardRole(r)
+        : r?.name && isDashboardRole(r.name)
     ))
   ) : false;
 
