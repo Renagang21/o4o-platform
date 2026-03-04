@@ -45,12 +45,15 @@ async function derivePharmacistQualification(userId: string): Promise<{
   pharmacistFunction: string | null;
   isStoreOwner: boolean;
 }> {
-  // 1. Check organization_members for owner status
-  const [ownerRecord] = await AppDataSource.query(
-    `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
-    [userId]
-  );
-  const isStoreOwner = !!ownerRecord;
+  // 1. Check organization_members for owner status (table may not exist in production)
+  let isStoreOwner = false;
+  try {
+    const [ownerRecord] = await AppDataSource.query(
+      `SELECT 1 FROM organization_members WHERE user_id = $1 AND role = 'owner' AND left_at IS NULL LIMIT 1`,
+      [userId]
+    );
+    isStoreOwner = !!ownerRecord;
+  } catch { /* table may not exist */ }
 
   // 2. Query kpa_pharmacist_profiles for activity_type
   const [profile] = await AppDataSource.query(
@@ -116,13 +119,17 @@ async function deriveKpaMembershipContext(userId: string): Promise<KpaMembership
 
   if (!member) return null;
 
-  // 2. organization_members 조회 (활성 소속)
-  const [orgMember] = await AppDataSource.query(
-    `SELECT role FROM organization_members
-     WHERE user_id = $1 AND left_at IS NULL
-     LIMIT 1`,
-    [userId]
-  );
+  // 2. organization_members 조회 (활성 소속, table may not exist)
+  let orgMember = null;
+  try {
+    const [row] = await AppDataSource.query(
+      `SELECT role FROM organization_members
+       WHERE user_id = $1 AND left_at IS NULL
+       LIMIT 1`,
+      [userId]
+    );
+    orgMember = row || null;
+  } catch { /* table may not exist */ }
 
   // 3. serviceAccess 매트릭스 계산
   let serviceAccess: KpaMembershipContext['serviceAccess'] = null;
