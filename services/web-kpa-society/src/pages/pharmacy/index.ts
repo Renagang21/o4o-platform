@@ -86,5 +86,8 @@ export { MarketingAnalyticsPage } from './MarketingAnalyticsPage';
 // WO-O4O-STORE-MARKETING-DASHBOARD-V1: 마케팅 대시보드
 export { StoreMarketingDashboardPage } from './StoreMarketingDashboardPage';
 
+// WO-O4O-PRODUCT-MARKETING-GRAPH-V1: 상품 마케팅 그래프
+export { ProductMarketingPage } from './ProductMarketingPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

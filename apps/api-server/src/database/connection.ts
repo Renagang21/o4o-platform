@@ -276,6 +276,7 @@ import {
   StoreLibraryItem,
   StoreQrCode,
   StoreQrScanEvent,
+  ProductMarketingAsset,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -780,6 +781,9 @@ export const AppDataSource = new DataSource({
     // QR SCAN EVENT ENTITY (WO-O4O-QR-SCAN-ANALYTICS-V1)
     // ============================================================================
     StoreQrScanEvent,
+    // PRODUCT MARKETING ASSET ENTITY (WO-O4O-PRODUCT-MARKETING-GRAPH-V1)
+    // ============================================================================
+    ProductMarketingAsset,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================

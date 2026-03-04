@@ -383,6 +383,19 @@ export function createStoreQrLandingController(
       });
 
       const saved = await qrRepo.save(item);
+
+      // WO-O4O-PRODUCT-MARKETING-GRAPH-V1: Auto-link QR → Product
+      if (landingType === 'product' && landingTargetId) {
+        dataSource.query(
+          `INSERT INTO product_marketing_assets (organization_id, product_id, asset_type, asset_id)
+           VALUES ($1, $2, 'qr', $3)
+           ON CONFLICT (product_id, asset_type, asset_id) DO NOTHING`,
+          [organizationId, landingTargetId, saved.id],
+        ).catch((err: unknown) => {
+          console.error('[ProductMarketingGraph] Auto-link QR failed:', err);
+        });
+      }
+
       res.status(201).json({ success: true, data: saved });
     }),
   );

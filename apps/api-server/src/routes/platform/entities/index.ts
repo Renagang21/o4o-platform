@@ -15,3 +15,4 @@ export { TabletInterestRequest, InterestRequestStatus } from './tablet-interest-
 export { StoreLibraryItem } from './store-library-item.entity.js';
 export { StoreQrCode } from './store-qr-code.entity.js';
 export { StoreQrScanEvent } from './store-qr-scan-event.entity.js';
+export { ProductMarketingAsset } from './product-marketing-asset.entity.js';
