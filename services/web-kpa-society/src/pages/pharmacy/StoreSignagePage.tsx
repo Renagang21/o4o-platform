@@ -55,11 +55,14 @@ import {
   deleteStorePlaylist,
   fetchPlaylistItems,
   addPlaylistItem,
+  addPlaylistItemFromLibrary,
   deletePlaylistItem,
   reorderPlaylistItems,
   type StorePlaylist,
   type StorePlaylistItem,
 } from '../../api/storePlaylist';
+import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
+import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
 
 /* ─── Constants ──────────────────────────────── */
 
@@ -196,6 +199,7 @@ export function StoreSignagePage() {
   // ── Signage snapshot list for "add to playlist" ──
   const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
   const [showAddPicker, setShowAddPicker] = useState(false);
+  const [showLibrarySelector, setShowLibrarySelector] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -280,6 +284,15 @@ export function StoreSignagePage() {
     try {
       await addPlaylistItem(selectedPlaylistId, snapshotId);
       setShowAddPicker(false);
+      loadPlaylistItems(selectedPlaylistId);
+    } catch { /* user can retry */ }
+  };
+
+  const handleAddFromLibrary = async (item: LibrarySelectorResult) => {
+    if (!selectedPlaylistId) return;
+    try {
+      await addPlaylistItemFromLibrary(selectedPlaylistId, item.id);
+      setShowLibrarySelector(false);
       loadPlaylistItems(selectedPlaylistId);
     } catch { /* user can retry */ }
   };
@@ -530,9 +543,17 @@ export function StoreSignagePage() {
               {/* Add item picker */}
               {showAddPicker && (
                 <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
-                  <p className="text-xs text-slate-500 mb-2">추가할 사이니지 자산을 선택하세요:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-slate-500">추가할 사이니지 자산을 선택하세요:</p>
+                    <button
+                      onClick={() => setShowLibrarySelector(true)}
+                      className="flex items-center gap-1 px-2.5 py-1 text-xs text-emerald-600 border border-emerald-300 rounded-md hover:bg-emerald-50"
+                    >
+                      Library에서 선택
+                    </button>
+                  </div>
                   {signageSnapshots.length === 0 ? (
-                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. Hub에서 가져와주세요.</p>
+                    <p className="text-xs text-slate-400">사이니지 자산이 없습니다. Hub에서 가져오거나 Library에서 선택하세요.</p>
                   ) : (
                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
                       {signageSnapshots.map(snap => (
@@ -773,6 +794,12 @@ export function StoreSignagePage() {
       )}
       </>}
 
+      {/* Library Selector Modal (WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1) */}
+      <StoreLibrarySelectorModal
+        open={showLibrarySelector}
+        onSelect={handleAddFromLibrary}
+        onClose={() => setShowLibrarySelector(false)}
+      />
     </div>
   );
 }

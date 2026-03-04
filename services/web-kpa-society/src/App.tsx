@@ -107,7 +107,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreQRPage, StorePopPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -631,6 +631,10 @@ function App() {
             <Route path="library/new" element={<StoreLibraryNewPage />} />
             {/* signage: 사이니지 운영 (WO-O4O-STORE-SIGNAGE-ENGINE-V1) */}
             <Route path="signage" element={<StoreSignagePage />} />
+            {/* qr: QR 자료 관리 (WO-O4O-STORE-QR-LIBRARY-INTEGRATION-V1) */}
+            <Route path="qr" element={<StoreQRPage />} />
+            {/* pop: POP 자료 관리 (WO-O4O-POP-LIBRARY-INTEGRATION-V1) */}
+            <Route path="pop" element={<StorePopPage />} />
             {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
             <Route path="billing" element={<StoreBillingPage />} />
             {/* settings: 설정 + 레이아웃 + 템플릿 */}

@@ -4,6 +4,7 @@
  * WO-O4O-STORE-LIBRARY-FOUNDATION-V1
  * WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1
  * WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1
+ * WO-O4O-LIBRARY-SELECTOR-PAGINATION-V1
  *
  * Neture Public 엔드포인트: /api/v1/neture/library/public/:id
  * Store Library CRUD: /api/v1/kpa/pharmacy/library
@@ -53,8 +54,29 @@ export async function getNetureLibraryItem(
 }
 
 /**
- * Store 자료실 목록 조회
+ * Store 자료실 페이지네이션 응답
  */
-export async function getStoreLibraryItems(): Promise<{ success: boolean; data: StoreLibraryItem[] }> {
-  return apiClient.get('/pharmacy/library');
+export interface StoreLibraryPaginatedResponse {
+  items: StoreLibraryItem[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
+/**
+ * Store 자료실 목록 조회 (페이지네이션)
+ */
+export async function getStoreLibraryItems(opts?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+}): Promise<{ success: boolean; data: StoreLibraryPaginatedResponse }> {
+  const params = new URLSearchParams();
+  if (opts?.page) params.set('page', String(opts.page));
+  if (opts?.limit) params.set('limit', String(opts.limit));
+  if (opts?.search) params.set('search', opts.search);
+  if (opts?.category && opts.category !== 'all') params.set('category', opts.category);
+  const qs = params.toString();
+  return apiClient.get(`/pharmacy/library${qs ? `?${qs}` : ''}`);
 }

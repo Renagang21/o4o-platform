@@ -492,6 +492,128 @@ export function createStorePlaylistController(
   );
 
   /**
+   * POST /store-playlists/:id/items/from-library
+   * Library에서 항목 추가 — Library item → asset snapshot → playlist item
+   * Body: { libraryItemId }
+   * WO-O4O-SIGNAGE-LIBRARY-INTEGRATION-V1
+   */
+  router.post(
+    '/:id/items/from-library',
+    requireAuth,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?.id;
+        const userRoles = authReq.user?.roles || [];
+
+        if (!userId) {
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
+          return;
+        }
+        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        if (!organizationId) {
+          res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner role required' } });
+          return;
+        }
+
+        const { id } = req.params;
+        const { libraryItemId } = req.body;
+
+        if (!libraryItemId) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'libraryItemId is required' } });
+          return;
+        }
+
+        // Verify playlist ownership
+        const plCheck = await dataSource.query(
+          `SELECT id, playlist_type FROM store_playlists WHERE id = $1 AND organization_id = $2 AND is_active = true`,
+          [id, organizationId],
+        );
+        if (plCheck.length === 0) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Playlist not found' } });
+          return;
+        }
+
+        // Verify library item ownership
+        const libItem = await dataSource.query(
+          `SELECT id, title, file_url, file_name, mime_type, category
+           FROM store_library_items
+           WHERE id = $1 AND organization_id = $2 AND is_active = true`,
+          [libraryItemId, organizationId],
+        );
+        if (libItem.length === 0) {
+          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Library item not found' } });
+          return;
+        }
+
+        const lib = libItem[0];
+
+        const result = await dataSource.transaction(async (manager) => {
+          // Create asset snapshot from library item
+          const snapshotRows = await manager.query(
+            `INSERT INTO o4o_asset_snapshots (organization_id, source_service, source_asset_id, asset_type, title, content_json, created_by)
+             VALUES ($1, 'store-library', $2, 'signage', $3, $4, $5)
+             RETURNING id`,
+            [
+              organizationId,
+              libraryItemId,
+              lib.title,
+              JSON.stringify({
+                fileUrl: lib.file_url,
+                fileName: lib.file_name,
+                mimeType: lib.mime_type,
+                category: lib.category,
+                source: 'store-library',
+              }),
+              userId,
+            ],
+          );
+
+          const snapshotId = snapshotRows[0].id;
+
+          // Lock playlist and add item
+          const locked = await manager.query(
+            `SELECT id, playlist_type FROM store_playlists WHERE id = $1 FOR UPDATE`,
+            [id],
+          );
+
+          if (locked[0]?.playlist_type === 'SINGLE') {
+            const existingCount = await manager.query(
+              `SELECT COUNT(*)::int AS count FROM store_playlist_items WHERE playlist_id = $1`,
+              [id],
+            );
+            if (existingCount[0]?.count > 0) {
+              throw Object.assign(new Error('SINGLE playlist allows only 1 item'), { statusCode: 400, code: 'SINGLE_LIMIT' });
+            }
+          }
+
+          const maxOrder = await manager.query(
+            `SELECT COALESCE(MAX(display_order), -1)::int + 1 AS next_order FROM store_playlist_items WHERE playlist_id = $1`,
+            [id],
+          );
+
+          const rows = await manager.query(
+            `INSERT INTO store_playlist_items (playlist_id, snapshot_id, display_order)
+             VALUES ($1, $2, $3)
+             RETURNING id, snapshot_id AS "snapshotId", display_order AS "displayOrder",
+                       is_forced AS "isForced", is_locked AS "isLocked", created_at AS "createdAt"`,
+            [id, snapshotId, maxOrder[0].next_order],
+          );
+          return rows;
+        });
+
+        res.status(201).json({ success: true, data: result[0] });
+      } catch (error: any) {
+        if (error.statusCode && error.code) {
+          res.status(error.statusCode).json({ success: false, error: { code: error.code, message: error.message } });
+          return;
+        }
+        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    },
+  );
+
+  /**
    * PATCH /store-playlists/:id/items/reorder
    * 항목 순서 변경
    * Body: { order: [itemId1, itemId2, ...] }

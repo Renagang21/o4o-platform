@@ -99,6 +99,17 @@ export async function addPlaylistItem(
   return response.data;
 }
 
+export async function addPlaylistItemFromLibrary(
+  playlistId: string,
+  libraryItemId: string,
+): Promise<StorePlaylistItem> {
+  const response = await apiClient.post<{ success: boolean; data: StorePlaylistItem }>(
+    `/store-playlists/${playlistId}/items/from-library`,
+    { libraryItemId },
+  );
+  return response.data;
+}
+
 export async function reorderPlaylistItems(
   playlistId: string,
   order: string[],

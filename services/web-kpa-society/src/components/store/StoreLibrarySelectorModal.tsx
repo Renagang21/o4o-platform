@@ -2,6 +2,7 @@
  * StoreLibrarySelectorModal — 매장 자료 선택 모달
  *
  * WO-O4O-LIBRARY-SELECTOR-V1
+ * WO-O4O-LIBRARY-SELECTOR-PAGINATION-V1
  *
  * 사용처: 사이니지, QR, 상품 설명, POP, 매장 홈페이지 등
  * 공통 재사용 컴포넌트
@@ -12,8 +13,8 @@
  *   onClose   — 모달 닫기 콜백
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, X, FileText, Image, Film } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, X, FileText, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { getStoreLibraryItems } from '../../api/storeLibrary';
 import type { StoreLibraryItem } from '../../api/storeLibrary';
@@ -47,6 +48,8 @@ const CATEGORIES = [
   { key: 'other', label: '기타' },
 ] as const;
 
+const PAGE_SIZE = 20;
+
 // ── 컴포넌트 ──
 
 export function StoreLibrarySelectorModal({
@@ -59,22 +62,53 @@ export function StoreLibrarySelectorModal({
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 모달 열릴 때 데이터 로드 + 상태 초기화
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // 모달 열릴 때 상태 초기화
   useEffect(() => {
     if (!open) return;
     setSearch('');
     setCategoryFilter('all');
     setSelectedId(null);
-    loadItems();
+    setPage(1);
+    setTotal(0);
   }, [open]);
 
-  const loadItems = async () => {
+  // 서버 데이터 로드 (page, category 변경 시 즉시)
+  useEffect(() => {
+    if (!open) return;
+    loadItems(page, search, categoryFilter);
+  }, [open, page, categoryFilter]);
+
+  // 검색어 디바운스
+  useEffect(() => {
+    if (!open) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setPage(1);
+      loadItems(1, search, categoryFilter);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
+
+  const loadItems = async (p: number, q: string, cat: string) => {
     try {
       setLoading(true);
-      const res = await getStoreLibraryItems();
+      const res = await getStoreLibraryItems({
+        page: p,
+        limit: PAGE_SIZE,
+        search: q.trim() || undefined,
+        category: cat !== 'all' ? cat : undefined,
+      });
       if (res.success && res.data) {
-        setItems(res.data);
+        setItems(res.data.items);
+        setTotal(res.data.total);
       }
     } catch {
       // silent — 빈 목록 표시
@@ -83,20 +117,11 @@ export function StoreLibrarySelectorModal({
     }
   };
 
-  // 검색 + 카테고리 필터
-  const filtered = useMemo(() => {
-    return items.filter((item) => {
-      if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchDesc = item.description?.toLowerCase().includes(q);
-        const matchCat = item.category?.toLowerCase().includes(q);
-        if (!matchTitle && !matchDesc && !matchCat) return false;
-      }
-      return true;
-    });
-  }, [items, search, categoryFilter]);
+  const handleCategoryChange = useCallback((key: string) => {
+    setCategoryFilter(key);
+    setPage(1);
+    setSelectedId(null);
+  }, []);
 
   const selectedItem = items.find((i) => i.id === selectedId) ?? null;
 
@@ -139,7 +164,7 @@ export function StoreLibrarySelectorModal({
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.key}
-                onClick={() => setCategoryFilter(cat.key)}
+                onClick={() => handleCategoryChange(cat.key)}
                 style={{
                   ...styles.filterChip,
                   ...(categoryFilter === cat.key ? styles.filterChipActive : {}),
@@ -157,15 +182,17 @@ export function StoreLibrarySelectorModal({
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>자료를 불러오는 중...</p>
             </div>
-          ) : filtered.length === 0 ? (
+          ) : items.length === 0 ? (
             <div style={styles.emptyState}>
               <p style={{ color: colors.neutral500 }}>
-                {items.length === 0 ? '등록된 자료가 없습니다' : '검색 결과가 없습니다'}
+                {search.trim() || categoryFilter !== 'all'
+                  ? '검색 결과가 없습니다'
+                  : '등록된 자료가 없습니다'}
               </p>
             </div>
           ) : (
             <div style={styles.grid}>
-              {filtered.map((item) => (
+              {items.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setSelectedId(item.id)}
@@ -191,6 +218,38 @@ export function StoreLibrarySelectorModal({
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div style={styles.pagination}>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              style={{
+                ...styles.pageBtn,
+                opacity: page <= 1 ? 0.4 : 1,
+                cursor: page <= 1 ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span style={styles.pageInfo}>
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              style={{
+                ...styles.pageBtn,
+                opacity: page >= totalPages ? 0.4 : 1,
+                cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+              }}
+            >
+              <ChevronRight size={16} />
+            </button>
+            <span style={styles.totalInfo}>(총 {total}건)</span>
+          </div>
+        )}
 
         {/* Footer */}
         <div style={styles.footer}>
@@ -413,6 +472,33 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#fff',
     fontSize: '11px',
     fontWeight: 600,
+  },
+  pagination: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
+    padding: '8px 24px',
+  },
+  pageBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: colors.neutral600,
+  },
+  pageInfo: {
+    fontSize: '13px',
+    color: colors.neutral600,
+    fontWeight: 500,
+  },
+  totalInfo: {
+    fontSize: '12px',
+    color: colors.neutral400,
   },
   footer: {
     display: 'flex',
