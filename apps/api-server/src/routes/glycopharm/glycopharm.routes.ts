@@ -20,9 +20,9 @@ import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
-import { createTabletController } from './controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
-import { createBlogController } from './controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
-import { createLayoutController } from './controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
+import { createTabletController } from '../o4o-store/controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
+import { createBlogController } from '../o4o-store/controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
+import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { createPharmacyController, createB2BController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request

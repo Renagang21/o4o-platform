@@ -70,26 +70,26 @@ import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './c
 import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
 import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.controller.js';
 import { createStewardController } from './controllers/steward.controller.js';
-import { createStoreHubController } from './controllers/store-hub.controller.js';
-import { createPharmacyStoreConfigController } from './controllers/pharmacy-store-config.controller.js';
-import { createPharmacyProductsController } from './controllers/pharmacy-products.controller.js';
+import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
+import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
+import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
 import { createOperatorProductApplicationsController } from './controllers/operator-product-applications.controller.js';
-import { createAssetSnapshotController } from './controllers/asset-snapshot.controller.js';
-import { createStoreAssetControlController } from './controllers/store-asset-control.controller.js';
+import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
+import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createAdminForceAssetController } from './controllers/admin-force-asset.controller.js';
-import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
-import { createStoreContentController } from './controllers/store-content.controller.js';
-import { createStoreLibraryController } from './controllers/store-library.controller.js';
-import { createStoreQrLandingController } from './controllers/store-qr-landing.controller.js';
-import { createStorePopController } from './controllers/store-pop.controller.js';
-import { createStoreAnalyticsController } from './controllers/store-analytics.controller.js';
-import { createProductMarketingController } from './controllers/product-marketing.controller.js';
-import { createStorePlaylistController } from './controllers/store-playlist.controller.js';
-import { createStoreChannelProductsController } from './controllers/store-channel-products.controller.js';
-import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
-import { createTabletController } from '../glycopharm/controllers/tablet.controller.js';
-import { createBlogController } from '../glycopharm/controllers/blog.controller.js';
-import { createLayoutController } from '../glycopharm/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
+import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
+import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
+import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
+import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
+import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
+import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
+import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
+import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
+import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
+import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
+import { createTabletController } from '../o4o-store/controllers/tablet.controller.js';
+import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
+import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -1843,19 +1843,23 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // Store Playlist routes (WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1)
   router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
 
-  // Store Library routes (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1)
+  // O4O-STORE: root-mounted controllers (internal prefix /pharmacy/*)
+  // 컨트롤러 내부에 full path 정의됨. prefix 분리는 별도 WO에서 수행.
+  // WO-KPA-B-STORE-CONTAMINATION-CLEANUP-V1 Phase 2: 문서화 완료
+
+  // Store Library routes (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1) — internal: /pharmacy/library/*
   router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
 
-  // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1)
+  // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1) — internal: /qr/public/*, /pharmacy/qr/*
   router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
 
-  // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1)
+  // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1) — internal: /pharmacy/pop/*
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any));
 
-  // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1)
+  // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1) — internal: /pharmacy/analytics/*
   router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
 
-  // Product Marketing Graph (WO-O4O-PRODUCT-MARKETING-GRAPH-V1)
+  // Product Marketing Graph (WO-O4O-PRODUCT-MARKETING-GRAPH-V1) — internal: /pharmacy/products/*/marketing
   router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
