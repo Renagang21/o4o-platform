@@ -256,7 +256,8 @@ export const AuthProvider: FC<AuthProviderProps> = ({
 
   // Check both user.role and user.roles array for admin access
   // Support both string roles and object roles with name field
-  const adminRoleNames = ['admin', 'administrator', 'super_admin'];
+  // Phase3-E: Support both unprefixed and domain-prefixed role names
+  const adminRoleNames = ['admin', 'administrator', 'super_admin', 'platform:admin', 'platform:super_admin'];
 
   const isAdmin = user ? (
     // Check user.role (string)
