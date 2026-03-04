@@ -1,31 +1,14 @@
 /**
  * AiPreviewModal - AI 요약 Preview 모달
  *
- * Work Order: WO-AI-PREVIEW-SUMMARY-V1
+ * WO-O4O-AI-COMPONENTS-CORE-EXTRACTION-V1
  *
- * 목적:
- * - AI 기능이 준비 중임을 사용자에게 일관된 UX로 안내
- * - 실제 AI 호출 없이 Preview만 제공
- * - 모든 서비스에서 공통 사용
- *
- * 구조:
- * - 헤더: "AI 요약 (Preview)" + 서브텍스트
- * - 본문: 더미 요약 영역 + 제공 예정 기능 체크리스트 + 안내 메시지
- * - 푸터: 닫기 버튼
+ * AI 기능이 준비 중임을 사용자에게 일관된 UX로 안내.
+ * 실제 AI 호출 없이 Preview만 제공.
  */
 
 import { SparklesIcon, CloseIcon, CheckIcon } from './icons';
-
-interface AiPreviewModalProps {
-  /** 모달 표시 여부 */
-  open: boolean;
-  /** 모달 닫기 콜백 */
-  onClose: () => void;
-  /** 모달 제목 (기본: "AI 요약 (Preview)") */
-  title?: string;
-  /** 컨텍스트 라벨 (예: "대시보드 요약", "상품 요약") */
-  contextLabel?: string;
-}
+import type { AiPreviewModalProps } from '../types';
 
 // 제공 예정 기능 목록
 const upcomingFeatures = [

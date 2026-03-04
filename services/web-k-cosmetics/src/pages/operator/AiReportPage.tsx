@@ -25,7 +25,7 @@ import {
   XCircle,
   Send,
 } from 'lucide-react';
-import { AiSummaryButton } from '@/components/ai/AiSummaryButton';
+import { AiSummaryButton } from '../../components/ai';
 
 // ===== 타입 정의 =====
 type Period = '7d' | '30d' | '90d';

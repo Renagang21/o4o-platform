@@ -2638,6 +2638,16 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/o4o-ai-components:
+    dependencies:
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/operator-core:
     dependencies:
       lucide-react:
@@ -3512,6 +3522,9 @@ importers:
 
   services/web-glucoseview:
     dependencies:
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
@@ -3582,6 +3595,9 @@ importers:
       '@o4o/admin-ux-core':
         specifier: workspace:*
         version: link:../../packages/admin-ux-core
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -3679,6 +3695,9 @@ importers:
 
   services/web-k-cosmetics:
     dependencies:
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -3746,6 +3765,9 @@ importers:
       '@o4o/admin-ux-core':
         specifier: workspace:*
         version: link:../../packages/admin-ux-core
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -3825,6 +3847,9 @@ importers:
       '@o4o/admin-ux-core':
         specifier: workspace:*
         version: link:../../packages/admin-ux-core
+      '@o4o/ai-components':
+        specifier: workspace:*
+        version: link:../../packages/o4o-ai-components
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client

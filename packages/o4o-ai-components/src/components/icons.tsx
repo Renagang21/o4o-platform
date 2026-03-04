@@ -1,19 +1,12 @@
 /**
  * AI 컴포넌트용 인라인 SVG 아이콘
  *
- * Work Order: WO-AI-ICON-CLEANUP-V1
+ * WO-O4O-AI-COMPONENTS-CORE-EXTRACTION-V1
  *
- * 목적:
- * - lucide-react 의존성 제거
- * - 가벼운 인라인 SVG 아이콘 제공
+ * lucide-react 의존성 없이 가벼운 인라인 SVG 아이콘 제공.
  */
 
-import React from 'react';
-
-interface IconProps {
-  size?: number;
-  style?: React.CSSProperties;
-}
+import type { IconProps } from '../types';
 
 /** AI/Sparkles 아이콘 */
 export function SparklesIcon({ size = 16, style }: IconProps) {

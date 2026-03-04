@@ -1,31 +1,17 @@
 /**
  * AiSummaryModal - AI 요약 실제 연동 모달
  *
- * Work Order: WO-AI-SUMMARY-INTEGRATION-V1
+ * WO-O4O-AI-COMPONENTS-CORE-EXTRACTION-V1
  *
- * 목적:
- * - 실제 AI API (/api/ai/query)를 호출하여 요약 제공
- * - 로딩, 에러, 성공 상태 처리
- * - 모든 서비스에서 공통 사용
+ * 실제 AI API (/api/ai/query)를 호출하여 요약 제공.
+ * 로딩, 에러, 성공 상태 처리.
  */
 
 import { useState, useEffect } from 'react';
 import { SparklesIcon, CloseIcon, LoaderIcon, AlertIcon, RefreshIcon } from './icons';
+import type { AiSummaryModalProps } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-
-interface AiSummaryModalProps {
-  /** 모달 표시 여부 */
-  open: boolean;
-  /** 모달 닫기 콜백 */
-  onClose: () => void;
-  /** 컨텍스트 라벨 (예: "대시보드 요약", "상품 요약") */
-  contextLabel?: string;
-  /** 요약할 데이터 컨텍스트 */
-  contextData?: Record<string, unknown>;
-  /** 서비스 ID (예: 'neture', 'glycopharm') */
-  serviceId?: string;
-}
 
 type ModalState = 'loading' | 'success' | 'error';
 
@@ -35,6 +21,7 @@ export function AiSummaryModal({
   contextLabel,
   contextData,
   serviceId = 'neture',
+  getAccessToken,
 }: AiSummaryModalProps) {
   const [state, setState] = useState<ModalState>('loading');
   const [summary, setSummary] = useState<string>('');
@@ -46,11 +33,19 @@ export function AiSummaryModal({
     setSummary('');
 
     try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (getAccessToken) {
+        const token = getAccessToken();
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/ai/query`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify({
           question: `${contextLabel || '현재 화면'}의 주요 지표와 현황을 요약해 주세요.`,

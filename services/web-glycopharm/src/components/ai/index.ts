@@ -1,8 +1,8 @@
 /**
  * AI Components Index
- * Work Order: WO-AI-SUMMARY-INTEGRATION-V1
+ * WO-O4O-AI-COMPONENTS-CORE-EXTRACTION-V1
+ *
+ * Shared components re-exported from @o4o/ai-components.
  */
 
-export { AiPreviewModal } from './AiPreviewModal';
-export { AiSummaryModal } from './AiSummaryModal';
-export { AiSummaryButton } from './AiSummaryButton';
+export { AiPreviewModal, AiSummaryModal, AiSummaryButton } from '@o4o/ai-components';
