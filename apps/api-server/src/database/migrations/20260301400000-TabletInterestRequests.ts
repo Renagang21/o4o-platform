@@ -26,7 +26,7 @@ export class TabletInterestRequests20260301400000 implements MigrationInterface 
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
         organization_id UUID NOT NULL
-          REFERENCES organization_stores(id) ON DELETE CASCADE,
+          REFERENCES organizations(id) ON DELETE CASCADE,
 
         master_id UUID NOT NULL
           REFERENCES product_masters(id) ON DELETE CASCADE,
