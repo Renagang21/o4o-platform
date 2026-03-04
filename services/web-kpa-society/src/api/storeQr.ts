@@ -2,10 +2,12 @@
  * Store QR API Client
  *
  * WO-O4O-QR-LANDING-PAGE-V1
+ * WO-O4O-QR-SCAN-ANALYTICS-V1
  *
- * QR 코드 CRUD + 공개 랜딩 데이터 조회.
+ * QR 코드 CRUD + 공개 랜딩 데이터 조회 + 스캔 분석.
  * Store QR CRUD: /api/v1/kpa/pharmacy/qr
  * Public Landing: /api/v1/kpa/qr/public/:slug
+ * Analytics: /api/v1/kpa/pharmacy/qr/:id/analytics
  */
 
 import { apiClient } from './client';
@@ -23,6 +25,7 @@ export interface StoreQrCode {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  scanCount?: number;
 }
 
 export interface QrLandingData {
@@ -98,4 +101,19 @@ export async function deleteStoreQrCode(
   id: string,
 ): Promise<{ success: boolean; message: string }> {
   return apiClient.delete(`/pharmacy/qr/${id}`);
+}
+
+// ─── Analytics (WO-O4O-QR-SCAN-ANALYTICS-V1) ────────
+
+export interface QrAnalyticsData {
+  totalScans: number;
+  todayScans: number;
+  weeklyScans: number;
+  deviceStats: { mobile: number; tablet: number; desktop: number };
+}
+
+export async function getQrAnalytics(
+  qrId: string,
+): Promise<{ success: boolean; data: QrAnalyticsData }> {
+  return apiClient.get(`/pharmacy/qr/${qrId}/analytics`);
 }

@@ -2,13 +2,15 @@
  * StoreQRPage — 매장 QR 코드 관리
  *
  * WO-O4O-QR-LANDING-PAGE-V1
+ * WO-O4O-QR-SCAN-ANALYTICS-V1
  *
  * Library에서 자료를 선택 → slug/landingType/landingTargetId 설정 → 백엔드 저장.
  * QR URL: /qr/{slug} (공개)
+ * 스캔 통계: totalScans / todayScans / weeklyScans / deviceStats
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw } from 'lucide-react';
+import { QrCode, Plus, Trash2, ExternalLink, Copy, Check, RefreshCw, BarChart3, X, Smartphone, Monitor, Tablet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
@@ -17,8 +19,9 @@ import {
   getStoreQrCodes,
   createStoreQrCode,
   deleteStoreQrCode,
+  getQrAnalytics,
 } from '../../api/storeQr';
-import type { StoreQrCode } from '../../api/storeQr';
+import type { StoreQrCode, QrAnalyticsData } from '../../api/storeQr';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -51,6 +54,11 @@ export function StoreQRPage() {
   const [formLandingTargetId, setFormLandingTargetId] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Analytics state
+  const [analyticsId, setAnalyticsId] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<QrAnalyticsData | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -128,6 +136,27 @@ export function StoreQRPage() {
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleShowAnalytics = async (id: string) => {
+    if (analyticsId === id) {
+      setAnalyticsId(null);
+      setAnalyticsData(null);
+      return;
+    }
+    setAnalyticsId(id);
+    setAnalyticsLoading(true);
+    setAnalyticsData(null);
+    try {
+      const res = await getQrAnalytics(id);
+      if (res.success && res.data) {
+        setAnalyticsData(res.data);
+      }
+    } catch {
+      // silent
+    } finally {
+      setAnalyticsLoading(false);
+    }
   };
 
   const qrBaseUrl = `${window.location.origin}/qr/`;
@@ -239,44 +268,95 @@ export function StoreQRPage() {
         ) : (
           <div style={styles.list}>
             {items.map((item) => (
-              <div key={item.id} style={styles.card}>
-                <div style={styles.cardIcon}>
-                  <QrCode size={24} style={{ color: colors.primary }} />
-                </div>
-                <div style={styles.cardInfo}>
-                  <p style={styles.cardTitle}>{item.title}</p>
-                  <div style={styles.cardMeta}>
-                    <span style={styles.cardBadge}>
-                      {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
-                    </span>
-                    <span style={styles.cardSlug}>/qr/{item.slug}</span>
+              <div key={item.id}>
+                <div style={styles.card}>
+                  <div style={styles.cardIcon}>
+                    <QrCode size={24} style={{ color: colors.primary }} />
+                  </div>
+                  <div style={styles.cardInfo}>
+                    <p style={styles.cardTitle}>{item.title}</p>
+                    <div style={styles.cardMeta}>
+                      <span style={styles.cardBadge}>
+                        {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
+                      </span>
+                      <span style={styles.cardSlug}>/qr/{item.slug}</span>
+                      {(item.scanCount ?? 0) > 0 && (
+                        <span style={styles.scanBadge}>{item.scanCount}회 스캔</span>
+                      )}
+                    </div>
+                  </div>
+                  <div style={styles.cardActions}>
+                    <button
+                      onClick={() => handleShowAnalytics(item.id)}
+                      style={{
+                        ...styles.iconBtn,
+                        color: analyticsId === item.id ? colors.primary : colors.neutral400,
+                      }}
+                      title="스캔 통계"
+                    >
+                      {analyticsId === item.id ? <X size={16} /> : <BarChart3 size={16} />}
+                    </button>
+                    <button
+                      onClick={() => handleCopyUrl(item.slug, item.id)}
+                      style={styles.iconBtn}
+                      title="QR URL 복사"
+                    >
+                      {copiedId === item.id ? <Check size={16} style={{ color: colors.primary }} /> : <Copy size={16} />}
+                    </button>
+                    <a
+                      href={`/qr/${item.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={styles.iconBtn}
+                      title="QR 페이지 열기"
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      style={styles.iconBtn}
+                      title="삭제"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
-                <div style={styles.cardActions}>
-                  <button
-                    onClick={() => handleCopyUrl(item.slug, item.id)}
-                    style={styles.iconBtn}
-                    title="QR URL 복사"
-                  >
-                    {copiedId === item.id ? <Check size={16} style={{ color: colors.primary }} /> : <Copy size={16} />}
-                  </button>
-                  <a
-                    href={`/qr/${item.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={styles.iconBtn}
-                    title="QR 페이지 열기"
-                  >
-                    <ExternalLink size={16} />
-                  </a>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    style={styles.iconBtn}
-                    title="삭제"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                {/* Analytics Panel */}
+                {analyticsId === item.id && (
+                  <div style={styles.analyticsPanel}>
+                    {analyticsLoading ? (
+                      <p style={styles.analyticsLoading}>불러오는 중...</p>
+                    ) : analyticsData ? (
+                      <div style={styles.analyticsGrid}>
+                        <div style={styles.statBox}>
+                          <p style={styles.statValue}>{analyticsData.totalScans}</p>
+                          <p style={styles.statLabel}>총 스캔</p>
+                        </div>
+                        <div style={styles.statBox}>
+                          <p style={styles.statValue}>{analyticsData.todayScans}</p>
+                          <p style={styles.statLabel}>오늘</p>
+                        </div>
+                        <div style={styles.statBox}>
+                          <p style={styles.statValue}>{analyticsData.weeklyScans}</p>
+                          <p style={styles.statLabel}>최근 7일</p>
+                        </div>
+                        <div style={styles.statBox}>
+                          <div style={styles.deviceRow}>
+                            <Smartphone size={12} /> <span>{analyticsData.deviceStats.mobile}</span>
+                          </div>
+                          <div style={styles.deviceRow}>
+                            <Tablet size={12} /> <span>{analyticsData.deviceStats.tablet}</span>
+                          </div>
+                          <div style={styles.deviceRow}>
+                            <Monitor size={12} /> <span>{analyticsData.deviceStats.desktop}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p style={styles.analyticsLoading}>데이터를 불러올 수 없습니다</p>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -519,5 +599,62 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     fontWeight: 500,
     cursor: 'pointer',
+  },
+
+  // Scan analytics
+  scanBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '10px',
+    backgroundColor: '#dbeafe',
+    fontSize: '11px',
+    color: '#2563eb',
+    fontWeight: 500,
+  },
+  analyticsPanel: {
+    padding: '16px',
+    marginTop: '-1px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '0 0 10px 10px',
+    backgroundColor: colors.neutral50,
+  },
+  analyticsLoading: {
+    fontSize: '13px',
+    color: colors.neutral400,
+    textAlign: 'center',
+    margin: 0,
+    padding: '8px 0',
+  },
+  analyticsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '12px',
+  },
+  statBox: {
+    textAlign: 'center',
+    padding: '8px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    border: `1px solid ${colors.neutral100}`,
+  },
+  statValue: {
+    fontSize: '20px',
+    fontWeight: 700,
+    color: colors.neutral800,
+    margin: 0,
+  },
+  statLabel: {
+    fontSize: '11px',
+    color: colors.neutral500,
+    margin: '2px 0 0',
+  },
+  deviceRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '4px',
+    fontSize: '12px',
+    color: colors.neutral600,
+    padding: '2px 0',
   },
 };

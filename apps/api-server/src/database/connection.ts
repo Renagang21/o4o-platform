@@ -275,6 +275,7 @@ import {
   TabletInterestRequest,
   StoreLibraryItem,
   StoreQrCode,
+  StoreQrScanEvent,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -776,6 +777,9 @@ export const AppDataSource = new DataSource({
     // STORE QR CODE ENTITY (WO-O4O-QR-LANDING-PAGE-V1)
     // ============================================================================
     StoreQrCode,
+    // QR SCAN EVENT ENTITY (WO-O4O-QR-SCAN-ANALYTICS-V1)
+    // ============================================================================
+    StoreQrScanEvent,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================
