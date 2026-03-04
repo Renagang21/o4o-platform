@@ -241,9 +241,16 @@ export class AuthenticationService {
     // Get merged profile - pass preloaded user to avoid duplicate query
     const mergedProfile = await AccountLinkingService.getMergedProfile(user.id, undefined, user);
 
+    // Phase3-E Fix: Inject roles from RoleAssignment into login response
+    // toPublicData() returns stale roles (users.roles column dropped).
+    // JWT token already has correct roles; response body must match.
+    const publicData = user.toPublicData();
+    publicData.roles = userRoles;
+    publicData.role = (userRoles[0] as any) || 'user';
+
     return {
       success: true,
-      user: user.toPublicData(),
+      user: publicData,
       tokens: {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
@@ -301,9 +308,14 @@ export class AuthenticationService {
       // Get merged profile
       const mergedProfile = await AccountLinkingService.getMergedProfile(user.id);
 
+      // Phase3-E Fix: Inject roles from RoleAssignment
+      const publicData0 = user.toPublicData();
+      publicData0.roles = userRoles0;
+      publicData0.role = (userRoles0[0] as any) || 'user';
+
       return {
         success: true,
-        user: user.toPublicData(),
+        user: publicData0,
         tokens: {
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
@@ -348,9 +360,14 @@ export class AuthenticationService {
       // Get merged profile
       const mergedProfile = await AccountLinkingService.getMergedProfile(existingUserByEmail.id);
 
+      // Phase3-E Fix: Inject roles from RoleAssignment
+      const publicDataExisting = existingUserByEmail.toPublicData();
+      publicDataExisting.roles = existingUserRoles;
+      publicDataExisting.role = (existingUserRoles[0] as any) || 'user';
+
       return {
         success: true,
-        user: existingUserByEmail.toPublicData(),
+        user: publicDataExisting,
         tokens: {
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
@@ -408,9 +425,14 @@ export class AuthenticationService {
     // Log new user creation and login
     await this.logLoginAttempt(newUser.id, profile.email, ipAddress, userAgent, true, undefined, provider);
 
+    // Phase3-E Fix: Inject roles from RoleAssignment
+    const publicDataNew = newUser.toPublicData();
+    publicDataNew.roles = newUserRoles;
+    publicDataNew.role = (newUserRoles[0] as any) || 'user';
+
     return {
       success: true,
-      user: newUser.toPublicData(),
+      user: publicDataNew,
       tokens: {
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
