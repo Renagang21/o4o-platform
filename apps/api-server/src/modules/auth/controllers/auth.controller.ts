@@ -638,6 +638,15 @@ export class AuthController extends BaseController {
       ud.pharmacistFunction = qualification.pharmacistFunction;
       ud.isStoreOwner = qualification.isStoreOwner;
 
+      // activityType from kpa_pharmacist_profiles (required for setup-activity gate)
+      try {
+        const [profile] = await AppDataSource.query(
+          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
+          [req.user.id]
+        );
+        ud.activityType = profile?.activity_type || null;
+      } catch { ud.activityType = null; }
+
       // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: KPA membership context 통합
       const kpaMembership = await deriveKpaMembershipContext(req.user.id);
       ud.kpaMembership = kpaMembership;
@@ -778,6 +787,15 @@ export class AuthController extends BaseController {
       ud.pharmacistRole = qualification.pharmacistRole;
       ud.pharmacistFunction = qualification.pharmacistFunction;
       ud.isStoreOwner = qualification.isStoreOwner;
+
+      // activityType from kpa_pharmacist_profiles (required for setup-activity gate)
+      try {
+        const [profile] = await AppDataSource.query(
+          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
+          [req.user.id]
+        );
+        ud.activityType = profile?.activity_type || null;
+      } catch { ud.activityType = null; }
     }
 
     return BaseController.ok(res, {
