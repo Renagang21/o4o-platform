@@ -71,5 +71,8 @@ export { StoreQRPage } from './StoreQRPage';
 // WO-O4O-POP-LIBRARY-INTEGRATION-V1: POP 자료 관리
 export { StorePopPage } from './StorePopPage';
 
+// WO-O4O-MARKETING-ANALYTICS-V1: 마케팅 분석
+export { MarketingAnalyticsPage } from './MarketingAnalyticsPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

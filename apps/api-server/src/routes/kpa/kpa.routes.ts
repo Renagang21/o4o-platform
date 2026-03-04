@@ -82,6 +82,7 @@ import { createStoreContentController } from './controllers/store-content.contro
 import { createStoreLibraryController } from './controllers/store-library.controller.js';
 import { createStoreQrLandingController } from './controllers/store-qr-landing.controller.js';
 import { createStorePopController } from './controllers/store-pop.controller.js';
+import { createStoreAnalyticsController } from './controllers/store-analytics.controller.js';
 import { createStorePlaylistController } from './controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from './controllers/store-channel-products.controller.js';
 import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
@@ -1849,6 +1850,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store POP routes (WO-O4O-QR-POP-AUTO-GENERATOR-V1)
   router.use('/', createStorePopController(dataSource, coreRequireAuth as any));
+
+  // Store Analytics routes (WO-O4O-MARKETING-ANALYTICS-V1)
+  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
