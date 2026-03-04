@@ -273,6 +273,7 @@ import {
   StoreTablet,
   StoreTabletDisplay,
   TabletInterestRequest,
+  StoreLibraryItem,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -766,6 +767,10 @@ export const AppDataSource = new DataSource({
     // TABLET INTEREST REQUEST (WO-O4O-TABLET-MODULE-V1)
     // ============================================================================
     TabletInterestRequest,
+    // ============================================================================
+    // STORE LIBRARY ITEMS (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1)
+    // ============================================================================
+    StoreLibraryItem,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================

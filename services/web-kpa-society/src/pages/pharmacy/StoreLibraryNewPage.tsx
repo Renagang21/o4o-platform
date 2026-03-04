@@ -2,30 +2,48 @@
  * StoreLibraryNewPage — 매장 자료실 등록 (Neture 프리필 지원)
  *
  * WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1
+ * WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1
  *
  * 동작:
  * - ?fromNeture=<id> 존재 시 Neture 공개 API에서 메타데이터 조회 → 폼 프리필
  * - file_url은 비워둠 (사용자 직접 업로드 필수)
  * - 자동 DB 복사 금지, FK 연결 금지
+ * - 파일 선택 시 file input으로 메타데이터 추출
+ * - handleSave → POST /api/v1/kpa/pharmacy/library
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Info, Upload } from 'lucide-react';
+import { ArrowLeft, Info, Upload, FileText, X } from 'lucide-react';
 import { colors } from '../../styles/theme';
-import { getNetureLibraryItem } from '../../api/storeLibrary';
+import { getNetureLibraryItem, createStoreLibraryItem } from '../../api/storeLibrary';
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export function StoreLibraryNewPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const fromNeture = searchParams.get('fromNeture');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [sourceType, setSourceType] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [category, setCategory] = useState('');
+
+  // File state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // UI state
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [prefillDone, setPrefillDone] = useState(false);
   const [prefillError, setPrefillError] = useState<string | null>(null);
 
@@ -44,6 +62,7 @@ export function StoreLibraryNewPage() {
           setDescription(res.data.description || '');
           setSourceType(res.data.type || '');
           setImageUrl(res.data.imageUrl || '');
+          setCategory(res.data.type || '');
           setPrefillDone(true);
         } else {
           setPrefillError('자료를 불러올 수 없습니다.');
@@ -61,10 +80,49 @@ export function StoreLibraryNewPage() {
     return () => { cancelled = true; };
   }, [fromNeture]);
 
-  const handleSave = () => {
-    // TODO: Store 자료실 저장 API 연동 (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
-    // 현재는 폼 프리필 + UX 흐름만 구현
-    alert('저장 기능은 Store Library API 연동 후 활성화됩니다.');
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setSaveError(null);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const canSave = title.trim().length > 0 && selectedFile !== null && !saving;
+
+  const handleSave = async () => {
+    if (!canSave) return;
+
+    setSaving(true);
+    setSaveError(null);
+
+    try {
+      const result = await createStoreLibraryItem({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        fileName: selectedFile!.name,
+        fileSize: selectedFile!.size,
+        mimeType: selectedFile!.type || 'application/octet-stream',
+        category: category.trim() || undefined,
+      });
+
+      if (result.success) {
+        navigate('/store/library', { replace: true });
+      } else {
+        setSaveError('자료 저장 중 오류가 발생했습니다.');
+      }
+    } catch {
+      setSaveError('자료 저장 중 오류가 발생했습니다.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -112,6 +170,14 @@ export function StoreLibraryNewPage() {
         </div>
       )}
 
+      {/* Save error */}
+      {saveError && (
+        <div style={styles.errorBanner}>
+          <Info size={16} style={{ color: colors.error, flexShrink: 0, marginTop: '2px' }} />
+          <p style={{ margin: 0, fontSize: '13px', color: colors.error }}>{saveError}</p>
+        </div>
+      )}
+
       {/* Form */}
       <div style={styles.formCard}>
         {/* Title */}
@@ -139,10 +205,24 @@ export function StoreLibraryNewPage() {
           />
         </div>
 
+        {/* Category */}
+        <div style={styles.fieldGroup}>
+          <label style={styles.label}>카테고리</label>
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            placeholder="예: 제품 설명, 이미지, 배너, 가이드"
+            style={styles.input}
+            maxLength={100}
+            readOnly={!!sourceType}
+          />
+        </div>
+
         {/* Source type (read-only when prefilled) */}
         {sourceType && (
           <div style={styles.fieldGroup}>
-            <label style={styles.label}>자료 유형</label>
+            <label style={styles.label}>자료 유형 (공급자)</label>
             <input
               type="text"
               value={sourceType}
@@ -155,15 +235,41 @@ export function StoreLibraryNewPage() {
         {/* File upload area */}
         <div style={styles.fieldGroup}>
           <label style={styles.label}>파일 업로드 *</label>
-          <div style={styles.uploadArea}>
-            <Upload size={32} style={{ color: colors.neutral400 }} />
-            <p style={styles.uploadText}>파일을 드래그하거나 클릭하여 업로드하세요</p>
-            <p style={styles.uploadHint}>
-              {fromNeture
-                ? '공급자 자료의 파일은 자동으로 복사되지 않습니다. 다운로드한 파일을 여기에 업로드해주세요.'
-                : '이미지, PDF 등 매장에서 사용할 파일을 업로드하세요.'}
-            </p>
-          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
+          {selectedFile ? (
+            <div style={styles.fileSelected}>
+              <div style={styles.fileInfo}>
+                <FileText size={20} style={{ color: colors.primary, flexShrink: 0 }} />
+                <div>
+                  <p style={styles.fileName}>{selectedFile.name}</p>
+                  <p style={styles.fileMeta}>
+                    {formatFileSize(selectedFile.size)} · {selectedFile.type || 'unknown'}
+                  </p>
+                </div>
+              </div>
+              <button onClick={handleRemoveFile} style={styles.removeFileBtn} title="파일 제거">
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <div
+              style={styles.uploadArea}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload size={32} style={{ color: colors.neutral400 }} />
+              <p style={styles.uploadText}>파일을 클릭하여 업로드하세요</p>
+              <p style={styles.uploadHint}>
+                {fromNeture
+                  ? '공급자 자료의 파일은 자동으로 복사되지 않습니다. 다운로드한 파일을 여기에 업로드해주세요.'
+                  : '이미지, PDF 등 매장에서 사용할 파일을 업로드하세요.'}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Image preview (if prefilled) */}
@@ -187,14 +293,14 @@ export function StoreLibraryNewPage() {
           <button onClick={() => navigate(-1)} style={styles.cancelBtn}>취소</button>
           <button
             onClick={handleSave}
-            disabled={!title.trim()}
+            disabled={!canSave}
             style={{
               ...styles.saveBtn,
-              opacity: title.trim() ? 1 : 0.5,
-              cursor: title.trim() ? 'pointer' : 'not-allowed',
+              opacity: canSave ? 1 : 0.5,
+              cursor: canSave ? 'pointer' : 'not-allowed',
             }}
           >
-            저장
+            {saving ? '저장 중...' : '저장'}
           </button>
         </div>
       </div>
@@ -322,6 +428,49 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral400,
     textAlign: 'center' as const,
     lineHeight: 1.5,
+  },
+  fileSelected: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '14px 16px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '10px',
+    backgroundColor: colors.neutral50,
+  },
+  fileInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flex: 1,
+    minWidth: 0,
+  },
+  fileName: {
+    margin: 0,
+    fontSize: '14px',
+    fontWeight: 500,
+    color: colors.neutral800,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+  },
+  fileMeta: {
+    margin: '2px 0 0',
+    fontSize: '12px',
+    color: colors.neutral400,
+  },
+  removeFileBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    backgroundColor: 'transparent',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '6px',
+    color: colors.neutral500,
+    cursor: 'pointer',
+    flexShrink: 0,
   },
   previewBox: {
     border: `1px solid ${colors.neutral200}`,
