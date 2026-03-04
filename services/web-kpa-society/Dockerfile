@@ -32,6 +32,7 @@ COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
 COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
+COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -53,6 +54,7 @@ COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
+COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
