@@ -211,7 +211,10 @@ export class User {
 
   // Role helper methods (use this.roles — set by middleware from RoleAssignment)
   hasRole(role: UserRole | string): boolean {
-    return this.roles?.includes(role as string) || false;
+    const roleStr = role as string;
+    if (!this.roles || this.roles.length === 0) return false;
+    // Direct match or domain-prefixed match (e.g., 'admin' matches 'platform:admin')
+    return this.roles.some(r => r === roleStr || r === `platform:${roleStr}`);
   }
 
   hasAnyRole(roles: (UserRole | string)[]): boolean {
