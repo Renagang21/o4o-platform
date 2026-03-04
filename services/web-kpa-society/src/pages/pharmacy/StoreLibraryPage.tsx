@@ -207,8 +207,11 @@ export function StoreLibraryPage() {
 
             return (
               <div key={item.id} style={styles.card}>
-                {/* Preview */}
-                <div style={styles.cardPreview}>
+                {/* Preview — clickable */}
+                <div
+                  style={{ ...styles.cardPreview, cursor: 'pointer' }}
+                  onClick={() => navigate(`/store/library/${item.id}`)}
+                >
                   {isImage && item.fileUrl ? (
                     <img
                       src={item.fileUrl}
@@ -221,8 +224,11 @@ export function StoreLibraryPage() {
                   )}
                 </div>
 
-                {/* Info */}
-                <div style={styles.cardBody}>
+                {/* Info — clickable */}
+                <div
+                  style={{ ...styles.cardBody, cursor: 'pointer' }}
+                  onClick={() => navigate(`/store/library/${item.id}`)}
+                >
                   <h3 style={styles.cardTitle}>{item.title}</h3>
                   {item.category && (
                     <span style={styles.categoryBadge}>{item.category}</span>

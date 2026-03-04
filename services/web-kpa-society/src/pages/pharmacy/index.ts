@@ -68,5 +68,8 @@ export { StoreLibraryNewPage } from './StoreLibraryNewPage';
 // WO-O4O-STORE-LIBRARY-LIST-UI-V1: 매장 자료실 목록
 export { StoreLibraryPage } from './StoreLibraryPage';
 
+// WO-O4O-STORE-LIBRARY-DETAIL-V1: 매장 자료 상세
+export { StoreLibraryDetailPage } from './StoreLibraryDetailPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

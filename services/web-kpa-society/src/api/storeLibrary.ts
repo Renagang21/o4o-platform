@@ -70,6 +70,15 @@ export async function getStoreLibraryItems(): Promise<{ success: boolean; data: 
 }
 
 /**
+ * Store 자료실 단건 조회
+ */
+export async function getStoreLibraryItem(
+  id: string,
+): Promise<{ success: boolean; data: StoreLibraryItem }> {
+  return apiClient.get(`/pharmacy/library/${id}`);
+}
+
+/**
  * Store 자료실 항목 생성
  */
 export async function createStoreLibraryItem(
