@@ -132,7 +132,8 @@ export default function UsersPage() {
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.pharmacyName?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = !roleFilter || user.role === roleFilter;
+    const { role } = user;
+    const matchesRole = !roleFilter || role === roleFilter;
     const matchesStatus = !statusFilter || user.status === statusFilter;
     return matchesSearch && matchesRole && matchesStatus;
   });

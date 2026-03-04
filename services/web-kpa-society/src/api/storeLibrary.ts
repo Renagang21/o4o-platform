@@ -43,6 +43,16 @@ export interface StoreLibraryItem {
   updatedAt: string;
 }
 
+export interface CreateStoreLibraryParams {
+  title: string;
+  description?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  category?: string;
+}
+
 /**
  * Neture 공개 자료 단건 조회 (published 상태만)
  * 인증 불필요
@@ -79,4 +89,51 @@ export async function getStoreLibraryItems(opts?: {
   if (opts?.category && opts.category !== 'all') params.set('category', opts.category);
   const qs = params.toString();
   return apiClient.get(`/pharmacy/library${qs ? `?${qs}` : ''}`);
+}
+
+/**
+ * Store 자료실 단건 조회
+ */
+export async function getStoreLibraryItem(
+  id: string,
+): Promise<{ success: boolean; data: StoreLibraryItem }> {
+  return apiClient.get(`/pharmacy/library/${id}`);
+}
+
+/**
+ * Store 자료실 항목 생성
+ */
+export async function createStoreLibraryItem(
+  params: CreateStoreLibraryParams,
+): Promise<{ success: boolean; data: StoreLibraryItem }> {
+  return apiClient.post('/pharmacy/library', params);
+}
+
+export interface UpdateStoreLibraryParams {
+  title?: string;
+  description?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  category?: string;
+}
+
+/**
+ * Store 자료실 항목 수정
+ */
+export async function updateStoreLibraryItem(
+  id: string,
+  params: UpdateStoreLibraryParams,
+): Promise<{ success: boolean; data: StoreLibraryItem }> {
+  return apiClient.put(`/pharmacy/library/${id}`, params);
+}
+
+/**
+ * Store 자료실 항목 삭제 (soft-delete)
+ */
+export async function deleteStoreLibraryItem(
+  id: string,
+): Promise<{ success: boolean; message: string }> {
+  return apiClient.delete(`/pharmacy/library/${id}`);
 }
