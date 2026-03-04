@@ -107,7 +107,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -627,7 +627,8 @@ function App() {
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
-            {/* library: 매장 자료실 등록 (WO-O4O-NETURE-TO-STORE-MANUAL-FLOW-V1) */}
+            {/* library: 매장 자료실 (WO-O4O-STORE-LIBRARY-LIST-UI-V1) */}
+            <Route path="library" element={<StoreLibraryPage />} />
             <Route path="library/new" element={<StoreLibraryNewPage />} />
             {/* signage: 사이니지 운영 (WO-O4O-STORE-SIGNAGE-ENGINE-V1) */}
             <Route path="signage" element={<StoreSignagePage />} />
