@@ -12,96 +12,58 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * 6. SeedPlatformServices — platform_services
  *
  * 보존: KPA-b/c (TestAccounts, TestForums, TestPostsComments, OrganizationsFullHierarchy)
+ * PL/pgSQL EXCEPTION 블록으로 존재하지 않는 테이블 안전 처리
  */
 export class CleanupDemoSeedData1709564400000 implements MigrationInterface {
   name = 'CleanupDemoSeedData1709564400000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // ── 1. Signage (UUID prefix 기반 삭제) ──
-
-    await queryRunner.query(`
-      DELETE FROM signage_playlist_items
-      WHERE id::text LIKE 'd2000000-0a00-4000-d200-%'
-    `).catch(() => {});
-
-    await queryRunner.query(`
-      DELETE FROM signage_playlists
-      WHERE id::text LIKE 'd1000000-0a00-4000-d100-%'
-    `).catch(() => {});
-
-    await queryRunner.query(`
-      DELETE FROM signage_media
-      WHERE id::text LIKE 'd0000000-0a00-4000-d000-%'
-    `).catch(() => {});
-
-    // ── 2. Banner content (28건) + slots (17건) ──
-
+    // Banner slot IDs (1~17)
     const bannerSlotIds = range(1, 17).map(n =>
       `'e1000000-0a00-4000-e100-${pad(n)}'`
     ).join(',');
 
-    await queryRunner.query(`
-      DELETE FROM cms_content_slots WHERE id IN (${bannerSlotIds})
-    `).catch(() => {});
-
+    // Banner content IDs (1~28)
     const bannerContentIds = range(1, 28).map(n =>
       `'e0000000-0a00-4000-e000-${pad(n)}'`
     ).join(',');
 
-    await queryRunner.query(`
-      DELETE FROM cms_contents WHERE id IN (${bannerContentIds})
-    `).catch(() => {});
-
-    // ── 3. Benefit content (24건) + slots (11건) ──
-
+    // Benefit slot IDs (101~111)
     const benefitSlotIds = range(101, 111).map(n =>
       `'e1000000-0a00-4000-e100-${pad(n)}'`
     ).join(',');
 
-    await queryRunner.query(`
-      DELETE FROM cms_content_slots WHERE id IN (${benefitSlotIds})
-    `).catch(() => {});
-
+    // Benefit content IDs (101~124)
     const benefitContentIds = range(101, 124).map(n =>
       `'e0000000-0a00-4000-e000-${pad(n)}'`
     ).join(',');
 
     await queryRunner.query(`
-      DELETE FROM cms_contents WHERE id IN (${benefitContentIds})
-    `).catch(() => {});
+      DO $$ BEGIN
+        -- 1. Signage (UUID prefix 기반 삭제)
+        BEGIN DELETE FROM signage_playlist_items WHERE id::text LIKE 'd2000000-0a00-4000-d200-%'; EXCEPTION WHEN OTHERS THEN NULL; END;
+        BEGIN DELETE FROM signage_playlists WHERE id::text LIKE 'd1000000-0a00-4000-d100-%'; EXCEPTION WHEN OTHERS THEN NULL; END;
+        BEGIN DELETE FROM signage_media WHERE id::text LIKE 'd0000000-0a00-4000-d000-%'; EXCEPTION WHEN OTHERS THEN NULL; END;
 
-    // ── 4. Hub hero content (3건) + slots (3건) ──
+        -- 2. Banner content + slots
+        BEGIN DELETE FROM cms_content_slots WHERE id IN (${bannerSlotIds}); EXCEPTION WHEN OTHERS THEN NULL; END;
+        BEGIN DELETE FROM cms_contents WHERE id IN (${bannerContentIds}); EXCEPTION WHEN OTHERS THEN NULL; END;
 
-    await queryRunner.query(`
-      DELETE FROM cms_content_slots
-      WHERE id IN (
-        'e3000000-0a00-4000-e300-000000000001',
-        'e3000000-0a00-4000-e300-000000000002',
-        'e3000000-0a00-4000-e300-000000000003'
-      )
-    `).catch(() => {});
+        -- 3. Benefit content + slots
+        BEGIN DELETE FROM cms_content_slots WHERE id IN (${benefitSlotIds}); EXCEPTION WHEN OTHERS THEN NULL; END;
+        BEGIN DELETE FROM cms_contents WHERE id IN (${benefitContentIds}); EXCEPTION WHEN OTHERS THEN NULL; END;
 
-    await queryRunner.query(`
-      DELETE FROM cms_contents
-      WHERE id IN (
-        'e2000000-0a00-4000-e200-000000000001',
-        'e2000000-0a00-4000-e200-000000000002',
-        'e2000000-0a00-4000-e200-000000000003'
-      )
-    `).catch(() => {});
+        -- 4. Hub hero content + slots
+        BEGIN DELETE FROM cms_content_slots WHERE id IN ('e3000000-0a00-4000-e300-000000000001','e3000000-0a00-4000-e300-000000000002','e3000000-0a00-4000-e300-000000000003'); EXCEPTION WHEN OTHERS THEN NULL; END;
+        BEGIN DELETE FROM cms_contents WHERE id IN ('e2000000-0a00-4000-e200-000000000001','e2000000-0a00-4000-e200-000000000002','e2000000-0a00-4000-e200-000000000003'); EXCEPTION WHEN OTHERS THEN NULL; END;
 
-    // ── 5. Forum service organization ──
+        -- 5. Forum service organization
+        BEGIN DELETE FROM organizations WHERE code = 'FORUM_GLYCOPHARM'; EXCEPTION WHEN OTHERS THEN NULL; END;
 
-    await queryRunner.query(`
-      DELETE FROM organizations WHERE code = 'FORUM_GLYCOPHARM'
-    `).catch(() => {});
-
-    // ── 6. Platform services ──
-
-    await queryRunner.query(`
-      DELETE FROM platform_services
-      WHERE code IN ('glycopharm', 'glucoseview', 'neture', 'kpa-society', 'k-cosmetics')
-    `).catch(() => {});
+        -- 6. Platform services
+        BEGIN DELETE FROM platform_services WHERE code IN ('glycopharm', 'glucoseview', 'neture', 'kpa-society', 'k-cosmetics'); EXCEPTION WHEN OTHERS THEN NULL; END;
+      END $$;
+    `);
   }
 
   public async down(_queryRunner: QueryRunner): Promise<void> {
