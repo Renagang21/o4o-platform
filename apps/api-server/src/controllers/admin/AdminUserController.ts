@@ -327,6 +327,16 @@ export class AdminUserController {
       user.status = status;
       await userRepo.save(user);
 
+      // KPA 회원 승인 시 kpa_members.status도 'active'로 동기화
+      if (status === 'approved') {
+        try {
+          await AppDataSource.query(
+            `UPDATE kpa_members SET status = 'active', updated_at = NOW() WHERE user_id = $1 AND status = 'pending'`,
+            [id]
+          );
+        } catch { /* kpa_members 없는 경우 무시 */ }
+      }
+
       res.json({
         success: true,
         message: `User status updated to ${status}`
