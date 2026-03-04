@@ -143,6 +143,9 @@ import { StorefrontHomePage } from './pages/store/StorefrontHomePage';
 // Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
 import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
+// QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1)
+import QrLandingPage from './pages/qr/QrLandingPage';
+
 // Legacy pages (for backward compatibility)
 import {
   MemberApplyPage,
@@ -659,6 +662,9 @@ function App() {
           {/* Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1) — public, no auth */}
           <Route path="/content/:snapshotId/print" element={<PrintContentPage />} />
           <Route path="/content/:snapshotId" element={<PublicContentViewPage />} />
+
+          {/* QR Landing Page (WO-O4O-QR-LANDING-PAGE-V1) — public, no auth */}
+          <Route path="/qr/:slug" element={<QrLandingPage />} />
 
           {/* Public Signage Rendering (WO-O4O-SIGNAGE-STRUCTURE-CONSOLIDATION-V1) — public, no auth */}
           <Route path="/public/signage" element={<PublicSignagePage />} />

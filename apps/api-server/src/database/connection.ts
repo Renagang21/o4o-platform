@@ -274,6 +274,7 @@ import {
   StoreTabletDisplay,
   TabletInterestRequest,
   StoreLibraryItem,
+  StoreQrCode,
 } from '../routes/platform/entities/index.js';
 
 // ============================================================================
@@ -771,6 +772,10 @@ export const AppDataSource = new DataSource({
     // STORE LIBRARY ENTITY (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1)
     // ============================================================================
     StoreLibraryItem,
+    // ============================================================================
+    // STORE QR CODE ENTITY (WO-O4O-QR-LANDING-PAGE-V1)
+    // ============================================================================
+    StoreQrCode,
     // ============================================================================
     // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
     // ============================================================================

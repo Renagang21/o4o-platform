@@ -80,6 +80,7 @@ import { createAdminForceAssetController } from './controllers/admin-force-asset
 import { createPublishedAssetsController } from './controllers/published-assets.controller.js';
 import { createStoreContentController } from './controllers/store-content.controller.js';
 import { createStoreLibraryController } from './controllers/store-library.controller.js';
+import { createStoreQrLandingController } from './controllers/store-qr-landing.controller.js';
 import { createStorePlaylistController } from './controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from './controllers/store-channel-products.controller.js';
 import { createKpaStoreTemplateController } from './controllers/kpa-store-template.controller.js';
@@ -1841,6 +1842,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Store Library routes (WO-O4O-STORE-LIBRARY-API-INTEGRATION-V1)
   router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
+
+  // Store QR Landing routes (WO-O4O-QR-LANDING-PAGE-V1)
+  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
 
   // ============================================================================
   // Store Channel Routes — WO-KPA-STORE-CHANNEL-INTEGRATION-V1
