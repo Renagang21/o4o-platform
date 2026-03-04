@@ -77,6 +77,8 @@ const ALL_ROLES = Object.values(SERVICE_ROLES).flat();
 interface Operator {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   roles: string[];
   status: 'active' | 'inactive';
@@ -122,7 +124,9 @@ const OperatorsPage: React.FC = () => {
         const operatorUsers = userData
           .map((user: any) => ({
             id: user.id || user._id,
-            name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown',
+            name: user.name || `${user.lastName || ''} ${user.firstName || ''}`.trim() || 'Unknown',
+            firstName: user.firstName || '',
+            lastName: user.lastName || '',
             email: user.email || '',
             roles: user.roles || [user.role].filter(Boolean),
             status: (user.isActive === false ? 'inactive' : 'active') as 'active' | 'inactive',
@@ -244,15 +248,11 @@ const OperatorsPage: React.FC = () => {
 
   const openEditModal = (operator: Operator) => {
     setEditingOperator(operator);
-    // name에서 성/이름 분리 (첫 글자 = 성, 나머지 = 이름)
-    const nameParts = operator.name.trim();
-    const lastName = nameParts.length > 0 ? nameParts.charAt(0) : '';
-    const firstName = nameParts.length > 1 ? nameParts.slice(1) : '';
     setFormData({
       email: operator.email,
       password: '',
-      lastName,
-      firstName,
+      lastName: operator.lastName,
+      firstName: operator.firstName,
       roles: operator.roles,
     });
     setFormErrors({});
@@ -310,7 +310,7 @@ const OperatorsPage: React.FC = () => {
         const updateData: any = {
           firstName: formData.firstName,
           lastName: formData.lastName,
-          name: `${formData.lastName}${formData.firstName}`,
+          name: `${formData.lastName} ${formData.firstName}`.trim(),
           roles: formData.roles,
         };
         if (formData.password) {
@@ -326,7 +326,7 @@ const OperatorsPage: React.FC = () => {
           password: formData.password,
           firstName: formData.firstName,
           lastName: formData.lastName,
-          name: `${formData.lastName}${formData.firstName}`,
+          name: `${formData.lastName} ${formData.firstName}`.trim(),
           roles: formData.roles,
           role: formData.roles[0]?.split(':')[1] || 'operator', // Legacy role field
           isEmailVerified: true,

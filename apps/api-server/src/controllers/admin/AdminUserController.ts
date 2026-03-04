@@ -355,12 +355,30 @@ export class AdminUserController {
         return;
       }
 
-      await userRepo.remove(user);
-
-      res.json({
-        success: true,
-        message: 'User deleted successfully'
-      });
+      // Try hard delete first; if FK constraint prevents it, soft-delete instead
+      try {
+        await userRepo.remove(user);
+        res.json({
+          success: true,
+          message: 'User deleted successfully'
+        });
+      } catch (deleteError: any) {
+        // FK constraint violation — fall back to soft delete
+        if (deleteError?.code === '23503' || deleteError?.message?.includes('violates foreign key')) {
+          await userRepo.update(id, { isActive: false });
+          // Also remove role assignments so the user can no longer log in
+          await AppDataSource.query(
+            `DELETE FROM role_assignments WHERE user_id = $1`,
+            [id]
+          );
+          res.json({
+            success: true,
+            message: 'User deactivated (has related records that prevent full deletion)'
+          });
+        } else {
+          throw deleteError;
+        }
+      }
     } catch (error) {
       console.error('Error deleting user:', error);
       res.status(500).json({
