@@ -74,5 +74,8 @@ export { StorePopPage } from './StorePopPage';
 // WO-O4O-MARKETING-ANALYTICS-V1: 마케팅 분석
 export { MarketingAnalyticsPage } from './MarketingAnalyticsPage';
 
+// WO-O4O-STORE-MARKETING-DASHBOARD-V1: 마케팅 대시보드
+export { StoreMarketingDashboardPage } from './StoreMarketingDashboardPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

@@ -7,7 +7,8 @@
  * store_qr_scan_events + store_qr_codes 집계.
  *
  * AUTHENTICATED (requireAuth + requirePharmacyOwner):
- *   GET /pharmacy/analytics/marketing — 조직 전체 마케팅 KPI + TOP QR + 디바이스 + 일별 추이
+ *   GET /pharmacy/analytics/marketing      — 조직 전체 마케팅 KPI + TOP QR + 디바이스 + 일별 추이
+ *   GET /pharmacy/analytics/recent-scans   — 최근 스캔 로그 (최대 20건)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -112,6 +113,33 @@ export function createStoreAnalyticsController(
           dailyScans: dailyResult,
         },
       });
+    }),
+  );
+
+  // ─── GET /pharmacy/analytics/recent-scans ─────────────────────
+  router.get(
+    '/pharmacy/analytics/recent-scans',
+    requireAuth,
+    requirePharmacyOwner,
+    asyncHandler(async (req: Request, res: Response) => {
+      const organizationId = (req as any).organizationId;
+
+      const rows = await dataSource.query(
+        `SELECT
+           e.device_type AS "deviceType",
+           e.created_at AS "createdAt",
+           qr.title AS "qrTitle",
+           qr.slug AS "qrSlug"
+         FROM store_qr_scan_events e
+         LEFT JOIN store_qr_codes qr
+           ON qr.id = e.qr_code_id AND qr.organization_id = $1
+         WHERE e.organization_id = $1
+         ORDER BY e.created_at DESC
+         LIMIT 20`,
+        [organizationId],
+      );
+
+      res.json({ success: true, data: rows });
     }),
   );
 
