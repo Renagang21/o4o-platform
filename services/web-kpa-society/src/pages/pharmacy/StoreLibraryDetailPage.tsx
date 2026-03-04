@@ -74,7 +74,7 @@ export function StoreLibraryDetailPage() {
     setDeleting(true);
     try {
       await deleteStoreLibraryItem(item.id);
-      navigate('/store/library', { replace: true });
+      navigate('/store/operation/library', { replace: true });
     } catch {
       setError('삭제 중 오류가 발생했습니다.');
       setDeleting(false);
@@ -118,7 +118,7 @@ export function StoreLibraryDetailPage() {
     return (
       <div style={styles.container}>
         <div style={styles.backRow}>
-          <button onClick={() => navigate('/store/library')} style={styles.backBtn}>
+          <button onClick={() => navigate('/store/operation/library')} style={styles.backBtn}>
             <ArrowLeft size={16} /> 목록으로
           </button>
         </div>
@@ -137,7 +137,7 @@ export function StoreLibraryDetailPage() {
     <div style={styles.container}>
       {/* Back + Actions */}
       <div style={styles.topBar}>
-        <button onClick={() => navigate('/store/library')} style={styles.backBtn}>
+        <button onClick={() => navigate('/store/operation/library')} style={styles.backBtn}>
           <ArrowLeft size={16} /> 목록으로
         </button>
         <div style={styles.topActions}>
@@ -146,7 +146,7 @@ export function StoreLibraryDetailPage() {
               <Download size={16} /> 다운로드
             </button>
           )}
-          <button onClick={() => navigate(`/store/library/${item.id}/edit`)} style={styles.actionButton}>
+          <button onClick={() => navigate(`/store/operation/library/${item.id}/edit`)} style={styles.actionButton}>
             <Edit2 size={16} /> 수정
           </button>
           <button

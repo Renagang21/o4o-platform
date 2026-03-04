@@ -13,6 +13,8 @@ export type {
   StoreMenuKey,
   StoreDashboardConfig,
   StoreMenuItemDef,
+  StoreMenuSection,
+  StoreMenuSectionItem,
 } from './config/storeMenuConfig';
 
 // Constants (per-service configs)

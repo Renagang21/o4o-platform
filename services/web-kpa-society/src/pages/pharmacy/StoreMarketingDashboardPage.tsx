@@ -135,7 +135,7 @@ export function StoreMarketingDashboardPage() {
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
             <h2 style={styles.sectionTitle}>QR 성과 TOP 5</h2>
-            <Link to="/store/analytics" style={styles.seeAllLink}>
+            <Link to="/store/analytics/marketing" style={styles.seeAllLink}>
               전체 보기 <ArrowRight size={12} />
             </Link>
           </div>
@@ -193,22 +193,22 @@ export function StoreMarketingDashboardPage() {
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>빠른 이동</h2>
         <div style={styles.quickGrid}>
-          <Link to="/store/qr" style={styles.quickCard}>
+          <Link to="/store/marketing/qr" style={styles.quickCard}>
             <QrCode size={24} style={{ color: colors.primary }} />
             <p style={styles.quickLabel}>QR 관리</p>
             <p style={styles.quickDesc}>QR 코드 생성 및 관리</p>
           </Link>
-          <Link to="/store/pop" style={styles.quickCard}>
+          <Link to="/store/marketing/pop" style={styles.quickCard}>
             <Megaphone size={24} style={{ color: '#f59e0b' }} />
             <p style={styles.quickLabel}>POP 자료</p>
             <p style={styles.quickDesc}>POP 광고 PDF 생성</p>
           </Link>
-          <Link to="/store/library/new" style={styles.quickCard}>
+          <Link to="/store/operation/library" style={styles.quickCard}>
             <BookOpen size={24} style={{ color: '#059669' }} />
             <p style={styles.quickLabel}>자료실</p>
-            <p style={styles.quickDesc}>매장 자료 등록</p>
+            <p style={styles.quickDesc}>매장 자료 관리</p>
           </Link>
-          <Link to="/store/analytics" style={styles.quickCard}>
+          <Link to="/store/analytics/marketing" style={styles.quickCard}>
             <BarChart3 size={24} style={{ color: '#7c3aed' }} />
             <p style={styles.quickLabel}>상세 분석</p>
             <p style={styles.quickDesc}>마케팅 성과 분석</p>

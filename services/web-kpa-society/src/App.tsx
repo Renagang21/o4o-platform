@@ -107,7 +107,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyDashboardPage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -608,46 +608,58 @@ function App() {
           <Route path="/tablet/:slug" element={<TabletStorePage />} />
 
           {/* ========================================
-           * Store Core v1.0 — 약국 경영지원 대시보드
-           * WO-STORE-CORE-MENU-ALIGNMENT-V1 Phase 2 Step 3
+           * Store Hub 운영 OS
+           * WO-O4O-STORE-HUB-STRUCTURE-REFACTOR-V1
            *
-           * StoreDashboardLayout (operator-core) 기반 통합 사이드바
+           * Dashboard / Operation / Marketing / Commerce / Analytics
+           * StoreDashboardLayout (store-ui-core) 기반 section sidebar
            * PharmacyGuard로 인증/승인 보호
            * ======================================== */}
           <Route path="/store" element={<PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard>}>
-            <Route index element={<PharmacyDashboardPage />} />
-            {/* products: B2B(기본) + B2C + 공급사 */}
-            <Route path="products" element={<PharmacyB2BPage />} />
-            <Route path="products/b2c" element={<PharmacySellPage />} />
-            <Route path="products/suppliers" element={<SupplierListPage />} />
-            <Route path="products/suppliers/:supplierId" element={<SupplierDetailPage />} />
-            {/* channels: 채널 관리 + 태블릿 */}
+            {/* Dashboard */}
+            <Route index element={<StoreMarketingDashboardPage />} />
+            <Route path="dashboard" element={<StoreMarketingDashboardPage />} />
+
+            {/* Operation */}
+            <Route path="operation/library" element={<StoreLibraryPage />} />
+            <Route path="operation/library/new" element={<StoreLibraryNewPage />} />
+            <Route path="operation/library/:id" element={<StoreLibraryDetailPage />} />
+            <Route path="operation/library/:id/edit" element={<StoreLibraryEditPage />} />
+
+            {/* Marketing */}
+            <Route path="marketing/qr" element={<StoreQRPage />} />
+            <Route path="marketing/pop" element={<StorePopPage />} />
+            <Route path="marketing/signage" element={<StoreSignagePage />} />
+
+            {/* Commerce */}
+            <Route path="commerce/products" element={<PharmacyB2BPage />} />
+            <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
+            <Route path="commerce/products/suppliers" element={<SupplierListPage />} />
+            <Route path="commerce/products/suppliers/:supplierId" element={<SupplierDetailPage />} />
+            <Route path="commerce/orders" element={<StoreOrdersPage />} />
+
+            {/* Analytics */}
+            <Route path="analytics/marketing" element={<MarketingAnalyticsPage />} />
+
+            {/* ── Legacy redirects (기존 URL 호환) ── */}
+            <Route path="qr" element={<Navigate to="/store/marketing/qr" replace />} />
+            <Route path="pop" element={<Navigate to="/store/marketing/pop" replace />} />
+            <Route path="library" element={<Navigate to="/store/operation/library" replace />} />
+            <Route path="library/new" element={<Navigate to="/store/operation/library/new" replace />} />
+            <Route path="signage" element={<Navigate to="/store/marketing/signage" replace />} />
+            <Route path="analytics" element={<Navigate to="/store/analytics/marketing" replace />} />
+            <Route path="products" element={<Navigate to="/store/commerce/products" replace />} />
+            <Route path="products/b2c" element={<Navigate to="/store/commerce/products/b2c" replace />} />
+            <Route path="products/suppliers" element={<Navigate to="/store/commerce/products/suppliers" replace />} />
+            <Route path="orders" element={<Navigate to="/store/commerce/orders" replace />} />
+
+            {/* ── Hidden routes (사이드바 미표시, URL 직접 접근 유지) ── */}
             <Route path="channels" element={<StoreChannelsPage />} />
             <Route path="channels/tablet" element={<TabletRequestsPage />} />
-            {/* orders: 주문 관리 (WO-STORE-ORDERS-FOUNDATION-V1) */}
-            <Route path="orders" element={<StoreOrdersPage />} />
-            {/* content: 자산 + 블로그 */}
             <Route path="content" element={<StoreAssetsPage />} />
             <Route path="content/blog" element={<PharmacyBlogPage />} />
             <Route path="content/:snapshotId/edit" element={<StoreContentEditPage />} />
-            {/* library: 매장 자료실 (WO-O4O-STORE-LIBRARY-LIST-UI-V1) */}
-            <Route path="library" element={<StoreLibraryPage />} />
-            <Route path="library/new" element={<StoreLibraryNewPage />} />
-            <Route path="library/:id" element={<StoreLibraryDetailPage />} />
-            <Route path="library/:id/edit" element={<StoreLibraryEditPage />} />
-            {/* signage: 사이니지 운영 (WO-O4O-STORE-SIGNAGE-ENGINE-V1) */}
-            <Route path="signage" element={<StoreSignagePage />} />
-            {/* qr: QR 자료 관리 (WO-O4O-STORE-QR-LIBRARY-INTEGRATION-V1) */}
-            <Route path="qr" element={<StoreQRPage />} />
-            {/* pop: POP 자료 관리 (WO-O4O-POP-LIBRARY-INTEGRATION-V1) */}
-            <Route path="pop" element={<StorePopPage />} />
-            {/* dashboard: 마케팅 대시보드 (WO-O4O-STORE-MARKETING-DASHBOARD-V1) */}
-            <Route path="dashboard" element={<StoreMarketingDashboardPage />} />
-            {/* analytics: 마케팅 분석 (WO-O4O-MARKETING-ANALYTICS-V1) */}
-            <Route path="analytics" element={<MarketingAnalyticsPage />} />
-            {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
             <Route path="billing" element={<StoreBillingPage />} />
-            {/* settings: 설정 + 레이아웃 + 템플릿 */}
             <Route path="settings" element={<PharmacyStorePage />} />
             <Route path="settings/layout" element={<LayoutBuilderPage />} />
             <Route path="settings/template" element={<PharmacyTemplatePage />} />

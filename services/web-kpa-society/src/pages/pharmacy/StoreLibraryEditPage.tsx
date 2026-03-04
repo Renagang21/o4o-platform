@@ -139,7 +139,7 @@ export function StoreLibraryEditPage() {
       const result = await updateStoreLibraryItem(id, params);
 
       if (result.success) {
-        navigate(`/store/library/${id}`, { replace: true });
+        navigate(`/store/operation/library/${id}`, { replace: true });
       } else {
         setSaveError('자료 수정 중 오류가 발생했습니다.');
       }
@@ -165,7 +165,7 @@ export function StoreLibraryEditPage() {
   if (loadError || !item) {
     return (
       <div style={styles.container}>
-        <button onClick={() => navigate('/store/library')} style={styles.backButton}>
+        <button onClick={() => navigate('/store/operation/library')} style={styles.backButton}>
           <ArrowLeft size={16} /> 목록으로
         </button>
         <div style={styles.errorCard}>
@@ -183,7 +183,7 @@ export function StoreLibraryEditPage() {
   return (
     <div style={styles.container}>
       {/* Back */}
-      <button onClick={() => navigate(`/store/library/${id}`)} style={styles.backButton}>
+      <button onClick={() => navigate(`/store/operation/library/${id}`)} style={styles.backButton}>
         <ArrowLeft size={16} /> 돌아가기
       </button>
 
@@ -324,7 +324,7 @@ export function StoreLibraryEditPage() {
 
         {/* Actions */}
         <div style={styles.actions}>
-          <button onClick={() => navigate(`/store/library/${id}`)} style={styles.cancelBtn}>취소</button>
+          <button onClick={() => navigate(`/store/operation/library/${id}`)} style={styles.cancelBtn}>취소</button>
           <button
             onClick={handleSave}
             disabled={!canSave}

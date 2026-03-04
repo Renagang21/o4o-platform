@@ -1,6 +1,7 @@
 /**
  * StoreSidebar - Store Dashboard 사이드바 내부 콘텐츠
  * WO-O4O-STORE-ADMIN-LAYOUT-STANDARDIZATION-V1
+ * WO-O4O-STORE-HUB-STRUCTURE-REFACTOR-V1: section-based 렌더링 추가
  *
  * 사이드바 헤더 + 네비게이션 메뉴 + 로그아웃 버튼
  * 서비스 컨텍스트 표시는 TopBar에서만 처리 (사이드바에서는 제거)
@@ -19,11 +20,15 @@ import {
   Settings,
   X,
   LogOut,
+  BookOpen,
+  QrCode,
+  Megaphone,
+  BarChart3,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
 
-/** Store Core v1.0 메뉴 키 → lucide 아이콘 매핑 */
+/** Store Core v1.0 메뉴 키 → lucide 아이콘 매핑 (flat mode) */
 const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   products: Package,
@@ -33,6 +38,18 @@ const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
   signage: Monitor,
   billing: Receipt,
   settings: Settings,
+};
+
+/** Section mode 아이콘 매핑 */
+const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
+  dashboard: LayoutDashboard,
+  library: BookOpen,
+  qr: QrCode,
+  pop: Megaphone,
+  signage: Monitor,
+  products: Package,
+  orders: ShoppingCart,
+  'analytics-marketing': BarChart3,
 };
 
 export interface StoreSidebarProps {
@@ -76,32 +93,75 @@ export function StoreSidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {enabledMenuItems.map((item) => {
-          const Icon = MENU_ICONS[item.key];
-          const fullPath = item.subPath
-            ? `${config.basePath}${item.subPath}`
-            : config.basePath;
+      <nav className="flex-1 p-4 overflow-y-auto">
+        {config.menuSections ? (
+          /* Section-based rendering */
+          <div className="space-y-4">
+            {config.menuSections.map((section, sIdx) => (
+              <div key={sIdx}>
+                {section.label && (
+                  <div className="px-4 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                    {section.label}
+                  </div>
+                )}
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const Icon = SECTION_ICONS[item.key] || FileText;
+                    const fullPath = `${config.basePath}${item.subPath}`;
 
-          return (
-            <NavLink
-              key={item.key}
-              to={fullPath}
-              end={item.key === 'dashboard'}
-              onClick={onItemClick}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-teal-100 text-teal-700'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`
-              }
-            >
-              <Icon className="w-5 h-5" />
-              {item.label}
-            </NavLink>
-          );
-        })}
+                    return (
+                      <NavLink
+                        key={item.key}
+                        to={fullPath}
+                        end={item.key === 'dashboard'}
+                        onClick={onItemClick}
+                        className={({ isActive }) =>
+                          `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                            isActive
+                              ? 'bg-teal-100 text-teal-700'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`
+                        }
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Flat rendering (backward-compat) */
+          <div className="space-y-1">
+            {enabledMenuItems.map((item) => {
+              const Icon = MENU_ICONS[item.key];
+              const fullPath = item.subPath
+                ? `${config.basePath}${item.subPath}`
+                : config.basePath;
+
+              return (
+                <NavLink
+                  key={item.key}
+                  to={fullPath}
+                  end={item.key === 'dashboard'}
+                  onClick={onItemClick}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      isActive
+                        ? 'bg-teal-100 text-teal-700'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`
+                  }
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </NavLink>
+              );
+            })}
+          </div>
+        )}
       </nav>
 
       {/* Sidebar Footer */}

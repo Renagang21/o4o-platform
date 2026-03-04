@@ -131,7 +131,7 @@ export function StoreLibraryPage() {
               Neture 자료 보기
             </button>
           )}
-          <button onClick={() => navigate('/store/library/new')} style={styles.primaryButton}>
+          <button onClick={() => navigate('/store/operation/library/new')} style={styles.primaryButton}>
             <Plus size={16} />
             자료 등록
           </button>
@@ -191,7 +191,7 @@ export function StoreLibraryPage() {
         <div style={styles.emptyState}>
           <FileText size={48} style={{ color: colors.neutral300, marginBottom: '16px' }} />
           <p style={styles.emptyTitle}>등록된 자료가 없습니다.</p>
-          <button onClick={() => navigate('/store/library/new')} style={styles.primaryButton}>
+          <button onClick={() => navigate('/store/operation/library/new')} style={styles.primaryButton}>
             <Plus size={16} />
             자료 등록
           </button>
@@ -210,7 +210,7 @@ export function StoreLibraryPage() {
                 {/* Preview — clickable */}
                 <div
                   style={{ ...styles.cardPreview, cursor: 'pointer' }}
-                  onClick={() => navigate(`/store/library/${item.id}`)}
+                  onClick={() => navigate(`/store/operation/library/${item.id}`)}
                 >
                   {isImage && item.fileUrl ? (
                     <img
@@ -227,7 +227,7 @@ export function StoreLibraryPage() {
                 {/* Info — clickable */}
                 <div
                   style={{ ...styles.cardBody, cursor: 'pointer' }}
-                  onClick={() => navigate(`/store/library/${item.id}`)}
+                  onClick={() => navigate(`/store/operation/library/${item.id}`)}
                 >
                   <h3 style={styles.cardTitle}>{item.title}</h3>
                   {item.category && (
@@ -243,7 +243,7 @@ export function StoreLibraryPage() {
                 {/* Actions */}
                 <div style={styles.cardActions}>
                   <button
-                    onClick={() => navigate(`/store/library/${item.id}`)}
+                    onClick={() => navigate(`/store/operation/library/${item.id}`)}
                     style={styles.actionBtn}
                     title="보기"
                   >
@@ -251,7 +251,7 @@ export function StoreLibraryPage() {
                     보기
                   </button>
                   <button
-                    onClick={() => navigate(`/store/library/${item.id}/edit`)}
+                    onClick={() => navigate(`/store/operation/library/${item.id}/edit`)}
                     style={styles.actionBtn}
                     title="수정"
                   >

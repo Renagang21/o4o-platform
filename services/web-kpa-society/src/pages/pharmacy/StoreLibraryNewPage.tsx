@@ -114,7 +114,7 @@ export function StoreLibraryNewPage() {
       });
 
       if (result.success) {
-        navigate('/store/library', { replace: true });
+        navigate('/store/operation/library', { replace: true });
       } else {
         setSaveError('자료 저장 중 오류가 발생했습니다.');
       }
