@@ -159,7 +159,7 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   if (requiredPermissions.length > 0) {
     // 향후 확장을 위한 구조 유지
     // 현재는 admin 역할이면 모든 권한을 가진 것으로 간주
-    const adminRoleNames = ['admin', 'administrator', 'super_admin'];
+    const adminRoleNames = ['admin', 'administrator', 'super_admin', 'platform:admin', 'platform:super_admin'];
     const userRole = user.role;
     const userActiveRole = (user as any).activeRole?.name;
     const userRoles = (user as any).roles || [];
