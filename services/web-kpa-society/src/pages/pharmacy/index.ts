@@ -71,5 +71,8 @@ export { StoreLibraryPage } from './StoreLibraryPage';
 // WO-O4O-STORE-LIBRARY-DETAIL-V1: 매장 자료 상세
 export { StoreLibraryDetailPage } from './StoreLibraryDetailPage';
 
+// WO-O4O-STORE-LIBRARY-EDIT-V1: 매장 자료 수정
+export { StoreLibraryEditPage } from './StoreLibraryEditPage';
+
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';

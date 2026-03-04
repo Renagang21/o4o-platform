@@ -87,6 +87,26 @@ export async function createStoreLibraryItem(
   return apiClient.post('/pharmacy/library', params);
 }
 
+export interface UpdateStoreLibraryParams {
+  title?: string;
+  description?: string;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  category?: string;
+}
+
+/**
+ * Store 자료실 항목 수정
+ */
+export async function updateStoreLibraryItem(
+  id: string,
+  params: UpdateStoreLibraryParams,
+): Promise<{ success: boolean; data: StoreLibraryItem }> {
+  return apiClient.put(`/pharmacy/library/${id}`, params);
+}
+
 /**
  * Store 자료실 항목 삭제 (soft-delete)
  */
