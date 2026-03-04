@@ -112,7 +112,7 @@ export function ForumActivitySection() {
         </div>
       ) : categories.length === 0 ? (
         <div style={styles.feedCard}>
-          <p style={styles.empty}>자료가 없습니다</p>
+          <p style={styles.empty}>등록된 활동이 없습니다</p>
         </div>
       ) : (
         <div style={styles.forumGrid}>

@@ -155,7 +155,7 @@ export function DocsManagementPage() {
               {loading ? (
                 <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>불러오는 중...</td></tr>
               ) : documents.length === 0 ? (
-                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>자료가 없습니다</td></tr>
+                <tr><td colSpan={8} style={{ ...pageStyles.td, textAlign: 'center' }}>등록된 자료가 없습니다</td></tr>
               ) : (
                 documents.map((doc) => (
                   <tr key={doc.id} style={pageStyles.tr}>

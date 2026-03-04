@@ -42,7 +42,7 @@ export function ActivityFeed() {
             <Link to="/forum" style={styles.moreLink}>더보기</Link>
           </div>
           {posts.length === 0 ? (
-            <p style={styles.empty}>자료가 없습니다</p>
+            <p style={styles.empty}>등록된 글이 없습니다</p>
           ) : (
             <ul style={styles.list}>
               {posts.map((post) => (
@@ -69,7 +69,7 @@ export function ActivityFeed() {
             <Link to="/news" style={styles.moreLink}>더보기</Link>
           </div>
           {notices.length === 0 ? (
-            <p style={styles.empty}>자료가 없습니다</p>
+            <p style={styles.empty}>등록된 공지사항이 없습니다</p>
           ) : (
             <ul style={styles.list}>
               {notices.map((notice) => (

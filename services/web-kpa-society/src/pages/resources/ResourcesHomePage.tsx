@@ -106,7 +106,7 @@ export function ResourcesHomePage() {
           <div style={styles.empty}>불러오는 중...</div>
         ) : filteredResources.length === 0 ? (
           <div style={styles.empty}>
-            <p>자료가 없습니다</p>
+            <p>등록된 자료가 없습니다</p>
           </div>
         ) : (
           <>

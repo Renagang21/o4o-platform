@@ -108,7 +108,7 @@ export function EventsHomePage() {
           <div style={styles.empty}>불러오는 중...</div>
         ) : filteredEvents.length === 0 ? (
           <div style={styles.empty}>
-            <p>자료가 없습니다</p>
+            <p>등록된 이벤트가 없습니다</p>
           </div>
         ) : (
           <>

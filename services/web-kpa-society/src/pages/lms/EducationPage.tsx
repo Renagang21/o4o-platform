@@ -126,7 +126,7 @@ export function EducationPage() {
               <div style={styles.loading}>강의를 불러오는 중...</div>
             ) : filteredLectures.length === 0 ? (
               <div style={styles.empty}>
-                <p>자료가 없습니다</p>
+                <p>등록된 강의가 없습니다</p>
               </div>
             ) : (
               <>
