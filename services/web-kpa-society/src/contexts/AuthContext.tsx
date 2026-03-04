@@ -336,7 +336,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response = await authClient.login({ email, password });
 
     if (response.success && response.user) {
-      const userData = createUserFromApiResponse(response.user as ApiUser);
+      const apiUser = response.user as any;
+      const userData = createUserFromApiResponse(apiUser as ApiUser);
+
+      // Parse kpaMembership from login response (same as checkAuth)
+      const km = apiUser.kpaMembership;
+      if (km) {
+        userData.kpaMembership = km;
+        userData.membershipRole = km.role || undefined;
+        userData.membershipOrgId = km.organizationId || undefined;
+        userData.membershipOrgName = km.organizationName || undefined;
+        userData.membershipOrgType = km.organizationType || undefined;
+        userData.membershipStatus = km.status || undefined;
+      }
+
       setUser(userData);
       return userData;
     } else {

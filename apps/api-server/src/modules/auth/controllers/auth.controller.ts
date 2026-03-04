@@ -239,6 +239,26 @@ export class AuthController extends BaseController {
       // Uses request origin for multi-domain cookie support
       authenticationService.setAuthCookies(req, res, result.tokens, result.sessionId);
 
+      // Enrich user data with activityType + kpaMembership (same as /auth/me)
+      const loginUser = result.user as Record<string, unknown>;
+      try {
+        const qualification = await derivePharmacistQualification(result.user.id);
+        loginUser.pharmacistRole = qualification.pharmacistRole;
+        loginUser.pharmacistFunction = qualification.pharmacistFunction;
+        loginUser.isStoreOwner = qualification.isStoreOwner;
+      } catch { /* non-critical */ }
+      try {
+        const [profile] = await AppDataSource.query(
+          `SELECT activity_type FROM kpa_pharmacist_profiles WHERE user_id = $1 LIMIT 1`,
+          [result.user.id]
+        );
+        loginUser.activityType = profile?.activity_type || null;
+      } catch { loginUser.activityType = null; }
+      try {
+        const kpaMembership = await deriveKpaMembershipContext(result.user.id);
+        loginUser.kpaMembership = kpaMembership;
+      } catch { /* non-critical */ }
+
       // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
       return BaseController.ok(res, {
         message: 'Login successful',
