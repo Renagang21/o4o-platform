@@ -59,14 +59,6 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         signalKey: 'requests',
       },
       {
-        id: 'contents',
-        title: '콘텐츠 관리',
-        description: '제품 콘텐츠와 사이니지를 관리합니다.',
-        href: '/workspace/supplier/contents',
-        icon: '📝',
-        signalKey: 'contents',
-      },
-      {
         id: 'settlements',
         title: '정산 현황',
         description: '파트너 정산 내역을 확인합니다.',

@@ -17,7 +17,7 @@
 
 import { Navigate, Outlet, NavLink, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, FileText, Monitor, User, LogOut, Home, FolderOpen } from 'lucide-react';
+import { LayoutDashboard, FileCheck, Package, PackageCheck, ShoppingBag, Monitor, User, LogOut, Home, FolderOpen } from 'lucide-react';
 import AccountMenu from '../../components/AccountMenu';
 
 /**
@@ -68,7 +68,6 @@ export default function SupplierDashboardLayout() {
     { to: '/workspace/supplier/supply-requests', icon: PackageCheck, label: '공급 요청' },
     { to: '/supplier/products', icon: Package, label: '내 제품' },
     { to: '/supplier/orders', icon: ShoppingBag, label: '주문 현황' },
-    { to: '/supplier/contents', icon: FileText, label: '콘텐츠' },
     { to: '/supplier/signage/content', icon: Monitor, label: '사이니지 콘텐츠' },
     { to: '/workspace/supplier/library', icon: FolderOpen, label: '자료실' },
     { to: '/workspace/supplier/profile', icon: User, label: '연락처 관리' },
@@ -118,16 +117,6 @@ export default function SupplierDashboardLayout() {
               }`}
             >
               상품
-            </Link>
-            <Link
-              to="/workspace/content"
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                isNavActive('/workspace/content') || isNavActive('/workspace/supplier/contents')
-                  ? 'text-primary-600'
-                  : 'text-gray-700 hover:text-primary-600'
-              }`}
-            >
-              콘텐츠
             </Link>
             <Link
               to="/workspace/partner/settlements"

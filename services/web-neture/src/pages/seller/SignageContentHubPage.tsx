@@ -307,7 +307,7 @@ export default function SignageContentHubPage() {
       <div className="bg-white rounded-xl border border-slate-200">
         <div className="border-b border-slate-200">
           <div className="flex">
-            {(['hq', 'supplier', 'community'] as ContentSource[]).map((source) => (
+            {(['hq', 'community'] as ContentSource[]).map((source) => (
               <button
                 key={source}
                 onClick={() => setActiveSource(source)}

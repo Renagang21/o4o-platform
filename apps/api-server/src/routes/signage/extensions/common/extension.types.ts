@@ -92,7 +92,7 @@ export interface ExtensionContentBase {
  * Core Content Sources (Phase 2)
  * Phase 3 Design FROZEN: Core는 변경 금지
  */
-export const CORE_CONTENT_SOURCES = ['hq', 'supplier', 'community'] as const;
+export const CORE_CONTENT_SOURCES = ['hq', 'community'] as const;
 export type CoreContentSource = typeof CORE_CONTENT_SOURCES[number];
 
 /**

@@ -23,7 +23,6 @@ function formatDuration(seconds: number): string {
 function getSourceBadgeStyle(source?: ContentSource): string {
   switch (source) {
     case 'hq': return 'bg-blue-100 text-blue-700';
-    case 'supplier': return 'bg-amber-100 text-amber-700';
     case 'community': return 'bg-green-100 text-green-700';
     default: return 'bg-slate-100 text-slate-600';
   }

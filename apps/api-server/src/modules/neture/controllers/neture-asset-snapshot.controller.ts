@@ -6,7 +6,7 @@
  * Uses Core Controller Factory with Neture-specific config:
  * - Roles: neture:admin, neture:supplier
  * - Org: neture_suppliers.id (supplierId)
- * - Resolver: NetureAssetResolver (NetureSupplierContent + signage_media)
+ * - Resolver: NetureAssetResolver (signage_media)
  */
 
 import type { RequestHandler } from 'express';

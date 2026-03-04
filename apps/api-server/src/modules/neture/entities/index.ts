@@ -4,7 +4,6 @@ export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from
 export { StoreProductProfile } from './StoreProductProfile.entity.js';
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
-export { NetureSupplierContent, ContentType, ContentStatus } from './NetureSupplierContent.entity.js';
 export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './NeturePartnerDashboardItem.entity.js';
 export { NeturePartnerDashboardItemContent, type ContentSource } from './NeturePartnerDashboardItemContent.entity.js';
 export { NeturePartnerRecruitment, RecruitmentStatus } from './NeturePartnerRecruitment.entity.js';

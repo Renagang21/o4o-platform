@@ -940,7 +940,7 @@ export const aiGenerationApi = {
 // Global Content API (Content Hub)
 // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone 메서드 제거 (clonePlaylist, cloneMedia 삭제)
 // ❌ globalContentApi.clone* 사용 금지
-export type ContentSource = 'hq' | 'supplier' | 'community';
+export type ContentSource = 'hq' | 'community';
 
 export const globalContentApi = {
   async listPlaylists(source: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignagePlaylist>>> {
