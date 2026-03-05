@@ -2274,6 +2274,44 @@ router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('netur
 // ==================== Admin SERVICE Approval Management (WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1) ====================
 
 /**
+ * GET /api/v1/neture/admin/service-approvals
+ * SERVICE 승인 요청 목록 조회
+ * WO-O4O-ADMIN-UI-COMPLETION-V1
+ */
+router.get('/admin/service-approvals', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { status } = req.query;
+    const params: any[] = [];
+    let whereClause = `WHERE pa.approval_type = 'service'`;
+    if (status && typeof status === 'string') {
+      params.push(status);
+      whereClause += ` AND pa.approval_status = $${params.length}`;
+    }
+    const rows = await AppDataSource.query(`
+      SELECT pa.id, pa.approval_status AS status,
+        pm.marketing_name AS "productName",
+        ns.name AS "supplierName",
+        o.name AS "sellerOrg",
+        pa.service_key AS "serviceId",
+        pa.reason AS "rejectReason",
+        pa.created_at AS "requestedAt",
+        pa.decided_at AS "decidedAt"
+      FROM product_approvals pa
+      JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+      JOIN product_masters pm ON pm.id = spo.master_id
+      JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN organizations o ON o.id = pa.organization_id
+      ${whereClause}
+      ORDER BY pa.created_at DESC
+    `, params);
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    logger.error('[Neture] Failed to fetch service approvals:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch service approvals' });
+  }
+});
+
+/**
  * POST /api/v1/neture/admin/service-approvals/:id/approve
  * SERVICE 승인 처리 + Listing 자동 생성
  */

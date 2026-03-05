@@ -925,6 +925,29 @@ export const supplierApi = {
   },
 
   /**
+   * POST /api/v1/neture/supplier/products
+   * 바코드 기반 신규 상품 등록
+   */
+  async createProduct(data: {
+    barcode: string;
+    distributionType?: string;
+    manualData?: Record<string, any>;
+  }): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
    * PATCH /api/v1/neture/supplier/products/:id
    * 제품 상태 업데이트
    */
@@ -1211,6 +1234,323 @@ export const adminOperatorApi = {
       return response.ok;
     } catch {
       return false;
+    }
+  },
+};
+
+// ==================== Admin Supplier API (WO-O4O-ADMIN-UI-COMPLETION-V1) ====================
+
+export interface AdminSupplier {
+  id: string;
+  name: string;
+  representativeName: string;
+  status: string;
+  email: string;
+  createdAt: string;
+}
+
+export const adminSupplierApi = {
+  async getSuppliers(status?: string): Promise<AdminSupplier[]> {
+    try {
+      const qs = status ? `?status=${status}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/suppliers${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch suppliers:', error);
+      return [];
+    }
+  },
+
+  async getPendingSuppliers(): Promise<AdminSupplier[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/suppliers/pending`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch pending suppliers:', error);
+      return [];
+    }
+  },
+
+  async approveSupplier(id: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/approve`,
+        { method: 'POST', credentials: 'include' },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async rejectSupplier(id: string, reason?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/reject`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ reason }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async deactivateSupplier(id: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/deactivate`,
+        { method: 'POST', credentials: 'include' },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Product API (WO-O4O-ADMIN-UI-COMPLETION-V1) ====================
+
+export interface AdminProduct {
+  id: string;
+  masterId: string;
+  marketingName: string;
+  supplierName: string;
+  category: string;
+  distributionType: string;
+  approvalStatus: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export const adminProductApi = {
+  async getProducts(status?: string): Promise<AdminProduct[]> {
+    try {
+      const qs = status ? `?status=${status}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/products${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch products:', error);
+      return [];
+    }
+  },
+
+  async getPendingProducts(): Promise<AdminProduct[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/products/pending`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch pending products:', error);
+      return [];
+    }
+  },
+
+  async approveProduct(id: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/products/${id}/approve`,
+        { method: 'POST', credentials: 'include' },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async rejectProduct(id: string, reason?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/products/${id}/reject`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ reason }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Master API (WO-O4O-ADMIN-UI-COMPLETION-V1) ====================
+
+export interface AdminMaster {
+  id: string;
+  barcode: string;
+  marketingName: string;
+  brandName: string;
+  category: string;
+  mfdsStatus: string;
+  createdAt: string;
+}
+
+export const adminMasterApi = {
+  async getMasters(): Promise<AdminMaster[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/masters`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch masters:', error);
+      return [];
+    }
+  },
+
+  async getMasterByBarcode(barcode: string): Promise<AdminMaster | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/masters/barcode/${encodeURIComponent(barcode)}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch master by barcode:', error);
+      return null;
+    }
+  },
+
+  async resolveMaster(data: { barcode: string; manualData?: Record<string, unknown> }): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/masters/resolve`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async updateMaster(id: string, data: Partial<AdminMaster>): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/masters/${id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Service Approval API (WO-O4O-ADMIN-UI-COMPLETION-V1) ====================
+
+export interface ServiceApproval {
+  id: string;
+  productName: string;
+  supplierName: string;
+  sellerOrg: string;
+  serviceId: string;
+  status: string;
+  requestedAt: string;
+  decidedAt?: string;
+  rejectReason?: string;
+}
+
+export const adminServiceApprovalApi = {
+  async getServiceApprovals(status?: string): Promise<ServiceApproval[]> {
+    try {
+      const qs = status ? `?status=${status}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/service-approvals${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch service approvals:', error);
+      return [];
+    }
+  },
+
+  async approveServiceApproval(id: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/approve`,
+        { method: 'POST', credentials: 'include' },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async rejectServiceApproval(id: string, reason?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/reject`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ reason }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async revokeServiceApproval(id: string, reason?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/revoke`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ reason }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Registration API (WO-O4O-ADMIN-UI-COMPLETION-V1) ====================
+
+export const adminRegistrationApi = {
+  async getRequests(filters?: { status?: string }): Promise<any[]> {
+    try {
+      const qs = filters?.status ? `?status=${filters.status}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/requests${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Admin API] Failed to fetch registration requests:', error);
+      return [];
     }
   },
 };

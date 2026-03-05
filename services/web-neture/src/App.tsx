@@ -217,6 +217,15 @@ const EmailSettingsPage = lazy(() =>
 // Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1)
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
 
+// Admin Approval Pages (WO-O4O-ADMIN-UI-COMPLETION-V1)
+const AdminSupplierApprovalPage = lazy(() => import('./pages/admin/AdminSupplierApprovalPage'));
+const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductApprovalPage'));
+const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
+const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
+
+// Supplier Product Create (WO-O4O-ADMIN-UI-COMPLETION-V1)
+const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
+
 // Hub (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1)
 const HubPage = lazy(() => import('./pages/hub/HubPage'));
 
@@ -469,6 +478,7 @@ function App() {
               <Route path="/workspace/supplier/requests" element={<SellerRequestsPage />} />
               <Route path="/workspace/supplier/requests/:id" element={<SellerRequestDetailPage />} />
               <Route path="/workspace/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/workspace/supplier/products/new" element={<SupplierProductCreatePage />} />
               <Route path="/workspace/supplier/supply-requests" element={<SupplyRequestsPage />} />
               <Route path="/workspace/supplier/orders" element={<SupplierOrdersPage />} />
               <Route path="/workspace/supplier/profile" element={<SupplierProfilePage />} />
@@ -516,6 +526,11 @@ function App() {
               <Route path="/workspace/admin/settings/email" element={<EmailSettingsPage />} />
               {/* Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1) */}
               <Route path="/workspace/admin/operators" element={<OperatorsPage />} />
+              {/* WO-O4O-ADMIN-UI-COMPLETION-V1: Admin 승인 관리 */}
+              <Route path="/workspace/admin/suppliers" element={<AdminSupplierApprovalPage />} />
+              <Route path="/workspace/admin/products" element={<AdminProductApprovalPage />} />
+              <Route path="/workspace/admin/masters" element={<AdminMasterManagementPage />} />
+              <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
             </Route>
 
             {/* ================================================================

@@ -95,7 +95,7 @@ export function OperatorDashboardPage() {
   const lmsBasePath = '';
 
   // 대시보드 통계 데이터
-  const [stats, setStats] = useState<DashboardStats>({
+  const [stats] = useState<DashboardStats>({
     members: { total: 0, active: 0, inactive: 0, pendingApproval: 0 },
     officers: { total: 0, president: 0, vicePresidents: 0, committeeChairs: 0, advisors: 0 },
     events: { total: 0, upcoming: 0, inProgress: 0, completed: 0 },
@@ -113,62 +113,8 @@ export function OperatorDashboardPage() {
     const loadDashboardData = async () => {
       setLoading(true);
       try {
-        // TODO: API 연동 - 현재는 샘플 데이터
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        setStats({
-          members: {
-            total: 245,
-            active: 230,
-            inactive: 10,
-            pendingApproval: 5,
-          },
-          officers: {
-            total: 15,
-            president: 1,
-            vicePresidents: 3,
-            committeeChairs: 8,
-            advisors: 3,
-          },
-          events: {
-            total: 12,
-            upcoming: 4,
-            inProgress: 2,
-            completed: 6,
-          },
-          personalReports: {
-            total: 245,
-            pending: 23,
-            approved: 210,
-            rejected: 12,
-          },
-          training: {
-            totalCourses: 8,
-            activeCourses: 5,
-            totalEnrollments: 450,
-            completionRate: 72,
-          },
-          trainingScores: {
-            avgScore: 85.3,
-            needsAttention: 18,
-            completed: 180,
-            inProgress: 65,
-          },
-          finance: {
-            currentBalance: 75000000,
-            monthlyIncome: 15000000,
-            monthlyExpense: 12000000,
-            pendingFees: 3500000,
-          },
-        });
-
-        setRecentActivities([
-          { id: '1', type: 'member', title: '신규 회원 가입', description: '박신입 약사 가입 승인 대기', date: '2025-01-10', status: 'pending' },
-          { id: '2', type: 'report', title: '신상신고서 제출', description: '홍길동 - 주소 변경', date: '2025-01-10', status: 'pending' },
-          { id: '3', type: 'event', title: '정기 이사회', description: '1월 정기 이사회 예정', date: '2025-01-15' },
-          { id: '4', type: 'training', title: '보수교육 완료', description: '12명 이수 완료', date: '2025-01-09', status: 'completed' },
-          { id: '5', type: 'finance', title: '연회비 수납', description: '1월분 연회비 ₩2,500,000 수납', date: '2025-01-08', status: 'completed' },
-        ]);
+        // API 연동 준비 중 - 별도 WO에서 대시보드 데이터 API 구축 예정
+        setRecentActivities([]);
       } finally {
         setLoading(false);
       }

@@ -8,7 +8,7 @@
  * - 이메일 알림 발송
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -19,6 +19,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../../components/common/SimpleTable';
+import { adminRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 type UserRole = 'supplier' | 'partner' | 'consumer' | 'seller' | 'pharmacist' | 'ALL';
@@ -40,57 +41,6 @@ interface RegistrationRequest {
   rejectReason?: string;
 }
 
-// Mock data
-const mockRequests: RegistrationRequest[] = [
-  {
-    id: '1',
-    email: 'supplier@example.com',
-    name: '김공급',
-    phone: '010-1234-5678',
-    role: 'supplier',
-    service: 'neture',
-    companyName: '(주)팜프레시코리아',
-    businessNumber: '123-45-67890',
-    status: 'PENDING',
-    createdAt: '2024-01-15T09:00:00Z',
-  },
-  {
-    id: '2',
-    email: 'partner@example.com',
-    name: '이파트너',
-    phone: '010-2345-6789',
-    role: 'partner',
-    service: 'neture',
-    companyName: '뷰티스타 강남점',
-    businessNumber: '234-56-78901',
-    status: 'PENDING',
-    createdAt: '2024-01-14T14:30:00Z',
-  },
-  {
-    id: '3',
-    email: 'seller@example.com',
-    name: '박판매',
-    phone: '010-3456-7890',
-    role: 'seller',
-    service: 'k-cosmetics',
-    companyName: '코스메틱랩',
-    status: 'APPROVED',
-    createdAt: '2024-01-13T11:00:00Z',
-    processedAt: '2024-01-13T15:00:00Z',
-    processedBy: '운영자',
-  },
-  {
-    id: '4',
-    email: 'pharmacist@example.com',
-    name: '최약사',
-    phone: '010-4567-8901',
-    role: 'pharmacist',
-    service: 'kpa-society',
-    licenseNumber: '12345',
-    status: 'PENDING',
-    createdAt: '2024-01-12T10:00:00Z',
-  },
-];
 
 const roleLabels: Record<UserRole | 'ALL', string> = {
   ALL: '전체',
@@ -126,36 +76,43 @@ export default function RegistrationRequestsPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
-      // TODO: Replace with actual API call
-      // const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      // const response = await fetch(`${baseUrl}/api/operator/registrations`, {
-      //   credentials: 'include',
-      // });
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setRequests(mockRequests);
+      const data = await adminRegistrationApi.getRequests();
+      // Map API response to local RegistrationRequest type
+      const mapped: RegistrationRequest[] = (data || []).map((r: any) => ({
+        id: r.id,
+        email: r.email || '',
+        name: r.name || '',
+        phone: r.phone || '',
+        role: r.role || 'consumer',
+        service: r.service || 'neture',
+        companyName: r.companyName || r.company_name,
+        businessNumber: r.businessNumber || r.business_number,
+        licenseNumber: r.licenseNumber || r.license_number,
+        status: r.status || 'PENDING',
+        createdAt: r.createdAt || r.created_at || new Date().toISOString(),
+        processedAt: r.processedAt || r.processed_at,
+        processedBy: r.processedBy || r.processed_by,
+        rejectReason: r.rejectReason || r.reject_reason,
+      }));
+      setRequests(mapped);
     } catch (error) {
       console.error('Failed to fetch registration requests:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
   const handleApprove = async (request: RegistrationRequest) => {
     try {
       setProcessing(true);
       setMessage(null);
-
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 500));
 
       setRequests(prev =>
         prev.map(r =>
@@ -165,7 +122,7 @@ export default function RegistrationRequestsPage() {
         )
       );
 
-      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다. 이메일 알림이 발송되었습니다.` });
+      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다.` });
       setSelectedRequest(null);
     } catch (error) {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
@@ -184,9 +141,6 @@ export default function RegistrationRequestsPage() {
       setProcessing(true);
       setMessage(null);
 
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       setRequests(prev =>
         prev.map(r =>
           r.id === request.id
@@ -195,7 +149,7 @@ export default function RegistrationRequestsPage() {
         )
       );
 
-      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다. 이메일 알림이 발송되었습니다.` });
+      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다.` });
       setSelectedRequest(null);
       setShowRejectModal(false);
       setRejectReason('');
