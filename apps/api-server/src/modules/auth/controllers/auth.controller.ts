@@ -61,31 +61,23 @@ async function derivePharmacistQualification(userId: string): Promise<{
     [userId]
   );
 
-  // 3. Derive pharmacistRole (backward compatible mapping)
+  // 3. Derive pharmacistRole (backward compatible)
+  // WO-O4O-KPA-A-ACTIVITY-TYPE-NORMALIZATION-V1:
+  //   isStoreOwner → 'pharmacy_owner', otherwise activityType 기반 단순 분기
   let pharmacistRole: string | null = null;
   if (isStoreOwner) {
     pharmacistRole = 'pharmacy_owner';
   } else if (profile?.activity_type) {
-    const roleMap: Record<string, string> = {
-      pharmacy_owner: 'pharmacy_owner', pharmacy_employee: 'general',
-      hospital: 'hospital', manufacturer: 'general', importer: 'general',
-      wholesaler: 'general', other_industry: 'general', government: 'general',
-      school: 'general', other: 'other', inactive: 'general',
-    };
-    pharmacistRole = roleMap[profile.activity_type] || 'general';
+    pharmacistRole = profile.activity_type === 'pharmacy_owner'
+      ? 'pharmacy_owner'
+      : 'general';
   }
 
-  // 4. Derive pharmacistFunction from activity_type
-  let pharmacistFunction: string | null = null;
-  if (profile?.activity_type) {
-    const funcMap: Record<string, string> = {
-      pharmacy_owner: 'pharmacy', pharmacy_employee: 'pharmacy',
-      hospital: 'hospital', manufacturer: 'industry', importer: 'industry',
-      wholesaler: 'industry', other_industry: 'industry', government: 'other',
-      school: 'other', other: 'other', inactive: 'other',
-    };
-    pharmacistFunction = funcMap[profile.activity_type] || null;
-  }
+  // 4. pharmacistFunction = activityType 직통 (SSOT 정합성)
+  // WO-O4O-KPA-A-ACTIVITY-TYPE-NORMALIZATION-V1:
+  //   기존 lossy mapping 제거 (manufacturer→industry 등 불일치 해소)
+  //   activityType이 유일한 기준, pharmacistFunction은 API 호환 필드
+  const pharmacistFunction: string | null = profile?.activity_type || null;
 
   return { pharmacistRole, pharmacistFunction, isStoreOwner };
 }
