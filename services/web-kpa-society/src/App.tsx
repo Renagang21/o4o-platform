@@ -129,6 +129,8 @@ import { getDefaultRouteByRole } from './lib/auth-utils';
 
 // WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 Guard 인터페이스
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
+import { PharmacistOnlyGuard } from './components/auth/PharmacistOnlyGuard';
+import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
 
 // Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
 import { TabletStorePage } from './pages/tablet/TabletStorePage';
@@ -378,12 +380,12 @@ function App() {
            *
            * 이 구조는 /demo/* (Service B)와 완전히 분리됨
            * ========================================================= */}
-          <Route path="/branch-services" element={<BranchServicesPage />} />
+          <Route path="/branch-services" element={<PharmacistOnlyGuard><BranchServicesPage /></PharmacistOnlyGuard>} />
           {/* SVC-C: 분회 Admin 대시보드 (WO-KPA-C-BRANCH-ADMIN-IMPLEMENTATION-V1) */}
           <Route path="/branch-services/:branchId/admin/*" element={<BranchAdminRoutes />} />
           {/* SVC-C: 분회 Operator 대시보드 (WO-KPA-C-BRANCH-OPERATOR-IMPLEMENTATION-V1) */}
           <Route path="/branch-services/:branchId/operator/*" element={<BranchOperatorRoutes />} />
-          <Route path="/branch-services/:branchId/*" element={<BranchRoutes />} />
+          <Route path="/branch-services/:branchId/*" element={<PharmacistOnlyGuard><BranchRoutes /></PharmacistOnlyGuard>} />
 
           {/* Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1) */}
           <Route path="/services/branch" element={<BranchServicePage />} />
@@ -507,7 +509,7 @@ function App() {
            * 기존 /demo/branch/* 경로는 호환성을 위해 리다이렉트
            * =================================================== */}
           <Route path="/demo/branch/:branchId/admin/*" element={<BranchAdminRoutes />} />
-          <Route path="/demo/branch/:branchId/*" element={<BranchRoutes />} />
+          <Route path="/demo/branch/:branchId/*" element={<PharmacistOnlyGuard><BranchRoutes /></PharmacistOnlyGuard>} />
           <Route path="/demo/branch" element={<Navigate to="/branch-services" replace />} />
 
           {/* Main Layout Routes - /demo 하위 나머지 경로 */}
@@ -594,8 +596,9 @@ function App() {
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
           {/* Groupbuy (공동구매) — WO-KPA-GROUPBUY-PAGE-V1: 상품 카탈로그 */}
-          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><KpaGroupbuyPage /></Layout>} />
-          <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><GroupbuyDetailPage /></Layout>} />
+          {/* WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약국 개설자만 접근 */}
+          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><KpaGroupbuyPage /></PharmacyOwnerOnlyGuard></Layout>} />
+          <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><GroupbuyDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
 
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
           <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
@@ -749,10 +752,10 @@ function DemoLayoutRoutes() {
         <Route path="/participation/:id/respond" element={<ParticipationRespondPage />} />
         <Route path="/participation/:id/results" element={<ParticipationResultPage />} />
 
-        {/* Groupbuy (공동구매) */}
-        <Route path="/groupbuy" element={<GroupbuyListPage />} />
-        <Route path="/groupbuy/history" element={<GroupbuyHistoryPage />} />
-        <Route path="/groupbuy/:id" element={<GroupbuyDetailPage />} />
+        {/* Groupbuy (공동구매) — WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약국 개설자만 접근 */}
+        <Route path="/groupbuy" element={<PharmacyOwnerOnlyGuard><GroupbuyListPage /></PharmacyOwnerOnlyGuard>} />
+        <Route path="/groupbuy/history" element={<PharmacyOwnerOnlyGuard><GroupbuyHistoryPage /></PharmacyOwnerOnlyGuard>} />
+        <Route path="/groupbuy/:id" element={<PharmacyOwnerOnlyGuard><GroupbuyDetailPage /></PharmacyOwnerOnlyGuard>} />
 
         {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />

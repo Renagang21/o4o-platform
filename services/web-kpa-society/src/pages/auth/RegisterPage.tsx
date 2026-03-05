@@ -1,56 +1,11 @@
 /**
- * RegisterPage - KPA Society 회원가입
- * Phase 6: 가입 시 약사/약대생만 구분
- * 승인 후 로그인 시 직능 분류(activity_type) 미설정이면 추가 입력 유도
+ * RegisterPage - KPA Society 회원가입 (레거시)
+ *
+ * WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약사 전용 가입 (학생 옵션 제거)
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-
-const PHARMACY_SCHOOLS = [
-  '가천대학교 약학대학',
-  '가톨릭대학교 약학대학',
-  '강원대학교 약학대학',
-  '경북대학교 약학대학',
-  '경상국립대학교 약학대학',
-  '경성대학교 약학대학',
-  '경희대학교 약학대학',
-  '고려대학교 약학대학',
-  '단국대학교 약학대학',
-  '대구가톨릭대학교 약학대학',
-  '덕성여자대학교 약학대학',
-  '동국대학교 약학대학',
-  '동아대학교 약학대학',
-  '목포대학교 약학대학',
-  '부산대학교 약학대학',
-  '삼육대학교 약학대학',
-  '서울대학교 약학대학',
-  '성균관대학교 약학대학',
-  '숙명여자대학교 약학대학',
-  '순천대학교 약학대학',
-  '아주대학교 약학대학',
-  '연세대학교 약학대학',
-  '영남대학교 약학대학',
-  '우석대학교 약학대학',
-  '원광대학교 약학대학',
-  '이화여자대학교 약학대학',
-  '인제대학교 약학대학',
-  '전남대학교 약학대학',
-  '전북대학교 약학대학',
-  '제주대학교 약학대학',
-  '조선대학교 약학대학',
-  '중앙대학교 약학대학',
-  '차의과학대학교 약학대학',
-  '충남대학교 약학대학',
-  '충북대학교 약학대학',
-  '한양대학교 약학대학',
-];
-
-const PHARMACY_DEPARTMENTS = [
-  '약학과',
-  '한약학과',
-  '제약학과',
-];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -65,10 +20,7 @@ export default function RegisterPage() {
     firstName: '',
     nickname: '',
     phone: '',
-    membershipType: 'pharmacist' as 'pharmacist' | 'student',
     licenseNumber: '',
-    universityName: '',
-    department: '',
     branchId: '',
     groupId: '',
     agreeTerms: false,
@@ -156,11 +108,8 @@ export default function RegisterPage() {
           firstName: formData.firstName,
           nickname: formData.nickname,
           phone: formData.phone,
-          membershipType: formData.membershipType,
-          licenseNumber: formData.membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
-          universityName: formData.membershipType === 'student'
-            ? `${formData.universityName} ${formData.department}`.trim()
-            : undefined,
+          membershipType: 'pharmacist',
+          licenseNumber: formData.licenseNumber,
           organizationId: formData.groupId || undefined,
           service: 'kpa-society',
           tos: true,
@@ -211,13 +160,7 @@ export default function RegisterPage() {
 
     if (!baseValid) return false;
 
-    if (formData.membershipType === 'pharmacist') {
-      return !!formData.licenseNumber && licenseStatus !== 'duplicate';
-    }
-    if (formData.membershipType === 'student') {
-      return !!formData.universityName && !!formData.department;
-    }
-    return true;
+    return !!formData.licenseNumber && licenseStatus !== 'duplicate';
   };
 
   return (
@@ -384,91 +327,43 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* 회원 구분 */}
+          {/* 약사 정보 */}
           <div style={styles.section}>
-            <h3 style={styles.sectionTitle}>회원 구분</h3>
+            <h3 style={styles.sectionTitle}>약사 정보</h3>
 
             <div style={styles.inputGroup}>
-              <label style={styles.label}>가입 유형 *</label>
-              <select
-                name="membershipType"
-                value={formData.membershipType}
+              <label style={styles.label}>약사면허번호 *</label>
+              <input
+                type="text"
+                name="licenseNumber"
+                value={formData.licenseNumber}
                 onChange={handleInputChange}
-                style={styles.select}
-              >
-                <option value="pharmacist">약사</option>
-                <option value="student">약대생</option>
-              </select>
+                onBlur={() => checkLicenseDuplicate(formData.licenseNumber)}
+                placeholder="00000"
+                style={{
+                  ...styles.input,
+                  ...(licenseStatus === 'duplicate' ? { borderColor: '#dc2626' } : {}),
+                  ...(licenseStatus === 'available' ? { borderColor: '#16a34a' } : {}),
+                }}
+                required
+              />
+              <p style={styles.helpText}>약사면허증에 기재된 면허번호</p>
+              {licenseStatus === 'checking' && (
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>
+                  면허번호 확인 중...
+                </p>
+              )}
+              {licenseStatus === 'duplicate' && (
+                <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
+                  이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.
+                </p>
+              )}
+              {licenseStatus === 'available' && (
+                <p style={{ fontSize: '12px', color: '#16a34a', margin: '4px 0 0 0' }}>
+                  사용 가능한 면허번호입니다.
+                </p>
+              )}
             </div>
-
-            {formData.membershipType === 'pharmacist' && (
-              <div style={styles.inputGroup}>
-                <label style={styles.label}>약사면허번호 *</label>
-                <input
-                  type="text"
-                  name="licenseNumber"
-                  value={formData.licenseNumber}
-                  onChange={handleInputChange}
-                  onBlur={() => checkLicenseDuplicate(formData.licenseNumber)}
-                  placeholder="00000"
-                  style={{
-                    ...styles.input,
-                    ...(licenseStatus === 'duplicate' ? { borderColor: '#dc2626' } : {}),
-                    ...(licenseStatus === 'available' ? { borderColor: '#16a34a' } : {}),
-                  }}
-                  required
-                />
-                <p style={styles.helpText}>약사면허증에 기재된 면허번호</p>
-                {licenseStatus === 'checking' && (
-                  <p style={{ fontSize: '12px', color: '#6b7280', margin: '4px 0 0 0' }}>
-                    면허번호 확인 중...
-                  </p>
-                )}
-                {licenseStatus === 'duplicate' && (
-                  <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0 0' }}>
-                    이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.
-                  </p>
-                )}
-                {licenseStatus === 'available' && (
-                  <p style={{ fontSize: '12px', color: '#16a34a', margin: '4px 0 0 0' }}>
-                    사용 가능한 면허번호입니다.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {formData.membershipType === 'student' && (
-              <>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>재학 약대 *</label>
-                  <select
-                    name="universityName"
-                    value={formData.universityName}
-                    onChange={handleInputChange}
-                    style={styles.select}
-                  >
-                    <option value="">약대를 선택하세요</option>
-                    {PHARMACY_SCHOOLS.map(school => (
-                      <option key={school} value={school}>{school}</option>
-                    ))}
-                  </select>
-                </div>
-                <div style={styles.inputGroup}>
-                  <label style={styles.label}>학과 *</label>
-                  <select
-                    name="department"
-                    value={formData.department}
-                    onChange={handleInputChange}
-                    style={styles.select}
-                  >
-                    <option value="">학과를 선택하세요</option>
-                    {PHARMACY_DEPARTMENTS.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-              </>
-            )}
           </div>
 
           {/* 소속 분회 */}

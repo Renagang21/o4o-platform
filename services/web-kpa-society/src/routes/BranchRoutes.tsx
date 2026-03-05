@@ -11,6 +11,7 @@ import { Routes, Route, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { BranchLayout } from '../components/branch';
 import { BranchProvider } from '../contexts/BranchContext';
+import { PharmacyOwnerOnlyGuard } from '../components/auth/PharmacyOwnerOnlyGuard';
 import { branchApi } from '../api/branch';
 
 // Branch pages
@@ -108,10 +109,10 @@ export function BranchRoutes() {
           <Route path="forum/write" element={<BranchForumWritePage />} />
           <Route path="forum/edit/:id" element={<BranchForumWritePage />} />
 
-          {/* Campaign (공동구매) — 라우트 경로 /groupbuy 유지 (URL 안정성) */}
-          <Route path="groupbuy" element={<BranchCampaignListPage />} />
-          <Route path="groupbuy/history" element={<BranchCampaignListPage />} />
-          <Route path="groupbuy/:id" element={<BranchCampaignDetailPage />} />
+          {/* Campaign (공동구매) — WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약국 개설자만 접근 */}
+          <Route path="groupbuy" element={<PharmacyOwnerOnlyGuard><BranchCampaignListPage /></PharmacyOwnerOnlyGuard>} />
+          <Route path="groupbuy/history" element={<PharmacyOwnerOnlyGuard><BranchCampaignListPage /></PharmacyOwnerOnlyGuard>} />
+          <Route path="groupbuy/:id" element={<PharmacyOwnerOnlyGuard><BranchCampaignDetailPage /></PharmacyOwnerOnlyGuard>} />
 
           {/* Docs */}
           <Route path="docs" element={<BranchDocsPage />} />

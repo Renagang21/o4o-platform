@@ -2,22 +2,20 @@
  * RegisterModal - KPA Society 회원가입 모달
  *
  * WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1
- * Phase 3: 약사/약대생 유형 분기 추가
+ * WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약사 전용 가입 (학생 옵션 제거)
  *
- * 흐름: type 선택 → form 입력 → success
+ * 흐름: form 입력 → success
  */
 
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, AlertCircle, CheckCircle, GraduationCap, Stethoscope } from 'lucide-react';
+import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
-type MembershipType = 'pharmacist' | 'student';
-type Step = 'type' | 'form' | 'success';
+type Step = 'form' | 'success';
 
 export default function RegisterModal() {
   const { activeModal, closeModal, openLoginModal } = useAuthModal();
-  const [step, setStep] = useState<Step>('type');
-  const [membershipType, setMembershipType] = useState<MembershipType | null>(null);
+  const [step, setStep] = useState<Step>('form');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +28,6 @@ export default function RegisterModal() {
     nickname: '',
     phone: '',
     licenseNumber: '',
-    university: '',
-    department: '',
-    studentYear: '',
     branchId: '',
     groupId: '',
     agreeTerms: false,
@@ -62,8 +57,7 @@ export default function RegisterModal() {
   // 모달 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
-      setStep('type');
-      setMembershipType(null);
+      setStep('form');
       setFormData({
         email: '',
         password: '',
@@ -73,9 +67,6 @@ export default function RegisterModal() {
         nickname: '',
         phone: '',
         licenseNumber: '',
-        university: '',
-        department: '',
-        studentYear: '',
         branchId: '',
         groupId: '',
         agreeTerms: false,
@@ -122,48 +113,6 @@ export default function RegisterModal() {
     } catch { setLicenseStatus('idle'); }
   };
 
-  // 약학대학 목록 (가나다순)
-  const PHARMACY_SCHOOLS: Array<{ university: string; departments: string[] }> = [
-    { university: '가천대학교', departments: ['약학대학'] },
-    { university: '가톨릭대학교', departments: ['약학대학'] },
-    { university: '강원대학교', departments: ['약학대학'] },
-    { university: '경북대학교', departments: ['약학대학'] },
-    { university: '경상국립대학교', departments: ['약학대학'] },
-    { university: '경희대학교', departments: ['약학대학'] },
-    { university: '계명대학교', departments: ['약학대학'] },
-    { university: '고려대학교', departments: ['약학대학'] },
-    { university: '단국대학교', departments: ['약학대학'] },
-    { university: '대구가톨릭대학교', departments: ['약학대학'] },
-    { university: '덕성여자대학교', departments: ['약학대학'] },
-    { university: '동국대학교', departments: ['약학대학'] },
-    { university: '동덕여자대학교', departments: ['약학대학'] },
-    { university: '목원대학교', departments: ['약학대학'] },
-    { university: '부산대학교', departments: ['약학대학'] },
-    { university: '삼육대학교', departments: ['약학대학'] },
-    { university: '서울대학교', departments: ['약학대학'] },
-    { university: '성균관대학교', departments: ['약학대학'] },
-    { university: '숙명여자대학교', departments: ['약학대학'] },
-    { university: '순천대학교', departments: ['약학과'] },
-    { university: '아주대학교', departments: ['약학대학'] },
-    { university: '연세대학교', departments: ['약학대학'] },
-    { university: '영남대학교', departments: ['약학대학'] },
-    { university: '우석대학교', departments: ['약학대학'] },
-    { university: '원광대학교', departments: ['약학대학'] },
-    { university: '이화여자대학교', departments: ['약학대학'] },
-    { university: '인제대학교', departments: ['약학대학'] },
-    { university: '전남대학교', departments: ['약학대학'] },
-    { university: '전북대학교', departments: ['약학대학'] },
-    { university: '제주대학교', departments: ['약학대학'] },
-    { university: '조선대학교', departments: ['약학대학'] },
-    { university: '중앙대학교', departments: ['약학대학'] },
-    { university: '차의과학대학교', departments: ['약학대학'] },
-    { university: '충남대학교', departments: ['약학대학'] },
-    { university: '충북대학교', departments: ['약학대학'] },
-    { university: '한양대학교', departments: ['약학과'] },
-  ];
-
-  const selectedUniDepts = PHARMACY_SCHOOLS.find(s => s.university === formData.university)?.departments || [];
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
     const { name, value } = target;
@@ -178,21 +127,10 @@ export default function RegisterModal() {
       setFormData(prev => ({ ...prev, branchId: value, groupId: '' }));
       return;
     }
-    if (name === 'university') {
-      const depts = PHARMACY_SCHOOLS.find(s => s.university === value)?.departments || [];
-      setFormData(prev => ({ ...prev, university: value, department: depts.length === 1 ? depts[0] : '' }));
-      return;
-    }
-
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-  };
-
-  const handleTypeSelect = (type: MembershipType) => {
-    setMembershipType(type);
-    setStep('form');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -213,13 +151,11 @@ export default function RegisterModal() {
           firstName: formData.firstName,
           nickname: formData.nickname,
           phone: formData.phone,
-          role: membershipType === 'student' ? 'student' : 'pharmacist',
+          role: 'pharmacist',
           service: 'kpa-society',
-          membershipType: membershipType,
-          licenseNumber: membershipType === 'pharmacist' ? formData.licenseNumber : undefined,
-          universityName: membershipType === 'student' ? `${formData.university} ${formData.department}`.trim() : undefined,
-          studentYear: membershipType === 'student' ? parseInt(formData.studentYear) || undefined : undefined,
-          organizationId: membershipType === 'pharmacist' ? (formData.groupId || undefined) : undefined,
+          membershipType: 'pharmacist',
+          licenseNumber: formData.licenseNumber,
+          organizationId: formData.groupId || undefined,
           tos: formData.agreeTerms,
           privacyAccepted: formData.agreePrivacy,
         }),
@@ -270,15 +206,7 @@ export default function RegisterModal() {
 
     if (!commonValid) return false;
 
-    if (membershipType === 'pharmacist') {
-      return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
-    }
-
-    if (membershipType === 'student') {
-      return !!formData.university && !!formData.department && !!formData.studentYear;
-    }
-
-    return false;
+    return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
   };
 
   const handleSwitchToLogin = (e: React.MouseEvent) => {
@@ -286,28 +214,11 @@ export default function RegisterModal() {
     openLoginModal();
   };
 
-  const handleBackToType = () => {
-    setStep('type');
-    setMembershipType(null);
-    setError(null);
-  };
-
-  const studentYearOptions = [
-    { value: '', label: '학년 선택' },
-    { value: '1', label: '1학년' },
-    { value: '2', label: '2학년' },
-    { value: '3', label: '3학년' },
-    { value: '4', label: '4학년' },
-    { value: '5', label: '5학년' },
-    { value: '6', label: '6학년' },
-  ];
-
   if (!isOpen) return null;
 
   const getHeaderTitle = () => {
-    if (step === 'type') return '회원가입';
     if (step === 'success') return '신청 완료';
-    return membershipType === 'student' ? '약대생 회원가입' : '약사 회원가입';
+    return '약사 회원가입';
   };
 
   return (
@@ -339,77 +250,17 @@ export default function RegisterModal() {
 
         {/* 스크롤 가능한 콘텐츠 */}
         <div className="flex-1 overflow-y-auto p-6">
-          {/* Step 1: 유형 선택 */}
-          {step === 'type' && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">회원 유형을 선택해 주세요</p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {/* 약사 카드 */}
-                <button
-                  onClick={() => handleTypeSelect('pharmacist')}
-                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
-                >
-                  <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                    <Stethoscope className="w-7 h-7 text-blue-600" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold text-gray-900">약사</p>
-                    <p className="text-xs text-gray-500 mt-1">약사면허번호 필요</p>
-                  </div>
-                </button>
-
-                {/* 약대생 카드 */}
-                <button
-                  onClick={() => handleTypeSelect('student')}
-                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
-                >
-                  <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                    <GraduationCap className="w-7 h-7 text-green-600" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold text-gray-900">약대생</p>
-                    <p className="text-xs text-gray-500 mt-1">재학 정보 필요</p>
-                  </div>
-                </button>
-              </div>
-
-              {/* 로그인 전환 */}
-              <p className="text-center text-sm text-gray-500">
-                이미 계정이 있으신가요?{' '}
-                <a
-                  href="#"
-                  onClick={handleSwitchToLogin}
-                  className="text-blue-600 font-medium hover:text-blue-700"
-                >
-                  로그인
-                </a>
-              </p>
-            </div>
-          )}
-
-          {/* Step 2: 가입 폼 */}
+          {/* 가입 폼 */}
           {step === 'form' && (
             <>
-              {/* 뒤로가기 + 승인제 안내 */}
+              {/* 승인제 안내 */}
               <div className="mb-6">
-                <button
-                  onClick={handleBackToType}
-                  className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1"
-                >
-                  ← 유형 다시 선택
-                </button>
-
                 <div className="flex gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-blue-900">승인제 가입 안내</p>
                     <p className="text-xs text-blue-700 mt-1">
-                      {membershipType === 'pharmacist'
-                        ? '약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'
-                        : '재학 정보 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'}
+                      약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
                     </p>
                   </div>
                 </div>
@@ -579,12 +430,11 @@ export default function RegisterModal() {
                   </div>
                 </div>
 
-                {/* 약사 정보 (약사 전용) */}
-                {membershipType === 'pharmacist' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                      약사 정보
-                    </h4>
+                {/* 약사 정보 */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                    약사 정보
+                  </h4>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -614,120 +464,51 @@ export default function RegisterModal() {
                         <p className="text-xs text-green-600 mt-1">사용 가능한 면허번호입니다.</p>
                       )}
                     </div>
-                  </div>
-                )}
+                </div>
 
-                {/* 약대생 정보 (약대생 전용) */}
-                {membershipType === 'student' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                      재학 정보
-                    </h4>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          대학교 <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          name="university"
-                          value={formData.university}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                        >
-                          <option value="">대학교 선택</option>
-                          {PHARMACY_SCHOOLS.map(s => (
-                            <option key={s.university} value={s.university}>{s.university}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          학과 <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          name="department"
-                          value={formData.department}
-                          onChange={handleInputChange}
-                          disabled={!formData.university}
-                          required
-                          className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.university ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          <option value="">{formData.university ? '학과 선택' : '대학교를 먼저 선택'}</option>
-                          {selectedUniDepts.map(d => (
-                            <option key={d} value={d}>{d}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
+                {/* 소속 분회 */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
+                    소속 분회 <span className="text-red-500">*</span>
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        학년 <span className="text-red-500">*</span>
+                        지부 (시/도)
                       </label>
                       <select
-                        name="studentYear"
-                        value={formData.studentYear}
+                        name="branchId"
+                        value={formData.branchId}
                         onChange={handleInputChange}
-                        required
                         className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                       >
-                        {studentYearOptions.map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
+                        <option value="">지부 선택</option>
+                        {branches.map(b => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        분회 (시/군/구)
+                      </label>
+                      <select
+                        name="groupId"
+                        value={formData.groupId}
+                        onChange={handleInputChange}
+                        disabled={!formData.branchId}
+                        className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <option value="">
+                          {formData.branchId ? '분회 선택' : '지부를 먼저 선택'}
+                        </option>
+                        {groups.map(g => (
+                          <option key={g.id} value={g.id}>{g.name}</option>
                         ))}
                       </select>
                     </div>
                   </div>
-                )}
-
-                {/* 소속 분회 (약사 전용 - 약대생은 분회 소속 아님) */}
-                {membershipType === 'pharmacist' && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                      소속 분회 <span className="text-red-500">*</span>
-                    </h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          지부 (시/도)
-                        </label>
-                        <select
-                          name="branchId"
-                          value={formData.branchId}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                        >
-                          <option value="">지부 선택</option>
-                          {branches.map(b => (
-                            <option key={b.id} value={b.id}>{b.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          분회 (시/군/구)
-                        </label>
-                        <select
-                          name="groupId"
-                          value={formData.groupId}
-                          onChange={handleInputChange}
-                          disabled={!formData.branchId}
-                          className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          <option value="">
-                            {formData.branchId ? '분회 선택' : '지부를 먼저 선택'}
-                          </option>
-                          {groups.map(g => (
-                            <option key={g.id} value={g.id}>{g.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                </div>
 
                 {/* 약관 동의 */}
                 <div className="space-y-3 pt-4 border-t border-gray-100">
@@ -814,16 +595,14 @@ export default function RegisterModal() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">가입 신청이 완료되었습니다</h3>
               <p className="text-gray-600 mb-6">
-                {membershipType === 'pharmacist'
-                  ? <>약사면허 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.</>
-                  : <>재학 정보 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.</>}
+                약사면허 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.
               </p>
               <div className="bg-blue-50 rounded-lg p-4 text-left mb-6">
                 <p className="text-sm text-blue-800">
                   <strong>신청 이메일:</strong> {formData.email}
                 </p>
                 <p className="text-sm text-blue-800 mt-1">
-                  <strong>회원 유형:</strong> {membershipType === 'pharmacist' ? '약사' : '약대생'}
+                  <strong>회원 유형:</strong> 약사
                 </p>
                 <p className="text-sm text-blue-800 mt-1">
                   승인까지 1-2 영업일이 소요될 수 있습니다.
