@@ -411,8 +411,8 @@ export class AuthController extends BaseController {
 
         await txUserRepo.save(newUser);
 
-        // KPA Society: auto-create KPA member with organization
-        if (data.service === 'kpa-society' && data.organizationId) {
+        // KPA Society: auto-create KPA member (pharmacist with org, or student without org)
+        if (data.service === 'kpa-society' && (data.organizationId || data.membershipType === 'student')) {
           const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
 
           const memberResult = await manager.query(`
@@ -421,7 +421,7 @@ export class AuthController extends BaseController {
             RETURNING id
           `, [
             newUser.id,
-            data.organizationId,
+            data.organizationId || null,
             data.membershipType || 'pharmacist',
             licenseNum,
             data.membershipType === 'student' ? (data.universityName || null) : null,
@@ -818,6 +818,9 @@ export class AuthController extends BaseController {
         );
         ud.activityType = profile?.activity_type || null;
       } catch { ud.activityType = null; }
+
+      // kpaMembership context (required for membershipType on frontend)
+      ud.kpaMembership = await deriveKpaMembershipContext(req.user.id);
     }
 
     return BaseController.ok(res, {
