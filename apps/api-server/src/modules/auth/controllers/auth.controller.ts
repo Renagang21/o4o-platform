@@ -98,6 +98,7 @@ async function derivePharmacistQualification(userId: string): Promise<{
 interface KpaMembershipContext {
   status: string | null;           // kpa_members.status
   role: string | null;             // kpa_members.role
+  membershipType: string | null;   // kpa_members.membership_type (pharmacist | student)
   organizationId: string | null;   // kpa_members.organization_id
   organizationName: string | null;
   organizationType: string | null;
@@ -108,7 +109,7 @@ interface KpaMembershipContext {
 async function deriveKpaMembershipContext(userId: string): Promise<KpaMembershipContext | null> {
   // 1. kpa_members 조회
   const [member] = await AppDataSource.query(
-    `SELECT m.status, m.role, m.organization_id,
+    `SELECT m.status, m.role, m.membership_type, m.organization_id,
             o.name AS org_name, o.type AS org_type
      FROM kpa_members m
      LEFT JOIN organizations o ON o.id = m.organization_id
@@ -144,6 +145,7 @@ async function deriveKpaMembershipContext(userId: string): Promise<KpaMembership
   return {
     status: member.status,
     role: member.role,
+    membershipType: member.membership_type || null,
     organizationId: member.organization_id || null,
     organizationName: member.org_name || null,
     organizationType: member.org_type || null,

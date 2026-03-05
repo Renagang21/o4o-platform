@@ -99,6 +99,7 @@ export type MembershipType = 'pharmacist' | 'student';
 export interface KpaMembershipContext {
   status: string | null;           // kpa_members.status
   role: string | null;             // kpa_members.role
+  membershipType: string | null;   // kpa_members.membership_type (pharmacist | student)
   organizationId: string | null;   // kpa_members.organization_id
   organizationName: string | null;
   organizationType: string | null;
@@ -250,15 +251,20 @@ interface ApiUser {
  */
 function createUserFromApiResponse(apiUser: ApiUser): User {
   // P1-T3: Get pharmacistFunction/Role from API response (not localStorage)
-  // Phase 3: membershipType 매핑 추가
+  // Phase 3: membershipType 매핑 — kpaMembership.membershipType 우선
   const role = apiUser.role || 'pharmacist';
+  const kpaMembership = (apiUser as any).kpaMembership;
+  const membershipType: MembershipType =
+    kpaMembership?.membershipType === 'student' ? 'student'
+    : role === 'student' ? 'student'
+    : 'pharmacist';
   return {
     id: apiUser.id,
     email: apiUser.email,
     name: apiUser.fullName || apiUser.name || apiUser.email,
     role, // 매핑 없이 그대로 사용 (Backward compatibility)
     roles: apiUser.roles || [role], // P2-T1: Phase 4 support
-    membershipType: (role === 'student' ? 'student' : 'pharmacist') as MembershipType,
+    membershipType,
     // WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner + activityType
     isStoreOwner: !!(apiUser as any).isStoreOwner,
     activityType: (apiUser as any).activityType || undefined,

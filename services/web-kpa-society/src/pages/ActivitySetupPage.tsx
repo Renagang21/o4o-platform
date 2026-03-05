@@ -14,7 +14,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { isActivityTypeExempt } from '../lib/role-constants';
 
-const ACTIVITY_OPTIONS = [
+const PHARMACIST_OPTIONS = [
   { value: 'pharmacy_owner', label: '약국 개설약사', desc: '약국을 운영하고 있습니다' },
   { value: 'pharmacy_employee', label: '약국 근무약사', desc: '약국에서 근무하고 있습니다' },
   { value: 'hospital', label: '병원 약사', desc: '의료기관에서 근무합니다' },
@@ -23,6 +23,11 @@ const ACTIVITY_OPTIONS = [
   { value: 'government', label: '공공기관/교육', desc: '공무원, 교육기관 등' },
   { value: 'other', label: '기타', desc: '' },
   { value: 'inactive', label: '미활동', desc: '현재 약사 활동을 하지 않습니다' },
+] as const;
+
+const STUDENT_OPTIONS = [
+  { value: 'student', label: '약대생', desc: '약학대학 재학 중입니다' },
+  { value: 'student_graduate', label: '약대 졸업생', desc: '약학대학을 졸업했습니다' },
 ] as const;
 
 export function ActivitySetupPage() {
@@ -64,14 +69,16 @@ export function ActivitySetupPage() {
       <div style={styles.card}>
         <div style={styles.header}>
           <div style={styles.stepBadge}>필수 설정</div>
-          <h1 style={styles.title}>직능 분류를 선택해주세요</h1>
+          <h1 style={styles.title}>
+            {user.membershipType === 'student' ? '학생 분류를 선택해주세요' : '직능 분류를 선택해주세요'}
+          </h1>
           <p style={styles.subtitle}>
-            {user.name}님, 환영합니다. 맞춤 서비스 제공을 위해 현재 직능을 선택해주세요.
+            {user.name}님, 환영합니다. 맞춤 서비스 제공을 위해 현재 {user.membershipType === 'student' ? '상태' : '직능'}를 선택해주세요.
           </p>
         </div>
 
         <div style={styles.options}>
-          {ACTIVITY_OPTIONS.map(opt => (
+          {(user.membershipType === 'student' ? STUDENT_OPTIONS : PHARMACIST_OPTIONS).map(opt => (
             <button
               key={opt.value}
               onClick={() => setSelected(opt.value)}
