@@ -1428,6 +1428,15 @@ export class NetureService {
 
       const savedOffer = await this.offerRepo.save(offer);
 
+      // WO-O4O-PRODUCT-AUTO-LISTING-STABILIZATION-V1: PUBLIC 전환 시 기존 매장에 자동 Listing 확산
+      if (savedOffer.distributionType === OfferDistributionType.PUBLIC
+          && savedOffer.approvalStatus === OfferApprovalStatus.APPROVED
+          && savedOffer.isActive) {
+        autoExpandPublicProduct(AppDataSource, savedOffer.id, savedOffer.masterId)
+          .then((count) => logger.info(`[NetureService] Auto-expanded ${count} listings for offer ${savedOffer.id} (PUBLIC transition)`))
+          .catch((err) => logger.error(`[NetureService] Auto-expand failed for offer ${savedOffer.id}:`, err));
+      }
+
       logger.info(`[NetureService] Updated offer ${offerId} by supplier ${supplierId}`);
 
       return {

@@ -37,7 +37,7 @@ export class OrganizationProductListing {
   @Column({ type: 'varchar', length: 50, default: 'kpa' })
   service_key: string;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ type: 'boolean', default: false })
   is_active: boolean;
 
   @Column({ name: 'master_id', type: 'uuid' })
