@@ -128,6 +128,13 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         icon: '🛡️',
         signalKey: 'audit',
       },
+      {
+        id: 'catalog-import',
+        title: '카탈로그 임포트',
+        description: '외부 상품 데이터를 일괄 등록합니다.',
+        href: '/workspace/admin/catalog-import',
+        icon: '📥',
+      },
     ],
   },
 ];

@@ -223,6 +223,12 @@ const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductAp
 const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
 
+// Catalog Import (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
+const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
+const FirstmallImportPage = lazy(() => import('./pages/admin/catalog-import/FirstmallImportPage'));
+const ImportHistoryPage = lazy(() => import('./pages/admin/catalog-import/ImportHistoryPage'));
+
 // Supplier Product Create (WO-O4O-ADMIN-UI-COMPLETION-V1)
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
 
@@ -531,6 +537,11 @@ function App() {
               <Route path="/workspace/admin/products" element={<AdminProductApprovalPage />} />
               <Route path="/workspace/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
+              {/* Catalog Import (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1) */}
+              <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
+              <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
+              <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
+              <Route path="/workspace/admin/catalog-import/history" element={<ImportHistoryPage />} />
             </Route>
 
             {/* ================================================================

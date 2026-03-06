@@ -208,6 +208,14 @@ import {
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
+// CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+// ============================================================================
+import {
+  CatalogImportJob,
+  CatalogImportRow,
+} from '../modules/catalog-import/entities/index.js';
+
+// ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
@@ -649,6 +657,11 @@ export const AppDataSource = new DataSource({
     SupplierCsvImportBatch,
     SupplierCsvImportRow,
     NetureSupplierLibraryItem,
+    // ============================================================================
+    // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+    // ============================================================================
+    CatalogImportJob,
+    CatalogImportRow,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
