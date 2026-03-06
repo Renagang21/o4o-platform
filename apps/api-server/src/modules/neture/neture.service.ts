@@ -126,7 +126,7 @@ export class NetureService {
     try {
       return await this.supplierRepo.findOne({
         where: { userId },
-        relations: ['products'],
+        relations: ['offers'],
       });
     } catch (error) {
       logger.error('[NetureService] Error finding supplier by user ID:', error);
@@ -803,7 +803,7 @@ export class NetureService {
     try {
       const supplier = await this.supplierRepo.findOne({
         where: { slug, status: SupplierStatus.ACTIVE },
-        relations: ['products'],
+        relations: ['offers'],
       });
 
       if (!supplier) {
