@@ -28,9 +28,9 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
         AND (ra.role LIKE 'kpa%' OR ra.role IN ('admin', 'operator', 'user'))
       ORDER BY ra.user_id, ra.role
     `);
-    console.log('[KPA-B Normalization] Step 1: All KPA-related active role_assignments:');
+    console.info('[KPA-B Normalization] Step 1: All KPA-related active role_assignments:');
     for (const r of allKpaRoles) {
-      console.log(`  ${r.email} | ${r.role} | scope=${r.scope_type || 'null'}`);
+      console.info(`  ${r.email} | ${r.role} | scope=${r.scope_type || 'null'}`);
     }
 
     // Step 2: kpa-b:* 역할을 가진 사용자 식별
@@ -41,10 +41,10 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
         AND role LIKE 'kpa-b:%'
     `);
     const kpaBUserIds = kpaBUsers.map((r: { user_id: string }) => r.user_id);
-    console.log(`[KPA-B Normalization] Step 2: Users with kpa-b roles: ${kpaBUserIds.length}`);
+    console.info(`[KPA-B Normalization] Step 2: Users with kpa-b roles: ${kpaBUserIds.length}`);
 
     if (kpaBUserIds.length === 0) {
-      console.log('[KPA-B Normalization] No kpa-b users found. Skipping cleanup.');
+      console.info('[KPA-B Normalization] No kpa-b users found. Skipping cleanup.');
       return;
     }
 
@@ -61,9 +61,9 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
         )
     `);
 
-    console.log(`[KPA-B Normalization] Step 3: Duplicate generic roles found: ${duplicates.length}`);
+    console.info(`[KPA-B Normalization] Step 3: Duplicate generic roles found: ${duplicates.length}`);
     for (const d of duplicates) {
-      console.log(`  DEACTIVATE: ${d.email} | generic role="${d.role}" | id=${d.id}`);
+      console.info(`  DEACTIVATE: ${d.email} | generic role="${d.role}" | id=${d.id}`);
     }
 
     // Step 4: generic role 비활성화 (삭제 아님)
@@ -74,7 +74,7 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
         SET is_active = false
         WHERE id IN (${ids})
       `);
-      console.log(`[KPA-B Normalization] Step 4: Deactivated ${duplicates.length} generic role(s)`);
+      console.info(`[KPA-B Normalization] Step 4: Deactivated ${duplicates.length} generic role(s)`);
     }
 
     // Step 5: 정리 후 확인
@@ -88,9 +88,9 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
       )
       ORDER BY ra.user_id, ra.role
     `);
-    console.log('[KPA-B Normalization] Step 5: After cleanup:');
+    console.info('[KPA-B Normalization] Step 5: After cleanup:');
     for (const r of afterCleanup) {
-      console.log(`  ${r.email} | ${r.role} | active=${r.is_active}`);
+      console.info(`  ${r.email} | ${r.role} | active=${r.is_active}`);
     }
   }
 
@@ -106,6 +106,6 @@ export class KpaBRoleDataNormalization1771200000009 implements MigrationInterfac
           WHERE role LIKE 'kpa-b:%'
         )
     `);
-    console.log('[KPA-B Normalization] Reverted: Reactivated generic roles for kpa-b users');
+    console.info('[KPA-B Normalization] Reverted: Reactivated generic roles for kpa-b users');
   }
 }
