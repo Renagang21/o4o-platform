@@ -1,6 +1,6 @@
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
-import { CareCoachingSession } from './entities/care-coaching-session.entity.js';
-import { CareKpiSnapshot } from './entities/care-kpi-snapshot.entity.js';
+import { CareCoachingSession } from '../../entities/care-coaching-session.entity.js';
+import { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js';
 
 export interface CreateCoachingSessionDto {
   patientId: string;

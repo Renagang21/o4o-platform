@@ -1,8 +1,9 @@
 /**
  * Patient Detail Tab Components
- * WO-CARE-PATIENT-DETAIL-STRUCTURE-V1
+ * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
  */
 
+export { default as DataTab } from './DataTab';
 export { default as SummaryTab } from './SummaryTab';
 export { default as AnalysisTab } from './AnalysisTab';
 export { default as CoachingTab } from './CoachingTab';

@@ -1,5 +1,5 @@
-import type { CareInsightDto } from './dto.js';
-import type { CgmProvider } from './cgm.provider.js';
+import type { CareInsightDto } from '../dto.js';
+import type { CgmProvider } from '../provider/cgm.provider.js';
 import { analyzeReadings } from './analysis.engine.js';
 import type { AnalysisResult } from './analysis.engine.js';
 

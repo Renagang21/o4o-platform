@@ -1,6 +1,6 @@
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
-import { CareKpiSnapshot } from './entities/care-kpi-snapshot.entity.js';
-import type { CareInsightDto } from './dto.js';
+import { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js';
+import type { CareInsightDto } from '../../domain/dto.js';
 
 export interface KpiComparisonDto {
   latestTir: number | null;

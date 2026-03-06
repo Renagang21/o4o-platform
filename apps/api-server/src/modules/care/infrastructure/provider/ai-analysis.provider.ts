@@ -1,7 +1,7 @@
-import type { AnalysisProvider } from './analysis.provider.js';
-import type { CareInsightDto } from './dto.js';
-import type { CgmProvider } from './cgm.provider.js';
-import { analyzeReadings } from './analysis.engine.js';
+import type { AnalysisProvider } from '../../domain/analysis/analysis.provider.js';
+import type { CareInsightDto } from '../../domain/dto.js';
+import type { CgmProvider } from '../../domain/provider/cgm.provider.js';
+import { analyzeReadings } from '../../domain/analysis/analysis.engine.js';
 import { AiInsightService } from '@o4o/pharmacy-ai-insight/backend';
 import type { AiInsightOutput } from '@o4o/pharmacy-ai-insight/backend';
 

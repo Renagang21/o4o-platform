@@ -1,15 +1,18 @@
 /**
- * PatientDetailPage - 환자 단일 관리 포털
- * WO-CARE-SUMMARY-DATA-ALIGNMENT-V1
+ * PatientDetailPage - Care Workspace
+ * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
  *
  * 데이터 소스:
  *   - pharmacyApi.getCustomerDetail(id) → 환자 기본정보
  *   - pharmacyApi.getCareDashboardSummary() → snapshotMap (riskLevel, createdAt)
+ *   - pharmacyApi.getCareKpi(id) → TIR/CV 실데이터
+ *   - pharmacyApi.getCoachingSessions(id) → 코칭 횟수
  *
  * 구조:
  *   CareSubNav
- *   Patient Header Block (이름, 위험도, 분석일)
- *   Tab Navigation (기본정보 | 분석 | 코칭 | 기록)
+ *   Patient Header Block (이름, 위험도, TIR, CV, 코칭 횟수)
+ *   Action Panel (Rule 기반)
+ *   Tab Navigation (데이터 | 분석 | 코칭 | 기록)
  *   Tab Content (Outlet context)
  */
 
@@ -22,8 +25,15 @@ import {
   CheckCircle,
   Calendar,
   Loader2,
+  MessageSquare,
+  ClipboardPlus,
 } from 'lucide-react';
-import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
+import {
+  pharmacyApi,
+  type PharmacyCustomer,
+  type CareDashboardSummary,
+  type KpiComparisonDto,
+} from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
 
 // ── Shared types for tab context ──
@@ -36,7 +46,9 @@ interface SnapshotData {
 export interface PatientDetailContext {
   patient: PharmacyCustomer | null;
   snapshot: SnapshotData | null;
+  kpi: KpiComparisonDto | null;
   loading: boolean;
+  reload: () => void;
 }
 
 /** Hook for child tabs to access patient data */
@@ -55,7 +67,7 @@ const RISK_DISPLAY = {
 type RiskKey = keyof typeof RISK_DISPLAY;
 
 const detailTabs = [
-  { path: '', label: '기본정보', end: true },
+  { path: '', label: '데이터', end: true },
   { path: 'analysis', label: '분석', end: false },
   { path: 'coaching', label: '코칭', end: false },
   { path: 'history', label: '기록', end: false },
@@ -67,15 +79,20 @@ export default function PatientDetailPage() {
 
   const [patient, setPatient] = useState<PharmacyCustomer | null>(null);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
+  const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
+  const [coachingCount, setCoachingCount] = useState<number>(0);
+  const [lastCoachingDate, setLastCoachingDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     if (!id) return;
     setLoading(true);
     try {
-      const [customerRes, summaryRes] = await Promise.all([
+      const [customerRes, summaryRes, kpiRes, sessionsRes] = await Promise.all([
         pharmacyApi.getCustomerDetail(id).catch(() => null),
         pharmacyApi.getCareDashboardSummary().catch(() => null),
+        pharmacyApi.getCareKpi(id).catch(() => null),
+        pharmacyApi.getCoachingSessions(id).catch(() => []),
       ]);
       if (customerRes?.success && customerRes.data) {
         setPatient(customerRes.data);
@@ -83,6 +100,10 @@ export default function PatientDetailPage() {
       if (summaryRes) {
         setSummary(summaryRes);
       }
+      setKpi(kpiRes);
+      const sessions = Array.isArray(sessionsRes) ? sessionsRes : [];
+      setCoachingCount(sessions.length);
+      setLastCoachingDate(sessions.length > 0 ? sessions[0].createdAt : null);
     } finally {
       setLoading(false);
     }
@@ -105,7 +126,7 @@ export default function PatientDetailPage() {
     : 'low';
   const risk = RISK_DISPLAY[riskKey];
 
-  // Date format (PatientsPage와 동일)
+  // Date format
   const analysisDate = snapshot?.createdAt
     ? new Date(snapshot.createdAt).toLocaleDateString()
     : '-';
@@ -113,8 +134,45 @@ export default function PatientDetailPage() {
   const patientName = patient?.name || `환자 ${id}`;
   const initial = patientName.charAt(0) || '?';
 
+  // ── Action Panel rules ──
+  const actions = useMemo(() => {
+    const items: Array<{ icon: typeof AlertTriangle; label: string; cls: string; path: string }> = [];
+
+    if (riskKey === 'high') {
+      items.push({
+        icon: AlertTriangle,
+        label: '고위험 환자 — 분석 확인 필요',
+        cls: 'bg-red-50 border-red-200 text-red-700',
+        path: 'analysis',
+      });
+    }
+
+    if (kpi?.latestTir == null) {
+      items.push({
+        icon: ClipboardPlus,
+        label: '데이터 미입력 — 건강 데이터를 입력해 주세요',
+        cls: 'bg-amber-50 border-amber-200 text-amber-700',
+        path: '',
+      });
+    }
+
+    const needsCoaching = coachingCount === 0 || (lastCoachingDate && (
+      Date.now() - new Date(lastCoachingDate).getTime() > 7 * 24 * 60 * 60 * 1000
+    ));
+    if (needsCoaching) {
+      items.push({
+        icon: MessageSquare,
+        label: coachingCount === 0 ? '코칭 기록 없음 — 첫 코칭을 시작하세요' : '코칭 필요 — 7일 이상 코칭 기록 없음',
+        cls: 'bg-blue-50 border-blue-200 text-blue-700',
+        path: 'coaching',
+      });
+    }
+
+    return items;
+  }, [riskKey, kpi, coachingCount, lastCoachingDate]);
+
   // Context for child tabs
-  const outletContext: PatientDetailContext = { patient, snapshot, loading };
+  const outletContext: PatientDetailContext = { patient, snapshot, kpi, loading, reload: loadData };
 
   if (loading) {
     return (
@@ -142,7 +200,7 @@ export default function PatientDetailPage() {
         </button>
 
         {/* Patient Header Block */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
@@ -164,22 +222,47 @@ export default function PatientDetailPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-800">--</p>
+                <p className="text-2xl font-bold text-slate-800">
+                  {kpi?.latestTir != null ? kpi.latestTir : '--'}
+                </p>
                 <p className="text-xs text-slate-500">TIR %</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-800">--</p>
+                <p className="text-2xl font-bold text-slate-800">
+                  {kpi?.latestCv != null ? kpi.latestCv : '--'}
+                </p>
                 <p className="text-xs text-slate-500">CV %</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-800">--</p>
+                <p className="text-2xl font-bold text-slate-800">{coachingCount}</p>
                 <p className="text-xs text-slate-500">코칭 횟수</p>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Action Panel */}
+        {actions.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {actions.map((action, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  const target = action.path === ''
+                    ? `/care/patients/${id}`
+                    : `/care/patients/${id}/${action.path}`;
+                  navigate(target);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors hover:opacity-80 ${action.cls}`}
+              >
+                <action.icon className="w-4 h-4 flex-shrink-0" />
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Tab Navigation */}
         <nav className="bg-white rounded-t-2xl border border-b-0 border-slate-200">

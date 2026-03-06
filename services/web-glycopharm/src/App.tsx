@@ -156,8 +156,8 @@ const PatientDetailPage = lazy(() => import('@/pages/care').then(m => ({ default
 const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.AnalysisPage })));
 const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
 
-// Patient Detail Tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1)
-const SummaryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.SummaryTab })));
+// Patient Detail Tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1)
+const DataTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.DataTab })));
 const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
 const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
 const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
@@ -326,9 +326,9 @@ function AppRoutes() {
         <Route element={<SoftGuardOutlet feature="care" allowedRoles={['pharmacy']} />}>
           <Route index element={<CareDashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
-          {/* Patient Detail with nested tabs (WO-CARE-PATIENT-DETAIL-STRUCTURE-V1) */}
+          {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}
           <Route path="patients/:id" element={<PatientDetailPage />}>
-            <Route index element={<SummaryTab />} />
+            <Route index element={<DataTab />} />
             <Route path="analysis" element={<PatientAnalysisTab />} />
             <Route path="coaching" element={<PatientCoachingTab />} />
             <Route path="history" element={<HistoryTab />} />

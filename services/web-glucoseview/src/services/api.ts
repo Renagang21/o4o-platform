@@ -75,6 +75,22 @@ export interface CreateCoachingSessionRequest {
   actionPlan: string;
 }
 
+// Health Reading types (WO-O4O-HEALTH-DATA-PIPELINE-V1)
+export interface HealthReadingDto {
+  id: string;
+  patientId: string;
+  metricType: string;
+  valueNumeric: string | null;
+  valueText: string | null;
+  unit: string;
+  measuredAt: string;
+  sourceType: string;
+  createdBy: string | null;
+  metadata: Record<string, unknown>;
+  pharmacyId: string;
+  createdAt: string;
+}
+
 // Customer types
 export interface Customer {
   id: string;
@@ -292,6 +308,34 @@ class ApiService {
   // Care Dashboard endpoint (WO-CARE-DASHBOARD-INTEGRATION-V1)
   async getCareDashboard(): Promise<CareDashboardDto> {
     return this.request<CareDashboardDto>('/api/v1/care/dashboard');
+  }
+
+  // Health Readings (WO-O4O-HEALTH-DATA-PIPELINE-V1)
+  async getHealthReadings(
+    patientId: string,
+    params?: { from?: string; to?: string; metricType?: string }
+  ): Promise<HealthReadingDto[]> {
+    const searchParams = new URLSearchParams();
+    if (params?.from) searchParams.set('from', params.from);
+    if (params?.to) searchParams.set('to', params.to);
+    if (params?.metricType) searchParams.set('metricType', params.metricType);
+    const query = searchParams.toString();
+    return this.request<HealthReadingDto[]>(
+      `/api/v1/care/health-readings/${patientId}${query ? `?${query}` : ''}`
+    );
+  }
+
+  async postHealthReading(data: {
+    patientId: string;
+    metricType?: string;
+    valueNumeric: number;
+    unit?: string;
+    measuredAt: string;
+  }): Promise<HealthReadingDto> {
+    return this.request<HealthReadingDto>('/api/v1/care/health-readings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   // Customer endpoints

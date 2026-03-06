@@ -1,4 +1,4 @@
-import type { CgmReading } from './cgm.provider.js';
+import type { CgmReading } from '../provider/cgm.provider.js';
 
 export interface AnalysisResult {
   tir: number;   // 0–100 (integer %)

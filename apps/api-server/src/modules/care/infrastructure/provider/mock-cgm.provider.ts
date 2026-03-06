@@ -1,4 +1,4 @@
-import type { CgmProvider, CgmReading } from './cgm.provider.js';
+import type { CgmProvider, CgmReading } from '../../domain/provider/cgm.provider.js';
 
 /**
  * MockCgmProvider

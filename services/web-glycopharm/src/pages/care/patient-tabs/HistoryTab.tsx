@@ -1,12 +1,12 @@
 /**
- * HistoryTab - 환자 타임라인 포털
- * WO-CARE-HISTORY-INTEGRATION-V1
+ * HistoryTab - 환자 타임라인 (live)
+ * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
  *
  * 분석(snapshot) + 코칭(session) 이벤트를 시간축 기준으로 통합 표시.
- * 데이터: PatientDetailPage context (snapshot) + local mock coaching
+ * 데이터: PatientDetailPage context (snapshot) + API coaching sessions
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   BarChart3,
   MessageSquare,
@@ -14,7 +14,9 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Loader2,
 } from 'lucide-react';
+import { pharmacyApi, type CoachingSession } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 // ── Types ──
@@ -30,7 +32,6 @@ interface TimelineEvent {
   description: string;
   meta?: {
     riskLevel?: string;
-    status?: string;
   };
 }
 
@@ -40,12 +41,6 @@ const RISK_DISPLAY = {
   high: { label: '고위험', cls: 'text-red-700 bg-red-100', Icon: AlertTriangle },
   moderate: { label: '주의', cls: 'text-amber-700 bg-amber-100', Icon: AlertCircle },
   low: { label: '양호', cls: 'text-green-700 bg-green-100', Icon: CheckCircle },
-} as const;
-
-const COACHING_STATUS = {
-  completed: { label: '완료', cls: 'text-green-700 bg-green-100' },
-  in_progress: { label: '진행중', cls: 'text-blue-700 bg-blue-100' },
-  on_hold: { label: '보류', cls: 'text-slate-600 bg-slate-100' },
 } as const;
 
 const EVENT_STYLE = {
@@ -59,42 +54,35 @@ const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
   { key: 'coaching', label: '코칭' },
 ];
 
-// ── Mock coaching data (CoachingTab과 동일 구조) ──
-
-const MOCK_COACHING_EVENTS: TimelineEvent[] = [
-  {
-    id: 'c1',
-    type: 'coaching',
-    date: '2026-02-18',
-    title: '대면 상담',
-    description: '식후 혈당 관리 방법 안내, 저녁 식단 조정 권유',
-    meta: { status: 'completed' },
-  },
-  {
-    id: 'c2',
-    type: 'coaching',
-    date: '2026-02-12',
-    title: '전화 상담',
-    description: '복약 순응도 확인, 인슐린 투여 시간 조정 논의',
-    meta: { status: 'completed' },
-  },
-  {
-    id: 'c3',
-    type: 'coaching',
-    date: '2026-02-05',
-    title: '메시지',
-    description: '운동 프로그램 안내 자료 전달',
-    meta: { status: 'completed' },
-  },
-];
-
 export default function HistoryTab() {
-  const { snapshot } = usePatientDetail();
+  const { patient, snapshot } = usePatientDetail();
   const [filter, setFilter] = useState<FilterType>('all');
+  const [sessions, setSessions] = useState<CoachingSession[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!patient?.id) return;
+    setLoading(true);
+    pharmacyApi.getCoachingSessions(patient.id)
+      .then((data) => setSessions(Array.isArray(data) ? data : []))
+      .catch(() => setSessions([]))
+      .finally(() => setLoading(false));
+  }, [patient?.id]);
 
   // Merge analysis snapshot + coaching into unified timeline
   const allEvents = useMemo<TimelineEvent[]>(() => {
-    const events: TimelineEvent[] = [...MOCK_COACHING_EVENTS];
+    const events: TimelineEvent[] = [];
+
+    // Coaching sessions → timeline events
+    for (const s of sessions) {
+      events.push({
+        id: `c-${s.id}`,
+        type: 'coaching',
+        date: s.createdAt,
+        title: '코칭 상담',
+        description: s.summary,
+      });
+    }
 
     // Snapshot → analysis event
     if (snapshot?.createdAt) {
@@ -112,11 +100,19 @@ export default function HistoryTab() {
 
     // Sort by date desc
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [snapshot]);
+  }, [snapshot, sessions]);
 
   const filteredEvents = filter === 'all'
     ? allEvents
     : allEvents.filter(e => e.type === filter);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -188,17 +184,6 @@ export default function HistoryTab() {
                                 {r.label}
                               </span>
                             );
-                          })()
-                        )}
-                        {event.type === 'coaching' && event.meta?.status && (
-                          (() => {
-                            const sk = event.meta.status as keyof typeof COACHING_STATUS;
-                            const s = COACHING_STATUS[sk];
-                            return s ? (
-                              <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${s.cls}`}>
-                                {s.label}
-                              </span>
-                            ) : null;
                           })()
                         )}
                       </div>

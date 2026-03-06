@@ -178,6 +178,9 @@ import {
 import { CareKpiSnapshot } from '../modules/care/entities/care-kpi-snapshot.entity.js';
 import { CareCoachingSession } from '../modules/care/entities/care-coaching-session.entity.js';
 
+// HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
+import { HealthReading } from '../modules/care/entities/health-reading.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -617,6 +620,10 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CareKpiSnapshot,
     CareCoachingSession,
+    // ============================================================================
+    // HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
+    // ============================================================================
+    HealthReading,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

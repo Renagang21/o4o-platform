@@ -52,7 +52,7 @@ describe('Care Ownership: pharmacistId override protection', () => {
   it('care-coaching.controller.ts forces pharmacistId from req.user', () => {
     const filePath = path.resolve(
       __dirname,
-      '../../modules/care/care-coaching.controller.ts'
+      '../../modules/care/controllers/care-coaching.controller.ts'
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
@@ -65,7 +65,7 @@ describe('Care Ownership: pharmacistId override protection', () => {
   it('care-coaching.controller.ts uses authenticate middleware', () => {
     const filePath = path.resolve(
       __dirname,
-      '../../modules/care/care-coaching.controller.ts'
+      '../../modules/care/controllers/care-coaching.controller.ts'
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
@@ -82,15 +82,15 @@ describe('Care Controllers: pharmacy context middleware applied', () => {
   const careControllers = [
     {
       name: 'care-analysis.controller.ts',
-      path: '../../modules/care/care-analysis.controller.ts',
+      path: '../../modules/care/controllers/care-analysis.controller.ts',
     },
     {
       name: 'care-coaching.controller.ts',
-      path: '../../modules/care/care-coaching.controller.ts',
+      path: '../../modules/care/controllers/care-coaching.controller.ts',
     },
     {
       name: 'care-dashboard.controller.ts',
-      path: '../../modules/care/care-dashboard.controller.ts',
+      path: '../../modules/care/controllers/care-dashboard.controller.ts',
     },
   ];
 
@@ -270,5 +270,61 @@ describe('Service Config Freeze Verification', () => {
     const glycoBlock = content.slice(glycoStart, glycoEnd);
 
     expect(glycoBlock).toContain('platformBypass: true');
+  });
+});
+
+// ─────────────────────────────────────────────────────
+// 7. Health Readings: created_by server enforcement
+//
+// WO-O4O-HEALTH-DATA-PIPELINE-V1
+// POST health-readings must force created_by = req.user.id
+// ─────────────────────────────────────────────────────
+
+describe('Health Readings Ownership: created_by override protection', () => {
+  it('health-readings.controller.ts forces created_by from req.user', () => {
+    const filePath = path.resolve(
+      __dirname,
+      '../../modules/care/controllers/health-readings.controller.ts'
+    );
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    // The guard pattern: createdBy from authenticated user (server-enforced)
+    expect(content).toMatch(/createdBy\s*=\s*pcReq\.user\?\.(id|userId)/);
+    // Must NOT use client-provided createdBy
+    expect(content).not.toMatch(/createdBy\s*=\s*(?:req\.body|data)\.createdBy/);
+  });
+
+  it('health-readings.controller.ts forces pharmacyId from pharmacy context', () => {
+    const filePath = path.resolve(
+      __dirname,
+      '../../modules/care/controllers/health-readings.controller.ts'
+    );
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    // pharmacyId from PharmacyContextMiddleware, not client
+    expect(content).toMatch(/pharmacyId\s*=\s*pcReq\.pharmacyId/);
+    expect(content).not.toMatch(/pharmacyId\s*=\s*(?:req\.body|data)\.pharmacyId/);
+  });
+
+  it('health-readings.controller.ts uses authenticate + requirePharmacyContext', () => {
+    const filePath = path.resolve(
+      __dirname,
+      '../../modules/care/controllers/health-readings.controller.ts'
+    );
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    expect(content).toContain('authenticate');
+    expect(content).toContain('requirePharmacyContext');
+  });
+
+  it('health-readings.controller.ts forces sourceType to manual', () => {
+    const filePath = path.resolve(
+      __dirname,
+      '../../modules/care/controllers/health-readings.controller.ts'
+    );
+    const content = fs.readFileSync(filePath, 'utf8');
+
+    // Phase 1: sourceType always 'manual'
+    expect(content).toMatch(/sourceType:\s*'manual'/);
   });
 });

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { createPharmacyContextMiddleware } from './care-pharmacy-context.middleware.js';
-import type { PharmacyContextRequest } from './care-pharmacy-context.middleware.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
+import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 
 export interface CareDashboardDto {
   totalPatients: number;

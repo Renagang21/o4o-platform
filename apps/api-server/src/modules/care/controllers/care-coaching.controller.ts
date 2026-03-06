@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
-import { CareCoachingSessionService } from './care-coaching-session.service.js';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { createPharmacyContextMiddleware } from './care-pharmacy-context.middleware.js';
-import type { PharmacyContextRequest } from './care-pharmacy-context.middleware.js';
+import { CareCoachingSessionService } from '../services/coaching/care-coaching-session.service.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
+import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 
 export function createCareCoachingRouter(dataSource: DataSource): Router {
   const router = Router();

@@ -955,7 +955,7 @@ const startServer = async () => {
 
     // 28b. Register Care Analysis routes (WO-CARE-KPI-SNAPSHOT-V1)
     try {
-      const { createCareAnalysisRouter } = await import('./modules/care/care-analysis.controller.js');
+      const { createCareAnalysisRouter } = await import('./modules/care/controllers/care-analysis.controller.js');
       app.use('/api/v1/care', createCareAnalysisRouter(AppDataSource));
       logger.info('✅ Care Analysis routes registered at /api/v1/care');
     } catch (careError) {
@@ -964,7 +964,7 @@ const startServer = async () => {
 
     // 28c. Register Care Coaching routes (WO-CARE-COACHING-ENGINE-V1)
     try {
-      const { createCareCoachingRouter } = await import('./modules/care/care-coaching.controller.js');
+      const { createCareCoachingRouter } = await import('./modules/care/controllers/care-coaching.controller.js');
       app.use('/api/v1/care', createCareCoachingRouter(AppDataSource));
       logger.info('✅ Care Coaching routes registered at /api/v1/care/coaching');
     } catch (coachingError) {
@@ -973,11 +973,20 @@ const startServer = async () => {
 
     // 28d. Register Care Dashboard routes (WO-CARE-DASHBOARD-INTEGRATION-V1)
     try {
-      const { createCareDashboardRouter } = await import('./modules/care/care-dashboard.controller.js');
+      const { createCareDashboardRouter } = await import('./modules/care/controllers/care-dashboard.controller.js');
       app.use('/api/v1/care', createCareDashboardRouter(AppDataSource));
       logger.info('✅ Care Dashboard routes registered at /api/v1/care/dashboard');
     } catch (dashboardError) {
       logger.error('Failed to register Care Dashboard routes:', dashboardError);
+    }
+
+    // 28e. Register Health Readings routes (WO-O4O-HEALTH-DATA-PIPELINE-V1)
+    try {
+      const { createHealthReadingsRouter } = await import('./modules/care/controllers/health-readings.controller.js');
+      app.use('/api/v1/care', createHealthReadingsRouter(AppDataSource));
+      logger.info('✅ Health Readings routes registered at /api/v1/care/health-readings');
+    } catch (healthError) {
+      logger.error('Failed to register Health Readings routes:', healthError);
     }
 
     // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)

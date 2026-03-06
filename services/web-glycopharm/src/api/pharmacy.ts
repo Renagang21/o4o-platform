@@ -491,19 +491,65 @@ class PharmacyApiClient {
   }
 
   // ============================================================================
-  // Care Dashboard API (read-only bridge to GlucoseView Care module)
+  // Care API (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1)
   // ============================================================================
 
-  /**
-   * Care 대시보드 요약 조회 (GlucoseView Care 모듈 read-only 연동)
-   * Returns raw CareDashboardSummary (not wrapped in StoreApiResponse)
-   */
   async getCareDashboardSummary(): Promise<CareDashboardSummary> {
     return this.request('/api/v1/care/dashboard');
   }
+
+  async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
+    return this.request(`/api/v1/care/analysis/${patientId}`);
+  }
+
+  async getCareKpi(patientId: string): Promise<KpiComparisonDto> {
+    return this.request(`/api/v1/care/kpi/${patientId}`);
+  }
+
+  async createCoachingSession(data: {
+    patientId: string;
+    summary: string;
+    actionPlan: string;
+  }): Promise<CoachingSession> {
+    return this.request('/api/v1/care/coaching', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getCoachingSessions(patientId: string): Promise<CoachingSession[]> {
+    return this.request(`/api/v1/care/coaching/${patientId}`);
+  }
+
+  async postHealthReading(data: {
+    patientId: string;
+    metricType?: string;
+    valueNumeric: number;
+    unit?: string;
+    measuredAt: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<HealthReadingDto> {
+    return this.request('/api/v1/care/health-readings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getHealthReadings(
+    patientId: string,
+    params?: { from?: string; to?: string; metricType?: string },
+  ): Promise<HealthReadingDto[]> {
+    const query = new URLSearchParams();
+    if (params?.from) query.set('from', params.from);
+    if (params?.to) query.set('to', params.to);
+    if (params?.metricType) query.set('metricType', params.metricType);
+    const qs = query.toString();
+    return this.request(`/api/v1/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
+  }
 }
 
-// Care Dashboard Summary (read-only from GlucoseView Care module)
+// ── Care Types ──
+
 export interface CareDashboardSummary {
   totalPatients: number;
   highRiskCount: number;
@@ -516,6 +562,50 @@ export interface CareDashboardSummary {
     riskLevel: string;
     createdAt: string;
   }>;
+}
+
+export interface CareInsightDto {
+  patientId: string;
+  tir: number;
+  cv: number;
+  riskLevel: 'low' | 'moderate' | 'high';
+  insights: string[];
+}
+
+export interface KpiComparisonDto {
+  latestTir: number | null;
+  previousTir: number | null;
+  tirChange: number | null;
+  latestCv: number | null;
+  previousCv: number | null;
+  cvChange: number | null;
+  riskTrend: 'improving' | 'stable' | 'worsening' | null;
+}
+
+export interface CoachingSession {
+  id: string;
+  patientId: string;
+  pharmacistId: string;
+  pharmacyId: string;
+  snapshotId: string | null;
+  summary: string;
+  actionPlan: string;
+  createdAt: string;
+}
+
+export interface HealthReadingDto {
+  id: string;
+  patientId: string;
+  metricType: string;
+  valueNumeric: string | null;
+  valueText: string | null;
+  unit: string;
+  measuredAt: string;
+  sourceType: string;
+  createdBy: string | null;
+  metadata: Record<string, unknown>;
+  pharmacyId: string;
+  createdAt: string;
 }
 
 // Export singleton instance
