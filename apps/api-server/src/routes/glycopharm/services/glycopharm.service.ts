@@ -155,7 +155,6 @@ export class GlycopharmService {
 
       // WO-O4O-PRODUCT-AUTO-LISTING-STABILIZATION-V1: Tier 1 자동 확산
       autoListPublicProductsForOrg(this.dataSource, org.id, 'glycopharm')
-        .then((count) => { if (count > 0) console.log(`[GlycopharmService] Auto-listed ${count} PUBLIC products for org ${org.id}`); })
         .catch((err) => console.error('[GlycopharmService] Auto-listing failed:', err));
 
       return this.toPharmacyResponse(org, ext, 0, slug);
