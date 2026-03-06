@@ -4,29 +4,29 @@
  * WO-O4O-STORE-LIBRARY-FOUNDATION-V1
  *
  * 매장 내부 전용 자료실 CRUD.
- * 모든 쿼리에 storeId(= organizationId) 필터 필수 (Boundary Policy §7).
+ * 모든 쿼리에 organizationId 필터 필수 (Boundary Policy §7).
  */
 
 import type { DataSource, Repository } from 'typeorm';
-import { StoreLibraryItem } from './entities/StoreLibraryItem.entity.js';
+import { StoreLibraryItem } from '../../routes/platform/entities/index.js';
 
 export interface CreateStoreLibraryItemInput {
   title: string;
   description?: string | null;
-  fileUrl: string;
-  fileName: string;
-  fileSize: string;
-  mimeType: string;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
   category?: string | null;
 }
 
 export interface UpdateStoreLibraryItemInput {
   title?: string;
   description?: string | null;
-  fileUrl?: string;
-  fileName?: string;
-  fileSize?: string;
-  mimeType?: string;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  fileSize?: number | null;
+  mimeType?: string | null;
   category?: string | null;
 }
 
@@ -37,34 +37,32 @@ export class StoreLibraryService {
     this.repo = dataSource.getRepository(StoreLibraryItem);
   }
 
-  async getStoreLibraryItems(storeId: string): Promise<StoreLibraryItem[]> {
+  async getStoreLibraryItems(organizationId: string): Promise<StoreLibraryItem[]> {
     return this.repo.find({
-      where: { storeId },
+      where: { organizationId },
       order: { createdAt: 'DESC' },
     });
   }
 
   async getStoreLibraryItemById(
     id: string,
-    storeId: string,
+    organizationId: string,
   ): Promise<StoreLibraryItem | null> {
-    return this.repo.findOne({ where: { id, storeId } });
+    return this.repo.findOne({ where: { id, organizationId } });
   }
 
   async createStoreLibraryItem(
-    storeId: string,
-    createdBy: string,
+    organizationId: string,
     input: CreateStoreLibraryItemInput,
   ): Promise<StoreLibraryItem> {
     const item = this.repo.create({
-      storeId,
-      createdBy,
+      organizationId,
       title: input.title,
       description: input.description ?? null,
-      fileUrl: input.fileUrl,
-      fileName: input.fileName,
-      fileSize: input.fileSize,
-      mimeType: input.mimeType,
+      fileUrl: input.fileUrl ?? null,
+      fileName: input.fileName ?? null,
+      fileSize: input.fileSize ?? null,
+      mimeType: input.mimeType ?? null,
       category: input.category ?? null,
     });
     return this.repo.save(item);
@@ -72,10 +70,10 @@ export class StoreLibraryService {
 
   async updateStoreLibraryItem(
     id: string,
-    storeId: string,
+    organizationId: string,
     updates: UpdateStoreLibraryItemInput,
   ): Promise<{ success: boolean; data?: StoreLibraryItem; error?: string }> {
-    const item = await this.repo.findOne({ where: { id, storeId } });
+    const item = await this.repo.findOne({ where: { id, organizationId } });
     if (!item) {
       return { success: false, error: 'ITEM_NOT_FOUND' };
     }
@@ -94,9 +92,9 @@ export class StoreLibraryService {
 
   async deleteStoreLibraryItem(
     id: string,
-    storeId: string,
+    organizationId: string,
   ): Promise<{ success: boolean; error?: string }> {
-    const item = await this.repo.findOne({ where: { id, storeId } });
+    const item = await this.repo.findOne({ where: { id, organizationId } });
     if (!item) {
       return { success: false, error: 'ITEM_NOT_FOUND' };
     }

@@ -71,12 +71,12 @@ export function createStoreLibraryRoutes(
         return;
       }
 
-      const item = await service.createStoreLibraryItem(storeId, userId, {
+      const item = await service.createStoreLibraryItem(storeId, {
         title: title.trim(),
         description: description ?? null,
         fileUrl,
         fileName,
-        fileSize: String(fileSize),
+        fileSize: fileSize != null ? Number(fileSize) : null,
         mimeType,
         category: category ?? null,
       });
