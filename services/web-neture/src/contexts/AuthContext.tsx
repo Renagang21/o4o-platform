@@ -36,9 +36,9 @@ const ROLE_LABELS: Record<UserRole, string> = {
 };
 
 const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  admin: '/workspace/hub',
-  supplier: '/workspace/hub',
-  partner: '/workspace/hub',
+  admin: '/workspace/admin',
+  supplier: '/account/supplier',
+  partner: '/account/partner',
   user: '/',
 };
 

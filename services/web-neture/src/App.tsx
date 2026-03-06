@@ -2,27 +2,43 @@
  * Neture - o4o 플랫폼 기반 서비스
  *
  * Work Orders:
- * - WO-SUPPLIER-OPS-ROUTE-REFACTOR-V1: /workspace 기준 라우트 분리
- * - WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: /workspace/hub 통합 허브
+ * - WO-O4O-NETURE-UI-REFACTORING-V1: 플랫폼 협업 구조 리팩토링
  *
  * 구조:
- * 1. o4o 공통 영역 (/, /o4o, /channel/*, /seller/overview/*, /partner/overview-info)
- * 2. Neture 고유 기능 (/workspace/*) - 공급자 중심 운영·연결 서비스
- *
- * HARD RULES:
- * - /workspace는 공급자 중심 운영·연결 서비스
- * - admin/operator는 /workspace 전용
- * - o4o 공통 영역에서는 공급자/파트너 운영 기능 노출 금지
+ * 1. Neture 메인 (/) - NetureLayout: 홍보 + 광고 + 활동 + 커뮤니티 미리보기 + 진입
+ * 2. Supplier Space (/supplier/*) - SupplierSpaceLayout: 공급자 운영 공간
+ * 2a. Supplier Account (/account/supplier/*) - SupplierAccountLayout: 공급자 계정 대시보드
+ * 3. Partner Space (/partner/*) - PartnerSpaceLayout: 파트너 협업 공간
+ * 3a. Partner Account (/account/partner/*) - PartnerAccountLayout: 파트너 계정 대시보드
+ * 4. o4o 공통 영역 (/o4o/*) - MainLayout: 플랫폼 소개
+ * 5. Admin/Operator (/workspace/*) - SupplierOpsLayout: 관리자 전용
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider, LoginModalProvider, useLoginModal, useAuth, ROLE_DASHBOARDS } from './contexts';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
+
+// Layouts
+import NetureLayout from './components/layouts/NetureLayout';
+import SupplierSpaceLayout from './components/layouts/SupplierSpaceLayout';
+import PartnerSpaceLayout from './components/layouts/PartnerSpaceLayout';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
+import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
+import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard } from './components/auth/RoleGuard';
+
+// ============================================================================
+// Neture 메인 페이지 (항상 로드)
+// ============================================================================
+import NetureHomePage from './pages/NetureHomePage';
+import AboutPage from './pages/AboutPage';
+import CommunityPage from './pages/CommunityPage';
+import ContactPage from './pages/ContactPage';
+import SupplierLandingPage from './pages/SupplierLandingPage';
+import PartnerLandingPage from './pages/PartnerLandingPage';
 
 // ============================================================================
 // o4o 공통 페이지 (항상 로드)
@@ -55,7 +71,7 @@ import {
   KpaSocietyServiceManualPage,
 } from './pages/test-guide';
 
-// o4o Public Site Pages (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1)
+// o4o Public Site Pages
 import O4OMainPage from './pages/o4o/O4OMainPage';
 import OtherTargetsPage from './pages/o4o/OtherTargetsPage';
 import SiteOperatorPage from './pages/o4o/SiteOperatorPage';
@@ -70,7 +86,7 @@ import ChannelMapPage from './pages/manual/concepts/ChannelMapPage';
 import BusinessInquiryPage from './pages/o4o/BusinessInquiryPage';
 import ConsultationRequestPage from './pages/o4o/ConsultationRequestPage';
 
-// Admin Vault Pages (WO-O4O-ADMIN-VAULT-ACCESS-V1)
+// Admin Vault Pages
 import {
   VaultOverviewPage,
   VaultDocsPage,
@@ -79,19 +95,15 @@ import {
   VaultInquiriesPage,
 } from './pages/admin-vault';
 
-// Test Center (다중 서비스)
+// Test Center
 import TestCenterPage from './pages/TestCenterPage';
 
-// Contact (문의 안내)
-import ContactPage from './pages/ContactPage';
-
 // ============================================================================
-// Neture 고유 페이지 (/workspace)
+// Neture 공통 페이지 (즉시 로드)
 // ============================================================================
-import HomePage from './pages/HomePage';
-import MyPage from './pages/MyPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
+import MyPage from './pages/MyPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
 import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
@@ -122,12 +134,6 @@ import ForumHubPage from './pages/forum/ForumHubPage';
 // ============================================================================
 
 // Supplier Dashboard
-const SupplierDashboardLayout = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardLayout }))
-);
-const MyHandledProductsPage = lazy(() =>
-  import('./pages/seller/MyHandledProductsPage')
-);
 const SupplierDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierDashboardPage }))
 );
@@ -149,8 +155,11 @@ const SupplyRequestsPage = lazy(() =>
 const SupplierProfilePage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierProfilePage }))
 );
+const MyHandledProductsPage = lazy(() =>
+  import('./pages/seller/MyHandledProductsPage')
+);
 
-// Supplier Library (WO-O4O-NETURE-LIBRARY-UI-V1)
+// Supplier Library
 const SupplierLibraryPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryPage }))
 );
@@ -158,8 +167,31 @@ const SupplierLibraryFormPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryFormPage }))
 );
 
-// Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1)
+// Signage Content Hub
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
+
+// Supplier Product Create
+const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
+
+// Supplier Account
+const SupplierAccountDashboardPage = lazy(() => import('./pages/account/SupplierAccountDashboardPage'));
+const SupplierProductsListPage = lazy(() => import('./pages/account/SupplierProductsListPage'));
+const SupplierOrdersListPage = lazy(() => import('./pages/account/SupplierOrdersListPage'));
+const SupplierOrderDetailPage = lazy(() => import('./pages/account/SupplierOrderDetailPage'));
+
+// Partner Account
+const PartnerAccountDashboardPage = lazy(() =>
+  import('./pages/partner/PartnerAccountDashboardPage').then((m) => ({ default: m.PartnerAccountDashboardPage }))
+);
+const PartnerContentsPage = lazy(() =>
+  import('./pages/partner/PartnerContentsPage').then((m) => ({ default: m.PartnerContentsPage }))
+);
+const PartnerLinksPage = lazy(() =>
+  import('./pages/partner/PartnerLinksPage').then((m) => ({ default: m.PartnerLinksPage }))
+);
+const PartnerStoresPage = lazy(() =>
+  import('./pages/partner/PartnerStoresPage').then((m) => ({ default: m.PartnerStoresPage }))
+);
 
 // Partner Dashboard
 const RecruitingProductsPage = lazy(() => import('./pages/partner/RecruitingProductsPage'));
@@ -214,25 +246,22 @@ const EmailSettingsPage = lazy(() =>
   import('./pages/admin/settings').then((m) => ({ default: m.EmailSettingsPage }))
 );
 
-// Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1)
+// Admin Operators
 const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
 
-// Admin Approval Pages (WO-O4O-ADMIN-UI-COMPLETION-V1)
+// Admin Approval Pages
 const AdminSupplierApprovalPage = lazy(() => import('./pages/admin/AdminSupplierApprovalPage'));
 const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductApprovalPage'));
 const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
 
-// Catalog Import (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+// Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
 const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
 const FirstmallImportPage = lazy(() => import('./pages/admin/catalog-import/FirstmallImportPage'));
 const ImportHistoryPage = lazy(() => import('./pages/admin/catalog-import/ImportHistoryPage'));
 
-// Supplier Product Create (WO-O4O-ADMIN-UI-COMPLETION-V1)
-const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
-
-// Hub (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1)
+// Hub
 const HubPage = lazy(() => import('./pages/hub/HubPage'));
 
 // Operator Dashboard
@@ -276,10 +305,10 @@ function LoginModalRenderer() {
   );
 }
 
-// Legacy redirect helpers - React Router v6 Navigate doesn't interpolate params
+// Legacy redirect helpers
 function RedirectSupplierDetail() {
   const { slug } = useParams();
-  return <Navigate to={`/workspace/suppliers/${slug}`} replace />;
+  return <Navigate to={`/community/knowledge/${slug}`} replace />;
 }
 function RedirectPartnershipRequestDetail() {
   const { id } = useParams();
@@ -287,54 +316,24 @@ function RedirectPartnershipRequestDetail() {
 }
 function RedirectContentDetail() {
   const { id } = useParams();
-  return <Navigate to={`/workspace/content/${id}`} replace />;
+  return <Navigate to={`/partner/contents/${id}`} replace />;
 }
 
-// /login 경로 접근 시 workspace로 리다이렉트하고 로그인 모달 열기
+// /login 경로 접근 시 홈으로 리다이렉트하고 로그인 모달 열기
 function LoginRedirect() {
   const { openLoginModal } = useLoginModal();
   const location = useLocation();
 
-  // state.from 또는 query param에서 returnUrl 추출
   const returnUrl = (location.state as any)?.from || new URLSearchParams(location.search).get('returnUrl');
 
-  // 컴포넌트 마운트 시 로그인 모달 열기 (returnUrl 전달)
   useEffect(() => {
     openLoginModal(returnUrl || undefined);
   }, [openLoginModal, returnUrl]);
 
-  return <Navigate to="/workspace" replace />;
+  return <Navigate to="/" replace />;
 }
 
-
-/**
- * ProtectedRoute → RoleGuard alias
- * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1: 통일된 인터페이스 사용
- * 실제 로직은 components/auth/RoleGuard.tsx
- */
 const ProtectedRoute = RoleGuard;
-
-/**
- * RoleBasedWorkspaceHome - WO-NETURE-ROLE-BASED-LANDING-V1
- * /workspace 접근 시 역할 기반 자동 리다이렉트
- * admin → /workspace/admin, supplier → /workspace/supplier/dashboard, partner → /workspace/partner
- * user → /workspace (HomePage 유지)
- */
-function RoleBasedWorkspaceHome() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user?.roles[0] && user.roles[0] !== 'user') {
-      const target = ROLE_DASHBOARDS[user.roles[0]];
-      if (target && target !== '/') {
-        navigate(target, { replace: true });
-      }
-    }
-  }, [user, navigate]);
-
-  return <HomePage />;
-}
 
 function App() {
   return (
@@ -353,12 +352,89 @@ function App() {
             <Route path="/my" element={<MyPage />} />
 
             {/* ================================================================
+                Neture 메인 (NetureLayout)
+                WO-O4O-NETURE-UI-REFACTORING-V1
+            ================================================================ */}
+            <Route element={<NetureLayout />}>
+              <Route path="/" element={<NetureHomePage />} />
+              <Route path="/supplier" element={<SupplierLandingPage />} />
+              <Route path="/partner" element={<PartnerLandingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+
+              {/* Community */}
+              <Route path="/community" element={<CommunityPage />} />
+              <Route path="/community/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/community/forum" />} />
+              <Route path="/community/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
+              <Route path="/community/forum/write" element={<ForumWritePage />} />
+              <Route path="/community/forum/post/:slug" element={<ForumPostPage />} />
+              <Route path="/community/knowledge" element={<SupplierListPage />} />
+              <Route path="/community/knowledge/:slug" element={<SupplierDetailPage />} />
+            </Route>
+
+            {/* ================================================================
+                Supplier Space (/supplier/*)
+                WO-O4O-NETURE-UI-REFACTORING-V1
+            ================================================================ */}
+            <Route element={<SupplierSpaceLayout />}>
+              <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
+              <Route path="/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
+              <Route path="/supplier/offers" element={<SupplyRequestsPage />} />
+              <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
+              <Route path="/supplier/requests" element={<SellerRequestsPage />} />
+              <Route path="/supplier/requests/:id" element={<SellerRequestDetailPage />} />
+              <Route path="/supplier/library" element={<SupplierLibraryPage />} />
+              <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
+              <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
+              <Route path="/supplier/profile" element={<SupplierProfilePage />} />
+              <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
+              <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" />} />
+            </Route>
+
+            {/* ================================================================
+                Supplier Account (/account/supplier/*)
+                WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1
+            ================================================================ */}
+            <Route element={<SupplierAccountLayout />}>
+              <Route path="/account/supplier" element={<SupplierAccountDashboardPage />} />
+              <Route path="/account/supplier/products" element={<SupplierProductsListPage />} />
+              <Route path="/account/supplier/orders" element={<SupplierOrdersListPage />} />
+              <Route path="/account/supplier/orders/:id" element={<SupplierOrderDetailPage />} />
+            </Route>
+
+            {/* ================================================================
+                Partner Account (/account/partner/*)
+                WO-O4O-PARTNER-DASHBOARD-PAGE-V1
+            ================================================================ */}
+            <Route element={<PartnerAccountLayout />}>
+              <Route path="/account/partner" element={<PartnerAccountDashboardPage />} />
+              <Route path="/account/partner/contents" element={<PartnerContentsPage />} />
+              <Route path="/account/partner/links" element={<PartnerLinksPage />} />
+              <Route path="/account/partner/stores" element={<PartnerStoresPage />} />
+            </Route>
+
+            {/* ================================================================
+                Partner Space (/partner/*)
+                WO-O4O-NETURE-UI-REFACTORING-V1
+            ================================================================ */}
+            <Route element={<PartnerSpaceLayout />}>
+              <Route path="/partner/dashboard" element={<PartnerOverviewPage />} />
+              <Route path="/partner/contents" element={<ContentListPage />} />
+              <Route path="/partner/contents/:id" element={<ContentDetailPage />} />
+              <Route path="/partner/links" element={<CollaborationPage />} />
+              <Route path="/partner/stores" element={<RecruitingProductsPage />} />
+              <Route path="/partner/settlements" element={<SettlementsPage />} />
+              <Route path="/partner/promotions" element={<PromotionsPage />} />
+              <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" />} />
+            </Route>
+
+            {/* ================================================================
                 o4o 공통 영역 (MainLayout)
             ================================================================ */}
             <Route element={<MainLayout />}>
-              {/* o4o 메인 (WO-O4O-PUBLIC-SITE-PHASE1-BUILD-V1) */}
-              <Route path="/" element={<O4OMainPage />} />
-              <Route path="/o4o" element={<O4OIntroPage />} />
+              <Route path="/o4o" element={<O4OMainPage />} />
+              <Route path="/o4o/intro" element={<O4OIntroPage />} />
               <Route path="/o4o/other-targets" element={<OtherTargetsPage />} />
               <Route path="/o4o/site-operator" element={<SiteOperatorPage />} />
               <Route path="/o4o/targets/pharmacy" element={<PharmacyTargetPage />} />
@@ -370,14 +446,14 @@ function App() {
               <Route path="/manual/concepts" element={<ConceptsPage />} />
               <Route path="/manual/concepts/channel-map" element={<ChannelMapPage />} />
 
-              {/* 채널 구조 설명 (o4o 공통) */}
+              {/* 채널 구조 설명 */}
               <Route path="/channel/structure" element={<ChannelSalesStructurePage />} />
               <Route path="/channel/dental" element={<DentalChannelExplanationPage />} />
               <Route path="/channel/pharmacy" element={<PharmacyChannelExplanationPage />} />
               <Route path="/channel/optical" element={<OpticalChannelExplanationPage />} />
               <Route path="/channel/medical" element={<MedicalChannelExplanationPage />} />
 
-              {/* 판매자 개요 (o4o 공통) */}
+              {/* 판매자 개요 */}
               <Route path="/seller/overview" element={<SellerOverviewPage />} />
               <Route path="/seller/overview/pharmacy" element={<SellerOverviewPharmacy />} />
               <Route path="/seller/overview/beauty" element={<SellerOverviewBeauty />} />
@@ -386,16 +462,13 @@ function App() {
               <Route path="/seller/qr-guide" element={<SellerQRGuidePage />} />
               <Route path="/seller/my-products" element={<MyHandledProductsPage />} />
 
-              {/* 파트너 개요 (o4o 공통) */}
+              {/* 파트너 개요 */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
 
-              {/* 문의 안내 */}
-              <Route path="/contact" element={<ContactPage />} />
-
-              {/* 테스트 센터 (다중 서비스) */}
+              {/* 테스트 센터 */}
               <Route path="/test-center" element={<TestCenterPage />} />
 
-              {/* 테스트 가이드 (다중 서비스 - o4o 레벨) */}
+              {/* 테스트 가이드 */}
               <Route path="/test-guide" element={<TestGuidePage />} />
               <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
               <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
@@ -403,7 +476,7 @@ function App() {
               <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
               <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
 
-              {/* 테스트 센터 포럼 (o4o 공통 - /forum) */}
+              {/* 테스트 센터 포럼 */}
               <Route path="/forum" element={<ForumPage title="테스트 센터" description="모든 서비스의 테스트 피드백과 의견을 나누는 공간입니다." noticeText="서비스 테스트 후 발견한 문제점, 개선 의견, 질문을 남겨주세요." />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
@@ -416,9 +489,7 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Admin Vault (/admin-vault) - 설계 보호 구역
-                WO-O4O-ADMIN-VAULT-ACCESS-V1
-                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
+                Admin Vault (/admin-vault)
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin']}>
@@ -433,40 +504,25 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Neture 고유 기능 (/workspace) - SupplierOpsLayout
+                Workspace - Admin/Operator 전용 (SupplierOpsLayout 유지)
             ================================================================ */}
             <Route element={<SupplierOpsLayout />}>
-              {/* Neture 홈 - WO-NETURE-ROLE-BASED-LANDING-V1: 역할 기반 자동 리다이렉트 */}
-              <Route path="/workspace" element={<RoleBasedWorkspaceHome />} />
-
-              {/* 공급자 */}
-              <Route path="/workspace/suppliers" element={<SupplierListPage />} />
-              <Route path="/workspace/suppliers/:slug" element={<SupplierDetailPage />} />
-
-              {/* 파트너/제휴 */}
+              {/* Workspace 공통 페이지 */}
               <Route path="/workspace/partners" element={<Navigate to="/workspace/partners/requests" replace />} />
               <Route path="/workspace/partners/requests" element={<PartnershipRequestListPage />} />
               <Route path="/workspace/partners/requests/new" element={<PartnershipRequestCreatePage />} />
               <Route path="/workspace/partners/requests/:id" element={<PartnershipRequestDetailPage />} />
               <Route path="/workspace/partners/info" element={<PartnerInfoPage />} />
-
-              {/* 플랫폼 정책 */}
               <Route path="/workspace/platform/principles" element={<PlatformPrinciplesPage />} />
-
-              {/* 콘텐츠 */}
-              <Route path="/workspace/content" element={<ContentListPage />} />
-              <Route path="/workspace/content/:id" element={<ContentDetailPage />} />
-
-              {/* 내 콘텐츠 (WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1) */}
               <Route path="/workspace/my-content" element={<MyContentPage />} />
 
-              {/* 포럼 허브 + 글 목록/작성/상세 */}
+              {/* Workspace 포럼 */}
               <Route path="/workspace/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/workspace/forum" />} />
               <Route path="/workspace/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
               <Route path="/workspace/forum/write" element={<ForumWritePage />} />
               <Route path="/workspace/forum/post/:slug" element={<ForumPostPage />} />
 
-              {/* 통합 허브 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+              {/* Hub */}
               <Route path="/workspace/hub" element={<HubPage />} />
 
               {/* Neture 전용 테스트 가이드 */}
@@ -477,39 +533,7 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Supplier Dashboard (/workspace/supplier/*)
-            ================================================================ */}
-            <Route element={<SupplierDashboardLayout />}>
-              <Route path="/workspace/supplier/dashboard" element={<SupplierDashboardPage />} />
-              <Route path="/workspace/supplier/requests" element={<SellerRequestsPage />} />
-              <Route path="/workspace/supplier/requests/:id" element={<SellerRequestDetailPage />} />
-              <Route path="/workspace/supplier/products" element={<SupplierProductsPage />} />
-              <Route path="/workspace/supplier/products/new" element={<SupplierProductCreatePage />} />
-              <Route path="/workspace/supplier/supply-requests" element={<SupplyRequestsPage />} />
-              <Route path="/workspace/supplier/orders" element={<SupplierOrdersPage />} />
-              <Route path="/workspace/supplier/profile" element={<SupplierProfilePage />} />
-              {/* Signage Content Hub (WO-SIGNAGE-CONTENT-HUB-V1) */}
-              <Route path="/workspace/supplier/signage/content" element={<SignageContentHubPage />} />
-              {/* Supplier Library (WO-O4O-NETURE-LIBRARY-UI-V1) */}
-              <Route path="/workspace/supplier/library" element={<SupplierLibraryPage />} />
-              <Route path="/workspace/supplier/library/new" element={<SupplierLibraryFormPage />} />
-              <Route path="/workspace/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
-            </Route>
-
-            {/* ================================================================
-                Partner Dashboard (/workspace/partner/*)
-            ================================================================ */}
-            <Route element={<SupplierOpsLayout />}>
-              <Route path="/workspace/partner" element={<PartnerOverviewPage />} />
-              <Route path="/workspace/partner/recruiting-products" element={<RecruitingProductsPage />} />
-              <Route path="/workspace/partner/collaboration" element={<CollaborationPage />} />
-              <Route path="/workspace/partner/promotions" element={<PromotionsPage />} />
-              <Route path="/workspace/partner/settlements" element={<SettlementsPage />} />
-            </Route>
-
-            {/* ================================================================
                 Admin Dashboard (/workspace/admin/*)
-                WO-SECURITY-NETURE-GUARD-FIX-V1: admin 역할 보호 추가
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin']}>
@@ -519,7 +543,6 @@ function App() {
               <Route path="/workspace/admin" element={<AdminDashboardPage />} />
               <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
               <Route path="/workspace/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              {/* AI Admin Control Plane */}
               <Route path="/workspace/admin/ai" element={<AiAdminDashboardPage />} />
               <Route path="/workspace/admin/ai/engines" element={<AiEnginesPage />} />
               <Route path="/workspace/admin/ai/policy" element={<AiPolicyPage />} />
@@ -528,16 +551,12 @@ function App() {
               <Route path="/workspace/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
               <Route path="/workspace/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
               <Route path="/workspace/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
-              {/* Admin Settings */}
               <Route path="/workspace/admin/settings/email" element={<EmailSettingsPage />} />
-              {/* Admin Operators (WO-NETURE-OPERATOR-UI-REALIZATION-V1) */}
               <Route path="/workspace/admin/operators" element={<OperatorsPage />} />
-              {/* WO-O4O-ADMIN-UI-COMPLETION-V1: Admin 승인 관리 */}
               <Route path="/workspace/admin/suppliers" element={<AdminSupplierApprovalPage />} />
               <Route path="/workspace/admin/products" element={<AdminProductApprovalPage />} />
               <Route path="/workspace/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
-              {/* Catalog Import (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1) */}
               <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
@@ -546,22 +565,18 @@ function App() {
 
             {/* ================================================================
                 Operator Dashboard (/workspace/operator/*)
-                WO-OPERATOR-GUARD-UNIFICATION-P0: ProtectedRoute 가드 적용
-                WO-SECURITY-NETURE-GUARD-FIX-V1: admin + operator 허용
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin', 'operator']}>
                 <SupplierOpsLayout />
               </ProtectedRoute>
             }>
-              {/* Signal 기반 대시보드 (WO-NETURE-OPERATOR-DASHBOARD-UX-V1) */}
               <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
               <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
               <Route path="/workspace/operator/forum-management" element={<ForumManagementPage />} />
               <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
-              {/* WO-NETURE-OPERATOR-EXPANSION-V1: Admin에서 운영 기능 이동 */}
               <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
               <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
@@ -570,44 +585,57 @@ function App() {
             {/* ================================================================
                 레거시 리다이렉트 (기존 경로 → 신규 경로)
             ================================================================ */}
-            {/* Neture 고유 기능 리다이렉트 */}
-            <Route path="/suppliers" element={<Navigate to="/workspace/suppliers" replace />} />
+            {/* Workspace → 새 경로 */}
+            <Route path="/workspace" element={<Navigate to="/" replace />} />
+            <Route path="/workspace/suppliers" element={<Navigate to="/community/knowledge" replace />} />
+            <Route path="/workspace/suppliers/:slug" element={<RedirectSupplierDetail />} />
+            <Route path="/workspace/content" element={<Navigate to="/partner/contents" replace />} />
+            <Route path="/workspace/content/:id" element={<RedirectContentDetail />} />
+
+            {/* Supplier Dashboard 리다이렉트 */}
+            <Route path="/workspace/supplier/dashboard" element={<Navigate to="/supplier" replace />} />
+            <Route path="/workspace/supplier/products" element={<Navigate to="/supplier/products" replace />} />
+            <Route path="/workspace/supplier/orders" element={<Navigate to="/supplier/orders" replace />} />
+            <Route path="/workspace/supplier/requests" element={<Navigate to="/supplier/requests" replace />} />
+            <Route path="/workspace/supplier/library" element={<Navigate to="/supplier/library" replace />} />
+            <Route path="/workspace/supplier/profile" element={<Navigate to="/supplier/profile" replace />} />
+            <Route path="/workspace/supplier/supply-requests" element={<Navigate to="/supplier/offers" replace />} />
+            <Route path="/workspace/supplier/*" element={<Navigate to="/supplier" replace />} />
+
+            {/* Partner Dashboard 리다이렉트 */}
+            <Route path="/workspace/partner" element={<Navigate to="/partner" replace />} />
+            <Route path="/workspace/partner/collaboration" element={<Navigate to="/partner/links" replace />} />
+            <Route path="/workspace/partner/promotions" element={<Navigate to="/partner/promotions" replace />} />
+            <Route path="/workspace/partner/settlements" element={<Navigate to="/partner/settlements" replace />} />
+            <Route path="/workspace/partner/recruiting-products" element={<Navigate to="/partner/stores" replace />} />
+            <Route path="/workspace/partner/*" element={<Navigate to="/partner" replace />} />
+
+            {/* 기존 최상위 경로 리다이렉트 */}
+            <Route path="/suppliers" element={<Navigate to="/community/knowledge" replace />} />
             <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
             <Route path="/partners/info" element={<Navigate to="/workspace/partners/info" replace />} />
             <Route path="/platform/principles" element={<Navigate to="/workspace/platform/principles" replace />} />
-            <Route path="/content" element={<Navigate to="/workspace/content" replace />} />
+            <Route path="/content" element={<Navigate to="/partner/contents" replace />} />
             <Route path="/content/:id" element={<RedirectContentDetail />} />
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 
-            {/* Supplier Dashboard 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1: → /workspace/hub) */}
-            <Route path="/supplier/dashboard" element={<Navigate to="/workspace/hub" replace />} />
-            <Route path="/supplier/requests" element={<Navigate to="/workspace/supplier/requests" replace />} />
-            <Route path="/supplier/products" element={<Navigate to="/workspace/supplier/products" replace />} />
-            <Route path="/supplier/orders" element={<Navigate to="/workspace/supplier/orders" replace />} />
-            <Route path="/supplier/*" element={<Navigate to="/workspace/hub" replace />} />
-
-            {/* Partner Dashboard 리다이렉트 */}
-            <Route path="/partner" element={<Navigate to="/workspace/partner" replace />} />
-            <Route path="/partner/collaboration" element={<Navigate to="/workspace/partner/collaboration" replace />} />
-            <Route path="/partner/promotions" element={<Navigate to="/workspace/partner/promotions" replace />} />
-            <Route path="/partner/settlements" element={<Navigate to="/workspace/partner/settlements" replace />} />
-
-            {/* Hub 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
+            {/* Hub/Admin/Operator 리다이렉트 */}
             <Route path="/hub" element={<Navigate to="/workspace/hub" replace />} />
+            <Route path="/admin" element={<Navigate to="/workspace/admin" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
+            <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/operator/*" element={<Navigate to="/workspace/operator" replace />} />
 
-            {/* Admin/Operator 리다이렉트 (WO-NETURE-HUB-ARCHITECTURE-RESTRUCTURE-V1) */}
-            <Route path="/admin" element={<Navigate to="/workspace/hub" replace />} />
-            <Route path="/admin/*" element={<Navigate to="/workspace/hub" replace />} />
-            <Route path="/operator" element={<Navigate to="/workspace/hub" replace />} />
-            <Route path="/operator/*" element={<Navigate to="/workspace/hub" replace />} />
-
-            {/* Test Guide 리다이렉트 (Neture 전용) */}
+            {/* Test Guide 리다이렉트 */}
             <Route path="/test-guide/manual/supplier" element={<Navigate to="/workspace/manual/supplier" replace />} />
             <Route path="/test-guide/manual/partner" element={<Navigate to="/workspace/manual/partner" replace />} />
             <Route path="/test-guide/manual/admin" element={<Navigate to="/workspace/manual/admin" replace />} />
             <Route path="/test-guide/service/neture" element={<Navigate to="/workspace/manual/service" replace />} />
+
+            {/* Legacy supplier/partner 리다이렉트 */}
+            <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
