@@ -1063,6 +1063,17 @@ const startServer = async () => {
       logger.error('Failed to register KPA routes:', kpaError);
     }
 
+    // 31-d. Register Store Library routes (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
+    try {
+      const { createStoreLibraryRoutes } = await import('./modules/store/store-library.routes.js');
+      const { requireAuth: storeLibraryAuth } = await import('./middleware/auth.middleware.js');
+      const storeLibraryRoutes = createStoreLibraryRoutes(AppDataSource, storeLibraryAuth as any);
+      app.use('/api/v1/store', storeLibraryRoutes);
+      logger.info('✅ Store Library routes registered at /api/v1/store');
+    } catch (storeLibraryError) {
+      logger.error('Failed to register Store Library routes:', storeLibraryError);
+    }
+
     // 32. Register CMS Content routes (WO-P2-IMPLEMENT-CONTENT)
     try {
       const cmsContentRoutes = createCmsContentRoutes(AppDataSource);

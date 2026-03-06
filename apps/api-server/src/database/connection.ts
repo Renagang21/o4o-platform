@@ -289,6 +289,7 @@ import {
   StoreQrScanEvent,
   ProductMarketingAsset,
 } from '../routes/platform/entities/index.js';
+import { StoreLibraryItem } from '../modules/store/entities/StoreLibraryItem.entity.js';
 
 // ============================================================================
 // PLATFORM STORE POLICY & PAYMENT CONFIG ENTITIES
@@ -818,6 +819,10 @@ export const AppDataSource = new DataSource({
     MarketTrialDecision,
     MarketTrialShippingAddress,
     MarketTrialFulfillment,
+    // ============================================================================
+    // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1)
+    // ============================================================================
+    StoreLibraryItem,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
