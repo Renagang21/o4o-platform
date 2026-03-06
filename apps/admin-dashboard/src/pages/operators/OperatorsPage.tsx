@@ -35,8 +35,10 @@ const SERVICE_ROLES = {
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
   ],
   'kpa-b': [
-    { value: 'kpa-b:district', label: '지부 운영자', description: '데모 서비스 지부 운영자' },
-    { value: 'kpa-b:branch', label: '분회 운영자', description: '데모 서비스 분회 운영자' },
+    { value: 'kpa-b:district-admin', label: '지부 Admin', description: '데모 서비스 지부 관리자' },
+    { value: 'kpa-b:district', label: '지부 Operator', description: '데모 서비스 지부 운영자' },
+    { value: 'kpa-b:branch-admin', label: '분회 Admin', description: '데모 서비스 분회 관리자' },
+    { value: 'kpa-b:branch', label: '분회 Operator', description: '데모 서비스 분회 운영자' },
   ],
   'kpa-c': [
     { value: 'kpa-c:admin', label: 'Admin', description: '분회서비스 관리자' },

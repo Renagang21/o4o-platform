@@ -50,8 +50,10 @@ export type KpaRole =
  * KPA-b 데모 서비스 roles
  */
 export type KpaBRole =
-  | 'kpa-b:district'  // 지부 운영자
-  | 'kpa-b:branch';   // 분회 운영자
+  | 'kpa-b:district-admin'  // 지부 관리자
+  | 'kpa-b:district'        // 지부 운영자
+  | 'kpa-b:branch-admin'    // 분회 관리자
+  | 'kpa-b:branch';         // 분회 운영자
 
 /**
  * KPA-c 분회서비스 roles
@@ -316,10 +318,26 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   },
 
   // KPA-b 데모 roles
+  'kpa-b:district-admin': {
+    role: 'kpa-b:district-admin',
+    label: 'District Admin',
+    description: '데모 서비스 지부 관리자',
+    service: 'kpa-b',
+    category: 'service',
+    deprecated: false
+  },
   'kpa-b:district': {
     role: 'kpa-b:district',
     label: 'District Operator',
     description: '데모 서비스 지부 운영자',
+    service: 'kpa-b',
+    category: 'service',
+    deprecated: false
+  },
+  'kpa-b:branch-admin': {
+    role: 'kpa-b:branch-admin',
+    label: 'Branch Admin',
+    description: '데모 서비스 분회 관리자',
     service: 'kpa-b',
     category: 'service',
     deprecated: false
