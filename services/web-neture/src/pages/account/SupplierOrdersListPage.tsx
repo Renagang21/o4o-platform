@@ -1,13 +1,14 @@
 /**
  * SupplierOrdersListPage - 공급자 주문 관리
  *
- * Work Order: WO-O4O-SUPPLIER-ORDERS-PAGE-V1
+ * Work Order: WO-O4O-SUPPLIER-ORDERS-PAGE-V2
  *
  * 구성:
  * - Toolbar: 검색 + 상태 필터 + 날짜 필터
- * - Table: 주문번호 / 매장명 / 지역 / 연락처 / 제품 / 수량 / 주문일 / 상태 / 관리
+ * - Table: 주문번호 / 매장명 / 지역 / 연락처 / 주문금액 / 제품수 / 주문일 / 상태 / 관리
  * - 상태 전환: Pending → Processing → Shipped → Completed
  *
+ * B2B 주문 구조: 하나의 주문에 여러 제품(Order Items)이 포함
  * 데이터: Mock (Neture는 주문을 직접 처리하지 않음)
  */
 
@@ -21,14 +22,19 @@ import { Search, ShoppingCart } from 'lucide-react';
 
 type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Completed' | 'Cancelled';
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 interface MockOrder {
   id: string;
   orderNo: string;
   storeName: string;
   region: string;
   contact: string;
-  product: string;
-  quantity: number;
+  items: OrderItem[];
   orderDate: string;
   status: OrderStatus;
 }
@@ -54,13 +60,70 @@ const NEXT_ACTION_LABEL: Partial<Record<OrderStatus, string>> = {
 };
 
 const INITIAL_ORDERS: MockOrder[] = [
-  { id: '1', orderNo: '1023', storeName: '서울약국', region: '서울', contact: '010-1234-5678', product: '비타민C', quantity: 10, orderDate: '2026-03-05', status: 'Pending' },
-  { id: '2', orderNo: '1022', storeName: '강남약국', region: '서울', contact: '010-8888-9999', product: '혈당측정기', quantity: 5, orderDate: '2026-03-04', status: 'Processing' },
-  { id: '3', orderNo: '1021', storeName: '부산약국', region: '부산', contact: '010-5555-6666', product: '프로바이오틱스', quantity: 8, orderDate: '2026-03-03', status: 'Shipped' },
-  { id: '4', orderNo: '1020', storeName: '대구약국', region: '대구', contact: '010-3333-4444', product: '오메가3', quantity: 12, orderDate: '2026-03-01', status: 'Completed' },
-  { id: '5', orderNo: '1019', storeName: '인천약국', region: '인천', contact: '010-7777-0000', product: '유산균', quantity: 3, orderDate: '2026-02-28', status: 'Cancelled' },
-  { id: '6', orderNo: '1018', storeName: '수원약국', region: '경기', contact: '010-2222-1111', product: '비타민D', quantity: 15, orderDate: '2026-02-25', status: 'Pending' },
+  {
+    id: '1', orderNo: '1023', storeName: '서울약국', region: '서울', contact: '010-1234-5678',
+    items: [
+      { name: '비타민C', quantity: 10, unitPrice: 15000 },
+      { name: '프로바이오틱스', quantity: 5, unitPrice: 28000 },
+      { name: '오메가3', quantity: 3, unitPrice: 22000 },
+    ],
+    orderDate: '2026-03-05', status: 'Pending',
+  },
+  {
+    id: '2', orderNo: '1022', storeName: '강남약국', region: '서울', contact: '010-8888-9999',
+    items: [
+      { name: '혈당측정기', quantity: 5, unitPrice: 45000 },
+      { name: '혈당측정 스트립', quantity: 20, unitPrice: 12000 },
+    ],
+    orderDate: '2026-03-04', status: 'Processing',
+  },
+  {
+    id: '3', orderNo: '1021', storeName: '부산약국', region: '부산', contact: '010-5555-6666',
+    items: [
+      { name: '프로바이오틱스', quantity: 8, unitPrice: 28000 },
+      { name: '비타민D', quantity: 10, unitPrice: 12000 },
+      { name: '칼슘', quantity: 6, unitPrice: 9000 },
+      { name: '유산균', quantity: 5, unitPrice: 18000 },
+      { name: '오메가3', quantity: 3, unitPrice: 22000 },
+    ],
+    orderDate: '2026-03-03', status: 'Shipped',
+  },
+  {
+    id: '4', orderNo: '1020', storeName: '대구약국', region: '대구', contact: '010-3333-4444',
+    items: [
+      { name: '오메가3', quantity: 12, unitPrice: 22000 },
+    ],
+    orderDate: '2026-03-01', status: 'Completed',
+  },
+  {
+    id: '5', orderNo: '1019', storeName: '인천약국', region: '인천', contact: '010-7777-0000',
+    items: [
+      { name: '유산균', quantity: 3, unitPrice: 18000 },
+      { name: '비타민C', quantity: 5, unitPrice: 15000 },
+    ],
+    orderDate: '2026-02-28', status: 'Cancelled',
+  },
+  {
+    id: '6', orderNo: '1018', storeName: '수원약국', region: '경기', contact: '010-2222-1111',
+    items: [
+      { name: '비타민D', quantity: 15, unitPrice: 12000 },
+      { name: '칼슘', quantity: 10, unitPrice: 9000 },
+    ],
+    orderDate: '2026-02-25', status: 'Pending',
+  },
 ];
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function calcOrderTotal(items: OrderItem[]): number {
+  return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+}
+
+function formatCurrency(v: number): string {
+  return v.toLocaleString('ko-KR') + '원';
+}
 
 // ============================================================================
 // Toolbar
@@ -87,7 +150,7 @@ function Toolbar(props: ToolbarProps) {
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="매장명 또는 제품 검색..."
+            placeholder="매장명 검색..."
             style={styles.searchInput}
           />
         </div>
@@ -142,8 +205,8 @@ function OrdersTable({
             <th style={styles.th}>매장명</th>
             <th style={styles.th}>지역</th>
             <th style={styles.th}>연락처</th>
-            <th style={styles.th}>제품</th>
-            <th style={{ ...styles.th, textAlign: 'center' }}>수량</th>
+            <th style={{ ...styles.th, textAlign: 'right' }}>주문금액</th>
+            <th style={{ ...styles.th, textAlign: 'center' }}>제품수</th>
             <th style={styles.th}>주문일</th>
             <th style={{ ...styles.th, textAlign: 'center' }}>상태</th>
             <th style={{ ...styles.th, textAlign: 'center' }}>관리</th>
@@ -153,6 +216,7 @@ function OrdersTable({
           {orders.map((order) => {
             const nextStatus = NEXT_STATUS[order.status];
             const actionLabel = NEXT_ACTION_LABEL[order.status];
+            const total = calcOrderTotal(order.items);
             return (
               <tr key={order.id} style={styles.tr}>
                 <td style={styles.td}>
@@ -172,8 +236,12 @@ function OrdersTable({
                 <td style={styles.td}>
                   <span style={styles.dimText}>{order.contact}</span>
                 </td>
-                <td style={styles.td}>{order.product}</td>
-                <td style={{ ...styles.td, textAlign: 'center' }}>{order.quantity}</td>
+                <td style={{ ...styles.td, textAlign: 'right' }}>
+                  <span style={styles.amountText}>{formatCurrency(total)}</span>
+                </td>
+                <td style={{ ...styles.td, textAlign: 'center' }}>
+                  <span style={styles.itemCountBadge}>{order.items.length}개</span>
+                </td>
                 <td style={styles.td}>
                   <span style={styles.dateText}>{order.orderDate}</span>
                 </td>
@@ -217,6 +285,7 @@ function OrderCards({
       {orders.map((order) => {
         const nextStatus = NEXT_STATUS[order.status];
         const actionLabel = NEXT_ACTION_LABEL[order.status];
+        const total = calcOrderTotal(order.items);
         return (
           <div key={order.id} style={styles.mobileCard}>
             <div style={styles.mobileCardTop}>
@@ -231,8 +300,8 @@ function OrderCards({
               <span>{order.contact}</span>
             </div>
             <div style={styles.mobileCardProduct}>
-              <span>{order.product}</span>
-              <span style={styles.dimText}>수량 {order.quantity}</span>
+              <span style={styles.amountText}>{formatCurrency(total)}</span>
+              <span style={styles.dimText}>{order.items.length}개 제품</span>
             </div>
             <div style={styles.mobileCardFooter}>
               <span style={styles.dateText}>{order.orderDate}</span>
@@ -273,7 +342,7 @@ export default function SupplierOrdersListPage() {
     return orders.filter((o) => {
       if (search) {
         const q = search.toLowerCase();
-        if (!o.storeName.toLowerCase().includes(q) && !o.product.toLowerCase().includes(q)) return false;
+        if (!o.storeName.toLowerCase().includes(q)) return false;
       }
       if (statusFilter && o.status !== statusFilter) return false;
       if (dateRange) {
@@ -406,7 +475,7 @@ const styles: Record<string, React.CSSProperties> = {
   table: {
     width: '100%',
     borderCollapse: 'collapse',
-    minWidth: '800px',
+    minWidth: '860px',
   },
   th: {
     textAlign: 'left',
@@ -444,6 +513,20 @@ const styles: Record<string, React.CSSProperties> = {
   dimText: {
     color: '#94a3b8',
     fontSize: '13px',
+  },
+  amountText: {
+    fontWeight: 600,
+    color: '#1e293b',
+    fontSize: '14px',
+  },
+  itemCountBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#64748b',
+    backgroundColor: '#f1f5f9',
   },
   dateText: {
     fontSize: '13px',
@@ -492,6 +575,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 600,
     color: '#3b82f6',
     marginRight: '8px',
+    textDecoration: 'none',
   },
   mobileStoreName: {
     fontSize: '15px',
@@ -508,6 +592,7 @@ const styles: Record<string, React.CSSProperties> = {
   mobileCardProduct: {
     display: 'flex',
     justifyContent: 'space-between',
+    alignItems: 'center',
     fontSize: '14px',
     color: '#334155',
     marginBottom: '8px',

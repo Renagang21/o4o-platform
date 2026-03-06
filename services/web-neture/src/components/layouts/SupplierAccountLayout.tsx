@@ -10,7 +10,7 @@
  */
 
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FileCheck, ShoppingCart, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Package, FileCheck, ShoppingCart } from 'lucide-react';
 import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -19,7 +19,6 @@ const SIDEBAR_ITEMS = [
   { label: 'Products', path: '/account/supplier/products', icon: Package },
   { label: 'Offers', path: '/supplier/offers', icon: FileCheck },
   { label: 'Orders', path: '/account/supplier/orders', icon: ShoppingCart },
-  { label: 'Forum', path: '/supplier/forum', icon: MessageSquare },
 ];
 
 export default function SupplierAccountLayout() {

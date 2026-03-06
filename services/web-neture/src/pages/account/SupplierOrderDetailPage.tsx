@@ -1,16 +1,18 @@
 /**
  * SupplierOrderDetailPage - 공급자 주문 상세
  *
- * Work Order: WO-O4O-SUPPLIER-ORDER-DETAIL-PAGE-V1
+ * Work Order: WO-O4O-SUPPLIER-ORDER-DETAIL-PAGE-V2
  *
  * 구성:
- * - Order Summary: 주문번호 / 주문일 / 상태
+ * - Order Summary: 주문번호 / 주문일 / 상태 / 총 주문금액
  * - Store Information: 매장명 / 지역 / 연락처 / 주소
- * - Order Products: 제품 / 수량 / 단가
+ * - Order Products: 제품 / 수량 / 단가 / 금액 (테이블)
+ * - 주문 금액 요약: 총 주문금액 / 배송비 / 최종 금액
  * - Order Status: 상태 변경 버튼
  * - Delivery Memo: 배송 메모 입력
  * - Order Timeline: 주문 상태 변경 기록
  *
+ * B2B 주문 구조: 하나의 주문에 여러 제품(Order Items)이 포함
  * 데이터: Mock (Neture는 주문을 직접 처리하지 않음)
  */
 
@@ -24,7 +26,7 @@ import { ArrowLeft, Store, Package, Truck, Clock } from 'lucide-react';
 
 type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Completed' | 'Cancelled';
 
-interface OrderProduct {
+interface OrderItem {
   name: string;
   quantity: number;
   unitPrice: number;
@@ -43,7 +45,8 @@ interface MockOrderDetail {
   region: string;
   contact: string;
   address: string;
-  products: OrderProduct[];
+  items: OrderItem[];
+  shippingFee: number;
   orderDate: string;
   status: OrderStatus;
   timeline: TimelineEvent[];
@@ -73,9 +76,12 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '1': {
     id: '1', orderNo: '1023', storeName: '서울약국', region: '서울', contact: '010-1234-5678',
     address: '서울 강남구 테헤란로 123',
-    products: [
+    items: [
       { name: '비타민C', quantity: 10, unitPrice: 15000 },
+      { name: '프로바이오틱스', quantity: 5, unitPrice: 28000 },
+      { name: '오메가3', quantity: 3, unitPrice: 22000 },
     ],
+    shippingFee: 0,
     orderDate: '2026-03-05', status: 'Pending',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-03-05 10:12' },
@@ -84,10 +90,11 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '2': {
     id: '2', orderNo: '1022', storeName: '강남약국', region: '서울', contact: '010-8888-9999',
     address: '서울 강남구 역삼동 456',
-    products: [
+    items: [
       { name: '혈당측정기', quantity: 5, unitPrice: 45000 },
       { name: '혈당측정 스트립', quantity: 20, unitPrice: 12000 },
     ],
+    shippingFee: 0,
     orderDate: '2026-03-04', status: 'Processing',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-03-04 09:30' },
@@ -97,9 +104,14 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '3': {
     id: '3', orderNo: '1021', storeName: '부산약국', region: '부산', contact: '010-5555-6666',
     address: '부산 해운대구 우동 789',
-    products: [
+    items: [
       { name: '프로바이오틱스', quantity: 8, unitPrice: 28000 },
+      { name: '비타민D', quantity: 10, unitPrice: 12000 },
+      { name: '칼슘', quantity: 6, unitPrice: 9000 },
+      { name: '유산균', quantity: 5, unitPrice: 18000 },
+      { name: '오메가3', quantity: 3, unitPrice: 22000 },
     ],
+    shippingFee: 5000,
     orderDate: '2026-03-03', status: 'Shipped',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-03-03 11:00' },
@@ -110,9 +122,10 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '4': {
     id: '4', orderNo: '1020', storeName: '대구약국', region: '대구', contact: '010-3333-4444',
     address: '대구 수성구 범어동 321',
-    products: [
+    items: [
       { name: '오메가3', quantity: 12, unitPrice: 22000 },
     ],
+    shippingFee: 3000,
     orderDate: '2026-03-01', status: 'Completed',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-03-01 08:45' },
@@ -124,9 +137,11 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '5': {
     id: '5', orderNo: '1019', storeName: '인천약국', region: '인천', contact: '010-7777-0000',
     address: '인천 남동구 구월동 654',
-    products: [
+    items: [
       { name: '유산균', quantity: 3, unitPrice: 18000 },
+      { name: '비타민C', quantity: 5, unitPrice: 15000 },
     ],
+    shippingFee: 0,
     orderDate: '2026-02-28', status: 'Cancelled',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-02-28 10:00' },
@@ -136,16 +151,29 @@ const MOCK_ORDERS: Record<string, MockOrderDetail> = {
   '6': {
     id: '6', orderNo: '1018', storeName: '수원약국', region: '경기', contact: '010-2222-1111',
     address: '경기 수원시 영통구 영통동 987',
-    products: [
+    items: [
       { name: '비타민D', quantity: 15, unitPrice: 12000 },
       { name: '칼슘', quantity: 10, unitPrice: 9000 },
     ],
+    shippingFee: 0,
     orderDate: '2026-02-25', status: 'Pending',
     timeline: [
       { status: 'created', label: '주문 접수', date: '2026-02-25 14:20' },
     ],
   },
 };
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+function calcItemsTotal(items: OrderItem[]): number {
+  return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+}
+
+function formatCurrency(v: number): string {
+  return v.toLocaleString('ko-KR') + '원';
+}
 
 // ============================================================================
 // Status Badge
@@ -203,6 +231,8 @@ export default function SupplierOrderDetailPage() {
 
   const nextStatus = NEXT_STATUS[order.status];
   const actionLabel = NEXT_ACTION_LABEL[order.status];
+  const itemsTotal = calcItemsTotal(order.items);
+  const finalTotal = itemsTotal + order.shippingFee;
 
   const handleStatusChange = () => {
     if (!nextStatus) return;
@@ -228,8 +258,6 @@ export default function SupplierOrderDetailPage() {
     setTimeout(() => setMemoSaved(false), 2000);
   };
 
-  const formatCurrency = (v: number) => v.toLocaleString('ko-KR') + '원';
-
   return (
     <div>
       {/* Back Link */}
@@ -243,8 +271,12 @@ export default function SupplierOrderDetailPage() {
         <div style={styles.summaryLeft}>
           <h1 style={styles.summaryTitle}>Order #{order.orderNo}</h1>
           <span style={styles.summaryDate}>{order.orderDate}</span>
+          <StatusBadge status={order.status} />
         </div>
-        <StatusBadge status={order.status} />
+        <div style={styles.summaryAmount}>
+          <span style={styles.summaryAmountLabel}>총 주문금액</span>
+          <span style={styles.summaryAmountValue}>{formatCurrency(finalTotal)}</span>
+        </div>
       </div>
 
       {/* Content Grid — single column on mobile, two columns on desktop */}
@@ -273,24 +305,51 @@ export default function SupplierOrderDetailPage() {
             </div>
           </SectionCard>
 
-          {/* 3. Order Products */}
-          <SectionCard title="주문 제품" icon={<Package size={18} style={{ color: '#64748b' }} />}>
-            <div style={styles.productList}>
-              {order.products.map((p, i) => (
-                <div key={i} style={styles.productRow}>
-                  <div style={styles.productInfo}>
-                    <span style={styles.productName}>{p.name}</span>
-                    <span style={styles.productMeta}>수량 {p.quantity} · 단가 {formatCurrency(p.unitPrice)}</span>
-                  </div>
-                  <span style={styles.productTotal}>{formatCurrency(p.quantity * p.unitPrice)}</span>
-                </div>
-              ))}
+          {/* 3. Order Products (Table) */}
+          <SectionCard title={`주문 제품 (${order.items.length}개)`} icon={<Package size={18} style={{ color: '#64748b' }} />}>
+            <div style={styles.productTableWrap}>
+              <table style={styles.productTable}>
+                <thead>
+                  <tr>
+                    <th style={styles.ptTh}>제품</th>
+                    <th style={{ ...styles.ptTh, textAlign: 'center' }}>수량</th>
+                    <th style={{ ...styles.ptTh, textAlign: 'right' }}>단가</th>
+                    <th style={{ ...styles.ptTh, textAlign: 'right' }}>금액</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.items.map((item, i) => (
+                    <tr key={i}>
+                      <td style={styles.ptTd}>
+                        <span style={styles.ptProductName}>{item.name}</span>
+                      </td>
+                      <td style={{ ...styles.ptTd, textAlign: 'center' }}>{item.quantity}</td>
+                      <td style={{ ...styles.ptTd, textAlign: 'right' }}>
+                        <span style={styles.ptDim}>{formatCurrency(item.unitPrice)}</span>
+                      </td>
+                      <td style={{ ...styles.ptTd, textAlign: 'right' }}>
+                        <span style={styles.ptAmount}>{formatCurrency(item.quantity * item.unitPrice)}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div style={styles.totalRow}>
-              <span style={styles.totalLabel}>합계</span>
-              <span style={styles.totalValue}>
-                {formatCurrency(order.products.reduce((sum, p) => sum + p.quantity * p.unitPrice, 0))}
-              </span>
+
+            {/* 주문 금액 요약 */}
+            <div style={styles.priceSummary}>
+              <div style={styles.priceRow}>
+                <span style={styles.priceLabel}>총 주문금액</span>
+                <span style={styles.priceValue}>{formatCurrency(itemsTotal)}</span>
+              </div>
+              <div style={styles.priceRow}>
+                <span style={styles.priceLabel}>배송비</span>
+                <span style={styles.priceValue}>{order.shippingFee === 0 ? '무료' : formatCurrency(order.shippingFee)}</span>
+              </div>
+              <div style={styles.priceFinalRow}>
+                <span style={styles.priceFinalLabel}>최종 금액</span>
+                <span style={styles.priceFinalValue}>{formatCurrency(finalTotal)}</span>
+              </div>
             </div>
           </SectionCard>
         </div>
@@ -384,7 +443,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   summaryLeft: {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'center',
     gap: '12px',
     flexWrap: 'wrap',
   },
@@ -397,6 +456,22 @@ const styles: Record<string, React.CSSProperties> = {
   summaryDate: {
     fontSize: '14px',
     color: '#94a3b8',
+  },
+  summaryAmount: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: '2px',
+  },
+  summaryAmountLabel: {
+    fontSize: '12px',
+    color: '#94a3b8',
+    fontWeight: 500,
+  },
+  summaryAmountValue: {
+    fontSize: '20px',
+    fontWeight: 700,
+    color: '#1e293b',
   },
 
   // Column stack
@@ -452,54 +527,85 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#1e293b',
   },
 
-  // Products
-  productList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
+  // Product Table
+  productTableWrap: {
+    overflow: 'auto',
   },
-  productRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px',
+  productTable: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  ptTh: {
+    textAlign: 'left',
+    padding: '8px 12px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#64748b',
+    borderBottom: '1px solid #e2e8f0',
     backgroundColor: '#f8fafc',
-    borderRadius: '8px',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    whiteSpace: 'nowrap',
   },
-  productInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-  },
-  productName: {
+  ptTd: {
+    padding: '10px 12px',
     fontSize: '14px',
+    color: '#334155',
+    borderBottom: '1px solid #f1f5f9',
+    verticalAlign: 'middle',
+    whiteSpace: 'nowrap',
+  },
+  ptProductName: {
     fontWeight: 500,
     color: '#1e293b',
   },
-  productMeta: {
-    fontSize: '12px',
+  ptDim: {
     color: '#94a3b8',
+    fontSize: '13px',
   },
-  productTotal: {
-    fontSize: '14px',
+  ptAmount: {
     fontWeight: 600,
     color: '#334155',
   },
-  totalRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+
+  // Price Summary
+  priceSummary: {
     marginTop: '16px',
     paddingTop: '12px',
     borderTop: '1px solid #e2e8f0',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
   },
-  totalLabel: {
-    fontSize: '14px',
-    fontWeight: 600,
+  priceRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  priceLabel: {
+    fontSize: '13px',
     color: '#64748b',
   },
-  totalValue: {
-    fontSize: '16px',
+  priceValue: {
+    fontSize: '14px',
+    fontWeight: 500,
+    color: '#334155',
+  },
+  priceFinalRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '4px',
+    paddingTop: '8px',
+    borderTop: '1px solid #e2e8f0',
+  },
+  priceFinalLabel: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#1e293b',
+  },
+  priceFinalValue: {
+    fontSize: '18px',
     fontWeight: 700,
     color: '#1e293b',
   },

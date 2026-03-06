@@ -1,17 +1,15 @@
 /**
  * SupplierAccountDashboardPage - 공급자 계정 대시보드
  *
- * Work Order: WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1
+ * Work Order: WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1 (Revised)
  *
  * 구성:
- * 1. KPI Summary (4 cards)
- * 2. Recent Orders (mock)
- * 3. Recent Products (API)
- * 4. Supplier Forum (static)
+ * 1. KPI Summary (4 cards): New Orders / Active Products / Active Offers / Connected Stores
+ * 2. Recent Orders: supplierApi.getOrdersSummary() → 서비스별 주문 현황
+ * 3. Products Summary: supplierApi.getProducts() → 제품명 / Offer 상태 / 취급 매장 수
+ * 4. Offers Status: supplierApi.getRequests() → 제품 / 상태
  *
- * 데이터:
- * - dashboardApi.getSupplierDashboardSummary() → KPI
- * - supplierApi.getProducts() → Recent Products
+ * 데이터: 실제 API 사용. Mock 데이터 사용 금지.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -20,10 +18,9 @@ import {
   Package,
   ShoppingCart,
   Store,
-  Clock,
+  FileCheck,
   ArrowRight,
   Plus,
-  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -31,6 +28,7 @@ import {
   dashboardApi,
   type SupplierDashboardSummary,
   type SupplierProduct,
+  type SupplierRequest,
 } from '../../lib/api';
 
 // ============================================================================
@@ -45,7 +43,7 @@ interface KpiCard {
 
 function KpiSummary({ cards, loading }: { cards: KpiCard[]; loading: boolean }) {
   return (
-    <div style={styles.kpiGrid}>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4" style={{ marginBottom: '24px' }}>
       {cards.map((card) => {
         const Icon = card.icon;
         return (
@@ -71,70 +69,76 @@ function KpiSummary({ cards, loading }: { cards: KpiCard[]; loading: boolean }) 
 }
 
 // ============================================================================
-// Recent Orders (Mock Data)
+// Recent Orders (from API)
 // ============================================================================
 
-const MOCK_ORDERS = [
-  { id: '1', store: '서울약국', product: '비타민C', quantity: 10, status: '완료' },
-  { id: '2', store: '강남약국', product: '혈당측정기', quantity: 5, status: '배송중' },
-  { id: '3', store: '부산약국', product: '프로바이오틱스', quantity: 8, status: '접수' },
-];
+interface RecentOrdersProps {
+  orders: Array<{ serviceId: string; serviceName: string; approvedSellerCount: number; pendingRequestCount: number }>;
+  loading: boolean;
+}
 
-const STATUS_STYLES: Record<string, React.CSSProperties> = {
-  '완료': { backgroundColor: '#dcfce7', color: '#15803d' },
-  '배송중': { backgroundColor: '#dbeafe', color: '#1d4ed8' },
-  '접수': { backgroundColor: '#fef3c7', color: '#b45309' },
-};
-
-function RecentOrders() {
+function RecentOrders({ orders, loading }: RecentOrdersProps) {
   return (
     <div style={styles.section}>
       <div style={styles.sectionHeader}>
         <h2 style={styles.sectionTitle}>Recent Orders</h2>
-        <Link to="/supplier/orders" style={styles.viewAllLink}>
+        <Link to="/account/supplier/orders" style={styles.viewAllLink}>
           전체 주문 보기 <ArrowRight size={14} />
         </Link>
       </div>
-      <div style={styles.tableWrapper}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>매장</th>
-              <th style={styles.th}>제품</th>
-              <th style={{ ...styles.th, textAlign: 'center' }}>수량</th>
-              <th style={{ ...styles.th, textAlign: 'center' }}>상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MOCK_ORDERS.map((order) => (
-              <tr key={order.id}>
-                <td style={styles.td}>{order.store}</td>
-                <td style={styles.td}>{order.product}</td>
-                <td style={{ ...styles.td, textAlign: 'center' }}>{order.quantity}</td>
-                <td style={{ ...styles.td, textAlign: 'center' }}>
-                  <span style={{ ...styles.statusBadge, ...(STATUS_STYLES[order.status] || {}) }}>
-                    {order.status}
-                  </span>
-                </td>
+      {loading ? (
+        <p style={styles.loadingText}>로딩 중...</p>
+      ) : orders.length === 0 ? (
+        <div style={styles.emptyState}>
+          <ShoppingCart size={32} style={{ color: '#cbd5e1', marginBottom: '8px' }} />
+          <p style={styles.emptyText}>주문 내역이 없습니다</p>
+        </div>
+      ) : (
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>서비스</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>승인 판매자</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>대기 요청</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr key={o.serviceId}>
+                  <td style={styles.td}>
+                    <span style={styles.storeName}>{o.serviceName}</span>
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <span style={styles.countBadge}>{o.approvedSellerCount}</span>
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    {o.pendingRequestCount > 0 ? (
+                      <span style={styles.pendingBadge}>{o.pendingRequestCount}</span>
+                    ) : (
+                      <span style={styles.dimText}>0</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
 // ============================================================================
-// Recent Products
+// Products Summary
 // ============================================================================
 
-function RecentProducts({ products, loading }: { products: SupplierProduct[]; loading: boolean }) {
+function ProductsSummary({ products, loading }: { products: SupplierProduct[]; loading: boolean }) {
   return (
     <div style={styles.section}>
       <div style={styles.sectionHeader}>
-        <h2 style={styles.sectionTitle}>Recent Products</h2>
-        <Link to="/supplier/products" style={styles.viewAllLink}>
+        <h2 style={styles.sectionTitle}>Products Summary</h2>
+        <Link to="/account/supplier/products" style={styles.viewAllLink}>
           제품 관리 <ArrowRight size={14} />
         </Link>
       </div>
@@ -146,20 +150,38 @@ function RecentProducts({ products, loading }: { products: SupplierProduct[]; lo
           <p style={styles.emptyText}>등록된 제품이 없습니다</p>
         </div>
       ) : (
-        <div style={styles.productList}>
-          {products.map((product) => (
-            <div key={product.id} style={styles.productItem}>
-              <div style={styles.productIcon}>
-                <Package size={16} style={{ color: '#64748b' }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={styles.productName}>{product.name}</p>
-                <p style={styles.productDate}>
-                  {new Date(product.createdAt).toLocaleDateString('ko-KR')}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>제품명</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>Offer 상태</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>취급 매장</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.slice(0, 5).map((p) => (
+                <tr key={p.id}>
+                  <td style={styles.td}>
+                    <span style={styles.storeName}>{p.name}</span>
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <span style={{
+                      ...styles.statusBadge,
+                      ...(p.isActive
+                        ? { backgroundColor: '#dcfce7', color: '#15803d' }
+                        : { backgroundColor: '#f1f5f9', color: '#64748b' }),
+                    }}>
+                      {p.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <span style={styles.dimText}>{p.activeServiceCount} stores</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -167,36 +189,67 @@ function RecentProducts({ products, loading }: { products: SupplierProduct[]; lo
 }
 
 // ============================================================================
-// Supplier Forum Preview
+// Offers Status
 // ============================================================================
 
-const FORUM_ITEMS = [
-  { id: '1', title: '제품 공급 협력 문의', icon: '📦' },
-  { id: '2', title: '매장 진열 사례 공유', icon: '🏪' },
-  { id: '3', title: '유통 전략 논의', icon: '📊' },
-];
+const OFFER_STATUS_STYLES: Record<string, React.CSSProperties> = {
+  pending: { backgroundColor: '#fef3c7', color: '#b45309' },
+  approved: { backgroundColor: '#dcfce7', color: '#15803d' },
+  rejected: { backgroundColor: '#fee2e2', color: '#b91c1c' },
+  suspended: { backgroundColor: '#f1f5f9', color: '#64748b' },
+  revoked: { backgroundColor: '#f1f5f9', color: '#64748b' },
+  expired: { backgroundColor: '#f1f5f9', color: '#64748b' },
+};
 
-function SupplierForumPreview() {
+function OffersStatus({ requests, loading }: { requests: SupplierRequest[]; loading: boolean }) {
   return (
     <div style={styles.section}>
       <div style={styles.sectionHeader}>
-        <h2 style={styles.sectionTitle}>
-          <MessageSquare size={18} style={{ color: '#64748b' }} />
-          Supplier Forum
-        </h2>
-        <Link to="/supplier/forum" style={styles.viewAllLink}>
-          Supplier Forum 이동 <ArrowRight size={14} />
+        <h2 style={styles.sectionTitle}>Offers Status</h2>
+        <Link to="/supplier/offers" style={styles.viewAllLink}>
+          공급 조건 관리 <ArrowRight size={14} />
         </Link>
       </div>
-      <div style={styles.forumList}>
-        {FORUM_ITEMS.map((item) => (
-          <Link key={item.id} to="/supplier/forum" style={styles.forumItem}>
-            <span style={styles.forumIcon}>{item.icon}</span>
-            <span style={styles.forumTitle}>{item.title}</span>
-            <ArrowRight size={14} style={{ color: '#94a3b8', flexShrink: 0 }} />
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <p style={styles.loadingText}>로딩 중...</p>
+      ) : requests.length === 0 ? (
+        <div style={styles.emptyState}>
+          <FileCheck size={32} style={{ color: '#cbd5e1', marginBottom: '8px' }} />
+          <p style={styles.emptyText}>공급 요청이 없습니다</p>
+        </div>
+      ) : (
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.th}>제품</th>
+                <th style={styles.th}>판매자</th>
+                <th style={{ ...styles.th, textAlign: 'center' }}>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {requests.slice(0, 5).map((r) => (
+                <tr key={r.id}>
+                  <td style={styles.td}>
+                    <span style={styles.storeName}>{r.productName}</span>
+                  </td>
+                  <td style={styles.td}>
+                    <span style={styles.dimText}>{r.sellerName}</span>
+                  </td>
+                  <td style={{ ...styles.td, textAlign: 'center' }}>
+                    <span style={{
+                      ...styles.statusBadge,
+                      ...(OFFER_STATUS_STYLES[r.status] || { backgroundColor: '#f1f5f9', color: '#64748b' }),
+                    }}>
+                      {r.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -209,17 +262,28 @@ export default function SupplierAccountDashboardPage() {
   const { user } = useAuth();
   const [summary, setSummary] = useState<SupplierDashboardSummary | null>(null);
   const [products, setProducts] = useState<SupplierProduct[]>([]);
+  const [requests, setRequests] = useState<SupplierRequest[]>([]);
+  const [orderServices, setOrderServices] = useState<Array<{ serviceId: string; serviceName: string; approvedSellerCount: number; pendingRequestCount: number }>>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [summaryData, productsData] = await Promise.all([
+      const [summaryData, productsData, requestsData, ordersSummary] = await Promise.all([
         dashboardApi.getSupplierDashboardSummary().catch(() => null),
         supplierApi.getProducts().catch(() => []),
+        supplierApi.getRequests().catch(() => []),
+        supplierApi.getOrdersSummary().catch(() => ({ services: [], totalApprovedSellers: 0, totalPendingRequests: 0 })),
       ]);
       setSummary(summaryData);
       setProducts(productsData);
+      setRequests(requestsData);
+      setOrderServices(ordersSummary.services.map((s) => ({
+        serviceId: s.serviceId,
+        serviceName: s.serviceName,
+        approvedSellerCount: s.summary.approvedSellerCount,
+        pendingRequestCount: s.summary.pendingRequestCount,
+      })));
     } catch {
       // non-critical
     }
@@ -232,13 +296,11 @@ export default function SupplierAccountDashboardPage() {
 
   const stats = summary?.stats;
   const kpiCards: KpiCard[] = [
-    { icon: Package, label: 'Products', value: stats?.totalProducts ?? 0 },
-    { icon: ShoppingCart, label: 'Orders', value: 0 },
-    { icon: Store, label: 'Active Stores', value: stats?.connectedServices ?? 0 },
-    { icon: Clock, label: 'Pending Requests', value: stats?.pendingRequests ?? 0 },
+    { icon: ShoppingCart, label: 'New Orders', value: stats?.pendingRequests ?? 0 },
+    { icon: Package, label: 'Active Products', value: stats?.activeProducts ?? 0 },
+    { icon: FileCheck, label: 'Active Offers', value: stats?.approvedRequests ?? 0 },
+    { icon: Store, label: 'Connected Stores', value: stats?.connectedServices ?? 0 },
   ];
-
-  const recentProducts = products.slice(0, 5);
 
   return (
     <div>
@@ -250,7 +312,7 @@ export default function SupplierAccountDashboardPage() {
             안녕하세요, <strong>{user?.name || '공급자'}</strong>님. 운영 현황을 확인하세요.
           </p>
         </div>
-        <Link to="/supplier/products/new" style={styles.addButton}>
+        <Link to="/account/supplier/products/new" style={styles.addButton}>
           <Plus size={16} />
           제품 등록
         </Link>
@@ -259,14 +321,14 @@ export default function SupplierAccountDashboardPage() {
       {/* KPI Summary */}
       <KpiSummary cards={kpiCards} loading={loading} />
 
-      {/* Two-column layout */}
-      <div style={styles.twoColumnGrid}>
-        <RecentOrders />
-        <RecentProducts products={recentProducts} loading={loading} />
+      {/* Recent Orders + Products Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ marginBottom: '24px' }}>
+        <RecentOrders orders={orderServices} loading={loading} />
+        <ProductsSummary products={products} loading={loading} />
       </div>
 
-      {/* Supplier Forum */}
-      <SupplierForumPreview />
+      {/* Offers Status */}
+      <OffersStatus requests={requests} loading={loading} />
     </div>
   );
 }
@@ -280,6 +342,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    gap: '12px',
     marginBottom: '24px',
   },
   title: {
@@ -309,12 +373,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   // KPI
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '16px',
-    marginBottom: '24px',
-  },
   kpiCard: {
     backgroundColor: '#fff',
     borderRadius: '12px',
@@ -354,12 +412,6 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   // Sections
-  twoColumnGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '24px',
-    marginBottom: '24px',
-  },
   section: {
     backgroundColor: '#fff',
     borderRadius: '12px',
@@ -408,12 +460,39 @@ const styles: Record<string, React.CSSProperties> = {
     borderBottom: '1px solid #e2e8f0',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.05em',
+    whiteSpace: 'nowrap',
   },
   td: {
     padding: '10px 12px',
     fontSize: '14px',
     color: '#334155',
     borderBottom: '1px solid #f1f5f9',
+  },
+  storeName: {
+    fontWeight: 500,
+    color: '#1e293b',
+  },
+  dimText: {
+    color: '#94a3b8',
+    fontSize: '13px',
+  },
+  countBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#64748b',
+    backgroundColor: '#f1f5f9',
+  },
+  pendingBadge: {
+    display: 'inline-block',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    fontSize: '12px',
+    fontWeight: 500,
+    color: '#b45309',
+    backgroundColor: '#fef3c7',
   },
   statusBadge: {
     display: 'inline-block',
@@ -423,12 +502,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 500,
   },
 
-  // Products
+  // States
   loadingText: {
     color: '#64748b',
     textAlign: 'center',
     padding: '24px',
     fontSize: '14px',
+    margin: 0,
   },
   emptyState: {
     textAlign: 'center',
@@ -441,66 +521,5 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#94a3b8',
     margin: 0,
-  },
-  productList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  productItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '10px 12px',
-    backgroundColor: '#f8fafc',
-    borderRadius: '8px',
-  },
-  productIcon: {
-    width: '32px',
-    height: '32px',
-    borderRadius: '8px',
-    backgroundColor: '#f1f5f9',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  productName: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#1e293b',
-    margin: 0,
-  },
-  productDate: {
-    fontSize: '12px',
-    color: '#94a3b8',
-    margin: '2px 0 0 0',
-  },
-
-  // Forum
-  forumList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  forumItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '12px',
-    borderRadius: '8px',
-    textDecoration: 'none',
-    transition: 'background-color 0.15s',
-    backgroundColor: '#f8fafc',
-  },
-  forumIcon: {
-    fontSize: '18px',
-    flexShrink: 0,
-  },
-  forumTitle: {
-    flex: 1,
-    fontSize: '14px',
-    color: '#334155',
-    fontWeight: 500,
   },
 };
