@@ -492,6 +492,12 @@ export const adminMenuStatic: MenuItem[] = [
         path: '/neture/products',
       },
       {
+        id: 'neture-approvals',
+        label: 'Product Approvals',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/neture/approvals',
+      },
+      {
         id: 'neture-suppliers',
         label: 'Suppliers',
         icon: <Package className="w-4 h-4" />,
