@@ -402,10 +402,12 @@ export function createAdminController(
             : null,
         });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         logger.error('[Glycopharm Admin] Review application error:', error);
         res.status(500).json({
-          error: 'Internal server error',
+          error: 'Application review failed',
           code: 'INTERNAL_SERVER_ERROR',
+          message: errorMessage,
         });
       }
     }) as unknown as RequestHandler
