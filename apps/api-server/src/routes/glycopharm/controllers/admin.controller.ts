@@ -233,25 +233,45 @@ export function createAdminController(
         }
 
         // Check if already decided
+        // Allow re-approval if application is approved but org creation failed
         if (application.status !== 'submitted') {
-          res.status(409).json({
-            error: 'Conflict',
-            code: 'ALREADY_DECIDED',
-            message: `Application already ${application.status}`,
-          });
-          return;
+          if (application.status === 'approved' && status === 'approved') {
+            // Check if org was actually created
+            const existingOrg = await orgRepo.findOne({
+              where: { created_by_user_id: application.userId },
+            });
+            if (existingOrg) {
+              res.status(409).json({
+                error: 'Conflict',
+                code: 'ALREADY_DECIDED',
+                message: `Application already ${application.status}`,
+              });
+              return;
+            }
+            // Org not created — allow retry (fall through to org creation)
+            logger.info(`[Glycopharm Admin] Re-processing approved application ${id} (org not created)`);
+          } else {
+            res.status(409).json({
+              error: 'Conflict',
+              code: 'ALREADY_DECIDED',
+              message: `Application already ${application.status}`,
+            });
+            return;
+          }
         }
 
-        // Update application
-        application.status = status;
-        application.decidedAt = new Date();
-        application.decidedBy = userId;
+        // Update application (skip if already approved — re-processing)
+        if (application.status !== status) {
+          application.status = status;
+          application.decidedAt = new Date();
+          application.decidedBy = userId;
 
-        if (status === 'rejected') {
-          application.rejectionReason = rejectionReason;
+          if (status === 'rejected') {
+            application.rejectionReason = rejectionReason;
+          }
+
+          await applicationRepo.save(application);
         }
-
-        await applicationRepo.save(application);
 
         // If approved, create pharmacy (organization + extension + enrollment)
         let createdOrg: OrganizationStore | null = null;
