@@ -209,10 +209,12 @@ export function createApplicationController(
           },
         });
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         logger.error('[Glycopharm] Application submission error:', error);
         res.status(500).json({
-          error: 'Internal server error',
+          error: 'Application submission failed',
           code: 'INTERNAL_SERVER_ERROR',
+          message: errorMessage,
         });
       }
     }) as unknown as RequestHandler
