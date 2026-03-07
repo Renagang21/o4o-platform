@@ -5,6 +5,7 @@ import { DefaultAnalysisProvider } from '../domain/analysis/analysis.provider.js
 import { AiInsightProvider } from '../infrastructure/provider/ai-analysis.provider.js';
 import { MockCgmProvider } from '../infrastructure/provider/mock-cgm.provider.js';
 import { DatabaseHealthProvider } from '../infrastructure/provider/database-health.provider.js';
+import { FallbackCgmProvider } from '../infrastructure/provider/fallback-cgm.provider.js';
 import type { CgmProvider } from '../domain/provider/cgm.provider.js';
 import { CareKpiSnapshotService } from '../services/kpi/care-kpi-snapshot.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
@@ -12,10 +13,14 @@ import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middle
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 
 export function createCareAnalysisRouter(dataSource: DataSource): Router {
-  // CGM provider: database (real data) or mock (synthetic fallback)
+  // CGM provider: database (real data with mock fallback) or mock-only
+  // WO-O4O-CARE-DATABASE-PROVIDER-ACTIVATION-V1
   const cgmProvider: CgmProvider =
     process.env.CGM_PROVIDER === 'database'
-      ? new DatabaseHealthProvider(dataSource)
+      ? new FallbackCgmProvider(
+          new DatabaseHealthProvider(dataSource),
+          new MockCgmProvider(),
+        )
       : new MockCgmProvider();
 
   // Analysis provider: default rule-based, env var opt-in for AI

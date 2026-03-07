@@ -132,7 +132,8 @@ deploy_cloudrun() {
         --timeout=300 \
         --set-env-vars="NODE_ENV=production" \
         --set-env-vars="PORT=8080" \
-        --set-env-vars="EMAIL_SERVICE_ENABLED=false"
+        --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
+        --set-env-vars="CGM_PROVIDER=database"
 
     # Get service URL
     SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
