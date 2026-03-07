@@ -19,6 +19,9 @@ import {
   CheckCircle,
   Loader2,
   Lightbulb,
+  Heart,
+  Weight,
+  ShieldAlert,
 } from 'lucide-react';
 import { pharmacyApi, type CareInsightDto, type KpiComparisonDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
@@ -34,6 +37,13 @@ const TREND_DISPLAY = {
   stable: { label: '유지', cls: 'text-slate-500', Icon: Minus },
   worsening: { label: '악화', cls: 'text-red-600', Icon: TrendingDown },
 } as const;
+
+const BP_CATEGORY_DISPLAY: Record<string, { label: string; cls: string }> = {
+  normal: { label: '정상', cls: 'bg-green-100 text-green-700' },
+  elevated: { label: '상승', cls: 'bg-amber-100 text-amber-700' },
+  high_stage1: { label: '고혈압 1단계', cls: 'bg-orange-100 text-orange-700' },
+  high_stage2: { label: '고혈압 2단계', cls: 'bg-red-100 text-red-700' },
+};
 
 export default function AnalysisTab() {
   const { patient } = usePatientDetail();
@@ -148,6 +158,97 @@ export default function AnalysisTab() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Multi-Metric Analysis — WO-O4O-CARE-MULTI-METRIC-ANALYSIS-V1 */}
+      {analysis.multiMetric && (
+        <>
+          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">복합 지표 분석</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Blood Pressure */}
+            {analysis.multiMetric.bp && analysis.multiMetric.bp.readingCount > 0 && (
+              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <Heart className="w-5 h-5 text-rose-500" />
+                <div className="flex-1">
+                  <p className="text-xs text-slate-400">혈압 (평균)</p>
+                  <p className="text-2xl font-bold text-slate-800">
+                    {analysis.multiMetric.bp.avgSystolic}/{analysis.multiMetric.bp.avgDiastolic}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {(() => {
+                      const cat = BP_CATEGORY_DISPLAY[analysis.multiMetric.bp!.bpCategory] || BP_CATEGORY_DISPLAY.normal;
+                      return (
+                        <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${cat.cls}`}>
+                          {cat.label}
+                        </span>
+                      );
+                    })()}
+                    <span className="text-xs text-slate-400">{analysis.multiMetric.bp.readingCount}회 측정</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Weight */}
+            {analysis.multiMetric.weight && analysis.multiMetric.weight.readingCount > 0 && (
+              <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                <Weight className="w-5 h-5 text-indigo-500" />
+                <div className="flex-1">
+                  <p className="text-xs text-slate-400">체중</p>
+                  <p className="text-2xl font-bold text-slate-800">
+                    {analysis.multiMetric.weight.latestWeight}kg
+                  </p>
+                  {analysis.multiMetric.weight.weightChange != null && (
+                    <p className={`text-xs ${analysis.multiMetric.weight.weightChange > 0 ? 'text-red-600' : analysis.multiMetric.weight.weightChange < 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                      {analysis.multiMetric.weight.weightChange > 0 ? '+' : ''}{analysis.multiMetric.weight.weightChange}kg 변화
+                    </p>
+                  )}
+                  <span className="text-xs text-slate-400">{analysis.multiMetric.weight.readingCount}회 측정</span>
+                </div>
+              </div>
+            )}
+
+            {/* Metabolic Risk */}
+            {(() => {
+              const mr = analysis.multiMetric!.metabolicRisk;
+              const mrRisk = RISK_DISPLAY[mr.metabolicRiskLevel as keyof typeof RISK_DISPLAY] || RISK_DISPLAY.low;
+              return (
+                <div className={`flex items-center gap-3 p-4 rounded-xl border ${mrRisk.cls}`}>
+                  <ShieldAlert className="w-5 h-5" />
+                  <div className="flex-1">
+                    <p className="text-xs opacity-70">대사 위험도</p>
+                    <p className="text-2xl font-bold">{mrRisk.label}</p>
+                    <p className="text-xs opacity-70">점수: {mr.metabolicScore}/100</p>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Metabolic Risk Factors */}
+          {analysis.multiMetric.metabolicRisk.riskFactors.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-rose-500" />
+                대사 위험 요인
+              </h4>
+              <div className="space-y-2">
+                {analysis.multiMetric.metabolicRisk.riskFactors.map((factor, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-3 bg-rose-50 rounded-lg border border-rose-100"
+                  >
+                    <div className="w-5 h-5 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">
+                      {i + 1}
+                    </div>
+                    <p className="text-sm text-rose-800">{factor}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Chart Placeholder */}

@@ -453,6 +453,82 @@ export default function CareDashboardPage() {
               )}
             </div>
 
+            {/* ④-2 복합 지표 분석 (Multi-Metric) — WO-O4O-CARE-MULTI-METRIC-ANALYSIS-V1 */}
+            {analysis?.multiMetric && (
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">복합 지표 분석</h2>
+                <div className="space-y-4">
+                  {/* Blood Pressure */}
+                  {analysis.multiMetric.bp && analysis.multiMetric.bp.readingCount > 0 && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-slate-600">혈압 (평균):</span>
+                      <span className="text-sm font-medium text-slate-800">
+                        {analysis.multiMetric.bp.avgSystolic}/{analysis.multiMetric.bp.avgDiastolic} mmHg
+                      </span>
+                      {(() => {
+                        const cats: Record<string, { label: string; cls: string }> = {
+                          normal: { label: '정상', cls: 'bg-green-100 text-green-700' },
+                          elevated: { label: '상승', cls: 'bg-amber-100 text-amber-700' },
+                          high_stage1: { label: '고혈압 1단계', cls: 'bg-orange-100 text-orange-700' },
+                          high_stage2: { label: '고혈압 2단계', cls: 'bg-red-100 text-red-700' },
+                        };
+                        const cat = cats[analysis.multiMetric!.bp!.bpCategory] || cats.normal;
+                        return (
+                          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${cat.cls}`}>
+                            {cat.label}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  )}
+
+                  {/* Weight */}
+                  {analysis.multiMetric.weight && analysis.multiMetric.weight.readingCount > 0 && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-slate-600">체중:</span>
+                      <span className="text-sm font-medium text-slate-800">
+                        {analysis.multiMetric.weight.latestWeight}kg
+                      </span>
+                      {analysis.multiMetric.weight.weightChange != null && (
+                        <span className={`text-xs font-medium ${analysis.multiMetric.weight.weightChange > 0 ? 'text-red-600' : analysis.multiMetric.weight.weightChange < 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                          {analysis.multiMetric.weight.weightChange > 0 ? '+' : ''}{analysis.multiMetric.weight.weightChange}kg
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Metabolic Risk */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-600">대사 위험도:</span>
+                    {(() => {
+                      const mr = analysis.multiMetric!.metabolicRisk;
+                      const badge = RISK_BADGE[mr.metabolicRiskLevel] || RISK_BADGE.low;
+                      return (
+                        <>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full ${badge.cls}`}>
+                            {badge.label}
+                          </span>
+                          <span className="text-xs text-slate-400">({mr.metabolicScore}점)</span>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Risk Factors */}
+                  {analysis.multiMetric.metabolicRisk.riskFactors.length > 0 && (
+                    <ul className="space-y-1.5 mt-2">
+                      {analysis.multiMetric.metabolicRisk.riskFactors.map((factor, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
+                          <span className="text-sm text-slate-700">{factor}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* ⑤ 케어 코칭 */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">케어 코칭</h2>

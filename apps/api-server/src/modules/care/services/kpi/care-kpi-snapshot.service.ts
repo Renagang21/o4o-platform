@@ -25,12 +25,18 @@ export class CareKpiSnapshotService {
     analysis: CareInsightDto,
     pharmacyId: string
   ): Promise<CareKpiSnapshot> {
+    const metadata: Record<string, unknown> = {};
+    if (analysis.multiMetric) {
+      metadata.multiMetric = analysis.multiMetric;
+    }
+
     const snapshot = this.repo.create({
       pharmacyId,
       patientId,
       tir: analysis.tir,
       cv: analysis.cv,
       riskLevel: analysis.riskLevel,
+      metadata,
     });
     return this.repo.save(snapshot);
   }

@@ -28,12 +28,40 @@ interface ApiError {
 }
 
 // Care Analysis types
+
+export interface BpAnalysisResult {
+  avgSystolic: number;
+  avgDiastolic: number;
+  bpCategory: 'normal' | 'elevated' | 'high_stage1' | 'high_stage2';
+  readingCount: number;
+}
+
+export interface WeightAnalysisResult {
+  latestWeight: number;
+  weightChange: number | null;
+  bmi: number | null;
+  readingCount: number;
+}
+
+export interface MetabolicRiskResult {
+  metabolicRiskLevel: 'low' | 'moderate' | 'high';
+  metabolicScore: number;
+  riskFactors: string[];
+}
+
+export interface MultiMetricData {
+  bp: BpAnalysisResult | null;
+  weight: WeightAnalysisResult | null;
+  metabolicRisk: MetabolicRiskResult;
+}
+
 export interface CareInsightDto {
   patientId: string;
   tir: number;
   cv: number;
   riskLevel: 'low' | 'moderate' | 'high';
   insights: string[];
+  multiMetric?: MultiMetricData;
 }
 
 export interface KpiComparisonDto {
