@@ -188,6 +188,12 @@ import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot
 import { ActionLog } from '@o4o/action-log-core';
 
 // ============================================================================
+// PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
+// ============================================================================
+import { PlatformStoreSlug } from '@o4o/platform-core/store-identity';
+import { PlatformStoreSlugHistory } from '@o4o/platform-core/store-identity';
+
+// ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
 import {
@@ -643,6 +649,11 @@ export const AppDataSource = new DataSource({
     // ACTION LOG ENTITY (WO-PLATFORM-ACTION-LOG-CORE-V1)
     // ============================================================================
     ActionLog,
+    // ============================================================================
+    // PLATFORM STORE IDENTITY ENTITIES (WO-CORE-STORE-SLUG-SYSTEM-V1)
+    // ============================================================================
+    PlatformStoreSlug,
+    PlatformStoreSlugHistory,
     // ============================================================================
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
