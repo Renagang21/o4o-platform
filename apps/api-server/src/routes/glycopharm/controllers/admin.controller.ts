@@ -9,7 +9,7 @@ import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { body, query, param, validationResult } from 'express-validator';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
-import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import { StoreSlugService, normalizeSlug } from '@o4o/platform-core/store-identity';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
@@ -181,6 +181,7 @@ export function createAdminController(
     param('id').isUUID(),
     body('status').isIn(['approved', 'rejected']).withMessage('Status must be approved or rejected'),
     body('rejectionReason').optional().isString().isLength({ max: 2000 }),
+    body('slug').optional().isString().isLength({ min: 3, max: 120 }).withMessage('Slug must be 3-120 characters, lowercase English'),
     (async (req, res) => {
       try {
         const errors = validationResult(req);
@@ -204,7 +205,7 @@ export function createAdminController(
         }
 
         const { id } = req.params;
-        const { status, rejectionReason } = req.body;
+        const { status, rejectionReason, slug: adminSlug } = req.body;
 
         // Validate rejection reason is required when rejecting
         if (status === 'rejected' && !rejectionReason) {
@@ -293,14 +294,16 @@ export function createAdminController(
               // Use StoreSlugService with EntityManager for transaction support
               const slugService = new StoreSlugService(queryRunner.manager);
 
-              // WO-CORE-STORE-REQUESTED-SLUG-V1: Compute slug value
+              // Slug priority: admin override > application requestedSlug > auto-generate
               let slugValue: string;
-              if (application.requestedSlug) {
-                const availability = await slugService.checkAvailability(application.requestedSlug);
+              const slugSource = adminSlug || application.requestedSlug;
+              if (slugSource) {
+                const normalized = normalizeSlug(slugSource);
+                const availability = await slugService.checkAvailability(normalized);
                 if (!availability.available) {
-                  throw new Error(`Requested slug '${application.requestedSlug}' is no longer available: ${availability.reason}`);
+                  throw new Error(`Slug '${slugSource}' is not available: ${availability.reason}`);
                 }
-                slugValue = application.requestedSlug;
+                slugValue = normalized;
               } else {
                 slugValue = await slugService.generateUniqueSlug(application.organizationName);
               }
