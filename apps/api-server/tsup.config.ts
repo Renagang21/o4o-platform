@@ -122,6 +122,9 @@ export default defineConfig({
     'lru-cache',
     'node-cache',
 
+    // Cloud services
+    '@google-cloud/storage',
+
     // File processing
     'sharp',
     'pdfkit',
