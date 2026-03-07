@@ -498,6 +498,10 @@ class PharmacyApiClient {
     return this.request('/api/v1/care/dashboard');
   }
 
+  async getRiskPatients(): Promise<RiskPatientsResponse> {
+    return this.request('/api/v1/care/risk-patients');
+  }
+
   async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
     return this.request(`/api/v1/care/analysis/${patientId}`);
   }
@@ -564,12 +568,39 @@ export interface CareDashboardSummary {
   }>;
 }
 
+export interface BpAnalysisResult {
+  avgSystolic: number;
+  avgDiastolic: number;
+  bpCategory: 'normal' | 'elevated' | 'high_stage1' | 'high_stage2';
+  readingCount: number;
+}
+
+export interface WeightAnalysisResult {
+  latestWeight: number;
+  weightChange: number | null;
+  bmi: number | null;
+  readingCount: number;
+}
+
+export interface MetabolicRiskResult {
+  metabolicRiskLevel: 'low' | 'moderate' | 'high';
+  metabolicScore: number;
+  riskFactors: string[];
+}
+
+export interface MultiMetricData {
+  bp: BpAnalysisResult | null;
+  weight: WeightAnalysisResult | null;
+  metabolicRisk: MetabolicRiskResult;
+}
+
 export interface CareInsightDto {
   patientId: string;
   tir: number;
   cv: number;
   riskLevel: 'low' | 'moderate' | 'high';
   insights: string[];
+  multiMetric?: MultiMetricData;
 }
 
 export interface KpiComparisonDto {
@@ -606,6 +637,33 @@ export interface HealthReadingDto {
   metadata: Record<string, unknown>;
   pharmacyId: string;
   createdAt: string;
+}
+
+// ── Risk Patient Detection Types (WO-O4O-CARE-RISK-PATIENT-DETECTION-V1) ──
+
+export interface RiskBreakdown {
+  glucose: number;
+  bp: number;
+  weight: number;
+  metabolic: number;
+}
+
+export interface RiskPatientDto {
+  patientId: string;
+  patientName: string;
+  phone?: string;
+  compositeRiskLevel: 'high' | 'caution' | 'normal';
+  compositeScore: number;
+  glucoseRiskLevel: string;
+  tir: number;
+  cv: number;
+  lastAnalysisDate: string;
+  riskBreakdown: RiskBreakdown;
+}
+
+export interface RiskPatientsResponse {
+  highRisk: RiskPatientDto[];
+  caution: RiskPatientDto[];
 }
 
 // Export singleton instance

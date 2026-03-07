@@ -3,6 +3,7 @@ import type { DataSource } from 'typeorm';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { CareRiskService } from '../services/care-risk.service.js';
 
 export interface CareDashboardDto {
   totalPatients: number;
@@ -18,6 +19,7 @@ export interface CareDashboardDto {
 export function createCareDashboardRouter(dataSource: DataSource): Router {
   const router = Router();
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
+  const riskService = new CareRiskService(dataSource);
 
   router.get('/dashboard', authenticate, requirePharmacyContext, async (req, res) => {
     try {
@@ -29,6 +31,20 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Dashboard aggregation error' });
+    }
+  });
+
+  // WO-O4O-CARE-RISK-PATIENT-DETECTION-V1
+  // GET /risk-patients — composite risk score based patient detection
+  router.get('/risk-patients', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+
+      const result = await riskService.getRiskPatients(pharmacyId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Risk patients retrieval error' });
     }
   });
 

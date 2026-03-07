@@ -21,7 +21,7 @@ import { Activity, ArrowRight } from 'lucide-react';
 import { useAuth, getAccessToken } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import { publicApi, type HomePreviewData } from '@/api/public';
-import { pharmacyApi, type CareDashboardSummary, type PharmacyCustomer } from '@/api/pharmacy';
+import { pharmacyApi, type CareDashboardSummary, type PharmacyCustomer, type RiskPatientsResponse } from '@/api/pharmacy';
 import {
   PatientSummaryCards,
   PharmacyNewsPreview,
@@ -31,7 +31,7 @@ import {
   BannerSection,
   PartnerSlider,
 } from '@/components/dashboard';
-import type { RiskPatient, ActivityItem } from '@/components/dashboard';
+import type { ActivityItem } from '@/components/dashboard';
 
 // ============================================================================
 // Hero Section
@@ -89,13 +89,14 @@ export default function HomeLivePage() {
   const [data, setData] = useState<HomePreviewData>(emptyData);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
   const [customers, setCustomers] = useState<PharmacyCustomer[]>([]);
+  const [riskData, setRiskData] = useState<RiskPatientsResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const token = getAccessToken();
-      const [homeResult, summaryResult, customersResult] = await Promise.all([
+      const [homeResult, summaryResult, customersResult, riskResult] = await Promise.all([
         publicApi.getHomePreview(token),
         isAuthenticated
           ? pharmacyApi.getCareDashboardSummary().catch(() => null)
@@ -103,12 +104,16 @@ export default function HomeLivePage() {
         isAuthenticated
           ? pharmacyApi.getCustomers({ pageSize: 100 }).catch(() => null)
           : Promise.resolve(null),
+        isAuthenticated
+          ? pharmacyApi.getRiskPatients().catch(() => null)
+          : Promise.resolve(null),
       ]);
       setData(homeResult);
       setSummary(summaryResult);
       if (customersResult?.success && customersResult.data) {
         setCustomers(customersResult.data.items || []);
       }
+      setRiskData(riskResult);
     } finally {
       setLoading(false);
     }
@@ -126,24 +131,6 @@ export default function HomeLivePage() {
       openLoginModal();
     }
   };
-
-  // Derive risk patients from snapshots + customer names
-  const riskPatients = useMemo<RiskPatient[]>(() => {
-    if (!summary?.recentSnapshots) return [];
-    const customerMap = new Map(customers.map((c) => [c.id, c]));
-    return summary.recentSnapshots
-      .filter((s) => s.riskLevel === 'high' || s.riskLevel === 'moderate')
-      .map((s) => {
-        const customer = customerMap.get(s.patientId);
-        return {
-          patientId: s.patientId,
-          patientName: customer?.name || '환자',
-          phone: customer?.phone,
-          riskLevel: s.riskLevel as 'high' | 'moderate',
-          lastAnalysisDate: s.createdAt,
-        };
-      });
-  }, [summary, customers]);
 
   // Derive activity items from snapshots
   const activities = useMemo<ActivityItem[]>(() => {
@@ -194,9 +181,10 @@ export default function HomeLivePage() {
             </div>
           </section>
 
-          {/* Block 3: Risk Patients */}
+          {/* Block 3: Risk Patients (WO-O4O-CARE-RISK-PATIENT-DETECTION-V1) */}
           <RiskPatientsSection
-            patients={riskPatients}
+            highRisk={riskData?.highRisk}
+            caution={riskData?.caution}
             onPatientClick={(id) => handleFeatureClick(`/care/patients/${id}`)}
           />
 
