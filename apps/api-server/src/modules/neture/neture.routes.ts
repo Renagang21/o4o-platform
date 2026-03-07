@@ -22,9 +22,12 @@ import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 import { CsvImportService } from './services/csv-import.service.js';
 import { ImageStorageService } from './services/image-storage.service.js';
 import sharp from 'sharp';
+import { NetureService as LegacyNetureService } from '../../routes/neture/services/neture.service.js';
+import { NetureOrderStatus } from '../../routes/neture/entities/neture-order.entity.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
+const legacyNetureService = new LegacyNetureService(AppDataSource);
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
 const csvImportService = new CsvImportService(AppDataSource);
@@ -1271,6 +1274,150 @@ router.patch('/supplier/products/:id', requireAuth, requireActiveSupplier, async
   }
 });
 
+// ==================== Inventory API (WO-O4O-INVENTORY-ENGINE-V1) ====================
+
+/**
+ * GET /api/v1/neture/supplier/inventory
+ * List inventory for all supplier's products
+ */
+router.get('/supplier/inventory', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+
+    const items = await AppDataSource.query(
+      `SELECT spo.id AS offer_id, spo.master_id,
+              pm.marketing_name, pm.brand_name, pm.barcode, pm.specification,
+              pi.image_url AS primary_image_url,
+              spo.price_general,
+              spo.is_active,
+              spo.stock_quantity, spo.reserved_quantity,
+              spo.low_stock_threshold, spo.track_inventory,
+              (spo.stock_quantity - spo.reserved_quantity) AS available_stock
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
+       WHERE spo.supplier_id = $1
+       ORDER BY spo.track_inventory DESC, pm.marketing_name ASC`,
+      [supplierId],
+    );
+
+    res.json({ success: true, data: items });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier inventory:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch inventory' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/inventory/:offerId
+ * Get inventory detail for a specific offer
+ */
+router.get('/supplier/inventory/:offerId', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { offerId } = req.params;
+
+    const items = await AppDataSource.query(
+      `SELECT spo.id AS offer_id, spo.master_id,
+              pm.marketing_name, pm.brand_name, pm.barcode, pm.specification,
+              pi.image_url AS primary_image_url,
+              spo.price_general,
+              spo.is_active,
+              spo.stock_quantity, spo.reserved_quantity,
+              spo.low_stock_threshold, spo.track_inventory,
+              (spo.stock_quantity - spo.reserved_quantity) AS available_stock
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
+       WHERE spo.id = $1 AND spo.supplier_id = $2`,
+      [offerId, supplierId],
+    );
+
+    if (items.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Inventory item not found' });
+    }
+
+    res.json({ success: true, data: items[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching inventory detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch inventory detail' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/inventory/:offerId
+ * Update inventory for a specific offer (stock_quantity, low_stock_threshold, track_inventory)
+ */
+router.patch('/supplier/inventory/:offerId', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { offerId } = req.params;
+    const { stock_quantity, low_stock_threshold, track_inventory } = req.body;
+
+    // Verify ownership
+    const ownerCheck = await AppDataSource.query(
+      `SELECT id FROM supplier_product_offers WHERE id = $1 AND supplier_id = $2`,
+      [offerId, supplierId],
+    );
+    if (ownerCheck.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Product not found' });
+    }
+
+    // Build update fields
+    const setClauses: string[] = [];
+    const params: any[] = [offerId, supplierId];
+    let paramIdx = 3;
+
+    if (stock_quantity !== undefined) {
+      if (!Number.isInteger(stock_quantity) || stock_quantity < 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_STOCK', message: 'stock_quantity must be a non-negative integer' });
+      }
+      setClauses.push(`stock_quantity = $${paramIdx++}`);
+      params.push(stock_quantity);
+    }
+    if (low_stock_threshold !== undefined) {
+      if (!Number.isInteger(low_stock_threshold) || low_stock_threshold < 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_THRESHOLD', message: 'low_stock_threshold must be a non-negative integer' });
+      }
+      setClauses.push(`low_stock_threshold = $${paramIdx++}`);
+      params.push(low_stock_threshold);
+    }
+    if (track_inventory !== undefined) {
+      setClauses.push(`track_inventory = $${paramIdx++}`);
+      params.push(!!track_inventory);
+    }
+
+    if (setClauses.length === 0) {
+      return res.status(400).json({ success: false, error: 'NO_UPDATES', message: 'No fields to update' });
+    }
+
+    setClauses.push('updated_at = NOW()');
+
+    await AppDataSource.query(
+      `UPDATE supplier_product_offers SET ${setClauses.join(', ')} WHERE id = $1 AND supplier_id = $2`,
+      params,
+    );
+
+    // Return updated inventory
+    const updated = await AppDataSource.query(
+      `SELECT spo.id AS offer_id, spo.master_id,
+              pm.marketing_name, pm.brand_name,
+              spo.stock_quantity, spo.reserved_quantity,
+              spo.low_stock_threshold, spo.track_inventory,
+              (spo.stock_quantity - spo.reserved_quantity) AS available_stock
+       FROM supplier_product_offers spo
+       JOIN product_masters pm ON pm.id = spo.master_id
+       WHERE spo.id = $1 AND spo.supplier_id = $2`,
+      [offerId, supplierId],
+    );
+
+    res.json({ success: true, data: updated[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error updating inventory:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update inventory' });
+  }
+});
+
 // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4) ====================
 
 /**
@@ -1298,6 +1445,442 @@ router.get('/supplier/orders/summary', requireAuth, requireLinkedSupplier, async
       error: 'INTERNAL_ERROR',
       message: 'Failed to fetch order summary',
     });
+  }
+});
+
+// ==================== Supplier Order Processing API ====================
+// WO-O4O-SUPPLIER-ORDER-PROCESSING-V1
+
+/** Extract region (시/도) from shipping address */
+function extractRegion(shipping: any): string | null {
+  try {
+    const s = typeof shipping === 'string' ? JSON.parse(shipping) : shipping;
+    if (s?.address) {
+      const first = s.address.trim().split(/\s+/)[0];
+      return first || null;
+    }
+    return null;
+  } catch { return null; }
+}
+
+/** Allowed supplier status transitions */
+const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
+  [NetureOrderStatus.CREATED]: [NetureOrderStatus.PREPARING],
+  [NetureOrderStatus.PAID]: [NetureOrderStatus.PREPARING],
+  [NetureOrderStatus.PREPARING]: [NetureOrderStatus.SHIPPED],
+  [NetureOrderStatus.SHIPPED]: [NetureOrderStatus.DELIVERED],
+};
+
+/**
+ * GET /api/v1/neture/supplier/orders/kpi
+ * WO-O4O-SUPPLIER-DASHBOARD-V1: Order KPI for supplier dashboard
+ */
+router.get('/supplier/orders/kpi', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+
+    const result = await AppDataSource.query(
+      `SELECT
+         COUNT(DISTINCT o.id) FILTER (WHERE o.created_at >= CURRENT_DATE)::int AS today_orders,
+         COUNT(DISTINCT o.id) FILTER (WHERE o.status IN ('created', 'paid'))::int AS pending_processing,
+         COUNT(DISTINCT o.id) FILTER (WHERE o.status = 'preparing')::int AS pending_shipping,
+         COUNT(DISTINCT o.id)::int AS total_orders
+       FROM neture_orders o
+       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE spo.supplier_id = $1`,
+      [supplierId],
+    );
+
+    res.json({
+      success: true,
+      data: {
+        today_orders: Number(result[0]?.today_orders || 0),
+        pending_processing: Number(result[0]?.pending_processing || 0),
+        pending_shipping: Number(result[0]?.pending_shipping || 0),
+        total_orders: Number(result[0]?.total_orders || 0),
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier order KPI:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch order KPI' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/orders
+ * List orders containing this supplier's products (paginated)
+ */
+router.get('/supplier/orders', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const baseParams: any[] = [supplierId];
+    let statusClause = '';
+    if (status) {
+      statusClause = 'AND o.status = $2';
+      baseParams.push(status);
+    }
+
+    const [orders, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT DISTINCT ON (o.created_at, o.id)
+                o.id, o.order_number, o.status, o.total_amount, o.shipping_fee,
+                o.final_amount, o.orderer_name, o.orderer_phone, o.orderer_email,
+                o.shipping, o.note, o.created_at, o.updated_at,
+                (SELECT COUNT(*)::int FROM neture_order_items oi2
+                 JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
+                 WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count
+         FROM neture_orders o
+         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         WHERE spo.supplier_id = $1 ${statusClause}
+         ORDER BY o.created_at DESC, o.id
+         LIMIT ${limit} OFFSET ${offset}`,
+        baseParams,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(DISTINCT o.id)::int AS total
+         FROM neture_orders o
+         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         WHERE spo.supplier_id = $1 ${statusClause}`,
+        baseParams,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+
+    const data = orders.map((o: any) => {
+      const shippingParsed = typeof o.shipping === 'string' ? JSON.parse(o.shipping) : o.shipping;
+      return {
+        ...o,
+        item_count: Number(o.item_count || 0),
+        shipping: shippingParsed,
+        region: extractRegion(o.shipping),
+      };
+    });
+
+    res.json({
+      success: true,
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier orders:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier orders' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/orders/:id
+ * Get order detail for supplier (with ownership validation & enrichment)
+ */
+router.get('/supplier/orders/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const orderId = req.params.id;
+
+    // Validate UUID format
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+    }
+
+    // Ownership check: order must contain this supplier's products
+    const ownerCheck = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
+      [orderId, supplierId],
+    );
+
+    if (Number(ownerCheck[0]?.cnt) === 0) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // Fetch order without userId restriction (ownership already verified via supplier)
+    const order = await legacyNetureService.getOrder(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // Enrich items with supplier/product master info (same pattern as seller/orders/:id)
+    if (order.items && order.items.length > 0) {
+      const productIds = order.items.map((i: any) => i.product_id);
+
+      const enrichments = await AppDataSource.query(
+        `SELECT spo.id AS offer_id,
+                s.id AS supplier_id, s.name AS supplier_name,
+                s.contact_phone AS supplier_phone, s.contact_website AS supplier_website,
+                pm.brand_name, pm.specification, pm.barcode,
+                pi.image_url AS primary_image_url
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers s ON s.id = spo.supplier_id
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
+         WHERE spo.id = ANY($1::uuid[])`,
+        [productIds],
+      );
+
+      const enrichMap = new Map<string, any>(enrichments.map((e: any) => [e.offer_id, e]));
+
+      order.items = order.items.map((item: any) => {
+        const e = enrichMap.get(item.product_id);
+        return {
+          ...item,
+          supplier_id: e?.supplier_id || null,
+          supplier_name: e?.supplier_name || null,
+          supplier_phone: e?.supplier_phone || null,
+          supplier_website: e?.supplier_website || null,
+          brand_name: e?.brand_name || null,
+          specification: e?.specification || null,
+          barcode: e?.barcode || null,
+          primary_image_url: e?.primary_image_url || item.product_image || null,
+        };
+      });
+    }
+
+    res.json({ success: true, data: order });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier order detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch order detail' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/orders/:id/status
+ * Update order status (supplier processing workflow)
+ */
+router.patch('/supplier/orders/:id/status', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const orderId = req.params.id;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, error: 'MISSING_STATUS', message: 'Status is required' });
+    }
+
+    // Validate UUID format
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const ownerCheck = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
+      [orderId, supplierId],
+    );
+
+    if (Number(ownerCheck[0]?.cnt) === 0) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // Fetch current order status
+    const currentOrder = await legacyNetureService.getOrder(orderId);
+    if (!currentOrder) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // Validate status transition
+    const allowed = SUPPLIER_STATUS_TRANSITIONS[currentOrder.status] || [];
+    if (!allowed.includes(status)) {
+      return res.status(403).json({
+        success: false,
+        error: 'INVALID_TRANSITION',
+        message: `Cannot transition from '${currentOrder.status}' to '${status}'`,
+      });
+    }
+
+    // Update via legacy service
+    const updated = await legacyNetureService.updateOrderStatus(orderId, { status });
+    if (!updated) {
+      return res.status(500).json({ success: false, error: 'UPDATE_FAILED', message: 'Failed to update order status' });
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    logger.error('[Neture API] Error updating supplier order status:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update order status' });
+  }
+});
+
+// ==================== Shipment API (WO-O4O-SHIPMENT-ENGINE-V1) ====================
+
+const SHIPMENT_STATUS_TRANSITIONS: Record<string, string[]> = {
+  shipped: ['in_transit', 'delivered'],
+  in_transit: ['delivered'],
+};
+
+/**
+ * POST /api/v1/neture/supplier/orders/:orderId/shipment
+ * 송장 등록 → 주문 상태 자동 shipped 전환
+ */
+router.post('/supplier/orders/:orderId/shipment', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { orderId } = req.params;
+    const { carrier_code, carrier_name, tracking_number } = req.body;
+
+    if (!carrier_code || !carrier_name || !tracking_number) {
+      return res.status(400).json({ success: false, error: 'MISSING_FIELDS', message: 'carrier_code, carrier_name, tracking_number are required' });
+    }
+
+    // UUID format check
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const ownerCheck = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
+      [orderId, supplierId],
+    );
+    if (Number(ownerCheck[0]?.cnt) === 0) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // Order must be in 'preparing' state
+    const currentOrder = await legacyNetureService.getOrder(orderId);
+    if (!currentOrder) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+    if (currentOrder.status !== NetureOrderStatus.PREPARING) {
+      return res.status(403).json({ success: false, error: 'INVALID_STATE', message: `Order must be in 'preparing' state (current: ${currentOrder.status})` });
+    }
+
+    // Check if shipment already exists
+    const existing = await AppDataSource.query(
+      `SELECT id FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
+      [orderId, supplierId],
+    );
+    if (existing.length > 0) {
+      return res.status(409).json({ success: false, error: 'SHIPMENT_EXISTS', message: 'Shipment already registered for this order' });
+    }
+
+    // Create shipment
+    const [shipment] = await AppDataSource.query(
+      `INSERT INTO neture_shipments (order_id, supplier_id, carrier_code, carrier_name, tracking_number, status, shipped_at)
+       VALUES ($1, $2, $3, $4, $5, 'shipped', NOW())
+       RETURNING *`,
+      [orderId, supplierId, carrier_code, carrier_name, tracking_number],
+    );
+
+    // Auto-transition order status to 'shipped'
+    await legacyNetureService.updateOrderStatus(orderId, { status: NetureOrderStatus.SHIPPED });
+
+    res.json({ success: true, data: shipment });
+  } catch (error) {
+    logger.error('[Neture API] Error creating shipment:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create shipment' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/orders/:orderId/shipment
+ * 공급자 배송 조회
+ */
+router.get('/supplier/orders/:orderId/shipment', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { orderId } = req.params;
+
+    // Ownership check
+    const ownerCheck = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
+      [orderId, supplierId],
+    );
+    if (Number(ownerCheck[0]?.cnt) === 0) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT * FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
+      [orderId, supplierId],
+    );
+
+    res.json({ success: true, data: rows[0] || null });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching shipment:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch shipment' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/supplier/shipments/:id
+ * 배송 상태 변경 (shipped → in_transit → delivered)
+ */
+router.patch('/supplier/shipments/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const shipmentId = req.params.id;
+    const { status, tracking_number } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ success: false, error: 'MISSING_STATUS', message: 'status is required' });
+    }
+
+    // Fetch shipment with ownership check
+    const rows = await AppDataSource.query(
+      `SELECT * FROM neture_shipments WHERE id = $1 AND supplier_id = $2 LIMIT 1`,
+      [shipmentId, supplierId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'SHIPMENT_NOT_FOUND', message: 'Shipment not found' });
+    }
+
+    const shipment = rows[0];
+
+    // Validate status transition
+    const allowed = SHIPMENT_STATUS_TRANSITIONS[shipment.status] || [];
+    if (!allowed.includes(status)) {
+      return res.status(403).json({
+        success: false,
+        error: 'INVALID_TRANSITION',
+        message: `Cannot transition from '${shipment.status}' to '${status}'`,
+      });
+    }
+
+    // Build update query
+    const setClauses = [`status = $1`, `updated_at = NOW()`];
+    const params: any[] = [status];
+    let paramIdx = 2;
+
+    if (status === 'delivered') {
+      setClauses.push(`delivered_at = NOW()`);
+    }
+
+    if (tracking_number) {
+      setClauses.push(`tracking_number = $${paramIdx}`);
+      params.push(tracking_number);
+      paramIdx++;
+    }
+
+    params.push(shipmentId);
+    const [updated] = await AppDataSource.query(
+      `UPDATE neture_shipments SET ${setClauses.join(', ')} WHERE id = $${paramIdx} RETURNING *`,
+      params,
+    );
+
+    // Auto-transition order status to 'delivered' if shipment delivered
+    if (status === 'delivered') {
+      await legacyNetureService.updateOrderStatus(shipment.order_id, { status: NetureOrderStatus.DELIVERED });
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    logger.error('[Neture API] Error updating shipment:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update shipment' });
   }
 });
 
@@ -2333,17 +2916,27 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
     }
 
     // Step 1: PUBLIC/SERVICE + PRIVATE(본인 배정) 제품 조회 (Tier 1+2+3)
+    // WO-O4O-STORE-CART-PAGE-V1: 가격/이미지/규격/바코드 포함
     const products: Array<{
       id: string; name: string; category: string; description: string;
       supplier_id: string; supplier_name: string; distribution_type: string;
+      price_general: string; consumer_reference_price: string | null;
+      approval_status: string; barcode: string; specification: string | null;
+      primary_image_url: string | null;
     }> = await AppDataSource.query(
       `SELECT spo.id, pm.marketing_name AS name, pm.brand_name AS category, '' AS description,
               spo.supplier_id, s.name AS supplier_name,
-              spo.distribution_type
+              spo.distribution_type,
+              spo.price_general, spo.consumer_reference_price,
+              spo.approval_status,
+              pm.barcode, pm.specification,
+              pi.image_url AS primary_image_url
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
+       LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
        WHERE spo.is_active = true
+         AND spo.approval_status = 'APPROVED'
          AND s.status = 'ACTIVE'
          AND (spo.distribution_type IN ('PUBLIC', 'SERVICE')
            OR (spo.distribution_type = 'PRIVATE' AND $1 = ANY(spo.allowed_seller_ids)))
@@ -2375,6 +2968,7 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
     }
 
     // Step 4: 머지하여 반환
+    // WO-O4O-STORE-CART-PAGE-V1: 가격/이미지/규격/바코드 포함
     const data = products.map((product) => {
       const approval = approvalMap.get(product.id);
       return {
@@ -2388,6 +2982,12 @@ router.get('/seller/available-supply-products', requireAuth, async (req: Authent
         supplyStatus: approval?.status || 'available',
         requestId: approval?.approvalId || null,
         rejectReason: approval?.reason || null,
+        priceGeneral: Number(product.price_general) || 0,
+        consumerReferencePrice: product.consumer_reference_price ? Number(product.consumer_reference_price) : null,
+        approvalStatus: product.approval_status || 'PENDING',
+        barcode: product.barcode || '',
+        specification: product.specification || null,
+        primaryImageUrl: product.primary_image_url || null,
       };
     });
 
@@ -2970,6 +3570,667 @@ router.get('/library/public/:id', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('[Neture API] Error fetching public library item:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch library item' });
+  }
+});
+
+// ============================================================================
+// Seller Orders (WO-O4O-STORE-ORDERS-PAGE-V1 + WO-O4O-STORE-CART-PAGE-V1)
+// ============================================================================
+
+/**
+ * GET /api/v1/neture/seller/orders
+ * WO-O4O-STORE-ORDERS-PAGE-V1: 판매자 주문 목록 (페이지네이션 + 상태 필터)
+ */
+router.get('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { page, limit, status, sort, order: sortOrder } = req.query;
+    const result = await legacyNetureService.listOrders({
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 20,
+      status: status as any,
+      sort: (sort as any) || 'created_at',
+      order: (sortOrder as any) || 'desc',
+    }, userId);
+
+    res.json({ success: true, ...result });
+  } catch (error: any) {
+    logger.error('[Neture API] Error fetching seller orders:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch orders' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/seller/orders/:id
+ * WO-O4O-STORE-ORDERS-PAGE-V1 + WO-O4O-STORE-ORDER-DETAIL-PAGE-V1
+ * 판매자 주문 상세 (소유권 검증 + 공급자/상품 정보 enrichment)
+ */
+router.get('/seller/orders/:id', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const order = await legacyNetureService.getOrder(req.params.id, userId);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    // WO-O4O-STORE-ORDER-DETAIL-PAGE-V1: 공급자 + 상품 마스터 정보 보강
+    if (order.items && order.items.length > 0) {
+      const productIds = order.items.map((i: any) => i.product_id);
+      const enrichments: Array<{
+        offer_id: string; supplier_id: string; supplier_name: string;
+        supplier_phone: string | null; supplier_website: string | null;
+        brand_name: string | null; specification: string | null; barcode: string;
+        primary_image_url: string | null;
+      }> = await AppDataSource.query(
+        `SELECT spo.id AS offer_id,
+                s.id AS supplier_id, s.name AS supplier_name,
+                s.contact_phone AS supplier_phone, s.contact_website AS supplier_website,
+                pm.brand_name, pm.specification, pm.barcode,
+                pi.image_url AS primary_image_url
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers s ON s.id = spo.supplier_id
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
+         WHERE spo.id = ANY($1::uuid[])`,
+        [productIds],
+      );
+
+      const enrichMap = new Map(enrichments.map((e) => [e.offer_id, e]));
+
+      order.items = order.items.map((item: any) => {
+        const e = enrichMap.get(item.product_id);
+        return {
+          ...item,
+          supplier_id: e?.supplier_id || null,
+          supplier_name: e?.supplier_name || null,
+          supplier_phone: e?.supplier_phone || null,
+          supplier_website: e?.supplier_website || null,
+          brand_name: e?.brand_name || null,
+          specification: e?.specification || null,
+          barcode: e?.barcode || null,
+          primary_image_url: e?.primary_image_url || item.product_image || null,
+        };
+      });
+    }
+
+    res.json({ success: true, data: order });
+  } catch (error: any) {
+    logger.error('[Neture API] Error fetching seller order detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch order' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/seller/orders/:orderId/shipment
+ * WO-O4O-SHIPMENT-ENGINE-V1: 매장(Store) 배송 조회
+ */
+router.get('/seller/orders/:orderId/shipment', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { orderId } = req.params;
+
+    // Verify order belongs to this user
+    const order = await legacyNetureService.getOrder(orderId, userId);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT * FROM neture_shipments WHERE order_id = $1 LIMIT 1`,
+      [orderId],
+    );
+
+    res.json({ success: true, data: rows[0] || null });
+  } catch (error: any) {
+    logger.error('[Neture API] Error fetching seller shipment:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch shipment' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/seller/orders
+ * WO-O4O-STORE-CART-PAGE-V1: 판매자 B2B 주문 생성 — 6-gate 검증 + 서버 가격 강제
+ */
+router.post('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+
+    const { items, shipping, orderer_name, orderer_phone, orderer_email, note } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Items required' });
+    }
+    if (!shipping || !orderer_name || !orderer_phone) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Shipping info and orderer info required' });
+    }
+
+    const order = await legacyNetureService.createOrder(
+      { items, shipping, orderer_name, orderer_phone, orderer_email, note },
+      userId,
+    );
+
+    res.status(201).json({ success: true, data: order });
+  } catch (error: any) {
+    logger.error('[Neture API] Error creating seller order:', error);
+    res.status(400).json({ success: false, error: 'ORDER_CREATION_FAILED', message: error.message });
+  }
+});
+
+// ==================== Settlement Engine (WO-O4O-SETTLEMENT-ENGINE-V1) ====================
+
+/** Default platform fee rate for supplier settlements (10%) */
+const NETURE_PLATFORM_FEE_RATE = 0.10;
+
+/**
+ * GET /api/v1/neture/supplier/settlements
+ * WO-O4O-SETTLEMENT-ENGINE-V1: 공급자 정산 목록 (페이지네이션 + 상태 필터)
+ */
+router.get('/supplier/settlements', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const baseParams: any[] = [supplierId];
+    let statusClause = '';
+    if (status && ['pending', 'calculated', 'approved', 'paid', 'cancelled'].includes(status)) {
+      statusClause = 'AND s.status = $2';
+      baseParams.push(status);
+    }
+
+    const [settlements, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT s.id, s.supplier_id, s.period_start, s.period_end,
+                s.total_sales, s.platform_fee, s.supplier_amount,
+                s.platform_fee_rate, s.order_count, s.status,
+                s.paid_at, s.notes, s.created_at, s.updated_at
+         FROM neture_settlements s
+         WHERE s.supplier_id = $1 ${statusClause}
+         ORDER BY s.period_end DESC, s.created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        baseParams,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM neture_settlements s
+         WHERE s.supplier_id = $1 ${statusClause}`,
+        baseParams,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+
+    res.json({
+      success: true,
+      data: settlements,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier settlements:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlements' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/settlements/kpi
+ * WO-O4O-SETTLEMENT-ENGINE-V1: 정산 KPI (대시보드용)
+ * NOTE: /kpi must be registered BEFORE /:id
+ */
+router.get('/supplier/settlements/kpi', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+
+    const result = await AppDataSource.query(
+      `SELECT
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved')), 0)::int AS pending_amount,
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount,
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved', 'paid')), 0)::int AS total_amount,
+         COUNT(*) FILTER (WHERE status IN ('calculated', 'approved'))::int AS pending_count,
+         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count
+       FROM neture_settlements
+       WHERE supplier_id = $1 AND status != 'cancelled'`,
+      [supplierId],
+    );
+
+    res.json({
+      success: true,
+      data: {
+        pending_amount: Number(result[0]?.pending_amount || 0),
+        paid_amount: Number(result[0]?.paid_amount || 0),
+        total_amount: Number(result[0]?.total_amount || 0),
+        pending_count: Number(result[0]?.pending_count || 0),
+        paid_count: Number(result[0]?.paid_count || 0),
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching settlement KPI:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlement KPI' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/supplier/settlements/:id
+ * WO-O4O-SETTLEMENT-ENGINE-V1: 공급자 정산 상세 (연결된 주문 포함)
+ */
+router.get('/supplier/settlements/:id', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const settlementId = req.params.id;
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(settlementId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid settlement ID format' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT * FROM neture_settlements WHERE id = $1 AND supplier_id = $2 LIMIT 1`,
+      [settlementId, supplierId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
+    }
+    const settlement = rows[0];
+
+    const orders = await AppDataSource.query(
+      `SELECT so.order_id, so.supplier_sales_amount,
+              o.order_number, o.status AS order_status,
+              o.orderer_name, o.created_at AS order_date
+       FROM neture_settlement_orders so
+       JOIN neture_orders o ON o.id = so.order_id
+       WHERE so.settlement_id = $1
+       ORDER BY o.created_at DESC`,
+      [settlementId],
+    );
+
+    res.json({ success: true, data: { ...settlement, orders } });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching settlement detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlement detail' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/settlements/calculate
+ * WO-O4O-SETTLEMENT-ENGINE-V1: 정산 일괄 생성 (관리자)
+ *
+ * Body: { period_start: 'YYYY-MM-DD', period_end: 'YYYY-MM-DD' }
+ */
+router.post('/admin/settlements/calculate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { period_start, period_end } = req.body;
+
+    if (!period_start || !period_end) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'period_start and period_end are required (YYYY-MM-DD)' });
+    }
+    const startDate = new Date(period_start);
+    const endDate = new Date(period_end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Invalid date format. Use YYYY-MM-DD.' });
+    }
+    if (startDate >= endDate) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'period_start must be before period_end' });
+    }
+
+    // Find delivered orders not in any settlement, grouped by supplier
+    const supplierAggregates = await AppDataSource.query(
+      `SELECT
+         spo.supplier_id,
+         ARRAY_AGG(DISTINCT o.id) AS order_ids,
+         COUNT(DISTINCT o.id)::int AS order_count,
+         SUM(oi.total_price)::int AS total_sales
+       FROM neture_orders o
+       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE o.status = 'delivered'
+         AND o.updated_at >= $1::date
+         AND o.updated_at < ($2::date + INTERVAL '1 day')
+         AND NOT EXISTS (
+           SELECT 1 FROM neture_settlement_orders nso
+           WHERE nso.order_id = o.id
+         )
+       GROUP BY spo.supplier_id
+       HAVING SUM(oi.total_price) > 0`,
+      [period_start, period_end],
+    );
+
+    if (supplierAggregates.length === 0) {
+      return res.json({
+        success: true,
+        data: { created: 0, settlements: [] },
+        message: 'No unsettled delivered orders found in the given period.',
+      });
+    }
+
+    const created: any[] = [];
+    const feeRate = NETURE_PLATFORM_FEE_RATE;
+
+    for (const agg of supplierAggregates) {
+      const totalSales = Number(agg.total_sales);
+      const platformFee = Math.round(totalSales * feeRate);
+      const supplierAmount = totalSales - platformFee;
+      const orderIds: string[] = agg.order_ids;
+
+      const [settlement] = await AppDataSource.query(
+        `INSERT INTO neture_settlements
+           (supplier_id, period_start, period_end, total_sales, platform_fee,
+            supplier_amount, platform_fee_rate, order_count, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'calculated')
+         RETURNING *`,
+        [agg.supplier_id, period_start, period_end, totalSales,
+         platformFee, supplierAmount, feeRate, agg.order_count],
+      );
+
+      // Per-order supplier sales for the junction table
+      const orderSales = await AppDataSource.query(
+        `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
+         FROM neture_orders o
+         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         WHERE o.id = ANY($1::uuid[]) AND spo.supplier_id = $2
+         GROUP BY o.id`,
+        [orderIds, agg.supplier_id],
+      );
+
+      for (const os of orderSales) {
+        await AppDataSource.query(
+          `INSERT INTO neture_settlement_orders (settlement_id, order_id, supplier_sales_amount)
+           VALUES ($1, $2, $3)`,
+          [settlement.id, os.order_id, os.supplier_sales_amount],
+        );
+      }
+
+      created.push(settlement);
+    }
+
+    logger.info(`[Neture Settlement] Created ${created.length} settlements for period ${period_start} ~ ${period_end}`);
+
+    res.json({
+      success: true,
+      data: { created: created.length, settlements: created },
+    });
+  } catch (error: any) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ success: false, error: 'DUPLICATE_SETTLEMENT', message: 'A settlement already exists for one or more suppliers in this period.' });
+    }
+    logger.error('[Neture API] Error calculating settlements:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to calculate settlements' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/settlements/:id/status
+ * WO-O4O-SETTLEMENT-ENGINE-OPERATOR-REFACTOR-V1: 정산 취소 (관리자)
+ *
+ * Body: { status: 'cancelled', notes?: string }
+ * calculated 또는 approved 상태에서 취소 가능
+ */
+router.patch('/admin/settlements/:id/status', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+    const { status, notes } = req.body;
+
+    if (!status || status !== 'cancelled') {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'This endpoint only supports "cancelled" status. Use /approve or /pay for transitions.' });
+    }
+
+    const setClauses = ['status = $1', 'updated_at = NOW()'];
+    const params: any[] = [status];
+    let paramIdx = 2;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(settlementId);
+    const result = await AppDataSource.query(
+      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status IN ('calculated', 'approved')
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in cancellable status' });
+    }
+
+    // Delete junction rows to allow re-settlement
+    await AppDataSource.query(
+      `DELETE FROM neture_settlement_orders WHERE settlement_id = $1`,
+      [settlementId],
+    );
+
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error cancelling settlement:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel settlement' });
+  }
+});
+
+// ==================== Admin Settlement Management (WO-O4O-SETTLEMENT-ENGINE-OPERATOR-REFACTOR-V1) ====================
+
+/**
+ * GET /api/v1/neture/admin/settlements
+ * 운영자 정산 목록 (페이지네이션 + 상태 필터 + 공급자명)
+ */
+router.get('/admin/settlements', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const baseParams: any[] = [];
+    let statusClause = '';
+    let paramIdx = 1;
+    if (status && ['pending', 'calculated', 'approved', 'paid', 'cancelled'].includes(status)) {
+      statusClause = `WHERE s.status = $${paramIdx}`;
+      baseParams.push(status);
+      paramIdx++;
+    }
+
+    const [settlements, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT s.id, s.supplier_id, ns.name AS supplier_name,
+                s.period_start, s.period_end,
+                s.total_sales, s.platform_fee, s.supplier_amount,
+                s.platform_fee_rate, s.order_count, s.status,
+                s.approved_at, s.paid_at, s.notes, s.created_at, s.updated_at
+         FROM neture_settlements s
+         LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
+         ${statusClause}
+         ORDER BY s.created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        baseParams,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM neture_settlements s
+         ${statusClause}`,
+        baseParams,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+    res.json({
+      success: true,
+      data: settlements,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin settlements:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlements' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/settlements/kpi
+ * 운영자 정산 KPI (calculated/approved/paid 건수 + 금액)
+ * NOTE: /kpi must be registered BEFORE /:id
+ */
+router.get('/admin/settlements/kpi', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  try {
+    const result = await AppDataSource.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE status = 'calculated')::int AS calculated_count,
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'calculated'), 0)::int AS calculated_amount,
+         COUNT(*) FILTER (WHERE status = 'approved')::int AS approved_count,
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'approved'), 0)::int AS approved_amount,
+         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count,
+         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount
+       FROM neture_settlements
+       WHERE status != 'cancelled'`,
+    );
+
+    res.json({
+      success: true,
+      data: {
+        calculated_count: Number(result[0]?.calculated_count || 0),
+        calculated_amount: Number(result[0]?.calculated_amount || 0),
+        approved_count: Number(result[0]?.approved_count || 0),
+        approved_amount: Number(result[0]?.approved_amount || 0),
+        paid_count: Number(result[0]?.paid_count || 0),
+        paid_amount: Number(result[0]?.paid_amount || 0),
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin settlement KPI:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlement KPI' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/settlements/:id
+ * 운영자 정산 상세 (공급자명 + 연결 주문)
+ */
+router.get('/admin/settlements/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(settlementId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid settlement ID format' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT s.*, ns.name AS supplier_name
+       FROM neture_settlements s
+       LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
+       WHERE s.id = $1 LIMIT 1`,
+      [settlementId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
+    }
+
+    const orders = await AppDataSource.query(
+      `SELECT so.order_id, so.supplier_sales_amount,
+              o.order_number, o.status AS order_status,
+              o.orderer_name, o.created_at AS order_date
+       FROM neture_settlement_orders so
+       JOIN neture_orders o ON o.id = so.order_id
+       WHERE so.settlement_id = $1
+       ORDER BY o.created_at DESC`,
+      [settlementId],
+    );
+
+    res.json({ success: true, data: { ...rows[0], orders } });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin settlement detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlement detail' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/settlements/:id/approve
+ * 운영자 정산 승인 (calculated → approved)
+ */
+router.patch('/admin/settlements/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+    const { notes } = req.body;
+
+    const setClauses = ["status = 'approved'", 'approved_at = NOW()', 'updated_at = NOW()'];
+    const params: any[] = [];
+    let paramIdx = 1;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(settlementId);
+    const result = await AppDataSource.query(
+      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status = 'calculated'
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in "calculated" status' });
+    }
+
+    logger.info(`[Neture Settlement] Settlement ${settlementId} approved`);
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error approving settlement:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve settlement' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/settlements/:id/pay
+ * 운영자 정산 지급 처리 (approved → paid)
+ */
+router.patch('/admin/settlements/:id/pay', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+    const { notes } = req.body;
+
+    const setClauses = ["status = 'paid'", 'paid_at = NOW()', 'updated_at = NOW()'];
+    const params: any[] = [];
+    let paramIdx = 1;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(settlementId);
+    const result = await AppDataSource.query(
+      `UPDATE neture_settlements SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status = 'approved'
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in "approved" status' });
+    }
+
+    logger.info(`[Neture Settlement] Settlement ${settlementId} paid`);
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error paying settlement:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay settlement' });
   }
 });
 

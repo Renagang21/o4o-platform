@@ -90,6 +90,24 @@ export class SupplierProductOffer {
   @Column({ name: 'consumer_reference_price', type: 'int', nullable: true })
   consumerReferencePrice: number | null;
 
+  // ==================== Inventory (WO-O4O-INVENTORY-ENGINE-V1) ====================
+
+  /** 총 재고 수량 */
+  @Column({ name: 'stock_quantity', type: 'int', default: 0 })
+  stockQuantity: number;
+
+  /** 예약 수량 (주문 생성 시 증가, 배송 완료/취소 시 감소) */
+  @Column({ name: 'reserved_quantity', type: 'int', default: 0 })
+  reservedQuantity: number;
+
+  /** 재고 부족 경고 기준값 */
+  @Column({ name: 'low_stock_threshold', type: 'int', default: 10 })
+  lowStockThreshold: number;
+
+  /** 재고 추적 활성화 (false = 무한 재고, 기존 상품 호환) */
+  @Column({ name: 'track_inventory', type: 'boolean', default: false })
+  trackInventory: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

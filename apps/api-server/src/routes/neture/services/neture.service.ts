@@ -551,6 +551,15 @@ export class NetureService {
         throw new Error(`Invalid price for product: ${productName}`);
       }
 
+      // Gate 7: 재고 검증 (WO-O4O-INVENTORY-ENGINE-V1)
+      // trackInventory가 true인 상품만 재고 검증, false면 무한 재고
+      if (offer.trackInventory) {
+        const availableStock = offer.stockQuantity - offer.reservedQuantity;
+        if (availableStock < item.quantity) {
+          throw new Error(`Insufficient stock for product: ${productName} (available: ${availableStock}, requested: ${item.quantity})`);
+        }
+      }
+
       const itemTotal = unitPrice * item.quantity;
       totalAmount += itemTotal;
 
@@ -569,7 +578,7 @@ export class NetureService {
     const shippingFee = totalAmount >= 50000 ? 0 : 3000;
     const finalAmount = totalAmount + shippingFee;
 
-    // 4. 주문 생성 (단일 트랜잭션: order + items 원자성 보장)
+    // 4. 주문 생성 (단일 트랜잭션: order + items + 재고 예약 원자성 보장)
     const orderNumber = await this.repository.generateOrderNumber();
 
     const order = await this.dataSource.transaction(async (manager) => {
@@ -599,6 +608,19 @@ export class NetureService {
       }));
       const savedItems = orderItemRepo.create(itemsWithOrderId);
       savedOrder.items = await orderItemRepo.save(savedItems);
+
+      // WO-O4O-INVENTORY-ENGINE-V1: 재고 예약 (reserved_quantity 증가)
+      for (const item of data.items) {
+        const offer = productMap.get(item.product_id);
+        if (offer?.trackInventory) {
+          await manager.query(
+            `UPDATE supplier_product_offers
+             SET reserved_quantity = reserved_quantity + $1, updated_at = NOW()
+             WHERE id = $2`,
+            [item.quantity, offer.id],
+          );
+        }
+      }
 
       return savedOrder;
     });
@@ -687,15 +709,38 @@ export class NetureService {
       status: data.status,
     };
 
-    // 취소 처리
+    // 취소 처리 — reserved_quantity 해제 (WO-O4O-INVENTORY-ENGINE-V1)
     if (data.status === NetureOrderStatus.CANCELLED) {
       updateData.cancelledAt = new Date();
       updateData.cancelReason = data.cancel_reason;
 
-      // 재고 복원
       if (order.items) {
         for (const item of order.items) {
+          // 예약 수량 해제 (trackInventory 여부와 무관하게 안전하게 감소)
+          await this.dataSource.query(
+            `UPDATE supplier_product_offers
+             SET reserved_quantity = GREATEST(reserved_quantity - $1, 0), updated_at = NOW()
+             WHERE id = $2`,
+            [item.quantity, item.productId],
+          );
+          // Legacy 재고 복원 (기존 neture_products 호환)
           await this.repository.restoreStock(item.productId, item.quantity);
+        }
+      }
+    }
+
+    // 배송 완료 — stock_quantity & reserved_quantity 동시 차감 (WO-O4O-INVENTORY-ENGINE-V1)
+    if (data.status === NetureOrderStatus.DELIVERED) {
+      if (order.items) {
+        for (const item of order.items) {
+          await this.dataSource.query(
+            `UPDATE supplier_product_offers
+             SET stock_quantity = GREATEST(stock_quantity - $1, 0),
+                 reserved_quantity = GREATEST(reserved_quantity - $1, 0),
+                 updated_at = NOW()
+             WHERE id = $2`,
+            [item.quantity, item.productId],
+          );
         }
       }
     }

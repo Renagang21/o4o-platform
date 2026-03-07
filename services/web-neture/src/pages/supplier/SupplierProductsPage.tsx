@@ -23,7 +23,7 @@
 
 import { useState, useEffect } from 'react';
 import { Package, Users, Clock, ToggleLeft, ToggleRight, AlertCircle, Globe, Lock, X, Check } from 'lucide-react';
-import { supplierApi, type SupplierProduct, type SupplierProductPurpose, type DistributionType } from '../../lib/api';
+import { supplierApi, type SupplierProduct, type SupplierProductPurpose, type DistributionType, type InventoryItem, getInventoryStatus } from '../../lib/api';
 
 const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; color: string; bgColor: string }> = {
   CATALOG: { label: '정보 제공', color: '#64748b', bgColor: '#f1f5f9' },
@@ -31,8 +31,16 @@ const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; color: str
   ACTIVE_SALES: { label: '판매 중', color: '#16a34a', bgColor: '#dcfce7' },
 };
 
+const STOCK_STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
+  in_stock: { label: '재고 충분', color: '#16a34a', bgColor: '#dcfce7' },
+  low_stock: { label: '재고 부족', color: '#b45309', bgColor: '#fef3c7' },
+  out_of_stock: { label: '품절', color: '#dc2626', bgColor: '#fee2e2' },
+  untracked: { label: '재고 미관리', color: '#64748b', bgColor: '#f1f5f9' },
+};
+
 export default function SupplierProductsPage() {
   const [products, setProducts] = useState<SupplierProduct[]>([]);
+  const [inventoryMap, setInventoryMap] = useState<Map<string, InventoryItem>>(new Map());
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [editingDistribution, setEditingDistribution] = useState<string | null>(null);
@@ -40,13 +48,17 @@ export default function SupplierProductsPage() {
   const [editSellerIds, setEditSellerIds] = useState('');
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const data = await supplierApi.getProducts();
-      setProducts(data);
+      const [productsData, inventoryData] = await Promise.all([
+        supplierApi.getProducts(),
+        supplierApi.getInventory().catch(() => []),
+      ]);
+      setProducts(productsData);
+      setInventoryMap(new Map(inventoryData.map((i) => [i.offer_id, i])));
       setLoading(false);
     };
-    fetchProducts();
+    fetchData();
   }, []);
 
   const handleToggleActive = async (productId: string, currentValue: boolean) => {
@@ -211,6 +223,24 @@ export default function SupplierProductsPage() {
                         {product.pendingRequestCount}건 대기
                       </span>
                     )}
+                    {(() => {
+                      const inv = inventoryMap.get(product.id);
+                      if (!inv) return null;
+                      const status = getInventoryStatus(inv);
+                      const cfg = STOCK_STATUS_CONFIG[status];
+                      return (
+                        <span
+                          style={{
+                            ...styles.purposeBadge,
+                            backgroundColor: cfg.bgColor,
+                            color: cfg.color,
+                            fontSize: '11px',
+                          }}
+                        >
+                          {cfg.label}{status !== 'untracked' ? ` (${inv.available_stock})` : ''}
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   {/* Distribution Editor (inline) */}

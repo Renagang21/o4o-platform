@@ -1102,6 +1102,243 @@ export const supplierApi = {
       return { success: false, error: 'NETWORK_ERROR' };
     }
   },
+
+  // WO-O4O-SUPPLIER-ORDER-PROCESSING-V1: 공급자 주문 관리
+
+  /** GET /api/v1/neture/supplier/orders — 공급자 주문 목록 */
+  async getOrders(params?: { page?: number; limit?: number; status?: string }): Promise<SupplierOrdersResponse> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params?.page) searchParams.set('page', String(params.page));
+      if (params?.limit) searchParams.set('limit', String(params.limit));
+      if (params?.status) searchParams.set('status', params.status);
+      const qs = searchParams.toString();
+      const url = `${API_BASE_URL}/api/v1/neture/supplier/orders${qs ? `?${qs}` : ''}`;
+
+      const response = await fetch(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Supplier API] Failed to fetch orders:', response.status);
+        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      }
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch orders:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/orders/:id — 공급자 주문 상세 */
+  async getOrderById(id: string): Promise<StoreOrder | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${id}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch order detail:', error);
+      return null;
+    }
+  },
+
+  /** PATCH /api/v1/neture/supplier/orders/:id/status — 주문 상태 변경 */
+  async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status }),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/orders/kpi — 주문 KPI (WO-O4O-SUPPLIER-DASHBOARD-V1) */
+  async getOrderKpi(): Promise<SupplierOrderKpi> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/kpi`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        return { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
+      }
+      const result = await response.json();
+      return result.data || { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch order KPI:', error);
+      return { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
+    }
+  },
+
+  // WO-O4O-INVENTORY-ENGINE-V1: 재고 관리
+
+  /** GET /api/v1/neture/supplier/inventory — 재고 목록 */
+  async getInventory(): Promise<InventoryItem[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch inventory:', error);
+      return [];
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/inventory/:offerId — 재고 상세 */
+  async getInventoryItem(offerId: string): Promise<InventoryItem | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory/${offerId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch inventory item:', error);
+      return null;
+    }
+  },
+
+  /** PATCH /api/v1/neture/supplier/inventory/:offerId — 재고 수정 */
+  async updateInventory(
+    offerId: string,
+    updates: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean }
+  ): Promise<{ success: boolean; error?: string; data?: InventoryItem }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory/${offerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-O4O-SHIPMENT-ENGINE-V1: 배송 관리
+
+  /** POST /api/v1/neture/supplier/orders/:orderId/shipment — 송장 등록 */
+  async createShipment(
+    orderId: string,
+    data: { carrier_code: string; carrier_name: string; tracking_number: string }
+  ): Promise<{ success: boolean; data?: Shipment; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${orderId}/shipment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/orders/:orderId/shipment — 배송 조회 */
+  async getShipment(orderId: string): Promise<Shipment | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${orderId}/shipment`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch shipment:', error);
+      return null;
+    }
+  },
+
+  /** PATCH /api/v1/neture/supplier/shipments/:id — 배송 상태 변경 */
+  async updateShipmentStatus(
+    shipmentId: string,
+    data: { status: string; tracking_number?: string }
+  ): Promise<{ success: boolean; data?: Shipment; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/shipments/${shipmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-O4O-SETTLEMENT-ENGINE-V1: 정산 관리
+
+  /** GET /api/v1/neture/supplier/settlements — 정산 목록 */
+  async getSettlements(
+    params?: { page?: number; limit?: number; status?: SettlementStatus }
+  ): Promise<SettlementsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.status) sp.append('status', params.status);
+      const qs = sp.toString() ? `?${sp}` : '';
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/neture/supplier/settlements${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) {
+        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      }
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch settlements:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/settlements/:id — 정산 상세 */
+  async getSettlementDetail(id: string): Promise<SettlementDetail | null> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/neture/supplier/settlements/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch settlement detail:', error);
+      return null;
+    }
+  },
+
+  /** GET /api/v1/neture/supplier/settlements/kpi — 정산 KPI */
+  async getSettlementKpi(): Promise<SettlementKpi> {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/neture/supplier/settlements/kpi`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) {
+        return { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
+      }
+      const result = await response.json();
+      return result.data || { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch settlement KPI:', error);
+      return { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
+    }
+  },
 };
 
 // ==================== Seller API (WO-S2S-FLOW-RECOVERY-PHASE1-V1) ====================
@@ -1319,6 +1556,132 @@ export const adminSupplierApi = {
       const response = await fetchWithTimeout(
         `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/deactivate`,
         { method: 'POST', credentials: 'include' },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Settlement API (WO-O4O-SETTLEMENT-ENGINE-OPERATOR-REFACTOR-V1) ====================
+
+const ADMIN_SETTLEMENT_KPI_DEFAULT: AdminSettlementKpi = {
+  calculated_count: 0, calculated_amount: 0,
+  approved_count: 0, approved_amount: 0,
+  paid_count: 0, paid_amount: 0,
+};
+
+export const adminSettlementApi = {
+  /** GET /api/v1/neture/admin/settlements — 운영자 정산 목록 */
+  async getSettlements(
+    params?: { page?: number; limit?: number; status?: SettlementStatus }
+  ): Promise<SettlementsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.status) sp.append('status', params.status);
+      const qs = sp.toString() ? `?${sp}` : '';
+
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Admin Settlement API] Failed to fetch settlements:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/admin/settlements/kpi — 운영자 KPI */
+  async getKpi(): Promise<AdminSettlementKpi> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/kpi`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return ADMIN_SETTLEMENT_KPI_DEFAULT;
+      const result = await response.json();
+      return result.data || ADMIN_SETTLEMENT_KPI_DEFAULT;
+    } catch {
+      return ADMIN_SETTLEMENT_KPI_DEFAULT;
+    }
+  },
+
+  /** GET /api/v1/neture/admin/settlements/:id — 운영자 정산 상세 */
+  async getDetail(id: string): Promise<SettlementDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+
+  /** POST /api/v1/neture/admin/settlements/calculate — 정산 일괄 계산 */
+  async calculate(periodStart: string, periodEnd: string): Promise<{ success: boolean; data?: any; error?: string; message?: string }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/calculate`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ period_start: periodStart, period_end: periodEnd }),
+        },
+      );
+      return await response.json();
+    } catch { return { success: false, error: 'NETWORK_ERROR' }; }
+  },
+
+  /** PATCH /api/v1/neture/admin/settlements/:id/approve — 정산 승인 */
+  async approve(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/approve`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ notes }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  /** PATCH /api/v1/neture/admin/settlements/:id/pay — 정산 지급 처리 */
+  async pay(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/pay`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ notes }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  /** PATCH /api/v1/neture/admin/settlements/:id/status — 정산 취소 */
+  async cancel(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/status`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'cancelled', notes }),
+        },
       );
       return response.ok;
     } catch { return false; }
@@ -2106,6 +2469,13 @@ interface OperatorSupplyProduct {
   supplyStatus: 'available' | 'pending' | 'approved' | 'rejected';
   requestId: string | null;
   rejectReason: string | null;
+  // WO-O4O-STORE-CART-PAGE-V1: 가격/이미지/규격/바코드
+  priceGeneral: number;
+  consumerReferencePrice: number | null;
+  approvalStatus: string;
+  barcode: string;
+  specification: string | null;
+  primaryImageUrl: string | null;
 }
 
 const operatorSupplyApi = {
@@ -2314,5 +2684,328 @@ export const partnerRecruitmentApi = {
       return { success: false, error: result.error || 'UNKNOWN_ERROR' };
     }
     return { success: true };
+  },
+};
+
+// ==================== Store API (WO-O4O-STORE-CART-PAGE-V1) ====================
+
+export interface StoreOrderShipping {
+  recipient_name: string;
+  phone: string;
+  postal_code: string;
+  address: string;
+  address_detail?: string;
+  delivery_note?: string;
+}
+
+export interface CreateStoreOrderRequest {
+  items: Array<{ product_id: string; quantity: number }>;
+  shipping: StoreOrderShipping;
+  orderer_name: string;
+  orderer_phone: string;
+  orderer_email?: string;
+  note?: string;
+}
+
+// WO-O4O-STORE-ORDERS-PAGE-V1: 주문 타입
+
+export interface StoreOrderItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_image: any | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  options: Record<string, any> | null;
+  // WO-O4O-STORE-ORDER-DETAIL-PAGE-V1: enriched fields
+  supplier_id?: string | null;
+  supplier_name?: string | null;
+  supplier_phone?: string | null;
+  supplier_website?: string | null;
+  brand_name?: string | null;
+  specification?: string | null;
+  barcode?: string | null;
+  primary_image_url?: string | null;
+}
+
+export interface StoreOrder {
+  id: string;
+  order_number: string;
+  status: string;
+  total_amount: number;
+  discount_amount: number;
+  shipping_fee: number;
+  final_amount: number;
+  orderer_name: string | null;
+  orderer_phone: string | null;
+  orderer_email?: string | null;
+  note: string | null;
+  // WO-O4O-STORE-ORDER-DETAIL-PAGE-V1: 배송 정보
+  shipping?: {
+    recipient_name: string;
+    phone: string;
+    postal_code: string;
+    address: string;
+    address_detail?: string;
+    delivery_note?: string;
+  } | null;
+  created_at: string;
+  updated_at: string;
+  items?: StoreOrderItem[];
+}
+
+export interface StoreOrdersResponse {
+  data: StoreOrder[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+// WO-O4O-SUPPLIER-ORDER-PROCESSING-V1: 공급자 주문 목록 타입
+
+export interface SupplierOrderSummary {
+  id: string;
+  order_number: string;
+  status: string;
+  total_amount: number;
+  shipping_fee: number;
+  final_amount: number;
+  orderer_name: string | null;
+  orderer_phone: string | null;
+  orderer_email: string | null;
+  shipping: {
+    recipient_name: string;
+    phone: string;
+    postal_code: string;
+    address: string;
+    address_detail?: string;
+    delivery_note?: string;
+  } | null;
+  note: string | null;
+  region: string | null;
+  item_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupplierOrdersResponse {
+  data: SupplierOrderSummary[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+// WO-O4O-SUPPLIER-DASHBOARD-V1: 공급자 주문 KPI
+
+export interface SupplierOrderKpi {
+  today_orders: number;
+  pending_processing: number;
+  pending_shipping: number;
+  total_orders: number;
+}
+
+// WO-O4O-INVENTORY-ENGINE-V1: 재고 관리
+
+export interface InventoryItem {
+  offer_id: string;
+  master_id: string;
+  marketing_name: string;
+  brand_name: string | null;
+  barcode: string | null;
+  specification: string | null;
+  primary_image_url: string | null;
+  price_general: number;
+  is_active: boolean;
+  stock_quantity: number;
+  reserved_quantity: number;
+  low_stock_threshold: number;
+  track_inventory: boolean;
+  available_stock: number;
+}
+
+export type InventoryStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'untracked';
+
+export function getInventoryStatus(item: InventoryItem): InventoryStatus {
+  if (!item.track_inventory) return 'untracked';
+  if (item.available_stock <= 0) return 'out_of_stock';
+  if (item.available_stock <= item.low_stock_threshold) return 'low_stock';
+  return 'in_stock';
+}
+
+// WO-O4O-SHIPMENT-ENGINE-V1: 배송 관리
+
+export interface Shipment {
+  id: string;
+  order_id: string;
+  supplier_id: string;
+  carrier_code: string;
+  carrier_name: string;
+  tracking_number: string;
+  status: string; // preparing | shipped | in_transit | delivered
+  shipped_at: string | null;
+  delivered_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const CARRIERS = [
+  { code: 'cj', name: 'CJ대한통운', trackUrl: 'https://trace.cjlogistics.com/next/tracking.html?wblNo=' },
+  { code: 'hanjin', name: '한진택배', trackUrl: 'https://www.hanjin.com/kor/CMS/DeliveryMgr/WaybillResult.do?mession=&inv_no=' },
+  { code: 'lotte', name: '롯데택배', trackUrl: 'https://www.lotteglogis.com/home/reservation/tracking/link498?InvNo=' },
+  { code: 'logen', name: '로젠택배', trackUrl: 'https://www.ilogen.com/web/personal/trace/' },
+  { code: 'post', name: '우체국택배', trackUrl: 'https://service.epost.go.kr/trace.RetrieveDomRi498.postal?sid1=' },
+  { code: 'other', name: '기타', trackUrl: null },
+] as const;
+
+export function getTrackingUrl(carrierCode: string, trackingNumber: string): string | null {
+  const carrier = CARRIERS.find((c) => c.code === carrierCode);
+  if (!carrier || !carrier.trackUrl) return null;
+  return `${carrier.trackUrl}${trackingNumber}`;
+}
+
+export const SHIPMENT_STATUS_LABELS: Record<string, string> = {
+  preparing: '배송 준비',
+  shipped: '발송 완료',
+  in_transit: '배송 중',
+  delivered: '배송 완료',
+};
+
+// WO-O4O-SETTLEMENT-ENGINE-V1: 정산 관리
+
+export type SettlementStatus = 'pending' | 'calculated' | 'approved' | 'paid' | 'cancelled';
+
+export interface Settlement {
+  id: string;
+  supplier_id: string;
+  supplier_name?: string;
+  period_start: string;
+  period_end: string;
+  total_sales: number;
+  platform_fee: number;
+  supplier_amount: number;
+  platform_fee_rate: number;
+  order_count: number;
+  status: SettlementStatus;
+  approved_at: string | null;
+  paid_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SettlementOrder {
+  order_id: string;
+  supplier_sales_amount: number;
+  order_number: string;
+  order_status: string;
+  orderer_name: string | null;
+  order_date: string;
+}
+
+export interface SettlementDetail extends Settlement {
+  orders: SettlementOrder[];
+}
+
+export interface SettlementKpi {
+  pending_amount: number;
+  paid_amount: number;
+  total_amount: number;
+  pending_count: number;
+  paid_count: number;
+}
+
+export interface SettlementsResponse {
+  data: Settlement[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
+  pending: '대기',
+  calculated: '정산완료',
+  approved: '승인완료',
+  paid: '지급완료',
+  cancelled: '취소',
+};
+
+// WO-O4O-SETTLEMENT-ENGINE-OPERATOR-REFACTOR-V1: Admin Settlement KPI
+
+export interface AdminSettlementKpi {
+  calculated_count: number;
+  calculated_amount: number;
+  approved_count: number;
+  approved_amount: number;
+  paid_count: number;
+  paid_amount: number;
+}
+
+export const storeApi = {
+  /** POST /api/v1/neture/seller/orders — B2B 주문 생성 (6-gate 서버 검증) */
+  async createOrder(data: CreateStoreOrderRequest): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/seller/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return { success: false, error: result.message || result.error || 'ORDER_FAILED' };
+      }
+      return { success: true, data: result.data };
+    } catch (error) {
+      console.error('[Store API] Failed to create order:', error);
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /** GET /api/v1/neture/seller/orders — 주문 목록 (WO-O4O-STORE-ORDERS-PAGE-V1) */
+  async getOrders(params?: { page?: number; limit?: number; status?: string }): Promise<StoreOrdersResponse> {
+    try {
+      const searchParams = new URLSearchParams();
+      if (params?.page) searchParams.set('page', String(params.page));
+      if (params?.limit) searchParams.set('limit', String(params.limit));
+      if (params?.status) searchParams.set('status', params.status);
+      const qs = searchParams.toString();
+      const url = `${API_BASE_URL}/api/v1/neture/seller/orders${qs ? `?${qs}` : ''}`;
+
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Store API] Failed to fetch orders:', response.status);
+        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      }
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Store API] Failed to fetch orders:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/seller/orders/:orderId/shipment — 배송 조회 (WO-O4O-SHIPMENT-ENGINE-V1) */
+  async getShipment(orderId: string): Promise<Shipment | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/seller/orders/${orderId}/shipment`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Store API] Failed to fetch shipment:', error);
+      return null;
+    }
+  },
+
+  /** GET /api/v1/neture/seller/orders/:id — 주문 상세 (WO-O4O-STORE-ORDERS-PAGE-V1) */
+  async getOrderById(id: string): Promise<StoreOrder | null> {
+    try {
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/seller/orders/${id}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Store API] Failed to fetch order:', error);
+      return null;
+    }
   },
 };
