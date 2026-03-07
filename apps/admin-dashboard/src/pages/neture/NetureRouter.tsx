@@ -21,6 +21,8 @@ const PartnershipRequestListPage = React.lazy(() => import('./PartnershipRequest
 const PartnershipRequestDetailPage = React.lazy(() => import('./PartnershipRequestDetailPage'));
 const SupplierListPage = React.lazy(() => import('./SupplierListPage'));
 const ProductApprovalQueuePage = React.lazy(() => import('./ProductApprovalQueuePage'));
+const CategoryListPage = React.lazy(() => import('./CategoryListPage'));
+const BrandListPage = React.lazy(() => import('./BrandListPage'));
 
 const NetureRouter: React.FC = () => {
   return (
@@ -41,6 +43,10 @@ const NetureRouter: React.FC = () => {
 
         {/* Suppliers (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) */}
         <Route path="suppliers" element={<SupplierListPage />} />
+
+        {/* Categories & Brands (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) */}
+        <Route path="categories" element={<CategoryListPage />} />
+        <Route path="brands" element={<BrandListPage />} />
 
         {/* Partners */}
         <Route path="partners" element={<PartnerListPage />} />

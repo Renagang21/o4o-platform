@@ -192,7 +192,7 @@ export default function AdminMasterManagementPage() {
                     <p className="font-medium text-slate-800">{m.marketingName || '(이름 없음)'}</p>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-600">{m.brandName || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{m.category || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-slate-600">{m.category?.name || '-'}</td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(m.createdAt).toLocaleDateString('ko-KR')}
                   </td>

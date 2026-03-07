@@ -16,8 +16,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import type { SupplierProductOffer } from './SupplierProductOffer.entity.js';
+import type { ProductCategory } from './ProductCategory.entity.js';
+import type { Brand } from './Brand.entity.js';
+import type { ProductImage } from './ProductImage.entity.js';
 
 @Entity('product_masters')
 export class ProductMaster {
@@ -40,9 +45,37 @@ export class ProductMaster {
   @Column({ name: 'marketing_name', type: 'varchar', length: 255 })
   marketingName: string;
 
-  /** 브랜드명 (optional) */
+  /** 브랜드명 (optional, legacy — brandId 전환 후 제거 예정) */
   @Column({ name: 'brand_name', type: 'varchar', length: 255, nullable: true })
   brandName: string | null;
+
+  /** 카테고리 FK (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) */
+  @Column({ name: 'category_id', type: 'uuid', nullable: true })
+  categoryId: string | null;
+
+  @ManyToOne('ProductCategory', { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'category_id' })
+  category?: ProductCategory;
+
+  /** 브랜드 FK (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) */
+  @Column({ name: 'brand_id', type: 'uuid', nullable: true })
+  brandId: string | null;
+
+  @ManyToOne('Brand', { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'brand_id' })
+  brand?: Brand;
+
+  /** 제품 규격 (예: 500mg × 60정) */
+  @Column({ type: 'text', nullable: true })
+  specification: string | null;
+
+  /** 원산지 */
+  @Column({ name: 'origin_country', type: 'varchar', length: 100, nullable: true })
+  originCountry: string | null;
+
+  /** 검색/필터용 태그 (JSONB) */
+  @Column({ type: 'jsonb', default: '[]' })
+  tags: string[];
 
   /** 제조사명 — immutable */
   @Column({ name: 'manufacturer_name', type: 'varchar', length: 255 })
@@ -73,4 +106,8 @@ export class ProductMaster {
   /** 이 Master에 연결된 공급 Offer 목록 */
   @OneToMany('SupplierProductOffer', 'master')
   offers: SupplierProductOffer[];
+
+  /** 이 Master에 연결된 상품 이미지 목록 (WO-O4O-NETURE-PRODUCT-IMAGE-STRUCTURE-V1) */
+  @OneToMany('ProductImage', 'master')
+  images: ProductImage[];
 }

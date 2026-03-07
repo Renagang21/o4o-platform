@@ -932,6 +932,10 @@ export const supplierApi = {
     barcode: string;
     distributionType?: string;
     manualData?: Record<string, any>;
+    priceGeneral?: number;
+    priceGold?: number | null;
+    pricePlatinum?: number | null;
+    consumerReferencePrice?: number | null;
   }): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
@@ -958,6 +962,10 @@ export const supplierApi = {
       acceptsApplications?: boolean;
       distributionType?: DistributionType;
       allowedSellerIds?: string[] | null;
+      priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
+      consumerReferencePrice?: number | null;
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
@@ -1394,10 +1402,20 @@ export const adminProductApi = {
 export interface AdminMaster {
   id: string;
   barcode: string;
+  regulatoryType: string;
+  regulatoryName: string;
   marketingName: string;
-  brandName: string;
-  category: string;
-  mfdsStatus: string;
+  brandName: string | null;
+  manufacturerName: string;
+  mfdsPermitNumber: string | null;
+  isMfdsVerified: boolean;
+  categoryId: string | null;
+  brandId: string | null;
+  specification: string | null;
+  originCountry: string | null;
+  tags: string[];
+  category: { id: string; name: string } | null;
+  brand: { id: string; name: string } | null;
   createdAt: string;
 }
 
@@ -1460,6 +1478,146 @@ export const adminMasterApi = {
       );
       return response.ok;
     } catch { return false; }
+  },
+};
+
+// ==================== Public Product API (WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1) ====================
+
+export interface CategoryTreeItem {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  depth: number;
+  sortOrder: number;
+  isActive: boolean;
+  children: CategoryTreeItem[];
+}
+
+export interface BrandItem {
+  id: string;
+  name: string;
+  slug: string;
+  manufacturerName: string | null;
+  countryOfOrigin: string | null;
+  isActive: boolean;
+}
+
+export interface ProductImage {
+  id: string;
+  imageUrl: string;
+  isPrimary: boolean;
+  sortOrder: number;
+}
+
+export const productApi = {
+  async getCategories(): Promise<CategoryTreeItem[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/categories`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Product API] Failed to fetch categories:', error);
+      return [];
+    }
+  },
+
+  async getBrands(): Promise<BrandItem[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/brands`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Product API] Failed to fetch brands:', error);
+      return [];
+    }
+  },
+
+  async getMasterByBarcode(barcode: string): Promise<AdminMaster | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/masters/barcode/${encodeURIComponent(barcode)}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Product API] Failed to fetch master by barcode:', error);
+      return null;
+    }
+  },
+
+  async getProductImages(masterId: string): Promise<ProductImage[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/products/${masterId}/images`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Product API] Failed to fetch product images:', error);
+      return [];
+    }
+  },
+
+  async uploadProductImage(masterId: string, file: File): Promise<{ success: boolean; data?: ProductImage; error?: string }> {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/products/${masterId}/images`,
+        { method: 'POST', credentials: 'include', body: formData },
+        30000,
+      );
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  async setPrimaryImage(imageId: string, masterId: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/products/images/${imageId}/primary`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ masterId }),
+        },
+      );
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+
+  async deleteProductImage(imageId: string, masterId: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/products/images/${imageId}`,
+        {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ masterId }),
+        },
+      );
+      return response.ok;
+    } catch {
+      return false;
+    }
   },
 };
 
@@ -1631,6 +1789,19 @@ interface SupplierProduct {
   activeServiceCount: number;
   createdAt: string;
   updatedAt: string;
+  // WO-O4O-SUPPLIER-PRODUCTS-PAGE-V1
+  masterId: string;
+  masterName: string;
+  barcode: string;
+  brandName: string | null;
+  categoryName: string | null;
+  specification: string | null;
+  primaryImageUrl: string | null;
+  approvalStatus: string;
+  priceGeneral: number;
+  priceGold: number | null;
+  pricePlatinum: number | null;
+  consumerReferencePrice: number | null;
 }
 
 // P1 §3.3: Enhanced order summary types

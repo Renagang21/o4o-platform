@@ -1,7 +1,12 @@
 /**
- * Neture Admin Product Detail Page
+ * Neture Admin ProductMaster Detail Page
  *
- * Phase D-3: Admin Dashboard에 Neture 서비스 등록
+ * WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1
+ *
+ * ProductMaster SSOT 상세/수정 페이지
+ * - Immutable 필드: 읽기 전용 표시
+ * - Mutable 필드: 수정 가능
+ * - "새 상품 등록" 없음 (Master는 barcode pipeline으로만 생성)
  */
 
 import React, { useState, useEffect } from 'react';
@@ -9,198 +14,176 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@o4o/auth-client';
 
-// Types
-interface ProductImage {
-  url: string;
-  alt?: string;
-  is_primary: boolean;
-  order?: number;
-}
-
-interface Product {
+// Types aligned with actual ProductMaster entity
+interface CategoryRef {
   id: string;
-  partner_id: string | null;
   name: string;
-  subtitle: string | null;
-  description: string | null;
-  short_description: string | null;
-  category: string;
-  status: string;
-  base_price: number;
-  sale_price: number | null;
-  currency: string;
-  stock: number;
-  sku: string | null;
-  manufacturer: string | null;
-  origin_country: string | null;
-  legal_category: string | null;
-  certification_ids: string[] | null;
-  usage_info: string | null;
-  caution_info: string | null;
-  barcodes: string[] | null;
-  images: ProductImage[] | null;
-  tags: string[] | null;
-  is_featured: boolean;
-  created_at: string;
-  updated_at: string;
+  slug: string;
 }
 
-interface ProductFormData {
+interface BrandRef {
+  id: string;
   name: string;
-  subtitle: string;
-  description: string;
-  short_description: string;
-  category: string;
-  base_price: number;
-  sale_price: number | null;
-  stock: number;
-  sku: string;
-  manufacturer: string;
-  origin_country: string;
-  legal_category: string;
-  certification_ids: string;
-  usage_info: string;
-  caution_info: string;
-  barcodes: string;
+  slug: string;
+}
+
+interface ProductMasterDetail {
+  id: string;
+  barcode: string;
+  regulatoryType: string;
+  regulatoryName: string;
+  marketingName: string;
+  brandName: string | null;
+  manufacturerName: string;
+  mfdsPermitNumber: string | null;
+  mfdsProductId: string;
+  isMfdsVerified: boolean;
+  mfdsSyncedAt: string | null;
+  categoryId: string | null;
+  brandId: string | null;
+  specification: string | null;
+  originCountry: string | null;
+  tags: string[];
+  category: CategoryRef | null;
+  brand: BrandRef | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface MasterFormData {
+  marketingName: string;
+  categoryId: string;
+  brandId: string;
+  specification: string;
+  originCountry: string;
   tags: string;
-  is_featured: boolean;
 }
 
-const CATEGORIES = [
-  { value: 'healthcare', label: '건강관리' },
-  { value: 'beauty', label: '뷰티' },
-  { value: 'food', label: '푸드' },
-  { value: 'lifestyle', label: '라이프스타일' },
-  { value: 'other', label: '기타' },
-];
-
-async function fetchProduct(id: string): Promise<{ data: Product }> {
-  const response = await authClient.api.get(`/api/v1/neture/admin/products/${id}`);
+// API functions
+async function fetchMaster(id: string): Promise<{ data: ProductMasterDetail }> {
+  const response = await authClient.api.get(`/api/v1/neture/admin/masters/${id}`);
   return response.data;
 }
 
-async function createProduct(data: Partial<Product>): Promise<{ data: Product }> {
-  const response = await authClient.api.post('/api/v1/neture/admin/products', data);
+async function updateMaster(id: string, data: Record<string, unknown>): Promise<{ data: ProductMasterDetail }> {
+  const response = await authClient.api.patch(`/api/v1/neture/admin/masters/${id}`, data);
   return response.data;
 }
 
-async function updateProduct(id: string, data: Partial<Product>): Promise<{ data: Product }> {
-  const response = await authClient.api.patch(`/api/v1/neture/admin/products/${id}`, data);
+async function fetchCategories(): Promise<{ data: CategoryRef[] }> {
+  const response = await authClient.api.get('/api/v1/neture/admin/categories');
   return response.data;
+}
+
+async function fetchBrands(): Promise<{ data: BrandRef[] }> {
+  const response = await authClient.api.get('/api/v1/neture/admin/brands');
+  return response.data;
+}
+
+// Flatten category tree for select dropdown
+function flattenCategories(categories: (CategoryRef & { depth?: number; children?: CategoryRef[] })[], depth = 0): { id: string; name: string; depth: number }[] {
+  const result: { id: string; name: string; depth: number }[] = [];
+  for (const cat of categories) {
+    result.push({ id: cat.id, name: cat.name, depth });
+    if ('children' in cat && Array.isArray(cat.children)) {
+      result.push(...flattenCategories(cat.children as (CategoryRef & { depth?: number; children?: CategoryRef[] })[], depth + 1));
+    }
+  }
+  return result;
 }
 
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isNew = productId === 'new';
 
-  const [formData, setFormData] = useState<ProductFormData>({
-    name: '',
-    subtitle: '',
-    description: '',
-    short_description: '',
-    category: 'other',
-    base_price: 0,
-    sale_price: null,
-    stock: 0,
-    sku: '',
-    manufacturer: '',
-    origin_country: '',
-    legal_category: '',
-    certification_ids: '',
-    usage_info: '',
-    caution_info: '',
-    barcodes: '',
+  const [formData, setFormData] = useState<MasterFormData>({
+    marketingName: '',
+    categoryId: '',
+    brandId: '',
+    specification: '',
+    originCountry: '',
     tags: '',
-    is_featured: false,
   });
 
-  const { data: productResponse, isLoading } = useQuery({
-    queryKey: ['neture', 'admin', 'product', productId],
-    queryFn: () => fetchProduct(productId!),
-    enabled: !isNew && !!productId,
+  // Fetch master detail
+  const { data: masterResponse, isLoading } = useQuery({
+    queryKey: ['neture', 'admin', 'master', productId],
+    queryFn: () => fetchMaster(productId!),
+    enabled: !!productId,
   });
+
+  // Fetch categories and brands for dropdowns
+  const { data: categoriesResponse } = useQuery({
+    queryKey: ['neture', 'admin', 'categories'],
+    queryFn: fetchCategories,
+  });
+
+  const { data: brandsResponse } = useQuery({
+    queryKey: ['neture', 'admin', 'brands'],
+    queryFn: fetchBrands,
+  });
+
+  const flatCategories = categoriesResponse?.data ? flattenCategories(categoriesResponse.data) : [];
+  const brands = brandsResponse?.data || [];
 
   useEffect(() => {
-    if (productResponse?.data) {
-      const product = productResponse.data;
+    if (masterResponse?.data) {
+      const m = masterResponse.data;
       setFormData({
-        name: product.name,
-        subtitle: product.subtitle || '',
-        description: product.description || '',
-        short_description: product.short_description || '',
-        category: product.category,
-        base_price: product.base_price,
-        sale_price: product.sale_price,
-        stock: product.stock,
-        sku: product.sku || '',
-        manufacturer: product.manufacturer || '',
-        origin_country: product.origin_country || '',
-        legal_category: product.legal_category || '',
-        certification_ids: product.certification_ids?.join('\n') || '',
-        usage_info: product.usage_info || '',
-        caution_info: product.caution_info || '',
-        barcodes: product.barcodes?.join('\n') || '',
-        tags: product.tags?.join(', ') || '',
-        is_featured: product.is_featured,
+        marketingName: m.marketingName,
+        categoryId: m.categoryId || '',
+        brandId: m.brandId || '',
+        specification: m.specification || '',
+        originCountry: m.originCountry || '',
+        tags: m.tags?.join(', ') || '',
       });
     }
-  }, [productResponse]);
+  }, [masterResponse]);
 
   const saveMutation = useMutation({
-    mutationFn: (data: Partial<Product>) => {
-      if (isNew) {
-        return createProduct(data);
-      }
-      return updateProduct(productId!, data);
-    },
+    mutationFn: (data: Record<string, unknown>) => updateMaster(productId!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'products'] });
+      queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'masters'] });
+      queryClient.invalidateQueries({ queryKey: ['neture', 'admin', 'master', productId] });
       navigate('/neture/products');
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const productData: Partial<Product> = {
-      name: formData.name,
-      subtitle: formData.subtitle || null,
-      description: formData.description || null,
-      short_description: formData.short_description || null,
-      category: formData.category,
-      base_price: formData.base_price,
-      sale_price: formData.sale_price,
-      stock: formData.stock,
-      sku: formData.sku || null,
-      manufacturer: formData.manufacturer || null,
-      origin_country: formData.origin_country || null,
-      legal_category: formData.legal_category || null,
-      certification_ids: formData.certification_ids ? formData.certification_ids.split('\n').map((c) => c.trim()).filter(Boolean) : null,
-      usage_info: formData.usage_info || null,
-      caution_info: formData.caution_info || null,
-      barcodes: formData.barcodes ? formData.barcodes.split('\n').map((b) => b.trim()).filter(Boolean) : null,
-      tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()).filter(Boolean) : null,
-      is_featured: formData.is_featured,
+    const updates: Record<string, unknown> = {
+      marketingName: formData.marketingName,
+      categoryId: formData.categoryId || null,
+      brandId: formData.brandId || null,
+      specification: formData.specification || null,
+      originCountry: formData.originCountry || null,
+      tags: formData.tags ? formData.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
     };
-
-    saveMutation.mutate(productData);
+    saveMutation.mutate(updates);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked :
-              type === 'number' ? (value === '' ? null : Number(value)) : value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  if (!isNew && isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const master = masterResponse?.data;
+  if (!master) {
+    return (
+      <div className="p-6">
+        <p className="text-red-600">ProductMaster를 찾을 수 없습니다.</p>
+        <Link to="/neture/products" className="text-blue-600 hover:underline text-sm mt-2 inline-block">
+          ← 목록으로
+        </Link>
       </div>
     );
   }
@@ -212,271 +195,124 @@ const ProductDetailPage: React.FC = () => {
         <Link to="/neture/products" className="text-blue-600 hover:underline text-sm">
           ← 상품 목록으로
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-2">
-          {isNew ? '새 상품 등록' : '상품 수정'}
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mt-2">ProductMaster 상세</h1>
+        <p className="text-sm text-gray-500 mt-1">바코드: {master.barcode}</p>
       </div>
 
-      {/* Form */}
+      {/* Immutable Fields (Read-only) */}
+      <div className="bg-gray-50 rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">고정 정보 (변경 불가)</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoField label="바코드" value={master.barcode} />
+          <InfoField label="규제 유형" value={master.regulatoryType} />
+          <InfoField label="식약처 공식명" value={master.regulatoryName} />
+          <InfoField label="제조사명" value={master.manufacturerName} />
+          <InfoField label="식약처 허가번호" value={master.mfdsPermitNumber || '-'} />
+          <InfoField label="식약처 제품ID" value={master.mfdsProductId} />
+          <InfoField
+            label="MFDS 검증"
+            value={master.isMfdsVerified ? '검증됨' : '미검증'}
+            highlight={!master.isMfdsVerified}
+          />
+          <InfoField
+            label="MFDS 동기화"
+            value={master.mfdsSyncedAt ? new Date(master.mfdsSyncedAt).toLocaleDateString('ko-KR') : '-'}
+          />
+        </div>
+      </div>
+
+      {/* Editable Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-        {/* Basic Info */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">기본 정보</h2>
+        <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">수정 가능 정보</h2>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              상품명 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="상품명을 입력하세요"
-            />
-          </div>
+        {/* Marketing Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            마케팅명 <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="marketingName"
+            value={formData.marketingName}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">부제목</label>
-            <input
-              type="text"
-              name="subtitle"
-              value={formData.subtitle}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="부제목을 입력하세요"
-            />
-          </div>
-
+        {/* Category + Brand */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
             <select
-              name="category"
-              value={formData.category}
+              name="categoryId"
+              value={formData.categoryId}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              <option value="">미지정</option>
+              {flatCategories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {'  '.repeat(cat.depth)}{cat.name}
+                </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">상품 설명</label>
-            <textarea
-              name="description"
-              value={formData.description}
+            <label className="block text-sm font-medium text-gray-700 mb-1">브랜드</label>
+            <select
+              name="brandId"
+              value={formData.brandId}
               onChange={handleChange}
-              rows={5}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="상품에 대한 상세 설명을 입력하세요"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">짧은 설명</label>
-            <textarea
-              name="short_description"
-              value={formData.short_description}
-              onChange={handleChange}
-              rows={2}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="목록 페이지에 표시될 짧은 설명을 입력하세요"
-            />
+              className="w-full px-3 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">미지정</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>{brand.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {/* Legal Info */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">법적 정보</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">제조사</label>
-              <input
-                type="text"
-                name="manufacturer"
-                value={formData.manufacturer}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="제조사명을 입력하세요"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">원산지</label>
-              <input
-                type="text"
-                name="origin_country"
-                value={formData.origin_country}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="예: 대한민국"
-              />
-            </div>
-          </div>
-
+        {/* Specification + Origin Country */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">법적 분류</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">제품 규격</label>
             <input
               type="text"
-              name="legal_category"
-              value={formData.legal_category}
+              name="specification"
+              value={formData.specification}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="예: 건강기능식품"
+              placeholder="예: 500mg × 60정"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">인증/허가 번호</label>
-            <textarea
-              name="certification_ids"
-              value={formData.certification_ids}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="한 줄에 하나씩 입력하세요"
-            />
-            <p className="mt-1 text-xs text-gray-500">각 인증번호를 줄바꿈으로 구분하여 입력하세요</p>
-          </div>
-        </div>
-
-        {/* Product Details */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">상세 정보</h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">사용 정보</label>
-            <textarea
-              name="usage_info"
-              value={formData.usage_info}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="사용 방법, 사용 시기 등을 입력하세요"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">주의사항</label>
-            <textarea
-              name="caution_info"
-              value={formData.caution_info}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="사용 시 주의사항을 입력하세요"
-            />
-          </div>
-        </div>
-
-        {/* Pricing */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">가격 및 재고</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                정가 (원) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="base_price"
-                value={formData.base_price}
-                onChange={handleChange}
-                required
-                min={0}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">할인가 (원)</label>
-              <input
-                type="number"
-                name="sale_price"
-                value={formData.sale_price ?? ''}
-                onChange={handleChange}
-                min={0}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="할인가가 없으면 비워두세요"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">재고</label>
-              <input
-                type="number"
-                name="stock"
-                value={formData.stock}
-                onChange={handleChange}
-                min={0}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">SKU (재고 관리 코드)</label>
-              <input
-                type="text"
-                name="sku"
-                value={formData.sku}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="예: NET-001"
-                disabled={!isNew && !!formData.sku}
-              />
-              <p className="mt-1 text-xs text-gray-500">⚠️ SKU는 한 번 설정하면 변경할 수 없습니다 (Product DB Constitution v1)</p>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">바코드</label>
-            <textarea
-              name="barcodes"
-              value={formData.barcodes}
-              onChange={handleChange}
-              rows={2}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="한 줄에 하나씩 입력하세요"
-            />
-            <p className="mt-1 text-xs text-gray-500">각 바코드를 줄바꿈으로 구분하여 입력하세요</p>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-900 border-b pb-2">추가 정보</h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">태그</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">원산지</label>
             <input
               type="text"
-              name="tags"
-              value={formData.tags}
+              name="originCountry"
+              value={formData.originCountry}
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="쉼표로 구분하여 입력 (예: 비타민, 건강, 영양제)"
+              placeholder="예: 대한민국"
             />
           </div>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="is_featured"
-              id="is_featured"
-              checked={formData.is_featured}
-              onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="is_featured" className="text-sm text-gray-700">
-              추천 상품으로 표시
-            </label>
-          </div>
+        {/* Tags */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">태그</label>
+          <input
+            type="text"
+            name="tags"
+            value={formData.tags}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="쉼표로 구분 (예: 비타민, 건강, 영양제)"
+          />
         </div>
 
         {/* Actions */}
@@ -492,7 +328,7 @@ const ProductDetailPage: React.FC = () => {
             disabled={saveMutation.isPending}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
           >
-            {saveMutation.isPending ? '저장 중...' : isNew ? '등록' : '저장'}
+            {saveMutation.isPending ? '저장 중...' : '저장'}
           </button>
         </div>
 
@@ -502,8 +338,23 @@ const ProductDetailPage: React.FC = () => {
           </div>
         )}
       </form>
+
+      {/* Metadata */}
+      <div className="mt-4 text-xs text-gray-400">
+        생성: {new Date(master.createdAt).toLocaleString('ko-KR')} | 수정: {new Date(master.updatedAt).toLocaleString('ko-KR')}
+      </div>
     </div>
   );
 };
+
+/** Read-only info field */
+function InfoField({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div>
+      <dt className="text-xs font-medium text-gray-500">{label}</dt>
+      <dd className={`text-sm mt-1 ${highlight ? 'text-amber-600 font-medium' : 'text-gray-900'}`}>{value}</dd>
+    </div>
+  );
+}
 
 export default ProductDetailPage;

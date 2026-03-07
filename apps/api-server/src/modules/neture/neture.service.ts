@@ -3,6 +3,9 @@ import { AppDataSource } from '../../database/connection.js';
 import {
   NetureSupplier,
   ProductMaster,
+  ProductCategory,
+  Brand,
+  ProductImage,
   SupplierProductOffer,
   OfferDistributionType,
   OfferApprovalStatus,
@@ -91,7 +94,31 @@ export class NetureService {
     return this._contractRepo;
   }
 
+  private _categoryRepo?: Repository<ProductCategory>;
+  private _brandRepo?: Repository<Brand>;
+  private _imageRepo?: Repository<ProductImage>;
   private _partnerEntityRepo?: Repository<NeturePartner>;
+
+  private get categoryRepo(): Repository<ProductCategory> {
+    if (!this._categoryRepo) {
+      this._categoryRepo = AppDataSource.getRepository(ProductCategory);
+    }
+    return this._categoryRepo;
+  }
+
+  private get brandRepo(): Repository<Brand> {
+    if (!this._brandRepo) {
+      this._brandRepo = AppDataSource.getRepository(Brand);
+    }
+    return this._brandRepo;
+  }
+
+  private get imageRepo(): Repository<ProductImage> {
+    if (!this._imageRepo) {
+      this._imageRepo = AppDataSource.getRepository(ProductImage);
+    }
+    return this._imageRepo;
+  }
 
   private get partnerEntityRepo(): Repository<NeturePartner> {
     if (!this._partnerEntityRepo) {
@@ -1232,7 +1259,7 @@ export class NetureService {
     try {
       const offers = await this.offerRepo.find({
         where: { supplierId },
-        relations: ['master'],
+        relations: ['master', 'master.category', 'master.brand'],
         order: { createdAt: 'DESC' },
       });
 
@@ -1257,10 +1284,23 @@ export class NetureService {
       );
       const serviceMap = new Map(serviceCountRows.map((r) => [r.offer_id, r.cnt]));
 
+      // Primary images for each master
+      const masterIds = offers.map((o) => o.masterId).filter(Boolean);
+      const imageMap = new Map<string, string>();
+      if (masterIds.length > 0) {
+        const imageRows: Array<{ master_id: string; image_url: string }> = await AppDataSource.query(
+          `SELECT master_id, image_url FROM product_images WHERE is_primary = true AND master_id = ANY($1::uuid[])`,
+          [masterIds],
+        );
+        for (const row of imageRows) {
+          imageMap.set(row.master_id, row.image_url);
+        }
+      }
+
       return offers.map((o) => ({
         id: o.id,
         masterId: o.masterId,
-        masterName: o.master?.marketingName || '',
+        masterName: o.master?.marketingName || o.master?.regulatoryName || '',
         isActive: o.isActive,
         distributionType: o.distributionType,
         allowedSellerIds: o.allowedSellerIds,
@@ -1273,6 +1313,11 @@ export class NetureService {
         activeServiceCount: serviceMap.get(o.id) || 0,
         createdAt: o.createdAt,
         updatedAt: o.updatedAt,
+        barcode: o.master?.barcode || '',
+        brandName: o.master?.brand?.name || o.master?.brandName || null,
+        categoryName: o.master?.category?.name || null,
+        specification: o.master?.specification || null,
+        primaryImageUrl: imageMap.get(o.masterId) || null,
       }));
     } catch (error) {
       logger.error('[NetureService] Error fetching supplier offers:', error);
@@ -1296,6 +1341,12 @@ export class NetureService {
         manufacturerName: string;
         marketingName?: string;
         mfdsPermitNumber?: string | null;
+        // WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1: extended master fields
+        categoryId?: string | null;
+        brandId?: string | null;
+        specification?: string | null;
+        originCountry?: string | null;
+        tags?: string[];
       };
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
@@ -1327,6 +1378,21 @@ export class NetureService {
       const masterResult = await this.resolveOrCreateMaster(data.barcode, data.manualData);
       if (!masterResult.success || !masterResult.data) {
         return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
+      }
+
+      // WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1: extended fields 적용 (resolveOrCreateMaster 파이프라인 변경 없음)
+      if (data.manualData) {
+        const extFields: Record<string, unknown> = {};
+        if (data.manualData.categoryId !== undefined) extFields.categoryId = data.manualData.categoryId;
+        if (data.manualData.brandId !== undefined) extFields.brandId = data.manualData.brandId;
+        if (data.manualData.specification !== undefined) extFields.specification = data.manualData.specification;
+        if (data.manualData.originCountry !== undefined) extFields.originCountry = data.manualData.originCountry;
+        if (data.manualData.tags !== undefined) extFields.tags = data.manualData.tags;
+        if (data.manualData.marketingName !== undefined) extFields.marketingName = data.manualData.marketingName;
+
+        if (Object.keys(extFields).length > 0) {
+          await this.updateProductMaster(masterResult.data.id, extFields);
+        }
       }
 
       const offer = this.offerRepo.create({
@@ -1475,14 +1541,14 @@ export class NetureService {
    * Master 조회 — barcode 기준
    */
   async getProductMasterByBarcode(barcode: string): Promise<ProductMaster | null> {
-    return this.masterRepo.findOne({ where: { barcode } });
+    return this.masterRepo.findOne({ where: { barcode }, relations: ['category', 'brand'] });
   }
 
   /**
    * Master 조회 — ID 기준
    */
   async getProductMasterById(id: string): Promise<ProductMaster | null> {
-    return this.masterRepo.findOne({ where: { id } });
+    return this.masterRepo.findOne({ where: { id }, relations: ['category', 'brand'] });
   }
 
   /**
@@ -1569,7 +1635,7 @@ export class NetureService {
   /**
    * Master 업데이트 — immutable 필드 변경 차단 (런타임 Guard)
    *
-   * 변경 가능: marketingName, brandName
+   * 변경 가능: marketingName, brandName, categoryId, brandId, specification, originCountry, tags
    * 변경 불가: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
    */
   async updateProductMaster(
@@ -1599,6 +1665,22 @@ export class NetureService {
     if ('brandName' in updates) {
       master.brandName = updates.brandName as string | null;
     }
+    // WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1: 확장 필드
+    if ('categoryId' in updates) {
+      master.categoryId = updates.categoryId as string | null;
+    }
+    if ('brandId' in updates) {
+      master.brandId = updates.brandId as string | null;
+    }
+    if ('specification' in updates) {
+      master.specification = updates.specification as string | null;
+    }
+    if ('originCountry' in updates) {
+      master.originCountry = updates.originCountry as string | null;
+    }
+    if ('tags' in updates && Array.isArray(updates.tags)) {
+      master.tags = updates.tags as string[];
+    }
 
     const saved = await this.masterRepo.save(master);
     return { success: true, data: saved };
@@ -1608,7 +1690,206 @@ export class NetureService {
    * Master 전체 목록 (Admin 전용)
    */
   async getAllProductMasters() {
-    return this.masterRepo.find({ order: { createdAt: 'DESC' } });
+    return this.masterRepo.find({ relations: ['category', 'brand'], order: { createdAt: 'DESC' } });
+  }
+
+  // ==================== ProductCategory — 카테고리 관리 (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================
+
+  /**
+   * 카테고리 트리 (root → children, in-memory 빌드)
+   */
+  async getCategoryTree(): Promise<ProductCategory[]> {
+    const all = await this.categoryRepo.find({ order: { depth: 'ASC', sortOrder: 'ASC', name: 'ASC' } });
+    const map = new Map<string, ProductCategory & { children: ProductCategory[] }>();
+    const roots: (ProductCategory & { children: ProductCategory[] })[] = [];
+
+    for (const cat of all) {
+      map.set(cat.id, { ...cat, children: [] });
+    }
+    for (const cat of all) {
+      const node = map.get(cat.id)!;
+      if (cat.parentId && map.has(cat.parentId)) {
+        map.get(cat.parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    return roots;
+  }
+
+  /**
+   * 카테고리 생성 (depth 자동 계산, 최대 4단계: 0-3)
+   */
+  async createCategory(data: {
+    name: string;
+    slug: string;
+    parentId?: string | null;
+    sortOrder?: number;
+  }): Promise<ProductCategory> {
+    let depth = 0;
+    if (data.parentId) {
+      const parent = await this.categoryRepo.findOne({ where: { id: data.parentId } });
+      if (!parent) throw new Error('PARENT_CATEGORY_NOT_FOUND');
+      if (parent.depth >= 3) throw new Error('MAX_CATEGORY_DEPTH_EXCEEDED');
+      depth = parent.depth + 1;
+    }
+    const cat = this.categoryRepo.create({
+      name: data.name,
+      slug: data.slug,
+      parentId: data.parentId || null,
+      depth,
+      sortOrder: data.sortOrder || 0,
+      isActive: true,
+    });
+    return this.categoryRepo.save(cat);
+  }
+
+  /**
+   * 카테고리 수정
+   */
+  async updateCategory(id: string, data: Partial<{
+    name: string;
+    slug: string;
+    sortOrder: number;
+    isActive: boolean;
+  }>): Promise<ProductCategory> {
+    const cat = await this.categoryRepo.findOne({ where: { id } });
+    if (!cat) throw new Error('CATEGORY_NOT_FOUND');
+    Object.assign(cat, data);
+    return this.categoryRepo.save(cat);
+  }
+
+  /**
+   * 카테고리 삭제 (FK SET NULL → 자식/상품 안전)
+   */
+  async deleteCategory(id: string): Promise<void> {
+    const cat = await this.categoryRepo.findOne({ where: { id } });
+    if (!cat) throw new Error('CATEGORY_NOT_FOUND');
+    await this.categoryRepo.delete(id);
+  }
+
+  // ==================== Brand — 브랜드 관리 (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================
+
+  /**
+   * 브랜드 전체 목록
+   */
+  async getAllBrands(): Promise<Brand[]> {
+    return this.brandRepo.find({ where: { isActive: true }, order: { name: 'ASC' } });
+  }
+
+  /**
+   * 브랜드 생성
+   */
+  async createBrand(data: {
+    name: string;
+    slug: string;
+    manufacturerName?: string;
+    countryOfOrigin?: string;
+  }): Promise<Brand> {
+    const brand = this.brandRepo.create({
+      name: data.name,
+      slug: data.slug,
+      manufacturerName: data.manufacturerName || null,
+      countryOfOrigin: data.countryOfOrigin || null,
+      isActive: true,
+    });
+    return this.brandRepo.save(brand);
+  }
+
+  /**
+   * 브랜드 수정
+   */
+  async updateBrand(id: string, data: Partial<{
+    name: string;
+    slug: string;
+    manufacturerName: string;
+    countryOfOrigin: string;
+    isActive: boolean;
+  }>): Promise<Brand> {
+    const brand = await this.brandRepo.findOne({ where: { id } });
+    if (!brand) throw new Error('BRAND_NOT_FOUND');
+    Object.assign(brand, data);
+    return this.brandRepo.save(brand);
+  }
+
+  /**
+   * 브랜드 삭제 (FK SET NULL → ProductMaster 안전)
+   */
+  async deleteBrand(id: string): Promise<void> {
+    const brand = await this.brandRepo.findOne({ where: { id } });
+    if (!brand) throw new Error('BRAND_NOT_FOUND');
+    await this.brandRepo.delete(id);
+  }
+
+  // ==================== ProductImage — 상품 이미지 관리 (WO-O4O-NETURE-PRODUCT-IMAGE-STRUCTURE-V1) ====================
+
+  /**
+   * 특정 Master의 이미지 목록 조회
+   */
+  async getProductImages(masterId: string): Promise<ProductImage[]> {
+    return this.imageRepo.find({
+      where: { masterId },
+      order: { sortOrder: 'ASC', createdAt: 'ASC' },
+    });
+  }
+
+  /**
+   * 이미지 추가 — 첫 이미지면 자동 대표
+   */
+  async addProductImage(
+    masterId: string,
+    imageUrl: string,
+    gcsPath: string,
+    isPrimary?: boolean
+  ): Promise<ProductImage> {
+    // 기존 이미지 수 확인
+    const existingCount = await this.imageRepo.count({ where: { masterId } });
+
+    const image = this.imageRepo.create({
+      masterId,
+      imageUrl,
+      gcsPath,
+      isPrimary: isPrimary ?? existingCount === 0, // 첫 이미지면 자동 대표
+      sortOrder: existingCount,
+    });
+
+    return this.imageRepo.save(image);
+  }
+
+  /**
+   * 대표 이미지 변경
+   */
+  async setPrimaryImage(imageId: string, masterId: string): Promise<void> {
+    // 트랜잭션: 기존 primary → false, 선택 → true
+    await AppDataSource.transaction(async (manager) => {
+      await manager.update(ProductImage, { masterId, isPrimary: true }, { isPrimary: false });
+      await manager.update(ProductImage, { id: imageId, masterId }, { isPrimary: true });
+    });
+  }
+
+  /**
+   * 이미지 삭제 — gcsPath 반환 (GCS 삭제는 호출자가 수행)
+   */
+  async deleteProductImage(imageId: string, masterId: string): Promise<{ gcsPath: string }> {
+    const image = await this.imageRepo.findOne({ where: { id: imageId, masterId } });
+    if (!image) throw new Error('IMAGE_NOT_FOUND');
+
+    const { gcsPath, isPrimary } = image;
+    await this.imageRepo.delete(imageId);
+
+    // 대표 이미지 삭제 시, 다음 이미지를 대표로 승격
+    if (isPrimary) {
+      const next = await this.imageRepo.findOne({
+        where: { masterId },
+        order: { sortOrder: 'ASC' },
+      });
+      if (next) {
+        next.isPrimary = true;
+        await this.imageRepo.save(next);
+      }
+    }
+
+    return { gcsPath };
   }
 
   // ==================== Order Summary (WO-NETURE-SUPPLIER-DASHBOARD-P0 §3.4, P1 §3.3) ====================

@@ -193,6 +193,8 @@ import { ActionLog } from '@o4o/action-log-core';
 import {
   NetureSupplier,
   ProductMaster,
+  ProductCategory,
+  Brand,
   SupplierProductOffer,
   StoreProductProfile,
   NeturePartnershipRequest,
@@ -205,6 +207,7 @@ import {
   SupplierCsvImportBatch,
   SupplierCsvImportRow,
   NetureSupplierLibraryItem,
+  ProductImage,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -645,6 +648,8 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     NetureSupplier,
     ProductMaster,
+    ProductCategory,
+    Brand,
     SupplierProductOffer,
     StoreProductProfile,
     NeturePartnershipRequest,
@@ -657,6 +662,7 @@ export const AppDataSource = new DataSource({
     SupplierCsvImportBatch,
     SupplierCsvImportRow,
     NetureSupplierLibraryItem,
+    ProductImage,
     // ============================================================================
     // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     // ============================================================================

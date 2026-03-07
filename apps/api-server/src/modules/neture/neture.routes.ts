@@ -20,12 +20,15 @@ import { ProductApprovalV2Service } from '../product-policy-v2/product-approval-
 import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 import { CsvImportService } from './services/csv-import.service.js';
+import { ImageStorageService } from './services/image-storage.service.js';
+import sharp from 'sharp';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
 const csvImportService = new CsvImportService(AppDataSource);
+const imageStorageService = new ImageStorageService();
 
 // Extended Request type with user info
 type AuthenticatedRequest = Request & {
@@ -595,7 +598,7 @@ router.post('/admin/masters/resolve', requireAuth, requireNetureScope('neture:ad
  * PATCH /api/v1/neture/admin/masters/:id
  * ProductMaster 수정 (immutable 필드 변경 차단)
  *
- * 허용: marketingName, brandName
+ * 허용: marketingName, brandName, categoryId, brandId, specification, originCountry, tags
  * 차단: barcode, regulatoryType, regulatoryName, manufacturerName, mfdsPermitNumber, mfdsProductId
  */
 router.patch('/admin/masters/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
@@ -613,6 +616,320 @@ router.patch('/admin/masters/:id', requireAuth, requireNetureScope('neture:admin
   } catch (error) {
     logger.error('[Neture API] Error updating product master:', error);
     res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update product master' } });
+  }
+});
+
+// ==================== Admin: ProductCategory CRUD (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================
+
+/**
+ * GET /api/v1/neture/admin/categories
+ * 카테고리 트리 (4단계 계층)
+ */
+router.get('/admin/categories', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
+  try {
+    const tree = await netureService.getCategoryTree();
+    res.json({ success: true, data: tree });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching categories:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch categories' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/categories
+ * 카테고리 생성
+ */
+router.post('/admin/categories', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { name, slug, parentId, sortOrder } = req.body;
+    if (!name || !slug) {
+      return res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'name and slug are required' } });
+    }
+    const category = await netureService.createCategory({ name, slug, parentId, sortOrder });
+    res.status(201).json({ success: true, data: category });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to create category';
+    const status = message === 'PARENT_CATEGORY_NOT_FOUND' || message === 'MAX_CATEGORY_DEPTH_EXCEEDED' ? 400 : 500;
+    logger.error('[Neture API] Error creating category:', error);
+    res.status(status).json({ success: false, error: { code: message, message } });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/categories/:id
+ * 카테고리 수정
+ */
+router.patch('/admin/categories/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const category = await netureService.updateCategory(id, req.body);
+    res.json({ success: true, data: category });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update category';
+    const status = message === 'CATEGORY_NOT_FOUND' ? 404 : 500;
+    logger.error('[Neture API] Error updating category:', error);
+    res.status(status).json({ success: false, error: { code: message, message } });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/admin/categories/:id
+ * 카테고리 삭제
+ */
+router.delete('/admin/categories/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await netureService.deleteCategory(id);
+    res.json({ success: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete category';
+    const status = message === 'CATEGORY_NOT_FOUND' ? 404 : 500;
+    logger.error('[Neture API] Error deleting category:', error);
+    res.status(status).json({ success: false, error: { code: message, message } });
+  }
+});
+
+// ==================== Admin: Brand CRUD (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================
+
+/**
+ * GET /api/v1/neture/admin/brands
+ * 브랜드 목록
+ */
+router.get('/admin/brands', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
+  try {
+    const brands = await netureService.getAllBrands();
+    res.json({ success: true, data: brands });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching brands:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch brands' } });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/brands
+ * 브랜드 생성
+ */
+router.post('/admin/brands', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { name, slug, manufacturerName, countryOfOrigin } = req.body;
+    if (!name || !slug) {
+      return res.status(400).json({ success: false, error: { code: 'MISSING_FIELDS', message: 'name and slug are required' } });
+    }
+    const brand = await netureService.createBrand({ name, slug, manufacturerName, countryOfOrigin });
+    res.status(201).json({ success: true, data: brand });
+  } catch (error) {
+    logger.error('[Neture API] Error creating brand:', error);
+    res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to create brand' } });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/brands/:id
+ * 브랜드 수정
+ */
+router.patch('/admin/brands/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const brand = await netureService.updateBrand(id, req.body);
+    res.json({ success: true, data: brand });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to update brand';
+    const status = message === 'BRAND_NOT_FOUND' ? 404 : 500;
+    logger.error('[Neture API] Error updating brand:', error);
+    res.status(status).json({ success: false, error: { code: message, message } });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/admin/brands/:id
+ * 브랜드 삭제
+ */
+router.delete('/admin/brands/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await netureService.deleteBrand(id);
+    res.json({ success: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to delete brand';
+    const status = message === 'BRAND_NOT_FOUND' ? 404 : 500;
+    logger.error('[Neture API] Error deleting brand:', error);
+    res.status(status).json({ success: false, error: { code: message, message } });
+  }
+});
+
+// ==================== Public Read-Only Endpoints (WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1) ====================
+
+/**
+ * GET /api/v1/neture/categories
+ * 공개 카테고리 트리 (isActive=true) — 공급자 상품 등록 시 카테고리 선택용
+ */
+router.get('/categories', requireAuth, async (_req: Request, res: Response) => {
+  try {
+    const tree = await netureService.getCategoryTree();
+    res.json({ success: true, data: tree });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching public categories:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/brands
+ * 공개 브랜드 목록 (isActive=true) — 공급자 상품 등록 시 브랜드 선택용
+ */
+router.get('/brands', requireAuth, async (_req: Request, res: Response) => {
+  try {
+    const brands = await netureService.getAllBrands();
+    res.json({ success: true, data: brands });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching public brands:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/masters/barcode/:barcode
+ * 공개 바코드 조회 — 공급자가 상품 등록 시 Master 존재 여부 확인용
+ */
+router.get('/masters/barcode/:barcode', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { barcode } = req.params;
+    const master = await netureService.getProductMasterByBarcode(barcode);
+    if (!master) {
+      return res.status(404).json({ success: false, error: 'MASTER_NOT_FOUND' });
+    }
+    res.json({ success: true, data: master });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching master by barcode (public):', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+// ==================== Product Images (WO-O4O-NETURE-PRODUCT-IMAGE-STRUCTURE-V1) ====================
+
+/**
+ * GET /api/v1/neture/products/:masterId/images
+ * 상품 이미지 목록 조회
+ */
+router.get('/products/:masterId/images', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const images = await netureService.getProductImages(req.params.masterId);
+    res.json({ success: true, data: images });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching product images:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/products/:masterId/images
+ * 상품 이미지 업로드 (공급자용)
+ * - multer memoryStorage → sharp 리사이즈 → GCS 업로드 → DB 저장
+ */
+router.post('/products/:masterId/images', requireAuth, requireActiveSupplier, uploadSingleMiddleware('image'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { masterId } = req.params;
+    const file = req.file as Express.Multer.File;
+
+    if (!file) {
+      return res.status(400).json({ success: false, error: 'NO_FILE' });
+    }
+
+    // sharp: 리사이즈 + webp 변환
+    const processed = await sharp(file.buffer)
+      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toBuffer();
+
+    // GCS 업로드
+    const { url, gcsPath } = await imageStorageService.uploadImage(
+      masterId,
+      processed,
+      'image/webp',
+      file.originalname
+    );
+
+    // DB 레코드 생성
+    const image = await netureService.addProductImage(masterId, url, gcsPath);
+
+    res.status(201).json({ success: true, data: image });
+  } catch (error) {
+    logger.error('[Neture API] Error uploading product image:', error);
+    res.status(500).json({ success: false, error: 'UPLOAD_FAILED' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/products/images/:imageId/primary
+ * 대표 이미지 변경
+ */
+router.patch('/products/images/:imageId/primary', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { imageId } = req.params;
+    const { masterId } = req.body;
+
+    if (!masterId) {
+      return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
+    }
+
+    await netureService.setPrimaryImage(imageId, masterId);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('[Neture API] Error setting primary image:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/products/images/:imageId
+ * 이미지 삭제 (DB + GCS)
+ */
+router.delete('/products/images/:imageId', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { imageId } = req.params;
+    const { masterId } = req.body;
+
+    if (!masterId) {
+      return res.status(400).json({ success: false, error: 'MISSING_MASTER_ID' });
+    }
+
+    const { gcsPath } = await netureService.deleteProductImage(imageId, masterId);
+    await imageStorageService.deleteImage(gcsPath);
+
+    res.json({ success: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'INTERNAL_ERROR';
+    const status = message === 'IMAGE_NOT_FOUND' ? 404 : 500;
+    logger.error('[Neture API] Error deleting product image:', error);
+    res.status(status).json({ success: false, error: message });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/products/:masterId/images
+ * Admin 이미지 업로드
+ */
+router.post('/admin/products/:masterId/images', requireAuth, requireNetureScope('neture:admin'), uploadSingleMiddleware('image'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { masterId } = req.params;
+    const file = req.file as Express.Multer.File;
+
+    if (!file) {
+      return res.status(400).json({ success: false, error: 'NO_FILE' });
+    }
+
+    const processed = await sharp(file.buffer)
+      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toBuffer();
+
+    const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname);
+    const image = await netureService.addProductImage(masterId, url, gcsPath);
+
+    res.status(201).json({ success: true, data: image });
+  } catch (error) {
+    logger.error('[Neture API] Error uploading admin product image:', error);
+    res.status(500).json({ success: false, error: 'UPLOAD_FAILED' });
   }
 });
 
@@ -860,7 +1177,7 @@ router.post('/supplier/products', requireAuth, requireActiveSupplier, async (req
   try {
     const supplierId = (req as SupplierRequest).supplierId;
 
-    const { barcode, distributionType, manualData } = req.body;
+    const { barcode, distributionType, manualData, priceGeneral, priceGold, pricePlatinum, consumerReferencePrice } = req.body;
 
     if (!barcode) {
       return res.status(400).json({ success: false, error: 'MISSING_BARCODE', message: 'barcode is required' });
@@ -870,6 +1187,10 @@ router.post('/supplier/products', requireAuth, requireActiveSupplier, async (req
       barcode,
       manualData,
       distributionType,
+      priceGeneral,
+      priceGold,
+      pricePlatinum,
+      consumerReferencePrice,
     });
 
     if (!result.success) {
@@ -921,12 +1242,17 @@ router.patch('/supplier/products/:id', requireAuth, requireActiveSupplier, async
     const supplierId = (req as SupplierRequest).supplierId;
 
     const { id } = req.params;
-    const { isActive, distributionType, allowedSellerIds } = req.body;
+    const { isActive, distributionType, allowedSellerIds,
+            priceGeneral, priceGold, pricePlatinum, consumerReferencePrice } = req.body;
 
     const result = await netureService.updateSupplierOffer(id, supplierId, {
       isActive,
       distributionType,
       allowedSellerIds,
+      priceGeneral,
+      priceGold,
+      pricePlatinum,
+      consumerReferencePrice,
     });
 
     if (!result.success) {

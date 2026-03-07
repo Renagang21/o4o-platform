@@ -1,5 +1,7 @@
 export { NetureSupplier, SupplierStatus, ContactVisibility } from './NetureSupplier.entity.js';
 export { ProductMaster } from './ProductMaster.entity.js';
+export { ProductCategory } from './ProductCategory.entity.js';
+export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';
 export { StoreProductProfile } from './StoreProductProfile.entity.js';
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
@@ -12,3 +14,4 @@ export { NetureSellerPartnerContract, ContractStatus, ContractTerminatedBy } fro
 export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImportBatch.entity.js';
 export { SupplierCsvImportRow, CsvRowValidationStatus, CsvRowActionType } from './SupplierCsvImportRow.entity.js';
 export { NetureSupplierLibraryItem } from './NetureSupplierLibraryItem.entity.js';
+export { ProductImage } from './ProductImage.entity.js';
