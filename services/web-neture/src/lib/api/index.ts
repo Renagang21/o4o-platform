@@ -1,0 +1,150 @@
+/**
+ * Neture API - Barrel export
+ *
+ * 기존 import { ... } from '../../lib/api' 경로 호환 유지
+ */
+
+// Client utilities
+export { API_BASE_URL, fetchWithTimeout } from './client.js';
+
+// Core Neture API
+export {
+  netureApi,
+  type ProductPurpose,
+  type ContactVisibility,
+  type TrustSignals,
+  type ContactHint,
+  type ContactHints,
+  type Supplier,
+  type SupplierDetail,
+  type PartnershipRequest,
+  type PartnershipRequestDetail,
+} from './neture.js';
+
+// Partner APIs
+export {
+  recruitingApi,
+  partnerDashboardApi,
+  partnerRecruitmentApi,
+  type RecruitingProduct,
+  type PartnerDashboardItem,
+  type BrowsableContent,
+  type LinkedContent,
+  type PartnerRecruitment,
+} from './partner.js';
+
+// Content APIs
+export {
+  cmsApi,
+  contentAssetApi,
+  type CmsContent,
+  type DashboardAsset,
+  type DashboardSortType,
+  type DashboardKpi,
+} from './content.js';
+
+// Supplier API
+export {
+  supplierApi,
+  supplierProfileApi,
+  type SupplierProductPurpose,
+  type DistributionType,
+  type SupplierRequestStatus,
+  type SupplierRequest,
+  type SupplierRequestDetail,
+  type SupplierLibraryItem,
+  type SupplierProduct,
+  type ServiceSummary,
+  type OrderSummaryResponse,
+  type OrderSummary,
+  type SupplierProfile,
+  type ProfileCompleteness,
+} from './supplier.js';
+
+// Seller API
+export {
+  sellerApi,
+  type SellerApprovedProduct,
+} from './seller.js';
+
+// Admin APIs
+export {
+  adminOperatorApi,
+  adminSupplierApi,
+  adminSettlementApi,
+  adminProductApi,
+  adminMasterApi,
+  adminServiceApprovalApi,
+  adminRegistrationApi,
+  type NetureOperatorInfo,
+  type AdminSupplier,
+  type AdminProduct,
+  type AdminMaster,
+  type ServiceApproval,
+} from './admin.js';
+
+// Product API
+export {
+  productApi,
+  type CategoryTreeItem,
+  type BrandItem,
+  type ProductImage,
+} from './product.js';
+
+// Catalog Import API
+export { catalogImportApi } from './catalog.js';
+
+// Dashboard API
+export {
+  dashboardApi,
+  type SupplierDashboardSummary,
+  type SupplierDashboardStats,
+  type ServiceStat,
+  type RecentActivity,
+  type AdminDashboardSummary,
+  type AdminDashboardStats,
+  type AppContentSummary,
+  type AppSignageSummary,
+  type AppForumSummary,
+  type ServiceStatus,
+  type RecentApplication,
+  type RecentActivityItem,
+  type PartnerDashboardSummary,
+  type PartnerDashboardStats,
+  type ConnectedService,
+  type Notification,
+} from './dashboard.js';
+
+// Operator API
+export {
+  operatorSupplyApi,
+  type OperatorSupplyProduct,
+} from './operator.js';
+
+// Store API + Order/Fulfillment types
+export {
+  storeApi,
+  getInventoryStatus,
+  getTrackingUrl,
+  CARRIERS,
+  SHIPMENT_STATUS_LABELS,
+  SETTLEMENT_STATUS_LABELS,
+  type StoreOrderShipping,
+  type CreateStoreOrderRequest,
+  type StoreOrderItem,
+  type StoreOrder,
+  type StoreOrdersResponse,
+  type SupplierOrderSummary,
+  type SupplierOrdersResponse,
+  type SupplierOrderKpi,
+  type InventoryItem,
+  type InventoryStatus,
+  type Shipment,
+  type SettlementStatus,
+  type Settlement,
+  type SettlementOrder,
+  type SettlementDetail,
+  type SettlementKpi,
+  type SettlementsResponse,
+  type AdminSettlementKpi,
+} from './store.js';
