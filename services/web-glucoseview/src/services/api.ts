@@ -55,6 +55,14 @@ export interface MultiMetricData {
   metabolicRisk: MetabolicRiskResult;
 }
 
+// WO-O4O-CARE-LLM-INSIGHT-V1
+export interface CareLlmInsightDto {
+  pharmacyInsight: string | null;
+  patientMessage: string | null;
+  model: string | null;
+  createdAt: string | null;
+}
+
 export interface CareInsightDto {
   patientId: string;
   tir: number;
@@ -319,6 +327,11 @@ class ApiService {
   // Care KPI endpoints (WO-CARE-KPI-SNAPSHOT-V1)
   async getCareKpi(patientId: string): Promise<KpiComparisonDto> {
     return this.request<KpiComparisonDto>(`/api/v1/care/kpi/${patientId}`);
+  }
+
+  // Care LLM Insight (WO-O4O-CARE-LLM-INSIGHT-V1)
+  async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
+    return this.request<CareLlmInsightDto>(`/api/v1/care/llm-insight/${patientId}`);
   }
 
   // Care Coaching endpoints (WO-CARE-COACHING-ENGINE-V1)

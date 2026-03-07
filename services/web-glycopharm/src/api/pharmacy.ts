@@ -502,6 +502,11 @@ class PharmacyApiClient {
     return this.request('/api/v1/care/risk-patients');
   }
 
+  // WO-O4O-CARE-LLM-INSIGHT-V1
+  async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
+    return this.request(`/api/v1/care/llm-insight/${patientId}`);
+  }
+
   async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
     return this.request(`/api/v1/care/analysis/${patientId}`);
   }
@@ -664,6 +669,14 @@ export interface RiskPatientDto {
 export interface RiskPatientsResponse {
   highRisk: RiskPatientDto[];
   caution: RiskPatientDto[];
+}
+
+// WO-O4O-CARE-LLM-INSIGHT-V1
+export interface CareLlmInsightDto {
+  pharmacyInsight: string | null;
+  patientMessage: string | null;
+  model: string | null;
+  createdAt: string | null;
 }
 
 // Export singleton instance

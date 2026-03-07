@@ -27,6 +27,7 @@ import type {
   KpiComparisonDto,
   CoachingSession,
   HealthReadingDto,
+  CareLlmInsightDto,
 } from '../services/api';
 
 // ── Constants ──
@@ -90,6 +91,7 @@ export default function CareDashboardPage() {
   const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
   const [sessions, setSessions] = useState<CoachingSession[]>([]);
   const [readings, setReadings] = useState<HealthReadingDto[]>([]);
+  const [llmInsight, setLlmInsight] = useState<CareLlmInsightDto | null>(null);
   const [loadingData, setLoadingData] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -122,17 +124,20 @@ export default function CareDashboardPage() {
     setKpi(null);
     setSessions([]);
     setReadings([]);
+    setLlmInsight(null);
     try {
-      const [analysisData, kpiData, sessionsData, readingsData] = await Promise.all([
+      const [analysisData, kpiData, sessionsData, readingsData, llmData] = await Promise.all([
         api.getCareAnalysis(patientId).catch(() => null),
         api.getCareKpi(patientId).catch(() => null),
         api.getCoachingSessions(patientId).catch(() => []),
         api.getHealthReadings(patientId).catch(() => []),
+        api.getCareLlmInsight(patientId).catch(() => null),
       ]);
       setAnalysis(analysisData);
       setKpi(kpiData);
       setSessions(sessionsData);
       setReadings(readingsData);
+      setLlmInsight(llmData);
     } catch {
       setError('데이터를 불러오지 못했습니다.');
     } finally {
@@ -452,6 +457,21 @@ export default function CareDashboardPage() {
                 </p>
               )}
             </div>
+
+            {/* ④-1.5 AI 맞춤 안내 — WO-O4O-CARE-LLM-INSIGHT-V1 */}
+            {llmInsight?.patientMessage && (
+              <div className="bg-blue-50 rounded-xl border border-blue-100 p-6">
+                <h2 className="text-sm font-medium text-blue-600 uppercase tracking-wider mb-3">AI 맞춤 안내</h2>
+                <p className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">
+                  {llmInsight.patientMessage}
+                </p>
+                {llmInsight.createdAt && (
+                  <p className="text-xs text-blue-400 mt-3">
+                    {new Date(llmInsight.createdAt).toLocaleString('ko-KR')}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* ④-2 복합 지표 분석 (Multi-Metric) — WO-O4O-CARE-MULTI-METRIC-ANALYSIS-V1 */}
             {analysis?.multiMetric && (

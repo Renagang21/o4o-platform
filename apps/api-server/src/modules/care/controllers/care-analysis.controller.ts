@@ -10,6 +10,7 @@ import { DatabaseHealthMetricProvider } from '../infrastructure/provider/databas
 import { FallbackCgmProvider } from '../infrastructure/provider/fallback-cgm.provider.js';
 import type { CgmProvider } from '../domain/provider/cgm.provider.js';
 import { CareKpiSnapshotService } from '../services/kpi/care-kpi-snapshot.service.js';
+import { CareLlmInsightService } from '../services/llm/care-llm-insight.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
@@ -43,6 +44,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
 
   const router = Router();
   const kpiService = new CareKpiSnapshotService(dataSource);
+  const llmInsightService = new CareLlmInsightService(dataSource);
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
 
   // GET /analysis/:patientId — run analysis + auto-record snapshot
@@ -54,9 +56,15 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
 
       const result = await provider.analyzePatient(patientId);
 
-      // Auto-record snapshot with pharmacy_id (fire-and-forget)
+      // Auto-record snapshot + chain LLM insight generation (fire-and-forget)
+      // WO-O4O-CARE-LLM-INSIGHT-V1
       if (pharmacyId) {
-        kpiService.recordSnapshot(patientId, result, pharmacyId).catch(() => {});
+        kpiService
+          .recordSnapshot(patientId, result, pharmacyId)
+          .then((snapshot) => {
+            llmInsightService.generateAndCache(snapshot, result, pharmacyId).catch(() => {});
+          })
+          .catch(() => {});
       }
 
       res.json(result);

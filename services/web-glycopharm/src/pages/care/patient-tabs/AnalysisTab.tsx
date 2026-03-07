@@ -22,8 +22,9 @@ import {
   Heart,
   Weight,
   ShieldAlert,
+  Sparkles,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto } from '@/api/pharmacy';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 const RISK_DISPLAY = {
@@ -49,6 +50,7 @@ export default function AnalysisTab() {
   const { patient } = usePatientDetail();
   const [analysis, setAnalysis] = useState<CareInsightDto | null>(null);
   const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
+  const [llmInsight, setLlmInsight] = useState<CareLlmInsightDto | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,9 +59,11 @@ export default function AnalysisTab() {
     Promise.all([
       pharmacyApi.getCareAnalysis(patient.id).catch(() => null),
       pharmacyApi.getCareKpi(patient.id).catch(() => null),
-    ]).then(([a, k]) => {
+      pharmacyApi.getCareLlmInsight(patient.id).catch(() => null),
+    ]).then(([a, k, llm]) => {
       setAnalysis(a);
       setKpi(k);
+      setLlmInsight(llm);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
 
@@ -156,6 +160,26 @@ export default function AnalysisTab() {
                 <p className="text-sm text-amber-800">{insight}</p>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* LLM Insight — WO-O4O-CARE-LLM-INSIGHT-V1 */}
+      {llmInsight?.pharmacyInsight && (
+        <div>
+          <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-500" />
+            AI 분석 해석
+          </h4>
+          <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <p className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">
+              {llmInsight.pharmacyInsight}
+            </p>
+            {llmInsight.createdAt && (
+              <p className="text-xs text-blue-400 mt-3">
+                {new Date(llmInsight.createdAt).toLocaleString('ko-KR')} | {llmInsight.model}
+              </p>
+            )}
           </div>
         </div>
       )}

@@ -181,6 +181,10 @@ import { CareCoachingSession } from '../modules/care/entities/care-coaching-sess
 // HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
 import { HealthReading } from '../modules/care/entities/health-reading.entity.js';
 
+// CARE LLM INSIGHT (WO-O4O-CARE-LLM-INSIGHT-V1)
+import { CareLlmInsight } from '../modules/care/entities/care-llm-insight.entity.js';
+import { AiModelSetting } from '../modules/care/entities/ai-model-setting.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -641,6 +645,11 @@ export const AppDataSource = new DataSource({
     // HEALTH DATA PIPELINE (WO-O4O-HEALTH-DATA-PIPELINE-V1)
     // ============================================================================
     HealthReading,
+    // ============================================================================
+    // CARE LLM INSIGHT (WO-O4O-CARE-LLM-INSIGHT-V1)
+    // ============================================================================
+    CareLlmInsight,
+    AiModelSetting,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

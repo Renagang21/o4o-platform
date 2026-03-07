@@ -992,6 +992,15 @@ const startServer = async () => {
       logger.error('Failed to register Health Readings routes:', healthError);
     }
 
+    // 28f. Register Care LLM Insight routes (WO-O4O-CARE-LLM-INSIGHT-V1)
+    try {
+      const { createCareLlmInsightRouter } = await import('./modules/care/controllers/care-llm-insight.controller.js');
+      app.use('/api/v1/care', createCareLlmInsightRouter(AppDataSource));
+      logger.info('✅ Care LLM Insight routes registered at /api/v1/care/llm-insight');
+    } catch (llmInsightError) {
+      logger.error('Failed to register Care LLM Insight routes:', llmInsightError);
+    }
+
     // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
     try {
       const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');
