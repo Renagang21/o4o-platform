@@ -1,23 +1,46 @@
 /**
- * StoreProductPage - 매장 제품 상세
+ * StoreProductPage - 매장 상품 상세 (공통 랜딩 페이지)
  *
- * Work Order: WO-O4O-PARTNER-HUB-CORE-V2
+ * Work Order: WO-O4O-STORE-PRODUCT-PAGE-V1
  *
  * Routes:
  * - /store/:storeSlug/product/:productSlug (V2 slug-based)
  * - /store/product/:offerId (V1 backward compat)
  *
- * - 제품 정보 표시
- * - 장바구니 담기
- * - ?ref=TOKEN 파라미터 캡처 → sessionStorage
+ * 구조:
+ * 1. Hero — 상품 이미지 + 상품명 + 브랜드
+ * 2. Price — 매장 가격 + 구매 버튼
+ * 3. Pharmacist Comment — 약사 코멘트 (StoreProductProfile)
+ * 4. Description — 상품 설명 (SupplierProductOffer)
+ * 5. Store Info — 매장 정보
+ * 6. QR Share — QR 공유
+ *
+ * 유입 경로: QR / Tablet / 전자상거래 목록 / 검색 / 외부 링크
+ * ?ref=TOKEN 파라미터 캡처 → sessionStorage
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, ArrowLeft, Package } from 'lucide-react';
+import {
+  ShoppingCart,
+  ArrowLeft,
+  Package,
+  Minus,
+  Plus,
+  MapPin,
+  Phone,
+  Clock,
+  QrCode,
+  Share2,
+  MessageSquare,
+  FileText,
+  Store,
+} from 'lucide-react';
 import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
 import { addToCart } from '../../lib/cart.js';
 import { captureReferralToken } from '../../lib/referral.js';
+
+// ── Types ──
 
 interface ProductDetail {
   offer_id: string;
@@ -33,7 +56,24 @@ interface ProductDetail {
   product_slug?: string;
   store_slug?: string;
   supplier_id?: string;
+  // Extended fields (from StoreProductProfile / Offer)
+  display_name?: string | null;
+  pharmacist_comment?: string | null;
+  description?: string | null;
+  short_description?: string | null;
+  // Store info
+  store_name?: string | null;
+  store_address?: string | null;
+  store_phone?: string | null;
+  store_hours?: string | null;
+  // Listing override
+  listing_price?: number | null;
 }
+
+// ── Mock fallbacks for fields not yet returned by API ──
+
+const MOCK_PHARMACIST_COMMENT = '이 제품은 일상적인 건강 관리에 적합합니다. 식후에 1정씩 복용하시고, 다른 약물과 함께 복용 시 약사에게 상담해 주세요.';
+const MOCK_DESCRIPTION = '본 제품은 엄격한 품질 관리 기준에 따라 제조되었으며, 식약처 기준을 충족합니다. 개봉 후에는 서늘하고 건조한 곳에 보관해 주세요.';
 
 export default function StoreProductPage() {
   const { offerId, storeSlug, productSlug } = useParams<{
@@ -46,6 +86,7 @@ export default function StoreProductPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     captureReferralToken();
@@ -54,10 +95,8 @@ export default function StoreProductPage() {
   useEffect(() => {
     let url: string | null = null;
     if (storeSlug && productSlug) {
-      // V2 slug-based route
       url = `${API_BASE_URL}/api/v1/neture/store/${storeSlug}/product/${productSlug}`;
     } else if (offerId) {
-      // V1 UUID-based route (backward compat)
       url = `${API_BASE_URL}/api/v1/neture/store/product/${offerId}`;
     }
     if (!url) { setLoading(false); return; }
@@ -83,236 +122,281 @@ export default function StoreProductPage() {
       offerId: product.offer_id,
       name: product.product_name,
       imageUrl: product.image_url,
-      priceGeneral: product.price_general,
-      supplierId: product.offer_id, // use offer context
+      priceGeneral: displayPrice,
+      supplierId: product.offer_id,
       supplierName: product.supplier_name,
     }, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: product?.product_name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  // ── Loading ──
   if (loading) {
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>불러오는 중...</p>
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <div className="animate-pulse space-y-4">
+          <div className="h-64 bg-gray-200 rounded-xl" />
+          <div className="h-6 bg-gray-200 rounded w-2/3 mx-auto" />
+          <div className="h-4 bg-gray-200 rounded w-1/3 mx-auto" />
+        </div>
       </div>
     );
   }
 
+  // ── Not Found ──
   if (!product) {
     return (
-      <div style={styles.container}>
-        <p style={styles.loadingText}>제품을 찾을 수 없습니다.</p>
-        <Link to="/store/cart" style={styles.backLink}>
-          <ArrowLeft size={16} /> 장바구니로 이동
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+          <Package size={32} className="text-gray-400" />
+        </div>
+        <p className="text-gray-600 font-medium mb-2">제품을 찾을 수 없습니다</p>
+        <Link to="/" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+          홈으로 돌아가기
         </Link>
       </div>
     );
   }
 
+  const displayPrice = product.listing_price ?? product.price_general;
+  const hasDiscount = product.consumer_reference_price && product.consumer_reference_price > displayPrice;
+  const pharmacistComment = product.pharmacist_comment || MOCK_PHARMACIST_COMMENT;
+  const description = product.description || MOCK_DESCRIPTION;
+  const storeName = product.store_name || (storeSlug ? decodeURIComponent(storeSlug) : '매장');
+
   return (
-    <div style={styles.container}>
-      <Link to="/store/cart" style={styles.backLink}>
-        <ArrowLeft size={16} /> 장바구니
+    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-10">
+      {/* Back navigation */}
+      <Link
+        to="/store/cart"
+        className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors"
+      >
+        <ArrowLeft size={16} />
+        장바구니
       </Link>
 
-      <div style={styles.productCard}>
-        {/* Image */}
-        <div style={styles.imageSection}>
-          {product.image_url ? (
-            <img src={product.image_url} alt={product.product_name} style={styles.image} />
-          ) : (
-            <div style={styles.imagePlaceholder}>
-              <Package size={48} style={{ color: '#94a3b8' }} />
+      {/* ══════════════════════════════════════════
+          Section 1: Hero — 상품 이미지 + 기본 정보
+      ══════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
+        <div className="flex flex-col md:flex-row">
+          {/* Image */}
+          <div className="md:w-[400px] flex-shrink-0">
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.product_name}
+                className="w-full h-[300px] md:h-[400px] object-cover"
+              />
+            ) : (
+              <div className="w-full h-[300px] md:h-[400px] bg-gray-100 flex items-center justify-center">
+                <Package size={48} className="text-gray-300" />
+              </div>
+            )}
+          </div>
+
+          {/* Info + Price + Actions */}
+          <div className="flex-1 p-6 md:p-8 flex flex-col">
+            {/* Supplier */}
+            <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+              {product.supplier_name}
+            </p>
+
+            {/* Product Name */}
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight mb-3">
+              {product.display_name || product.product_name}
+            </h1>
+
+            {/* Meta */}
+            <div className="space-y-1 mb-5">
+              {product.brand_name && (
+                <p className="text-sm text-gray-500">
+                  브랜드: <span className="text-gray-700">{product.brand_name}</span>
+                </p>
+              )}
+              {product.manufacturer_name && (
+                <p className="text-sm text-gray-500">
+                  제조사: <span className="text-gray-700">{product.manufacturer_name}</span>
+                </p>
+              )}
+              {product.specification && (
+                <p className="text-sm text-gray-500">
+                  규격: <span className="text-gray-700">{product.specification}</span>
+                </p>
+              )}
+            </div>
+
+            {/* ══════════════════════════════════════
+                Section 2: Price + 구매
+            ══════════════════════════════════════ */}
+            <div className="mt-auto">
+              {/* Price */}
+              <div className="mb-5">
+                {hasDiscount && (
+                  <p className="text-sm text-gray-400 line-through">
+                    ₩{product.consumer_reference_price!.toLocaleString()}
+                  </p>
+                )}
+                <p className="text-3xl font-bold text-gray-900">
+                  ₩{displayPrice.toLocaleString()}
+                </p>
+              </div>
+
+              {/* Quantity */}
+              <div className="flex items-center gap-3 mb-5">
+                <span className="text-sm text-gray-500">수량</span>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="w-10 text-center text-sm font-semibold text-gray-900">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity((q) => Math.min(999, q + 1))}
+                    className="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-colors ${
+                    added
+                      ? 'border-emerald-500 text-emerald-600 bg-emerald-50'
+                      : 'border-primary-600 text-primary-600 hover:bg-primary-50'
+                  }`}
+                >
+                  <ShoppingCart size={18} />
+                  {added ? '담겼습니다!' : '장바구니'}
+                </button>
+                <button
+                  onClick={() => { handleAddToCart(); navigate('/store/cart'); }}
+                  className="flex-1 py-3 px-4 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+                >
+                  바로 구매
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+          Section 3: 약사 코멘트
+      ══════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <MessageSquare size={16} className="text-emerald-600" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">약사 추천</h2>
+        </div>
+        <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+            {pharmacistComment}
+          </p>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+          Section 4: 상품 설명
+      ══════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+            <FileText size={16} className="text-blue-600" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">상품 설명</h2>
+        </div>
+        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+          {description}
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════
+          Section 5: 매장 정보
+      ══════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+            <Store size={16} className="text-purple-600" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">매장 정보</h2>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <MapPin size={16} className="text-gray-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">{storeName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {product.store_address || '주소 정보가 등록되지 않았습니다'}
+              </p>
+            </div>
+          </div>
+          {product.store_phone && (
+            <div className="flex items-center gap-3">
+              <Phone size={16} className="text-gray-400 flex-shrink-0" />
+              <a href={`tel:${product.store_phone}`} className="text-sm text-primary-600 hover:text-primary-700">
+                {product.store_phone}
+              </a>
+            </div>
+          )}
+          {product.store_hours && (
+            <div className="flex items-center gap-3">
+              <Clock size={16} className="text-gray-400 flex-shrink-0" />
+              <p className="text-sm text-gray-600">{product.store_hours}</p>
             </div>
           )}
         </div>
+      </div>
 
-        {/* Info */}
-        <div style={styles.infoSection}>
-          <p style={styles.supplierName}>{product.supplier_name}</p>
-          <h1 style={styles.productName}>{product.product_name}</h1>
-
-          {product.brand_name && (
-            <p style={styles.meta}>브랜드: {product.brand_name}</p>
-          )}
-          {product.manufacturer_name && (
-            <p style={styles.meta}>제조사: {product.manufacturer_name}</p>
-          )}
-          {product.specification && (
-            <p style={styles.meta}>규격: {product.specification}</p>
-          )}
-
-          {product.consumer_reference_price && product.consumer_reference_price > product.price_general && (
-            <p style={styles.refPrice}>소비자가 ₩{product.consumer_reference_price.toLocaleString()}</p>
-          )}
-          <p style={styles.price}>₩{product.price_general.toLocaleString()}</p>
-
-          {/* Quantity */}
-          <div style={styles.qtyRow}>
-            <button
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              style={styles.qtyBtn}
-            >
-              -
-            </button>
-            <span style={styles.qtyValue}>{quantity}</span>
-            <button
-              onClick={() => setQuantity((q) => Math.min(1000, q + 1))}
-              style={styles.qtyBtn}
-            >
-              +
-            </button>
+      {/* ══════════════════════════════════════════
+          Section 6: QR 공유
+      ══════════════════════════════════════════ */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+            <QrCode size={16} className="text-amber-600" />
           </div>
-
-          {/* Actions */}
-          <div style={styles.actions}>
-            <button onClick={handleAddToCart} style={styles.addBtn}>
-              <ShoppingCart size={18} />
-              {added ? '담겼습니다!' : '장바구니 담기'}
-            </button>
-            <button onClick={() => { handleAddToCart(); navigate('/store/cart'); }} style={styles.buyBtn}>
-              바로 구매
-            </button>
-          </div>
+          <h2 className="text-lg font-bold text-gray-900">공유</h2>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleShare}
+            className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              shared
+                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Share2 size={16} />
+            {shared ? '링크가 복사되었습니다!' : '이 상품 공유하기'}
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '900px',
-    margin: '0 auto',
-    padding: '40px 20px',
-  },
-  loadingText: {
-    textAlign: 'center' as const,
-    color: '#64748b',
-    padding: '60px 0',
-    fontSize: '14px',
-  },
-  backLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '6px',
-    color: '#64748b',
-    textDecoration: 'none',
-    fontSize: '14px',
-    marginBottom: '24px',
-  },
-  productCard: {
-    display: 'flex',
-    gap: '32px',
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    border: '1px solid #e2e8f0',
-    padding: '24px',
-    flexWrap: 'wrap' as const,
-  },
-  imageSection: {
-    flex: '0 0 320px',
-    maxWidth: '320px',
-  },
-  image: {
-    width: '100%',
-    borderRadius: '12px',
-    objectFit: 'cover' as const,
-  },
-  imagePlaceholder: {
-    width: '100%',
-    height: '320px',
-    borderRadius: '12px',
-    backgroundColor: '#f1f5f9',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  infoSection: {
-    flex: 1,
-    minWidth: '240px',
-  },
-  supplierName: {
-    fontSize: '13px',
-    color: '#64748b',
-    margin: '0 0 8px 0',
-  },
-  productName: {
-    fontSize: '22px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '0 0 12px 0',
-    lineHeight: 1.3,
-  },
-  meta: {
-    fontSize: '13px',
-    color: '#64748b',
-    margin: '0 0 4px 0',
-  },
-  refPrice: {
-    fontSize: '14px',
-    color: '#94a3b8',
-    textDecoration: 'line-through',
-    margin: '16px 0 4px 0',
-  },
-  price: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: '4px 0 20px 0',
-  },
-  qtyRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '24px',
-  },
-  qtyBtn: {
-    width: '36px',
-    height: '36px',
-    borderRadius: '8px',
-    border: '1px solid #d1d5db',
-    backgroundColor: '#fff',
-    fontSize: '18px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qtyValue: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#0f172a',
-    minWidth: '32px',
-    textAlign: 'center' as const,
-  },
-  actions: {
-    display: 'flex',
-    gap: '12px',
-    flexWrap: 'wrap' as const,
-  },
-  addBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '12px 24px',
-    borderRadius: '10px',
-    border: '1px solid #2563eb',
-    backgroundColor: '#fff',
-    color: '#2563eb',
-    fontSize: '15px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-  buyBtn: {
-    padding: '12px 24px',
-    borderRadius: '10px',
-    border: 'none',
-    backgroundColor: '#2563eb',
-    color: '#fff',
-    fontSize: '15px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-};

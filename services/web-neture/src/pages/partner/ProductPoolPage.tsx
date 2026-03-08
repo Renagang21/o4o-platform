@@ -2,21 +2,39 @@
  * ProductPoolPage - 파트너 제품 풀
  *
  * Work Order: WO-O4O-PARTNER-HUB-CORE-V1
+ * Refined: WO-O4O-PARTNER-HUB-REFINEMENT-V1
  *
  * 커미션 정책이 설정된 제품 목록.
  * 파트너가 홍보할 제품을 선택하고 Referral 링크를 생성.
+ *
+ * Filters: Supplier / Commission amount
+ * Sort: Commission DESC / Latest commission
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Package, Link2, Check } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Package, Link2, Search, SlidersHorizontal } from 'lucide-react';
 import { partnerAffiliateApi } from '../../lib/api/index.js';
 import type { PoolProduct } from '../../lib/api/index.js';
+import { ReferralLinkModal } from './ReferralLinkModal';
+
+type SortOption = 'commission_desc' | 'latest';
+
+interface ModalState {
+  productName: string;
+  supplierName: string;
+  referralUrl: string;
+}
 
 export default function ProductPoolPage() {
   const [products, setProducts] = useState<PoolProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [modal, setModal] = useState<ModalState | null>(null);
+
+  // Filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSupplier, setSelectedSupplier] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('latest');
 
   useEffect(() => {
     (async () => {
@@ -26,25 +44,108 @@ export default function ProductPoolPage() {
     })();
   }, []);
 
-  const handleGenerateLink = useCallback(async (productId: string) => {
-    setGenerating(productId);
-    const result = await partnerAffiliateApi.createReferralLink(productId);
+  const suppliers = useMemo(() => {
+    const names = [...new Set(products.map((p) => p.supplier_name))];
+    return names.sort();
+  }, [products]);
+
+  const filtered = useMemo(() => {
+    let result = [...products];
+
+    // Search
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      result = result.filter(
+        (p) => p.product_name.toLowerCase().includes(q) || p.supplier_name.toLowerCase().includes(q),
+      );
+    }
+
+    // Supplier filter
+    if (selectedSupplier) {
+      result = result.filter((p) => p.supplier_name === selectedSupplier);
+    }
+
+    // Sort
+    if (sortBy === 'commission_desc') {
+      result.sort((a, b) => b.commission_per_unit - a.commission_per_unit);
+    } else {
+      result.sort((a, b) => (b.commission_start_date || '').localeCompare(a.commission_start_date || ''));
+    }
+
+    return result;
+  }, [products, searchTerm, selectedSupplier, sortBy]);
+
+  const handleGenerateLink = useCallback(async (product: PoolProduct) => {
+    setGenerating(product.product_id);
+    const result = await partnerAffiliateApi.createReferralLink(product.product_id);
     setGenerating(null);
 
     if (result) {
-      const fullUrl = `${window.location.origin}${result.referral_url}`;
-      await navigator.clipboard.writeText(fullUrl);
-      setCopiedId(productId);
-      setTimeout(() => setCopiedId(null), 2000);
+      setModal({
+        productName: product.product_name,
+        supplierName: product.supplier_name,
+        referralUrl: result.referral_url,
+      });
     }
   }, []);
 
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>Product Pool</h1>
+        <h1 style={styles.title}>Products</h1>
         <p style={styles.subtitle}>커미션이 설정된 제품을 홍보하고 수익을 얻으세요</p>
       </div>
+
+      {/* Toolbar */}
+      {!loading && products.length > 0 && (
+        <div style={styles.toolbar}>
+          {/* Search */}
+          <div style={styles.searchWrap}>
+            <Search size={16} style={{ color: '#94a3b8', flexShrink: 0 }} />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="제품명, 공급자 검색..."
+              style={styles.searchInput}
+            />
+          </div>
+
+          {/* Supplier Filter */}
+          <div style={styles.filterWrap}>
+            <SlidersHorizontal size={14} style={{ color: '#64748b' }} />
+            <select
+              value={selectedSupplier}
+              onChange={(e) => setSelectedSupplier(e.target.value)}
+              style={styles.select}
+            >
+              <option value="">전체 공급자</option>
+              {suppliers.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as SortOption)}
+            style={styles.select}
+          >
+            <option value="latest">최신 커미션순</option>
+            <option value="commission_desc">커미션 높은순</option>
+          </select>
+        </div>
+      )}
+
+      {modal && (
+        <ReferralLinkModal
+          productName={modal.productName}
+          supplierName={modal.supplierName}
+          referralUrl={modal.referralUrl}
+          onClose={() => setModal(null)}
+        />
+      )}
 
       {loading ? (
         <p style={styles.emptyText}>불러오는 중...</p>
@@ -53,9 +154,14 @@ export default function ProductPoolPage() {
           <Package size={40} style={{ color: '#94a3b8' }} />
           <p style={styles.emptyText}>현재 홍보 가능한 제품이 없습니다.</p>
         </div>
+      ) : filtered.length === 0 ? (
+        <div style={styles.emptyState}>
+          <Search size={40} style={{ color: '#94a3b8' }} />
+          <p style={styles.emptyText}>검색 조건에 맞는 제품이 없습니다.</p>
+        </div>
       ) : (
         <div style={styles.grid}>
-          {products.map((p) => (
+          {filtered.map((p) => (
             <div key={p.product_id} style={styles.card}>
               {p.image_url ? (
                 <img src={p.image_url} alt={p.product_name} style={styles.cardImage} />
@@ -72,16 +178,11 @@ export default function ProductPoolPage() {
                   커미션 ₩{p.commission_per_unit.toLocaleString()} / 개
                 </div>
                 <button
-                  onClick={() => handleGenerateLink(p.product_id)}
+                  onClick={() => handleGenerateLink(p)}
                   disabled={generating === p.product_id}
-                  style={{
-                    ...styles.linkBtn,
-                    ...(copiedId === p.product_id ? styles.linkBtnCopied : {}),
-                  }}
+                  style={styles.linkBtn}
                 >
-                  {copiedId === p.product_id ? (
-                    <><Check size={14} /> 복사 완료</>
-                  ) : generating === p.product_id ? (
+                  {generating === p.product_id ? (
                     '생성 중...'
                   ) : (
                     <><Link2 size={14} /> Referral 링크 생성</>
@@ -115,6 +216,46 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '14px',
     color: '#64748b',
     margin: '4px 0 0 0',
+  },
+  toolbar: {
+    display: 'flex',
+    gap: '12px',
+    marginBottom: '24px',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+  },
+  searchWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flex: 1,
+    minWidth: '200px',
+    padding: '10px 14px',
+    backgroundColor: '#fff',
+    border: '1px solid #e2e8f0',
+    borderRadius: '8px',
+  },
+  searchInput: {
+    border: 'none',
+    outline: 'none',
+    fontSize: '14px',
+    color: '#1e293b',
+    width: '100%',
+    backgroundColor: 'transparent',
+  },
+  filterWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  select: {
+    padding: '10px 12px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    fontSize: '14px',
+    color: '#475569',
+    backgroundColor: '#fff',
+    cursor: 'pointer',
   },
   grid: {
     display: 'grid',
@@ -185,11 +326,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     fontWeight: 600,
     cursor: 'pointer',
-  },
-  linkBtnCopied: {
-    backgroundColor: '#dcfce7',
-    borderColor: '#16a34a',
-    color: '#166534',
   },
   emptyState: {
     textAlign: 'center' as const,

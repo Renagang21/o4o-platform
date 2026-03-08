@@ -426,3 +426,65 @@ export const partnerAffiliateApi = {
     }
   },
 };
+
+// ==================== Partner Settlement (WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1) ====================
+
+export interface PartnerSettlementSummary {
+  id: string;
+  partner_id: string;
+  total_commission: number;
+  commission_count: number;
+  status: string;
+  created_at: string;
+  paid_at: string | null;
+}
+
+export interface PartnerSettlementDetailItem {
+  commission_amount: number;
+  order_number: string;
+  order_amount: number;
+  commission_rate: number;
+  supplier_name: string | null;
+  commission_date: string;
+}
+
+export interface PartnerSettlementDetail extends PartnerSettlementSummary {
+  items: PartnerSettlementDetailItem[];
+}
+
+export const partnerSettlementApi = {
+  /** GET /api/v1/neture/partner/settlements */
+  async getSettlements(params?: { page?: number; limit?: number }): Promise<{
+    data: PartnerSettlementSummary[];
+    meta: { page: number; limit: number; total: number; totalPages: number };
+  }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/settlements${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch {
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/partner/settlements/:id */
+  async getDetail(id: string): Promise<PartnerSettlementDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/settlements/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+};

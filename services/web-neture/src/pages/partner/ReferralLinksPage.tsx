@@ -2,8 +2,10 @@
  * ReferralLinksPage - 내 Referral 링크 관리
  *
  * Work Order: WO-O4O-PARTNER-HUB-CORE-V1
+ * Refined: WO-O4O-PARTNER-HUB-REFINEMENT-V1
  *
- * 파트너의 referral 링크 목록 + URL 복사 기능.
+ * Desktop: Table (Product | Store | Referral URL | Created date | Actions)
+ * Mobile: Card list
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -38,10 +40,14 @@ export default function ReferralLinksPage() {
     setTimeout(() => setCopiedId(null), 2000);
   }, [buildUrl]);
 
+  const handleOpen = useCallback((link: ReferralLink) => {
+    window.open(buildUrl(link), '_blank', 'noopener,noreferrer');
+  }, [buildUrl]);
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>My Referral Links</h1>
+        <h1 style={styles.title}>My Links</h1>
         <p style={styles.subtitle}>생성한 Referral 링크를 관리하고 공유하세요</p>
       </div>
 
@@ -51,56 +57,126 @@ export default function ReferralLinksPage() {
         <div style={styles.emptyState}>
           <Link2 size={40} style={{ color: '#94a3b8' }} />
           <p style={styles.emptyText}>생성된 Referral 링크가 없습니다.</p>
-          <p style={styles.emptyHint}>Product Pool에서 제품을 선택하여 링크를 생성하세요.</p>
+          <p style={styles.emptyHint}>Products에서 제품을 선택하여 링크를 생성하세요.</p>
         </div>
       ) : (
-        <div style={styles.list}>
-          {links.map((link) => {
-            const url = buildUrl(link);
-            const isCopied = copiedId === link.id;
+        <>
+          {/* Desktop Table */}
+          <div className="referral-links-table" style={styles.tableWrap}>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Product</th>
+                  <th style={styles.th}>Store</th>
+                  <th style={styles.th}>Referral URL</th>
+                  <th style={styles.th}>Created</th>
+                  <th style={{ ...styles.th, textAlign: 'center' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {links.map((link) => {
+                  const url = buildUrl(link);
+                  const isCopied = copiedId === link.id;
+                  return (
+                    <tr key={link.id} style={styles.tr}>
+                      <td style={styles.td}>
+                        <div style={{ fontWeight: 500, color: '#1e293b' }}>{link.product_name}</div>
+                        {link.commission_per_unit != null && (
+                          <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>
+                            커미션 ₩{link.commission_per_unit.toLocaleString()}/개
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ ...styles.td, color: '#64748b', fontSize: '13px' }}>
+                        {link.store_slug || '-'}
+                      </td>
+                      <td style={styles.td}>
+                        <code style={styles.urlCode}>{url}</code>
+                      </td>
+                      <td style={{ ...styles.td, color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>
+                        {new Date(link.created_at).toLocaleDateString('ko-KR')}
+                      </td>
+                      <td style={{ ...styles.td, textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                          <button
+                            onClick={() => handleCopy(link)}
+                            style={{
+                              ...styles.actionBtn,
+                              ...(isCopied ? styles.actionBtnDone : {}),
+                            }}
+                            title="URL 복사"
+                          >
+                            {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                            {isCopied ? '복사됨' : 'Copy'}
+                          </button>
+                          <button
+                            onClick={() => handleOpen(link)}
+                            style={styles.actionBtnOpen}
+                            title="URL 열기"
+                          >
+                            <ExternalLink size={14} />
+                            Open
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
-            return (
-              <div key={link.id} style={styles.card}>
-                <div style={styles.cardInfo}>
-                  <h3 style={styles.cardName}>{link.product_name}</h3>
-                  <p style={styles.cardMeta}>
-                    가격: ₩{link.price_general.toLocaleString()}
-                    {link.commission_per_unit != null && (
-                      <> · 커미션: ₩{link.commission_per_unit.toLocaleString()}/개</>
-                    )}
-                  </p>
-                  <div style={styles.urlRow}>
-                    <code style={styles.urlCode}>{url}</code>
+          {/* Mobile Cards */}
+          <div className="referral-links-cards" style={{ display: 'none' }}>
+            {links.map((link) => {
+              const url = buildUrl(link);
+              const isCopied = copiedId === link.id;
+              return (
+                <div key={link.id} style={styles.card}>
+                  <div style={styles.cardInfo}>
+                    <h3 style={styles.cardName}>{link.product_name}</h3>
+                    <p style={styles.cardMeta}>
+                      가격: ₩{link.price_general.toLocaleString()}
+                      {link.commission_per_unit != null && (
+                        <> · 커미션: ₩{link.commission_per_unit.toLocaleString()}/개</>
+                      )}
+                    </p>
+                    <div style={styles.urlRow}>
+                      <code style={styles.urlCode}>{url}</code>
+                    </div>
+                    <p style={styles.cardDate}>
+                      생성일: {new Date(link.created_at).toLocaleDateString('ko-KR')}
+                    </p>
                   </div>
-                  <p style={styles.cardDate}>
-                    생성일: {new Date(link.created_at).toLocaleDateString('ko-KR')}
-                  </p>
+                  <div style={styles.cardActions}>
+                    <button
+                      onClick={() => handleCopy(link)}
+                      style={{
+                        ...styles.actionBtn,
+                        ...(isCopied ? styles.actionBtnDone : {}),
+                      }}
+                    >
+                      {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                      {isCopied ? '복사됨' : 'URL 복사'}
+                    </button>
+                    <button onClick={() => handleOpen(link)} style={styles.actionBtnOpen}>
+                      <ExternalLink size={14} />
+                      열기
+                    </button>
+                  </div>
                 </div>
-                <div style={styles.cardActions}>
-                  <button
-                    onClick={() => handleCopy(link)}
-                    style={{
-                      ...styles.copyBtn,
-                      ...(isCopied ? styles.copyBtnDone : {}),
-                    }}
-                  >
-                    {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                    {isCopied ? '복사됨' : 'URL 복사'}
-                  </button>
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={styles.openBtn}
-                  >
-                    <ExternalLink size={14} />
-                    열기
-                  </a>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+
+          {/* Responsive CSS */}
+          <style>{`
+            @media (max-width: 768px) {
+              .referral-links-table { display: none !important; }
+              .referral-links-cards { display: flex !important; flex-direction: column; gap: 12px; }
+            }
+          `}</style>
+        </>
       )}
     </div>
   );
@@ -108,7 +184,7 @@ export default function ReferralLinksPage() {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    maxWidth: '900px',
+    maxWidth: '1000px',
     margin: '0 auto',
     padding: '32px 20px',
   },
@@ -126,10 +202,74 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: '4px 0 0 0',
   },
-  list: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '12px',
+  tableWrap: {
+    backgroundColor: '#fff',
+    borderRadius: '12px',
+    border: '1px solid #e2e8f0',
+    overflow: 'hidden',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse' as const,
+  },
+  th: {
+    padding: '12px 16px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#64748b',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    borderBottom: '1px solid #e2e8f0',
+    backgroundColor: '#f8fafc',
+    textAlign: 'left' as const,
+  },
+  tr: {
+    borderBottom: '1px solid #f1f5f9',
+  },
+  td: {
+    padding: '14px 16px',
+    fontSize: '14px',
+    color: '#1e293b',
+  },
+  urlCode: {
+    fontSize: '12px',
+    color: '#475569',
+    backgroundColor: '#f1f5f9',
+    padding: '4px 8px',
+    borderRadius: '4px',
+    wordBreak: 'break-all' as const,
+  },
+  actionBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: '1px solid #2563eb',
+    backgroundColor: '#fff',
+    color: '#2563eb',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  actionBtnDone: {
+    backgroundColor: '#dcfce7',
+    borderColor: '#16a34a',
+    color: '#166534',
+  },
+  actionBtnOpen: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '6px 12px',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    textDecoration: 'none',
   },
   card: {
     display: 'flex',
@@ -160,14 +300,6 @@ const styles: Record<string, React.CSSProperties> = {
   urlRow: {
     marginBottom: '4px',
   },
-  urlCode: {
-    fontSize: '12px',
-    color: '#475569',
-    backgroundColor: '#f1f5f9',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    wordBreak: 'break-all' as const,
-  },
   cardDate: {
     fontSize: '12px',
     color: '#94a3b8',
@@ -177,38 +309,6 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: '8px',
     flexShrink: 0,
-  },
-  copyBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '8px 14px',
-    borderRadius: '8px',
-    border: '1px solid #2563eb',
-    backgroundColor: '#fff',
-    color: '#2563eb',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-  copyBtnDone: {
-    backgroundColor: '#dcfce7',
-    borderColor: '#16a34a',
-    color: '#166534',
-  },
-  openBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '8px 14px',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#fff',
-    color: '#475569',
-    fontSize: '13px',
-    fontWeight: 600,
-    textDecoration: 'none',
-    cursor: 'pointer',
   },
   emptyState: {
     textAlign: 'center' as const,

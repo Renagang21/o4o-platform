@@ -3930,6 +3930,186 @@ router.get('/supplier/settlements/:id', requireAuth, requireLinkedSupplier, asyn
   }
 });
 
+// ==================== Supplier Partner Commission Manager (WO-O4O-SUPPLIER-COMMISSION-MANAGER-V1) ====================
+
+/**
+ * GET /api/v1/neture/supplier/partner-commissions
+ * 공급자의 파트너 커미션 정책 목록
+ */
+router.get('/supplier/partner-commissions', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+
+    const rows = await AppDataSource.query(
+      `SELECT spc.id, spc.supplier_product_id, spc.commission_per_unit,
+              spc.start_date, spc.end_date, spc.created_at,
+              COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+              spo.barcode
+       FROM supplier_partner_commissions spc
+       JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
+       WHERE spo.supplier_id = $1
+       ORDER BY spc.start_date DESC`,
+      [supplierId],
+    );
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching supplier partner commissions:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/supplier/partner-commissions
+ * 커미션 정책 생성 (기간 겹침 검증)
+ */
+router.post('/supplier/partner-commissions', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const { supplier_product_id, commission_per_unit, start_date, end_date } = req.body;
+
+    if (!supplier_product_id || commission_per_unit == null || !start_date) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'supplier_product_id, commission_per_unit, start_date required' });
+    }
+
+    // Verify product belongs to this supplier
+    const [product] = await AppDataSource.query(
+      `SELECT id FROM supplier_product_offers WHERE id = $1 AND supplier_id = $2`,
+      [supplier_product_id, supplierId],
+    );
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'PRODUCT_NOT_FOUND', message: 'Product not found or not owned by supplier' });
+    }
+
+    // Check date overlap
+    const overlaps = await AppDataSource.query(
+      `SELECT id FROM supplier_partner_commissions
+       WHERE supplier_product_id = $1
+         AND (
+           ($2::date <= COALESCE(end_date, '9999-12-31'::date))
+           AND (COALESCE($3::date, '9999-12-31'::date) >= start_date)
+         )`,
+      [supplier_product_id, start_date, end_date || null],
+    );
+    if (overlaps.length > 0) {
+      return res.status(409).json({ success: false, error: 'DATE_OVERLAP', message: 'Commission period overlaps with existing policy' });
+    }
+
+    const [created] = await AppDataSource.query(
+      `INSERT INTO supplier_partner_commissions (supplier_product_id, commission_per_unit, start_date, end_date)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [supplier_product_id, commission_per_unit, start_date, end_date || null],
+    );
+
+    res.status(201).json({ success: true, data: created });
+  } catch (error) {
+    logger.error('[Neture API] Error creating supplier partner commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * PUT /api/v1/neture/supplier/partner-commissions/:id
+ * 커미션 정책 수정 (기간 겹침 검증)
+ */
+router.put('/supplier/partner-commissions/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const commissionId = req.params.id;
+    const { commission_per_unit, start_date, end_date } = req.body;
+
+    // Find existing and verify ownership
+    const [existing] = await AppDataSource.query(
+      `SELECT spc.id, spc.supplier_product_id
+       FROM supplier_partner_commissions spc
+       JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
+       WHERE spc.id = $1 AND spo.supplier_id = $2`,
+      [commissionId, supplierId],
+    );
+    if (!existing) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    }
+
+    // Check date overlap (exclude self)
+    if (start_date) {
+      const overlaps = await AppDataSource.query(
+        `SELECT id FROM supplier_partner_commissions
+         WHERE supplier_product_id = $1 AND id != $2
+           AND (
+             ($3::date <= COALESCE(end_date, '9999-12-31'::date))
+             AND (COALESCE($4::date, '9999-12-31'::date) >= start_date)
+           )`,
+        [existing.supplier_product_id, commissionId, start_date, end_date || null],
+      );
+      if (overlaps.length > 0) {
+        return res.status(409).json({ success: false, error: 'DATE_OVERLAP', message: 'Commission period overlaps with existing policy' });
+      }
+    }
+
+    const sets: string[] = [];
+    const params: any[] = [];
+    let idx = 1;
+
+    if (commission_per_unit != null) { sets.push(`commission_per_unit = $${idx++}`); params.push(commission_per_unit); }
+    if (start_date) { sets.push(`start_date = $${idx++}`); params.push(start_date); }
+    if (end_date !== undefined) { sets.push(`end_date = $${idx++}`); params.push(end_date || null); }
+
+    if (sets.length === 0) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'No fields to update' });
+    }
+
+    params.push(commissionId);
+    const [updated] = await AppDataSource.query(
+      `UPDATE supplier_partner_commissions SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
+      params,
+    );
+
+    res.json({ success: true, data: updated });
+  } catch (error) {
+    logger.error('[Neture API] Error updating supplier partner commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * DELETE /api/v1/neture/supplier/partner-commissions/:id
+ * 커미션 정책 삭제 (이미 사용된 정책은 삭제 불가)
+ */
+router.delete('/supplier/partner-commissions/:id', requireAuth, requireActiveSupplier, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const supplierId = (req as SupplierRequest).supplierId;
+    const commissionId = req.params.id;
+
+    // Verify ownership
+    const [existing] = await AppDataSource.query(
+      `SELECT spc.id, spc.supplier_product_id
+       FROM supplier_partner_commissions spc
+       JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
+       WHERE spc.id = $1 AND spo.supplier_id = $2`,
+      [commissionId, supplierId],
+    );
+    if (!existing) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    }
+
+    // Check if policy has been used (partner_commissions referencing this product)
+    const [usage] = await AppDataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM partner_commissions WHERE product_id = $1`,
+      [existing.supplier_product_id],
+    );
+    if (usage.cnt > 0) {
+      return res.status(409).json({ success: false, error: 'IN_USE', message: 'Cannot delete: commissions have been earned under this policy' });
+    }
+
+    await AppDataSource.query(`DELETE FROM supplier_partner_commissions WHERE id = $1`, [commissionId]);
+    res.json({ success: true });
+  } catch (error) {
+    logger.error('[Neture API] Error deleting supplier partner commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
 // ==================== Partner Commission Engine (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
 
 /**
@@ -4997,6 +5177,301 @@ router.patch('/admin/commissions/:id/status', requireAuth, requireNetureScope('n
   } catch (error) {
     logger.error('[Neture API] Error cancelling commission:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel commission' });
+  }
+});
+
+// ==================== Partner Settlements (WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1) ====================
+
+/**
+ * POST /api/v1/neture/admin/partner-settlements
+ * approved 커미션으로 정산 배치 생성
+ */
+router.post('/admin/partner-settlements', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { partner_id } = req.body;
+
+    if (!partner_id) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'partner_id is required' });
+    }
+
+    // approved 상태이고 아직 정산에 포함되지 않은 커미션 조회
+    const payableCommissions = await AppDataSource.query(
+      `SELECT pc.id, pc.commission_amount
+       FROM partner_commissions pc
+       WHERE pc.partner_id = $1
+         AND pc.status = 'approved'
+         AND NOT EXISTS (
+           SELECT 1 FROM partner_settlement_items psi WHERE psi.commission_id = pc.id
+         )
+       ORDER BY pc.created_at`,
+      [partner_id],
+    );
+
+    if (payableCommissions.length === 0) {
+      return res.status(400).json({ success: false, error: 'NO_PAYABLE', message: 'No approved commissions available for settlement' });
+    }
+
+    const totalCommission = payableCommissions.reduce((sum: number, c: { commission_amount: number }) => sum + Number(c.commission_amount), 0);
+
+    // settlement 생성
+    const [settlement] = await AppDataSource.query(
+      `INSERT INTO partner_settlements (partner_id, total_commission, commission_count, status)
+       VALUES ($1, $2, $3, 'pending')
+       RETURNING *`,
+      [partner_id, totalCommission, payableCommissions.length],
+    );
+
+    // settlement items 생성
+    for (const c of payableCommissions) {
+      await AppDataSource.query(
+        `INSERT INTO partner_settlement_items (settlement_id, commission_id, commission_amount)
+         VALUES ($1, $2, $3)`,
+        [settlement.id, c.id, c.commission_amount],
+      );
+    }
+
+    logger.info(`[Partner Settlement] Created settlement ${settlement.id} for partner ${partner_id}: ${payableCommissions.length} commissions, total ${totalCommission}`);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        ...settlement,
+        item_count: payableCommissions.length,
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error creating partner settlement:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to create partner settlement' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/admin/partner-settlements/:id/pay
+ * 정산 지급 완료 처리
+ */
+router.post('/admin/partner-settlements/:id/pay', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+
+    // settlement 상태 확인
+    const [settlement] = await AppDataSource.query(
+      `SELECT * FROM partner_settlements WHERE id = $1`,
+      [settlementId],
+    );
+
+    if (!settlement) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
+    }
+
+    if (settlement.status === 'paid') {
+      return res.status(400).json({ success: false, error: 'ALREADY_PAID', message: 'Settlement already paid' });
+    }
+
+    // 트랜잭션: settlement paid + commissions paid
+    await AppDataSource.query(`BEGIN`);
+
+    try {
+      // settlement 상태 → paid
+      await AppDataSource.query(
+        `UPDATE partner_settlements SET status = 'paid', paid_at = NOW() WHERE id = $1`,
+        [settlementId],
+      );
+
+      // 포함된 커미션 → paid
+      await AppDataSource.query(
+        `UPDATE partner_commissions
+         SET status = 'paid', paid_at = NOW(), updated_at = NOW()
+         WHERE id IN (
+           SELECT commission_id FROM partner_settlement_items WHERE settlement_id = $1
+         )`,
+        [settlementId],
+      );
+
+      await AppDataSource.query(`COMMIT`);
+    } catch (txError) {
+      await AppDataSource.query(`ROLLBACK`);
+      throw txError;
+    }
+
+    logger.info(`[Partner Settlement] Settlement ${settlementId} paid`);
+
+    res.json({
+      success: true,
+      data: { id: settlementId, status: 'paid', paid_at: new Date().toISOString() },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error paying partner settlement:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay partner settlement' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/partner-settlements
+ * Admin 파트너 정산 목록
+ */
+router.get('/admin/partner-settlements', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const params: any[] = [];
+    let statusClause = '';
+    if (status && ['pending', 'processing', 'paid'].includes(status)) {
+      statusClause = `WHERE ps.status = $1`;
+      params.push(status);
+    }
+
+    const [settlements, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT ps.*,
+                u."displayName" AS partner_name,
+                u.email AS partner_email
+         FROM partner_settlements ps
+         LEFT JOIN users u ON u.id = ps.partner_id
+         ${statusClause}
+         ORDER BY ps.created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        params,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total FROM partner_settlements ps ${statusClause}`,
+        params,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+    res.json({
+      success: true,
+      data: settlements,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin partner settlements:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner settlements' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/partner-settlements/:id
+ * Admin 파트너 정산 상세
+ */
+router.get('/admin/partner-settlements/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const settlementId = req.params.id;
+
+    const [settlement] = await AppDataSource.query(
+      `SELECT ps.*,
+              u."displayName" AS partner_name,
+              u.email AS partner_email
+       FROM partner_settlements ps
+       LEFT JOIN users u ON u.id = ps.partner_id
+       WHERE ps.id = $1`,
+      [settlementId],
+    );
+
+    if (!settlement) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
+    }
+
+    // 포함된 커미션 목록
+    const items = await AppDataSource.query(
+      `SELECT psi.*, pc.order_number, pc.order_amount, pc.commission_rate,
+              pc.supplier_id, ns.name AS supplier_name,
+              pc.status AS commission_status
+       FROM partner_settlement_items psi
+       JOIN partner_commissions pc ON pc.id = psi.commission_id
+       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       WHERE psi.settlement_id = $1
+       ORDER BY pc.created_at`,
+      [settlementId],
+    );
+
+    res.json({
+      success: true,
+      data: { ...settlement, items },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin partner settlement detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner settlement detail' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/settlements
+ * 파트너 본인 정산 목록
+ */
+router.get('/partner/settlements', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+
+    const [settlements, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT * FROM partner_settlements
+         WHERE partner_id = $1
+         ORDER BY created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        [partnerId],
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total FROM partner_settlements WHERE partner_id = $1`,
+        [partnerId],
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+    res.json({
+      success: true,
+      data: settlements,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner settlements:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner settlements' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/settlements/:id
+ * 파트너 정산 상세
+ */
+router.get('/partner/settlements/:id', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+    const settlementId = req.params.id;
+
+    const [settlement] = await AppDataSource.query(
+      `SELECT * FROM partner_settlements WHERE id = $1 AND partner_id = $2`,
+      [settlementId, partnerId],
+    );
+
+    if (!settlement) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
+    }
+
+    const items = await AppDataSource.query(
+      `SELECT psi.commission_amount, pc.order_number, pc.order_amount,
+              pc.commission_rate, pc.supplier_id, ns.name AS supplier_name,
+              pc.created_at AS commission_date
+       FROM partner_settlement_items psi
+       JOIN partner_commissions pc ON pc.id = psi.commission_id
+       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       WHERE psi.settlement_id = $1
+       ORDER BY pc.created_at`,
+      [settlementId],
+    );
+
+    res.json({
+      success: true,
+      data: { ...settlement, items },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner settlement detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner settlement detail' });
   }
 });
 

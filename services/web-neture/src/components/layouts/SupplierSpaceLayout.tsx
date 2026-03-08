@@ -103,6 +103,9 @@ export default function SupplierSpaceLayout() {
             <Link to="/supplier/orders" className={subNavClass('/supplier/orders')}>
               Orders
             </Link>
+            <Link to="/supplier/partner-commissions" className={subNavClass('/supplier/partner-commissions')}>
+              Partner Commissions
+            </Link>
             <Link to="/supplier/library" className={subNavClass('/supplier/library')}>
               Library
             </Link>

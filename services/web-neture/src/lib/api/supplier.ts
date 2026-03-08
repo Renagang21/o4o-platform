@@ -147,6 +147,85 @@ export interface OrderSummary {
   message: string;
 }
 
+// ==================== Supplier Partner Commission Types ====================
+
+export interface SupplierPartnerCommission {
+  id: string;
+  supplier_product_id: string;
+  commission_per_unit: number;
+  start_date: string;
+  end_date: string | null;
+  created_at: string;
+  product_name: string;
+  barcode: string;
+}
+
+// ==================== Supplier Partner Commission API ====================
+
+export const supplierCommissionApi = {
+  async getCommissions(): Promise<SupplierPartnerCommission[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier Commission API] Failed to fetch commissions:', error);
+      return [];
+    }
+  },
+
+  async create(data: {
+    supplier_product_id: string;
+    commission_per_unit: number;
+    start_date: string;
+    end_date?: string;
+  }): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  async update(
+    id: string,
+    data: { commission_per_unit?: number; start_date?: string; end_date?: string | null }
+  ): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  async remove(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      return response.json();
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+};
+
 // ==================== Supplier Profile Types ====================
 
 export interface SupplierProfile {

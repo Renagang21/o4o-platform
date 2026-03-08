@@ -5,7 +5,7 @@
  *
  * 구조:
  * - 상단: NetureLayout 헤더 (Partner 활성)
- * - 서브 nav: Dashboard | Contents | Links | Stores | Forum
+ * - 서브 nav: Dashboard | Products | My Links | Settlements
  * - 스코프: /partner/*
  */
 
@@ -94,23 +94,14 @@ export default function PartnerSpaceLayout() {
             <Link to="/partner/dashboard" className={subNavClass('/partner/dashboard')}>
               Dashboard
             </Link>
-            <Link to="/partner/contents" className={subNavClass('/partner/contents')}>
-              Contents
+            <Link to="/partner/products" className={subNavClass('/partner/products')}>
+              Products
             </Link>
             <Link to="/partner/links" className={subNavClass('/partner/links')}>
-              Links
+              My Links
             </Link>
-            <Link to="/partner/stores" className={subNavClass('/partner/stores')}>
-              Stores
-            </Link>
-            <Link to="/partner/product-pool" className={subNavClass('/partner/product-pool')}>
-              Product Pool
-            </Link>
-            <Link to="/partner/referrals" className={subNavClass('/partner/referrals')}>
-              Referrals
-            </Link>
-            <Link to="/partner/forum" className={subNavClass('/partner/forum')}>
-              Forum
+            <Link to="/partner/settlements" className={subNavClass('/partner/settlements')}>
+              Settlements
             </Link>
           </nav>
         </div>

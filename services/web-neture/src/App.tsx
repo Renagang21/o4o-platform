@@ -166,6 +166,9 @@ const SupplierLibraryPage = lazy(() =>
 const SupplierLibraryFormPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryFormPage }))
 );
+const SupplierPartnerCommissionsPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierPartnerCommissionsPage }))
+);
 
 // Signage Content Hub
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
@@ -204,9 +207,6 @@ const PartnerStoresPage = lazy(() =>
 const RecruitingProductsPage = lazy(() => import('./pages/partner/RecruitingProductsPage'));
 const PartnerOverviewPage = lazy(() =>
   import('./pages/partner/PartnerOverviewPage').then((m) => ({ default: m.PartnerOverviewPage }))
-);
-const CollaborationPage = lazy(() =>
-  import('./pages/partner/CollaborationPage').then((m) => ({ default: m.CollaborationPage }))
 );
 const PromotionsPage = lazy(() =>
   import('./pages/partner/PromotionsPage').then((m) => ({ default: m.PromotionsPage }))
@@ -263,6 +263,17 @@ const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterMa
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
 const AdminSettlementsPage = lazy(() => import('./pages/admin/AdminSettlementsPage'));
 const AdminCommissionsPage = lazy(() => import('./pages/admin/AdminCommissionsPage'));
+const AdminPartnerSettlementsPage = lazy(() => import('./pages/admin/AdminPartnerSettlementsPage'));
+
+// Partner HUB (WO-O4O-PARTNER-HUB-DASHBOARD-V1)
+const PartnerHubDashboardPage = lazy(() =>
+  import('./pages/partner/PartnerHubDashboardPage').then((m) => ({ default: m.PartnerHubDashboardPage }))
+);
+
+// Partner Settlement Batch (WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1)
+const PartnerSettlementBatchPage = lazy(() =>
+  import('./pages/partner/PartnerSettlementBatchPage').then((m) => ({ default: m.PartnerSettlementBatchPage }))
+);
 
 // Partner Affiliate (WO-O4O-PARTNER-HUB-CORE-V1)
 const ProductPoolPage = lazy(() => import('./pages/partner/ProductPoolPage'));
@@ -403,6 +414,7 @@ function App() {
               <Route path="/supplier/library" element={<SupplierLibraryPage />} />
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
+              <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" />} />
@@ -437,15 +449,19 @@ function App() {
                 WO-O4O-NETURE-UI-REFACTORING-V1
             ================================================================ */}
             <Route element={<PartnerSpaceLayout />}>
-              <Route path="/partner/dashboard" element={<PartnerOverviewPage />} />
+              <Route path="/partner/dashboard" element={<PartnerHubDashboardPage />} />
+              <Route path="/partner/products" element={<ProductPoolPage />} />
+              <Route path="/partner/links" element={<ReferralLinksPage />} />
+              <Route path="/partner/settlements" element={<PartnerSettlementBatchPage />} />
+              {/* Legacy routes kept for compatibility */}
+              <Route path="/partner/overview" element={<PartnerOverviewPage />} />
               <Route path="/partner/contents" element={<ContentListPage />} />
               <Route path="/partner/contents/:id" element={<ContentDetailPage />} />
-              <Route path="/partner/links" element={<CollaborationPage />} />
               <Route path="/partner/stores" element={<RecruitingProductsPage />} />
-              <Route path="/partner/settlements" element={<SettlementsPage />} />
+              <Route path="/partner/commissions" element={<SettlementsPage />} />
               <Route path="/partner/promotions" element={<PromotionsPage />} />
-              <Route path="/partner/product-pool" element={<ProductPoolPage />} />
-              <Route path="/partner/referrals" element={<ReferralLinksPage />} />
+              <Route path="/partner/product-pool" element={<Navigate to="/partner/products" replace />} />
+              <Route path="/partner/referrals" element={<Navigate to="/partner/links" replace />} />
               <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" />} />
             </Route>
 
@@ -591,6 +607,7 @@ function App() {
               <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
               <Route path="/workspace/admin/settlements" element={<AdminSettlementsPage />} />
               <Route path="/workspace/admin/commissions" element={<AdminCommissionsPage />} />
+              <Route path="/workspace/admin/partner-settlements" element={<AdminPartnerSettlementsPage />} />
               <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
@@ -637,12 +654,12 @@ function App() {
             <Route path="/workspace/supplier/*" element={<Navigate to="/supplier" replace />} />
 
             {/* Partner Dashboard 리다이렉트 */}
-            <Route path="/workspace/partner" element={<Navigate to="/partner" replace />} />
+            <Route path="/workspace/partner" element={<Navigate to="/partner/dashboard" replace />} />
             <Route path="/workspace/partner/collaboration" element={<Navigate to="/partner/links" replace />} />
             <Route path="/workspace/partner/promotions" element={<Navigate to="/partner/promotions" replace />} />
             <Route path="/workspace/partner/settlements" element={<Navigate to="/partner/settlements" replace />} />
             <Route path="/workspace/partner/recruiting-products" element={<Navigate to="/partner/stores" replace />} />
-            <Route path="/workspace/partner/*" element={<Navigate to="/partner" replace />} />
+            <Route path="/workspace/partner/*" element={<Navigate to="/partner/dashboard" replace />} />
 
             {/* 기존 최상위 경로 리다이렉트 */}
             <Route path="/suppliers" element={<Navigate to="/community/knowledge" replace />} />

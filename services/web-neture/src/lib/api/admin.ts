@@ -623,6 +623,113 @@ export const adminCommissionApi = {
   },
 };
 
+// ==================== Admin Partner Settlement (WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1) ====================
+
+export type PartnerSettlementStatus = 'pending' | 'processing' | 'paid';
+
+export interface PartnerSettlement {
+  id: string;
+  partner_id: string;
+  partner_name?: string;
+  partner_email?: string;
+  total_commission: number;
+  commission_count: number;
+  status: PartnerSettlementStatus;
+  created_at: string;
+  paid_at: string | null;
+}
+
+export interface PartnerSettlementItem {
+  id: string;
+  settlement_id: string;
+  commission_id: string;
+  commission_amount: number;
+  order_number: string;
+  order_amount: number;
+  commission_rate: number;
+  supplier_name: string | null;
+  commission_status: string;
+  created_at: string;
+}
+
+export interface PartnerSettlementDetail extends PartnerSettlement {
+  items: PartnerSettlementItem[];
+}
+
+export interface PartnerSettlementsResponse {
+  data: PartnerSettlement[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export const adminPartnerSettlementApi = {
+  /** POST /api/v1/neture/admin/partner-settlements — 정산 배치 생성 */
+  async create(partnerId: string): Promise<{ success: boolean; data?: PartnerSettlement; error?: string }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ partner_id: partnerId }),
+        },
+      );
+      const result = await response.json();
+      if (!response.ok) return { success: false, error: result.message || 'Failed' };
+      return { success: true, data: result.data };
+    } catch { return { success: false, error: 'Network error' }; }
+  },
+
+  /** POST /api/v1/neture/admin/partner-settlements/:id/pay — 지급 완료 */
+  async pay(id: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements/${id}/pay`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({}),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  /** GET /api/v1/neture/admin/partner-settlements — 목록 */
+  async getList(params?: { page?: number; limit?: number; status?: PartnerSettlementStatus }): Promise<PartnerSettlementsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.status) sp.append('status', params.status);
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch {
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/admin/partner-settlements/:id — 상세 */
+  async getDetail(id: string): Promise<PartnerSettlementDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+};
+
 // ==================== Admin Registration ====================
 
 export const adminRegistrationApi = {
