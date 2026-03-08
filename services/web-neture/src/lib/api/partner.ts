@@ -1,5 +1,5 @@
 /**
- * Partner APIs - Recruiting, Dashboard, Recruitment
+ * Partner APIs - Recruiting, Dashboard, Recruitment, Commission
  */
 import { API_BASE_URL, fetchWithTimeout } from './client.js';
 
@@ -241,5 +241,184 @@ export const partnerRecruitmentApi = {
       return { success: false, error: result.error || 'UNKNOWN_ERROR' };
     }
     return { success: true };
+  },
+};
+
+// ==================== Partner Commission (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
+
+export type CommissionStatus = 'pending' | 'approved' | 'paid' | 'cancelled';
+
+export interface Commission {
+  id: string;
+  partner_id: string;
+  partner_name?: string;
+  supplier_id: string;
+  supplier_name?: string;
+  order_id: string;
+  order_number: string;
+  contract_id: string;
+  commission_rate: number;
+  order_amount: number;
+  commission_amount: number;
+  status: CommissionStatus;
+  period_start: string;
+  period_end: string;
+  approved_at: string | null;
+  paid_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CommissionOrderItem {
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
+
+export interface CommissionDetail extends Commission {
+  items: CommissionOrderItem[];
+}
+
+export interface PartnerCommissionKpi {
+  pending_amount: number;
+  paid_amount: number;
+  total_amount: number;
+  pending_count: number;
+  paid_count: number;
+}
+
+export interface CommissionsResponse {
+  data: Commission[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+const PARTNER_COMMISSION_KPI_DEFAULT: PartnerCommissionKpi = {
+  pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0,
+};
+
+export const partnerCommissionApi = {
+  /** GET /api/v1/neture/partner/commissions/kpi */
+  async getKpi(): Promise<PartnerCommissionKpi> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/commissions/kpi`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return PARTNER_COMMISSION_KPI_DEFAULT;
+      const result = await response.json();
+      return result.data || PARTNER_COMMISSION_KPI_DEFAULT;
+    } catch {
+      return PARTNER_COMMISSION_KPI_DEFAULT;
+    }
+  },
+
+  /** GET /api/v1/neture/partner/commissions */
+  async getCommissions(
+    params?: { page?: number; limit?: number; status?: CommissionStatus }
+  ): Promise<CommissionsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.status) sp.append('status', params.status);
+      const qs = sp.toString() ? `?${sp}` : '';
+
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/commissions${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch {
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  /** GET /api/v1/neture/partner/commissions/:id */
+  async getDetail(id: string): Promise<CommissionDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/commissions/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+};
+
+// ==================== Partner Affiliate (WO-O4O-PARTNER-HUB-CORE-V1) ====================
+
+export interface PoolProduct {
+  product_id: string;
+  product_name: string;
+  supplier_name: string;
+  commission_per_unit: number;
+  commission_start_date: string;
+  consumer_reference_price: number | null;
+  price_general: number;
+  image_url: string | null;
+}
+
+export interface ReferralLink {
+  id: string;
+  referral_token: string;
+  product_id: string;
+  product_name: string;
+  price_general: number;
+  commission_per_unit: number | null;
+  created_at: string;
+}
+
+export const partnerAffiliateApi = {
+  async getProductPool(): Promise<PoolProduct[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/product-pool`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async createReferralLink(productId: string): Promise<{ referral_url: string; referral_token: string } | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/referral-links`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ product_id: productId }),
+        },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  async getReferralLinks(): Promise<ReferralLink[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/partner/referral-links`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch {
+      return [];
+    }
   },
 };

@@ -103,6 +103,12 @@ export default function PartnerSpaceLayout() {
             <Link to="/partner/stores" className={subNavClass('/partner/stores')}>
               Stores
             </Link>
+            <Link to="/partner/product-pool" className={subNavClass('/partner/product-pool')}>
+              Product Pool
+            </Link>
+            <Link to="/partner/referrals" className={subNavClass('/partner/referrals')}>
+              Referrals
+            </Link>
             <Link to="/partner/forum" className={subNavClass('/partner/forum')}>
               Forum
             </Link>

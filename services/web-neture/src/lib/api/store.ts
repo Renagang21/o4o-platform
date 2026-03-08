@@ -21,6 +21,7 @@ export interface CreateStoreOrderRequest {
   orderer_phone: string;
   orderer_email?: string;
   note?: string;
+  referral_token?: string;
 }
 
 export interface StoreOrderItem {

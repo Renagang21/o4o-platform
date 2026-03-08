@@ -262,6 +262,14 @@ const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductAp
 const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
 const AdminSettlementsPage = lazy(() => import('./pages/admin/AdminSettlementsPage'));
+const AdminCommissionsPage = lazy(() => import('./pages/admin/AdminCommissionsPage'));
+
+// Partner Affiliate (WO-O4O-PARTNER-HUB-CORE-V1)
+const ProductPoolPage = lazy(() => import('./pages/partner/ProductPoolPage'));
+const ReferralLinksPage = lazy(() => import('./pages/partner/ReferralLinksPage'));
+
+// Store Product Detail (WO-O4O-PARTNER-HUB-CORE-V1)
+const StoreProductPage = lazy(() => import('./pages/store/StoreProductPage'));
 
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
@@ -436,6 +444,8 @@ function App() {
               <Route path="/partner/stores" element={<RecruitingProductsPage />} />
               <Route path="/partner/settlements" element={<SettlementsPage />} />
               <Route path="/partner/promotions" element={<PromotionsPage />} />
+              <Route path="/partner/product-pool" element={<ProductPoolPage />} />
+              <Route path="/partner/referrals" element={<ReferralLinksPage />} />
               <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" />} />
             </Route>
 
@@ -444,6 +454,7 @@ function App() {
                 WO-O4O-STORE-CART-PAGE-V1
             ================================================================ */}
             <Route element={<MainLayout />}>
+              <Route path="/store/product/:offerId" element={<StoreProductPage />} />
               <Route path="/store/cart" element={<StoreCartPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />
@@ -578,6 +589,7 @@ function App() {
               <Route path="/workspace/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
               <Route path="/workspace/admin/settlements" element={<AdminSettlementsPage />} />
+              <Route path="/workspace/admin/commissions" element={<AdminCommissionsPage />} />
               <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />

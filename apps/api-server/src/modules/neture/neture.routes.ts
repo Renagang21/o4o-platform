@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
@@ -3702,6 +3703,7 @@ router.get('/seller/orders/:orderId/shipment', requireAuth, async (req: Authenti
 /**
  * POST /api/v1/neture/seller/orders
  * WO-O4O-STORE-CART-PAGE-V1: 판매자 B2B 주문 생성 — 6-gate 검증 + 서버 가격 강제
+ * WO-O4O-PARTNER-HUB-CORE-V1: referral_token → Order Attribution + Commission Snapshot
  */
 router.post('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -3710,7 +3712,7 @@ router.post('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res
       return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
     }
 
-    const { items, shipping, orderer_name, orderer_phone, orderer_email, note } = req.body;
+    const { items, shipping, orderer_name, orderer_phone, orderer_email, note, referral_token } = req.body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Items required' });
@@ -3723,6 +3725,69 @@ router.post('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res
       { items, shipping, orderer_name, orderer_phone, orderer_email, note },
       userId,
     );
+
+    // === POST-CREATION: Referral Attribution + Commission Snapshot (WO-O4O-PARTNER-HUB-CORE-V1) ===
+    if (referral_token && order?.id) {
+      try {
+        const [referral] = await AppDataSource.query(
+          `SELECT partner_id, product_id, store_id FROM partner_referrals WHERE referral_token = $1`,
+          [referral_token],
+        );
+
+        if (referral) {
+          // Store attribution in order metadata
+          await AppDataSource.query(
+            `UPDATE neture_orders SET metadata = COALESCE(metadata, '{}'::jsonb) || $1::jsonb WHERE id = $2`,
+            [JSON.stringify({ partner_id: referral.partner_id, referral_token }), order.id],
+          );
+
+          // Find matching order item for referred product
+          const [orderItem] = await AppDataSource.query(
+            `SELECT quantity, total_price FROM neture_order_items WHERE order_id = $1 AND product_id = $2::text`,
+            [order.id, referral.product_id],
+          );
+
+          if (orderItem) {
+            // Get active commission policy
+            const [policy] = await AppDataSource.query(
+              `SELECT commission_per_unit FROM supplier_partner_commissions
+               WHERE supplier_product_id = $1
+                 AND start_date <= CURRENT_DATE
+                 AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+               ORDER BY start_date DESC LIMIT 1`,
+              [referral.product_id],
+            );
+
+            if (policy) {
+              const qty = Number(orderItem.quantity);
+              const commissionAmount = qty * Number(policy.commission_per_unit);
+              const [offer] = await AppDataSource.query(
+                `SELECT supplier_id FROM supplier_product_offers WHERE id = $1`,
+                [referral.product_id],
+              );
+
+              await AppDataSource.query(
+                `INSERT INTO partner_commissions
+                  (partner_id, supplier_id, order_id, order_number, product_id, store_id,
+                   quantity, commission_per_unit, commission_amount, referral_token,
+                   order_amount, commission_rate, contract_id, status)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 0, $2, 'pending')
+                 ON CONFLICT DO NOTHING`,
+                [
+                  referral.partner_id, offer?.supplier_id || referral.partner_id,
+                  order.id, order.order_number,
+                  referral.product_id, referral.store_id,
+                  qty, policy.commission_per_unit, commissionAmount, referral_token,
+                  Number(orderItem.total_price),
+                ],
+              );
+            }
+          }
+        }
+      } catch (attrErr) {
+        logger.warn('[Partner Commission] Attribution failed (non-blocking):', attrErr);
+      }
+    }
 
     res.status(201).json({ success: true, data: order });
   } catch (error: any) {
@@ -3862,6 +3927,298 @@ router.get('/supplier/settlements/:id', requireAuth, requireLinkedSupplier, asyn
   } catch (error) {
     logger.error('[Neture API] Error fetching settlement detail:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlement detail' });
+  }
+});
+
+// ==================== Partner Commission Engine (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
+
+/**
+ * GET /api/v1/neture/partner/commissions/kpi
+ * 파트너 커미션 KPI (대시보드용)
+ * NOTE: /kpi must be registered BEFORE /:id
+ */
+router.get('/partner/commissions/kpi', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+
+    const result = await AppDataSource.query(
+      `SELECT
+         COALESCE(SUM(commission_amount) FILTER (WHERE status IN ('pending', 'approved')), 0)::int AS pending_amount,
+         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount,
+         COALESCE(SUM(commission_amount) FILTER (WHERE status IN ('pending', 'approved', 'paid')), 0)::int AS total_amount,
+         COUNT(*) FILTER (WHERE status IN ('pending', 'approved'))::int AS pending_count,
+         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count
+       FROM partner_commissions
+       WHERE partner_id = $1 AND status != 'cancelled'`,
+      [partnerId],
+    );
+
+    res.json({
+      success: true,
+      data: {
+        pending_amount: Number(result[0]?.pending_amount || 0),
+        paid_amount: Number(result[0]?.paid_amount || 0),
+        total_amount: Number(result[0]?.total_amount || 0),
+        pending_count: Number(result[0]?.pending_count || 0),
+        paid_count: Number(result[0]?.paid_count || 0),
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner commission KPI:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commission KPI' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/commissions
+ * 파트너 커미션 목록 (페이지네이션 + 상태 필터)
+ */
+router.get('/partner/commissions', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const baseParams: any[] = [partnerId];
+    let statusClause = '';
+    if (status && ['pending', 'approved', 'paid', 'cancelled'].includes(status)) {
+      statusClause = 'AND pc.status = $2';
+      baseParams.push(status);
+    }
+
+    const [commissions, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT pc.id, pc.partner_id, pc.supplier_id, ns.name AS supplier_name,
+                pc.order_id, pc.order_number, pc.contract_id,
+                pc.commission_rate, pc.order_amount, pc.commission_amount,
+                pc.status, pc.period_start, pc.period_end,
+                pc.approved_at, pc.paid_at, pc.notes,
+                pc.created_at, pc.updated_at
+         FROM partner_commissions pc
+         LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+         WHERE pc.partner_id = $1 ${statusClause}
+         ORDER BY pc.created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        baseParams,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM partner_commissions pc
+         WHERE pc.partner_id = $1 ${statusClause}`,
+        baseParams,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+    res.json({
+      success: true,
+      data: commissions,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner commissions:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commissions' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/commissions/:id
+ * 파트너 커미션 상세 (연결 주문 항목 포함)
+ */
+router.get('/partner/commissions/:id', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+    const commissionId = req.params.id;
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(commissionId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid commission ID format' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT pc.*, ns.name AS supplier_name
+       FROM partner_commissions pc
+       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       WHERE pc.id = $1 AND pc.partner_id = $2 LIMIT 1`,
+      [commissionId, partnerId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found' });
+    }
+
+    // Fetch linked order items
+    const items = await AppDataSource.query(
+      `SELECT oi.product_name, oi.quantity, oi.unit_price, oi.total_price
+       FROM neture_order_items oi
+       WHERE oi.order_id = $1
+       ORDER BY oi.created_at`,
+      [rows[0].order_id],
+    );
+
+    res.json({ success: true, data: { ...rows[0], items } });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching partner commission detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commission detail' });
+  }
+});
+
+// ==================== Store Product Detail (WO-O4O-PARTNER-HUB-CORE-V1) ====================
+
+/**
+ * GET /api/v1/neture/store/product/:offerId
+ * 공개 제품 상세 — Store Product Page에서 사용
+ */
+router.get('/store/product/:offerId', async (req: Request, res: Response) => {
+  try {
+    const { offerId } = req.params;
+    const [product] = await AppDataSource.query(`
+      SELECT
+        spo.id AS offer_id,
+        spo.master_id,
+        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        pm.manufacturer_name,
+        pm.brand_name,
+        pm.specification,
+        ns.name AS supplier_name,
+        spo.price_general,
+        spo.consumer_reference_price,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url
+      FROM supplier_product_offers spo
+      LEFT JOIN product_masters pm ON pm.id = spo.master_id
+      LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      WHERE spo.id = $1 AND spo.is_active = true AND spo.approval_status = 'APPROVED'
+    `, [offerId]);
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    }
+    res.json({ success: true, data: product });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching store product:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+// ==================== Partner Affiliate (WO-O4O-PARTNER-HUB-CORE-V1) ====================
+
+/**
+ * GET /api/v1/neture/partner/product-pool
+ * 커미션 정책이 설정된 제품 목록 (파트너 홍보 가능 제품)
+ */
+router.get('/partner/product-pool', requireAuth, requireLinkedPartner as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const rows = await AppDataSource.query(`
+      SELECT
+        spo.id AS product_id,
+        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        ns.name AS supplier_name,
+        spc.commission_per_unit,
+        spc.start_date AS commission_start_date,
+        spo.consumer_reference_price,
+        spo.price_general,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url
+      FROM supplier_partner_commissions spc
+      JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
+      JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN product_masters pm ON pm.id = spo.master_id
+      WHERE spc.start_date <= CURRENT_DATE
+        AND (spc.end_date IS NULL OR spc.end_date >= CURRENT_DATE)
+        AND spo.is_active = true AND spo.approval_status = 'APPROVED'
+      ORDER BY spc.start_date DESC
+    `);
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching product pool:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * POST /api/v1/neture/partner/referral-links
+ * Affiliate 링크 생성
+ */
+router.post('/partner/referral-links', requireAuth, requireActivePartner as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+    const { product_id, store_id } = req.body;
+
+    if (!product_id) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'product_id required' });
+    }
+
+    // Check if referral already exists for this (partner, product)
+    const [existing] = await AppDataSource.query(
+      `SELECT id, referral_token FROM partner_referrals WHERE partner_id = $1 AND product_id = $2`,
+      [partnerId, product_id],
+    );
+
+    if (existing) {
+      const referralUrl = `/store/product/${product_id}?ref=${existing.referral_token}`;
+      return res.json({ success: true, data: { referral_url: referralUrl, referral_token: existing.referral_token, product_id } });
+    }
+
+    // Generate unique 8-char token
+    const referralToken = crypto.randomBytes(4).toString('hex');
+
+    await AppDataSource.query(
+      `INSERT INTO partner_referrals (partner_id, store_id, product_id, referral_token) VALUES ($1, $2, $3, $4)`,
+      [partnerId, store_id || null, product_id, referralToken],
+    );
+
+    const referralUrl = `/store/product/${product_id}?ref=${referralToken}`;
+    res.status(201).json({ success: true, data: { referral_url: referralUrl, referral_token: referralToken, product_id } });
+  } catch (error: any) {
+    // Handle token collision (retry once)
+    if (error?.code === '23505') {
+      try {
+        const retryToken = crypto.randomBytes(5).toString('hex').slice(0, 8);
+        const partnerId = (req as PartnerRequest).partnerId;
+        const { product_id, store_id } = req.body;
+        await AppDataSource.query(
+          `INSERT INTO partner_referrals (partner_id, store_id, product_id, referral_token) VALUES ($1, $2, $3, $4)`,
+          [partnerId, store_id || null, product_id, retryToken],
+        );
+        const referralUrl = `/store/product/${product_id}?ref=${retryToken}`;
+        return res.status(201).json({ success: true, data: { referral_url: referralUrl, referral_token: retryToken, product_id } });
+      } catch (retryErr) {
+        logger.error('[Neture API] Referral link creation retry failed:', retryErr);
+      }
+    }
+    logger.error('[Neture API] Error creating referral link:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/partner/referral-links
+ * 파트너의 referral 링크 목록
+ */
+router.get('/partner/referral-links', requireAuth, requireLinkedPartner as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = (req as PartnerRequest).partnerId;
+
+    const rows = await AppDataSource.query(`
+      SELECT
+        pr.id, pr.referral_token, pr.product_id, pr.store_id, pr.created_at,
+        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        spo.price_general,
+        spc.commission_per_unit
+      FROM partner_referrals pr
+      JOIN supplier_product_offers spo ON spo.id = pr.product_id
+      LEFT JOIN product_masters pm ON pm.id = spo.master_id
+      LEFT JOIN supplier_partner_commissions spc ON spc.supplier_product_id = pr.product_id
+        AND spc.start_date <= CURRENT_DATE
+        AND (spc.end_date IS NULL OR spc.end_date >= CURRENT_DATE)
+      WHERE pr.partner_id = $1
+      ORDER BY pr.created_at DESC
+    `, [partnerId]);
+
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching referral links:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
   }
 });
 
@@ -4231,6 +4588,344 @@ router.patch('/admin/settlements/:id/pay', requireAuth, requireNetureScope('netu
   } catch (error) {
     logger.error('[Neture API] Error paying settlement:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay settlement' });
+  }
+});
+
+// ==================== Admin Commission Management (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
+
+/**
+ * POST /api/v1/neture/admin/commissions/calculate
+ * 커미션 일괄 계산 — 계약 기반으로 delivered 주문에서 파트너 커미션 생성
+ *
+ * Body: { period_start: 'YYYY-MM-DD', period_end: 'YYYY-MM-DD' }
+ */
+router.post('/admin/commissions/calculate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { period_start, period_end } = req.body;
+
+    if (!period_start || !period_end) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'period_start and period_end are required (YYYY-MM-DD)' });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(period_start) || !/^\d{4}-\d{2}-\d{2}$/.test(period_end)) {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Date format must be YYYY-MM-DD' });
+    }
+
+    // Find delivered orders with active partner contracts, excluding already-commissioned
+    const rows = await AppDataSource.query(
+      `SELECT
+         nspc.partner_id,
+         spo.supplier_id,
+         o.id AS order_id,
+         o.order_number,
+         nspc.id AS contract_id,
+         nspc.commission_rate,
+         SUM(oi.total_price)::int AS order_amount
+       FROM neture_orders o
+       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       JOIN neture_partner_recruitments npr ON npr.product_id = spo.master_id
+       JOIN neture_seller_partner_contracts nspc ON nspc.recruitment_id = npr.id
+         AND nspc.contract_status = 'active'
+       WHERE o.status = 'delivered'
+         AND o.updated_at >= $1::date
+         AND o.updated_at < ($2::date + INTERVAL '1 day')
+         AND NOT EXISTS (
+           SELECT 1 FROM partner_commissions pc
+           WHERE pc.partner_id = nspc.partner_id AND pc.order_id = o.id AND pc.status != 'cancelled'
+         )
+       GROUP BY nspc.partner_id, spo.supplier_id, o.id, o.order_number, nspc.id, nspc.commission_rate`,
+      [period_start, period_end],
+    );
+
+    if (rows.length === 0) {
+      return res.json({ success: true, data: { created: 0, message: 'No eligible orders found for commission calculation' } });
+    }
+
+    // Insert commission records
+    let created = 0;
+    for (const row of rows) {
+      const commissionAmount = Math.round(Number(row.order_amount) * Number(row.commission_rate) / 100);
+      try {
+        await AppDataSource.query(
+          `INSERT INTO partner_commissions
+             (partner_id, supplier_id, order_id, order_number, contract_id,
+              commission_rate, order_amount, commission_amount, status,
+              period_start, period_end)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', $9, $10)`,
+          [row.partner_id, row.supplier_id, row.order_id, row.order_number,
+           row.contract_id, row.commission_rate, row.order_amount, commissionAmount,
+           period_start, period_end],
+        );
+        created++;
+      } catch (insertErr: any) {
+        // Skip duplicate constraint violations
+        if (insertErr.code === '23505') {
+          logger.warn(`[Neture Commission] Duplicate commission for partner=${row.partner_id} order=${row.order_id}, skipping`);
+        } else {
+          throw insertErr;
+        }
+      }
+    }
+
+    logger.info(`[Neture Commission] Created ${created} commission records for period ${period_start} ~ ${period_end}`);
+    res.json({ success: true, data: { created, period: { start: period_start, end: period_end } } });
+  } catch (error: any) {
+    logger.error('[Neture API] Error calculating commissions:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to calculate commissions' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/commissions
+ * 운영자 커미션 목록 (페이지네이션 + 상태 필터 + 파트너명)
+ */
+router.get('/admin/commissions', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const status = req.query.status as string | undefined;
+
+    const baseParams: any[] = [];
+    let statusClause = '';
+    let paramIdx = 1;
+    if (status && ['pending', 'approved', 'paid', 'cancelled'].includes(status)) {
+      statusClause = `WHERE pc.status = $${paramIdx}`;
+      baseParams.push(status);
+      paramIdx++;
+    }
+
+    const [commissions, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT pc.id, pc.partner_id, np.name AS partner_name,
+                pc.supplier_id, ns.name AS supplier_name,
+                pc.order_id, pc.order_number, pc.contract_id,
+                pc.commission_rate, pc.order_amount, pc.commission_amount,
+                pc.status, pc.period_start, pc.period_end,
+                pc.approved_at, pc.paid_at, pc.notes,
+                pc.created_at, pc.updated_at
+         FROM partner_commissions pc
+         LEFT JOIN neture_partners np ON np.id = pc.partner_id
+         LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+         ${statusClause}
+         ORDER BY pc.created_at DESC
+         LIMIT ${limit} OFFSET ${offset}`,
+        baseParams,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM partner_commissions pc
+         ${statusClause}`,
+        baseParams,
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+    res.json({
+      success: true,
+      data: commissions,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin commissions:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commissions' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/commissions/kpi
+ * 운영자 커미션 KPI (pending/approved/paid)
+ * NOTE: /kpi must be registered BEFORE /:id
+ */
+router.get('/admin/commissions/kpi', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+  try {
+    const result = await AppDataSource.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE status = 'pending')::int AS pending_count,
+         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'pending'), 0)::int AS pending_amount,
+         COUNT(*) FILTER (WHERE status = 'approved')::int AS approved_count,
+         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'approved'), 0)::int AS approved_amount,
+         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count,
+         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount
+       FROM partner_commissions
+       WHERE status != 'cancelled'`,
+    );
+
+    res.json({
+      success: true,
+      data: {
+        pending_count: Number(result[0]?.pending_count || 0),
+        pending_amount: Number(result[0]?.pending_amount || 0),
+        approved_count: Number(result[0]?.approved_count || 0),
+        approved_amount: Number(result[0]?.approved_amount || 0),
+        paid_count: Number(result[0]?.paid_count || 0),
+        paid_amount: Number(result[0]?.paid_amount || 0),
+      },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin commission KPI:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commission KPI' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/commissions/:id
+ * 운영자 커미션 상세 (파트너명 + 주문 항목)
+ */
+router.get('/admin/commissions/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const commissionId = req.params.id;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(commissionId)) {
+      return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid commission ID format' });
+    }
+
+    const rows = await AppDataSource.query(
+      `SELECT pc.*, np.name AS partner_name, ns.name AS supplier_name
+       FROM partner_commissions pc
+       LEFT JOIN neture_partners np ON np.id = pc.partner_id
+       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       WHERE pc.id = $1 LIMIT 1`,
+      [commissionId],
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found' });
+    }
+
+    const items = await AppDataSource.query(
+      `SELECT oi.product_name, oi.quantity, oi.unit_price, oi.total_price
+       FROM neture_order_items oi
+       WHERE oi.order_id = $1
+       ORDER BY oi.created_at`,
+      [rows[0].order_id],
+    );
+
+    res.json({ success: true, data: { ...rows[0], items } });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin commission detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commission detail' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/commissions/:id/approve
+ * 커미션 승인 (pending → approved)
+ */
+router.patch('/admin/commissions/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const commissionId = req.params.id;
+    const { notes } = req.body;
+
+    const setClauses = ["status = 'approved'", 'approved_at = NOW()', 'updated_at = NOW()'];
+    const params: any[] = [];
+    let paramIdx = 1;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(commissionId);
+    const result = await AppDataSource.query(
+      `UPDATE partner_commissions SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status = 'pending'
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in "pending" status' });
+    }
+
+    logger.info(`[Neture Commission] Commission ${commissionId} approved`);
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error approving commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve commission' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/commissions/:id/pay
+ * 커미션 지급 처리 (approved → paid)
+ */
+router.patch('/admin/commissions/:id/pay', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const commissionId = req.params.id;
+    const { notes } = req.body;
+
+    const setClauses = ["status = 'paid'", 'paid_at = NOW()', 'updated_at = NOW()'];
+    const params: any[] = [];
+    let paramIdx = 1;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(commissionId);
+    const result = await AppDataSource.query(
+      `UPDATE partner_commissions SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status = 'approved'
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in "approved" status' });
+    }
+
+    logger.info(`[Neture Commission] Commission ${commissionId} paid`);
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error paying commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay commission' });
+  }
+});
+
+/**
+ * PATCH /api/v1/neture/admin/commissions/:id/status
+ * 커미션 취소 (pending/approved → cancelled)
+ *
+ * Body: { status: 'cancelled', notes?: string }
+ */
+router.patch('/admin/commissions/:id/status', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const commissionId = req.params.id;
+    const { status, notes } = req.body;
+
+    if (!status || status !== 'cancelled') {
+      return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'This endpoint only supports "cancelled" status. Use /approve or /pay for transitions.' });
+    }
+
+    const setClauses = ['status = $1', 'updated_at = NOW()'];
+    const params: any[] = [status];
+    let paramIdx = 2;
+
+    if (notes !== undefined) {
+      setClauses.push(`notes = $${paramIdx}`);
+      params.push(notes);
+      paramIdx++;
+    }
+
+    params.push(commissionId);
+    const result = await AppDataSource.query(
+      `UPDATE partner_commissions SET ${setClauses.join(', ')}
+       WHERE id = $${paramIdx} AND status IN ('pending', 'approved')
+       RETURNING *`,
+      params,
+    );
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in cancellable status' });
+    }
+
+    logger.info(`[Neture Commission] Commission ${commissionId} cancelled`);
+    res.json({ success: true, data: result[0] });
+  } catch (error) {
+    logger.error('[Neture API] Error cancelling commission:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel commission' });
   }
 });
 

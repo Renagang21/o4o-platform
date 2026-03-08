@@ -1,36 +1,73 @@
 /**
- * SettlementsPage - 파트너 정산 내역
+ * SettlementsPage - 파트너 커미션 내역
  *
- * Work Order: WO-NETURE-PARTNER-DASHBOARD-HUB
+ * Work Order: WO-O4O-PARTNER-COMMISSION-ENGINE-V1
  *
- * 정산 현황:
- * - 정산 내역 목록
- * - 월별 요약
- * - 커미션 정보 (읽기 전용)
+ * 커미션 현황:
+ * - KPI 요약 (총 커미션 / 지급 완료 / 지급 대기)
+ * - 상태 필터 탭
+ * - 커미션 목록 (카드)
+ * - 페이지네이션
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, CreditCard, Calendar, CheckCircle, Clock, TrendingUp, Download } from 'lucide-react';
+import { ArrowLeft, CreditCard, CheckCircle, Clock, TrendingUp, ChevronLeft, ChevronRight, ShieldCheck } from 'lucide-react';
+import { partnerCommissionApi } from '../../lib/api/index.js';
+import type { Commission, CommissionStatus, PartnerCommissionKpi } from '../../lib/api/index.js';
 
-// TODO: API 연동 필요 - 현재 빈 배열
-const settlements: {
-  id: string;
-  month: string;
-  service: string;
-  amount: number;
-  status: 'completed' | 'pending';
-  paidDate: string | null;
-  commission: number;
-}[] = [];
+const STATUS_MAP: Record<CommissionStatus, { label: string; bg: string; color: string }> = {
+  pending: { label: '대기', bg: '#fef3c7', color: '#92400e' },
+  approved: { label: '승인완료', bg: '#e0e7ff', color: '#4338ca' },
+  paid: { label: '지급완료', bg: '#dcfce7', color: '#166534' },
+  cancelled: { label: '취소', bg: '#f1f5f9', color: '#64748b' },
+};
+
+const FILTER_TABS: { label: string; value: CommissionStatus | 'all' }[] = [
+  { label: '전체', value: 'all' },
+  { label: '대기', value: 'pending' },
+  { label: '승인완료', value: 'approved' },
+  { label: '지급완료', value: 'paid' },
+  { label: '취소', value: 'cancelled' },
+];
+
+const KPI_DEFAULT: PartnerCommissionKpi = {
+  pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0,
+};
 
 export function SettlementsPage() {
-  const totalAmount = settlements.reduce((sum, s) => sum + s.amount, 0);
-  const completedAmount = settlements
-    .filter(s => s.status === 'completed')
-    .reduce((sum, s) => sum + s.amount, 0);
-  const pendingAmount = settlements
-    .filter(s => s.status === 'pending')
-    .reduce((sum, s) => sum + s.amount, 0);
+  const [kpi, setKpi] = useState<PartnerCommissionKpi>(KPI_DEFAULT);
+  const [commissions, setCommissions] = useState<Commission[]>([]);
+  const [filter, setFilter] = useState<CommissionStatus | 'all'>('all');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params: { page: number; limit: number; status?: CommissionStatus } = { page, limit: 20 };
+      if (filter !== 'all') params.status = filter;
+      const [kpiRes, listRes] = await Promise.all([
+        partnerCommissionApi.getKpi(),
+        partnerCommissionApi.getCommissions(params),
+      ]);
+      setKpi(kpiRes);
+      setCommissions(listRes.data);
+      setTotalPages(listRes.meta.totalPages);
+    } catch {
+      // defaults remain
+    } finally {
+      setLoading(false);
+    }
+  }, [page, filter]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const handleFilterChange = (value: CommissionStatus | 'all') => {
+    setFilter(value);
+    setPage(1);
+  };
 
   return (
     <div style={styles.container}>
@@ -46,9 +83,9 @@ export function SettlementsPage() {
           <CreditCard size={28} style={{ color: '#16a34a' }} />
         </div>
         <div>
-          <h1 style={styles.title}>정산 내역</h1>
+          <h1 style={styles.title}>커미션 내역</h1>
           <p style={styles.subtitle}>
-            커미션 및 정산 현황을 확인합니다
+            파트너 소개 판매에 대한 커미션 현황을 확인합니다
           </p>
         </div>
       </div>
@@ -58,99 +95,127 @@ export function SettlementsPage() {
         <div style={styles.statCard}>
           <TrendingUp size={24} style={{ color: '#2563eb' }} />
           <div>
-            <p style={styles.statValue}>{totalAmount.toLocaleString()}</p>
-            <p style={styles.statLabel}>총 정산액 (원)</p>
+            <p style={styles.statValue}>{kpi.total_amount.toLocaleString()}</p>
+            <p style={styles.statLabel}>총 커미션 (원)</p>
           </div>
         </div>
         <div style={styles.statCard}>
           <CheckCircle size={24} style={{ color: '#16a34a' }} />
           <div>
-            <p style={styles.statValue}>{completedAmount.toLocaleString()}</p>
+            <p style={styles.statValue}>{kpi.paid_amount.toLocaleString()}</p>
             <p style={styles.statLabel}>지급 완료 (원)</p>
           </div>
         </div>
         <div style={styles.statCard}>
           <Clock size={24} style={{ color: '#f59e0b' }} />
           <div>
-            <p style={styles.statValue}>{pendingAmount.toLocaleString()}</p>
+            <p style={styles.statValue}>{kpi.pending_amount.toLocaleString()}</p>
             <p style={styles.statLabel}>지급 대기 (원)</p>
           </div>
         </div>
       </div>
 
-      {/* Settlements List */}
+      {/* Filter Tabs */}
+      <div style={styles.filterRow}>
+        {FILTER_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => handleFilterChange(tab.value)}
+            style={{
+              ...styles.filterTab,
+              ...(filter === tab.value ? styles.filterTabActive : {}),
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Commissions List */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>정산 내역</h2>
-        {settlements.length === 0 ? (
+        {loading ? (
           <div style={styles.emptyState}>
-            <p style={styles.emptyStateText}>정산 내역이 없습니다.</p>
+            <p style={styles.emptyStateText}>불러오는 중...</p>
+          </div>
+        ) : commissions.length === 0 ? (
+          <div style={styles.emptyState}>
+            <p style={styles.emptyStateText}>커미션 내역이 없습니다.</p>
           </div>
         ) : (
-        <div style={styles.list}>
-          {settlements.map((settlement) => (
-            <div key={settlement.id} style={styles.card}>
-              <div style={styles.cardHeader}>
-                <div style={styles.cardInfo}>
-                  <div>
-                    <h3 style={styles.cardTitle}>{settlement.month}</h3>
-                    <p style={styles.cardService}>{settlement.service}</p>
+          <div style={styles.list}>
+            {commissions.map((c) => {
+              const st = STATUS_MAP[c.status] || STATUS_MAP.pending;
+              return (
+                <div key={c.id} style={styles.card}>
+                  <div style={styles.cardHeader}>
+                    <div style={styles.cardInfo}>
+                      <div>
+                        <h3 style={styles.cardTitle}>주문 #{c.order_number}</h3>
+                        <p style={styles.cardService}>{c.supplier_name || '공급자'}</p>
+                      </div>
+                    </div>
+                    <div style={styles.cardRight}>
+                      <span style={{ ...styles.statusBadge, backgroundColor: st.bg, color: st.color }}>
+                        {c.status === 'paid' ? <CheckCircle size={14} /> :
+                         c.status === 'approved' ? <ShieldCheck size={14} /> :
+                         <Clock size={14} />}
+                        {st.label}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={styles.cardBody}>
+                    <div style={styles.amountRow}>
+                      <div>
+                        <p style={styles.amountLabel}>커미션 금액</p>
+                        <p style={styles.amountValue}>₩{c.commission_amount.toLocaleString()}</p>
+                      </div>
+                      <div style={styles.commissionInfo}>
+                        <span style={styles.commissionLabel}>커미션율</span>
+                        <span style={styles.commissionValue}>{c.commission_rate}%</span>
+                      </div>
+                    </div>
+                    <div style={styles.cardMeta}>
+                      <span style={styles.metaItem}>
+                        주문금액: ₩{c.order_amount.toLocaleString()}
+                      </span>
+                      <span style={styles.metaItem}>
+                        {c.period_start} ~ {c.period_end}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div style={styles.cardRight}>
-                  <span style={{
-                    ...styles.statusBadge,
-                    backgroundColor: settlement.status === 'completed' ? '#dcfce7' : '#fef3c7',
-                    color: settlement.status === 'completed' ? '#166534' : '#92400e',
-                  }}>
-                    {settlement.status === 'completed' ? (
-                      <>
-                        <CheckCircle size={14} />
-                        지급 완료
-                      </>
-                    ) : (
-                      <>
-                        <Clock size={14} />
-                        지급 대기
-                      </>
-                    )}
-                  </span>
-                </div>
-              </div>
-              <div style={styles.cardBody}>
-                <div style={styles.amountRow}>
-                  <div>
-                    <p style={styles.amountLabel}>정산 금액</p>
-                    <p style={styles.amountValue}>₩{settlement.amount.toLocaleString()}</p>
-                  </div>
-                  <div style={styles.commissionInfo}>
-                    <span style={styles.commissionLabel}>커미션율</span>
-                    <span style={styles.commissionValue}>{settlement.commission}%</span>
-                  </div>
-                </div>
-                <div style={styles.cardMeta}>
-                  <span style={styles.metaItem}>
-                    <Calendar size={14} />
-                    {settlement.paidDate ? `지급일: ${settlement.paidDate}` : '지급 예정'}
-                  </span>
-                  {settlement.status === 'completed' && (
-                    <button style={styles.downloadBtn}>
-                      <Download size={14} />
-                      명세서
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={styles.pagination}>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            style={{ ...styles.pageBtn, opacity: page <= 1 ? 0.4 : 1 }}
+          >
+            <ChevronLeft size={16} /> 이전
+          </button>
+          <span style={styles.pageInfo}>{page} / {totalPages}</span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            style={{ ...styles.pageBtn, opacity: page >= totalPages ? 0.4 : 1 }}
+          >
+            다음 <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
 
       {/* Info Notice */}
       <div style={styles.infoCard}>
         <p style={styles.infoText}>
-          정산은 매월 5일에 전월 실적을 기준으로 지급됩니다.<br />
-          상세 정산 내역 및 세금계산서는 각 서비스에서 확인해 주세요.
+          커미션은 배송 완료된 주문에 대해 계약된 커미션율로 자동 계산됩니다.<br />
+          승인 후 정산 시점에 지급됩니다.
         </p>
       </div>
     </div>
@@ -202,7 +267,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '16px',
-    marginBottom: '32px',
+    marginBottom: '24px',
   },
   statCard: {
     backgroundColor: '#fff',
@@ -225,18 +290,33 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#64748b',
     margin: '4px 0 0 0',
   },
+  filterRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '20px',
+    flexWrap: 'wrap' as const,
+  },
+  filterTab: {
+    padding: '6px 16px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#64748b',
+    fontSize: '13px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  filterTabActive: {
+    backgroundColor: '#1e293b',
+    color: '#fff',
+    borderColor: '#1e293b',
+  },
   section: {
     marginBottom: '24px',
   },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#475569',
-    margin: '0 0 16px 0',
-  },
   list: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     gap: '12px',
   },
   card: {
@@ -328,17 +408,28 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: '#64748b',
   },
-  downloadBtn: {
+  pagination: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '16px',
+    marginBottom: '24px',
+  },
+  pageBtn: {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
+    padding: '6px 14px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
     fontSize: '13px',
-    color: '#2563eb',
-    backgroundColor: 'transparent',
-    border: '1px solid #2563eb',
-    borderRadius: '6px',
-    padding: '6px 12px',
     cursor: 'pointer',
+  },
+  pageInfo: {
+    fontSize: '13px',
+    color: '#64748b',
   },
   infoCard: {
     backgroundColor: '#f8fafc',

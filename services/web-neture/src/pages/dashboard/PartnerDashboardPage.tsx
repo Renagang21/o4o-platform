@@ -108,7 +108,7 @@ export function PartnerDashboardPage() {
             <span style={styles.menuIcon}>🔗</span>
             <span style={styles.menuLabel}>추천 현황</span>
           </Link>
-          <Link to="/partner/commission" style={styles.menuCard}>
+          <Link to="/partner/settlements" style={styles.menuCard}>
             <span style={styles.menuIcon}>💰</span>
             <span style={styles.menuLabel}>커미션 내역</span>
           </Link>

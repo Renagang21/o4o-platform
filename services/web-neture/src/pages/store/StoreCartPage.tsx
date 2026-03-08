@@ -18,6 +18,7 @@ import { useCart } from '../../lib/cart';
 import { storeApi } from '../../lib/api';
 import type { StoreOrderShipping } from '../../lib/api';
 import type { SupplierGroup, CartItem } from '../../lib/cart';
+import { getReferralToken, clearReferralToken } from '../../lib/referral';
 
 // ============================================================================
 // Helpers
@@ -323,16 +324,19 @@ export default function StoreCartPage() {
     setOrderLoading(true);
     setErrorMessage(null);
 
+    const referralToken = getReferralToken();
     const result = await storeApi.createOrder({
       items: group.items.map((i) => ({ product_id: i.offerId, quantity: i.quantity })),
       shipping,
       orderer_name: ordererName,
       orderer_phone: ordererPhone,
+      ...(referralToken ? { referral_token: referralToken } : {}),
     });
 
     setOrderLoading(false);
 
     if (result.success) {
+      clearReferralToken();
       removeSupplier(orderingSupplierId);
       setOrderingSupplierId(null);
       setSuccessMessage(`${group.supplierName} 주문이 완료되었습니다.`);

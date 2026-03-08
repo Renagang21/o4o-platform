@@ -8,6 +8,11 @@ import type {
   SettlementDetail,
   AdminSettlementKpi,
 } from './store.js';
+import type {
+  CommissionStatus,
+  CommissionsResponse,
+  CommissionDetail,
+} from './partner.js';
 
 // ==================== Admin Operator ====================
 
@@ -484,6 +489,133 @@ export const adminServiceApprovalApi = {
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({ reason }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+};
+
+// ==================== Admin Commission (WO-O4O-PARTNER-COMMISSION-ENGINE-V1) ====================
+
+export interface AdminCommissionKpi {
+  pending_count: number;
+  pending_amount: number;
+  approved_count: number;
+  approved_amount: number;
+  paid_count: number;
+  paid_amount: number;
+}
+
+const ADMIN_COMMISSION_KPI_DEFAULT: AdminCommissionKpi = {
+  pending_count: 0, pending_amount: 0,
+  approved_count: 0, approved_amount: 0,
+  paid_count: 0, paid_amount: 0,
+};
+
+export const adminCommissionApi = {
+  async getCommissions(
+    params?: { page?: number; limit?: number; status?: CommissionStatus }
+  ): Promise<CommissionsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.status) sp.append('status', params.status);
+      const qs = sp.toString() ? `?${sp}` : '';
+
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch {
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  async getKpi(): Promise<AdminCommissionKpi> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/kpi`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return ADMIN_COMMISSION_KPI_DEFAULT;
+      const result = await response.json();
+      return result.data || ADMIN_COMMISSION_KPI_DEFAULT;
+    } catch {
+      return ADMIN_COMMISSION_KPI_DEFAULT;
+    }
+  },
+
+  async getDetail(id: string): Promise<CommissionDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+
+  async calculate(periodStart: string, periodEnd: string): Promise<{ success: boolean; data?: any; error?: string; message?: string }> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/calculate`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ period_start: periodStart, period_end: periodEnd }),
+        },
+      );
+      return await response.json();
+    } catch { return { success: false, error: 'NETWORK_ERROR' }; }
+  },
+
+  async approve(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/approve`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ notes }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async pay(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/pay`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ notes }),
+        },
+      );
+      return response.ok;
+    } catch { return false; }
+  },
+
+  async cancel(id: string, notes?: string): Promise<boolean> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/status`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'cancelled', notes }),
         },
       );
       return response.ok;
