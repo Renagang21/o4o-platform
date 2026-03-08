@@ -2,6 +2,7 @@
  * StoreProductPage - 매장 상품 상세 (공통 랜딩 페이지)
  *
  * Work Order: WO-O4O-STORE-PRODUCT-PAGE-V1
+ * Enhanced: WO-O4O-STORE-PRODUCT-PAGE-ENHANCEMENT-V1
  *
  * Routes:
  * - /store/:storeSlug/product/:productSlug (V2 slug-based)
@@ -11,16 +12,17 @@
  * 1. Hero — 상품 이미지 + 상품명 + 브랜드
  * 2. Price — 매장 가격 + 구매 버튼
  * 3. Pharmacist Comment — 약사 코멘트 (StoreProductProfile)
- * 4. Description — 상품 설명 (SupplierProductOffer)
+ * 4. Description — 상품 설명 (StoreProductProfile / SupplierProductOffer)
  * 5. Store Info — 매장 정보
- * 6. QR Share — QR 공유
+ * 6. QR Share — QR 코드 + 공유 + 다운로드
  *
  * 유입 경로: QR / Tablet / 전자상거래 목록 / 검색 / 외부 링크
  * ?ref=TOKEN 파라미터 캡처 → sessionStorage
+ * ?org=UUID 파라미터 → StoreProductProfile 조회 시 매장 컨텍스트
  */
 
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart,
   ArrowLeft,
@@ -35,7 +37,10 @@ import {
   MessageSquare,
   FileText,
   Store,
+  Download,
+  Printer,
 } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
 import { addToCart } from '../../lib/cart.js';
 import { captureReferralToken } from '../../lib/referral.js';
@@ -56,11 +61,10 @@ interface ProductDetail {
   product_slug?: string;
   store_slug?: string;
   supplier_id?: string;
-  // Extended fields (from StoreProductProfile / Offer)
+  // Extended fields (from StoreProductProfile)
   display_name?: string | null;
   pharmacist_comment?: string | null;
   description?: string | null;
-  short_description?: string | null;
   // Store info
   store_name?: string | null;
   store_address?: string | null;
@@ -70,23 +74,21 @@ interface ProductDetail {
   listing_price?: number | null;
 }
 
-// ── Mock fallbacks for fields not yet returned by API ──
-
-const MOCK_PHARMACIST_COMMENT = '이 제품은 일상적인 건강 관리에 적합합니다. 식후에 1정씩 복용하시고, 다른 약물과 함께 복용 시 약사에게 상담해 주세요.';
-const MOCK_DESCRIPTION = '본 제품은 엄격한 품질 관리 기준에 따라 제조되었으며, 식약처 기준을 충족합니다. 개봉 후에는 서늘하고 건조한 곳에 보관해 주세요.';
-
 export default function StoreProductPage() {
   const { offerId, storeSlug, productSlug } = useParams<{
     offerId?: string;
     storeSlug?: string;
     productSlug?: string;
   }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const qrRef = useRef<HTMLCanvasElement>(null);
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [shared, setShared] = useState(false);
+  const [flyerLoading, setFlyerLoading] = useState<number | null>(null);
 
   useEffect(() => {
     captureReferralToken();
@@ -94,10 +96,13 @@ export default function StoreProductPage() {
 
   useEffect(() => {
     let url: string | null = null;
+    const orgId = searchParams.get('org');
+    const orgParam = orgId ? `?org=${encodeURIComponent(orgId)}` : '';
+
     if (storeSlug && productSlug) {
-      url = `${API_BASE_URL}/api/v1/neture/store/${storeSlug}/product/${productSlug}`;
+      url = `${API_BASE_URL}/api/v1/neture/store/${storeSlug}/product/${productSlug}${orgParam}`;
     } else if (offerId) {
-      url = `${API_BASE_URL}/api/v1/neture/store/product/${offerId}`;
+      url = `${API_BASE_URL}/api/v1/neture/store/product/${offerId}${orgParam}`;
     }
     if (!url) { setLoading(false); return; }
 
@@ -114,7 +119,7 @@ export default function StoreProductPage() {
         setLoading(false);
       }
     })();
-  }, [offerId, storeSlug, productSlug]);
+  }, [offerId, storeSlug, productSlug, searchParams]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -123,7 +128,7 @@ export default function StoreProductPage() {
       name: product.product_name,
       imageUrl: product.image_url,
       priceGeneral: displayPrice,
-      supplierId: product.offer_id,
+      supplierId: product.supplier_id || product.offer_id,
       supplierName: product.supplier_name,
     }, quantity);
     setAdded(true);
@@ -144,6 +149,37 @@ export default function StoreProductPage() {
       // ignore
     }
   };
+
+  const handleDownloadQr = useCallback(() => {
+    const canvas = qrRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `qr-${product?.product_name || 'product'}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }, [product]);
+
+  const handleDownloadFlyer = useCallback(async (template: 1 | 4 | 8) => {
+    if (!product) return;
+    setFlyerLoading(template);
+    try {
+      const orgId = searchParams.get('org');
+      const orgParam = orgId ? `&org=${encodeURIComponent(orgId)}` : '';
+      const url = `${API_BASE_URL}/api/v1/neture/store/product/${product.offer_id}/flyer?template=${template}${orgParam}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed');
+      const blob = await res.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `flyer-${product.product_name}-${template}.pdf`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch {
+      // ignore
+    } finally {
+      setFlyerLoading(null);
+    }
+  }, [product, searchParams]);
 
   // ── Loading ──
   if (loading) {
@@ -175,9 +211,8 @@ export default function StoreProductPage() {
 
   const displayPrice = product.listing_price ?? product.price_general;
   const hasDiscount = product.consumer_reference_price && product.consumer_reference_price > displayPrice;
-  const pharmacistComment = product.pharmacist_comment || MOCK_PHARMACIST_COMMENT;
-  const description = product.description || MOCK_DESCRIPTION;
   const storeName = product.store_name || (storeSlug ? decodeURIComponent(storeSlug) : '매장');
+  const pageUrl = window.location.href;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 sm:py-10">
@@ -307,34 +342,38 @@ export default function StoreProductPage() {
       {/* ══════════════════════════════════════════
           Section 3: 약사 코멘트
       ══════════════════════════════════════════ */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-            <MessageSquare size={16} className="text-emerald-600" />
+      {product.pharmacist_comment && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+              <MessageSquare size={16} className="text-emerald-600" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">약사 추천</h2>
           </div>
-          <h2 className="text-lg font-bold text-gray-900">약사 추천</h2>
+          <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              {product.pharmacist_comment}
+            </p>
+          </div>
         </div>
-        <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
-          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-            {pharmacistComment}
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* ══════════════════════════════════════════
           Section 4: 상품 설명
       ══════════════════════════════════════════ */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-            <FileText size={16} className="text-blue-600" />
+      {product.description && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <FileText size={16} className="text-blue-600" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">상품 설명</h2>
           </div>
-          <h2 className="text-lg font-bold text-gray-900">상품 설명</h2>
+          <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+            {product.description}
+          </div>
         </div>
-        <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-          {description}
-        </div>
-      </div>
+      )}
 
       {/* ══════════════════════════════════════════
           Section 5: 매장 정보
@@ -374,27 +413,82 @@ export default function StoreProductPage() {
       </div>
 
       {/* ══════════════════════════════════════════
-          Section 6: QR 공유
+          Section 6: QR 코드 + 공유
       ══════════════════════════════════════════ */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
             <QrCode size={16} className="text-amber-600" />
           </div>
-          <h2 className="text-lg font-bold text-gray-900">공유</h2>
+          <h2 className="text-lg font-bold text-gray-900">QR 코드 & 공유</h2>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleShare}
-            className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-              shared
-                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <Share2 size={16} />
-            {shared ? '링크가 복사되었습니다!' : '이 상품 공유하기'}
-          </button>
+
+        <div className="flex flex-col sm:flex-row gap-6">
+          {/* QR Code */}
+          <div className="flex flex-col items-center gap-3">
+            <div className="bg-white p-3 rounded-xl border border-gray-200">
+              <QRCodeCanvas
+                ref={qrRef}
+                value={pageUrl}
+                size={160}
+                level="M"
+                marginSize={2}
+              />
+            </div>
+            <button
+              onClick={handleDownloadQr}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
+            >
+              <Download size={14} />
+              QR 다운로드
+            </button>
+          </div>
+
+          {/* Share + Flyer Actions */}
+          <div className="flex-1 flex flex-col gap-4 justify-center">
+            <p className="text-sm text-gray-500">
+              이 QR 코드를 스캔하면 이 상품 페이지로 바로 연결됩니다.
+              매장 POP나 전단지에 활용하세요.
+            </p>
+            <button
+              onClick={handleShare}
+              className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                shared
+                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <Share2 size={16} />
+              {shared ? '링크가 복사되었습니다!' : '이 상품 공유하기'}
+            </button>
+
+            {/* Flyer Templates */}
+            <div className="border-t border-gray-100 pt-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                <Printer size={12} className="inline mr-1" />
+                전단지 PDF 다운로드
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { t: 1 as const, label: 'A4 1분할', desc: '카운터 POP' },
+                  { t: 4 as const, label: 'A4 4분할', desc: '상품 전단' },
+                  { t: 8 as const, label: 'A4 8분할', desc: 'QR 카드' },
+                ] as const).map(({ t, label, desc }) => (
+                  <button
+                    key={t}
+                    onClick={() => handleDownloadFlyer(t)}
+                    disabled={flyerLoading !== null}
+                    className="flex flex-col items-center gap-0.5 px-2 py-2.5 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-colors text-center disabled:opacity-50"
+                  >
+                    <span className="text-xs font-semibold text-gray-800">
+                      {flyerLoading === t ? '생성 중...' : label}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

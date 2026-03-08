@@ -46,6 +46,10 @@ export class StoreProductProfile {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
+  /** 약사 코멘트 */
+  @Column({ name: 'pharmacist_comment', type: 'text', nullable: true })
+  pharmacistComment: string | null;
+
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 

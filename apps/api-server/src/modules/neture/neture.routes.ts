@@ -4252,6 +4252,13 @@ router.get('/partner/commissions/:id', requireAuth, requireLinkedPartner, async 
 router.get('/store/product/:offerId', async (req: Request, res: Response) => {
   try {
     const { offerId } = req.params;
+    const orgId = req.query.org as string | undefined;
+    const params: any[] = [offerId];
+    let orgFilter = '';
+    if (orgId) {
+      params.push(orgId);
+      orgFilter = `AND spp.organization_id = $${params.length}`;
+    }
     const [product] = await AppDataSource.query(`
       SELECT
         spo.id AS offer_id,
@@ -4261,14 +4268,25 @@ router.get('/store/product/:offerId', async (req: Request, res: Response) => {
         pm.brand_name,
         pm.specification,
         ns.name AS supplier_name,
+        ns.id AS supplier_id,
         spo.price_general,
         spo.consumer_reference_price,
-        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url,
+        profile.display_name,
+        profile.description,
+        profile.pharmacist_comment
       FROM supplier_product_offers spo
       LEFT JOIN product_masters pm ON pm.id = spo.master_id
       LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN LATERAL (
+        SELECT spp.display_name, spp.description, spp.pharmacist_comment
+        FROM store_product_profiles spp
+        WHERE spp.master_id = spo.master_id AND spp.is_active = true ${orgFilter}
+        ORDER BY spp.updated_at DESC
+        LIMIT 1
+      ) profile ON true
       WHERE spo.id = $1 AND spo.is_active = true AND spo.approval_status = 'APPROVED'
-    `, [offerId]);
+    `, params);
 
     if (!product) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND' });
@@ -4287,6 +4305,13 @@ router.get('/store/product/:offerId', async (req: Request, res: Response) => {
 router.get('/store/:storeSlug/product/:productSlug', async (req: Request, res: Response) => {
   try {
     const { storeSlug, productSlug } = req.params;
+    const orgId = req.query.org as string | undefined;
+    const params: any[] = [productSlug, storeSlug];
+    let orgFilter = '';
+    if (orgId) {
+      params.push(orgId);
+      orgFilter = `AND spp.organization_id = $${params.length}`;
+    }
     const [product] = await AppDataSource.query(`
       SELECT
         spo.id AS offer_id,
@@ -4301,13 +4326,23 @@ router.get('/store/:storeSlug/product/:productSlug', async (req: Request, res: R
         ns.id AS supplier_id,
         spo.price_general,
         spo.consumer_reference_price,
-        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url,
+        profile.display_name,
+        profile.description,
+        profile.pharmacist_comment
       FROM supplier_product_offers spo
       LEFT JOIN product_masters pm ON pm.id = spo.master_id
       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN LATERAL (
+        SELECT spp.display_name, spp.description, spp.pharmacist_comment
+        FROM store_product_profiles spp
+        WHERE spp.master_id = spo.master_id AND spp.is_active = true ${orgFilter}
+        ORDER BY spp.updated_at DESC
+        LIMIT 1
+      ) profile ON true
       WHERE spo.slug = $1 AND ns.slug = $2
         AND spo.is_active = true AND spo.approval_status = 'APPROVED'
-    `, [productSlug, storeSlug]);
+    `, params);
 
     if (!product) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND' });
@@ -4315,6 +4350,96 @@ router.get('/store/:storeSlug/product/:productSlug', async (req: Request, res: R
     res.json({ success: true, data: product });
   } catch (error) {
     logger.error('[Neture API] Error fetching store product by slug:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
+// ==================== QR Flyer (WO-O4O-QR-FLYER-SYSTEM-V1) ====================
+
+/**
+ * GET /api/v1/neture/store/product/:offerId/flyer
+ * 상품 QR 전단지 PDF 생성 (공개)
+ * ?template=1|4|8 (default: 4)
+ * ?org=UUID (매장 컨텍스트, 선택)
+ */
+router.get('/store/product/:offerId/flyer', async (req: Request, res: Response) => {
+  try {
+    const { offerId } = req.params;
+    const template = parseInt(req.query.template as string) || 4;
+    const orgId = req.query.org as string | undefined;
+
+    if (![1, 4, 8].includes(template)) {
+      return res.status(400).json({ success: false, error: 'INVALID_TEMPLATE', message: 'template must be 1, 4, or 8' });
+    }
+
+    const params: any[] = [offerId];
+    let orgFilter = '';
+    if (orgId) {
+      params.push(orgId);
+      orgFilter = `AND spp.organization_id = $${params.length}`;
+    }
+
+    const [product] = await AppDataSource.query(`
+      SELECT
+        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        pm.brand_name,
+        ns.name AS supplier_name,
+        spo.price_general,
+        spo.slug AS product_slug,
+        ns.slug AS store_slug,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url,
+        profile.pharmacist_comment,
+        profile.display_name
+      FROM supplier_product_offers spo
+      LEFT JOIN product_masters pm ON pm.id = spo.master_id
+      LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN LATERAL (
+        SELECT spp.pharmacist_comment, spp.display_name
+        FROM store_product_profiles spp
+        WHERE spp.master_id = spo.master_id AND spp.is_active = true ${orgFilter}
+        ORDER BY spp.updated_at DESC
+        LIMIT 1
+      ) profile ON true
+      WHERE spo.id = $1 AND spo.is_active = true AND spo.approval_status = 'APPROVED'
+    `, params);
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    }
+
+    const publicDomain = process.env.PUBLIC_DOMAIN || 'neture.o4o.kr';
+    let qrUrl: string;
+    if (product.store_slug && product.product_slug) {
+      qrUrl = `https://${publicDomain}/store/${product.store_slug}/product/${product.product_slug}`;
+    } else {
+      qrUrl = `https://${publicDomain}/store/product/${offerId}`;
+    }
+    if (orgId) {
+      qrUrl += `?org=${orgId}`;
+    }
+
+    const { generateProductFlyer } = await import('../../services/qr-flyer.service.js');
+
+    const pdfBuffer = await generateProductFlyer({
+      productName: product.display_name || product.product_name,
+      brandName: product.brand_name || undefined,
+      price: product.price_general,
+      pharmacistComment: product.pharmacist_comment || undefined,
+      imageUrl: product.image_url || undefined,
+      storeName: product.supplier_name || 'O4O Store',
+      qrUrl,
+    }, template as 1 | 4 | 8);
+
+    const safeName = (product.display_name || product.product_name || 'product')
+      .replace(/[^a-zA-Z0-9가-힣\s]/g, '')
+      .trim()
+      .slice(0, 30);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="flyer-${safeName}-${template}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    logger.error('[Neture API] Error generating product flyer:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
   }
 });

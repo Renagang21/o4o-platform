@@ -188,6 +188,8 @@ const SupplierSettlementsPage = lazy(() => import('./pages/account/SupplierSettl
 const StoreCartPage = lazy(() => import('./pages/store/StoreCartPage'));
 const StoreOrdersPage = lazy(() => import('./pages/store/StoreOrdersPage'));
 const StoreOrderDetailPage = lazy(() => import('./pages/store/StoreOrderDetailPage'));
+const StoreBlogListPage = lazy(() => import('./pages/store/StoreBlogListPage'));
+const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage'));
 
 // Partner Account
 const PartnerAccountDashboardPage = lazy(() =>
@@ -281,6 +283,9 @@ const ReferralLinksPage = lazy(() => import('./pages/partner/ReferralLinksPage')
 
 // Store Product Detail (WO-O4O-PARTNER-HUB-CORE-V1)
 const StoreProductPage = lazy(() => import('./pages/store/StoreProductPage'));
+
+// QR Landing (WO-O4O-STORE-PRODUCT-PAGE-INTEGRATION-V1)
+const QrLandingPage = lazy(() => import('./pages/store/QrLandingPage'));
 
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
@@ -377,6 +382,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/my" element={<MyPage />} />
+            <Route path="/qr/:slug" element={<QrLandingPage />} />
 
             {/* ================================================================
                 Neture 메인 (NetureLayout)
@@ -472,6 +478,8 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/store/product/:offerId" element={<StoreProductPage />} />
               <Route path="/store/:storeSlug/product/:productSlug" element={<StoreProductPage />} />
+              <Route path="/store/:storeSlug/blog" element={<StoreBlogListPage />} />
+              <Route path="/store/:storeSlug/blog/:postSlug" element={<StoreBlogPage />} />
               <Route path="/store/cart" element={<StoreCartPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />
