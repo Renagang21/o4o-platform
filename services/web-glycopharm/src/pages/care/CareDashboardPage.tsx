@@ -20,8 +20,14 @@ import {
   MessageCircle,
   Filter,
   ChevronRight,
+  Star,
+  Activity,
+  BarChart3,
+  Bell,
+  Check,
+  CheckCircle2,
 } from 'lucide-react';
-import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
+import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary, type PriorityPatientDto, type PopulationDashboardDto, type CareAlertDto } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
@@ -41,6 +47,9 @@ export default function CareDashboardPage() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<PharmacyCustomer[]>([]);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
+  const [priorityPatients, setPriorityPatients] = useState<PriorityPatientDto[]>([]);
+  const [population, setPopulation] = useState<PopulationDashboardDto | null>(null);
+  const [alerts, setAlerts] = useState<CareAlertDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,12 +66,15 @@ export default function CareDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const [customersRes, summaryRes] = await Promise.all([
+      const [customersRes, summaryRes, priorityRes, populationRes, alertsRes] = await Promise.all([
         pharmacyApi.getCustomers({
           search: debouncedSearch || undefined,
           pageSize: 100,
         }),
         pharmacyApi.getCareDashboardSummary().catch(() => null),
+        pharmacyApi.getPriorityPatients().catch(() => null),
+        pharmacyApi.getPopulationDashboard().catch(() => null),
+        pharmacyApi.getCareAlerts().catch(() => [] as CareAlertDto[]),
       ]);
 
       if (customersRes.success && customersRes.data) {
@@ -71,6 +83,9 @@ export default function CareDashboardPage() {
       if (summaryRes) {
         setSummary(summaryRes);
       }
+      setPriorityPatients(priorityRes?.priorityPatients ?? []);
+      setPopulation(populationRes);
+      setAlerts(alertsRes);
     } catch {
       setError('환자 정보를 불러오는데 실패했습니다.');
       setPatients([]);
@@ -116,6 +131,20 @@ export default function CareDashboardPage() {
     if (riskFilter === 'all') return true;
     return getRisk(p) === riskFilter;
   });
+
+  const handleAckAlert = async (alertId: string) => {
+    try {
+      await pharmacyApi.acknowledgeCareAlert(alertId);
+      setAlerts((prev) => prev.map((a) => a.id === alertId ? { ...a, status: 'acknowledged' as const } : a));
+    } catch { /* ignore */ }
+  };
+
+  const handleResolveAlert = async (alertId: string) => {
+    try {
+      await pharmacyApi.resolveCareAlert(alertId);
+      setAlerts((prev) => prev.filter((a) => a.id !== alertId));
+    } catch { /* ignore */ }
+  };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR');
@@ -186,6 +215,243 @@ export default function CareDashboardPage() {
             </p>
           </div>
         </div>
+
+        {/* Active Alerts — WO-O4O-CARE-ALERT-ENGINE-V1 */}
+        {alerts.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Bell className="w-5 h-5 text-red-500" />
+              <h2 className="text-sm font-semibold text-slate-700">활성 알림</h2>
+              <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-medium">
+                {alerts.length}
+              </span>
+            </div>
+            <div className="space-y-2">
+              {alerts.map((alert) => {
+                const severityStyle =
+                  alert.severity === 'critical'
+                    ? 'border-red-300 bg-red-50'
+                    : alert.severity === 'warning'
+                      ? 'border-amber-300 bg-amber-50'
+                      : 'border-blue-300 bg-blue-50';
+                const severityLabel =
+                  alert.severity === 'critical'
+                    ? 'text-red-700'
+                    : alert.severity === 'warning'
+                      ? 'text-amber-700'
+                      : 'text-blue-700';
+                return (
+                  <div
+                    key={alert.id}
+                    className={`flex items-center justify-between rounded-xl border p-4 ${severityStyle}`}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <button
+                        onClick={() => navigate(`/care/patients/${alert.patientId}`)}
+                        className={`text-sm font-medium underline-offset-2 hover:underline ${severityLabel}`}
+                      >
+                        {alert.patientName}
+                      </button>
+                      <span className={`text-sm ${severityLabel}`}>{alert.message}</span>
+                      <span className="text-xs text-slate-400 flex-shrink-0">
+                        {formatDate(alert.createdAt)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                      {alert.status === 'open' && (
+                        <button
+                          onClick={() => handleAckAlert(alert.id)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <Check className="w-3 h-3" />
+                          확인
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleResolveAlert(alert.id)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-green-600 bg-white border border-green-200 rounded-lg hover:bg-green-50 transition-colors"
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        해결
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Population Dashboard — WO-O4O-CARE-POPULATION-DASHBOARD-V1 */}
+        {population && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Risk Distribution */}
+            <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 className="w-4 h-4 text-slate-500" />
+                <p className="text-sm font-medium text-slate-700">위험도 분포</p>
+              </div>
+              {(() => {
+                const { high, moderate, low } = population.riskDistribution;
+                const total = high + moderate + low;
+                if (total === 0) return <p className="text-xs text-slate-400">분석 데이터 없음</p>;
+                return (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500 w-12">고위험</span>
+                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+                        <div
+                          className="bg-red-400 h-full rounded-full transition-all"
+                          style={{ width: `${(high / total) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{high}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500 w-12">주의</span>
+                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+                        <div
+                          className="bg-amber-400 h-full rounded-full transition-all"
+                          style={{ width: `${(moderate / total) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{moderate}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500 w-12">양호</span>
+                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+                        <div
+                          className="bg-green-400 h-full rounded-full transition-all"
+                          style={{ width: `${(low / total) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{low}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Average Metrics */}
+            <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="w-4 h-4 text-slate-500" />
+                <p className="text-sm font-medium text-slate-700">평균 지표</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-slate-400 mb-1">평균 TIR</p>
+                  <p className="text-2xl font-bold text-slate-800">
+                    {population.averageMetrics.tir}
+                    <span className="text-sm font-normal text-slate-400">%</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 mb-1">평균 CV</p>
+                  <p className="text-2xl font-bold text-slate-800">
+                    {population.averageMetrics.cv}
+                    <span className="text-sm font-normal text-slate-400">%</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Coaching & Activity */}
+            <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
+              <div className="flex items-center gap-2 mb-3">
+                <MessageCircle className="w-4 h-4 text-slate-500" />
+                <p className="text-sm font-medium text-slate-700">코칭 & 활동</p>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-500">7일 코칭 전송</span>
+                  <span className="text-sm font-semibold text-slate-800">{population.coaching.sent7d}건</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-500">대기 초안</span>
+                  <span className={`text-sm font-semibold ${population.coaching.pending > 0 ? 'text-blue-600' : 'text-slate-800'}`}>
+                    {population.coaching.pending}건
+                  </span>
+                </div>
+                <div className="border-t border-slate-100 pt-2 flex items-center justify-between">
+                  <span className="text-xs text-slate-500">활성 환자 (7일)</span>
+                  <span className="text-sm font-semibold text-green-600">{population.activity.activePatients}명</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-500">비활성 환자</span>
+                  <span className={`text-sm font-semibold ${population.activity.inactivePatients > 0 ? 'text-orange-500' : 'text-slate-800'}`}>
+                    {population.activity.inactivePatients}명
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Priority Patients — WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1 */}
+        {priorityPatients.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Star className="w-5 h-5 text-orange-500" />
+              <h2 className="text-sm font-semibold text-slate-700">오늘의 우선 관리 환자</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              {priorityPatients.map((pp) => {
+                const scoreColor =
+                  pp.priorityScore >= 80
+                    ? 'bg-red-100 text-red-700'
+                    : pp.priorityScore >= 50
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-yellow-100 text-yellow-700';
+                const riskBadge =
+                  pp.riskLevel === 'high'
+                    ? 'bg-red-100 text-red-700'
+                    : pp.riskLevel === 'caution'
+                      ? 'bg-amber-100 text-amber-700'
+                      : 'bg-green-100 text-green-700';
+                const riskLabel =
+                  pp.riskLevel === 'high' ? '고위험' : pp.riskLevel === 'caution' ? '주의' : '양호';
+
+                return (
+                  <div
+                    key={pp.patientId}
+                    onClick={() => navigate(`/care/patients/${pp.patientId}`)}
+                    className="bg-white rounded-xl border border-slate-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-[10px] font-medium">
+                            {pp.patientName.charAt(0)}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-slate-800 truncate">
+                          {pp.patientName}
+                        </span>
+                      </div>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${scoreColor}`}>
+                        {pp.priorityScore}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${riskBadge}`}>
+                        {riskLabel}
+                      </span>
+                      <span className="text-[10px] text-slate-400">TIR {pp.tir}%</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {pp.reasons.slice(0, 2).map((r, i) => (
+                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Action Bar */}
         <div className="flex items-center gap-3">

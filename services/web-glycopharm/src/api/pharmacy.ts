@@ -502,6 +502,38 @@ class PharmacyApiClient {
     return this.request('/api/v1/care/risk-patients');
   }
 
+  // WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1
+  async getPriorityPatients(): Promise<{ priorityPatients: PriorityPatientDto[] }> {
+    return this.request('/api/v1/care/priority-patients');
+  }
+
+  // WO-O4O-CARE-POPULATION-DASHBOARD-V1
+  async getPopulationDashboard(): Promise<PopulationDashboardDto> {
+    return this.request('/api/v1/care/population-dashboard');
+  }
+
+  // WO-O4O-CARE-TODAY-PRIORITY-PATIENTS-V1
+  async getTodayPriorityPatients(): Promise<TodayPriorityPatientDto[]> {
+    return this.request('/api/v1/care/today-priority');
+  }
+
+  // WO-O4O-CARE-ALERT-ENGINE-V1
+  async getCareAlerts(): Promise<CareAlertDto[]> {
+    return this.request('/api/v1/care/alerts');
+  }
+
+  async acknowledgeCareAlert(alertId: string): Promise<void> {
+    return this.request(`/api/v1/care/alerts/${alertId}/ack`, {
+      method: 'PATCH',
+    });
+  }
+
+  async resolveCareAlert(alertId: string): Promise<void> {
+    return this.request(`/api/v1/care/alerts/${alertId}/resolve`, {
+      method: 'PATCH',
+    });
+  }
+
   // WO-O4O-CARE-LLM-INSIGHT-V1
   async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
     return this.request(`/api/v1/care/llm-insight/${patientId}`);
@@ -528,6 +560,27 @@ class PharmacyApiClient {
 
   async getCoachingSessions(patientId: string): Promise<CoachingSession[]> {
     return this.request(`/api/v1/care/coaching/${patientId}`);
+  }
+
+  // WO-O4O-CARE-AI-COACHING-DRAFT-V1
+  async getCoachingDraft(patientId: string): Promise<CoachingDraftDto | null> {
+    return this.request(`/api/v1/care/coaching-drafts/${patientId}`);
+  }
+
+  async approveCoachingDraft(
+    draftId: string,
+    data?: { summary?: string; actionPlan?: string },
+  ): Promise<CoachingSession> {
+    return this.request(`/api/v1/care/coaching-drafts/${draftId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify(data || {}),
+    });
+  }
+
+  async discardCoachingDraft(draftId: string): Promise<void> {
+    return this.request(`/api/v1/care/coaching-drafts/${draftId}/discard`, {
+      method: 'POST',
+    });
   }
 
   async postHealthReading(data: {
@@ -677,6 +730,57 @@ export interface CareLlmInsightDto {
   patientMessage: string | null;
   model: string | null;
   createdAt: string | null;
+}
+
+// WO-O4O-CARE-POPULATION-DASHBOARD-V1
+export interface PopulationDashboardDto {
+  totalPatients: number;
+  riskDistribution: { high: number; moderate: number; low: number };
+  averageMetrics: { tir: number; cv: number };
+  coaching: { sent7d: number; pending: number };
+  activity: { activePatients: number; inactivePatients: number };
+}
+
+// WO-O4O-CARE-TODAY-PRIORITY-PATIENTS-V1
+export interface TodayPriorityPatientDto {
+  patientId: string;
+  name: string;
+  priorityScore: number;
+  riskLevel: string;
+  alertCount: number;
+}
+
+// WO-O4O-CARE-ALERT-ENGINE-V1
+export interface CareAlertDto {
+  id: string;
+  patientId: string;
+  patientName: string;
+  alertType: string;
+  severity: 'critical' | 'warning' | 'info';
+  message: string;
+  status: 'open' | 'acknowledged' | 'resolved';
+  createdAt: string;
+}
+
+// WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1
+export interface PriorityPatientDto {
+  patientId: string;
+  patientName: string;
+  priorityScore: number;
+  riskLevel: 'high' | 'caution' | 'normal';
+  tir: number;
+  lastReadingAt: string | null;
+  reasons: string[];
+}
+
+// WO-O4O-CARE-AI-COACHING-DRAFT-V1
+export interface CoachingDraftDto {
+  id: string;
+  patientId: string;
+  snapshotId: string;
+  draftMessage: string;
+  status: 'draft' | 'approved' | 'discarded';
+  createdAt: string;
 }
 
 // Export singleton instance

@@ -4,11 +4,11 @@
  * WO-O4O-GLUCOSEVIEW-HOME-BEHAVIOR-UI-V1
  *
  * 환자를 선택하면 5개 섹션 표시:
- *   ① 오늘 혈당 (KPI + 오늘 readings)
- *   ② 오늘 행동 (Behavior Panel)
+ *   ① 오늘 건강 (glucose + BP + weight KPI)
+ *   ② 데이터 입력 (3-button quick entry)
  *   ③ 최근 기록 (Health Readings)
- *   ④ AI 분석 요약
- *   ⑤ 케어 코칭
+ *   ④ AI 건강 인사이트 (LLM + risk + insights)
+ *   ⑤ 약사 코칭
  *
  * API:
  *   - listCustomers → 환자 목록
@@ -304,12 +304,12 @@ export default function CareDashboardPage() {
         {/* ─── Patient Data Sections ─── */}
         {selectedId && !loadingData && (
           <>
-            {/* ① 오늘 혈당 */}
+            {/* ① 오늘 건강 */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">오늘 혈당</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">오늘 건강</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-xs text-slate-400 mb-1">오늘 측정</p>
+                  <p className="text-xs text-slate-400 mb-1">오늘 혈당</p>
                   <p className="text-2xl font-bold text-slate-900">
                     {todayGlucose.length > 0
                       ? `${todayGlucose[0].valueNumeric}`
@@ -337,35 +337,81 @@ export default function CareDashboardPage() {
                     {kpi?.latestCv != null ? `${kpi.latestCv}%` : '--'}
                   </p>
                 </div>
+                <div>
+                  <p className="text-xs text-slate-400 mb-1">혈압</p>
+                  {analysis?.multiMetric?.bp && analysis.multiMetric.bp.readingCount > 0 ? (
+                    <>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {analysis.multiMetric.bp.avgSystolic}/{analysis.multiMetric.bp.avgDiastolic}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        mmHg · {
+                          { normal: '정상', elevated: '상승', high_stage1: '고혈압1', high_stage2: '고혈압2' }[analysis.multiMetric.bp.bpCategory] || '정상'
+                        }
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-300">--</p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400 mb-1">체중</p>
+                  {analysis?.multiMetric?.weight && analysis.multiMetric.weight.readingCount > 0 ? (
+                    <>
+                      <p className="text-2xl font-bold text-slate-900">
+                        {analysis.multiMetric.weight.latestWeight}
+                        <span className="text-sm font-normal text-slate-400 ml-0.5">kg</span>
+                      </p>
+                      {analysis.multiMetric.weight.weightChange != null && (
+                        <p className={`text-xs font-medium ${analysis.multiMetric.weight.weightChange > 0 ? 'text-red-500' : analysis.multiMetric.weight.weightChange < 0 ? 'text-green-500' : 'text-slate-400'}`}>
+                          {analysis.multiMetric.weight.weightChange > 0 ? '+' : ''}{analysis.multiMetric.weight.weightChange}kg
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-2xl font-bold text-slate-300">--</p>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* ② 오늘 행동 (Behavior Panel) */}
+            {/* ② 데이터 입력 */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">오늘 행동</h2>
+              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">데이터 입력</h2>
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => {
+                    setRecordMetric('glucose');
                     setRecordDate(defaultMeasuredAt());
                     setShowRecordModal(true);
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex flex-col items-center gap-2 px-4 py-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  혈당 기록하기
+                  <span className="text-xl">🩸</span>
+                  <span className="text-sm font-medium text-blue-700">혈당 입력</span>
                 </button>
-              </div>
-              <div className="space-y-2">
-                {behaviorActions.map((action, i) => (
-                  <div
-                    key={i}
-                    className={`px-4 py-3 rounded-lg border text-sm ${action.cls}`}
-                  >
-                    {action.label}
-                  </div>
-                ))}
+                <button
+                  onClick={() => {
+                    setRecordMetric('blood_pressure_systolic');
+                    setRecordDate(defaultMeasuredAt());
+                    setShowRecordModal(true);
+                  }}
+                  className="flex flex-col items-center gap-2 px-4 py-4 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 transition-colors"
+                >
+                  <span className="text-xl">💓</span>
+                  <span className="text-sm font-medium text-rose-700">혈압 입력</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setRecordMetric('weight');
+                    setRecordDate(defaultMeasuredAt());
+                    setShowRecordModal(true);
+                  }}
+                  className="flex flex-col items-center gap-2 px-4 py-4 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
+                >
+                  <span className="text-xl">⚖️</span>
+                  <span className="text-sm font-medium text-emerald-700">체중 입력</span>
+                </button>
               </div>
             </div>
 
@@ -408,9 +454,24 @@ export default function CareDashboardPage() {
               )}
             </div>
 
-            {/* ④ AI 분석 요약 */}
+            {/* ④ AI 건강 인사이트 */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">AI 분석 요약</h2>
+              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">AI 건강 인사이트</h2>
+
+              {/* LLM 맞춤 안내 */}
+              {llmInsight?.patientMessage && (
+                <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">
+                    {llmInsight.patientMessage}
+                  </p>
+                  {llmInsight.createdAt && (
+                    <p className="text-xs text-blue-400 mt-2">
+                      {new Date(llmInsight.createdAt).toLocaleString('ko-KR')}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {analysis ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -425,11 +486,7 @@ export default function CareDashboardPage() {
                         <span className="text-sm text-slate-400">-</span>
                       );
                     })()}
-                  </div>
-
-                  {kpi && kpi.riskTrend && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-600">추세:</span>
+                    {kpi?.riskTrend && (
                       <span className={`text-sm font-medium ${
                         kpi.riskTrend === 'improving' ? 'text-green-600'
                           : kpi.riskTrend === 'worsening' ? 'text-red-600'
@@ -437,8 +494,8 @@ export default function CareDashboardPage() {
                       }`}>
                         {kpi.riskTrend === 'improving' ? '개선' : kpi.riskTrend === 'worsening' ? '악화' : '유지'}
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {analysis.insights.length > 0 && (
                     <ul className="space-y-2">
@@ -458,100 +515,9 @@ export default function CareDashboardPage() {
               )}
             </div>
 
-            {/* ④-1.5 AI 맞춤 안내 — WO-O4O-CARE-LLM-INSIGHT-V1 */}
-            {llmInsight?.patientMessage && (
-              <div className="bg-blue-50 rounded-xl border border-blue-100 p-6">
-                <h2 className="text-sm font-medium text-blue-600 uppercase tracking-wider mb-3">AI 맞춤 안내</h2>
-                <p className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">
-                  {llmInsight.patientMessage}
-                </p>
-                {llmInsight.createdAt && (
-                  <p className="text-xs text-blue-400 mt-3">
-                    {new Date(llmInsight.createdAt).toLocaleString('ko-KR')}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* ④-2 복합 지표 분석 (Multi-Metric) — WO-O4O-CARE-MULTI-METRIC-ANALYSIS-V1 */}
-            {analysis?.multiMetric && (
-              <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">복합 지표 분석</h2>
-                <div className="space-y-4">
-                  {/* Blood Pressure */}
-                  {analysis.multiMetric.bp && analysis.multiMetric.bp.readingCount > 0 && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-600">혈압 (평균):</span>
-                      <span className="text-sm font-medium text-slate-800">
-                        {analysis.multiMetric.bp.avgSystolic}/{analysis.multiMetric.bp.avgDiastolic} mmHg
-                      </span>
-                      {(() => {
-                        const cats: Record<string, { label: string; cls: string }> = {
-                          normal: { label: '정상', cls: 'bg-green-100 text-green-700' },
-                          elevated: { label: '상승', cls: 'bg-amber-100 text-amber-700' },
-                          high_stage1: { label: '고혈압 1단계', cls: 'bg-orange-100 text-orange-700' },
-                          high_stage2: { label: '고혈압 2단계', cls: 'bg-red-100 text-red-700' },
-                        };
-                        const cat = cats[analysis.multiMetric!.bp!.bpCategory] || cats.normal;
-                        return (
-                          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${cat.cls}`}>
-                            {cat.label}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                  )}
-
-                  {/* Weight */}
-                  {analysis.multiMetric.weight && analysis.multiMetric.weight.readingCount > 0 && (
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-600">체중:</span>
-                      <span className="text-sm font-medium text-slate-800">
-                        {analysis.multiMetric.weight.latestWeight}kg
-                      </span>
-                      {analysis.multiMetric.weight.weightChange != null && (
-                        <span className={`text-xs font-medium ${analysis.multiMetric.weight.weightChange > 0 ? 'text-red-600' : analysis.multiMetric.weight.weightChange < 0 ? 'text-green-600' : 'text-slate-400'}`}>
-                          {analysis.multiMetric.weight.weightChange > 0 ? '+' : ''}{analysis.multiMetric.weight.weightChange}kg
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Metabolic Risk */}
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-600">대사 위험도:</span>
-                    {(() => {
-                      const mr = analysis.multiMetric!.metabolicRisk;
-                      const badge = RISK_BADGE[mr.metabolicRiskLevel] || RISK_BADGE.low;
-                      return (
-                        <>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full ${badge.cls}`}>
-                            {badge.label}
-                          </span>
-                          <span className="text-xs text-slate-400">({mr.metabolicScore}점)</span>
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  {/* Risk Factors */}
-                  {analysis.multiMetric.metabolicRisk.riskFactors.length > 0 && (
-                    <ul className="space-y-1.5 mt-2">
-                      {analysis.multiMetric.metabolicRisk.riskFactors.map((factor, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
-                          <span className="text-sm text-slate-700">{factor}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ⑤ 케어 코칭 */}
+            {/* ⑤ 약사 코칭 */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">케어 코칭</h2>
+              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">약사 코칭</h2>
               {sessions.length === 0 ? (
                 <p className="text-sm text-slate-400 text-center py-4">
                   아직 코칭 기록이 없습니다.

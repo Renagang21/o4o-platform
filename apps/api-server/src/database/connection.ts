@@ -185,6 +185,12 @@ import { HealthReading } from '../modules/care/entities/health-reading.entity.js
 import { CareLlmInsight } from '../modules/care/entities/care-llm-insight.entity.js';
 import { AiModelSetting } from '../modules/care/entities/ai-model-setting.entity.js';
 
+// CARE COACHING DRAFT (WO-O4O-CARE-AI-COACHING-DRAFT-V1)
+import { CareCoachingDraft } from '../modules/care/entities/care-coaching-draft.entity.js';
+
+// CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
+import { CareAlert } from '../modules/care/entities/care-alert.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -650,6 +656,14 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     CareLlmInsight,
     AiModelSetting,
+    // ============================================================================
+    // CARE COACHING DRAFT (WO-O4O-CARE-AI-COACHING-DRAFT-V1)
+    // ============================================================================
+    CareCoachingDraft,
+    // ============================================================================
+    // CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
+    // ============================================================================
+    CareAlert,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

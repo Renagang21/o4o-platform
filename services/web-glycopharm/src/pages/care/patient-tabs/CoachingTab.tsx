@@ -15,8 +15,10 @@ import {
   X,
   Loader2,
   Send,
+  Sparkles,
+  Trash2,
 } from 'lucide-react';
-import { pharmacyApi, type CoachingSession } from '@/api/pharmacy';
+import { pharmacyApi, type CoachingSession, type CoachingDraftDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 export default function CoachingTab() {
@@ -31,22 +33,39 @@ export default function CoachingTab() {
   const [summary, setSummary] = useState('');
   const [actionPlan, setActionPlan] = useState('');
 
-  const loadSessions = useCallback(async () => {
+  // AI Draft state (WO-O4O-CARE-AI-COACHING-DRAFT-V1)
+  const [draft, setDraft] = useState<CoachingDraftDto | null>(null);
+  const [draftMessage, setDraftMessage] = useState('');
+  const [draftSending, setDraftSending] = useState(false);
+  const [draftDiscarding, setDraftDiscarding] = useState(false);
+
+  const loadData = useCallback(async () => {
     if (!patient?.id) return;
     setLoading(true);
     try {
-      const data = await pharmacyApi.getCoachingSessions(patient.id);
-      setSessions(Array.isArray(data) ? data : []);
+      const [sessionsData, draftData] = await Promise.all([
+        pharmacyApi.getCoachingSessions(patient.id),
+        pharmacyApi.getCoachingDraft(patient.id).catch(() => null),
+      ]);
+      setSessions(Array.isArray(sessionsData) ? sessionsData : []);
+      if (draftData && draftData.status === 'draft') {
+        setDraft(draftData);
+        setDraftMessage(draftData.draftMessage);
+      } else {
+        setDraft(null);
+        setDraftMessage('');
+      }
     } catch {
       setSessions([]);
+      setDraft(null);
     } finally {
       setLoading(false);
     }
   }, [patient?.id]);
 
   useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
+    loadData();
+  }, [loadData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,12 +81,42 @@ export default function CoachingTab() {
       setSummary('');
       setActionPlan('');
       setShowForm(false);
-      await loadSessions();
+      await loadData();
       reload();
     } catch {
       // error silenced
     } finally {
       setSaving(false);
+    }
+  };
+
+  // WO-O4O-CARE-AI-COACHING-DRAFT-V1
+  const handleDraftApprove = async () => {
+    if (!draft || draftSending) return;
+    setDraftSending(true);
+    try {
+      await pharmacyApi.approveCoachingDraft(draft.id, {
+        actionPlan: draftMessage,
+      });
+      await loadData();
+      reload();
+    } catch {
+      // error silenced
+    } finally {
+      setDraftSending(false);
+    }
+  };
+
+  const handleDraftDiscard = async () => {
+    if (!draft || draftDiscarding) return;
+    setDraftDiscarding(true);
+    try {
+      await pharmacyApi.discardCoachingDraft(draft.id);
+      await loadData();
+    } catch {
+      // error silenced
+    } finally {
+      setDraftDiscarding(false);
     }
   };
 
@@ -121,6 +170,40 @@ export default function CoachingTab() {
           </div>
         </div>
       </div>
+
+      {/* AI Coaching Draft — WO-O4O-CARE-AI-COACHING-DRAFT-V1 */}
+      {draft && (
+        <div className="bg-blue-50 rounded-xl border border-blue-200 p-5 space-y-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-4 h-4 text-blue-500" />
+            <span className="text-sm font-semibold text-blue-700">AI 코칭 초안</span>
+          </div>
+          <textarea
+            value={draftMessage}
+            onChange={(e) => setDraftMessage(e.target.value)}
+            rows={4}
+            className="w-full px-3 py-2 text-sm border border-blue-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none"
+          />
+          <div className="flex items-center gap-2 justify-end">
+            <button
+              onClick={handleDraftDiscard}
+              disabled={draftDiscarding}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
+            >
+              {draftDiscarding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+              폐기
+            </button>
+            <button
+              onClick={handleDraftApprove}
+              disabled={draftSending || !draftMessage.trim()}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {draftSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              전송
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Action Bar */}
       <div className="flex items-center justify-between">

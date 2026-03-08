@@ -4,6 +4,9 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 import { CareRiskService } from '../services/care-risk.service.js';
+import { CarePriorityService } from '../services/care-priority.service.js';
+import { CarePopulationService } from '../services/care-population.service.js';
+import { CareAlertService } from '../services/care-alert.service.js';
 
 export interface CareDashboardDto {
   totalPatients: number;
@@ -20,6 +23,9 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
   const router = Router();
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
   const riskService = new CareRiskService(dataSource);
+  const priorityService = new CarePriorityService(dataSource);
+  const populationService = new CarePopulationService(dataSource);
+  const alertService = new CareAlertService(dataSource);
 
   router.get('/dashboard', authenticate, requirePharmacyContext, async (req, res) => {
     try {
@@ -45,6 +51,104 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Risk patients retrieval error' });
+    }
+  });
+
+  // WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1
+  // GET /priority-patients — top N patients by priority score
+  router.get('/priority-patients', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+
+      const priorityPatients = await priorityService.getTopPriorityPatients(pharmacyId);
+      res.json({ priorityPatients });
+    } catch (error) {
+      res.status(500).json({ message: 'Priority patients retrieval error' });
+    }
+  });
+
+  // WO-O4O-CARE-POPULATION-DASHBOARD-V1
+  // GET /population-dashboard — population-level statistics
+  router.get('/population-dashboard', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+
+      const result = await populationService.getPopulationDashboard(pharmacyId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: 'Population dashboard retrieval error' });
+    }
+  });
+
+  // WO-O4O-CARE-TODAY-PRIORITY-PATIENTS-V1
+  // GET /today-priority — today's priority patients for pharmacy home
+  router.get('/today-priority', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      if (!pharmacyId) {
+        res.json([]);
+        return;
+      }
+
+      const patients = await priorityService.getTodayPriorityPatients(pharmacyId);
+      res.json(patients);
+    } catch (error) {
+      res.status(500).json({ message: 'Today priority patients retrieval error' });
+    }
+  });
+
+  // WO-O4O-CARE-ALERT-ENGINE-V1
+  // GET /alerts — active alerts for pharmacy
+  router.get('/alerts', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      if (!pharmacyId) {
+        res.json([]);
+        return;
+      }
+
+      const alerts = await alertService.getActiveAlerts(pharmacyId);
+      res.json(alerts);
+    } catch (error) {
+      res.status(500).json({ message: 'Alert retrieval error' });
+    }
+  });
+
+  // PATCH /alerts/:id/ack — acknowledge alert
+  router.patch('/alerts/:id/ack', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      if (!pharmacyId) {
+        res.status(400).json({ message: 'Pharmacy context required' });
+        return;
+      }
+
+      await alertService.acknowledgeAlert(req.params.id, pharmacyId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Alert acknowledge error' });
+    }
+  });
+
+  // PATCH /alerts/:id/resolve — resolve alert
+  router.patch('/alerts/:id/resolve', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      if (!pharmacyId) {
+        res.status(400).json({ message: 'Pharmacy context required' });
+        return;
+      }
+
+      await alertService.resolveAlert(req.params.id, pharmacyId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ message: 'Alert resolve error' });
     }
   });
 
