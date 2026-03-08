@@ -108,6 +108,10 @@ export class SupplierProductOffer {
   @Column({ name: 'track_inventory', type: 'boolean', default: false })
   trackInventory: boolean;
 
+  /** V2: SEO slug for store URLs (/store/{store_slug}/product/{slug}) */
+  @Column({ name: 'slug', type: 'varchar', length: 160, unique: true })
+  slug: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

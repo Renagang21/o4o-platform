@@ -1,9 +1,12 @@
 /**
  * StoreProductPage - 매장 제품 상세
  *
- * Work Order: WO-O4O-PARTNER-HUB-CORE-V1
+ * Work Order: WO-O4O-PARTNER-HUB-CORE-V2
  *
- * Route: /store/product/:offerId
+ * Routes:
+ * - /store/:storeSlug/product/:productSlug (V2 slug-based)
+ * - /store/product/:offerId (V1 backward compat)
+ *
  * - 제품 정보 표시
  * - 장바구니 담기
  * - ?ref=TOKEN 파라미터 캡처 → sessionStorage
@@ -27,10 +30,17 @@ interface ProductDetail {
   price_general: number;
   consumer_reference_price: number | null;
   image_url: string | null;
+  product_slug?: string;
+  store_slug?: string;
+  supplier_id?: string;
 }
 
 export default function StoreProductPage() {
-  const { offerId } = useParams<{ offerId: string }>();
+  const { offerId, storeSlug, productSlug } = useParams<{
+    offerId?: string;
+    storeSlug?: string;
+    productSlug?: string;
+  }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,10 +52,19 @@ export default function StoreProductPage() {
   }, []);
 
   useEffect(() => {
-    if (!offerId) return;
+    let url: string | null = null;
+    if (storeSlug && productSlug) {
+      // V2 slug-based route
+      url = `${API_BASE_URL}/api/v1/neture/store/${storeSlug}/product/${productSlug}`;
+    } else if (offerId) {
+      // V1 UUID-based route (backward compat)
+      url = `${API_BASE_URL}/api/v1/neture/store/product/${offerId}`;
+    }
+    if (!url) { setLoading(false); return; }
+
     (async () => {
       try {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/store/product/${offerId}`);
+        const res = await fetchWithTimeout(url!);
         if (res.ok) {
           const result = await res.json();
           setProduct(result.data || null);
@@ -56,7 +75,7 @@ export default function StoreProductPage() {
         setLoading(false);
       }
     })();
-  }, [offerId]);
+  }, [offerId, storeSlug, productSlug]);
 
   const handleAddToCart = () => {
     if (!product) return;

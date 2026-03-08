@@ -24,12 +24,19 @@ export default function ReferralLinksPage() {
     })();
   }, []);
 
+  const buildUrl = useCallback((link: ReferralLink) => {
+    if (link.store_slug && link.product_slug) {
+      return `/store/${link.store_slug}/product/${link.product_slug}?ref=${link.referral_token}`;
+    }
+    return `/store/product/${link.product_id}?ref=${link.referral_token}`;
+  }, []);
+
   const handleCopy = useCallback(async (link: ReferralLink) => {
-    const url = `${window.location.origin}/store/product/${link.product_id}?ref=${link.referral_token}`;
+    const url = `${window.location.origin}${buildUrl(link)}`;
     await navigator.clipboard.writeText(url);
     setCopiedId(link.id);
     setTimeout(() => setCopiedId(null), 2000);
-  }, []);
+  }, [buildUrl]);
 
   return (
     <div style={styles.container}>
@@ -49,7 +56,7 @@ export default function ReferralLinksPage() {
       ) : (
         <div style={styles.list}>
           {links.map((link) => {
-            const url = `/store/product/${link.product_id}?ref=${link.referral_token}`;
+            const url = buildUrl(link);
             const isCopied = copiedId === link.id;
 
             return (

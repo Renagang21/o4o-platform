@@ -4100,6 +4100,45 @@ router.get('/store/product/:offerId', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * GET /api/v1/neture/store/:storeSlug/product/:productSlug
+ * V2 slug 기반 제품 상세 — /store/{store_slug}/product/{product_slug}
+ */
+router.get('/store/:storeSlug/product/:productSlug', async (req: Request, res: Response) => {
+  try {
+    const { storeSlug, productSlug } = req.params;
+    const [product] = await AppDataSource.query(`
+      SELECT
+        spo.id AS offer_id,
+        spo.slug AS product_slug,
+        spo.master_id,
+        COALESCE(pm.marketing_name, 'Unknown') AS product_name,
+        pm.manufacturer_name,
+        pm.brand_name,
+        pm.specification,
+        ns.name AS supplier_name,
+        ns.slug AS store_slug,
+        ns.id AS supplier_id,
+        spo.price_general,
+        spo.consumer_reference_price,
+        (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = spo.master_id AND pi.is_primary = true LIMIT 1) AS image_url
+      FROM supplier_product_offers spo
+      LEFT JOIN product_masters pm ON pm.id = spo.master_id
+      JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      WHERE spo.slug = $1 AND ns.slug = $2
+        AND spo.is_active = true AND spo.approval_status = 'APPROVED'
+    `, [productSlug, storeSlug]);
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND' });
+    }
+    res.json({ success: true, data: product });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching store product by slug:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+  }
+});
+
 // ==================== Partner Affiliate (WO-O4O-PARTNER-HUB-CORE-V1) ====================
 
 /**
@@ -4111,6 +4150,8 @@ router.get('/partner/product-pool', requireAuth, requireLinkedPartner as Request
     const rows = await AppDataSource.query(`
       SELECT
         spo.id AS product_id,
+        spo.slug AS product_slug,
+        ns.slug AS store_slug,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
         ns.name AS supplier_name,
         spc.commission_per_unit,
@@ -4142,11 +4183,27 @@ router.get('/partner/product-pool', requireAuth, requireLinkedPartner as Request
 router.post('/partner/referral-links', requireAuth, requireActivePartner as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const partnerId = (req as PartnerRequest).partnerId;
-    const { product_id, store_id } = req.body;
+    const { product_id } = req.body;
 
     if (!product_id) {
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'product_id required' });
     }
+
+    // V2: Resolve offer → supplier_id + slugs
+    const [offer] = await AppDataSource.query(
+      `SELECT spo.id, spo.slug AS product_slug, spo.supplier_id, ns.slug AS store_slug
+       FROM supplier_product_offers spo
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       WHERE spo.id = $1`,
+      [product_id],
+    );
+
+    if (!offer) {
+      return res.status(404).json({ success: false, error: 'PRODUCT_NOT_FOUND' });
+    }
+
+    const buildUrl = (token: string) =>
+      `/store/${offer.store_slug}/product/${offer.product_slug}?ref=${token}`;
 
     // Check if referral already exists for this (partner, product)
     const [existing] = await AppDataSource.query(
@@ -4155,32 +4212,43 @@ router.post('/partner/referral-links', requireAuth, requireActivePartner as Requ
     );
 
     if (existing) {
-      const referralUrl = `/store/product/${product_id}?ref=${existing.referral_token}`;
-      return res.json({ success: true, data: { referral_url: referralUrl, referral_token: existing.referral_token, product_id } });
+      return res.json({ success: true, data: { referral_url: buildUrl(existing.referral_token), referral_token: existing.referral_token, product_id } });
     }
 
     // Generate unique 8-char token
     const referralToken = crypto.randomBytes(4).toString('hex');
 
+    // V2: store_id = supplier_id (자동)
     await AppDataSource.query(
       `INSERT INTO partner_referrals (partner_id, store_id, product_id, referral_token) VALUES ($1, $2, $3, $4)`,
-      [partnerId, store_id || null, product_id, referralToken],
+      [partnerId, offer.supplier_id, product_id, referralToken],
     );
 
-    const referralUrl = `/store/product/${product_id}?ref=${referralToken}`;
-    res.status(201).json({ success: true, data: { referral_url: referralUrl, referral_token: referralToken, product_id } });
+    res.status(201).json({ success: true, data: { referral_url: buildUrl(referralToken), referral_token: referralToken, product_id } });
   } catch (error: any) {
     // Handle token collision (retry once)
     if (error?.code === '23505') {
       try {
         const retryToken = crypto.randomBytes(5).toString('hex').slice(0, 8);
         const partnerId = (req as PartnerRequest).partnerId;
-        const { product_id, store_id } = req.body;
+        const { product_id } = req.body;
+
+        const [offer] = await AppDataSource.query(
+          `SELECT spo.slug AS product_slug, spo.supplier_id, ns.slug AS store_slug
+           FROM supplier_product_offers spo
+           JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+           WHERE spo.id = $1`,
+          [product_id],
+        );
+
         await AppDataSource.query(
           `INSERT INTO partner_referrals (partner_id, store_id, product_id, referral_token) VALUES ($1, $2, $3, $4)`,
-          [partnerId, store_id || null, product_id, retryToken],
+          [partnerId, offer?.supplier_id || null, product_id, retryToken],
         );
-        const referralUrl = `/store/product/${product_id}?ref=${retryToken}`;
+
+        const referralUrl = offer
+          ? `/store/${offer.store_slug}/product/${offer.product_slug}?ref=${retryToken}`
+          : `/store/product/${product_id}?ref=${retryToken}`;
         return res.status(201).json({ success: true, data: { referral_url: referralUrl, referral_token: retryToken, product_id } });
       } catch (retryErr) {
         logger.error('[Neture API] Referral link creation retry failed:', retryErr);
@@ -4202,11 +4270,14 @@ router.get('/partner/referral-links', requireAuth, requireLinkedPartner as Reque
     const rows = await AppDataSource.query(`
       SELECT
         pr.id, pr.referral_token, pr.product_id, pr.store_id, pr.created_at,
+        spo.slug AS product_slug,
+        ns.slug AS store_slug,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
         spo.price_general,
         spc.commission_per_unit
       FROM partner_referrals pr
       JOIN supplier_product_offers spo ON spo.id = pr.product_id
+      JOIN neture_suppliers ns ON ns.id = spo.supplier_id
       LEFT JOIN product_masters pm ON pm.id = spo.master_id
       LEFT JOIN supplier_partner_commissions spc ON spc.supplier_product_id = pr.product_id
         AND spc.start_date <= CURRENT_DATE

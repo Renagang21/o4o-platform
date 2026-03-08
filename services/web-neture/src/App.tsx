@@ -455,6 +455,7 @@ function App() {
             ================================================================ */}
             <Route element={<MainLayout />}>
               <Route path="/store/product/:offerId" element={<StoreProductPage />} />
+              <Route path="/store/:storeSlug/product/:productSlug" element={<StoreProductPage />} />
               <Route path="/store/cart" element={<StoreCartPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />

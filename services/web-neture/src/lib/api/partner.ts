@@ -355,6 +355,8 @@ export const partnerCommissionApi = {
 
 export interface PoolProduct {
   product_id: string;
+  product_slug: string;
+  store_slug: string;
   product_name: string;
   supplier_name: string;
   commission_per_unit: number;
@@ -368,6 +370,8 @@ export interface ReferralLink {
   id: string;
   referral_token: string;
   product_id: string;
+  product_slug: string;
+  store_slug: string;
   product_name: string;
   price_general: number;
   commission_per_unit: number | null;
