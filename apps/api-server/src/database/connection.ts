@@ -195,6 +195,10 @@ import { CareAlert } from '../modules/care/entities/care-alert.entity.js';
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
 import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';
 
+// STORE AI PRODUCT ENTITIES (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
+import { StoreAiProductSnapshot } from '../modules/store-ai/entities/store-ai-product-snapshot.entity.js';
+import { StoreAiProductInsight } from '../modules/store-ai/entities/store-ai-product-insight.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -873,6 +877,8 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     StoreAiSnapshot,
     StoreAiInsight,
+    StoreAiProductSnapshot,
+    StoreAiProductInsight,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

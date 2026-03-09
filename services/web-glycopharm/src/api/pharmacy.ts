@@ -180,6 +180,16 @@ export interface StoreAiSummaryData {
   snapshotId: string;
 }
 
+// Product AI Insight 응답 (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
+export interface ProductAiInsightData {
+  summary: string;
+  productHighlights: Array<{ productId: string; productName: string; highlight: string; metric?: string }>;
+  issues: Array<{ type: string; severity: string; message: string; productId?: string; productName?: string }>;
+  actions: Array<{ label: string; priority: string; reason: string; productId?: string }>;
+  model: string;
+  createdAt: string;
+}
+
 class PharmacyApiClient {
   private baseUrl: string;
 
@@ -297,6 +307,20 @@ class PharmacyApiClient {
    */
   async createStoreAiSnapshot(): Promise<StoreApiResponse<{ id: string }>> {
     return this.request('/api/v1/store-hub/ai/snapshot', { method: 'POST' });
+  }
+
+  /**
+   * 상품 AI 인사이트 조회 (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
+   */
+  async getProductAiInsight(): Promise<StoreApiResponse<ProductAiInsightData | null>> {
+    return this.request('/api/v1/store-hub/ai/products/insight');
+  }
+
+  /**
+   * 상품 AI 스냅샷 생성 + 인사이트 트리거 (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
+   */
+  async createProductAiSnapshot(): Promise<StoreApiResponse<{ count: number }>> {
+    return this.request('/api/v1/store-hub/ai/products/snapshot', { method: 'POST' });
   }
 
   /**

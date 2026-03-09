@@ -50,7 +50,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
-import type { StoreAiSummaryData } from '@/api/pharmacy';
+import type { StoreAiSummaryData, ProductAiInsightData } from '@/api/pharmacy';
 import { AiSummaryButton } from '@/components/ai';
 import HubCopyModal from '@/components/store/HubCopyModal';
 import { PRODUCT_POLICY_CONFIG, APPROVAL_STATUS_CONFIG } from '@/config/store-catalog';
@@ -125,6 +125,9 @@ export default function StoreMainPage() {
   const [aiSummary, setAiSummary] = useState<AiSummaryResult | null>(null);
   const [llmSummary, setLlmSummary] = useState<StoreAiSummaryData | null>(null);
   const [llmLoading, setLlmLoading] = useState(false);
+  // WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1
+  const [productInsight, setProductInsight] = useState<ProductAiInsightData | null>(null);
+  const [productInsightLoading, setProductInsightLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -159,6 +162,17 @@ export default function StoreMainPage() {
           })
           .catch(() => { /* LLM 실패 시 rule-based fallback 유지 */ })
           .finally(() => setLlmLoading(false));
+
+        // WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1: 상품 AI 인사이트 병렬 조회
+        setProductInsightLoading(true);
+        pharmacyApi.getProductAiInsight()
+          .then((piRes) => {
+            if (piRes.success && piRes.data) {
+              setProductInsight(piRes.data);
+            }
+          })
+          .catch(() => { /* 상품 AI 실패 시 무시 */ })
+          .finally(() => setProductInsightLoading(false));
       }
     } catch (err: any) {
       console.error('Store main load error:', err);
@@ -514,6 +528,112 @@ export default function StoreMainPage() {
           ) : null}
         </div>
       )}
+
+      {/* ========================================= */}
+      {/* Block 6: 상품 AI 분석                      */}
+      {/* WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1         */}
+      {/* ========================================= */}
+      <div className="bg-white rounded-2xl shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Package className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-lg font-semibold text-slate-800">상품 AI 분석</h2>
+            {productInsight && (
+              <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">AI</span>
+            )}
+          </div>
+          {productInsightLoading && <Loader2 className="w-4 h-4 text-indigo-400 animate-spin" />}
+          {!productInsight && !productInsightLoading && (
+            <button
+              onClick={() => {
+                setProductInsightLoading(true);
+                pharmacyApi.createProductAiSnapshot()
+                  .then(() => pharmacyApi.getProductAiInsight())
+                  .then((res) => { if (res.success && res.data) setProductInsight(res.data); })
+                  .catch(() => {})
+                  .finally(() => setProductInsightLoading(false));
+              }}
+              className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-lg hover:bg-indigo-100 transition-colors"
+            >
+              상품 AI 분석 요청
+            </button>
+          )}
+        </div>
+
+        {productInsight ? (
+          <>
+            {/* Summary */}
+            <div className="bg-indigo-50 rounded-xl p-4 mb-4">
+              <p className="text-sm text-indigo-800">{productInsight.summary}</p>
+              <p className="text-xs text-indigo-500 mt-2">
+                {productInsight.model} · {new Date(productInsight.createdAt).toLocaleString('ko-KR')}
+              </p>
+            </div>
+
+            {/* Product Highlights */}
+            {productInsight.productHighlights.length > 0 && (
+              <div className="space-y-2 mb-4">
+                <h3 className="text-sm font-medium text-slate-600">주목할 상품</h3>
+                {productInsight.productHighlights.map((ph, idx) => (
+                  <div key={idx} className="flex items-start gap-3 px-3 py-2 bg-slate-50 rounded-lg">
+                    <Sparkles className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-800 truncate">{ph.productName}</p>
+                      <p className="text-xs text-slate-600">{ph.highlight}</p>
+                      {ph.metric && <p className="text-xs text-indigo-600 mt-0.5">{ph.metric}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Issues */}
+            {productInsight.issues.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {productInsight.issues.map((issue, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-start gap-2 px-3 py-2 rounded-lg text-sm ${
+                      issue.severity === 'high'
+                        ? 'bg-red-50 text-red-800'
+                        : issue.severity === 'medium'
+                        ? 'bg-amber-50 text-amber-800'
+                        : 'bg-blue-50 text-blue-800'
+                    }`}
+                  >
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <div>
+                      {issue.productName && <span className="font-medium">{issue.productName}: </span>}
+                      <span>{issue.message}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            {productInsight.actions.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {productInsight.actions.map((action, idx) => (
+                  <span
+                    key={idx}
+                    className={`px-3 py-1.5 text-sm rounded-full cursor-pointer transition-colors ${
+                      action.priority === 'high'
+                        ? 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                    title={action.reason}
+                  >
+                    {action.label}
+                  </span>
+                ))}
+              </div>
+            )}
+          </>
+        ) : !productInsightLoading ? (
+          <p className="text-sm text-slate-500">상품별 QR 스캔, 주문, 전환율을 AI가 분석합니다.</p>
+        ) : null}
+      </div>
     </div>
   );
 }
