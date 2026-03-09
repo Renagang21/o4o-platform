@@ -14,8 +14,12 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
  * 핵심 원칙:
  * - LLM = 설명 (진단/처방/치료 권고 금지)
  * - fire-and-forget: 실패해도 기존 인사이트에 영향 없음
- * - snapshot 당 1회 호출 (캐시 기반)
+ * - snapshot 당 1회 호출 (캐시 기반, 중복 방어)
+ * - 1회 retry (2초 delay) — WO-O4O-CARE-AI-RESILIENCE-FIX-V1
  */
+
+const RETRY_DELAY_MS = 2_000;
+const MAX_ATTEMPTS = 2;
 
 const SYSTEM_PROMPT = `당신은 약국 환자 케어 데이터를 설명하는 전문 도우미입니다.
 
@@ -54,7 +58,9 @@ export class CareLlmInsightService {
 
   /**
    * Fire-and-forget: generate + cache LLM insight for a snapshot.
-   * 전체 try/catch — 실패 시 log만, throw 안 함.
+   * - 중복 방어: snapshot_id 기존 존재 시 skip
+   * - 1회 retry (2초 delay, retryable 오류만)
+   * - 전체 try/catch — 실패 시 log만, throw 안 함.
    */
   async generateAndCache(
     snapshot: CareKpiSnapshot,
@@ -62,6 +68,15 @@ export class CareLlmInsightService {
     pharmacyId: string,
   ): Promise<void> {
     try {
+      // 중복 방어: 이 snapshot에 대해 이미 insight가 있으면 skip
+      const existing = await this.insightRepo.findOne({
+        where: { snapshotId: snapshot.id },
+        select: ['id'],
+      });
+      if (existing) {
+        return;
+      }
+
       const config = await this.buildProviderConfig();
 
       // API key 없으면 skip (로컬 환경 등)
@@ -71,29 +86,64 @@ export class CareLlmInsightService {
       }
 
       const userPrompt = this.buildUserPrompt(analysis);
-      const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
-      const parsed = JSON.parse(response.content) as LlmResponse;
 
-      // 필수 필드 검증
-      if (!parsed.pharmacyInsight || !parsed.patientMessage) {
-        console.error('[CareLlmInsight] Invalid LLM response: missing required fields');
-        return;
+      // Retry loop: max 2 attempts, 2초 delay between
+      let lastError: unknown = null;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
+          const parsed = JSON.parse(response.content) as LlmResponse;
+
+          // 필수 필드 검증 (non-retryable)
+          if (!parsed.pharmacyInsight || !parsed.patientMessage) {
+            console.error('[CareLlmInsight] Invalid LLM response: missing required fields', {
+              snapshotId: snapshot.id,
+              content: response.content.slice(0, 200),
+            });
+            return;
+          }
+
+          const insight = this.insightRepo.create({
+            snapshotId: snapshot.id,
+            pharmacyId,
+            patientId: analysis.patientId,
+            pharmacyInsight: parsed.pharmacyInsight,
+            patientMessage: parsed.patientMessage,
+            model: response.model,
+            promptTokens: response.promptTokens,
+            completionTokens: response.completionTokens,
+          });
+          await this.insightRepo.save(insight);
+          return; // success
+        } catch (err) {
+          lastError = err;
+          const msg = err instanceof Error ? err.message : String(err);
+
+          // Non-retryable: API key error, validation
+          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
+            console.error('[CareLlmInsight] non-retryable error:', { snapshotId: snapshot.id, error: msg });
+            return;
+          }
+
+          // Retryable: timeout, 5xx, network, JSON parse
+          if (attempt < MAX_ATTEMPTS) {
+            console.warn(`[CareLlmInsight] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
+            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+          }
+        }
       }
 
-      const insight = this.insightRepo.create({
+      // All attempts exhausted
+      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
+      console.error('[CareLlmInsight] generation failed after all attempts:', {
         snapshotId: snapshot.id,
-        pharmacyId,
         patientId: analysis.patientId,
-        pharmacyInsight: parsed.pharmacyInsight,
-        patientMessage: parsed.patientMessage,
-        model: response.model,
-        promptTokens: response.promptTokens,
-        completionTokens: response.completionTokens,
+        attempts: MAX_ATTEMPTS,
+        lastError: errMsg,
       });
-      await this.insightRepo.save(insight);
     } catch (error) {
-      // Fire-and-forget: log error, never throw to caller
-      console.error('[CareLlmInsight] generation failed:', error);
+      // Outer guard: unexpected errors (DB, config loading, etc.)
+      console.error('[CareLlmInsight] unexpected error:', error);
     }
   }
 

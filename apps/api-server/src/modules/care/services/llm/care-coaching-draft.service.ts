@@ -15,7 +15,11 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
  * - AI = 초안 생성
  * - 약사 = 승인 결정
  * - fire-and-forget: 실패해도 기존 흐름에 영향 없음
+ * - 중복 방어 + 1회 retry — WO-O4O-CARE-AI-RESILIENCE-FIX-V1
  */
+
+const RETRY_DELAY_MS = 2_000;
+const MAX_ATTEMPTS = 2;
 
 const SYSTEM_PROMPT = `당신은 약국 환자 건강 행동 코칭 도우미입니다.
 
@@ -53,6 +57,8 @@ export class CareCoachingDraftService {
 
   /**
    * Fire-and-forget: generate + cache coaching draft for a snapshot.
+   * - 중복 방어: snapshot_id 기존 존재 시 skip
+   * - 1회 retry (2초 delay, retryable 오류만)
    */
   async generateAndCache(
     snapshot: CareKpiSnapshot,
@@ -60,6 +66,15 @@ export class CareCoachingDraftService {
     pharmacyId: string,
   ): Promise<void> {
     try {
+      // 중복 방어: 이 snapshot에 대해 이미 draft가 있으면 skip
+      const existing = await this.draftRepo.findOne({
+        where: { snapshotId: snapshot.id },
+        select: ['id'],
+      });
+      if (existing) {
+        return;
+      }
+
       const config = await this.buildProviderConfig();
 
       if (!config.apiKey) {
@@ -68,24 +83,61 @@ export class CareCoachingDraftService {
       }
 
       const userPrompt = this.buildUserPrompt(analysis);
-      const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
-      const parsed = JSON.parse(response.content) as DraftLlmResponse;
 
-      if (!parsed.draftMessage) {
-        console.error('[CareCoachingDraft] Invalid LLM response: missing draftMessage');
-        return;
+      // Retry loop: max 2 attempts, 2초 delay between
+      let lastError: unknown = null;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
+          const parsed = JSON.parse(response.content) as DraftLlmResponse;
+
+          // 필수 필드 검증 (non-retryable)
+          if (!parsed.draftMessage) {
+            console.error('[CareCoachingDraft] Invalid LLM response: missing draftMessage', {
+              snapshotId: snapshot.id,
+              content: response.content.slice(0, 200),
+            });
+            return;
+          }
+
+          const draft = this.draftRepo.create({
+            patientId: analysis.patientId,
+            snapshotId: snapshot.id,
+            pharmacyId,
+            draftMessage: parsed.draftMessage,
+            status: 'draft',
+          });
+          await this.draftRepo.save(draft);
+          return; // success
+        } catch (err) {
+          lastError = err;
+          const msg = err instanceof Error ? err.message : String(err);
+
+          // Non-retryable: API key error, validation
+          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
+            console.error('[CareCoachingDraft] non-retryable error:', { snapshotId: snapshot.id, error: msg });
+            return;
+          }
+
+          // Retryable: timeout, 5xx, network, JSON parse
+          if (attempt < MAX_ATTEMPTS) {
+            console.warn(`[CareCoachingDraft] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
+            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+          }
+        }
       }
 
-      const draft = this.draftRepo.create({
-        patientId: analysis.patientId,
+      // All attempts exhausted
+      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
+      console.error('[CareCoachingDraft] generation failed after all attempts:', {
         snapshotId: snapshot.id,
-        pharmacyId,
-        draftMessage: parsed.draftMessage,
-        status: 'draft',
+        patientId: analysis.patientId,
+        attempts: MAX_ATTEMPTS,
+        lastError: errMsg,
       });
-      await this.draftRepo.save(draft);
     } catch (error) {
-      console.error('[CareCoachingDraft] generation failed:', error);
+      // Outer guard: unexpected errors (DB, config loading, etc.)
+      console.error('[CareCoachingDraft] unexpected error:', error);
     }
   }
 
