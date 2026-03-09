@@ -41,8 +41,16 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
         return;
       }
 
-      // Fire-and-forget: AI 태그 생성
-      taggingService.generateTags(product).catch(() => {});
+      // Fire-and-forget: AI 태그 생성 → 완료 후 AI 콘텐츠 생성 트리거
+      taggingService.generateTags(product).then(() => {
+        // WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1: 태그 생성 완료 → AI 콘텐츠 생성
+        import('../services/product-ai-content.service.js').then(({ ProductAiContentService }) => {
+          const contentService = new ProductAiContentService(dataSource);
+          return loadProductContentInput(dataSource, productId).then((contentInput) => {
+            if (contentInput) contentService.generateAllContents(contentInput).catch(() => {});
+          });
+        }).catch(() => {});
+      }).catch(() => {});
 
       res.json({ success: true, message: 'Tag generation started' });
     } catch (error) {
@@ -120,6 +128,65 @@ async function loadProductTagInput(
       categoryName: r.categoryName,
       brandName: r.brandName,
       manufacturerName: r.manufacturerName,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ProductMaster + Tags + OCR 정보를 콘텐츠 생성용으로 조회.
+ * WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1
+ */
+async function loadProductContentInput(
+  dataSource: DataSource,
+  productId: string,
+): Promise<{ id: string; regulatoryName: string; marketingName: string; specification?: string | null; categoryName?: string | null; brandName?: string | null; manufacturerName: string; tags?: string[]; ocrText?: string | null } | null> {
+  try {
+    const rows = await dataSource.query(
+      `SELECT
+         pm.id,
+         pm.regulatory_name AS "regulatoryName",
+         pm.marketing_name AS "marketingName",
+         pm.specification,
+         pm.manufacturer_name AS "manufacturerName",
+         pm.tags,
+         pc.name AS "categoryName",
+         b.name AS "brandName"
+       FROM product_masters pm
+       LEFT JOIN product_categories pc ON pc.id = pm.category_id
+       LEFT JOIN brands b ON b.id = pm.brand_id
+       WHERE pm.id = $1`,
+      [productId],
+    );
+    if (rows.length === 0) return null;
+    const r = rows[0];
+
+    let ocrText: string | null = null;
+    try {
+      const ocrRows = await dataSource.query(
+        `SELECT ocr_text FROM product_ocr_texts WHERE product_id = $1 ORDER BY created_at ASC`,
+        [productId],
+      );
+      const combined = ocrRows
+        .filter((o: any) => o.ocr_text && o.ocr_text.trim().length > 0)
+        .map((o: any) => o.ocr_text.trim())
+        .join('\n');
+      if (combined.length > 0) ocrText = combined;
+    } catch {
+      // OCR table may not exist yet
+    }
+
+    return {
+      id: r.id,
+      regulatoryName: r.regulatoryName,
+      marketingName: r.marketingName,
+      specification: r.specification,
+      categoryName: r.categoryName,
+      brandName: r.brandName,
+      manufacturerName: r.manufacturerName,
+      tags: Array.isArray(r.tags) ? r.tags : [],
+      ocrText,
     };
   } catch {
     return null;

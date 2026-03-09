@@ -1037,6 +1037,24 @@ const startServer = async () => {
       logger.error('Failed to register Product AI Tag routes:', productAiTagError);
     }
 
+    // 28i. Register Product AI Content routes (IR-O4O-AI-CONTENT-ENGINE-IMPLEMENTATION-V1)
+    try {
+      const { createProductAiContentRouter } = await import('./modules/store-ai/controllers/product-ai-content.controller.js');
+      app.use('/api/v1/products', createProductAiContentRouter(AppDataSource));
+      logger.info('✅ Product AI Content routes registered at /api/v1/products');
+    } catch (productAiContentError) {
+      logger.error('Failed to register Product AI Content routes:', productAiContentError);
+    }
+
+    // 28j. Register Product POP PDF routes (WO-O4O-POP-PDF-GENERATOR-V1)
+    try {
+      const { createProductPopPdfRouter } = await import('./modules/store-ai/controllers/product-pop-pdf.controller.js');
+      app.use('/api/v1/products', createProductPopPdfRouter(AppDataSource));
+      logger.info('✅ Product POP PDF routes registered at /api/v1/products/:productId/pop');
+    } catch (productPopPdfError) {
+      logger.error('Failed to register Product POP PDF routes:', productPopPdfError);
+    }
+
     // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
     try {
       const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');

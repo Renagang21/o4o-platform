@@ -860,6 +860,14 @@ router.post('/products/:masterId/images', requireAuth, requireActiveSupplier, up
     // DB 레코드 생성
     const image = await netureService.addProductImage(masterId, url, gcsPath);
 
+    // Fire-and-forget: OCR 추출 (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
+    import('../store-ai/services/product-ocr.service.js')
+      .then(({ ProductOcrService }) => {
+        const ocrService = new ProductOcrService(AppDataSource);
+        return ocrService.extractAndSave(masterId, image.id, url);
+      })
+      .catch(() => {});
+
     res.status(201).json({ success: true, data: image });
   } catch (error) {
     logger.error('[Neture API] Error uploading product image:', error);
@@ -933,6 +941,14 @@ router.post('/admin/products/:masterId/images', requireAuth, requireNetureScope(
 
     const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname);
     const image = await netureService.addProductImage(masterId, url, gcsPath);
+
+    // Fire-and-forget: OCR 추출 (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
+    import('../store-ai/services/product-ocr.service.js')
+      .then(({ ProductOcrService }) => {
+        const ocrService = new ProductOcrService(AppDataSource);
+        return ocrService.extractAndSave(masterId, image.id, url);
+      })
+      .catch(() => {});
 
     res.status(201).json({ success: true, data: image });
   } catch (error) {
