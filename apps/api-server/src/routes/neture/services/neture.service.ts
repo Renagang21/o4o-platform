@@ -50,12 +50,16 @@ import {
   ListOrdersResponseDto,
   UpdateOrderStatusRequestDto,
 } from '../dto/index.js';
+import { PartnerCommissionService } from '../../../modules/neture/services/partner-commission.service.js';
+import logger from '../../../utils/logger.js';
 
 export class NetureService {
   private repository: NetureRepository;
+  private partnerCommissionService: PartnerCommissionService;
 
   constructor(private dataSource: DataSource) {
     this.repository = new NetureRepository(dataSource);
+    this.partnerCommissionService = new PartnerCommissionService(dataSource);
   }
 
   // ============================================================================
@@ -742,6 +746,16 @@ export class NetureService {
             [item.quantity, item.productId],
           );
         }
+      }
+
+      // Partner Commission auto-trigger (WO-O4O-PARTNER-COMMISSION-TRIGGER-V1)
+      try {
+        const created = await this.partnerCommissionService.createContractCommissionsForOrder(id);
+        if (created > 0) {
+          logger.info(`[Partner Commission] Auto-created ${created} commission(s) for order ${id}`);
+        }
+      } catch (commErr) {
+        logger.warn('[Partner Commission] Auto-trigger failed (non-blocking):', commErr);
       }
     }
 

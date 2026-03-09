@@ -26,10 +26,12 @@ import sharp from 'sharp';
 import { NetureService as LegacyNetureService } from '../../routes/neture/services/neture.service.js';
 import { NetureOrderStatus } from '../../routes/neture/entities/neture-order.entity.js';
 import { NetureSettlementService } from './services/neture-settlement.service.js';
+import { PartnerCommissionService } from './services/partner-commission.service.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
 const settlementService = new NetureSettlementService(AppDataSource);
+const commissionService = new PartnerCommissionService(AppDataSource);
 const legacyNetureService = new LegacyNetureService(AppDataSource);
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
@@ -3913,29 +3915,8 @@ router.delete('/supplier/partner-commissions/:id', requireAuth, requireActiveSup
 router.get('/partner/commissions/kpi', requireAuth, requireLinkedPartner, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const partnerId = (req as PartnerRequest).partnerId;
-
-    const result = await AppDataSource.query(
-      `SELECT
-         COALESCE(SUM(commission_amount) FILTER (WHERE status IN ('pending', 'approved')), 0)::int AS pending_amount,
-         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount,
-         COALESCE(SUM(commission_amount) FILTER (WHERE status IN ('pending', 'approved', 'paid')), 0)::int AS total_amount,
-         COUNT(*) FILTER (WHERE status IN ('pending', 'approved'))::int AS pending_count,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count
-       FROM partner_commissions
-       WHERE partner_id = $1 AND status != 'cancelled'`,
-      [partnerId],
-    );
-
-    res.json({
-      success: true,
-      data: {
-        pending_amount: Number(result[0]?.pending_amount || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-        total_amount: Number(result[0]?.total_amount || 0),
-        pending_count: Number(result[0]?.pending_count || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-      },
-    });
+    const result = await commissionService.getPartnerKpi(partnerId);
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching partner commission KPI:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commission KPI' });
@@ -3951,45 +3932,9 @@ router.get('/partner/commissions', requireAuth, requireLinkedPartner, async (req
     const partnerId = (req as PartnerRequest).partnerId;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
     const status = req.query.status as string | undefined;
-
-    const baseParams: any[] = [partnerId];
-    let statusClause = '';
-    if (status && ['pending', 'approved', 'paid', 'cancelled'].includes(status)) {
-      statusClause = 'AND pc.status = $2';
-      baseParams.push(status);
-    }
-
-    const [commissions, countResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT pc.id, pc.partner_id, pc.supplier_id, ns.name AS supplier_name,
-                pc.order_id, pc.order_number, pc.contract_id,
-                pc.commission_rate, pc.order_amount, pc.commission_amount,
-                pc.status, pc.period_start, pc.period_end,
-                pc.approved_at, pc.paid_at, pc.notes,
-                pc.created_at, pc.updated_at
-         FROM partner_commissions pc
-         LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
-         WHERE pc.partner_id = $1 ${statusClause}
-         ORDER BY pc.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM partner_commissions pc
-         WHERE pc.partner_id = $1 ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-    res.json({
-      success: true,
-      data: commissions,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    const result = await commissionService.getPartnerCommissions(partnerId, { page, limit, status });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching partner commissions:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commissions' });
@@ -4009,27 +3954,11 @@ router.get('/partner/commissions/:id', requireAuth, requireLinkedPartner, async 
       return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid commission ID format' });
     }
 
-    const rows = await AppDataSource.query(
-      `SELECT pc.*, ns.name AS supplier_name
-       FROM partner_commissions pc
-       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
-       WHERE pc.id = $1 AND pc.partner_id = $2 LIMIT 1`,
-      [commissionId, partnerId],
-    );
-    if (rows.length === 0) {
+    const result = await commissionService.getPartnerCommissionDetail(commissionId, partnerId);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found' });
     }
-
-    // Fetch linked order items
-    const items = await AppDataSource.query(
-      `SELECT oi.product_name, oi.quantity, oi.unit_price, oi.total_price
-       FROM neture_order_items oi
-       WHERE oi.order_id = $1
-       ORDER BY oi.created_at`,
-      [rows[0].order_id],
-    );
-
-    res.json({ success: true, data: { ...rows[0], items } });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching partner commission detail:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner commission detail' });
@@ -4370,6 +4299,7 @@ router.get('/partner/referral-links', requireAuth, requireLinkedPartner as Reque
         pr.id, pr.referral_token, pr.product_id, pr.store_id, pr.created_at,
         spo.slug AS product_slug,
         ns.slug AS store_slug,
+        ns.name AS store_name,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
         spo.price_general,
         spc.commission_per_unit
@@ -4384,7 +4314,13 @@ router.get('/partner/referral-links', requireAuth, requireLinkedPartner as Reque
       ORDER BY pr.created_at DESC
     `, [partnerId]);
 
-    res.json({ success: true, data: rows });
+    // Build referral_url for each link
+    const data = rows.map((r: any) => ({
+      ...r,
+      referral_url: `/store/${r.store_slug}/product/${r.product_slug}?ref=${r.referral_token}`,
+    }));
+
+    res.json({ success: true, data });
   } catch (error) {
     logger.error('[Neture API] Error fetching referral links:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
@@ -4564,65 +4500,8 @@ router.post('/admin/commissions/calculate', requireAuth, requireNetureScope('net
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'Date format must be YYYY-MM-DD' });
     }
 
-    // Find delivered orders with active partner contracts, excluding already-commissioned
-    const rows = await AppDataSource.query(
-      `SELECT
-         nspc.partner_id,
-         spo.supplier_id,
-         o.id AS order_id,
-         o.order_number,
-         nspc.id AS contract_id,
-         nspc.commission_rate,
-         SUM(oi.total_price)::int AS order_amount
-       FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       JOIN neture_partner_recruitments npr ON npr.product_id = spo.master_id
-       JOIN neture_seller_partner_contracts nspc ON nspc.recruitment_id = npr.id
-         AND nspc.contract_status = 'active'
-       WHERE o.status = 'delivered'
-         AND o.updated_at >= $1::date
-         AND o.updated_at < ($2::date + INTERVAL '1 day')
-         AND NOT EXISTS (
-           SELECT 1 FROM partner_commissions pc
-           WHERE pc.partner_id = nspc.partner_id AND pc.order_id = o.id AND pc.status != 'cancelled'
-         )
-       GROUP BY nspc.partner_id, spo.supplier_id, o.id, o.order_number, nspc.id, nspc.commission_rate`,
-      [period_start, period_end],
-    );
-
-    if (rows.length === 0) {
-      return res.json({ success: true, data: { created: 0, message: 'No eligible orders found for commission calculation' } });
-    }
-
-    // Insert commission records
-    let created = 0;
-    for (const row of rows) {
-      const commissionAmount = Math.round(Number(row.order_amount) * Number(row.commission_rate) / 100);
-      try {
-        await AppDataSource.query(
-          `INSERT INTO partner_commissions
-             (partner_id, supplier_id, order_id, order_number, contract_id,
-              commission_rate, order_amount, commission_amount, status,
-              period_start, period_end)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', $9, $10)`,
-          [row.partner_id, row.supplier_id, row.order_id, row.order_number,
-           row.contract_id, row.commission_rate, row.order_amount, commissionAmount,
-           period_start, period_end],
-        );
-        created++;
-      } catch (insertErr: any) {
-        // Skip duplicate constraint violations
-        if (insertErr.code === '23505') {
-          logger.warn(`[Neture Commission] Duplicate commission for partner=${row.partner_id} order=${row.order_id}, skipping`);
-        } else {
-          throw insertErr;
-        }
-      }
-    }
-
-    logger.info(`[Neture Commission] Created ${created} commission records for period ${period_start} ~ ${period_end}`);
-    res.json({ success: true, data: { created, period: { start: period_start, end: period_end } } });
+    const result = await commissionService.calculateBatchCommissions(period_start, period_end);
+    res.json(result);
   } catch (error: any) {
     logger.error('[Neture API] Error calculating commissions:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to calculate commissions' });
@@ -4637,49 +4516,9 @@ router.get('/admin/commissions', requireAuth, requireNetureScope('neture:admin')
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
     const status = req.query.status as string | undefined;
-
-    const baseParams: any[] = [];
-    let statusClause = '';
-    let paramIdx = 1;
-    if (status && ['pending', 'approved', 'paid', 'cancelled'].includes(status)) {
-      statusClause = `WHERE pc.status = $${paramIdx}`;
-      baseParams.push(status);
-      paramIdx++;
-    }
-
-    const [commissions, countResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT pc.id, pc.partner_id, np.name AS partner_name,
-                pc.supplier_id, ns.name AS supplier_name,
-                pc.order_id, pc.order_number, pc.contract_id,
-                pc.commission_rate, pc.order_amount, pc.commission_amount,
-                pc.status, pc.period_start, pc.period_end,
-                pc.approved_at, pc.paid_at, pc.notes,
-                pc.created_at, pc.updated_at
-         FROM partner_commissions pc
-         LEFT JOIN neture_partners np ON np.id = pc.partner_id
-         LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
-         ${statusClause}
-         ORDER BY pc.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM partner_commissions pc
-         ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-    res.json({
-      success: true,
-      data: commissions,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    const result = await commissionService.getAdminCommissions({ page, limit, status });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin commissions:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commissions' });
@@ -4693,29 +4532,8 @@ router.get('/admin/commissions', requireAuth, requireNetureScope('neture:admin')
  */
 router.get('/admin/commissions/kpi', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
   try {
-    const result = await AppDataSource.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE status = 'pending')::int AS pending_count,
-         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'pending'), 0)::int AS pending_amount,
-         COUNT(*) FILTER (WHERE status = 'approved')::int AS approved_count,
-         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'approved'), 0)::int AS approved_amount,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count,
-         COALESCE(SUM(commission_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount
-       FROM partner_commissions
-       WHERE status != 'cancelled'`,
-    );
-
-    res.json({
-      success: true,
-      data: {
-        pending_count: Number(result[0]?.pending_count || 0),
-        pending_amount: Number(result[0]?.pending_amount || 0),
-        approved_count: Number(result[0]?.approved_count || 0),
-        approved_amount: Number(result[0]?.approved_amount || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-      },
-    });
+    const result = await commissionService.getAdminKpi();
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin commission KPI:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commission KPI' });
@@ -4733,27 +4551,11 @@ router.get('/admin/commissions/:id', requireAuth, requireNetureScope('neture:adm
       return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid commission ID format' });
     }
 
-    const rows = await AppDataSource.query(
-      `SELECT pc.*, np.name AS partner_name, ns.name AS supplier_name
-       FROM partner_commissions pc
-       LEFT JOIN neture_partners np ON np.id = pc.partner_id
-       LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
-       WHERE pc.id = $1 LIMIT 1`,
-      [commissionId],
-    );
-    if (rows.length === 0) {
+    const result = await commissionService.getAdminCommissionDetail(commissionId);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found' });
     }
-
-    const items = await AppDataSource.query(
-      `SELECT oi.product_name, oi.quantity, oi.unit_price, oi.total_price
-       FROM neture_order_items oi
-       WHERE oi.order_id = $1
-       ORDER BY oi.created_at`,
-      [rows[0].order_id],
-    );
-
-    res.json({ success: true, data: { ...rows[0], items } });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin commission detail:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin commission detail' });
@@ -4768,31 +4570,11 @@ router.patch('/admin/commissions/:id/approve', requireAuth, requireNetureScope('
   try {
     const commissionId = req.params.id;
     const { notes } = req.body;
-
-    const setClauses = ["status = 'approved'", 'approved_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(commissionId);
-    const result = await AppDataSource.query(
-      `UPDATE partner_commissions SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'pending'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await commissionService.approveCommission(commissionId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in "pending" status' });
     }
-
-    logger.info(`[Neture Commission] Commission ${commissionId} approved`);
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error approving commission:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve commission' });
@@ -4807,31 +4589,11 @@ router.patch('/admin/commissions/:id/pay', requireAuth, requireNetureScope('netu
   try {
     const commissionId = req.params.id;
     const { notes } = req.body;
-
-    const setClauses = ["status = 'paid'", 'paid_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(commissionId);
-    const result = await AppDataSource.query(
-      `UPDATE partner_commissions SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'approved'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await commissionService.payCommission(commissionId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in "approved" status' });
     }
-
-    logger.info(`[Neture Commission] Commission ${commissionId} paid`);
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error paying commission:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay commission' });
@@ -4853,30 +4615,11 @@ router.patch('/admin/commissions/:id/status', requireAuth, requireNetureScope('n
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'This endpoint only supports "cancelled" status. Use /approve or /pay for transitions.' });
     }
 
-    const setClauses = ['status = $1', 'updated_at = NOW()'];
-    const params: any[] = [status];
-    let paramIdx = 2;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(commissionId);
-    const result = await AppDataSource.query(
-      `UPDATE partner_commissions SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status IN ('pending', 'approved')
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await commissionService.cancelCommission(commissionId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Commission not found or not in cancellable status' });
     }
-
-    logger.info(`[Neture Commission] Commission ${commissionId} cancelled`);
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error cancelling commission:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel commission' });
