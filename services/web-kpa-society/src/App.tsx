@@ -142,6 +142,12 @@ import { StoreBlogPostPage } from './pages/store/StoreBlogPostPage';
 // Store Home (WO-STORE-TEMPLATE-PROFILE-V1)
 import { StorefrontHomePage } from './pages/store/StorefrontHomePage';
 
+// WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1: Storefront Commerce Pages
+import { StorefrontProductDetailPage } from './pages/storefront/StorefrontProductDetailPage';
+import { CheckoutPage } from './pages/storefront/CheckoutPage';
+import { PaymentSuccessPage } from './pages/storefront/PaymentSuccessPage';
+import { PaymentFailPage } from './pages/storefront/PaymentFailPage';
+
 // Public Content View (WO-KPA-A-CONTENT-USAGE-MODE-EXTENSION-V1)
 import { PublicContentViewPage, PrintContentPage } from './pages/content';
 
@@ -671,6 +677,12 @@ function App() {
 
           {/* Store Home (WO-STORE-TEMPLATE-PROFILE-V1) — public, block-based storefront */}
           <Route path="/store/:slug" element={<StorefrontHomePage />} />
+
+          {/* WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1: Product Detail + Checkout + Payment */}
+          <Route path="/store/:slug/products/:id" element={<StorefrontProductDetailPage />} />
+          <Route path="/store/:slug/checkout" element={<CheckoutPage />} />
+          <Route path="/store/:slug/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/store/:slug/payment/fail" element={<PaymentFailPage />} />
 
           {/* Store Blog (WO-STORE-BLOG-CHANNEL-V1) — public, no auth */}
           <Route path="/store/:slug/blog" element={<Layout serviceName={SERVICE_NAME}><StoreBlogPage /></Layout>} />

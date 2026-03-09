@@ -87,6 +87,8 @@ import { createProductMarketingController } from '../o4o-store/controllers/produ
 import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
 import { createKpaStoreTemplateController } from '../o4o-store/controllers/kpa-store-template.controller.js';
+import { createKpaCheckoutController } from './controllers/kpa-checkout.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+import { createKpaPaymentController } from './controllers/kpa-payment.controller.js'; // WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
 import { createTabletController } from '../o4o-store/controllers/tablet.controller.js';
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js';
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
@@ -2822,6 +2824,24 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   });
 
   router.use('/organization', orgInfoRouter);
+
+  // ============================================================================
+  // Checkout Routes — WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+  // POST /api/v1/kpa/checkout — 주문 생성
+  // GET  /api/v1/kpa/checkout/orders — 내 주문 목록
+  // GET  /api/v1/kpa/checkout/orders/:orderId — 주문 상세
+  // ============================================================================
+  const kpaCheckoutController = createKpaCheckoutController(dataSource, coreRequireAuth as any);
+  router.use('/checkout', kpaCheckoutController);
+
+  // ============================================================================
+  // Payment Routes — WO-O4O-KPA-CUSTOMER-COMMERCE-LOOP-V1
+  // POST /api/v1/kpa/payments/prepare — 결제 준비
+  // POST /api/v1/kpa/payments/confirm — 결제 확인
+  // GET  /api/v1/kpa/payments/order/:orderId — 결제 정보
+  // ============================================================================
+  const kpaPaymentController = createKpaPaymentController(dataSource, coreRequireAuth as any);
+  router.use('/payments', kpaPaymentController);
 
   // Health check endpoint
   router.get('/health', (req, res) => {
