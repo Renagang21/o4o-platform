@@ -23,7 +23,7 @@ export default function LoginPage() {
     try {
       const loggedInUser = await login(email, password);
       // WO-GLYCOPHARM-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
-      navigate(returnUrl || getDefaultRouteByRole(loggedInUser.role));
+      navigate(returnUrl || getDefaultRouteByRole(loggedInUser.roles?.[0]));
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
       setIsSubmitting(false);

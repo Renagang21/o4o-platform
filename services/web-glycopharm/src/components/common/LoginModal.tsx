@@ -72,7 +72,7 @@ export default function LoginModal() {
       // WO-HOME-LIVE-PREVIEW-V1: /login 페이지에서만 역할 기반 이동
       // Home(/)에서 로그인 시 → Home 유지 (데이터가 pharmacy-scoped로 갱신됨)
       if (location.pathname === '/login') {
-        navigate(getDefaultRouteByRole(loggedInUser.role));
+        navigate(getDefaultRouteByRole(loggedInUser.roles?.[0]));
       }
 
       onLoginSuccess?.();

@@ -18,7 +18,7 @@ import {
   HeartPulse,
   Users,
   Store,
-  UserCircle,
+  LayoutDashboard,
 } from 'lucide-react';
 
 /**
@@ -31,7 +31,6 @@ const menuItems = [
   { label: 'Care 관리', icon: HeartPulse, pathPublic: '/care', pathAuth: '/care', end: false },
   { label: '환자관리', icon: Users, pathPublic: '/care/patients', pathAuth: '/care/patients', end: false },
   { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },
-  { label: '내정보', icon: UserCircle, pathPublic: '/mypage', pathAuth: '/mypage', end: false },
 ];
 
 export default function Header() {
@@ -42,6 +41,13 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const isPharmacy = isAuthenticated && user?.roles?.includes('pharmacy');
+  const isOperator = isAuthenticated && user?.roles?.some(r => ['operator', 'admin'].includes(r));
+
+  // Role-based dashboard links for profile dropdown
+  const roleDashboardLinks = isAuthenticated ? [
+    ...(isOperator ? [{ label: '운영자 대시보드', path: '/operator' }] : []),
+    ...(isPharmacy ? [{ label: 'Care 대시보드', path: '/care' }] : []),
+  ] : [];
 
   const handleLogout = () => {
     logout();
@@ -129,6 +135,17 @@ export default function Header() {
                         </p>
                         <p className="text-xs text-slate-500">{user?.email}</p>
                       </div>
+                      {roleDashboardLinks.map((link) => (
+                        <NavLink
+                          key={link.path}
+                          to={link.path}
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          {link.label}
+                        </NavLink>
+                      ))}
                       <NavLink
                         to="/mypage"
                         className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
@@ -204,13 +221,26 @@ export default function Header() {
 
             <div className="mt-4 pt-4 border-t">
               {isAuthenticated ? (
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600"
-                >
-                  <LogOut className="w-5 h-5" />
-                  로그아웃
-                </button>
+                <div className="flex flex-col gap-1">
+                  {roleDashboardLinks.map((link) => (
+                    <NavLink
+                      key={link.path}
+                      to={link.path}
+                      className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-primary-600"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <LayoutDashboard className="w-5 h-5" />
+                      {link.label}
+                    </NavLink>
+                  ))}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-red-600"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    로그아웃
+                  </button>
+                </div>
               ) : (
                 <div className="flex flex-col gap-2 px-4">
                   <button
