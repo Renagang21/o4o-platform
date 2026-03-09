@@ -39,3 +39,5 @@ export { KpaInstructorQualification } from './kpa-instructor-qualification.entit
 export { KpaCourseRequest } from './kpa-course-request.entity.js';
 // WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
 export { KpaApprovalRequest } from './kpa-approval-request.entity.js';
+// WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
+export { ServiceProduct } from './service-product.entity.js';

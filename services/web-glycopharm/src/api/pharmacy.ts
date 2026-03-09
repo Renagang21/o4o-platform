@@ -170,6 +170,16 @@ export interface PharmacyCustomer {
   createdAt: string;
 }
 
+// Store AI Summary 응답 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+export interface StoreAiSummaryData {
+  summary: string;
+  issues: Array<{ type: string; severity: string; message: string; metric?: string }>;
+  actions: Array<{ label: string; priority: string; reason: string }>;
+  model: string;
+  createdAt: string;
+  snapshotId: string;
+}
+
 class PharmacyApiClient {
   private baseUrl: string;
 
@@ -273,6 +283,20 @@ class PharmacyApiClient {
    */
   async getStoreMain(): Promise<StoreApiResponse<StoreMainData>> {
     return this.request('/api/v1/glycopharm/pharmacy/cockpit/store-main');
+  }
+
+  /**
+   * Store AI 요약 조회 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+   */
+  async getStoreAiSummary(): Promise<StoreApiResponse<StoreAiSummaryData | null>> {
+    return this.request('/api/v1/store-hub/ai/summary');
+  }
+
+  /**
+   * Store AI 스냅샷 생성 + 인사이트 트리거 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+   */
+  async createStoreAiSnapshot(): Promise<StoreApiResponse<{ id: string }>> {
+    return this.request('/api/v1/store-hub/ai/snapshot', { method: 'POST' });
   }
 
   /**

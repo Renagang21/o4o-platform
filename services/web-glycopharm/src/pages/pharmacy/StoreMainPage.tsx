@@ -50,6 +50,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
+import type { StoreAiSummaryData } from '@/api/pharmacy';
 import { AiSummaryButton } from '@/components/ai';
 import HubCopyModal from '@/components/store/HubCopyModal';
 import { PRODUCT_POLICY_CONFIG, APPROVAL_STATUS_CONFIG } from '@/config/store-catalog';
@@ -122,6 +123,8 @@ export default function StoreMainPage() {
   const navigate = useNavigate();
   const [data, setData] = useState<StoreMainData | null>(null);
   const [aiSummary, setAiSummary] = useState<AiSummaryResult | null>(null);
+  const [llmSummary, setLlmSummary] = useState<StoreAiSummaryData | null>(null);
+  const [llmLoading, setLlmLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,6 +148,17 @@ export default function StoreMainPage() {
       if (res.success && res.data) {
         setData(res.data);
         setAiSummary(generateStoreSummary(res.data));
+
+        // WO-O4O-STORE-HUB-AI-SUMMARY-V1: LLM 요약 병렬 조회
+        setLlmLoading(true);
+        pharmacyApi.getStoreAiSummary()
+          .then((aiRes) => {
+            if (aiRes.success && aiRes.data) {
+              setLlmSummary(aiRes.data);
+            }
+          })
+          .catch(() => { /* LLM 실패 시 rule-based fallback 유지 */ })
+          .finally(() => setLlmLoading(false));
       }
     } catch (err: any) {
       console.error('Store main load error:', err);
@@ -395,31 +409,109 @@ export default function StoreMainPage() {
       />
 
       {/* ========================================= */}
-      {/* Block 5: AI 요약 (Rule-based Stub)        */}
+      {/* Block 5: AI 매장 요약                      */}
+      {/* WO-O4O-STORE-HUB-AI-SUMMARY-V1            */}
+      {/* LLM 우선 → rule-based fallback             */}
       {/* ========================================= */}
-      {aiSummary && (
+      {(llmSummary || aiSummary) && (
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-primary-600" />
-            <h2 className="text-lg font-semibold text-slate-800">AI 매장 요약</h2>
-          </div>
-
-          <div className="bg-primary-50 rounded-xl p-4 mb-4">
-            <p className="text-sm text-primary-800">{aiSummary.message}</p>
-          </div>
-
-          {aiSummary.suggestions.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {aiSummary.suggestions.map((suggestion, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full hover:bg-slate-200 cursor-pointer transition-colors"
-                >
-                  {suggestion}
-                </span>
-              ))}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary-600" />
+              <h2 className="text-lg font-semibold text-slate-800">AI 매장 요약</h2>
+              {llmSummary && (
+                <span className="px-2 py-0.5 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">AI</span>
+              )}
             </div>
-          )}
+            {llmLoading && <Loader2 className="w-4 h-4 text-primary-400 animate-spin" />}
+            {!llmSummary && !llmLoading && (
+              <button
+                onClick={() => {
+                  setLlmLoading(true);
+                  pharmacyApi.createStoreAiSnapshot()
+                    .then(() => pharmacyApi.getStoreAiSummary())
+                    .then((res) => { if (res.success && res.data) setLlmSummary(res.data); })
+                    .catch(() => {})
+                    .finally(() => setLlmLoading(false));
+                }}
+                className="px-3 py-1.5 bg-primary-50 text-primary-700 text-xs font-medium rounded-lg hover:bg-primary-100 transition-colors"
+              >
+                AI 분석 요청
+              </button>
+            )}
+          </div>
+
+          {/* LLM Summary */}
+          {llmSummary ? (
+            <>
+              <div className="bg-primary-50 rounded-xl p-4 mb-4">
+                <p className="text-sm text-primary-800">{llmSummary.summary}</p>
+                <p className="text-xs text-primary-500 mt-2">
+                  {llmSummary.model} · {new Date(llmSummary.createdAt).toLocaleString('ko-KR')}
+                </p>
+              </div>
+
+              {/* Issues */}
+              {llmSummary.issues.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {llmSummary.issues.map((issue, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-start gap-2 px-3 py-2 rounded-lg text-sm ${
+                        issue.severity === 'high'
+                          ? 'bg-red-50 text-red-800'
+                          : issue.severity === 'medium'
+                          ? 'bg-amber-50 text-amber-800'
+                          : 'bg-blue-50 text-blue-800'
+                      }`}
+                    >
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>{issue.message}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Actions */}
+              {llmSummary.actions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {llmSummary.actions.map((action, idx) => (
+                    <span
+                      key={idx}
+                      className={`px-3 py-1.5 text-sm rounded-full cursor-pointer transition-colors ${
+                        action.priority === 'high'
+                          ? 'bg-primary-100 text-primary-800 hover:bg-primary-200'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                      title={action.reason}
+                    >
+                      {action.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : aiSummary ? (
+            /* Rule-based Fallback */
+            <>
+              <div className="bg-primary-50 rounded-xl p-4 mb-4">
+                <p className="text-sm text-primary-800">{aiSummary.message}</p>
+              </div>
+
+              {aiSummary.suggestions.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {aiSummary.suggestions.map((suggestion, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full hover:bg-slate-200 cursor-pointer transition-colors"
+                    >
+                      {suggestion}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : null}
         </div>
       )}
     </div>

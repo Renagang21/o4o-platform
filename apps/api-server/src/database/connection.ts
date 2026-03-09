@@ -191,6 +191,10 @@ import { CareCoachingDraft } from '../modules/care/entities/care-coaching-draft.
 // CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
 import { CareAlert } from '../modules/care/entities/care-alert.entity.js';
 
+// STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
+import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -258,6 +262,7 @@ import {
   OrganizationStore, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   KpaPharmacistProfile, // WO-ROLE-NORMALIZATION-PHASE3-B-V1
+  ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
 } from '../routes/kpa/entities/index.js';
 
 // ============================================================================
@@ -730,6 +735,8 @@ export const AppDataSource = new DataSource({
     OrganizationServiceEnrollment,
     // WO-ROLE-NORMALIZATION-PHASE3-B-V1
     KpaPharmacistProfile,
+    // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
+    ServiceProduct,
     // ============================================================================
     // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
     // ============================================================================
@@ -861,6 +868,11 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     // STORE LIBRARY (WO-O4O-STORE-LIBRARY-FOUNDATION-V1) — merged into existing entry above
     // ============================================================================
+    // ============================================================================
+    // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+    // ============================================================================
+    StoreAiSnapshot,
+    StoreAiInsight,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

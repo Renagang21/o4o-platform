@@ -19,6 +19,7 @@ import {
 import type { OrganizationStore } from './organization-store.entity.js';
 import type { ProductMaster } from '../../../modules/neture/entities/ProductMaster.entity.js';
 import type { SupplierProductOffer } from '../../../modules/neture/entities/SupplierProductOffer.entity.js';
+import type { ServiceProduct } from './service-product.entity.js';
 
 @Entity('organization_product_listings')
 @Index('IDX_org_product_listing_org_id', ['organization_id'])
@@ -53,6 +54,14 @@ export class OrganizationProductListing {
   @ManyToOne('SupplierProductOffer', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'offer_id' })
   offer?: SupplierProductOffer;
+
+  /** WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1: 미래 FK — 현재 nullable, 기존 동작 무변경 */
+  @Column({ type: 'uuid', nullable: true })
+  service_product_id: string | null;
+
+  @ManyToOne('ServiceProduct')
+  @JoinColumn({ name: 'service_product_id' })
+  service_product?: ServiceProduct;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, nullable: true })
   price: number | null;

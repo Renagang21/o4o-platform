@@ -1001,6 +1001,15 @@ const startServer = async () => {
       logger.error('Failed to register Care LLM Insight routes:', llmInsightError);
     }
 
+    // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
+    try {
+      const { createStoreAiRouter } = await import('./modules/store-ai/controllers/store-ai.controller.js');
+      app.use('/api/v1/store-hub/ai', createStoreAiRouter(AppDataSource));
+      logger.info('✅ Store AI routes registered at /api/v1/store-hub/ai');
+    } catch (storeAiError) {
+      logger.error('Failed to register Store AI routes:', storeAiError);
+    }
+
     // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
     try {
       const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');
