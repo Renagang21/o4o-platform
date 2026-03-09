@@ -314,6 +314,7 @@ jobs:
           --set-env-vars="ENABLE_INTERNAL_V2=true" \
           --set-env-vars="CGM_PROVIDER=database" \
           --set-env-vars="CARE_MULTI_METRIC=true" \
+          --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
           --vpc-connector=o4o-vpc-connector \
           --vpc-egress=private-ranges-only \
           --add-cloudsql-instances=netureyoutube:asia-northeast3:o4o-platform-db
