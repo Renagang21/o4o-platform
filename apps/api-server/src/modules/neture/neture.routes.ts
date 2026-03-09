@@ -3,7 +3,6 @@ import { Router, Request, Response } from 'express';
 import type { RequestHandler, Router as ExpressRouter } from 'express';
 import { NetureService } from './neture.service.js';
 import { SupplierStatus, PartnershipStatus, RecruitmentStatus, OfferDistributionType, OfferApprovalStatus } from './entities/index.js';
-import { NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { requireAuth, requireRole } from '../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../middleware/neture-scope.middleware.js';
@@ -27,35 +26,21 @@ import { NetureService as LegacyNetureService } from '../../routes/neture/servic
 import { NetureOrderStatus } from '../../routes/neture/entities/neture-order.entity.js';
 import { NetureSettlementService } from './services/neture-settlement.service.js';
 import { PartnerCommissionService } from './services/partner-commission.service.js';
+import { SupplierOrdersService } from './services/supplier-orders.service.js';
+import { requireActiveSupplier, requireLinkedSupplier, getSupplierIdFromUser } from './middleware/supplier.middleware.js';
+import { requireActivePartner, requireLinkedPartner } from './middleware/partner.middleware.js';
+import type { AuthenticatedRequest, SupplierRequest, PartnerRequest } from './middleware/types.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
 const settlementService = new NetureSettlementService(AppDataSource);
 const commissionService = new PartnerCommissionService(AppDataSource);
+const supplierOrdersService = new SupplierOrdersService(AppDataSource);
 const legacyNetureService = new LegacyNetureService(AppDataSource);
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
 const csvImportService = new CsvImportService(AppDataSource);
 const imageStorageService = new ImageStorageService();
-
-// Extended Request type with user info
-type AuthenticatedRequest = Request & {
-  user?: {
-    id: string;
-    role: string;
-    supplierId?: string;
-  };
-};
-
-/** Request with supplierId set by requireActiveSupplier / requireLinkedSupplier middleware */
-type SupplierRequest = AuthenticatedRequest & {
-  supplierId: string;
-};
-
-/** Request with partnerId set by requireActivePartner / requireLinkedPartner middleware */
-type PartnerRequest = AuthenticatedRequest & {
-  partnerId: string;
-};
 
 /**
  * GET /api/v1/neture/suppliers
@@ -176,113 +161,6 @@ router.get('/partnership/requests/:id', requireAuth, async (req: Request, res: R
     });
   }
 });
-
-// ==================== Supplier Request API (WO-NETURE-SUPPLIER-REQUEST-API-V1) ====================
-
-/**
- * Helper: Get supplier ID from authenticated user
- * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1: fallback 제거 — user_id 매핑만 허용
- */
-async function getSupplierIdFromUser(req: AuthenticatedRequest): Promise<string | null> {
-  if (!req.user?.id) return null;
-  return netureService.getSupplierIdByUserId(req.user.id);
-}
-
-/**
- * Middleware: Require authenticated user to be an ACTIVE supplier
- * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1
- * 쓰기 작업용 — PENDING/REJECTED/INACTIVE 차단
- */
-async function requireActiveSupplier(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-  if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
-    return;
-  }
-  if (supplier.status !== SupplierStatus.ACTIVE) {
-    res.status(403).json({
-      success: false,
-      error: { code: 'SUPPLIER_NOT_ACTIVE', message: `Supplier account is ${supplier.status}. Only ACTIVE suppliers can perform this action.` },
-      currentStatus: supplier.status,
-    });
-    return;
-  }
-  (req as SupplierRequest).supplierId = supplier.id;
-  next();
-}
-
-/**
- * Middleware: Require authenticated user to be a linked supplier (any status)
- * WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1
- * 읽기 작업용 — PENDING/REJECTED도 자신의 프로필/대시보드 조회 허용
- */
-async function requireLinkedSupplier(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-  if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
-    return;
-  }
-  (req as SupplierRequest).supplierId = supplier.id;
-  next();
-}
-
-// ==================== Partner Domain Gate (WO-NETURE-IDENTITY-DOMAIN-STATUS-SEPARATION-V1) ====================
-
-/**
- * Middleware: Require authenticated user to be an ACTIVE partner
- * 쓰기 작업용 — PENDING/SUSPENDED/INACTIVE 차단
- */
-async function requireActivePartner(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const partner = await netureService.getPartnerByUserId(authReq.user.id);
-  if (!partner) {
-    res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
-    return;
-  }
-  if (partner.status !== NeturePartnerStatus.ACTIVE) {
-    res.status(403).json({
-      success: false,
-      error: { code: 'PARTNER_NOT_ACTIVE', message: `Partner account is ${partner.status}. Only ACTIVE partners can perform this action.` },
-      currentStatus: partner.status,
-    });
-    return;
-  }
-  (req as PartnerRequest).partnerId = partner.id;
-  next();
-}
-
-/**
- * Middleware: Require authenticated user to be a linked partner (any status)
- * 읽기 작업용 — PENDING/SUSPENDED도 자신의 대시보드 조회 허용
- */
-async function requireLinkedPartner(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const partner = await netureService.getPartnerByUserId(authReq.user.id);
-  if (!partner) {
-    res.status(401).json({ success: false, error: { code: 'NO_PARTNER', message: 'No linked partner account found' } });
-    return;
-  }
-  (req as PartnerRequest).partnerId = partner.id;
-  next();
-}
 
 // ==================== Supplier Onboarding (WO-NETURE-SUPPLIER-ONBOARDING-REALIGN-V1) ====================
 
@@ -1451,28 +1329,9 @@ router.get('/supplier/orders/kpi', requireAuth, requireLinkedSupplier, async (re
   try {
     const supplierId = (req as SupplierRequest).supplierId;
 
-    const result = await AppDataSource.query(
-      `SELECT
-         COUNT(DISTINCT o.id) FILTER (WHERE o.created_at >= CURRENT_DATE)::int AS today_orders,
-         COUNT(DISTINCT o.id) FILTER (WHERE o.status IN ('created', 'paid'))::int AS pending_processing,
-         COUNT(DISTINCT o.id) FILTER (WHERE o.status = 'preparing')::int AS pending_shipping,
-         COUNT(DISTINCT o.id)::int AS total_orders
-       FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE spo.supplier_id = $1`,
-      [supplierId],
-    );
+    const data = await supplierOrdersService.getOrderKpi(supplierId);
 
-    res.json({
-      success: true,
-      data: {
-        today_orders: Number(result[0]?.today_orders || 0),
-        pending_processing: Number(result[0]?.pending_processing || 0),
-        pending_shipping: Number(result[0]?.pending_shipping || 0),
-        total_orders: Number(result[0]?.total_orders || 0),
-      },
-    });
+    res.json({ success: true, data });
   } catch (error) {
     logger.error('[Neture API] Error fetching supplier order KPI:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch order KPI' });
@@ -1488,44 +1347,9 @@ router.get('/supplier/orders', requireAuth, requireLinkedSupplier, async (req: A
     const supplierId = (req as SupplierRequest).supplierId;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
     const status = req.query.status as string | undefined;
 
-    const baseParams: any[] = [supplierId];
-    let statusClause = '';
-    if (status) {
-      statusClause = 'AND o.status = $2';
-      baseParams.push(status);
-    }
-
-    const [orders, countResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT DISTINCT ON (o.created_at, o.id)
-                o.id, o.order_number, o.status, o.total_amount, o.shipping_fee,
-                o.final_amount, o.orderer_name, o.orderer_phone, o.orderer_email,
-                o.shipping, o.note, o.created_at, o.updated_at,
-                (SELECT COUNT(*)::int FROM neture_order_items oi2
-                 JOIN supplier_product_offers spo2 ON spo2.id = oi2.product_id::uuid
-                 WHERE oi2.order_id = o.id AND spo2.supplier_id = $1) AS item_count
-         FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE spo.supplier_id = $1 ${statusClause}
-         ORDER BY o.created_at DESC, o.id
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      AppDataSource.query(
-        `SELECT COUNT(DISTINCT o.id)::int AS total
-         FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE spo.supplier_id = $1 ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
+    const { orders, total } = await supplierOrdersService.listOrders(supplierId, { page, limit, status });
 
     const data = orders.map((o: any) => {
       const shippingParsed = typeof o.shipping === 'string' ? JSON.parse(o.shipping) : o.shipping;
@@ -1563,14 +1387,8 @@ router.get('/supplier/orders/:id', requireAuth, requireLinkedSupplier, async (re
     }
 
     // Ownership check: order must contain this supplier's products
-    const ownerCheck = await AppDataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
-      [orderId, supplierId],
-    );
-
-    if (Number(ownerCheck[0]?.cnt) === 0) {
+    const isOwner = await supplierOrdersService.checkOrderOwnership(orderId, supplierId);
+    if (!isOwner) {
       return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
     }
 
@@ -1583,21 +1401,7 @@ router.get('/supplier/orders/:id', requireAuth, requireLinkedSupplier, async (re
     // Enrich items with supplier/product master info (same pattern as seller/orders/:id)
     if (order.items && order.items.length > 0) {
       const productIds = order.items.map((i: any) => i.product_id);
-
-      const enrichments = await AppDataSource.query(
-        `SELECT spo.id AS offer_id,
-                s.id AS supplier_id, s.name AS supplier_name,
-                s.contact_phone AS supplier_phone, s.contact_website AS supplier_website,
-                pm.brand_name, pm.specification, pm.barcode,
-                pi.image_url AS primary_image_url
-         FROM supplier_product_offers spo
-         JOIN neture_suppliers s ON s.id = spo.supplier_id
-         JOIN product_masters pm ON pm.id = spo.master_id
-         LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
-         WHERE spo.id = ANY($1::uuid[])`,
-        [productIds],
-      );
-
+      const enrichments = await supplierOrdersService.getOrderItemEnrichments(productIds);
       const enrichMap = new Map<string, any>(enrichments.map((e: any) => [e.offer_id, e]));
 
       order.items = order.items.map((item: any) => {
@@ -1643,14 +1447,8 @@ router.patch('/supplier/orders/:id/status', requireAuth, requireActiveSupplier, 
     }
 
     // Ownership check
-    const ownerCheck = await AppDataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
-      [orderId, supplierId],
-    );
-
-    if (Number(ownerCheck[0]?.cnt) === 0) {
+    const isOwner = await supplierOrdersService.checkOrderOwnership(orderId, supplierId);
+    if (!isOwner) {
       return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
     }
 
@@ -1710,13 +1508,8 @@ router.post('/supplier/orders/:orderId/shipment', requireAuth, requireActiveSupp
     }
 
     // Ownership check
-    const ownerCheck = await AppDataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
-      [orderId, supplierId],
-    );
-    if (Number(ownerCheck[0]?.cnt) === 0) {
+    const isOwner = await supplierOrdersService.checkOrderOwnership(orderId, supplierId);
+    if (!isOwner) {
       return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
     }
 
@@ -1730,21 +1523,15 @@ router.post('/supplier/orders/:orderId/shipment', requireAuth, requireActiveSupp
     }
 
     // Check if shipment already exists
-    const existing = await AppDataSource.query(
-      `SELECT id FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
-      [orderId, supplierId],
-    );
-    if (existing.length > 0) {
+    const shipmentExists = await supplierOrdersService.checkShipmentExists(orderId, supplierId);
+    if (shipmentExists) {
       return res.status(409).json({ success: false, error: 'SHIPMENT_EXISTS', message: 'Shipment already registered for this order' });
     }
 
     // Create shipment
-    const [shipment] = await AppDataSource.query(
-      `INSERT INTO neture_shipments (order_id, supplier_id, carrier_code, carrier_name, tracking_number, status, shipped_at)
-       VALUES ($1, $2, $3, $4, $5, 'shipped', NOW())
-       RETURNING *`,
-      [orderId, supplierId, carrier_code, carrier_name, tracking_number],
-    );
+    const shipment = await supplierOrdersService.createShipment({
+      orderId, supplierId, carrierCode: carrier_code, carrierName: carrier_name, trackingNumber: tracking_number,
+    });
 
     // Auto-transition order status to 'shipped'
     await legacyNetureService.updateOrderStatus(orderId, { status: NetureOrderStatus.SHIPPED });
@@ -1766,22 +1553,13 @@ router.get('/supplier/orders/:orderId/shipment', requireAuth, requireLinkedSuppl
     const { orderId } = req.params;
 
     // Ownership check
-    const ownerCheck = await AppDataSource.query(
-      `SELECT COUNT(*)::int AS cnt FROM neture_order_items oi
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE oi.order_id = $1 AND spo.supplier_id = $2`,
-      [orderId, supplierId],
-    );
-    if (Number(ownerCheck[0]?.cnt) === 0) {
+    const isOwner = await supplierOrdersService.checkOrderOwnership(orderId, supplierId);
+    if (!isOwner) {
       return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
     }
 
-    const rows = await AppDataSource.query(
-      `SELECT * FROM neture_shipments WHERE order_id = $1 AND supplier_id = $2 LIMIT 1`,
-      [orderId, supplierId],
-    );
-
-    res.json({ success: true, data: rows[0] || null });
+    const shipment = await supplierOrdersService.getShipmentByOrderAndSupplier(orderId, supplierId);
+    res.json({ success: true, data: shipment });
   } catch (error) {
     logger.error('[Neture API] Error fetching shipment:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch shipment' });
@@ -1803,15 +1581,10 @@ router.patch('/supplier/shipments/:id', requireAuth, requireActiveSupplier, asyn
     }
 
     // Fetch shipment with ownership check
-    const rows = await AppDataSource.query(
-      `SELECT * FROM neture_shipments WHERE id = $1 AND supplier_id = $2 LIMIT 1`,
-      [shipmentId, supplierId],
-    );
-    if (rows.length === 0) {
+    const shipment = await supplierOrdersService.getShipmentById(shipmentId, supplierId);
+    if (!shipment) {
       return res.status(404).json({ success: false, error: 'SHIPMENT_NOT_FOUND', message: 'Shipment not found' });
     }
-
-    const shipment = rows[0];
 
     // Validate status transition
     const allowed = SHIPMENT_STATUS_TRANSITIONS[shipment.status] || [];
@@ -1823,26 +1596,8 @@ router.patch('/supplier/shipments/:id', requireAuth, requireActiveSupplier, asyn
       });
     }
 
-    // Build update query
-    const setClauses = [`status = $1`, `updated_at = NOW()`];
-    const params: any[] = [status];
-    let paramIdx = 2;
-
-    if (status === 'delivered') {
-      setClauses.push(`delivered_at = NOW()`);
-    }
-
-    if (tracking_number) {
-      setClauses.push(`tracking_number = $${paramIdx}`);
-      params.push(tracking_number);
-      paramIdx++;
-    }
-
-    params.push(shipmentId);
-    const [updated] = await AppDataSource.query(
-      `UPDATE neture_shipments SET ${setClauses.join(', ')} WHERE id = $${paramIdx} RETURNING *`,
-      params,
-    );
+    // Update shipment
+    const updated = await supplierOrdersService.updateShipmentStatus(shipmentId, { status, trackingNumber: tracking_number });
 
     // Auto-transition order status to 'delivered' if shipment delivered
     if (status === 'delivered') {

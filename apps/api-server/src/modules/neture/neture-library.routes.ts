@@ -10,78 +10,14 @@
 import { Router, Request, Response } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { requireAuth } from '../../middleware/auth.middleware.js';
-import { SupplierStatus } from './entities/index.js';
-import { NetureService } from './neture.service.js';
 import { NetureLibraryService } from './services/neture-library.service.js';
 import { AppDataSource } from '../../database/connection.js';
 import logger from '../../utils/logger.js';
+import { requireActiveSupplier, requireLinkedSupplier } from './middleware/supplier.middleware.js';
+import type { SupplierRequest } from './middleware/types.js';
 
 const router: ExpressRouter = Router();
-const netureService = new NetureService();
 const libraryService = new NetureLibraryService(AppDataSource);
-
-// ============================================================================
-// Request Types
-// ============================================================================
-
-type AuthenticatedRequest = Request & {
-  user?: {
-    id: string;
-    role: string;
-    supplierId?: string;
-  };
-};
-
-type SupplierRequest = AuthenticatedRequest & {
-  supplierId: string;
-};
-
-// ============================================================================
-// Supplier Middleware (동일 패턴: neture.routes.ts lines 184-225)
-// ============================================================================
-
-/**
- * 쓰기 작업용 — ACTIVE 상태만 허용
- */
-async function requireActiveSupplier(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-  if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
-    return;
-  }
-  if (supplier.status !== SupplierStatus.ACTIVE) {
-    res.status(403).json({
-      success: false,
-      error: { code: 'SUPPLIER_NOT_ACTIVE', message: `Supplier account is ${supplier.status}. Only ACTIVE suppliers can perform this action.` },
-    });
-    return;
-  }
-  (req as SupplierRequest).supplierId = supplier.id;
-  next();
-}
-
-/**
- * 읽기 작업용 — 모든 상태 허용 (PENDING 포함)
- */
-async function requireLinkedSupplier(req: Request, res: Response, next: () => void): Promise<void> {
-  const authReq = req as AuthenticatedRequest;
-  if (!authReq.user?.id) {
-    res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
-    return;
-  }
-  const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-  if (!supplier) {
-    res.status(401).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
-    return;
-  }
-  (req as SupplierRequest).supplierId = supplier.id;
-  next();
-}
 
 // ============================================================================
 // Public Endpoint (인증 불필요)
