@@ -9,6 +9,7 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore, OrganizationChannel } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
+import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -168,6 +169,19 @@ export function createOrganizationController(
           }
         } catch (seedErr: any) {
           console.warn('[OrgCreate] Failed to seed base channels:', seedErr.message);
+        }
+
+        // WO-O4O-KPA-STORE-SLUG-REGISTRATION-V1: Storefront slug 자동 등록
+        try {
+          const slugService = new StoreSlugService(dataSource);
+          const slug = await slugService.generateUniqueSlug(saved.name);
+          await slugService.reserveSlug({
+            storeId: saved.id,
+            serviceKey: 'kpa',
+            slug,
+          });
+        } catch (slugErr: any) {
+          console.warn('[OrgCreate] Failed to register slug:', slugErr.message);
         }
 
         // WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: Tier 1 자동 확산
