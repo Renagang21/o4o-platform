@@ -661,6 +661,101 @@ export interface PartnerSettlementsResponse {
   meta: { page: number; limit: number; total: number; totalPages: number };
 }
 
+// ==================== Admin Partner Monitoring (WO-O4O-ADMIN-PARTNER-MONITORING-V1) ====================
+
+export interface PartnerMonitoringItem {
+  partner_id: string;
+  name: string;
+  email: string;
+  orders: number;
+  commission: number;
+  payable: number;
+  paid: number;
+  first_commission_at: string | null;
+}
+
+export interface PartnerMonitoringKpi {
+  total_partners: number;
+  total_commission: number;
+  total_payable: number;
+  total_paid: number;
+}
+
+export interface PartnerMonitoringCommission {
+  id: string;
+  order_id: string;
+  order_number: string;
+  product_name: string | null;
+  store_name: string | null;
+  commission_amount: number;
+  status: string;
+  created_at: string;
+}
+
+export interface PartnerMonitoringDetail {
+  partner_id: string;
+  name: string;
+  email: string;
+  orders: number;
+  commission: number;
+  payable: number;
+  paid: number;
+  commissions: PartnerMonitoringCommission[];
+}
+
+export interface PartnerMonitoringListResponse {
+  data: PartnerMonitoringItem[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+  kpi: PartnerMonitoringKpi;
+}
+
+export const adminPartnerMonitoringApi = {
+  async getPartners(params?: { page?: number; limit?: number; search?: string }): Promise<PartnerMonitoringListResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.append('page', String(params.page));
+      if (params?.limit) sp.append('limit', String(params.limit));
+      if (params?.search) sp.append('search', params.search);
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partners${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) {
+        return {
+          data: [],
+          meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
+          kpi: { total_partners: 0, total_commission: 0, total_payable: 0, total_paid: 0 },
+        };
+      }
+      const result = await response.json();
+      return {
+        data: result.data || [],
+        meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 },
+        kpi: result.kpi || { total_partners: 0, total_commission: 0, total_payable: 0, total_paid: 0 },
+      };
+    } catch {
+      return {
+        data: [],
+        meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
+        kpi: { total_partners: 0, total_commission: 0, total_payable: 0, total_paid: 0 },
+      };
+    }
+  },
+
+  async getDetail(partnerId: string): Promise<PartnerMonitoringDetail | null> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/partners/${partnerId}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch { return null; }
+  },
+};
+
 export const adminPartnerSettlementApi = {
   /** POST /api/v1/neture/admin/partner-settlements — 정산 배치 생성 */
   async create(partnerId: string): Promise<{ success: boolean; data?: PartnerSettlement; error?: string }> {

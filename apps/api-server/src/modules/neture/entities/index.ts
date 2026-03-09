@@ -15,3 +15,5 @@ export { SupplierCsvImportBatch, CsvImportBatchStatus } from './SupplierCsvImpor
 export { SupplierCsvImportRow, CsvRowValidationStatus, CsvRowActionType } from './SupplierCsvImportRow.entity.js';
 export { NetureSupplierLibraryItem } from './NetureSupplierLibraryItem.entity.js';
 export { ProductImage } from './ProductImage.entity.js';
+export { NetureSettlement } from './neture-settlement.entity.js';
+export { NetureSettlementOrder } from './neture-settlement-order.entity.js';

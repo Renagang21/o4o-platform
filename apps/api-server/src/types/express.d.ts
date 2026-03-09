@@ -29,6 +29,7 @@ declare global {
         userId?: string;
         email?: string;
         role?: string;
+        roles?: string[];
         status?: string;
         name?: string;
         firstName?: string;
@@ -38,6 +39,24 @@ declare global {
         domain?: string;
         betaUserId?: string;
         [key: string]: unknown;
+      };
+
+      /**
+       * Organization ID — set by store auth middleware
+       * WO-O4O-AUTH-CONTEXT-UNIFICATION-V1
+       */
+      organizationId?: string;
+
+      /**
+       * Unified auth context — set by requireStoreAuth / optionalStoreAuth
+       * WO-O4O-AUTH-CONTEXT-UNIFICATION-V1
+       */
+      authContext?: {
+        userId: string;
+        organizationId: string;
+        memberRole: string;
+        roles: string[];
+        serviceKey?: string;
       };
     }
   }

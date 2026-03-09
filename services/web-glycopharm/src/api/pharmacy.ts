@@ -190,6 +190,65 @@ export interface ProductAiInsightData {
   createdAt: string;
 }
 
+// Product AI Tag 응답 (WO-O4O-PRODUCT-AI-TAGGING-V1)
+export interface ProductAiTagData {
+  id: string;
+  tag: string;
+  confidence: number;
+  source: 'ai' | 'manual';
+  model?: string | null;
+  createdAt: string;
+}
+
+// AI 추천 상품 (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
+export interface RecommendedProductData {
+  id: string;
+  regulatoryName: string;
+  marketingName: string;
+  tags: string[];
+  specification: string | null;
+  categoryName: string | null;
+  brandName: string | null;
+  matchingTags: number;
+  score: number;
+  reason: string;
+}
+
+// KPI 요약 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+export interface KpiSummaryData {
+  todayOrders: number;
+  weekOrders: number;
+  monthOrders: number;
+  monthRevenue: number;
+  avgOrderValue: number;
+  lastMonthRevenue: number;
+}
+
+// 상품 스냅샷 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+export interface ProductSnapshotData {
+  id: string;
+  organizationId: string;
+  productId: string;
+  productName: string;
+  snapshotDate: string;
+  qrScans: number;
+  orders: number;
+  revenue: number;
+  conversionRate: number;
+}
+
+// AI Tag 검색 결과 (WO-O4O-AI-TAG-SEARCH-V1)
+export interface ProductSearchResultData {
+  id: string;
+  regulatoryName: string;
+  marketingName: string;
+  tags: string[];
+  specification: string | null;
+  categoryName: string | null;
+  brandName: string | null;
+  score: number;
+}
+
 class PharmacyApiClient {
   private baseUrl: string;
 
@@ -321,6 +380,72 @@ class PharmacyApiClient {
    */
   async createProductAiSnapshot(): Promise<StoreApiResponse<{ count: number }>> {
     return this.request('/api/v1/store-hub/ai/products/snapshot', { method: 'POST' });
+  }
+
+  /**
+   * 상품 AI 태그 조회 (WO-O4O-PRODUCT-AI-TAGGING-V1)
+   */
+  async getProductAiTags(productId: string): Promise<StoreApiResponse<{ aiTags: ProductAiTagData[]; manualTags: ProductAiTagData[] }>> {
+    return this.request(`/api/v1/products/${productId}/ai-tags`);
+  }
+
+  /**
+   * 상품 AI 태그 재생성 (WO-O4O-PRODUCT-AI-TAGGING-V1)
+   */
+  async regenerateProductAiTags(productId: string): Promise<StoreApiResponse<{ message: string }>> {
+    return this.request(`/api/v1/products/${productId}/ai-tags/regenerate`, { method: 'POST' });
+  }
+
+  /**
+   * 수동 태그 추가 (WO-O4O-PRODUCT-AI-TAGGING-V1)
+   */
+  async addProductManualTag(productId: string, tag: string): Promise<StoreApiResponse<ProductAiTagData>> {
+    return this.request(`/api/v1/products/${productId}/ai-tags/manual`, {
+      method: 'POST',
+      body: JSON.stringify({ tag }),
+    });
+  }
+
+  /**
+   * 태그 삭제 (WO-O4O-PRODUCT-AI-TAGGING-V1)
+   */
+  async deleteProductAiTag(productId: string, tagId: string): Promise<StoreApiResponse<void>> {
+    return this.request(`/api/v1/products/${productId}/ai-tags/${tagId}`, { method: 'DELETE' });
+  }
+
+  /**
+   * AI 태그 기반 상품 검색 (WO-O4O-AI-TAG-SEARCH-V1)
+   */
+  async searchProductsByAiTag(query: string): Promise<StoreApiResponse<{ products: ProductSearchResultData[]; query: string; total: number }>> {
+    return this.request(`/api/v1/products/search/ai?q=${encodeURIComponent(query)}`);
+  }
+
+  /**
+   * 태그 기반 상품 추천 (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
+   */
+  async getProductRecommendations(tags: string[]): Promise<StoreApiResponse<{ products: RecommendedProductData[]; total: number; context: string }>> {
+    return this.request(`/api/v1/products/recommend?tags=${encodeURIComponent(tags.join(','))}`);
+  }
+
+  /**
+   * 매장 컨텍스트 기반 상품 추천 (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
+   */
+  async getStoreProductRecommendations(): Promise<StoreApiResponse<{ products: RecommendedProductData[]; total: number; context: string }>> {
+    return this.request('/api/v1/products/recommend/store');
+  }
+
+  /**
+   * KPI 요약 조회 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+   */
+  async getKpiSummary(): Promise<StoreApiResponse<KpiSummaryData>> {
+    return this.request('/api/v1/store-hub/kpi-summary');
+  }
+
+  /**
+   * 상품 스냅샷 조회 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
+   */
+  async getProductSnapshots(): Promise<StoreApiResponse<ProductSnapshotData[]>> {
+    return this.request('/api/v1/store-hub/ai/products/snapshots');
   }
 
   /**

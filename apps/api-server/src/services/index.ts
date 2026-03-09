@@ -3,7 +3,7 @@
 // Export all service files
 export * from './AnalyticsService.js';
 export * from './AuthService.js';
-export * from './AuthServiceV2.js';
+// AuthServiceV2 removed (WO-O4O-LEGACY-CLEANUP-V1)
 export * from './AutoRecoveryService.js';
 export * from './AutoScalingService.js';
 export * from './BackupService.js';
@@ -56,6 +56,7 @@ export * from './sessionSyncService.js';
 export * from './settingsService.js';
 export * from './socialAuthService.js';
 // export * from './webhookService.js';
+export * from './service-registry.service.js';
 
 // Export shipping services
 // export * from './shipping/ShippingService.js';

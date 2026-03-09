@@ -16,8 +16,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import type { AuthRequest } from '../../../types/auth.js';
-import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { OrganizationProductChannel } from '../../kpa/entities/organization-product-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
@@ -34,28 +33,7 @@ export function createStoreChannelProductsController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
-
-  /**
-   * Auth guard: pharmacy owner + resolve organizationId
-   * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-   */
-  async function resolveOrgContext(req: Request, res: Response): Promise<{ userId: string; organizationId: string } | null> {
-    const authReq = req as AuthRequest;
-    const userId = authReq.user?.id;
-    if (!userId) {
-      res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-      return null;
-    }
-
-    const userRoles: string[] = authReq.user?.roles || [];
-    const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
-    if (!organizationId) {
-      res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: 'Pharmacy owner or operator role required' } });
-      return null;
-    }
-
-    return { userId, organizationId };
-  }
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
 
   /**
    * Validate channel belongs to org and is a product-manageable type.
@@ -98,13 +76,13 @@ export function createStoreChannelProductsController(
   router.get(
     '/:channelId',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const ctx = await resolveOrgContext(req, res);
-        if (!ctx) return;
+        const organizationId = req.organizationId!;
 
         const { channelId } = req.params;
-        const channelType = await validateChannel(channelId, ctx.organizationId, res);
+        const channelType = await validateChannel(channelId, organizationId, res);
         if (!channelType) return;
 
         const products = await dataSource.query(
@@ -126,7 +104,7 @@ export function createStoreChannelProductsController(
            WHERE opc.channel_id = $1
              AND oc.organization_id = $2
            ORDER BY opc.display_order ASC, opc.created_at ASC`,
-          [channelId, ctx.organizationId]
+          [channelId, organizationId]
         );
 
         res.json({ success: true, data: products });
@@ -140,13 +118,13 @@ export function createStoreChannelProductsController(
   router.get(
     '/:channelId/available',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const ctx = await resolveOrgContext(req, res);
-        if (!ctx) return;
+        const organizationId = req.organizationId!;
 
         const { channelId } = req.params;
-        const channelType = await validateChannel(channelId, ctx.organizationId, res);
+        const channelType = await validateChannel(channelId, organizationId, res);
         if (!channelType) return;
 
         const available = await dataSource.query(
@@ -167,7 +145,7 @@ export function createStoreChannelProductsController(
                WHERE channel_id = $2 AND is_active = true
              )
            ORDER BY pm.marketing_name ASC`,
-          [ctx.organizationId, channelId]
+          [organizationId, channelId]
         );
 
         res.json({ success: true, data: available });
@@ -181,10 +159,10 @@ export function createStoreChannelProductsController(
   router.post(
     '/:channelId',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const ctx = await resolveOrgContext(req, res);
-        if (!ctx) return;
+        const organizationId = req.organizationId!;
 
         const { channelId } = req.params;
         const { productListingId } = req.body;
@@ -195,13 +173,13 @@ export function createStoreChannelProductsController(
         }
 
         // Validate channel (requireApproved: mutation)
-        const channelType = await validateChannel(channelId, ctx.organizationId, res, true);
+        const channelType = await validateChannel(channelId, organizationId, res, true);
         if (!channelType) return;
 
         // Validate product listing belongs to same org and is active
         const listings = await dataSource.query(
           `SELECT id FROM organization_product_listings WHERE id = $1 AND organization_id = $2 AND is_active = true`,
-          [productListingId, ctx.organizationId]
+          [productListingId, organizationId]
         );
         if (listings.length === 0) {
           res.status(404).json({ success: false, error: { code: 'LISTING_NOT_FOUND', message: 'Product listing not found or inactive' } });
@@ -260,10 +238,10 @@ export function createStoreChannelProductsController(
   router.patch(
     '/:channelId/reorder',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const ctx = await resolveOrgContext(req, res);
-        if (!ctx) return;
+        const organizationId = req.organizationId!;
 
         const { channelId } = req.params;
         const { items } = req.body;
@@ -274,7 +252,7 @@ export function createStoreChannelProductsController(
         }
 
         // Validate channel (requireApproved: mutation)
-        const channelType = await validateChannel(channelId, ctx.organizationId, res, true);
+        const channelType = await validateChannel(channelId, organizationId, res, true);
         if (!channelType) return;
 
         // Validate all items belong to this channel
@@ -315,15 +293,15 @@ export function createStoreChannelProductsController(
   router.patch(
     '/:channelId/:productChannelId/deactivate',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const ctx = await resolveOrgContext(req, res);
-        if (!ctx) return;
+        const organizationId = req.organizationId!;
 
         const { channelId, productChannelId } = req.params;
 
         // Validate channel ownership (requireApproved: mutation)
-        const channelType = await validateChannel(channelId, ctx.organizationId, res, true);
+        const channelType = await validateChannel(channelId, organizationId, res, true);
         if (!channelType) return;
 
         // Find and validate the product-channel mapping

@@ -199,6 +199,9 @@ import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.en
 import { StoreAiProductSnapshot } from '../modules/store-ai/entities/store-ai-product-snapshot.entity.js';
 import { StoreAiProductInsight } from '../modules/store-ai/entities/store-ai-product-insight.entity.js';
 
+// PRODUCT AI TAG (WO-O4O-PRODUCT-AI-TAGGING-V1)
+import { ProductAiTag } from '../modules/store-ai/entities/product-ai-tag.entity.js';
+
 // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
 import { AssetSnapshot } from '../modules/asset-snapshot/entities/asset-snapshot.entity.js';
 
@@ -232,6 +235,8 @@ import {
   SupplierCsvImportRow,
   NetureSupplierLibraryItem,
   ProductImage,
+  NetureSettlement,
+  NetureSettlementOrder,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -706,6 +711,8 @@ export const AppDataSource = new DataSource({
     SupplierCsvImportRow,
     NetureSupplierLibraryItem,
     ProductImage,
+    NetureSettlement,
+    NetureSettlementOrder,
     // ============================================================================
     // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     // ============================================================================
@@ -879,6 +886,7 @@ export const AppDataSource = new DataSource({
     StoreAiInsight,
     StoreAiProductSnapshot,
     StoreAiProductInsight,
+    ProductAiTag,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================

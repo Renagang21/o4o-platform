@@ -38,59 +38,9 @@ import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-
 import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
 import { StoreProductProfile } from '../../modules/neture/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
-import type { AuthRequest } from '../../types/auth.js';
-import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
+import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 
 type AuthMiddleware = import('express').RequestHandler;
-
-// ─────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────
-
-/**
- * Authenticates request and extracts organizationId.
- * Returns null if auth fails (response already sent).
- *
- * WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
- */
-async function authenticateAndGetOrg(
-  dataSource: DataSource,
-  req: Request,
-  res: Response,
-  authMiddleware: AuthMiddleware,
-): Promise<string | null> {
-  try {
-    await new Promise<void>((resolve, reject) => {
-      (authMiddleware as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
-    });
-  } catch {
-    return null;
-  }
-
-  const authReq = req as AuthRequest;
-  const userId = authReq.user?.id;
-  if (!userId) {
-    res.status(403).json({
-      success: false,
-      error: 'Store owner or operator role required',
-      code: 'FORBIDDEN',
-    });
-    return null;
-  }
-
-  const userRoles: string[] = authReq.user?.roles || [];
-  const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
-  if (!organizationId) {
-    res.status(403).json({
-      success: false,
-      error: 'Store owner or operator role required',
-      code: 'FORBIDDEN',
-    });
-    return null;
-  }
-
-  return organizationId;
-}
 
 // ─────────────────────────────────────────────────────
 // Display Guard — 상품 존재 검증
@@ -147,14 +97,42 @@ export function createStoreTabletRoutes(
   dataSource: DataSource,
 ): Router {
   const router = Router();
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
 
-  let requireAuth: AuthMiddleware;
-  async function getAuth(): Promise<AuthMiddleware> {
-    if (!requireAuth) {
+  // Lazy-loaded requireAuth middleware
+  let _requireAuth: AuthMiddleware;
+  async function getRequireAuth(): Promise<AuthMiddleware> {
+    if (!_requireAuth) {
       const mod = await import('../../middleware/auth.middleware.js');
-      requireAuth = mod.requireAuth as AuthMiddleware;
+      _requireAuth = mod.requireAuth as AuthMiddleware;
     }
-    return requireAuth;
+    return _requireAuth;
+  }
+
+  /**
+   * Helper: applies requireAuth + requirePharmacyOwner, then calls handler.
+   * Replaces the old authenticateAndGetOrg pattern.
+   */
+  function withStoreAuth(handler: (req: Request, res: Response, organizationId: string) => Promise<void>) {
+    return async (req: Request, res: Response): Promise<void> => {
+      try {
+        const auth = await getRequireAuth();
+        await new Promise<void>((resolve, reject) => {
+          (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+        });
+      } catch {
+        return;
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        (requirePharmacyOwner as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+      }).catch(() => { /* response already sent by middleware */ });
+
+      if (res.headersSent) return;
+
+      const organizationId = req.organizationId!;
+      await handler(req, res, organizationId);
+    };
   }
 
   // ─── Tablet CRUD ───────────────────────────────────
@@ -163,12 +141,8 @@ export function createStoreTabletRoutes(
    * GET /tablets
    * 매장 태블릿 목록
    */
-  router.get('/tablets', async (req: Request, res: Response): Promise<void> => {
+  router.get('/tablets', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tablets = await dataSource.query(
         `SELECT id, name, location, is_active, created_at
          FROM store_tablets
@@ -186,18 +160,14 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * POST /tablets
    * 태블릿 등록
    */
-  router.post('/tablets', async (req: Request, res: Response): Promise<void> => {
+  router.post('/tablets', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const { name, location } = req.body;
 
       if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -227,18 +197,14 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * PUT /tablets/:id
    * 태블릿 수정
    */
-  router.put('/tablets/:id', async (req: Request, res: Response): Promise<void> => {
+  router.put('/tablets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tabletId = req.params.id;
       const repo = dataSource.getRepository(StoreTablet);
       const existing = await repo.findOne({
@@ -270,18 +236,14 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * DELETE /tablets/:id
    * 태블릿 비활성화 (soft delete)
    */
-  router.delete('/tablets/:id', async (req: Request, res: Response): Promise<void> => {
+  router.delete('/tablets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tabletId = req.params.id;
       const result = await dataSource.query(
         `UPDATE store_tablets SET is_active = false
@@ -307,7 +269,7 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   // ─── Display Management ────────────────────────────
 
@@ -315,12 +277,8 @@ export function createStoreTabletRoutes(
    * GET /tablets/:id/displays
    * 태블릿 진열 구성 조회
    */
-  router.get('/tablets/:id/displays', async (req: Request, res: Response): Promise<void> => {
+  router.get('/tablets/:id/displays', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tabletId = req.params.id;
 
       // Verify tablet ownership
@@ -354,7 +312,7 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * PUT /tablets/:id/displays
@@ -364,12 +322,8 @@ export function createStoreTabletRoutes(
    *
    * Phase 3 Guard: 각 상품의 존재 + 소유권 검증
    */
-  router.put('/tablets/:id/displays', async (req: Request, res: Response): Promise<void> => {
+  router.put('/tablets/:id/displays', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tabletId = req.params.id;
 
       // Verify tablet ownership
@@ -448,7 +402,7 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   // ─── Product Pool ──────────────────────────────────
 
@@ -458,12 +412,8 @@ export function createStoreTabletRoutes(
    *
    * 반환: { supplierProducts: [...], localProducts: [...] }
    */
-  router.get('/tablets/:id/product-pool', async (req: Request, res: Response): Promise<void> => {
+  router.get('/tablets/:id/product-pool', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const tabletId = req.params.id;
 
       // Verify tablet ownership
@@ -518,7 +468,7 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   // ─── Barcode Product Registration (WO-O4O-TABLET-MODULE-V1) ──
 
@@ -528,12 +478,8 @@ export function createStoreTabletRoutes(
    *
    * Body: { barcode: string }
    */
-  router.post('/products/register-by-barcode', async (req: Request, res: Response): Promise<void> => {
+  router.post('/products/register-by-barcode', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const { barcode } = req.body;
       if (!barcode || typeof barcode !== 'string') {
         res.status(400).json({
@@ -607,7 +553,7 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   // ─── Interest Request Staff Routes (WO-O4O-TABLET-MODULE-V1) ──
 
@@ -623,12 +569,8 @@ export function createStoreTabletRoutes(
    * GET /interest/pending-count
    * 미확인 관심 요청 건수 (3초 폴링용 — 경량 COUNT)
    */
-  router.get('/interest/pending-count', async (req: Request, res: Response): Promise<void> => {
+  router.get('/interest/pending-count', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const result: Array<{ count: string }> = await dataSource.query(
         `SELECT COUNT(*)::int AS count
          FROM tablet_interest_requests
@@ -648,18 +590,14 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * GET /interest/recent
    * 최근 관심 요청 목록 (REQUESTED + ACKNOWLEDGED, 최신 50건)
    */
-  router.get('/interest/recent', async (req: Request, res: Response): Promise<void> => {
+  router.get('/interest/recent', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const interestRepo = dataSource.getRepository(TabletInterestRequest);
       const requests = await interestRepo.find({
         where: {
@@ -691,18 +629,14 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * GET /interest/stats
    * 대시보드용 관심 요청 통계
    */
-  router.get('/interest/stats', async (req: Request, res: Response): Promise<void> => {
+  router.get('/interest/stats', withStoreAuth(async (req, res, organizationId) => {
     try {
-      const auth = await getAuth();
-      const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-      if (!organizationId) return;
-
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -757,31 +691,31 @@ export function createStoreTabletRoutes(
         code: 'INTERNAL_ERROR',
       });
     }
-  });
+  }));
 
   /**
    * PATCH /interest/:id/acknowledge
    * 관심 요청 확인 처리
    */
-  router.patch('/interest/:id/acknowledge', async (req: Request, res: Response): Promise<void> => {
-    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.ACKNOWLEDGED, INTEREST_TRANSITIONS);
-  });
+  router.patch('/interest/:id/acknowledge', withStoreAuth(async (req, res, organizationId) => {
+    await handleInterestTransition(dataSource, req, res, organizationId, InterestRequestStatus.ACKNOWLEDGED, INTEREST_TRANSITIONS);
+  }));
 
   /**
    * PATCH /interest/:id/complete
    * 관심 요청 완료 처리
    */
-  router.patch('/interest/:id/complete', async (req: Request, res: Response): Promise<void> => {
-    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.COMPLETED, INTEREST_TRANSITIONS);
-  });
+  router.patch('/interest/:id/complete', withStoreAuth(async (req, res, organizationId) => {
+    await handleInterestTransition(dataSource, req, res, organizationId, InterestRequestStatus.COMPLETED, INTEREST_TRANSITIONS);
+  }));
 
   /**
    * PATCH /interest/:id/cancel
    * 관심 요청 취소 처리
    */
-  router.patch('/interest/:id/cancel', async (req: Request, res: Response): Promise<void> => {
-    await handleInterestTransition(dataSource, req, res, getAuth, InterestRequestStatus.CANCELLED, INTEREST_TRANSITIONS);
-  });
+  router.patch('/interest/:id/cancel', withStoreAuth(async (req, res, organizationId) => {
+    await handleInterestTransition(dataSource, req, res, organizationId, InterestRequestStatus.CANCELLED, INTEREST_TRANSITIONS);
+  }));
 
   return router;
 }
@@ -794,15 +728,11 @@ async function handleInterestTransition(
   dataSource: DataSource,
   req: Request,
   res: Response,
-  getAuth: () => Promise<import('express').RequestHandler>,
+  organizationId: string,
   targetStatus: InterestRequestStatus,
   transitions: Record<string, InterestRequestStatus[]>,
 ): Promise<void> {
   try {
-    const auth = await getAuth();
-    const organizationId = await authenticateAndGetOrg(dataSource, req, res, auth);
-    if (!organizationId) return;
-
     const { id } = req.params;
     const interestRepo = dataSource.getRepository(TabletInterestRequest);
 

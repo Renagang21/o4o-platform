@@ -1,712 +1,357 @@
 /**
- * SupplierDashboardPage - 공급자 대시보드 메인
+ * SupplierDashboardPage — 공급자 AI Copilot Dashboard
  *
- * Work Order: WO-NETURE-SUPPLIER-DASHBOARD-P0, P1, P2
+ * WO-O4O-SUPPLIER-COPILOT-DASHBOARD-V1
  *
- * P2 확장 내용:
- * - 운영 요약 카드 (Summary Cards)
- * - 서비스별 상태판 (Service Status Board)
- * - 최근 활동 타임라인
- * - 최소 통계 영역
- *
- * 금지사항 (HARD RULES):
- * - 주문 생성/처리 ❌
- * - 배송/반품/정산 ❌
- * - 매출 금액 계산 ❌
- * - POST/PUT/DELETE API ❌
+ * 8-Block Copilot:
+ *  1. 공급자 KPI (slate)
+ *  2. AI 공급자 요약 (indigo)
+ *  3. 상품 성과 (slate)
+ *  4. 매장 확산 (slate)
+ *  5. AI 상품 분석 (indigo)
+ *  6. 인기 상품 (slate)
+ *  7. 성장 상품 (emerald)
+ *  8. 추천 전략 (violet)
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { FileCheck, ArrowRight, RefreshCw, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { supplierApi, dashboardApi, supplierProfileApi, type SupplierRequest, type SupplierDashboardSummary, type ProfileCompleteness } from '../../lib/api';
 import {
-  SupplierSummaryCards,
-  SupplierServiceStatusBoard,
-  SupplierActivityTimeline,
-  SupplierBasicStats,
-  type SummaryData,
-  type ServiceStatus,
-  type ActivityEvent,
-  type BasicStatsData,
-} from '../../components/supplier';
-
-// 서비스 설정
-const SERVICE_CONFIG: Record<string, { name: string; icon: string; url: string; color: string }> = {
-  glycopharm: {
-    name: 'GlycoPharm',
-    icon: '🏥',
-    url: 'https://glycopharm.co.kr/pharmacy',
-    color: '#22c55e',
-  },
-  'k-cosmetics': {
-    name: 'K-Cosmetics',
-    icon: '💄',
-    url: 'https://k-cosmetics.site/seller',
-    color: '#ec4899',
-  },
-  glucoseview: {
-    name: 'GlucoseView',
-    icon: '📊',
-    url: 'https://glucoseview.co.kr/provider',
-    color: '#3b82f6',
-  },
-};
-
-// API 데이터를 컴포넌트 props 형식으로 변환
-function transformSummaryData(summary: SupplierDashboardSummary | null): SummaryData {
-  if (!summary) {
-    return {
-      activeProducts: 0,
-      pendingRequests: 0,
-      recentApprovals: 0,
-      activeOrders: 0,
-      publishedContents: 0,
-      connectedServices: 0,
-    };
-  }
-
-  return {
-    activeProducts: summary.stats.activeProducts,
-    pendingRequests: summary.stats.pendingRequests,
-    recentApprovals: summary.stats.recentApprovals,
-    activeOrders: 0, // Neture에서 주문 처리 안함
-    publishedContents: summary.stats.publishedContents,
-    connectedServices: summary.stats.connectedServices,
-  };
-}
-
-function transformServiceStatuses(summary: SupplierDashboardSummary | null): ServiceStatus[] {
-  if (!summary || summary.serviceStats.length === 0) {
-    return [];
-  }
-
-  return summary.serviceStats.map((stat) => {
-    const config = SERVICE_CONFIG[stat.serviceId] || {
-      name: stat.serviceName,
-      icon: '📦',
-      url: '#',
-      color: '#64748b',
-    };
-
-    return {
-      serviceId: stat.serviceId,
-      serviceName: config.name,
-      serviceIcon: config.icon,
-      serviceUrl: config.url,
-      requests: {
-        pending: stat.pending,
-        approved: stat.approved,
-        rejected: stat.rejected,
-      },
-      orders: { active: 0, completed: 0 }, // Neture에서 주문 처리 안함
-      activeProducts: stat.approved * 2, // 승인당 평균 2개 제품 가정
-    };
-  });
-}
-
-function transformActivityEvents(summary: SupplierDashboardSummary | null): ActivityEvent[] {
-  if (!summary || summary.recentActivity.length === 0) {
-    return [];
-  }
-
-  return summary.recentActivity
-    .filter((activity) => activity.type === 'approved' || activity.type === 'rejected')
-    .map((activity) => ({
-      id: activity.id,
-      type: activity.type === 'approved' ? 'request_approved' as const : 'request_rejected' as const,
-      title: activity.type === 'approved' ? '신청 승인' : '신청 거절',
-      description: `${activity.sellerName}님의 ${activity.productName} 신청`,
-      serviceName: activity.serviceName,
-      timestamp: activity.timestamp,
-    }));
-}
-
-function transformBasicStats(summary: SupplierDashboardSummary | null): BasicStatsData {
-  if (!summary) {
-    return {
-      approvalRate: { approved: 0, total: 0 },
-      serviceDistribution: [],
-      conversionCount: 0,
-    };
-  }
-
-  const total = summary.stats.totalRequests;
-  const approved = summary.stats.approvedRequests;
-
-  const distribution = summary.serviceStats.map((stat) => {
-    const config = SERVICE_CONFIG[stat.serviceId];
-    const count = stat.pending + stat.approved + stat.rejected;
-    return {
-      serviceId: stat.serviceId,
-      serviceName: config?.name || stat.serviceName,
-      count,
-      percentage: total > 0 ? Math.round((count / total) * 100) : 0,
-      color: config?.color || '#64748b',
-    };
-  });
-
-  return {
-    approvalRate: { approved, total },
-    serviceDistribution: distribution,
-    conversionCount: approved,
-  };
-}
-
-// 프로필 완성도 항목 라벨 (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1)
-const COMPLETENESS_LABELS: Record<string, string> = {
-  name: '상호명',
-  description: '소개글 (50자 이상)',
-  logoUrl: '프로필 이미지',
-  email: '이메일 (공개/파트너)',
-  website: '웹사이트 (공개/파트너)',
-  kakao: '카카오톡 (공개/파트너)',
-  partnerApproval: '파트너 승인 1건+',
-  recentActivity: '최근 30일 활동',
-};
-
-function getCompletenessColor(completed: number): string {
-  if (completed >= 7) return '#22c55e'; // green
-  if (completed >= 4) return '#3b82f6'; // blue
-  return '#94a3b8'; // gray
-}
-
-function ProfileCompletenessCard({ data }: { data: ProfileCompleteness }) {
-  const color = getCompletenessColor(data.completed);
-  const pct = Math.round((data.completed / data.total) * 100);
-  const allItems = Object.keys(COMPLETENESS_LABELS);
-
-  return (
-    <div style={styles.completenessCard}>
-      <div style={styles.completenessHeader}>
-        <div>
-          <h3 style={styles.completenessTitle}>프로필 완성도</h3>
-          <p style={{ ...styles.completenessRatio, color }}>
-            {data.completed} / {data.total}
-          </p>
-        </div>
-        <div style={styles.completenessBarOuter}>
-          <div
-            style={{
-              ...styles.completenessBarInner,
-              width: `${pct}%`,
-              backgroundColor: color,
-            }}
-          />
-        </div>
-      </div>
-      <div style={styles.completenessItems}>
-        {allItems.map((key) => {
-          const done = !data.missing.includes(key);
-          return (
-            <div key={key} style={styles.completenessItem}>
-              {done ? (
-                <CheckCircle2 size={14} style={{ color: '#22c55e', flexShrink: 0 }} />
-              ) : (
-                <Circle size={14} style={{ color: '#cbd5e1', flexShrink: 0 }} />
-              )}
-              <span style={{ color: done ? '#475569' : '#94a3b8', fontSize: '13px' }}>
-                {COMPLETENESS_LABELS[key]}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      {data.missing.length > 0 && (
-        <Link to="/supplier/profile" style={styles.completenessLink}>
-          프로필 관리 <ArrowRight size={14} />
-        </Link>
-      )}
-    </div>
-  );
-}
-
-// 빈 데이터 상태 컴포넌트
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div style={styles.emptyState}>
-      <AlertCircle size={40} style={{ color: '#94a3b8', marginBottom: '16px' }} />
-      <p style={styles.emptyStateText}>{message}</p>
-    </div>
-  );
-}
+  supplierCopilotApi,
+  type SupplierKpiSummary,
+  type ProductPerformanceItem,
+  type DistributionItem,
+  type TrendingProductItem,
+  type SupplierAiInsight,
+} from '../../lib/api';
 
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
-  const [summary, setSummary] = useState<SupplierDashboardSummary | null>(null);
-  const [requests, setRequests] = useState<SupplierRequest[]>([]);
-  const [completeness, setCompleteness] = useState<ProfileCompleteness | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const navigate = useNavigate();
 
-  // 공급자 행동 신호 + 선택적 제안
-  const [sellerSignal, setSellerSignal] = useState(false);
-  const [suggestionShown, setSuggestionShown] = useState(
-    () => !sessionStorage.getItem('seller_suggestion_dismissed')
-  );
+  const [kpi, setKpi] = useState<SupplierKpiSummary | null>(null);
+  const [aiInsight, setAiInsight] = useState<SupplierAiInsight | null>(null);
+  const [performance, setPerformance] = useState<ProductPerformanceItem[]>([]);
+  const [distribution, setDistribution] = useState<DistributionItem[]>([]);
+  const [trending, setTrending] = useState<TrendingProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const [summaryData, requestsData, completenessData] = await Promise.all([
-        dashboardApi.getSupplierDashboardSummary(),
-        supplierApi.getRequests({ status: 'pending' }),
-        supplierProfileApi.getCompleteness(),
-      ]);
-      setSummary(summaryData);
-      setRequests(requestsData);
-      setCompleteness(completenessData);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+      // Primary await — auth check
+      const kpiData = await supplierCopilotApi.getKpi();
+      setKpi(kpiData);
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('403')) {
+        setError('공급자 권한이 필요합니다.');
+        setLoading(false);
+        return;
+      }
+      setError('데이터를 불러오는데 실패했습니다.');
+      setLoading(false);
+      return;
     }
-    setLastUpdated(new Date());
+
+    // Fire-and-forget parallel loads
+    supplierCopilotApi.getAiInsight()
+      .then(d => setAiInsight(d))
+      .catch(() => {});
+
+    supplierCopilotApi.getProductPerformance()
+      .then(d => setPerformance(d))
+      .catch(() => {});
+
+    supplierCopilotApi.getDistribution()
+      .then(d => setDistribution(d))
+      .catch(() => {});
+
+    supplierCopilotApi.getTrendingProducts()
+      .then(d => setTrending(d))
+      .catch(() => {});
+
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // 공급자 행동 신호: 세션 1회 조회
-  useEffect(() => {
-    if (sessionStorage.getItem('seller_signal_dismissed')) return;
-    dashboardApi.getSellerSignal()
-      .then(res => { if (res.hasApprovedSeller) setSellerSignal(true); })
-      .catch(() => {});
-  }, []);
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-slate-500 text-lg mb-4">{error}</p>
+          <button onClick={fetchData} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm">
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  // 공급자 행동 신호 숨기기 (새로고침/링크 클릭 등 행동 시)
-  const dismissSellerSignal = useCallback(() => {
-    if (sellerSignal) {
-      setSellerSignal(false);
-      sessionStorage.setItem('seller_signal_dismissed', '1');
-    }
-  }, [sellerSignal]);
+  const riskColor = aiInsight?.insight?.riskLevel === 'high' ? 'text-red-600 bg-red-50'
+    : aiInsight?.insight?.riskLevel === 'medium' ? 'text-amber-600 bg-amber-50'
+    : 'text-emerald-600 bg-emerald-50';
 
-  // API 데이터를 컴포넌트 props 형식으로 변환
-  const summaryData = transformSummaryData(summary);
-  const serviceStatuses = transformServiceStatuses(summary);
-  const activityEvents = transformActivityEvents(summary);
-  const basicStats = transformBasicStats(summary);
+  const topByRevenue = performance.slice(0, 5);
+  const topByOrders = [...performance].sort((a, b) => b.orders - a.orders).slice(0, 5);
 
-  const pendingRequests = requests.slice(0, 3);
-  const hasData = summary !== null;
-  const hasServiceData = serviceStatuses.length > 0;
-  const hasActivityData = activityEvents.length > 0;
+  // AI actions split: Block 5 gets first 3, Block 8 gets all
+  const aiActions = aiInsight?.insight?.recommendedActions || [];
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div style={styles.header}>
+      <div className="flex items-start justify-between">
         <div>
-          <h1 style={styles.title}>공급자 대시보드</h1>
-          <p style={styles.subtitle}>
-            안녕하세요, <strong>{user?.name || '공급자'}</strong>님.
-            현재 운영 상황을 확인하고 필요한 서비스로 이동하세요.
+          <h1 className="text-2xl font-bold text-slate-900">공급자 AI Copilot</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            {user?.name || '공급자'}님의 상품 성과와 매장 확산 현황을 AI가 분석합니다.
           </p>
         </div>
-        <button onClick={() => { dismissSellerSignal(); fetchData(); }} style={styles.refreshButton} disabled={loading}>
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          새로고침
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 disabled:opacity-50"
+        >
+          {loading ? '로딩...' : '새로고침'}
         </button>
       </div>
 
-      {/* Profile Completeness (WO-O4O-SUPPLIER-PROFILE-COMPLETENESS-V1) */}
-      {!loading && completeness && (
-        <ProfileCompletenessCard data={completeness} />
-      )}
+      {/* Block 1: 공급자 KPI (slate) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 className="text-base font-semibold text-slate-800 mb-4">공급자 KPI</h2>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1,2,3,4].map(i => <div key={i} className="h-20 bg-slate-100 rounded-lg animate-pulse" />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KpiCard label="등록 상품" value={kpi?.registeredProducts ?? 0} />
+            <KpiCard label="판매 중" value={kpi?.activeProducts ?? 0} accent />
+            <KpiCard label="매장 진열" value={kpi?.storeListings ?? 0} />
+            <KpiCard label="최근 7일 주문" value={kpi?.recentOrders ?? 0} accent />
+          </div>
+        )}
+      </div>
 
-      {/* 공급자 행동 신호 + 선택적 제안 */}
-      {sellerSignal && (
-        <div style={styles.sellerSignal}>
-          활동 가능한 판매자가 있습니다.
-          {suggestionShown && (
-            <div style={styles.suggestionRow}>
-              <Link
-                to="/supplier/requests"
-                style={styles.suggestionLink}
-                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('seller_suggestion_dismissed', '1'); }}
-              >
-                원하시면 판매자 지원 캠페인을 준비할 수 있습니다.
-              </Link>
-              <button
-                style={styles.suggestionDismiss}
-                onClick={() => { setSuggestionShown(false); sessionStorage.setItem('seller_suggestion_dismissed', '1'); }}
-                aria-label="닫기"
-              >✕</button>
+      {/* Block 2: AI 공급자 요약 (indigo) */}
+      <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-base font-semibold text-indigo-900">AI 공급자 요약</h2>
+          {aiInsight?.insight?.riskLevel && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${riskColor}`}>
+              {aiInsight.insight.riskLevel === 'high' ? '주의' : aiInsight.insight.riskLevel === 'medium' ? '보통' : '양호'}
+            </span>
+          )}
+        </div>
+        {aiInsight ? (
+          <>
+            <p className="text-sm text-indigo-800 leading-relaxed">{aiInsight.insight.summary}</p>
+            <p className="text-xs text-indigo-400 mt-3">
+              {aiInsight.meta.provider}/{aiInsight.meta.model} &middot; {aiInsight.meta.durationMs}ms
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-indigo-400">AI 분석을 불러오는 중...</p>
+        )}
+      </div>
+
+      {/* Block 3 + 4: 2-column */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Block 3: 상품 성과 (slate) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">상품 성과 (매출 TOP 5)</h2>
+          {topByRevenue.length === 0 ? (
+            <p className="text-sm text-slate-400 py-8 text-center">상품 데이터가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {topByRevenue.map((item, idx) => (
+                <div key={item.productId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <span className="text-xs font-bold text-slate-400 w-5">{idx + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-700 truncate">{item.productName}</p>
+                    <p className="text-xs text-slate-400">
+                      주문 {item.orders}건 &middot; QR {item.qrScans}
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-slate-700">
+                    {item.revenue.toLocaleString()}원
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </div>
-      )}
 
-      {/* P2: 운영 요약 카드 */}
-      <SupplierSummaryCards data={summaryData} loading={loading} />
-
-      {/* P2: 서비스별 상태판 */}
-      {!loading && !hasServiceData ? (
-        <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>제품·콘텐츠가 활용되는 서비스</h2>
-          <EmptyState message="자료가 없습니다. 아직 연결된 서비스가 없습니다." />
-        </div>
-      ) : (
-        <SupplierServiceStatusBoard
-          services={hasServiceData ? serviceStatuses : []}
-          loading={loading}
-        />
-      )}
-
-      {/* P2: 2-Column Layout for Timeline & Stats */}
-      <div style={styles.twoColumnGrid}>
-        {/* 최근 활동 타임라인 */}
-        {!loading && !hasActivityData ? (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitleSmall}>최근 활동</h2>
-            <EmptyState message="자료가 없습니다. 아직 활동 내역이 없습니다." />
-          </div>
-        ) : (
-          <SupplierActivityTimeline events={activityEvents} loading={loading} />
-        )}
-
-        {/* 최소 통계 영역 */}
-        {!loading && !hasData ? (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitleSmall}>기본 통계</h2>
-            <EmptyState message="자료가 없습니다. 데이터가 쌓이면 통계가 표시됩니다." />
-          </div>
-        ) : (
-          <SupplierBasicStats data={basicStats} loading={loading} />
-        )}
-      </div>
-
-      {/* 기존: 대기 중인 신청 미리보기 */}
-      <div style={styles.section}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>
-            <FileCheck size={20} />
-            대기 중인 신청
-          </h2>
-          <Link to="/supplier/requests" style={styles.viewAllLink}>
-            전체 보기 <ArrowRight size={16} />
-          </Link>
-        </div>
-
-        {loading ? (
-          <p style={styles.loading}>로딩 중...</p>
-        ) : pendingRequests.length === 0 ? (
-          <EmptyState message="자료가 없습니다. 현재 대기 중인 신청이 없습니다." />
-        ) : (
-          <div style={styles.requestList}>
-            {pendingRequests.map((req) => {
-              const config = SERVICE_CONFIG[req.serviceId];
-              return (
-                <Link
-                  key={req.id}
-                  to={`/supplier/requests/${req.id}`}
-                  style={styles.requestCard}
-                >
-                  <div style={styles.requestHeader}>
-                    <span style={styles.serviceIcon}>{config?.icon || '📦'}</span>
-                    <span style={styles.serviceName}>{config?.name || req.serviceName}</span>
-                    <span style={styles.pendingBadge}>대기 중</span>
+        {/* Block 4: 매장 확산 (slate) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">매장 확산</h2>
+          {distribution.length === 0 ? (
+            <p className="text-sm text-slate-400 py-8 text-center">매장 진열 데이터가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {distribution.slice(0, 5).map(item => (
+                <div key={item.productId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-700 truncate">{item.productName}</p>
                   </div>
-                  <div style={styles.requestBody}>
-                    <p style={styles.sellerName}>{req.sellerName}</p>
-                    <p style={styles.productName}>{req.productName}</p>
-                  </div>
-                  <div style={styles.requestFooter}>
-                    <span style={styles.timestamp}>
-                      {new Date(req.requestedAt).toLocaleDateString('ko-KR')}
+                  <span className="text-sm font-semibold text-slate-600">
+                    {item.storeCount}개 매장
+                  </span>
+                  {item.newStores > 0 && (
+                    <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                      +{item.newStores} new
                     </span>
-                    <ArrowRight size={16} style={{ color: '#94a3b8' }} />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 안내 박스 */}
-      <div style={styles.infoBox}>
-        <h3 style={styles.infoTitle}>대시보드 안내</h3>
-        <ul style={styles.infoList}>
-          <li>이 대시보드는 <strong>현재 상황 확인용</strong>입니다.</li>
-          <li>모든 수치는 실시간 집계 데이터입니다.</li>
-          <li>"이 서비스에서 상품 보기" 링크를 통해 각 서비스의 상품을 확인할 수 있습니다.</li>
-        </ul>
-        <p style={styles.lastUpdatedText}>
-          마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}
-        </p>
+      {/* Block 5: AI 상품 분석 (indigo) */}
+      {aiActions.length > 0 && (
+        <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+          <h2 className="text-base font-semibold text-indigo-900 mb-4">AI 상품 분석</h2>
+          <div className="space-y-2">
+            {aiActions.slice(0, 3).map((action, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
+                <span className="text-indigo-400 text-xs font-bold mt-0.5">{idx + 1}</span>
+                <p className="text-sm text-indigo-800">{action}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Block 6 + 7: 2-column */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Block 6: 인기 상품 (slate) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">인기 상품 (주문 TOP 5)</h2>
+          {topByOrders.length === 0 ? (
+            <p className="text-sm text-slate-400 py-8 text-center">주문 데이터가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {topByOrders.map((item, idx) => (
+                <div key={item.productId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <span className="text-xs font-bold text-slate-400 w-5">{idx + 1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-700 truncate">{item.productName}</p>
+                    <p className="text-xs text-slate-400">
+                      매출 {item.revenue.toLocaleString()}원
+                    </p>
+                  </div>
+                  <span className="text-sm font-semibold text-slate-700">
+                    {item.orders}건
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Block 7: 성장 상품 (emerald) */}
+        <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-6">
+          <h2 className="text-base font-semibold text-emerald-900 mb-4">성장 상품</h2>
+          {trending.length === 0 ? (
+            <p className="text-sm text-emerald-400 py-8 text-center">성장 데이터가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {trending.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-emerald-800 truncate">{item.productName}</p>
+                    <p className="text-xs text-emerald-500">
+                      이번주 {item.currentOrders}건 / 지난주 {item.previousOrders}건
+                    </p>
+                  </div>
+                  <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
+                    item.growthRate > 0
+                      ? 'text-emerald-700 bg-emerald-100'
+                      : item.growthRate < 0
+                      ? 'text-red-600 bg-red-50'
+                      : 'text-slate-500 bg-slate-100'
+                  }`}>
+                    {item.growthRate > 0 ? '+' : ''}{item.growthRate}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Block 8: 추천 전략 (violet) */}
+      <div className="bg-violet-50 rounded-xl border border-violet-200 p-6">
+        <h2 className="text-base font-semibold text-violet-900 mb-4">추천 전략</h2>
+        {aiActions.length > 0 ? (
+          <div className="space-y-2 mb-5">
+            {aiActions.map((action, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-3 p-3 bg-white/60 rounded-lg cursor-pointer hover:bg-white/80 transition-colors"
+                onClick={() => inferActionPath(action, navigate)}
+              >
+                <span className="text-violet-400 text-xs font-bold mt-0.5">{idx + 1}</span>
+                <p className="text-sm text-violet-800">{action}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-violet-400 mb-5">AI 추천을 불러오는 중...</p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {QUICK_LINKS.map(link => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className="px-3 py-1.5 bg-violet-100 text-violet-700 rounded-full text-xs font-medium hover:bg-violet-200 transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '32px',
-  },
-  title: {
-    fontSize: '28px',
-    fontWeight: 700,
-    color: '#1e293b',
-    margin: '0 0 8px 0',
-  },
-  subtitle: {
-    fontSize: '15px',
-    color: '#64748b',
-    margin: 0,
-    lineHeight: 1.5,
-  },
-  refreshButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '10px 16px',
-    backgroundColor: '#f1f5f9',
-    color: '#475569',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-  twoColumnGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '24px',
-    marginBottom: '24px',
-  },
-  section: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    padding: '24px',
-    marginBottom: '24px',
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-  },
-  sectionTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '18px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: 0,
-  },
-  sectionTitleSmall: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 16px 0',
-  },
-  viewAllLink: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    fontSize: '14px',
-    color: '#3b82f6',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-  loading: {
-    color: '#64748b',
-    textAlign: 'center',
-    padding: '40px',
-  },
-  emptyState: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#94a3b8',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyStateText: {
-    margin: 0,
-    fontSize: '14px',
-    color: '#64748b',
-  },
-  requestList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  },
-  requestCard: {
-    display: 'block',
-    backgroundColor: '#f8fafc',
-    borderRadius: '8px',
-    border: '1px solid #e2e8f0',
-    padding: '16px',
-    textDecoration: 'none',
-    transition: 'all 0.15s',
-  },
-  requestHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '12px',
-  },
-  serviceIcon: {
-    fontSize: '18px',
-  },
-  serviceName: {
-    fontSize: '13px',
-    fontWeight: 500,
-    color: '#64748b',
-    flex: 1,
-  },
-  pendingBadge: {
-    fontSize: '11px',
-    fontWeight: 500,
-    backgroundColor: '#fef3c7',
-    color: '#b45309',
-    padding: '2px 8px',
-    borderRadius: '4px',
-  },
-  requestBody: {
-    marginBottom: '12px',
-  },
-  sellerName: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px 0',
-  },
-  productName: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: 0,
-  },
-  requestFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: '12px',
-    color: '#94a3b8',
-  },
-  infoBox: {
-    backgroundColor: '#eff6ff',
-    borderRadius: '12px',
-    border: '1px solid #bfdbfe',
-    padding: '20px',
-  },
-  infoTitle: {
-    fontSize: '14px',
-    fontWeight: 600,
-    color: '#1e40af',
-    margin: '0 0 12px 0',
-  },
-  infoList: {
-    margin: '0 0 12px 0',
-    paddingLeft: '20px',
-    fontSize: '13px',
-    color: '#1e40af',
-    lineHeight: 1.8,
-  },
-  lastUpdatedText: {
-    fontSize: '12px',
-    color: '#3b82f6',
-    margin: 0,
-  },
-  sellerSignal: {
-    backgroundColor: '#F0FDF4',
-    border: '1px solid #BBF7D0',
-    borderRadius: '10px',
-    padding: '12px 16px',
-    fontSize: '14px',
-    color: '#15803D',
-    fontWeight: 500,
-    marginBottom: '24px',
-  },
-  suggestionRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginTop: '6px',
-  },
-  suggestionLink: {
-    fontSize: '12px',
-    color: '#16A34A',
-    textDecoration: 'underline',
-    textUnderlineOffset: '2px',
-  },
-  suggestionDismiss: {
-    background: 'none',
-    border: 'none',
-    color: '#86EFAC',
-    cursor: 'pointer',
-    fontSize: '12px',
-    lineHeight: 1,
-    padding: 0,
-  },
-  completenessCard: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    padding: '24px',
-    marginBottom: '24px',
-  },
-  completenessHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '16px',
-    gap: '24px',
-  },
-  completenessTitle: {
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#1e293b',
-    margin: '0 0 4px 0',
-  },
-  completenessRatio: {
-    fontSize: '24px',
-    fontWeight: 700,
-    margin: 0,
-  },
-  completenessBarOuter: {
-    flex: 1,
-    height: '8px',
-    backgroundColor: '#e2e8f0',
-    borderRadius: '4px',
-    overflow: 'hidden',
-  },
-  completenessBarInner: {
-    height: '100%',
-    borderRadius: '4px',
-    transition: 'width 0.3s ease',
-  },
-  completenessItems: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '8px 24px',
-    marginBottom: '16px',
-  },
-  completenessItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  completenessLink: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    fontSize: '13px',
-    color: '#3b82f6',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
-};
+// ---- Sub-components & helpers ----
+
+function KpiCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className={`rounded-lg p-4 ${accent ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-700'}`}>
+      <p className={`text-xs font-medium mb-1 ${accent ? 'text-slate-300' : 'text-slate-500'}`}>{label}</p>
+      <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+    </div>
+  );
+}
+
+const QUICK_LINKS = [
+  { label: '상품 관리', path: '/supplier/products' },
+  { label: '주문 관리', path: '/supplier/orders' },
+  { label: '라이브러리', path: '/supplier/library' },
+  { label: '판매자 신청', path: '/supplier/requests' },
+  { label: '정산 현황', path: '/supplier/orders' },
+  { label: '프로필 관리', path: '/supplier/profile' },
+];
+
+function inferActionPath(action: string, navigate: (path: string) => void) {
+  const lower = action.toLowerCase();
+  if (lower.includes('상품') || lower.includes('제품') || lower.includes('product')) {
+    navigate('/supplier/products');
+  } else if (lower.includes('주문') || lower.includes('order')) {
+    navigate('/supplier/orders');
+  } else if (lower.includes('라이브러리') || lower.includes('콘텐츠') || lower.includes('content')) {
+    navigate('/supplier/library');
+  } else if (lower.includes('판매자') || lower.includes('seller') || lower.includes('신청')) {
+    navigate('/supplier/requests');
+  } else if (lower.includes('프로필') || lower.includes('profile')) {
+    navigate('/supplier/profile');
+  }
+}

@@ -75,6 +75,12 @@ export {
   type SupplierProfile,
   type ProfileCompleteness,
   type SupplierPartnerCommission,
+  supplierCopilotApi,
+  type SupplierKpiSummary,
+  type ProductPerformanceItem,
+  type DistributionItem,
+  type TrendingProductItem,
+  type SupplierAiInsight,
 } from './supplier.js';
 
 // Seller API

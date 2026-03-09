@@ -25,9 +25,11 @@ import { ImageStorageService } from './services/image-storage.service.js';
 import sharp from 'sharp';
 import { NetureService as LegacyNetureService } from '../../routes/neture/services/neture.service.js';
 import { NetureOrderStatus } from '../../routes/neture/entities/neture-order.entity.js';
+import { NetureSettlementService } from './services/neture-settlement.service.js';
 
 const router: ExpressRouter = Router();
 const netureService = new NetureService();
+const settlementService = new NetureSettlementService(AppDataSource);
 const legacyNetureService = new LegacyNetureService(AppDataSource);
 const netureActionLogService = new ActionLogService(AppDataSource);
 const approvalV2Service = new ProductApprovalV2Service(AppDataSource);
@@ -1038,39 +1040,6 @@ router.get('/supplier/requests/:id', requireAuth, requireLinkedSupplier, async (
       message: 'Failed to fetch supplier request detail',
     });
   }
-});
-
-/**
- * POST /api/v1/neture/supplier/requests/:id/approve
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests/:id/approve', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval/:id/approve' },
-  });
-});
-
-/**
- * POST /api/v1/neture/supplier/requests/:id/reject
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests/:id/reject', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval/:id/approve or reject' },
-  });
-});
-
-/**
- * POST /api/v1/neture/supplier/requests
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system. Use POST /api/v1/product-policy-v2/private-approval' },
-  });
 });
 
 // ==================== Supplier CSV Import (WO-O4O-B2B-CSV-INGEST-PIPELINE-V1) ====================
@@ -2829,30 +2798,6 @@ router.get('/partner/dashboard/summary', requireAuth, async (req: AuthenticatedR
   }
 });
 
-// ==================== Request Events — DEPRECATED (WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1) ====================
-
-/**
- * GET /api/v1/neture/supplier/requests/:id/events → 410 Gone
- * Event table dropped by migration.
- */
-router.get('/supplier/requests/:id/events', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Request events have been removed. Event data is no longer available.' },
-  });
-});
-
-/**
- * GET /api/v1/neture/supplier/events → 410 Gone
- * Event table dropped by migration.
- */
-router.get('/supplier/events', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier events have been removed. Event data is no longer available.' },
-  });
-});
-
 // ==================== Seller Product Query (WO-S2S-FLOW-RECOVERY-PHASE3-V1 T1) ====================
 
 /**
@@ -3176,28 +3121,6 @@ router.get('/admin/requests', requireAuth, requireNetureScope('neture:admin'), a
   }
 });
 
-/**
- * POST /api/v1/neture/admin/requests/:id/approve
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/admin/requests/:id/approve', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Use POST /api/v1/product-policy-v2/private-approval/:id/approve' },
-  });
-});
-
-/**
- * POST /api/v1/neture/admin/requests/:id/reject
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/admin/requests/:id/reject', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Use v2 approval API for rejection.' },
-  });
-});
-
 // ==================== Admin SERVICE Approval Management (WO-NETURE-TIER2-SERVICE-USABILITY-BETA-V1) ====================
 
 /**
@@ -3326,63 +3249,6 @@ router.post('/admin/service-approvals/:id/revoke', requireAuth, requireNetureSco
     logger.error('[Neture API] Error revoking SERVICE approval:', error);
     res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to revoke SERVICE approval' } });
   }
-});
-
-// ==================== Relation State Extension (WO-NETURE-SUPPLIER-RELATION-STATE-EXTENSION-V1) ====================
-
-/**
- * POST /api/v1/neture/supplier/requests/:id/suspend
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests/:id/suspend', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
-  });
-});
-
-/**
- * POST /api/v1/neture/supplier/requests/:id/reactivate
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests/:id/reactivate', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
-  });
-});
-
-/**
- * POST /api/v1/neture/supplier/requests/:id/revoke
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/supplier/requests/:id/revoke', requireRole('supplier'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
-  });
-});
-
-/**
- * POST /api/v1/neture/admin/requests/:id/suspend
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/admin/requests/:id/suspend', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
-  });
-});
-
-/**
- * POST /api/v1/neture/admin/requests/:id/revoke
- * WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: 410
- */
-router.post('/admin/requests/:id/revoke', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
-  res.status(410).json({
-    success: false,
-    error: { code: 'ENDPOINT_DEPRECATED', message: 'Supplier requests are handled by v2 approval system.' },
-  });
 });
 
 // ==================== Seller Dashboard AI Insight (WO-STORE-AI-V1-SELLER-INSIGHT) ====================
@@ -3797,9 +3663,7 @@ router.post('/seller/orders', requireAuth, async (req: AuthenticatedRequest, res
 });
 
 // ==================== Settlement Engine (WO-O4O-SETTLEMENT-ENGINE-V1) ====================
-
-/** Default platform fee rate for supplier settlements (10%) */
-const NETURE_PLATFORM_FEE_RATE = 0.10;
+// Business logic extracted to NetureSettlementService (WO-O4O-SETTLEMENT-SERVICE-EXTRACTION-V1)
 
 /**
  * GET /api/v1/neture/supplier/settlements
@@ -3810,43 +3674,9 @@ router.get('/supplier/settlements', requireAuth, requireLinkedSupplier, async (r
     const supplierId = (req as SupplierRequest).supplierId;
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
     const status = req.query.status as string | undefined;
-
-    const baseParams: any[] = [supplierId];
-    let statusClause = '';
-    if (status && ['pending', 'calculated', 'approved', 'paid', 'cancelled'].includes(status)) {
-      statusClause = 'AND s.status = $2';
-      baseParams.push(status);
-    }
-
-    const [settlements, countResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT s.id, s.supplier_id, s.period_start, s.period_end,
-                s.total_sales, s.platform_fee, s.supplier_amount,
-                s.platform_fee_rate, s.order_count, s.status,
-                s.paid_at, s.notes, s.created_at, s.updated_at
-         FROM neture_settlements s
-         WHERE s.supplier_id = $1 ${statusClause}
-         ORDER BY s.period_end DESC, s.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM neture_settlements s
-         WHERE s.supplier_id = $1 ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-
-    res.json({
-      success: true,
-      data: settlements,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    const result = await settlementService.getSupplierSettlements(supplierId, { page, limit, status });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching supplier settlements:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlements' });
@@ -3861,29 +3691,8 @@ router.get('/supplier/settlements', requireAuth, requireLinkedSupplier, async (r
 router.get('/supplier/settlements/kpi', requireAuth, requireLinkedSupplier, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const supplierId = (req as SupplierRequest).supplierId;
-
-    const result = await AppDataSource.query(
-      `SELECT
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved')), 0)::int AS pending_amount,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status IN ('calculated', 'approved', 'paid')), 0)::int AS total_amount,
-         COUNT(*) FILTER (WHERE status IN ('calculated', 'approved'))::int AS pending_count,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count
-       FROM neture_settlements
-       WHERE supplier_id = $1 AND status != 'cancelled'`,
-      [supplierId],
-    );
-
-    res.json({
-      success: true,
-      data: {
-        pending_amount: Number(result[0]?.pending_amount || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-        total_amount: Number(result[0]?.total_amount || 0),
-        pending_count: Number(result[0]?.pending_count || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-      },
-    });
+    const result = await settlementService.getSupplierKpi(supplierId);
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching settlement KPI:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlement KPI' });
@@ -3903,27 +3712,11 @@ router.get('/supplier/settlements/:id', requireAuth, requireLinkedSupplier, asyn
       return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid settlement ID format' });
     }
 
-    const rows = await AppDataSource.query(
-      `SELECT * FROM neture_settlements WHERE id = $1 AND supplier_id = $2 LIMIT 1`,
-      [settlementId, supplierId],
-    );
-    if (rows.length === 0) {
+    const result = await settlementService.getSupplierSettlementDetail(settlementId, supplierId);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
     }
-    const settlement = rows[0];
-
-    const orders = await AppDataSource.query(
-      `SELECT so.order_id, so.supplier_sales_amount,
-              o.order_number, o.status AS order_status,
-              o.orderer_name, o.created_at AS order_date
-       FROM neture_settlement_orders so
-       JOIN neture_orders o ON o.id = so.order_id
-       WHERE so.settlement_id = $1
-       ORDER BY o.created_at DESC`,
-      [settlementId],
-    );
-
-    res.json({ success: true, data: { ...settlement, orders } });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching settlement detail:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch settlement detail' });
@@ -4620,83 +4413,8 @@ router.post('/admin/settlements/calculate', requireAuth, requireNetureScope('net
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'period_start must be before period_end' });
     }
 
-    // Find delivered orders not in any settlement, grouped by supplier
-    const supplierAggregates = await AppDataSource.query(
-      `SELECT
-         spo.supplier_id,
-         ARRAY_AGG(DISTINCT o.id) AS order_ids,
-         COUNT(DISTINCT o.id)::int AS order_count,
-         SUM(oi.total_price)::int AS total_sales
-       FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE o.status = 'delivered'
-         AND o.updated_at >= $1::date
-         AND o.updated_at < ($2::date + INTERVAL '1 day')
-         AND NOT EXISTS (
-           SELECT 1 FROM neture_settlement_orders nso
-           WHERE nso.order_id = o.id
-         )
-       GROUP BY spo.supplier_id
-       HAVING SUM(oi.total_price) > 0`,
-      [period_start, period_end],
-    );
-
-    if (supplierAggregates.length === 0) {
-      return res.json({
-        success: true,
-        data: { created: 0, settlements: [] },
-        message: 'No unsettled delivered orders found in the given period.',
-      });
-    }
-
-    const created: any[] = [];
-    const feeRate = NETURE_PLATFORM_FEE_RATE;
-
-    for (const agg of supplierAggregates) {
-      const totalSales = Number(agg.total_sales);
-      const platformFee = Math.round(totalSales * feeRate);
-      const supplierAmount = totalSales - platformFee;
-      const orderIds: string[] = agg.order_ids;
-
-      const [settlement] = await AppDataSource.query(
-        `INSERT INTO neture_settlements
-           (supplier_id, period_start, period_end, total_sales, platform_fee,
-            supplier_amount, platform_fee_rate, order_count, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'calculated')
-         RETURNING *`,
-        [agg.supplier_id, period_start, period_end, totalSales,
-         platformFee, supplierAmount, feeRate, agg.order_count],
-      );
-
-      // Per-order supplier sales for the junction table
-      const orderSales = await AppDataSource.query(
-        `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
-         FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE o.id = ANY($1::uuid[]) AND spo.supplier_id = $2
-         GROUP BY o.id`,
-        [orderIds, agg.supplier_id],
-      );
-
-      for (const os of orderSales) {
-        await AppDataSource.query(
-          `INSERT INTO neture_settlement_orders (settlement_id, order_id, supplier_sales_amount)
-           VALUES ($1, $2, $3)`,
-          [settlement.id, os.order_id, os.supplier_sales_amount],
-        );
-      }
-
-      created.push(settlement);
-    }
-
-    logger.info(`[Neture Settlement] Created ${created.length} settlements for period ${period_start} ~ ${period_end}`);
-
-    res.json({
-      success: true,
-      data: { created: created.length, settlements: created },
-    });
+    const result = await settlementService.calculateSettlements(period_start, period_end);
+    res.json(result);
   } catch (error: any) {
     if (error?.code === '23505') {
       return res.status(409).json({ success: false, error: 'DUPLICATE_SETTLEMENT', message: 'A settlement already exists for one or more suppliers in this period.' });
@@ -4722,35 +4440,11 @@ router.patch('/admin/settlements/:id/status', requireAuth, requireNetureScope('n
       return res.status(400).json({ success: false, error: 'VALIDATION_ERROR', message: 'This endpoint only supports "cancelled" status. Use /approve or /pay for transitions.' });
     }
 
-    const setClauses = ['status = $1', 'updated_at = NOW()'];
-    const params: any[] = [status];
-    let paramIdx = 2;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await AppDataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status IN ('calculated', 'approved')
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await settlementService.cancelSettlement(settlementId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in cancellable status' });
     }
-
-    // Delete junction rows to allow re-settlement
-    await AppDataSource.query(
-      `DELETE FROM neture_settlement_orders WHERE settlement_id = $1`,
-      [settlementId],
-    );
-
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error cancelling settlement:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to cancel settlement' });
@@ -4767,46 +4461,9 @@ router.get('/admin/settlements', requireAuth, requireNetureScope('neture:admin')
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
-    const offset = (page - 1) * limit;
     const status = req.query.status as string | undefined;
-
-    const baseParams: any[] = [];
-    let statusClause = '';
-    let paramIdx = 1;
-    if (status && ['pending', 'calculated', 'approved', 'paid', 'cancelled'].includes(status)) {
-      statusClause = `WHERE s.status = $${paramIdx}`;
-      baseParams.push(status);
-      paramIdx++;
-    }
-
-    const [settlements, countResult] = await Promise.all([
-      AppDataSource.query(
-        `SELECT s.id, s.supplier_id, ns.name AS supplier_name,
-                s.period_start, s.period_end,
-                s.total_sales, s.platform_fee, s.supplier_amount,
-                s.platform_fee_rate, s.order_count, s.status,
-                s.approved_at, s.paid_at, s.notes, s.created_at, s.updated_at
-         FROM neture_settlements s
-         LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
-         ${statusClause}
-         ORDER BY s.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
-      ),
-      AppDataSource.query(
-        `SELECT COUNT(*)::int AS total
-         FROM neture_settlements s
-         ${statusClause}`,
-        baseParams,
-      ),
-    ]);
-
-    const total = Number(countResult[0]?.total || 0);
-    res.json({
-      success: true,
-      data: settlements,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    const result = await settlementService.getAdminSettlements({ page, limit, status });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin settlements:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlements' });
@@ -4820,29 +4477,8 @@ router.get('/admin/settlements', requireAuth, requireNetureScope('neture:admin')
  */
 router.get('/admin/settlements/kpi', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
   try {
-    const result = await AppDataSource.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE status = 'calculated')::int AS calculated_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'calculated'), 0)::int AS calculated_amount,
-         COUNT(*) FILTER (WHERE status = 'approved')::int AS approved_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'approved'), 0)::int AS approved_amount,
-         COUNT(*) FILTER (WHERE status = 'paid')::int AS paid_count,
-         COALESCE(SUM(supplier_amount) FILTER (WHERE status = 'paid'), 0)::int AS paid_amount
-       FROM neture_settlements
-       WHERE status != 'cancelled'`,
-    );
-
-    res.json({
-      success: true,
-      data: {
-        calculated_count: Number(result[0]?.calculated_count || 0),
-        calculated_amount: Number(result[0]?.calculated_amount || 0),
-        approved_count: Number(result[0]?.approved_count || 0),
-        approved_amount: Number(result[0]?.approved_amount || 0),
-        paid_count: Number(result[0]?.paid_count || 0),
-        paid_amount: Number(result[0]?.paid_amount || 0),
-      },
-    });
+    const result = await settlementService.getAdminKpi();
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin settlement KPI:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlement KPI' });
@@ -4860,29 +4496,11 @@ router.get('/admin/settlements/:id', requireAuth, requireNetureScope('neture:adm
       return res.status(400).json({ success: false, error: 'INVALID_ID', message: 'Invalid settlement ID format' });
     }
 
-    const rows = await AppDataSource.query(
-      `SELECT s.*, ns.name AS supplier_name
-       FROM neture_settlements s
-       LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
-       WHERE s.id = $1 LIMIT 1`,
-      [settlementId],
-    );
-    if (rows.length === 0) {
+    const result = await settlementService.getAdminSettlementDetail(settlementId);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found' });
     }
-
-    const orders = await AppDataSource.query(
-      `SELECT so.order_id, so.supplier_sales_amount,
-              o.order_number, o.status AS order_status,
-              o.orderer_name, o.created_at AS order_date
-       FROM neture_settlement_orders so
-       JOIN neture_orders o ON o.id = so.order_id
-       WHERE so.settlement_id = $1
-       ORDER BY o.created_at DESC`,
-      [settlementId],
-    );
-
-    res.json({ success: true, data: { ...rows[0], orders } });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error fetching admin settlement detail:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin settlement detail' });
@@ -4897,31 +4515,11 @@ router.patch('/admin/settlements/:id/approve', requireAuth, requireNetureScope('
   try {
     const settlementId = req.params.id;
     const { notes } = req.body;
-
-    const setClauses = ["status = 'approved'", 'approved_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await AppDataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'calculated'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await settlementService.approveSettlement(settlementId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in "calculated" status' });
     }
-
-    logger.info(`[Neture Settlement] Settlement ${settlementId} approved`);
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error approving settlement:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve settlement' });
@@ -4936,31 +4534,11 @@ router.patch('/admin/settlements/:id/pay', requireAuth, requireNetureScope('netu
   try {
     const settlementId = req.params.id;
     const { notes } = req.body;
-
-    const setClauses = ["status = 'paid'", 'paid_at = NOW()', 'updated_at = NOW()'];
-    const params: any[] = [];
-    let paramIdx = 1;
-
-    if (notes !== undefined) {
-      setClauses.push(`notes = $${paramIdx}`);
-      params.push(notes);
-      paramIdx++;
-    }
-
-    params.push(settlementId);
-    const result = await AppDataSource.query(
-      `UPDATE neture_settlements SET ${setClauses.join(', ')}
-       WHERE id = $${paramIdx} AND status = 'approved'
-       RETURNING *`,
-      params,
-    );
-
-    if (!result || result.length === 0) {
+    const result = await settlementService.paySettlement(settlementId, notes);
+    if (!result) {
       return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Settlement not found or not in "approved" status' });
     }
-
-    logger.info(`[Neture Settlement] Settlement ${settlementId} paid`);
-    res.json({ success: true, data: result[0] });
+    res.json(result);
   } catch (error) {
     logger.error('[Neture API] Error paying settlement:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay settlement' });
@@ -5427,6 +5005,137 @@ router.post('/admin/partner-settlements/:id/pay', requireAuth, requireNetureScop
   } catch (error) {
     logger.error('[Neture API] Error paying partner settlement:', error);
     res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to pay partner settlement' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/partners
+ * Admin 파트너 모니터링 — 파트너 목록 + 통계
+ * WO-O4O-ADMIN-PARTNER-MONITORING-V1
+ */
+router.get('/admin/partners', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
+    const offset = (page - 1) * limit;
+    const search = (req.query.search as string || '').trim();
+
+    const params: any[] = [];
+    let searchClause = '';
+    if (search) {
+      params.push(`%${search}%`);
+      searchClause = `WHERE (u."displayName" ILIKE $1 OR u.email ILIKE $1)`;
+    }
+
+    const limitIdx = params.length + 1;
+    const offsetIdx = params.length + 2;
+    params.push(limit, offset);
+
+    const [partners, countResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT
+           u.id AS partner_id,
+           u."displayName" AS name,
+           u.email,
+           COUNT(pc.id)::int AS orders,
+           COALESCE(SUM(pc.commission_amount), 0)::int AS commission,
+           COALESCE(SUM(CASE WHEN pc.status = 'approved' THEN pc.commission_amount ELSE 0 END), 0)::int AS payable,
+           COALESCE(SUM(CASE WHEN pc.status = 'paid' THEN pc.commission_amount ELSE 0 END), 0)::int AS paid,
+           MIN(pc.created_at) AS first_commission_at
+         FROM partner_commissions pc
+         JOIN users u ON u.id = pc.partner_id
+         ${searchClause}
+         GROUP BY u.id, u."displayName", u.email
+         ORDER BY commission DESC
+         LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+        params,
+      ),
+      AppDataSource.query(
+        `SELECT COUNT(DISTINCT pc.partner_id)::int AS total
+         FROM partner_commissions pc
+         JOIN users u ON u.id = pc.partner_id
+         ${searchClause}`,
+        search ? [params[0]] : [],
+      ),
+    ]);
+
+    const total = Number(countResult[0]?.total || 0);
+
+    // KPI totals
+    const [kpi] = await AppDataSource.query(
+      `SELECT
+         COUNT(DISTINCT pc.partner_id)::int AS total_partners,
+         COALESCE(SUM(pc.commission_amount), 0)::int AS total_commission,
+         COALESCE(SUM(CASE WHEN pc.status = 'approved' THEN pc.commission_amount ELSE 0 END), 0)::int AS total_payable,
+         COALESCE(SUM(CASE WHEN pc.status = 'paid' THEN pc.commission_amount ELSE 0 END), 0)::int AS total_paid
+       FROM partner_commissions pc`,
+    );
+
+    res.json({
+      success: true,
+      data: partners,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      kpi: kpi || { total_partners: 0, total_commission: 0, total_payable: 0, total_paid: 0 },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin partners:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partners' });
+  }
+});
+
+/**
+ * GET /api/v1/neture/admin/partners/:id
+ * Admin 파트너 상세 + 최근 커미션
+ * WO-O4O-ADMIN-PARTNER-MONITORING-V1
+ */
+router.get('/admin/partners/:id', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const partnerId = req.params.id;
+
+    // Partner summary
+    const [summary] = await AppDataSource.query(
+      `SELECT
+         u.id AS partner_id,
+         u."displayName" AS name,
+         u.email,
+         COUNT(pc.id)::int AS orders,
+         COALESCE(SUM(pc.commission_amount), 0)::int AS commission,
+         COALESCE(SUM(CASE WHEN pc.status = 'approved' THEN pc.commission_amount ELSE 0 END), 0)::int AS payable,
+         COALESCE(SUM(CASE WHEN pc.status = 'paid' THEN pc.commission_amount ELSE 0 END), 0)::int AS paid
+       FROM partner_commissions pc
+       JOIN users u ON u.id = pc.partner_id
+       WHERE pc.partner_id = $1
+       GROUP BY u.id, u."displayName", u.email`,
+      [partnerId],
+    );
+
+    if (!summary) {
+      return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Partner not found' });
+    }
+
+    // Recent commissions (20)
+    const commissions = await AppDataSource.query(
+      `SELECT pc.id, pc.order_id, pc.order_number,
+              pm.marketing_name AS product_name,
+              os.name AS store_name,
+              pc.commission_amount, pc.status, pc.created_at
+       FROM partner_commissions pc
+       LEFT JOIN supplier_product_offers spo ON spo.id = pc.product_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN organization_stores os ON os.id = pc.store_id
+       WHERE pc.partner_id = $1
+       ORDER BY pc.created_at DESC
+       LIMIT 20`,
+      [partnerId],
+    );
+
+    res.json({
+      success: true,
+      data: { ...summary, commissions },
+    });
+  } catch (error) {
+    logger.error('[Neture API] Error fetching admin partner detail:', error);
+    res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch partner detail' });
   }
 });
 

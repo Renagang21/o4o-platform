@@ -13,8 +13,8 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import type { AuthRequest } from '../../../types/auth.js';
-import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
+import { optionalStoreAuth } from '../../../auth/auth-context.middleware.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import { OrganizationChannel } from '../../kpa/entities/organization-channel.entity.js';
 
@@ -54,6 +54,8 @@ export function createStoreHubController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
+  const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+  const optionalAuth = optionalStoreAuth(dataSource);
 
   /**
    * GET /store-hub/overview
@@ -63,17 +65,10 @@ export function createStoreHubController(
   router.get(
     '/overview',
     requireAuth,
+    optionalAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-        const userRoles: string[] = authReq.user?.roles || [];
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        const organizationId = req.organizationId;
         if (!organizationId) {
           res.json({ success: true, data: null, message: 'User not associated with an organization' });
           return;
@@ -208,17 +203,10 @@ export function createStoreHubController(
   router.get(
     '/channels',
     requireAuth,
+    optionalAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-        const userRoles: string[] = authReq.user?.roles || [];
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        const organizationId = req.organizationId;
         if (!organizationId) {
           res.json({ success: true, data: [] });
           return;
@@ -315,21 +303,10 @@ export function createStoreHubController(
   router.post(
     '/channels',
     requireAuth,
+    requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-        const userRoles: string[] = authReq.user?.roles || [];
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
-        if (!organizationId) {
-          res.status(403).json({ success: false, error: { code: 'NO_ORGANIZATION', message: 'No organization found' } });
-          return;
-        }
+        const organizationId = req.organizationId!;
 
         const { channelType } = req.body;
         const VALID_TYPES = ['B2C', 'KIOSK', 'TABLET', 'SIGNAGE'];
@@ -399,17 +376,10 @@ export function createStoreHubController(
   router.get(
     '/kpi-summary',
     requireAuth,
+    optionalAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-        const userRoles: string[] = authReq.user?.roles || [];
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        const organizationId = req.organizationId;
         if (!organizationId) {
           res.json({
             success: true,
@@ -502,17 +472,11 @@ export function createStoreHubController(
   router.get(
     '/live-signals',
     requireAuth,
+    optionalAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        // WO-ROLE-NORMALIZATION-PHASE3-A-V1: organization_members 기반
-        const authReq = req as AuthRequest;
-        const userId = authReq.user?.id;
-        if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'User ID not found' } });
-          return;
-        }
-        const userRoles: string[] = authReq.user?.roles || [];
-        const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+        const organizationId = req.organizationId;
+        const userId = req.user?.id;
 
         const signals = {
           newOrders: 0,
@@ -536,33 +500,37 @@ export function createStoreHubController(
         }
 
         // 2. Pending tablet requests (via pharmacy ownership)
-        try {
-          const rows = await dataSource.query(
-            `SELECT COUNT(*)::int AS count
-             FROM tablet_service_requests tsr
-             JOIN glycopharm_pharmacies gp ON gp.id = tsr.pharmacy_id
-             WHERE gp.created_by_user_id = $1
-               AND tsr.status = 'requested'`,
-            [userId]
-          );
-          signals.pendingTabletRequests = rows[0]?.count || 0;
-        } catch { /* table may not exist */ }
+        if (userId) {
+          try {
+            const rows = await dataSource.query(
+              `SELECT COUNT(*)::int AS count
+               FROM tablet_service_requests tsr
+               JOIN glycopharm_pharmacies gp ON gp.id = tsr.pharmacy_id
+               WHERE gp.created_by_user_id = $1
+                 AND tsr.status = 'requested'`,
+              [userId]
+            );
+            signals.pendingTabletRequests = rows[0]?.count || 0;
+          } catch { /* table may not exist */ }
+        }
 
         // 3. Pending customer requests — sales + survey (via pharmacy ownership)
-        try {
-          const rows = await dataSource.query(
-            `SELECT
-               COUNT(*) FILTER (WHERE purpose = 'order')::int AS "salesCount",
-               COUNT(*) FILTER (WHERE purpose = 'survey_followup')::int AS "surveyCount"
-             FROM glycopharm_customer_requests gcr
-             JOIN glycopharm_pharmacies gp ON gp.id = gcr.pharmacy_id
-             WHERE gp.created_by_user_id = $1
-               AND gcr.status = 'pending'`,
-            [userId]
-          );
-          signals.pendingSalesRequests = rows[0]?.salesCount || 0;
-          signals.surveyRequests = rows[0]?.surveyCount || 0;
-        } catch { /* table may not exist */ }
+        if (userId) {
+          try {
+            const rows = await dataSource.query(
+              `SELECT
+                 COUNT(*) FILTER (WHERE purpose = 'order')::int AS "salesCount",
+                 COUNT(*) FILTER (WHERE purpose = 'survey_followup')::int AS "surveyCount"
+               FROM glycopharm_customer_requests gcr
+               JOIN glycopharm_pharmacies gp ON gp.id = gcr.pharmacy_id
+               WHERE gp.created_by_user_id = $1
+                 AND gcr.status = 'pending'`,
+              [userId]
+            );
+            signals.pendingSalesRequests = rows[0]?.salesCount || 0;
+            signals.surveyRequests = rows[0]?.surveyCount || 0;
+          } catch { /* table may not exist */ }
+        }
 
         res.json({ success: true, data: signals });
       } catch (error: any) {

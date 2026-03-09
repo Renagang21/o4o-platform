@@ -226,6 +226,125 @@ export const supplierCommissionApi = {
   },
 };
 
+// ==================== Supplier Copilot Types (WO-O4O-SUPPLIER-COPILOT-DASHBOARD-V1) ====================
+
+export interface SupplierKpiSummary {
+  registeredProducts: number;
+  activeProducts: number;
+  storeListings: number;
+  recentOrders: number;
+}
+
+export interface ProductPerformanceItem {
+  productId: string;
+  productName: string;
+  orders: number;
+  revenue: number;
+  qrScans: number;
+}
+
+export interface DistributionItem {
+  productId: string;
+  productName: string;
+  storeCount: number;
+  newStores: number;
+}
+
+export interface TrendingProductItem {
+  productName: string;
+  currentOrders: number;
+  previousOrders: number;
+  growthRate: number;
+}
+
+export interface SupplierAiInsight {
+  insight: {
+    summary: string;
+    riskLevel: string;
+    recommendedActions: string[];
+    confidenceScore: number;
+  };
+  meta: {
+    provider: string;
+    model: string;
+    durationMs: number;
+  };
+}
+
+// ==================== Supplier Copilot API ====================
+
+export const supplierCopilotApi = {
+  async getKpi(): Promise<SupplierKpiSummary> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/kpi`, {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      return result.data || { registeredProducts: 0, activeProducts: 0, storeListings: 0, recentOrders: 0 };
+    } catch (error) {
+      console.warn('[Supplier Copilot] KPI fetch failed:', error);
+      throw error;
+    }
+  },
+
+  async getProductPerformance(): Promise<ProductPerformanceItem[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/products/performance`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier Copilot] Performance fetch failed:', error);
+      return [];
+    }
+  },
+
+  async getDistribution(): Promise<DistributionItem[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/distribution`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier Copilot] Distribution fetch failed:', error);
+      return [];
+    }
+  },
+
+  async getTrendingProducts(): Promise<TrendingProductItem[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/products/trending`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Supplier Copilot] Trending fetch failed:', error);
+      return [];
+    }
+  },
+
+  async getAiInsight(): Promise<SupplierAiInsight | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/ai-insight`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data || null;
+    } catch (error) {
+      console.warn('[Supplier Copilot] AI insight fetch failed:', error);
+      return null;
+    }
+  },
+};
+
 // ==================== Supplier Profile Types ====================
 
 export interface SupplierProfile {

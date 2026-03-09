@@ -1010,6 +1010,33 @@ const startServer = async () => {
       logger.error('Failed to register Store AI routes:', storeAiError);
     }
 
+    // 28f. Register Product AI Recommendation routes (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1) — static /recommend before parametric /:productId
+    try {
+      const { createProductAiRecommendationRouter } = await import('./modules/store-ai/controllers/product-ai-recommendation.controller.js');
+      app.use('/api/v1/products', createProductAiRecommendationRouter(AppDataSource));
+      logger.info('✅ Product AI Recommendation routes registered at /api/v1/products/recommend');
+    } catch (productAiRecommendError) {
+      logger.error('Failed to register Product AI Recommendation routes:', productAiRecommendError);
+    }
+
+    // 28g. Register Product AI Search routes (WO-O4O-AI-TAG-SEARCH-V1) — MUST come before tag routes
+    try {
+      const { createProductAiSearchRouter } = await import('./modules/store-ai/controllers/product-ai-search.controller.js');
+      app.use('/api/v1/products', createProductAiSearchRouter(AppDataSource));
+      logger.info('✅ Product AI Search routes registered at /api/v1/products/search');
+    } catch (productAiSearchError) {
+      logger.error('Failed to register Product AI Search routes:', productAiSearchError);
+    }
+
+    // 28h. Register Product AI Tag routes (WO-O4O-PRODUCT-AI-TAGGING-V1)
+    try {
+      const { createProductAiTagRouter } = await import('./modules/store-ai/controllers/product-ai-tag.controller.js');
+      app.use('/api/v1/products', createProductAiTagRouter(AppDataSource));
+      logger.info('✅ Product AI Tag routes registered at /api/v1/products');
+    } catch (productAiTagError) {
+      logger.error('Failed to register Product AI Tag routes:', productAiTagError);
+    }
+
     // 28-d. Home Preview (WO-HOME-LIVE-PREVIEW-V1: public aggregate API)
     try {
       const { createHomePreviewRouter } = await import('./modules/home/home-preview.controller.js');
@@ -1044,7 +1071,16 @@ const startServer = async () => {
       logger.error('Failed to register Neture Library routes:', netureLibraryError);
     }
 
-    // 29d. Register Catalog Import routes (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+    // 29d. Register Supplier Copilot routes (WO-O4O-SUPPLIER-COPILOT-DASHBOARD-V1)
+    try {
+      const { createSupplierCopilotRouter } = await import('./modules/neture/controllers/supplier-copilot.controller.js');
+      app.use('/api/v1/neture/supplier', createSupplierCopilotRouter(AppDataSource));
+      logger.info('✅ Supplier Copilot routes registered at /api/v1/neture/supplier/copilot/*');
+    } catch (supplierCopilotError) {
+      logger.error('Failed to register Supplier Copilot routes:', supplierCopilotError);
+    }
+
+    // 29e. Register Catalog Import routes (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     try {
       const catalogImportRoutes = createCatalogImportRoutes(AppDataSource);
       app.use('/api/v1/catalog-import', catalogImportRoutes);

@@ -266,6 +266,8 @@ const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceAp
 const AdminSettlementsPage = lazy(() => import('./pages/admin/AdminSettlementsPage'));
 const AdminCommissionsPage = lazy(() => import('./pages/admin/AdminCommissionsPage'));
 const AdminPartnerSettlementsPage = lazy(() => import('./pages/admin/AdminPartnerSettlementsPage'));
+const AdminPartnerMonitoringPage = lazy(() => import('./pages/admin/AdminPartnerMonitoringPage'));
+const AdminPartnerDetailPage = lazy(() => import('./pages/admin/AdminPartnerDetailPage'));
 
 // Partner HUB (WO-O4O-PARTNER-HUB-DASHBOARD-V1)
 const PartnerHubDashboardPage = lazy(() =>
@@ -616,6 +618,8 @@ function App() {
               <Route path="/workspace/admin/settlements" element={<AdminSettlementsPage />} />
               <Route path="/workspace/admin/commissions" element={<AdminCommissionsPage />} />
               <Route path="/workspace/admin/partner-settlements" element={<AdminPartnerSettlementsPage />} />
+              <Route path="/workspace/admin/partners" element={<AdminPartnerMonitoringPage />} />
+              <Route path="/workspace/admin/partners/:id" element={<AdminPartnerDetailPage />} />
               <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
