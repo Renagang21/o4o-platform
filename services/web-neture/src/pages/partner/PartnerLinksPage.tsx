@@ -1,142 +1,98 @@
 /**
- * PartnerLinksPage - 파트너 홍보 링크 관리 페이지
+ * PartnerLinksPage - 파트너 Referral 링크 관리 페이지
  *
- * Work Order: WO-O4O-PARTNER-LINKS-PAGE-V1
+ * WO-O4O-PARTNER-LINKS-API-INTEGRATION-V1
  *
- * 구조:
- * - Toolbar: 검색 + 콘텐츠 필터 + 상태 필터 + 생성 버튼
- * - Table: 링크 목록 (Desktop) / Card (Mobile)
- * - Empty State: 링크 없을 때
+ * partner_referrals 실제 데이터 조회
  */
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, Copy, Edit3, Trash2, Link2 } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { Search, Copy, ExternalLink, Link2, Loader2 } from 'lucide-react';
+import { partnerAffiliateApi, type ReferralLink } from '../../lib/api/partner';
 
-// ── Types ──
-
-type LinkStatus = 'Draft' | 'Active' | 'Inactive';
-
-interface LinkItem {
-  id: string;
-  path: string;
-  contentTitle: string;
-  storeName: string;
-  createdAt: string;
-  status: LinkStatus;
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-// ── Mock Data ──
-
-const mockLinks: LinkItem[] = [
-  { id: '1', path: '/neture/p/123', contentTitle: '비타민C 홍보', storeName: '서울약국', createdAt: '2026-03-01', status: 'Active' },
-  { id: '2', path: '/neture/p/124', contentTitle: '혈당측정기 홍보', storeName: '강남약국', createdAt: '2026-02-28', status: 'Active' },
-  { id: '3', path: '/neture/p/125', contentTitle: '프로바이오틱스 리뷰', storeName: '부산약국', createdAt: '2026-02-25', status: 'Draft' },
-  { id: '4', path: '/neture/p/126', contentTitle: '봄 시즌 캠페인', storeName: '대전약국', createdAt: '2026-02-20', status: 'Active' },
-  { id: '5', path: '/neture/p/127', contentTitle: '신제품 런칭', storeName: '인천약국', createdAt: '2026-02-15', status: 'Inactive' },
-];
-
-const contentOptions = [...new Set(mockLinks.map((l) => l.contentTitle))];
-const linkStatuses: LinkStatus[] = ['Draft', 'Active', 'Inactive'];
-
-// ── Style Helpers ──
-
-const statusStyle: Record<LinkStatus, string> = {
-  Draft: 'bg-amber-100 text-amber-700',
-  Active: 'bg-emerald-100 text-emerald-700',
-  Inactive: 'bg-gray-100 text-gray-500',
-};
-
 export function PartnerLinksPage() {
+  const [links, setLinks] = useState<ReferralLink[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [contentFilter, setContentFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState<LinkStatus | ''>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const filtered = mockLinks.filter((l) => {
-    if (search && !l.path.toLowerCase().includes(search.toLowerCase()) && !l.contentTitle.toLowerCase().includes(search.toLowerCase())) return false;
-    if (contentFilter && l.contentTitle !== contentFilter) return false;
-    if (statusFilter && l.status !== statusFilter) return false;
-    return true;
+  const fetchLinks = useCallback(async () => {
+    setLoading(true);
+    const data = await partnerAffiliateApi.getReferralLinks();
+    setLinks(data);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchLinks();
+  }, [fetchLinks]);
+
+  const filtered = links.filter((l) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (
+      l.product_name.toLowerCase().includes(q) ||
+      (l.store_name || '').toLowerCase().includes(q) ||
+      l.referral_token.toLowerCase().includes(q)
+    );
   });
 
-  const handleCopy = async (link: LinkItem) => {
+  const handleCopy = async (link: ReferralLink) => {
     try {
-      await navigator.clipboard.writeText(`https://neture.co.kr${link.path}`);
+      const fullUrl = `${window.location.origin}${link.referral_url}`;
+      await navigator.clipboard.writeText(fullUrl);
       setCopiedId(link.id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      // fallback: do nothing
+      // fallback
     }
+  };
+
+  const handleOpen = (link: ReferralLink) => {
+    window.open(link.referral_url, '_blank');
   };
 
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Links</h1>
-          <p className="text-sm text-gray-500 mt-1">홍보 링크를 생성하고 매장 연결을 관리합니다</p>
-        </div>
-        <Link
-          to="/account/partner/links/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Plus size={16} />
-          링크 생성
-        </Link>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">My Links</h1>
+        <p className="text-sm text-gray-500 mt-1">생성한 Referral 링크를 관리합니다</p>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="링크 또는 콘텐츠 검색..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          />
-        </div>
-        <select
-          value={contentFilter}
-          onChange={(e) => setContentFilter(e.target.value)}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-        >
-          <option value="">모든 콘텐츠</option>
-          {contentOptions.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as LinkStatus | '')}
-          className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-        >
-          <option value="">모든 상태</option>
-          {linkStatuses.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="상품명, 매장명, 토큰 검색..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+        />
       </div>
 
       {/* Content */}
-      {filtered.length === 0 ? (
-        /* Empty State */
+      {loading ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <Loader2 size={24} className="text-gray-400 animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500">링크를 불러오는 중...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
           <div className="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4">
             <Link2 size={24} className="text-gray-400" />
           </div>
-          <p className="text-gray-600 font-medium mb-2">등록된 홍보 링크가 없습니다</p>
-          <p className="text-sm text-gray-400 mb-6">홍보 링크를 생성하여 매장과 콘텐츠를 연결하세요.</p>
-          <Link
-            to="/account/partner/links/new"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            <Plus size={16} />
-            링크 생성
-          </Link>
+          <p className="text-gray-600 font-medium mb-2">
+            {links.length === 0 ? '생성된 Referral 링크가 없습니다' : '검색 결과가 없습니다'}
+          </p>
+          <p className="text-sm text-gray-400">
+            {links.length === 0 ? 'Products 탭에서 Referral 링크를 생성하세요.' : '다른 검색어를 입력해보세요.'}
+          </p>
         </div>
       ) : (
         <>
@@ -145,35 +101,29 @@ export function PartnerLinksPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">링크</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">콘텐츠</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">매장</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">생성일</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">상태</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">관리</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Store</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Referral URL</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
+                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filtered.map((l) => (
                   <tr key={l.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3.5">
-                      <code className="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                        {l.path}
+                      <span className="text-sm font-medium text-gray-900">{l.product_name}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="text-sm text-gray-600">{l.store_name || l.store_slug}</span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <code className="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded max-w-xs truncate block">
+                        {l.referral_url}
                       </code>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-900">{l.contentTitle}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-600">{l.storeName}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-500">{l.createdAt}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[l.status]}`}>
-                        {l.status}
-                      </span>
+                      <span className="text-sm text-gray-500">{fmtDate(l.created_at)}</span>
                     </td>
                     <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
@@ -184,22 +134,16 @@ export function PartnerLinksPage() {
                               ? 'text-emerald-600 bg-emerald-50'
                               : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
                           }`}
-                          title={copiedId === l.id ? 'Copied!' : 'Copy'}
+                          title={copiedId === l.id ? 'Copied!' : 'Copy URL'}
                         >
                           <Copy size={15} />
                         </button>
-                        <Link
-                          to={`/account/partner/links/${l.id}/edit`}
-                          className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Edit3 size={15} />
-                        </Link>
                         <button
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="Delete"
+                          onClick={() => handleOpen(l)}
+                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                          title="Open Page"
                         >
-                          <Trash2 size={15} />
+                          <ExternalLink size={15} />
                         </button>
                       </div>
                     </td>
@@ -213,39 +157,31 @@ export function PartnerLinksPage() {
           <div className="md:hidden space-y-3">
             {filtered.map((l) => (
               <div key={l.id} className="bg-white rounded-xl border border-gray-200 p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{l.contentTitle}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{l.storeName}</p>
-                  </div>
-                  <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[l.status]}`}>
-                    {l.status}
-                  </span>
+                <div className="mb-2">
+                  <p className="text-sm font-medium text-gray-900">{l.product_name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{l.store_name || l.store_slug}</p>
                 </div>
-                <code className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded block mb-3">
-                  {l.path}
+                <code className="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded block mb-3 truncate">
+                  {l.referral_url}
                 </code>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">{l.createdAt}</span>
+                  <span className="text-xs text-gray-400">{fmtDate(l.created_at)}</span>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleCopy(l)}
-                      className={`p-1.5 rounded-md text-xs font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                         copiedId === l.id
                           ? 'text-emerald-600 bg-emerald-50'
-                          : 'text-gray-400 hover:text-blue-600'
+                          : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50 border border-gray-200'
                       }`}
                     >
-                      {copiedId === l.id ? 'Copied!' : <Copy size={15} />}
+                      {copiedId === l.id ? 'Copied!' : 'Copy'}
                     </button>
-                    <Link
-                      to={`/account/partner/links/${l.id}/edit`}
-                      className="p-1.5 text-gray-400 hover:text-primary-600 rounded-md"
+                    <button
+                      onClick={() => handleOpen(l)}
+                      className="px-3 py-1.5 rounded-md text-xs font-medium text-gray-500 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 transition-colors"
                     >
-                      <Edit3 size={15} />
-                    </Link>
-                    <button className="p-1.5 text-gray-400 hover:text-red-600 rounded-md">
-                      <Trash2 size={15} />
+                      Open
                     </button>
                   </div>
                 </div>

@@ -1080,7 +1080,16 @@ const startServer = async () => {
       logger.error('Failed to register Supplier Copilot routes:', supplierCopilotError);
     }
 
-    // 29e. Register Catalog Import routes (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
+    // 29e. Register Operator Copilot routes (WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1)
+    try {
+      const { createOperatorCopilotRouter } = await import('./modules/operator/operator-copilot.controller.js');
+      app.use('/api/v1/operator', createOperatorCopilotRouter(AppDataSource));
+      logger.info('✅ Operator Copilot routes registered at /api/v1/operator/copilot/*');
+    } catch (operatorCopilotError) {
+      logger.error('Failed to register Operator Copilot routes:', operatorCopilotError);
+    }
+
+    // 29f. Register Catalog Import routes (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     try {
       const catalogImportRoutes = createCatalogImportRoutes(AppDataSource);
       app.use('/api/v1/catalog-import', catalogImportRoutes);

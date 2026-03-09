@@ -3,33 +3,29 @@
  *
  * Work Order: WO-O4O-PARTNER-HUB-CORE-V1
  * Refined: WO-O4O-PARTNER-HUB-REFINEMENT-V1
+ * UX: WO-O4O-PARTNER-PRODUCTS-UX-IMPROVEMENT-V1
  *
  * 커미션 정책이 설정된 제품 목록.
  * 파트너가 홍보할 제품을 선택하고 Referral 링크를 생성.
+ * 기존 링크가 있으면 바로 Copy/Open 가능.
  *
  * Filters: Supplier / Commission amount
  * Sort: Commission DESC / Latest commission
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Package, Link2, Search, SlidersHorizontal } from 'lucide-react';
+import { Package, Link2, Search, SlidersHorizontal, Copy, ExternalLink, Check } from 'lucide-react';
 import { partnerAffiliateApi } from '../../lib/api/index.js';
-import type { PoolProduct } from '../../lib/api/index.js';
-import { ReferralLinkModal } from './ReferralLinkModal';
+import type { PoolProduct, ReferralLink } from '../../lib/api/index.js';
 
 type SortOption = 'commission_desc' | 'latest';
 
-interface ModalState {
-  productName: string;
-  supplierName: string;
-  referralUrl: string;
-}
-
 export default function ProductPoolPage() {
   const [products, setProducts] = useState<PoolProduct[]>([]);
+  const [existingLinks, setExistingLinks] = useState<ReferralLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState<string | null>(null);
-  const [modal, setModal] = useState<ModalState | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,11 +34,24 @@ export default function ProductPoolPage() {
 
   useEffect(() => {
     (async () => {
-      const data = await partnerAffiliateApi.getProductPool();
-      setProducts(data);
+      const [poolData, linksData] = await Promise.all([
+        partnerAffiliateApi.getProductPool(),
+        partnerAffiliateApi.getReferralLinks(),
+      ]);
+      setProducts(poolData);
+      setExistingLinks(linksData);
       setLoading(false);
     })();
   }, []);
+
+  // Map product_id → existing ReferralLink
+  const linkMap = useMemo(() => {
+    const map = new Map<string, ReferralLink>();
+    for (const link of existingLinks) {
+      map.set(link.product_id, link);
+    }
+    return map;
+  }, [existingLinks]);
 
   const suppliers = useMemo(() => {
     const names = [...new Set(products.map((p) => p.supplier_name))];
@@ -52,7 +61,6 @@ export default function ProductPoolPage() {
   const filtered = useMemo(() => {
     let result = [...products];
 
-    // Search
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
       result = result.filter(
@@ -60,12 +68,10 @@ export default function ProductPoolPage() {
       );
     }
 
-    // Supplier filter
     if (selectedSupplier) {
       result = result.filter((p) => p.supplier_name === selectedSupplier);
     }
 
-    // Sort
     if (sortBy === 'commission_desc') {
       result.sort((a, b) => b.commission_per_unit - a.commission_per_unit);
     } else {
@@ -75,18 +81,31 @@ export default function ProductPoolPage() {
     return result;
   }, [products, searchTerm, selectedSupplier, sortBy]);
 
-  const handleGenerateLink = useCallback(async (product: PoolProduct) => {
+  const handleCreateLink = useCallback(async (product: PoolProduct) => {
     setGenerating(product.product_id);
     const result = await partnerAffiliateApi.createReferralLink(product.product_id);
     setGenerating(null);
 
     if (result) {
-      setModal({
-        productName: product.product_name,
-        supplierName: product.supplier_name,
-        referralUrl: result.referral_url,
-      });
+      // Refresh links to include newly created one
+      const updated = await partnerAffiliateApi.getReferralLinks();
+      setExistingLinks(updated);
     }
+  }, []);
+
+  const handleCopy = useCallback(async (referralUrl: string, productId: string) => {
+    try {
+      const fullUrl = `${window.location.origin}${referralUrl}`;
+      await navigator.clipboard.writeText(fullUrl);
+      setCopiedId(productId);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      // fallback
+    }
+  }, []);
+
+  const handleOpen = useCallback((referralUrl: string) => {
+    window.open(referralUrl, '_blank');
   }, []);
 
   return (
@@ -99,7 +118,6 @@ export default function ProductPoolPage() {
       {/* Toolbar */}
       {!loading && products.length > 0 && (
         <div style={styles.toolbar}>
-          {/* Search */}
           <div style={styles.searchWrap}>
             <Search size={16} style={{ color: '#94a3b8', flexShrink: 0 }} />
             <input
@@ -111,7 +129,6 @@ export default function ProductPoolPage() {
             />
           </div>
 
-          {/* Supplier Filter */}
           <div style={styles.filterWrap}>
             <SlidersHorizontal size={14} style={{ color: '#64748b' }} />
             <select
@@ -126,7 +143,6 @@ export default function ProductPoolPage() {
             </select>
           </div>
 
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
@@ -136,15 +152,6 @@ export default function ProductPoolPage() {
             <option value="commission_desc">커미션 높은순</option>
           </select>
         </div>
-      )}
-
-      {modal && (
-        <ReferralLinkModal
-          productName={modal.productName}
-          supplierName={modal.supplierName}
-          referralUrl={modal.referralUrl}
-          onClose={() => setModal(null)}
-        />
       )}
 
       {loading ? (
@@ -161,36 +168,67 @@ export default function ProductPoolPage() {
         </div>
       ) : (
         <div style={styles.grid}>
-          {filtered.map((p) => (
-            <div key={p.product_id} style={styles.card}>
-              {p.image_url ? (
-                <img src={p.image_url} alt={p.product_name} style={styles.cardImage} />
-              ) : (
-                <div style={styles.cardImagePlaceholder}>
-                  <Package size={32} style={{ color: '#94a3b8' }} />
-                </div>
-              )}
-              <div style={styles.cardBody}>
-                <p style={styles.cardSupplier}>{p.supplier_name}</p>
-                <h3 style={styles.cardName}>{p.product_name}</h3>
-                <p style={styles.cardPrice}>₩{p.price_general.toLocaleString()}</p>
-                <div style={styles.commissionBadge}>
-                  커미션 ₩{p.commission_per_unit.toLocaleString()} / 개
-                </div>
-                <button
-                  onClick={() => handleGenerateLink(p)}
-                  disabled={generating === p.product_id}
-                  style={styles.linkBtn}
-                >
-                  {generating === p.product_id ? (
-                    '생성 중...'
+          {filtered.map((p) => {
+            const existing = linkMap.get(p.product_id);
+            const isCopied = copiedId === p.product_id;
+            const isGenerating = generating === p.product_id;
+
+            return (
+              <div key={p.product_id} style={styles.card}>
+                {p.image_url ? (
+                  <img src={p.image_url} alt={p.product_name} style={styles.cardImage} />
+                ) : (
+                  <div style={styles.cardImagePlaceholder}>
+                    <Package size={32} style={{ color: '#94a3b8' }} />
+                  </div>
+                )}
+                <div style={styles.cardBody}>
+                  <p style={styles.cardSupplier}>{p.supplier_name}</p>
+                  <h3 style={styles.cardName}>{p.product_name}</h3>
+                  <p style={styles.cardPrice}>₩{p.price_general.toLocaleString()}</p>
+                  <div style={styles.commissionBadge}>
+                    커미션 ₩{p.commission_per_unit.toLocaleString()} / 개
+                  </div>
+
+                  {existing ? (
+                    /* Link exists — show Copy / Open */
+                    <div style={styles.linkActions}>
+                      <button
+                        onClick={() => handleCopy(existing.referral_url, p.product_id)}
+                        style={{
+                          ...styles.actionBtn,
+                          ...(isCopied ? styles.actionBtnCopied : {}),
+                        }}
+                      >
+                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                        {isCopied ? 'Copied!' : 'Copy'}
+                      </button>
+                      <button
+                        onClick={() => handleOpen(existing.referral_url)}
+                        style={styles.actionBtn}
+                      >
+                        <ExternalLink size={14} />
+                        Open
+                      </button>
+                    </div>
                   ) : (
-                    <><Link2 size={14} /> Referral 링크 생성</>
+                    /* No link — show Create */
+                    <button
+                      onClick={() => handleCreateLink(p)}
+                      disabled={isGenerating}
+                      style={styles.linkBtn}
+                    >
+                      {isGenerating ? (
+                        '생성 중...'
+                      ) : (
+                        <><Link2 size={14} /> Create Link</>
+                      )}
+                    </button>
                   )}
-                </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -326,6 +364,30 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     fontWeight: 600,
     cursor: 'pointer',
+  },
+  linkActions: {
+    display: 'flex',
+    gap: '8px',
+  },
+  actionBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '4px',
+    flex: 1,
+    padding: '10px',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  actionBtnCopied: {
+    borderColor: '#059669',
+    backgroundColor: '#ecfdf5',
+    color: '#059669',
   },
   emptyState: {
     textAlign: 'center' as const,

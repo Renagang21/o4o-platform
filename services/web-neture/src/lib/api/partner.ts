@@ -372,9 +372,11 @@ export interface ReferralLink {
   product_id: string;
   product_slug: string;
   store_slug: string;
+  store_name: string;
   product_name: string;
   price_general: number;
   commission_per_unit: number | null;
+  referral_url: string;
   created_at: string;
 }
 

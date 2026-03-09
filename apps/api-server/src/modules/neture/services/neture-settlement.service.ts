@@ -2,16 +2,17 @@
  * Neture Settlement Service
  *
  * WO-O4O-SETTLEMENT-SERVICE-EXTRACTION-V1
+ * WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1 — CommissionEngine 통합
  *
  * neture.routes.ts 인라인 정산 로직을 Service Layer로 추출.
- * SQL 및 계산 방식은 기존과 100% 동일.
+ * Platform Fee 계산은 CommissionEngine에 위임.
  */
 
 import type { DataSource } from 'typeorm';
+import { CommissionEngine } from '@o4o/financial-core';
 import logger from '../../../utils/logger.js';
 
-/** Default platform fee rate for supplier settlements (10%) */
-const NETURE_PLATFORM_FEE_RATE = 0.10;
+const commissionEngine = new CommissionEngine();
 
 const VALID_STATUSES = ['pending', 'calculated', 'approved', 'paid', 'cancelled'] as const;
 
@@ -164,12 +165,12 @@ export class NetureSettlementService {
     }
 
     const created: any[] = [];
-    const feeRate = NETURE_PLATFORM_FEE_RATE;
+    const feeRate = commissionEngine.getPlatformFeeRate();
 
     for (const agg of supplierAggregates) {
       const totalSales = Number(agg.total_sales);
-      const platformFee = Math.round(totalSales * feeRate);
-      const supplierAmount = totalSales - platformFee;
+      const platformFee = commissionEngine.calculatePlatformFee(totalSales);
+      const supplierAmount = commissionEngine.calculateSupplierAmount(totalSales, platformFee);
       const orderIds: string[] = agg.order_ids;
 
       const [settlement] = await this.dataSource.query(

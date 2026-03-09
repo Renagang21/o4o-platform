@@ -2,6 +2,8 @@
  * CommissionService
  *
  * 조건 기반 수수료 계산 엔진
+ *
+ * @deprecated Use CommissionEngine from @o4o/financial-core instead (WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1)
  */
 
 import { Injectable } from '@nestjs/common';

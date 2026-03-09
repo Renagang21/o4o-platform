@@ -4,6 +4,8 @@
  *
  * Determines commission policy and calculates commission amounts
  * Priority: Product → Seller → Global Default
+ *
+ * @deprecated Use CommissionEngine from @o4o/financial-core instead (WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1)
  */
 
 import AppDataSource from '../database/data-source.js';
@@ -19,6 +21,7 @@ export interface CommissionResult {
   source: 'product' | 'seller' | 'global'; // Where the policy came from
 }
 
+/** @deprecated Use CommissionEngine from @o4o/financial-core instead */
 export class CommissionCalculator {
   private productRepository = AppDataSource.getRepository(Product);
   private businessInfoRepository = AppDataSource.getRepository(BusinessInfo);

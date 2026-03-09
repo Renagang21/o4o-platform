@@ -1,153 +1,42 @@
 /**
- * NetureOperatorDashboard — 5-Block 통합 Operator 대시보드
+ * NetureOperatorDashboard — Operator AI Copilot Dashboard
  *
- * WO-O4O-OPERATOR-UX-NETURE-PILOT-V1:
- *   @o4o/operator-ux-core 기반 5-Block 구조로 전환.
- *   기존 API 데이터(AdminDashboardSummary)를 OperatorDashboardConfig로 변환.
+ * WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1
  *
- * Block 구조:
- *  [1] KPI Grid       — 핵심 수치 (공급자, 요청, 콘텐츠, 포럼)
- *  [2] AI Summary     — AI 운영 인사이트 (선택적)
- *  [3] Action Queue   — 즉시 처리 항목
- *  [4] Activity Log   — 최근 운영 활동
- *  [5] Quick Actions  — 빠른 작업 카드
+ * 8-Block Copilot:
+ *  1. 플랫폼 KPI (slate)
+ *  2. AI 플랫폼 요약 (indigo)
+ *  3. 신규 매장 (slate)
+ *  4. 공급자 활동 (slate)
+ *  5. 상품 승인 대기 (slate)
+ *  6. 플랫폼 트렌드 (emerald)
+ *  7. 위험 알림 (red/amber)
+ *  8. 운영 액션 (violet)
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  OperatorDashboardLayout,
-  type OperatorDashboardConfig,
-  type KpiItem,
-  type AiSummaryItem,
-  type ActionItem,
-  type ActivityItem,
-  type QuickActionItem,
-} from '@o4o/operator-ux-core';
-import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
-
-// ─── Data Transformer ───
-
-function buildDashboardConfig(
-  data: AdminDashboardSummary,
-): OperatorDashboardConfig {
-  const { stats } = data;
-
-  // Block 1: KPI Grid
-  const kpis: KpiItem[] = [
-    {
-      key: 'suppliers',
-      label: '활성 공급자',
-      value: stats.activeSuppliers,
-      status: stats.activeSuppliers === 0 ? 'critical' : 'neutral',
-    },
-    {
-      key: 'pending',
-      label: '승인 대기',
-      value: stats.pendingRequests,
-      status: stats.pendingRequests > 5 ? 'warning' : 'neutral',
-    },
-    {
-      key: 'content',
-      label: '콘텐츠 발행',
-      value: data.content?.totalPublished ?? 0,
-    },
-    {
-      key: 'forum',
-      label: '포럼 게시글',
-      value: data.forum?.totalPosts ?? 0,
-    },
-  ];
-
-  // Block 2: AI Summary (기존 signal 데이터로 생성)
-  const aiSummary: AiSummaryItem[] = [];
-  if (stats.pendingRequests > 0) {
-    aiSummary.push({
-      id: 'ai-pending',
-      message: `가입 승인 대기 ${stats.pendingRequests}건이 있습니다. 신속한 처리를 권장합니다.`,
-      level: stats.pendingRequests > 5 ? 'warning' : 'info',
-      link: '/workspace/operator/registrations',
-    });
-  }
-  if (stats.openPartnershipRequests > 0) {
-    aiSummary.push({
-      id: 'ai-partnership',
-      message: `파트너십 요청 ${stats.openPartnershipRequests}건이 검토 대기 중입니다.`,
-      level: 'info',
-      link: '/workspace/partners/requests',
-    });
-  }
-  if ((data.content?.totalPublished ?? 0) === 0 && (data.signage?.totalMedia ?? 0) === 0) {
-    aiSummary.push({
-      id: 'ai-content',
-      message: '발행된 콘텐츠가 없습니다. 콘텐츠 등록을 시작하세요.',
-      level: 'warning',
-      link: '/workspace/content',
-    });
-  }
-
-  // Block 3: Action Queue
-  const actionQueue: ActionItem[] = [];
-  if (stats.pendingRequests > 0) {
-    actionQueue.push({
-      id: 'aq-registrations',
-      label: '가입 승인 대기',
-      count: stats.pendingRequests,
-      link: '/workspace/operator/registrations',
-    });
-  }
-  if (stats.openPartnershipRequests > 0) {
-    actionQueue.push({
-      id: 'aq-partnership',
-      label: '파트너십 요청',
-      count: stats.openPartnershipRequests,
-      link: '/workspace/partners/requests',
-    });
-  }
-
-  // Block 4: Activity Log
-  const activityLog: ActivityItem[] = [];
-  for (const c of data.content?.recentItems ?? []) {
-    activityLog.push({
-      id: `c-${c.id}`,
-      message: `콘텐츠 등록: ${c.title}`,
-      timestamp: c.publishedAt || c.createdAt,
-    });
-  }
-  for (const p of data.forum?.recentPosts ?? []) {
-    activityLog.push({
-      id: `f-${p.id}`,
-      message: `포럼 게시: ${p.title}`,
-      timestamp: p.createdAt,
-    });
-  }
-  for (const a of data.recentActivities ?? []) {
-    activityLog.push({
-      id: `a-${a.id}`,
-      message: a.text,
-      timestamp: a.time,
-    });
-  }
-  // Sort by timestamp descending, limit 10
-  activityLog.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  activityLog.splice(10);
-
-  // Block 5: Quick Actions
-  const quickActions: QuickActionItem[] = [
-    { id: 'qa-registrations', label: '가입 승인', link: '/workspace/operator/registrations', icon: '✅' },
-    { id: 'qa-forum', label: '포럼 관리', link: '/workspace/operator/forum-management', icon: '💬' },
-    { id: 'qa-ai-report', label: 'AI 리포트', link: '/workspace/operator/ai-report', icon: '📊' },
-    { id: 'qa-content', label: '콘텐츠 관리', link: '/workspace/content', icon: '📝' },
-    { id: 'qa-suppliers', label: '공급자 관리', link: '/workspace/suppliers', icon: '🏢' },
-    { id: 'qa-supply', label: '공급 현황', link: '/workspace/operator/supply', icon: '📦' },
-  ];
-
-  return { kpis, aiSummary, actionQueue, activityLog, quickActions };
-}
-
-// ─── Component ───
+  operatorCopilotApi,
+  type OperatorKpiSummary,
+  type RecentStoreItem,
+  type SupplierActivityItem,
+  type PendingProductItem,
+  type PlatformTrends,
+  type AlertItem,
+  type OperatorAiSummary,
+} from '../../lib/api';
 
 export default function NetureOperatorDashboard() {
-  const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
+  const navigate = useNavigate();
+
+  const [kpi, setKpi] = useState<OperatorKpiSummary | null>(null);
+  const [aiSummary, setAiSummary] = useState<OperatorAiSummary | null>(null);
+  const [stores, setStores] = useState<RecentStoreItem[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierActivityItem[]>([]);
+  const [products, setProducts] = useState<PendingProductItem[]>([]);
+  const [trends, setTrends] = useState<PlatformTrends | null>(null);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -155,40 +44,355 @@ export default function NetureOperatorDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const data = await dashboardApi.getAdminDashboardSummary();
-      if (data) setConfig(buildDashboardConfig(data));
-    } catch (err) {
-      console.error('Failed to fetch operator dashboard:', err);
-      setError('데이터를 불러오지 못했습니다.');
+      const kpiData = await operatorCopilotApi.getKpi();
+      setKpi(kpiData);
+    } catch (err: any) {
+      if (err?.message?.includes('401') || err?.message?.includes('403')) {
+        setError('운영자 권한이 필요합니다.');
+        setLoading(false);
+        return;
+      }
+      setError('데이터를 불러오는데 실패했습니다.');
+      setLoading(false);
+      return;
     }
+
+    // Fire-and-forget parallel loads
+    operatorCopilotApi.getAiSummary()
+      .then(d => setAiSummary(d))
+      .catch(() => {});
+
+    operatorCopilotApi.getRecentStores()
+      .then(d => setStores(d))
+      .catch(() => {});
+
+    operatorCopilotApi.getSupplierActivity()
+      .then(d => setSuppliers(d))
+      .catch(() => {});
+
+    operatorCopilotApi.getPendingProducts()
+      .then(d => setProducts(d))
+      .catch(() => {});
+
+    operatorCopilotApi.getTrends()
+      .then(d => setTrends(d))
+      .catch(() => {});
+
+    operatorCopilotApi.getAlerts()
+      .then(d => setAlerts(d))
+      .catch(() => {});
+
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  if (loading) {
+  if (error) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-slate-500 text-lg mb-4">{error}</p>
+          <button onClick={fetchData} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm">
+            다시 시도
+          </button>
+        </div>
       </div>
     );
   }
 
-  if (error || !config) {
-    return (
-      <div className="text-center py-20">
-        <p className="text-slate-500 mb-4">{error || '데이터를 불러올 수 없습니다.'}</p>
+  const riskColor = aiSummary?.insight?.riskLevel === 'high' ? 'text-red-600 bg-red-50'
+    : aiSummary?.insight?.riskLevel === 'medium' ? 'text-amber-600 bg-amber-50'
+    : 'text-emerald-600 bg-emerald-50';
+
+  const aiActions = aiSummary?.insight?.recommendedActions || [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Operator AI Copilot</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            플랫폼 전체 상태를 AI가 분석하고, 운영 인사이트를 제공합니다.
+          </p>
+        </div>
         <button
           onClick={fetchData}
-          className="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium text-slate-700 transition-colors"
+          disabled={loading}
+          className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200 disabled:opacity-50"
         >
-          다시 시도
+          {loading ? '로딩...' : '새로고침'}
         </button>
       </div>
-    );
-  }
 
-  return <OperatorDashboardLayout config={config} />;
+      {/* Block 1: 플랫폼 KPI (slate) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 className="text-base font-semibold text-slate-800 mb-4">플랫폼 KPI</h2>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1,2,3,4].map(i => <div key={i} className="h-20 bg-slate-100 rounded-lg animate-pulse" />)}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <KpiCard label="총 매장" value={kpi?.totalStores ?? 0} />
+            <KpiCard label="총 공급자" value={kpi?.totalSuppliers ?? 0} accent />
+            <KpiCard label="등록 상품" value={kpi?.totalProducts ?? 0} />
+            <KpiCard label="최근 7일 주문" value={kpi?.recentOrders ?? 0} accent />
+          </div>
+        )}
+      </div>
+
+      {/* Block 2: AI 플랫폼 요약 (indigo) */}
+      <div className="bg-indigo-50 rounded-xl border border-indigo-200 p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-base font-semibold text-indigo-900">AI 플랫폼 요약</h2>
+          {aiSummary?.insight?.riskLevel && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${riskColor}`}>
+              {aiSummary.insight.riskLevel === 'high' ? '주의' : aiSummary.insight.riskLevel === 'medium' ? '보통' : '양호'}
+            </span>
+          )}
+        </div>
+        {aiSummary ? (
+          <>
+            <p className="text-sm text-indigo-800 leading-relaxed">{aiSummary.insight.summary}</p>
+            <p className="text-xs text-indigo-400 mt-3">
+              {aiSummary.meta.provider}/{aiSummary.meta.model} &middot; {aiSummary.meta.durationMs}ms
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-indigo-400">AI 분석을 불러오는 중...</p>
+        )}
+      </div>
+
+      {/* Block 3 + 4: 2-column */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Block 3: 신규 매장 (slate) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">신규 매장</h2>
+          {stores.length === 0 ? (
+            <p className="text-sm text-slate-400 py-8 text-center">최근 매장 데이터가 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {stores.map(store => (
+                <div key={store.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-700 truncate">{store.name}</p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {formatDate(store.createdAt)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Block 4: 공급자 활동 (slate) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">공급자 활동</h2>
+          {suppliers.length === 0 ? (
+            <p className="text-sm text-slate-400 py-8 text-center">최근 공급자 활동이 없습니다.</p>
+          ) : (
+            <div className="space-y-3">
+              {suppliers.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-700 truncate">{item.productName}</p>
+                    <p className="text-xs text-slate-400">{item.supplierName}</p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {formatDate(item.createdAt)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Block 5: 상품 승인 대기 (slate) */}
+      <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <h2 className="text-base font-semibold text-slate-800 mb-4">상품 승인 대기</h2>
+        {products.length === 0 ? (
+          <p className="text-sm text-slate-400 py-8 text-center">승인 대기 상품이 없습니다.</p>
+        ) : (
+          <div className="space-y-3">
+            {products.slice(0, 5).map(item => (
+              <div key={item.productId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-700 truncate">{item.productName}</p>
+                  <p className="text-xs text-slate-400">{item.supplierName}</p>
+                </div>
+                <span className="text-xs text-slate-400">
+                  {formatDate(item.createdAt)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Block 6 + 7: 2-column */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Block 6: 플랫폼 트렌드 (emerald) */}
+        <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-6">
+          <h2 className="text-base font-semibold text-emerald-900 mb-4">플랫폼 트렌드</h2>
+          {trends ? (
+            <div className="space-y-3">
+              <TrendRow
+                label="주문 변동"
+                current={trends.currentOrders}
+                previous={trends.previousOrders}
+                growth={trends.orderGrowth}
+                unit="건"
+              />
+              <div className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm text-emerald-800">이번 주 신규 매장</p>
+                </div>
+                <span className="text-sm font-bold text-emerald-700">{trends.newStores}개</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm text-emerald-800">이번 주 신규 공급자</p>
+                </div>
+                <span className="text-sm font-bold text-emerald-700">{trends.newSuppliers}개</span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm text-emerald-400 py-8 text-center">트렌드 데이터를 불러오는 중...</p>
+          )}
+        </div>
+
+        {/* Block 7: 위험 알림 (red/amber) */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <h2 className="text-base font-semibold text-slate-800 mb-4">위험 알림</h2>
+          {alerts.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-emerald-600 font-medium">모든 지표가 정상입니다.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {alerts.map(alert => (
+                <div
+                  key={alert.id}
+                  className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer ${
+                    alert.severity === 'high' ? 'bg-red-50 hover:bg-red-100'
+                    : alert.severity === 'medium' ? 'bg-amber-50 hover:bg-amber-100'
+                    : 'bg-slate-50 hover:bg-slate-100'
+                  }`}
+                  onClick={() => alert.link && navigate(alert.link)}
+                >
+                  <span className={`text-xs font-bold mt-0.5 ${
+                    alert.severity === 'high' ? 'text-red-500'
+                    : alert.severity === 'medium' ? 'text-amber-500'
+                    : 'text-slate-400'
+                  }`}>
+                    {alert.severity === 'high' ? '!!' : alert.severity === 'medium' ? '!' : '-'}
+                  </span>
+                  <p className={`text-sm ${
+                    alert.severity === 'high' ? 'text-red-800'
+                    : alert.severity === 'medium' ? 'text-amber-800'
+                    : 'text-slate-600'
+                  }`}>
+                    {alert.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Block 8: 운영 액션 (violet) */}
+      <div className="bg-violet-50 rounded-xl border border-violet-200 p-6">
+        <h2 className="text-base font-semibold text-violet-900 mb-4">운영 액션</h2>
+        {aiActions.length > 0 ? (
+          <div className="space-y-2 mb-5">
+            {aiActions.map((action, idx) => (
+              <div
+                key={idx}
+                className="flex items-start gap-3 p-3 bg-white/60 rounded-lg cursor-pointer hover:bg-white/80 transition-colors"
+                onClick={() => inferActionPath(action, navigate)}
+              >
+                <span className="text-violet-400 text-xs font-bold mt-0.5">{idx + 1}</span>
+                <p className="text-sm text-violet-800">{action}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-violet-400 mb-5">AI 추천을 불러오는 중...</p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {QUICK_LINKS.map(link => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className="px-3 py-1.5 bg-violet-100 text-violet-700 rounded-full text-xs font-medium hover:bg-violet-200 transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- Sub-components & helpers ----
+
+function KpiCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className={`rounded-lg p-4 ${accent ? 'bg-slate-800 text-white' : 'bg-slate-50 text-slate-700'}`}>
+      <p className={`text-xs font-medium mb-1 ${accent ? 'text-slate-300' : 'text-slate-500'}`}>{label}</p>
+      <p className="text-2xl font-bold">{value.toLocaleString()}</p>
+    </div>
+  );
+}
+
+function TrendRow({ label, current, previous, growth, unit }: {
+  label: string; current: number; previous: number; growth: number; unit: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 p-3 bg-white/60 rounded-lg">
+      <div className="flex-1">
+        <p className="text-sm text-emerald-800">{label}</p>
+        <p className="text-xs text-emerald-500">이번주 {current}{unit} / 지난주 {previous}{unit}</p>
+      </div>
+      <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${
+        growth > 0 ? 'text-emerald-700 bg-emerald-100'
+        : growth < 0 ? 'text-red-600 bg-red-50'
+        : 'text-slate-500 bg-slate-100'
+      }`}>
+        {growth > 0 ? '+' : ''}{growth}%
+      </span>
+    </div>
+  );
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    return new Date(dateStr).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+  } catch {
+    return '';
+  }
+}
+
+const QUICK_LINKS = [
+  { label: '가입 승인', path: '/workspace/operator/registrations' },
+  { label: '공급자 관리', path: '/workspace/suppliers' },
+  { label: '공급 현황', path: '/workspace/operator/supply' },
+  { label: '콘텐츠 관리', path: '/workspace/content' },
+  { label: '포럼 관리', path: '/workspace/operator/forum-management' },
+  { label: 'AI 리포트', path: '/workspace/operator/ai-report' },
+];
+
+function inferActionPath(action: string, nav: (path: string) => void) {
+  const lower = action.toLowerCase();
+  if (lower.includes('승인') || lower.includes('가입')) nav('/workspace/operator/registrations');
+  else if (lower.includes('매장') || lower.includes('store')) nav('/workspace/operator/supply');
+  else if (lower.includes('공급자') || lower.includes('supplier')) nav('/workspace/suppliers');
+  else if (lower.includes('상품') || lower.includes('product')) nav('/workspace/operator/supply');
+  else if (lower.includes('콘텐츠') || lower.includes('content')) nav('/workspace/content');
+  else if (lower.includes('주문') || lower.includes('order')) nav('/workspace/operator/supply');
 }

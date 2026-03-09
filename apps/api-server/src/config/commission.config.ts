@@ -4,6 +4,8 @@
  *
  * This file defines global commission settings and fallback values
  * used when product-level or seller-level commission policies are not set.
+ *
+ * @deprecated Use CommissionEngine from @o4o/financial-core instead (WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1)
  */
 
 /**

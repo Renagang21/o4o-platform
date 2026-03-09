@@ -5,6 +5,8 @@
  * - 우선순위 기반 정책 조회 (product > campaign > partner > default)
  * - 정률(PERCENT) / 정액(FIXED) 계산
  * - 이벤트 타입별 커미션 처리
+ *
+ * @deprecated Use CommissionEngine from @o4o/financial-core instead (WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1)
  */
 
 import type { Repository } from 'typeorm';

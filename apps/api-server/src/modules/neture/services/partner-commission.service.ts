@@ -2,14 +2,18 @@
  * Partner Commission Service
  *
  * WO-O4O-PARTNER-COMMISSION-TRIGGER-V1
+ * WO-O4O-COMMISSION-ENGINE-UNIFICATION-V1 — CommissionEngine 통합
  *
  * neture.routes.ts 인라인 커미션 로직을 Service Layer로 추출.
  * + 배송 완료 시 contract-based 커미션 자동 생성 트리거 추가.
- * SQL 및 계산 방식은 기존과 100% 동일.
+ * Partner Commission 계산은 CommissionEngine에 위임.
  */
 
 import type { DataSource } from 'typeorm';
+import { CommissionEngine } from '@o4o/financial-core';
 import logger from '../../../utils/logger.js';
+
+const commissionEngine = new CommissionEngine();
 
 const VALID_STATUSES = ['pending', 'approved', 'paid', 'cancelled'] as const;
 
@@ -62,7 +66,10 @@ export class PartnerCommissionService {
 
     let created = 0;
     for (const row of rows) {
-      const commissionAmount = Math.round(Number(row.order_amount) * Number(row.commission_rate) / 100);
+      const commissionAmount = commissionEngine.calculatePartnerCommission({
+        orderId: row.order_id, supplierId: row.supplier_id, productId: '', quantity: 0, unitPrice: 0,
+        totalPrice: Number(row.order_amount), contractCommissionRate: Number(row.commission_rate),
+      });
       try {
         await this.dataSource.query(
           `INSERT INTO partner_commissions
@@ -235,7 +242,10 @@ export class PartnerCommissionService {
 
     let created = 0;
     for (const row of rows) {
-      const commissionAmount = Math.round(Number(row.order_amount) * Number(row.commission_rate) / 100);
+      const commissionAmount = commissionEngine.calculatePartnerCommission({
+        orderId: row.order_id, supplierId: row.supplier_id, productId: '', quantity: 0, unitPrice: 0,
+        totalPrice: Number(row.order_amount), contractCommissionRate: Number(row.commission_rate),
+      });
       try {
         await this.dataSource.query(
           `INSERT INTO partner_commissions

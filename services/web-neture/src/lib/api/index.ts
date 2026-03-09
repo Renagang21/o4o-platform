@@ -148,6 +148,14 @@ export {
 export {
   operatorSupplyApi,
   type OperatorSupplyProduct,
+  operatorCopilotApi,
+  type OperatorKpiSummary,
+  type RecentStoreItem,
+  type SupplierActivityItem,
+  type PendingProductItem,
+  type PlatformTrends,
+  type AlertItem,
+  type OperatorAiSummary,
 } from './operator.js';
 
 // Store API + Order/Fulfillment types

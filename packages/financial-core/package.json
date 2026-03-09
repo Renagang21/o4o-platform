@@ -1,0 +1,26 @@
+{
+  "name": "@o4o/financial-core",
+  "version": "1.0.0",
+  "description": "Unified Commission Engine — Platform Fee, Supplier Settlement, Partner Commission",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@o4o/types": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}
