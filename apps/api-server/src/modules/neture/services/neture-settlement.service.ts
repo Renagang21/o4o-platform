@@ -9,10 +9,13 @@
  */
 
 import type { DataSource } from 'typeorm';
-import { CommissionEngine } from '@o4o/financial-core';
 import logger from '../../../utils/logger.js';
 
-const commissionEngine = new CommissionEngine();
+// Commission helpers (inlined from @o4o/financial-core)
+const PLATFORM_FEE_RATE = 0.10;
+const getPlatformFeeRate = () => PLATFORM_FEE_RATE;
+const calculatePlatformFee = (total: number) => Math.round(total * PLATFORM_FEE_RATE);
+const calculateSupplierAmount = (total: number, fee: number) => total - fee;
 
 const VALID_STATUSES = ['pending', 'calculated', 'approved', 'paid', 'cancelled'] as const;
 
@@ -165,12 +168,12 @@ export class NetureSettlementService {
     }
 
     const created: any[] = [];
-    const feeRate = commissionEngine.getPlatformFeeRate();
+    const feeRate = getPlatformFeeRate();
 
     for (const agg of supplierAggregates) {
       const totalSales = Number(agg.total_sales);
-      const platformFee = commissionEngine.calculatePlatformFee(totalSales);
-      const supplierAmount = commissionEngine.calculateSupplierAmount(totalSales, platformFee);
+      const platformFee = calculatePlatformFee(totalSales);
+      const supplierAmount = calculateSupplierAmount(totalSales, platformFee);
       const orderIds: string[] = agg.order_ids;
 
       const [settlement] = await this.dataSource.query(

@@ -10,10 +10,11 @@
  */
 
 import type { DataSource } from 'typeorm';
-import { CommissionEngine } from '@o4o/financial-core';
 import logger from '../../../utils/logger.js';
 
-const commissionEngine = new CommissionEngine();
+// Commission helper (inlined from @o4o/financial-core)
+const calculatePartnerCommission = (totalPrice: number, commissionRate: number) =>
+  Math.round(totalPrice * commissionRate / 100);
 
 const VALID_STATUSES = ['pending', 'approved', 'paid', 'cancelled'] as const;
 
@@ -66,10 +67,9 @@ export class PartnerCommissionService {
 
     let created = 0;
     for (const row of rows) {
-      const commissionAmount = commissionEngine.calculatePartnerCommission({
-        orderId: row.order_id, supplierId: row.supplier_id, productId: '', quantity: 0, unitPrice: 0,
-        totalPrice: Number(row.order_amount), contractCommissionRate: Number(row.commission_rate),
-      });
+      const commissionAmount = calculatePartnerCommission(
+        Number(row.order_amount), Number(row.commission_rate),
+      );
       try {
         await this.dataSource.query(
           `INSERT INTO partner_commissions
@@ -242,10 +242,9 @@ export class PartnerCommissionService {
 
     let created = 0;
     for (const row of rows) {
-      const commissionAmount = commissionEngine.calculatePartnerCommission({
-        orderId: row.order_id, supplierId: row.supplier_id, productId: '', quantity: 0, unitPrice: 0,
-        totalPrice: Number(row.order_amount), contractCommissionRate: Number(row.commission_rate),
-      });
+      const commissionAmount = calculatePartnerCommission(
+        Number(row.order_amount), Number(row.commission_rate),
+      );
       try {
         await this.dataSource.query(
           `INSERT INTO partner_commissions
