@@ -224,8 +224,10 @@ export class User {
   hasRole(role: UserRole | string): boolean {
     const roleStr = role as string;
     if (!this.roles || this.roles.length === 0) return false;
-    // Direct match or domain-prefixed match (e.g., 'admin' matches 'platform:admin')
-    return this.roles.some(r => r === roleStr || r === `platform:${roleStr}`);
+    // Direct match, platform-prefixed match, or service-prefixed match
+    // e.g., 'admin' matches 'platform:admin', 'glycopharm:admin', 'kpa:admin'
+    // WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1
+    return this.roles.some(r => r === roleStr || r === `platform:${roleStr}` || r.endsWith(`:${roleStr}`));
   }
 
   hasAnyRole(roles: (UserRole | string)[]): boolean {

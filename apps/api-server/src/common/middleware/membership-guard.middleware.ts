@@ -58,6 +58,14 @@ export function createMembershipScopeGuard(
         return scopeHandler(req, res, next);
       }
 
+      // WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1
+      // Service-scoped role bypass — users with {service}:* roles (e.g., kpa:admin)
+      // are by definition service members and don't need a separate membership record.
+      const servicePrefix = `${config.serviceKey}:`;
+      if (user.roles?.some((r: string) => r.startsWith(servicePrefix))) {
+        return scopeHandler(req, res, next);
+      }
+
       // Check service membership from JWT payload
       const memberships: { serviceKey: string; status: string }[] = user.memberships || [];
       const membership = memberships.find((m: { serviceKey: string }) => m.serviceKey === membershipKey);

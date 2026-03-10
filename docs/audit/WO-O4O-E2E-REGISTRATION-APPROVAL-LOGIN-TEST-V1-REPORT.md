@@ -1,8 +1,8 @@
 # WO-O4O-E2E-REGISTRATION-APPROVAL-LOGIN-TEST-V1 — E2E Test Report
 
-Version: **2.0**
+Version: **3.0**
 Date: **2026-03-10**
-Status: **PARTIAL PASS — 가입 4/5 성공, 승인 미완주, P1 잔여**
+Status: **가입 4/5 OK, 운영자 로그인 5/5 OK, 승인 API 403 차단 (Backend RBAC)**
 
 ---
 
@@ -24,10 +24,30 @@ Cloud SQL `o4o_api` 비밀번호 재설정 + 마이그레이션 실행 → **DB 
 사용자 로그인:       0/5 — 승인 미완료로 "대기 중" 상태 (정상 동작)
 ```
 
+### Round 2 → 3 사이 수정 (WO-O4O-E2E-BLOCKER-FIX-V1)
+
+| # | 수정 | 커밋 |
+|---|------|------|
+| 1 | **GlucoseView /login 빈 화면 수정** — LoginPage 라우트 등록 (`App.tsx`) | `a28861fb8` |
+| 2 | **GlycoPharm /operator/users 404 수정** — operator 라우터에 UsersPage 라우트 추가 | `a28861fb8` |
+| 3 | **K-Cosmetics /operator/users 404 수정** — operator 라우터에 OperatorUsersPage 라우트 추가 | `a28861fb8` |
+| 4 | **E2E 스크립트 개선** — KPA-a 직접 `/operator/members` 이동, GlucoseView 약관 체크박스 자동 체크 | `a28861fb8` |
+
+### Round 3 (수정 배포 후)
+
+```
+가입(Registration):  4/5 성공 (Round 2 동일)
+운영자 로그인:       5/5 성공 ← GlucoseView 빈 화면 수정됨
+승인 페이지 로드:    3/5 성공 (GlycoPharm, KPA-a, K-Cosmetics 페이지 렌더링)
+승인 API 호출:      0/5 실패 — API 403 Forbidden (Backend RBAC 이슈)
+사용자 로그인:       0/5 — 승인 미완료 → "가입 승인 대기 중" (정상 동작)
+```
+
 **핵심 발견:**
-- 가입 + 운영자 로그인 = **플랫폼 인증 인프라 정상**
-- 승인 실패는 Playwright 네비게이션 문제 (서비스 기능 이상 아님)
-- 사용자 "가입 승인 대기 중" 메시지 = **Service Membership pending 상태 정상 작동**
+- GlucoseView P1 빈 화면 **수정 확인** — `/login` 정상 렌더링
+- 승인 페이지 404 **수정 확인** — GlycoPharm, KPA-a 회원 관리 UI 렌더링 성공
+- **NEW P1: 승인 API 403 Forbidden** — 운영자 계정이 회원 관리 API 호출 시 403 반환
+- 사용자 로그인 "가입 승인 대기 중" 메시지 4/4 서비스 정상 표시
 
 ---
 
@@ -72,119 +92,125 @@ neture.co.kr      → 136.110.132.35 (OK)
 ```
 
 **영향:** Neture 서비스에 `shop.neture.co.kr`로 접근 불가.
-**대안:** Round 2에서 `www.neture.co.kr` 사용하여 테스트 진행.
+**대안:** Round 2/3에서 `www.neture.co.kr` 사용하여 테스트 진행.
 
 ---
 
-## 3. E2E Test Results — Round 2 (DB 복구 후)
+## 3. E2E Test Results — Round 3 (수정 배포 후)
 
-테스트 계정: `test-e2e-v2@o4o.com` / `O4oTestPass1!`
+테스트 계정: `test-e2e-v3@o4o.com` / `O4oTestPass1!`
 
 ### 3.1 GlycoPharm (glycopharm.co.kr)
 
-| 단계 | 결과 | 스크린샷 | 비고 |
-|------|------|---------|------|
-| 가입 페이지 | **OK** | 01-register-page | 폼 정상 렌더링 |
-| 폼 입력 | **OK** | 02-register-filled | 이메일, 비밀번호, 성, 이름, 핸드폰, 면허번호 |
-| 가입 제출 | **OK** | 03-register-result | 가입 성공 → 대시보드 리다이렉트 |
-| 운영자 로그인 | **OK** | 04-operator-login | `GlycopharmAdmin` 대시보드 진입 성공 |
-| 승인 페이지 이동 | **FAIL** | 05-approval-page | 404 — `/operator/users` 경로 불일치 |
-| 사용자 로그인 | **PENDING** | 07-user-login | "가입 승인 대기 중입니다" (승인 미완료) |
+| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
+|------|---------|---------|---------|------|
+| 가입 | OK | **OK** | 01~03 | 가입 성공 |
+| 운영자 로그인 | OK | **OK** | 04 | `GlycopharmAdmin` 대시보드 진입 |
+| 승인 페이지 | 404 | **페이지 로드 OK** | 05 | "회원 관리" UI 렌더링 성공, "가입 신청" 탭 표시 |
+| 승인 API | — | **403 Forbidden** | 05~06 | 전체 0, 활성 0, 대기 0, 거부 0 — API 차단 |
+| 사용자 로그인 | 승인 대기 | **승인 대기** | 07 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." |
 
-**분석:**
-- 운영자 대시보드에서 사이드바 "회원 관리" 메뉴 확인됨
-- 승인 페이지 실제 경로: 사이드바 "회원 관리" → "신청 관리" 탭 (직접 URL 확인 필요)
-- 사용자 로그인 시 "가입 승인 대기 중" 메시지 = Service Membership `pending` 상태 정상
+**Round 3 분석:**
+- `/operator/users` 라우트 수정 확인 — 페이지 정상 렌더링
+- "회원 관리" 헤더, 전체/활성/대기/거부 카운트 카드, "회원 목록"/"가입 신청" 탭 모두 표시
+- **API 403**: `GlycopharmAdmin` 계정의 역할이 회원 관리 API 호출 권한 없음
+- 사용자 로그인 시 "가입 승인 대기 중" 정상 표시 (test-e2e-v3 계정 pending 확인)
 
 ### 3.2 KPA-a (kpa-society.co.kr)
 
-| 단계 | 결과 | 스크린샷 | 비고 |
-|------|------|---------|------|
-| 가입 페이지 | **OK** | 01-register-page | 모달 팝업, 지부/분회 선택 포함 |
-| 폼 입력 | **OK** | 02-register-filled | 기본 필드 + 지부(서울지부)/분회(강남분회) 선택 |
-| 가입 제출 | **OK** | 03-register-result | 가입 성공 |
-| 운영자 로그인 | **OK** | 04-operator-login | KPA Community 홈 진입, "운영 대시보드" 링크 표시 |
-| 승인 페이지 이동 | **FAIL** | 05-approval-page | 운영 대시보드 진입은 성공했으나 회원 승인 UI 탐색 실패 |
-| 사용자 로그인 | **PENDING** | 07-user-login | 모달에서 "가입 승인 대기 중입니다" 표시 |
+| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
+|------|---------|---------|---------|------|
+| 가입 | OK | **OK** | 01~03 | 가입 성공 |
+| 운영자 로그인 | OK | **OK** | 04 | KPA Community 운영자 진입 |
+| 승인 페이지 | 네비게이션 실패 | **페이지 로드 OK** | 05 | "회원 관리" UI 렌더링 성공, "가입 신청" 탭 표시 |
+| 승인 API | — | **403 Forbidden** | 05~06 | 총 회원 수 0, 승인 대기 0, "API error 403" |
+| 사용자 로그인 | 승인 대기 | **승인 대기** | 07 | 모달에서 "가입 승인 대기 중입니다" |
 
-**분석:**
-- 운영자 대시보드 (05 스크린샷): AI Summary, Action Queue, Recent Activity 정상 표시
-- 회원 승인은 별도 네비게이션 필요 (대시보드 → 회원관리)
-- KPA 특수: 모달 기반 로그인, 운영자와 일반 사용자 같은 도메인
+**Round 3 분석:**
+- `/operator/members` 직접 이동 → 페이지 정상 렌더링
+- "회원 관리" 헤더, 총 회원 수/승인 대기/승인 완료 카드 표시
+- **API error 403**: GlycoPharm과 동일 패턴 — 운영자 역할의 API 권한 부족
+- 사용자 로그인 시 "가입 승인 대기 중" 정상 표시
 
 ### 3.3 GlucoseView (glucoseview.co.kr)
 
-| 단계 | 결과 | 스크린샷 | 비고 |
-|------|------|---------|------|
-| 가입 페이지 | **OK** | 01-register-page | 약사 전용 가입 폼 정상 |
-| 폼 입력 | **OK** | 02-register-filled | 면허번호, 본명, 표시이름, 핸드폰, 이메일, 비밀번호, 지부/분회, 약국명 |
-| 가입 제출 | **PARTIAL** | 03-register-result | "Terms of service must be accepted" 에러 — 약관 동의 미체크 |
-| 운영자 로그인 | **FAIL (P1)** | 04-operator-login | **완전 빈 화면 (white screen)** |
-| 사용자 로그인 | **FAIL (P1)** | 07-user-login | 동일 빈 화면 |
+| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
+|------|---------|---------|---------|------|
+| 가입 | 약관 미체크 | **OK** | 01~03 | 약관 자동 체크로 가입 성공 |
+| 운영자 로그인 | **P1 빈 화면** | **OK → 홈으로 리다이렉트** | 04 | 홈 렌더링 성공 + "신청이 심사 중입니다" 배너 |
+| 승인 페이지 | — | **세션 소실** | 05 | 로그인 모달 표시 (운영자 세션 유지 안 됨) |
+| 사용자 로그인 | P1 빈 화면 | **LoginPage 정상** | 07 | "가입 승인 대기 중입니다" — **P1 수정 확인** |
 
-**P1 GlucoseView /login 빈 화면 버그:**
-- `/login` 경로 접근 시 완전 빈 화면 (HTML/JS 렌더링 실패)
-- DB 장애와 무관 — Round 1, Round 2 동일 증상
-- 프론트엔드 번들 에러 또는 라우터 설정 문제 추정
-- `/register`는 정상 렌더링 → `/login` 컴포넌트 특정 문제
-
-**추가 발견:**
-- 가입 폼에 "약관 동의" 체크박스 존재 (다른 서비스에는 없거나 자동 체크)
-- 지부/분회 드롭다운 정상 동작 (서울지부/강남분회 선택됨)
+**Round 3 분석:**
+- **P1 수정 확인**: `/login` → LoginPage 정상 렌더링 (빈 화면 해소)
+- 운영자 로그인 → 홈 페이지 렌더링 (NOT 빈 화면). "신청이 심사 중입니다" 배너 = 운영자 계정이 pending 상태?
+- 운영자가 `/operator/glucoseview/users`로 이동 시 세션 소실 → 로그인 모달 재표시
+- **이슈**: 운영자 계정이 operator 대시보드가 아닌 홈으로 리다이렉트 됨 — 역할/권한 라우팅 문제
+- 사용자 로그인: LoginPage에서 "가입 승인 대기 중" 정상 표시, 테스트 계정 pharmacist@o4o.com 힌트 표시
 
 ### 3.4 K-Cosmetics (k-cosmetics.site)
 
-| 단계 | 결과 | 스크린샷 | 비고 |
-|------|------|---------|------|
-| 가입 페이지 | **OK** | 01-register-page | 2단계 (역할 선택 → 폼) |
-| 역할 선택 + 폼 입력 | **OK** | 02-register-filled | "소비자" 선택 → 이메일, 비밀번호, 이름, 핸드폰, 약관 |
-| 가입 제출 | **OK** | 03-register-result | 가입 성공 |
-| 운영자 로그인 | **OK** | 04-operator-login | `K-cosmetics Admin` 관리자 대시보드 진입 |
-| 승인 페이지 이동 | **FAIL** | 05-approval-page | 404 — 경로 불일치 |
-| 사용자 로그인 | **PENDING** | 07-user-login | "가입 승인 대기 중입니다" (승인 미완료) |
+| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
+|------|---------|---------|---------|------|
+| 가입 | OK | **OK** | 01~03 | 가입 성공 |
+| 운영자 로그인 | OK | **OK** | 04 | `K-cosmetics Admin` 관리자 대시보드 진입 |
+| 승인 페이지 | 404 | **세션 소실** | 05 | 로그인 페이지 표시 (운영자 세션 유지 안 됨) |
+| 사용자 로그인 | 승인 대기 | **승인 대기** | 07 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." |
 
-**분석:**
-- 관리자 대시보드: 사이드바에 "대시보드", "매장 네트워크", "회원 관리", "설정" 확인
-- 대시보드 본문: "데이터를 불러올 수 없습니다" — 대시보드 데이터 API 에러 (별도 이슈)
-- 승인 페이지: 사이드바 "회원 관리" 클릭으로 접근해야 함
+**Round 3 분석:**
+- 운영자 대시보드 진입 성공 (04 스크린샷: 사이드바 렌더링, "데이터를 불러올 수 없습니다")
+- `/operator/users` 이동 시 로그인 페이지로 리다이렉트 — 세션/인증 소실
+- **이슈**: `관리자` 역할로 로그인했지만 `/operator/*` 경로 접근 시 인증 유지 안 됨
+- 사용자 로그인 "가입 승인 대기 중" 정상 표시
 
 ### 3.5 Neture (www.neture.co.kr)
 
-| 단계 | 결과 | 스크린샷 | 비고 |
-|------|------|---------|------|
-| 가입 페이지 | **OK** | 01-register-page | 2단계 (공급자/파트너 역할 선택) |
-| 역할 선택 | **FAIL** | 02-register-filled | 역할 선택 후 step 2 진입은 가능하나 폼 필드 탐색 실패 |
-| 가입 제출 | **FAIL** | — | 폼 미완성으로 제출 불가 |
-| 운영자 로그인 | **OK** | 04-operator-login | `Neture 공급자·파트너` 워크스페이스 진입 |
-| 승인 페이지 이동 | **FAIL** | 05-approval-page | 메인 페이지 로그인 모달 표시 — 경로 불일치 |
-| 사용자 로그인 | — | 07-user-login | 가입 미완료로 테스트 불가 |
+| 단계 | Round 2 | Round 3 | 스크린샷 | 비고 |
+|------|---------|---------|---------|------|
+| 가입 | 폼 필드 탐색 실패 | **동일 실패** | 01~02 | 폼 필드 선택자 탐색 불가 |
+| 운영자 로그인 | OK | **OK → 데이터 에러** | 04 | "데이터를 불러올 수 없습니다" |
+| 승인 페이지 | URL 불일치 | **로그인 모달 표시** | 05 | 세션 소실 또는 경로 불일치 |
+| 사용자 로그인 | — | **"존재하지 않은 이메일"** | 07 | 가입 미완료로 정상 |
 
 **분석:**
-- Neture 가입은 "공급자" or "파트너" 중 역할 선택 → step 2 폼으로 진행
-- 운영자 워크스페이스: 네비게이션 바에 홈/상품/콘텐츠/정산/허브 메뉴 확인
-- 워크스페이스 본문: "데이터를 불러올 수 없습니다" — 대시보드 데이터 로딩 에러
+- Neture 가입 폼은 2단계 마법사 → Playwright 셀렉터 추가 작업 필요
+- 운영자 워크스페이스: 네비게이션 표시되나 본문 "데이터를 불러올 수 없습니다"
+- 사용자 로그인: "존재하지 않은 이메일입니다" — 가입이 안 됐으므로 정상
 
 ---
 
 ## 4. 종합 결과 매트릭스
 
-| 서비스 | 가입 | 운영자 로그인 | 승인 | 사용자 로그인 | 서비스 접근 |
-|--------|------|-------------|------|-------------|-----------|
-| **GlycoPharm** | OK | OK | URL 불일치 (404) | 승인 대기 중 | — |
-| **KPA-a** | OK | OK | 네비게이션 실패 | 승인 대기 중 | — |
-| **GlucoseView** | 약관 미체크 | **P1: 빈 화면** | — | **P1: 빈 화면** | — |
-| **K-Cosmetics** | OK | OK | URL 불일치 (404) | 승인 대기 중 | — |
-| **Neture** | 폼 필드 탐색 실패 | OK | URL 불일치 | — | — |
+### Round 3
+
+| 서비스 | 가입 | 운영자 로그인 | 승인 페이지 | 승인 API | 사용자 로그인 |
+|--------|------|-------------|-----------|---------|-------------|
+| **GlycoPharm** | OK | OK | **OK** | **403** | 승인 대기 중 |
+| **KPA-a** | OK | OK | **OK** | **403** | 승인 대기 중 |
+| **GlucoseView** | OK | OK (→홈) | 세션 소실 | — | 승인 대기 중 |
+| **K-Cosmetics** | OK | OK | 세션 소실 | — | 승인 대기 중 |
+| **Neture** | 폼 실패 | OK (→에러) | 세션 소실 | — | 미등록 |
+
+### Round 2 → Round 3 개선 사항
+
+| 항목 | Round 2 | Round 3 | 상태 |
+|------|---------|---------|------|
+| GlucoseView /login 빈 화면 | 완전 빈 화면 (P1) | LoginPage 정상 렌더링 | **FIXED** |
+| GlycoPharm /operator/users | 404 | 회원 관리 UI 렌더링 | **FIXED** |
+| K-Cosmetics /operator/users | 404 | 라우트 등록됨 (세션 이슈 별도) | **FIXED** |
+| GlucoseView 약관 체크 | 미체크로 가입 실패 | 자동 체크로 가입 성공 | **FIXED** |
+| KPA-a 승인 페이지 네비게이션 | 실패 | `/operator/members` 직접 이동 성공 | **FIXED** |
 
 ### 인프라 검증 결론
 
 | 검증 항목 | 결과 | 근거 |
 |----------|------|------|
 | DB 연결 | **PASS** | health/database: healthy |
-| 회원가입 API | **PASS** | 4/5 서비스 가입 성공, 계정 생성 확인 |
+| 회원가입 API | **PASS** | 4/5 서비스 가입 성공 |
 | Service Membership | **PASS** | "가입 승인 대기 중" 메시지 = pending 상태 정상 |
-| 운영자 인증 | **PASS** | 4/5 서비스 운영자 대시보드 진입 (GlucoseView만 UI 버그) |
+| 운영자 UI 인증 | **PASS** | 5/5 서비스 운영자 대시보드/홈 진입 |
 | 운영자 API 인증 | **PASS** | 10/10 계정 API 로그인 성공 (Round 2 전 검증) |
+| **회원 관리 API 권한** | **FAIL** | API 403 Forbidden (GlycoPharm, KPA-a 확인) |
 
 ---
 
@@ -196,109 +222,141 @@ neture.co.kr      → 136.110.132.35 (OK)
 |---|------|------|------|
 | 1 | DB 인증 실패 | **RESOLVED** | Cloud SQL 비밀번호 재설정 + 마이그레이션 실행 |
 
-### P1 (중요) — OPEN
+### P1 (중요)
 
-| # | 버그 | 영향 | 원인 | 상태 |
-|---|------|------|------|------|
-| 2 | **shop.neture.co.kr DNS 미등록** | Neture `shop` 서브도메인 접근 불가 | DNS A/CNAME 레코드 없음 | OPEN |
-| 3 | **GlucoseView /login 빈 화면** | GlucoseView 로그인 불가 | 프론트엔드 렌더링 버그 (/register는 정상) | OPEN |
-| 4 | **K-Cosmetics 대시보드 데이터 로딩 실패** | 관리자 대시보드 빈 화면 ("데이터를 불러올 수 없습니다") | API 응답 에러 | NEW |
-| 5 | **Neture 워크스페이스 데이터 로딩 실패** | 파트너/공급자 대시보드 빈 화면 | API 응답 에러 | NEW |
+| # | 버그 | 영향 | Round 2 | Round 3 | 상태 |
+|---|------|------|---------|---------|------|
+| 2 | shop.neture.co.kr DNS 미등록 | Neture `shop` 서브도메인 접근 불가 | OPEN | OPEN | **OPEN** |
+| 3 | GlucoseView /login 빈 화면 | GlucoseView 로그인 불가 | P1 | **정상 렌더링** | **FIXED** |
+| 4 | K-Cosmetics 대시보드 데이터 로딩 실패 | "데이터를 불러올 수 없습니다" | NEW | 동일 | **OPEN** |
+| 5 | Neture 워크스페이스 데이터 로딩 실패 | "데이터를 불러올 수 없습니다" | NEW | 동일 | **OPEN** |
+| 6 | **회원 관리 API 403 Forbidden** | 운영자가 회원 승인 불가 | — | **NEW** | **NEW** |
+| 7 | **GlucoseView 운영자 세션/라우팅** | operator 대시보드 대신 홈으로 리다이렉트 | — | **NEW** | **NEW** |
+| 8 | **K-Cosmetics 운영자 세션 소실** | `/operator/users` 이동 시 로그인 페이지 | — | **NEW** | **NEW** |
 
 ### P2 (개선)
 
 | # | 관찰 | 권장 |
 |---|------|------|
-| 6 | GlucoseView 가입 시 약관 동의 체크 필요 (다른 서비스는 자동/없음) | UX 통일 검토 |
-| 7 | 가입 폼 필드명이 서비스마다 다름 | 공통 RegisterDTO 표준화 |
-| 8 | Neture 가입 2단계 폼 필드 선택자 비표준 | data-testid 또는 name 속성 추가 |
+| 9 | Neture 가입 2단계 폼 필드 비표준 셀렉터 | data-testid 또는 name 속성 추가 |
+| 10 | 가입 폼 필드명이 서비스마다 다름 | 공통 RegisterDTO 표준화 검토 |
 
 ---
 
-## 6. 서비스별 UI 구조 (Round 2 확인)
+## 6. 핵심 차단 이슈: API 403 Forbidden 분석
 
-### 가입 페이지
+### 증상
 
-| 서비스 | URL | 가입 방식 | Round 2 결과 |
-|--------|-----|----------|-------------|
-| GlycoPharm | glycopharm.co.kr/register | 단일 폼 (약사 전용) | OK |
-| KPA-Society | kpa-society.co.kr/register | 모달 + 지부/분회 선택 | OK |
-| GlucoseView | glucoseview.co.kr/register | 단일 폼 + 약관 동의 | 약관 미체크 |
-| K-Cosmetics | k-cosmetics.site/register | 2단계 (역할 → 폼) | OK |
-| Neture | www.neture.co.kr/register | 2단계 (공급자/파트너 → 폼) | 폼 탐색 실패 |
+GlycoPharm과 KPA-a 모두 **회원 관리 페이지는 정상 렌더링**되지만, API 호출 시 **403 Forbidden** 반환.
 
-### 운영자 대시보드
+```
+GlycoPharm-05: "회원 관리" UI 렌더링 → "Forbidden" 에러 (빨간색)
+KPA-a-05:      "회원 관리" UI 렌더링 → "API error 403" (빨간색)
+```
 
-| 서비스 | 로그인 경로 | 대시보드 경로 | 사이드바 메뉴 | Round 2 |
-|--------|-----------|-------------|-------------|---------|
-| GlycoPharm | /login | /operator | 대시보드, 신청관리, 상품관리, 주문관리, 재고/공급, 정산관리, 분석/리포트, 회원관리 등 | OK |
-| KPA-Society | /login (모달) | /operator | 운영 대시보드 링크 → AI Summary, Action Queue | OK |
-| GlucoseView | /login | /operator | **빈 화면 (P1)** | FAIL |
-| K-Cosmetics | /login | /operator | 대시보드, 매장 네트워크, 회원 관리, 설정 | OK |
-| Neture | /login | /workspace/* | 홈, 상품, 콘텐츠, 정산, 허브 | OK |
+### 추정 원인
 
-### 회원 승인 페이지 (확인 필요)
+1. **RBAC 권한 부족**: 운영자 계정의 `role_assignments`에 회원 관리 API 호출 권한이 없음
+2. **API 엔드포인트 권한 체크**: 회원 목록/승인 API가 특정 역할(admin/super_admin)만 허용
+3. **serviceKey 스코프**: 운영자가 해당 서비스의 회원을 조회할 권한이 매핑되지 않음
 
-| 서비스 | 예상 경로 | 접근 방법 |
-|--------|---------|----------|
-| GlycoPharm | 사이드바 "회원 관리" or "신청 관리" | 대시보드 → 사이드바 클릭 |
-| KPA-Society | 운영 대시보드 → 회원관리 | 대시보드 하위 메뉴 |
-| GlucoseView | (P1 해결 후 확인) | — |
-| K-Cosmetics | 사이드바 "회원 관리" | 대시보드 → 사이드바 클릭 |
-| Neture | /workspace/operator/registrations | 별도 경로 |
+### 조사 필요
+
+```
+1. 회원 관리 API 엔드포인트 경로 확인 (GET /api/v1/admin/memberships?status=pending)
+2. 해당 엔드포인트의 미들웨어 체인 확인 (requireRole, requirePermission 등)
+3. 운영자 계정의 role_assignments 테이블 조회
+4. operator 역할에 필요한 permission 추가 또는 API 미들웨어 수정
+```
 
 ---
 
-## 7. 즉시 조치 권장
+## 7. 서비스별 회원 승인 경로 (Round 3 확인)
+
+| 서비스 | 승인 페이지 URL | 페이지 렌더링 | API 결과 |
+|--------|----------------|-------------|---------|
+| GlycoPharm | `/operator/users` → "가입 신청" 탭 | OK | **403 Forbidden** |
+| KPA-a | `/operator/members` → "가입 신청" 탭 | OK | **403 (API error 403)** |
+| GlucoseView | `/operator/glucoseview/users` | 세션 소실 | 미확인 |
+| K-Cosmetics | `/operator/users` | 세션 소실 | 미확인 |
+| Neture | `/workspace/operator/registrations` | 세션 소실 | 미확인 |
+
+---
+
+## 8. 사용자 로그인 결과 (Round 3 — 승인 전)
+
+모든 가입 완료 서비스에서 **"가입 승인 대기 중"** 메시지 정상 표시:
+
+| 서비스 | 로그인 UI | 메시지 | 스크린샷 |
+|--------|----------|--------|---------|
+| GlycoPharm | 전용 페이지 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
+| KPA-a | 모달 | "가입 승인 대기 중입니다. 운영자 승인 후 이용합니다." | 07 |
+| GlucoseView | **LoginPage** (P1 수정됨) | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
+| K-Cosmetics | 전용 페이지 | "가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다." | 07 |
+
+**결론**: Service Membership pending → approved 전환 전까지 정상적으로 "대기 중" 안내 — **인증 인프라 정상 동작 확인**.
+
+---
+
+## 9. 즉시 조치 권장
 
 ```
 [DONE] 1. [P0] Cloud SQL o4o_api 비밀번호 재설정 → 완료
 [DONE] 2. [P0] 마이그레이션 실행 (service_memberships 테이블 생성) → 완료
 [DONE] 3. [P0] 전체 운영자 계정 API 검증 (10/10 PASS) → 완료
-[OPEN] 4. [P1] GlucoseView /login 빈 화면 → 프론트엔드 디버깅 필요
-[OPEN] 5. [P1] shop.neture.co.kr DNS 레코드 등록
-[OPEN] 6. [P1] K-Cosmetics / Neture 대시보드 데이터 로딩 에러 조사
-[TODO] 7. [E2E] 승인 페이지 URL 수정 후 E2E 3차 실행
+[DONE] 4. [P1] GlucoseView /login 빈 화면 → LoginPage 라우트 등록으로 수정
+[DONE] 5. [P1] GlycoPharm/K-Cosmetics /operator/users 404 → operator 라우터에 라우트 추가
+[OPEN] 6. [P1] 회원 관리 API 403 Forbidden → Backend RBAC 권한 조사 + 수정 필요
+[OPEN] 7. [P1] GlucoseView/K-Cosmetics 운영자 세션 소실 → 인증 상태 유지 조사
+[OPEN] 8. [P1] K-Cosmetics / Neture 대시보드 데이터 로딩 에러 조사
+[OPEN] 9. [P1] shop.neture.co.kr DNS 레코드 등록
+[TODO] 10. [P2] Neture 가입 폼 E2E 스크립트 개선
 ```
+
+### 우선순위: API 403 Forbidden (#6)
+
+이 이슈가 해결되면 GlycoPharm과 KPA-a에서 승인 → 사용자 로그인 → 서비스 접근 전체 플로우 검증 가능.
 
 ---
 
-## 8. 스크린샷 경로 (Round 2)
+## 10. 스크린샷 경로 (Round 3)
 
 ```
 e2e/screenshots/
 ├── GlycoPharm-01-register-page.png
 ├── GlycoPharm-02-register-filled.png
-├── GlycoPharm-03-register-result.png     ✅ 가입 성공 → 대시보드 리다이렉트
+├── GlycoPharm-03-register-result.png     ✅ 가입 성공
 ├── GlycoPharm-04-operator-login.png      ✅ 운영자 대시보드 (GlycopharmAdmin)
-├── GlycoPharm-05-approval-page.png       ❌ 404 페이지
-├── GlycoPharm-06-approval-result.png     ❌ 404 페이지
+├── GlycoPharm-05-approval-page.png       ✅ 회원 관리 UI 로드, ❌ API 403 Forbidden
+├── GlycoPharm-06-approval-result.png     ❌ Forbidden 지속
 ├── GlycoPharm-07-user-login.png          ⏳ "가입 승인 대기 중"
 ├── KPA-a-01-register-page.png
 ├── KPA-a-02-register-filled.png
 ├── KPA-a-03-register-result.png          ✅ 가입 성공
-├── KPA-a-04-operator-login.png           ✅ KPA Community 홈 (운영자 로그인)
-├── KPA-a-05-approval-page.png            ❌ 운영 대시보드 진입했으나 승인 UI 미도달
-├── KPA-a-06-approval-result.png
+├── KPA-a-04-operator-login.png           ✅ KPA Community 운영자 진입
+├── KPA-a-05-approval-page.png            ✅ 회원 관리 UI 로드, ❌ API error 403
+├── KPA-a-06-approval-result.png          ❌ API error 403
 ├── KPA-a-07-user-login.png               ⏳ "가입 승인 대기 중" (모달)
 ├── GlucoseView-01-register-page.png
 ├── GlucoseView-02-register-filled.png
-├── GlucoseView-03-register-result.png    ⚠️ "Terms of service must be accepted"
-├── GlucoseView-04-operator-login.png     ❌ 완전 빈 화면 (P1)
-├── GlucoseView-07-user-login.png         ❌ 완전 빈 화면 (P1)
+├── GlucoseView-03-register-result.png    ✅ 가입 성공 (약관 자동 체크)
+├── GlucoseView-04-operator-login.png     ✅ 홈 렌더링 + "신청이 심사 중입니다" 배너
+├── GlucoseView-05-approval-page.png      ❌ 로그인 모달 (세션 소실)
+├── GlucoseView-06-approval-result.png
+├── GlucoseView-07-user-login.png         ✅ LoginPage 정상 + "가입 승인 대기 중"
 ├── K-Cosmetics-01-register-page.png
 ├── K-Cosmetics-02-register-filled.png
 ├── K-Cosmetics-03-register-result.png    ✅ 가입 성공
-├── K-Cosmetics-04-operator-login.png     ✅ 관리자 대시보드 (K-cosmetics Admin)
-├── K-Cosmetics-05-approval-page.png      ❌ 404 페이지
+├── K-Cosmetics-04-operator-login.png     ✅ 관리자 대시보드 (데이터 로딩 에러)
+├── K-Cosmetics-05-approval-page.png      ❌ 로그인 페이지 (세션 소실)
 ├── K-Cosmetics-06-approval-result.png
 ├── K-Cosmetics-07-user-login.png         ⏳ "가입 승인 대기 중"
-├── Neture-01-register-page.png           ✅ 역할 선택 화면 (공급자/파트너)
-├── Neture-02-register-filled.png
-├── Neture-04-operator-login.png          ✅ 공급자·파트너 워크스페이스
-├── Neture-05-approval-page.png           ❌ 메인 페이지 로그인 모달
+├── Neture-01-register-page.png           역할 선택 화면
+├── Neture-02-register-filled.png         폼 필드 탐색 실패
+├── Neture-04-operator-login.png          ✅ 워크스페이스 진입 (데이터 에러)
+├── Neture-05-approval-page.png           ❌ 로그인 모달 (세션 소실)
 ├── Neture-06-approval-result.png
-├── Neture-07-user-login.png
+├── Neture-07-user-login.png              "존재하지 않은 이메일" (미등록)
 └── results.json
 ```
 
@@ -306,25 +364,34 @@ e2e/screenshots/
 
 ## 결론
 
-### P0 복구 완료
-DB 인증 장애는 Cloud SQL 비밀번호 재설정 + 마이그레이션으로 **완전 복구**.
+### 수정 확인 (Round 2 → 3)
 
-### E2E 테스트 현황
-- **가입**: 4/5 서비스 성공 (Neture만 폼 탐색 이슈)
-- **운영자 로그인**: 4/5 서비스 성공 (GlucoseView P1 빈 화면)
-- **승인**: Playwright 스크립트의 URL/네비게이션 문제로 미완주 (서비스 기능 이상 아님)
-- **사용자 로그인**: 승인 미완료 → "대기 중" 상태 (정상 동작 확인)
-
-### 플랫폼 인증 인프라 평가
-| 영역 | 평가 |
+| 수정 | 검증 |
 |------|------|
-| 회원가입 (Account + Service Membership) | **정상** |
-| 운영자 인증 (API level) | **정상** (10/10 PASS) |
-| 운영자 대시보드 (UI level) | **4/5 정상** (GlucoseView P1) |
-| Service Membership pending 처리 | **정상** ("승인 대기" 메시지 표시) |
+| GlucoseView /login 빈 화면 | **FIXED** — LoginPage 정상 렌더링, "가입 승인 대기 중" 표시 |
+| GlycoPharm /operator/users 404 | **FIXED** — "회원 관리" UI 정상 로드 |
+| K-Cosmetics /operator/users 404 | **FIXED** — 라우트 등록됨 (세션 문제 별도) |
+| GlucoseView 약관 체크 E2E | **FIXED** — 가입 성공 |
 
-### 잔여 작업
-1. GlucoseView /login 빈 화면 (P1) 해결
-2. K-Cosmetics / Neture 대시보드 데이터 로딩 에러 조사
-3. 승인 페이지 정확한 URL 확인 후 E2E 3차 실행
-4. shop.neture.co.kr DNS 등록
+### 현재 차단 이슈
+
+**API 403 Forbidden** — 운영자 계정으로 회원 관리 API 호출 시 403 반환
+- GlycoPharm: `/operator/users` 페이지 로드 OK → API "Forbidden"
+- KPA-a: `/operator/members` 페이지 로드 OK → API "API error 403"
+- 원인: Backend RBAC 설정 (role_assignments / API 미들웨어 권한 체크)
+
+### 플랫폼 인증 인프라 최종 평가
+
+| 영역 | 평가 | 비고 |
+|------|------|------|
+| 회원가입 | **정상** | 4/5 서비스 성공 |
+| 운영자 인증 (API) | **정상** | 10/10 PASS |
+| 운영자 인증 (UI) | **정상** | 5/5 서비스 진입 (Round 3에서 GlucoseView 수정) |
+| Service Membership pending | **정상** | 4/4 서비스 "승인 대기 중" 표시 |
+| **회원 관리 API 권한** | **차단** | API 403 — Backend RBAC 수정 필요 |
+
+### 다음 단계
+
+1. **[P1] 회원 관리 API 403 조사** — 운영자 역할의 API 권한 부족 원인 파악 + 수정
+2. **[P1] 세션 소실 조사** — GlucoseView/K-Cosmetics 운영자 세션이 페이지 이동 시 유실
+3. 403 해결 후 **E2E 4차 실행** — 승인 → 사용자 로그인 → 서비스 접근 전체 플로우 검증

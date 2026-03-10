@@ -10,7 +10,7 @@ import { join } from 'path';
 const SCREENSHOT_DIR = join(process.cwd(), 'e2e', 'screenshots');
 mkdirSync(SCREENSHOT_DIR, { recursive: true });
 
-const TEST_USER = { email: 'test-e2e-v2@o4o.com', password: 'O4oTestPass1!' };
+const TEST_USER = { email: 'test-e2e-v3@o4o.com', password: 'O4oTestPass1!' };
 const TIMEOUT = 15_000;
 
 interface ServiceConfig {
