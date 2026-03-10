@@ -170,8 +170,9 @@ export class EmailService {
   /**
    * Send password reset email
    */
-  async sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
-    const resetUrl = `${process.env.ADMIN_URL || 'http://localhost:3001'}/reset-password?token=${resetToken}`;
+  async sendPasswordResetEmail(email: string, resetToken: string, serviceUrl?: string): Promise<boolean> {
+    const baseUrl = serviceUrl || process.env.ADMIN_URL || 'http://localhost:3001';
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
     
     return this.sendEmail({
       to: email,

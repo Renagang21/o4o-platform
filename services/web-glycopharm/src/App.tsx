@@ -16,6 +16,8 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 // Public Pages (always loaded - first paint)
 import HomeLivePage from '@/pages/HomeLivePage';
 import LoginPage from '@/pages/auth/LoginPage';
+import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import RedirectNoticeBanner from '@/components/common/RedirectNoticeBanner';
 import FeatureIntroPage from '@/components/common/FeatureIntroPage';
@@ -276,6 +278,8 @@ function AppRoutes() {
         <Route index element={<HomeLivePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="forgot-password" element={<AccountRecoveryPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/posts" element={<ForumPage />} />

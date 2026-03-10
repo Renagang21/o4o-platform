@@ -14,7 +14,7 @@ export class PasswordResetService {
   /**
    * Request password reset
    */
-  static async requestPasswordReset(email: string): Promise<boolean> {
+  static async requestPasswordReset(email: string, serviceUrl?: string): Promise<boolean> {
     const userRepo = AppDataSource.getRepository(User);
     const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
 
@@ -47,7 +47,7 @@ export class PasswordResetService {
     await tokenRepo.save(resetToken);
 
     // Send email
-    await emailService.sendPasswordResetEmail(email, token);
+    await emailService.sendPasswordResetEmail(email, token, serviceUrl);
 
     return true;
   }

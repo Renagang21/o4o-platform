@@ -102,6 +102,8 @@ import TestCenterPage from './pages/TestCenterPage';
 // Neture 공통 페이지 (즉시 로드)
 // ============================================================================
 import { RegisterPage } from './pages/RegisterPage';
+import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import MyPage from './pages/MyPage';
 import SupplierListPage from './pages/suppliers/SupplierListPage';
@@ -382,6 +384,8 @@ function App() {
             ================================================================ */}
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<AccountRecoveryPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
             <Route path="/my" element={<MyPage />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />

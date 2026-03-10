@@ -9,6 +9,8 @@ import InsightsPage from './pages/InsightsPage';
 import SettingsPage from './pages/SettingsPage';
 import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
+import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import PendingPage from './pages/PendingPage';
 import AdminPage from './pages/AdminPage';
 import MyPage from './pages/MyPage';
@@ -106,6 +108,8 @@ function AppRoutes() {
       <Route path="/register" element={
         isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
       } />
+      <Route path="/forgot-password" element={<AccountRecoveryPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* 승인 대기 페이지 */}
       <Route path="/pending" element={

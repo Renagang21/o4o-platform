@@ -108,6 +108,12 @@ router.post(
   asyncHandler(PasswordController.resetPassword)
 );
 
+// POST /api/v1/auth/find-id - Find account by phone
+router.post(
+  '/find-id',
+  asyncHandler(PasswordController.findId)
+);
+
 /**
  * ========================================
  * Email Verification Routes

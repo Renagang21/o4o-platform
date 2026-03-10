@@ -26,6 +26,17 @@ export class PasswordResetDto {
 }
 
 /**
+ * Find ID DTO
+ *
+ * Validates phone number for account lookup
+ */
+export class FindIdDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Phone number is required' })
+  phone: string;
+}
+
+/**
  * Password Reset Response DTO
  *
  * Standard response structure for password reset operations

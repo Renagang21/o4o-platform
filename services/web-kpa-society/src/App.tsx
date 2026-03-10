@@ -9,6 +9,8 @@ import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { DashboardPage } from './pages/DashboardPage';
+import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
 // Forum pages
 import { ForumHomePage, ForumListPage, ForumDetailPage, ForumWritePage } from './pages/forum';
@@ -528,6 +530,8 @@ function App() {
            * ========================================================= */}
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
+          <Route path="/forgot-password" element={<AccountRecoveryPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
           {/* Hub = 약국 공용공간 (WO-O4O-HUB-MARKET-RESTRUCTURE-V1) */}
           <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubMarketPage /></PharmacyGuard></Layout>} />

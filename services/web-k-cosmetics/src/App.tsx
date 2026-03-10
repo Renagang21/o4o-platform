@@ -19,6 +19,8 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 // Public Pages (always loaded - first paint)
 import { HomePage, NotFoundPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
+import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 
 // ============================================================================
 // Lazy loaded pages (heavy / rarely accessed)
@@ -151,6 +153,8 @@ function AppRoutes() {
         <Route index element={<RoleBasedHome />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="forgot-password" element={<AccountRecoveryPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
