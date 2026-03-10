@@ -448,6 +448,8 @@ function AppRoutes() {
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
         {/* Support */}
         <Route path="support" element={<SupportPage />} />
+        {/* 회원 관리 (WO-O4O-E2E-BLOCKER-FIX-V1: operator 사이드바 링크 연결) */}
+        <Route path="users" element={<UsersPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<AiReportPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
