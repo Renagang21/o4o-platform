@@ -1,10 +1,7 @@
 import { PerformanceOptimizationService } from './PerformanceOptimizationService.js';
-import { AutoScalingService } from './AutoScalingService.js';
-import { CDNOptimizationService } from './CDNOptimizationService.js';
-import { DatabaseOptimizationService } from './DatabaseOptimizationService.js';
+// AutoScalingService, CDNOptimizationService, DatabaseOptimizationService removed (WO-O4O-CODEBASE-CLEANUP-V1)
+// DeploymentMonitoringService, OperationsMonitoringService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 import { AnalyticsService } from './AnalyticsService.js';
-import { DeploymentMonitoringService } from './DeploymentMonitoringService.js';
-import { OperationsMonitoringService } from './OperationsMonitoringService.js';
 import Redis from 'ioredis';
 
 /**
@@ -54,11 +51,7 @@ export class PerformanceMonitoringInitializer {
       // 서비스 초기화 순서 (의존성 고려)
       await this.initializeAnalyticsService();
       await this.initializePerformanceOptimizationService();
-      await this.initializeDatabaseOptimizationService();
-      await this.initializeCDNOptimizationService();
-      await this.initializeAutoScalingService();
-      await this.initializeOperationsMonitoring();
-      await this.initializeDeploymentMonitoring();
+      // DatabaseOptimization, CDNOptimization, AutoScaling, Operations, Deployment removed (WO-O4O-CODEBASE-CLEANUP-V1)
 
       // 서비스 간 통합 설정
       await this.configureServiceIntegration();
@@ -120,80 +113,9 @@ export class PerformanceMonitoringInitializer {
     }
   }
 
-  /**
-   * 데이터베이스 최적화 서비스 초기화
-   */
-  private async initializeDatabaseOptimizationService(): Promise<void> {
-    try {
-      const databaseService = new DatabaseOptimizationService();
-      this.services.set('database', databaseService as unknown as MonitoringService);
-      this.serviceStatus.set('database', { status: 'running', lastCheck: new Date() });
-    } catch (error) {
-      // Error log removed
-      this.serviceStatus.set('database', { status: 'failed', lastCheck: new Date(), error: error as Error });
-      throw error;
-    }
-  }
-
-  /**
-   * CDN 최적화 서비스 초기화
-   */
-  private async initializeCDNOptimizationService(): Promise<void> {
-    try {
-      const cdnService = new CDNOptimizationService();
-      this.services.set('cdn', cdnService as unknown as MonitoringService);
-      this.serviceStatus.set('cdn', { status: 'running', lastCheck: new Date() });
-    } catch (error) {
-      // Error log removed
-      this.serviceStatus.set('cdn', { status: 'failed', lastCheck: new Date(), error: error as Error });
-      throw error;
-    }
-  }
-
-  /**
-   * 자동 스케일링 서비스 초기화
-   */
-  private async initializeAutoScalingService(): Promise<void> {
-    try {
-      const scalingService = new AutoScalingService();
-      this.services.set('scaling', scalingService as unknown as MonitoringService);
-      this.serviceStatus.set('scaling', { status: 'running', lastCheck: new Date() });
-    } catch (error) {
-      // Error log removed
-      this.serviceStatus.set('scaling', { status: 'failed', lastCheck: new Date(), error: error as Error });
-      throw error;
-    }
-  }
-
-  /**
-   * 운영 모니터링 서비스 초기화
-   */
-  private async initializeOperationsMonitoring(): Promise<void> {
-    try {
-      const operationsService = new OperationsMonitoringService();
-      this.services.set('operations', operationsService as unknown as MonitoringService);
-      this.serviceStatus.set('operations', { status: 'running', lastCheck: new Date() });
-    } catch (error) {
-      // Error log removed
-      this.serviceStatus.set('operations', { status: 'failed', lastCheck: new Date(), error: error as Error });
-      throw error;
-    }
-  }
-
-  /**
-   * 배포 모니터링 서비스 초기화
-   */
-  private async initializeDeploymentMonitoring(): Promise<void> {
-    try {
-      const deploymentService = new DeploymentMonitoringService();
-      this.services.set('deployment', deploymentService as unknown as MonitoringService);
-      this.serviceStatus.set('deployment', { status: 'running', lastCheck: new Date() });
-    } catch (error) {
-      // Error log removed
-      this.serviceStatus.set('deployment', { status: 'failed', lastCheck: new Date(), error: error as Error });
-      throw error;
-    }
-  }
+  // initializeDatabaseOptimizationService, initializeCDNOptimizationService,
+  // initializeAutoScalingService, initializeOperationsMonitoring,
+  // initializeDeploymentMonitoring removed (WO-O4O-CODEBASE-CLEANUP-V1)
 
   /**
    * 서비스 간 통합 설정
