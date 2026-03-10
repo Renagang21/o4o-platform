@@ -18,6 +18,15 @@ export function mapApiRoles<R extends string>(
 
   if (rawRoles.length === 0) return [fallback];
 
-  const mapped = rawRoles.map((r) => roleMap[r] ?? fallback);
+  const mapped = rawRoles.map((r) => {
+    if (roleMap[r] !== undefined) return roleMap[r];
+    // Handle prefixed roles (e.g., 'glycopharm:admin' → 'admin')
+    const colonIdx = r.indexOf(':');
+    if (colonIdx !== -1) {
+      const base = r.slice(colonIdx + 1);
+      if (roleMap[base] !== undefined) return roleMap[base];
+    }
+    return fallback;
+  });
   return [...new Set(mapped)];
 }
