@@ -186,6 +186,10 @@ export class User {
   @OneToMany('LinkedAccount', 'user')
   linkedAccounts?: any[];
 
+  // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: 서비스별 멤버십
+  @OneToMany('ServiceMembership', 'user')
+  serviceMemberships?: any[];
+
   @OneToMany('AccountActivity', 'user')
   accountActivities?: any[];
 

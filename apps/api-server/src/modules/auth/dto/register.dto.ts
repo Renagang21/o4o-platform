@@ -109,6 +109,28 @@ export class RegisterRequestDto {
   @IsString()
   businessType?: string;
 
+  // --- GlucoseView 전용 필드 ---
+
+  /** GlucoseView: 표시 이름 (사이트에서 보일 이름) */
+  @IsOptional()
+  @IsString()
+  displayName?: string;
+
+  /** GlucoseView: 약국명 */
+  @IsOptional()
+  @IsString()
+  pharmacyName?: string;
+
+  /** GlucoseView: 지부 ID */
+  @IsOptional()
+  @IsString()
+  branchId?: string;
+
+  /** GlucoseView: 분회 ID */
+  @IsOptional()
+  @IsString()
+  chapterId?: string;
+
   // --- 동의 필드 (서비스별 택일) ---
 
   /** KPA/GlycoPharm: 약관 동의 */

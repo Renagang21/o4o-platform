@@ -126,8 +126,14 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
+          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+        }
         if (response.status === 409) {
           const msg = (data.error || '').toLowerCase();
+          if (data.code === 'SERVICE_ALREADY_JOINED') {
+            throw new Error('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+          }
           if (msg.includes('license') || msg.includes('면허')) {
             throw new Error('이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.');
           }

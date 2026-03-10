@@ -87,7 +87,13 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
+          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+        }
         if (response.status === 409) {
+          if (data.code === 'SERVICE_ALREADY_JOINED') {
+            throw new Error('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+          }
           throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
         // Show detailed validation errors if available

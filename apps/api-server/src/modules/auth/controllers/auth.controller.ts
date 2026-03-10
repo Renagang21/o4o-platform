@@ -7,6 +7,7 @@ import { PasswordResetService } from '../../../services/passwordResetService.js'
 import { AppDataSource } from '../../../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { RoleAssignment } from '../entities/RoleAssignment.js';
+import { ServiceMembership } from '../entities/ServiceMembership.js';
 import { LoginRequestDto, RegisterRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
@@ -321,27 +322,17 @@ export class AuthController extends BaseController {
       }
 
       const userRepository = AppDataSource.getRepository(User);
-
-      // Check if email exists
-      const existingUser = await userRepository.findOne({ where: { email: data.email } });
-      if (existingUser) {
-        return BaseController.error(res, 'Email already exists', 409);
-      }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(data.password, env.getNumber('BCRYPT_ROUNDS', 12));
+      const smRepository = AppDataSource.getRepository(ServiceMembership);
 
       // Phase 3: membershipType에 따라 role 분기
-      // Validate role against UserRole enum to prevent DB enum errors
       const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business', 'partner', 'supplier', 'manager', 'customer'];
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
       const effectiveRole = VALID_ROLES.includes(rawRole) ? rawRole : 'user';
+      const serviceKey = data.service || 'platform';
 
-      // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization (before transaction)
-      // KPA/GlycoPharm: lastName + firstName → name
-      // Neture/K-Cosmetics: single name field
+      // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;
       let resolvedLastName: string | undefined;
       let resolvedFirstName: string | undefined;
@@ -355,7 +346,75 @@ export class AuthController extends BaseController {
         return BaseController.error(res, 'Name is required (provide name or lastName+firstName)', 400);
       }
 
-      // User 생성 (트랜잭션 내 KPA member + RoleAssignment 포함)
+      // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: Check existing user
+      const existingUser = await userRepository.findOne({ where: { email: data.email } });
+
+      if (existingUser) {
+        // ── 기존 사용자: 서비스 멤버십 추가 플로우 ──
+
+        // 1. 해당 서비스 멤버십 확인
+        const existingMembership = await smRepository.findOne({
+          where: { userId: existingUser.id, serviceKey },
+        });
+        if (existingMembership) {
+          return BaseController.error(res, '이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.', 409,
+            'SERVICE_ALREADY_JOINED');
+        }
+
+        // 2. 비밀번호 검증 (보안: 본인 확인)
+        const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
+        if (!passwordMatch) {
+          return BaseController.error(res, '이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.', 401,
+            'PASSWORD_MISMATCH');
+        }
+
+        // 3. 새 서비스 멤버십 + RoleAssignment 추가 (트랜잭션)
+        await AppDataSource.transaction(async (manager) => {
+          // ServiceMembership 생성
+          const txSmRepo = manager.getRepository(ServiceMembership);
+          const membership = new ServiceMembership();
+          membership.userId = existingUser.id;
+          membership.serviceKey = serviceKey;
+          membership.status = 'pending';
+          membership.role = effectiveRole;
+          await txSmRepo.save(membership);
+
+          // RoleAssignment 생성 (서비스 접두사 포함)
+          const txAssignRepo = manager.getRepository(RoleAssignment);
+          const assignment = new RoleAssignment();
+          assignment.userId = existingUser.id;
+          assignment.role = effectiveRole;
+          assignment.isActive = true;
+          assignment.validFrom = new Date();
+          assignment.assignedAt = new Date();
+          await txAssignRepo.save(assignment);
+
+          // KPA Society: auto-create KPA member
+          await AuthController.createKpaRecords(manager, existingUser.id, data);
+        });
+
+        logger.info('[AuthController.register] Service membership added to existing user', {
+          userId: existingUser.id,
+          serviceKey,
+          role: effectiveRole,
+        });
+
+        return BaseController.created(res, {
+          message: '서비스 가입 신청이 완료되었습니다. 승인을 기다려주세요.',
+          user: {
+            id: existingUser.id,
+            email: existingUser.email,
+            name: existingUser.name,
+            status: 'pending',
+          },
+          existingAccount: true,
+          pendingApproval: true,
+        });
+      }
+
+      // ── 신규 사용자: 기존 로직 + ServiceMembership 추가 ──
+      const hashedPassword = await bcrypt.hash(data.password, env.getNumber('BCRYPT_ROUNDS', 12));
+
       const user = await AppDataSource.transaction(async (manager) => {
         const txUserRepo = manager.getRepository(User);
 
@@ -369,12 +428,10 @@ export class AuthController extends BaseController {
         newUser.nickname = data.nickname || resolvedName;
 
         // role column removed - Phase3-E: roles is populated from role_assignments
-        newUser.serviceKey = data.service || 'platform';
+        newUser.serviceKey = serviceKey;
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
         }
-        // WO-ROLE-NORMALIZATION-PHASE3-B-V1: pharmacistFunction/pharmacistRole removed from users
-        // Qualification data now stored in kpa_pharmacist_profiles (created below)
 
         // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Consent timestamps
         newUser.tosAcceptedAt = tosAccepted ? new Date() : undefined;
@@ -382,7 +439,6 @@ export class AuthController extends BaseController {
         newUser.marketingAccepted = marketingAccepted;
 
         // businessInfo: 사업자 정보 + 면허번호 저장
-        // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: companyName → businessName fallback
         const effectiveBusinessName = data.businessName || data.companyName;
         const businessInfo: Record<string, string> = {};
         if (data.licenseNumber) {
@@ -403,49 +459,19 @@ export class AuthController extends BaseController {
 
         await txUserRepo.save(newUser);
 
-        // KPA Society: auto-create KPA member (pharmacist with org, or student without org)
-        if (data.service === 'kpa-society' && (data.organizationId || data.membershipType === 'student')) {
-          const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
+        // WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1: ServiceMembership 생성
+        const txSmRepo = manager.getRepository(ServiceMembership);
+        const membership = new ServiceMembership();
+        membership.userId = newUser.id;
+        membership.serviceKey = serviceKey;
+        membership.status = 'pending';
+        membership.role = effectiveRole;
+        await txSmRepo.save(membership);
 
-          const memberResult = await manager.query(`
-            INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
-            VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
-            RETURNING id
-          `, [
-            newUser.id,
-            data.organizationId || null,
-            data.membershipType || 'pharmacist',
-            licenseNum,
-            data.membershipType === 'student' ? (data.universityName || null) : null,
-          ]);
+        // KPA Society: auto-create KPA member
+        await AuthController.createKpaRecords(manager, newUser.id, data);
 
-          // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
-          if (memberResult[0]?.id) {
-            await manager.query(`
-              INSERT INTO kpa_member_services (member_id, service_key, status)
-              VALUES ($1, 'kpa-a', 'pending')
-            `, [memberResult[0].id]);
-          }
-        }
-
-        // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
-        if (data.service === 'kpa-society' && (data.pharmacistFunction || data.licenseNumber)) {
-          const functionToActivity: Record<string, string> = {
-            pharmacy: 'pharmacy_employee', hospital: 'hospital',
-            industry: 'other_industry', other: 'other',
-          };
-          await manager.query(
-            `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
-             VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`,
-            [
-              newUser.id,
-              data.licenseNumber || null,
-              data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
-            ]
-          );
-        }
-
-        // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: RoleAssignment inside transaction
+        // RoleAssignment inside transaction
         const txAssignRepo = manager.getRepository(RoleAssignment);
         const assignment = new RoleAssignment();
         assignment.userId = newUser.id;
@@ -495,10 +521,67 @@ export class AuthController extends BaseController {
         if (detail.includes('user_id')) {
           return BaseController.error(res, '이미 가입된 회원입니다.', 409);
         }
+        if (detail.includes('service_key')) {
+          return BaseController.error(res, '이미 해당 서비스에 가입된 계정입니다.', 409,
+            'SERVICE_ALREADY_JOINED');
+        }
         return BaseController.error(res, 'Registration conflict', 409);
       }
 
       return BaseController.error(res, 'Registration failed');
+    }
+  }
+
+  /**
+   * KPA-specific record creation (extracted for reuse in both new-user and existing-user flows)
+   */
+  private static async createKpaRecords(
+    manager: import('typeorm').EntityManager,
+    userId: string,
+    data: RegisterRequestDto,
+  ): Promise<void> {
+    // KPA Society: auto-create KPA member (pharmacist with org, or student without org)
+    if (data.service === 'kpa-society' && (data.organizationId || data.membershipType === 'student')) {
+      const licenseNum = data.membershipType === 'pharmacist' ? (data.licenseNumber || null) : null;
+
+      const memberResult = await manager.query(`
+        INSERT INTO kpa_members (user_id, organization_id, membership_type, license_number, university_name, role, status, identity_status)
+        VALUES ($1, $2, $3, $4, $5, 'member', 'pending', 'active')
+        ON CONFLICT (user_id) DO NOTHING
+        RETURNING id
+      `, [
+        userId,
+        data.organizationId || null,
+        data.membershipType || 'pharmacist',
+        licenseNum,
+        data.membershipType === 'student' ? (data.universityName || null) : null,
+      ]);
+
+      // 서비스별 승인 레코드 생성 (kpa-a: 커뮤니티)
+      if (memberResult[0]?.id) {
+        await manager.query(`
+          INSERT INTO kpa_member_services (member_id, service_key, status)
+          VALUES ($1, 'kpa-a', 'pending')
+          ON CONFLICT (member_id, service_key) DO NOTHING
+        `, [memberResult[0].id]);
+      }
+    }
+
+    // WO-ROLE-NORMALIZATION-PHASE3-B-V1: create kpa_pharmacist_profiles record
+    if (data.service === 'kpa-society' && (data.pharmacistFunction || data.licenseNumber)) {
+      const functionToActivity: Record<string, string> = {
+        pharmacy: 'pharmacy_employee', hospital: 'hospital',
+        industry: 'other_industry', other: 'other',
+      };
+      await manager.query(
+        `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
+         VALUES ($1, $2, $3) ON CONFLICT (user_id) DO NOTHING`,
+        [
+          userId,
+          data.licenseNumber || null,
+          data.pharmacistFunction ? (functionToActivity[data.pharmacistFunction] || 'other') : null,
+        ]
+      );
     }
   }
 
