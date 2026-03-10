@@ -106,6 +106,7 @@ function mapApiRoleToWebRole(apiRole: string): UserRole {
     'user': 'pharmacy',
     'admin': 'operator',
     'super_admin': 'operator',
+    'operator': 'operator',
     'supplier': 'supplier',
     'partner': 'partner',
   };
@@ -202,17 +203,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // API 응답 구조: { success: true, data: { id, email, ... } }
           const apiUser = data.data || data.user || data;
           if (apiUser && apiUser.id) {
-            const mappedRole = mapApiRoleToWebRole(apiUser.role);
+            // RBAC: roles 배열 우선, 없으면 role(singular) 폴백
+            const apiRoles: string[] = Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+              ? apiUser.roles
+              : apiUser.role ? [apiUser.role] : ['consumer'];
+            const mappedRoles = [...new Set(apiRoles.map(mapApiRoleToWebRole))];
             const userData: User = {
               ...apiUser,
-              roles: [mappedRole],
+              roles: mappedRoles,
               name: apiUser.fullName as string || apiUser.email as string,
               status: (apiUser.status as string) || 'approved',
               createdAt: apiUser.createdAt as string,
               updatedAt: apiUser.updatedAt as string,
             } as User;
             setUser(userData);
-            setAvailableRoles([mappedRole]);
+            setAvailableRoles(mappedRoles);
           }
         } else if (response.status === 401) {
           // Token expired, try refresh
@@ -259,10 +264,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const apiUser = data.data?.user || data.user;
     if (apiUser && apiUser.id) {
-      const mappedRole = mapApiRoleToWebRole(apiUser.role);
+      // RBAC: roles 배열 우선, 없으면 role(singular) 폴백
+      const apiRoles: string[] = Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+        ? apiUser.roles
+        : apiUser.role ? [apiUser.role] : ['consumer'];
+      const mappedRoles = [...new Set(apiRoles.map(mapApiRoleToWebRole))];
       const typedUser: User = {
         ...apiUser,
-        roles: [mappedRole],
+        roles: mappedRoles,
         name: apiUser.fullName as string || apiUser.email as string,
         status: (apiUser.status as string) || 'approved',
         createdAt: apiUser.createdAt as string,
@@ -270,7 +279,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } as User;
 
       setUser(typedUser);
-      setAvailableRoles([mappedRole]);
+      setAvailableRoles(mappedRoles);
       return typedUser;
     }
 
