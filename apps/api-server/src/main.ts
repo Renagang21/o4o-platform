@@ -513,8 +513,8 @@ import { createGlucoseViewRoutes } from './routes/glucoseview/glucoseview.routes
 // Neture Routes (Phase D-1)
 import { createNetureRoutes } from './routes/neture/neture.routes.js';
 
-// Neture Supplier Routes (modules/neture - supplier dashboard APIs)
-import netureSupplierRoutes from './modules/neture/neture.routes.js';
+// Neture Module Routes (modules/neture - supplier/admin/partner/seller APIs)
+import createNetureModuleRoutes from './modules/neture/neture.routes.js';
 
 // Neture Library Routes (WO-O4O-NETURE-LIBRARY-FOUNDATION-V1)
 import netureLibraryRoutes from './modules/neture/neture-library.routes.js';
@@ -1073,12 +1073,13 @@ const startServer = async () => {
       logger.error('Failed to register Neture routes:', netureError);
     }
 
-    // 29b. Register Neture Supplier routes (modules/neture - supplier dashboard)
+    // 29b. Register Neture Module routes (modules/neture - supplier/admin/partner/seller)
     try {
-      app.use('/api/v1/neture', netureSupplierRoutes);
-      logger.info('✅ Neture Supplier routes registered at /api/v1/neture/supplier/*');
-    } catch (netureSupplierError) {
-      logger.error('Failed to register Neture Supplier routes:', netureSupplierError);
+      const netureModuleRoutes = createNetureModuleRoutes(AppDataSource);
+      app.use('/api/v1/neture', netureModuleRoutes);
+      logger.info('✅ Neture Module routes registered at /api/v1/neture/*');
+    } catch (netureModuleError) {
+      logger.error('Failed to register Neture Module routes:', netureModuleError);
     }
 
     // 29c. Register Neture Library routes (WO-O4O-NETURE-LIBRARY-FOUNDATION-V1)
