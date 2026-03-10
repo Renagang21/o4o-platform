@@ -1,9 +1,12 @@
 /**
  * AuthContext - K-Cosmetics 인증 및 역할 관리
  * httpOnly Cookie 기반 인증
+ *
+ * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
  */
 
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -46,20 +49,17 @@ const ROLE_DASHBOARDS: Record<UserRole, string> = {
   operator: '/operator',
 };
 
-// API 역할을 web 역할로 매핑
-function mapApiRole(apiRole: string): UserRole {
-  const roleMap: Record<string, UserRole> = {
-    'admin': 'admin',
-    'super_admin': 'admin',
-    'operator': 'operator',
-    'supplier': 'supplier',
-    'seller': 'seller',
-    'partner': 'partner',
-    'customer': 'seller',
-    'user': 'seller',
-  };
-  return roleMap[apiRole] || 'seller';
-}
+// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
+const ROLE_MAP: Record<string, UserRole> = {
+  admin: 'admin',
+  super_admin: 'admin',
+  operator: 'operator',
+  supplier: 'supplier',
+  seller: 'seller',
+  partner: 'partner',
+  customer: 'seller',
+  user: 'seller',
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -78,19 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
-        const userData = data.data?.user || data.user;
-        if (userData) {
-          const apiUser = userData;
-          const mappedRole = mapApiRole(apiUser.role);
-          const newUser: User = {
-            id: apiUser.id,
-            email: apiUser.email,
-            name: apiUser.fullName || apiUser.email,
-            roles: [mappedRole],
-
-          };
-          setUser(newUser);
+        const { user: apiUser } = parseAuthResponse(data);
+        if (apiUser) {
+          const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
+          const base = normalizeUser(apiUser);
+          setUser({ ...base, roles });
         }
       }
     } catch {
@@ -115,30 +107,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        const code = data.code;
-        let errorMsg = data.message || data.error || '로그인에 실패했습니다.';
-        if (code === 'INVALID_USER') errorMsg = '등록되지 않은 이메일입니다.';
-        else if (code === 'INVALID_CREDENTIALS') errorMsg = '비밀번호가 올바르지 않습니다.';
-        else if (code === 'ACCOUNT_NOT_ACTIVE') errorMsg = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
-        else if (code === 'ACCOUNT_LOCKED') errorMsg = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
-        else if (response.status === 429) errorMsg = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-        return { success: false, error: errorMsg };
+        return { success: false, error: resolveAuthError(data, response.status) };
       }
 
-      // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
-      const userData = data.data?.user || data.user;
-      if (userData) {
-        const apiUser = userData;
-        const mappedRole = mapApiRole(apiUser.role);
-        const newUser: User = {
-          id: apiUser.id,
-          email: apiUser.email,
-          name: apiUser.fullName || apiUser.email,
-          roles: [mappedRole],
-        };
-        setUser(newUser);
+      const { user: apiUser } = parseAuthResponse(data);
+      if (apiUser) {
+        const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
+        const base = normalizeUser(apiUser);
+        setUser({ ...base, roles });
         setIsSessionChecked(true);
-        return { success: true, role: mappedRole };
+        return { success: true, role: roles[0] };
       }
 
       return { success: false, error: data.message || data.error || '로그인 응답이 올바르지 않습니다.' };

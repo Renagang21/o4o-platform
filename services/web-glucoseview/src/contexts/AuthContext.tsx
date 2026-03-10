@@ -1,9 +1,12 @@
 /**
  * AuthContext - GlucoseView 인증 및 역할 관리
  * httpOnly Cookie 기반 인증
+ *
+ * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
  */
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -48,19 +51,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// API 역할을 web 역할로 매핑
-function mapApiRole(apiRole: string): UserRole {
-  const roleMap: Record<string, UserRole> = {
-    'admin': 'admin',
-    'super_admin': 'admin',
-    'pharmacist': 'pharmacist',
-    'seller': 'pharmacist',
-    'customer': 'pharmacist',
-    'user': 'pharmacist',
-    'partner': 'partner',
-  };
-  return roleMap[apiRole] || 'pharmacist';
-}
+// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
+const ROLE_MAP: Record<string, UserRole> = {
+  admin: 'admin',
+  super_admin: 'admin',
+  pharmacist: 'pharmacist',
+  seller: 'pharmacist',
+  customer: 'pharmacist',
+  user: 'pharmacist',
+  partner: 'partner',
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -76,18 +76,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
-          const apiUser = data.data?.user || data.data || data.user;
-          if (apiUser && apiUser.id) {
-            const mappedRole = mapApiRole(apiUser.role);
+          const { user: apiUser } = parseAuthResponse(data);
+          if (apiUser) {
+            const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+            const base = normalizeUser(apiUser);
             const userData: User = {
-              id: apiUser.id,
-              name: apiUser.fullName || apiUser.email,
-              email: apiUser.email,
-              roles: [mappedRole],
+              ...base,
+              roles,
               approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
-              displayName: apiUser.fullName || apiUser.email,
-              phone: apiUser.phone,
+              displayName: base.name,
             };
             setUser(userData);
           }
@@ -114,20 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        const code = data.code;
-        let errorMsg = data.message || data.error || '이메일 또는 비밀번호가 올바르지 않습니다.';
-        if (code === 'INVALID_USER') errorMsg = '등록되지 않은 이메일입니다.';
-        else if (code === 'INVALID_CREDENTIALS') errorMsg = '비밀번호가 올바르지 않습니다.';
-        else if (code === 'ACCOUNT_NOT_ACTIVE') errorMsg = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
-        else if (code === 'ACCOUNT_LOCKED') errorMsg = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
-        else if (response.status === 429) errorMsg = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-        return { success: false, message: errorMsg };
+        return { success: false, message: resolveAuthError(data, response.status) };
       }
 
-      // API 응답 구조: { success: true, data: { user: {...} } } 또는 { user: {...} }
-      const apiUser = data.data?.user || data.user;
-      if (apiUser && apiUser.id) {
-        const mappedRole = mapApiRole(apiUser.role);
+      const { user: apiUser } = parseAuthResponse(data);
+      if (apiUser) {
+        const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+        const base = normalizeUser(apiUser);
+
         // API 상태를 ApprovalStatus로 매핑
         let approvalStatus: ApprovalStatus = 'pending';
         if (apiUser.status === 'active') {
@@ -137,13 +128,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const userData: User = {
-          id: apiUser.id,
-          name: apiUser.fullName || apiUser.email,
-          email: apiUser.email,
-          roles: [mappedRole],
+          ...base,
+          roles,
           approvalStatus,
-          displayName: apiUser.fullName || apiUser.email,
-          phone: apiUser.phone,
+          displayName: base.name,
         };
         setUser(userData);
 

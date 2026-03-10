@@ -42,10 +42,13 @@ interface RegistrationRequest {
 }
 
 
-const roleLabels: Record<UserRole | 'ALL', string> = {
+const roleLabels: Record<string, string> = {
   ALL: '전체',
+  admin: '관리자',
+  operator: '운영자',
   supplier: '공급자',
   partner: '파트너',
+  user: '사용자',
   consumer: '소비자',
   seller: '판매자',
   pharmacist: '약사회원',

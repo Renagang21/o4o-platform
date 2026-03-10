@@ -11,6 +11,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { AuthClient, getAccessToken } from '@o4o/auth-client';
+import { parseAuthResponse, type ApiUser } from '@o4o/auth-utils';
 
 // Re-export for client.ts to use
 export { getAccessToken };
@@ -220,15 +221,7 @@ interface AuthContextType {
   serviceUserLogout: () => void;
 }
 
-interface ApiUser {
-  id: string;
-  email: string;
-  name?: string;
-  fullName?: string;
-  role?: string;
-  roles?: string[];
-  [key: string]: unknown;
-}
+// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: ApiUser is imported from @o4o/auth-utils
 
 /**
  * WO-P0-KPA-OPERATOR-CONTEXT-FIX-V1
@@ -299,8 +292,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = response.data as { success: boolean; data: any };
 
       if (data.success && data.data) {
-        // /auth/me returns {success, data: {user: {...}}} — unwrap user object
-        const apiUser: ApiUser = data.data.user || data.data;
+        // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: parseAuthResponse로 user 추출 통일
+        const { user: apiUser } = parseAuthResponse(data);
+        if (!apiUser) { setUser(null); setIsLoading(false); return; }
         const userData = createUserFromApiResponse(apiUser);
 
         // WO-KPA-B-SERVICE-CONTEXT-UNIFICATION-V1: kpaMembership from /auth/me (단일 호출)

@@ -183,41 +183,6 @@ export default function CareDashboardPage() {
     return readings.filter(r => r.metricType === 'glucose' && isToday(r.measuredAt));
   }, [readings]);
 
-  // Derived: behavior actions
-  const behaviorActions = useMemo(() => {
-    const items: Array<{ label: string; cls: string }> = [];
-
-    if (todayGlucose.length === 0) {
-      items.push({
-        label: '오늘 혈당이 아직 기록되지 않았습니다. 혈당을 측정해 주세요.',
-        cls: 'bg-amber-50 border-amber-200 text-amber-700',
-      });
-    }
-
-    if (kpi?.latestTir != null && kpi.latestTir < 70) {
-      items.push({
-        label: 'TIR이 목표(70%) 미만입니다. 식후 혈당을 확인해 보세요.',
-        cls: 'bg-red-50 border-red-200 text-red-700',
-      });
-    }
-
-    if (sessions.length > 0) {
-      items.push({
-        label: `최근 코칭: ${sessions[0].summary.slice(0, 40)}${sessions[0].summary.length > 40 ? '...' : ''}`,
-        cls: 'bg-blue-50 border-blue-200 text-blue-700',
-      });
-    }
-
-    if (items.length === 0) {
-      items.push({
-        label: '잘 하고 있습니다! 꾸준히 기록을 이어가세요.',
-        cls: 'bg-green-50 border-green-200 text-green-700',
-      });
-    }
-
-    return items;
-  }, [todayGlucose, kpi, sessions]);
-
   const selectedPatient = patients.find(p => p.id === selectedId);
 
   // ── Loading state ──

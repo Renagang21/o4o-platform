@@ -1711,6 +1711,12 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/auth-utils:
+    dependencies:
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+
   packages/block-core:
     dependencies:
       react:
@@ -3541,6 +3547,9 @@ importers:
       '@o4o/ai-components':
         specifier: workspace:*
         version: link:../../packages/o4o-ai-components
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@o4o/operator-core':
         specifier: workspace:*
         version: link:../../packages/operator-core
@@ -3617,6 +3626,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@o4o/hub-core':
         specifier: workspace:*
         version: link:../../packages/hub-core
@@ -3717,6 +3729,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@o4o/hub-exploration-core':
         specifier: workspace:*
         version: link:../../packages/hub-exploration-core
@@ -3787,6 +3802,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@o4o/content-editor':
         specifier: workspace:*
         version: link:../../packages/content-editor
@@ -3869,6 +3887,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
       '@o4o/content-editor':
         specifier: workspace:*
         version: link:../../packages/content-editor

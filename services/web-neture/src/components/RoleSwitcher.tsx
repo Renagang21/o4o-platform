@@ -10,6 +10,7 @@ const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
   supplier: '📦',
   partner: '🤝',
+  operator: '🔧',
   user: '👤',
 };
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
+import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 
 // Re-export UserRole for use by other components
 export type { UserRole } from '@/types';
@@ -97,21 +98,18 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// API 서버 역할을 glycopharm-web 역할로 매핑
-function mapApiRoleToWebRole(apiRole: string): UserRole {
-  const roleMap: Record<string, UserRole> = {
-    'pharmacy': 'pharmacy',  // glycopharm 전용 역할
-    'seller': 'pharmacy',
-    'customer': 'pharmacy',
-    'user': 'pharmacy',
-    'admin': 'operator',
-    'super_admin': 'operator',
-    'operator': 'operator',
-    'supplier': 'supplier',
-    'partner': 'partner',
-  };
-  return roleMap[apiRole] || 'consumer';
-}
+// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
+const ROLE_MAP: Record<string, UserRole> = {
+  pharmacy: 'pharmacy',
+  seller: 'pharmacy',
+  customer: 'pharmacy',
+  user: 'pharmacy',
+  admin: 'operator',
+  super_admin: 'operator',
+  operator: 'operator',
+  supplier: 'supplier',
+  partner: 'partner',
+};
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: '관리자',
@@ -182,7 +180,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Bearer Token 기반 세션 확인
-    // Cross-domain에서는 httpOnly 쿠키가 작동하지 않으므로 localStorage 토큰 사용
     const checkSession = async () => {
       const { accessToken } = getStoredTokens();
 
@@ -200,21 +197,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          // API 응답 구조: { success: true, data: { user: { id, email, ... } } }
-          const apiUser = data.data?.user || data.data || data.user || data;
-          if (apiUser && apiUser.id) {
-            // RBAC: roles 배열 우선, 없으면 role(singular) 폴백
-            const apiRoles: string[] = Array.isArray(apiUser.roles) && apiUser.roles.length > 0
-              ? apiUser.roles
-              : apiUser.role ? [apiUser.role] : ['consumer'];
-            const mappedRoles = [...new Set(apiRoles.map(mapApiRoleToWebRole))];
+          const { user: apiUser } = parseAuthResponse(data);
+          if (apiUser) {
+            const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
+            const base = normalizeUser(apiUser);
             const userData: User = {
               ...apiUser,
+              ...base,
               roles: mappedRoles,
-              name: apiUser.fullName as string || apiUser.email as string,
               status: (apiUser.status as string) || 'approved',
-              createdAt: apiUser.createdAt as string,
-              updatedAt: apiUser.updatedAt as string,
             } as User;
             setUser(userData);
             setAvailableRoles(mappedRoles);
@@ -245,37 +236,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await response.json();
 
     if (!response.ok) {
-      const code = data.code;
-      let errorMsg = data.message || data.error || '로그인에 실패했습니다.';
-      if (code === 'INVALID_USER') errorMsg = '등록되지 않은 이메일입니다.';
-      else if (code === 'INVALID_CREDENTIALS') errorMsg = '비밀번호가 올바르지 않습니다.';
-      else if (code === 'ACCOUNT_NOT_ACTIVE') errorMsg = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
-      else if (code === 'ACCOUNT_LOCKED') errorMsg = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
-      else if (response.status === 429) errorMsg = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-      throw new Error(errorMsg);
+      throw new Error(resolveAuthError(data, response.status));
     }
 
+    const { user: apiUser, tokens } = parseAuthResponse(data);
+
     // Cross-domain 환경에서는 응답 body에서 토큰을 추출하여 localStorage에 저장
-    // API 응답 구조: { success: true, data: { message, user: {...}, tokens: {...} } }
-    const tokens = data.data?.tokens || data.tokens;
-    if (tokens?.accessToken && tokens?.refreshToken) {
+    if (tokens) {
       storeTokens(tokens.accessToken, tokens.refreshToken);
     }
 
-    const apiUser = data.data?.user || data.user;
-    if (apiUser && apiUser.id) {
-      // RBAC: roles 배열 우선, 없으면 role(singular) 폴백
-      const apiRoles: string[] = Array.isArray(apiUser.roles) && apiUser.roles.length > 0
-        ? apiUser.roles
-        : apiUser.role ? [apiUser.role] : ['consumer'];
-      const mappedRoles = [...new Set(apiRoles.map(mapApiRoleToWebRole))];
+    if (apiUser) {
+      const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
+      const base = normalizeUser(apiUser);
       const typedUser: User = {
         ...apiUser,
+        ...base,
         roles: mappedRoles,
-        name: apiUser.fullName as string || apiUser.email as string,
         status: (apiUser.status as string) || 'approved',
-        createdAt: apiUser.createdAt as string,
-        updatedAt: apiUser.updatedAt as string,
       } as User;
 
       setUser(typedUser);
