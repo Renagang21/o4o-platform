@@ -85,14 +85,14 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
     });
   });
 
-  // Verify kpa.routes.ts uses security-core guard with KPA_SCOPE_CONFIG
-  it('kpa.routes.ts uses createServiceScopeGuard(KPA_SCOPE_CONFIG)', () => {
+  // Verify kpa.routes.ts uses membership-aware guard with KPA_SCOPE_CONFIG
+  it('kpa.routes.ts uses createMembershipScopeGuard(KPA_SCOPE_CONFIG)', () => {
     const filePath = path.resolve(__dirname, '../routes/kpa/kpa.routes.ts');
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // Must import from security-core
+    // Must import config from security-core
     expect(content).toContain(`from '@o4o/security-core'`);
-    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('createMembershipScopeGuard');
     expect(content).toContain('KPA_SCOPE_CONFIG');
   });
 
@@ -157,17 +157,17 @@ describe('isBranchOperator role matrix (KPA-c)', () => {
     });
   });
 
-  // Verify branch-admin-dashboard uses security-core guard
-  it('branch-admin-dashboard.controller.ts uses createServiceScopeGuard(KPA_SCOPE_CONFIG)', () => {
+  // Verify branch-admin-dashboard uses membership-aware guard
+  it('branch-admin-dashboard.controller.ts uses createMembershipScopeGuard(KPA_SCOPE_CONFIG)', () => {
     const filePath = path.resolve(
       __dirname,
       '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // Must import from security-core
+    // Must import config from security-core
     expect(content).toContain(`from '@o4o/security-core'`);
-    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('createMembershipScopeGuard');
     expect(content).toContain('KPA_SCOPE_CONFIG');
   });
 

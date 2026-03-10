@@ -186,7 +186,7 @@ describe('LMS Ownership Guards', () => {
 // ─────────────────────────────────────────────────────
 
 describe('Service Scope Guards use @o4o/security-core', () => {
-  it('KPA routes use createServiceScopeGuard with KPA_SCOPE_CONFIG', () => {
+  it('KPA routes use createMembershipScopeGuard with KPA_SCOPE_CONFIG', () => {
     const filePath = path.resolve(
       __dirname,
       '../../routes/kpa/kpa.routes.ts'
@@ -195,10 +195,10 @@ describe('Service Scope Guards use @o4o/security-core', () => {
 
     expect(content).toContain('@o4o/security-core');
     expect(content).toContain('KPA_SCOPE_CONFIG');
-    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('createMembershipScopeGuard');
   });
 
-  it('Neture middleware uses createServiceScopeGuard with NETURE_SCOPE_CONFIG', () => {
+  it('Neture middleware uses createMembershipScopeGuard with NETURE_SCOPE_CONFIG', () => {
     const filePath = path.resolve(
       __dirname,
       '../../middleware/neture-scope.middleware.ts'
@@ -207,9 +207,10 @@ describe('Service Scope Guards use @o4o/security-core', () => {
 
     expect(content).toContain('@o4o/security-core');
     expect(content).toContain('NETURE_SCOPE_CONFIG');
+    expect(content).toContain('createMembershipScopeGuard');
   });
 
-  it('GlycoPharm routes use createServiceScopeGuard with GLYCOPHARM_SCOPE_CONFIG', () => {
+  it('GlycoPharm routes use createMembershipScopeGuard with GLYCOPHARM_SCOPE_CONFIG', () => {
     const filePath = path.resolve(
       __dirname,
       '../../routes/glycopharm/glycopharm.routes.ts'
@@ -218,7 +219,7 @@ describe('Service Scope Guards use @o4o/security-core', () => {
 
     expect(content).toContain('@o4o/security-core');
     expect(content).toContain('GLYCOPHARM_SCOPE_CONFIG');
-    expect(content).toContain('createServiceScopeGuard');
+    expect(content).toContain('createMembershipScopeGuard');
   });
 });
 

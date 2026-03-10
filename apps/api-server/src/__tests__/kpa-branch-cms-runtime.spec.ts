@@ -155,12 +155,13 @@ beforeAll(() => {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  // Default: User A (ORG_A) with kpa:branch_admin
+  // Default: User A (ORG_A) with kpa:branch_admin + active membership
   currentUser = {
     id: USER_A,
     name: 'Branch A Operator',
     email: 'a@test.com',
     roles: ['kpa:branch_admin'],
+    memberships: [{ serviceKey: 'kpa-society', status: 'active' }],
   };
 });
 
@@ -235,21 +236,21 @@ describe('Category A: Organization Isolation', () => {
 
 describe('Category B: Permission Boundary', () => {
   it('B1: kpa:pharmacist (member) → branch-admin API → 403', async () => {
-    currentUser = { id: USER_A, name: 'Pharmacist', roles: ['kpa:pharmacist'] };
+    currentUser = { id: USER_A, name: 'Pharmacist', roles: ['kpa:pharmacist'], memberships: [{ serviceKey: 'kpa-society', status: 'active' }] };
     const res = await request(app).get('/branch-admin/news');
     expect(res.status).toBe(403);
     expect(res.body.error.code).toBe('FORBIDDEN');
   });
 
   it('B2: platform:admin → branch-admin API → 403', async () => {
-    currentUser = { id: USER_A, name: 'Platform Admin', roles: ['platform:admin'] };
+    currentUser = { id: USER_A, name: 'Platform Admin', roles: ['platform:admin'], memberships: [{ serviceKey: 'kpa-society', status: 'active' }] };
     const res = await request(app).get('/branch-admin/news');
     expect(res.status).toBe(403);
     expect(res.body.error.code).toBe('FORBIDDEN');
   });
 
   it('B3: kpa:operator → branch-admin API → 200 (allowed)', async () => {
-    currentUser = { id: USER_A, name: 'KPA Operator', roles: ['kpa:operator'] };
+    currentUser = { id: USER_A, name: 'KPA Operator', roles: ['kpa:operator'], memberships: [{ serviceKey: 'kpa-society', status: 'active' }] };
     const res = await request(app).get('/branch-admin/news');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -363,7 +364,7 @@ describe('Category D: Audit Log', () => {
   });
 
   it('D4: permission denied (403) → audit NOT called', async () => {
-    currentUser = { id: USER_A, name: 'Pharmacist', roles: ['kpa:pharmacist'] };
+    currentUser = { id: USER_A, name: 'Pharmacist', roles: ['kpa:pharmacist'], memberships: [{ serviceKey: 'kpa-society', status: 'active' }] };
 
     await request(app)
       .post('/branch-admin/news')
