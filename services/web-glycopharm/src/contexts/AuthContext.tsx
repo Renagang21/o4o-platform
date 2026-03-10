@@ -200,8 +200,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (response.ok) {
           const data = await response.json();
-          // API 응답 구조: { success: true, data: { id, email, ... } }
-          const apiUser = data.data || data.user || data;
+          // API 응답 구조: { success: true, data: { user: { id, email, ... } } }
+          const apiUser = data.data?.user || data.data || data.user || data;
           if (apiUser && apiUser.id) {
             // RBAC: roles 배열 우선, 없으면 role(singular) 폴백
             const apiRoles: string[] = Array.isArray(apiUser.roles) && apiUser.roles.length > 0
