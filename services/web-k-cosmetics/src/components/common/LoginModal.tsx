@@ -18,7 +18,8 @@
 
 import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 const REMEMBER_EMAIL_KEY = 'kcosmetics_remember_email';
@@ -74,7 +75,7 @@ export default function LoginModal() {
 
       // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 홈(/) 또는 /login에서 로그인한 경우 역할 기반 이동
       if (location.pathname === '/' || location.pathname === '/login') {
-        const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
+        const dashboardPath = result.role ? getPrimaryDashboardRoute([result.role]) : '/';
         if (dashboardPath !== '/') {
           navigate(dashboardPath);
         }

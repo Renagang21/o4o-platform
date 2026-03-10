@@ -39,12 +39,11 @@ const ROLE_LABELS: Record<UserRole, string> = {
   user: '사용자',
 };
 
-const ROLE_DASHBOARDS: Record<UserRole, string> = {
+const ROUTE_OVERRIDES: Record<string, string> = {
   admin: '/workspace/admin',
+  operator: '/workspace/operator',
   supplier: '/account/supplier',
   partner: '/account/partner',
-  operator: '/workspace/operator',
-  user: '/',
 };
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
@@ -172,4 +171,4 @@ export function useAuth() {
   return context;
 }
 
-export { ROLE_LABELS, ROLE_DASHBOARDS };
+export { ROLE_LABELS, ROUTE_OVERRIDES };

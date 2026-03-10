@@ -4,7 +4,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, ROLE_ICONS } from '@/contexts/AuthContext';
+import { useAuth, ROLE_LABELS, ROLE_ICONS } from '@/contexts/AuthContext';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import type { UserRole } from '@/types';
 
 // 이 서비스에서 사용 가능한 역할 (공급자/파트너는 Neture에서 관리)
@@ -26,7 +27,7 @@ export function RoleSwitcher() {
   const handleRoleChange = (role: UserRole) => {
     switchRole(role);
     setIsOpen(false);
-    navigate(ROLE_DASHBOARDS[role]);
+    navigate(getPrimaryDashboardRoute([role]));
   };
 
   return (

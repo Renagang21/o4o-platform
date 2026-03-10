@@ -7,7 +7,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
+import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 
 export default function Header() {
@@ -49,7 +50,7 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
-  const dashboardPath = user?.roles[0] ? ROLE_DASHBOARDS[user.roles[0]] : '/';
+  const dashboardPath = user?.roles[0] ? getPrimaryDashboardRoute(user.roles) : '/';
   const roleLabel = user?.roles[0] ? ROLE_LABELS[user.roles[0]] : '';
 
   return (

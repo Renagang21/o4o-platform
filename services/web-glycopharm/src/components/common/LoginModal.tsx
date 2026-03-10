@@ -21,7 +21,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
-import { getDefaultRouteByRole } from '@/lib/auth-utils';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 
@@ -72,7 +72,7 @@ export default function LoginModal() {
       // WO-HOME-LIVE-PREVIEW-V1: /login 페이지에서만 역할 기반 이동
       // Home(/)에서 로그인 시 → Home 유지 (데이터가 pharmacy-scoped로 갱신됨)
       if (location.pathname === '/login') {
-        navigate(getDefaultRouteByRole(loggedInUser.roles?.[0]));
+        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
       }
 
       onLoginSuccess?.();

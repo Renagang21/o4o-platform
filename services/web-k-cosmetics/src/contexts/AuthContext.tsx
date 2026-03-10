@@ -41,13 +41,6 @@ const ROLE_LABELS: Record<UserRole, string> = {
   operator: '운영자',
 };
 
-const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  admin: '/admin',
-  supplier: '/supplier',
-  seller: '/seller',
-  partner: '/partner',
-  operator: '/operator',
-};
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
 const ROLE_MAP: Record<string, UserRole> = {
@@ -174,4 +167,4 @@ export function useAuth() {
   return context;
 }
 
-export { ROLE_LABELS, ROLE_DASHBOARDS };
+export { ROLE_LABELS };

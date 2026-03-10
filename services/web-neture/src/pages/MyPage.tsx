@@ -13,7 +13,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Shield, Edit3, Check, X, LogOut, LayoutDashboard } from 'lucide-react';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '../contexts';
+import { useAuth, ROLE_LABELS, ROUTE_OVERRIDES } from '../contexts';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { useLoginModal } from '../contexts/LoginModalContext';
 
 /**
@@ -59,7 +60,7 @@ export default function MyPage() {
   }
 
   const activeRole = user.roles[0];
-  const dashboardPath = ROLE_DASHBOARDS[activeRole];
+  const dashboardPath = getPrimaryDashboardRoute(user.roles, ROUTE_OVERRIDES);
   const roleLabel = ROLE_LABELS[activeRole];
 
   const handleSave = () => {

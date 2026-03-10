@@ -5,7 +5,8 @@
 
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 
@@ -116,7 +117,7 @@ function RoleBasedHome() {
 
   useEffect(() => {
     if (user?.roles[0]) {
-      const target = ROLE_DASHBOARDS[user.roles[0]];
+      const target = getPrimaryDashboardRoute(user.roles);
       if (target && target !== '/') {
         navigate(target, { replace: true });
       }

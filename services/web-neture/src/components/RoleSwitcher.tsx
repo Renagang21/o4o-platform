@@ -4,7 +4,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
+import { useAuth, ROLE_LABELS, ROUTE_OVERRIDES, UserRole } from '../contexts';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
@@ -26,7 +27,7 @@ export function RoleSwitcher() {
   const handleRoleChange = (role: UserRole) => {
     switchRole(role);
     setIsOpen(false);
-    navigate(ROLE_DASHBOARDS[role]);
+    navigate(getPrimaryDashboardRoute([role], ROUTE_OVERRIDES));
   };
 
   return (

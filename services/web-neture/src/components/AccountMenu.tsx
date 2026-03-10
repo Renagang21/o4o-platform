@@ -11,7 +11,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, LayoutDashboard, Settings, Shield } from 'lucide-react';
-import { useAuth, ROLE_DASHBOARDS, ROLE_LABELS, useLoginModal } from '../contexts';
+import { useAuth, ROUTE_OVERRIDES, ROLE_LABELS, useLoginModal } from '../contexts';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import type { User as UserType } from '../contexts';
 
 /**
@@ -91,7 +92,7 @@ export default function AccountMenu() {
 
   // 현재 역할에 따른 대시보드 경로
   const activeRole = user.roles[0];
-  const dashboardPath = ROLE_DASHBOARDS[activeRole] || '/';
+  const dashboardPath = getPrimaryDashboardRoute([activeRole], ROUTE_OVERRIDES);
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
   const isOperator = isSuperOperator(user);
 

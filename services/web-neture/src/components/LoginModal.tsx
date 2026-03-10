@@ -15,7 +15,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useAuth, ROLE_DASHBOARDS } from '../contexts';
+import { useAuth, ROUTE_OVERRIDES } from '../contexts';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
 
@@ -84,7 +85,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       if (returnUrl) {
         navigate(returnUrl);
       } else {
-        const dashboardPath = result.role ? ROLE_DASHBOARDS[result.role] : '/';
+        const dashboardPath = result.role ? getPrimaryDashboardRoute([result.role], ROUTE_OVERRIDES) : '/';
         navigate(dashboardPath);
       }
     } catch (err) {

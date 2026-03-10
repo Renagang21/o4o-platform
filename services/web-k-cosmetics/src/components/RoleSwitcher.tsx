@@ -4,7 +4,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS, UserRole } from '../contexts';
+import { useAuth, ROLE_LABELS, UserRole } from '../contexts';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const ROLE_ICONS: Record<UserRole, string> = {
   admin: '🛡️',
@@ -30,12 +31,12 @@ export function RoleSwitcher() {
     if (!AVAILABLE_ROLES.includes(role)) {
       // 공급자/파트너는 Neture로 안내
       setIsOpen(false);
-      navigate(ROLE_DASHBOARDS[role]);
+      navigate(getPrimaryDashboardRoute([role]));
       return;
     }
     switchRole(role);
     setIsOpen(false);
-    navigate(ROLE_DASHBOARDS[role]);
+    navigate(getPrimaryDashboardRoute([role]));
   };
 
   // 사용 가능한 역할과 Neture 관리 역할 분리

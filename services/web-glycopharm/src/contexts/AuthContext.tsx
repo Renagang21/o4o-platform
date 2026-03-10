@@ -120,14 +120,6 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   consumer: '소비자',
 };
 
-export const ROLE_DASHBOARDS: Record<UserRole, string> = {
-  admin: '/admin',
-  pharmacy: '/care',  // WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: auth-utils.ts와 통일
-  supplier: '/supplier',
-  partner: '/partner',
-  operator: '/operator',
-  consumer: '/',
-};
 
 export const ROLE_ICONS: Record<UserRole, string> = {
   admin: '👑',

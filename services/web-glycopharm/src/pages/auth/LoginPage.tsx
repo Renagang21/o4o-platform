@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getDefaultRouteByRole } from '@/lib/auth-utils';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
@@ -23,7 +23,7 @@ export default function LoginPage() {
     try {
       const loggedInUser = await login(email, password);
       // WO-GLYCOPHARM-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
-      navigate(returnUrl || getDefaultRouteByRole(loggedInUser.roles?.[0]));
+      navigate(returnUrl || getPrimaryDashboardRoute(loggedInUser.roles ?? []));
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
       setIsSubmitting(false);

@@ -12,7 +12,8 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth, ROLE_LABELS, ROLE_DASHBOARDS } from '@/contexts/AuthContext';
+import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 export default function MyPage() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -32,7 +33,7 @@ export default function MyPage() {
     );
   }
 
-  const dashboardPath = ROLE_DASHBOARDS[user.roles[0]];
+  const dashboardPath = getPrimaryDashboardRoute(user.roles);
   const roleLabel = ROLE_LABELS[user.roles[0]];
 
   const handleSave = () => {
