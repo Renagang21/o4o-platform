@@ -14,6 +14,7 @@ RUN npm install -g pnpm
 
 # Copy workspace configuration
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
+COPY tsconfig.base.json tsconfig.packages.json ./
 
 # Copy all workspace packages (pnpm reads lockfile and expects all
 # packages/* entries to exist for workspace graph resolution)
@@ -28,6 +29,10 @@ RUN pnpm install --filter glucoseview-web...
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+# Build workspace dependencies
+RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-utils build
 
 # Build the service
 WORKDIR /app/services/web-glucoseview

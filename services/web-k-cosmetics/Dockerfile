@@ -20,6 +20,7 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
@@ -36,6 +37,7 @@ RUN pnpm install --filter @o4o/web-k-cosmetics...
 
 # Copy workspace package source
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/types/ ./packages/types/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
@@ -49,6 +51,7 @@ COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/
 
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
 

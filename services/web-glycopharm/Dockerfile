@@ -20,6 +20,7 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/types/package.json ./packages/types/
+COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/ui/package.json ./packages/ui/
@@ -40,6 +41,7 @@ RUN pnpm install --filter glycopharm-web...
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
+COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/utils/ ./packages/utils/
 COPY packages/ui/ ./packages/ui/
@@ -57,6 +59,7 @@ COPY services/web-glycopharm/ ./services/web-glycopharm/
 
 # Build workspace dependencies first
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
 RUN pnpm --filter @o4o/utils build
