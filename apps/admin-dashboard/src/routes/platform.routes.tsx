@@ -1,0 +1,109 @@
+import { Route } from 'react-router-dom';
+import { AdminProtectedRoute } from '@o4o/auth-context';
+import { Suspense, lazy } from 'react';
+
+// Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
+const StoreNetworkPage = lazy(() => import('@/pages/platform/StoreNetworkPage'));
+
+// Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+const PhysicalStoresPage = lazy(() => import('@/pages/platform/PhysicalStoresPage'));
+
+// Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
+const PlatformHubPage = lazy(() => import('@/pages/platform/PlatformHubPage'));
+
+// Monitoring
+const IntegratedMonitoring = lazy(() => import('@/pages/monitoring/IntegratedMonitoring'));
+const PerformanceDashboard = lazy(() => import('@/pages/monitoring/PerformanceDashboard'));
+const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
+
+// Service Monitoring (Phase 9 Task 3)
+const ServiceOverview = lazy(() => import('@/pages/services/ServiceOverview'));
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-admin-blue"></div>
+  </div>
+);
+
+/**
+ * Platform routes — store network, monitoring, services overview, platform hub
+ */
+export function PlatformRoutes() {
+  return [
+    // Store Network Dashboard (WO-O4O-STORE-NETWORK-DASHBOARD-V1)
+    <Route key="/admin/store-network" path="/admin/store-network" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <StoreNetworkPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Physical Stores (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
+    <Route key="/admin/physical-stores" path="/admin/physical-stores" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PhysicalStoresPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Platform Hub — Global Operations (WO-PLATFORM-GLOBAL-HUB-V1)
+    <Route key="/admin/platform/hub" path="/admin/platform/hub" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PlatformHubPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // System Monitoring
+    <Route key="/monitoring" path="/monitoring" element={
+      <AdminProtectedRoute requiredPermissions={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <IntegratedMonitoring />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/monitoring/performance" path="/monitoring/performance" element={
+      <AdminProtectedRoute requiredPermissions={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <PerformanceDashboard />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/monitoring/security" path="/monitoring/security" element={
+      <AdminProtectedRoute requiredPermissions={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <IntegratedMonitoring />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Phase 2.4 - Operations Dashboard
+    <Route key="/admin/dashboard/operations" path="/admin/dashboard/operations" element={
+      <AdminProtectedRoute requiredPermissions={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <OperationsDashboard />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Phase 9 Task 3 - Service Monitoring Dashboard
+    <Route key="/admin/services/overview" path="/admin/services/overview" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <ServiceOverview />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/admin/services" path="/admin/services" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <ServiceOverview />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+  ];
+}
