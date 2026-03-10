@@ -115,13 +115,18 @@ export const AuthProvider: FC<AuthProviderProps> = ({
               setUser(null);
               localStorage.removeItem('admin-auth-storage');
             }
-          } catch (apiError) {
-            // API call failed (possibly 401) - session invalid
-            if (!cachedUser) {
+          } catch (apiError: any) {
+            // API call failed - check if it's a definitive auth failure (401)
+            // vs a transient network error
+            if (apiError?.response?.status === 401) {
+              // Definitive: server says unauthorized → clear cached user
+              setUser(null);
+              localStorage.removeItem('admin-auth-storage');
+            } else if (!cachedUser) {
               setUser(null);
             }
-            // If we had cached user, keep it but it may fail on next API call
-            // This prevents flash of login screen on temporary network issues
+            // For non-401 errors with cached user, keep it to prevent
+            // flash of login screen on temporary network issues
           }
           setIsLoading(false);
         } else {

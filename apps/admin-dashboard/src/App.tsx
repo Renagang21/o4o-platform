@@ -8,6 +8,7 @@ import { EnvBadge } from '@/components/EnvBadge';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/contexts/ToastContext';
 import { useAuthStore } from '@/stores/authStore';
+import { useAuth as useAuthContext } from '@o4o/auth-context';
 import '@/styles/o4o-admin-theme.css';
 import '@/styles/o4o-admin-sidebar.css';
 import '@/styles/admin-layout-fixed.css';
@@ -415,6 +416,31 @@ const getAuthApiUrl = () => {
 const ssoClient = new AuthClient(getAuthApiUrl(), { strategy: 'cookie' });
 
 /**
+ * AuthStoreSync - AuthProvider ↔ zustand authStore 동기화
+ *
+ * 문제: AuthProvider(@o4o/auth-context)와 zustand authStore가 동일한
+ * localStorage 키(admin-auth-storage)를 사용하여 충돌 발생.
+ * AuthProvider가 세션 만료로 키를 삭제해도 zustand persist가 재기록하여
+ * 무한 리다이렉트 루프 발생.
+ *
+ * 해결: AuthProvider의 인증 상태를 zustand store에 동기화하여
+ * 양쪽이 항상 일관된 상태를 유지하도록 함.
+ */
+function AuthStoreSync() {
+  const { isAuthenticated, user } = useAuthContext();
+  const zustandAuth = useAuthStore();
+
+  useEffect(() => {
+    // AuthProvider가 미인증 상태인데 zustand은 인증 상태 → zustand 정리
+    if (!isAuthenticated && zustandAuth.isAuthenticated) {
+      zustandAuth.logout();
+    }
+  }, [isAuthenticated, zustandAuth.isAuthenticated]);
+
+  return null;
+}
+
+/**
  * 관리자 대시보드 메인 앱
  * SSO 인증 시스템 통합
  */
@@ -484,6 +510,7 @@ function App() {
             onAuthError={handleAuthError}
             onSessionExpiring={handleSessionExpiring}
           >
+          <AuthStoreSync />
           <SessionManager
             warningBeforeExpiry={5 * 60 * 1000} // 5분 전 경고
             onSessionExpiring={handleSessionExpiring}
