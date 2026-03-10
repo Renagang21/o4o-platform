@@ -4,17 +4,17 @@
 export * from './AnalyticsService.js';
 export * from './AuthService.js';
 // AuthServiceV2 removed (WO-O4O-LEGACY-CLEANUP-V1)
-export * from './AutoRecoveryService.js';
-export * from './AutoScalingService.js';
+// AutoRecoveryService removed (WO-O4O-CODEBASE-CLEANUP-V1)
+// AutoScalingService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 export * from './BackupService.js';
-export * from './CDNOptimizationService.js';
+// CDNOptimizationService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 export * from './CacheService.js';
 // export * from './CartService.js';
 export * from './CircuitBreakerService.js';
 // export * from './CouponService.js';
 // export * from './CrowdfundingService.js';
-export * from './DatabaseOptimizationService.js';
-export * from './DeploymentMonitoringService.js';
+// DatabaseOptimizationService removed (WO-O4O-CODEBASE-CLEANUP-V1)
+// DeploymentMonitoringService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 export * from './ErrorAlertService.js';
 export * from './GracefulDegradationService.js';
 export * from './HookSystem.js';
@@ -25,7 +25,7 @@ export { loginSecurityService } from '../modules/auth/services/login-security.se
 // export * from './MembershipService.js';
 // export * from './MockDataService.js';
 // export * from './MonitoringInitializer.js';
-export * from './OperationsMonitoringService.js';
+// OperationsMonitoringService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 // export * from './OrderAutomationService.js';
 // export * from './OrderSplitService.js';
 export * from './PerformanceMonitoringInitializer.js';
@@ -39,7 +39,7 @@ export { refreshTokenService } from '../modules/auth/services/refresh-token.serv
 export * from './ScheduledReportingService.js';
 // export * from './SearchService.js';
 export * from './SecurityAuditService.js';
-export * from './SelfHealingService.js';
+// SelfHealingService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 // export * from './ShippingTrackingService.js';
 // export * from './StatusPageService.js';
 export * from './ThemeService.js';
