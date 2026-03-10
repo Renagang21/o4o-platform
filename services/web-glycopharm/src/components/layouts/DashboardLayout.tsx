@@ -127,6 +127,7 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/operator/signage/my', label: '내 사이니지', icon: Tv },
       { path: '/operator/support', label: '고객지원', icon: HelpCircle },
       { path: '/operator/ai-report', label: 'AI 리포트', icon: BarChart3 },
+      { path: '/operator/users', label: '회원 관리', icon: Users },
     ],
   },
 };

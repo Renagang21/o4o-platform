@@ -105,10 +105,9 @@ export function RegisterPage() {
 
   const passwordChecks = {
     length: formData.password.length >= 8,
-    lowercase: /[a-z]/.test(formData.password),
-    uppercase: /[A-Z]/.test(formData.password),
+    letter: /[a-zA-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
-    special: /[@$!%*?&]/.test(formData.password),
+    special: /[^A-Za-z\d\s]/.test(formData.password),
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
@@ -213,7 +212,7 @@ export function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                     style={styles.input}
                     required
                   />
@@ -230,17 +229,14 @@ export function RegisterPage() {
                     <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>
                       {passwordChecks.length ? '\u2713' : '\u2717'} 8자 이상
                     </span><br />
-                    <span style={{ color: passwordChecks.uppercase ? '#16a34a' : '#dc2626' }}>
-                      {passwordChecks.uppercase ? '\u2713' : '\u2717'} 영문 대문자
-                    </span><br />
-                    <span style={{ color: passwordChecks.lowercase ? '#16a34a' : '#dc2626' }}>
-                      {passwordChecks.lowercase ? '\u2713' : '\u2717'} 영문 소문자
+                    <span style={{ color: passwordChecks.letter ? '#16a34a' : '#dc2626' }}>
+                      {passwordChecks.letter ? '\u2713' : '\u2717'} 영문 포함
                     </span><br />
                     <span style={{ color: passwordChecks.number ? '#16a34a' : '#dc2626' }}>
-                      {passwordChecks.number ? '\u2713' : '\u2717'} 숫자
+                      {passwordChecks.number ? '\u2713' : '\u2717'} 숫자 포함
                     </span><br />
                     <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>
-                      {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자(@$!%*?&)
+                      {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자 포함
                     </span>
                   </div>
                 )}

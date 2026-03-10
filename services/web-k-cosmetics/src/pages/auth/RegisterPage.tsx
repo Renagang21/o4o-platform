@@ -93,10 +93,9 @@ export default function RegisterPage() {
 
   const passwordChecks = {
     length: formData.password.length >= 8,
-    lowercase: /[a-z]/.test(formData.password),
-    uppercase: /[A-Z]/.test(formData.password),
+    letter: /[a-zA-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
-    special: /[@$!%*?&]/.test(formData.password),
+    special: /[^A-Za-z\d\s]/.test(formData.password),
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
@@ -200,7 +199,7 @@ export default function RegisterPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                     style={styles.input}
                     required
                   />
@@ -215,10 +214,9 @@ export default function RegisterPage() {
                 {formData.password && (
                   <ul style={styles.passwordChecklist}>
                     <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
-                    <li style={passwordChecks.lowercase ? styles.checkPass : styles.checkFail}>영문 소문자 포함</li>
-                    <li style={passwordChecks.uppercase ? styles.checkPass : styles.checkFail}>영문 대문자 포함</li>
+                    <li style={passwordChecks.letter ? styles.checkPass : styles.checkFail}>영문 포함</li>
                     <li style={passwordChecks.number ? styles.checkPass : styles.checkFail}>숫자 포함</li>
-                    <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자(@$!%*?&) 포함</li>
+                    <li style={passwordChecks.special ? styles.checkPass : styles.checkFail}>특수문자 포함</li>
                   </ul>
                 )}
               </div>

@@ -85,15 +85,14 @@ export default function RegisterPage() {
     // 비밀번호 강도 검증
     const passwordChecks = {
       length: form.password.length >= 8,
-      lowercase: /[a-z]/.test(form.password),
-      uppercase: /[A-Z]/.test(form.password),
+      letter: /[a-zA-Z]/.test(form.password),
       number: /\d/.test(form.password),
-      special: /[@$!%*?&]/.test(form.password),
+      special: /[^A-Za-z\d\s]/.test(form.password),
     };
     const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
     if (!isPasswordStrong) {
-      setError('비밀번호는 8자 이상, 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.');
+      setError('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.');
       return;
     }
 
@@ -282,17 +281,16 @@ export default function RegisterPage() {
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {form.password && (
                 <ul className="mt-2 space-y-1">
                   {[
                     { check: form.password.length >= 8, label: '8자 이상' },
-                    { check: /[a-z]/.test(form.password), label: '영문 소문자 포함' },
-                    { check: /[A-Z]/.test(form.password), label: '영문 대문자 포함' },
+                    { check: /[a-zA-Z]/.test(form.password), label: '영문 포함' },
                     { check: /\d/.test(form.password), label: '숫자 포함' },
-                    { check: /[@$!%*?&]/.test(form.password), label: '특수문자(@$!%*?&) 포함' },
+                    { check: /[^A-Za-z\d\s]/.test(form.password), label: '특수문자 포함' },
                   ].map(({ check, label }) => (
                     <li key={label} className={`flex items-center gap-1.5 text-xs ${check ? 'text-green-600' : 'text-slate-400'}`}>
                       {check ? (

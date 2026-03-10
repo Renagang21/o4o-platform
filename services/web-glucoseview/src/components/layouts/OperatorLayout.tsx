@@ -46,6 +46,18 @@ export default function OperatorLayout() {
               신청 관리
             </NavLink>
             <NavLink
+              to="/operator/glucoseview/users"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              회원 관리
+            </NavLink>
+            <NavLink
               to="/operator/glucoseview/ai-report"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${

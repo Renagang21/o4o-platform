@@ -21,6 +21,7 @@ import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import OperatorAiReportPage from './pages/operator/AiReportPage';
+import OperatorUsersPage from './pages/operator/UsersPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
 import TestCenterPage from './pages/TestCenterPage';
 
@@ -144,6 +145,8 @@ function AppRoutes() {
       }>
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="applications/:id" element={<OperatorApplicationDetailPage />} />
+        {/* 회원 관리 (WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1) */}
+        <Route path="users" element={<OperatorUsersPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>

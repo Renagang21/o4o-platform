@@ -96,19 +96,15 @@ export const validatePasswordStrength = (password: string): { valid: boolean; er
     errors.push('비밀번호는 최소 8자 이상이어야 합니다');
   }
   
-  if (!/[A-Z]/.test(password)) {
-    errors.push('대문자를 하나 이상 포함해야 합니다');
+  if (!/[a-zA-Z]/.test(password)) {
+    errors.push('영문을 하나 이상 포함해야 합니다');
   }
-  
-  if (!/[a-z]/.test(password)) {
-    errors.push('소문자를 하나 이상 포함해야 합니다');
-  }
-  
+
   if (!/[0-9]/.test(password)) {
     errors.push('숫자를 하나 이상 포함해야 합니다');
   }
-  
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+
+  if (!/[^A-Za-z\d\s]/.test(password)) {
     errors.push('특수문자를 하나 이상 포함해야 합니다');
   }
 

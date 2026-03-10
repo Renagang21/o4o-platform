@@ -1,484 +1,474 @@
 /**
- * Operator Users Page
+ * Operator Users Page — 회원 관리
+ * WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1
  *
- * 운영자 사용자 관리 페이지
- * - 사용자 목록 조회 (페이지네이션)
- * - 역할별 필터링
- * - 사용자 상세 조회/수정
+ * 실제 /api/v1/admin/users API 연결
+ * 탭: 회원 목록 | 가입 신청
+ * 기능: 승인, 거부, 비밀번호 변경, 삭제
  */
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Search,
-  Filter,
-  ChevronRight,
-  Shield,
-  User,
-  Building2,
-  Mail,
-  Phone,
-  Calendar,
-  MoreVertical,
-  Edit,
-  Ban,
   CheckCircle,
   XCircle,
   Clock,
+  RefreshCw,
+  UserCheck,
+  UserX,
+  KeyRound,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  X,
 } from 'lucide-react';
+import { getAccessToken } from '@/contexts/AuthContext';
 
-// 사용자 역할 타입
-type UserRole = 'admin' | 'operator' | 'pharmacist' | 'user';
-type UserStatus = 'active' | 'inactive' | 'pending';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+
+// ─── Types ───────────────────────────────────────────────────
 
 interface UserData {
   id: string;
-  name: string;
   email: string;
-  phone?: string;
-  role: UserRole;
-  status: UserStatus;
-  pharmacyName?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  status: string;
+  roles?: string[];
+  role?: string;
   createdAt: string;
-  lastLoginAt?: string;
+  updatedAt?: string;
 }
 
-const ROLE_CONFIG: Record<UserRole, { label: string; icon: typeof Shield; bgColor: string; textColor: string }> = {
-  admin: { label: '관리자', icon: Shield, bgColor: 'bg-red-100', textColor: 'text-red-700' },
-  operator: { label: '운영자', icon: Shield, bgColor: 'bg-purple-100', textColor: 'text-purple-700' },
-  pharmacist: { label: '약사', icon: Building2, bgColor: 'bg-blue-100', textColor: 'text-blue-700' },
-  user: { label: '일반 사용자', icon: User, bgColor: 'bg-slate-100', textColor: 'text-slate-700' },
-};
+interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
-const STATUS_CONFIG: Record<UserStatus, { label: string; icon: typeof CheckCircle; bgColor: string; textColor: string }> = {
-  active: { label: '활성', icon: CheckCircle, bgColor: 'bg-green-100', textColor: 'text-green-700' },
-  inactive: { label: '비활성', icon: XCircle, bgColor: 'bg-slate-100', textColor: 'text-slate-500' },
-  pending: { label: '승인 대기', icon: Clock, bgColor: 'bg-amber-100', textColor: 'text-amber-700' },
-};
+type Tab = 'all' | 'pending';
 
-// 샘플 데이터
-const SAMPLE_USERS: UserData[] = [
-  {
-    id: '1',
-    name: '김약사',
-    email: 'pharmacist1@test.kr',
-    phone: '010-1234-5678',
-    role: 'pharmacist',
-    status: 'active',
-    pharmacyName: '건강약국',
-    createdAt: '2024-01-15T09:00:00Z',
-    lastLoginAt: '2025-01-16T10:30:00Z',
-  },
-  {
-    id: '2',
-    name: '이운영',
-    email: 'operator@neture.co.kr',
-    phone: '010-2345-6789',
-    role: 'operator',
-    status: 'active',
-    createdAt: '2024-02-01T09:00:00Z',
-    lastLoginAt: '2025-01-16T09:00:00Z',
-  },
-  {
-    id: '3',
-    name: '박약사',
-    email: 'pharmacist2@test.kr',
-    phone: '010-3456-7890',
-    role: 'pharmacist',
-    status: 'pending',
-    pharmacyName: '행복약국',
-    createdAt: '2025-01-10T09:00:00Z',
-  },
-  {
-    id: '4',
-    name: '최관리',
-    email: 'admin@neture.co.kr',
-    phone: '010-4567-8901',
-    role: 'admin',
-    status: 'active',
-    createdAt: '2023-12-01T09:00:00Z',
-    lastLoginAt: '2025-01-16T08:00:00Z',
-  },
-  {
-    id: '5',
-    name: '정약사',
-    email: 'pharmacist3@test.kr',
-    phone: '010-5678-9012',
-    role: 'pharmacist',
-    status: 'inactive',
-    pharmacyName: '사랑약국',
-    createdAt: '2024-06-15T09:00:00Z',
-    lastLoginAt: '2024-12-01T10:00:00Z',
-  },
-];
+// ─── API Helper ──────────────────────────────────────────────
 
-export default function UsersPage() {
-  const [users] = useState<UserData[]>(SAMPLE_USERS);
-  const [loading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
-  const [statusFilter, setStatusFilter] = useState<UserStatus | ''>('');
-  const [page, setPage] = useState(1);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
-
-  const itemsPerPage = 20;
-
-  // 필터링된 사용자 목록
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      !searchQuery ||
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.pharmacyName?.toLowerCase().includes(searchQuery.toLowerCase());
-    const { role } = user;
-    const matchesRole = !roleFilter || role === roleFilter;
-    const matchesStatus = !statusFilter || user.status === statusFilter;
-    return matchesSearch && matchesRole && matchesStatus;
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getAccessToken();
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
+    credentials: 'include',
   });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error || body?.message || `API error ${res.status}`);
+  }
+  return res.json();
+}
 
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const paginatedUsers = filteredUsers.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+// ─── Status Config ───────────────────────────────────────────
 
-  const clearFilters = () => {
-    setSearchQuery('');
-    setRoleFilter('');
-    setStatusFilter('');
-    setPage(1);
+const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
+  active: { label: '활성', color: 'text-green-700', bg: 'bg-green-50' },
+  approved: { label: '승인', color: 'text-green-700', bg: 'bg-green-50' },
+  pending: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
+  rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
+  suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
+  inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const cfg = STATUS_MAP[status] || { label: status, color: 'text-slate-500', bg: 'bg-slate-100' };
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.color}`}>
+      {cfg.label}
+    </span>
+  );
+}
+
+function getUserName(u: UserData): string {
+  if (u.name) return u.name;
+  if (u.firstName || u.lastName) return `${u.lastName || ''} ${u.firstName || ''}`.trim();
+  return u.email.split('@')[0];
+}
+
+function getRoleLabel(u: UserData): string {
+  const roles = u.roles || (u.role ? [u.role] : []);
+  if (roles.length === 0) return 'user';
+  return roles.join(', ');
+}
+
+// ─── Password Modal ──────────────────────────────────────────
+
+function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: () => void; onSuccess: () => void }) {
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.length < 6) { setError('비밀번호는 최소 6자 이상이어야 합니다.'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await apiFetch(`/api/v1/admin/users/${user.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ password }),
+      });
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const hasFilters = searchQuery || roleFilter || statusFilter;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-800">비밀번호 변경</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
+        </div>
+        <p className="text-sm text-slate-500 mb-4">{getUserName(user)} ({user.email})</p>
+        {error && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />{error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="새 비밀번호 (6자 이상)"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            required
+            minLength={6}
+          />
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
+            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+              {loading ? '처리 중...' : '변경'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
-  // 통계
-  const stats = {
-    total: users.length,
-    active: users.filter((u) => u.status === 'active').length,
-    pending: users.filter((u) => u.status === 'pending').length,
-    pharmacists: users.filter((u) => u.role === 'pharmacist').length,
+// ─── Main Component ──────────────────────────────────────────
+
+export default function UsersPage() {
+  const [tab, setTab] = useState<Tab>('all');
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
+
+  // Stats
+  const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0 });
+
+  const fetchUsers = useCallback(async (page = 1) => {
+    setLoading(true);
+    setError('');
+    try {
+      const params = new URLSearchParams();
+      params.set('page', String(page));
+      params.set('limit', '20');
+      if (tab === 'pending') {
+        params.set('status', 'pending');
+      } else if (statusFilter) {
+        params.set('status', statusFilter);
+      }
+      if (search) params.set('search', search);
+
+      const data = await apiFetch<any>(`/api/v1/admin/users?${params}`);
+      setUsers(data.users || []);
+      setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [tab, statusFilter, search]);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const data = await apiFetch<any>('/api/v1/admin/users/statistics');
+      const byStatus = data.statistics?.byStatus || [];
+      const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
+      setStats({
+        total: data.statistics?.total || 0,
+        active: getCount('active') + getCount('approved'),
+        pending: getCount('pending'),
+        rejected: getCount('rejected'),
+      });
+    } catch {
+      // stats failure is non-critical
+    }
+  }, []);
+
+  useEffect(() => { fetchUsers(1); }, [fetchUsers]);
+  useEffect(() => { fetchStats(); }, [fetchStats]);
+
+  const handleStatusChange = async (userId: string, status: string) => {
+    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
+    if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
+    setActionLoading(userId);
+    try {
+      await apiFetch(`/api/v1/admin/users/${userId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      fetchUsers(pagination.page);
+      fetchStats();
+    } catch (err: any) {
+      alert(`오류: ${err.message}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDelete = async (user: UserData) => {
+    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    setActionLoading(user.id);
+    try {
+      await apiFetch(`/api/v1/admin/users/${user.id}`, { method: 'DELETE' });
+      fetchUsers(pagination.page);
+      fetchStats();
+    } catch (err: any) {
+      alert(`오류: ${err.message}`);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">사용자 관리</h1>
-        <p className="text-slate-500">시스템 사용자를 조회하고 관리합니다.</p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">회원 관리</h1>
+          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 비밀번호 관리</p>
+        </div>
+        <button onClick={() => { fetchUsers(pagination.page); fetchStats(); }} className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">
+          <RefreshCw className="w-4 h-4" />새로고침
+        </button>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-slate-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.total}</p>
-              <p className="text-xs text-slate-500">전체 사용자</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.active}</p>
-              <p className="text-xs text-slate-500">활성 사용자</p>
+        {[
+          { label: '전체', value: stats.total, icon: Users, color: 'slate' },
+          { label: '활성', value: stats.active, icon: CheckCircle, color: 'green' },
+          { label: '대기', value: stats.pending, icon: Clock, color: 'amber' },
+          { label: '거부', value: stats.rejected, icon: XCircle, color: 'red' },
+        ].map((s) => (
+          <div key={s.label} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 bg-${s.color}-100 rounded-lg flex items-center justify-center`}>
+                <s.icon className={`w-5 h-5 text-${s.color}-600`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">{s.value}</p>
+                <p className="text-xs text-slate-500">{s.label}</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.pending}</p>
-              <p className="text-xs text-slate-500">승인 대기</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.pharmacists}</p>
-              <p className="text-xs text-slate-500">등록 약사</p>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-slate-400" />
-          <span className="text-sm font-medium text-slate-700">검색 및 필터</span>
-          {hasFilters && (
-            <button
-              onClick={clearFilters}
-              className="ml-auto text-sm text-primary-600 hover:text-primary-700"
-            >
-              필터 초기화
-            </button>
+      {/* Tabs */}
+      <div className="flex border-b border-slate-200 mb-4">
+        <button
+          onClick={() => { setTab('all'); setStatusFilter(''); }}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'all' ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          <Users className="inline w-4 h-4 mr-1" />회원 목록
+        </button>
+        <button
+          onClick={() => setTab('pending')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'pending' ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+        >
+          <Clock className="inline w-4 h-4 mr-1" />가입 신청
+          {stats.pending > 0 && (
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">{stats.pending}</span>
           )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="md:col-span-2">
-            <label className="block text-xs text-slate-500 mb-1">검색</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="이름, 이메일, 약국명으로 검색"
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-          </div>
-          {/* Role Filter */}
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">역할</label>
-            <select
-              value={roleFilter}
-              onChange={(e) => {
-                setRoleFilter(e.target.value as UserRole | '');
-                setPage(1);
-              }}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">전체</option>
-              <option value="admin">관리자</option>
-              <option value="operator">운영자</option>
-              <option value="pharmacist">약사</option>
-              <option value="user">일반 사용자</option>
-            </select>
-          </div>
-          {/* Status Filter */}
-          <div>
-            <label className="block text-xs text-slate-500 mb-1">상태</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value as UserStatus | '');
-                setPage(1);
-              }}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="">전체</option>
-              <option value="active">활성</option>
-              <option value="inactive">비활성</option>
-              <option value="pending">승인 대기</option>
-            </select>
-          </div>
-        </div>
+        </button>
       </div>
 
-      {/* Results Count */}
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-sm text-slate-500">
-          총 <span className="font-medium text-slate-700">{filteredUsers.length}</span>명
-        </span>
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[200px] max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
+            placeholder="이름, 이메일로 검색 (Enter)"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        </div>
+        {tab === 'all' && (
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <option value="">전체 상태</option>
+            <option value="active">활성</option>
+            <option value="pending">대기</option>
+            <option value="rejected">거부</option>
+            <option value="suspended">정지</option>
+          </select>
+        )}
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700 mb-4">
+          <AlertCircle className="w-4 h-4 shrink-0" />{error}
+        </div>
+      )}
 
       {/* Loading */}
       {loading && (
         <div className="text-center py-16">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-slate-500">불러오는 중...</p>
+          <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-3" />
+          <p className="text-slate-500 text-sm">불러오는 중...</p>
         </div>
       )}
 
-      {/* Users Table */}
-      {!loading && paginatedUsers.length > 0 && (
+      {/* Table */}
+      {!loading && users.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  사용자
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  연락처
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  역할
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  상태
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  가입일
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">
-                  마지막 로그인
-                </th>
-                <th className="px-4 py-3"></th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">역할</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">가입일</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">관리</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {paginatedUsers.map((user) => {
-                const roleConfig = ROLE_CONFIG[user.role ?? 'consumer'];
-                const statusConfig = STATUS_CONFIG[user.status];
-                const RoleIcon = roleConfig.icon;
-                const StatusIcon = statusConfig.icon;
-
-                return (
-                  <tr
-                    key={user.id}
-                    className={`hover:bg-slate-50 ${selectedUserId === user.id ? 'bg-primary-50' : ''}`}
-                    onClick={() => setSelectedUserId(user.id)}
-                  >
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-slate-600">
-                            {user.name.charAt(0)}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-800">{user.name}</p>
-                          {user.pharmacyName && (
-                            <p className="text-xs text-slate-500">{user.pharmacyName}</p>
-                          )}
-                        </div>
+              {users.map((user) => (
+                <tr key={user.id} className="hover:bg-slate-50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
+                        {getUserName(user).charAt(0)}
                       </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1 text-sm text-slate-600">
-                          <Mail className="w-3 h-3 text-slate-400" />
-                          {user.email}
-                        </div>
-                        {user.phone && (
-                          <div className="flex items-center gap-1 text-xs text-slate-500">
-                            <Phone className="w-3 h-3 text-slate-400" />
-                            {user.phone}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${roleConfig.bgColor} ${roleConfig.textColor}`}
-                      >
-                        <RoleIcon className="w-3 h-3" />
-                        {roleConfig.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}
-                      >
-                        <StatusIcon className="w-3 h-3" />
-                        {statusConfig.label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-1 text-sm text-slate-600">
-                        <Calendar className="w-3 h-3 text-slate-400" />
-                        {new Date(user.createdAt).toLocaleDateString('ko-KR')}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      {user.lastLoginAt ? (
-                        <span className="text-sm text-slate-600">
-                          {new Date(user.lastLoginAt).toLocaleDateString('ko-KR')}
-                        </span>
+                      <span className="font-medium text-slate-800 text-sm">{getUserName(user)}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{getRoleLabel(user)}</td>
+                  <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
+                  <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-1">
+                      {actionLoading === user.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       ) : (
-                        <span className="text-sm text-slate-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="relative">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setShowActionMenu(showActionMenu === user.id ? null : user.id);
-                          }}
-                          className="p-1 hover:bg-slate-100 rounded"
-                        >
-                          <MoreVertical className="w-4 h-4 text-slate-400" />
-                        </button>
-                        {showActionMenu === user.id && (
-                          <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
-                            <Link
-                              to={`/operator/users/${user.id}`}
-                              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <ChevronRight className="w-4 h-4" />
-                              상세 보기
-                            </Link>
+                        <>
+                          {(user.status === 'pending') && (
+                            <>
+                              <button
+                                onClick={() => handleStatusChange(user.id, 'approved')}
+                                title="승인"
+                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                              >
+                                <UserCheck className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(user.id, 'rejected')}
+                                title="거부"
+                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                              >
+                                <UserX className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+                          {user.status === 'rejected' && (
                             <button
-                              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 w-full"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                alert('수정 기능은 준비 중입니다.');
-                              }}
+                              onClick={() => handleStatusChange(user.id, 'approved')}
+                              title="승인"
+                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
                             >
-                              <Edit className="w-4 h-4" />
-                              정보 수정
+                              <UserCheck className="w-4 h-4" />
                             </button>
-                            {user.status === 'active' ? (
-                              <button
-                                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  alert('비활성화 기능은 준비 중입니다.');
-                                }}
-                              >
-                                <Ban className="w-4 h-4" />
-                                비활성화
-                              </button>
-                            ) : (
-                              <button
-                                className="flex items-center gap-2 px-3 py-2 text-sm text-green-600 hover:bg-green-50 w-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  alert('활성화 기능은 준비 중입니다.');
-                                }}
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                                활성화
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                          )}
+                          {(user.status === 'active' || user.status === 'approved') && (
+                            <button
+                              onClick={() => handleStatusChange(user.id, 'suspended')}
+                              title="정지"
+                              className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </button>
+                          )}
+                          {user.status === 'suspended' && (
+                            <button
+                              onClick={() => handleStatusChange(user.id, 'approved')}
+                              title="활성화"
+                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setPasswordUser(user)}
+                            title="비밀번호 변경"
+                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user)}
+                            title="삭제"
+                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
           {/* Pagination */}
-          {totalPages > 1 && (
+          {pagination.totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
               <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
+                onClick={() => fetchUsers(pagination.page - 1)}
+                disabled={pagination.page <= 1}
                 className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 이전
               </button>
-              <span className="text-sm text-slate-600">
-                {page} / {totalPages}
-              </span>
+              <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
               <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                onClick={() => fetchUsers(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
                 className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 다음
@@ -488,21 +478,20 @@ export default function UsersPage() {
         </div>
       )}
 
-      {/* Empty State */}
-      {!loading && paginatedUsers.length === 0 && (
+      {/* Empty */}
+      {!loading && users.length === 0 && !error && (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">
-            {hasFilters ? '조건에 맞는 사용자가 없습니다.' : '등록된 사용자가 없습니다.'}
-          </p>
+          <p className="text-slate-500">{tab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}</p>
         </div>
       )}
 
-      {/* Click outside to close action menu */}
-      {showActionMenu && (
-        <div
-          className="fixed inset-0 z-0"
-          onClick={() => setShowActionMenu(null)}
+      {/* Password Modal */}
+      {passwordUser && (
+        <PasswordModal
+          user={passwordUser}
+          onClose={() => setPasswordUser(null)}
+          onSuccess={() => { fetchUsers(pagination.page); }}
         />
       )}
     </div>

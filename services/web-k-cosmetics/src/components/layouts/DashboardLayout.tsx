@@ -203,6 +203,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/operator/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
       { path: '/operator/support', label: '고객지원', icon: icons.HelpCircle },
       { path: '/operator/ai-report', label: 'AI 리포트', icon: icons.BarChart3 },
+      { path: '/operator/users', label: '회원 관리', icon: icons.Users },
     ],
   },
 };

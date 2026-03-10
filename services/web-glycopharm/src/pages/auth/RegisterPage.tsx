@@ -47,8 +47,7 @@ export default function RegisterPage() {
 
   const passwordChecks = {
     length: formData.password.length >= 8,
-    lowercase: /[a-z]/.test(formData.password),
-    uppercase: /[A-Z]/.test(formData.password),
+    letter: /[a-zA-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
     special: /[^A-Za-z\d\s]/.test(formData.password),
   };
@@ -179,7 +178,7 @@ export default function RegisterPage() {
                       value={formData.password}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="영문 대/소문자, 숫자, 특수문자 포함"
+                      placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                       required
                     />
                     <button
@@ -194,8 +193,7 @@ export default function RegisterPage() {
                     <div className="mt-2 space-y-1">
                       {[
                         { key: 'length' as const, label: '8자 이상' },
-                        { key: 'lowercase' as const, label: '영문 소문자 포함' },
-                        { key: 'uppercase' as const, label: '영문 대문자 포함' },
+                        { key: 'letter' as const, label: '영문 포함' },
                         { key: 'number' as const, label: '숫자 포함' },
                         { key: 'special' as const, label: '특수문자 포함' },
                       ].map(({ key, label }) => (
