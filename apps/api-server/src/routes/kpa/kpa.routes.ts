@@ -101,7 +101,8 @@ import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 // WO-KPA-GROUPBUY-ORDER-METADATA-SYNC-V1: E-commerce Core entities for order creation
 import {
   EcommerceOrder,
@@ -134,7 +135,7 @@ import { CourseService } from '../../modules/lms/services/CourseService.js';
  * Replaces inline implementation with shared security-core guard factory.
  * Behavior is identical: KPA roles only, no platform bypass, legacy detect+deny.
  */
-const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
+const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
 
 /**
  * Create KPA routes

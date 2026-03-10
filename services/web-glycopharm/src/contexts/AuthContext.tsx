@@ -197,6 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               ...apiUser,
               ...base,
               roles: mappedRoles,
+              memberships: (apiUser as any).memberships || [],
               status: (apiUser.status as string) || 'approved',
             } as User;
             setUser(userData);
@@ -245,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...apiUser,
         ...base,
         roles: mappedRoles,
+        memberships: (apiUser as any).memberships || [],
         status: (apiUser.status as string) || 'approved',
       } as User;
 

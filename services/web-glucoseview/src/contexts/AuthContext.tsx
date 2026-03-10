@@ -23,6 +23,7 @@ export interface User {
   email: string;
   roles: UserRole[];
   role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
+  memberships?: { serviceKey: string; status: string }[];
   approvalStatus: ApprovalStatus;
   pharmacyName?: string;
   pharmacyAddress?: string;
@@ -83,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const userData: User = {
               ...base,
               roles,
+              memberships: (apiUser as any).memberships || [],
               approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
               displayName: base.name,
             };
@@ -130,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData: User = {
           ...base,
           roles,
+          memberships: (apiUser as any).memberships || [],
           approvalStatus,
           displayName: base.name,
         };

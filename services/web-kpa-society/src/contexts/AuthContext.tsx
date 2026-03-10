@@ -130,6 +130,7 @@ export interface User {
   membershipOrgType?: string;   // 'association' | 'branch' | 'group'
   membershipParentId?: string;
   membershipStatus?: string;    // 'pending' | 'active' | 'suspended' | 'withdrawn'
+  memberships?: { serviceKey: string; status: string }[];
 }
 
 /**
@@ -261,6 +262,7 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
     // WO-ROLE-NORMALIZATION-PHASE3-C-V1: isStoreOwner + activityType
     isStoreOwner: !!(apiUser as any).isStoreOwner,
     activityType: (apiUser as any).activityType || undefined,
+    memberships: (apiUser as any).memberships || [],
   };
 }
 

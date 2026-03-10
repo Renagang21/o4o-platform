@@ -17,6 +17,7 @@ export interface User {
   email: string;
   name: string;
   roles: UserRole[];
+  memberships?: { serviceKey: string; status: string }[];
 }
 
 interface AuthContextType {
@@ -75,7 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (apiUser) {
           const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
           const base = normalizeUser(apiUser);
-          setUser({ ...base, roles });
+          const memberships = (apiUser as any).memberships || [];
+          setUser({ ...base, roles, memberships });
         }
       }
     } catch {
@@ -107,7 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
         const base = normalizeUser(apiUser);
-        setUser({ ...base, roles });
+        const memberships = (apiUser as any).memberships || [];
+        setUser({ ...base, roles, memberships });
         setIsSessionChecked(true);
         return { success: true, role: roles[0] };
       }

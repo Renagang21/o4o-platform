@@ -21,12 +21,13 @@ import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { requireOrgRole } from '../middleware/kpa-org-role.middleware.js';
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 
 type AuthMiddleware = RequestHandler;
 
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: service-level scope guard
-const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
+const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
 
 // Response interfaces
 // WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1: placeholder 필드 제거

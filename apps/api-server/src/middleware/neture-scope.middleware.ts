@@ -6,6 +6,7 @@
  * Behavior is identical: scope-level role mapping, platform bypass, legacy detect+deny.
  */
 
-import { createServiceScopeGuard, NETURE_SCOPE_CONFIG } from '@o4o/security-core';
+import { NETURE_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
 
-export const requireNetureScope = createServiceScopeGuard(NETURE_SCOPE_CONFIG);
+export const requireNetureScope = createMembershipScopeGuard(NETURE_SCOPE_CONFIG);

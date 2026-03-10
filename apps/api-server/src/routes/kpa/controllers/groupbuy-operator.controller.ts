@@ -21,7 +21,8 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { supplierStatsService } from '../services/supplier-stats.service.js';
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -67,7 +68,7 @@ function createErrorResponse(
   });
 }
 
-const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
+const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
 
 export function createGroupbuyOperatorController(
   dataSource: DataSource,

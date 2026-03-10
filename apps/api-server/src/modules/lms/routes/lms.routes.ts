@@ -20,8 +20,9 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { requireEnrollment } from '../middleware/requireEnrollment.js';
 import { requireInstructor } from '../middleware/requireInstructor.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: KPA scope guard replaces legacy requireKpaAdmin
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
-const requireKpaAdmin = createServiceScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
+const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin');
 
 const router: Router = Router();
 

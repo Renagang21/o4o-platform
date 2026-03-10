@@ -194,9 +194,15 @@ export class AuthenticationService {
     // Phase3-E: Query RoleAssignment table for current roles
     const userRoles = await roleAssignmentService.getRoleNames(user.id);
 
+    // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Query service memberships
+    const memberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      [user.id]
+    );
+
     // Generate session ID and tokens first (critical path)
     const sessionId = SessionSyncService.generateSessionId();
-    const tokens = tokenUtils.generateTokens(user, userRoles, 'neture.co.kr');
+    const tokens = tokenUtils.generateTokens(user, userRoles, 'neture.co.kr', memberships);
 
     // Prepare user updates
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);
@@ -247,6 +253,8 @@ export class AuthenticationService {
     const publicData = user.toPublicData();
     publicData.roles = userRoles;
     publicData.role = (userRoles[0] as any) || 'user';
+    // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
+    (publicData as Record<string, unknown>).memberships = memberships;
 
     return {
       success: true,

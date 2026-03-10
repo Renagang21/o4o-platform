@@ -748,6 +748,14 @@ export class AuthController extends BaseController {
       const kpaMembership = await deriveKpaMembershipContext(req.user.id);
       ud.kpaMembership = kpaMembership;
 
+      // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
+      try {
+        ud.memberships = await AppDataSource.query(
+          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+          [req.user.id]
+        );
+      } catch { ud.memberships = []; }
+
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {
       logger.error('[AuthController.me] Get user error', {
@@ -896,6 +904,14 @@ export class AuthController extends BaseController {
 
       // kpaMembership context (required for membershipType on frontend)
       ud.kpaMembership = await deriveKpaMembershipContext(req.user.id);
+
+      // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
+      try {
+        ud.memberships = await AppDataSource.query(
+          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+          [req.user.id]
+        );
+      } catch { ud.memberships = []; }
     }
 
     return BaseController.ok(res, {

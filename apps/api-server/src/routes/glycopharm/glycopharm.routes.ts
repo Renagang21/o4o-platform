@@ -33,7 +33,8 @@ import { createInvoiceController } from './controllers/invoice.controller.js'; /
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
-import { createServiceScopeGuard, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
+import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
 import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware.js';
 
@@ -48,7 +49,7 @@ import { FORUM_ORGS } from '../../controllers/forum/forum-organizations.js';
  * Replaces inline implementation with shared security-core guard factory.
  * Behavior is identical: glycopharm roles, platform bypass, legacy detect+deny.
  */
-const requireGlycopharmScope = createServiceScopeGuard(GLYCOPHARM_SCOPE_CONFIG);
+const requireGlycopharmScope = createMembershipScopeGuard(GLYCOPHARM_SCOPE_CONFIG);
 
 /**
  * Create Glycopharm routes

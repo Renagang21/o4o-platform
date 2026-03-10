@@ -107,6 +107,8 @@ export const requireAuth = async (
 
     // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
     user.roles = payload.roles || [];
+    // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload
+    user.memberships = (payload as any).memberships || [];
 
     // Attach user to request
     req.user = user;

@@ -157,6 +157,22 @@ export class UserManagementController extends BaseController {
         await roleAssignmentService.assignRole({ userId: user.id, role: data.role as string });
       }
 
+      // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Sync service_memberships on status change
+      if (data.status) {
+        const adminId = (req as any).user?.id || null;
+        if (data.status === 'active' || data.status === 'approved') {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW() WHERE user_id = $2 AND status = 'pending'`,
+            [adminId, id]
+          );
+        } else if (data.status === 'suspended') {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'suspended', updated_at = NOW() WHERE user_id = $1`,
+            [id]
+          );
+        }
+      }
+
       user.updatedAt = new Date();
       await userRepository.save(user);
 

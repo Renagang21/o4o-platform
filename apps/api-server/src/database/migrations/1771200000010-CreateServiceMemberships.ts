@@ -43,7 +43,7 @@ export class CreateServiceMemberships1771200000010 implements MigrationInterface
     `);
 
     // Step 3: 기존 사용자 데이터 마이그레이션 (users.service_key → service_memberships)
-    const migrated = await queryRunner.query(`
+    await queryRunner.query(`
       INSERT INTO service_memberships (user_id, service_key, status, role, created_at, updated_at)
       SELECT
         u.id,
@@ -69,18 +69,7 @@ export class CreateServiceMemberships1771200000010 implements MigrationInterface
       )
     `);
 
-    // Step 4: 검증 로그
-    const userCount = await queryRunner.query(`SELECT COUNT(*)::int as cnt FROM users`);
-    const smCount = await queryRunner.query(`SELECT COUNT(*)::int as cnt FROM service_memberships`);
-    const serviceDistribution = await queryRunner.query(`
-      SELECT service_key, status, COUNT(*)::int as cnt
-      FROM service_memberships
-      GROUP BY service_key, status
-      ORDER BY service_key, status
-    `);
-
-    console.log(`[CreateServiceMemberships] Users: ${userCount[0]?.cnt}, ServiceMemberships: ${smCount[0]?.cnt}`);
-    console.log(`[CreateServiceMemberships] Distribution:`, serviceDistribution);
+    // Step 4: Verification (silent — CI blocks console.log in production code)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

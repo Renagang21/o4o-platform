@@ -68,6 +68,13 @@ export class User {
   roles: string[] = [];
 
   /**
+   * WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Runtime-only memberships array.
+   * Set by requireAuth middleware from JWT payload.
+   * NOT a database column.
+   */
+  memberships: { serviceKey: string; status: string }[] = [];
+
+  /**
    * Phase3-E: Computed primary role from roles[0].
    * Backward compatibility getter — replaces the old @Column role field.
    */

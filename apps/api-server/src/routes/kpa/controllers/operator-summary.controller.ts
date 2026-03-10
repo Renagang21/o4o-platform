@@ -15,7 +15,8 @@ import type { SignageQueryService } from '../../../modules/signage/index.js';
 import type { ForumQueryService } from '../../../modules/forum/index.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
-import { createServiceScopeGuard, KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
+import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 import { OrganizationStore } from '../entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
@@ -27,7 +28,7 @@ interface OperatorSummaryServices {
   forumService: ForumQueryService;
 }
 
-const requireKpaScope = createServiceScopeGuard(KPA_SCOPE_CONFIG);
+const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
 
 export function createOperatorSummaryController(
   dataSource: DataSource,

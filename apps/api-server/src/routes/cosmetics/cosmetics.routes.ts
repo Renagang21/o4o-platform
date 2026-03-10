@@ -7,76 +7,30 @@
  * Main entry point for cosmetics API routes
  */
 
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
 import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
 import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
 import { createCosmeticsStoreController } from './controllers/cosmetics-store.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
-import type { AuthRequest } from '../../types/auth.js';
-import { hasAnyServiceRole } from '../../utils/role.utils.js';
+import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
+import type { ServiceScopeGuardConfig } from '@o4o/security-core';
 
 /**
- * Cosmetics scope verification middleware
+ * Cosmetics Scope Guard — WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
  *
- * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.4: K-Cosmetics)
- * - **Cosmetics 비즈니스 서비스는 cosmetics:* role + platform:admin 신뢰**
- * - Priority 1: Cosmetics prefixed roles + platform admin
- * - Priority 2: Legacy role detection → Log + DENY
- * - Cross-service isolation: Other service roles DENY
+ * Replaces inline implementation with membership-aware scope guard.
+ * Behavior: membership check + cosmetics roles, platform bypass, cross-service deny.
  */
-function requireCosmeticsScope(requiredScope: string) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const authReq = req as AuthRequest;
-    const userRoles = authReq.user?.roles || [];
-
-    // Get scopes from user object (set by auth middleware)
-    const userScopes = authReq.user?.scopes || [];
-
-    // Check if user has the required scope or cosmetics:admin scope
-    const hasScope =
-      userScopes.includes(requiredScope) ||
-      userScopes.includes('cosmetics:admin');
-
-    // Priority 1: Check Cosmetics-specific prefixed roles + platform admin
-    const hasCosmeticsRole = hasAnyServiceRole(userRoles, [
-      'cosmetics:admin',
-      'cosmetics:operator',
-      'platform:admin',
-      'platform:super_admin',
-    ]);
-
-    if (hasScope || hasCosmeticsRole) {
-      return next();
-    }
-
-    // Detect other service roles and deny
-    const hasOtherServiceRole = userRoles.some((r: string) =>
-      r.startsWith('kpa:') ||
-      r.startsWith('neture:') ||
-      r.startsWith('glycopharm:') ||
-      r.startsWith('glucoseview:')
-    );
-
-    if (hasOtherServiceRole) {
-      return res.status(403).json({
-        error: {
-          code: 'COSMETICS_403',
-          message: `Required scope: ${requiredScope}. Cross-service access denied. Cosmetics requires cosmetics:* or platform:* roles.`,
-        },
-      });
-    }
-
-    // Default deny
-    return res.status(403).json({
-      error: {
-        code: 'COSMETICS_403',
-        message: `Permission denied. Required scope: ${requiredScope}`,
-      },
-    });
-  };
-}
+const COSMETICS_SCOPE_CONFIG: ServiceScopeGuardConfig = {
+  serviceKey: 'cosmetics',
+  allowedRoles: ['cosmetics:admin', 'cosmetics:operator'],
+  platformBypass: true,
+  legacyRoles: [],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'glucoseview'],
+};
+const requireCosmeticsScope = createMembershipScopeGuard(COSMETICS_SCOPE_CONFIG);
 
 /**
  * Create cosmetics routes

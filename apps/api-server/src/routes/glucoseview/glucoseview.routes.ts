@@ -17,66 +17,23 @@ import { createGlucoseViewApplicationController } from './controllers/applicatio
 import { createGlucoseViewPharmacyController } from './controllers/pharmacy.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import { GlucoseViewPharmacist } from './entities/index.js';
-import { hasAnyServiceRole } from '../../utils/role.utils.js';
+import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
+import type { ServiceScopeGuardConfig } from '@o4o/security-core';
 
 /**
- * Scope verification middleware factory for GlucoseView
+ * GlucoseView Scope Guard — WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
  *
- * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.3: GlucoseView)
- * - **GlucoseView 비즈니스 서비스는 glucoseview:* role + platform:admin 신뢰**
- * - Priority 1: GlucoseView prefixed roles + platform admin
- * - Priority 2: Legacy role detection → Log + DENY
- * - Cross-service isolation: Other service roles DENY
+ * Replaces inline implementation with membership-aware scope guard.
+ * Behavior: membership check + glucoseview roles, platform bypass, cross-service deny.
  */
-function requireGlucoseViewScope(scope: string): RequestHandler {
-  return (req, res, next) => {
-    const user = (req as any).user;
-    const userRoles = user?.roles || [];
-
-    // Priority 1: Check GlucoseView-specific prefixed roles + platform admin
-    const hasGlucoseViewRole = hasAnyServiceRole(userRoles, [
-      'glucoseview:admin',
-      'glucoseview:operator',
-      'platform:admin',
-      'platform:super_admin',
-    ]);
-
-    // Check for specific scope
-    const userScopes = user?.scopes || [];
-    const hasScope = userScopes.includes(scope) || userScopes.includes('glucoseview:admin');
-
-    if (hasScope || hasGlucoseViewRole) {
-      next();
-      return;
-    }
-
-    // Detect other service roles and deny
-    const hasOtherServiceRole = userRoles.some((r: string) =>
-      r.startsWith('kpa:') ||
-      r.startsWith('neture:') ||
-      r.startsWith('glycopharm:') ||
-      r.startsWith('cosmetics:')
-    );
-
-    if (hasOtherServiceRole) {
-      res.status(403).json({
-        error: {
-          code: 'FORBIDDEN',
-          message: `Required scope: ${scope}. Cross-service access denied. GlucoseView requires glucoseview:* or platform:* roles.`,
-        },
-      });
-      return;
-    }
-
-    // Default deny
-    res.status(403).json({
-      error: {
-        code: 'FORBIDDEN',
-        message: `Missing required scope: ${scope}`,
-      },
-    });
-  };
-}
+const GLUCOSEVIEW_SCOPE_CONFIG: ServiceScopeGuardConfig = {
+  serviceKey: 'glucoseview',
+  allowedRoles: ['glucoseview:admin', 'glucoseview:operator'],
+  platformBypass: true,
+  legacyRoles: [],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
+};
+const requireGlucoseViewScope = createMembershipScopeGuard(GLUCOSEVIEW_SCOPE_CONFIG);
 
 /**
  * GlucoseView Admin middleware factory
