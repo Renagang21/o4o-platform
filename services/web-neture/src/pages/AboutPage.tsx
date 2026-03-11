@@ -1,229 +1,231 @@
 /**
- * AboutPage - Neture 플랫폼 소개 페이지
+ * AboutPage - Neture 플랫폼 소개 Hub 페이지
  *
- * Work Order: WO-O4O-NETURE-SUPPLIER-PARTNER-PAGES-V1
+ * Work Order: WO-O4O-NETURE-ABOUT-HUB-PAGE-V1
+ *
+ * 기존 소개 페이지들을 연결하는 Hub 구조.
+ * 새 콘텐츠를 작성하지 않고, 이미 존재하는 페이지들을 정리하여 연결한다.
  *
  * 구조:
- * 1. Hero - Neture + Online for Offline Network
- * 2. Neture 소개
- * 3. O4O 플랫폼 설명 + 구조 흐름도
- * 4. 플랫폼 구조 (3 cards: Supplier, Partner, Store)
- * 5. Supplier / Partner 역할
- * 6. 플랫폼 비전
+ * 1. Hero - About Neture
+ * 2. 플랫폼 소개 - /o4o, /o4o/intro
+ * 3. 플랫폼 개념 - /manual/concepts, /workspace/platform/principles
+ * 4. 플랫폼 구조 - /channel/structure, /manual/concepts/channel-map
+ * 5. 대상 산업 - /o4o/targets/*
+ * 6. 유통 채널 - /channel/*
  */
 
 import { Link } from 'react-router-dom';
-import { Package, Megaphone, Store, ChevronRight, ArrowRight, ArrowDown } from 'lucide-react';
+import {
+  Globe,
+  BookOpen,
+  Network,
+  Building2,
+  Truck,
+  ArrowRight,
+  Pill,
+  Stethoscope,
+  Scissors,
+  Glasses,
+  MoreHorizontal,
+} from 'lucide-react';
+
+/* ── 섹션 데이터 ── */
+
+const platformIntro = [
+  { title: 'O4O 플랫폼 소개', desc: 'Neture와 O4O 개념을 소개합니다.', to: '/o4o' },
+  { title: 'O4O 플랫폼 상세', desc: '플랫폼 구조와 비전을 상세히 설명합니다.', to: '/o4o/intro' },
+];
+
+const platformConcepts = [
+  { title: '플랫폼 개념 설명', desc: 'O4O 플랫폼의 핵심 개념을 설명합니다.', to: '/manual/concepts' },
+  { title: '플랫폼 운영 원칙', desc: 'Neture 플랫폼의 운영 원칙을 안내합니다.', to: '/workspace/platform/principles' },
+];
+
+const platformStructure = [
+  { title: '유통 채널 구조', desc: '공급자에서 매장까지의 유통 흐름을 설명합니다.', to: '/channel/structure' },
+  { title: '채널 맵', desc: '전체 채널 구조를 시각적으로 보여줍니다.', to: '/manual/concepts/channel-map' },
+];
+
+const targetIndustries = [
+  { icon: Pill, title: '약국', desc: '약국 채널 안내', to: '/o4o/targets/pharmacy', color: { bg: 'bg-blue-50', text: 'text-blue-600' } },
+  { icon: Stethoscope, title: '의원', desc: '의원 채널 안내', to: '/o4o/targets/clinic', color: { bg: 'bg-emerald-50', text: 'text-emerald-600' } },
+  { icon: Scissors, title: '미용실', desc: '미용실 채널 안내', to: '/o4o/targets/salon', color: { bg: 'bg-violet-50', text: 'text-violet-600' } },
+  { icon: Glasses, title: '안경점', desc: '안경점 채널 안내', to: '/o4o/targets/optical', color: { bg: 'bg-amber-50', text: 'text-amber-600' } },
+  { icon: MoreHorizontal, title: '기타 업종', desc: '기타 대상 업종', to: '/o4o/other-targets', color: { bg: 'bg-gray-50', text: 'text-gray-600' } },
+];
+
+const channels = [
+  { title: '약국 채널', desc: '약국 유통 채널 구조를 설명합니다.', to: '/channel/pharmacy' },
+  { title: '안경점 채널', desc: '안경점 유통 채널 구조를 설명합니다.', to: '/channel/optical' },
+  { title: '의료기기 채널', desc: '의료기기 유통 채널 구조를 설명합니다.', to: '/channel/medical' },
+  { title: '치과 채널', desc: '치과 유통 채널 구조를 설명합니다.', to: '/channel/dental' },
+];
+
+/* ── 공통 카드 링크 컴포넌트 ── */
+
+function LinkCard({ title, desc, to }: { title: string; desc: string; to: string }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center justify-between p-5 bg-white rounded-xl border border-gray-200 hover:border-primary-200 hover:shadow-sm transition-all group"
+    >
+      <div>
+        <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
+        <p className="text-sm text-gray-500">{desc}</p>
+      </div>
+      <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-primary-500 transition-colors flex-shrink-0 ml-4" />
+    </Link>
+  );
+}
+
+/* ── 섹션 헤더 ── */
+
+function SectionHeader({ icon: Icon, title, desc, color }: { icon: typeof Globe; title: string; desc: string; color: string }) {
+  return (
+    <div className="flex items-start gap-4 mb-6">
+      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center flex-shrink-0`}>
+        <Icon className="w-6 h-6" />
+      </div>
+      <div>
+        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        <p className="text-sm text-gray-500 mt-1">{desc}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function AboutPage() {
   return (
     <div>
       {/* ── 1. Hero ── */}
-      <section className="bg-gradient-to-br from-primary-700 to-primary-900 text-white py-24">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">Neture</h1>
-          <p className="text-xl md:text-2xl font-medium text-white/90 mb-6">
-            Online for Offline Network
-          </p>
-          <p className="text-lg text-white/70 leading-relaxed max-w-xl mx-auto">
-            Neture는 오프라인 매장을 지원하는<br />
-            공급자·파트너 협업 플랫폼입니다.
+      <section className="bg-gradient-to-br from-primary-700 to-primary-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 py-20 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">About Neture</h1>
+          <p className="text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+            Neture는 O4O(Online for Offline) 유통 플랫폼입니다.
+            <br />
+            공급자, 파트너, 매장을 연결하여 오프라인 매장의 경쟁력을 강화합니다.
           </p>
         </div>
       </section>
 
-      {/* ── 2. Neture 소개 ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Neture 소개</h2>
-          <p className="text-gray-600 leading-relaxed mb-4">
-            Neture는 공급자와 파트너가 협력하여<br />
-            매장 네트워크를 지원하는 플랫폼입니다.
-          </p>
-          <p className="text-gray-600 leading-relaxed">
-            제품 공급, 콘텐츠 홍보, 매장 협업을 통해<br />
-            오프라인 매장의 경쟁력을 높이는 것을 목표로 합니다.
-          </p>
-        </div>
-      </section>
-
-      {/* ── 3. O4O 플랫폼 설명 ── */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-sm font-semibold text-primary-600 uppercase tracking-wider mb-2">
-            Platform Concept
-          </p>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">Online for Offline</h2>
-          <p className="text-gray-600 mb-10 max-w-lg mx-auto leading-relaxed">
-            온라인 서비스를 통해<br />
-            오프라인 매장의 경쟁력을 강화합니다.
-          </p>
-
-          {/* 구조 흐름도 */}
-          <div className="flex items-center justify-center gap-4 md:gap-8 flex-wrap">
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-3">
-                <Package className="w-8 h-8 text-blue-600" />
-              </div>
-              <span className="text-sm font-semibold text-gray-900">Supplier</span>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-300 hidden md:block" />
-            <ArrowDown className="w-5 h-5 text-gray-300 md:hidden" />
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-3">
-                <Package className="w-8 h-8 text-amber-600" />
-              </div>
-              <span className="text-sm font-semibold text-gray-900">Product</span>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-300 hidden md:block" />
-            <ArrowDown className="w-5 h-5 text-gray-300 md:hidden" />
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mb-3">
-                <Store className="w-8 h-8 text-gray-600" />
-              </div>
-              <span className="text-sm font-semibold text-gray-900">Store</span>
-            </div>
-            <ChevronRight className="w-6 h-6 text-gray-300 hidden md:block rotate-180" />
-            <ArrowDown className="w-5 h-5 text-gray-300 md:hidden rotate-180" />
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mb-3">
-                <Megaphone className="w-8 h-8 text-emerald-600" />
-              </div>
-              <span className="text-sm font-semibold text-gray-900">Partner</span>
-            </div>
+      <div className="max-w-4xl mx-auto px-4 py-12 space-y-16">
+        {/* ── 2. 플랫폼 소개 ── */}
+        <section>
+          <SectionHeader
+            icon={Globe}
+            title="플랫폼 소개"
+            desc="Neture 플랫폼과 O4O 개념을 소개합니다."
+            color="bg-primary-100 text-primary-600"
+          />
+          <div className="space-y-3">
+            {platformIntro.map((item) => (
+              <LinkCard key={item.to} {...item} />
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 4. 플랫폼 구조 (3 cards) ── */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">플랫폼 구조</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-100 text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Package className="w-7 h-7 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Supplier</h3>
-              <p className="text-sm text-gray-600">제품을 공급하는 기업</p>
-            </div>
-
-            <div className="bg-emerald-50 rounded-xl p-6 border border-emerald-100 text-center">
-              <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Megaphone className="w-7 h-7 text-emerald-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Partner</h3>
-              <p className="text-sm text-gray-600">마케팅 / 콘텐츠 협력</p>
-            </div>
-
-            <div className="bg-gray-100 rounded-xl p-6 border border-gray-200 text-center">
-              <div className="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Store className="w-7 h-7 text-gray-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Store</h3>
-              <p className="text-sm text-gray-600">제품을 판매하는 매장</p>
-            </div>
+        {/* ── 3. 플랫폼 개념 ── */}
+        <section>
+          <SectionHeader
+            icon={BookOpen}
+            title="플랫폼 개념"
+            desc="플랫폼 운영 원칙과 개념 설명"
+            color="bg-violet-100 text-violet-600"
+          />
+          <div className="space-y-3">
+            {platformConcepts.map((item) => (
+              <LinkCard key={item.to} {...item} />
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 5. Supplier / Partner 역할 ── */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10">
-            Supplier &middot; Partner 역할
-          </h2>
+        {/* ── 4. 플랫폼 구조 ── */}
+        <section>
+          <SectionHeader
+            icon={Network}
+            title="플랫폼 구조"
+            desc="Neture 유통 구조와 채널 구조 설명"
+            color="bg-blue-100 text-blue-600"
+          />
+          <div className="space-y-3">
+            {platformStructure.map((item) => (
+              <LinkCard key={item.to} {...item} />
+            ))}
+          </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Supplier */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-5 h-5 text-blue-600" />
+        {/* ── 5. 대상 산업 ── */}
+        <section>
+          <SectionHeader
+            icon={Building2}
+            title="대상 산업"
+            desc="Neture 플랫폼이 활용되는 산업 분야"
+            color="bg-emerald-100 text-emerald-600"
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {targetIndustries.map((t) => (
+              <Link
+                key={t.to}
+                to={t.to}
+                className="flex flex-col items-center p-5 bg-white rounded-xl border border-gray-200 hover:border-primary-200 hover:shadow-sm transition-all text-center"
+              >
+                <div className={`w-12 h-12 ${t.color.bg} rounded-xl flex items-center justify-center mb-3`}>
+                  <t.icon className={`w-6 h-6 ${t.color.text}`} />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">Supplier</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">제품 등록</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">매장 공급</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">파트너 협력</span>
-                </li>
-              </ul>
-              <div className="mt-6">
-                <Link
-                  to="/supplier"
-                  className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Supplier 자세히 보기
-                  <ArrowRight className="ml-1 w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Partner */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <Megaphone className="w-5 h-5 text-emerald-600" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900">Partner</h3>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">콘텐츠 제작</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">마케팅 협력</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="mt-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full flex-shrink-0" />
-                  <span className="text-sm text-gray-700">매장 홍보</span>
-                </li>
-              </ul>
-              <div className="mt-6">
-                <Link
-                  to="/partner"
-                  className="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                >
-                  Partner 자세히 보기
-                  <ArrowRight className="ml-1 w-4 h-4" />
-                </Link>
-              </div>
-            </div>
+                <span className="text-sm font-semibold text-gray-900">{t.title}</span>
+                <span className="text-xs text-gray-500 mt-1">{t.desc}</span>
+              </Link>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 6. 플랫폼 비전 ── */}
-      <section className="py-20 bg-gray-900 text-white">
+        {/* ── 6. 유통 채널 ── */}
+        <section>
+          <SectionHeader
+            icon={Truck}
+            title="유통 채널"
+            desc="산업별 유통 채널 구조 설명"
+            color="bg-amber-100 text-amber-600"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {channels.map((item) => (
+              <LinkCard key={item.to} {...item} />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* ── CTA ── */}
+      <section className="py-16 bg-gray-900 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-6">플랫폼 비전</h2>
-          <p className="text-gray-300 leading-relaxed mb-4">
-            Neture는 공급자와 파트너가 협력하여<br />
-            매장 네트워크를 지원하는 협업 플랫폼입니다.
+          <h2 className="text-2xl font-bold mb-4">Neture와 함께하세요</h2>
+          <p className="text-gray-400 mb-8">
+            공급자, 파트너로 참여하거나 문의를 보내주세요.
           </p>
-          <p className="text-gray-300 leading-relaxed mb-10">
-            제품과 콘텐츠가 연결되는<br />
-            새로운 매장 생태계를 구축합니다.
-          </p>
-          <Link
-            to="/contact"
-            className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
-          >
-            문의하기
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/supplier"
+              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              공급자 참여
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+            <Link
+              to="/partner"
+              className="inline-flex items-center justify-center px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              파트너 참여
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-600 text-gray-300 font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              문의하기
+            </Link>
+          </div>
         </div>
       </section>
     </div>
