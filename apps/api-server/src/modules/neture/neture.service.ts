@@ -26,6 +26,8 @@ import {
 import { NeturePartner, NeturePartnerStatus } from '../../routes/neture/entities/neture-partner.entity.js';
 import logger from '../../utils/logger.js';
 import { autoExpandPublicProduct } from '../../utils/auto-listing.utils.js';
+import { roleAssignmentService } from '../auth/services/role-assignment.service.js';
+import { ServiceMembership } from '../auth/entities/ServiceMembership.js';
 
 export class NetureService {
   // Lazy initialization: repositories are created on first access
@@ -98,6 +100,14 @@ export class NetureService {
   private _brandRepo?: Repository<Brand>;
   private _imageRepo?: Repository<ProductImage>;
   private _partnerEntityRepo?: Repository<NeturePartner>;
+  private _membershipRepo?: Repository<ServiceMembership>;
+
+  private get membershipRepo(): Repository<ServiceMembership> {
+    if (!this._membershipRepo) {
+      this._membershipRepo = AppDataSource.getRepository(ServiceMembership);
+    }
+    return this._membershipRepo;
+  }
 
   private get categoryRepo(): Repository<ProductCategory> {
     if (!this._categoryRepo) {
@@ -263,6 +273,27 @@ export class NetureService {
       supplier.approvedAt = new Date();
       await this.supplierRepo.save(supplier);
 
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-INTEGRATION-V1: Sync membership + RBAC
+      if (supplier.userId) {
+        // 1. Service membership: pending → approved
+        const membership = await this.membershipRepo.findOne({
+          where: { userId: supplier.userId, serviceKey: 'neture' },
+        });
+        if (membership && membership.status !== 'active') {
+          membership.status = 'active';
+          await this.membershipRepo.save(membership);
+          logger.info(`[NetureService] Membership activated for user ${supplier.userId}`);
+        }
+
+        // 2. RBAC: assign neture:supplier role
+        await roleAssignmentService.assignRole({
+          userId: supplier.userId,
+          role: 'neture:supplier',
+          assignedBy: approvedByUserId,
+        });
+        logger.info(`[NetureService] Role neture:supplier assigned to user ${supplier.userId}`);
+      }
+
       logger.info(`[NetureService] Supplier approved: ${supplierId} by ${approvedByUserId}`);
 
       return {
@@ -303,6 +334,18 @@ export class NetureService {
       supplier.approvedAt = new Date();
       supplier.rejectedReason = reason || null;
       await this.supplierRepo.save(supplier);
+
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-INTEGRATION-V1: Sync membership + RBAC on reject
+      if (supplier.userId) {
+        const membership = await this.membershipRepo.findOne({
+          where: { userId: supplier.userId, serviceKey: 'neture' },
+        });
+        if (membership) {
+          membership.status = 'rejected';
+          await this.membershipRepo.save(membership);
+        }
+        await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
+      }
 
       logger.info(`[NetureService] Supplier rejected: ${supplierId} by ${rejectedByUserId}`);
 
@@ -409,6 +452,18 @@ export class NetureService {
          )`,
         [supplierId],
       );
+
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-INTEGRATION-V1: Sync membership + RBAC on deactivate
+      if (supplier.userId) {
+        const membership = await this.membershipRepo.findOne({
+          where: { userId: supplier.userId, serviceKey: 'neture' },
+        });
+        if (membership) {
+          membership.status = 'suspended';
+          await this.membershipRepo.save(membership);
+        }
+        await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
+      }
 
       logger.info(`[NetureService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${revokedCount} approvals, deactivated listings)`);
 
