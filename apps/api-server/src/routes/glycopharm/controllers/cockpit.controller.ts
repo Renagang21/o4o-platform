@@ -12,7 +12,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 import { GlycopharmCustomerRequest } from '../entities/customer-request.entity.js';

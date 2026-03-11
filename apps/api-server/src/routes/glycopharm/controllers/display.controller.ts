@@ -16,7 +16,7 @@ import {
   DisplayPlaylistItem,
   DisplaySchedule,
 } from '../entities/index.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 
 type AuthMiddleware = RequestHandler;

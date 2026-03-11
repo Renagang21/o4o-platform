@@ -18,7 +18,7 @@ import {
   Unique,
   Index,
 } from 'typeorm';
-import type { ProductMaster } from './ProductMaster.entity.js';
+import type { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
 
 @Entity('store_product_profiles')
 @Unique(['organizationId', 'masterId'])

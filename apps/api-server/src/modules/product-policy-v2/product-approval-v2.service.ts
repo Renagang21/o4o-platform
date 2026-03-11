@@ -13,7 +13,7 @@ import {
   ProductApprovalType,
   ProductApprovalStatus,
 } from '../../entities/ProductApproval.js';
-import { OrganizationProductListing } from '../../routes/kpa/entities/organization-product-listing.entity.js';
+import { OrganizationProductListing } from '../store-core/entities/organization-product-listing.entity.js';
 import {
   SupplierProductOffer,
   OfferDistributionType,

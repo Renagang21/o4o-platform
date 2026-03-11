@@ -17,7 +17,7 @@
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
-import { OrganizationProductChannel } from '../../kpa/entities/organization-product-channel.entity.js';
+import { OrganizationProductChannel } from '../../../modules/store-core/entities/organization-product-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 

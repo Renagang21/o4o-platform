@@ -23,7 +23,7 @@ import logger from '../../../utils/logger.js';
 import { opsMetrics, OPS } from '../../../services/ops-metrics.service.js';
 import { validateSupplierSellerRelation } from '../../../core/checkout/checkout-guard.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import {
   EcommerceOrder,
   EcommerceOrderItem,

@@ -9,7 +9,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';

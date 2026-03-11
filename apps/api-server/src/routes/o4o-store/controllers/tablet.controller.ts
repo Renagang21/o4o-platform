@@ -19,7 +19,7 @@ import { DataSource, In } from 'typeorm';
 import rateLimit from 'express-rate-limit';
 import { GlycopharmService } from '../../glycopharm/services/glycopharm.service.js';
 import { GlycopharmProduct } from '../../glycopharm/entities/glycopharm-product.entity.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { TabletServiceRequest } from '../../glycopharm/entities/tablet-service-request.entity.js';
 import type { TabletServiceRequestStatus, TabletRequestItem } from '../../glycopharm/entities/tablet-service-request.entity.js';

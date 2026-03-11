@@ -19,7 +19,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource, LessThanOrEqual } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { StoreBlogPost } from '../../glycopharm/entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../../glycopharm/entities/store-blog-post.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';

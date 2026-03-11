@@ -9,7 +9,7 @@
  */
 
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmProductLog } from '../entities/glycopharm-product-log.entity.js';

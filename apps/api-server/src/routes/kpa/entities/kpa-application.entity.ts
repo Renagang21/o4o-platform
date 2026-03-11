@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { OrganizationStore } from './organization-store.entity.js';
+import type { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 
 export type KpaApplicationType = 'membership' | 'service' | 'other';
 export type KpaApplicationStatus = 'submitted' | 'approved' | 'rejected' | 'cancelled';

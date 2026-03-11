@@ -3,7 +3,8 @@ export { ProductMaster } from './ProductMaster.entity.js';
 export { ProductCategory } from './ProductCategory.entity.js';
 export { Brand } from './Brand.entity.js';
 export { SupplierProductOffer, OfferDistributionType, OfferApprovalStatus } from './SupplierProductOffer.entity.js';
-export { StoreProductProfile } from './StoreProductProfile.entity.js';
+// WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1: re-export from store-core
+export { StoreProductProfile } from '../../store-core/entities/StoreProductProfile.entity.js';
 export { NeturePartnershipRequest, PartnershipStatus } from './NeturePartnershipRequest.entity.js';
 export { NeturePartnershipProduct } from './NeturePartnershipProduct.entity.js';
 export { NeturePartnerDashboardItem, type PartnerDashboardItemStatus } from './NeturePartnerDashboardItem.entity.js';

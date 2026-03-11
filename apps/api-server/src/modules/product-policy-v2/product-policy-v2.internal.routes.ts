@@ -18,7 +18,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { DataSource } from 'typeorm';
 import { ProductApprovalV2Service } from './product-approval-v2.service.js';
-import { OrganizationProductListing } from '../../routes/kpa/entities/organization-product-listing.entity.js';
+import { OrganizationProductListing } from '../store-core/entities/organization-product-listing.entity.js';
 import { SupplierProductOffer } from '../neture/entities/SupplierProductOffer.entity.js';
 import { ProductApproval } from '../../entities/ProductApproval.js';
 import logger from '../../utils/logger.js';

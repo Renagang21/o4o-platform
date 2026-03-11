@@ -32,7 +32,7 @@ import rateLimit from 'express-rate-limit';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../cache/read-cache.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
-import { OrganizationStore } from '../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../glycopharm/entities/glycopharm-pharmacy-extension.entity.js';
 import { StoreBlogPost } from '../glycopharm/entities/store-blog-post.entity.js';
 import type { StoreBlogPostStatus } from '../glycopharm/entities/store-blog-post.entity.js';

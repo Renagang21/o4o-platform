@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { OrganizationStore } from './organization-store.entity.js';
+import type { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import type { User } from '../../../modules/auth/entities/User.js';
 
 export type KpaMemberRole = 'member' | 'operator' | 'admin';

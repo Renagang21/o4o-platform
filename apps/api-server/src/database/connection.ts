@@ -231,7 +231,6 @@ import {
   ProductCategory,
   Brand,
   SupplierProductOffer,
-  StoreProductProfile,
   NeturePartnershipRequest,
   NeturePartnershipProduct,
   NeturePartnerDashboardItem,
@@ -257,6 +256,17 @@ import {
 } from '../modules/catalog-import/entities/index.js';
 
 // ============================================================================
+// STORE CORE ENTITIES (WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1)
+// ============================================================================
+import {
+  OrganizationStore,
+  OrganizationChannel,
+  OrganizationProductListing,
+  OrganizationProductChannel,
+  StoreProductProfile,
+} from '../modules/store-core/entities/index.js';
+
+// ============================================================================
 // KPA ENTITIES (Pharmacist Association SaaS)
 // ============================================================================
 import {
@@ -271,13 +281,9 @@ import {
   KpaBranchSettings,
   KpaMemberService,
   KpaAuditLog,
-  OrganizationProductListing,
-  OrganizationChannel,
-  OrganizationProductChannel,
   KpaStoreAssetControl,
   KpaStoreContent, // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
   KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
-  OrganizationStore, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   KpaPharmacistProfile, // WO-ROLE-NORMALIZATION-PHASE3-B-V1
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
@@ -709,7 +715,6 @@ export const AppDataSource = new DataSource({
     ProductCategory,
     Brand,
     SupplierProductOffer,
-    StoreProductProfile,
     NeturePartnershipRequest,
     NeturePartnershipProduct,
     NeturePartnerDashboardItem,
@@ -730,6 +735,14 @@ export const AppDataSource = new DataSource({
     CatalogImportJob,
     CatalogImportRow,
     // ============================================================================
+    // STORE CORE ENTITIES (WO-O4O-STORE-CORE-ENTITY-EXTRACTION-V1)
+    // ============================================================================
+    OrganizationStore,
+    OrganizationChannel,
+    OrganizationProductListing,
+    OrganizationProductChannel,
+    StoreProductProfile,
+    // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================
     KpaOrganization,
@@ -743,17 +756,12 @@ export const AppDataSource = new DataSource({
     KpaBranchSettings,
     KpaMemberService,
     KpaAuditLog,
-    OrganizationProductListing,
-    OrganizationChannel,
-    OrganizationProductChannel,
     // WO-KPA-A-ASSET-CONTROL-EXTENSION-V1
     KpaStoreAssetControl,
     // WO-KPA-A-CONTENT-OVERRIDE-EXTENSION-V1
     KpaStoreContent,
     // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
     KpaPharmacyRequest,
-    // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
-    OrganizationStore,
     OrganizationServiceEnrollment,
     // WO-ROLE-NORMALIZATION-PHASE3-B-V1
     KpaPharmacistProfile,

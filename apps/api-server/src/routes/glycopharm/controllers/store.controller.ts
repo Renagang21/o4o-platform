@@ -22,7 +22,7 @@ import { DataSource } from 'typeorm';
 import { GlycopharmService } from '../services/glycopharm.service.js';
 import { FeaturedProductsService } from '../services/featured-products.service.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import type { TemplateProfile } from '../entities/glycopharm-pharmacy.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../../types/auth.js';

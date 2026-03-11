@@ -12,7 +12,7 @@
  */
 
 import type { DataSource, Repository } from 'typeorm';
-import { OrganizationProductListing } from '../entities/organization-product-listing.entity.js';
+import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';
 import {
   EcommerceOrder,

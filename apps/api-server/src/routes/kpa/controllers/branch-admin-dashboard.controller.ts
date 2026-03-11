@@ -10,7 +10,7 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import { KpaBranchNews } from '../entities/kpa-branch-news.entity.js';

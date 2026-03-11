@@ -102,7 +102,7 @@ import { createMypageController } from './controllers/mypage.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
-import { OrganizationStore } from './entities/organization-store.entity.js';
+import { OrganizationStore } from '../../modules/store-core/entities/organization-store.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed

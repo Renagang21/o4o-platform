@@ -17,9 +17,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 import type { OrganizationStore } from './organization-store.entity.js';
-import type { ProductMaster } from '../../../modules/neture/entities/ProductMaster.entity.js';
-import type { SupplierProductOffer } from '../../../modules/neture/entities/SupplierProductOffer.entity.js';
-import type { ServiceProduct } from './service-product.entity.js';
+import type { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
+import type { SupplierProductOffer } from '../../neture/entities/SupplierProductOffer.entity.js';
+import type { ServiceProduct } from '../../../routes/kpa/entities/service-product.entity.js';
 
 @Entity('organization_product_listings')
 @Index('IDX_org_product_listing_org_id', ['organization_id'])

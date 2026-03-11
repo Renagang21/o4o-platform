@@ -12,7 +12,7 @@ import { DataSource } from 'typeorm';
 import { normalizeBusinessNumber } from '../../../utils/business-number.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import type { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';

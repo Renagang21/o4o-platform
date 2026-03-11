@@ -16,7 +16,7 @@ import {
   type GlycopharmEventSourceType,
   type GlycopharmEventPurpose,
 } from '../entities/glycopharm-event.entity.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { EventPromotionService } from '../services/event-promotion.service.js';
 import type { AuthRequest } from '../../../types/auth.js';
 

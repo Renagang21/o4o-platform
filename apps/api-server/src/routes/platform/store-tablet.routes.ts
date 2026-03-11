@@ -36,7 +36,7 @@ import { StoreTablet } from './entities/store-tablet.entity.js';
 import { StoreTabletDisplay } from './entities/store-tablet-display.entity.js';
 import { TabletInterestRequest, InterestRequestStatus } from './entities/tablet-interest-request.entity.js';
 import { ProductMaster } from '../../modules/neture/entities/ProductMaster.entity.js';
-import { StoreProductProfile } from '../../modules/neture/entities/StoreProductProfile.entity.js';
+import { StoreProductProfile } from '../../modules/store-core/entities/StoreProductProfile.entity.js';
 import { validateGtin } from '../../utils/gtin.js';
 import { createRequireStoreOwner } from '../../utils/store-owner.utils.js';
 

@@ -17,8 +17,8 @@
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationProductListing } from '../../kpa/entities/organization-product-listing.entity.js';
-import { OrganizationProductChannel } from '../../kpa/entities/organization-product-channel.entity.js';
+import { OrganizationProductListing } from '../../../modules/store-core/entities/organization-product-listing.entity.js';
+import { OrganizationProductChannel } from '../../../modules/store-core/entities/organization-product-channel.entity.js';
 import { KpaAuditLog } from '../../kpa/entities/kpa-audit-log.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { SERVICE_KEYS } from '../../../constants/service-keys.js';

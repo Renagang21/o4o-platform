@@ -12,7 +12,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import type { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import type { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import type { DisplayPlaylist } from './display-playlist.entity.js';
 
 @Entity('glycopharm_display_schedules')

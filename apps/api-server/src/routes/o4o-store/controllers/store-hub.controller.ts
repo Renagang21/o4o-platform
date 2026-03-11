@@ -16,7 +16,7 @@ import { DataSource } from 'typeorm';
 import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { optionalStoreAuth } from '../../../auth/auth-context.middleware.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
-import { OrganizationChannel } from '../../kpa/entities/organization-channel.entity.js';
+import { OrganizationChannel } from '../../../modules/store-core/entities/organization-channel.entity.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 

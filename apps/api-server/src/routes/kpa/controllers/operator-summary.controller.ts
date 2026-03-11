@@ -17,7 +17,7 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
-import { OrganizationStore } from '../entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import { KpaOrganizationJoinRequest } from '../entities/kpa-organization-join-request.entity.js';

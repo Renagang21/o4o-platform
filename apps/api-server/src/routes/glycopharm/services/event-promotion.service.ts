@@ -35,7 +35,7 @@ import {
   type CustomerRequestPurpose,
   type CustomerRequestSourceType,
 } from '../entities/customer-request.entity.js';
-import { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 
 /** 쿨타임 (분) */
 const COOLDOWN_MINUTES = 10;

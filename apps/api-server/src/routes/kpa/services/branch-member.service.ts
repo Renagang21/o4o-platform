@@ -12,7 +12,7 @@
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
-import { OrganizationStore } from '../entities/organization-store.entity.js';
+import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 
 export class BranchMemberService {
   constructor(private dataSource: DataSource) {}

@@ -24,7 +24,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import type { OrganizationStore } from '../../kpa/entities/organization-store.entity.js';
+import type { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import type { GlycopharmProductLog } from './glycopharm-product-log.entity.js';
 
 export type GlycopharmProductStatus = 'draft' | 'active' | 'inactive' | 'discontinued';
