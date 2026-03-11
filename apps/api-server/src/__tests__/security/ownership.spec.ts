@@ -23,15 +23,16 @@ import * as path from 'path';
 // ─────────────────────────────────────────────────────
 
 describe('Neture Ownership: sellerId override protection', () => {
-  it('neture.routes.ts forces sellerId from authenticated user', () => {
+  it('seller.controller.ts forces sellerId from authenticated user', () => {
+    // After WO-O4O-ROUTES-REFACTOR-V1, sellerId enforcement moved from
+    // neture.routes.ts to seller.controller.ts (controller/service split)
     const filePath = path.resolve(
       __dirname,
-      '../../modules/neture/neture.routes.ts'
+      '../../modules/neture/controllers/seller.controller.ts'
     );
     const content = fs.readFileSync(filePath, 'utf8');
 
     // The guard pattern: sellerId from authenticated user (server-enforced)
-    // Accepts: `const sellerId = userId` OR `const sellerId = req.user?.id`
     const hasServerEnforced =
       content.includes('const sellerId = userId') ||
       content.includes('const sellerId = req.user?.id');
