@@ -1,8 +1,8 @@
 {
-  "name": "@o4o/lms-core",
+  "name": "@o4o/interactive-content-core",
   "version": "1.0.0",
   "private": true,
-  "description": "LMS (Learning Management System) Core for O4O Platform",
+  "description": "Interactive Content Core - Quiz, Survey, ContentBundle Engine for O4O Platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -17,18 +17,15 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/types": "workspace:*",
-    "@o4o/organization-core": "workspace:*",
-    "@o4o/interactive-content-core": "workspace:*",
-    "@o4o/education-extension": "workspace:*"
+    "@o4o/types": "workspace:*"
   },
   "peerDependencies": {
     "typeorm": "^0.3.0",
-    "class-validator": "^0.14.0",
-    "class-transformer": "^0.5.0"
+    "express": "^4.18.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/express": "^4.17.0",
     "typescript": "^5.3.0",
     "rimraf": "^5.0.0"
   }

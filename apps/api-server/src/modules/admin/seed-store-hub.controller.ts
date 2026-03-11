@@ -149,6 +149,7 @@ export function createSeedStoreHubRouter(dataSource: DataSource): Router {
       }
 
       // 5. Store channels (B2C, TABLET, SIGNAGE per org)
+      // Table: organization_channels (ENUM types for channel_type and status)
       const channels = [
         { id: T.chKpaB2c, orgId: T.orgKpa, type: 'B2C' },
         { id: T.chKpaTablet, orgId: T.orgKpa, type: 'TABLET' },
@@ -161,25 +162,26 @@ export function createSeedStoreHubRouter(dataSource: DataSource): Router {
         { id: T.chCosSignage, orgId: T.orgCosmetics, type: 'SIGNAGE' },
       ];
       for (const ch of channels) {
-        await insertIfNotExists(dataSource, 'store_channels', ch.id,
-          `INSERT INTO store_channels (id, organization_id, channel_type, status, created_at, updated_at)
-           VALUES ($1, $2, $3, 'APPROVED', NOW(), NOW())`,
+        await insertIfNotExists(dataSource, 'organization_channels', ch.id,
+          `INSERT INTO organization_channels (id, organization_id, channel_type, status, approved_at, created_at, updated_at)
+           VALUES ($1, $2, $3::organization_channel_type, 'APPROVED'::organization_channel_status, NOW(), NOW(), NOW())`,
           [ch.id, ch.orgId, ch.type],
           created, skipped, `channel:${ch.type}@${ch.orgId.slice(-1)}`,
         );
       }
 
       // 6. Product listings (basic test products)
+      // Table: organization_product_listings (has external_product_id NOT NULL)
       const products = [
         { id: T.pl1, orgId: T.orgKpa, name: '테스트 비타민C 1000', price: 15000, serviceKey: 'kpa' },
         { id: T.pl2, orgId: T.orgKpa, name: '테스트 혈당 측정기', price: 45000, serviceKey: 'kpa' },
         { id: T.pl3, orgId: T.orgCosmetics, name: '테스트 마스크팩', price: 3000, serviceKey: 'cosmetics' },
       ];
       for (const p of products) {
-        await insertIfNotExists(dataSource, 'product_listings', p.id,
-          `INSERT INTO product_listings (id, organization_id, product_name, retail_price, service_key, is_active, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, true, NOW(), NOW())`,
-          [p.id, p.orgId, p.name, p.price, p.serviceKey],
+        await insertIfNotExists(dataSource, 'organization_product_listings', p.id,
+          `INSERT INTO organization_product_listings (id, organization_id, external_product_id, product_name, product_metadata, retail_price, service_key, is_active, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, '{}'::jsonb, $5, $6, true, NOW(), NOW())`,
+          [p.id, p.orgId, 'test-' + p.id, p.name, p.price, p.serviceKey],
           created, skipped, `product:${p.name}`,
         );
       }
@@ -222,8 +224,8 @@ export function createSeedStoreHubRouter(dataSource: DataSource): Router {
       // Reverse dependency order
       const cleanups = [
         { table: 'organization_product_channels', col: 'channel_id', pattern: 'e0000000-ee03-4000' },
-        { table: 'product_listings', col: 'id', pattern: 'e0000000-ee04-4000' },
-        { table: 'store_channels', col: 'id', pattern: 'e0000000-ee03-4000' },
+        { table: 'organization_product_listings', col: 'id', pattern: 'e0000000-ee04-4000' },
+        { table: 'organization_channels', col: 'id', pattern: 'e0000000-ee03-4000' },
         { table: 'platform_store_slugs', col: 'id', pattern: 'e0000000-ee05-4000' },
         { table: 'organization_members', col: 'organization_id', pattern: 'e0000000-ee02-4000' },
         { table: 'organizations', col: 'id', pattern: 'e0000000-ee02-4000' },

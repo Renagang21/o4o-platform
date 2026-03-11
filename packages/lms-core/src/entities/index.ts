@@ -1,24 +1,29 @@
-export { Course, CourseLevel, CourseStatus } from './Course.js';
-export { Lesson, LessonType } from './Lesson.js';
-export { Enrollment, EnrollmentStatus } from './Enrollment.js';
-export { Progress, ProgressStatus } from './Progress.js';
-export { Certificate } from './Certificate.js';
-export { LMSEvent, LMSEventType, EventStatus } from './LMSEvent.js';
-export { Attendance, AttendanceStatus } from './Attendance.js';
-export { ContentBundle, ContentBundleType } from './ContentBundle.js';
-export type { ContentItem } from './ContentBundle.js';
-
-// Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
+// Local entities (remain in lms-core)
 export { InstructorApplication } from './InstructorApplication.js';
+export { EngagementLog, EngagementEventType } from './EngagementLog.js';
+export type { EngagementMetadata } from './EngagementLog.js';
 
-// Quiz Core Entities (Phase 1 Refoundation)
-export { Quiz } from './Quiz.js';
-export type { QuizQuestion } from './Quiz.js';
-export { QuizAttempt, AttemptStatus } from './QuizAttempt.js';
-export type { QuizAnswer } from './QuizAttempt.js';
+// Interactive Content (re-export from @o4o/interactive-content-core for backward compatibility)
+export {
+  // Phase 1
+  Quiz, QuizAttempt, AttemptStatus,
+  Survey, SurveyStatus, SurveyQuestion, QuestionType, SurveyResponse, ResponseStatus,
+  ContentBundle, ContentBundleType,
+  // Phase 2
+  Course, CourseLevel, CourseStatus,
+  Lesson, LessonType,
+} from '@o4o/interactive-content-core';
+export type {
+  QuizQuestion, QuizAnswer,
+  QuestionOption,
+  ContentItem,
+} from '@o4o/interactive-content-core';
 
-// Survey Core Entities (Phase 1 Refoundation)
-export { Survey, SurveyStatus } from './Survey.js';
-export { SurveyQuestion, QuestionType } from './SurveyQuestion.js';
-export type { QuestionOption } from './SurveyQuestion.js';
-export { SurveyResponse, ResponseStatus } from './SurveyResponse.js';
+// Education Extension (re-export from @o4o/education-extension for backward compatibility)
+export {
+  Enrollment, EnrollmentStatus,
+  Progress, ProgressStatus,
+  Certificate,
+  LMSEvent, LMSEventType, EventStatus,
+  Attendance, AttendanceStatus,
+} from '@o4o/education-extension';

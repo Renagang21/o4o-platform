@@ -3,6 +3,8 @@
  *
  * Bridge cosmetics_stores → organizations for Store HUB integration.
  *
+ * 0. Create organization_members table (was only created by synchronize:true)
+ * 0b. Fix organization_channels FK: kpa_organizations → organizations
  * 1. Create organizations records for existing approved cosmetics_stores
  * 2. Add organization_id column to cosmetics_stores
  * 3. Link existing stores via code match
@@ -19,7 +21,67 @@ export class CosmeticsStoreOrgBridge20260311200000
   name = 'CosmeticsStoreOrgBridge20260311200000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // Guard: skip if cosmetics_stores table does not exist
+    // ============================================================
+    // 0. Create organization_members table (IF NOT EXISTS)
+    //
+    // This table was previously only created by TypeORM synchronize:true.
+    // Column naming: snake_case (matches all raw SQL throughout codebase).
+    // ============================================================
+    await queryRunner.query(`
+      CREATE TABLE IF NOT EXISTS organization_members (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        organization_id UUID NOT NULL,
+        user_id UUID NOT NULL,
+        role VARCHAR(50) NOT NULL DEFAULT 'member',
+        is_primary BOOLEAN NOT NULL DEFAULT false,
+        metadata JSONB,
+        joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        left_at TIMESTAMP,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        CONSTRAINT "UQ_org_member_org_user" UNIQUE (organization_id, user_id)
+      )
+    `);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_org_member_user_id" ON organization_members (user_id)`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_org_member_org_id" ON organization_members (organization_id)`);
+    await queryRunner.query(`CREATE INDEX IF NOT EXISTS "IDX_org_member_is_primary" ON organization_members (is_primary)`);
+
+    // ============================================================
+    // 0b. Fix organization_channels FK: kpa_organizations → organizations
+    //
+    // The original migration (20260215200001) created FK to kpa_organizations,
+    // but after Org Service Model Normalization, organizations is the canonical table.
+    // GlycoPharm/Cosmetics channels require FK to organizations.
+    // ============================================================
+    const hasChannelsTable = await queryRunner.query(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'organization_channels'
+      ) AS exists
+    `);
+    if (hasChannelsTable[0]?.exists) {
+      // Drop old FK if it exists (references kpa_organizations)
+      await queryRunner.query(`
+        ALTER TABLE organization_channels
+          DROP CONSTRAINT IF EXISTS "FK_org_channel_organization"
+      `);
+      // Add new FK to organizations (if not already present)
+      const hasNewFk = await queryRunner.query(`
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE constraint_name = 'FK_org_channel_organizations'
+          AND table_name = 'organization_channels'
+      `);
+      if (hasNewFk.length === 0) {
+        await queryRunner.query(`
+          ALTER TABLE organization_channels
+            ADD CONSTRAINT "FK_org_channel_organizations"
+            FOREIGN KEY (organization_id) REFERENCES organizations(id)
+            ON DELETE RESTRICT ON UPDATE CASCADE
+        `);
+      }
+    }
+
+    // Guard: skip cosmetics bridge if cosmetics_stores table does not exist
     const hasTable = await queryRunner.query(`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables

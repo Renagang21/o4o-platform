@@ -394,28 +394,36 @@ import {
 } from '@o4o-apps/digital-signage-core/entities';
 
 // ============================================================================
-// LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
-// Use /entities subpath to avoid side-effect loading
+// LMS-CORE ENTITIES (reduced after Phase 2)
 // ============================================================================
 import {
+  InstructorApplication,
+} from '@o4o/lms-core/entities';
+
+// ============================================================================
+// INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
+// ============================================================================
+import {
+  Quiz,
+  QuizAttempt,
+  Survey,
+  SurveyQuestion,
+  SurveyResponse,
+  ContentBundle,
   Course,
   Lesson,
+} from '@o4o/interactive-content-core/entities';
+
+// ============================================================================
+// EDUCATION-EXTENSION ENTITIES (WO-O4O-INTERACTIVE-CONTENT-CORE-EXTRACTION-PHASE2)
+// ============================================================================
+import {
   Enrollment,
   Progress,
   Certificate,
   LMSEvent,
   Attendance,
-  ContentBundle,
-  // Quiz Core Entities (Phase 1 Refoundation)
-  Quiz,
-  QuizAttempt,
-  // Survey Core Entities (Phase 1 Refoundation)
-  Survey,
-  SurveyQuestion,
-  SurveyResponse,
-  // Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
-  InstructorApplication,
-} from '@o4o/lms-core/entities';
+} from '@o4o/education-extension/entities';
 
 // ============================================================================
 // LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
@@ -807,25 +815,28 @@ export const AppDataSource = new DataSource({
     Organization,
     OrganizationMember,
     // ============================================================================
-    // LMS-CORE ENTITIES (Phase 4: Entities-only Re-introduction)
+    // LMS-CORE ENTITIES (reduced after Phase 2)
     // ============================================================================
+    InstructorApplication,
+    // ============================================================================
+    // INTERACTIVE-CONTENT-CORE ENTITIES (Phase 1 + Phase 2)
+    // ============================================================================
+    Quiz,
+    QuizAttempt,
+    Survey,
+    SurveyQuestion,
+    SurveyResponse,
+    ContentBundle,
     Course,
     Lesson,
+    // ============================================================================
+    // EDUCATION-EXTENSION ENTITIES
+    // ============================================================================
     Enrollment,
     Progress,
     Certificate,
     LMSEvent,
     Attendance,
-    ContentBundle,
-    // Quiz Core Entities (Phase 1 Refoundation)
-    Quiz,
-    QuizAttempt,
-    // Survey Core Entities (Phase 1 Refoundation)
-    Survey,
-    SurveyQuestion,
-    SurveyResponse,
-    // Instructor Application (WO-LMS-INSTRUCTOR-ROLE-V1)
-    InstructorApplication,
     // ============================================================================
     // LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
     // Core ID reference pattern - NOT entity duplication

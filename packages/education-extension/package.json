@@ -1,8 +1,8 @@
 {
-  "name": "@o4o/lms-core",
+  "name": "@o4o/education-extension",
   "version": "1.0.0",
   "private": true,
-  "description": "LMS (Learning Management System) Core for O4O Platform",
+  "description": "Education Extension - Enrollment, Progress, Certificate, Event, Attendance for O4O Platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -17,15 +17,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/types": "workspace:*",
-    "@o4o/organization-core": "workspace:*",
-    "@o4o/interactive-content-core": "workspace:*",
-    "@o4o/education-extension": "workspace:*"
+    "@o4o/types": "workspace:*"
   },
   "peerDependencies": {
-    "typeorm": "^0.3.0",
-    "class-validator": "^0.14.0",
-    "class-transformer": "^0.5.0"
+    "typeorm": "^0.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
