@@ -87,6 +87,7 @@ const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsP
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 const OperatorMarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
+const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
@@ -235,6 +236,7 @@ function AppRoutes() {
         <Route index element={<KCosmeticsOperatorDashboard />} />
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="users" element={<OperatorUsersPage />} />
+        <Route path="users/:id" element={<OperatorUserDetailPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
       </Route>
 
@@ -242,7 +244,7 @@ function AppRoutes() {
       <Route
         path="operator"
         element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['admin', 'operator']}>
             <DashboardLayout role="operator" />
           </ProtectedRoute>
         }
@@ -260,8 +262,9 @@ function AppRoutes() {
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
               <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
-        {/* 회원 관리 (WO-O4O-E2E-BLOCKER-FIX-V1: operator 사이드바 링크 연결) */}
+        {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<OperatorUsersPage />} />
+        <Route path="users/:id" element={<OperatorUserDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}

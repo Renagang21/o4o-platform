@@ -65,7 +65,7 @@ export default function OperatorApplicationDetailPage() {
 
     try {
       await api.reviewApplication(id!, { status: 'approved' });
-      navigate('/operator/glucoseview/applications', { replace: true });
+      navigate('/operator/applications', { replace: true });
     } catch (err: any) {
       setReviewError(err.message || '승인 처리에 실패했습니다.');
     } finally {
@@ -87,7 +87,7 @@ export default function OperatorApplicationDetailPage() {
         status: 'rejected',
         rejectionReason: rejectionReason.trim(),
       });
-      navigate('/operator/glucoseview/applications', { replace: true });
+      navigate('/operator/applications', { replace: true });
     } catch (err: any) {
       setReviewError(err.message || '반려 처리에 실패했습니다.');
     } finally {
@@ -117,7 +117,7 @@ export default function OperatorApplicationDetailPage() {
           </div>
           <p className="text-red-600 mb-4">{error}</p>
           <Link
-            to="/operator/glucoseview/applications"
+            to="/operator/applications"
             className="text-blue-600 hover:text-blue-700 font-medium"
           >
             ← 목록으로 돌아가기
@@ -137,7 +137,7 @@ export default function OperatorApplicationDetailPage() {
       <div className="max-w-4xl mx-auto">
         {/* Back Link */}
         <Link
-          to="/operator/glucoseview/applications"
+          to="/operator/applications"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

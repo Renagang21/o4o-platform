@@ -19,7 +19,9 @@ export default function LoginPage() {
 
   // 역할에 따른 대시보드 경로
   const getDashboardPath = (role: string) => {
-    return role === 'admin' ? '/admin' : '/';
+    if (role === 'admin') return '/admin';
+    if (role === 'operator') return '/operator';
+    return '/';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

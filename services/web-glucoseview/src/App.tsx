@@ -23,6 +23,7 @@ import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import OperatorAiReportPage from './pages/operator/AiReportPage';
 import OperatorUsersPage from './pages/operator/UsersPage';
+import OperatorUserDetailPage from './pages/operator/UserDetailPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
 import TestCenterPage from './pages/TestCenterPage';
 
@@ -141,16 +142,17 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      {/* 운영자 페이지 (Phase C-4) — WO-SECURITY-GLUCOSEVIEW-GUARD-FIX-V1: admin+operator 보호 */}
-      <Route path="/operator/glucoseview" element={
+      {/* 운영자 페이지 — WO-O4O-OPERATOR-CONSOLE-ARCHITECTURE-V1: /operator 표준 경로 */}
+      <Route path="/operator" element={
         <RoleProtectedRoute allowedRoles={['admin', 'operator']}>
           <OperatorLayout />
         </RoleProtectedRoute>
       }>
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="applications/:id" element={<OperatorApplicationDetailPage />} />
-        {/* 회원 관리 (WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1) */}
+        {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<OperatorUsersPage />} />
+        <Route path="users/:id" element={<OperatorUserDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>

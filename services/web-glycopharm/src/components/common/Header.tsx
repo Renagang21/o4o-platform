@@ -41,10 +41,12 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const isPharmacy = isAuthenticated && user?.roles?.includes('pharmacy');
+  const isAdmin = isAuthenticated && user?.roles?.includes('admin');
   const isOperator = isAuthenticated && user?.roles?.some(r => ['operator', 'admin'].includes(r));
 
   // Role-based dashboard links for profile dropdown
   const roleDashboardLinks = isAuthenticated ? [
+    ...(isAdmin ? [{ label: '관리자 대시보드', path: '/admin' }] : []),
     ...(isOperator ? [{ label: '운영자 대시보드', path: '/operator' }] : []),
     ...(isPharmacy ? [{ label: 'Care 대시보드', path: '/care' }] : []),
   ] : [];

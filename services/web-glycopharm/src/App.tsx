@@ -89,6 +89,7 @@ const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPag
 const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprovalDetailPage'));
 const StoreTemplateManagerPage = lazy(() => import('@/pages/operator/store-template').then(m => ({ default: m.StoreTemplateManagerPage })));
 const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
+const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 
@@ -407,6 +408,7 @@ function AppRoutes() {
         <Route index element={<GlycoPharmAdminDashboard />} />
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
 
@@ -414,7 +416,7 @@ function AppRoutes() {
       <Route
         path="operator"
         element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['admin', 'operator']}>
             <DashboardLayout role="operator" />
           </ProtectedRoute>
         }
@@ -448,8 +450,9 @@ function AppRoutes() {
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
         {/* Support */}
         <Route path="support" element={<SupportPage />} />
-        {/* 회원 관리 (WO-O4O-E2E-BLOCKER-FIX-V1: operator 사이드바 링크 연결) */}
+        {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<UsersPage />} />
+        <Route path="users/:id" element={<UserDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<AiReportPage />} />
         {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}

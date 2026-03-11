@@ -34,7 +34,7 @@ export default function OperatorLayout() {
           {/* Center - Navigation */}
           <nav className="flex items-center gap-1">
             <NavLink
-              to="/operator/glucoseview/applications"
+              to="/operator/applications"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive
@@ -46,7 +46,7 @@ export default function OperatorLayout() {
               신청 관리
             </NavLink>
             <NavLink
-              to="/operator/glucoseview/users"
+              to="/operator/users"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive
@@ -58,7 +58,7 @@ export default function OperatorLayout() {
               회원 관리
             </NavLink>
             <NavLink
-              to="/operator/glucoseview/ai-report"
+              to="/operator/ai-report"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive

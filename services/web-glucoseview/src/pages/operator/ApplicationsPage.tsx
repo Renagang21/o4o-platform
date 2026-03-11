@@ -163,7 +163,7 @@ export default function OperatorApplicationsPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <Link
-                            to={`/operator/glucoseview/applications/${app.id}`}
+                            to={`/operator/applications/${app.id}`}
                             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                           >
                             상세 →

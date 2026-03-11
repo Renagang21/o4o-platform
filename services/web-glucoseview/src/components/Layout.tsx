@@ -105,6 +105,22 @@ export default function Layout() {
                 </NavLink>
               )}
 
+              {/* Operator Link - 관리자 또는 운영자 표시 */}
+              {(isAdmin || user?.roles?.includes('operator')) && (
+                <NavLink
+                  to="/operator"
+                  className={({ isActive }) =>
+                    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-blue-500 hover:text-blue-700 hover:bg-blue-50'
+                    }`
+                  }
+                >
+                  Operator
+                </NavLink>
+              )}
+
               {/* User Icon & Dropdown OR Login Button */}
               <div className="ml-4 pl-4 border-l border-slate-200 flex items-center">
                 {isAuthenticated ? (
