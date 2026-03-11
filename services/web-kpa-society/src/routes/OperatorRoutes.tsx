@@ -22,6 +22,13 @@ import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
+// Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
+import HqMediaPage from '../pages/operator/signage/HqMediaPage';
+import HqMediaDetailPage from '../pages/operator/signage/HqMediaDetailPage';
+import HqPlaylistsPage from '../pages/operator/signage/HqPlaylistsPage';
+import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage';
+import TemplatesPage from '../pages/operator/signage/TemplatesPage';
+import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 
@@ -66,6 +73,13 @@ export function OperatorRoutes() {
 
           {/* 사이니지 콘텐츠 허브 */}
           <Route path="signage/content" element={<ContentHubPage />} />
+          {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
+          <Route path="signage/hq-media" element={<HqMediaPage />} />
+          <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
+          <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+          <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
+          <Route path="signage/templates" element={<TemplatesPage />} />
+          <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />
 
           {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
           <Route path="legal" element={<LegalManagementPage />} />

@@ -70,6 +70,14 @@ const SignageContentHubPage = lazy(() => import('@/pages/signage/ContentHubPage'
 const SignagePlaylistDetailPage = lazy(() => import('@/pages/signage/PlaylistDetailPage'));
 const SignageMediaDetailPage = lazy(() => import('@/pages/signage/MediaDetailPage'));
 
+// Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
+const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
+const HqMediaDetailPage = lazy(() => import('@/pages/operator/signage/HqMediaDetailPage'));
+const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsPage'));
+const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
+const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
+const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
+
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/store-ui-core';
 
@@ -268,6 +276,13 @@ function AppRoutes() {
         <Route path="signage/content" element={<SignageContentHubPage />} />
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
               <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
+        {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
+        <Route path="signage/hq-media" element={<HqMediaPage />} />
+        <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
+        <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+        <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
+        <Route path="signage/templates" element={<SignageTemplatesPage />} />
+        <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
         <Route path="support" element={<OperatorSupportPage />} />
         {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<OperatorUsersPage />} />

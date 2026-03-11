@@ -60,6 +60,14 @@ const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m 
 const SignagePlaylistDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.PlaylistDetailPage })));
 const SignageMediaDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MediaDetailPage })));
 
+// Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
+const HqMediaPage = lazy(() => import('@/pages/operator/signage/HqMediaPage'));
+const HqMediaDetailPage = lazy(() => import('@/pages/operator/signage/HqMediaDetailPage'));
+const HqPlaylistsPage = lazy(() => import('@/pages/operator/signage/HqPlaylistsPage'));
+const HqPlaylistDetailPage = lazy(() => import('@/pages/operator/signage/HqPlaylistDetailPage'));
+const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/TemplatesPage'));
+const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
+
 // Market Trial Extension
 const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
 const OperatorTrialSelectorPage = lazy(() => import('@/pages/operator/market-trial').then(m => ({ default: m.OperatorTrialSelectorPage })));
@@ -469,6 +477,13 @@ function AppRoutes() {
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
+        {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
+        <Route path="signage/hq-media" element={<HqMediaPage />} />
+        <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
+        <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />
+        <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
+        <Route path="signage/templates" element={<SignageTemplatesPage />} />
+        <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
