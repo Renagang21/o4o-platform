@@ -122,7 +122,7 @@ const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').the
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
