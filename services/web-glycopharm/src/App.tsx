@@ -176,13 +176,6 @@ const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m
 const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
 const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
 
-// Test Guide Pages
-const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
-const PharmacyManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.PharmacyManualPage })));
-const ConsumerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.ConsumerManualPage })));
-const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.OperatorManualPage })));
-const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
-
 // Partner Dashboard Pages
 const PartnerIndex = lazy(() => import('@/pages/partner/index'));
 const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
@@ -307,14 +300,6 @@ function AppRoutes() {
         <Route path="partners/apply" element={<PartnerApplyPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
 
-        {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
-        <Route path="test-center" element={<TestCenterPage />} />
-
-        {/* Test Guide */}
-        <Route path="test-guide" element={<TestGuidePage />} />
-        <Route path="test-guide/manual/pharmacy" element={<PharmacyManualPage />} />
-        <Route path="test-guide/manual/consumer" element={<ConsumerManualPage />} />
-        <Route path="test-guide/manual/operator" element={<OperatorManualPage />} />
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
         {/* B2B Supply */}
         <Route path="b2b/supply" element={<SupplyPage />} />

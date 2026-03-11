@@ -66,15 +66,7 @@ import {
   ChannelSalesStructurePage,
 } from './pages/channel';
 
-// Test Guide Pages (o4o 공통 - 다중 서비스)
-import {
-  TestGuidePage,
-  ContentEditorManualPage,
-  KCosmeticsServiceManualPage,
-  GlycoPharmServiceManualPage,
-  GlucoseViewServiceManualPage,
-  KpaSocietyServiceManualPage,
-} from './pages/test-guide';
+// Test Guide Pages (o4o 공통 - 다중 서비스) — removed
 
 // o4o Public Site Pages
 import O4OMainPage from './pages/o4o/O4OMainPage';
@@ -100,8 +92,6 @@ import {
   VaultInquiriesPage,
 } from './pages/admin-vault';
 
-// Test Center
-import TestCenterPage from './pages/TestCenterPage';
 
 // ============================================================================
 // Neture 공통 페이지 (즉시 로드)
@@ -120,13 +110,6 @@ import ContentListPage from './pages/content/ContentListPage';
 import ContentDetailPage from './pages/content/ContentDetailPage';
 import MyContentPage from './pages/dashboard/MyContentPage';
 
-// Neture 전용 Test Guide
-import {
-  SupplierManualPage,
-  PartnerManualPage,
-  AdminManualPage,
-  NetureServiceManualPage,
-} from './pages/test-guide';
 
 // Forum Pages
 import { ForumPage } from './pages/forum/ForumPage';
@@ -542,24 +525,10 @@ function App() {
               {/* 파트너 개요 */}
               <Route path="/partner/overview-info" element={<PartnerOverviewInfoPage />} />
 
-              {/* 테스트 센터 */}
-              <Route path="/test-center" element={<TestCenterPage />} />
-
-              {/* 테스트 가이드 */}
-              <Route path="/test-guide" element={<TestGuidePage />} />
-              <Route path="/test-guide/manual/content-editor" element={<ContentEditorManualPage />} />
-              <Route path="/test-guide/service/k-cosmetics" element={<KCosmeticsServiceManualPage />} />
-              <Route path="/test-guide/service/glycopharm" element={<GlycoPharmServiceManualPage />} />
-              <Route path="/test-guide/service/glucoseview" element={<GlucoseViewServiceManualPage />} />
-              <Route path="/test-guide/service/kpa-society" element={<KpaSocietyServiceManualPage />} />
-
               {/* 테스트 센터 포럼 */}
               <Route path="/forum" element={<ForumPage title="테스트 센터" description="모든 서비스의 테스트 피드백과 의견을 나누는 공간입니다." noticeText="서비스 테스트 후 발견한 문제점, 개선 의견, 질문을 남겨주세요." />} />
               <Route path="/forum/write" element={<ForumWritePage />} />
               <Route path="/forum/post/:slug" element={<ForumPostPage />} />
-              <Route path="/forum/test-feedback" element={<ForumPage boardSlug="test-feedback" />} />
-              <Route path="/forum/test-feedback/new" element={<ForumWritePage />} />
-              <Route path="/forum/test-feedback/:slug" element={<ForumPostPage />} />
               <Route path="/forum/service-update" element={<ForumPage boardSlug="service-update" />} />
               <Route path="/forum/service-update/new" element={<ForumWritePage />} />
               <Route path="/forum/service-update/:slug" element={<ForumPostPage />} />
@@ -602,11 +571,6 @@ function App() {
               {/* Hub */}
               <Route path="/workspace/hub" element={<HubPage />} />
 
-              {/* Neture 전용 테스트 가이드 */}
-              <Route path="/workspace/manual/supplier" element={<SupplierManualPage />} />
-              <Route path="/workspace/manual/partner" element={<PartnerManualPage />} />
-              <Route path="/workspace/manual/admin" element={<AdminManualPage />} />
-              <Route path="/workspace/manual/service" element={<NetureServiceManualPage />} />
             </Route>
 
             {/* ================================================================
@@ -719,12 +683,6 @@ function App() {
             <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
             <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
             <Route path="/operator/*" element={<Navigate to="/workspace/operator" replace />} />
-
-            {/* Test Guide 리다이렉트 */}
-            <Route path="/test-guide/manual/supplier" element={<Navigate to="/workspace/manual/supplier" replace />} />
-            <Route path="/test-guide/manual/partner" element={<Navigate to="/workspace/manual/partner" replace />} />
-            <Route path="/test-guide/manual/admin" element={<Navigate to="/workspace/manual/admin" replace />} />
-            <Route path="/test-guide/service/neture" element={<Navigate to="/workspace/manual/service" replace />} />
 
             {/* Legacy supplier/partner 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />

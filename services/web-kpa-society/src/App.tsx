@@ -88,13 +88,6 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
 import { ManualHomePage, ManualPlaceholderPage, ManualServicePage } from './pages/manual';
 
-// Test Guide Pages
-import { TestGuidePage, PharmacistManualPage, DistrictOfficerManualPage, BranchOfficerManualPage, AdminManualPage } from './pages/test-guide';
-
-// Platform Home (WO-KPA-HOME-FOUNDATION-V1) - legacy, kept for reference
-// import { HomePage } from './pages/platform';
-import TestCenterPage from './pages/TestCenterPage';
-import { TestMainPage, TestHubPage, TestStorePage } from './pages/test-center';
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
@@ -370,13 +363,6 @@ function App() {
           <Route path="/manual/admin" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Admin) 매뉴얼" description="플랫폼 관리, 승인 처리, 사용자 관리 등 관리자 업무." /></Layout>} />
           <Route path="/manual/operator" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Operator) 매뉴얼" description="콘텐츠 운영, 서비스 관리, 데이터 모니터링 등." /></Layout>} />
 
-          {/* Test Center (WO-KPA-A-TEST-CENTER-PHASE1-MAIN-PAGE-V1) */}
-          <Route path="/test" element={<TestCenterPage />} />
-          <Route path="/test/main" element={<TestMainPage />} />
-          <Route path="/test/hub" element={<TestHubPage />} />
-          <Route path="/test/store" element={<TestStorePage />} />
-          <Route path="/test-center" element={<Navigate to="/test" replace />} />
-
           {/* =========================================================
            * Service C - 분회 서비스 (Branch Services)
            * WO-KPA-BRANCH-SERVICE-ROUTE-MIGRATION-V1
@@ -493,13 +479,6 @@ function App() {
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
           <Route path="/demo/select-function" element={<Navigate to="/setup-activity" replace />} />
 
-          {/* Test Guide (레이아웃 없음) */}
-          <Route path="/demo/test-guide" element={<TestGuidePage />} />
-          <Route path="/demo/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
-          <Route path="/demo/test-guide/manual/district_officer" element={<DistrictOfficerManualPage />} />
-          <Route path="/demo/test-guide/manual/branch_officer" element={<BranchOfficerManualPage />} />
-          <Route path="/demo/test-guide/manual/admin" element={<AdminManualPage />} />
-
           {/* Admin Routes (지부 관리자 - 별도 레이아웃) */}
           <Route path="/demo/admin/*" element={<AdminRoutes />} />
 
@@ -543,7 +522,6 @@ function App() {
           <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
-          <Route path="/test-guide/*" element={<Navigate to="/demo/test-guide" replace />} />
 
           {/* ========================================
            * 커뮤니티 서비스 라우트 (메인 서비스)

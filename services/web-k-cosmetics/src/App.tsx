@@ -40,15 +40,6 @@ const MyPage = lazy(() => import('@/pages/MyPage'));
 // Partner Application (WO-PARTNER-APPLICATION-V1)
 const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
-// Test Guide Pages
-const TestGuidePage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.TestGuidePage })));
-const ConsumerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.ConsumerManualPage })));
-const SellerManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.SellerManualPage })));
-const SupplierManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.SupplierManualPage })));
-const AdminManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.AdminManualPage })));
-const OperatorManualPage = lazy(() => import('@/pages/test-guide').then(m => ({ default: m.OperatorManualPage })));
-const TestCenterPage = lazy(() => import('@/pages/TestCenterPage'));
-
 // Hub (WO-O4O-HUB-EXPLORATION-UNIFORM-STRUCTURE-V1)
 const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
 
@@ -169,17 +160,6 @@ function AppRoutes() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
-
-        {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
-        <Route path="test-center" element={<TestCenterPage />} />
-
-        {/* Test Guide */}
-        <Route path="test-guide" element={<TestGuidePage />} />
-        <Route path="test-guide/manual/consumer" element={<ConsumerManualPage />} />
-        <Route path="test-guide/manual/seller" element={<SellerManualPage />} />
-        <Route path="test-guide/manual/supplier" element={<SupplierManualPage />} />
-        <Route path="test-guide/manual/admin" element={<AdminManualPage />} />
-        <Route path="test-guide/manual/operator" element={<OperatorManualPage />} />
 
         {/* Forum */}
         <Route path="forum" element={<ForumHubPage />} />

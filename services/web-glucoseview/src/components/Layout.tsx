@@ -288,9 +288,6 @@ export default function Layout() {
                     </a>
                   </p>
                 </div>
-                <NavLink to="/test-center" className="text-xs text-blue-500 hover:text-blue-600 flex items-center gap-1 transition-colors">
-                  🧪 테스트 센터
-                </NavLink>
               </div>
             </div>
           </div>

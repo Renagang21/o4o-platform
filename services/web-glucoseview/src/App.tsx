@@ -28,9 +28,6 @@ import OperatorProductsPage from './pages/operator/ProductsPage';
 import OperatorProductDetailPage from './pages/operator/ProductDetailPage';
 import OperatorStoresPage from './pages/operator/StoresPage';
 import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
-import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
-import TestCenterPage from './pages/TestCenterPage';
-
 // Partner Dashboard
 import PartnerLayout from './components/layouts/PartnerLayout';
 import PartnerIndex from './pages/partner/index';
@@ -166,14 +163,6 @@ function AppRoutes() {
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>
-
-      {/* Test Center (WO-TEST-CENTER-SEPARATION-V1) */}
-      <Route path="/test-center" element={<TestCenterPage />} />
-
-      {/* Test Guide */}
-      <Route path="/test-guide" element={<TestGuidePage />} />
-      <Route path="/test-guide/manual/pharmacist" element={<PharmacistManualPage />} />
-      <Route path="/test-guide/manual/admin" element={<AdminManualPage />} />
 
       {/* Partner Application (WO-PARTNER-APPLICATION-V1) */}
       <Route path="/partners/apply" element={<PartnerApplyPage />} />

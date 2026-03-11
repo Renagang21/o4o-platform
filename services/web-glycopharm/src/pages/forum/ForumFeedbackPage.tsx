@@ -5,8 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { MessageSquare, Plus, ThumbsUp, Eye, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Plus, ThumbsUp, Eye } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import { LoadingState, EmptyState } from '@/components/common';
 
@@ -59,13 +58,6 @@ export default function ForumFeedbackPage() {
     <div className="max-w-4xl mx-auto py-8 px-4">
       {/* Header */}
       <div className="mb-8">
-        <Link
-          to="/test-center"
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          테스트 센터로 돌아가기
-        </Link>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">테스트 의견</h1>
