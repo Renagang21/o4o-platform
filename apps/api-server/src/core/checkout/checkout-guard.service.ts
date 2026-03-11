@@ -44,7 +44,7 @@ export async function validateSupplierSellerRelation(
     // Check SERVICE + PRIVATE approval records for this seller
     const records: Array<{ status: string }> = await dataSource.query(
       `SELECT approval_status AS status FROM product_approvals
-       WHERE organization_id = $1 AND approval_type IN ('PRIVATE', 'service')
+       WHERE organization_id = $1 AND approval_type IN ('private', 'service')
        LIMIT 20`,
       [sellerId],
     );

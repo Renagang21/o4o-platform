@@ -31,7 +31,7 @@ export class SellerService {
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE pa.organization_id = $1
-         AND pa.approval_type IN ('PRIVATE', 'service')
+         AND pa.approval_type IN ('private', 'service')
          AND pa.approval_status = 'approved'
        ORDER BY pa.decided_at DESC`,
       [sellerId],
@@ -84,7 +84,7 @@ export class SellerService {
     }> = await this.dataSource.query(
       `SELECT pa.offer_id, pa.approval_status AS status, pa.id AS approval_id, pa.reason
        FROM product_approvals pa
-       WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
+       WHERE pa.organization_id = $1 AND pa.approval_type IN ('private', 'service')`,
       [sellerId],
     );
 

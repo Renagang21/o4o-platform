@@ -21,7 +21,7 @@ export class AdminService {
     serviceId?: string;
   }) {
     const params: unknown[] = [];
-    const conditions: string[] = [`pa.approval_type = 'PRIVATE'`];
+    const conditions: string[] = [`pa.approval_type = 'private'`];
 
     if (filters.status && typeof filters.status === 'string') {
       params.push(filters.status);

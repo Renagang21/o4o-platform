@@ -108,7 +108,7 @@ async function getNetureSummary(ds: DataSource): Promise<Record<string, any>> {
         COUNT(*) FILTER (WHERE approval_status = 'pending') as "pendingRequests",
         COUNT(*) FILTER (WHERE approval_status = 'approved') as "approvedRequests"
       FROM product_approvals
-      WHERE approval_type = 'PRIVATE'
+      WHERE approval_type = 'private'
     `);
 
     const totalReq = parseInt(requestStats?.totalRequests || '0');

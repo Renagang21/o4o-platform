@@ -518,7 +518,7 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
           `SELECT EXISTS(
             SELECT 1 FROM product_approvals
             WHERE organization_id = $1
-              AND approval_type = 'PRIVATE'
+              AND approval_type = 'private'
               AND approval_status = 'approved'
             LIMIT 1
           ) AS "exists"`,
@@ -558,7 +558,7 @@ export function createDashboardAssetsRoutes(dataSource: DataSource): Router {
             SELECT 1 FROM product_approvals pa
             JOIN supplier_product_offers spo ON spo.id = pa.offer_id
             WHERE spo.supplier_id = $1
-              AND pa.approval_type = 'PRIVATE'
+              AND pa.approval_type = 'private'
               AND pa.approval_status = 'approved'
             LIMIT 1
           ) AS "exists"`,

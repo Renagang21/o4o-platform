@@ -727,7 +727,7 @@ export class NetureService {
     const [{ count: approvedCount }] = await AppDataSource.query(
       `SELECT COUNT(*)::int AS count FROM product_approvals pa
        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-       WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+       WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'`,
       [supplierId],
     );
 
@@ -738,7 +738,7 @@ export class NetureService {
     const [{ count: recentCount }] = await AppDataSource.query(
       `SELECT COUNT(*)::int AS count FROM product_approvals pa
        JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-       WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+       WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
          AND pa.created_at >= $2`,
       [supplierId, thirtyDaysAgo],
     );
@@ -811,7 +811,7 @@ export class NetureService {
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          WHERE spo.supplier_id = $1 AND pa.organization_id = $2
-           AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+           AND pa.approval_type = 'private' AND pa.approval_status = 'approved'`,
         [supplierId, viewerId],
       );
       return count > 0;
@@ -1071,7 +1071,7 @@ export class NetureService {
       const [{ count: pApprovedCount }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'`,
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'`,
         [supplierId],
       );
       if (pApprovedCount === 0) {
@@ -1084,7 +1084,7 @@ export class NetureService {
       const [{ count: pRecentCount }] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS count FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
            AND pa.created_at >= $2`,
         [supplierId, thirtyDaysAgo],
       );
@@ -1323,7 +1323,7 @@ export class NetureService {
         `SELECT pa.offer_id, COUNT(*)::int AS cnt
          FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'pending'
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'pending'
          GROUP BY pa.offer_id`,
         [supplierId],
       );
@@ -1333,7 +1333,7 @@ export class NetureService {
         `SELECT pa.offer_id, COUNT(DISTINCT pa.service_key)::int AS cnt
          FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
          GROUP BY pa.offer_id`,
         [supplierId],
       );
@@ -1450,9 +1450,14 @@ export class NetureService {
         }
       }
 
+      // P1: slug 자동 생성 (barcode-supplierId-timestamp)
+      const slugBase = masterResult.data.barcode || masterResult.data.id;
+      const slug = `${slugBase}-${supplierId.slice(0, 8)}-${Date.now()}`;
+
       const offer = this.offerRepo.create({
         supplierId,
         masterId: masterResult.data.id,
+        slug,
         distributionType: data.distributionType || OfferDistributionType.PRIVATE,
         isActive: false,
         approvalStatus: OfferApprovalStatus.PENDING,
@@ -1969,7 +1974,7 @@ export class NetureService {
                 MAX(pa.decided_at)::text AS "lastApprovedAt"
          FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
          GROUP BY pa.service_key`,
         [supplierId],
       );
@@ -2020,7 +2025,7 @@ export class NetureService {
           const [{ cnt: pendingCount }] = await AppDataSource.query(
             `SELECT COUNT(*)::int AS cnt FROM product_approvals pa
              JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-             WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+             WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
                AND pa.approval_status = 'pending' AND pa.service_key = $2`,
             [supplierId, svc.serviceId],
           );
@@ -2071,7 +2076,7 @@ export class NetureService {
           COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS "rejectedRequests"
         FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
       `, [supplierId]);
 
       const sevenDaysAgo = new Date();
@@ -2079,7 +2084,7 @@ export class NetureService {
       const [{ count: recentApprovals }] = await AppDataSource.query(`
         SELECT COUNT(*)::int AS count FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
           AND pa.approval_status = 'approved' AND pa.decided_at >= $2
       `, [supplierId, sevenDaysAgo]);
 
@@ -2092,7 +2097,7 @@ export class NetureService {
       const [{ count: connectedCount }] = await AppDataSource.query(`
         SELECT COUNT(DISTINCT pa.service_key)::int AS count FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
       `, [supplierId]);
 
       // 서비스별 통계
@@ -2103,7 +2108,7 @@ export class NetureService {
           SUM(CASE WHEN pa.approval_status = 'rejected' THEN 1 ELSE 0 END)::int AS rejected
         FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-        WHERE spo.supplier_id = $1 AND pa.approval_type = 'PRIVATE'
+        WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
         GROUP BY pa.service_key
       `, [supplierId]);
 
@@ -2179,7 +2184,7 @@ export class NetureService {
       `);
       const emptyTier = { total: 0, pending: 0, approved: 0, rejected: 0 };
       const serviceTier = tierStats.find((t) => t.approval_type === 'service') || emptyTier;
-      const privateTier = tierStats.find((t) => t.approval_type === 'PRIVATE') || emptyTier;
+      const privateTier = tierStats.find((t) => t.approval_type === 'private') || emptyTier;
 
       // 파트너십 요청 통계
       const totalPartnershipRequests = await this.partnershipRepo.count();
@@ -2275,7 +2280,7 @@ export class NetureService {
         SELECT pa.id, pa.service_key AS "serviceId", pa.service_key AS "serviceName",
                pa.created_at AS "createdAt"
         FROM product_approvals pa
-        WHERE pa.organization_id = $1 AND pa.approval_type = 'PRIVATE' AND pa.approval_status = 'approved'
+        WHERE pa.organization_id = $1 AND pa.approval_type = 'private' AND pa.approval_status = 'approved'
       `, [userId]);
 
       // 연결된 서비스 (중복 제거)
@@ -2385,7 +2390,7 @@ export class NetureService {
         `SELECT pa.offer_id, spo.supplier_id, pa.approval_status AS status, pa.id, pa.reason
          FROM product_approvals pa
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
-         WHERE pa.organization_id = $1 AND pa.approval_type IN ('PRIVATE', 'service')`,
+         WHERE pa.organization_id = $1 AND pa.approval_type IN ('private', 'service')`,
         [operatorUserId],
       );
 
@@ -2747,7 +2752,7 @@ export class NetureService {
             )
             AND spo.id NOT IN (
               SELECT pa.offer_id FROM product_approvals pa
-              WHERE pa.organization_id = $1 AND pa.approval_type = 'PRIVATE'
+              WHERE pa.organization_id = $1 AND pa.approval_type = 'private'
             )
         `, [sellerId]),
       ]);
@@ -2759,15 +2764,15 @@ export class NetureService {
       // ② 공급 신청 상태 — WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       const [pendingRows, approvedRows, rejectedRows] = await Promise.all([
         AppDataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'pending'`,
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'private' AND approval_status = 'pending'`,
           [sellerId],
         ),
         AppDataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'approved'`,
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'private' AND approval_status = 'approved'`,
           [sellerId],
         ),
         AppDataSource.query(
-          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'PRIVATE' AND approval_status = 'rejected'`,
+          `SELECT COUNT(*)::int AS cnt FROM product_approvals WHERE organization_id = $1 AND approval_type = 'private' AND approval_status = 'rejected'`,
           [sellerId],
         ),
       ]);

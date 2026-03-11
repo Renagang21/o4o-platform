@@ -108,7 +108,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-         WHERE pa.approval_type = 'PRIVATE'
+         WHERE pa.approval_type = 'private'
            AND spo.supplier_id = $1${statusFilter}${serviceFilter}
          ORDER BY pa.created_at DESC`,
         params,
@@ -140,7 +140,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-         WHERE pa.id = $1 AND pa.approval_type = 'PRIVATE'
+         WHERE pa.id = $1 AND pa.approval_type = 'private'
            AND spo.supplier_id = $2`,
         [id, supplierId],
       );
