@@ -58,6 +58,30 @@ export default function OperatorLayout() {
               회원 관리
             </NavLink>
             <NavLink
+              to="/operator/products"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              상품 관리
+            </NavLink>
+            <NavLink
+              to="/operator/stores"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              매장 관리
+            </NavLink>
+            <NavLink
               to="/operator/ai-report"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${

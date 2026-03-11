@@ -3,24 +3,11 @@
  * WO-O4O-PRODUCT-MASTER-CONSOLE-V1
  *
  * /api/v1/operator/products API (Extension Layer)
- * product_masters 테이블 기반 플랫폼 상품 관리
+ * Cookie-based auth (GlucoseView)
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Package,
-  Search,
-  RefreshCw,
-  Loader2,
-  AlertCircle,
-  ChevronRight,
-  ChevronLeft,
-  Image,
-  Truck,
-  Copy,
-} from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -57,12 +44,8 @@ interface PaginationData {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string): Promise<T> {
-  const token = getAccessToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
   });
   if (!res.ok) {
@@ -138,10 +121,8 @@ export default function ProductsPage() {
     }
   };
 
-  // ─── Render ──────────────────────────────────────────────────
-
   return (
-    <div className="space-y-6 p-6">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -153,86 +134,58 @@ export default function ProductsPage() {
           disabled={isLoading}
           className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50"
         >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
           새로고침
         </button>
       </div>
 
-      {/* Error Banner */}
+      {/* Error */}
       {error && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+          <svg className="w-5 h-5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           <p className="text-sm text-amber-800">{error}</p>
         </div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-              <Package className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.totalProducts}</p>
-              <p className="text-xs text-slate-500">전체 상품</p>
-            </div>
-          </div>
+          <p className="text-2xl font-bold text-slate-800">{stats.totalProducts}</p>
+          <p className="text-xs text-slate-500">전체 상품</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-              <Image className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.withImage}</p>
-              <p className="text-xs text-slate-500">이미지 있음</p>
-            </div>
-          </div>
+          <p className="text-2xl font-bold text-green-600">{stats.withImage}</p>
+          <p className="text-xs text-slate-500">이미지 있음</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Truck className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.withSupplier}</p>
-              <p className="text-xs text-slate-500">공급자 연결</p>
-            </div>
-          </div>
+          <p className="text-2xl font-bold text-blue-600">{stats.withSupplier}</p>
+          <p className="text-xs text-slate-500">공급자 연결</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-              <Copy className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-800">{stats.duplicateBarcodes}</p>
-              <p className="text-xs text-slate-500">중복 바코드</p>
-            </div>
-          </div>
+          <p className="text-2xl font-bold text-amber-600">{stats.duplicateBarcodes}</p>
+          <p className="text-xs text-slate-500">중복 바코드</p>
         </div>
       </div>
 
-      {/* Search & Table */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-100">
         {/* Search */}
         <div className="p-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               <input
                 type="text"
                 placeholder="상품명, 바코드, 브랜드, 제조사 검색..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm font-medium"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
             >
               검색
             </button>
@@ -243,13 +196,12 @@ export default function ProductsPage() {
         {isLoading && products.length === 0 && (
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
               <p className="text-slate-500 text-sm">상품 데이터 로딩 중...</p>
             </div>
           </div>
         )}
 
-        {/* Table */}
         {(!isLoading || products.length > 0) && (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -287,8 +239,8 @@ export default function ProductsPage() {
                             className="w-10 h-10 rounded-lg object-cover border border-slate-200"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <Package className="w-5 h-5 text-slate-300" />
+                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300 text-xs">
+                            N/A
                           </div>
                         )}
                       </td>
@@ -322,7 +274,7 @@ export default function ProductsPage() {
                         {formatDate(product.createdAt)}
                       </td>
                       <td className="px-4 py-3">
-                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                        <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                       </td>
                     </tr>
                   ))
@@ -345,7 +297,7 @@ export default function ProductsPage() {
                 disabled={currentPage === 1}
                 className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
               {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                 const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
@@ -356,7 +308,7 @@ export default function ProductsPage() {
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                     currentPage === page
-                      ? 'bg-primary-500 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'hover:bg-slate-100 text-slate-600'
                   }`}
                 >
@@ -368,7 +320,7 @@ export default function ProductsPage() {
                 disabled={currentPage === pagination.totalPages}
                 className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ChevronRight className="w-4 h-4" />
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
           </div>

@@ -96,6 +96,9 @@ const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
 const ProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
+const ProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
+const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
+const OperatorStoreDetailPage = lazy(() => import('@/pages/operator/StoreDetailPage'));
 const OrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 const InventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
 const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
@@ -427,6 +430,10 @@ function AppRoutes() {
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
         <Route path="products" element={<ProductsPage />} />
+        <Route path="products/:productId" element={<ProductDetailPage />} />
+        {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}
+        <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="settlements" element={<SettlementsPage />} />

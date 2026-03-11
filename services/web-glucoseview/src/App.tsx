@@ -24,6 +24,10 @@ import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPag
 import OperatorAiReportPage from './pages/operator/AiReportPage';
 import OperatorUsersPage from './pages/operator/UsersPage';
 import OperatorUserDetailPage from './pages/operator/UserDetailPage';
+import OperatorProductsPage from './pages/operator/ProductsPage';
+import OperatorProductDetailPage from './pages/operator/ProductDetailPage';
+import OperatorStoresPage from './pages/operator/StoresPage';
+import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
 import { TestGuidePage, PharmacistManualPage, AdminManualPage } from './pages/test-guide';
 import TestCenterPage from './pages/TestCenterPage';
 
@@ -153,6 +157,12 @@ function AppRoutes() {
         {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="users/:id" element={<OperatorUserDetailPage />} />
+        {/* 상품 관리 (WO-O4O-PRODUCT-MASTER-CONSOLE-V1) */}
+        <Route path="products" element={<OperatorProductsPage />} />
+        <Route path="products/:productId" element={<OperatorProductDetailPage />} />
+        {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}
+        <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>

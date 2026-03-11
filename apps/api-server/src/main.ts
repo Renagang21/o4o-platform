@@ -495,6 +495,15 @@ import adminDashboardRoutes from './routes/admin/dashboard.routes.js';
 // Operator Notification Settings Routes (WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1)
 import operatorNotificationRoutes from './routes/operator-notification.routes.js';
 
+// Operator Membership Console Routes (WO-O4O-MEMBERSHIP-CONSOLE-V1)
+import operatorMembershipRoutes from './routes/operator/membership.routes.js';
+
+// Operator Product Console Routes (WO-O4O-PRODUCT-MASTER-CONSOLE-V1)
+import operatorProductRoutes from './routes/operator/products.routes.js';
+
+// Operator Store Console Routes (WO-O4O-STORE-CONSOLE-V1)
+import operatorStoreRoutes from './routes/operator/stores.routes.js';
+
 // Cosmetics Routes (Phase 7-A-1)
 import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
 
@@ -898,6 +907,18 @@ const startServer = async () => {
     // 24-c. Register Operator Notification Settings routes (WO-O4O-OPERATOR-NOTIFICATION-EMAIL-MANAGEMENT-V1)
     app.use('/api/operator', operatorNotificationRoutes);
     logger.info('✅ Operator Notification routes registered at /api/operator');
+
+    // 24-d. Register Operator Membership Console routes (WO-O4O-MEMBERSHIP-CONSOLE-V1)
+    app.use('/api/v1/operator/members', operatorMembershipRoutes);
+    logger.info('✅ Operator Membership Console routes registered at /api/v1/operator/members');
+
+    // 24-e. Register Operator Product Console routes (WO-O4O-PRODUCT-MASTER-CONSOLE-V1)
+    app.use('/api/v1/operator/products', operatorProductRoutes);
+    logger.info('✅ Operator Product Console routes registered at /api/v1/operator/products');
+
+    // 24-f. Register Operator Store Console routes (WO-O4O-STORE-CONSOLE-V1)
+    app.use('/api/v1/operator/stores', operatorStoreRoutes);
+    logger.info('✅ Operator Store Console routes registered at /api/v1/operator/stores');
 
     // 25. Register Cosmetics routes (Phase 7-A-1)
     try {

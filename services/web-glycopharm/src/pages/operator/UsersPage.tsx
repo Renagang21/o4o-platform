@@ -1,13 +1,14 @@
 /**
  * Operator Users Page — 회원 관리
- * WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1
+ * WO-O4O-MEMBERSHIP-CONSOLE-V1
  *
- * 실제 /api/v1/admin/users API 연결
+ * /api/v1/operator/members API (Extension Layer)
  * 탭: 회원 목록 | 가입 신청
- * 기능: 승인, 거부, 비밀번호 변경, 삭제
+ * 기능: 승인, 거부, 비밀번호 변경, 삭제, 멤버십 표시, 상세 페이지 이동
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -22,12 +23,21 @@ import {
   Loader2,
   AlertCircle,
   X,
+  ChevronRight,
 } from 'lucide-react';
 import { getAccessToken } from '@/contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // ─── Types ───────────────────────────────────────────────────
+
+interface MembershipData {
+  id: string;
+  serviceKey: string;
+  status: string;
+  role: string;
+  createdAt: string;
+}
 
 interface UserData {
   id: string;
@@ -38,6 +48,7 @@ interface UserData {
   status: string;
   roles?: string[];
   role?: string;
+  memberships?: MembershipData[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -80,6 +91,15 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
   suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
   inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
+};
+
+const SERVICE_LABELS: Record<string, string> = {
+  glycopharm: 'GlycoPharm',
+  glucoseview: 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics',
+  neture: 'Neture',
+  'kpa-society': 'KPA',
+  platform: 'Platform',
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -167,6 +187,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -194,7 +215,7 @@ export default function UsersPage() {
       }
       if (search) params.set('search', search);
 
-      const data = await apiFetch<any>(`/api/v1/admin/users?${params}`);
+      const data = await apiFetch<any>(`/api/v1/operator/members?${params}`);
       setUsers(data.users || []);
       setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
     } catch (err: any) {
@@ -261,7 +282,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">회원 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 비밀번호 관리</p>
+          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 서비스 멤버십 관리</p>
         </div>
         <button onClick={() => { fetchUsers(pagination.page); fetchStats(); }} className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">
           <RefreshCw className="w-4 h-4" />새로고침
@@ -361,6 +382,7 @@ export default function UsersPage() {
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">역할</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">서비스</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">가입일</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">관리</th>
@@ -368,7 +390,11 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50">
+                <tr
+                  key={user.id}
+                  className="hover:bg-slate-50 cursor-pointer"
+                  onClick={() => navigate(`/operator/users/${user.id}`)}
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
@@ -379,10 +405,31 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{getRoleLabel(user)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {(user.memberships && user.memberships.length > 0) ? (
+                        user.memberships.map((m) => (
+                          <span
+                            key={m.id}
+                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                              m.status === 'active' ? 'bg-blue-50 text-blue-700' :
+                              m.status === 'pending' ? 'bg-amber-50 text-amber-700' :
+                              'bg-slate-100 text-slate-500'
+                            }`}
+                            title={`${SERVICE_LABELS[m.serviceKey] || m.serviceKey}: ${m.status}`}
+                          >
+                            {SERVICE_LABELS[m.serviceKey] || m.serviceKey}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-slate-400">-</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       {actionLoading === user.id ? (
                         <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       ) : (
@@ -446,6 +493,7 @@ export default function UsersPage() {
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
+                          <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
                         </>
                       )}
                     </div>

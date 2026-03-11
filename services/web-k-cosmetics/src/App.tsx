@@ -79,8 +79,10 @@ const MarketTrialListPage = lazy(() => import('@/pages/store/MarketTrialListPage
 // Operator Dashboard Pages
 const KCosmeticsOperatorDashboard = lazy(() => import('@/pages/operator/KCosmeticsOperatorDashboard'));
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
+const OperatorStoreDetailPage = lazy(() => import('@/pages/operator/StoreDetailPage'));
 const OperatorApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
+const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
 const OperatorInventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
 const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
@@ -235,6 +237,7 @@ function AppRoutes() {
       >
         <Route index element={<KCosmeticsOperatorDashboard />} />
         <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="users/:id" element={<OperatorUserDetailPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
@@ -253,6 +256,10 @@ function AppRoutes() {
         <Route index element={<KCosmeticsOperatorDashboard />} />
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="products" element={<OperatorProductsPage />} />
+        <Route path="products/:productId" element={<OperatorProductDetailPage />} />
+        {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}
+        <Route path="stores" element={<OperatorStoresPage />} />
+        <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OperatorOrdersPage />} />
         <Route path="inventory" element={<OperatorInventoryPage />} />
         <Route path="settlements" element={<OperatorSettlementsPage />} />

@@ -1,17 +1,42 @@
 /**
  * Operator Users Page — 회원 관리
- * WO-O4O-MEMBERSHIP-MANAGEMENT-UNIFICATION-V1
+ * WO-O4O-MEMBERSHIP-CONSOLE-V1
  *
- * 실제 /api/v1/admin/users API 연결 (cookie auth)
+ * /api/v1/operator/members API (Extension Layer)
  * 탭: 회원 목록 | 가입 신청
- * 기능: 승인, 거부, 비밀번호 변경, 삭제
+ * 기능: 승인, 거부, 비밀번호 변경, 삭제, 멤버십 표시, 상세 페이지 이동
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Users,
+  Search,
+  CheckCircle,
+  XCircle,
+  Clock,
+  RefreshCw,
+  UserCheck,
+  UserX,
+  KeyRound,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  X,
+  ChevronRight,
+} from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // ─── Types ───────────────────────────────────────────────────
+
+interface MembershipData {
+  id: string;
+  serviceKey: string;
+  status: string;
+  role: string;
+  createdAt: string;
+}
 
 interface UserData {
   id: string;
@@ -22,6 +47,7 @@ interface UserData {
   status: string;
   roles?: string[];
   role?: string;
+  memberships?: MembershipData[];
   createdAt: string;
   updatedAt?: string;
 }
@@ -62,6 +88,15 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
   suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
   inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
+};
+
+const SERVICE_LABELS: Record<string, string> = {
+  glycopharm: 'GlycoPharm',
+  glucoseview: 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics',
+  neture: 'Neture',
+  'kpa-society': 'KPA',
+  platform: 'Platform',
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -116,15 +151,12 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-slate-800">비밀번호 변경</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-          </button>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
         </div>
         <p className="text-sm text-slate-500 mb-4">{getUserName(user)} ({user.email})</p>
         {error && (
           <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
-            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
-            {error}
+            <AlertCircle className="w-4 h-4 shrink-0" />{error}
           </div>
         )}
         <form onSubmit={handleSubmit}>
@@ -152,6 +184,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -179,7 +212,7 @@ export default function UsersPage() {
       }
       if (search) params.set('search', search);
 
-      const data = await apiFetch<any>(`/api/v1/admin/users?${params}`);
+      const data = await apiFetch<any>(`/api/v1/operator/members?${params}`);
       setUsers(data.users || []);
       setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
     } catch (err: any) {
@@ -241,47 +274,53 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+    <div className="p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">회원 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 비밀번호 관리</p>
+          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 서비스 멤버십 관리</p>
         </div>
         <button onClick={() => { fetchUsers(pagination.page); fetchStats(); }} className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>
-          새로고침
+          <RefreshCw className="w-4 h-4" />새로고침
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: '전체', value: stats.total, color: 'slate' },
-          { label: '활성', value: stats.active, color: 'green' },
-          { label: '대기', value: stats.pending, color: 'amber' },
-          { label: '거부', value: stats.rejected, color: 'red' },
+          { label: '전체', value: stats.total, icon: Users, color: 'slate' },
+          { label: '활성', value: stats.active, icon: CheckCircle, color: 'green' },
+          { label: '대기', value: stats.pending, icon: Clock, color: 'amber' },
+          { label: '거부', value: stats.rejected, icon: XCircle, color: 'red' },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-xl border border-slate-200 p-4">
-            <p className="text-xs text-slate-500">{s.label}</p>
-            <p className={`text-2xl font-bold mt-1 text-${s.color === 'slate' ? 'slate-800' : s.color + '-600'}`}>{s.value}</p>
+          <div key={s.label} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 bg-${s.color}-100 rounded-lg flex items-center justify-center`}>
+                <s.icon className={`w-5 h-5 text-${s.color}-600`} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-800">{s.value}</p>
+                <p className="text-xs text-slate-500">{s.label}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 mb-4">
         <button
           onClick={() => { setTab('all'); setStatusFilter(''); }}
           className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'all' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
         >
-          회원 목록
+          <Users className="inline w-4 h-4 mr-1" />회원 목록
         </button>
         <button
           onClick={() => setTab('pending')}
           className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'pending' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
         >
-          가입 신청
+          <Clock className="inline w-4 h-4 mr-1" />가입 신청
           {stats.pending > 0 && (
             <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">{stats.pending}</span>
           )}
@@ -289,9 +328,9 @@ export default function UsersPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-md">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
             value={search}
@@ -318,29 +357,29 @@ export default function UsersPage() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
-          {error}
+        <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700 mb-4">
+          <AlertCircle className="w-4 h-4 shrink-0" />{error}
         </div>
       )}
 
       {/* Loading */}
       {loading && (
         <div className="text-center py-16">
-          <svg className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
           <p className="text-slate-500 text-sm">불러오는 중...</p>
         </div>
       )}
 
       {/* Table */}
       {!loading && users.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">역할</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">서비스</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">가입일</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
                 <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">관리</th>
@@ -348,10 +387,14 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50">
+                <tr
+                  key={user.id}
+                  className="hover:bg-slate-50 cursor-pointer"
+                  onClick={() => navigate(`/operator/users/${user.id}`)}
+                >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-medium text-blue-600">
+                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
                         {getUserName(user).charAt(0)}
                       </div>
                       <span className="font-medium text-slate-800 text-sm">{getUserName(user)}</span>
@@ -359,12 +402,33 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
                   <td className="px-4 py-3 text-sm text-slate-600">{getRoleLabel(user)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {(user.memberships && user.memberships.length > 0) ? (
+                        user.memberships.map((m) => (
+                          <span
+                            key={m.id}
+                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                              m.status === 'active' ? 'bg-blue-50 text-blue-700' :
+                              m.status === 'pending' ? 'bg-amber-50 text-amber-700' :
+                              'bg-slate-100 text-slate-500'
+                            }`}
+                            title={`${SERVICE_LABELS[m.serviceKey] || m.serviceKey}: ${m.status}`}
+                          >
+                            {SERVICE_LABELS[m.serviceKey] || m.serviceKey}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-slate-400">-</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       {actionLoading === user.id ? (
-                        <svg className="w-4 h-4 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       ) : (
                         <>
                           {(user.status === 'pending') && (
@@ -374,14 +438,14 @@ export default function UsersPage() {
                                 title="승인"
                                 className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
                               >
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><polyline points="16 11 18 13 22 9" /></svg>
+                                <UserCheck className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleStatusChange(user.id, 'rejected')}
                                 title="거부"
                                 className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
                               >
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="17" x2="22" y1="8" y2="13" /><line x1="22" x2="17" y1="8" y2="13" /></svg>
+                                <UserX className="w-4 h-4" />
                               </button>
                             </>
                           )}
@@ -391,7 +455,7 @@ export default function UsersPage() {
                               title="승인"
                               className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
                             >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><polyline points="16 11 18 13 22 9" /></svg>
+                              <UserCheck className="w-4 h-4" />
                             </button>
                           )}
                           {(user.status === 'active' || user.status === 'approved') && (
@@ -400,7 +464,7 @@ export default function UsersPage() {
                               title="정지"
                               className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
                             >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg>
+                              <XCircle className="w-4 h-4" />
                             </button>
                           )}
                           {user.status === 'suspended' && (
@@ -409,7 +473,7 @@ export default function UsersPage() {
                               title="활성화"
                               className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
                             >
-                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="m9 11 3 3L22 4" /></svg>
+                              <CheckCircle className="w-4 h-4" />
                             </button>
                           )}
                           <button
@@ -417,15 +481,16 @@ export default function UsersPage() {
                             title="비밀번호 변경"
                             className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
                           >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z" /><circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></svg>
+                            <KeyRound className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(user)}
                             title="삭제"
                             className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
                           >
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
+                            <Trash2 className="w-4 h-4" />
                           </button>
+                          <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
                         </>
                       )}
                     </div>
@@ -460,8 +525,8 @@ export default function UsersPage() {
 
       {/* Empty */}
       {!loading && users.length === 0 && !error && (
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <svg className="w-12 h-12 text-slate-300 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
           <p className="text-slate-500">{tab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}</p>
         </div>
       )}
