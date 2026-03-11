@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Auth + RBAC
+ * Core Middleware: requireAuth, requireAdmin, requireAnyRole
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { User } from '../../modules/auth/entities/User.js';

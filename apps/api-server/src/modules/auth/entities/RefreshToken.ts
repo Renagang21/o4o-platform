@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Auth
+ * Core Entity: RefreshToken
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import type { User } from './User.js';
 

@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Auth
+ * Core Entity: User (Identity)
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import { UserRole, UserStatus } from '../../../types/auth.js';
 import type { BusinessInfo } from '../../../types/user.js';

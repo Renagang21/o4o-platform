@@ -1,4 +1,9 @@
 /**
+ * @core O4O_PLATFORM_CORE — Membership
+ * Core Entity: ServiceMembership
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ *
  * ServiceMembership Entity
  * WO-O4O-SERVICE-MEMBERSHIP-ARCHITECTURE-V1
  *

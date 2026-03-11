@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Auth
+ * Core Routes: login, register, refresh, status, logout
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Router, type IRouter } from 'express';
 import { AuthController, PasswordController, VerificationController } from '../controllers/index.js';
 import {

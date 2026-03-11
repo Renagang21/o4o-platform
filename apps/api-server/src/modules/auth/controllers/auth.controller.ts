@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Auth
+ * Core Controller: login, register, refresh, logout
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { BaseController } from '../../../common/base.controller.js';

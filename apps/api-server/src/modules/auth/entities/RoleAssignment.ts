@@ -1,3 +1,10 @@
+/**
+ * @core O4O_PLATFORM_CORE — RBAC
+ * Core Entity: RoleAssignment (RBAC SSOT)
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ * See also: RBAC-FREEZE-DECLARATION-V1
+ */
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -1,4 +1,9 @@
 /**
+ * @core O4O_PLATFORM_CORE — RBAC
+ * Core Service: RoleAssignmentService (RBAC SSOT)
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ *
  * RoleAssignmentService - Manages role assignments for RBAC
  *
  * This service replaces the deprecated User.role/roles/dbRoles fields.

@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Approval
+ * Core Controller: User list, status change (approve/reject), password reset, delete
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js';

@@ -1,4 +1,9 @@
 /**
+ * @core O4O_PLATFORM_CORE — Membership
+ * Core Middleware: Membership-aware Service Scope Guard
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ *
  * Membership-aware Service Scope Guard
  * WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
  *

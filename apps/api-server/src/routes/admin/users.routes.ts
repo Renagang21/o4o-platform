@@ -1,3 +1,9 @@
+/**
+ * @core O4O_PLATFORM_CORE — Approval
+ * Core Routes: GET /admin/users, PATCH /admin/users/:id/status
+ * Do not modify without CORE_CHANGE approval.
+ * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
+ */
 import { Router } from 'express';
 import { AdminUserController } from '../../controllers/admin/AdminUserController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
