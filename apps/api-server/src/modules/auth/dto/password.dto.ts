@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsNotEmpty, IsOptional, IsUrl } from 'class-validator';
 
 /**
  * Password Reset Request DTO
@@ -8,6 +8,10 @@ import { IsEmail, IsString, MinLength, IsNotEmpty } from 'class-validator';
 export class PasswordResetRequestDto {
   @IsEmail({}, { message: 'Valid email is required' })
   email: string;
+
+  @IsOptional()
+  @IsUrl({}, { message: 'Valid URL is required' })
+  serviceUrl?: string;
 }
 
 /**
