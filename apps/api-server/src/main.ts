@@ -1270,7 +1270,14 @@ const startServer = async () => {
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
     }
 
-    // 37-b. Demo Seed routes removed (WO-O4O-STORE-LIBRARY-EDIT-V1: 상품 데모 데이터 정리)
+    // 37-b. Store HUB Test Seed routes (VERIFICATION-STORE-HUB-STAGE-1)
+    try {
+      const { createSeedStoreHubRouter } = await import('./modules/admin/seed-store-hub.controller.js');
+      app.use('/api/v1/ops/seed-store-hub', createSeedStoreHubRouter(AppDataSource));
+      logger.info('✅ Store HUB Seed routes registered at /api/v1/ops/seed-store-hub');
+    } catch (seedStoreHubError) {
+      logger.error('Failed to register Store HUB Seed routes:', seedStoreHubError);
+    }
 
     // 37-c. Register Care Diagnostic routes (WO-HOME-CGM-CARD-V1)
     try {
