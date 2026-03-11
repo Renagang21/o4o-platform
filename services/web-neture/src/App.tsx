@@ -36,6 +36,11 @@ import { RoleGuard } from './components/auth/RoleGuard';
 import NetureHomePage from './pages/NetureHomePage';
 import AboutPage from './pages/AboutPage';
 import CommunityPage from './pages/CommunityPage';
+import {
+  CommunityAnnouncementsPage,
+  CommunityAnnouncementDetailPage,
+  CommunitySignagePage,
+} from './pages/community';
 import ContactPage from './pages/ContactPage';
 import SupplierLandingPage from './pages/SupplierLandingPage';
 import PartnerLandingPage from './pages/PartnerLandingPage';
@@ -106,8 +111,6 @@ import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
 import MyPage from './pages/MyPage';
-import SupplierListPage from './pages/suppliers/SupplierListPage';
-import SupplierDetailPage from './pages/suppliers/SupplierDetailPage';
 import PartnershipRequestListPage from './pages/partners/requests/PartnershipRequestListPage';
 import PartnershipRequestDetailPage from './pages/partners/requests/PartnershipRequestDetailPage';
 import PartnershipRequestCreatePage from './pages/partners/requests/PartnershipRequestCreatePage';
@@ -354,8 +357,7 @@ function LoginModalRenderer() {
 
 // Legacy redirect helpers
 function RedirectSupplierDetail() {
-  const { slug } = useParams();
-  return <Navigate to={`/community/knowledge/${slug}`} replace />;
+  return <Navigate to="/community" replace />;
 }
 function RedirectPartnershipRequestDetail() {
   const { id } = useParams();
@@ -412,14 +414,15 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
 
-              {/* Community */}
+              {/* Community (WO-O4O-NETURE-COMMUNITY-PAGE-V1) */}
               <Route path="/community" element={<CommunityPage />} />
+              <Route path="/community/announcements" element={<CommunityAnnouncementsPage />} />
+              <Route path="/community/announcements/:id" element={<CommunityAnnouncementDetailPage />} />
+              <Route path="/community/signage" element={<CommunitySignagePage />} />
               <Route path="/community/forum" element={<ForumHubPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" basePath="/community/forum" />} />
               <Route path="/community/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
               <Route path="/community/forum/write" element={<ForumWritePage />} />
               <Route path="/community/forum/post/:slug" element={<ForumPostPage />} />
-              <Route path="/community/knowledge" element={<SupplierListPage />} />
-              <Route path="/community/knowledge/:slug" element={<SupplierDetailPage />} />
             </Route>
 
             {/* ================================================================
@@ -674,7 +677,7 @@ function App() {
             ================================================================ */}
             {/* Workspace → 새 경로 */}
             <Route path="/workspace" element={<Navigate to="/" replace />} />
-            <Route path="/workspace/suppliers" element={<Navigate to="/community/knowledge" replace />} />
+            <Route path="/workspace/suppliers" element={<Navigate to="/community" replace />} />
             <Route path="/workspace/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/workspace/content" element={<Navigate to="/partner/contents" replace />} />
             <Route path="/workspace/content/:id" element={<RedirectContentDetail />} />
@@ -698,7 +701,7 @@ function App() {
             <Route path="/workspace/partner/*" element={<Navigate to="/partner/dashboard" replace />} />
 
             {/* 기존 최상위 경로 리다이렉트 */}
-            <Route path="/suppliers" element={<Navigate to="/community/knowledge" replace />} />
+            <Route path="/suppliers" element={<Navigate to="/community" replace />} />
             <Route path="/suppliers/:slug" element={<RedirectSupplierDetail />} />
             <Route path="/partners/requests" element={<Navigate to="/workspace/partners/requests" replace />} />
             <Route path="/partners/requests/:id" element={<RedirectPartnershipRequestDetail />} />
