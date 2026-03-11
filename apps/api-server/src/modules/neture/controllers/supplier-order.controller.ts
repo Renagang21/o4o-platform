@@ -66,8 +66,7 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
       res.json({ success: true, ...result });
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier orders:', error);
-      const errMsg = error instanceof Error ? error.message : String(error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier orders', debug: errMsg });
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier orders' });
     }
   });
 

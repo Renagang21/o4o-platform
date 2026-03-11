@@ -52,8 +52,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
       res.json({ success: true, data: summary });
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier dashboard summary:', error);
-      const errMsg = error instanceof Error ? error.message : String(error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch dashboard summary', debug: errMsg });
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch dashboard summary' });
     }
   });
 

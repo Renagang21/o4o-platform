@@ -2071,9 +2071,9 @@ export class NetureService {
       // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-REMOVAL-V1: v2 product_approvals
       const [reqStats] = await AppDataSource.query(`
         SELECT COUNT(*)::int AS "totalRequests",
-          COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS "pendingRequests",
-          COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS "approvedRequests",
-          COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS "rejectedRequests"
+          COUNT(*) FILTER (WHERE pa.approval_status = 'pending')::int AS "pendingRequests",
+          COUNT(*) FILTER (WHERE pa.approval_status = 'approved')::int AS "approvedRequests",
+          COUNT(*) FILTER (WHERE pa.approval_status = 'rejected')::int AS "rejectedRequests"
         FROM product_approvals pa
         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
         WHERE spo.supplier_id = $1 AND pa.approval_type = 'private'
