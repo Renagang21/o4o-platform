@@ -730,6 +730,9 @@ importers:
       '@o4o/groupbuy-yaksa':
         specifier: workspace:*
         version: link:../../packages/groupbuy-yaksa
+      '@o4o/interactive-content-core':
+        specifier: workspace:*
+        version: link:../../packages/interactive-content-core
       '@o4o/lms-core':
         specifier: workspace:*
         version: link:../../packages/lms-core
@@ -2450,8 +2453,36 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
+  packages/interactive-content-core:
+    dependencies:
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../types
+      express:
+        specifier: ^4.18.0
+        version: 4.21.2
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
+    devDependencies:
+      '@types/express':
+        specifier: 4.17.23
+        version: 4.17.23
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.25
+      rimraf:
+        specifier: ^5.0.0
+        version: 5.0.10
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
   packages/lms-core:
     dependencies:
+      '@o4o/interactive-content-core':
+        specifier: workspace:*
+        version: link:../interactive-content-core
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../organization-core
@@ -3741,6 +3772,9 @@ importers:
       '@o4o/operator-ux-core':
         specifier: workspace:*
         version: link:../../packages/operator-ux-core
+      '@o4o/store-asset-policy-core':
+        specifier: workspace:*
+        version: link:../../packages/store-asset-policy-core
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core

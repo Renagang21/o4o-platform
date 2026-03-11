@@ -94,6 +94,9 @@ const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'))
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
 
+// Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
+const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -284,6 +287,8 @@ function AppRoutes() {
       >
         <Route index element={<StoreCockpitPage />} />
         <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
+        {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
+        <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />

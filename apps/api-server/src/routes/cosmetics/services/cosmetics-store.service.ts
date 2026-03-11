@@ -142,6 +142,23 @@ export class CosmeticsStoreService {
           slug = await slugService.generateUniqueSlug(application.storeName);
         }
 
+        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Create organizations record
+        const orgId = crypto.randomUUID();
+        await queryRunner.query(`
+          INSERT INTO organizations (id, name, code, type, level, path, "isActive",
+            address, phone, business_number, metadata, "createdAt", "updatedAt")
+          VALUES ($1, $2, $3, 'store', 0, $4, true, $5, $6, $7, $8, NOW(), NOW())
+        `, [
+          orgId,
+          application.storeName,
+          storeCode,
+          '/' + storeCode,
+          application.address || null,
+          application.contactPhone || null,
+          application.businessNumber,
+          JSON.stringify({ serviceKey: 'cosmetics' }),
+        ]);
+
         const store = queryRunner.manager.create('CosmeticsStore', {
           name: application.storeName,
           code: storeCode,
@@ -152,6 +169,7 @@ export class CosmeticsStoreService {
           address: application.address,
           region: application.region,
           status: CosmeticsStoreStatus.APPROVED,
+          organization_id: orgId,
         });
         const savedStore = await queryRunner.manager.save('CosmeticsStore', store);
 
@@ -162,13 +180,19 @@ export class CosmeticsStoreService {
           slug,
         });
 
-        // Create owner member
+        // Create owner member (cosmetics_store_members)
         const member = queryRunner.manager.create('CosmeticsStoreMember', {
           storeId: (savedStore as any).id,
           userId: application.applicantUserId,
           role: CosmeticsStoreMemberRole.OWNER,
         });
         await queryRunner.manager.save('CosmeticsStoreMember', member);
+
+        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Create organization_members record
+        await queryRunner.query(`
+          INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+          VALUES (gen_random_uuid(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
+        `, [orgId, application.applicantUserId]);
 
         await queryRunner.commitTransaction();
 

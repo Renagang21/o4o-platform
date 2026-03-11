@@ -70,7 +70,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceName: 'K-Cosmetics',
   basePath: '/store',
   enabledMenus: [
-    'dashboard', 'products', 'orders',
+    'dashboard', 'products', 'channels', 'orders',
     'billing', 'content', 'settings',
   ],
 };

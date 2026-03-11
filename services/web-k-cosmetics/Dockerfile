@@ -25,6 +25,7 @@ COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy-core/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
@@ -42,6 +43,7 @@ COPY packages/types/ ./packages/types/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/

@@ -77,6 +77,10 @@ export class CosmeticsStore {
   @Index()
   status!: CosmeticsStoreStatus;
 
+  // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Bridge to organizations table
+  @Column({ type: 'uuid', nullable: true })
+  organization_id!: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
