@@ -2,13 +2,13 @@
  * Asset Snapshot API Client — GlycoPharm
  *
  * WO-O4O-STORE-HUB-CORE-EXTRACTION-V1: commonality verification
- *
- * Stub API client for store asset management.
- * Backend integration pending — currently returns empty data.
+ * WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1: updateChannelMap 추가
  */
 
-import type { StoreAssetItem, AssetPublishStatus } from '@o4o/store-asset-policy-core';
+import type { StoreAssetItem, AssetPublishStatus, ChannelMap } from '@o4o/store-asset-policy-core';
 import { getAccessToken } from '@/contexts/AuthContext';
+
+export type { StoreAssetItem, AssetPublishStatus, ChannelMap };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -46,5 +46,14 @@ export const storeAssetControlApi = {
     }>(`/api/v1/glycopharm/store-assets/${snapshotId}/publish`, {
       method: 'PATCH',
       body: JSON.stringify({ status }),
+    }),
+
+  updateChannelMap: (snapshotId: string, channelMap: ChannelMap) =>
+    authFetch<{
+      success: boolean;
+      data: { snapshotId: string; channelMap: ChannelMap; updatedAt: string };
+    }>(`/api/v1/glycopharm/store-assets/${snapshotId}/channel`, {
+      method: 'PATCH',
+      body: JSON.stringify({ channelMap }),
     }),
 };

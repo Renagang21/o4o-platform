@@ -23,6 +23,21 @@ import { createStoreController } from './controllers/store.controller.js'; // WO
 import { createTabletController } from '../o4o-store/controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
 import { createBlogController } from '../o4o-store/controllers/blog.controller.js'; // WO-STORE-BLOG-CHANNEL-V1
 import { createLayoutController } from '../o4o-store/controllers/layout.controller.js'; // WO-STORE-BLOCK-ENGINE-V1
+// WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
+import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
+import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
+import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
+import { createStoreAnalyticsController } from '../o4o-store/controllers/store-analytics.controller.js';
+import { createStoreContentController } from '../o4o-store/controllers/store-content.controller.js';
+import { createStorePlaylistController } from '../o4o-store/controllers/store-playlist.controller.js';
+import { createStoreLibraryController } from '../o4o-store/controllers/store-library.controller.js';
+import { createStoreQrLandingController } from '../o4o-store/controllers/store-qr-landing.controller.js';
+import { createStorePopController } from '../o4o-store/controllers/store-pop.controller.js';
+import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
+import { createProductMarketingController } from '../o4o-store/controllers/product-marketing.controller.js';
+import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
+import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
+import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 import { createPharmacyController, createB2BController } from './controllers/pharmacy.controller.js';
 import { createCustomerRequestController } from './controllers/customer-request.controller.js'; // Phase 1: Common Request
 import { createEventController } from './controllers/event.controller.js'; // Phase 2-A: Event → Request
@@ -300,6 +315,53 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/operator', operatorController);
+
+  // ============================================================================
+  // Store HUB Controllers (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1)
+  // KPA 수준 Store HUB 기능 완전 적용
+  // ============================================================================
+
+  // Store Hub — Dashboard overview, channels, KPI, live signals
+  router.use('/store-hub', createStoreHubController(dataSource, coreRequireAuth as any));
+
+  // Channel Product Management — 채널별 상품 진열 관리
+  router.use('/store-hub/channel-products', createStoreChannelProductsController(dataSource, coreRequireAuth as any));
+
+  // Pharmacy Store Config — 스토어프론트 설정
+  router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
+
+  // Pharmacy Products — 상품 채택/관리
+  router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));
+
+  // Asset Snapshot
+  router.use('/assets', createAssetSnapshotController(dataSource, coreRequireAuth as any));
+
+  // Store Asset Control
+  router.use('/store-assets', createStoreAssetControlController(dataSource, coreRequireAuth as any));
+
+  // Store Content — 콘텐츠 오버라이드
+  router.use('/store-contents', createStoreContentController(dataSource, coreRequireAuth as any));
+
+  // Store Playlist — 사이니지 플레이리스트
+  router.use('/store-playlists', createStorePlaylistController(dataSource, coreRequireAuth as any));
+
+  // Store Library (internal: /pharmacy/library/*)
+  router.use('/', createStoreLibraryController(dataSource, coreRequireAuth as any));
+
+  // Store QR Landing (internal: /qr/public/*, /pharmacy/qr/*)
+  router.use('/', createStoreQrLandingController(dataSource, coreRequireAuth as any));
+
+  // Store POP (internal: /pharmacy/pop/*)
+  router.use('/', createStorePopController(dataSource, coreRequireAuth as any));
+
+  // Store Analytics (internal: /pharmacy/analytics/*)
+  router.use('/', createStoreAnalyticsController(dataSource, coreRequireAuth as any));
+
+  // Product Marketing Graph (internal: /pharmacy/products/*/marketing)
+  router.use('/', createProductMarketingController(dataSource, coreRequireAuth as any));
+
+  // Published Assets
+  router.use('/published-assets', createPublishedAssetsController(dataSource));
 
   // ============================================================================
   // Tablet Request Channel Routes (WO-STORE-TABLET-REQUEST-CHANNEL-V1)

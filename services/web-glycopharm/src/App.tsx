@@ -126,6 +126,7 @@ import { StoreDashboardLayout, StorePlaceholderPage, GLYCOPHARM_STORE_CONFIG } f
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
+const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 
 // Pharmacy Store Apply
 const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
@@ -510,8 +511,8 @@ function AppRoutes() {
         <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
-        {/* channels: 채널 관리 (WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 P3) */}
-        <Route path="channels" element={<StorePlaceholderPage title="채널 관리" />} />
+        {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}
+        <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="orders" element={<PharmacyOrders />} />
         <Route path="content" element={<StoreAssetsPage />} />
         <Route path="services" element={<PharmacyPatients />} />
