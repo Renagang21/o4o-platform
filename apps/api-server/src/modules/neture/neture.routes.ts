@@ -29,6 +29,7 @@ import { createAdminController, createProductImageController } from './controlle
 import { createAdminSettlementController } from './controllers/admin-settlement.controller.js';
 import { createPartnerController } from './controllers/partner.controller.js';
 import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
+import { createContactController } from './controllers/contact.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -72,6 +73,9 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
 
   // Seller domain
   router.use('/seller', createSellerController(dataSource));
+
+  // Contact (public POST + admin management)
+  router.use('/', createContactController(dataSource));
 
   // Product images (supplier-facing, mounted at root: /products/*)
   router.use('/', createProductImageController(dataSource));

@@ -273,6 +273,7 @@ const AdminCommissionsPage = lazy(() => import('./pages/admin/AdminCommissionsPa
 const AdminPartnerSettlementsPage = lazy(() => import('./pages/admin/AdminPartnerSettlementsPage'));
 const AdminPartnerMonitoringPage = lazy(() => import('./pages/admin/AdminPartnerMonitoringPage'));
 const AdminPartnerDetailPage = lazy(() => import('./pages/admin/AdminPartnerDetailPage'));
+const AdminContactMessagesPage = lazy(() => import('./pages/admin/AdminContactMessagesPage'));
 
 // Partner HUB (WO-O4O-PARTNER-HUB-DASHBOARD-V1)
 const PartnerHubDashboardPage = lazy(() =>
@@ -642,6 +643,7 @@ function App() {
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
               <Route path="/workspace/admin/catalog-import/history" element={<ImportHistoryPage />} />
+              <Route path="/workspace/admin/contact-messages" element={<AdminContactMessagesPage />} />
             </Route>
 
             {/* ================================================================

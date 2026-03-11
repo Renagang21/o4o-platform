@@ -158,6 +158,13 @@ export {
   type OperatorAiSummary,
 } from './operator.js';
 
+// Contact API
+export {
+  contactApi,
+  type ContactFormData,
+  type ContactSubmitResult,
+} from './contact.js';
+
 // Store API + Order/Fulfillment types
 export {
   storeApi,
