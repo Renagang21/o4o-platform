@@ -264,6 +264,7 @@ import {
   OrganizationProductListing,
   OrganizationProductChannel,
   StoreProductProfile,
+  StoreCapability,
 } from '../modules/store-core/entities/index.js';
 
 // ============================================================================
@@ -742,6 +743,7 @@ export const AppDataSource = new DataSource({
     OrganizationProductListing,
     OrganizationProductChannel,
     StoreProductProfile,
+    StoreCapability,
     // ============================================================================
     // KPA ENTITIES (Pharmacist Association SaaS)
     // ============================================================================

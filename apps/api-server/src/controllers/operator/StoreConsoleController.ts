@@ -7,8 +7,23 @@
  */
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
+import { StoreCapabilityService } from '../../modules/store-core/services/store-capability.service.js';
+import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
 
 export class StoreConsoleController {
+  private capabilityService: StoreCapabilityService;
+
+  constructor() {
+    // Lazy init — AppDataSource may not be ready at import time
+    this.capabilityService = null as any;
+  }
+
+  private getCapabilityService(): StoreCapabilityService {
+    if (!this.capabilityService) {
+      this.capabilityService = new StoreCapabilityService(AppDataSource);
+    }
+    return this.capabilityService;
+  }
 
   /**
    * GET /api/v1/operator/stores
@@ -304,6 +319,95 @@ export class StoreConsoleController {
     } catch (error) {
       console.error('[StoreConsole] getStoreProducts error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch store products' });
+    }
+  };
+
+  /**
+   * GET /api/v1/operator/stores/:storeId/capabilities
+   * WO-O4O-STORE-CAPABILITY-SYSTEM-V1
+   */
+  getStoreCapabilities = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { storeId } = req.params;
+      const svc = this.getCapabilityService();
+      const capabilities = await svc.getCapabilities(storeId);
+
+      // 전체 capability 키 기준으로 응답 (DB에 없는 키는 disabled로 표시)
+      const allKeys = Object.values(Cap);
+      const capMap = new Map(capabilities.map(c => [c.capability_key, c]));
+
+      res.json({
+        success: true,
+        capabilities: allKeys.map(key => {
+          const row = capMap.get(key);
+          return {
+            key,
+            enabled: row?.enabled ?? false,
+            source: row?.source ?? 'system',
+            updatedAt: row?.updated_at ?? null,
+          };
+        }),
+      });
+    } catch (error) {
+      console.error('[StoreConsole] getStoreCapabilities error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch store capabilities' });
+    }
+  };
+
+  /**
+   * PUT /api/v1/operator/stores/:storeId/capabilities
+   * WO-O4O-STORE-CAPABILITY-SYSTEM-V1
+   *
+   * Body: { capabilities: [{ key: "TABLET", enabled: true }, ...] }
+   */
+  updateStoreCapabilities = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { storeId } = req.params;
+      const { capabilities } = req.body;
+
+      if (!Array.isArray(capabilities)) {
+        res.status(400).json({ success: false, error: 'capabilities must be an array' });
+        return;
+      }
+
+      const validKeys = new Set(Object.values(Cap));
+      const updates: { key: StoreCapabilityKey; enabled: boolean }[] = [];
+
+      for (const item of capabilities) {
+        if (!validKeys.has(item.key)) {
+          res.status(400).json({ success: false, error: `Invalid capability key: ${item.key}` });
+          return;
+        }
+        if (typeof item.enabled !== 'boolean') {
+          res.status(400).json({ success: false, error: `enabled must be boolean for ${item.key}` });
+          return;
+        }
+        updates.push({ key: item.key, enabled: item.enabled });
+      }
+
+      const svc = this.getCapabilityService();
+      await svc.bulkUpdate(storeId, updates);
+
+      // 업데이트 후 전체 상태 반환
+      const result = await svc.getCapabilities(storeId);
+      const allKeys = Object.values(Cap);
+      const capMap = new Map(result.map(c => [c.capability_key, c]));
+
+      res.json({
+        success: true,
+        capabilities: allKeys.map(key => {
+          const row = capMap.get(key);
+          return {
+            key,
+            enabled: row?.enabled ?? false,
+            source: row?.source ?? 'system',
+            updatedAt: row?.updated_at ?? null,
+          };
+        }),
+      });
+    } catch (error) {
+      console.error('[StoreConsole] updateStoreCapabilities error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update store capabilities' });
     }
   };
 }

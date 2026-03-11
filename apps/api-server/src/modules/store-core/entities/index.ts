@@ -11,3 +11,4 @@ export type { OrganizationChannelType, OrganizationChannelStatus } from './organ
 export { OrganizationProductListing } from './organization-product-listing.entity.js';
 export { OrganizationProductChannel } from './organization-product-channel.entity.js';
 export { StoreProductProfile } from './StoreProductProfile.entity.js';
+export { StoreCapability } from './store-capability.entity.js';

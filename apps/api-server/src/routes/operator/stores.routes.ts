@@ -29,4 +29,8 @@ router.get('/:storeId/channels', controller.getStoreChannels);
 // Store product listings
 router.get('/:storeId/products', controller.getStoreProducts);
 
+// Store capabilities (WO-O4O-STORE-CAPABILITY-SYSTEM-V1)
+router.get('/:storeId/capabilities', controller.getStoreCapabilities);
+router.put('/:storeId/capabilities', controller.updateStoreCapabilities);
+
 export default router;
