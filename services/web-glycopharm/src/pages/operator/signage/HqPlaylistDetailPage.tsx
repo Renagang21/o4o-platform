@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken } from '@/contexts/AuthContext';
 import { ArrowLeft, ListMusic, Play } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -67,7 +67,6 @@ const mediaTypeLabel: Record<string, string> = {
 export default function HqPlaylistDetailPage() {
   const { playlistId } = useParams<{ playlistId: string }>();
   const navigate = useNavigate();
-  const { getAccessToken } = useAuth();
 
   const [playlist, setPlaylist] = useState<PlaylistDetail | null>(null);
   const [items, setItems] = useState<PlaylistItemData[]>([]);
@@ -91,7 +90,7 @@ export default function HqPlaylistDetailPage() {
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
     return res.json();
-  }, [getAccessToken]);
+  }, []);
 
   const fetchData = useCallback(async () => {
     if (!playlistId) return;

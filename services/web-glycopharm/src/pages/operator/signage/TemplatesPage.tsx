@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken } from '@/contexts/AuthContext';
 import { LayoutTemplate, RefreshCw, ChevronRight } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -24,7 +24,6 @@ interface TemplateItem {
 }
 
 export default function TemplatesPage() {
-  const { getAccessToken } = useAuth();
   const navigate = useNavigate();
 
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
@@ -45,7 +44,7 @@ export default function TemplatesPage() {
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
     return res.json();
-  }, [getAccessToken]);
+  }, []);
 
   const fetchTemplates = useCallback(async () => {
     setIsLoading(true);

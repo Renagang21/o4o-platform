@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken } from '@/contexts/AuthContext';
 import { ArrowLeft, Film, ExternalLink } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -57,7 +57,6 @@ const sourceTypeLabel: Record<string, string> = {
 export default function HqMediaDetailPage() {
   const { mediaId } = useParams<{ mediaId: string }>();
   const navigate = useNavigate();
-  const { getAccessToken } = useAuth();
 
   const [media, setMedia] = useState<MediaDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +79,7 @@ export default function HqMediaDetailPage() {
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
     return res.json();
-  }, [getAccessToken]);
+  }, []);
 
   const fetchMedia = useCallback(async () => {
     if (!mediaId) return;

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken } from '@/contexts/AuthContext';
 import { ListMusic, RefreshCw, Plus, ChevronRight } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -30,7 +30,6 @@ const statusConfig: Record<string, { text: string; cls: string }> = {
 };
 
 export default function HqPlaylistsPage() {
-  const { getAccessToken } = useAuth();
   const navigate = useNavigate();
 
   const [playlists, setPlaylists] = useState<PlaylistItem[]>([]);
@@ -60,7 +59,7 @@ export default function HqPlaylistsPage() {
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
     return res.json();
-  }, [getAccessToken]);
+  }, []);
 
   const fetchPlaylists = useCallback(async () => {
     setIsLoading(true);

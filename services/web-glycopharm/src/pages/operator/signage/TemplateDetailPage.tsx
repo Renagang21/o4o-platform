@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { getAccessToken } from '@/contexts/AuthContext';
 import { ArrowLeft, LayoutTemplate } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -43,7 +43,6 @@ const zoneTypeLabel: Record<string, string> = {
 export default function TemplateDetailPage() {
   const { templateId } = useParams<{ templateId: string }>();
   const navigate = useNavigate();
-  const { getAccessToken } = useAuth();
 
   const [template, setTemplate] = useState<TemplateDetail | null>(null);
   const [zones, setZones] = useState<ZoneData[]>([]);
@@ -64,7 +63,7 @@ export default function TemplateDetailPage() {
       throw new Error(body?.error || body?.message || `API error ${res.status}`);
     }
     return res.json();
-  }, [getAccessToken]);
+  }, []);
 
   useEffect(() => {
     if (!templateId) return;
