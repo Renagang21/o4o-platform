@@ -299,7 +299,13 @@ jobs:
           --timeout=300 \
           --set-env-vars="NODE_ENV=production" \
           --set-env-vars="GRACEFUL_STARTUP=true" \
-          --set-env-vars="EMAIL_SERVICE_ENABLED=false" \
+          --set-env-vars="EMAIL_SERVICE_ENABLED=true" \
+          --set-env-vars="SMTP_HOST=smtp.gmail.com" \
+          --set-env-vars="SMTP_PORT=587" \
+          --set-env-vars="SMTP_SECURE=false" \
+          --set-env-vars="SMTP_USER=${{ secrets.SMTP_USER }}" \
+          --set-env-vars="SMTP_PASS=${{ secrets.SMTP_PASS }}" \
+          --set-env-vars="EMAIL_FROM_NAME=O4O Platform" \
           --set-env-vars="COOKIE_DOMAIN=.neture.co.kr" \
           --set-env-vars="DB_HOST=/cloudsql/netureyoutube:asia-northeast3:o4o-platform-db" \
           --set-env-vars="DB_PORT=5432" \
