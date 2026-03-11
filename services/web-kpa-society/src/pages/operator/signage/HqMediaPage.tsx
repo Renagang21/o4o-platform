@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Film, RefreshCw, Plus, Search, ChevronRight } from 'lucide-react';
+import { Film, RefreshCw, Plus, ChevronRight } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
