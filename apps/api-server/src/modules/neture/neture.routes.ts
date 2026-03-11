@@ -469,5 +469,188 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     }
   });
 
+  // ==================== Homepage CMS — Public ====================
+
+  const HOMEPAGE_SECTION_MAP: Record<string, { type: string; metadataSection?: string }> = {
+    hero: { type: 'hero' },
+    ads: { type: 'promo', metadataSection: 'homepage-ads' },
+    logos: { type: 'featured', metadataSection: 'partner-logo' },
+  };
+
+  /**
+   * GET /api/v1/neture/home/hero — Published hero slides (public)
+   * GET /api/v1/neture/home/ads  — Published homepage ads (public)
+   * GET /api/v1/neture/home/logos — Published partner logos (public)
+   */
+  for (const [section, cfg] of Object.entries(HOMEPAGE_SECTION_MAP)) {
+    router.get(`/home/${section}`, async (_req: Request, res: Response) => {
+      try {
+        const params: any[] = [cfg.type];
+        let metadataFilter = '';
+        if (cfg.metadataSection) {
+          metadataFilter = ` AND metadata->>'section' = $2`;
+          params.push(cfg.metadataSection);
+        }
+        const rows = await dataSource.query(
+          `SELECT id, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", metadata
+           FROM cms_contents
+           WHERE type = $1 AND "serviceKey" = 'neture' AND status = 'published'
+             AND ("expiresAt" IS NULL OR "expiresAt" > NOW())${metadataFilter}
+           ORDER BY "sortOrder" ASC, "createdAt" DESC`,
+          params,
+        );
+        res.json({ success: true, data: rows });
+      } catch (error) {
+        logger.error(`[Neture Homepage] Error fetching ${section}:`, error);
+        res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+      }
+    });
+  }
+
+  // ==================== Homepage CMS — Admin CRUD ====================
+
+  /**
+   * GET /api/v1/neture/admin/homepage-contents?section=hero|ads|logos
+   */
+  router.get('/admin/homepage-contents', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const { section } = req.query;
+      const cfg = HOMEPAGE_SECTION_MAP[section as string];
+      if (!cfg) {
+        res.status(400).json({ success: false, error: 'INVALID_SECTION', message: 'section must be hero, ads, or logos' });
+        return;
+      }
+      const params: any[] = [cfg.type];
+      let metadataFilter = '';
+      if (cfg.metadataSection) {
+        metadataFilter = ` AND metadata->>'section' = $2`;
+        params.push(cfg.metadataSection);
+      }
+      const rows = await dataSource.query(
+        `SELECT id, type, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", status, metadata, "createdAt", "updatedAt"
+         FROM cms_contents
+         WHERE type = $1 AND "serviceKey" = 'neture'${metadataFilter}
+         ORDER BY "sortOrder" ASC, "createdAt" DESC`,
+        params,
+      );
+      res.json({ success: true, data: rows });
+    } catch (error) {
+      logger.error('[Neture Homepage Admin] Error listing:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * POST /api/v1/neture/admin/homepage-contents — Create content
+   */
+  router.post('/admin/homepage-contents', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const { section, title, summary, imageUrl, linkUrl, linkText, sortOrder, metadata: extraMeta } = req.body;
+      const cfg = HOMEPAGE_SECTION_MAP[section as string];
+      if (!cfg) {
+        res.status(400).json({ success: false, error: 'INVALID_SECTION' });
+        return;
+      }
+      if (!title) {
+        res.status(400).json({ success: false, error: 'TITLE_REQUIRED' });
+        return;
+      }
+      const contentMetadata = { ...(extraMeta || {}), ...(cfg.metadataSection ? { section: cfg.metadataSection } : {}) };
+      const authReq = req as AuthenticatedRequest;
+      const rows = await dataSource.query(
+        `INSERT INTO cms_contents (type, title, summary, "imageUrl", "linkUrl", "linkText", "sortOrder", status, "serviceKey", "authorRole", "visibilityScope", metadata, "createdBy")
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'draft', 'neture', 'service_admin', 'service', $8, $9)
+         RETURNING *`,
+        [cfg.type, title, summary || null, imageUrl || null, linkUrl || null, linkText || null, sortOrder || 0, JSON.stringify(contentMetadata), authReq.user?.id || null],
+      );
+      res.json({ success: true, data: rows[0] });
+    } catch (error) {
+      logger.error('[Neture Homepage Admin] Error creating:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * PUT /api/v1/neture/admin/homepage-contents/:id — Update content
+   */
+  router.put('/admin/homepage-contents/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { title, summary, imageUrl, linkUrl, linkText, sortOrder, metadata: extraMeta } = req.body;
+      const rows = await dataSource.query(
+        `UPDATE cms_contents SET
+           title = COALESCE($2, title),
+           summary = $3,
+           "imageUrl" = $4,
+           "linkUrl" = $5,
+           "linkText" = $6,
+           "sortOrder" = COALESCE($7, "sortOrder"),
+           metadata = COALESCE($8, metadata),
+           "updatedAt" = NOW()
+         WHERE id = $1 AND "serviceKey" = 'neture'
+         RETURNING *`,
+        [id, title, summary || null, imageUrl || null, linkUrl || null, linkText || null, sortOrder, extraMeta ? JSON.stringify(extraMeta) : null],
+      );
+      if (!rows.length) {
+        res.status(404).json({ success: false, error: 'NOT_FOUND' });
+        return;
+      }
+      res.json({ success: true, data: rows[0] });
+    } catch (error) {
+      logger.error('[Neture Homepage Admin] Error updating:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * DELETE /api/v1/neture/admin/homepage-contents/:id
+   */
+  router.delete('/admin/homepage-contents/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = await dataSource.query(
+        `DELETE FROM cms_contents WHERE id = $1 AND "serviceKey" = 'neture' RETURNING id`,
+        [id],
+      );
+      if (!result.length) {
+        res.status(404).json({ success: false, error: 'NOT_FOUND' });
+        return;
+      }
+      res.json({ success: true, data: { deleted: true } });
+    } catch (error) {
+      logger.error('[Neture Homepage Admin] Error deleting:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * PATCH /api/v1/neture/admin/homepage-contents/:id/status — Publish/Archive
+   */
+  router.patch('/admin/homepage-contents/:id/status', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      if (!['draft', 'published', 'archived'].includes(status)) {
+        res.status(400).json({ success: false, error: 'INVALID_STATUS' });
+        return;
+      }
+      const publishClause = status === 'published' ? ', "publishedAt" = NOW()' : '';
+      const rows = await dataSource.query(
+        `UPDATE cms_contents SET status = $2${publishClause}, "updatedAt" = NOW()
+         WHERE id = $1 AND "serviceKey" = 'neture'
+         RETURNING *`,
+        [id, status],
+      );
+      if (!rows.length) {
+        res.status(404).json({ success: false, error: 'NOT_FOUND' });
+        return;
+      }
+      res.json({ success: true, data: rows[0] });
+    } catch (error) {
+      logger.error('[Neture Homepage Admin] Error updating status:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
   return router;
 }

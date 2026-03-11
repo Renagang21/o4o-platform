@@ -41,14 +41,14 @@ export default function NetureLayout() {
               <Link to="/" className={navLinkClass('/')}>
                 Home
               </Link>
+              <Link to="/community" className={navLinkClass('/community')}>
+                Community
+              </Link>
               <Link to="/supplier" className={navLinkClass('/supplier')}>
                 Supplier
               </Link>
               <Link to="/partner" className={navLinkClass('/partner')}>
                 Partner
-              </Link>
-              <Link to="/community" className={navLinkClass('/community')}>
-                Community
               </Link>
               <Link to="/contact" className={navLinkClass('/contact')}>
                 Contact Us

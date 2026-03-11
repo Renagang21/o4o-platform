@@ -216,3 +216,98 @@ export const cmsApi = {
     }
   },
 };
+
+// ==================== Homepage CMS API ====================
+
+export const homepageCmsApi = {
+  // --- Public (no auth) ---
+  async getHeroSlides(): Promise<CmsContent[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/neture/home/hero`);
+      if (!res.ok) return [];
+      const result = await res.json();
+      return result.data || [];
+    } catch { return []; }
+  },
+
+  async getAds(): Promise<CmsContent[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/neture/home/ads`);
+      if (!res.ok) return [];
+      const result = await res.json();
+      return result.data || [];
+    } catch { return []; }
+  },
+
+  async getLogos(): Promise<CmsContent[]> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/neture/home/logos`);
+      if (!res.ok) return [];
+      const result = await res.json();
+      return result.data || [];
+    } catch { return []; }
+  },
+
+  // --- Admin CRUD ---
+  async getContents(section: string): Promise<CmsContent[]> {
+    try {
+      const res = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/admin/homepage-contents?section=${section}`,
+        { credentials: 'include' },
+      );
+      if (!res.ok) return [];
+      const result = await res.json();
+      return result.data || [];
+    } catch { return []; }
+  },
+
+  async createContent(section: string, data: {
+    title: string; summary?: string; imageUrl?: string; linkUrl?: string;
+    linkText?: string; sortOrder?: number; metadata?: Record<string, any>;
+  }): Promise<CmsContent | null> {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/admin/homepage-contents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ section, ...data }),
+    });
+    if (!res.ok) throw new Error('Failed to create content');
+    const result = await res.json();
+    return result.data;
+  },
+
+  async updateContent(id: string, data: {
+    title?: string; summary?: string; imageUrl?: string; linkUrl?: string;
+    linkText?: string; sortOrder?: number; metadata?: Record<string, any>;
+  }): Promise<CmsContent | null> {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/admin/homepage-contents/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Failed to update content');
+    const result = await res.json();
+    return result.data;
+  },
+
+  async deleteContent(id: string): Promise<void> {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/admin/homepage-contents/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!res.ok) throw new Error('Failed to delete content');
+  },
+
+  async updateStatus(id: string, status: 'draft' | 'published' | 'archived'): Promise<CmsContent | null> {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/admin/homepage-contents/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error('Failed to update status');
+    const result = await res.json();
+    return result.data;
+  },
+};

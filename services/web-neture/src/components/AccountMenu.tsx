@@ -78,15 +78,23 @@ export default function AccountMenu() {
     navigate('/');
   };
 
-  // 비로그인 상태: 로그인 버튼 (모달 열기)
+  // 비로그인 상태: 로그인 + 회원가입
   if (!isAuthenticated || !user) {
     return (
-      <button
-        onClick={() => openLoginModal(location.pathname + location.search)}
-        className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-      >
-        로그인
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => openLoginModal(location.pathname + location.search)}
+          className="text-gray-700 px-4 py-2 text-sm font-medium hover:text-primary-600 transition-colors"
+        >
+          로그인
+        </button>
+        <Link
+          to="/register"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+        >
+          회원가입
+        </Link>
+      </div>
     );
   }
 

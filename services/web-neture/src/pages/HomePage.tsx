@@ -16,77 +16,31 @@ import { ArrowRight, Building2, Handshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { netureApi, type Supplier, type PartnershipRequest } from '../lib/api';
 import { HomeForumSection } from '../components/home/HomeForumSection';
+import HeroSlider from '../components/home/HeroSlider';
+import HomepageAds from '../components/home/HomepageAds';
+import PartnerLogoCarousel from '../components/home/PartnerLogoCarousel';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <HeroSection />
+      {/* Hero Slider (CMS) */}
+      <HeroSlider />
 
       {/* Suppliers Preview */}
       <SuppliersPreviewSection />
+
+      {/* Homepage Ads (CMS) */}
+      <HomepageAds />
 
       {/* Partnership Requests Preview */}
       <PartnershipRequestsPreviewSection />
 
       {/* Forum Section */}
       <HomeForumSection />
-    </div>
-  );
-}
 
-function HeroSection() {
-  return (
-    <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 운영형 알파 상태 표시 */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs text-primary-100 mb-4">
-          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
-          <span>운영형 알파 · v0.8.0</span>
-        </div>
-        {/* WO-NETURE-HOME-HERO-AND-NAV-O4O-ALIGNMENT-V1: o4o ↔ Neture 관계 명확화 */}
-        <p className="text-primary-200 text-sm mb-4">
-          o4o 플랫폼 기반 서비스
-        </p>
-        <h1 className="text-4xl sm:text-5xl font-bold mb-6">
-          공급자·파트너 연결, Neture
-        </h1>
-        <p className="text-xl text-primary-100 mb-6">
-          공급자를 탐색하고, 파트너로 참여하세요.
-          <br />
-          주문·결제 없이 조건과 기회를 투명하게 확인합니다.
-        </p>
-        {/* WO-GLOBAL-ALPHA-STATUS-HERO-V080: 알파 단계 안내 문구 */}
-        <p className="text-sm text-primary-200/70 mb-8">
-          현재 파트너 기반 운영 검증 단계입니다
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/workspace/suppliers"
-            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-slate-500 bg-white hover:bg-primary-50 transition-colors"
-          >
-            공급자 보기
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-          <Link
-            to="/partners/requests"
-            className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-white hover:text-slate-500 transition-colors"
-          >
-            제휴 요청 보기
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Link>
-        </div>
-        {/* o4o 플랫폼 소개 링크 */}
-        <div className="mt-6">
-          <Link
-            to="/o4o"
-            className="text-primary-100 hover:text-white text-sm underline underline-offset-2 transition-colors"
-          >
-            o4o 플랫폼 소개 보기
-          </Link>
-        </div>
-      </div>
-    </section>
+      {/* Partner Logo Carousel (CMS) */}
+      <PartnerLogoCarousel />
+    </div>
   );
 }
 

@@ -320,6 +320,17 @@ const SupplyDashboardPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
 );
 
+// Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
+const SignageHqMediaPage = lazy(() => import('./pages/operator/signage/HqMediaPage'));
+const SignageHqMediaDetailPage = lazy(() => import('./pages/operator/signage/HqMediaDetailPage'));
+const SignageHqPlaylistsPage = lazy(() => import('./pages/operator/signage/HqPlaylistsPage'));
+const SignageHqPlaylistDetailPage = lazy(() => import('./pages/operator/signage/HqPlaylistDetailPage'));
+const SignageTemplatesPage = lazy(() => import('./pages/operator/signage/TemplatesPage'));
+const SignageTemplateDetailPage = lazy(() => import('./pages/operator/signage/TemplateDetailPage'));
+
+// Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1)
+const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -647,6 +658,15 @@ function App() {
               <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
               <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
+              {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
+              <Route path="/workspace/operator/signage/hq-media" element={<SignageHqMediaPage />} />
+              <Route path="/workspace/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
+              <Route path="/workspace/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
+              <Route path="/workspace/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
+              <Route path="/workspace/operator/signage/templates" element={<SignageTemplatesPage />} />
+              <Route path="/workspace/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+              {/* Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1) */}
+              <Route path="/workspace/operator/homepage-cms" element={<HomepageCmsPage />} />
             </Route>
 
             {/* ================================================================
