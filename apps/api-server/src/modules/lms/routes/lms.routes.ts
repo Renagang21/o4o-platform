@@ -481,4 +481,143 @@ router.post('/instructor/enrollments/:id/approve', requireAuth, requireInstructo
 // POST /api/v1/lms/instructor/enrollments/:id/reject - Reject Enrollment (Instructor)
 router.post('/instructor/enrollments/:id/reject', requireAuth, requireInstructor, asyncHandler(InstructorController.rejectEnrollment));
 
+// ========================================
+// TEMPLATE ROUTES (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
+// ========================================
+import { TemplateController } from '../controllers/TemplateController.js';
+// WO-O4O-STORE-CONTENT-COPY
+import { StoreContentController } from '../controllers/StoreContentController.js';
+
+// Library sub-paths (must be before /:id to avoid parameter capture)
+
+// GET /api/v1/lms/templates/search - Search Templates (Library)
+router.get('/templates/search', requireAuth, asyncHandler(TemplateController.searchTemplates));
+
+// GET /api/v1/lms/templates/library - List Library Templates
+router.get('/templates/library', requireAuth, asyncHandler(TemplateController.listLibrary));
+
+// GET /api/v1/lms/templates/tags - List Tags
+router.get('/templates/tags', requireAuth, asyncHandler(TemplateController.listTags));
+
+// POST /api/v1/lms/templates/tags - Create Tag
+router.post('/templates/tags', requireAuth, requireInstructor, asyncHandler(TemplateController.createTag));
+
+// GET /api/v1/lms/templates/categories - List Categories
+router.get('/templates/categories', requireAuth, asyncHandler(TemplateController.listCategories));
+
+// POST /api/v1/lms/templates/categories - Create Category
+router.post('/templates/categories', requireAuth, requireInstructor, asyncHandler(TemplateController.createCategory));
+
+// Block/Version sub-paths
+
+// GET /api/v1/lms/templates/versions/:versionId/blocks - Get Blocks
+router.get('/templates/versions/:versionId/blocks', requireAuth, asyncHandler(TemplateController.getBlocks));
+
+// POST /api/v1/lms/templates/versions/:versionId/blocks - Add Block
+router.post('/templates/versions/:versionId/blocks', requireAuth, requireInstructor, asyncHandler(TemplateController.addBlock));
+
+// POST /api/v1/lms/templates/versions/:versionId/blocks/reorder - Reorder Blocks
+router.post('/templates/versions/:versionId/blocks/reorder', requireAuth, requireInstructor, asyncHandler(TemplateController.reorderBlocks));
+
+// PATCH /api/v1/lms/templates/blocks/:blockId - Update Block
+router.patch('/templates/blocks/:blockId', requireAuth, requireInstructor, asyncHandler(TemplateController.updateBlock));
+
+// DELETE /api/v1/lms/templates/blocks/:blockId - Delete Block
+router.delete('/templates/blocks/:blockId', requireAuth, requireInstructor, asyncHandler(TemplateController.removeBlock));
+
+// Template CRUD
+
+// POST /api/v1/lms/templates - Create Template
+router.post('/templates', requireAuth, requireInstructor, asyncHandler(TemplateController.createTemplate));
+
+// GET /api/v1/lms/templates - List Templates
+router.get('/templates', requireAuth, asyncHandler(TemplateController.listTemplates));
+
+// GET /api/v1/lms/templates/:id - Get Template by ID
+router.get('/templates/:id', requireAuth, asyncHandler(TemplateController.getTemplate));
+
+// PATCH /api/v1/lms/templates/:id - Update Template
+router.patch('/templates/:id', requireAuth, requireInstructor, asyncHandler(TemplateController.updateTemplate));
+
+// DELETE /api/v1/lms/templates/:id - Delete Template
+router.delete('/templates/:id', requireAuth, requireInstructor, asyncHandler(TemplateController.deleteTemplate));
+
+// POST /api/v1/lms/templates/:id/versions - Create Version
+router.post('/templates/:id/versions', requireAuth, requireInstructor, asyncHandler(TemplateController.createVersion));
+
+// GET /api/v1/lms/templates/:id/versions - List Versions
+router.get('/templates/:id/versions', requireAuth, asyncHandler(TemplateController.getVersions));
+
+// POST /api/v1/lms/templates/:id/publish - Publish Template
+router.post('/templates/:id/publish', requireAuth, requireInstructor, asyncHandler(TemplateController.publishTemplate));
+
+// POST /api/v1/lms/templates/:id/archive - Archive Template
+router.post('/templates/:id/archive', requireAuth, requireInstructor, asyncHandler(TemplateController.archiveTemplate));
+
+// GET /api/v1/lms/templates/:id/preview - Template Preview
+router.get('/templates/:id/preview', requireAuth, asyncHandler(TemplateController.getTemplatePreview));
+
+// GET /api/v1/lms/templates/:id/tags - Get Template Tags
+router.get('/templates/:id/tags', requireAuth, asyncHandler(TemplateController.getTemplateTags));
+
+// POST /api/v1/lms/templates/:id/tags - Add Tag to Template
+router.post('/templates/:id/tags', requireAuth, requireInstructor, asyncHandler(TemplateController.addTagToTemplate));
+
+// DELETE /api/v1/lms/templates/:id/tags/:tagId - Remove Tag from Template
+router.delete('/templates/:id/tags/:tagId', requireAuth, requireInstructor, asyncHandler(TemplateController.removeTagFromTemplate));
+
+// GET /api/v1/lms/templates/:id/categories - Get Template Categories
+router.get('/templates/:id/categories', requireAuth, asyncHandler(TemplateController.getTemplateCategories));
+
+// POST /api/v1/lms/templates/:id/categories - Add Category to Template
+router.post('/templates/:id/categories', requireAuth, requireInstructor, asyncHandler(TemplateController.addCategoryToTemplate));
+
+// DELETE /api/v1/lms/templates/:id/categories/:categoryId - Remove Category from Template
+router.delete('/templates/:id/categories/:categoryId', requireAuth, requireInstructor, asyncHandler(TemplateController.removeCategoryFromTemplate));
+
+// ========================================
+// PUBLIC CONTENT (WO-O4O-STORE-CONTENT-USAGE) — NO AUTH
+// ========================================
+
+// GET /api/v1/lms/content/:slug - Public Content by slug (no auth)
+router.get('/content/:slug', asyncHandler(StoreContentController.getPublicContent));
+
+// ========================================
+// STORE CONTENT ROUTES (WO-O4O-STORE-CONTENT-COPY)
+// ========================================
+
+// POST /api/v1/lms/store-contents/copy - Copy Template to Store (before /:id)
+router.post('/store-contents/copy', requireAuth, asyncHandler(StoreContentController.copyTemplate));
+
+// GET /api/v1/lms/store-contents - List Store Contents
+router.get('/store-contents', requireAuth, asyncHandler(StoreContentController.listStoreContents));
+
+// GET /api/v1/lms/store-contents/:id - Get Store Content
+router.get('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.getStoreContent));
+
+// PATCH /api/v1/lms/store-contents/:id - Update Store Content
+router.patch('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.updateStoreContent));
+
+// DELETE /api/v1/lms/store-contents/:id - Delete Store Content
+router.delete('/store-contents/:id', requireAuth, asyncHandler(StoreContentController.deleteStoreContent));
+
+// GET /api/v1/lms/store-contents/:id/blocks - Get Store Content Blocks
+router.get('/store-contents/:id/blocks', requireAuth, asyncHandler(StoreContentController.getBlocks));
+
+// PATCH /api/v1/lms/store-content-blocks/:blockId - Update Store Content Block
+router.patch('/store-content-blocks/:blockId', requireAuth, asyncHandler(StoreContentController.updateBlock));
+
+// ========================================
+// STORE CONTENT USAGE (WO-O4O-STORE-CONTENT-USAGE)
+// ========================================
+
+// GET /api/v1/lms/store-contents/:id/sns - SNS Share Payload
+router.get('/store-contents/:id/sns', requireAuth, asyncHandler(StoreContentController.getSNSContent));
+
+// GET /api/v1/lms/store-contents/:id/pop - POP Display Payload
+router.get('/store-contents/:id/pop', requireAuth, asyncHandler(StoreContentController.getPOPContent));
+
+// GET /api/v1/lms/store-contents/:id/qr - QR Code Generation
+router.get('/store-contents/:id/qr', requireAuth, asyncHandler(StoreContentController.getQRCode));
+
 export default router;

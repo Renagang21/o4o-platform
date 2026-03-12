@@ -17,3 +17,29 @@ export type { ContentItem } from './ContentBundle.js';
 // Course & Lesson (Phase 2)
 export { Course, CourseLevel, CourseStatus } from './Course.js';
 export { Lesson, LessonType } from './Lesson.js';
+
+// Templates (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
+export {
+  Template,
+  TemplateType,
+  TemplateVisibility,
+  TemplateStatus,
+} from './templates/index.js';
+export {
+  TemplateVersion,
+  TemplateVersionStatus,
+} from './templates/index.js';
+export {
+  TemplateBlock,
+  TemplateBlockType,
+} from './templates/index.js';
+
+// Template Library (WO-O4O-TEMPLATE-LIBRARY)
+export { TemplateTag } from './templates/index.js';
+export { TemplateTagMap } from './templates/index.js';
+export { TemplateCategory } from './templates/index.js';
+export { TemplateCategoryMap } from './templates/index.js';
+
+// Store Content (WO-O4O-STORE-CONTENT-COPY)
+export { StoreContent, StoreContentStatus } from './store/index.js';
+export { StoreContentBlock, StoreContentBlockType } from './store/index.js';

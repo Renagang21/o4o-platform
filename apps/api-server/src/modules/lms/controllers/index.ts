@@ -12,3 +12,7 @@ export * from './SurveyController.js';
 export * from './ProductContentController.js';
 export * from './QuizCampaignController.js';
 export * from './SurveyCampaignController.js';
+// WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
+export * from './TemplateController.js';
+// WO-O4O-STORE-CONTENT-COPY
+export * from './StoreContentController.js';

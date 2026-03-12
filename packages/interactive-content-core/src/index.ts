@@ -27,9 +27,12 @@ export const entities = Object.values(Entities).filter(
 
 // Service initialization
 import { initContentBundleService } from './services/ContentBundleService.js';
+import { initTemplateService } from './services/TemplateService.js';
+import { initStoreContentService } from './services/StoreContentService.js';
 
 // Controller routes
 import { createContentBundleRoutes } from './controllers/ContentBundleController.js';
+import { createTemplateRoutes } from './controllers/TemplateController.js';
 
 /**
  * Routes factory compatible with Module Loader
@@ -42,6 +45,8 @@ export function routes(dataSource?: DataSource | any): Router {
   // Initialize services with data source
   if (dataSource) {
     initContentBundleService(dataSource);
+    initTemplateService(dataSource);
+    initStoreContentService(dataSource);
   }
 
   // Health check
@@ -51,6 +56,11 @@ export function routes(dataSource?: DataSource | any): Router {
 
   // ContentBundle routes
   router.use('/bundles', createContentBundleRoutes());
+
+  // Template routes (WO-O4O-TEMPLATE-SYSTEM-FOUNDATION)
+  if (dataSource) {
+    router.use('/templates', createTemplateRoutes(dataSource));
+  }
 
   return router;
 }

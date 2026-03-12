@@ -13,3 +13,9 @@ export {
   SurveyController,
   createSurveyRoutes,
 } from './SurveyController.js';
+
+// WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
+export {
+  TemplateController,
+  createTemplateRoutes,
+} from './TemplateController.js';
