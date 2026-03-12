@@ -1031,6 +1031,15 @@ const startServer = async () => {
       logger.error('Failed to register Patient Profile routes:', patientProfileError);
     }
 
+    // 28g-2. Register Patient Health Readings routes (WO-GLYCOPHARM-GLUCOSE-INPUT-PAGE-V1)
+    try {
+      const { createPatientHealthReadingsRouter } = await import('./modules/care/controllers/patient-health-readings.controller.js');
+      app.use('/api/v1/care', createPatientHealthReadingsRouter(AppDataSource));
+      logger.info('✅ Patient Health Readings routes registered at /api/v1/care/patient/health-readings');
+    } catch (patientHealthReadingsError) {
+      logger.error('Failed to register Patient Health Readings routes:', patientHealthReadingsError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('./modules/store-ai/controllers/store-ai.controller.js');
