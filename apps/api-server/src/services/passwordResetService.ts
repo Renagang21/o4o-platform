@@ -40,6 +40,7 @@ export class PasswordResetService {
     const resetToken = tokenRepo.create({
       token: hashedToken,
       userId: user.id,
+      email: user.email,
       user,
       expiresAt: new Date(Date.now() + this.RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
     });
@@ -127,6 +128,7 @@ export class PasswordResetService {
     const verificationToken = tokenRepo.create({
       token: hashedToken,
       userId: user.id,
+      email: user.email,
       user,
       expiresAt: new Date(Date.now() + this.VERIFICATION_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000)
     });
