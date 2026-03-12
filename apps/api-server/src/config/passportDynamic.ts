@@ -14,7 +14,7 @@ import { Strategy as KakaoStrategy } from 'passport-kakao';
 import { Strategy as NaverStrategy } from 'passport-naver-v2';
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
-import { emailService } from '../services/emailService.js';
+import { emailService } from '../services/email.service.js';
 import { Settings as Setting } from '../entities/Settings.js';
 import { decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';

@@ -5,7 +5,7 @@ import { FormSubmission } from '../entities/FormSubmission.js';
 import { User } from '../entities/User.js';
 import type { FormField, FormNotification } from '../types/index.js';
 import type { AuthRequest } from '../types/auth.js';
-import { sendEmail } from '../utils/email.js';
+import { emailService } from '../services/email.service.js';
 import { evaluateConditionalLogic } from '../utils/conditionalLogic.js';
 import { calculateFormula } from '../utils/formula.js';
 import type { Express } from 'express';
@@ -335,14 +335,10 @@ export const formController = {
 
         // Send email
         try {
-          await sendEmail({
-            to: toEmails,
+          await emailService.sendEmail({
+            to: Array.isArray(toEmails) ? toEmails.join(', ') : toEmails,
             subject: notification.subject,
             html: message,
-            from: notification.fromEmail ? `${notification.fromName || ''} <${notification.fromEmail}>` : undefined,
-            replyTo: notification.replyTo,
-            cc: notification.cc ? notification.cc.split(',').map((e: any) => e.trim()).filter(Boolean) : undefined,
-            bcc: notification.bcc ? notification.bcc.split(',').map((e: any) => e.trim()).filter(Boolean) : undefined
           });
         } catch (emailError) {
           // Error log removed

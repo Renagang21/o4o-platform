@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import logger from '../utils/logger.js';
-import { emailService } from './emailService.js';
+import { emailService } from './email.service.js';
 
 const execAsync = promisify(exec);
 

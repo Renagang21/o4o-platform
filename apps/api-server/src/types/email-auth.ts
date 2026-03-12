@@ -62,33 +62,8 @@ export interface AuthResponse {
   };
 }
 
-// Email template data
-export interface EmailTemplateData {
-  name: string;
-  actionUrl: string;
-  supportEmail: string;
-  companyName: string;
-  year: number;
-}
-
-export interface VerificationEmailData extends EmailTemplateData {
-  verificationCode?: string;
-}
-
-export interface PasswordResetEmailData extends EmailTemplateData {
-  resetCode?: string;
-  expiresIn?: string;
-}
-
-// Email service options
-export interface EmailOptions {
-  to: string;
-  subject: string;
-  template?: 'verification' | 'passwordReset' | 'welcome' | 'accountLocked';
-  data?: EmailTemplateData;
-  html?: string;
-  text?: string;
-}
+// Email types — re-exported from @o4o/mail-core (WO-O4O-MAIL-CORE-EXTRACTION-V1)
+export type { EmailOptions, EmailTemplateData, VerificationEmailData, PasswordResetEmailData } from '@o4o/mail-core';
 
 // Token types
 export interface EmailVerificationToken {

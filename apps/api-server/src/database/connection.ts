@@ -36,8 +36,7 @@ import { ReusableBlock } from '../entities/ReusableBlock.js';
 import { BlockPattern } from '../entities/BlockPattern.js';
 import { TemplatePart } from '../entities/TemplatePart.js';
 // Shipment/ShipmentTrackingHistory removed - legacy commerce entities
-import { SmtpSettings } from '../entities/SmtpSettings.js';
-import { EmailLog } from '../entities/EmailLog.js';
+import { SmtpSettings, EmailLog } from '@o4o/mail-core';
 import { OperatorNotificationSettings } from '../entities/OperatorNotificationSettings.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../entities/CustomField.js';
 import { CustomPost } from '../entities/CustomPost.js';
@@ -412,6 +411,18 @@ import {
   ContentBundle,
   Course,
   Lesson,
+  // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
+  Template,
+  TemplateVersion,
+  TemplateBlock,
+  // WO-O4O-TEMPLATE-LIBRARY
+  TemplateTag,
+  TemplateTagMap,
+  TemplateCategory,
+  TemplateCategoryMap,
+  // WO-O4O-STORE-CONTENT-COPY
+  StoreContent,
+  StoreContentBlock,
 } from '@o4o/interactive-content-core/entities';
 
 // ============================================================================
@@ -829,6 +840,18 @@ export const AppDataSource = new DataSource({
     ContentBundle,
     Course,
     Lesson,
+    // WO-O4O-TEMPLATE-SYSTEM-FOUNDATION
+    Template,
+    TemplateVersion,
+    TemplateBlock,
+    // WO-O4O-TEMPLATE-LIBRARY
+    TemplateTag,
+    TemplateTagMap,
+    TemplateCategory,
+    TemplateCategoryMap,
+    // WO-O4O-STORE-CONTENT-COPY
+    StoreContent,
+    StoreContentBlock,
     // ============================================================================
     // EDUCATION-EXTENSION ENTITIES
     // ============================================================================

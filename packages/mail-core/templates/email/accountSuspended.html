@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>계정 정지 알림</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 20px 40px; text-align: center; background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Neture Platform</h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px; opacity: 0.9;">중요 안내: 계정 정지</p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;">
+                {{userName}}님께
+              </h2>
+              
+              <div style="background-color: #fff8e1; border-left: 4px solid #ffa751; padding: 20px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #666666; font-size: 16px; line-height: 1.6; font-weight: 600;">
+                  귀하의 계정이 일시적으로 정지되었습니다.
+                </p>
+              </div>
+              
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px;">정지 정보</h3>
+                <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666; width: 120px;">정지일시:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{suspendedDate}}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666; vertical-align: top;">정지 사유:</td>
+                    <td style="padding: 8px 0; color: #333333;">{{suspendReason}}</td>
+                  </tr>
+                  {{#if suspendDuration}}
+                  <tr>
+                    <td style="padding: 8px 0; color: #666666;">정지 기간:</td>
+                    <td style="padding: 8px 0; color: #333333; font-weight: 600;">{{suspendDuration}}</td>
+                  </tr>
+                  {{/if}}
+                </table>
+              </div>
+              
+              <h3 style="margin: 30px 0 15px 0; color: #333333; font-size: 18px;">계정 정지 중 제한사항</h3>
+              <ul style="margin: 10px 0 20px 0; padding-left: 20px; color: #666666; font-size: 16px; line-height: 1.8;">
+                <li>플랫폼 로그인 불가</li>
+                <li>서비스 이용 불가</li>
+                <li>거래 및 결제 처리 중단</li>
+                <li>API 접근 제한</li>
+              </ul>
+              
+              <h3 style="margin: 30px 0 15px 0; color: #333333; font-size: 18px;">계정 복구 방법</h3>
+              <ol style="margin: 10px 0 20px 0; padding-left: 20px; color: #666666; font-size: 16px; line-height: 1.8;">
+                <li>정지 사유를 확인하고 문제를 해결해 주세요</li>
+                <li>고객 지원팀에 문의하여 상황을 설명해 주세요</li>
+                <li>필요한 경우 추가 인증이나 서류를 제출해 주세요</li>
+                <li>검토 후 계정 재활성화 여부가 결정됩니다</li>
+              </ol>
+              
+              <div style="text-align: center; margin: 40px 0;">
+                <a href="{{appealUrl}}" style="display: inline-block; padding: 14px 32px; background-color: #ffa751; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">
+                  이의 신청하기
+                </a>
+              </div>
+              
+              <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">문의처</h4>
+                <p style="margin: 5px 0; color: #666666; font-size: 14px;">
+                  이메일: compliance@neture.co.kr<br>
+                  전화: 02-1234-5678 (평일 09:00-18:00)
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f8f9fa; border-radius: 0 0 8px 8px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #999999; font-size: 14px;">
+                이 이메일은 Neture Platform에서 자동으로 발송되었습니다.
+              </p>
+              <p style="margin: 0; color: #999999; font-size: 14px;">
+                © 2024 Neture. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

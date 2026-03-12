@@ -992,69 +992,9 @@ export class AuthenticationService {
     }
   }
 
-  /**
-   * Request password reset
-   *
-   * @param email - User email
-   */
-  async requestPasswordReset(email: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      // Don't reveal if user exists
-      return;
-    }
-
-    // Generate reset token (expires in 10 minutes)
-    const resetToken = generateRandomToken(32);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    // Save token to user
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = expiresAt;
-    await this.userRepository.save(user);
-
-    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
-
-    await emailService.sendEmail({
-      to: email,
-      subject: '비밀번호 재설정',
-      html: `
-        <h2>비밀번호 재설정</h2>
-        <p>비밀번호 재설정을 요청하셨습니다.</p>
-        <p>아래 링크를 클릭하여 새 비밀번호를 설정해주세요:</p>
-        <p><a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">비밀번호 재설정하기</a></p>
-        <p>또는 다음 주소를 브라우저에 복사하여 붙여넣으세요:</p>
-        <p>${resetUrl}</p>
-        <br/>
-        <p style="color: #666; font-size: 12px;">이 링크는 10분간 유효합니다.</p>
-        <p style="color: #666; font-size: 12px;">본인이 요청하지 않은 경우 이 이메일을 무시하셔도 됩니다.</p>
-      `
-    });
-  }
-
-  /**
-   * Reset password with token
-   *
-   * @param token - Reset token
-   * @param newPassword - New password
-   */
-  async resetPassword(token: string, newPassword: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { resetPasswordToken: token }
-    });
-
-    if (!user || !user.resetPasswordExpires || user.resetPasswordExpires < new Date()) {
-      throw new InvalidPasswordResetTokenError();
-    }
-
-    // Hash new password
-    user.password = await hashPassword(newPassword);
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
-
-    await this.userRepository.save(user);
-  }
+  // Legacy requestPasswordReset / resetPassword removed (WO-O4O-MAIL-CONSOLIDATION-V1)
+  // Password reset is now handled exclusively by PasswordResetService
+  // via POST /api/v1/auth/forgot-password → PasswordController → PasswordResetService
 
   /**
    * Handle failed login attempt

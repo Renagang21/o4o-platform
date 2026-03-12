@@ -4,7 +4,7 @@ import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken.js';
-import { emailService } from './emailService.js';
+import { emailService } from './email.service.js';
 import { UserStatus } from '../types/auth.js';
 
 export class PasswordResetService {

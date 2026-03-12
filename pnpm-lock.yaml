@@ -745,6 +745,9 @@ importers:
       '@o4o/lms-yaksa':
         specifier: workspace:*
         version: link:../../packages/lms-yaksa
+      '@o4o/mail-core':
+        specifier: workspace:*
+        version: link:../../packages/mail-core
       '@o4o/market-trial':
         specifier: workspace:*
         version: link:../../packages/market-trial
@@ -2588,6 +2591,22 @@ importers:
         version: 5.0.10
       typescript:
         specifier: ^5.3.0
+        version: 5.9.3
+
+  packages/mail-core:
+    dependencies:
+      nodemailer:
+        specifier: ^7.0.5
+        version: 7.0.6
+      typeorm:
+        specifier: ^0.3.0
+        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
+    devDependencies:
+      '@types/nodemailer':
+        specifier: ^6.4.17
+        version: 6.4.19
+      typescript:
+        specifier: ^5.7.2
         version: 5.9.3
 
   packages/market-trial:

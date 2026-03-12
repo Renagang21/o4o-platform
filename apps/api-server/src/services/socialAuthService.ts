@@ -1,7 +1,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../entities/User.js';
 import { SessionSyncService } from './sessionSyncService.js';
-import { emailService } from './emailService.js';
+import { emailService } from './email.service.js';
 import { Request, Response } from 'express';
 import logger from '../utils/logger.js';
 import * as tokenUtils from '../utils/token.utils.js';
