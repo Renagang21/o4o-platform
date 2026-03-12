@@ -16,9 +16,7 @@ export class CreateAuthTokenTables1771200000015 implements MigrationInterface {
     const prtExists = await queryRunner.query(
       `SELECT to_regclass('public.password_reset_tokens') IS NOT NULL AS exists`,
     );
-    if (prtExists[0]?.exists) {
-      console.log('[Migration] password_reset_tokens already exists — skipping');
-    } else {
+    if (!prtExists[0]?.exists) {
       await queryRunner.query(`
         CREATE TABLE "password_reset_tokens" (
           "id"         uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -40,15 +38,12 @@ export class CreateAuthTokenTables1771200000015 implements MigrationInterface {
           ON "password_reset_tokens" ("userId", "createdAt")
       `);
 
-      console.log('[Migration] Created password_reset_tokens table');
     }
 
     const evtExists = await queryRunner.query(
       `SELECT to_regclass('public.email_verification_tokens') IS NOT NULL AS exists`,
     );
-    if (evtExists[0]?.exists) {
-      console.log('[Migration] email_verification_tokens already exists — skipping');
-    } else {
+    if (!evtExists[0]?.exists) {
       await queryRunner.query(`
         CREATE TABLE "email_verification_tokens" (
           "id"         uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -70,7 +65,6 @@ export class CreateAuthTokenTables1771200000015 implements MigrationInterface {
           ON "email_verification_tokens" ("userId", "createdAt")
       `);
 
-      console.log('[Migration] Created email_verification_tokens table');
     }
   }
 
