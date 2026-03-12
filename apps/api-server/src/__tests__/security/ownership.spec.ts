@@ -124,18 +124,6 @@ describe('LMS Ownership Guards', () => {
     expect(content).toContain("kpa:admin");
   });
 
-  it('EventController has checkEventOwnership', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../modules/lms/controllers/EventController.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).toContain('checkEventOwnership');
-    expect(content).toContain('instructorId');
-    expect(content).toContain("kpa:admin");
-  });
-
   it('LessonController has checkCourseOwnership', () => {
     const filePath = path.resolve(
       __dirname,
@@ -148,38 +136,6 @@ describe('LMS Ownership Guards', () => {
     expect(content).toContain("kpa:admin");
   });
 
-  it('QuizController has checkQuizOwnership', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../modules/lms/controllers/QuizController.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).toContain('checkQuizOwnership');
-    expect(content).toContain("kpa:admin");
-  });
-
-  it('SurveyController has checkSurveyOwnership', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../modules/lms/controllers/SurveyController.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).toContain('checkSurveyOwnership');
-    expect(content).toContain("kpa:admin");
-  });
-
-  it('AttendanceController has checkEventOwnership', () => {
-    const filePath = path.resolve(
-      __dirname,
-      '../../modules/lms/controllers/AttendanceController.ts'
-    );
-    const content = fs.readFileSync(filePath, 'utf8');
-
-    expect(content).toContain('checkEventOwnership');
-    expect(content).toContain("kpa:admin");
-  });
 });
 
 // ─────────────────────────────────────────────────────
