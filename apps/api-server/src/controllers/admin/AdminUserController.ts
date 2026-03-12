@@ -171,10 +171,24 @@ export class AdminUserController {
 
       // Check if email already exists
       const existingUser = await userRepo.findOne({ where: { email } });
+
+      // WO-OPERATOR-MULTI-SERVICE-V1: If user exists, add roles to existing user
+      // A single user can be an operator for multiple services
       if (existingUser) {
-        res.status(400).json({
-          success: false,
-          error: 'Email already exists'
+        const rolesToAssign = Array.isArray(rolesArray) && rolesArray.length > 0
+          ? rolesArray
+          : [role];
+
+        for (const r of rolesToAssign) {
+          await roleAssignmentService.assignRole({ userId: existingUser.id, role: r });
+        }
+
+        const { password: _, ...userWithoutPassword } = existingUser;
+
+        res.status(200).json({
+          success: true,
+          user: userWithoutPassword,
+          message: 'Roles added to existing user'
         });
         return;
       }

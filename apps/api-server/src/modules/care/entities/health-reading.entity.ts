@@ -39,9 +39,9 @@ export class HealthReading {
   @Column({ type: 'jsonb', default: '{}' })
   metadata!: Record<string, unknown>;
 
-  @Column({ name: 'pharmacy_id', type: 'uuid' })
+  @Column({ name: 'pharmacy_id', type: 'uuid', nullable: true })
   @Index()
-  pharmacyId!: string;
+  pharmacyId?: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

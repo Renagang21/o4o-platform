@@ -70,21 +70,19 @@ export function createPatientProfileRouter(dataSource: DataSource): Router {
       res.json({
         success: true,
         data: {
-          basicInfo,
-          customerInfo,
-          healthProfile: healthProfile
-            ? {
-                id: healthProfile.id,
-                diabetesType: healthProfile.diabetesType,
-                treatmentMethod: healthProfile.treatmentMethod,
-                height: healthProfile.height,
-                weight: healthProfile.weight,
-                targetHbA1c: healthProfile.targetHbA1c,
-                targetGlucoseLow: healthProfile.targetGlucoseLow,
-                targetGlucoseHigh: healthProfile.targetGlucoseHigh,
-                birthDate: healthProfile.birthDate,
-              }
-            : null,
+          id: healthProfile?.id || null,
+          name: basicInfo.name,
+          email: basicInfo.email,
+          phone: basicInfo.phone,
+          gender: customerInfo?.gender || null,
+          birthDate: healthProfile?.birthDate || null,
+          diabetesType: healthProfile?.diabetesType || null,
+          treatmentMethod: healthProfile?.treatmentMethod || null,
+          height: healthProfile?.height || null,
+          weight: healthProfile?.weight || null,
+          targetHbA1c: healthProfile?.targetHbA1c || null,
+          targetGlucoseLow: healthProfile?.targetGlucoseLow ?? 70,
+          targetGlucoseHigh: healthProfile?.targetGlucoseHigh ?? 180,
         },
       });
     } catch (error) {

@@ -1,15 +1,21 @@
 /**
  * ProfilePage — 개인 설정 관리
- * WO-GLYCOPHARM-PATIENT-PROFILE-V1
+ * WO-GLYCOPHARM-PATIENT-PROFILE-V1 + PATCH-V1
  *
  * 기본 정보 (읽기 전용) + 건강 프로필 (편집)
+ * Flat API response, validation, unknown options
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Settings, Save, CheckCircle } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { BasicInfo, HealthProfile } from '@/api/patient';
+import type { PatientProfile, HealthProfilePayload } from '@/api/patient';
+
+const GENDER_LABELS: Record<string, string> = {
+  male: '남성',
+  female: '여성',
+};
 
 const DIABETES_TYPE_OPTIONS = [
   { value: '', label: '선택하세요' },
@@ -17,6 +23,7 @@ const DIABETES_TYPE_OPTIONS = [
   { value: 'type2', label: '제2형 당뇨' },
   { value: 'gestational', label: '임신성 당뇨' },
   { value: 'prediabetes', label: '당뇨 전단계' },
+  { value: 'unknown', label: '모름' },
 ];
 
 const TREATMENT_OPTIONS = [
@@ -25,9 +32,21 @@ const TREATMENT_OPTIONS = [
   { value: 'oral', label: '경구약' },
   { value: 'diet', label: '식이요법' },
   { value: 'combined', label: '병합 치료' },
+  { value: 'unknown', label: '모름' },
 ];
 
-const DEFAULT_PROFILE: HealthProfile = {
+interface FormData {
+  diabetesType: string | null;
+  treatmentMethod: string | null;
+  height: string | null;
+  weight: string | null;
+  targetHbA1c: string | null;
+  targetGlucoseLow: number;
+  targetGlucoseHigh: number;
+  birthDate: string | null;
+}
+
+const DEFAULT_FORM: FormData = {
   diabetesType: null,
   treatmentMethod: null,
   height: null,
@@ -38,6 +57,19 @@ const DEFAULT_PROFILE: HealthProfile = {
   birthDate: null,
 };
 
+function validate(form: FormData): string | null {
+  const h = form.height ? Number(form.height) : null;
+  if (h !== null && (h < 80 || h > 250)) return '키는 80~250cm 범위로 입력하세요.';
+
+  const w = form.weight ? Number(form.weight) : null;
+  if (w !== null && (w < 20 || w > 300)) return '몸무게는 20~300kg 범위로 입력하세요.';
+
+  const a = form.targetHbA1c ? Number(form.targetHbA1c) : null;
+  if (a !== null && (a < 4.0 || a > 15.0)) return 'HbA1c 목표는 4.0~15.0% 범위로 입력하세요.';
+
+  return null;
+}
+
 export default function ProfilePage() {
   const navigate = useNavigate();
 
@@ -46,18 +78,27 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
-  const [basicInfo, setBasicInfo] = useState<BasicInfo | null>(null);
-  const [profile, setProfile] = useState<HealthProfile>(DEFAULT_PROFILE);
+  const [profileData, setProfileData] = useState<PatientProfile | null>(null);
+  const [form, setForm] = useState<FormData>(DEFAULT_FORM);
   const [hasExisting, setHasExisting] = useState(false);
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await patientApi.getProfile();
+      const res = await patientApi.getMyProfile();
       if (res.success && res.data) {
-        setBasicInfo(res.data.basicInfo);
-        if (res.data.healthProfile) {
-          setProfile(res.data.healthProfile);
+        setProfileData(res.data);
+        if (res.data.id) {
+          setForm({
+            diabetesType: res.data.diabetesType,
+            treatmentMethod: res.data.treatmentMethod,
+            height: res.data.height,
+            weight: res.data.weight,
+            targetHbA1c: res.data.targetHbA1c,
+            targetGlucoseLow: res.data.targetGlucoseLow,
+            targetGlucoseHigh: res.data.targetGlucoseHigh,
+            birthDate: res.data.birthDate,
+          });
           setHasExisting(true);
         }
       }
@@ -73,24 +114,30 @@ export default function ProfilePage() {
   }, [loadProfile]);
 
   const handleSave = async () => {
+    const validationError = validate(form);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setSaving(true);
     setError('');
     setSaved(false);
 
     try {
-      const payload = {
-        diabetesType: profile.diabetesType || null,
-        treatmentMethod: profile.treatmentMethod || null,
-        height: profile.height || null,
-        weight: profile.weight || null,
-        targetHbA1c: profile.targetHbA1c || null,
-        targetGlucoseLow: profile.targetGlucoseLow,
-        targetGlucoseHigh: profile.targetGlucoseHigh,
-        birthDate: profile.birthDate || null,
+      const payload: HealthProfilePayload = {
+        diabetesType: form.diabetesType || null,
+        treatmentMethod: form.treatmentMethod || null,
+        height: form.height || null,
+        weight: form.weight || null,
+        targetHbA1c: form.targetHbA1c || null,
+        targetGlucoseLow: form.targetGlucoseLow,
+        targetGlucoseHigh: form.targetGlucoseHigh,
+        birthDate: form.birthDate || null,
       };
 
       const res = hasExisting
-        ? await patientApi.saveProfile(payload)
+        ? await patientApi.updateProfile(payload)
         : await patientApi.createProfile(payload);
 
       if (res.success) {
@@ -107,8 +154,8 @@ export default function ProfilePage() {
     }
   };
 
-  const updateProfile = (field: keyof HealthProfile, value: unknown) => {
-    setProfile((prev) => ({ ...prev, [field]: value }));
+  const updateForm = (field: keyof FormData, value: unknown) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   if (loading) {
@@ -151,9 +198,17 @@ export default function ProfilePage() {
             기본 정보
           </h2>
           <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-            <InfoRow label="이름" value={basicInfo?.name || '-'} />
-            <InfoRow label="이메일" value={basicInfo?.email || '-'} />
-            <InfoRow label="전화번호" value={basicInfo?.phone || '-'} />
+            <InfoRow label="이름" value={profileData?.name || '-'} />
+            <InfoRow label="이메일" value={profileData?.email || '-'} />
+            <InfoRow label="전화번호" value={profileData?.phone || '-'} />
+            <InfoRow
+              label="성별"
+              value={
+                profileData?.gender
+                  ? GENDER_LABELS[profileData.gender] || profileData.gender
+                  : '-'
+              }
+            />
           </div>
         </section>
 
@@ -166,25 +221,25 @@ export default function ProfilePage() {
             {/* 당뇨 유형 */}
             <FormSelect
               label="당뇨 유형"
-              value={profile.diabetesType || ''}
+              value={form.diabetesType || ''}
               options={DIABETES_TYPE_OPTIONS}
-              onChange={(v) => updateProfile('diabetesType', v || null)}
+              onChange={(v) => updateForm('diabetesType', v || null)}
             />
 
             {/* 치료 방식 */}
             <FormSelect
               label="치료 방식"
-              value={profile.treatmentMethod || ''}
+              value={form.treatmentMethod || ''}
               options={TREATMENT_OPTIONS}
-              onChange={(v) => updateProfile('treatmentMethod', v || null)}
+              onChange={(v) => updateForm('treatmentMethod', v || null)}
             />
 
             {/* 생년월일 */}
             <FormInput
               label="생년월일"
               type="date"
-              value={profile.birthDate || ''}
-              onChange={(v) => updateProfile('birthDate', v || null)}
+              value={form.birthDate || ''}
+              onChange={(v) => updateForm('birthDate', v || null)}
             />
 
             {/* 키 / 몸무게 */}
@@ -192,16 +247,20 @@ export default function ProfilePage() {
               <FormInput
                 label="키 (cm)"
                 type="number"
-                value={profile.height || ''}
-                onChange={(v) => updateProfile('height', v || null)}
+                value={form.height || ''}
+                onChange={(v) => updateForm('height', v || null)}
                 placeholder="170"
+                min="80"
+                max="250"
               />
               <FormInput
                 label="몸무게 (kg)"
                 type="number"
-                value={profile.weight || ''}
-                onChange={(v) => updateProfile('weight', v || null)}
+                value={form.weight || ''}
+                onChange={(v) => updateForm('weight', v || null)}
                 placeholder="70"
+                min="20"
+                max="300"
               />
             </div>
 
@@ -209,10 +268,12 @@ export default function ProfilePage() {
             <FormInput
               label="HbA1c 목표 (%)"
               type="number"
-              value={profile.targetHbA1c || ''}
-              onChange={(v) => updateProfile('targetHbA1c', v || null)}
+              value={form.targetHbA1c || ''}
+              onChange={(v) => updateForm('targetHbA1c', v || null)}
               placeholder="7.0"
               step="0.1"
+              min="4.0"
+              max="15.0"
             />
 
             {/* 혈당 목표 범위 */}
@@ -223,16 +284,16 @@ export default function ProfilePage() {
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  value={profile.targetGlucoseLow}
-                  onChange={(e) => updateProfile('targetGlucoseLow', Number(e.target.value) || 70)}
+                  value={form.targetGlucoseLow}
+                  onChange={(e) => updateForm('targetGlucoseLow', Number(e.target.value) || 70)}
                   className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="70"
                 />
                 <span className="text-slate-400 text-sm">~</span>
                 <input
                   type="number"
-                  value={profile.targetGlucoseHigh}
-                  onChange={(e) => updateProfile('targetGlucoseHigh', Number(e.target.value) || 180)}
+                  value={form.targetGlucoseHigh}
+                  onChange={(e) => updateForm('targetGlucoseHigh', Number(e.target.value) || 180)}
                   className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="180"
                 />
@@ -316,6 +377,8 @@ function FormInput({
   onChange,
   placeholder,
   step,
+  min,
+  max,
 }: {
   label: string;
   type: string;
@@ -323,6 +386,8 @@ function FormInput({
   onChange: (v: string) => void;
   placeholder?: string;
   step?: string;
+  min?: string;
+  max?: string;
 }) {
   return (
     <div>
@@ -334,6 +399,8 @@ function FormInput({
         className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
         placeholder={placeholder}
         step={step}
+        min={min}
+        max={max}
       />
     </div>
   );

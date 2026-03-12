@@ -58,20 +58,25 @@ async function request<T>(
   }
 }
 
-// Health Profile types
-export interface BasicInfo {
+// Flat patient profile (matches flattened API response)
+export interface PatientProfile {
+  id: string | null;
   name: string;
   email: string;
   phone: string | null;
-}
-
-export interface CustomerInfo {
-  birthYear: number | null;
   gender: string | null;
+  birthDate: string | null;
+  diabetesType: string | null;
+  treatmentMethod: string | null;
+  height: string | null;
+  weight: string | null;
+  targetHbA1c: string | null;
+  targetGlucoseLow: number;
+  targetGlucoseHigh: number;
 }
 
-export interface HealthProfile {
-  id?: string;
+// Health profile fields for create/update payload
+export interface HealthProfilePayload {
   diabetesType: string | null;
   treatmentMethod: string | null;
   height: string | null;
@@ -82,19 +87,49 @@ export interface HealthProfile {
   birthDate: string | null;
 }
 
-export interface PatientProfileData {
-  basicInfo: BasicInfo;
-  customerInfo: CustomerInfo | null;
-  healthProfile: HealthProfile | null;
+// Glucose reading types (WO-GLYCOPHARM-GLUCOSE-INPUT-PAGE-V1)
+export interface GlucoseReading {
+  id: string;
+  patientId: string;
+  metricType: string;
+  valueNumeric: string | null;
+  unit: string;
+  measuredAt: string;
+  sourceType: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface GlucoseReadingPayload {
+  metricType?: string;
+  valueNumeric: number;
+  unit?: string;
+  measuredAt: string;
+  metadata?: { mealTiming?: string; mealTimingLabel?: string };
 }
 
 export const patientApi = {
-  getProfile: () =>
-    request<PatientProfileData>('GET', '/api/v1/care/patient-profile/me'),
+  getMyProfile: () =>
+    request<PatientProfile>('GET', '/api/v1/care/patient-profile/me'),
 
-  createProfile: (data: Partial<HealthProfile>) =>
-    request<HealthProfile>('POST', '/api/v1/care/patient-profile', data),
+  createProfile: (data: HealthProfilePayload) =>
+    request<PatientProfile>('POST', '/api/v1/care/patient-profile', data),
 
-  saveProfile: (data: Partial<HealthProfile>) =>
-    request<HealthProfile>('PUT', '/api/v1/care/patient-profile', data),
+  updateProfile: (data: HealthProfilePayload) =>
+    request<PatientProfile>('PUT', '/api/v1/care/patient-profile', data),
+
+  postGlucoseReading: (data: GlucoseReadingPayload) =>
+    request<GlucoseReading>('POST', '/api/v1/care/patient/health-readings', data),
+
+  getGlucoseReadings: (params?: { from?: string; to?: string; metricType?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.from) query.set('from', params.from);
+    if (params?.to) query.set('to', params.to);
+    if (params?.metricType) query.set('metricType', params.metricType);
+    const qs = query.toString();
+    return request<GlucoseReading[]>(
+      'GET',
+      `/api/v1/care/patient/health-readings${qs ? `?${qs}` : ''}`,
+    );
+  },
 };
