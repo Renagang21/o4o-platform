@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { StoreContentService } from '../services/StoreContentService.js';
+import { ContentAnalyticsService } from '../services/ContentAnalyticsService.js';
+import { ContentAnalyticsEventType } from '@o4o/interactive-content-core/entities';
 import logger from '../../../utils/logger.js';
 
 /**
@@ -241,9 +243,92 @@ export class StoreContentController extends BaseController {
         return BaseController.notFound(res, 'Content not found or not public');
       }
 
+      // Fire-and-forget view tracking (WO-O4O-CONTENT-ANALYTICS)
+      ContentAnalyticsService.getInstance()
+        .trackEvent(result.content.id, ContentAnalyticsEventType.VIEW, null, {
+          userAgent: req.headers['user-agent'],
+          referrer: req.headers.referer,
+        })
+        .catch(() => {}); // 실패해도 무시
+
       return BaseController.ok(res, result);
     } catch (error: any) {
       logger.error('[StoreContentController.getPublicContent] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  // ============================================
+  // Content Analytics (WO-O4O-CONTENT-ANALYTICS)
+  // ============================================
+
+  static async trackAnalyticsEvent(req: Request, res: Response): Promise<any> {
+    try {
+      const { storeContentId, eventType, metadata } = req.body;
+
+      if (!storeContentId || !eventType) {
+        return BaseController.validationError(res, [
+          { field: 'storeContentId', message: 'storeContentId is required' },
+          { field: 'eventType', message: 'eventType is required' },
+        ].filter(e => !req.body[e.field]));
+      }
+
+      const validTypes = Object.values(ContentAnalyticsEventType);
+      if (!validTypes.includes(eventType)) {
+        return BaseController.validationError(res, [
+          { field: 'eventType', message: `eventType must be one of: ${validTypes.join(', ')}` },
+        ]);
+      }
+
+      const analyticsService = ContentAnalyticsService.getInstance();
+      const event = await analyticsService.trackEvent(
+        storeContentId,
+        eventType as ContentAnalyticsEventType,
+        null,
+        metadata,
+      );
+
+      return BaseController.created(res, { event });
+    } catch (error: any) {
+      logger.error('[StoreContentController.trackAnalyticsEvent] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  static async getContentAnalytics(req: Request, res: Response): Promise<any> {
+    try {
+      const { storeContentId } = req.params;
+      const analyticsService = ContentAnalyticsService.getInstance();
+      const stats = await analyticsService.getContentStats(storeContentId);
+
+      return BaseController.ok(res, stats);
+    } catch (error: any) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        logger.warn('[StoreContentController.getContentAnalytics] Table not found - returning zeros');
+        return BaseController.ok(res, {
+          views: 0, qrScans: 0, quizSubmits: 0, surveySubmits: 0, shares: 0, total: 0,
+        });
+      }
+      logger.error('[StoreContentController.getContentAnalytics] Error', { error: error.message });
+      return BaseController.error(res, error);
+    }
+  }
+
+  static async getStoreAnalytics(req: Request, res: Response): Promise<any> {
+    try {
+      const { storeId } = req.params;
+      const analyticsService = ContentAnalyticsService.getInstance();
+      const stats = await analyticsService.getStoreStats(storeId);
+
+      return BaseController.ok(res, stats);
+    } catch (error: any) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        logger.warn('[StoreContentController.getStoreAnalytics] Table not found - returning zeros');
+        return BaseController.ok(res, {
+          totalContents: 0, totalViews: 0, totalEngagements: 0, topContents: [],
+        });
+      }
+      logger.error('[StoreContentController.getStoreAnalytics] Error', { error: error.message });
       return BaseController.error(res, error);
     }
   }

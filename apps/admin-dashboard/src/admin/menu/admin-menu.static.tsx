@@ -574,6 +574,27 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
   {
+    id: 'store-content',
+    label: 'Store Content',
+    icon: <FileText className="w-5 h-5" />,
+    roles: ['admin', 'super_admin'],
+    children: [
+      {
+        id: 'store-content-list',
+        label: '콘텐츠 관리',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/store-content',
+      },
+      {
+        id: 'store-content-templates',
+        label: '템플릿 라이브러리',
+        icon: <LayoutGrid className="w-4 h-4" />,
+        path: '/store-content/templates',
+      },
+    ],
+  },
+
+  {
     id: 'physical-stores',
     label: 'Physical Stores',
     icon: <Link2 className="w-5 h-5" />,

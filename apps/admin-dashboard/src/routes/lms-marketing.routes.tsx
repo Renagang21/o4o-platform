@@ -22,6 +22,11 @@ const OperatorConsole = lazy(() => import('@/pages/marketing/operator-console'))
 // Digital Signage Management (Phase 6)
 const DigitalSignageRouter = lazy(() => import('@/pages/digital-signage/DigitalSignageRouter'));
 
+// Store Content Pages (WO-O4O-STORE-CONTENT-UI)
+const StoreContentListPage = lazy(() => import('@/pages/store-content'));
+const TemplateLibraryPage = lazy(() => import('@/pages/store-content/templates'));
+const StoreContentEditorPage = lazy(() => import('@/pages/store-content/[id]'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -105,6 +110,29 @@ export function LmsMarketingRoutes() {
       <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <DigitalSignageRouter />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Store Content (WO-O4O-STORE-CONTENT-UI)
+    <Route key="/store-content/templates" path="/store-content/templates" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <TemplateLibraryPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/store-content/:id" path="/store-content/:id" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <StoreContentEditorPage />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+    <Route key="/store-content" path="/store-content" element={
+      <AdminProtectedRoute requiredRoles={['admin']}>
+        <Suspense fallback={<PageLoader />}>
+          <StoreContentListPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,

@@ -43,3 +43,6 @@ export { TemplateCategoryMap } from './templates/index.js';
 // Store Content (WO-O4O-STORE-CONTENT-COPY)
 export { StoreContent, StoreContentStatus } from './store/index.js';
 export { StoreContentBlock, StoreContentBlockType } from './store/index.js';
+
+// Content Analytics (WO-O4O-CONTENT-ANALYTICS)
+export { ContentAnalytics, ContentAnalyticsEventType } from './analytics/index.js';

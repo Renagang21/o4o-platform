@@ -16,3 +16,5 @@ export * from './SurveyCampaignService.js';
 export * from './TemplateService.js';
 // WO-O4O-STORE-CONTENT-COPY
 export * from './StoreContentService.js';
+// WO-O4O-CONTENT-ANALYTICS
+export * from './ContentAnalyticsService.js';

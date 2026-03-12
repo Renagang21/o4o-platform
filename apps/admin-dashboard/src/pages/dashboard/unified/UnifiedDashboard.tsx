@@ -24,6 +24,7 @@ import {
   OperatorCard,
   ExecutiveCard,
   KakaoConnectCard,
+  StoreContentCard,
 } from './cards';
 
 /**
@@ -80,6 +81,14 @@ const CARD_REGISTRY: UnifiedCardConfig[] = [
     component: OperatorCard,
   },
   // Note: ExecutiveCard는 동적으로 생성되므로 registry에 포함하지 않음
+  {
+    id: 'store-content',
+    title: '매장 콘텐츠',
+    size: 'medium',
+    priority: 'normal',
+    showCondition: ['operator', 'admin'],
+    component: StoreContentCard,
+  },
   {
     id: 'kakao-connect',
     title: '카카오톡 연결',
