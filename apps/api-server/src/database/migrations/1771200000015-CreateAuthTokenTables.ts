@@ -21,7 +21,7 @@ export class CreateAuthTokenTables1771200000015 implements MigrationInterface {
         CREATE TABLE "password_reset_tokens" (
           "id"         uuid NOT NULL DEFAULT uuid_generate_v4(),
           "token"      varchar NOT NULL,
-          "userId"     varchar NOT NULL,
+          "userId"     uuid NOT NULL,
           "expiresAt"  timestamp NOT NULL,
           "email"      varchar NOT NULL,
           "usedAt"     timestamp,
@@ -48,7 +48,7 @@ export class CreateAuthTokenTables1771200000015 implements MigrationInterface {
         CREATE TABLE "email_verification_tokens" (
           "id"         uuid NOT NULL DEFAULT uuid_generate_v4(),
           "token"      varchar NOT NULL,
-          "userId"     varchar NOT NULL,
+          "userId"     uuid NOT NULL,
           "expiresAt"  timestamp NOT NULL,
           "email"      varchar NOT NULL,
           "usedAt"     timestamp,
