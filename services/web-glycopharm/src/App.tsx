@@ -14,7 +14,7 @@ import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
-import HomeLivePage from '@/pages/HomeLivePage';
+import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
@@ -34,6 +34,17 @@ const ServiceDashboardPage = lazy(() => import('@/pages/service/ServiceDashboard
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
+
+// WO-GLYCOPHARM-ENTRY-SCREENS-V1: Placeholder dashboards
+const PatientMainPage = lazy(() => import('@/pages/PatientPlaceholderPage'));
+const PharmacistPlaceholderPage = lazy(() => import('@/pages/PharmacistPlaceholderPage'));
+
+// WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
+const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
+const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
+const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisPage'));
+const PatientPharmacistCoachingPage = lazy(() => import('@/pages/patient/PharmacistCoachingPage'));
+const PatientCareGuidelinePage = lazy(() => import('@/pages/patient/CareGuidelinePage'));
 
 // Store pages (files under pages/pharmacy/ — reused by /store routes)
 const StoreMainPage = lazy(() => import('@/pages/pharmacy/StoreMainPage'));
@@ -279,13 +290,23 @@ function StoreLayoutWrapper() {
 function AppRoutes() {
   return (
     <Routes>
+      {/* WO-GLYCOPHARM-ENTRY-SCREENS-V1: 진입 화면 (MainLayout 없음) */}
+      <Route index element={<LandingPage />} />
+      <Route path="login" element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
+      <Route path="forgot-password" element={<AccountRecoveryPage />} />
+      <Route path="reset-password" element={<ResetPasswordPage />} />
+      {/* WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: 환자 메뉴형 시스템 */}
+      <Route path="patient" element={<PatientMainPage />} />
+      <Route path="patient/profile" element={<PatientProfilePage />} />
+      <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
+      <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
+      <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
+      <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
+      <Route path="pharmacist" element={<PharmacistPlaceholderPage />} />
+
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
-        <Route index element={<HomeLivePage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="forgot-password" element={<AccountRecoveryPage />} />
-        <Route path="reset-password" element={<ResetPasswordPage />} />
         <Route path="role-select" element={<RoleSelectPage />} />
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/posts" element={<ForumPage />} />

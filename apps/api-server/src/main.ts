@@ -1022,6 +1022,15 @@ const startServer = async () => {
       logger.error('Failed to register Care LLM Insight routes:', llmInsightError);
     }
 
+    // 28g-1. Register Patient Profile routes (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
+    try {
+      const { createPatientProfileRouter } = await import('./modules/care/controllers/patient-profile.controller.js');
+      app.use('/api/v1/care', createPatientProfileRouter(AppDataSource));
+      logger.info('✅ Patient Profile routes registered at /api/v1/care/patient-profile');
+    } catch (patientProfileError) {
+      logger.error('Failed to register Patient Profile routes:', patientProfileError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('./modules/store-ai/controllers/store-ai.controller.js');
