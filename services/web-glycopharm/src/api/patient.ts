@@ -108,6 +108,17 @@ export interface GlucoseReadingPayload {
   metadata?: { mealTiming?: string; mealTimingLabel?: string };
 }
 
+// Coaching session from pharmacist (WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1)
+export interface PatientCoachingRecord {
+  id: string;
+  patientId: string;
+  pharmacistId: string;
+  summary: string;
+  actionPlan: string;
+  createdAt: string;
+  pharmacistName: string;
+}
+
 export const patientApi = {
   getMyProfile: () =>
     request<PatientProfile>('GET', '/api/v1/care/patient-profile/me'),
@@ -132,4 +143,7 @@ export const patientApi = {
       `/api/v1/care/patient/health-readings${qs ? `?${qs}` : ''}`,
     );
   },
+
+  getMyCoaching: () =>
+    request<PatientCoachingRecord[]>('GET', '/api/v1/care/patient/coaching'),
 };

@@ -39,6 +39,11 @@ const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 const PatientMainPage = lazy(() => import('@/pages/PatientPlaceholderPage'));
 const PharmacistPlaceholderPage = lazy(() => import('@/pages/PharmacistPlaceholderPage'));
 
+// WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1 + PATIENT-LIST-SCREEN-V1 + PATIENT-DETAIL-SCREEN-V1
+const PharmacistCoachingPage = lazy(() => import('@/pages/pharmacist/PharmacistCoachingPage'));
+const PharmacistPatientsPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientsPage'));
+const PharmacistPatientDetailPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientDetailPage'));
+
 // WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
 const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
 const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
@@ -304,6 +309,9 @@ function AppRoutes() {
       <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
       <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
       <Route path="pharmacist" element={<PharmacistPlaceholderPage />} />
+      <Route path="pharmacist/patients" element={<PharmacistPatientsPage />} />
+      <Route path="pharmacist/patient/:patientId" element={<PharmacistPatientDetailPage />} />
+      <Route path="pharmacist/coaching/:patientId" element={<PharmacistCoachingPage />} />
 
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>

@@ -1040,6 +1040,15 @@ const startServer = async () => {
       logger.error('Failed to register Patient Health Readings routes:', patientHealthReadingsError);
     }
 
+    // 28g-3. Register Patient Coaching routes (WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1)
+    try {
+      const { createPatientCoachingRouter } = await import('./modules/care/controllers/patient-coaching.controller.js');
+      app.use('/api/v1/care', createPatientCoachingRouter(AppDataSource));
+      logger.info('✅ Patient Coaching routes registered at /api/v1/care/patient/coaching');
+    } catch (patientCoachingError) {
+      logger.error('Failed to register Patient Coaching routes:', patientCoachingError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('./modules/store-ai/controllers/store-ai.controller.js');
