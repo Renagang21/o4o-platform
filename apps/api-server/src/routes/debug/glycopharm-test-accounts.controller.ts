@@ -53,7 +53,6 @@ export function createGlycopharmTestAccountsRouter(dataSource: DataSource): Rout
         SELECT 'glucoseview_customers' AS t, COUNT(*)::int AS c FROM glucoseview_customers
         UNION ALL SELECT 'health_readings', COUNT(*)::int FROM health_readings
         UNION ALL SELECT 'care_kpi_snapshots', COUNT(*)::int FROM care_kpi_snapshots
-        UNION ALL SELECT 'patient_health_profiles', COUNT(*)::int FROM patient_health_profiles
       `);
 
       // 3. All glycopharm-related users (pharmacists/operators)
