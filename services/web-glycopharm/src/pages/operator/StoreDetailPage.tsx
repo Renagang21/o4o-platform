@@ -189,7 +189,7 @@ export default function StoreDetailPage() {
     return (
       <div className="p-6 space-y-4">
         <button
-          onClick={() => navigate('/operator/stores')}
+          onClick={() => navigate('/admin/stores')}
           className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -208,7 +208,7 @@ export default function StoreDetailPage() {
       {/* Back + Title */}
       <div>
         <button
-          onClick={() => navigate('/operator/stores')}
+          onClick={() => navigate('/admin/stores')}
           className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 transition-colors mb-4"
         >
           <ArrowLeft className="w-4 h-4" />

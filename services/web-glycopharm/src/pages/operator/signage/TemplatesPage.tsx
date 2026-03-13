@@ -106,7 +106,7 @@ export default function TemplatesPage() {
               {templates.length === 0 ? (
                 <tr><td colSpan={7} className="px-4 py-12 text-center text-slate-400 text-sm">템플릿이 없습니다</td></tr>
               ) : templates.map(t => (
-                <tr key={t.id} onClick={() => navigate(`/operator/signage/templates/${t.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
+                <tr key={t.id} onClick={() => navigate(`/admin/signage/templates/${t.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
                   <td className="px-4 py-3">
                     <p className="font-medium text-slate-800 text-sm">{t.name}</p>
                     {t.description && <p className="text-xs text-slate-400 mt-0.5 truncate max-w-xs">{t.description}</p>}

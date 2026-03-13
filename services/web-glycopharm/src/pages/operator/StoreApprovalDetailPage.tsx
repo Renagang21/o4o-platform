@@ -188,7 +188,7 @@ export default function StoreApprovalDetailPage() {
 
     try {
       await storeApi.approveStoreApplication(id!, storeSlug.trim());
-      navigate('/operator/store-approvals', { replace: true });
+      navigate('/admin/store-approvals', { replace: true });
     } catch (err: any) {
       setProcessError(err.message || '승인 처리에 실패했습니다.');
     } finally {
@@ -207,7 +207,7 @@ export default function StoreApprovalDetailPage() {
 
     try {
       await storeApi.rejectStoreApplication(id!, rejectionReason.trim());
-      navigate('/operator/store-approvals', { replace: true });
+      navigate('/admin/store-approvals', { replace: true });
     } catch (err: any) {
       setProcessError(err.message || '반려 처리에 실패했습니다.');
     } finally {
@@ -226,7 +226,7 @@ export default function StoreApprovalDetailPage() {
 
     try {
       await storeApi.requestSupplement(id!, supplementRequest.trim());
-      navigate('/operator/store-approvals', { replace: true });
+      navigate('/admin/store-approvals', { replace: true });
     } catch (err: any) {
       setProcessError(err.message || '보완 요청에 실패했습니다.');
     } finally {

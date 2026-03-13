@@ -128,7 +128,7 @@ export default function HqMediaDetailPage() {
   if (error || !media) {
     return (
       <div className="space-y-4">
-        <button onClick={() => navigate('/operator/signage/hq-media')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+        <button onClick={() => navigate('/admin/signage/hq-media')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
           <ArrowLeft className="w-4 h-4" /> HQ 미디어 목록
         </button>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -143,7 +143,7 @@ export default function HqMediaDetailPage() {
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Back */}
-      <button onClick={() => navigate('/operator/signage/hq-media')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+      <button onClick={() => navigate('/admin/signage/hq-media')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
         <ArrowLeft className="w-4 h-4" /> HQ 미디어 목록
       </button>
 

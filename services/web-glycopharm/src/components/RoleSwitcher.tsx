@@ -27,7 +27,7 @@ export function RoleSwitcher() {
   const handleRoleChange = (role: UserRole) => {
     switchRole(role);
     setIsOpen(false);
-    navigate(getPrimaryDashboardRoute([role]));
+    navigate(getPrimaryDashboardRoute([role], { operator: '/admin' }));
   };
 
   return (

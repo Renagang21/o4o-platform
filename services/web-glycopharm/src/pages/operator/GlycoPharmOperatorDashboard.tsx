@@ -75,7 +75,7 @@ function buildDashboardConfig(
       id: 'ai-pending',
       message: `스토어 승인 대기 ${storeStatus.pendingApprovals}건이 있습니다. 빠른 처리를 권장합니다.`,
       level: 'warning',
-      link: '/operator/applications',
+      link: '/admin/applications',
     });
   }
   if (storeStatus.supplementRequests > 0) {
@@ -90,7 +90,7 @@ function buildDashboardConfig(
       id: 'ai-draft',
       message: `임시저장 상품 ${productStats.draft}건이 발행 대기 중입니다.`,
       level: 'info',
-      link: '/operator/products',
+      link: '/admin/products',
     });
   }
   const totalContent = contentStatus.hero.total + contentStatus.featured.total + contentStatus.eventNotice.total;
@@ -109,7 +109,7 @@ function buildDashboardConfig(
       id: 'aq-approvals',
       label: '스토어 승인 대기',
       count: storeStatus.pendingApprovals,
-      link: '/operator/applications',
+      link: '/admin/applications',
     });
   }
   if (storeStatus.supplementRequests > 0) {
@@ -117,7 +117,7 @@ function buildDashboardConfig(
       id: 'aq-supplement',
       label: '보완 요청 처리',
       count: storeStatus.supplementRequests,
-      link: '/operator/applications',
+      link: '/admin/applications',
     });
   }
   if (productStats.draft > 0) {
@@ -125,7 +125,7 @@ function buildDashboardConfig(
       id: 'aq-draft',
       label: '상품 발행 대기',
       count: productStats.draft,
-      link: '/operator/products',
+      link: '/admin/products',
     });
   }
 
@@ -161,12 +161,12 @@ function buildDashboardConfig(
 
   // Block 5: Quick Actions
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-applications', label: '신청 관리', link: '/operator/applications', icon: '📋' },
-    { id: 'qa-products', label: '상품 관리', link: '/operator/products', icon: '📦' },
-    { id: 'qa-orders', label: '주문 관리', link: '/operator/orders', icon: '🛒' },
-    { id: 'qa-analytics', label: '분석 보기', link: '/operator/analytics', icon: '📊' },
-    { id: 'qa-settlements', label: '정산 관리', link: '/operator/settlements', icon: '💰' },
-    { id: 'qa-marketing', label: '마케팅', link: '/operator/marketing', icon: '📢' },
+    { id: 'qa-applications', label: '신청 관리', link: '/admin/applications', icon: '📋' },
+    { id: 'qa-products', label: '상품 관리', link: '/admin/products', icon: '📦' },
+    { id: 'qa-orders', label: '주문 관리', link: '/admin/orders', icon: '🛒' },
+    { id: 'qa-analytics', label: '분석 보기', link: '/admin/analytics', icon: '📊' },
+    { id: 'qa-settlements', label: '정산 관리', link: '/admin/settlements', icon: '💰' },
+    { id: 'qa-marketing', label: '마케팅', link: '/admin/marketing', icon: '📢' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog, quickActions };

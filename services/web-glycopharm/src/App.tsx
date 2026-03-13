@@ -289,6 +289,22 @@ function StoreLayoutWrapper() {
   );
 }
 
+/**
+ * AdminAreaLayout — 유저 role에 따라 DashboardLayout role 자동 설정
+ * WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1: /admin + /operator 병합
+ */
+function AdminAreaLayout() {
+  const { user } = useAuth();
+  const role = user?.roles?.includes('admin') ? 'admin' : 'operator';
+  return <DashboardLayout role={role} />;
+}
+
+function AdminIndexRedirect() {
+  const { user } = useAuth();
+  if (user?.roles?.includes('admin')) return <GlycoPharmAdminDashboard />;
+  return <GlycoPharmOperatorDashboard />;
+}
+
 // App Routes
 function AppRoutes() {
   return (
@@ -309,12 +325,13 @@ function AppRoutes() {
       <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
       <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
       <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
-      <Route path="pharmacist" element={<PharmacistPlaceholderPage />} />
-      <Route path="pharmacist/patients" element={<PharmacistPatientsPage />} />
-      <Route path="pharmacist/patient/:patientId" element={<PharmacistPatientDetailPage />} />
-      <Route path="pharmacist/patient-requests" element={<PharmacistPatientRequestsPage />} />
-      <Route path="pharmacist/appointments" element={<PharmacistAppointmentsPage />} />
-      <Route path="pharmacist/coaching/:patientId" element={<PharmacistCoachingPage />} />
+      {/* WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1: /pharmacist → /pharmacy */}
+      <Route path="pharmacy" element={<PharmacistPlaceholderPage />} />
+      <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
+      <Route path="pharmacy/patient/:patientId" element={<PharmacistPatientDetailPage />} />
+      <Route path="pharmacy/patient-requests" element={<PharmacistPatientRequestsPage />} />
+      <Route path="pharmacy/appointments" element={<PharmacistAppointmentsPage />} />
+      <Route path="pharmacy/coaching/:patientId" element={<PharmacistCoachingPage />} />
 
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
@@ -387,7 +404,11 @@ function AppRoutes() {
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
-      {/* /pharmacy removed — WO-PHARMACY-FULL-REMOVAL-V1 */}
+      {/* Backward compat redirects (WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1) */}
+      <Route path="pharmacist" element={<Navigate to="/pharmacy" replace />} />
+      <Route path="pharmacist/*" element={<Navigate to="/pharmacy" replace />} />
+      <Route path="operator" element={<Navigate to="/admin" replace />} />
+      <Route path="operator/*" element={<Navigate to="/admin" replace />} />
 
       {/* Supplier Dashboard - Neture에서 관리 */}
       <Route
@@ -399,50 +420,38 @@ function AppRoutes() {
         element={<RoleNotAvailablePage role="supplier" />}
       />
 
-      {/* Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block 구조) */}
+      {/* Admin Login (outside ProtectedRoute) — WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1 */}
+      <Route path="admin/login" element={<LoginPage />} />
+
+      {/* Admin + Operator 통합 Dashboard (WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1) */}
       <Route
         path="admin"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <DashboardLayout role="admin" />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<GlycoPharmAdminDashboard />} />
-        <Route path="pharmacies" element={<PharmaciesPage />} />
-        <Route path="users" element={<UsersPage />} />
-        <Route path="users/:id" element={<UserDetailPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-      </Route>
-
-      {/* Operator Dashboard */}
-      <Route
-        path="operator"
-        element={
           <ProtectedRoute allowedRoles={['admin', 'operator']}>
-            <DashboardLayout role="operator" />
+            <AdminAreaLayout />
           </ProtectedRoute>
         }
       >
-        {/* Signal 기반 대시보드 (WO-GLYCOPHARM-OPERATOR-DASHBOARD-UX-V1) */}
-        <Route index element={<GlycoPharmOperatorDashboard />} />
-        {/* Semi-Franchise Management */}
+        {/* Role-aware index: admin → AdminDashboard, operator → OperatorDashboard */}
+        <Route index element={<AdminIndexRedirect />} />
+        {/* Admin structure pages */}
+        <Route path="pharmacies" element={<PharmaciesPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+        {/* Semi-Franchise Management (was /operator/*) */}
         <Route path="applications" element={<ApplicationsPage />} />
         <Route path="applications/:id" element={<ApplicationDetailPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="products/:productId" element={<ProductDetailPage />} />
-        {/* 매장 관리 (WO-O4O-STORE-CONSOLE-V1) */}
+        {/* 매장 관리 */}
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OrdersPage />} />
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="settlements" element={<SettlementsPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
-        {/* Billing Report (Phase 3-B) */}
+        {/* Billing */}
         <Route path="reports" element={<ReportsPage />} />
-        {/* Billing Preview (Phase 3-C) */}
         <Route path="billing-preview" element={<BillingPreviewPage />} />
-        {/* Invoices (Phase 3-D) */}
         <Route path="invoices" element={<InvoicesPage />} />
         <Route path="marketing" element={<MarketingPage />} />
         {/* Forum */}
@@ -457,19 +466,19 @@ function AppRoutes() {
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
         {/* Support */}
         <Route path="support" element={<SupportPage />} />
-        {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
+        {/* 회원 관리 */}
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
-        {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
+        {/* AI Report */}
         <Route path="ai-report" element={<AiReportPage />} />
-        {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
+        {/* Signage Extension */}
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
         <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
-        {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
+        {/* Signage Operator Console */}
         <Route path="signage/hq-media" element={<HqMediaPage />} />
         <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
         <Route path="signage/hq-playlists" element={<HqPlaylistsPage />} />

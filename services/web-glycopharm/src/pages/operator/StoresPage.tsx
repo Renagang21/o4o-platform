@@ -254,7 +254,7 @@ export default function StoresPage() {
                   stores.map((store) => (
                     <tr
                       key={store.id}
-                      onClick={() => navigate(`/operator/stores/${store.id}`)}
+                      onClick={() => navigate(`/admin/stores/${store.id}`)}
                       className="hover:bg-slate-50 transition-colors cursor-pointer"
                     >
                       <td className="px-4 py-3">

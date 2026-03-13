@@ -105,7 +105,7 @@ export function buildGlycoPharmOperatorConfig(
       title: '스토어 상태',
       signal: storeSignal,
       actionLabel: '스토어 관리',
-      actionLink: '/operator/store-approvals',
+      actionLink: '/admin/store-approvals',
     },
     {
       icon: MessageSquare,
@@ -114,7 +114,7 @@ export function buildGlycoPharmOperatorConfig(
       title: '포럼 상태',
       signal: forumSignal,
       actionLabel: '포럼 관리',
-      actionLink: '/operator/forum-management',
+      actionLink: '/admin/forum-management',
     },
     {
       icon: Monitor,
@@ -123,7 +123,7 @@ export function buildGlycoPharmOperatorConfig(
       title: '콘텐츠 상태',
       signal: contentSignal,
       actionLabel: '콘텐츠 관리',
-      actionLink: '/operator/store-template',
+      actionLink: '/admin/store-template',
     },
   ];
 

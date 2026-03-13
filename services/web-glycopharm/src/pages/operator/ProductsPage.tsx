@@ -276,7 +276,7 @@ export default function ProductsPage() {
                   products.map((product) => (
                     <tr
                       key={product.id}
-                      onClick={() => navigate(`/operator/products/${product.id}`)}
+                      onClick={() => navigate(`/admin/products/${product.id}`)}
                       className="hover:bg-slate-50 transition-colors cursor-pointer"
                     >
                       <td className="px-4 py-3">

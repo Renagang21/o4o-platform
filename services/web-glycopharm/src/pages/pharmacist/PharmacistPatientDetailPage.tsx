@@ -156,7 +156,7 @@ export default function PharmacistPatientDetailPage() {
       <div className="w-full max-w-lg mx-auto">
         {/* Header */}
         <button
-          onClick={() => navigate('/pharmacist/patients')}
+          onClick={() => navigate('/pharmacy/patients')}
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -264,19 +264,19 @@ export default function PharmacistPatientDetailPage() {
                 icon={<MessageSquarePlus className="w-5 h-5 text-blue-600" />}
                 label="코칭 작성"
                 description="환자에게 코칭 메시지 전달"
-                onClick={() => navigate(`/pharmacist/coaching/${patientId}`)}
+                onClick={() => navigate(`/pharmacy/coaching/${patientId}`)}
               />
               <ActionButton
                 icon={<FileText className="w-5 h-5 text-violet-600" />}
                 label="코칭 기록 보기"
                 description={sessions.length > 0 ? `${sessions.length}건의 코칭 기록` : '코칭 기록 없음'}
-                onClick={() => navigate(`/pharmacist/coaching/${patientId}`)}
+                onClick={() => navigate(`/pharmacy/coaching/${patientId}`)}
               />
               <ActionButton
                 icon={<Calendar className="w-5 h-5 text-orange-600" />}
                 label="예약 관리"
                 description="환자 상담 예약 확인 및 관리"
-                onClick={() => navigate('/pharmacist/appointments')}
+                onClick={() => navigate('/pharmacy/appointments')}
               />
             </section>
 

@@ -31,21 +31,21 @@ export default function PharmacistPlaceholderPage() {
         </p>
         <div className="w-full max-w-xs mx-auto space-y-3">
           <button
-            onClick={() => navigate('/pharmacist/patients')}
+            onClick={() => navigate('/pharmacy/patients')}
             className="w-full py-3.5 text-base font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
           >
             <Users className="w-5 h-5" />
             환자 관리
           </button>
           <button
-            onClick={() => navigate('/pharmacist/patient-requests')}
+            onClick={() => navigate('/pharmacy/patient-requests')}
             className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
             연결 요청 확인
           </button>
           <button
-            onClick={() => navigate('/pharmacist/appointments')}
+            onClick={() => navigate('/pharmacy/appointments')}
             className="w-full py-3 text-sm font-medium text-orange-600 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
           >
             <Calendar className="w-4 h-4" />

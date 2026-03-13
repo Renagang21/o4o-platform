@@ -80,7 +80,7 @@ export default function PatientRequestsPage() {
       <div className="w-full max-w-lg mx-auto">
         {/* Header */}
         <button
-          onClick={() => navigate('/pharmacist')}
+          onClick={() => navigate('/pharmacy')}
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />

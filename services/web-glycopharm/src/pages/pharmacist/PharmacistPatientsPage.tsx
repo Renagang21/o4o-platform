@@ -128,7 +128,7 @@ export default function PharmacistPatientsPage() {
       <div className="w-full max-w-lg mx-auto">
         {/* Header */}
         <button
-          onClick={() => navigate('/pharmacist')}
+          onClick={() => navigate('/pharmacy')}
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -223,7 +223,7 @@ export default function PharmacistPatientsPage() {
                 {filtered.map((patient) => (
                   <button
                     key={patient.id}
-                    onClick={() => navigate(`/pharmacist/patient/${patient.id}`)}
+                    onClick={() => navigate(`/pharmacy/patient/${patient.id}`)}
                     className="w-full bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 text-left hover:bg-slate-50 transition-colors"
                   >
                     {/* Risk dot */}

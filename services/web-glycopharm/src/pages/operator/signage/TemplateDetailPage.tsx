@@ -101,7 +101,7 @@ export default function TemplateDetailPage() {
   if (error || !template) {
     return (
       <div className="space-y-4">
-        <button onClick={() => navigate('/operator/signage/templates')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+        <button onClick={() => navigate('/admin/signage/templates')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
           <ArrowLeft className="w-4 h-4" /> 템플릿 목록
         </button>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -113,7 +113,7 @@ export default function TemplateDetailPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <button onClick={() => navigate('/operator/signage/templates')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+      <button onClick={() => navigate('/admin/signage/templates')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
         <ArrowLeft className="w-4 h-4" /> 템플릿 목록
       </button>
 

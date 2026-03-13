@@ -23,23 +23,27 @@ export default function LandingPage() {
 
       <div className="w-full max-w-sm space-y-4">
         <button
-          onClick={() => navigate('/login?type=patient')}
+          onClick={() => navigate('/patient')}
           className="w-full py-4 text-lg font-medium text-slate-800 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors border border-slate-200"
         >
           환자용 시스템
         </button>
         <button
-          onClick={() => navigate('/login?type=pharmacist')}
+          onClick={() => navigate('/pharmacy')}
           className="w-full py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
         >
           약사용 시스템
         </button>
-        <button
-          onClick={() => navigate('/login?type=operator')}
-          className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
-        >
-          운영자 로그인
-        </button>
+
+        <div className="pt-2">
+          <div className="border-t border-slate-200 mb-4" />
+          <button
+            onClick={() => navigate('/admin/login')}
+            className="w-full py-3 text-sm font-medium text-slate-600 bg-white rounded-xl border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors"
+          >
+            운영자 / 관리자 로그인
+          </button>
+        </div>
       </div>
     </div>
   );

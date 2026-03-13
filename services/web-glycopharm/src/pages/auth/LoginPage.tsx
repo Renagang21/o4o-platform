@@ -22,7 +22,8 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const returnUrl = (location.state as any)?.from;
-  const loginType = searchParams.get('type'); // 'patient' | 'pharmacist' | null
+  const loginType = searchParams.get('type') // 'patient' | 'pharmacist' | 'operator' | null
+    || (location.pathname.startsWith('/admin') ? 'operator' : null);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,11 +62,11 @@ export default function LoginPage() {
       } else if (loginType === 'patient') {
         navigate('/patient');
       } else if (loginType === 'pharmacist') {
-        navigate('/pharmacist');
+        navigate('/pharmacy');
       } else if (loginType === 'operator') {
-        navigate('/operator');
+        navigate('/admin');
       } else {
-        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
+        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? [], { operator: '/admin' }));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
