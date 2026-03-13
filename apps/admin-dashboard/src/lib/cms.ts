@@ -570,6 +570,7 @@ export const cmsAPI = {
     isOperatorPicked?: boolean;
     metadata?: Record<string, any>;
     bodyBlocks?: Record<string, any>[] | null;
+    attachments?: Array<{ name: string; url: string; type: string; size?: number }> | null;
   }): Promise<CmsContent> {
     const response = await api.post('/cms/contents', data);
     return response.data.data;
@@ -582,6 +583,7 @@ export const cmsAPI = {
     summary: string;
     body: string;
     bodyBlocks: Record<string, any>[] | null;
+    attachments: Array<{ name: string; url: string; type: string; size?: number }> | null;
     imageUrl: string;
     linkUrl: string;
     linkText: string;
@@ -687,7 +689,7 @@ export const cmsAPI = {
 // CMS CONTENT TYPES (P3)
 // ========================================
 
-export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event' | 'guide';
+export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event' | 'guide' | 'knowledge';
 // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added 'pending' for approval workflow
 export type ContentStatus = 'draft' | 'pending' | 'published' | 'archived';
 
@@ -700,6 +702,7 @@ export interface CmsContent {
   summary: string | null;
   body: string | null;
   bodyBlocks: Record<string, any>[] | null;
+  attachments: Array<{ name: string; url: string; type: string; size?: number }> | null;
   imageUrl: string | null;
   linkUrl: string | null;
   linkText: string | null;

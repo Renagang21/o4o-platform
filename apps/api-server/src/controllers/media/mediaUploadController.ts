@@ -25,19 +25,30 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
     'image/svg+xml',
     'image/x-icon',
     'image/webp',
-    'text/markdown',           // ✨ Added: Markdown files
-    'text/plain',              // ✨ Added: Plain text files (.md may be detected as text/plain)
-    'application/octet-stream' // ✨ Added: Binary files (some .md files)
+    'text/markdown',
+    'text/plain',
+    'application/octet-stream',
+    // WO-O4O-KNOWLEDGE-LIBRARY-V1: Document types
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/zip',
   ];
 
-  // Also allow by file extension for markdown
   const fileExt = path.extname(file.originalname).toLowerCase();
-  const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.webp', '.md'];
+  const allowedExts = [
+    '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.webp', '.md',
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.zip',
+  ];
 
   if (allowedMimes.includes(file.mimetype) || allowedExts.includes(fileExt)) {
     cb(null, true);
   } else {
-    cb(new Error(`Invalid file type. Allowed: images and markdown files. Got: ${file.mimetype}, ext: ${fileExt}`), false);
+    cb(new Error(`Invalid file type. Got: ${file.mimetype}, ext: ${fileExt}`), false);
   }
 };
 
@@ -45,7 +56,7 @@ export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB max (increased for markdown files)
+    fileSize: 25 * 1024 * 1024 // 25MB max (documents + images)
   }
 });
 
@@ -77,13 +88,17 @@ export class MediaUploadController {
       let processedBuffer: Buffer = file.buffer;
       let metadata: any = {};
 
-      // Check if file is markdown
-      const isMarkdown = ext.toLowerCase() === '.md' || file.mimetype === 'text/markdown' || file.mimetype === 'text/plain';
+      // Check if file is non-image (markdown or document)
+      const extLower = ext.toLowerCase();
+      const isMarkdown = extLower === '.md' || file.mimetype === 'text/markdown' || file.mimetype === 'text/plain';
+      const docExts = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.zip'];
+      const isDocument = docExts.includes(extLower);
 
-      if (isMarkdown) {
-        // Skip image processing for markdown files
+      if (isMarkdown || isDocument) {
+        // Skip image processing for non-image files
         metadata = {
-          fileType: 'markdown',
+          fileType: isDocument ? 'document' : 'markdown',
+          originalName: file.originalname,
           size: file.size
         };
       } else if (type === 'logo') {

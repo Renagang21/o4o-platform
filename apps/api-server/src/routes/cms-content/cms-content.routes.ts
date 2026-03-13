@@ -426,6 +426,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         summary,
         body,
         bodyBlocks,
+        attachments,
         imageUrl,
         linkUrl,
         linkText,
@@ -446,10 +447,10 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       }
 
       // Supported content types
-      if (!['hero', 'notice', 'guide'].includes(type)) {
+      if (!['hero', 'notice', 'guide', 'knowledge'].includes(type)) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide' },
+          error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide, knowledge' },
         });
         return;
       }
@@ -479,6 +480,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         summary: summary || null,
         body: body || null,
         bodyBlocks: bodyBlocks || null,
+        attachments: attachments || null,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
         linkText: linkText || null,
@@ -523,6 +525,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         summary,
         body,
         bodyBlocks,
+        attachments,
         imageUrl,
         linkUrl,
         linkText,
@@ -550,10 +553,10 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       if (serviceKey !== undefined) content.serviceKey = serviceKey;
       if (type !== undefined) {
         // Supported content types
-        if (!['hero', 'notice', 'guide'].includes(type)) {
+        if (!['hero', 'notice', 'guide', 'knowledge'].includes(type)) {
           res.status(400).json({
             success: false,
-            error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide' },
+            error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide, knowledge' },
           });
           return;
         }
@@ -563,6 +566,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       if (summary !== undefined) content.summary = summary;
       if (body !== undefined) content.body = body;
       if (bodyBlocks !== undefined) (content as any).bodyBlocks = bodyBlocks;
+      if (attachments !== undefined) (content as any).attachments = attachments;
       if (imageUrl !== undefined) content.imageUrl = imageUrl;
       if (linkUrl !== undefined) content.linkUrl = linkUrl;
       if (linkText !== undefined) content.linkText = linkText;

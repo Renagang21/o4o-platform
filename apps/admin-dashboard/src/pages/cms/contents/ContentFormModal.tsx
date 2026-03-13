@@ -2,16 +2,14 @@
  * Content Form Modal
  *
  * WO-P3-CMS-ADMIN-CRUD-P0: Create/Edit form for CMS Content
- *
- * Features:
- * - Create new content (draft status)
- * - Edit existing content
- * - P0: Only hero and notice types
+ * WO-O4O-CMS-GUIDE-EDITOR-V1: TipTap Rich Editor for guide type
+ * WO-O4O-KNOWLEDGE-LIBRARY-V1: Knowledge type + file attachments
  */
 
-import { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, Upload, FileText, Trash2 } from 'lucide-react';
 import cmsAPI, { CmsContent, ContentType } from '@/lib/cms';
+import { mediaApi } from '@/services/api/postApi';
 import toast from 'react-hot-toast';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
@@ -37,7 +35,15 @@ const CONTENT_TYPES: { value: ContentType; label: string; description: string }[
   { value: 'hero', label: 'Hero', description: 'Main banner/slide for homepage' },
   { value: 'notice', label: 'Notice', description: 'Announcements and notifications' },
   { value: 'guide', label: 'Guide', description: '가이드 콘텐츠 (Rich Editor)' },
+  { value: 'knowledge', label: 'Knowledge', description: '자료실 (Rich Editor + 첨부파일)' },
 ];
+
+interface AttachmentItem {
+  name: string;
+  url: string;
+  type: string;
+  size?: number;
+}
 
 interface FormData {
   serviceKey: string;
@@ -52,17 +58,19 @@ interface FormData {
   isPinned: boolean;
   isOperatorPicked: boolean;
   backgroundColor: string;
+  attachments: AttachmentItem[];
 }
 
 export default function ContentFormModal({ content, onClose, onSave }: ContentFormModalProps) {
   const isEditing = !!content;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<FormData>({
     serviceKey: content?.serviceKey || '',
     type: content?.type || 'hero',
     title: content?.title || '',
     summary: content?.summary || '',
-    editorHtml: content?.bodyBlocks ? blocksToHtml(content.bodyBlocks) : '',
+    editorHtml: content?.bodyBlocks ? blocksToHtml(content.bodyBlocks as any) : '',
     imageUrl: content?.imageUrl || '',
     linkUrl: content?.linkUrl || '',
     linkText: content?.linkText || '',
@@ -70,9 +78,11 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
     isPinned: content?.isPinned || false,
     isOperatorPicked: content?.isOperatorPicked || false,
     backgroundColor: content?.metadata?.backgroundColor || '',
+    attachments: content?.attachments || [],
   });
 
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
@@ -88,6 +98,47 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const result = await mediaApi.upload(file);
+        if (result.success && result.data) {
+          const ext = file.name.split('.').pop()?.toLowerCase() || '';
+          setFormData((prev) => ({
+            ...prev,
+            attachments: [
+              ...prev.attachments,
+              {
+                name: file.name,
+                url: result.data!.url,
+                type: ext,
+                size: file.size,
+              },
+            ],
+          }));
+        }
+      }
+      toast.success('파일 업로드 완료');
+    } catch (error) {
+      console.error('File upload failed:', error);
+      toast.error('파일 업로드 실패');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      attachments: prev.attachments.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,16 +169,21 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       };
 
-      // Guide type: convert editor HTML to bodyBlocks
-      if (formData.type === 'guide' && formData.editorHtml.trim()) {
+      // Guide/Knowledge type: convert editor HTML to bodyBlocks
+      if ((formData.type === 'guide' || formData.type === 'knowledge') && formData.editorHtml.trim()) {
         data.bodyBlocks = htmlToBlocks(formData.editorHtml);
+      }
+
+      // Knowledge type: include attachments
+      if (formData.type === 'knowledge') {
+        data.attachments = formData.attachments.length > 0 ? formData.attachments : null;
       }
 
       if (isEditing) {
         await cmsAPI.updateContent(content!.id, data);
         toast.success('Content updated successfully');
       } else {
-        await cmsAPI.createContent(data);
+        await cmsAPI.createContent(data as any);
         toast.success('Content created successfully');
       }
 
@@ -157,6 +213,15 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
         return newErrors;
       });
     }
+  };
+
+  const isRichEditorType = formData.type === 'guide' || formData.type === 'knowledge';
+
+  const formatFileSize = (bytes?: number) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -275,20 +340,79 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                 />
               </div>
 
-              {/* Rich Text Editor (Guide type only) */}
-              {formData.type === 'guide' && (
+              {/* Rich Text Editor (Guide / Knowledge) */}
+              {isRichEditorType && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     본문 (Rich Editor)
                   </label>
                   <div className="border border-gray-300 rounded-md overflow-hidden">
                     <RichTextEditor
-                      content={formData.editorHtml}
-                      onChange={(html: string) =>
-                        setFormData((prev) => ({ ...prev, editorHtml: html }))
+                      value={formData.editorHtml}
+                      onChange={(content) =>
+                        setFormData((prev) => ({ ...prev, editorHtml: content.html }))
                       }
                     />
                   </div>
+                </div>
+              )}
+
+              {/* Attachments (Knowledge only) */}
+              {formData.type === 'knowledge' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    첨부파일
+                  </label>
+
+                  {/* Attachment list */}
+                  {formData.attachments.length > 0 && (
+                    <div className="space-y-2 mb-3">
+                      {formData.attachments.map((att, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-md border border-gray-200"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            <span className="text-sm text-gray-700 truncate">{att.name}</span>
+                            <span className="text-xs text-gray-400 uppercase flex-shrink-0">{att.type}</span>
+                            {att.size && (
+                              <span className="text-xs text-gray-400 flex-shrink-0">{formatFileSize(att.size)}</span>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeAttachment(index)}
+                            className="text-red-400 hover:text-red-600 flex-shrink-0 ml-2"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Upload button */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.gif"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    <Upload className="w-4 h-4" />
+                    {uploading ? '업로드 중...' : '파일 추가'}
+                  </button>
+                  <p className="mt-1 text-xs text-gray-500">
+                    PDF, DOC, XLS, PPT, ZIP, 이미지 (최대 25MB)
+                  </p>
                 </div>
               )}
 
@@ -437,7 +561,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
               <button
                 type="submit"
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={saving}
+                disabled={saving || uploading}
               >
                 {saving ? 'Saving...' : isEditing ? 'Update' : 'Create'}
               </button>

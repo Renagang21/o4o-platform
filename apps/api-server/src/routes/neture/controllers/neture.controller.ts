@@ -35,7 +35,7 @@ export function createNetureController(dataSource: DataSource): Router {
   // APP-CONTENT Phase 2: shared content query service
   const contentService = new ContentQueryService(dataSource, {
     serviceKeys: ['neture'],
-    defaultTypes: ['notice', 'news', 'hero', 'guide'],
+    defaultTypes: ['notice', 'news', 'hero', 'guide', 'knowledge'],
   });
 
   // APP-SIGNAGE Phase 1: shared signage query service

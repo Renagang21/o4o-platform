@@ -12,6 +12,7 @@ export interface CmsContent {
   summary: string | null;
   body: string | null;
   bodyBlocks: Record<string, any>[] | null;
+  attachments: Array<{ name: string; url: string; type: string; size?: number }> | null;
   imageUrl: string | null;
   linkUrl: string | null;
   linkText: string | null;

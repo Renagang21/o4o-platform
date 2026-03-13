@@ -12,7 +12,7 @@
 // =============================================================================
 
 /** CMS 콘텐츠 타입 — cms-core CmsContent.type 과 1:1 대응 */
-export type ContentType = 'notice' | 'hero' | 'promo' | 'news' | 'featured' | 'event' | 'guide';
+export type ContentType = 'notice' | 'hero' | 'promo' | 'news' | 'featured' | 'event' | 'guide' | 'knowledge';
 
 /** 정렬 기준 */
 export type ContentSortType = 'latest' | 'featured' | 'views';
@@ -57,6 +57,8 @@ export interface ContentItemResponse {
   body?: string | null;
   /** WO-O4O-CMS-GUIDE-EDITOR-V1: TipTap Block[] JSON */
   bodyBlocks?: Record<string, any>[] | null;
+  /** WO-O4O-KNOWLEDGE-LIBRARY-V1: File attachments */
+  attachments?: Array<{ name: string; url: string; type: string; size?: number }> | null;
   imageUrl?: string | null;
   linkUrl?: string | null;
   linkText?: string | null;
@@ -111,6 +113,7 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   featured: '추천',
   event: '이벤트',
   guide: '가이드',
+  knowledge: 'Knowledge',
 };
 
 /** 정렬 기준별 한글 라벨 */

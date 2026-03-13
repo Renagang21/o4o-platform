@@ -38,6 +38,8 @@ import NetureHomePage from './pages/NetureHomePage';
 import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
 import CommunityPage from './pages/CommunityPage';
+import KnowledgePage from './pages/knowledge/KnowledgePage';
+import KnowledgeDetailPage from './pages/knowledge/KnowledgeDetailPage';
 import {
   CommunityAnnouncementsPage,
   CommunityAnnouncementDetailPage,
@@ -428,6 +430,10 @@ function App() {
               {/* Community Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
               <Route path="/community/write" element={<ForumWritePage categorySlug="article" backPath="/community" />} />
               <Route path="/community/article/:slug" element={<ForumPostPage />} />
+
+              {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
+              <Route path="/knowledge" element={<KnowledgePage />} />
+              <Route path="/knowledge/:id" element={<KnowledgeDetailPage />} />
             </Route>
 
             {/* ================================================================

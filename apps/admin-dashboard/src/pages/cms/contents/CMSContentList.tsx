@@ -150,6 +150,8 @@ export default function CMSContentList() {
       featured: { bg: 'bg-amber-100 text-amber-800', icon: <FileText className="w-3 h-3" /> },
       promo: { bg: 'bg-pink-100 text-pink-800', icon: <FileText className="w-3 h-3" /> },
       event: { bg: 'bg-red-100 text-red-800', icon: <FileText className="w-3 h-3" /> },
+      guide: { bg: 'bg-green-100 text-green-800', icon: <FileText className="w-3 h-3" /> },
+      knowledge: { bg: 'bg-teal-100 text-teal-800', icon: <FileText className="w-3 h-3" /> },
     };
     return badges[type] || badges.notice;
   };

@@ -30,6 +30,8 @@ import {
   Users,
   Layers,
   PenSquare,
+  BookOpen,
+  Paperclip,
 } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { cmsApi, type CmsContent } from '../lib/api/content';
@@ -58,6 +60,7 @@ export default function CommunityPage() {
   const { isAuthenticated } = useAuth();
   const [notices, setNotices] = useState<CmsContent[]>([]);
   const [contents, setContents] = useState<CmsContent[]>([]);
+  const [knowledges, setKnowledges] = useState<CmsContent[]>([]);
   const [articles, setArticles] = useState<ForumPost[]>([]);
   const [recentPosts, setRecentPosts] = useState<ForumPost[]>([]);
   const [popularCategories, setPopularCategories] = useState<PopularForum[]>([]);
@@ -69,6 +72,10 @@ export default function CommunityPage() {
 
     cmsApi.getContents({ sort: 'featured', limit: 6 })
       .then(res => setContents(res.data))
+      .catch(() => {});
+
+    cmsApi.getContents({ type: 'knowledge', sort: 'latest', limit: 5 })
+      .then(res => setKnowledges(res.data))
       .catch(() => {});
 
     // Articles: article 카테고리의 포럼 글
@@ -275,9 +282,57 @@ export default function CommunityPage() {
         </section>
       )}
 
+      {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
+      {knowledges.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-primary-600" />
+                <h2 className="text-xl font-bold text-gray-900">Knowledge</h2>
+              </div>
+              <Link
+                to="/knowledge"
+                className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
+              >
+                더보기
+                <ArrowRight className="ml-1 w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {knowledges.map(item => (
+                <Link
+                  key={item.id}
+                  to={`/knowledge/${item.id}`}
+                  className="flex items-center justify-between p-4 rounded-lg hover:bg-white transition-colors group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600">
+                      {item.title}
+                    </p>
+                    {item.summary && (
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{item.summary}</p>
+                    )}
+                  </div>
+                  <div className="shrink-0 ml-4 flex items-center gap-3 text-xs text-gray-400">
+                    {item.attachments && Array.isArray(item.attachments) && item.attachments.length > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Paperclip className="w-3 h-3" />
+                        {item.attachments.length}
+                      </span>
+                    )}
+                    <span>{item.publishedAt ? formatRelativeDate(item.publishedAt) : ''}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 최근 포럼 글 */}
       {recentPosts.length > 0 && (
-        <section className="py-12 bg-gray-50">
+        <section className="py-12 bg-white">
           <div className="max-w-5xl mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
