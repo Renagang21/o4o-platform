@@ -156,6 +156,65 @@ export class HandoffController extends BaseController {
   }
 
   /**
+   * POST /api/v1/auth/services/:serviceKey/join
+   *
+   * Join or reactivate a service membership.
+   * Requires authentication.
+   */
+  static async joinService(req: Request, res: Response): Promise<any> {
+    const user = (req as AuthRequest).user;
+    const { serviceKey } = req.params;
+
+    if (!user) {
+      return BaseController.error(res, 'Authentication required', 401, 'AUTH_REQUIRED');
+    }
+
+    // Validate service exists
+    const service = getService(serviceKey);
+    if (!service) {
+      return BaseController.error(res, `Unknown service: ${serviceKey}`, 400, 'INVALID_SERVICE');
+    }
+
+    if (!service.joinEnabled) {
+      return BaseController.error(res, 'This service does not accept new memberships', 400, 'JOIN_DISABLED');
+    }
+
+    try {
+      // Check existing membership
+      const existing: { id: string; status: string }[] = await AppDataSource.query(
+        `SELECT id, status FROM service_memberships WHERE user_id = $1 AND service_key = $2`,
+        [user.id, serviceKey],
+      );
+
+      if (existing.length > 0) {
+        // Reactivate if inactive
+        if (existing[0].status !== 'active') {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'active', updated_at = NOW() WHERE id = $1`,
+            [existing[0].id],
+          );
+        }
+      } else {
+        // Create new membership
+        await AppDataSource.query(
+          `INSERT INTO service_memberships (user_id, service_key, status, created_at, updated_at)
+           VALUES ($1, $2, 'active', NOW(), NOW())`,
+          [user.id, serviceKey],
+        );
+      }
+
+      return BaseController.ok(res, {
+        serviceKey,
+        serviceName: service.name,
+        status: 'active',
+      });
+    } catch (err: any) {
+      logger.error('[Handoff] Service join failed', err);
+      return BaseController.error(res, 'Failed to join service', 500, 'SERVICE_JOIN_FAILED');
+    }
+  }
+
+  /**
    * GET /api/v1/auth/services
    *
    * Returns the service catalog with user's membership status.

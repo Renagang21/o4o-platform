@@ -129,6 +129,13 @@ router.get(
   asyncHandler(HandoffController.getServices)
 );
 
+// POST /api/v1/auth/services/:serviceKey/join - Join or reactivate service membership
+router.post(
+  '/services/:serviceKey/join',
+  requireAuth,
+  asyncHandler(HandoffController.joinService)
+);
+
 /**
  * ========================================
  * Password Management Routes (Public)
