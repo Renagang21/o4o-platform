@@ -12,9 +12,17 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, ChevronRight } from 'lucide-react';
+import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, ChevronRight } from 'lucide-react';
 
 const MENU_ITEMS = [
+  {
+    label: '약국 연결',
+    description: '담당 약국 선택 및 연결 요청',
+    path: '/patient/select-pharmacy',
+    icon: Building2,
+    color: 'text-teal-600',
+    bg: 'bg-teal-50',
+  },
   {
     label: '개인 설정 관리',
     description: '내 정보 및 알림 설정',

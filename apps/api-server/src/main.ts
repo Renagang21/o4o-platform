@@ -1049,6 +1049,15 @@ const startServer = async () => {
       logger.error('Failed to register Patient Coaching routes:', patientCoachingError);
     }
 
+    // 28g-4. Register Pharmacy Link routes (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
+    try {
+      const { createPharmacyLinkRouter } = await import('./modules/care/controllers/pharmacy-link.controller.js');
+      app.use('/api/v1/care', createPharmacyLinkRouter(AppDataSource));
+      logger.info('✅ Pharmacy Link routes registered at /api/v1/care/pharmacy-link');
+    } catch (pharmacyLinkError) {
+      logger.error('Failed to register Pharmacy Link routes:', pharmacyLinkError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('./modules/store-ai/controllers/store-ai.controller.js');

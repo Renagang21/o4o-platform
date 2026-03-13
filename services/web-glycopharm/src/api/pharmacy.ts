@@ -781,6 +781,39 @@ class PharmacyApiClient {
     const qs = query.toString();
     return this.request(`/api/v1/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
   }
+
+  // ── Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
+
+  async getPharmacyLinkRequests(): Promise<PharmacyLinkRequestDto[]> {
+    return this.request('/api/v1/care/pharmacy-link/requests');
+  }
+
+  async approvePharmacyLink(requestId: string): Promise<void> {
+    return this.request('/api/v1/care/pharmacy-link/approve', {
+      method: 'POST',
+      body: JSON.stringify({ requestId }),
+    });
+  }
+
+  async rejectPharmacyLink(requestId: string, reason?: string): Promise<void> {
+    return this.request('/api/v1/care/pharmacy-link/reject', {
+      method: 'POST',
+      body: JSON.stringify({ requestId, reason }),
+    });
+  }
+}
+
+// ── Pharmacy Link Types (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
+
+export interface PharmacyLinkRequestDto {
+  id: string;
+  patientId: string;
+  patientEmail: string;
+  patientName: string;
+  pharmacyName: string;
+  status: string;
+  message: string | null;
+  createdAt: string;
 }
 
 // ── Care Types ──

@@ -192,6 +192,9 @@ import { CareCoachingDraft } from '../modules/care/entities/care-coaching-draft.
 // CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
 import { CareAlert } from '../modules/care/entities/care-alert.entity.js';
 
+// PHARMACY LINK REQUEST (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
+import { CarePharmacyLinkRequest } from '../modules/care/entities/care-pharmacy-link-request.entity.js';
+
 // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
 import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';
@@ -716,6 +719,10 @@ export const AppDataSource = new DataSource({
     // CARE ALERT ENGINE (WO-O4O-CARE-ALERT-ENGINE-V1)
     // ============================================================================
     CareAlert,
+    // ============================================================================
+    // PHARMACY LINK REQUEST (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
+    // ============================================================================
+    CarePharmacyLinkRequest,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

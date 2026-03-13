@@ -119,6 +119,24 @@ export interface PatientCoachingRecord {
   pharmacistName: string;
 }
 
+// Pharmacy Link types (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
+export interface PharmacyListItem {
+  id: string;
+  name: string;
+  patientCount: number;
+}
+
+export interface MyLinkStatus {
+  linked: boolean;
+  pharmacyId?: string;
+  pharmacyName?: string;
+  pendingRequest?: {
+    id: string;
+    pharmacyName: string;
+    createdAt: string;
+  };
+}
+
 export const patientApi = {
   getMyProfile: () =>
     request<PatientProfile>('GET', '/api/v1/care/patient-profile/me'),
@@ -146,4 +164,14 @@ export const patientApi = {
 
   getMyCoaching: () =>
     request<PatientCoachingRecord[]>('GET', '/api/v1/care/patient/coaching'),
+
+  // Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
+  getPharmacies: () =>
+    request<PharmacyListItem[]>('GET', '/api/v1/care/pharmacy-link/pharmacies'),
+
+  getMyLinkStatus: () =>
+    request<MyLinkStatus>('GET', '/api/v1/care/pharmacy-link/my-status'),
+
+  requestPharmacyLink: (pharmacyId: string, message?: string) =>
+    request<{ id: string }>('POST', '/api/v1/care/pharmacy-link/request', { pharmacyId, message }),
 };

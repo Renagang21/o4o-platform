@@ -5,7 +5,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Users } from 'lucide-react';
+import { Activity, LogOut, Users, UserPlus } from 'lucide-react';
 
 export default function PharmacistPlaceholderPage() {
   const { user, logout } = useAuth();
@@ -36,6 +36,13 @@ export default function PharmacistPlaceholderPage() {
           >
             <Users className="w-5 h-5" />
             환자 관리
+          </button>
+          <button
+            onClick={() => navigate('/pharmacist/patient-requests')}
+            className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <UserPlus className="w-4 h-4" />
+            연결 요청 확인
           </button>
           <button
             onClick={() => navigate('/care')}

@@ -44,6 +44,10 @@ const PharmacistCoachingPage = lazy(() => import('@/pages/pharmacist/PharmacistC
 const PharmacistPatientsPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientsPage'));
 const PharmacistPatientDetailPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientDetailPage'));
 
+// WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1
+const PatientSelectPharmacyPage = lazy(() => import('@/pages/patient/SelectPharmacyPage'));
+const PharmacistPatientRequestsPage = lazy(() => import('@/pages/pharmacist/PatientRequestsPage'));
+
 // WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
 const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
 const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
@@ -308,9 +312,11 @@ function AppRoutes() {
       <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
       <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
       <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
+      <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
       <Route path="pharmacist" element={<PharmacistPlaceholderPage />} />
       <Route path="pharmacist/patients" element={<PharmacistPatientsPage />} />
       <Route path="pharmacist/patient/:patientId" element={<PharmacistPatientDetailPage />} />
+      <Route path="pharmacist/patient-requests" element={<PharmacistPatientRequestsPage />} />
       <Route path="pharmacist/coaching/:patientId" element={<PharmacistCoachingPage />} />
 
       {/* Public Routes with MainLayout */}
