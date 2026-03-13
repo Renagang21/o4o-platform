@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Calendar, Download, FileText, Paperclip } from 'lucide-react';
 import { cmsApi, type CmsContent } from '../../lib/api';
-import { blocksToHtml } from '@o4o/forum-core';
+import { blocksToHtml } from '@o4o/forum-core/utils';
 
 export default function KnowledgeDetailPage() {
   const { id } = useParams<{ id: string }>();
