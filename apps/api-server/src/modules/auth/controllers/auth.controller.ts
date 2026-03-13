@@ -370,11 +370,22 @@ export class AuthController extends BaseController {
         // 2. 비밀번호 검증 (보안: 본인 확인)
         const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
         if (!passwordMatch) {
-          return BaseController.error(res, '이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.', 401,
-            'PASSWORD_MISMATCH');
+          // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: 기존 가입 서비스 목록 포함
+          const existingMemberships = await smRepository.find({
+            where: { userId: existingUser.id },
+            select: ['serviceKey', 'status'],
+          });
+          return res.status(401).json({
+            success: false,
+            error: 'O4O 플랫폼에 이미 가입된 계정입니다. 기존 비밀번호를 입력해주세요.',
+            code: 'PASSWORD_MISMATCH',
+            existingAccount: true,
+            services: existingMemberships.map(m => ({ key: m.serviceKey, status: m.status })),
+          });
         }
 
-        // 3. 새 서비스 멤버십 + RoleAssignment 추가 (트랜잭션)
+        // 3. 새 서비스 멤버십 추가 (트랜잭션)
+        // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: RoleAssignment는 서비스 승인 시에만 생성
         await AppDataSource.transaction(async (manager) => {
           // ServiceMembership 생성
           const txSmRepo = manager.getRepository(ServiceMembership);
@@ -384,16 +395,6 @@ export class AuthController extends BaseController {
           membership.status = 'pending';
           membership.role = effectiveRole;
           await txSmRepo.save(membership);
-
-          // RoleAssignment 생성 (서비스 접두사 포함)
-          const txAssignRepo = manager.getRepository(RoleAssignment);
-          const assignment = new RoleAssignment();
-          assignment.userId = existingUser.id;
-          assignment.role = effectiveRole;
-          assignment.isActive = true;
-          assignment.validFrom = new Date();
-          assignment.assignedAt = new Date();
-          await txAssignRepo.save(assignment);
 
           // KPA Society: auto-create KPA member
           await AuthController.createKpaRecords(manager, existingUser.id, data);
@@ -477,15 +478,7 @@ export class AuthController extends BaseController {
         // KPA Society: auto-create KPA member
         await AuthController.createKpaRecords(manager, newUser.id, data);
 
-        // RoleAssignment inside transaction
-        const txAssignRepo = manager.getRepository(RoleAssignment);
-        const assignment = new RoleAssignment();
-        assignment.userId = newUser.id;
-        assignment.role = effectiveRole;
-        assignment.isActive = true;
-        assignment.validFrom = new Date();
-        assignment.assignedAt = new Date();
-        await txAssignRepo.save(assignment);
+        // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: RoleAssignment는 서비스 승인 시에만 생성
 
         return newUser;
       });
@@ -535,6 +528,47 @@ export class AuthController extends BaseController {
       }
 
       return BaseController.error(res, 'Registration failed');
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/check-email
+   * WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: 이메일 사전 확인 (멀티 서비스 가입 UX)
+   */
+  static async checkEmail(req: Request, res: Response): Promise<any> {
+    const { email, service } = req.body;
+    if (!email) {
+      return BaseController.error(res, 'Email is required', 400);
+    }
+
+    try {
+      const userRepo = AppDataSource.getRepository(User);
+      const smRepo = AppDataSource.getRepository(ServiceMembership);
+
+      const existingUser = await userRepo.findOne({ where: { email } });
+      if (!existingUser) {
+        return BaseController.ok(res, { exists: false });
+      }
+
+      // 이미 해당 서비스에 가입되어 있는지 확인
+      const currentMembership = service
+        ? await smRepo.findOne({ where: { userId: existingUser.id, serviceKey: service } })
+        : null;
+
+      // 가입된 서비스 목록 조회
+      const memberships = await smRepo.find({
+        where: { userId: existingUser.id },
+        select: ['serviceKey', 'status'],
+      });
+
+      return BaseController.ok(res, {
+        exists: true,
+        alreadyJoined: !!currentMembership,
+        services: memberships.map(m => ({ key: m.serviceKey, status: m.status })),
+      });
+    } catch (error) {
+      logger.error('[AuthController.checkEmail] Error', { error });
+      return BaseController.error(res, 'Email check failed');
     }
   }
 

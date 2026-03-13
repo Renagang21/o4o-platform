@@ -23,6 +23,11 @@ const roleOptions: Array<{ role: UserRole; label: string; description: string; e
   },
 ];
 
+const SERVICE_LABELS: Record<string, string> = {
+  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics', 'kpa-society': '대한약사회', platform: 'O4O 플랫폼',
+};
+
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -30,6 +35,8 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingAccountMode, setExistingAccountMode] = useState(false);
+  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -49,6 +56,31 @@ export default function RegisterPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : name === 'phone' ? value.replace(/\D/g, '') : value,
     }));
+  };
+
+  const handleEmailBlur = async () => {
+    if (!formData.email || !formData.email.includes('@')) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, service: 'k-cosmetics' }),
+      });
+      const result = await res.json();
+      if (result.success && result.data.exists) {
+        if (result.data.alreadyJoined) {
+          setError('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else {
+          setExistingAccountMode(true);
+          setExistingServices(result.data.services || []);
+          setError(null);
+        }
+      } else {
+        setExistingAccountMode(false);
+        setExistingServices([]);
+      }
+    } catch { /* silent */ }
   };
 
   const handleRoleSelect = (role: UserRole) => {
@@ -78,11 +110,13 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+          setExistingAccountMode(true);
+          if (data.services) setExistingServices(data.services);
+          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
         }
         if (response.status === 409) {
           if (data.code === 'SERVICE_ALREADY_JOINED') {
-            throw new Error('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+            throw new Error('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
           }
           throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
@@ -108,16 +142,10 @@ export default function RegisterPage() {
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const isFormValid = () => {
-    return (
-      formData.email &&
-      isPasswordStrong &&
-      formData.password === formData.passwordConfirm &&
-      formData.name &&
-      formData.phone &&
-      isPhoneValid &&
-      formData.agreeTerms &&
-      formData.agreePrivacy
-    );
+    const base = formData.email && formData.name && formData.phone && isPhoneValid &&
+      formData.agreeTerms && formData.agreePrivacy;
+    if (existingAccountMode) return base && formData.password.length > 0;
+    return base && isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
   return (
@@ -190,22 +218,37 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                onBlur={handleEmailBlur}
                 placeholder="example@email.com"
                 style={styles.input}
                 required
               />
             </div>
 
-            <div style={styles.inputRow}>
+            {existingAccountMode && (
+              <div style={{ backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e40af', padding: '16px', borderRadius: '8px', fontSize: '14px', lineHeight: '1.5' }}>
+                <strong>이미 O4O 플랫폼 계정이 존재합니다</strong>
+                <p style={{ margin: '8px 0 4px', fontSize: '13px' }}>기존 비밀번호를 입력하면 K-Cosmetics 서비스 가입이 진행됩니다.</p>
+                {existingServices.length > 0 && (
+                  <p style={{ margin: '4px 0', fontSize: '12px', color: '#64748b' }}>가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}</p>
+                )}
+                <div style={{ marginTop: '8px', fontSize: '13px' }}>
+                  <Link to="/login" style={{ color: '#e91e63', marginRight: '12px' }}>로그인</Link>
+                  <Link to="/forgot-password" style={{ color: '#64748b' }}>비밀번호 찾기</Link>
+                </div>
+              </div>
+            )}
+
+            <div style={existingAccountMode ? undefined : styles.inputRow}>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>비밀번호 *</label>
+                <label style={styles.label}>{existingAccountMode ? '기존 비밀번호 *' : '비밀번호 *'}</label>
                 <div style={styles.passwordWrapper}>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                    placeholder={existingAccountMode ? 'O4O 계정 비밀번호 입력' : '영문, 숫자, 특수문자 포함 8자 이상'}
                     style={styles.input}
                     required
                   />
@@ -217,7 +260,7 @@ export default function RegisterPage() {
                     {showPassword ? '🙈' : '👁️'}
                   </button>
                 </div>
-                {formData.password && (
+                {!existingAccountMode && formData.password && (
                   <ul style={styles.passwordChecklist}>
                     <li style={passwordChecks.length ? styles.checkPass : styles.checkFail}>8자 이상</li>
                     <li style={passwordChecks.letter ? styles.checkPass : styles.checkFail}>영문 포함</li>
@@ -226,6 +269,7 @@ export default function RegisterPage() {
                   </ul>
                 )}
               </div>
+              {!existingAccountMode && (
               <div style={styles.inputGroup}>
                 <label style={styles.label}>비밀번호 확인 *</label>
                 <input
@@ -241,6 +285,7 @@ export default function RegisterPage() {
                   <span style={styles.fieldError}>비밀번호가 일치하지 않습니다</span>
                 )}
               </div>
+              )}
             </div>
 
             <div style={styles.inputRow}>

@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+const SERVICE_LABELS: Record<string, string> = {
+  'neture': 'Neture',
+  'glycopharm': 'GlycoPharm',
+  'glucoseview': 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics',
+  'kpa-society': '대한약사회',
+  'platform': 'O4O 플랫폼',
+};
+
 // 샘플 지부/분회 데이터
 const sampleBranches = [
   {
@@ -51,6 +60,32 @@ export default function RegisterPage() {
   });
 
   const [chapters, setChapters] = useState<{ id: string; name: string }[]>([]);
+  const [existingAccountMode, setExistingAccountMode] = useState(false);
+  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
+
+  const handleEmailBlur = async () => {
+    if (!form.email || !form.email.includes('@')) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, service: 'glucoseview' }),
+      });
+      const data = await res.json();
+      if (data.success && data.data.exists) {
+        if (data.data.alreadyJoined) {
+          setError('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else {
+          setExistingAccountMode(true);
+          setExistingServices(data.data.services || []);
+        }
+      } else {
+        setExistingAccountMode(false);
+        setExistingServices([]);
+      }
+    } catch { /* silent */ }
+  };
 
   // 지부 선택 시 분회 목록 업데이트
   useEffect(() => {
@@ -82,23 +117,25 @@ export default function RegisterPage() {
       return;
     }
 
-    // 비밀번호 강도 검증
-    const passwordChecks = {
-      length: form.password.length >= 8,
-      letter: /[a-zA-Z]/.test(form.password),
-      number: /\d/.test(form.password),
-      special: /[^A-Za-z\d\s]/.test(form.password),
-    };
-    const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
+    // 비밀번호 강도 검증 (기존 계정 모드에서는 스킵)
+    if (!existingAccountMode) {
+      const passwordChecks = {
+        length: form.password.length >= 8,
+        letter: /[a-zA-Z]/.test(form.password),
+        number: /\d/.test(form.password),
+        special: /[^A-Za-z\d\s]/.test(form.password),
+      };
+      const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
-    if (!isPasswordStrong) {
-      setError('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.');
-      return;
-    }
+      if (!isPasswordStrong) {
+        setError('비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.');
+        return;
+      }
 
-    if (form.password !== form.passwordConfirm) {
-      setError('비밀번호가 일치하지 않습니다.');
-      return;
+      if (form.password !== form.passwordConfirm) {
+        setError('비밀번호가 일치하지 않습니다.');
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -127,7 +164,9 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+          setExistingAccountMode(true);
+          if (data.services) setExistingServices(data.services);
+          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
         }
         if (response.status === 409) {
           const msg = (data.error || '').toLowerCase();
@@ -273,15 +312,33 @@ export default function RegisterPage() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onBlur={handleEmailBlur}
                 placeholder="example@email.com"
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
+            {existingAccountMode && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3">
+                <p className="font-semibold text-sm">이미 O4O 플랫폼 계정이 존재합니다</p>
+                <p className="text-sm mt-1">기존 비밀번호를 입력하면 GlucoseView 서비스 가입이 진행됩니다.</p>
+                {existingServices.length > 0 && (
+                  <p className="text-xs mt-1 text-blue-600">
+                    가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                  </p>
+                )}
+                <div className="mt-2 text-xs space-x-2">
+                  <Link to="/login" className="text-blue-700 underline">로그인</Link>
+                  <span>·</span>
+                  <Link to="/forgot-password" className="text-blue-700 underline">비밀번호 찾기</Link>
+                </div>
+              </div>
+            )}
+
             {/* 비밀번호 */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
-                비밀번호 <span className="text-red-500">*</span>
+                {existingAccountMode ? '기존 비밀번호' : '비밀번호'} <span className="text-red-500">*</span>
               </label>
               <input
                 type="password"
@@ -290,7 +347,7 @@ export default function RegisterPage() {
                 placeholder="영문, 숫자, 특수문자 포함 8자 이상"
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {form.password && (
+              {!existingAccountMode && form.password && (
                 <ul className="mt-2 space-y-1">
                   {[
                     { check: form.password.length >= 8, label: '8자 이상' },
@@ -312,6 +369,7 @@ export default function RegisterPage() {
             </div>
 
             {/* 비밀번호 확인 */}
+            {!existingAccountMode && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 비밀번호 확인 <span className="text-red-500">*</span>
@@ -329,6 +387,7 @@ export default function RegisterPage() {
                 </p>
               )}
             </div>
+            )}
 
             {/* 지부/분회 */}
             <div className="grid grid-cols-2 gap-3">

@@ -39,6 +39,11 @@ interface RegisterModalProps {
   isOpen: boolean;
 }
 
+const SERVICE_LABELS: Record<string, string> = {
+  neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics', 'kpa-society': '대한약사회', platform: 'O4O 플랫폼',
+};
+
 export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const { closeModal, openLoginModal } = useLoginModal();
   const [step, setStep] = useState(1);
@@ -46,6 +51,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingAccountMode, setExistingAccountMode] = useState(false);
+  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -68,6 +75,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
       setShowPassword(false);
       setLoading(false);
       setError(null);
+      setExistingAccountMode(false);
+      setExistingServices([]);
       setFormData({
         email: '',
         password: '',
@@ -116,6 +125,31 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     }));
   };
 
+  const handleEmailBlur = async () => {
+    if (!formData.email || !formData.email.includes('@')) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, service: 'neture' }),
+      });
+      const result = await res.json();
+      if (result.success && result.data.exists) {
+        if (result.data.alreadyJoined) {
+          setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else {
+          setExistingAccountMode(true);
+          setExistingServices(result.data.services || []);
+          setError(null);
+        }
+      } else {
+        setExistingAccountMode(false);
+        setExistingServices([]);
+      }
+    } catch { /* silent */ }
+  };
+
   const handleRoleSelect = (role: SignupRole) => {
     setSelectedRole(role);
     setStep(2);
@@ -144,11 +178,13 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
       if (!response.ok) {
         if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+          setExistingAccountMode(true);
+          if (data.services) setExistingServices(data.services);
+          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
         }
         if (response.status === 409) {
           if (data.code === 'SERVICE_ALREADY_JOINED') {
-            throw new Error('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+            throw new Error('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
           }
           throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
         }
@@ -172,19 +208,11 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
   const isFormValid = () => {
-    return (
-      formData.email &&
-      formData.password &&
-      isPasswordStrong &&
-      formData.password === formData.passwordConfirm &&
-      formData.name &&
-      formData.phone &&
-      formData.phone.length >= 10 &&
-      formData.phone.length <= 11 &&
-      formData.companyName &&
-      formData.agreeTerms &&
-      formData.agreePrivacy
-    );
+    const base = formData.email && formData.password && formData.name &&
+      formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
+      formData.companyName && formData.agreeTerms && formData.agreePrivacy;
+    if (existingAccountMode) return base && formData.password.length > 0;
+    return base && isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
   if (!isOpen) return null;
@@ -308,17 +336,31 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onBlur={handleEmailBlur}
                   placeholder="example@company.com"
                   required
                   className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
                 />
               </div>
 
+              {existingAccountMode && (
+                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 text-sm">
+                  <p className="font-semibold">이미 O4O 플랫폼 계정이 존재합니다</p>
+                  <p className="mt-1 text-xs text-blue-600">기존 비밀번호를 입력하면 Neture 서비스 가입이 진행됩니다.</p>
+                  {existingServices.length > 0 && (
+                    <p className="mt-1 text-xs text-gray-500">가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}</p>
+                  )}
+                  <div className="mt-2 text-xs space-x-3">
+                    <button type="button" onClick={() => openLoginModal()} className="text-green-600 hover:underline">로그인</button>
+                  </div>
+                </div>
+              )}
+
               {/* 비밀번호 */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className={existingAccountMode ? '' : 'grid grid-cols-2 gap-3'}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    비밀번호 <span className="text-red-500">*</span>
+                    {existingAccountMode ? '기존 비밀번호' : '비밀번호'} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -326,7 +368,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      placeholder="8자 이상"
+                      placeholder={existingAccountMode ? 'O4O 계정 비밀번호 입력' : '8자 이상'}
                       required
                       className="w-full px-4 py-3 pr-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
                     />
@@ -339,7 +381,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {formData.password.length > 0 && !isPasswordStrong && (
+                  {!existingAccountMode && formData.password.length > 0 && !isPasswordStrong && (
                     <div className="mt-1 space-y-0.5 text-xs">
                       <p className={passwordChecks.length ? 'text-green-600' : 'text-red-500'}>
                         {passwordChecks.length ? '✓' : '✗'} 8자 이상
@@ -356,6 +398,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     </div>
                   )}
                 </div>
+                {!existingAccountMode && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     비밀번호 확인 <span className="text-red-500">*</span>
@@ -373,6 +416,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     <p className="mt-1 text-xs text-red-500">비밀번호가 일치하지 않습니다</p>
                   )}
                 </div>
+                )}
               </div>
 
               {/* 이름 + 전화번호 */}

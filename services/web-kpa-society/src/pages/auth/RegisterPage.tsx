@@ -7,6 +7,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
+const SERVICE_LABELS: Record<string, string> = {
+  'neture': 'Neture',
+  'glycopharm': 'GlycoPharm',
+  'glucoseview': 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics',
+  'kpa-society': '대한약사회',
+  'platform': 'O4O 플랫폼',
+};
+
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +39,32 @@ export default function RegisterPage() {
   const [branches, setBranches] = useState<Array<{id: string, name: string}>>([]);
   const [groups, setGroups] = useState<Array<{id: string, name: string}>>([]);
   const [licenseStatus, setLicenseStatus] = useState<'idle' | 'checking' | 'available' | 'duplicate'>('idle');
+  const [existingAccountMode, setExistingAccountMode] = useState(false);
+  const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
+
+  const handleEmailBlur = async () => {
+    if (!formData.email || !formData.email.includes('@')) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, service: 'kpa-society' }),
+      });
+      const data = await res.json();
+      if (data.success && data.data.exists) {
+        if (data.data.alreadyJoined) {
+          setError('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else {
+          setExistingAccountMode(true);
+          setExistingServices(data.data.services || []);
+        }
+      } else {
+        setExistingAccountMode(false);
+        setExistingServices([]);
+      }
+    } catch { /* silent */ }
+  };
 
   useEffect(() => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
@@ -119,7 +154,9 @@ export default function RegisterPage() {
       const data = await response.json();
       if (!response.ok) {
         if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          throw new Error('이미 다른 서비스에 가입된 계정입니다. 기존 비밀번호를 입력해주세요.');
+          setExistingAccountMode(true);
+          if (data.services) setExistingServices(data.services);
+          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
         }
         if (response.status === 409) {
           const msg = (data.error || '').toLowerCase();
@@ -150,11 +187,9 @@ export default function RegisterPage() {
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
   const isFormValid = () => {
-    const baseValid =
+    const commonValid =
       formData.email &&
       formData.password &&
-      isPasswordStrong &&
-      formData.password === formData.passwordConfirm &&
       formData.lastName &&
       formData.firstName &&
       formData.nickname &&
@@ -163,9 +198,12 @@ export default function RegisterPage() {
       formData.agreeTerms &&
       formData.agreePrivacy;
 
-    if (!baseValid) return false;
+    if (!commonValid) return false;
+    if (!formData.licenseNumber || licenseStatus === 'duplicate') return false;
 
-    return !!formData.licenseNumber && licenseStatus !== 'duplicate';
+    if (existingAccountMode) return true;
+
+    return isPasswordStrong && formData.password === formData.passwordConfirm;
   };
 
   return (
@@ -199,15 +237,39 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                onBlur={handleEmailBlur}
                 placeholder="example@email.com"
                 style={styles.input}
                 required
               />
             </div>
 
-            <div style={styles.inputRow}>
+            {existingAccountMode && (
+              <div style={{
+                backgroundColor: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: '8px',
+                padding: '16px',
+                color: '#1e40af',
+              }}>
+                <p style={{ fontWeight: 600, fontSize: '14px', margin: 0 }}>이미 O4O 플랫폼 계정이 존재합니다</p>
+                <p style={{ fontSize: '13px', margin: '8px 0 0 0' }}>기존 비밀번호를 입력하면 대한약사회 서비스 가입이 진행됩니다.</p>
+                {existingServices.length > 0 && (
+                  <p style={{ fontSize: '12px', margin: '4px 0 0 0', color: '#2563eb' }}>
+                    가입된 서비스: {existingServices.map(s => SERVICE_LABELS[s.key] || s.key).join(', ')}
+                  </p>
+                )}
+                <div style={{ marginTop: '8px', fontSize: '12px' }}>
+                  <Link to="/login" style={{ color: '#1e40af', textDecoration: 'underline' }}>로그인</Link>
+                  <span style={{ margin: '0 6px' }}>·</span>
+                  <Link to="/forgot-password" style={{ color: '#1e40af', textDecoration: 'underline' }}>비밀번호 찾기</Link>
+                </div>
+              </div>
+            )}
+
+            <div style={existingAccountMode ? {} : styles.inputRow}>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>비밀번호 *</label>
+                <label style={styles.label}>{existingAccountMode ? '기존 비밀번호 *' : '비밀번호 *'}</label>
                 <div style={styles.passwordWrapper}>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -226,7 +288,7 @@ export default function RegisterPage() {
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
-                {formData.password.length > 0 && !isPasswordStrong && (
+                {!existingAccountMode && formData.password.length > 0 && !isPasswordStrong && (
                   <div style={{ fontSize: '12px', margin: '4px 0 0 0', lineHeight: '1.6' }}>
                     <span style={{ color: passwordChecks.length ? '#16a34a' : '#dc2626' }}>
                       {passwordChecks.length ? '\u2713' : '\u2717'} 8자 이상
@@ -243,6 +305,7 @@ export default function RegisterPage() {
                   </div>
                 )}
               </div>
+              {!existingAccountMode && (
               <div style={styles.inputGroup}>
                 <label style={styles.label}>비밀번호 확인 *</label>
                 <input
@@ -260,6 +323,7 @@ export default function RegisterPage() {
                   </p>
                 )}
               </div>
+              )}
             </div>
           </div>
 

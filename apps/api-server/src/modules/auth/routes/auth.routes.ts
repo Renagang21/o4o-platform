@@ -52,6 +52,13 @@ router.post(
   asyncHandler(AuthController.register)
 );
 
+// POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)
+// WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1
+router.post(
+  '/check-email',
+  asyncHandler(AuthController.checkEmail)
+);
+
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(
   '/refresh',
