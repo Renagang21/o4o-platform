@@ -425,6 +425,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         title,
         summary,
         body,
+        bodyBlocks,
         imageUrl,
         linkUrl,
         linkText,
@@ -444,11 +445,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      // P0: Only hero and notice types allowed
-      if (!['hero', 'notice'].includes(type)) {
+      // Supported content types
+      if (!['hero', 'notice', 'guide'].includes(type)) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'Only hero and notice types are supported in P0' },
+          error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide' },
         });
         return;
       }
@@ -477,6 +478,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         title,
         summary: summary || null,
         body: body || null,
+        bodyBlocks: bodyBlocks || null,
         imageUrl: imageUrl || null,
         linkUrl: linkUrl || null,
         linkText: linkText || null,
@@ -520,6 +522,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
         title,
         summary,
         body,
+        bodyBlocks,
         imageUrl,
         linkUrl,
         linkText,
@@ -546,11 +549,11 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       // Update fields if provided
       if (serviceKey !== undefined) content.serviceKey = serviceKey;
       if (type !== undefined) {
-        // P0: Only hero and notice types allowed
-        if (!['hero', 'notice'].includes(type)) {
+        // Supported content types
+        if (!['hero', 'notice', 'guide'].includes(type)) {
           res.status(400).json({
             success: false,
-            error: { code: 'VALIDATION_ERROR', message: 'Only hero and notice types are supported in P0' },
+            error: { code: 'VALIDATION_ERROR', message: 'Supported types: hero, notice, guide' },
           });
           return;
         }
@@ -559,6 +562,7 @@ export function createCmsContentRoutes(dataSource: DataSource): Router {
       if (title !== undefined) content.title = title;
       if (summary !== undefined) content.summary = summary;
       if (body !== undefined) content.body = body;
+      if (bodyBlocks !== undefined) (content as any).bodyBlocks = bodyBlocks;
       if (imageUrl !== undefined) content.imageUrl = imageUrl;
       if (linkUrl !== undefined) content.linkUrl = linkUrl;
       if (linkText !== undefined) content.linkText = linkText;

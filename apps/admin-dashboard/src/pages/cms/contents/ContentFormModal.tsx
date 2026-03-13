@@ -13,6 +13,8 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import cmsAPI, { CmsContent, ContentType } from '@/lib/cms';
 import toast from 'react-hot-toast';
+import { RichTextEditor } from '@o4o/content-editor';
+import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
 
 interface ContentFormModalProps {
   content: CmsContent | null;
@@ -30,10 +32,11 @@ const SERVICES = [
   { value: 'k-cosmetics', label: 'K-Cosmetics' },
 ];
 
-// Content types for P0 (only hero and notice)
+// Content types
 const CONTENT_TYPES: { value: ContentType; label: string; description: string }[] = [
   { value: 'hero', label: 'Hero', description: 'Main banner/slide for homepage' },
   { value: 'notice', label: 'Notice', description: 'Announcements and notifications' },
+  { value: 'guide', label: 'Guide', description: '가이드 콘텐츠 (Rich Editor)' },
 ];
 
 interface FormData {
@@ -41,6 +44,7 @@ interface FormData {
   type: ContentType;
   title: string;
   summary: string;
+  editorHtml: string;
   imageUrl: string;
   linkUrl: string;
   linkText: string;
@@ -58,6 +62,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
     type: content?.type || 'hero',
     title: content?.title || '',
     summary: content?.summary || '',
+    editorHtml: content?.bodyBlocks ? blocksToHtml(content.bodyBlocks) : '',
     imageUrl: content?.imageUrl || '',
     linkUrl: content?.linkUrl || '',
     linkText: content?.linkText || '',
@@ -99,7 +104,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
         metadata.backgroundColor = formData.backgroundColor;
       }
 
-      const data = {
+      const data: Record<string, any> = {
         serviceKey: formData.serviceKey || undefined,
         type: formData.type,
         title: formData.title.trim(),
@@ -112,6 +117,11 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
         isOperatorPicked: formData.isOperatorPicked,
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       };
+
+      // Guide type: convert editor HTML to bodyBlocks
+      if (formData.type === 'guide' && formData.editorHtml.trim()) {
+        data.bodyBlocks = htmlToBlocks(formData.editorHtml);
+      }
 
       if (isEditing) {
         await cmsAPI.updateContent(content!.id, data);
@@ -264,6 +274,23 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                   placeholder="Brief description or subtitle"
                 />
               </div>
+
+              {/* Rich Text Editor (Guide type only) */}
+              {formData.type === 'guide' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    본문 (Rich Editor)
+                  </label>
+                  <div className="border border-gray-300 rounded-md overflow-hidden">
+                    <RichTextEditor
+                      content={formData.editorHtml}
+                      onChange={(html: string) =>
+                        setFormData((prev) => ({ ...prev, editorHtml: html }))
+                      }
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Image URL */}
               <div>

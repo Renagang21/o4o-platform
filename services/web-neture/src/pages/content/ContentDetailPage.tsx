@@ -11,8 +11,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Bell, FileText, Calendar } from 'lucide-react';
+import { ArrowLeft, Bell, FileText, Calendar, BookOpen } from 'lucide-react';
 import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
+import { blocksToHtml } from '@o4o/forum-core';
 import { useAuth } from '../../contexts/AuthContext';
 import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 import { ContentMetaBar } from '@o4o/ui';
@@ -104,6 +105,8 @@ export default function ContentDetailPage() {
     switch (type) {
       case 'notice':
         return <Bell className="w-6 h-6" />;
+      case 'guide':
+        return <BookOpen className="w-6 h-6" />;
       default:
         return <FileText className="w-6 h-6" />;
     }
@@ -117,6 +120,8 @@ export default function ContentDetailPage() {
         return '메인 콘텐츠';
       case 'news':
         return '뉴스';
+      case 'guide':
+        return '가이드';
       default:
         return type;
     }
@@ -190,7 +195,12 @@ export default function ContentDetailPage() {
             />
           )}
 
-          {content.body ? (
+          {content.bodyBlocks && Array.isArray(content.bodyBlocks) && content.bodyBlocks.length > 0 ? (
+            <div
+              className="prose prose-gray max-w-none"
+              dangerouslySetInnerHTML={{ __html: blocksToHtml(content.bodyBlocks as any) }}
+            />
+          ) : content.body ? (
             <div className="prose prose-gray max-w-none">
               {content.body.split('\n').map((paragraph, index) => (
                 <p key={index} className="mb-4 text-gray-700 leading-relaxed">

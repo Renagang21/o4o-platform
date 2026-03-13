@@ -19,7 +19,7 @@ import {
 } from 'typeorm';
 
 // Content types for different use cases
-export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event';
+export type ContentType = 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event' | 'guide';
 
 // Content lifecycle states
 // WO-O4O-CMS-PENDING-STATE-IMPLEMENTATION-V1: added 'pending' for approval workflow
@@ -60,6 +60,10 @@ export class CmsContent {
 
   @Column({ type: 'text', nullable: true })
   body!: string | null; // Full content body (if needed)
+
+  // WO-O4O-CMS-GUIDE-EDITOR-V1: TipTap Block[] JSON for rich content
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  bodyBlocks!: Record<string, any>[] | null;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   imageUrl!: string | null; // Featured image

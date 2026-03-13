@@ -11,6 +11,7 @@ export interface CmsContent {
   title: string;
   summary: string | null;
   body: string | null;
+  bodyBlocks: Record<string, any>[] | null;
   imageUrl: string | null;
   linkUrl: string | null;
   linkText: string | null;
