@@ -19,6 +19,7 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 // Public Pages (always loaded - first paint)
 import { HomePage, NotFoundPage } from '@/pages';
 import LoginPage from '@/pages/auth/LoginPage';
+import HandoffPage from '@/pages/HandoffPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 
@@ -156,6 +157,7 @@ function AppRoutes() {
       <Route element={<MainLayout />}>
         {/* WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 자동 리다이렉트 */}
         <Route index element={<RoleBasedHome />} />
+        <Route path="handoff" element={<HandoffPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route path="forgot-password" element={<AccountRecoveryPage />} />

@@ -10,6 +10,7 @@ import SettingsPage from './pages/SettingsPage';
 import AboutPage from './pages/AboutPage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import HandoffPage from './pages/HandoffPage';
 import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import PendingPage from './pages/PendingPage';
@@ -109,6 +110,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/* 공개 페이지 */}
+      <Route path="/handoff" element={<HandoffPage />} />
       <Route path="/login" element={
         isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
       } />

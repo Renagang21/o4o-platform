@@ -16,6 +16,7 @@ import { RoleGuard } from '@/components/auth/RoleGuard';
 // Public Pages (always loaded - first paint)
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/auth/LoginPage';
+import HandoffPage from '@/pages/HandoffPage';
 import AccountRecoveryPage from '@/pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import NotFoundPage from '@/pages/NotFoundPage';
@@ -47,6 +48,10 @@ const PharmacistPatientDetailPage = lazy(() => import('@/pages/pharmacist/Pharma
 // WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1
 const PatientSelectPharmacyPage = lazy(() => import('@/pages/patient/SelectPharmacyPage'));
 const PharmacistPatientRequestsPage = lazy(() => import('@/pages/pharmacist/PatientRequestsPage'));
+
+// WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1
+const PatientAppointmentsPage = lazy(() => import('@/pages/patient/AppointmentsPage'));
+const PharmacistAppointmentsPage = lazy(() => import('@/pages/pharmacist/AppointmentsPage'));
 
 // WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
 const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
@@ -301,6 +306,7 @@ function AppRoutes() {
     <Routes>
       {/* WO-GLYCOPHARM-ENTRY-SCREENS-V1: 진입 화면 (MainLayout 없음) */}
       <Route index element={<LandingPage />} />
+      <Route path="handoff" element={<HandoffPage />} />
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
@@ -313,10 +319,12 @@ function AppRoutes() {
       <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
       <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
       <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
+      <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
       <Route path="pharmacist" element={<PharmacistPlaceholderPage />} />
       <Route path="pharmacist/patients" element={<PharmacistPatientsPage />} />
       <Route path="pharmacist/patient/:patientId" element={<PharmacistPatientDetailPage />} />
       <Route path="pharmacist/patient-requests" element={<PharmacistPatientRequestsPage />} />
+      <Route path="pharmacist/appointments" element={<PharmacistAppointmentsPage />} />
       <Route path="pharmacist/coaching/:patientId" element={<PharmacistCoachingPage />} />
 
       {/* Public Routes with MainLayout */}

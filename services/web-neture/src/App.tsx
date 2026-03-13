@@ -35,6 +35,7 @@ import { RoleGuard } from './components/auth/RoleGuard';
 // Neture 메인 페이지 (항상 로드)
 // ============================================================================
 import NetureHomePage from './pages/NetureHomePage';
+import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
 import CommunityPage from './pages/CommunityPage';
 import {
@@ -394,6 +395,7 @@ function App() {
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
+            <Route path="/handoff" element={<HandoffPage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/register" element={<RegisterRedirect />} />
             <Route path="/forgot-password" element={<AccountRecoveryPage />} />

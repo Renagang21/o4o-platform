@@ -6,6 +6,7 @@
  */
 import { Router, type IRouter } from 'express';
 import { AuthController, PasswordController, VerificationController } from '../controllers/index.js';
+import { HandoffController } from '../controllers/handoff.controller.js';
 import {
   validateDto,
 } from '../../../common/middleware/validation.middleware.js';
@@ -99,6 +100,33 @@ router.post(
   '/logout-all',
   requireAuth,
   asyncHandler(AuthController.logoutAll)
+);
+
+/**
+ * ========================================
+ * Service Handoff Routes
+ * WO-O4O-SERVICE-HANDOFF-ARCHITECTURE-V1
+ * ========================================
+ */
+
+// POST /api/v1/auth/handoff - Generate handoff token for cross-service navigation
+router.post(
+  '/handoff',
+  requireAuth,
+  asyncHandler(HandoffController.generateHandoff)
+);
+
+// POST /api/v1/auth/handoff/exchange - Exchange handoff token for auth tokens (public)
+router.post(
+  '/handoff/exchange',
+  asyncHandler(HandoffController.exchangeHandoff)
+);
+
+// GET /api/v1/auth/services - Get service catalog with user's membership status
+router.get(
+  '/services',
+  requireAuth,
+  asyncHandler(HandoffController.getServices)
 );
 
 /**

@@ -9,6 +9,7 @@ import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import { DashboardPage } from './pages/DashboardPage';
+import HandoffPage from './pages/HandoffPage';
 import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
@@ -507,6 +508,7 @@ function App() {
            * 기존 북마크 호환용, 신규 코드에서 참조 금지
            * WO-O4O-AUTH-LEGACY-LOGIN-REGISTER-PAGE-REMOVAL-V1
            * ========================================================= */}
+          <Route path="/handoff" element={<HandoffPage />} />
           <Route path="/login" element={<LoginRedirect />} />
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
