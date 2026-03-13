@@ -8,3 +8,12 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+// PWA Service Worker registration (WO-GLUCOSEVIEW-PWA-ENABLE-V1)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js').catch(() => {
+      // silent — SW registration is optional
+    });
+  });
+}

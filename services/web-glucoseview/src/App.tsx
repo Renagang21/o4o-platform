@@ -49,6 +49,7 @@ import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } 
 import StoreOverviewPage from './pages/store/StoreOverviewPage';
 
 import { RoleGuard } from './components/auth/RoleGuard';
+import PwaInstallPrompt from './components/common/PwaInstallPrompt';
 import './index.css';
 
 // 인증이 필요한 라우트를 보호하는 컴포넌트
@@ -239,6 +240,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <LoginModalProvider>
+          <PwaInstallPrompt />
           <LoginModal />
           <AppRoutes />
         </LoginModalProvider>
