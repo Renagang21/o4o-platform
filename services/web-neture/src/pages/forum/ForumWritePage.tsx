@@ -34,14 +34,21 @@ import {
 // Constants
 // ============================================================================
 
-const CATEGORY_SLUG = 'neture-forum';
 const MIN_CONTENT_LENGTH = 5;
 
 // ============================================================================
 // Main Component
 // ============================================================================
 
-export function ForumWritePage() {
+interface ForumWritePageProps {
+  categorySlug?: string;
+  backPath?: string;
+}
+
+export function ForumWritePage({
+  categorySlug = 'neture-forum',
+  backPath,
+}: ForumWritePageProps = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editPostId = searchParams.get('edit');
@@ -112,12 +119,12 @@ export function ForumWritePage() {
         <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>게시글을 작성하려면 로그인해주세요.</p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
           <button
-            onClick={() => openLoginModal('/forum/write')}
+            onClick={() => openLoginModal(backPath ? `${backPath.replace(/\/$/, '')}/write` : '/forum/write')}
             style={{ padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}
           >
             로그인
           </button>
-          <Link to="/forum" style={{ padding: '10px 24px', background: '#f1f5f9', color: '#475569', borderRadius: '8px', fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+          <Link to={backPath || '/forum'} style={{ padding: '10px 24px', background: '#f1f5f9', color: '#475569', borderRadius: '8px', fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
             목록으로
           </Link>
         </div>
@@ -146,15 +153,19 @@ export function ForumWritePage() {
       // Convert HTML to Block[]
       const blocks = htmlToBlocks(editorHtml);
 
+      const postDetailPath = backPath
+        ? (slug: string) => `${backPath.replace(/\/$/, '')}/article/${slug}`
+        : (slug: string) => `/forum/post/${slug}`;
+
       if (isEditMode && editPostId) {
         const response = await updateForumPost(editPostId, {
           title: title.trim(),
           content: blocks,
-          categorySlug: CATEGORY_SLUG,
+          categorySlug: categorySlug,
         });
 
         if (response.success && response.data) {
-          navigate(`/forum/post/${response.data.slug}`);
+          navigate(postDetailPath(response.data.slug));
         } else {
           setError(response.error || '게시글 수정에 실패했습니다.');
         }
@@ -162,12 +173,12 @@ export function ForumWritePage() {
         const response = await createForumPost({
             title: title.trim(),
             content: blocks,
-            categorySlug: CATEGORY_SLUG,
+            categorySlug: categorySlug,
             showContactOnPost: hasContactInfo ? showContactOnPost : false,
           });
 
         if (response.success && response.data) {
-          navigate(`/forum/post/${response.data.slug}`);
+          navigate(postDetailPath(response.data.slug));
         } else {
           setError(response.error || '게시글 작성에 실패했습니다.');
         }
@@ -190,7 +201,7 @@ export function ForumWritePage() {
         return;
       }
     }
-    navigate('/forum');
+    navigate(backPath || '/forum');
   }
 
   if (isLoadingPost) {

@@ -1,15 +1,104 @@
 /**
  * CommunityPage - 커뮤니티 허브
  *
- * Work Order: WO-O4O-NETURE-COMMUNITY-PAGE-V1
+ * WO-O4O-NETURE-COMMUNITY-PAGE-V1
+ * WO-O4O-NETURE-COMMUNITY-HOME-V1: 데이터 기반 허브로 재구성
  *
- * 3개 섹션: Announcements, Forum, Digital Signage
+ * 구조:
+ * 1. Hero (gradient)
+ * 2. 공지사항 (CMS notice)
+ * 3. 콘텐츠 하이라이트 (CMS featured)
+ * 3.5. Articles (Forum article 카테고리, WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1)
+ * 4. 최근 포럼 글 (Forum API)
+ * 5. 인기 포럼 카테고리 (Popular Forums)
+ * 6. 커뮤니티 통계 (Popular Forums 집계)
+ * 7. Digital Signage 안내 (정적)
  */
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, MessageSquare, Monitor, ArrowRight } from 'lucide-react';
+import {
+  Bell,
+  MessageSquare,
+  Monitor,
+  ArrowRight,
+  FileText,
+  Heart,
+  Eye,
+  MessageCircle,
+  TrendingUp,
+  Users,
+  Layers,
+  PenSquare,
+} from 'lucide-react';
+import { useAuth } from '../contexts';
+import { cmsApi, type CmsContent } from '../lib/api/content';
+import {
+  fetchForumPosts,
+  fetchForumCategories,
+  fetchPopularForums,
+  getAuthorName,
+  type ForumPost,
+  type PopularForum,
+} from '../services/forumApi';
+
+function formatRelativeDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (days === 0) return '오늘';
+  if (days === 1) return '어제';
+  if (days < 7) return `${days}일 전`;
+  return date.toLocaleDateString('ko-KR');
+}
 
 export default function CommunityPage() {
+  const { isAuthenticated } = useAuth();
+  const [notices, setNotices] = useState<CmsContent[]>([]);
+  const [contents, setContents] = useState<CmsContent[]>([]);
+  const [articles, setArticles] = useState<ForumPost[]>([]);
+  const [recentPosts, setRecentPosts] = useState<ForumPost[]>([]);
+  const [popularCategories, setPopularCategories] = useState<PopularForum[]>([]);
+
+  useEffect(() => {
+    cmsApi.getContents({ type: 'notice', sort: 'latest', limit: 5 })
+      .then(res => setNotices(res.data))
+      .catch(() => {});
+
+    cmsApi.getContents({ sort: 'featured', limit: 6 })
+      .then(res => setContents(res.data))
+      .catch(() => {});
+
+    // Articles: article 카테고리의 포럼 글
+    fetchForumCategories()
+      .then(res => {
+        if (res.data) {
+          const articleCat = res.data.find(c => c.slug === 'article');
+          if (articleCat) {
+            fetchForumPosts({ categoryId: articleCat.id, limit: 5, sortBy: 'latest' })
+              .then(postsRes => { if (postsRes.data) setArticles(postsRes.data); })
+              .catch(() => {});
+          }
+        }
+      })
+      .catch(() => {});
+
+    fetchForumPosts({ limit: 10, sortBy: 'latest' })
+      .then(res => { if (res.data) setRecentPosts(res.data); })
+      .catch(() => {});
+
+    fetchPopularForums(6)
+      .then(res => { if (res.data) setPopularCategories(res.data); })
+      .catch(() => {});
+  }, []);
+
+  // 통계 집계
+  const totalPosts7d = popularCategories.reduce((sum, c) => sum + c.postCount7d, 0);
+  const totalComments7d = popularCategories.reduce((sum, c) => sum + c.commentSum7d, 0);
+  const activeForumCount = popularCategories.filter(c => c.postCount7d > 0).length;
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -17,69 +106,314 @@ export default function CommunityPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold mb-3">Community</h1>
           <p className="text-lg text-white/80">
-            공지사항, 포럼, 디지털 사이니지 안내
+            공지사항, 콘텐츠, 포럼에서 정보를 공유합니다
           </p>
         </div>
       </section>
 
-      {/* Sections */}
-      <section className="py-16">
+      {/* 공지사항 */}
+      {notices.length > 0 && (
+        <section className="py-12 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <Bell className="w-5 h-5 text-amber-600" />
+                <h2 className="text-xl font-bold text-gray-900">공지사항</h2>
+              </div>
+              <Link
+                to="/community/announcements"
+                className="inline-flex items-center text-sm font-medium text-amber-600 hover:text-amber-700"
+              >
+                전체 보기
+                <ArrowRight className="ml-1 w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {notices.map(notice => (
+                <Link
+                  key={notice.id}
+                  to={`/community/announcements/${notice.id}`}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-amber-50 transition-colors group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {notice.isPinned && (
+                      <span className="shrink-0 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded">
+                        중요
+                      </span>
+                    )}
+                    <span className="text-sm text-gray-900 truncate group-hover:text-amber-700">
+                      {notice.title}
+                    </span>
+                  </div>
+                  <span className="shrink-0 ml-4 text-xs text-gray-500">
+                    {notice.publishedAt ? formatRelativeDate(notice.publishedAt) : ''}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 콘텐츠 하이라이트 */}
+      {contents.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary-600" />
+                <h2 className="text-xl font-bold text-gray-900">콘텐츠</h2>
+              </div>
+              <Link
+                to="/partner/contents"
+                className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
+              >
+                더보기
+                <ArrowRight className="ml-1 w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {contents.map(content => (
+                <Link
+                  key={content.id}
+                  to={`/partner/contents/${content.id}`}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group"
+                >
+                  {content.imageUrl && (
+                    <div className="aspect-video bg-gray-100 overflow-hidden">
+                      <img
+                        src={content.imageUrl}
+                        alt={content.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
+                      {content.title}
+                    </h3>
+                    {content.summary && (
+                      <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                        {content.summary}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                      {content.viewCount != null && content.viewCount > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          {content.viewCount}
+                        </span>
+                      )}
+                      {content.recommendCount != null && content.recommendCount > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Heart className="w-3 h-3" />
+                          {content.recommendCount}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
+      {articles.length > 0 && (
+        <section className="py-12 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <PenSquare className="w-5 h-5 text-primary-600" />
+                <h2 className="text-xl font-bold text-gray-900">Articles</h2>
+              </div>
+              <div className="flex items-center gap-3">
+                {isAuthenticated && (
+                  <Link
+                    to="/community/write"
+                    className="inline-flex items-center text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    글쓰기
+                  </Link>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              {articles.map(post => (
+                <Link
+                  key={post.id}
+                  to={`/community/article/${post.slug}`}
+                  className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600">
+                      {post.title}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {getAuthorName(post)} · {formatRelativeDate(post.publishedAt || post.createdAt)}
+                    </p>
+                  </div>
+                  <div className="shrink-0 ml-4 flex items-center gap-3 text-xs text-gray-400">
+                    {post.viewCount != null && post.viewCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {post.viewCount}
+                      </span>
+                    )}
+                    {post.commentCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className="w-3 h-3" />
+                        {post.commentCount}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 최근 포럼 글 */}
+      {recentPosts.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-primary-600" />
+                <h2 className="text-xl font-bold text-gray-900">최근 포럼 글</h2>
+              </div>
+              <Link
+                to="/community/forum"
+                className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
+              >
+                포럼 보기
+                <ArrowRight className="ml-1 w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {recentPosts.map(post => (
+                <Link
+                  key={post.id}
+                  to={`/community/forum/post/${post.slug}`}
+                  className="flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 transition-colors group"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-primary-600">
+                      {post.title}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {getAuthorName(post)} · {formatRelativeDate(post.publishedAt || post.createdAt)}
+                    </p>
+                  </div>
+                  <div className="shrink-0 ml-4 flex items-center gap-3 text-xs text-gray-400">
+                    {post.commentCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className="w-3 h-3" />
+                        {post.commentCount}
+                      </span>
+                    )}
+                    {post.likeCount > 0 && (
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3 h-3" />
+                        {post.likeCount}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 인기 포럼 카테고리 */}
+      {popularCategories.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="w-5 h-5 text-primary-600" />
+              <h2 className="text-xl font-bold text-gray-900">인기 포럼</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {popularCategories.map(cat => (
+                <Link
+                  key={cat.id}
+                  to="/community/forum"
+                  className="p-5 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-sm transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl">{cat.iconUrl || '💬'}</span>
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary-600">
+                      {cat.name}
+                    </h3>
+                  </div>
+                  {cat.description && (
+                    <p className="text-xs text-gray-500 mb-3 line-clamp-2">{cat.description}</p>
+                  )}
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span>글 {cat.postCount}개</span>
+                    {cat.postCount7d > 0 && (
+                      <span className="px-1.5 py-0.5 bg-primary-50 text-primary-600 rounded text-[10px] font-medium">
+                        +{cat.postCount7d} 이번 주
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 커뮤니티 통계 */}
+      {(totalPosts7d > 0 || totalComments7d > 0) && (
+        <section className="py-12 bg-white">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center gap-2 mb-6">
+              <Layers className="w-5 h-5 text-primary-600" />
+              <h2 className="text-xl font-bold text-gray-900">이번 주 활동</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-6 bg-primary-50 rounded-xl text-center">
+                <MessageSquare className="w-6 h-6 text-primary-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{totalPosts7d}</p>
+                <p className="text-xs text-gray-500 mt-1">새 글</p>
+              </div>
+              <div className="p-6 bg-emerald-50 rounded-xl text-center">
+                <MessageCircle className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{totalComments7d}</p>
+                <p className="text-xs text-gray-500 mt-1">댓글</p>
+              </div>
+              <div className="p-6 bg-amber-50 rounded-xl text-center">
+                <Users className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+                <p className="text-2xl font-bold text-gray-900">{activeForumCount}</p>
+                <p className="text-xs text-gray-500 mt-1">활성 포럼</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Digital Signage 안내 */}
+      <section className="py-12 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Announcements */}
-            <Link
-              to="/community/announcements"
-              className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-amber-300 hover:shadow-lg transition-all"
-            >
-              <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-6">
-                <Bell className="w-7 h-7 text-amber-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Announcements</h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                플랫폼 공지와 업데이트 안내
-              </p>
-              <span className="inline-flex items-center text-sm font-medium text-amber-600 group-hover:text-amber-700">
-                공지 보기
-                <ArrowRight className="ml-1 w-4 h-4" />
-              </span>
-            </Link>
-
-            {/* Forum */}
-            <Link
-              to="/community/forum"
-              className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-primary-300 hover:shadow-lg transition-all"
-            >
-              <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center mb-6">
-                <MessageSquare className="w-7 h-7 text-primary-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Forum</h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                공급자, 파트너, 판매자 커뮤니티
-              </p>
-              <span className="inline-flex items-center text-sm font-medium text-primary-600 group-hover:text-primary-700">
-                포럼 참여
-                <ArrowRight className="ml-1 w-4 h-4" />
-              </span>
-            </Link>
-
-            {/* Digital Signage */}
-            <Link
-              to="/community/signage"
-              className="group p-8 bg-white rounded-2xl border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all"
-            >
-              <div className="w-14 h-14 bg-violet-100 rounded-xl flex items-center justify-center mb-6">
-                <Monitor className="w-7 h-7 text-violet-600" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Digital Signage</h2>
-              <p className="text-gray-600 text-sm leading-relaxed mb-6">
+          <Link
+            to="/community/signage"
+            className="flex items-center gap-6 p-8 bg-white rounded-2xl border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all group"
+          >
+            <div className="shrink-0 w-14 h-14 bg-violet-100 rounded-xl flex items-center justify-center">
+              <Monitor className="w-7 h-7 text-violet-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-gray-900 mb-1">Digital Signage</h2>
+              <p className="text-sm text-gray-600">
                 매장에서 사용하는 디지털 콘텐츠 안내
               </p>
-              <span className="inline-flex items-center text-sm font-medium text-violet-600 group-hover:text-violet-700">
-                Signage 보기
-                <ArrowRight className="ml-1 w-4 h-4" />
-              </span>
-            </Link>
-          </div>
+            </div>
+            <ArrowRight className="shrink-0 w-5 h-5 text-gray-400 group-hover:text-violet-600 transition-colors" />
+          </Link>
         </div>
       </section>
     </div>

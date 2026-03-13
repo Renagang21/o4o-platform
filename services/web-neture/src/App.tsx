@@ -422,6 +422,10 @@ function App() {
               <Route path="/community/forum/posts" element={<ForumPage title="네뚜레 포럼" description="o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다" />} />
               <Route path="/community/forum/write" element={<ForumWritePage />} />
               <Route path="/community/forum/post/:slug" element={<ForumPostPage />} />
+
+              {/* Community Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
+              <Route path="/community/write" element={<ForumWritePage categorySlug="article" backPath="/community" />} />
+              <Route path="/community/article/:slug" element={<ForumPostPage />} />
             </Route>
 
             {/* ================================================================
