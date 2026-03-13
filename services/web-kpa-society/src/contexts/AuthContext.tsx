@@ -209,6 +209,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
+  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<User>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -333,6 +334,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('auth:token-cleared', handleTokenCleared);
     return () => window.removeEventListener('auth:token-cleared', handleTokenCleared);
   }, []);
+
+  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<User> => {
+    const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-sync`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, syncToken, newPassword }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || '비밀번호 변경에 실패했습니다.');
+    }
+    const { user: apiUser, tokens } = parseAuthResponse(data);
+    if (tokens) {
+      localStorage.setItem('o4o_accessToken', tokens.accessToken);
+      if (tokens.refreshToken) {
+        localStorage.setItem('o4o_refreshToken', tokens.refreshToken);
+      }
+    }
+    if (apiUser) {
+      const userData = createUserFromApiResponse(apiUser);
+      const km = (apiUser as any).kpaMembership;
+      if (km) {
+        userData.kpaMembership = km;
+        userData.membershipRole = km.role || undefined;
+        userData.membershipOrgId = km.organizationId || undefined;
+        userData.membershipOrgName = km.organizationName || undefined;
+        userData.membershipOrgType = km.organizationType || undefined;
+        userData.membershipStatus = km.status || undefined;
+      }
+      setUser(userData);
+      return userData;
+    }
+    throw new Error('응답이 올바르지 않습니다.');
+  };
 
   const login = async (email: string, password: string): Promise<User> => {
     const response = await authClient.login({ email, password });
@@ -467,6 +502,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
+        passwordSync,
         loginAsTestAccount,
         logout,
         logoutAll,

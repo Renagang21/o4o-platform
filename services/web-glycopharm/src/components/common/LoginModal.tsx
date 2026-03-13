@@ -14,6 +14,9 @@
  * - 이메일 저장 (Remember Me)
  * - 비밀번호 찾기 링크
  * - 회원가입 링크
+ * - 비밀번호 동기화 (PASSWORD_MISMATCH 시)
+ *
+ * WO-O4O-AUTH-PASSWORD-SYNC-V1: 비밀번호 동기화 (Password Sync)
  */
 
 import { useState, useEffect, type FormEvent } from 'react';
@@ -28,7 +31,7 @@ const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
 export default function LoginModal() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, passwordSync } = useAuth();
   const { isLoginModalOpen, closeLoginModal, onLoginSuccess } = useLoginModal();
 
   const [email, setEmail] = useState('');
@@ -37,6 +40,11 @@ export default function LoginModal() {
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Password sync state
+  const [syncMode, setSyncMode] = useState(false);
+  const [syncToken, setSyncToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // 저장된 이메일 불러오기
   useEffect(() => {
@@ -77,16 +85,71 @@ export default function LoginModal() {
 
       onLoginSuccess?.();
     } catch (err: any) {
+      if (err.passwordSyncAvailable && err.syncToken) {
+        setSyncMode(true);
+        setSyncToken(err.syncToken);
+        setError('비밀번호가 일치하지 않습니다. 새 비밀번호를 설정해주세요.');
+        setIsSubmitting(false);
+        return;
+      }
       setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handlePasswordSync = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (newPassword !== confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('비밀번호는 6자 이상이어야 합니다.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const loggedInUser = await passwordSync(email, syncToken, newPassword);
+      // 이메일 저장 처리
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+      setEmail('');
+      setPassword('');
+      closeLoginModal();
+      if (location.pathname === '/login') {
+        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
+      }
+      onLoginSuccess?.();
+    } catch (err: any) {
+      setError(err.message || '비밀번호 변경에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const resetToLogin = () => {
+    setSyncMode(false);
+    setSyncToken('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setError('');
+  };
+
   const handleClose = () => {
     setEmail('');
     setPassword('');
     setError('');
+    setSyncMode(false);
+    setSyncToken('');
+    setNewPassword('');
+    setConfirmPassword('');
     closeLoginModal();
   };
 
@@ -106,8 +169,12 @@ export default function LoginModal() {
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-800">로그인</h2>
-              <p className="text-xs text-slate-500">GlycoPharm</p>
+              <h2 className="text-xl font-bold text-slate-800">
+                {syncMode ? '비밀번호 재설정' : '로그인'}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {syncMode ? '새 비밀번호를 설정합니다' : 'GlycoPharm'}
+              </p>
             </div>
           </div>
           <button
@@ -119,116 +186,221 @@ export default function LoginModal() {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              {error}
-            </div>
-          )}
+        {syncMode ? (
+          /* 비밀번호 동기화 폼 */
+          <form onSubmit={handlePasswordSync} className="space-y-5">
+            {error && (
+              <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              이메일
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                placeholder="example@email.com"
-                autoComplete="email"
-                required
-                autoFocus
-              />
+            <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl">
+              <p className="text-sm text-blue-700">
+                이 비밀번호는 O4O 전체 서비스에 적용됩니다.
+              </p>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              비밀번호
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                placeholder="비밀번호를 입력하세요"
-                autoComplete="current-password"
-                required
-              />
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">이메일</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  disabled
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">새 비밀번호</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  placeholder="새 비밀번호 입력 (6자 이상)"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5 text-slate-400" />
+                  ) : (
+                    <Eye className="w-5 h-5 text-slate-400" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">비밀번호 확인</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  placeholder="비밀번호를 다시 입력하세요"
+                  required
+                  minLength={6}
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25"
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  변경 중...
+                </span>
+              ) : (
+                '비밀번호 변경 및 로그인'
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={resetToLogin}
+              className="w-full py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              로그인으로 돌아가기
+            </button>
+          </form>
+        ) : (
+          <>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  이메일
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    placeholder="example@email.com"
+                    autoComplete="email"
+                    required
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  비밀번호
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    placeholder="비밀번호를 입력하세요"
+                    autoComplete="current-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5 text-slate-400" />
+                    ) : (
+                      <Eye className="w-5 h-5 text-slate-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* 이메일 저장 체크박스 */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberEmail"
+                  checked={rememberEmail}
+                  onChange={(e) => setRememberEmail(e.target.checked)}
+                  className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
+                />
+                <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
+                  이메일 저장
+                </label>
+              </div>
+
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded-lg"
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5 text-slate-400" />
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    로그인 중...
+                  </span>
                 ) : (
-                  <Eye className="w-5 h-5 text-slate-400" />
+                  '로그인'
                 )}
               </button>
+            </form>
+
+            {/* Footer Links */}
+            <div className="mt-6 pt-6 border-t border-slate-200">
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <Link
+                  to="/forgot-password"
+                  className="text-slate-500 hover:text-primary-600 transition-colors"
+                  onClick={handleClose}
+                >
+                  비밀번호 찾기
+                </Link>
+                <span className="text-slate-300">|</span>
+                <Link
+                  to="/register"
+                  className="text-primary-600 font-medium hover:text-primary-700 transition-colors"
+                  onClick={handleClose}
+                >
+                  회원가입
+                </Link>
+              </div>
             </div>
-          </div>
-
-          {/* 이메일 저장 체크박스 */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="rememberEmail"
-              checked={rememberEmail}
-              onChange={(e) => setRememberEmail(e.target.checked)}
-              className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
-            />
-            <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
-              이메일 저장
-            </label>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-600/25"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                로그인 중...
-              </span>
-            ) : (
-              '로그인'
-            )}
-          </button>
-        </form>
-
-        {/* Footer Links */}
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <Link
-              to="/forgot-password"
-              className="text-slate-500 hover:text-primary-600 transition-colors"
-              onClick={handleClose}
-            >
-              비밀번호 찾기
-            </Link>
-            <span className="text-slate-300">|</span>
-            <Link
-              to="/register"
-              className="text-primary-600 font-medium hover:text-primary-700 transition-colors"
-              onClick={handleClose}
-            >
-              회원가입
-            </Link>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
