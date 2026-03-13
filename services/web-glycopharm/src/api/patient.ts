@@ -105,7 +105,14 @@ export interface GlucoseReadingPayload {
   valueNumeric: number;
   unit?: string;
   measuredAt: string;
-  metadata?: { mealTiming?: string; mealTimingLabel?: string };
+  metadata?: {
+    mealTiming?: string;
+    mealTimingLabel?: string;
+    // WO-GLYCOPHARM-DATA-INPUT-EXPANSION-V1
+    medication?: { name: string; dose: string; takenAt: string };
+    exercise?: { type: string; duration: number; intensity: string };
+    symptoms?: string[];
+  };
 }
 
 // Coaching session from pharmacist (WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1)
@@ -135,6 +142,17 @@ export interface MyLinkStatus {
     pharmacyName: string;
     createdAt: string;
   };
+}
+
+// Appointment types (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
+export interface AppointmentDto {
+  id: string;
+  pharmacyName: string;
+  scheduledAt: string;
+  status: 'requested' | 'confirmed' | 'rejected' | 'completed' | 'cancelled';
+  notes: string | null;
+  rejectReason: string | null;
+  createdAt: string;
 }
 
 export const patientApi = {
@@ -174,4 +192,14 @@ export const patientApi = {
 
   requestPharmacyLink: (pharmacyId: string, message?: string) =>
     request<{ id: string }>('POST', '/api/v1/care/pharmacy-link/request', { pharmacyId, message }),
+
+  // Appointments (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
+  getMyAppointments: () =>
+    request<AppointmentDto[]>('GET', '/api/v1/care/appointments/my'),
+
+  createAppointment: (scheduledAt: string, notes?: string) =>
+    request<{ id: string }>('POST', '/api/v1/care/appointments', { scheduledAt, notes }),
+
+  cancelAppointment: (id: string) =>
+    request<void>('DELETE', `/api/v1/care/appointments/${id}`),
 };

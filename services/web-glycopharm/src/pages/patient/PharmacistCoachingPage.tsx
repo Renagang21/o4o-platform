@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageCircle, UserCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, MessageCircle, UserCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { PatientCoachingRecord } from '@/api/patient';
 
@@ -122,6 +122,15 @@ export default function PharmacistCoachingPage() {
                     </div>
                   )}
                 </div>
+
+                {/* Appointment shortcut */}
+                <button
+                  onClick={() => navigate('/patient/appointments')}
+                  className="w-full mt-3 py-2.5 text-sm font-medium text-orange-600 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  상담 예약하기
+                </button>
               </section>
             )}
 

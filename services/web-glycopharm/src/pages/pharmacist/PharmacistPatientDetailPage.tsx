@@ -15,14 +15,15 @@ import {
   BarChart3,
   MessageSquarePlus,
   FileText,
+  Calendar,
   ChevronRight,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type {
-  CareInsightDto,
   CoachingSession,
   HealthReadingDto,
 } from '@/api/pharmacy';
+import { calculateRisk, RISK_CONFIG } from '@/utils/riskScore';
 
 // ─── Helpers ───
 
@@ -32,12 +33,6 @@ const MEAL_LABELS: Record<string, string> = {
   after_meal: '식후',
   bedtime: '취침 전',
   random: '기타',
-};
-
-const RISK_DISPLAY: Record<string, { label: string; color: string; bgColor: string }> = {
-  high: { label: '고위험', color: 'text-red-700', bgColor: 'bg-red-50' },
-  moderate: { label: '주의', color: 'text-amber-700', bgColor: 'bg-amber-50' },
-  low: { label: '정상', color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
 };
 
 interface GlucoseStats {
@@ -95,7 +90,6 @@ export default function PharmacistPatientDetailPage() {
 
   const [patientName, setPatientName] = useState('');
   const [createdAt, setCreatedAt] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState<CareInsightDto | null>(null);
   const [sessions, setSessions] = useState<CoachingSession[]>([]);
   const [readings, setReadings] = useState<HealthReadingDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,9 +98,8 @@ export default function PharmacistPatientDetailPage() {
     if (!patientId) return;
     setLoading(true);
     try {
-      const [customerRes, analysisRes, sessionsRes, readingsRes] = await Promise.all([
+      const [customerRes, sessionsRes, readingsRes] = await Promise.all([
         pharmacyApi.getCustomerDetail(patientId).catch(() => null),
-        pharmacyApi.getCareAnalysis(patientId).catch(() => null),
         pharmacyApi.getCoachingSessions(patientId).catch(() => []),
         pharmacyApi.getHealthReadings(patientId, { metricType: 'glucose' }).catch(() => []),
       ]);
@@ -121,7 +114,6 @@ export default function PharmacistPatientDetailPage() {
         setCreatedAt(d.createdAt || null);
       }
 
-      setAnalysis(analysisRes);
       setSessions(Array.isArray(sessionsRes) ? sessionsRes : []);
       setReadings(Array.isArray(readingsRes) ? readingsRes : []);
     } catch {
@@ -145,8 +137,10 @@ export default function PharmacistPatientDetailPage() {
     [readings],
   );
 
-  const riskCfg = analysis
-    ? RISK_DISPLAY[analysis.riskLevel] || RISK_DISPLAY.low
+  // WO-GLYCOPHARM-PATIENT-RISK-SCORE-V1: client-side risk calculation
+  const riskResult = useMemo(() => calculateRisk(readings), [readings]);
+  const riskCfg = riskResult.readingCount > 0
+    ? RISK_CONFIG[riskResult.level]
     : null;
 
   if (!patientId) {
@@ -277,6 +271,12 @@ export default function PharmacistPatientDetailPage() {
                 label="코칭 기록 보기"
                 description={sessions.length > 0 ? `${sessions.length}건의 코칭 기록` : '코칭 기록 없음'}
                 onClick={() => navigate(`/pharmacist/coaching/${patientId}`)}
+              />
+              <ActionButton
+                icon={<Calendar className="w-5 h-5 text-orange-600" />}
+                label="예약 관리"
+                description="환자 상담 예약 확인 및 관리"
+                onClick={() => navigate('/pharmacist/appointments')}
               />
             </section>
 

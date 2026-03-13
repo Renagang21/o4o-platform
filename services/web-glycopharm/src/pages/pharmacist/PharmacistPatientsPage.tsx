@@ -1,10 +1,10 @@
 /**
  * PharmacistPatientsPage — 약사 환자 목록
  * WO-GLYCOPHARM-PHARMACIST-PATIENT-LIST-SCREEN-V1
+ * WO-GLYCOPHARM-PATIENT-RISK-SCORE-V1
  *
- * 약사가 관리하는 환자 목록 + 위험 상태 + 검색.
- * 기존 pharmacyApi (getCustomers, getRiskPatients) 재사용.
- * 새 백엔드 불필요.
+ * 약사가 관리하는 환자 목록 + 위험도 + 최근/평균 혈당 + 검색.
+ * 클라이언트 측 calculateRisk() 기반 위험도 계산.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -14,28 +14,11 @@ import {
   Users,
   Search,
   ChevronRight,
-  Activity,
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
-import type { PharmacyCustomer, RiskPatientDto } from '@/api/pharmacy';
-
-// ─── Risk config ───
-
-interface RiskConfig {
-  label: string;
-  color: string;
-  bgColor: string;
-  dotColor: string;
-  sortOrder: number;
-}
-
-const RISK_MAP: Record<string, RiskConfig> = {
-  high: { label: '고위험', color: 'text-red-700', bgColor: 'bg-red-50', dotColor: 'bg-red-500', sortOrder: 0 },
-  caution: { label: '주의', color: 'text-amber-700', bgColor: 'bg-amber-50', dotColor: 'bg-amber-500', sortOrder: 1 },
-  normal: { label: '정상', color: 'text-emerald-700', bgColor: 'bg-emerald-50', dotColor: 'bg-emerald-500', sortOrder: 2 },
-};
-
-const DEFAULT_RISK: RiskConfig = { label: '미분석', color: 'text-slate-500', bgColor: 'bg-slate-50', dotColor: 'bg-slate-300', sortOrder: 3 };
+import type { PharmacyCustomer, HealthReadingDto } from '@/api/pharmacy';
+import { calculateRisk, RISK_CONFIG, NO_DATA_CONFIG } from '@/utils/riskScore';
+import type { RiskResult } from '@/utils/riskScore';
 
 type SortKey = 'risk' | 'recent' | 'name';
 
@@ -45,7 +28,7 @@ export default function PharmacistPatientsPage() {
   const navigate = useNavigate();
 
   const [customers, setCustomers] = useState<PharmacyCustomer[]>([]);
-  const [riskMap, setRiskMap] = useState<Map<string, RiskPatientDto>>(new Map());
+  const [readingsMap, setReadingsMap] = useState<Map<string, RiskResult>>(new Map());
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortKey>('risk');
@@ -53,28 +36,33 @@ export default function PharmacistPatientsPage() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [customersRes, riskRes] = await Promise.all([
-        pharmacyApi.getCustomers({ pageSize: 200 }).catch(() => null),
-        pharmacyApi.getRiskPatients().catch(() => null),
-      ]);
+      const customersRes = await pharmacyApi.getCustomers({ pageSize: 200 }).catch(() => null);
 
-      // Extract customers
+      let loadedCustomers: PharmacyCustomer[] = [];
       if (customersRes && 'data' in customersRes && customersRes.data) {
         const data = customersRes.data;
         if ('data' in data && Array.isArray(data.data)) {
-          setCustomers(data.data);
+          loadedCustomers = data.data;
         } else if (Array.isArray(data)) {
-          setCustomers(data as PharmacyCustomer[]);
+          loadedCustomers = data as PharmacyCustomer[];
         }
       }
+      setCustomers(loadedCustomers);
 
-      // Build risk lookup map
-      if (riskRes) {
-        const map = new Map<string, RiskPatientDto>();
-        const highRisk = Array.isArray(riskRes.highRisk) ? riskRes.highRisk : [];
-        const caution = Array.isArray(riskRes.caution) ? riskRes.caution : [];
-        [...highRisk, ...caution].forEach((r) => map.set(r.patientId, r));
-        setRiskMap(map);
+      // Fetch readings per patient in parallel → compute risk
+      if (loadedCustomers.length > 0) {
+        const riskEntries = await Promise.all(
+          loadedCustomers.map(async (c) => {
+            try {
+              const readings = await pharmacyApi.getHealthReadings(c.id, { metricType: 'glucose' });
+              const arr = Array.isArray(readings) ? readings as HealthReadingDto[] : [];
+              return [c.id, calculateRisk(arr)] as const;
+            } catch {
+              return [c.id, calculateRisk([])] as const;
+            }
+          }),
+        );
+        setReadingsMap(new Map(riskEntries));
       }
     } catch {
       // silent
@@ -91,20 +79,12 @@ export default function PharmacistPatientsPage() {
 
   const enrichedPatients = useMemo(() => {
     return customers.map((c) => {
-      const risk = riskMap.get(c.id);
-      const riskLevel = risk?.compositeRiskLevel || 'normal';
-      const riskCfg = RISK_MAP[riskLevel] || DEFAULT_RISK;
-      return {
-        ...c,
-        risk,
-        riskLevel,
-        riskCfg: risk ? riskCfg : DEFAULT_RISK,
-        tir: risk?.tir ?? null,
-        cv: risk?.cv ?? null,
-        lastAnalysis: risk?.lastAnalysisDate || null,
-      };
+      const risk = readingsMap.get(c.id) || null;
+      const hasData = risk && risk.readingCount > 0;
+      const cfg = hasData ? RISK_CONFIG[risk.level] : NO_DATA_CONFIG;
+      return { ...c, risk, cfg, hasData };
     });
-  }, [customers, riskMap]);
+  }, [customers, readingsMap]);
 
   const filtered = useMemo(() => {
     let list = enrichedPatients;
@@ -123,14 +103,14 @@ export default function PharmacistPatientsPage() {
     // Sort
     list = [...list].sort((a, b) => {
       if (sortBy === 'risk') {
-        const diff = a.riskCfg.sortOrder - b.riskCfg.sortOrder;
+        const diff = a.cfg.sortOrder - b.cfg.sortOrder;
         if (diff !== 0) return diff;
         return a.name.localeCompare(b.name, 'ko');
       }
       if (sortBy === 'recent') {
-        const aTime = a.lastAnalysis ? new Date(a.lastAnalysis).getTime() : 0;
-        const bTime = b.lastAnalysis ? new Date(b.lastAnalysis).getTime() : 0;
-        return bTime - aTime;
+        const aVal = a.risk?.latestGlucose ?? 0;
+        const bVal = b.risk?.latestGlucose ?? 0;
+        return bVal - aVal;
       }
       return a.name.localeCompare(b.name, 'ko');
     });
@@ -139,8 +119,9 @@ export default function PharmacistPatientsPage() {
   }, [enrichedPatients, search, sortBy]);
 
   // Summary counts
-  const highCount = enrichedPatients.filter((p) => p.riskLevel === 'high').length;
-  const cautionCount = enrichedPatients.filter((p) => p.riskLevel === 'caution').length;
+  const highCount = enrichedPatients.filter((p) => p.hasData && p.risk?.level === 'HIGH').length;
+  const mediumCount = enrichedPatients.filter((p) => p.hasData && p.risk?.level === 'MEDIUM').length;
+  const lowCount = enrichedPatients.filter((p) => p.hasData && p.risk?.level === 'LOW').length;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6">
@@ -183,9 +164,14 @@ export default function PharmacistPatientsPage() {
                     고위험 {highCount}
                   </span>
                 )}
-                {cautionCount > 0 && (
+                {mediumCount > 0 && (
                   <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-600">
-                    주의 {cautionCount}
+                    주의 {mediumCount}
+                  </span>
+                )}
+                {lowCount > 0 && (
+                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600">
+                    정상 {lowCount}
                   </span>
                 )}
               </div>
@@ -207,7 +193,7 @@ export default function PharmacistPatientsPage() {
             <div className="flex gap-2 mb-4">
               {([
                 { key: 'risk' as SortKey, label: '위험도순' },
-                { key: 'recent' as SortKey, label: '최근순' },
+                { key: 'recent' as SortKey, label: '최근 혈당순' },
                 { key: 'name' as SortKey, label: '이름순' },
               ]).map((opt) => (
                 <button
@@ -242,7 +228,7 @@ export default function PharmacistPatientsPage() {
                   >
                     {/* Risk dot */}
                     <div className="flex-shrink-0">
-                      <div className={`w-3 h-3 rounded-full ${patient.riskCfg.dotColor}`} />
+                      <div className={`w-3 h-3 rounded-full ${patient.cfg.dotColor}`} />
                     </div>
 
                     {/* Info */}
@@ -251,20 +237,19 @@ export default function PharmacistPatientsPage() {
                         <p className="text-sm font-semibold text-slate-800 truncate">
                           {patient.name}
                         </p>
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${patient.riskCfg.bgColor} ${patient.riskCfg.color}`}>
-                          {patient.riskCfg.label}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${patient.cfg.bgColor} ${patient.cfg.color}`}>
+                          {patient.cfg.label}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
-                        {patient.tir != null && (
-                          <span className="flex items-center gap-1">
-                            <Activity className="w-3 h-3" />
-                            TIR {patient.tir}%
+                        {patient.risk?.avgGlucose != null && (
+                          <span>
+                            평균 <span className="font-medium text-slate-600">{patient.risk.avgGlucose}</span>
                           </span>
                         )}
-                        {patient.lastAnalysis && (
-                          <span>
-                            {new Date(patient.lastAnalysis).toLocaleDateString('ko-KR')}
+                        {patient.risk?.hypoCount != null && patient.risk.hypoCount > 0 && (
+                          <span className="text-violet-500">
+                            저혈당 {patient.risk.hypoCount}회
                           </span>
                         )}
                         {patient.diabetesType && (
@@ -280,6 +265,20 @@ export default function PharmacistPatientsPage() {
                         )}
                       </div>
                     </div>
+
+                    {/* Latest glucose */}
+                    {patient.risk?.latestGlucose != null && (
+                      <div className="text-right flex-shrink-0">
+                        <p className={`text-lg font-bold tabular-nums ${
+                          patient.risk.latestGlucose > 180 || patient.risk.latestGlucose < 70
+                            ? 'text-red-600'
+                            : 'text-slate-800'
+                        }`}>
+                          {patient.risk.latestGlucose}
+                        </p>
+                        <p className="text-[10px] text-slate-400">mg/dL</p>
+                      </div>
+                    )}
 
                     {/* Chevron */}
                     <ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" />

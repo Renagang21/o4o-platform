@@ -801,6 +801,28 @@ class PharmacyApiClient {
       body: JSON.stringify({ requestId, reason }),
     });
   }
+
+  // ── Appointments (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1) ──
+
+  async getPharmacyAppointments(status?: string): Promise<PharmacyAppointmentDto[]> {
+    const qs = status ? `?status=${status}` : '';
+    return this.request(`/api/v1/care/appointments/pharmacy${qs}`);
+  }
+
+  async confirmAppointment(id: string): Promise<void> {
+    return this.request(`/api/v1/care/appointments/${id}/confirm`, { method: 'PATCH' });
+  }
+
+  async rejectAppointment(id: string, reason?: string): Promise<void> {
+    return this.request(`/api/v1/care/appointments/${id}/reject`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reason }),
+    });
+  }
+
+  async completeAppointment(id: string): Promise<void> {
+    return this.request(`/api/v1/care/appointments/${id}/complete`, { method: 'PATCH' });
+  }
 }
 
 // ── Pharmacy Link Types (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
@@ -813,6 +835,21 @@ export interface PharmacyLinkRequestDto {
   pharmacyName: string;
   status: string;
   message: string | null;
+  createdAt: string;
+}
+
+// ── Appointment Types (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1) ──
+
+export interface PharmacyAppointmentDto {
+  id: string;
+  patientId: string;
+  patientName: string;
+  patientEmail: string;
+  pharmacyName: string;
+  scheduledAt: string;
+  status: string;
+  notes: string | null;
+  rejectReason: string | null;
   createdAt: string;
 }
 

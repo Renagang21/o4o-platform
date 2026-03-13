@@ -12,7 +12,7 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, ChevronRight } from 'lucide-react';
+import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, Calendar, ChevronRight } from 'lucide-react';
 
 const MENU_ITEMS = [
   {
@@ -22,6 +22,14 @@ const MENU_ITEMS = [
     icon: Building2,
     color: 'text-teal-600',
     bg: 'bg-teal-50',
+  },
+  {
+    label: '상담 예약',
+    description: '약사와 상담 시간 예약',
+    path: '/patient/appointments',
+    icon: Calendar,
+    color: 'text-orange-600',
+    bg: 'bg-orange-50',
   },
   {
     label: '개인 설정 관리',
