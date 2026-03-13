@@ -45,7 +45,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isPending: boolean;
   isRejected: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; passwordSyncAvailable?: boolean; syncToken?: string }>;
+  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
 }
@@ -102,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; passwordSyncAvailable?: boolean; syncToken?: string }> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
@@ -114,6 +115,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.code === 'PASSWORD_MISMATCH' && data.passwordSyncAvailable) {
+          return { success: false, message: data.error, passwordSyncAvailable: true, syncToken: data.syncToken };
+        }
         return { success: false, message: resolveAuthError(data, response.status) };
       }
 
@@ -156,6 +160,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, syncToken, newPassword }),
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return { success: false, message: data.error || '비밀번호 변경에 실패했습니다.' };
+      }
+      const { user: apiUser } = parseAuthResponse(data);
+      if (apiUser) {
+        const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+        const base = normalizeUser(apiUser);
+        const userData: User = {
+          ...base,
+          roles,
+          memberships: (apiUser as any).memberships || [],
+          approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
+          displayName: base.name,
+        };
+        setUser(userData);
+        return { success: true };
+      }
+      return { success: false, message: '응답이 올바르지 않습니다.' };
+    } catch {
+      return { success: false, message: '비밀번호 변경에 실패했습니다.' };
+    }
+  };
+
   const logout = async () => {
     try {
       await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
@@ -189,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isPending,
       isRejected,
       login,
+      passwordSync,
       logout,
       updateUser,
     }}>

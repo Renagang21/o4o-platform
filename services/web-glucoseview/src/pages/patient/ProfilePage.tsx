@@ -7,8 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Settings, Save, CheckCircle } from 'lucide-react';
+import { Settings, Save, CheckCircle } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { PatientProfile, HealthProfilePayload } from '@/api/patient';
 
@@ -71,8 +70,6 @@ function validate(form: FormData): string | null {
 }
 
 export default function ProfilePage() {
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -170,14 +167,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-white px-4 py-6">
       <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <button
-          onClick={() => navigate('/patient')}
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          돌아가기
-        </button>
-
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
             <Settings className="w-5 h-5 text-slate-600" />
@@ -306,7 +295,7 @@ export default function ProfilePage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-4 bg-teal-600 text-white text-lg font-semibold rounded-xl hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {saving ? (
             <>

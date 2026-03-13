@@ -50,14 +50,14 @@ export const O4O_SERVICES: O4OService[] = [
   {
     key: 'kpa-society',
     name: 'KPA Society',
-    domain: 'yaksa.site',
+    domain: 'kpa-society.co.kr',
     description: '약사 커뮤니티 서비스',
     joinEnabled: true,
   },
   {
     key: 'k-cosmetics',
     name: 'K-Cosmetics',
-    domain: 'cosmetics.neture.co.kr',
+    domain: 'k-cosmetics.site',
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
   },

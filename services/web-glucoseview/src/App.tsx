@@ -30,6 +30,8 @@ import OperatorStoresPage from './pages/operator/StoresPage';
 import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
 // Operator Layout
 import OperatorLayout from './components/layouts/OperatorLayout';
+// Patient Layout (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1)
+import PatientLayout from './components/layouts/PatientLayout';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/store-ui-core';
@@ -178,52 +180,28 @@ function AppRoutes() {
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
-      {/* 환자 서비스 — 루트(/) = 환자 홈 (WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1) */}
+      {/* 환자 루트(/) → /patient 리다이렉트 */}
       <Route path="/" element={
         <RoleProtectedRoute allowedRoles={['patient']}>
-          <PatientMainPage />
+          <Navigate to="/patient" replace />
         </RoleProtectedRoute>
       } />
+
+      {/* 환자 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
       <Route path="/patient" element={
         <RoleProtectedRoute allowedRoles={['patient']}>
-          <PatientMainPage />
+          <PatientLayout />
         </RoleProtectedRoute>
-      } />
-      <Route path="/patient/profile" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <PatientProfilePage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/glucose-input" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <GlucoseInputPage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/data-analysis" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <DataAnalysisPage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/pharmacist-coaching" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <PharmacistCoachingPage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/select-pharmacy" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <SelectPharmacyPage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/appointments" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <PatientAppointmentsPage />
-        </RoleProtectedRoute>
-      } />
-      <Route path="/patient/care-guideline" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <CareGuidelinePage />
-        </RoleProtectedRoute>
-      } />
+      }>
+        <Route index element={<PatientMainPage />} />
+        <Route path="profile" element={<PatientProfilePage />} />
+        <Route path="glucose-input" element={<GlucoseInputPage />} />
+        <Route path="data-analysis" element={<DataAnalysisPage />} />
+        <Route path="pharmacist-coaching" element={<PharmacistCoachingPage />} />
+        <Route path="select-pharmacy" element={<SelectPharmacyPage />} />
+        <Route path="appointments" element={<PatientAppointmentsPage />} />
+        <Route path="care-guideline" element={<CareGuidelinePage />} />
+      </Route>
 
       {/* 약사/운영 레이아웃 (환자 홈은 위에서 처리) */}
       <Route path="/" element={<Layout />}>

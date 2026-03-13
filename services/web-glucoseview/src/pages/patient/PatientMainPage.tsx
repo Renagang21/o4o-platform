@@ -1,129 +1,267 @@
 /**
- * PatientMainPage — 환자용 메인 메뉴 화면
- * WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1
+ * PatientMainPage — 환자 대시보드
+ * WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1
  *
- * 메뉴형 시스템: 7개 기능 버튼으로 구성
+ * 모바일 중심 대시보드:
+ * - 빠른 혈당 입력 CTA
+ * - 오늘 혈당 요약
+ * - 최근 기록
+ * - 약사 코칭 메시지
+ * - 퀵 메뉴 (2×2)
  */
 
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, Calendar, ChevronRight } from 'lucide-react';
+import {
+  Activity,
+  Plus,
+  ChevronRight,
+  Building2,
+  Calendar,
+  BookOpen,
+  Sparkles,
+  MessageCircle,
+} from 'lucide-react';
+import { patientApi } from '@/api/patient';
+import type { GlucoseReading, PatientCoachingRecord } from '@/api/patient';
 
-const MENU_ITEMS = [
-  {
-    label: '약국 연결',
-    description: '담당 약국 선택 및 연결 요청',
-    path: '/patient/select-pharmacy',
-    icon: Building2,
-    color: 'text-teal-600',
-    bg: 'bg-teal-50',
-  },
-  {
-    label: '상담 예약',
-    description: '약사와 상담 시간 예약',
-    path: '/patient/appointments',
-    icon: Calendar,
-    color: 'text-orange-600',
-    bg: 'bg-orange-50',
-  },
-  {
-    label: '개인 설정 관리',
-    description: '내 정보 및 알림 설정',
-    path: '/patient/profile',
-    icon: Settings,
-    color: 'text-slate-600',
-    bg: 'bg-slate-100',
-  },
-  {
-    label: '데이터 입력 및 조회',
-    description: '혈당·식사·운동 데이터 기록',
-    path: '/patient/glucose-input',
-    icon: ClipboardEdit,
-    color: 'text-blue-600',
-    bg: 'bg-blue-50',
-  },
-  {
-    label: '데이터 분석 확인',
-    description: '혈당 추이 및 패턴 분석',
-    path: '/patient/data-analysis',
-    icon: BarChart3,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-  },
-  {
-    label: '약사 코칭 확인',
-    description: '약사 상담 내역 및 조언',
-    path: '/patient/pharmacist-coaching',
-    icon: MessageCircle,
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-  },
-  {
-    label: '당뇨 케어 가이드라인',
-    description: '당뇨 관리 교육 자료',
-    path: '/patient/care-guideline',
-    icon: BookOpen,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
-  },
+const MEAL_TIMING_LABELS: Record<string, string> = {
+  fasting: '공복',
+  before_meal: '식전',
+  after_meal: '식후',
+  bedtime: '취침 전',
+  random: '기타',
+};
+
+const QUICK_MENU = [
+  { label: '약국 연결', path: '/patient/select-pharmacy', icon: Building2, color: 'text-teal-600', bg: 'bg-teal-50' },
+  { label: '상담 예약', path: '/patient/appointments', icon: Calendar, color: 'text-orange-600', bg: 'bg-orange-50' },
+  { label: '케어 가이드', path: '/patient/care-guideline', icon: BookOpen, color: 'text-amber-600', bg: 'bg-amber-50' },
 ] as const;
 
 export default function PatientMainPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const [readings, setReadings] = useState<GlucoseReading[]>([]);
+  const [latestCoaching, setLatestCoaching] = useState<PatientCoachingRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [readingsRes, coachingRes] = await Promise.all([
+          patientApi.getGlucoseReadings({ metricType: 'glucose' }),
+          patientApi.getMyCoaching(),
+        ]);
+
+        if (readingsRes.success && readingsRes.data) {
+          setReadings(Array.isArray(readingsRes.data) ? readingsRes.data : []);
+        }
+        if (coachingRes.success && coachingRes.data) {
+          const list = Array.isArray(coachingRes.data) ? coachingRes.data : [];
+          setLatestCoaching(list.length > 0 ? list[0] : null);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // 오늘 기록 필터
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayReadings = readings.filter(
+    (r) => new Date(r.measuredAt) >= todayStart,
+  );
+  const latestReading = readings.length > 0 ? readings[0] : null;
+
+  const formatDate = () => {
+    const d = new Date();
+    return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
   };
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
+    <div className="bg-white px-4 py-6">
       <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
-            <Activity className="w-7 h-7 text-white" />
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-slate-800">
+                {user?.name || user?.email || '환자'}님
+              </h1>
+              <p className="text-xs text-slate-400">{formatDate()}</p>
+            </div>
           </div>
-          <h1 className="text-xl font-bold text-slate-800">
-            {user?.name || user?.email || '환자'}님
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">GlucoseView 환자 서비스</p>
         </div>
 
-        {/* Menu Items */}
-        <div className="space-y-3">
-          {MENU_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className="w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all text-left"
-              >
-                <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`w-6 h-6 ${item.color}`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-base font-medium text-slate-800">{item.label}</p>
-                  <p className="text-sm text-slate-400">{item.description}</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-300 flex-shrink-0" />
-              </button>
-            );
-          })}
-        </div>
+        {/* Quick Glucose Input CTA */}
+        <button
+          onClick={() => navigate('/patient/glucose-input')}
+          className="w-full py-4 bg-teal-600 text-white text-lg font-semibold rounded-xl hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 mb-6 shadow-sm"
+        >
+          <Plus className="w-5 h-5" />
+          혈당 기록하기
+        </button>
 
-        {/* Logout */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            로그아웃
-          </button>
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Today's Glucose Card */}
+            <section className="rounded-xl border border-slate-200 p-4 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-500 mb-3">오늘의 혈당</h2>
+              {todayReadings.length > 0 ? (
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-4xl font-bold text-slate-800 tabular-nums">
+                      {latestReading?.valueNumeric != null
+                        ? Number(latestReading.valueNumeric).toFixed(0)
+                        : '-'}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">mg/dL</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-slate-500">
+                      {MEAL_TIMING_LABELS[(latestReading?.metadata as Record<string, string>)?.mealTiming] || ''}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      오늘 {todayReadings.length}회 기록
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-sm text-slate-400">오늘 아직 기록이 없습니다</p>
+                  <p className="text-xs text-slate-300 mt-1">위 버튼을 눌러 혈당을 기록하세요</p>
+                </div>
+              )}
+            </section>
+
+            {/* Recent Records Card */}
+            <section className="rounded-xl border border-slate-200 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-semibold text-slate-500">최근 기록</h2>
+                <button
+                  onClick={() => navigate('/patient/data-analysis')}
+                  className="text-xs text-teal-600 font-medium flex items-center gap-0.5"
+                >
+                  분석 보기
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {readings.length > 0 ? (
+                <div className="space-y-2">
+                  {readings.slice(0, 5).map((r) => {
+                    const meta = r.metadata as Record<string, string>;
+                    return (
+                      <div
+                        key={r.id}
+                        className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0"
+                      >
+                        <div>
+                          <p className="text-xs text-slate-400">
+                            {new Date(r.measuredAt).toLocaleDateString('ko-KR', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          <p className="text-xs text-slate-300">
+                            {MEAL_TIMING_LABELS[meta?.mealTiming] || ''}
+                          </p>
+                        </div>
+                        <p className="text-lg font-bold text-slate-800 tabular-nums">
+                          {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(0) : '-'}
+                          <span className="text-xs font-normal text-slate-400 ml-0.5">mg/dL</span>
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400 text-center py-4">아직 기록이 없습니다</p>
+              )}
+            </section>
+
+            {/* AI Insight Placeholder */}
+            <section className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-slate-400" />
+                <h2 className="text-sm font-semibold text-slate-400">AI 인사이트</h2>
+              </div>
+              <p className="text-xs text-slate-400">
+                혈당 패턴 분석 AI가 곧 준비됩니다.
+              </p>
+            </section>
+
+            {/* Pharmacist Coaching Card */}
+            <section className="rounded-xl border border-slate-200 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 text-violet-500" />
+                  <h2 className="text-sm font-semibold text-slate-500">약사 코칭</h2>
+                </div>
+                {latestCoaching && (
+                  <button
+                    onClick={() => navigate('/patient/pharmacist-coaching')}
+                    className="text-xs text-violet-600 font-medium flex items-center gap-0.5"
+                  >
+                    자세히 보기
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              {latestCoaching ? (
+                <div>
+                  <p className="text-sm text-slate-700 line-clamp-2 leading-relaxed">
+                    {latestCoaching.summary}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-2">
+                    {latestCoaching.pharmacistName || '약사'} ·{' '}
+                    {new Date(latestCoaching.createdAt).toLocaleDateString('ko-KR')}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400 text-center py-2">
+                  아직 약사 코칭이 없습니다
+                </p>
+              )}
+            </section>
+
+            {/* Quick Menu */}
+            <section>
+              <div className="grid grid-cols-3 gap-3">
+                {QUICK_MENU.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      className="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center`}>
+                        <Icon className={`w-5 h-5 ${item.color}`} />
+                      </div>
+                      <span className="text-xs font-medium text-slate-600">{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );

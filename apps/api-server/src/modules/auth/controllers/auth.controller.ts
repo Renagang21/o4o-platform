@@ -6,6 +6,7 @@
  */
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -20,6 +21,7 @@ import { env } from '../../../utils/env-validator.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import { getServiceName } from '../../../config/service-catalog.js';
+import { RedisService } from '../../../services/redis.service.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -287,7 +289,29 @@ export class AuthController extends BaseController {
       });
 
       // Handle specific auth errors with specific error codes
-      if (error.code === 'INVALID_CREDENTIALS' || error.code === 'INVALID_USER') {
+      if (error.code === 'INVALID_CREDENTIALS') {
+        // WO-O4O-AUTH-PASSWORD-SYNC-V1: Issue syncToken for password reset flow
+        try {
+          const syncToken = uuidv4();
+          const redis = RedisService.getInstance();
+          await redis.set(
+            `password-sync:${syncToken}`,
+            JSON.stringify({ email, createdAt: Date.now() }),
+            300, // 5 minutes TTL
+          );
+          return res.status(401).json({
+            success: false,
+            error: '비밀번호가 일치하지 않습니다.',
+            code: 'PASSWORD_MISMATCH',
+            passwordSyncAvailable: true,
+            syncToken,
+          });
+        } catch (syncErr) {
+          logger.warn('[AuthController.login] Failed to generate syncToken', syncErr);
+          return BaseController.unauthorized(res, error.message, 'PASSWORD_MISMATCH');
+        }
+      }
+      if (error.code === 'INVALID_USER') {
         return BaseController.unauthorized(res, error.message, error.code);
       }
       if (error.code === 'ACCOUNT_NOT_ACTIVE' || error.code === 'ACCOUNT_LOCKED') {

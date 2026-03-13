@@ -14,6 +14,9 @@
  * - 이메일 저장 (Remember Me)
  * - 비밀번호 찾기 링크
  * - 회원가입 링크
+ * - 비밀번호 동기화 (PASSWORD_MISMATCH 시)
+ *
+ * WO-O4O-AUTH-PASSWORD-SYNC-V1: 비밀번호 동기화 (Password Sync)
  */
 
 import { useState, useEffect } from 'react';
@@ -26,7 +29,7 @@ const REMEMBER_EMAIL_KEY = 'glucoseview_remember_email';
 
 export default function LoginModal() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, passwordSync } = useAuth();
   const { isLoginModalOpen, closeLoginModal, returnUrl, onLoginSuccess } = useLoginModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,6 +37,11 @@ export default function LoginModal() {
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // Password sync state
+  const [syncMode, setSyncMode] = useState(false);
+  const [syncToken, setSyncToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // 저장된 이메일 불러오기
   useEffect(() => {
@@ -76,6 +84,13 @@ export default function LoginModal() {
           }
         }
       } else {
+        if (result.passwordSyncAvailable && result.syncToken) {
+          setSyncMode(true);
+          setSyncToken(result.syncToken);
+          setError('비밀번호가 일치하지 않습니다. 새 비밀번호를 설정해주세요.');
+          setIsLoading(false);
+          return;
+        }
         setError(result.message || '로그인에 실패했습니다.');
       }
     } catch {
@@ -85,10 +100,62 @@ export default function LoginModal() {
     }
   };
 
+  const handlePasswordSync = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (newPassword !== confirmPassword) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('비밀번호는 6자 이상이어야 합니다.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await passwordSync(email, syncToken, newPassword);
+      if (!result.success) {
+        setError(result.message || '비밀번호 변경에 실패했습니다.');
+        return;
+      }
+      // 이메일 저장 처리
+      if (rememberEmail) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, email);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+      setEmail('');
+      setPassword('');
+      closeLoginModal();
+      onLoginSuccess?.();
+      if (returnUrl) {
+        navigate(returnUrl);
+      }
+    } catch {
+      setError('비밀번호 변경에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetToLogin = () => {
+    setSyncMode(false);
+    setSyncToken('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setError('');
+  };
+
   const handleClose = () => {
     setEmail('');
     setPassword('');
     setError('');
+    setSyncMode(false);
+    setSyncToken('');
+    setNewPassword('');
+    setConfirmPassword('');
     closeLoginModal();
   };
 
@@ -97,7 +164,9 @@ export default function LoginModal() {
       <div className="bg-white rounded-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-slate-900">약사 로그인</h3>
+          <h3 className="text-lg font-semibold text-slate-900">
+            {syncMode ? '비밀번호 재설정' : '약사 로그인'}
+          </h3>
           <button
             onClick={handleClose}
             className="p-1 text-slate-400 hover:text-slate-600"
@@ -108,96 +177,179 @@ export default function LoginModal() {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+        {syncMode ? (
+          /* 비밀번호 동기화 폼 */
+          <form onSubmit={handlePasswordSync} className="space-y-4">
+            {error && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-700">{error}</p>
+              </div>
+            )}
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                이 비밀번호는 O4O 전체 서비스에 적용됩니다.
+              </p>
             </div>
-          )}
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              이메일
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
-              required
-              autoFocus
-              className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              비밀번호
-            </label>
-            <div className="relative">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                required
-                className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                type="email"
+                value={email}
+                disabled
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 text-slate-500"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
             </div>
-          </div>
 
-          {/* 이메일 저장 체크박스 */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="rememberEmail"
-              checked={rememberEmail}
-              onChange={(e) => setRememberEmail(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
-              이메일 저장
-            </label>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">새 비밀번호</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="새 비밀번호 입력 (6자 이상)"
+                  required
+                  minLength={6}
+                  className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? '로그인 중...' : '로그인'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">비밀번호 확인</label>
+              <input
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="비밀번호를 다시 입력하세요"
+                required
+                minLength={6}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
 
-        {/* Footer Links */}
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <Link
-              to="/forgot-password"
-              className="text-slate-500 hover:text-blue-600 transition-colors"
-              onClick={handleClose}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              비밀번호 찾기
-            </Link>
-            <span className="text-slate-300">|</span>
-            <Link
-              to="/register"
-              className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
-              onClick={handleClose}
+              {isLoading ? '변경 중...' : '비밀번호 변경 및 로그인'}
+            </button>
+
+            <button
+              type="button"
+              onClick={resetToLogin}
+              className="w-full py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
             >
-              약사 회원가입
-            </Link>
-          </div>
-        </div>
+              로그인으로 돌아가기
+            </button>
+          </form>
+        ) : (
+          <>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  이메일
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="example@email.com"
+                  required
+                  autoFocus
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  비밀번호
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="비밀번호를 입력하세요"
+                    required
+                    className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* 이메일 저장 체크박스 */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberEmail"
+                  checked={rememberEmail}
+                  onChange={(e) => setRememberEmail(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="rememberEmail" className="ml-2 text-sm text-slate-600">
+                  이메일 저장
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? '로그인 중...' : '로그인'}
+              </button>
+            </form>
+
+            {/* Footer Links */}
+            <div className="mt-6 pt-6 border-t border-slate-200">
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <Link
+                  to="/forgot-password"
+                  className="text-slate-500 hover:text-blue-600 transition-colors"
+                  onClick={handleClose}
+                >
+                  비밀번호 찾기
+                </Link>
+                <span className="text-slate-300">|</span>
+                <Link
+                  to="/register"
+                  className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
+                  onClick={handleClose}
+                >
+                  약사 회원가입
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

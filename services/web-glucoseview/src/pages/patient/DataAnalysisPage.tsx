@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, TrendingUp, TrendingDown, Activity, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Activity, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading } from '@/api/patient';
 
@@ -283,14 +283,6 @@ export default function DataAnalysisPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-6">
       <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <button
-          onClick={() => navigate('/patient')}
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          돌아가기
-        </button>
-
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-emerald-600" />
@@ -304,7 +296,7 @@ export default function DataAnalysisPage() {
             <button
               key={opt.value}
               onClick={() => setPeriod(opt.value)}
-              className={`flex-1 py-2 text-sm font-medium rounded-xl transition-colors ${
+              className={`flex-1 py-3 text-sm font-medium rounded-xl transition-colors ${
                 period === opt.value
                   ? 'bg-emerald-600 text-white'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
@@ -335,26 +327,7 @@ export default function DataAnalysisPage() {
           </div>
         ) : (
           <>
-            {/* Risk Level Badge */}
-            {risk && (() => {
-              const cfg = RISK_CONFIG[risk];
-              const { Icon } = cfg;
-              return (
-                <div className={`mb-4 p-3 rounded-xl border ${cfg.bgColor} ${cfg.borderColor} flex items-center gap-2`}>
-                  <Icon className={`w-5 h-5 ${cfg.color}`} />
-                  <div>
-                    <span className={`text-sm font-semibold ${cfg.color}`}>
-                      위험 수준: {cfg.label}
-                    </span>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      최근 {period}일 평균 혈당 {stats.average.toFixed(0)} mg/dL 기준
-                    </p>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* KPI Summary Cards */}
+            {/* KPI Summary Cards — 모바일 최적화: 카드 먼저 */}
             <div className="grid grid-cols-2 gap-3 mb-4">
               <KpiCard
                 label="평균 혈당"
@@ -386,19 +359,27 @@ export default function DataAnalysisPage() {
               />
             </div>
 
-            {/* Variability Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-4">
-              <h3 className="text-sm font-semibold text-slate-700 mb-3">혈당 변동성</h3>
-              <div className="grid grid-cols-4 gap-2 text-center">
-                <StatItem label="최고" value={stats.max.toFixed(0)} color="text-red-600" />
-                <StatItem label="최저" value={stats.min.toFixed(0)} color="text-blue-600" />
-                <StatItem label="범위" value={stats.range.toFixed(0)} color="text-slate-800" />
-                <StatItem label="표준편차" value={stats.stdDev.toFixed(1)} color="text-slate-800" />
-              </div>
-            </div>
+            {/* Risk Level Badge */}
+            {risk && (() => {
+              const cfg = RISK_CONFIG[risk];
+              const { Icon } = cfg;
+              return (
+                <div className={`mb-4 p-4 rounded-xl border ${cfg.bgColor} ${cfg.borderColor} flex items-center gap-2`}>
+                  <Icon className={`w-5 h-5 ${cfg.color}`} />
+                  <div>
+                    <span className={`text-sm font-semibold ${cfg.color}`}>
+                      위험 수준: {cfg.label}
+                    </span>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      최근 {period}일 평균 혈당 {stats.average.toFixed(0)} mg/dL 기준
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Chart */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4">
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 mb-4 overflow-hidden">
               <h3 className="text-sm font-semibold text-slate-700 mb-2">혈당 추이</h3>
               <GlucoseChart readings={readings} />
               <div className="flex items-center justify-center gap-4 mt-2 text-xs text-slate-400">
@@ -410,6 +391,17 @@ export default function DataAnalysisPage() {
                   <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                   범위 밖
                 </span>
+              </div>
+            </div>
+
+            {/* Variability Card */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3">혈당 변동성</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <StatItem label="최고" value={stats.max.toFixed(0)} color="text-red-600" />
+                <StatItem label="최저" value={stats.min.toFixed(0)} color="text-blue-600" />
+                <StatItem label="범위" value={stats.range.toFixed(0)} color="text-slate-800" />
+                <StatItem label="표준편차" value={stats.stdDev.toFixed(1)} color="text-slate-800" />
               </div>
             </div>
           </>
@@ -435,12 +427,12 @@ function KpiCard({
   subtext: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-3">
+    <div className="bg-white rounded-xl border border-slate-200 p-4">
       <div className="flex items-center gap-1.5 mb-2">
         {icon}
         <span className="text-xs font-medium text-slate-500">{label}</span>
       </div>
-      <p className="text-2xl font-bold text-slate-800 tabular-nums leading-none">
+      <p className="text-3xl font-bold text-slate-800 tabular-nums leading-none">
         {value}
         {unit && <span className="text-xs font-normal text-slate-400 ml-1">{unit}</span>}
       </p>

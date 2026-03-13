@@ -9,9 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   ClipboardEdit,
   Save,
   CheckCircle,
@@ -73,7 +71,6 @@ function getDefaultMeasuredAt(): string {
 }
 
 export default function GlucoseInputPage() {
-  const navigate = useNavigate();
 
   // Form state — Glucose
   const [glucoseValue, setGlucoseValue] = useState('');
@@ -218,19 +215,11 @@ export default function GlucoseInputPage() {
     <div className="min-h-screen bg-white px-4 py-6">
       <div className="w-full max-w-md mx-auto">
         {/* Header */}
-        <button
-          onClick={() => navigate('/patient')}
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          돌아가기
-        </button>
-
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-            <ClipboardEdit className="w-5 h-5 text-blue-600" />
+          <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+            <ClipboardEdit className="w-5 h-5 text-teal-600" />
           </div>
-          <h1 className="text-xl font-bold text-slate-800">데이터 입력 및 조회</h1>
+          <h1 className="text-xl font-bold text-slate-800">혈당 기록</h1>
         </div>
 
         {/* Error */}
@@ -243,55 +232,73 @@ export default function GlucoseInputPage() {
         {/* ─── Section 1: Glucose Input (Required) ─── */}
         <section className="mb-4">
           <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5">
-            <h3 className="text-sm font-semibold text-blue-600 flex items-center gap-2">
-              <ClipboardEdit className="w-4 h-4" />
-              혈당 기록
-            </h3>
-
-            {/* 혈당 값 */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+            {/* 혈당 값 — 대형 입력 */}
+            <div className="text-center">
+              <label className="block text-sm font-medium text-slate-500 mb-2">
                 혈당 (mg/dL)
               </label>
               <input
                 type="number"
+                inputMode="numeric"
                 value={glucoseValue}
                 onChange={(e) => setGlucoseValue(e.target.value)}
-                placeholder="예: 115"
+                placeholder="0"
                 min="20"
                 max="600"
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full text-center text-5xl font-bold text-slate-800 py-4 rounded-2xl border-2 border-slate-200 focus:border-teal-500 focus:outline-none focus:ring-0 tabular-nums"
               />
+              <p className="text-xs text-slate-400 mt-1">20~600 mg/dL</p>
             </div>
 
-            {/* 측정 구분 */}
+            {/* 측정 구분 — 버튼 그룹 */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-slate-500 mb-2">
                 측정 구분
               </label>
-              <select
-                value={mealTiming}
-                onChange={(e) => setMealTiming(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
-              >
-                {MEAL_TIMING_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                {MEAL_TIMING_OPTIONS.filter((o) => ['fasting', 'after_meal', 'bedtime'].includes(o.value)).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setMealTiming(opt.value)}
+                    className={`py-3 text-sm font-medium rounded-xl border transition-colors ${
+                      mealTiming === opt.value
+                        ? 'bg-teal-50 border-teal-300 text-teal-700'
+                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
                     {opt.label}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {MEAL_TIMING_OPTIONS.filter((o) => ['before_meal', 'random'].includes(o.value)).map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setMealTiming(opt.value)}
+                    className={`py-2.5 text-xs font-medium rounded-xl border transition-colors ${
+                      mealTiming === opt.value
+                        ? 'bg-teal-50 border-teal-300 text-teal-700'
+                        : 'border-slate-200 text-slate-400 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* 측정 시간 */}
+            {/* 측정 시간 — 축소 표시 */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-slate-500 mb-2">
                 측정 시간
               </label>
               <input
                 type="datetime-local"
                 value={measuredAt}
                 onChange={(e) => setMeasuredAt(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full px-3 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
               />
             </div>
           </div>
@@ -302,7 +309,7 @@ export default function GlucoseInputPage() {
           <button
             type="button"
             onClick={() => setMedOpen(!medOpen)}
-            className="w-full flex items-center justify-between px-5 py-3.5 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-violet-600">
               <Pill className="w-4 h-4" />
@@ -359,7 +366,7 @@ export default function GlucoseInputPage() {
           <button
             type="button"
             onClick={() => setExOpen(!exOpen)}
-            className="w-full flex items-center justify-between px-5 py-3.5 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-emerald-600">
               <Footprints className="w-4 h-4" />
@@ -431,7 +438,7 @@ export default function GlucoseInputPage() {
           <button
             type="button"
             onClick={() => setSymOpen(!symOpen)}
-            className="w-full flex items-center justify-between px-5 py-3.5 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
+            className="w-full flex items-center justify-between px-5 py-4 bg-white rounded-2xl border border-slate-200 hover:bg-slate-50 transition-colors"
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-amber-600">
               <AlertTriangle className="w-4 h-4" />
@@ -474,7 +481,7 @@ export default function GlucoseInputPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-8"
+          className="w-full py-4 bg-teal-600 text-white text-lg font-semibold rounded-xl hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mb-8"
         >
           {saving ? (
             <>
