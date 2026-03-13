@@ -40,7 +40,7 @@ function isSuperOperator(user: UserType | null): boolean {
 
 export default function AccountMenu() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { openLoginModal } = useLoginModal();
+  const { openLoginModal, openRegisterModal } = useLoginModal();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -88,12 +88,12 @@ export default function AccountMenu() {
         >
           로그인
         </button>
-        <Link
-          to="/register"
+        <button
+          onClick={() => openRegisterModal()}
           className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
           회원가입
-        </Link>
+        </button>
       </div>
     );
   }

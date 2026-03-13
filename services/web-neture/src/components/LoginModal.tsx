@@ -15,7 +15,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useAuth, ROUTE_OVERRIDES } from '../contexts';
+import { useAuth, ROUTE_OVERRIDES, useLoginModal } from '../contexts';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
@@ -29,6 +29,7 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { openRegisterModal } = useLoginModal();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -211,17 +212,12 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                 비밀번호 찾기
               </a>
               <span className="text-gray-300">|</span>
-              <a
-                href="/register"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onClose();
-                  navigate('/register');
-                }}
+              <button
+                onClick={() => openRegisterModal()}
                 className="text-green-600 font-medium hover:text-green-700 transition-colors"
               >
                 회원가입
-              </a>
+              </button>
             </div>
           </div>
         </div>

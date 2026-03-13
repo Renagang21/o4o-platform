@@ -18,6 +18,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
+import RegisterModal from './components/RegisterModal';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -96,7 +97,7 @@ import {
 // ============================================================================
 // Neture 공통 페이지 (즉시 로드)
 // ============================================================================
-import { RegisterPage } from './pages/RegisterPage';
+// RegisterPage는 RegisterModal로 대체됨 (WO-O4O-AUTH-MODAL-SIGNUP-ROLE-UPDATE-V1)
 import AccountRecoveryPage from './pages/auth/AccountRecoveryPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import { RegisterPendingPage } from './pages/RegisterPendingPage';
@@ -327,15 +328,18 @@ function PageLoading() {
   );
 }
 
-// 로그인 모달 렌더링 컴포넌트
-function LoginModalRenderer() {
-  const { isLoginModalOpen, closeLoginModal, loginReturnUrl } = useLoginModal();
+// 인증 모달 렌더링 컴포넌트 (로그인 + 회원가입)
+function ModalRenderer() {
+  const { activeModal, closeModal, loginReturnUrl } = useLoginModal();
   return (
-    <LoginModal
-      isOpen={isLoginModalOpen}
-      onClose={closeLoginModal}
-      returnUrl={loginReturnUrl}
-    />
+    <>
+      <LoginModal
+        isOpen={activeModal === 'login'}
+        onClose={closeModal}
+        returnUrl={loginReturnUrl}
+      />
+      <RegisterModal isOpen={activeModal === 'register'} />
+    </>
   );
 }
 
@@ -366,6 +370,17 @@ function LoginRedirect() {
   return <Navigate to="/" replace />;
 }
 
+// /register 경로 접근 시 홈으로 리다이렉트하고 회원가입 모달 열기
+function RegisterRedirect() {
+  const { openRegisterModal } = useLoginModal();
+
+  useEffect(() => {
+    openRegisterModal();
+  }, [openRegisterModal]);
+
+  return <Navigate to="/" replace />;
+}
+
 const ProtectedRoute = RoleGuard;
 
 function App() {
@@ -373,14 +388,14 @@ function App() {
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
-          <LoginModalRenderer />
+          <ModalRenderer />
           <Suspense fallback={<PageLoading />}>
             <Routes>
             {/* ================================================================
                 인증 페이지 (레이아웃 없음)
             ================================================================ */}
             <Route path="/login" element={<LoginRedirect />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/register" element={<RegisterRedirect />} />
             <Route path="/forgot-password" element={<AccountRecoveryPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />

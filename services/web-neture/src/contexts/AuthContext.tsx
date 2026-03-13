@@ -10,7 +10,7 @@ import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
-export type UserRole = 'admin' | 'supplier' | 'partner' | 'operator' | 'user';
+export type UserRole = 'admin' | 'supplier' | 'partner' | 'seller' | 'operator' | 'user';
 
 export interface User {
   id: string;
@@ -36,6 +36,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
   admin: '관리자',
   supplier: '공급자',
   partner: '파트너',
+  seller: '셀러',
   operator: '운영자',
   user: '사용자',
 };
@@ -45,6 +46,7 @@ const ROUTE_OVERRIDES: Record<string, string> = {
   operator: '/workspace/operator',
   supplier: '/account/supplier',
   partner: '/account/partner',
+  seller: '/seller/overview',
 };
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
@@ -54,7 +56,7 @@ const ROLE_MAP: Record<string, UserRole> = {
   operator: 'operator',
   supplier: 'supplier',
   partner: 'partner',
-  seller: 'user',
+  seller: 'seller',
   customer: 'user',
   user: 'user',
 };
