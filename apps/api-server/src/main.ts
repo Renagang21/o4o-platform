@@ -1325,6 +1325,15 @@ const startServer = async () => {
       logger.error('Failed to register GlycoPharm Test Accounts:', glycoTestError);
     }
 
+    // 37-f. Service Users Audit endpoint
+    try {
+      const { createServiceUsersAuditRouter } = await import('./routes/debug/service-users-audit.controller.js');
+      app.use('/__debug__/service-users', createServiceUsersAuditRouter(AppDataSource));
+      logger.info('✅ Service Users Audit endpoint registered at /__debug__/service-users');
+    } catch (serviceUsersError) {
+      logger.error('Failed to register Service Users Audit:', serviceUsersError);
+    }
+
     // 37-e. Register RBAC Backfill User Role endpoint (WO-RBAC-DATA-NORMALIZATION-EXECUTION-V1)
     try {
       const { createRbacBackfillUserRoleRouter } = await import('./routes/debug/rbac-backfill-user-role.controller.js');
