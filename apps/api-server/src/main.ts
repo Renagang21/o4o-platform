@@ -1316,6 +1316,15 @@ const startServer = async () => {
       logger.error('Failed to register RBAC DB Audit routes:', rbacAuditError);
     }
 
+    // TEMP: GlycoPharm Test Account Audit (IR-GLYCOPHARM-TEST-ACCOUNT-EXTRACT-V2) — remove after use
+    try {
+      const { createGlycopharmTestAccountsRouter } = await import('./routes/debug/glycopharm-test-accounts.controller.js');
+      app.use('/__debug__/glycopharm-test-accounts', createGlycopharmTestAccountsRouter(AppDataSource));
+      logger.info('✅ GlycoPharm Test Accounts endpoint registered at /__debug__/glycopharm-test-accounts');
+    } catch (glycoTestError) {
+      logger.error('Failed to register GlycoPharm Test Accounts:', glycoTestError);
+    }
+
     // 37-e. Register RBAC Backfill User Role endpoint (WO-RBAC-DATA-NORMALIZATION-EXECUTION-V1)
     try {
       const { createRbacBackfillUserRoleRouter } = await import('./routes/debug/rbac-backfill-user-role.controller.js');

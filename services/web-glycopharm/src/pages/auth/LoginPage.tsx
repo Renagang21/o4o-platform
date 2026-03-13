@@ -62,6 +62,8 @@ export default function LoginPage() {
         navigate('/patient');
       } else if (loginType === 'pharmacist') {
         navigate('/pharmacist');
+      } else if (loginType === 'operator') {
+        navigate('/operator');
       } else {
         navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
       }
@@ -75,7 +77,9 @@ export default function LoginPage() {
     ? '환자용 시스템 로그인'
     : loginType === 'pharmacist'
       ? '약사용 시스템 로그인'
-      : 'GlycoPharm에 오신 것을 환영합니다';
+      : loginType === 'operator'
+        ? '운영자 로그인'
+        : 'GlycoPharm에 오신 것을 환영합니다';
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-white">

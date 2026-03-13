@@ -34,6 +34,12 @@ export default function LandingPage() {
         >
           약사용 시스템
         </button>
+        <button
+          onClick={() => navigate('/login?type=operator')}
+          className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          운영자 로그인
+        </button>
       </div>
     </div>
   );
