@@ -51,7 +51,7 @@ export default function PwaInstallPrompt() {
   if (!deferredPrompt || dismissed) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white px-4 py-3 flex items-center justify-between gap-3 shadow-lg">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-teal-700 text-white px-4 py-3 flex items-center justify-between gap-3 shadow-lg">
       <div className="flex items-center gap-3 min-w-0">
         <Download className="w-5 h-5 flex-shrink-0" />
         <p className="text-sm font-medium truncate">
@@ -61,13 +61,13 @@ export default function PwaInstallPrompt() {
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={handleInstall}
-          className="px-4 py-1.5 text-sm font-medium bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+          className="px-4 py-1.5 text-sm font-medium bg-white text-teal-700 rounded-lg hover:bg-teal-50 transition-colors"
         >
           설치
         </button>
         <button
           onClick={handleDismiss}
-          className="p-1 hover:bg-blue-500 rounded transition-colors"
+          className="p-1 hover:bg-teal-500 rounded transition-colors"
           aria-label="닫기"
         >
           <X className="w-4 h-4" />
