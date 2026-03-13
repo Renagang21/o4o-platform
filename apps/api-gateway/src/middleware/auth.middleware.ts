@@ -24,9 +24,14 @@ export class AuthMiddleware {
   private redis: Redis | null;
   private jwtSecret: string;
 
+  private jwtIssuer: string;
+  private jwtAudience: string;
+
   constructor(redis?: Redis) {
     this.redis = redis || null;
     this.jwtSecret = gatewayConfig.jwt.secret;
+    this.jwtIssuer = gatewayConfig.jwt.issuer;
+    this.jwtAudience = gatewayConfig.jwt.audience;
   }
 
   /**
@@ -55,8 +60,11 @@ export class AuthMiddleware {
       
       // Verify JWT token
       try {
-        const decoded = jwt.verify(token, this.jwtSecret) as any;
-        
+        const decoded = jwt.verify(token, this.jwtSecret, {
+          issuer: this.jwtIssuer,
+          audience: this.jwtAudience,
+        }) as any;
+
         // Check if token is blacklisted (for logout functionality)
         if (this.redis) {
           const isBlacklisted = await this.redis.get(`blacklist:${token}`);
@@ -68,10 +76,10 @@ export class AuthMiddleware {
             return;
           }
         }
-        
+
         // Attach user to request
         req.user = {
-          id: decoded.id || decoded.userId,
+          id: decoded.userId || decoded.sub,
           email: decoded.email,
           role: decoded.role,
           status: decoded.status,
@@ -213,14 +221,17 @@ export class AuthMiddleware {
       
       if (token) {
         try {
-          const decoded = jwt.verify(token, this.jwtSecret) as any;
-          
+          const decoded = jwt.verify(token, this.jwtSecret, {
+            issuer: this.jwtIssuer,
+            audience: this.jwtAudience,
+          }) as any;
+
           // Check blacklist
           if (this.redis) {
             const isBlacklisted = await this.redis.get(`blacklist:${token}`);
             if (!isBlacklisted) {
               req.user = {
-                id: decoded.id || decoded.userId,
+                id: decoded.userId || decoded.sub,
                 email: decoded.email,
                 role: decoded.role,
                 status: decoded.status,
@@ -229,7 +240,7 @@ export class AuthMiddleware {
             }
           } else {
             req.user = {
-              id: decoded.id || decoded.userId,
+              id: decoded.userId || decoded.sub,
               email: decoded.email,
               role: decoded.role,
               status: decoded.status,

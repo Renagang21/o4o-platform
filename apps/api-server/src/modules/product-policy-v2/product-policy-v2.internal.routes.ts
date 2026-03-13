@@ -25,13 +25,13 @@ import logger from '../../utils/logger.js';
 
 /**
  * Admin secret 검증 미들웨어.
- * X-Admin-Secret 헤더가 JWT_SECRET과 일치해야 통과.
+ * X-Admin-Secret 헤더가 ADMIN_INTERNAL_SECRET (또는 JWT_SECRET fallback)과 일치해야 통과.
  */
 function requireAdminSecret(req: Request, res: Response, next: NextFunction): void {
   const secret = req.headers['x-admin-secret'] as string;
-  const jwtSecret = process.env.JWT_SECRET;
+  const adminSecret = process.env.ADMIN_INTERNAL_SECRET || process.env.JWT_SECRET;
 
-  if (secret && jwtSecret && secret === jwtSecret) {
+  if (secret && adminSecret && secret === adminSecret) {
     next();
     return;
   }

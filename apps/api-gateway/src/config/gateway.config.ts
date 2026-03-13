@@ -48,6 +48,8 @@ export interface GatewayConfig {
   };
   jwt: {
     secret: string;
+    issuer: string;
+    audience: string;
   };
   logging: {
     level: string;
@@ -205,7 +207,9 @@ export const gatewayConfig: GatewayConfig = {
   
   // JWT Configuration
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-jwt-secret'
+    secret: process.env.JWT_SECRET || 'your-jwt-secret',
+    issuer: process.env.JWT_ISSUER || 'o4o-platform',
+    audience: process.env.JWT_AUDIENCE || 'o4o-api',
   },
   
   // Logging Configuration

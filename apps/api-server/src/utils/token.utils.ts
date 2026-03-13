@@ -94,7 +94,7 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     memberships: memberships || [], // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
-    domain,
+    // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: domain 제거 (미사용, 하드코딩 'neture.co.kr')
     tokenType: 'user',  // Phase 1: Service User 인증 기반
     iss: jwtIssuer,     // Phase 2.5: Server isolation
     aud: jwtAudience,   // Phase 2.5: Server isolation
@@ -134,7 +134,6 @@ export function generateServiceAccessToken(
     role: 'service_user', // Not a platform role, just for identification
     permissions: [],       // Service users have no platform permissions
     scopes: [],            // Service users have no platform scopes
-    domain,
     tokenType: 'service',  // Phase 1: Service User 인증 기반
     serviceId: serviceUser.serviceId,
     storeId: serviceUser.storeId,
@@ -471,7 +470,6 @@ export function generateGuestAccessToken(
     role: 'guest', // Not a platform role, just for identification
     permissions: [],    // Guest users have no platform permissions
     scopes: [],         // Guest users have no platform scopes
-    domain,
     tokenType: 'guest', // Phase 3: Guest 인증
     serviceId: guestData.serviceId,
     storeId: guestData.storeId,

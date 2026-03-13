@@ -307,8 +307,13 @@ export class AuthenticationService {
       }
 
       // Generate tokens
+      // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: OAuth 경로에도 memberships 포함
       const userRoles0 = await roleAssignmentService.getRoleNames(user.id);
-      const tokens = tokenUtils.generateTokens(user, userRoles0, 'neture.co.kr');
+      const oauthMemberships0: { serviceKey: string; status: string }[] = await AppDataSource.query(
+        `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+        [user.id]
+      );
+      const tokens = tokenUtils.generateTokens(user, userRoles0, 'neture.co.kr', oauthMemberships0);
 
       // Log successful login
       await this.logLoginAttempt(user.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -359,8 +364,13 @@ export class AuthenticationService {
       }
 
       // Generate tokens
+      // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: OAuth auto-link 경로에도 memberships 포함
       const existingUserRoles = await roleAssignmentService.getRoleNames(existingUserByEmail.id);
-      const tokens = tokenUtils.generateTokens(existingUserByEmail, existingUserRoles, 'neture.co.kr');
+      const autoLinkMemberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+        `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+        [existingUserByEmail.id]
+      );
+      const tokens = tokenUtils.generateTokens(existingUserByEmail, existingUserRoles, 'neture.co.kr', autoLinkMemberships);
 
       // Log successful login
       await this.logLoginAttempt(existingUserByEmail.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -427,8 +437,13 @@ export class AuthenticationService {
     await this.linkedAccountRepository.save(linkedAccount);
 
     // Generate tokens
+    // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: 신규 OAuth 사용자 경로에도 memberships 포함
     const newUserRoles = await roleAssignmentService.getRoleNames(newUser.id);
-    const tokens = tokenUtils.generateTokens(newUser, newUserRoles, 'neture.co.kr');
+    const newUserMemberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      [newUser.id]
+    );
+    const tokens = tokenUtils.generateTokens(newUser, newUserRoles, 'neture.co.kr', newUserMemberships);
 
     // Log new user creation and login
     await this.logLoginAttempt(newUser.id, profile.email, ipAddress, userAgent, true, undefined, provider);
@@ -898,8 +913,13 @@ export class AuthenticationService {
     }
 
     // Generate new tokens (with rotation)
+    // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: refresh 시에도 최신 memberships 포함
     const refreshedRoles = await roleAssignmentService.getRoleNames(user.id);
-    const tokens = tokenUtils.generateTokens(user, refreshedRoles, 'neture.co.kr');
+    const refreshedMemberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      [user.id]
+    );
+    const tokens = tokenUtils.generateTokens(user, refreshedRoles, 'neture.co.kr', refreshedMemberships);
 
     // Update token family
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);

@@ -52,8 +52,11 @@ export class WebSocketSessionSync {
 
       try {
         // Verify JWT token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
-        const userId = decoded.id;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!, {
+          issuer: process.env.JWT_ISSUER || 'o4o-platform',
+          audience: process.env.JWT_AUDIENCE || 'o4o-api',
+        }) as { userId: string; sub: string };
+        const userId = decoded.userId || decoded.sub;
 
         // Register socket for user
         this.addUserSocket(userId, socket.id);
