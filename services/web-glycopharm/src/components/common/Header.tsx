@@ -20,6 +20,7 @@ import {
   Store,
   LayoutDashboard,
 } from 'lucide-react';
+import ServiceSwitcher from '../ServiceSwitcher';
 
 /**
  * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 5-메뉴
@@ -106,6 +107,7 @@ export default function Header() {
 
           {/* Desktop User Actions */}
           <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated && <ServiceSwitcher currentServiceKey="glycopharm" />}
             {isAuthenticated ? (
               <div className="relative">
                 <button

@@ -22,6 +22,7 @@ import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
 import { PLATFORM_ROLES, SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
+import ServiceSwitcher from './ServiceSwitcher';
 
 /**
  * Super Operator 감지 헬퍼
@@ -163,6 +164,7 @@ export function Header({ serviceName }: { serviceName: string }) {
 
           {/* Auth Buttons */}
           <div style={styles.authArea}>
+            {user && <ServiceSwitcher currentServiceKey="kpa-society" />}
             {user ? (
               <div
                 style={styles.userIconWrapper}

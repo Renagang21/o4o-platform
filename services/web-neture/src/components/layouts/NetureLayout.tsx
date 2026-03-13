@@ -9,9 +9,12 @@
 
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import AccountMenu from '../AccountMenu';
+import ServiceSwitcher from '../ServiceSwitcher';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function NetureLayout() {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
@@ -59,7 +62,8 @@ export default function NetureLayout() {
             </nav>
 
             {/* Account */}
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              {isAuthenticated && <ServiceSwitcher currentServiceKey="neture" />}
               <AccountMenu />
             </div>
           </div>

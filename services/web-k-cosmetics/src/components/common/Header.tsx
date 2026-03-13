@@ -10,6 +10,7 @@ import { User } from 'lucide-react';
 import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { useLoginModal } from '@/contexts/LoginModalContext';
+import ServiceSwitcher from '../ServiceSwitcher';
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -77,6 +78,7 @@ export default function Header() {
 
           {/* Desktop User Actions */}
           <div style={styles.actions}>
+            {isAuthenticated && <ServiceSwitcher currentServiceKey="k-cosmetics" />}
             {isAuthenticated ? (
               <div style={styles.userMenu} ref={dropdownRef}>
                 <button

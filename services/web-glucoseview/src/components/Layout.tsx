@@ -8,6 +8,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { AIChatButton } from './ai';
+import ServiceSwitcher from './ServiceSwitcher';
 
 const navItems = [
   { path: '/', label: 'Home', protected: false },
@@ -121,6 +122,8 @@ export default function Layout() {
                 </NavLink>
               )}
 
+              {/* Service Switcher */}
+              {isAuthenticated && <ServiceSwitcher currentServiceKey="glucoseview" />}
               {/* User Icon & Dropdown OR Login Button */}
               <div className="ml-4 pl-4 border-l border-slate-200 flex items-center">
                 {isAuthenticated ? (
