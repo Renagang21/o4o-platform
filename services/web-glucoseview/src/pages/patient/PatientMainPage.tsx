@@ -22,9 +22,11 @@ import {
   BookOpen,
   Sparkles,
   MessageCircle,
+  CheckCircle,
+  Clock,
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { GlucoseReading, PatientCoachingRecord } from '@/api/patient';
+import type { GlucoseReading, PatientCoachingRecord, MyLinkStatus } from '@/api/patient';
 
 const MEAL_TIMING_LABELS: Record<string, string> = {
   fasting: '공복',
@@ -46,14 +48,16 @@ export default function PatientMainPage() {
 
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
   const [latestCoaching, setLatestCoaching] = useState<PatientCoachingRecord | null>(null);
+  const [linkStatus, setLinkStatus] = useState<MyLinkStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [readingsRes, coachingRes] = await Promise.all([
+        const [readingsRes, coachingRes, statusRes] = await Promise.all([
           patientApi.getGlucoseReadings({ metricType: 'glucose' }),
           patientApi.getMyCoaching(),
+          patientApi.getMyLinkStatus().catch(() => ({ data: { linked: false } as MyLinkStatus })),
         ]);
 
         if (readingsRes.success && readingsRes.data) {
@@ -63,6 +67,7 @@ export default function PatientMainPage() {
           const list = Array.isArray(coachingRes.data) ? coachingRes.data : [];
           setLatestCoaching(list.length > 0 ? list[0] : null);
         }
+        setLinkStatus(statusRes?.data || { linked: false });
       } catch {
         // ignore
       } finally {
@@ -118,6 +123,54 @@ export default function PatientMainPage() {
           </div>
         ) : (
           <div className="space-y-4">
+            {/* Pharmacy Link Status Card */}
+            {linkStatus?.linked ? (
+              <section className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-emerald-800 truncate">
+                    {linkStatus.pharmacyName}
+                  </p>
+                  <p className="text-xs text-emerald-600">연결됨</p>
+                </div>
+                <button
+                  onClick={() => navigate('/patient/pharmacist-coaching')}
+                  className="text-xs text-emerald-600 font-medium flex items-center gap-0.5 flex-shrink-0"
+                >
+                  코칭
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </section>
+            ) : linkStatus?.pendingRequest ? (
+              <section className="rounded-xl bg-amber-50 border border-amber-200 p-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800 truncate">
+                    {linkStatus.pendingRequest.pharmacyName}
+                  </p>
+                  <p className="text-xs text-amber-600">승인 대기 중</p>
+                </div>
+              </section>
+            ) : (
+              <section
+                onClick={() => navigate('/patient/select-pharmacy')}
+                className="rounded-xl bg-slate-50 border border-slate-200 p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                <div className="w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-teal-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-slate-700">약국 연결하기</p>
+                  <p className="text-xs text-slate-400">전문 약사 코칭을 받을 수 있습니다</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              </section>
+            )}
+
             {/* Today's Glucose Card */}
             <section className="rounded-xl border border-slate-200 p-4 shadow-sm">
               <h2 className="text-sm font-semibold text-slate-500 mb-3">오늘의 혈당</h2>

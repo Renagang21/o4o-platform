@@ -1,36 +1,43 @@
 /**
  * PharmacistCoachingPage — 환자용 약사 코칭 확인 화면
  * WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1
+ * WO-GLUCOSEVIEW-PATIENT-PHARMACY-LINK-FLOW-V1
  *
- * 약사가 작성한 코칭 내용을 환자가 확인.
- * - 최신 코칭 강조 표시
- * - 행동 가이드 (actionPlan)
- * - 과거 코칭 기록 목록
+ * 약국 연결 상태에 따라 3가지 UI:
+ * 1. 미연결 → 약국 연결 CTA
+ * 2. 대기 중 → 승인 대기 안내
+ * 3. 연결 완료 → 코칭 기록 표시
  *
  * 고령 사용자 고려: 큰 글자, 명확한 색상, 카드형 UI.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageCircle, UserCheck, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { MessageCircle, UserCheck, ChevronDown, ChevronUp, Calendar, Building2, Clock } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { PatientCoachingRecord } from '@/api/patient';
+import type { PatientCoachingRecord, MyLinkStatus } from '@/api/patient';
 
 export default function PharmacistCoachingPage() {
   const navigate = useNavigate();
   const [records, setRecords] = useState<PatientCoachingRecord[]>([]);
+  const [linkStatus, setLinkStatus] = useState<MyLinkStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const loadCoaching = useCallback(async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await patientApi.getMyCoaching();
-      if (res.success && res.data) {
-        setRecords(Array.isArray(res.data) ? res.data : []);
+      const [coachingRes, statusRes] = await Promise.all([
+        patientApi.getMyCoaching().catch(() => ({ success: false, data: [] })),
+        patientApi.getMyLinkStatus().catch(() => ({ success: false, data: { linked: false } as MyLinkStatus })),
+      ]);
+
+      if (coachingRes.success && coachingRes.data) {
+        setRecords(Array.isArray(coachingRes.data) ? coachingRes.data : []);
       } else {
         setRecords([]);
       }
+      setLinkStatus(statusRes?.data || { linked: false });
     } catch {
       setRecords([]);
     } finally {
@@ -39,8 +46,8 @@ export default function PharmacistCoachingPage() {
   }, []);
 
   useEffect(() => {
-    loadCoaching();
-  }, [loadCoaching]);
+    loadData();
+  }, [loadData]);
 
   const latest = records.length > 0 ? records[0] : null;
   const older = records.slice(1);
@@ -60,17 +67,71 @@ export default function PharmacistCoachingPage() {
           <div className="flex items-center justify-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-500" />
           </div>
-        ) : records.length === 0 ? (
-          /* Empty State */
+        ) : !linkStatus?.linked && !linkStatus?.pendingRequest ? (
+          /* State 1: Not Linked */
           <div className="bg-slate-50 rounded-2xl border border-slate-100 p-8 flex flex-col items-center justify-center">
-            <MessageCircle className="w-12 h-12 text-slate-300 mb-3" />
-            <p className="text-base font-medium text-slate-500">아직 코칭 기록이 없습니다</p>
+            <Building2 className="w-12 h-12 text-slate-300 mb-3" />
+            <p className="text-base font-medium text-slate-500">약국을 먼저 연결해 주세요</p>
             <p className="text-sm text-slate-400 mt-1 text-center">
-              약사가 코칭을 등록하면 여기에 표시됩니다.
+              약사가 코칭을 시작하려면 약국 연결이 필요합니다.
             </p>
+            <button
+              onClick={() => navigate('/patient/select-pharmacy')}
+              className="mt-5 px-6 py-3 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition-colors inline-flex items-center gap-2"
+            >
+              <Building2 className="w-4 h-4" />
+              약국 연결하기
+            </button>
+          </div>
+        ) : linkStatus?.pendingRequest && !linkStatus?.linked ? (
+          /* State 2: Pending */
+          <div className="bg-amber-50 rounded-2xl border border-amber-200 p-8 flex flex-col items-center justify-center">
+            <Clock className="w-12 h-12 text-amber-500 mx-auto mb-3" />
+            <p className="text-base font-medium text-slate-700">
+              {linkStatus.pendingRequest.pharmacyName} 승인 대기 중
+            </p>
+            <p className="text-sm text-slate-500 mt-1 text-center">
+              약사가 연결을 승인하면 코칭이 시작됩니다.
+            </p>
+            <p className="text-xs text-slate-400 mt-3">
+              요청일: {new Date(linkStatus.pendingRequest.createdAt).toLocaleDateString('ko-KR', {
+                year: 'numeric', month: 'long', day: 'numeric',
+              })}
+            </p>
+          </div>
+        ) : records.length === 0 ? (
+          /* State 3: Linked but no coaching yet */
+          <div>
+            {linkStatus?.linked && (
+              <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4 mb-4 flex items-center gap-3">
+                <Building2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-emerald-800">{linkStatus.pharmacyName}</p>
+                  <p className="text-xs text-emerald-600">연결됨</p>
+                </div>
+              </div>
+            )}
+            <div className="bg-slate-50 rounded-2xl border border-slate-100 p-8 flex flex-col items-center justify-center">
+              <MessageCircle className="w-12 h-12 text-slate-300 mb-3" />
+              <p className="text-base font-medium text-slate-500">아직 코칭 기록이 없습니다</p>
+              <p className="text-sm text-slate-400 mt-1 text-center">
+                약사가 코칭을 등록하면 여기에 표시됩니다.
+              </p>
+            </div>
           </div>
         ) : (
           <>
+            {/* Connected Pharmacy */}
+            {linkStatus?.linked && (
+              <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4 mb-4 flex items-center gap-3">
+                <Building2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-emerald-800">{linkStatus.pharmacyName}</p>
+                  <p className="text-xs text-emerald-600">연결됨</p>
+                </div>
+              </div>
+            )}
+
             {/* Latest Coaching — Highlighted */}
             {latest && (
               <section className="mb-6">
