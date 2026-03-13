@@ -58,7 +58,7 @@ export {
 } from './store';
 
 // User Roles
-export type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'partner' | 'operator' | 'consumer';
+export type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'operator' | 'consumer';
 
 // User status
 export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -101,16 +101,6 @@ export interface SupplierUser extends User {
     name: string;
     businessNumber: string;
     category: string[];
-  };
-}
-
-// Partner specific user data
-export interface PartnerUser extends User {
-  role: 'partner';
-  partnerInfo: {
-    id: string;
-    companyName: string;
-    partnerType: 'device' | 'content' | 'marketing' | 'other';
   };
 }
 

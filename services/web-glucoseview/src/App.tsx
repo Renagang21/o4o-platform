@@ -3,7 +3,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginModalProvider } from './contexts/LoginModalContext';
 import Layout from './components/Layout';
 import LoginModal from './components/LoginModal';
-import HomePage from './pages/HomePage';
 import PatientsPage from './pages/PatientsPage';
 import InsightsPage from './pages/InsightsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -29,24 +28,22 @@ import OperatorProductsPage from './pages/operator/ProductsPage';
 import OperatorProductDetailPage from './pages/operator/ProductDetailPage';
 import OperatorStoresPage from './pages/operator/StoresPage';
 import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
-// Partner Dashboard
-import PartnerLayout from './components/layouts/PartnerLayout';
-import PartnerIndex from './pages/partner/index';
-import PartnerOverviewPage from './pages/partner/OverviewPage';
-import PartnerTargetsPage from './pages/partner/TargetsPage';
-import PartnerContentPage from './pages/partner/ContentPage';
-import PartnerEventsPage from './pages/partner/EventsPage';
-import PartnerStatusPage from './pages/partner/StatusPage';
-
-// Partner Application (WO-PARTNER-APPLICATION-V1)
-import PartnerApplyPage from './pages/partners/ApplyPage';
-
 // Operator Layout
 import OperatorLayout from './components/layouts/OperatorLayout';
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
 import { StoreDashboardLayout, StorePlaceholderPage, GLUCOSEVIEW_STORE_CONFIG } from '@o4o/store-ui-core';
 import StoreOverviewPage from './pages/store/StoreOverviewPage';
+
+// Patient Pages (WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1)
+import PatientMainPage from './pages/patient/PatientMainPage';
+import PatientProfilePage from './pages/patient/ProfilePage';
+import GlucoseInputPage from './pages/patient/GlucoseInputPage';
+import DataAnalysisPage from './pages/patient/DataAnalysisPage';
+import PharmacistCoachingPage from './pages/patient/PharmacistCoachingPage';
+import SelectPharmacyPage from './pages/patient/SelectPharmacyPage';
+import PatientAppointmentsPage from './pages/patient/AppointmentsPage';
+import CareGuidelinePage from './pages/patient/CareGuidelinePage';
 
 import { RoleGuard } from './components/auth/RoleGuard';
 import PwaInstallPrompt from './components/common/PwaInstallPrompt';
@@ -167,26 +164,6 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
       </Route>
 
-      {/* Partner Application (WO-PARTNER-APPLICATION-V1) */}
-      <Route path="/partners/apply" element={<PartnerApplyPage />} />
-
-      {/* Partner Dashboard */}
-      <Route
-        path="/partner"
-        element={
-          <RoleProtectedRoute allowedRoles={['partner']}>
-            <PartnerLayout />
-          </RoleProtectedRoute>
-        }
-      >
-        <Route index element={<PartnerIndex />} />
-        <Route path="overview" element={<PartnerOverviewPage />} />
-        <Route path="targets" element={<PartnerTargetsPage />} />
-        <Route path="content" element={<PartnerContentPage />} />
-        <Route path="events" element={<PartnerEventsPage />} />
-        <Route path="status" element={<PartnerStatusPage />} />
-      </Route>
-
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
       <Route
         path="/store"
@@ -201,9 +178,55 @@ function AppRoutes() {
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
-      {/* 메인 레이아웃 (홈은 공개, 나머지는 보호) */}
+      {/* 환자 서비스 — 루트(/) = 환자 홈 (WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1) */}
+      <Route path="/" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <PatientMainPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <PatientMainPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/profile" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <PatientProfilePage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/glucose-input" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <GlucoseInputPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/data-analysis" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <DataAnalysisPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/pharmacist-coaching" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <PharmacistCoachingPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/select-pharmacy" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <SelectPharmacyPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/appointments" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <PatientAppointmentsPage />
+        </RoleProtectedRoute>
+      } />
+      <Route path="/patient/care-guideline" element={
+        <RoleProtectedRoute allowedRoles={['patient']}>
+          <CareGuidelinePage />
+        </RoleProtectedRoute>
+      } />
+
+      {/* 약사/운영 레이아웃 (환자 홈은 위에서 처리) */}
       <Route path="/" element={<Layout />}>
-        <Route index element={<HomePage />} />
         <Route path="patients" element={
           <ProtectedRoute>
             <PatientsPage />

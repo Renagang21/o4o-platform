@@ -108,14 +108,12 @@ const ROLE_MAP: Record<string, UserRole> = {
   super_admin: 'admin',
   operator: 'operator',
   supplier: 'supplier',
-  partner: 'partner',
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   admin: '관리자',
   pharmacy: '약국',
   supplier: '공급자',
-  partner: '파트너',
   operator: '운영자',
   consumer: '소비자',
 };
@@ -125,7 +123,6 @@ export const ROLE_ICONS: Record<UserRole, string> = {
   admin: '👑',
   pharmacy: '💊',
   supplier: '📦',
-  partner: '🤝',
   operator: '🛡️',
   consumer: '👤',
 };

@@ -14,7 +14,6 @@ import {
   ChevronDown,
   Building2,
   Truck,
-  Handshake,
   Shield,
   Bell,
   Search,
@@ -91,20 +90,6 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
       { path: '/supplier/products', label: '상품 관리', icon: Package },
       { path: '/supplier/orders', label: '주문 현황', icon: ShoppingCart },
       { path: '/supplier/settings', label: '설정', icon: Settings },
-    ],
-  },
-  partner: {
-    title: '파트너 관리',
-    icon: Handshake,
-    color: 'purple',
-    menuItems: [
-      { path: '/partner', label: '대시보드', icon: LayoutDashboard },
-      { path: '/partner/contents', label: '컨텐츠 관리', icon: Package },
-      { path: '/partner/analytics', label: '분석', icon: ShoppingCart },
-      { path: '/partner/signage/content', label: '콘텐츠 가져오기', icon: Monitor },
-      { path: '/partner/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
-      { path: '/partner/signage/my', label: '내 사이니지', icon: Tv },
-      { path: '/partner/settings', label: '설정', icon: Settings },
     ],
   },
   operator: {

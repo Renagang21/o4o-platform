@@ -29,7 +29,6 @@ import {
   PatientActivitySection,
   AnalysisSummarySection,
   BannerSection,
-  PartnerSlider,
 } from '@/components/dashboard';
 import type { ActivityItem } from '@/components/dashboard';
 
@@ -382,8 +381,6 @@ export default function HomeLivePage() {
           {/* Block 6: Banner */}
           <BannerSection />
 
-          {/* Block 7: Partner Slider */}
-          <PartnerSlider />
         </>
       )}
     </div>

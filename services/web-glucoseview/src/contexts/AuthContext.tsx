@@ -11,7 +11,7 @@ import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // 사용자 역할
-export type UserRole = 'pharmacist' | 'admin' | 'operator' | 'partner';
+export type UserRole = 'pharmacist' | 'admin' | 'operator' | 'patient';
 
 // 승인 상태
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
@@ -61,7 +61,7 @@ const ROLE_MAP: Record<string, UserRole> = {
   seller: 'pharmacist',
   customer: 'pharmacist',
   user: 'pharmacist',
-  partner: 'partner',
+  patient: 'patient',
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

@@ -10,7 +10,6 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
-import PartnerLayout from '@/components/layouts/PartnerLayout';
 import { RoleGuard } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
@@ -108,7 +107,6 @@ const OperatorForumManagementPage = lazy(() => import('@/pages/operator/forum-ma
 
 // Role Not Available Page
 const RoleNotAvailablePage = lazy(() => import('@/pages/RoleNotAvailablePage'));
-const PartnerInfoPage = lazy(() => import('@/pages/PartnerInfoPage'));
 
 // Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block)
 const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdminDashboard'));
@@ -176,8 +174,6 @@ const EducationPage = lazy(() => import('@/pages/education/EducationPage'));
 // Common Pages
 const MyPage = lazy(() => import('@/pages/MyPage'));
 
-// Partner Application (WO-PARTNER-APPLICATION-V1)
-const PartnerApplyPage = lazy(() => import('@/pages/partners/ApplyPage'));
 
 // Apply Pages (API 연동)
 const PharmacyApplyPage = lazy(() => import('@/pages/apply/PharmacyApplyPage'));
@@ -202,13 +198,6 @@ const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m
 const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
 const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
 
-// Partner Dashboard Pages
-const PartnerIndex = lazy(() => import('@/pages/partner/index'));
-const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
-const PartnerTargetsPage = lazy(() => import('@/pages/partner/TargetsPage'));
-const PartnerContentPage = lazy(() => import('@/pages/partner/ContentPage'));
-const PartnerEventsPage = lazy(() => import('@/pages/partner/EventsPage'));
-const PartnerStatusPage = lazy(() => import('@/pages/partner/StatusPage'));
 
 // Loading fallback
 function PageLoading() {
@@ -340,8 +329,6 @@ function AppRoutes() {
         <Route path="forum-ext/:forumId" element={<ForumFeedPage />} />
         <Route path="education" element={<EducationPage />} />
         <Route path="contact" element={<ContactPage />} />
-        <Route path="partners" element={<PartnerInfoPage />} />
-        <Route path="partners/apply" element={<PartnerApplyPage />} />
         <Route path="apply" element={<PharmacyApplyPage />} />
 
         <Route path="apply/my-applications" element={<MyApplicationsPage />} />
@@ -411,30 +398,6 @@ function AppRoutes() {
         path="supplier/*"
         element={<RoleNotAvailablePage role="supplier" />}
       />
-
-      {/* Partner Dashboard */}
-      <Route
-        path="partner"
-        element={
-          <ProtectedRoute allowedRoles={['partner']}>
-            <PartnerLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<PartnerIndex />} />
-        <Route path="overview" element={<PartnerOverviewPage />} />
-        <Route path="targets" element={<PartnerTargetsPage />} />
-        <Route path="content" element={<PartnerContentPage />} />
-        <Route path="events" element={<PartnerEventsPage />} />
-        <Route path="status" element={<PartnerStatusPage />} />
-        {/* Signage Extension (WO-SIGNAGE-CONTENT-HUB-V1) */}
-        <Route path="signage/library" element={<ContentLibraryPage />} />
-        <Route path="signage/content" element={<ContentHubPage />} />
-        <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
-        <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="signage/my" element={<MySignagePage />} />
-        <Route path="signage/preview" element={<SignagePreviewPage />} />
-      </Route>
 
       {/* Admin Dashboard (WO-O4O-ADMIN-UX-GLYCOPHARM-PILOT-V1: 4-Block 구조) */}
       <Route

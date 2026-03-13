@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@o4o/operator-core': path.resolve(__dirname, '../../packages/operator-core/src'),
+      '@': path.resolve(__dirname, 'src'),
     },
   },
   server: {
