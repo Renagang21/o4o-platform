@@ -1058,7 +1058,16 @@ const startServer = async () => {
       logger.error('Failed to register Pharmacy Link routes:', pharmacyLinkError);
     }
 
-    // 28g-5. Register Care Appointment routes (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
+    // 28g-5. Register Patient AI Insight routes (WO-GLUCOSEVIEW-AI-GLUCOSE-INSIGHT-V1)
+    try {
+      const { createPatientAiInsightRouter } = await import('./modules/care/controllers/patient-ai-insight.controller.js');
+      app.use('/api/v1/care', createPatientAiInsightRouter(AppDataSource));
+      logger.info('✅ Patient AI Insight routes registered at /api/v1/care/patient/ai-insight');
+    } catch (patientAiInsightError) {
+      logger.error('Failed to register Patient AI Insight routes:', patientAiInsightError);
+    }
+
+    // 28g-6. Register Care Appointment routes (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
     try {
       const { createCareAppointmentRouter } = await import('./modules/care/controllers/care-appointment.controller.js');
       app.use('/api/v1/care', createCareAppointmentRouter(AppDataSource));

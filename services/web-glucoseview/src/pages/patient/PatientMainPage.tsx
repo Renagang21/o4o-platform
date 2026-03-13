@@ -24,9 +24,11 @@ import {
   MessageCircle,
   CheckCircle,
   Clock,
+  AlertTriangle,
+  Lightbulb,
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { GlucoseReading, PatientCoachingRecord, MyLinkStatus } from '@/api/patient';
+import type { GlucoseReading, PatientCoachingRecord, MyLinkStatus, AiInsight } from '@/api/patient';
 
 const MEAL_TIMING_LABELS: Record<string, string> = {
   fasting: '공복',
@@ -49,15 +51,17 @@ export default function PatientMainPage() {
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
   const [latestCoaching, setLatestCoaching] = useState<PatientCoachingRecord | null>(null);
   const [linkStatus, setLinkStatus] = useState<MyLinkStatus | null>(null);
+  const [aiInsight, setAiInsight] = useState<AiInsight | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [readingsRes, coachingRes, statusRes] = await Promise.all([
+        const [readingsRes, coachingRes, statusRes, insightRes] = await Promise.all([
           patientApi.getGlucoseReadings({ metricType: 'glucose' }),
           patientApi.getMyCoaching(),
           patientApi.getMyLinkStatus().catch(() => ({ data: { linked: false } as MyLinkStatus })),
+          patientApi.getAiInsight().catch(() => ({ success: false, data: undefined })),
         ]);
 
         if (readingsRes.success && readingsRes.data) {
@@ -68,6 +72,9 @@ export default function PatientMainPage() {
           setLatestCoaching(list.length > 0 ? list[0] : null);
         }
         setLinkStatus(statusRes?.data || { linked: false });
+        if (insightRes.success && insightRes.data) {
+          setAiInsight(insightRes.data);
+        }
       } catch {
         // ignore
       } finally {
@@ -248,15 +255,42 @@ export default function PatientMainPage() {
               )}
             </section>
 
-            {/* AI Insight Placeholder */}
-            <section className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-slate-400" />
-                <h2 className="text-sm font-semibold text-slate-400">AI 인사이트</h2>
+            {/* AI Insight Card */}
+            <section className="rounded-xl border border-violet-200 bg-violet-50 p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-violet-500" />
+                <h2 className="text-sm font-semibold text-violet-600">AI 인사이트</h2>
               </div>
-              <p className="text-xs text-slate-400">
-                혈당 패턴 분석 AI가 곧 준비됩니다.
-              </p>
+              {aiInsight?.summary ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {aiInsight.summary}
+                  </p>
+                  {aiInsight.warning && (
+                    <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-2.5 border border-amber-100">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-700">{aiInsight.warning}</p>
+                    </div>
+                  )}
+                  {aiInsight.tip && (
+                    <div className="flex items-start gap-2 bg-emerald-50 rounded-lg p-2.5 border border-emerald-100">
+                      <Lightbulb className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-emerald-700">{aiInsight.tip}</p>
+                    </div>
+                  )}
+                  {aiInsight.generatedAt && (
+                    <p className="text-[10px] text-violet-400 text-right">
+                      {new Date(aiInsight.generatedAt).toLocaleString('ko-KR', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })} 기준
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-violet-400">
+                  데이터가 충분하면 AI 인사이트가 제공됩니다.
+                </p>
+              )}
             </section>
 
             {/* Pharmacist Coaching Card */}

@@ -11,9 +11,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, TrendingUp, TrendingDown, Activity, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Activity, AlertTriangle, CheckCircle, AlertCircle, Sparkles, Lightbulb } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { GlucoseReading } from '@/api/patient';
+import type { GlucoseReading, AiInsight } from '@/api/patient';
 
 // ─── Constants ───
 
@@ -249,6 +249,7 @@ export default function DataAnalysisPage() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState(7);
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
+  const [aiInsight, setAiInsight] = useState<AiInsight | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadReadings = useCallback(async () => {
@@ -275,6 +276,13 @@ export default function DataAnalysisPage() {
   useEffect(() => {
     loadReadings();
   }, [loadReadings]);
+
+  // Load AI insight once (not tied to period)
+  useEffect(() => {
+    patientApi.getAiInsight()
+      .then((res) => { if (res.success && res.data) setAiInsight(res.data); })
+      .catch(() => {});
+  }, []);
 
   const stats = useMemo(() => computeStats(readings), [readings]);
   const risk = useMemo(() => (stats ? getRiskLevel(stats) : null), [stats]);
@@ -393,6 +401,31 @@ export default function DataAnalysisPage() {
                 </span>
               </div>
             </div>
+
+            {/* AI Insight Card */}
+            {aiInsight?.summary && (
+              <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-violet-500" />
+                  <h3 className="text-sm font-semibold text-violet-600">AI 인사이트</h3>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed mb-2">
+                  {aiInsight.summary}
+                </p>
+                {aiInsight.warning && (
+                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-2.5 border border-amber-100 mb-2">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700">{aiInsight.warning}</p>
+                  </div>
+                )}
+                {aiInsight.tip && (
+                  <div className="flex items-start gap-2 bg-emerald-50 rounded-lg p-2.5 border border-emerald-100">
+                    <Lightbulb className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-emerald-700">{aiInsight.tip}</p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Variability Card */}
             <div className="bg-white rounded-2xl border border-slate-200 p-4">

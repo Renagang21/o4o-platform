@@ -148,6 +148,14 @@ export interface AppointmentDto {
   createdAt: string;
 }
 
+// AI Insight
+export interface AiInsight {
+  summary: string | null;
+  warning: string | null;
+  tip: string | null;
+  generatedAt: string | null;
+}
+
 export const patientApi = {
   getMyProfile: () =>
     request<PatientProfile>('GET', '/api/v1/care/patient-profile/me'),
@@ -195,4 +203,8 @@ export const patientApi = {
 
   cancelAppointment: (id: string) =>
     request<void>('DELETE', `/api/v1/care/appointments/${id}`),
+
+  // AI Insight
+  getAiInsight: () =>
+    request<AiInsight>('GET', '/api/v1/care/patient/ai-insight'),
 };
