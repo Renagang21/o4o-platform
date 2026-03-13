@@ -19,6 +19,7 @@ import logger from '../../../utils/logger.js';
 import { env } from '../../../utils/env-validator.js';
 import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
+import { getServiceName } from '../../../config/service-catalog.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -380,7 +381,7 @@ export class AuthController extends BaseController {
             error: 'O4O 플랫폼에 이미 가입된 계정입니다. 기존 비밀번호를 입력해주세요.',
             code: 'PASSWORD_MISMATCH',
             existingAccount: true,
-            services: existingMemberships.map(m => ({ key: m.serviceKey, status: m.status })),
+            services: existingMemberships.map(m => ({ key: m.serviceKey, name: getServiceName(m.serviceKey), status: m.status })),
           });
         }
 
@@ -564,7 +565,7 @@ export class AuthController extends BaseController {
       return BaseController.ok(res, {
         exists: true,
         alreadyJoined: !!currentMembership,
-        services: memberships.map(m => ({ key: m.serviceKey, status: m.status })),
+        services: memberships.map(m => ({ key: m.serviceKey, name: getServiceName(m.serviceKey), status: m.status })),
       });
     } catch (error) {
       logger.error('[AuthController.checkEmail] Error', { error });
