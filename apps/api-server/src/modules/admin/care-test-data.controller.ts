@@ -306,10 +306,10 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
       // ──────────────────────────────────────
       for (const u of TEST_USERS) {
         await dataSource.query(
-          `INSERT INTO users (id, email, password, name, roles, "isActive", "isEmailVerified", "createdAt", "updatedAt")
-           VALUES ($1, $2, $3, $4, $5::text[], true, true, NOW(), NOW())
+          `INSERT INTO users (id, email, password, name, "isActive", "isEmailVerified", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, true, true, NOW(), NOW())
            ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, name = EXCLUDED.name, "updatedAt" = NOW()`,
-          [u.id, u.email, passwordHash, u.name, u.roles],
+          [u.id, u.email, passwordHash, u.name],
         );
       }
       log.push(`users: ${TEST_USERS.length} created`);
