@@ -15,6 +15,8 @@ import {
   ChevronDown,
   Activity,
   Home,
+  MessageSquare,
+  FileText,
   HeartPulse,
   Users,
   Store,
@@ -29,6 +31,8 @@ import ServiceSwitcher from '../ServiceSwitcher';
  */
 const menuItems = [
   { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/', end: true },
+  { label: '커뮤니티', icon: MessageSquare, pathPublic: '/community', pathAuth: '/community', end: false },
+  { label: '포럼', icon: FileText, pathPublic: '/forum', pathAuth: '/forum', end: false },
   { label: 'Care 관리', icon: HeartPulse, pathPublic: '/care', pathAuth: '/care', end: false },
   { label: '환자관리', icon: Users, pathPublic: '/care/patients', pathAuth: '/care/patients', end: false },
   { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },

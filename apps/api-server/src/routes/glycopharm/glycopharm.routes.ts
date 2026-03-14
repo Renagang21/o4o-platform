@@ -46,6 +46,7 @@ import { createReportController } from './controllers/report.controller.js'; // 
 import { createBillingPreviewController } from './controllers/billing-preview.controller.js'; // Phase 3-C: Billing Preview
 import { createInvoiceController } from './controllers/invoice.controller.js'; // Phase 3-D: Invoice Finalization
 import { createInvoiceDispatchController } from './controllers/invoice-dispatch.controller.js'; // Phase 3-E: Invoice Dispatch
+import { createGlycopharmCommunityHubController } from './controllers/glycopharm-community-hub.controller.js'; // WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js';
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -205,6 +206,17 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requirePharmacyContext as any,
   );
   router.use('/pharmacy', pharmacyController);
+
+  // ============================================================================
+  // Community Hub Routes - WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
+  // /api/v1/glycopharm/community/*
+  // ============================================================================
+  const communityHubController = createGlycopharmCommunityHubController(
+    dataSource,
+    coreRequireAuth as any,
+    requireGlycopharmScope as any,
+  );
+  router.use('/', communityHubController);
 
   // ============================================================================
   // Customer Request Routes - Phase 1: Common Request Implementation

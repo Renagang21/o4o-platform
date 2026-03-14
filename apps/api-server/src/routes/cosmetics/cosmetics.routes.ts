@@ -30,6 +30,8 @@ import { createProductMarketingController } from '../o4o-store/controllers/produ
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
 import { createStoreAssetControlController } from '../o4o-store/controllers/store-asset-control.controller.js';
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
+// WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
+import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
 
 /**
  * Cosmetics Scope Guard — WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
@@ -124,6 +126,9 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Published Assets
   router.use('/published-assets', createPublishedAssetsController(dataSource));
+
+  // Community Hub — ads, sponsors (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
+  router.use('/', createCosmeticsCommunityHubController(dataSource, coreRequireAuth as any, requireCosmeticsScope as any));
 
   return router;
 }

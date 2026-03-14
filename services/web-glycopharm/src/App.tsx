@@ -163,9 +163,14 @@ const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
 const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail'));
 const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
+// Community Hub (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1)
+const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
+const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
+
 // Forum & Education
 const ForumHubPage = lazy(() => import('@/pages/forum/ForumHubPage'));
 const ForumPage = lazy(() => import('@/pages/forum/ForumPage'));
+const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
 const RequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 const MyRequestsPage = lazy(() => import('@/pages/forum/MyRequestsPage'));
 const ForumFeedbackPage = lazy(() => import('@/pages/forum/ForumFeedbackPage'));
@@ -336,7 +341,10 @@ function AppRoutes() {
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="role-select" element={<RoleSelectPage />} />
+        {/* Community Hub (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+        <Route path="community" element={<CommunityHubPage />} />
         <Route path="forum" element={<ForumHubPage />} />
+        <Route path="forum/write" element={<ForumWritePage />} />
         <Route path="forum/posts" element={<ForumPage />} />
         <Route path="forum/request-category" element={<RequestCategoryPage />} />
         <Route path="forum/my-requests" element={<MyRequestsPage />} />
@@ -457,6 +465,8 @@ function AppRoutes() {
         {/* Forum */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-management" element={<OperatorForumManagementPage />} />
+        {/* Community Management (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+        <Route path="community" element={<CommunityManagementPage />} />
         {/* Market Trial Extension */}
         <Route path="market-trial" element={<OperatorTrialSelectorPage />} />
         {/* Store Approvals */}

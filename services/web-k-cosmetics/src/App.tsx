@@ -48,6 +48,10 @@ const KCosmeticsHubPage = lazy(() => import('@/pages/hub/KCosmeticsHubPage'));
 const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumHubPage })));
 const ForumPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumPage })));
 const PostDetailPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.PostDetailPage })));
+const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
+
+// Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
+const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
 
 // Partner Dashboard Pages
 const PartnerIndex = lazy(() => import('@/pages/partner/index'));
@@ -94,6 +98,9 @@ const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
+
+// Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
+const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
@@ -166,10 +173,21 @@ function AppRoutes() {
         <Route path="partners" element={<PartnerInfoPage />} />
         <Route path="partners/apply" element={<PartnerApplyPage />} />
 
+        {/* Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+        <Route path="community" element={<CommunityHubPage />} />
+
         {/* Forum */}
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/posts" element={<ForumPage />} />
         <Route path="forum/post/:postId" element={<PostDetailPage />} />
+        <Route
+          path="forum/write"
+          element={
+            <ProtectedRoute>
+              <ForumWritePage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* MyPage (Protected) */}
         <Route
@@ -276,6 +294,8 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* Store Cockpit (WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1) */}
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
+        {/* Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+        <Route path="community" element={<CommunityManagementPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
