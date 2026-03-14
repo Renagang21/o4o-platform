@@ -462,6 +462,7 @@ import marketTrialRoutes from './routes/market-trial.routes.js';
 
 // AI Query Routes (Phase AI-1)
 import aiQueryRoutes from './routes/ai-query.routes.js';
+import aiProxyRoutes from './routes/ai-proxy.routes.js';
 
 // AI Admin Routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
 import aiAdminRoutes from './routes/ai-admin.routes.js';
@@ -873,7 +874,8 @@ const startServer = async () => {
 
     // 22-ai. Register AI Query routes (Phase AI-1)
     app.use('/api/ai', aiQueryRoutes);
-    logger.info('✅ AI Query routes registered at /api/ai');
+    app.use('/api/ai', aiProxyRoutes);
+    logger.info('✅ AI Query + Proxy routes registered at /api/ai');
 
     // 22-ai-admin. Register AI Admin routes (WO-AI-ADMIN-CONTROL-PLANE-V1)
     app.use('/api/ai/admin', aiAdminRoutes);

@@ -15,7 +15,7 @@ import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
-import { googleAI } from './google-ai.service.js';
+import { callGemini } from '../utils/gemini.helper.js';
 import { aiCardExposureService } from './ai-card-exposure.service.js';
 import { aiOperationsService } from './ai-operations.service.js';
 import type { AiCard, CardExposureContext, AiCardData } from '@o4o/ai-core';
@@ -473,18 +473,17 @@ class AiQueryService {
       request.contextData
     );
 
-    const fullPrompt = `${systemPrompt}\n\n[사용자 질문]\n${request.question}`;
-
     try {
-      // 4. Call Gemini API
-      const response = await googleAI.executeGemini(apiKey, {
-        prompt: fullPrompt,
+      // 4. Call Gemini API (WO-O4O-AI-LLM-PATH-CONSOLIDATION)
+      const response = await callGemini(apiKey, {
+        systemPrompt,
+        userPrompt: `[사용자 질문]\n${request.question}`,
         model: policy.defaultModel,
         temperature: 0.7,
-        maxOutputTokens: 2048
+        maxTokens: 2048,
       });
 
-      const answer = response.data.text;
+      const answer = response.text;
       const durationMs = Date.now() - startTime;
 
       // Operations: Record success

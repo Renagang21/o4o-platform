@@ -1,10 +1,4 @@
-import { ImageAnalysis } from '@/components/ai/ImageUploader';
-
-export interface VisionAIConfig {
-  provider: 'openai' | 'gemini' | 'claude';
-  apiKey: string;
-  model?: string;
-}
+import { authClient } from '@o4o/auth-client';
 
 export interface VisionAIResult {
   description: string;
@@ -17,15 +11,6 @@ export interface VisionAIResult {
 }
 
 class VisionAIService {
-  private config: VisionAIConfig | null = null;
-
-  /**
-   * Vision AI 설정
-   */
-  setConfig(config: VisionAIConfig) {
-    this.config = config;
-  }
-
   /**
    * 이미지를 Base64로 변환
    */
@@ -41,203 +26,6 @@ class VisionAIService {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-  }
-
-  /**
-   * OpenAI Vision API로 이미지 분석
-   */
-  private async analyzeWithOpenAI(imageBase64: string): Promise<VisionAIResult> {
-    if (!this.config?.apiKey) {
-      throw new Error('OpenAI API 키가 설정되지 않았습니다');
-    }
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: this.config.model || 'gpt-4-vision-preview',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `이 이미지를 분석하여 다음 정보를 JSON 형식으로 제공해주세요:
-                {
-                  "description": "이미지에 대한 상세한 설명 (한국어)",
-                  "objects": ["감지된 주요 객체들"],
-                  "colors": ["주요 색상들"],
-                  "mood": "이미지의 분위기나 감정",
-                  "style": "이미지의 스타일 (예: 현대적, 클래식, 미니멀 등)",
-                  "suggestions": ["이 이미지가 웹사이트에서 어떻게 활용될 수 있는지 제안"],
-                  "context": "AI 페이지 생성 시 활용할 수 있는 컨텍스트 정보"
-                }`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`
-                }
-              }
-            ]
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.3,
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'OpenAI Vision API 오류');
-    }
-
-    try {
-      const content = data.choices[0].message.content;
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-      throw new Error('JSON 파싱 실패');
-    } catch (error) {
-      throw new Error('OpenAI 응답 파싱 실패');
-    }
-  }
-
-  /**
-   * Gemini Vision API로 이미지 분석
-   */
-  private async analyzeWithGemini(imageBase64: string): Promise<VisionAIResult> {
-    if (!this.config?.apiKey) {
-      throw new Error('Gemini API 키가 설정되지 않았습니다');
-    }
-
-    const modelName = this.config.model || 'gemini-2.0-flash';
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${this.config.apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `이 이미지를 분석하여 다음 JSON 형식으로 응답해주세요:
-                  {
-                    "description": "이미지에 대한 상세한 설명 (한국어)",
-                    "objects": ["감지된 주요 객체들"],
-                    "colors": ["주요 색상들"],
-                    "mood": "이미지의 분위기나 감정",
-                    "style": "이미지의 스타일",
-                    "suggestions": ["웹사이트 활용 제안"],
-                    "context": "AI 페이지 생성용 컨텍스트"
-                  }`
-                },
-                {
-                  inline_data: {
-                    mime_type: 'image/jpeg',
-                    data: imageBase64
-                  }
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 1000,
-            responseMimeType: 'application/json'
-          }
-        }),
-      }
-    );
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Gemini Vision API 오류');
-    }
-
-    try {
-      const content = data.candidates[0].content.parts[0].text;
-      return JSON.parse(content);
-    } catch (error) {
-      throw new Error('Gemini 응답 파싱 실패');
-    }
-  }
-
-  /**
-   * Claude Vision API로 이미지 분석
-   */
-  private async analyzeWithClaude(imageBase64: string): Promise<VisionAIResult> {
-    if (!this.config?.apiKey) {
-      throw new Error('Claude API 키가 설정되지 않았습니다');
-    }
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': this.config.apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: this.config.model || 'claude-3-opus-20240229',
-        max_tokens: 1000,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `이 이미지를 분석하여 다음 JSON 형식으로 응답해주세요:
-                {
-                  "description": "이미지에 대한 상세한 설명 (한국어)",
-                  "objects": ["감지된 주요 객체들"],
-                  "colors": ["주요 색상들"],
-                  "mood": "이미지의 분위기나 감정",
-                  "style": "이미지의 스타일",
-                  "suggestions": ["웹사이트 활용 제안"],
-                  "context": "AI 페이지 생성용 컨텍스트"
-                }`
-              },
-              {
-                type: 'image',
-                source: {
-                  type: 'base64',
-                  media_type: 'image/jpeg',
-                  data: imageBase64
-                }
-              }
-            ]
-          }
-        ],
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error?.message || 'Claude Vision API 오류');
-    }
-
-    try {
-      const content = data.content[0].text;
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-      throw new Error('JSON 파싱 실패');
-    } catch (error) {
-      throw new Error('Claude 응답 파싱 실패');
-    }
   }
 
   /**
@@ -296,29 +84,26 @@ class VisionAIService {
   }
 
   /**
-   * 이미지 분석 실행
+   * 이미지 분석 실행 — Backend Proxy 경유
    */
   async analyzeImage(file: File): Promise<VisionAIResult> {
-    if (!this.config) {
-      // 설정이 없으면 모의 분석 실행
-      return this.mockAnalyze();
-    }
-
     try {
       const imageBase64 = await this.fileToBase64(file);
 
-      switch (this.config.provider) {
-        case 'openai':
-          return await this.analyzeWithOpenAI(imageBase64);
-        case 'gemini':
-          return await this.analyzeWithGemini(imageBase64);
-        case 'claude':
-          return await this.analyzeWithClaude(imageBase64);
-        default:
-          return await this.mockAnalyze();
+      const response = await authClient.api.post('/ai/vision/analyze', {
+        imageBase64,
+        mimeType: file.type || 'image/jpeg',
+      });
+
+      const data = response.data as { success: boolean; result?: VisionAIResult };
+
+      if (data?.success && data.result) {
+        return data.result;
       }
+
+      // 응답은 왔지만 성공하지 않은 경우 fallback
+      return this.mockAnalyze();
     } catch (error) {
-      
       // 실패 시 모의 분석으로 폴백
       return this.mockAnalyze();
     }

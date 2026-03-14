@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ChatMessage, PromptDefinition } from './types';
 import { getDefaultPrompts, buildUserPrompt } from './prompts';
+import { api } from '../../services/api';
 
 interface AIChatWidgetProps {
   userName?: string;
   context?: Record<string, unknown>;
-  apiKey?: string;
   onClose?: () => void;
 }
 
@@ -17,7 +17,6 @@ interface AIChatWidgetProps {
 export default function AIChatWidget({
   userName = '사용자',
   context = {},
-  apiKey,
   onClose,
 }: AIChatWidgetProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -65,53 +64,26 @@ export default function AIChatWidget({
           return `🔍 **혈당 데이터 분석 가이드**\n\n CGM 데이터 분석 시 확인할 핵심 지표:\n\n**1. 목표 범위 내 시간 (TIR)**\n• 목표: 70% 이상\n• 70-180 mg/dL 범위\n\n**2. 혈당 변동성 (CV)**\n• 목표: 36% 미만\n• 안정적인 혈당 관리 지표\n\n**3. 시간대별 패턴**\n• 새벽 현상 확인\n• 식후 스파이크 분석\n\n구체적인 환자 데이터를 공유해주시면 더 상세한 분석을 도와드릴 수 있습니다.`;
 
         default:
-          return `${prompt.icon || '💬'} **${prompt.name}**\n\n질문에 대한 답변을 준비 중입니다.\n\n현재 데모 모드로 실행 중이며, OpenAI API 키를 설정하면 실제 AI 응답을 받을 수 있습니다.`;
+          return `${prompt.icon || '💬'} **${prompt.name}**\n\n질문에 대한 답변을 준비 중입니다.\n\n현재 데모 모드로 실행 중이며, AI 설정이 완료되면 실제 AI 응답을 받을 수 있습니다.`;
       }
     }
 
     // 일반 메시지 응답
-    return `안녕하세요! "${userMessage}"에 대해 답변드립니다.\n\n현재 **데모 모드**로 실행 중입니다.\n\n실제 AI 응답을 받으려면 설정에서 OpenAI API 키를 입력해주세요.\n\n**GlucoseView AI가 도울 수 있는 것:**\n• 환자 혈당 데이터 분석\n• 패턴 인식 및 인사이트 제공\n• 상담 포인트 제안\n• 생활습관 팁 제공`;
+    return `안녕하세요! "${userMessage}"에 대해 답변드립니다.\n\n현재 **데모 모드**로 실행 중입니다.\n\n실제 AI 응답을 받으려면 관리자 설정에서 AI를 활성화해주세요.\n\n**GlucoseView AI가 도울 수 있는 것:**\n• 환자 혈당 데이터 분석\n• 패턴 인식 및 인사이트 제공\n• 상담 포인트 제안\n• 생활습관 팁 제공`;
   };
 
-  // API 호출 (실제 또는 데모)
+  // Backend Proxy를 통한 AI 호출
   const callAI = async (
     userMessage: string,
     systemPrompt?: string,
     prompt?: PromptDefinition
   ): Promise<string> => {
-    if (!apiKey) {
-      // 데모 모드
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return getDemoResponse(userMessage, prompt);
-    }
-
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
-            { role: 'user', content: userMessage },
-          ],
-          max_tokens: 2000,
-          temperature: 0.7,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0]?.message?.content || '응답을 받지 못했습니다.';
-    } catch (error) {
-      console.error('AI API Error:', error);
-      return '죄송합니다. AI 응답을 받는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      const response = await api.aiQuery(userMessage, systemPrompt);
+      return response || getDemoResponse(userMessage, prompt);
+    } catch {
+      // API 실패 시 데모 응답
+      return getDemoResponse(userMessage, prompt);
     }
   };
 

@@ -501,6 +501,17 @@ class ApiService {
       body: JSON.stringify(data),
     });
   }
+
+  /**
+   * AI 질의 — Backend Proxy 경유
+   */
+  async aiQuery(userPrompt: string, systemPrompt?: string): Promise<string> {
+    const data = await this.request<{ success: boolean; answer?: string }>('/api/ai/query', {
+      method: 'POST',
+      body: JSON.stringify({ question: userPrompt, systemPrompt }),
+    });
+    return data.answer || '';
+  }
 }
 
 export const api = new ApiService();

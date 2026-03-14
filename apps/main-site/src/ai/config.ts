@@ -1,29 +1,17 @@
 /**
  * AI Generator Configuration
  * Configure LLM providers and settings
+ *
+ * All LLM API keys are server-side only.
+ * Frontend always uses rule-based local fallback.
  */
 
 export const AI_CONFIG = {
-  // Default provider (can be overridden by environment variable)
-  defaultProvider: (process.env.VITE_AI_PROVIDER as 'openai' | 'anthropic' | 'google' | 'local') || 'local',
+  // Always use local rule-based generator (no client-side API keys)
+  defaultProvider: 'local' as const,
 
   // Provider settings
   providers: {
-    openai: {
-      apiKey: process.env.VITE_OPENAI_API_KEY || '',
-      model: process.env.VITE_OPENAI_MODEL || 'gpt-4',
-      baseURL: process.env.VITE_OPENAI_BASE_URL || 'https://api.openai.com/v1',
-    },
-    anthropic: {
-      apiKey: process.env.VITE_ANTHROPIC_API_KEY || '',
-      model: process.env.VITE_ANTHROPIC_MODEL || 'claude-3-sonnet-20240229',
-      baseURL: process.env.VITE_ANTHROPIC_BASE_URL || 'https://api.anthropic.com/v1',
-    },
-    google: {
-      apiKey: process.env.VITE_GOOGLE_API_KEY || '',
-      model: process.env.VITE_GOOGLE_MODEL || 'gemini-pro',
-      baseURL: process.env.VITE_GOOGLE_BASE_URL || 'https://generativelanguage.googleapis.com/v1',
-    },
     local: {
       // Local rule-based fallback (no API key needed)
       enabled: true,
@@ -72,31 +60,13 @@ Rules:
 /**
  * Check if AI provider is configured
  */
-export function isAIConfigured(provider?: string): boolean {
-  const currentProvider = provider || AI_CONFIG.defaultProvider;
-
-  if (currentProvider === 'local') {
-    return true;
-  }
-
-  const config = AI_CONFIG.providers[currentProvider as keyof typeof AI_CONFIG.providers];
-  return !!(config && 'apiKey' in config && config.apiKey);
+export function isAIConfigured(_provider?: string): boolean {
+  return AI_CONFIG.defaultProvider === 'local';
 }
 
 /**
  * Get current AI provider
  */
 export function getCurrentProvider(): string {
-  if (isAIConfigured(AI_CONFIG.defaultProvider)) {
-    return AI_CONFIG.defaultProvider;
-  }
-
-  // Check each provider
-  for (const [name, config] of Object.entries(AI_CONFIG.providers)) {
-    if ('apiKey' in config && config.apiKey) {
-      return name;
-    }
-  }
-
-  return 'local'; // Fallback to rule-based
+  return 'local';
 }

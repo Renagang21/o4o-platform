@@ -8,7 +8,7 @@ import { App } from '../entities/App.js';
 import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AIUsageLog, AIProvider } from '../entities/AIUsageLog.js';
-import { googleAI } from './google-ai.service.js';
+import { callGemini } from '../utils/gemini.helper.js';
 import logger from '../utils/logger.js';
 
 interface ExecuteOptions {
@@ -256,15 +256,34 @@ class AppRegistryService {
   }
 
   /**
-   * Execute app-specific logic (to be overridden by provider services)
+   * Execute app-specific logic
+   * WO-O4O-AI-LLM-PATH-CONSOLIDATION: google-ai.service → callGemini
    */
   private async executeAppLogic(instance: AppInstance, action: string, payload: any): Promise<any> {
     const app = instance.app;
+    const config = instance.config || {};
 
-    // Delegate to provider-specific services
     switch (app.provider) {
-      case 'google':
-        return await googleAI.execute(instance.config || {}, action, payload);
+      case 'google': {
+        if (action !== 'generate-text') {
+          throw new Error(`Unknown action: ${action}`);
+        }
+        if (!config.apiKey) {
+          throw new Error('Google AI API key not configured');
+        }
+        const result = await callGemini(config.apiKey, {
+          systemPrompt: '',
+          userPrompt: payload.prompt,
+          model: config.model || payload.model,
+          temperature: config.temperature || payload.temperature,
+          maxTokens: payload.maxOutputTokens,
+        });
+        return {
+          data: { text: result.text },
+          usage: { inputTokens: result.promptTokens, outputTokens: result.completionTokens },
+          model: result.model,
+        };
+      }
 
       default:
         throw new Error(`App execution not implemented for provider: ${app.provider}`);

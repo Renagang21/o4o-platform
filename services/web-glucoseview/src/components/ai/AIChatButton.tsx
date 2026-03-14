@@ -4,7 +4,6 @@ import AIChatWidget from './AIChatWidget';
 interface AIChatButtonProps {
   userName?: string;
   context?: Record<string, unknown>;
-  apiKey?: string;
 }
 
 /**
@@ -12,7 +11,7 @@ interface AIChatButtonProps {
  *
  * 화면 우하단 고정 버튼 + 채팅 위젯
  */
-export default function AIChatButton({ userName, context, apiKey }: AIChatButtonProps) {
+export default function AIChatButton({ userName, context }: AIChatButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -23,7 +22,6 @@ export default function AIChatButton({ userName, context, apiKey }: AIChatButton
           <AIChatWidget
             userName={userName}
             context={context}
-            apiKey={apiKey}
             onClose={() => setIsOpen(false)}
           />
         </div>

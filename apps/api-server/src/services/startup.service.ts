@@ -211,11 +211,45 @@ export class StartupService {
 
     try {
       const { appRegistry } = await import('./app-registry.service.js');
-      const { googleAI } = await import('./google-ai.service.js');
 
       appRegistry.initialize(AppDataSource);
-      await googleAI.initializeApps();
-      logger.info('✅ App System initialized (Google AI ready)');
+
+      // App registration (WO-O4O-AI-LLM-PATH-CONSOLIDATION: moved from google-ai.service.ts)
+      const geminiApp = await appRegistry.getBySlug('google-gemini-text');
+      if (!geminiApp) {
+        await appRegistry.register({
+          slug: 'google-gemini-text',
+          name: 'Gemini 텍스트 생성',
+          provider: 'google',
+          category: 'text-generation',
+          type: 'integration',
+          description: 'Google Gemini API를 사용한 텍스트 생성',
+          icon: 'sparkles',
+          version: '1.0.0',
+          status: 'active',
+          isSystem: true,
+          manifest: {
+            displayName: 'Gemini Text Generation',
+            category: 'AI Text',
+            provides: {
+              apis: [{ path: '/execute', method: 'POST', description: 'Generate text using Gemini' }],
+            },
+            settingsSchema: {
+              apiKey: { type: 'string', required: true, description: 'Google AI API Key', secret: true },
+              model: {
+                type: 'select',
+                options: ['gemini-3.0-flash', 'gemini-3.0-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'],
+                default: 'gemini-3.0-flash',
+                description: 'Gemini model to use',
+              },
+              temperature: { type: 'number', default: 0.7, min: 0, max: 2, description: 'Sampling temperature' },
+            },
+          },
+        });
+        logger.info('Gemini app registered');
+      }
+
+      logger.info('✅ App System initialized');
     } catch (appError) {
       logger.error('Failed to initialize App System:', appError);
       // Temporarily non-critical during clean DB reset + app installation

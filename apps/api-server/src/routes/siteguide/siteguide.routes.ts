@@ -22,7 +22,7 @@ import {
   SiteGuideBusinessStatus,
   SiteGuideApiKeyStatus,
 } from './entities/index.js';
-import { googleAI } from '../../services/google-ai.service.js';
+import { callGemini } from '../../utils/gemini.helper.js';
 import logger from '../../utils/logger.js';
 
 // Gemini API Key (환경변수에서 가져옴)
@@ -100,12 +100,12 @@ interface SiteGuideQueryRequest {
 }
 
 /**
- * 페이지 컨텍스트와 질문을 결합한 전체 프롬프트 구성
+ * 페이지 컨텍스트와 질문을 분리한 프롬프트 구성
  */
-function buildSiteGuidePrompt(
+function buildSiteGuidePrompts(
   pageContext: SiteGuideQueryRequest['pageContext'],
   question: string
-): string {
+): { systemPrompt: string; userQuestion: string } {
   const parts: string[] = [
     '당신은 웹사이트 방문자를 돕는 친절한 AI 안내 도우미입니다.',
     '사용자가 현재 보고 있는 페이지의 맥락을 바탕으로 질문에 답변해 주세요.',
@@ -139,12 +139,12 @@ function buildSiteGuidePrompt(
     '3. 확실하지 않은 정보는 "확인이 필요합니다"라고 말합니다.',
     '4. 답변은 간결하게, 핵심만 전달합니다.',
     '5. 사이트와 무관한 질문은 정중히 범위를 안내합니다.',
-    '',
-    '## 사용자 질문',
-    question
   );
 
-  return parts.join('\n');
+  return {
+    systemPrompt: parts.join('\n'),
+    userQuestion: question,
+  };
 }
 
 /**
@@ -248,17 +248,16 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
         });
       }
 
-      // 4. 페이지 컨텍스트 기반 프롬프트 구성
-      const fullPrompt = buildSiteGuidePrompt(body.pageContext, body.question);
-
-      // 5. AI 호출
-      const response = await googleAI.executeGemini(GEMINI_API_KEY, {
-        prompt: fullPrompt,
-        maxOutputTokens: 500,
+      // 4-5. AI 호출 (WO-O4O-AI-LLM-PATH-CONSOLIDATION)
+      const { systemPrompt, userQuestion } = buildSiteGuidePrompts(body.pageContext, body.question);
+      const response = await callGemini(GEMINI_API_KEY, {
+        systemPrompt,
+        userPrompt: userQuestion,
+        maxTokens: 500,
         temperature: 0.7,
       });
 
-      if (!response.data?.text) {
+      if (!response.text) {
         logger.error('[SiteGuide] AI generation failed: empty response');
 
         await service.recordUsage(
@@ -293,7 +292,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
       const newRemaining = await service.getRemainingUsage(businessId);
       return res.json({
         success: true,
-        answer: response.data.text,
+        answer: response.text,
         remaining: newRemaining,
       });
     } catch (error) {
