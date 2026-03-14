@@ -503,7 +503,7 @@ class GlycopharmApiClient {
     if (params?.search) searchParams.set('search', params.search);
 
     const queryString = searchParams.toString();
-    const endpoint = `/api/v1/glycopharm/operator/orders${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/api/v1/glycopharm/operator/recent-orders${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }

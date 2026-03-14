@@ -183,6 +183,9 @@ export const displayApi = {
 };
 
 // Forum Category Request API
+// NOTE: /api/v1/forum/category-requests was deprecated and moved to /api/v1/kpa/forum-requests
+// (WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1)
+// GlycoPharm does not have kpa:operator scope, so these calls return empty data gracefully.
 export const forumRequestApi = {
   // User APIs
   create: (data: { name: string; description: string; reason?: string }) =>
@@ -191,21 +194,29 @@ export const forumRequestApi = {
       serviceCode: 'glycopharm',
     }),
 
-  getMyRequests: () =>
-    apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm'),
+  getMyRequests: async () => {
+    const res = await apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm');
+    if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
+    return res;
+  },
 
   // Admin APIs
-  getAllRequests: (params?: { status?: string; page?: number; limit?: number }) => {
+  getAllRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
     const query = new URLSearchParams();
     query.set('serviceCode', 'glycopharm');
     if (params?.status) query.set('status', params.status);
     if (params?.page) query.set('page', params.page.toString());
     if (params?.limit) query.set('limit', params.limit.toString());
-    return apiClient.get<unknown[]>(`/api/v1/forum/category-requests?${query}`);
+    const res = await apiClient.get<unknown[]>(`/api/v1/forum/category-requests?${query}`);
+    if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
+    return res;
   },
 
-  getPendingCount: () =>
-    apiClient.get<{ count: number }>('/api/v1/forum/category-requests/pending-count?serviceCode=glycopharm'),
+  getPendingCount: async () => {
+    const res = await apiClient.get<{ count: number }>('/api/v1/forum/category-requests/pending-count?serviceCode=glycopharm');
+    if (res.error?.code === 'API_ERROR') return { data: { count: 0 } };
+    return res;
+  },
 
   approve: (id: string, data: { review_comment?: string }) =>
     apiClient.patch<unknown>(`/api/v1/forum/category-requests/${id}/approve`, data),
