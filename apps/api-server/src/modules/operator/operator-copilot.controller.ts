@@ -99,10 +99,12 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   // GET /copilot/ai-summary
   router.get('/copilot/ai-summary', async (req: Request, res: Response) => {
     try {
-      // Gather platform context
-      const kpi = await service.getKpiSummary();
-      const trends = await service.getPlatformTrends();
-      const alerts = await service.getAlerts();
+      // Gather platform context — each call is already resilient (safeQuery)
+      const [kpi, trends, alerts] = await Promise.all([
+        service.getKpiSummary(),
+        service.getPlatformTrends(),
+        service.getAlerts(),
+      ]);
 
       // Try AI insight
       try {
@@ -159,6 +161,7 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
       if (trends.orderGrowth !== 0) {
         summaryParts.push(`주문 ${trends.orderGrowth > 0 ? '증가' : '감소'} ${Math.abs(trends.orderGrowth)}%`);
       }
+      if (summaryParts.length === 0) summaryParts.push('플랫폼 운영 데이터를 수집 중입니다');
 
       const actions: string[] = [];
       if (alerts.some(a => a.severity === 'high')) actions.push('긴급 알림을 확인하세요.');
