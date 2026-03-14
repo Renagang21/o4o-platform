@@ -108,6 +108,7 @@ export default function StoreDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [capabilityLoading, setCapabilityLoading] = useState<string | null>(null);
+  const [channelActionLoading, setChannelActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!storeId) return;
@@ -156,6 +157,28 @@ export default function StoreDetailPage() {
       console.error('Failed to toggle capability:', err);
     } finally {
       setCapabilityLoading(null);
+    }
+  };
+
+  const handleChannelStatusChange = async (channelId: string, newStatus: string) => {
+    if (!storeId) return;
+    if (newStatus === 'TERMINATED') {
+      const ok = window.confirm('채널을 종료하면 복구할 수 없습니다. 계속하시겠습니까?');
+      if (!ok) return;
+    }
+    setChannelActionLoading(channelId);
+    try {
+      await apiFetch(`/api/v1/operator/stores/${storeId}/channels/${channelId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      setChannels((prev) =>
+        prev.map((ch) => (ch.id === channelId ? { ...ch, status: newStatus } : ch)),
+      );
+    } catch (err) {
+      console.error('Failed to update channel status:', err);
+    } finally {
+      setChannelActionLoading(null);
     }
   };
 
@@ -270,15 +293,56 @@ export default function StoreDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {channels.map((ch) => {
               const sl = statusLabel[ch.status] || { text: ch.status, cls: 'bg-slate-100 text-slate-600' };
+              const isActioning = channelActionLoading === ch.id;
               return (
                 <div key={ch.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
                   <div>
                     <p className="text-sm font-medium text-slate-800">{channelLabel[ch.channelType] || ch.channelType}</p>
                     <p className="text-xs text-slate-400">{formatDate(ch.createdAt)}</p>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sl.cls}`}>
-                    {sl.text}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sl.cls}`}>
+                      {sl.text}
+                    </span>
+                    {ch.status !== 'TERMINATED' && (
+                      <div className="flex gap-1">
+                        {ch.status === 'APPROVED' && (
+                          <button
+                            onClick={() => handleChannelStatusChange(ch.id, 'SUSPENDED')}
+                            disabled={isActioning}
+                            className="px-2 py-1 text-xs rounded bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                          >
+                            비활성화
+                          </button>
+                        )}
+                        {ch.status === 'SUSPENDED' && (
+                          <button
+                            onClick={() => handleChannelStatusChange(ch.id, 'APPROVED')}
+                            disabled={isActioning}
+                            className="px-2 py-1 text-xs rounded bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                          >
+                            재활성화
+                          </button>
+                        )}
+                        {(ch.status === 'PENDING' || ch.status === 'REJECTED') && (
+                          <button
+                            onClick={() => handleChannelStatusChange(ch.id, 'APPROVED')}
+                            disabled={isActioning}
+                            className="px-2 py-1 text-xs rounded bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                          >
+                            승인
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleChannelStatusChange(ch.id, 'TERMINATED')}
+                          disabled={isActioning}
+                          className="px-2 py-1 text-xs rounded bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-50"
+                        >
+                          종료
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}

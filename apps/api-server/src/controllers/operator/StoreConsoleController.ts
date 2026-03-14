@@ -8,14 +8,17 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { StoreCapabilityService } from '../../modules/store-core/services/store-capability.service.js';
+import { StoreChannelService } from '../../modules/store-core/services/store-channel.service.js';
 import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
 
 export class StoreConsoleController {
   private capabilityService: StoreCapabilityService;
+  private channelService: StoreChannelService;
 
   constructor() {
     // Lazy init — AppDataSource may not be ready at import time
     this.capabilityService = null as any;
+    this.channelService = null as any;
   }
 
   private getCapabilityService(): StoreCapabilityService {
@@ -23,6 +26,13 @@ export class StoreConsoleController {
       this.capabilityService = new StoreCapabilityService(AppDataSource);
     }
     return this.capabilityService;
+  }
+
+  private getChannelService(): StoreChannelService {
+    if (!this.channelService) {
+      this.channelService = new StoreChannelService(AppDataSource);
+    }
+    return this.channelService;
   }
 
   /**
@@ -408,6 +418,85 @@ export class StoreConsoleController {
     } catch (error) {
       console.error('[StoreConsole] updateStoreCapabilities error:', error);
       res.status(500).json({ success: false, error: 'Failed to update store capabilities' });
+    }
+  };
+
+  /**
+   * GET /api/v1/operator/store-channels
+   * WO-O4O-STORE-CHANNEL-LIFECYCLE-V1
+   *
+   * Cross-store 채널 목록 (필터: status, channelType, search)
+   */
+  getAllChannels = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const {
+        page = 1,
+        limit = 20,
+        status,
+        channelType,
+        search,
+      } = req.query;
+
+      const svc = this.getChannelService();
+      const result = await svc.getAllChannels({
+        status: status as string | undefined,
+        channelType: channelType as string | undefined,
+        search: search as string | undefined,
+        page: Math.max(1, Number(page)),
+        limit: Math.min(100, Math.max(1, Number(limit))),
+      });
+
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error('[StoreConsole] getAllChannels error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch channels' });
+    }
+  };
+
+  /**
+   * PUT /api/v1/operator/stores/:storeId/channels/:channelId/status
+   * WO-O4O-STORE-CHANNEL-LIFECYCLE-V1
+   *
+   * Channel 상태 변경 (APPROVED ↔ SUSPENDED → TERMINATED)
+   */
+  updateChannelStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { storeId, channelId } = req.params;
+      const { status } = req.body;
+
+      const ALLOWED_STATUSES = ['APPROVED', 'SUSPENDED', 'TERMINATED'];
+      if (!status || !ALLOWED_STATUSES.includes(status)) {
+        res.status(400).json({
+          success: false,
+          error: `status must be one of: ${ALLOWED_STATUSES.join(', ')}`,
+        });
+        return;
+      }
+
+      const svc = this.getChannelService();
+      const channel = await svc.updateChannelStatus(channelId, storeId, status);
+
+      res.json({
+        success: true,
+        channel: {
+          id: channel.id,
+          channelType: channel.channel_type,
+          status: channel.status,
+          approvedAt: channel.approved_at,
+          updatedAt: channel.updated_at,
+        },
+      });
+    } catch (error: any) {
+      if (error.message === 'CHANNEL_NOT_FOUND') {
+        res.status(404).json({ success: false, error: 'Channel not found' });
+        return;
+      }
+      if (error.message?.startsWith('INVALID_TRANSITION')) {
+        res.status(400).json({ success: false, error: error.message });
+        return;
+      }
+      console.error('[StoreConsole] updateChannelStatus error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update channel status' });
     }
   };
 }

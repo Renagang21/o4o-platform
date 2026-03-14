@@ -258,6 +258,7 @@ export function buildKpaOperatorConfig(
     { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: '🛒' },
     { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
+    { id: 'qa-store-channels', label: '채널 관리', link: '/operator/store-channels', icon: '📡' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
     { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
     // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Quick Actions

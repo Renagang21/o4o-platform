@@ -20,11 +20,18 @@ router.use(requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.OPERAT
 // Store list with slug + owner + channel_count + product_count
 router.get('/', controller.getStores);
 
+// WO-O4O-STORE-CHANNEL-LIFECYCLE-V1: Cross-store channel list
+// NOTE: Must be before /:storeId to avoid param collision
+router.get('/channels', controller.getAllChannels);
+
 // Store detail
 router.get('/:storeId', controller.getStoreDetail);
 
 // Store channels
 router.get('/:storeId/channels', controller.getStoreChannels);
+
+// WO-O4O-STORE-CHANNEL-LIFECYCLE-V1: Channel status update
+router.put('/:storeId/channels/:channelId/status', controller.updateChannelStatus);
 
 // Store product listings
 router.get('/:storeId/products', controller.getStoreProducts);

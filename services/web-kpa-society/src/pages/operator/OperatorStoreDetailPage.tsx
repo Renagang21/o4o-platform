@@ -129,6 +129,7 @@ export default function OperatorStoreDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [capabilityLoading, setCapabilityLoading] = useState<string | null>(null);
+  const [channelActionLoading, setChannelActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!storeId) return;
@@ -177,6 +178,25 @@ export default function OperatorStoreDetailPage() {
       console.error('Failed to toggle capability:', err);
     } finally {
       setCapabilityLoading(null);
+    }
+  };
+
+  const handleChannelStatusChange = async (channelId: string, newStatus: string) => {
+    if (!storeId) return;
+    if (newStatus === 'TERMINATED' && !window.confirm('이 채널을 영구 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    setChannelActionLoading(channelId);
+    try {
+      await apiFetch(`/api/v1/operator/stores/${storeId}/channels/${channelId}/status`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      setChannels((prev) =>
+        prev.map((c) => (c.id === channelId ? { ...c, status: newStatus } : c)),
+      );
+    } catch (err: any) {
+      alert(err?.message || '상태 변경 실패');
+    } finally {
+      setChannelActionLoading(null);
     }
   };
 
@@ -276,15 +296,32 @@ export default function OperatorStoreDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {channels.map((ch) => {
               const sl = statusLabel[ch.status] || { text: ch.status, cls: 'bg-slate-100 text-slate-600' };
+              const loading = channelActionLoading === ch.id;
               return (
-                <div key={ch.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
-                  <div>
-                    <p className="text-sm font-medium text-slate-800">{channelLabel[ch.channelType] || ch.channelType}</p>
-                    <p className="text-xs text-slate-400">{formatDate(ch.createdAt)}</p>
+                <div key={ch.id} className="p-4 rounded-lg border border-slate-100 bg-slate-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="text-sm font-medium text-slate-800">{channelLabel[ch.channelType] || ch.channelType}</p>
+                      <p className="text-xs text-slate-400">{formatDate(ch.createdAt)}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sl.cls}`}>
+                      {sl.text}
+                    </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sl.cls}`}>
-                    {sl.text}
-                  </span>
+                  {ch.status !== 'TERMINATED' && ch.status !== 'EXPIRED' && (
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200">
+                      {ch.status === 'APPROVED' && (
+                        <button onClick={() => handleChannelStatusChange(ch.id, 'SUSPENDED')} disabled={loading} className="px-2 py-1 text-xs rounded border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-50">비활성화</button>
+                      )}
+                      {ch.status === 'SUSPENDED' && (
+                        <button onClick={() => handleChannelStatusChange(ch.id, 'APPROVED')} disabled={loading} className="px-2 py-1 text-xs rounded bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50">재활성화</button>
+                      )}
+                      {(ch.status === 'PENDING' || ch.status === 'REJECTED') && (
+                        <button onClick={() => handleChannelStatusChange(ch.id, 'APPROVED')} disabled={loading} className="px-2 py-1 text-xs rounded bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50">승인</button>
+                      )}
+                      <button onClick={() => handleChannelStatusChange(ch.id, 'TERMINATED')} disabled={loading} className="px-2 py-1 text-xs rounded text-red-600 hover:bg-red-50 disabled:opacity-50">종료</button>
+                    </div>
+                  )}
                 </div>
               );
             })}

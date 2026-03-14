@@ -21,6 +21,7 @@ import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, Operato
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
+import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPage';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
@@ -118,6 +119,9 @@ export function OperatorRoutes() {
           {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
           <Route path="stores" element={<OperatorStoresPage />} />
           <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
+
+          {/* 채널 관리 (WO-O4O-STORE-CHANNEL-LIFECYCLE-V1) */}
+          <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
 
           {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
           <Route path="operators" element={
