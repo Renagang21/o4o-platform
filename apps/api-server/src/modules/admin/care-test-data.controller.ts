@@ -19,7 +19,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import logger from '../../utils/logger.js';
 
 /* ═══════════════════════════════════════════
