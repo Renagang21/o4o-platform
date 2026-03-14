@@ -26,6 +26,7 @@ import SupplierSpaceLayout from './components/layouts/SupplierSpaceLayout';
 import PartnerSpaceLayout from './components/layouts/PartnerSpaceLayout';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
+import OperatorLayout from './components/layouts/OperatorLayout';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
@@ -645,7 +646,7 @@ function App() {
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin', 'operator']}>
-                <SupplierOpsLayout />
+                <OperatorLayout />
               </ProtectedRoute>
             }>
               <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
