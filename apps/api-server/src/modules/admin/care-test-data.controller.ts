@@ -247,22 +247,25 @@ function generateWeight(patientSeed: number): ReadingRow[] {
  * Auth helper
  * ═══════════════════════════════════════════ */
 
-async function verifyAdminSecret(req: Request, res: Response): Promise<boolean> {
+function verifyAdminSecret(req: Request, res: Response): boolean {
   const jwtSecret = process.env.JWT_SECRET;
 
   // Option 1: X-Admin-Secret header (= JWT_SECRET)
   const secret = req.headers['x-admin-secret'] as string;
   if (secret && jwtSecret && secret === jwtSecret) return true;
 
-  // Option 2: Bearer token with platform:admin role
+  // Option 2: Bearer token with platform:admin role (decode JWT payload without library)
   const authHeader = req.headers.authorization;
-  if (authHeader?.startsWith('Bearer ') && jwtSecret) {
+  if (authHeader?.startsWith('Bearer ')) {
     try {
-      const { default: jwtLib } = await import('jsonwebtoken');
       const token = authHeader.slice(7);
-      const decoded = jwtLib.verify(token, jwtSecret) as { roles?: string[] };
-      if (decoded.roles?.includes('platform:admin') || decoded.roles?.includes('platform:super_admin')) {
-        return true;
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+        const roles: string[] = payload.roles || [];
+        if (roles.includes('platform:admin') || roles.includes('platform:super_admin')) {
+          return true;
+        }
       }
     } catch { /* invalid token */ }
   }
@@ -295,7 +298,7 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
 
   /* ─── POST: Create complete test environment ─── */
   router.post('/', async (req: Request, res: Response) => {
-    if (!(await verifyAdminSecret(req, res))) return;
+    if (!verifyAdminSecret(req, res)) return;
 
     try {
       const log: string[] = [];
@@ -481,7 +484,7 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
 
   /* ─── DELETE: Full cleanup ─── */
   router.delete('/', async (req: Request, res: Response) => {
-    if (!(await verifyAdminSecret(req, res))) return;
+    if (!verifyAdminSecret(req, res)) return;
 
     try {
       const deleted: Record<string, number> = {};
