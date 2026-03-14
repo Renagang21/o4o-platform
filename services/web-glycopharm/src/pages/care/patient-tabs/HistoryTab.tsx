@@ -1,9 +1,11 @@
 /**
- * HistoryTab - 환자 타임라인 (live)
- * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
+ * HistoryTab - 환자 타임라인 (통합)
+ * WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 Phase 3
  *
- * 분석(snapshot) + 코칭(session) 이벤트를 시간축 기준으로 통합 표시.
- * 데이터: PatientDetailPage context (snapshot) + API coaching sessions
+ * 4가지 이벤트를 시간축으로 통합 표시:
+ *   health_reading | analysis | coaching | alert
+ *
+ * 데이터: pharmacyApi.getPatientTimeline(patientId) — backend UNION ALL
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -15,25 +17,16 @@ import {
   CheckCircle,
   Clock,
   Loader2,
+  Heart,
+  Bell,
 } from 'lucide-react';
-import { pharmacyApi, type CoachingSession } from '@/api/pharmacy';
+import { pharmacyApi, type TimelineEventDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 // ── Types ──
 
-type EventType = 'analysis' | 'coaching';
+type EventType = TimelineEventDto['type'];
 type FilterType = 'all' | EventType;
-
-interface TimelineEvent {
-  id: string;
-  type: EventType;
-  date: string;
-  title: string;
-  description: string;
-  meta?: {
-    riskLevel?: string;
-  };
-}
 
 // ── Constants ──
 
@@ -43,68 +36,46 @@ const RISK_DISPLAY = {
   low: { label: '양호', cls: 'text-green-700 bg-green-100', Icon: CheckCircle },
 } as const;
 
-const EVENT_STYLE = {
+const EVENT_STYLE: Record<EventType, { dot: string; Icon: typeof BarChart3; label: string }> = {
+  health_reading: { dot: 'bg-purple-500', Icon: Heart, label: '건강데이터' },
   analysis: { dot: 'bg-blue-500', Icon: BarChart3, label: '분석' },
   coaching: { dot: 'bg-green-500', Icon: MessageSquare, label: '코칭' },
-} as const;
+  alert: { dot: 'bg-red-500', Icon: Bell, label: '알림' },
+};
 
 const FILTER_OPTIONS: { key: FilterType; label: string }[] = [
   { key: 'all', label: '전체' },
+  { key: 'health_reading', label: '건강데이터' },
   { key: 'analysis', label: '분석' },
   { key: 'coaching', label: '코칭' },
+  { key: 'alert', label: '알림' },
 ];
 
+const SEVERITY_STYLE = {
+  critical: 'text-red-700 bg-red-100',
+  warning: 'text-amber-700 bg-amber-100',
+  info: 'text-blue-700 bg-blue-100',
+} as const;
+
 export default function HistoryTab() {
-  const { patient, snapshot } = usePatientDetail();
+  const { patient } = usePatientDetail();
   const [filter, setFilter] = useState<FilterType>('all');
-  const [sessions, setSessions] = useState<CoachingSession[]>([]);
+  const [events, setEvents] = useState<TimelineEventDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!patient?.id) return;
     setLoading(true);
-    pharmacyApi.getCoachingSessions(patient.id)
-      .then((data) => setSessions(Array.isArray(data) ? data : []))
-      .catch(() => setSessions([]))
+    pharmacyApi.getPatientTimeline(patient.id)
+      .then((data) => setEvents(Array.isArray(data) ? data : []))
+      .catch(() => setEvents([]))
       .finally(() => setLoading(false));
   }, [patient?.id]);
 
-  // Merge analysis snapshot + coaching into unified timeline
-  const allEvents = useMemo<TimelineEvent[]>(() => {
-    const events: TimelineEvent[] = [];
-
-    // Coaching sessions → timeline events
-    for (const s of sessions) {
-      events.push({
-        id: `c-${s.id}`,
-        type: 'coaching',
-        date: s.createdAt,
-        title: '코칭 상담',
-        description: s.summary,
-      });
-    }
-
-    // Snapshot → analysis event
-    if (snapshot?.createdAt) {
-      const riskKey = snapshot.riskLevel in RISK_DISPLAY ? snapshot.riskLevel : 'low';
-      const risk = RISK_DISPLAY[riskKey as keyof typeof RISK_DISPLAY];
-      events.push({
-        id: 'a1',
-        type: 'analysis',
-        date: snapshot.createdAt,
-        title: '분석 완료',
-        description: `위험도: ${risk.label}`,
-        meta: { riskLevel: riskKey },
-      });
-    }
-
-    // Sort by date desc
-    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [snapshot, sessions]);
-
-  const filteredEvents = filter === 'all'
-    ? allEvents
-    : allEvents.filter(e => e.type === filter);
+  const filteredEvents = useMemo(
+    () => filter === 'all' ? events : events.filter(e => e.type === filter),
+    [events, filter],
+  );
 
   if (loading) {
     return (
@@ -117,7 +88,7 @@ export default function HistoryTab() {
   return (
     <div className="space-y-5">
       {/* Filter Bar */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.key}
@@ -149,7 +120,7 @@ export default function HistoryTab() {
             {filteredEvents.map((event) => {
               const style = EVENT_STYLE[event.type];
               return (
-                <div key={event.id} className="relative flex gap-4">
+                <div key={`${event.type}-${event.id}`} className="relative flex gap-4">
                   {/* Dot */}
                   <div className="relative z-10 flex-shrink-0 mt-1">
                     <div className={`w-[9px] h-[9px] rounded-full ${style.dot} ring-4 ring-white`} />
@@ -164,28 +135,16 @@ export default function HistoryTab() {
                           <style.Icon className="w-4 h-4 text-slate-400" />
                           <span className="text-xs font-medium text-slate-400 uppercase">{style.label}</span>
                           <span className="text-xs text-slate-400">
-                            {new Date(event.date).toLocaleDateString()}
+                            {new Date(event.eventAt).toLocaleDateString()}
                           </span>
                         </div>
-                        {/* Title + Description */}
-                        <p className="text-sm font-medium text-slate-800">{event.title}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{event.description}</p>
+                        {/* Content by type */}
+                        <EventContent event={event} />
                       </div>
 
                       {/* Meta Badge */}
                       <div className="flex-shrink-0">
-                        {event.type === 'analysis' && event.meta?.riskLevel && (
-                          (() => {
-                            const rk = event.meta.riskLevel as keyof typeof RISK_DISPLAY;
-                            const r = RISK_DISPLAY[rk];
-                            return (
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${r.cls}`}>
-                                <r.Icon className="w-3 h-3" />
-                                {r.label}
-                              </span>
-                            );
-                          })()
-                        )}
+                        <EventBadge event={event} />
                       </div>
                     </div>
                   </div>
@@ -197,4 +156,82 @@ export default function HistoryTab() {
       )}
     </div>
   );
+}
+
+function EventContent({ event }: { event: TimelineEventDto }) {
+  const p = event.payload;
+
+  switch (event.type) {
+    case 'health_reading': {
+      const parts: string[] = [];
+      if (p.fasting != null) parts.push(`공복 ${p.fasting}`);
+      if (p.postMeal != null) parts.push(`식후 ${p.postMeal}`);
+      if (p.systolic != null && p.diastolic != null) parts.push(`BP ${p.systolic}/${p.diastolic}`);
+      if (p.weight != null) parts.push(`체중 ${p.weight}kg`);
+      return (
+        <>
+          <p className="text-sm font-medium text-slate-800">건강 데이터 입력</p>
+          <p className="text-xs text-slate-500 mt-0.5">{parts.join(' · ') || '데이터 기록'}</p>
+        </>
+      );
+    }
+    case 'analysis': {
+      const riskKey = (p.riskLevel as string) in RISK_DISPLAY
+        ? (p.riskLevel as keyof typeof RISK_DISPLAY)
+        : 'low';
+      const risk = RISK_DISPLAY[riskKey];
+      return (
+        <>
+          <p className="text-sm font-medium text-slate-800">분석 완료</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            위험도: {risk.label} · TIR {p.tir ?? '-'}% · CV {p.cv ?? '-'}%
+          </p>
+        </>
+      );
+    }
+    case 'coaching':
+      return (
+        <>
+          <p className="text-sm font-medium text-slate-800">코칭 상담</p>
+          <p className="text-xs text-slate-500 mt-0.5">{(p.summary as string) || '상담 기록'}</p>
+        </>
+      );
+    case 'alert':
+      return (
+        <>
+          <p className="text-sm font-medium text-slate-800">{(p.message as string) || '알림'}</p>
+          <p className="text-xs text-slate-500 mt-0.5">유형: {p.alertType as string}</p>
+        </>
+      );
+  }
+}
+
+function EventBadge({ event }: { event: TimelineEventDto }) {
+  const p = event.payload;
+
+  if (event.type === 'analysis' && p.riskLevel) {
+    const rk = p.riskLevel as string;
+    if (rk in RISK_DISPLAY) {
+      const r = RISK_DISPLAY[rk as keyof typeof RISK_DISPLAY];
+      return (
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${r.cls}`}>
+          <r.Icon className="w-3 h-3" />
+          {r.label}
+        </span>
+      );
+    }
+  }
+
+  if (event.type === 'alert' && p.severity) {
+    const sev = p.severity as string;
+    const sevCls = SEVERITY_STYLE[sev as keyof typeof SEVERITY_STYLE] ?? SEVERITY_STYLE.info;
+    const sevLabel = sev === 'critical' ? '긴급' : sev === 'warning' ? '경고' : '정보';
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${sevCls}`}>
+        {sevLabel}
+      </span>
+    );
+  }
+
+  return null;
 }

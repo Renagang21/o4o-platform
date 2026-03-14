@@ -707,6 +707,25 @@ class PharmacyApiClient {
     });
   }
 
+  // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 3: Patient Timeline
+  async getPatientTimeline(patientId: string, limit = 50): Promise<TimelineEventDto[]> {
+    return this.request(`/api/v1/care/timeline/${patientId}?limit=${limit}`);
+  }
+
+  // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 4: AI Priority
+  async getAiPriorityPatients(limit = 5): Promise<{ priorityPatients: AiPriorityPatientDto[] }> {
+    return this.request(`/api/v1/care/ai-priority-patients?limit=${limit}`);
+  }
+
+  // WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
+  async sendCareAiChat(message: string, patientId?: string): Promise<AiChatResponseDto> {
+    const res = await this.request<{ success: boolean; data: AiChatResponseDto }>(
+      '/api/v1/care/ai-chat',
+      { method: 'POST', body: JSON.stringify({ message, patientId }) },
+    );
+    return (res as { data: AiChatResponseDto }).data ?? (res as unknown as AiChatResponseDto);
+  }
+
   // WO-O4O-CARE-LLM-INSIGHT-V1
   async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
     return this.request(`/api/v1/care/llm-insight/${patientId}`);
@@ -1024,6 +1043,32 @@ export interface CoachingDraftDto {
   draftMessage: string;
   status: 'draft' | 'approved' | 'discarded';
   createdAt: string;
+}
+
+// WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 3: Timeline
+export interface TimelineEventDto {
+  type: 'health_reading' | 'analysis' | 'coaching' | 'alert';
+  id: string;
+  patientId: string;
+  eventAt: string;
+  payload: Record<string, unknown>;
+}
+
+// WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 4: AI Priority
+export interface AiPriorityPatientDto extends PriorityPatientDto {
+  baseScore: number;
+  aiAdjustment: number;
+  aiReason: string | null;
+}
+
+// WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
+export interface AiChatResponseDto {
+  summary: string;
+  details: string[];
+  recommendations: string[];
+  relatedPatients: Array<{ patientId: string; name: string; reason: string }>;
+  model: string;
+  respondedAt: string;
 }
 
 // Export singleton instance

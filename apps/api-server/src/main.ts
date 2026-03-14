@@ -1022,6 +1022,15 @@ const startServer = async () => {
       logger.error('Failed to register Care LLM Insight routes:', llmInsightError);
     }
 
+    // 28f-2. Register Care AI Chat routes (WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1)
+    try {
+      const { createCareAiChatRouter } = await import('./modules/care/controllers/care-ai-chat.controller.js');
+      app.use('/api/v1/care', createCareAiChatRouter(AppDataSource));
+      logger.info('✅ Care AI Chat routes registered at /api/v1/care/ai-chat');
+    } catch (aiChatError) {
+      logger.error('Failed to register Care AI Chat routes:', aiChatError);
+    }
+
     // 28g-1. Register Patient Profile routes (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
     try {
       const { createPatientProfileRouter } = await import('./modules/care/controllers/patient-profile.controller.js');

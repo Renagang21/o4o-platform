@@ -1,11 +1,15 @@
 /**
- * CareDashboardPage - Care Home (환자 관리 포털)
+ * CareDashboardPage - AI Care Control Tower
  *
- * WO-CARE-DATA-ALIGNMENT-PHASE1-V1
+ * WO-GLYCOPHARM-CARE-CONTROL-TOWER-AI-UX-REFINE-V1
  *
- * - 위험도: Care snapshot risk_level 기반 (fallback: 'low')
- * - 최근 분석일: Care snapshot created_at 기반
- * - KPI: Care dashboard summary 데이터
+ * 구조:
+ *   Population Summary + AI explanation
+ *   Priority Patients + AI explanation
+ *   Alert Stream
+ *   Risk Summary + AI explanation + Avg Metrics + Coaching
+ *   Ask AI (Chat Entry)
+ *   Patient Search + Table
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -22,13 +26,16 @@ import {
   ChevronRight,
   Star,
   Activity,
-  BarChart3,
   Bell,
   Check,
   CheckCircle2,
 } from 'lucide-react';
-import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary, type PriorityPatientDto, type PopulationDashboardDto, type CareAlertDto } from '@/api/pharmacy';
+import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary, type PriorityPatientDto, type AiPriorityPatientDto, type PopulationDashboardDto, type CareAlertDto } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
+import CareAiPopulationSummary from './CareAiPopulationSummary';
+import CareAiPrioritySummary from './CareAiPrioritySummary';
+import CareRiskSummary from './CareRiskSummary';
+import CareAiChatEntry from './CareAiChatEntry';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
 
@@ -47,7 +54,7 @@ export default function CareDashboardPage() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<PharmacyCustomer[]>([]);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
-  const [priorityPatients, setPriorityPatients] = useState<PriorityPatientDto[]>([]);
+  const [priorityPatients, setPriorityPatients] = useState<(PriorityPatientDto | AiPriorityPatientDto)[]>([]);
   const [population, setPopulation] = useState<PopulationDashboardDto | null>(null);
   const [alerts, setAlerts] = useState<CareAlertDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +79,10 @@ export default function CareDashboardPage() {
           pageSize: 100,
         }),
         pharmacyApi.getCareDashboardSummary().catch(() => null),
-        pharmacyApi.getPriorityPatients().catch(() => null),
+        // Phase 4: AI Priority with fallback to rule-based
+        pharmacyApi.getAiPriorityPatients().catch(() =>
+          pharmacyApi.getPriorityPatients().catch(() => null)
+        ),
         pharmacyApi.getPopulationDashboard().catch(() => null),
         pharmacyApi.getCareAlerts().catch(() => [] as CareAlertDto[]),
       ]);
@@ -159,13 +169,13 @@ export default function CareDashboardPage() {
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <h1 className="text-2xl font-bold text-white">Care 관리 현황</h1>
+          <h1 className="text-2xl font-bold text-white">AI Care Control Tower</h1>
           <p className="text-primary-100 mt-1">오늘의 관리 요약 · {todayStr}</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* KPI Row */}
+        {/* ═══ Section 1: Population Summary + AI Explanation ═══ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
             <div className="flex items-center gap-3 mb-2">
@@ -216,7 +226,93 @@ export default function CareDashboardPage() {
           </div>
         </div>
 
-        {/* Active Alerts — WO-O4O-CARE-ALERT-ENGINE-V1 */}
+        {/* AI Population Explanation */}
+        <CareAiPopulationSummary summary={summary} population={population} />
+
+        {/* ═══ Section 2: Priority Patients + AI Explanation ═══ */}
+        {priorityPatients.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Star className="w-5 h-5 text-orange-500" />
+              <h2 className="text-sm font-semibold text-slate-700">오늘의 우선 관리 환자</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              {priorityPatients.map((pp) => {
+                const scoreColor =
+                  pp.priorityScore >= 80
+                    ? 'bg-red-100 text-red-700'
+                    : pp.priorityScore >= 50
+                      ? 'bg-orange-100 text-orange-700'
+                      : 'bg-yellow-100 text-yellow-700';
+                const riskBadge =
+                  pp.riskLevel === 'high'
+                    ? 'bg-red-100 text-red-700'
+                    : pp.riskLevel === 'caution'
+                      ? 'bg-amber-100 text-amber-700'
+                      : 'bg-green-100 text-green-700';
+                const riskLabel =
+                  pp.riskLevel === 'high' ? '고위험' : pp.riskLevel === 'caution' ? '주의' : '양호';
+
+                // AI adjustment display (Phase 4)
+                const aiData = 'aiAdjustment' in pp ? pp as AiPriorityPatientDto : null;
+
+                return (
+                  <div
+                    key={pp.patientId}
+                    onClick={() => navigate(`/care/patients/${pp.patientId}`)}
+                    className="bg-white rounded-xl border border-slate-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-[10px] font-medium">
+                            {pp.patientName.charAt(0)}
+                          </span>
+                        </div>
+                        <span className="text-sm font-medium text-slate-800 truncate">
+                          {pp.patientName}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${scoreColor}`}>
+                          {pp.priorityScore}
+                        </span>
+                        {aiData && aiData.aiAdjustment !== 0 && (
+                          <span className={`text-[9px] font-medium ${aiData.aiAdjustment > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                            {aiData.aiAdjustment > 0 ? `+${aiData.aiAdjustment}` : aiData.aiAdjustment}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${riskBadge}`}>
+                        {riskLabel}
+                      </span>
+                      <span className="text-[10px] text-slate-400">TIR {pp.tir}%</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {pp.reasons.slice(0, 2).map((r, i) => (
+                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                    {aiData?.aiReason && (
+                      <p className="text-[10px] text-primary-600 mt-1.5 line-clamp-1">{aiData.aiReason}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* AI Priority Summary */}
+            <div className="mt-3">
+              <CareAiPrioritySummary patients={priorityPatients} />
+            </div>
+          </div>
+        )}
+
+        {/* ═══ Section 3: Alert Stream ═══ */}
         {alerts.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -282,55 +378,11 @@ export default function CareDashboardPage() {
           </div>
         )}
 
-        {/* Population Dashboard — WO-O4O-CARE-POPULATION-DASHBOARD-V1 */}
+        {/* ═══ Section 4: Risk Summary + Avg Metrics + Coaching ═══ */}
         {population && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Risk Distribution */}
-            <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
-              <div className="flex items-center gap-2 mb-3">
-                <BarChart3 className="w-4 h-4 text-slate-500" />
-                <p className="text-sm font-medium text-slate-700">위험도 분포</p>
-              </div>
-              {(() => {
-                const { high, moderate, low } = population.riskDistribution;
-                const total = high + moderate + low;
-                if (total === 0) return <p className="text-xs text-slate-400">분석 데이터 없음</p>;
-                return (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500 w-12">고위험</span>
-                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
-                        <div
-                          className="bg-red-400 h-full rounded-full transition-all"
-                          style={{ width: `${(high / total) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{high}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500 w-12">주의</span>
-                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
-                        <div
-                          className="bg-amber-400 h-full rounded-full transition-all"
-                          style={{ width: `${(moderate / total) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{moderate}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500 w-12">양호</span>
-                      <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
-                        <div
-                          className="bg-green-400 h-full rounded-full transition-all"
-                          style={{ width: `${(low / total) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-slate-700 w-8 text-right">{low}</span>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
+            {/* Risk Summary (replaces bar chart) */}
+            <CareRiskSummary population={population} />
 
             {/* Average Metrics */}
             <div className="bg-white rounded-2xl shadow-sm p-5 border border-slate-200">
@@ -388,72 +440,10 @@ export default function CareDashboardPage() {
           </div>
         )}
 
-        {/* Priority Patients — WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1 */}
-        {priorityPatients.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Star className="w-5 h-5 text-orange-500" />
-              <h2 className="text-sm font-semibold text-slate-700">오늘의 우선 관리 환자</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-              {priorityPatients.map((pp) => {
-                const scoreColor =
-                  pp.priorityScore >= 80
-                    ? 'bg-red-100 text-red-700'
-                    : pp.priorityScore >= 50
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-yellow-100 text-yellow-700';
-                const riskBadge =
-                  pp.riskLevel === 'high'
-                    ? 'bg-red-100 text-red-700'
-                    : pp.riskLevel === 'caution'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'bg-green-100 text-green-700';
-                const riskLabel =
-                  pp.riskLevel === 'high' ? '고위험' : pp.riskLevel === 'caution' ? '주의' : '양호';
+        {/* ═══ Section 5: AI Chat Entry ═══ */}
+        <CareAiChatEntry />
 
-                return (
-                  <div
-                    key={pp.patientId}
-                    onClick={() => navigate(`/care/patients/${pp.patientId}`)}
-                    className="bg-white rounded-xl border border-slate-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-[10px] font-medium">
-                            {pp.patientName.charAt(0)}
-                          </span>
-                        </div>
-                        <span className="text-sm font-medium text-slate-800 truncate">
-                          {pp.patientName}
-                        </span>
-                      </div>
-                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${scoreColor}`}>
-                        {pp.priorityScore}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${riskBadge}`}>
-                        {riskLabel}
-                      </span>
-                      <span className="text-[10px] text-slate-400">TIR {pp.tir}%</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {pp.reasons.slice(0, 2).map((r, i) => (
-                        <span key={i} className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
-                          {r}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Action Bar */}
+        {/* ═══ Section 6: Patient Search + Table ═══ */}
         <div className="flex items-center gap-3">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />

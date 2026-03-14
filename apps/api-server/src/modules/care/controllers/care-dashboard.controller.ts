@@ -5,6 +5,7 @@ import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middle
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 import { CareRiskService } from '../services/care-risk.service.js';
 import { CarePriorityService } from '../services/care-priority.service.js';
+import { CarePriorityAiService } from '../services/care-priority-ai.service.js';
 import { CarePopulationService } from '../services/care-population.service.js';
 import { CareAlertService } from '../services/care-alert.service.js';
 
@@ -26,6 +27,7 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
   const priorityService = new CarePriorityService(dataSource);
   const populationService = new CarePopulationService(dataSource);
   const alertService = new CareAlertService(dataSource);
+  const aiPriorityService = new CarePriorityAiService(dataSource, priorityService);
 
   router.get('/dashboard', authenticate, requirePharmacyContext, async (req, res) => {
     try {
@@ -149,6 +151,96 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: 'Alert resolve error' });
+    }
+  });
+
+  // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 3
+  // GET /timeline/:patientId — unified patient timeline (4 event types)
+  router.get('/timeline/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      if (!pharmacyId) {
+        res.json([]);
+        return;
+      }
+
+      const { patientId } = req.params;
+      const limit = Math.min(Number(req.query.limit) || 50, 200);
+
+      const rows: Array<{
+        type: string;
+        id: string;
+        patient_id: string;
+        event_at: string;
+        payload: Record<string, unknown>;
+      }> = await dataSource.query(
+        `(
+          SELECT 'health_reading' AS type, id::text, patient_id::text, measured_at AS event_at,
+            jsonb_build_object(
+              'fasting', fasting_glucose, 'postMeal', post_meal_glucose,
+              'systolic', systolic_bp, 'diastolic', diastolic_bp, 'weight', weight
+            ) AS payload
+          FROM health_readings WHERE patient_id = $1 AND pharmacy_id = $2
+        )
+        UNION ALL
+        (
+          SELECT 'analysis' AS type, id::text, patient_id::text, created_at AS event_at,
+            jsonb_build_object('riskLevel', risk_level, 'tir', tir, 'cv', cv) AS payload
+          FROM care_kpi_snapshots WHERE patient_id = $1 AND pharmacy_id = $2
+        )
+        UNION ALL
+        (
+          SELECT 'coaching' AS type, id::text, patient_id::text, created_at AS event_at,
+            jsonb_build_object('summary', summary) AS payload
+          FROM care_coaching_sessions WHERE patient_id = $1 AND pharmacy_id = $2
+        )
+        UNION ALL
+        (
+          SELECT 'alert' AS type, id::text, patient_id::text, created_at AS event_at,
+            jsonb_build_object('alertType', alert_type, 'severity', severity, 'message', message, 'status', status) AS payload
+          FROM care_alerts WHERE patient_id = $1 AND pharmacy_id = $2
+        )
+        ORDER BY event_at DESC
+        LIMIT $3`,
+        [patientId, pharmacyId, limit],
+      );
+
+      const events = rows.map(r => ({
+        type: r.type,
+        id: r.id,
+        patientId: r.patient_id,
+        eventAt: typeof r.event_at === 'string' ? r.event_at : new Date(r.event_at).toISOString(),
+        payload: r.payload,
+      }));
+
+      res.json(events);
+    } catch (error) {
+      console.error('[CareTimeline] error:', error);
+      res.status(500).json({ message: 'Timeline retrieval error' });
+    }
+  });
+
+  // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 4
+  // GET /ai-priority-patients — AI-adjusted priority patients
+  router.get('/ai-priority-patients', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+
+      const limit = Math.min(Number(req.query.limit) || 5, 20);
+      const patients = await aiPriorityService.getAiAdjustedPriorityPatients(pharmacyId, limit);
+      res.json({ priorityPatients: patients });
+    } catch (error) {
+      console.error('[AiPriority] error:', error);
+      // Fallback to rule-based
+      try {
+        const pcReq = req as PharmacyContextRequest;
+        const patients = await priorityService.getTopPriorityPatients(pcReq.pharmacyId);
+        res.json({ priorityPatients: patients });
+      } catch {
+        res.status(500).json({ message: 'AI priority patients retrieval error' });
+      }
     }
   });
 

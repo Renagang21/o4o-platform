@@ -35,6 +35,8 @@ import {
   type KpiComparisonDto,
 } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
+import PatientAiSummary from './PatientAiSummary';
+import CareAiChatEntry from './CareAiChatEntry';
 
 // ── Shared types for tab context ──
 
@@ -263,6 +265,12 @@ export default function PatientDetailPage() {
             ))}
           </div>
         )}
+
+        {/* AI Summary */}
+        {id && <PatientAiSummary patientId={id} />}
+
+        {/* AI Chat Entry — Patient Mode */}
+        {id && <CareAiChatEntry patientId={id} patientName={patientName} />}
 
         {/* Tab Navigation */}
         <nav className="bg-white rounded-t-2xl border border-b-0 border-slate-200">

@@ -76,7 +76,7 @@ export class OperatorCopilotService {
     // Recent 7-day orders
     const orderRows = await this.dataSource.query(
       `SELECT COUNT(DISTINCT id)::int AS "recentOrders"
-       FROM neture_orders
+       FROM neture.neture_orders
        WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
     );
 
@@ -113,7 +113,7 @@ export class OperatorCopilotService {
          spo.created_at AS "createdAt"
        FROM supplier_product_offers spo
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
-       JOIN product_masters pm ON pm.id = spo.product_master_id
+       JOIN product_masters pm ON pm.id = spo.master_id
        ORDER BY spo.created_at DESC
        LIMIT $1`,
       [limit]
@@ -133,7 +133,7 @@ export class OperatorCopilotService {
          ns.name AS "supplierName",
          spo.created_at AS "createdAt"
        FROM supplier_product_offers spo
-       JOIN product_masters pm ON pm.id = spo.product_master_id
+       JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers ns ON ns.id = spo.supplier_id
        WHERE spo.is_active = false
        ORDER BY spo.created_at DESC
@@ -153,13 +153,13 @@ export class OperatorCopilotService {
     const orderRows = await this.dataSource.query(
       `WITH current_week AS (
          SELECT COUNT(*)::int AS orders
-         FROM neture_orders
+         FROM neture.neture_orders
          WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
            AND status IN ('paid','preparing','shipped','delivered')
        ),
        prev_week AS (
          SELECT COUNT(*)::int AS orders
-         FROM neture_orders
+         FROM neture.neture_orders
          WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
            AND created_at < CURRENT_DATE - INTERVAL '7 days'
            AND status IN ('paid','preparing','shipped','delivered')
@@ -236,7 +236,7 @@ export class OperatorCopilotService {
     // No orders in 7 days
     const recentOrderRows = await this.dataSource.query(
       `SELECT COUNT(DISTINCT id)::int AS cnt
-       FROM neture_orders
+       FROM neture.neture_orders
        WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
     );
     if ((recentOrderRows[0]?.cnt ?? 0) === 0) {
