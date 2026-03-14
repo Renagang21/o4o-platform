@@ -5,16 +5,21 @@
  *   @o4o/admin-ux-core 기반 4-Block 구조로 전환.
  *   "AI 중심형" — Structure Snapshot + Governance Alerts 강조.
  *
+ * WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1:
+ *   Partner Network KPI 섹션 추가 (Active Partners, Commission, Settlements)
+ *
  * Block 구조:
  *  [A] Structure Snapshot — 공급자, 파트너, 승인대기, 콘텐츠
  *  [B] Policy Overview   — AI 정책, 승인 정책, 이메일 설정
  *  [C] Governance Alerts  — 구조 경고 (승인 대기, 파트너 요청, 콘텐츠 부재)
  *  [D] Structure Actions  — 구조 변경 진입점
+ *  [+] Partner KPI        — 활성 파트너, 총 커미션, 대기 커미션, 대기 정산
  *
- * API 재사용: dashboardApi.getAdminDashboardSummary()
+ * API: dashboardApi.getAdminDashboardSummary() + dashboardApi.getPartnerKpiSummary()
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import {
   AdminDashboardLayout,
   type AdminDashboardConfig,
@@ -23,7 +28,7 @@ import {
   type GovernanceAlert,
   type StructureAction,
 } from '@o4o/admin-ux-core';
-import { dashboardApi, type AdminDashboardSummary } from '../../lib/api';
+import { dashboardApi, type AdminDashboardSummary, type PartnerKpiSummary } from '../../lib/api';
 
 // ─── Data Transformer ───
 
@@ -122,10 +127,55 @@ function buildAdminConfig(summary: AdminDashboardSummary): AdminDashboardConfig 
   return { structureMetrics, policies, governanceAlerts, structureActions };
 }
 
+// ─── Partner KPI Card ───
+
+function formatKpiValue(value: number, isCurrency: boolean): string {
+  if (isCurrency) return `${value.toLocaleString('ko-KR')}원`;
+  return String(value);
+}
+
+function PartnerKpiSection({ kpi }: { kpi: PartnerKpiSummary }) {
+  const cards: Array<{ label: string; value: number; isCurrency: boolean; color: string; borderColor: string }> = [
+    { label: 'Active Partners', value: kpi.activePartners, isCurrency: false, color: '#2563eb', borderColor: '#dbeafe' },
+    { label: 'Total Commission', value: kpi.totalCommission, isCurrency: true, color: '#059669', borderColor: '#d1fae5' },
+    { label: 'Pending Commission', value: kpi.pendingCommission, isCurrency: true, color: '#d97706', borderColor: '#fef3c7' },
+    { label: 'Pending Settlements', value: kpi.pendingSettlements, isCurrency: false, color: '#7c3aed', borderColor: '#ede9fe' },
+  ];
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-base font-semibold text-slate-800">Partner Network</h2>
+        <Link
+          to="/workspace/admin/partners"
+          className="text-xs text-slate-500 hover:text-primary-600 transition-colors"
+        >
+          파트너 관리 →
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {cards.map((card) => (
+          <div
+            key={card.label}
+            className="bg-white rounded-xl border p-4"
+            style={{ borderColor: card.borderColor }}
+          >
+            <p className="text-xs font-medium text-slate-500 mb-1">{card.label}</p>
+            <p className="text-xl font-bold" style={{ color: card.color }}>
+              {formatKpiValue(card.value, card.isCurrency)}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ───
 
 export default function AdminDashboardPage() {
   const [config, setConfig] = useState<AdminDashboardConfig | null>(null);
+  const [partnerKpi, setPartnerKpi] = useState<PartnerKpiSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -133,8 +183,12 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await dashboardApi.getAdminDashboardSummary();
-      if (data) setConfig(buildAdminConfig(data));
+      const [summaryData, kpiData] = await Promise.all([
+        dashboardApi.getAdminDashboardSummary(),
+        dashboardApi.getPartnerKpiSummary(),
+      ]);
+      if (summaryData) setConfig(buildAdminConfig(summaryData));
+      setPartnerKpi(kpiData);
     } catch (err) {
       console.error('Failed to fetch admin dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');
@@ -168,5 +222,10 @@ export default function AdminDashboardPage() {
     );
   }
 
-  return <AdminDashboardLayout config={config} />;
+  return (
+    <div>
+      <AdminDashboardLayout config={config} />
+      {partnerKpi && <PartnerKpiSection kpi={partnerKpi} />}
+    </div>
+  );
 }

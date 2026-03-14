@@ -165,6 +165,15 @@ export interface PartnerDashboardSummary {
   notifications: Notification[];
 }
 
+// ==================== Admin Partner KPI Types (WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1) ====================
+
+export interface PartnerKpiSummary {
+  activePartners: number;
+  totalCommission: number;
+  pendingCommission: number;
+  pendingSettlements: number;
+}
+
 // ==================== Dashboard API ====================
 
 export const dashboardApi = {
@@ -198,6 +207,20 @@ export const dashboardApi = {
       return result.data;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch admin dashboard summary:', error);
+      return null;
+    }
+  },
+
+  async getPartnerKpiSummary(): Promise<PartnerKpiSummary | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/partner-kpi`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.warn('[Dashboard API] Failed to fetch partner KPI:', error);
       return null;
     }
   },

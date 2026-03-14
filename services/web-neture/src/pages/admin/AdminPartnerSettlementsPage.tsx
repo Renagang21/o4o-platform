@@ -2,22 +2,25 @@
  * AdminPartnerSettlementsPage - 파트너 커미션 정산 관리
  *
  * Work Order: WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1
+ * WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1: Partner 검색 UI 개선
  *
  * 구성:
- * - 정산 생성: partner_id 입력 → approved 커미션 batch 생성
+ * - 정산 생성: 파트너 검색 → 선택 → approved 커미션 batch 생성
  * - 상태 필터: 전체 / pending / paid
  * - 정산 목록: 파트너 / 커미션 건수 / 총 금액 / 상태 / 생성일 / 지급일 / 액션
  * - 상세 확장: 포함 커미션 목록
  * - 지급 완료 처리
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Plus, CreditCard } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronDown, ChevronUp, Plus, CreditCard, Search, X } from 'lucide-react';
 import {
   adminPartnerSettlementApi,
+  adminPartnerMonitoringApi,
   type PartnerSettlement,
   type PartnerSettlementDetail,
   type PartnerSettlementStatus,
+  type PartnerMonitoringItem,
 } from '../../lib/api/admin.js';
 
 // ============================================================================
@@ -70,13 +73,50 @@ export default function AdminPartnerSettlementsPage() {
   const [expandedDetail, setExpandedDetail] = useState<PartnerSettlementDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // Create settlement
-  const [createPartnerId, setCreatePartnerId] = useState('');
+  // Create settlement — Partner search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<PartnerMonitoringItem[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [creating, setCreating] = useState(false);
   const [createMessage, setCreateMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Pay action
   const [payingId, setPayingId] = useState<string | null>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Debounced partner search
+  useEffect(() => {
+    if (!searchQuery.trim() || selectedPartner) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(async () => {
+      setSearching(true);
+      const result = await adminPartnerMonitoringApi.getPartners({ search: searchQuery, limit: 10 });
+      setSearchResults(result.data);
+      setShowDropdown(result.data.length > 0);
+      setSearching(false);
+    }, 300);
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, [searchQuery, selectedPartner]);
 
   const fetchList = useCallback(async () => {
     setLoading(true);
@@ -106,14 +146,27 @@ export default function AdminPartnerSettlementsPage() {
     setDetailLoading(false);
   };
 
+  const handleSelectPartner = (partner: PartnerMonitoringItem) => {
+    setSelectedPartner({ id: partner.partner_id, name: partner.name, email: partner.email });
+    setSearchQuery(partner.name);
+    setShowDropdown(false);
+    setCreateMessage(null);
+  };
+
+  const handleClearPartner = () => {
+    setSelectedPartner(null);
+    setSearchQuery('');
+    setCreateMessage(null);
+  };
+
   const handleCreate = async () => {
-    if (!createPartnerId.trim()) return;
+    if (!selectedPartner) return;
     setCreating(true);
     setCreateMessage(null);
-    const result = await adminPartnerSettlementApi.create(createPartnerId.trim());
+    const result = await adminPartnerSettlementApi.create(selectedPartner.id);
     if (result.success) {
       setCreateMessage({ type: 'success', text: `정산 생성 완료: ${result.data?.commission_count}건, ${formatCurrency(result.data?.total_commission ?? 0)}원` });
-      setCreatePartnerId('');
+      handleClearPartner();
       fetchList();
     } else {
       setCreateMessage({ type: 'error', text: result.error || '정산 생성 실패' });
@@ -144,30 +197,71 @@ export default function AdminPartnerSettlementsPage() {
       <div style={styles.createSection}>
         <h2 style={styles.sectionTitle}>정산 생성</h2>
         <p style={{ margin: '0 0 12px 0', fontSize: '13px', color: '#64748B' }}>
-          파트너 ID를 입력하면 해당 파트너의 승인(approved) 상태 커미션을 묶어 정산 배치를 생성합니다.
+          파트너를 검색하여 선택하면 해당 파트너의 승인(approved) 상태 커미션을 묶어 정산 배치를 생성합니다.
         </p>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <input
-            type="text"
-            placeholder="Partner ID (UUID)"
-            value={createPartnerId}
-            onChange={(e) => setCreatePartnerId(e.target.value)}
-            style={styles.input}
-          />
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative' }} ref={dropdownRef}>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+              <input
+                type="text"
+                placeholder="파트너 이름 또는 이메일 검색"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (selectedPartner) setSelectedPartner(null);
+                }}
+                style={{ ...styles.input, paddingLeft: '36px', paddingRight: selectedPartner ? '36px' : '14px' }}
+              />
+              {selectedPartner && (
+                <button
+                  onClick={handleClearPartner}
+                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: '2px' }}
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+            {/* Search Dropdown */}
+            {showDropdown && searchResults.length > 0 && (
+              <div style={styles.dropdown}>
+                {searchResults.map((p) => (
+                  <button
+                    key={p.partner_id}
+                    onClick={() => handleSelectPartner(p)}
+                    style={styles.dropdownItem}
+                  >
+                    <span style={{ fontWeight: 600, fontSize: '14px', color: '#1E293B' }}>{p.name}</span>
+                    <span style={{ fontSize: '12px', color: '#94A3B8', marginLeft: '8px' }}>{p.email}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {searching && (
+              <div style={{ ...styles.dropdown, padding: '12px 16px' }}>
+                <span style={{ fontSize: '13px', color: '#94A3B8' }}>검색 중...</span>
+              </div>
+            )}
+          </div>
           <button
             onClick={handleCreate}
-            disabled={creating || !createPartnerId.trim()}
+            disabled={creating || !selectedPartner}
             style={{
               ...styles.actionBtn,
               backgroundColor: '#2563EB',
               color: '#fff',
-              opacity: creating || !createPartnerId.trim() ? 0.5 : 1,
+              opacity: creating || !selectedPartner ? 0.5 : 1,
             }}
           >
             <Plus size={14} />
             {creating ? '생성 중...' : '정산 생성'}
           </button>
         </div>
+        {selectedPartner && (
+          <p style={{ margin: '8px 0 0 0', fontSize: '13px', color: '#2563EB' }}>
+            선택: {selectedPartner.name} ({selectedPartner.email})
+          </p>
+        )}
         {createMessage && (
           <p style={{
             margin: '8px 0 0 0',
@@ -377,12 +471,38 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 0 8px 0',
   },
   input: {
-    flex: 1,
+    width: '100%',
     padding: '10px 14px',
     fontSize: '14px',
     border: '1px solid #E2E8F0',
     borderRadius: '8px',
     outline: 'none',
+    boxSizing: 'border-box' as const,
+  },
+  dropdown: {
+    position: 'absolute' as const,
+    top: '100%',
+    left: 0,
+    right: 0,
+    marginTop: '4px',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    border: '1px solid #E2E8F0',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    zIndex: 50,
+    maxHeight: '240px',
+    overflowY: 'auto' as const,
+  },
+  dropdownItem: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    padding: '10px 16px',
+    border: 'none',
+    backgroundColor: 'transparent',
+    cursor: 'pointer',
+    textAlign: 'left' as const,
+    transition: 'background-color 0.15s',
   },
   actionBtn: {
     display: 'flex',

@@ -573,6 +573,24 @@ export function createAdminController(dataSource: DataSource): Router {
     }
   });
 
+  /**
+   * GET /admin/dashboard/partner-kpi
+   * WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1
+   */
+  router.get('/dashboard/partner-kpi', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await netureService.getPartnerKpiSummary();
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching partner KPI:', error);
+      res.status(500).json({
+        success: false,
+        error: 'INTERNAL_ERROR',
+        message: 'Failed to fetch partner KPI',
+      });
+    }
+  });
+
   // ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1 T2) ====================
 
   /**

@@ -142,6 +142,7 @@ export {
   type PartnerDashboardStats,
   type ConnectedService,
   type Notification,
+  type PartnerKpiSummary,
 } from './dashboard.js';
 
 // Operator API

@@ -2261,6 +2261,31 @@ export class NetureService {
   }
 
   /**
+   * GET /admin/dashboard/partner-kpi
+   * WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1
+   */
+  async getPartnerKpiSummary() {
+    try {
+      const [result] = await AppDataSource.query(`
+        SELECT
+          (SELECT COUNT(*)::int FROM neture.neture_partners WHERE status = 'active') AS "activePartners",
+          (SELECT COALESCE(SUM(commission_amount), 0)::int FROM partner_commissions WHERE status != 'cancelled') AS "totalCommission",
+          (SELECT COALESCE(SUM(commission_amount), 0)::int FROM partner_commissions WHERE status = 'pending') AS "pendingCommission",
+          (SELECT COUNT(*)::int FROM partner_settlements WHERE status = 'pending') AS "pendingSettlements"
+      `);
+      return {
+        activePartners: result.activePartners ?? 0,
+        totalCommission: result.totalCommission ?? 0,
+        pendingCommission: result.pendingCommission ?? 0,
+        pendingSettlements: result.pendingSettlements ?? 0,
+      };
+    } catch (error) {
+      logger.error('[NetureService] Error fetching partner KPI summary:', error);
+      throw error;
+    }
+  }
+
+  /**
    * GET /partner/dashboard/summary - 파트너 대시보드 통계 요약
    */
   async getPartnerDashboardSummary(userId: string) {
