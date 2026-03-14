@@ -47,6 +47,8 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/src'),
       // CGM Pharmacist App - map to source for lazy loading
       '@o4o/cgm-pharmacist-app': path.resolve(__dirname, '../../packages/cgm-pharmacist-app/src'),
+      // AI Prompts - map to dist for subpath imports (@o4o/ai-prompts/admin)
+      '@o4o/ai-prompts': path.resolve(__dirname, '../../packages/ai-prompts/dist'),
       // Force React to use single version
       'react': path.resolve(__dirname, '../../node_modules/react'),
       'react-dom': path.resolve(__dirname, '../../node_modules/react-dom'),
