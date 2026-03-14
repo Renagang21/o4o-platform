@@ -58,6 +58,20 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
       const { patientId } = req.params;
       const pharmacyId = pcReq.pharmacyId;
 
+      // Patient ownership guard: verify patient belongs to this pharmacy
+      if (pharmacyId) {
+        const ownerCheck = await dataSource.query(
+          `SELECT id FROM glucoseview_customers WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+          [patientId, pharmacyId],
+        );
+        if (ownerCheck.length === 0) {
+          return res.status(403).json({
+            success: false,
+            error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
+          });
+        }
+      }
+
       const result = await provider.analyzePatient(patientId);
 
       // Auto-record snapshot + chain LLM insight + coaching draft (fire-and-forget, parallel)

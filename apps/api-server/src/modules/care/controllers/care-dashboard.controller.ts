@@ -178,8 +178,7 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
         `(
           SELECT 'health_reading' AS type, id::text, patient_id::text, measured_at AS event_at,
             jsonb_build_object(
-              'fasting', fasting_glucose, 'postMeal', post_meal_glucose,
-              'systolic', systolic_bp, 'diastolic', diastolic_bp, 'weight', weight
+              'metricType', metric_type, 'value', value_numeric, 'unit', unit
             ) AS payload
           FROM health_readings WHERE patient_id = $1 AND pharmacy_id = $2
         )
