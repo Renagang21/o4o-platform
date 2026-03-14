@@ -39,6 +39,7 @@
     "@o4o/content-editor": "file:../../packages/content-editor",
     "@o4o/forum-core": "file:../../packages/forum-core",
     "@o4o/appearance-system": "workspace:^",
+    "@o4o/ai-prompts": "file:../../packages/ai-prompts",
     "@o4o/auth-client": "file:../../packages/auth-client",
     "@o4o/auth-context": "file:../../packages/auth-context",
     "@o4o/block-renderer": "file:../../packages/block-renderer",

@@ -1,6 +1,7 @@
 import type { DataSource, Repository } from 'typeorm';
 import { GeminiProvider } from '@o4o/ai-core';
 import type { AIProviderConfig } from '@o4o/ai-core';
+import { CARE_LLM_INSIGHT_SYSTEM } from '@o4o/ai-prompts/care';
 import { CareLlmInsight } from '../../entities/care-llm-insight.entity.js';
 import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
 import type { CareInsightDto } from '../../domain/dto.js';
@@ -20,25 +21,6 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
 
 const RETRY_DELAY_MS = 2_000;
 const MAX_ATTEMPTS = 2;
-
-const SYSTEM_PROMPT = `당신은 약국 환자 케어 데이터를 설명하는 전문 도우미입니다.
-
-역할:
-- 분석 결과를 쉬운 한국어로 설명합니다.
-- 의료적 진단, 처방, 치료 권고를 절대 하지 않습니다.
-- 관찰된 데이터 패턴만 설명합니다.
-- "~경향이 관찰됩니다", "~패턴이 보입니다" 형태로 표현합니다.
-
-출력 형식 (반드시 아래 JSON만 출력):
-{
-  "pharmacyInsight": "약사를 위한 전문적 분석 설명 (2-3문장). 전문의 상담 권장 문구를 끝에 포함.",
-  "patientMessage": "환자를 위한 쉬운 설명 (2-3문장). 격려와 생활 습관 팁 포함."
-}
-
-제약:
-- 반드시 위 JSON 형식만 출력하세요. JSON 외의 텍스트를 포함하지 마세요.
-- 구체적인 약품명을 언급하지 마세요.
-- "전문의 상담을 권장합니다" 문구를 pharmacyInsight 끝에 포함하세요.`;
 
 interface LlmResponse {
   pharmacyInsight: string;
@@ -91,7 +73,7 @@ export class CareLlmInsightService {
       let lastError: unknown = null;
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         try {
-          const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
+          const response = await this.gemini.complete(CARE_LLM_INSIGHT_SYSTEM, userPrompt, config);
           const parsed = JSON.parse(response.content) as LlmResponse;
 
           // 필수 필드 검증 (non-retryable)

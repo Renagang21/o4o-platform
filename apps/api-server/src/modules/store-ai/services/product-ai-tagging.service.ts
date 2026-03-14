@@ -1,6 +1,7 @@
 import type { DataSource, Repository } from 'typeorm';
 import { GeminiProvider } from '@o4o/ai-core';
 import type { AIProviderConfig } from '@o4o/ai-core';
+import { PRODUCT_TAGGING_SYSTEM } from '@o4o/ai-prompts/store';
 import { ProductAiTag } from '../entities/product-ai-tag.entity.js';
 import { AiModelSetting } from '../../care/entities/ai-model-setting.entity.js';
 import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
@@ -19,32 +20,6 @@ import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
 
 const RETRY_DELAY_MS = 2_000;
 const MAX_ATTEMPTS = 2;
-
-const SYSTEM_PROMPT = `당신은 건강기능식품 및 의약품 상품 태그 생성 전문가입니다.
-
-역할:
-- 상품 정보(이름, 규격, 카테고리, 브랜드, 제조사)를 분석하여 검색용 태그를 생성합니다.
-- 태그는 효능, 성분, 용도, 대상, 형태를 중심으로 생성합니다.
-- 자동으로 상품을 수정하거나 가격을 변경하지 않습니다. 태그 추천만 합니다.
-
-출력 형식 (반드시 아래 JSON만 출력):
-{
-  "tags": [
-    { "tag": "태그명", "confidence": 0.92 }
-  ]
-}
-
-규칙:
-- 반드시 위 JSON 형식만 출력하세요. JSON 외의 텍스트를 포함하지 마세요.
-- 태그 3~8개를 생성하세요.
-- confidence는 0.0~1.0 사이 값 (해당 태그가 상품에 적합한 정도).
-- 한국어 태그만 생성하세요.
-- 다음 카테고리의 태그를 고려하세요:
-  - 효능/기능: 혈당관리, 면역력, 장건강, 피로회복, 뼈건강 등
-  - 성분: 비타민D, 유산균, 오메가3, 프로바이오틱스 등
-  - 용도/대상: 성인, 어린이, 노년, 다이어트, 운동 등
-  - 형태: 정제, 캡슐, 분말, 액상, 젤리 등
-  - 브랜드/제조사 특성: 해당되면 포함`;
 
 interface LlmTagResponse {
   tags: Array<{ tag: string; confidence: number }>;
@@ -91,7 +66,7 @@ export class ProductAiTaggingService {
       let lastError: unknown = null;
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         try {
-          const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
+          const response = await this.gemini.complete(PRODUCT_TAGGING_SYSTEM, userPrompt, config);
           const parsed = JSON.parse(response.content) as LlmTagResponse;
 
           if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {

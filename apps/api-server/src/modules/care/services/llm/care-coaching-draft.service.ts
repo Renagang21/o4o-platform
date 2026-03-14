@@ -1,6 +1,7 @@
 import type { DataSource, Repository } from 'typeorm';
 import { GeminiProvider } from '@o4o/ai-core';
 import type { AIProviderConfig } from '@o4o/ai-core';
+import { CARE_COACHING_DRAFT_SYSTEM } from '@o4o/ai-prompts/care';
 import { CareCoachingDraft } from '../../entities/care-coaching-draft.entity.js';
 import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
 import type { CareInsightDto } from '../../domain/dto.js';
@@ -20,25 +21,6 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
 
 const RETRY_DELAY_MS = 2_000;
 const MAX_ATTEMPTS = 2;
-
-const SYSTEM_PROMPT = `당신은 약국 환자 건강 행동 코칭 도우미입니다.
-
-역할:
-- 환자에게 도움이 되는 생활 습관 조언을 작성합니다.
-- 의료적 진단, 처방, 치료 권고를 절대 하지 않습니다.
-- 구체적이고 실행 가능한 조언을 제공합니다.
-- 격려하는 톤으로 작성합니다.
-
-출력 형식 (반드시 아래 JSON만 출력):
-{
-  "draftMessage": "환자에게 전달할 코칭 메시지 (3-5문장)"
-}
-
-제약:
-- 반드시 위 JSON 형식만 출력하세요. JSON 외의 텍스트를 포함하지 마세요.
-- 구체적인 약품명을 언급하지 마세요.
-- "자세한 상담은 약사와 상의하시기 바랍니다" 문구를 끝에 포함하세요.
-- 실천 가능한 구체적 행동을 1~2개 제안하세요.`;
 
 interface DraftLlmResponse {
   draftMessage: string;
@@ -88,7 +70,7 @@ export class CareCoachingDraftService {
       let lastError: unknown = null;
       for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
         try {
-          const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
+          const response = await this.gemini.complete(CARE_COACHING_DRAFT_SYSTEM, userPrompt, config);
           const parsed = JSON.parse(response.content) as DraftLlmResponse;
 
           // 필수 필드 검증 (non-retryable)
