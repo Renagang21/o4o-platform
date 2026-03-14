@@ -629,7 +629,14 @@
       "Bash(/tmp/find_unmounted.sh:*)",
       "Bash(__NEW_LINE_8a8b0cd41ea0c0b9__ bash /tmp/find_unmounted.sh)",
       "Bash(for controller in \"apps/api-server/src/modules/admin/care-diagnostic.controller.ts\" \"apps/api-server/src/modules/admin/seed-store-hub.controller.ts\" \"apps/api-server/src/modules/home/home-preview.controller.ts\" \"apps/api-server/src/routes/o4o-store/controllers/store-events.controller.ts\" \"apps/api-server/src/routes/o4o-store/controllers/store-qr.controller.ts\")",
-      "Bash(for controller in \"store-events.controller.ts\" \"store-qr.controller.ts\")"
+      "Bash(for controller in \"store-events.controller.ts\" \"store-qr.controller.ts\")",
+      "Bash(test:*)",
+      "Bash(/c/Users/sohae/gh_2.67.0_windows_amd64/bin/gh.exe pr:*)",
+      "Bash(gh.exe pr:*)",
+      "Bash(cmd.exe /c \"where gh\")",
+      "Bash(powershell.exe -Command \"Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
+      "Bash(winget list:*)",
+      "Bash(choco list:*)"
     ],
     "deny": []
   }

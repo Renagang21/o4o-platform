@@ -1351,7 +1351,16 @@ const startServer = async () => {
       logger.error('Failed to register Care Diagnostic routes:', careDiagError);
     }
 
-    // 37-d. Register RBAC DB Audit debug endpoint (WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1)
+    // 37-d. Register Care Test Data seed endpoint (WO-GLYCOPHARM-CARE-TEST-ENV-FIX-V1)
+    try {
+      const { createCareTestDataRouter } = await import('./modules/admin/care-test-data.controller.js');
+      app.use('/api/v1/ops/care-test-data', createCareTestDataRouter(AppDataSource));
+      logger.info('✅ Care Test Data routes registered at /api/v1/ops/care-test-data');
+    } catch (careTestError) {
+      logger.error('Failed to register Care Test Data routes:', careTestError);
+    }
+
+    // 37-e. Register RBAC DB Audit debug endpoint (WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1)
     // READ-ONLY: SELECT queries only. No auth required. Phase 5B Step 1 전용.
     try {
       const { createRbacDbAuditRouter } = await import('./routes/debug/rbac-db-audit.controller.js');
