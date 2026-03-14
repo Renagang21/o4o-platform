@@ -52,40 +52,35 @@ export interface AlertItem {
 export class OperatorCopilotService {
   constructor(private dataSource: DataSource) {}
 
+  private async safeCount(label: string, sql: string): Promise<number> {
+    try {
+      const rows = await this.dataSource.query(sql);
+      const val = rows[0] ? Object.values(rows[0])[0] : 0;
+      return (val as number) ?? 0;
+    } catch (err) {
+      console.error(`[OperatorCopilot] KPI "${label}" failed:`, (err as Error).message);
+      return 0;
+    }
+  }
+
   async getKpiSummary(): Promise<OperatorKpiSummary> {
-    // Total active stores
-    const storeRows = await this.dataSource.query(
-      `SELECT COUNT(DISTINCT o.id)::int AS "totalStores"
-       FROM organizations o
-       JOIN organization_service_enrollments ose ON ose.organization_id = o.id
-       WHERE o."isActive" = true`
-    );
+    const [totalStores, totalSuppliers, totalProducts, recentOrders] = await Promise.all([
+      this.safeCount('totalStores',
+        `SELECT COUNT(DISTINCT o.id)::int AS val
+         FROM organizations o
+         JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+         WHERE o."isActive" = true`),
+      this.safeCount('totalSuppliers',
+        `SELECT COUNT(*)::int AS val FROM neture_suppliers WHERE status = 'ACTIVE'`),
+      this.safeCount('totalProducts',
+        `SELECT COUNT(*)::int AS val FROM supplier_product_offers WHERE is_active = true`),
+      this.safeCount('recentOrders',
+        `SELECT COUNT(DISTINCT id)::int AS val
+         FROM neture.neture_orders
+         WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`),
+    ]);
 
-    // Total active suppliers
-    const supplierRows = await this.dataSource.query(
-      `SELECT COUNT(*)::int AS "totalSuppliers"
-       FROM neture_suppliers WHERE status = 'ACTIVE'`
-    );
-
-    // Total active products
-    const productRows = await this.dataSource.query(
-      `SELECT COUNT(*)::int AS "totalProducts"
-       FROM supplier_product_offers WHERE is_active = true`
-    );
-
-    // Recent 7-day orders
-    const orderRows = await this.dataSource.query(
-      `SELECT COUNT(DISTINCT id)::int AS "recentOrders"
-       FROM neture.neture_orders
-       WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
-    );
-
-    return {
-      totalStores: storeRows[0]?.totalStores ?? 0,
-      totalSuppliers: supplierRows[0]?.totalSuppliers ?? 0,
-      totalProducts: productRows[0]?.totalProducts ?? 0,
-      recentOrders: orderRows[0]?.recentOrders ?? 0,
-    };
+    return { totalStores, totalSuppliers, totalProducts, recentOrders };
   }
 
   async getRecentStores(limit = 5): Promise<RecentStoreItem[]> {
