@@ -37,6 +37,7 @@ import { RoleGuard } from './components/auth/RoleGuard';
 import NetureHomePage from './pages/NetureHomePage';
 import HandoffPage from './pages/HandoffPage';
 import AboutPage from './pages/AboutPage';
+import LegalPage from './pages/LegalPage';
 import CommunityPage from './pages/CommunityPage';
 import KnowledgePage from './pages/knowledge/KnowledgePage';
 import KnowledgeDetailPage from './pages/knowledge/KnowledgeDetailPage';
@@ -416,6 +417,8 @@ function App() {
               <Route path="/partner" element={<PartnerLandingPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/terms" element={<LegalPage slug="terms-of-service" title="이용약관" />} />
+              <Route path="/privacy" element={<LegalPage slug="privacy-policy" title="개인정보처리방침" />} />
 
               {/* Community (WO-O4O-NETURE-COMMUNITY-PAGE-V1) */}
               <Route path="/community" element={<CommunityPage />} />

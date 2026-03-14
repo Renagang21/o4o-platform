@@ -14,6 +14,12 @@ import { useLoginModal } from '../contexts';
 
 type SignupRole = 'supplier' | 'partner' | 'seller';
 
+function formatBusinessNumber(digits: string): string {
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 10)}`;
+}
+
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; emoji: string }> = [
   {
     role: 'supplier',
@@ -115,7 +121,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     const checked = target instanceof HTMLInputElement ? target.checked : false;
     const type = target instanceof HTMLInputElement ? target.type : 'text';
 
-    if (name === 'phone') {
+    if (name === 'phone' || name === 'businessNumber') {
       value = value.replace(/\D/g, '');
     }
 
@@ -314,7 +320,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
 
           {/* Step 2: 회원 정보 입력 */}
           {step === 2 && (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form id="register-form" onSubmit={handleSubmit} className="space-y-4">
               {/* 선택된 역할 표시 */}
               <div className="flex items-center gap-2 px-4 py-3 bg-green-50 rounded-lg text-sm text-green-800">
                 <span className="text-lg">
@@ -479,9 +485,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     <input
                       type="text"
                       name="businessNumber"
-                      value={formData.businessNumber}
+                      value={formatBusinessNumber(formData.businessNumber)}
                       onChange={handleInputChange}
-                      placeholder="000-00-00000"
+                      placeholder="숫자만 입력"
+                      maxLength={12}
                       className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow bg-white"
                     />
                   </div>
@@ -517,7 +524,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     className="w-4 h-4 mt-0.5 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     required
                   />
-                  <span><span className="text-red-500">*</span> 이용약관에 동의합니다</span>
+                  <span>
+                    <span className="text-red-500">*</span> 이용약관에 동의합니다{' '}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 underline" onClick={(e) => e.stopPropagation()}>(보기)</a>
+                  </span>
                 </label>
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -528,7 +538,10 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                     className="w-4 h-4 mt-0.5 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     required
                   />
-                  <span><span className="text-red-500">*</span> 개인정보처리방침에 동의합니다</span>
+                  <span>
+                    <span className="text-red-500">*</span> 개인정보처리방침에 동의합니다{' '}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-green-600 hover:text-green-700 underline" onClick={(e) => e.stopPropagation()}>(보기)</a>
+                  </span>
                 </label>
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -542,28 +555,6 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 </label>
               </div>
 
-              {/* 제출 버튼 */}
-              <button
-                type="submit"
-                disabled={!isFormValid() || loading}
-                className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? '가입 처리 중...' : '가입하기'}
-              </button>
-
-              {/* 로그인 링크 */}
-              <div className="text-center pt-2">
-                <p className="text-sm text-gray-500">
-                  이미 계정이 있으신가요?{' '}
-                  <button
-                    type="button"
-                    onClick={() => openLoginModal()}
-                    className="text-green-600 font-medium hover:text-green-700 transition-colors"
-                  >
-                    로그인
-                  </button>
-                </p>
-              </div>
             </form>
           )}
 
@@ -587,6 +578,30 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
             </div>
           )}
         </div>
+
+        {/* 고정 Footer — Step 2에서만 표시 */}
+        {step === 2 && (
+          <div className="shrink-0 border-t border-gray-100 px-6 py-4 bg-white">
+            <button
+              type="submit"
+              form="register-form"
+              disabled={!isFormValid() || loading}
+              className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '가입 처리 중...' : '가입하기'}
+            </button>
+            <p className="text-center text-sm text-gray-500 mt-2">
+              이미 계정이 있으신가요?{' '}
+              <button
+                type="button"
+                onClick={() => openLoginModal()}
+                className="text-green-600 font-medium hover:text-green-700 transition-colors"
+              >
+                로그인
+              </button>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
