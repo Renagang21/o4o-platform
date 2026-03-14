@@ -27,6 +27,7 @@ import PartnerSpaceLayout from './components/layouts/PartnerSpaceLayout';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayout from './components/layouts/OperatorLayout';
+import AdminLayout from './components/layouts/AdminLayout';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
@@ -609,7 +610,7 @@ function App() {
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <SupplierOpsLayout />
+                <AdminLayout />
               </ProtectedRoute>
             }>
               <Route path="/workspace/admin" element={<AdminDashboardPage />} />
