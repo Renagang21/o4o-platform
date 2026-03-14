@@ -68,7 +68,7 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
       console.error('[CareAiChat] endpoint error:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'AI_CHAT_ERROR', message: 'AI chat processing failed' },
+        error: { code: 'AI_CHAT_ERROR', message: 'AI chat processing failed', debug: msg },
       });
     }
   });
