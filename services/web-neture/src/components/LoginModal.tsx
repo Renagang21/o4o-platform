@@ -69,7 +69,8 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     };
   }, [isOpen, onClose]);
 
-  const handleLoginSuccess = (role?: string) => {
+  // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles 기반 대시보드 결정
+  const handleLoginSuccess = (role?: string, roles?: string[]) => {
     if (rememberEmail) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
     } else {
@@ -79,7 +80,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     if (returnUrl) {
       navigate(returnUrl);
     } else {
-      const dashboardPath = role ? getPrimaryDashboardRoute([role], ROUTE_OVERRIDES) : '/';
+      const dashboardPath = (roles && roles.length > 0)
+        ? getPrimaryDashboardRoute(roles, ROUTE_OVERRIDES)
+        : role
+          ? getPrimaryDashboardRoute([role], ROUTE_OVERRIDES)
+          : '/';
       navigate(dashboardPath);
     }
   };
@@ -103,7 +108,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
 
-      handleLoginSuccess(result.role);
+      handleLoginSuccess(result.role, result.roles);
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
@@ -130,7 +135,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       if (!result.success) {
         throw new Error(result.error || '비밀번호 변경에 실패했습니다.');
       }
-      handleLoginSuccess(result.role);
+      handleLoginSuccess(result.role, result.roles);
     } catch (err) {
       setError(err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.');
     } finally {

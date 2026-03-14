@@ -24,8 +24,8 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; passwordSyncAvailable?: boolean; syncToken?: string }>;
-  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }>;
+  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; passwordSyncAvailable?: boolean; syncToken?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }> => {
     try {
       setIsLoading(true);
 
@@ -119,7 +119,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const base = normalizeUser(apiUser);
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
-        return { success: true, role: roles[0] };
+        // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles 반환
+        return { success: true, role: roles[0], roles };
       }
 
       return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
@@ -134,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; error?: string; role?: UserRole }> => {
+  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-sync`, {
         method: 'POST',
@@ -152,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const base = normalizeUser(apiUser);
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
-        return { success: true, role: roles[0] };
+        return { success: true, role: roles[0], roles };
       }
       return { success: false, error: '응답이 올바르지 않습니다.' };
     } catch {

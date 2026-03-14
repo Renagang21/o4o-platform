@@ -98,9 +98,9 @@ export default function AccountMenu() {
     );
   }
 
-  // 현재 역할에 따른 대시보드 경로
+  // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles로 대시보드 경로 결정
+  const dashboardPath = getPrimaryDashboardRoute(user.roles, ROUTE_OVERRIDES);
   const activeRole = user.roles[0];
-  const dashboardPath = getPrimaryDashboardRoute([activeRole], ROUTE_OVERRIDES);
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
   const isOperator = isSuperOperator(user);
 
