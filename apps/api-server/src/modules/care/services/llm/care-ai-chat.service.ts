@@ -37,8 +37,22 @@ const SYSTEM_PROMPT = `당신은 약국 환자 케어 데이터를 분석하는 
   "summary": "질문에 대한 답변 요약 (2-4문장)",
   "details": ["세부 설명 포인트 1", "세부 설명 포인트 2"],
   "recommendations": ["약사에게 제안하는 후속 조치 1", "후속 조치 2"],
-  "relatedPatients": [{"patientId": "uuid", "name": "이름", "reason": "관련 이유"}]
+  "relatedPatients": [{"patientId": "uuid", "name": "이름", "reason": "관련 이유"}],
+  "actions": [
+    {"type": "open_patient", "label": "김OO 환자 열기", "patientId": "uuid"},
+    {"type": "create_coaching", "label": "코칭 생성", "patientId": "uuid"},
+    {"type": "run_analysis", "label": "혈당 분석 실행", "patientId": "uuid"},
+    {"type": "resolve_alert", "label": "알림 확인", "alertId": "uuid"}
+  ]
 }
+
+actions 규칙:
+- 환자 조회/확인이 필요하면 open_patient 포함
+- 코칭이 필요한 환자가 있으면 create_coaching 포함
+- 분석이 오래된 환자가 있으면 run_analysis 포함
+- 활성 알림이 있으면 resolve_alert 포함
+- relatedPatients에 포함된 환자의 patientId를 actions에서 재사용
+- actions가 불필요하면 빈 배열
 
 제약:
 - 반드시 위 JSON 형식만 출력하세요. JSON 외의 텍스트를 포함하지 마세요.
@@ -46,11 +60,21 @@ const SYSTEM_PROMPT = `당신은 약국 환자 케어 데이터를 분석하는 
 - 중요 사안에 "전문의 상담을 권장합니다" 문구를 포함하세요.
 - relatedPatients는 질문과 관련된 환자가 있을 때만 포함합니다 (없으면 빈 배열).`;
 
+export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+
+export interface CareAction {
+  type: CareActionType;
+  label: string;
+  patientId?: string;
+  alertId?: string;
+}
+
 export interface AiChatResponse {
   summary: string;
   details: string[];
   recommendations: string[];
   relatedPatients: Array<{ patientId: string; name: string; reason: string }>;
+  actions: CareAction[];
   model: string;
   respondedAt: string;
 }
@@ -103,11 +127,16 @@ export class CareAiChatService {
         const response = await this.gemini.complete(SYSTEM_PROMPT, userPrompt, config);
         const parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
 
+        const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+        const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
+          .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
+
         const result: AiChatResponse = {
           summary: parsed.summary || '응답을 생성할 수 없습니다.',
           details: Array.isArray(parsed.details) ? parsed.details : [],
           recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
           relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
+          actions,
           model: response.model,
           respondedAt: new Date().toISOString(),
         };

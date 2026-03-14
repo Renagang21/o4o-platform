@@ -1061,12 +1061,20 @@ export interface AiPriorityPatientDto extends PriorityPatientDto {
   aiReason: string | null;
 }
 
-// WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
+// WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1 + WO-GLYCOPHARM-CARE-ACTION-ENGINE-V1
+export interface AiChatActionDto {
+  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+  label: string;
+  patientId?: string;
+  alertId?: string;
+}
+
 export interface AiChatResponseDto {
   summary: string;
   details: string[];
   recommendations: string[];
   relatedPatients: Array<{ patientId: string; name: string; reason: string }>;
+  actions: AiChatActionDto[];
   model: string;
   respondedAt: string;
 }

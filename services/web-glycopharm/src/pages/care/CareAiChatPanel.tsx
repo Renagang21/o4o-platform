@@ -17,8 +17,11 @@ import {
   RefreshCw,
   User,
   ArrowRight,
+  MessageSquare,
+  BarChart3,
+  CheckCircle,
 } from 'lucide-react';
-import { pharmacyApi, type AiChatResponseDto } from '@/api/pharmacy';
+import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api/pharmacy';
 
 // ── Types ──
 
@@ -180,6 +183,36 @@ export default function CareAiChatPanel({
     }
   };
 
+  // Action execution handler
+  const handleActionExecute = async (action: AiChatActionDto) => {
+    switch (action.type) {
+      case 'open_patient':
+        if (action.patientId) {
+          navigate(`/care/patients/${action.patientId}`);
+          onClose();
+        }
+        break;
+      case 'create_coaching':
+        if (action.patientId) {
+          navigate(`/care/patients/${action.patientId}?tab=coaching`);
+          onClose();
+        }
+        break;
+      case 'run_analysis':
+        if (action.patientId) {
+          try {
+            await pharmacyApi.getCareAnalysis(action.patientId);
+          } catch { /* proceed to page anyway */ }
+          navigate(`/care/patients/${action.patientId}?tab=analysis`);
+          onClose();
+        }
+        break;
+      case 'resolve_alert':
+        // handled inline in ActionButton
+        break;
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -250,6 +283,7 @@ export default function CareAiChatPanel({
                 navigate(`/care/patients/${pid}`);
                 onClose();
               }}
+              onActionExecute={handleActionExecute}
             />
           ))}
 
@@ -306,10 +340,12 @@ function MessageBubble({
   message,
   onRetry,
   onPatientClick,
+  onActionExecute,
 }: {
   message: ChatMessage;
   onRetry: () => void;
   onPatientClick: (patientId: string) => void;
+  onActionExecute: (action: AiChatActionDto) => void;
 }) {
   if (message.role === 'user') {
     return (
@@ -411,11 +447,80 @@ function MessageBubble({
           </div>
         )}
 
+        {/* Actions */}
+        {resp.actions && resp.actions.length > 0 && (
+          <div className="pt-2 border-t border-slate-200 space-y-1.5">
+            {resp.actions.map((action, i) => (
+              <ActionButton key={i} action={action} onExecute={onActionExecute} />
+            ))}
+          </div>
+        )}
+
         {/* Meta */}
         <p className="text-[10px] text-slate-400">
           {resp.model} · {new Date(resp.respondedAt).toLocaleTimeString('ko-KR')}
         </p>
       </div>
     </div>
+  );
+}
+
+// ── Action Button ──
+
+const ACTION_ICONS: Record<string, typeof User> = {
+  open_patient: User,
+  create_coaching: MessageSquare,
+  run_analysis: BarChart3,
+  resolve_alert: CheckCircle,
+};
+
+function ActionButton({
+  action,
+  onExecute,
+}: {
+  action: AiChatActionDto;
+  onExecute: (action: AiChatActionDto) => void;
+}) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+  const Icon = ACTION_ICONS[action.type] || ArrowRight;
+
+  const handleClick = async () => {
+    if (status !== 'idle') return;
+
+    if (action.type === 'resolve_alert' && action.alertId) {
+      setStatus('loading');
+      try {
+        await pharmacyApi.resolveCareAlert(action.alertId);
+        setStatus('done');
+      } catch {
+        setStatus('idle');
+      }
+      return;
+    }
+
+    onExecute(action);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={status !== 'idle'}
+      className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg border transition-colors ${
+        status === 'done'
+          ? 'border-green-200 bg-green-50 text-green-700'
+          : 'border-blue-200 bg-white text-blue-700 hover:bg-blue-50'
+      } disabled:opacity-60`}
+    >
+      {status === 'loading' ? (
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+      ) : status === 'done' ? (
+        <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+      ) : (
+        <Icon className="w-3.5 h-3.5" />
+      )}
+      <span className="font-medium">
+        {status === 'done' ? '완료' : action.label}
+      </span>
+    </button>
   );
 }
