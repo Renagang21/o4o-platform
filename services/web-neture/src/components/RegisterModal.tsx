@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useLoginModal } from '../contexts';
 
-type SignupRole = 'supplier' | 'partner' | 'seller';
+type SignupRole = 'supplier' | 'partner' | 'seller' | 'user';
 
 function formatBusinessNumber(digits: string): string {
   if (digits.length <= 3) return digits;
@@ -21,6 +21,12 @@ function formatBusinessNumber(digits: string): string {
 }
 
 const roleOptions: Array<{ role: SignupRole; label: string; description: string; emoji: string }> = [
+  {
+    role: 'user',
+    label: '일반 사용자',
+    description: '서비스를 이용하는 일반 사용자',
+    emoji: '👤',
+  },
   {
     role: 'supplier',
     label: '공급자',
@@ -234,7 +240,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const isFormValid = () => {
     const base = formData.email && formData.password && formData.name &&
       formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
-      formData.companyName && formData.agreeTerms && formData.agreePrivacy;
+      (selectedRole === 'user' || formData.companyName) && formData.agreeTerms && formData.agreePrivacy;
     if (existingAccountMode) return base && formData.password.length > 0;
     return base && isPasswordStrong && formData.password === formData.passwordConfirm;
   };
@@ -309,7 +315,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               <h3 className="text-base font-semibold text-gray-700 mb-5">
                 어떤 역할로 가입하시겠습니까?
               </h3>
-              <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
                 {roleOptions.map((option) => (
                   <button
                     key={option.role}
@@ -447,7 +453,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    담당자명 <span className="text-red-500">*</span>
+                    {selectedRole === 'user' ? '이름' : '담당자명'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -478,7 +484,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 </div>
               </div>
 
-              {/* 사업자 정보 */}
+              {/* 사업자 정보 — 일반 사용자는 표시하지 않음 */}
+              {selectedRole !== 'user' && (
               <div className="p-4 bg-gray-50 rounded-lg space-y-3">
                 <h4 className="text-sm font-semibold text-gray-700">사업자 정보</h4>
                 <div>
@@ -530,6 +537,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* 동의 항목 */}
               <div className="space-y-3 pt-4 border-t border-gray-200">
@@ -581,11 +589,12 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
             <div className="text-center py-8">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                가입 신청이 완료되었습니다
+                {selectedRole === 'user' ? '가입이 완료되었습니다' : '가입 신청이 완료되었습니다'}
               </h3>
               <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-                운영자 승인 후 서비스를 이용하실 수 있습니다.<br />
-                승인 완료 시 이메일로 안내드리겠습니다.
+                {selectedRole === 'user'
+                  ? '로그인하여 서비스를 이용하실 수 있습니다.'
+                  : <>운영자 승인 후 서비스를 이용하실 수 있습니다.<br />승인 완료 시 이메일로 안내드리겠습니다.</>}
               </p>
               <p className="text-xs text-gray-400 mb-6">
                 {autoCloseCount}초 후 자동으로 닫힙니다

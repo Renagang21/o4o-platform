@@ -6,20 +6,32 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-type UserRole = 'supplier' | 'partner';
+type UserRole = 'supplier' | 'partner' | 'seller' | 'user';
 
 const roleOptions: Array<{ role: UserRole; label: string; description: string; emoji: string }> = [
   {
+    role: 'user',
+    label: '일반 사용자',
+    description: '서비스를 이용하는 일반 사용자',
+    emoji: '👤',
+  },
+  {
     role: 'supplier',
     label: '공급자',
-    description: '제품을 공급하는 공급사/제조사입니다',
+    description: '제품을 공급하는 공급사/제조사',
     emoji: '🏭',
   },
   {
     role: 'partner',
     label: '파트너',
-    description: '제품을 판매하는 판매자/셀러입니다',
+    description: '제품을 홍보하는 파트너',
     emoji: '🤝',
+  },
+  {
+    role: 'seller',
+    label: '셀러',
+    description: '매장을 운영하는 판매자',
+    emoji: '🏪',
   },
 ];
 
@@ -154,7 +166,7 @@ export function RegisterPage() {
   const isFormValid = () => {
     const base = formData.email && formData.password && formData.name &&
       formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
-      formData.companyName && formData.agreeTerms && formData.agreePrivacy;
+      (selectedRole === 'user' || formData.companyName) && formData.agreeTerms && formData.agreePrivacy;
 
     if (existingAccountMode) {
       return base && formData.password.length > 0;
@@ -318,7 +330,7 @@ export function RegisterPage() {
 
             <div style={styles.inputRow}>
               <div style={styles.inputGroup}>
-                <label style={styles.label}>담당자명 *</label>
+                <label style={styles.label}>{selectedRole === 'user' ? '이름' : '담당자명'} *</label>
                 <input
                   type="text"
                   name="name"
@@ -351,7 +363,8 @@ export function RegisterPage() {
               </div>
             </div>
 
-            {/* Business Info */}
+            {/* Business Info — 일반 사용자는 표시하지 않음 */}
+            {selectedRole !== 'user' && (
             <div style={styles.businessSection}>
               <h3 style={styles.businessTitle}>사업자 정보</h3>
               <div style={styles.inputGroup}>
@@ -396,6 +409,7 @@ export function RegisterPage() {
                 </div>
               </div>
             </div>
+            )}
 
             {/* Agreements */}
             <div style={styles.agreements}>
@@ -543,8 +557,8 @@ const styles: Record<string, React.CSSProperties> = {
   },
   roleGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '16px',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '12px',
     marginBottom: '24px',
   },
   roleButton: {
