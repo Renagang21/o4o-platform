@@ -171,7 +171,7 @@ export class CareAiChatService {
     // All attempts exhausted
     const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
     console.error('[CareAiChat] all attempts failed:', errMsg);
-    throw new Error('AI_CHAT_FAILED');
+    throw new Error(`AI_CHAT_FAILED: ${errMsg}`);
   }
 
   // ── Population Context ──
