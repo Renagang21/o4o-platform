@@ -20,7 +20,6 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import logger from '../../utils/logger.js';
 
 /* ═══════════════════════════════════════════
@@ -248,7 +247,7 @@ function generateWeight(patientSeed: number): ReadingRow[] {
  * Auth helper
  * ═══════════════════════════════════════════ */
 
-function verifyAdminSecret(req: Request, res: Response): boolean {
+async function verifyAdminSecret(req: Request, res: Response): Promise<boolean> {
   const jwtSecret = process.env.JWT_SECRET;
 
   // Option 1: X-Admin-Secret header (= JWT_SECRET)
@@ -259,8 +258,9 @@ function verifyAdminSecret(req: Request, res: Response): boolean {
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ') && jwtSecret) {
     try {
+      const { default: jwtLib } = await import('jsonwebtoken');
       const token = authHeader.slice(7);
-      const decoded = jwt.verify(token, jwtSecret) as { roles?: string[] };
+      const decoded = jwtLib.verify(token, jwtSecret) as { roles?: string[] };
       if (decoded.roles?.includes('platform:admin') || decoded.roles?.includes('platform:super_admin')) {
         return true;
       }
@@ -295,7 +295,7 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
 
   /* ─── POST: Create complete test environment ─── */
   router.post('/', async (req: Request, res: Response) => {
-    if (!verifyAdminSecret(req, res)) return;
+    if (!(await verifyAdminSecret(req, res))) return;
 
     try {
       const log: string[] = [];
@@ -481,7 +481,7 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
 
   /* ─── DELETE: Full cleanup ─── */
   router.delete('/', async (req: Request, res: Response) => {
-    if (!verifyAdminSecret(req, res)) return;
+    if (!(await verifyAdminSecret(req, res))) return;
 
     try {
       const deleted: Record<string, number> = {};
