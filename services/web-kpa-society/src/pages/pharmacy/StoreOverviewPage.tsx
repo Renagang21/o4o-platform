@@ -13,8 +13,10 @@ import { useNavigate } from 'react-router-dom';
 import {
   fetchChannelOverview,
   fetchStoreHubOverview,
+  fetchStoreCapabilities,
   type ChannelOverview,
   type StoreHubOverview,
+  type StoreCapabilityOverview,
 } from '../../api/storeHub';
 
 const CHANNEL_LABEL: Record<string, string> = {
@@ -22,6 +24,19 @@ const CHANNEL_LABEL: Record<string, string> = {
   TABLET: '태블릿',
   SIGNAGE: '사이니지',
   KIOSK: '키오스크',
+};
+
+const CAPABILITY_LABELS: Record<string, string> = {
+  B2C_COMMERCE: '온라인 스토어 (B2C)',
+  TABLET: '태블릿 디스플레이',
+  KIOSK: '키오스크',
+  QR_MARKETING: 'QR 마케팅',
+  POP_PRINT: 'POP 인쇄물',
+  SIGNAGE: '디지털 사이니지',
+  BLOG: '블로그/콘텐츠',
+  LIBRARY: '자산 라이브러리',
+  AI_CONTENT: 'AI 콘텐츠',
+  LOCAL_PRODUCTS: '지역 상품',
 };
 
 const STATUS_LABEL: Record<string, { text: string; color: string }> = {
@@ -37,15 +52,18 @@ export function StoreOverviewPage() {
   const navigate = useNavigate();
   const [channels, setChannels] = useState<ChannelOverview[]>([]);
   const [overview, setOverview] = useState<StoreHubOverview | null>(null);
+  const [capabilities, setCapabilities] = useState<StoreCapabilityOverview[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetchChannelOverview().catch(() => []),
       fetchStoreHubOverview().catch(() => null),
-    ]).then(([ch, ov]) => {
+      fetchStoreCapabilities().catch(() => []),
+    ]).then(([ch, ov, caps]) => {
       setChannels(ch);
       setOverview(ov);
+      setCapabilities(caps);
       setLoading(false);
     });
   }, []);
@@ -113,6 +131,33 @@ export function StoreOverviewPage() {
           </div>
         )}
       </Section>
+
+      {/* Capabilities (WO-O4O-STORE-CAPABILITY-SYSTEM-V1) */}
+      {capabilities.length > 0 && (
+        <Section title="매장 기능">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '8px' }}>
+            {capabilities.map((cap) => (
+              <div key={cap.key} style={styles.capChip}>
+                <span style={{ fontSize: '14px', fontWeight: 500, color: '#334155' }}>
+                  {CAPABILITY_LABELS[cap.key] || cap.key}
+                </span>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    color: cap.enabled ? '#22c55e' : '#94a3b8',
+                  }}
+                >
+                  {cap.enabled ? '활성' : '비활성'}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '8px' }}>
+            기능 변경은 운영자에게 문의하세요.
+          </p>
+        </Section>
+      )}
 
       {/* Quick Links */}
       <Section title="빠른 이동">
@@ -194,6 +239,15 @@ const styles: Record<string, React.CSSProperties> = {
     border: '1px solid #e2e8f0',
     fontSize: '14px',
     minWidth: '120px',
+  },
+  capChip: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 14px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '8px',
+    border: '1px solid #e2e8f0',
   },
   linkBtn: {
     background: 'none',

@@ -93,6 +93,9 @@ import { ManualHomePage, ManualPlaceholderPage, ManualServicePage } from './page
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
 
+// Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
+import CommunityHubPage from './pages/community/CommunityHubPage';
+
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
 
@@ -342,6 +345,9 @@ function App() {
           {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
           <Route path="/setup-activity" element={<ActivitySetupPage />} />
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
+
+          {/* Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+          <Route path="/community" element={<Layout serviceName={SERVICE_NAME}><CommunityHubPage /></Layout>} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)

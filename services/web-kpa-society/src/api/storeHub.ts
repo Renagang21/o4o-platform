@@ -145,3 +145,20 @@ export async function fetchLiveSignals(): Promise<LiveSignals> {
   );
   return response.data ?? EMPTY_SIGNALS;
 }
+
+// ─────────────────────────────────────────────────────
+// Store Capabilities (WO-O4O-STORE-CAPABILITY-SYSTEM-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StoreCapabilityOverview {
+  key: string;
+  enabled: boolean;
+  source: string;
+}
+
+export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[]> {
+  const response = await apiClient.get<{ success: boolean; data: StoreCapabilityOverview[] }>(
+    '/store-hub/capabilities'
+  );
+  return response.data ?? [];
+}

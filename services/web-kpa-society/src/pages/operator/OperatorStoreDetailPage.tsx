@@ -1,19 +1,21 @@
 /**
- * Operator Store Detail Page
- * WO-O4O-STORE-CONSOLE-V1
+ * OperatorStoreDetailPage — 매장 상세 (채널 + Capabilities + 상품)
  *
  * WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1:
- *   Capabilities 섹션 추가 (조회 + enable/disable toggle).
+ *   Operator HUB → Store HUB 연결.
+ *   /api/v1/operator/stores/:storeId API 기반 매장 상세 조회.
+ *   Capabilities 섹션 포함 (조회 + enable/disable toggle).
  *
- * Cookie-based auth (K-Cosmetics)
+ * Bearer token auth (KPA — getAccessToken 사용).
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getAccessToken } from '../../contexts/AuthContext';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-// ─── Types ───────────────────────────────────────────────────
+// ─── Types ───
 
 interface StoreDetail {
   id: string;
@@ -61,16 +63,17 @@ interface StoreProduct {
   createdAt: string;
 }
 
-// ─── API Helper ──────────────────────────────────────────────
+// ─── API Helper ───
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getAccessToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
-    credentials: 'include',
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
@@ -94,9 +97,27 @@ const CAPABILITY_LABELS: Record<string, string> = {
   LOCAL_PRODUCTS: '지역 상품',
 };
 
-// ─── Component ───────────────────────────────────────────────
+const channelLabel: Record<string, string> = {
+  B2C: '온라인 스토어',
+  KIOSK: '키오스크',
+  TABLET: '태블릿',
+  SIGNAGE: '사이니지',
+};
 
-export default function StoreDetailPage() {
+const statusLabel: Record<string, { text: string; cls: string }> = {
+  APPROVED: { text: '승인', cls: 'bg-green-100 text-green-700' },
+  PENDING: { text: '대기', cls: 'bg-amber-100 text-amber-700' },
+  REJECTED: { text: '거부', cls: 'bg-red-100 text-red-700' },
+  SUSPENDED: { text: '정지', cls: 'bg-slate-100 text-slate-600' },
+  EXPIRED: { text: '만료', cls: 'bg-slate-100 text-slate-500' },
+  TERMINATED: { text: '해지', cls: 'bg-red-100 text-red-600' },
+};
+
+const typeLabel: Record<string, string> = { pharmacy: '약국', store: '매장', branch: '지점' };
+
+// ─── Component ───
+
+export default function OperatorStoreDetailPage() {
   const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
 
@@ -173,26 +194,11 @@ export default function StoreDetailPage() {
     return `${price.toLocaleString()}원`;
   };
 
-  const typeLabel: Record<string, string> = { pharmacy: '약국', store: '매장', branch: '지점' };
-
-  const channelLabel: Record<string, string> = {
-    B2C: '온라인 스토어', KIOSK: '키오스크', TABLET: '태블릿', SIGNAGE: '사이니지',
-  };
-
-  const statusLabel: Record<string, { text: string; cls: string }> = {
-    APPROVED: { text: '승인', cls: 'bg-green-100 text-green-700' },
-    PENDING: { text: '대기', cls: 'bg-amber-100 text-amber-700' },
-    REJECTED: { text: '거부', cls: 'bg-red-100 text-red-700' },
-    SUSPENDED: { text: '정지', cls: 'bg-slate-100 text-slate-600' },
-    EXPIRED: { text: '만료', cls: 'bg-slate-100 text-slate-500' },
-    TERMINATED: { text: '해지', cls: 'bg-red-100 text-red-600' },
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-pink-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-slate-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-500 text-sm">매장 정보 로딩 중...</p>
         </div>
       </div>
@@ -286,12 +292,14 @@ export default function StoreDetailPage() {
         )}
       </div>
 
-      {/* Capabilities (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
-      {capabilities.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-100 p-6">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">
-            기능 (Capabilities) <span className="text-sm font-normal text-slate-400">({capabilities.length})</span>
-          </h2>
+      {/* Capabilities */}
+      <div className="bg-white rounded-xl border border-slate-100 p-6">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4">
+          기능 (Capabilities) <span className="text-sm font-normal text-slate-400">({capabilities.length})</span>
+        </h2>
+        {capabilities.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-400">설정된 기능이 없습니다</p>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {capabilities.map((cap) => (
               <div key={cap.capabilityKey} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
@@ -307,7 +315,7 @@ export default function StoreDetailPage() {
                   onClick={() => handleToggleCapability(cap.capabilityKey, cap.enabled)}
                   disabled={capabilityLoading === cap.capabilityKey}
                   className={`relative w-11 h-6 rounded-full transition-colors ${
-                    cap.enabled ? 'bg-pink-500' : 'bg-slate-300'
+                    cap.enabled ? 'bg-green-500' : 'bg-slate-300'
                   } ${capabilityLoading === cap.capabilityKey ? 'opacity-50' : ''}`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
@@ -317,8 +325,8 @@ export default function StoreDetailPage() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Products */}
       <div className="bg-white rounded-xl border border-slate-100 p-6">

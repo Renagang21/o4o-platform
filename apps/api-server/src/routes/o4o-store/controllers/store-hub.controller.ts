@@ -17,6 +17,7 @@ import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { optionalStoreAuth } from '../../../auth/auth-context.middleware.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import { OrganizationChannel } from '../../../modules/store-core/entities/organization-channel.entity.js';
+import { StoreCapabilityService } from '../../../modules/store-core/services/store-capability.service.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -319,6 +320,24 @@ export function createStoreHubController(
           return;
         }
 
+        // WO-O4O-STORE-CAPABILITY-SYSTEM-V1:
+        // Channel 생성 전 해당 capability 활성 여부 확인
+        const CHANNEL_CAPABILITY_MAP: Record<string, string> = {
+          B2C: 'B2C_COMMERCE', TABLET: 'TABLET', KIOSK: 'KIOSK', SIGNAGE: 'SIGNAGE',
+        };
+        const requiredCap = CHANNEL_CAPABILITY_MAP[channelType];
+        if (requiredCap) {
+          const capSvc = new StoreCapabilityService(dataSource);
+          const capEnabled = await capSvc.isEnabled(organizationId, requiredCap as any);
+          if (!capEnabled) {
+            res.status(403).json({
+              success: false,
+              error: { code: 'STORE_CAPABILITY_DISABLED', message: `'${requiredCap}' capability must be enabled first` },
+            });
+            return;
+          }
+        }
+
         // WO-STORE-CHANNEL-BASE-RIGHT-ACTIVATION-V1:
         // All 4 channel types are base-right channels → APPROVED immediately.
         // External/partner channels (future) will use PENDING flow.
@@ -540,6 +559,40 @@ export function createStoreHubController(
         });
       }
     }
+  );
+
+  /**
+   * GET /store-hub/capabilities
+   *
+   * WO-O4O-STORE-CAPABILITY-SYSTEM-V1
+   *
+   * Returns store-owner's capability list (read-only).
+   */
+  router.get(
+    '/capabilities',
+    requireAuth,
+    requirePharmacyOwner,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const organizationId = req.organizationId!;
+        const capSvc = new StoreCapabilityService(dataSource);
+        const caps = await capSvc.getCapabilities(organizationId);
+
+        res.json({
+          success: true,
+          data: caps.map((c) => ({
+            key: c.capability_key,
+            enabled: c.enabled,
+            source: c.source,
+          })),
+        });
+      } catch (error: any) {
+        res.status(500).json({
+          success: false,
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    },
   );
 
   return router;

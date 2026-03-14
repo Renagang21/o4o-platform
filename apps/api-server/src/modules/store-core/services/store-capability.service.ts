@@ -7,7 +7,9 @@
 
 import type { DataSource, Repository } from 'typeorm';
 import { StoreCapability } from '../entities/store-capability.entity.js';
+import { OrganizationChannel } from '../entities/organization-channel.entity.js';
 import {
+  CAPABILITY_CHANNEL_MAP,
   DEFAULT_CAPABILITIES,
   StoreCapability as Cap,
   type StoreCapabilityKey,
@@ -15,9 +17,11 @@ import {
 } from '../constants/store-capabilities.js';
 
 export class StoreCapabilityService {
+  private dataSource: DataSource;
   private repo: Repository<StoreCapability>;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.repo = dataSource.getRepository(StoreCapability);
   }
 
@@ -60,6 +64,10 @@ export class StoreCapabilityService {
 
   /**
    * Capability 활성/비활성 토글 (관리자)
+   *
+   * WO-O4O-STORE-CAPABILITY-SYSTEM-V1:
+   * enabled=true + CAPABILITY_CHANNEL_MAP 매핑 존재 → 해당 channel 자동 생성 (APPROVED).
+   * channel이 이미 존재하면 skip. disabled 시 channel 삭제 안 함 (데이터 보존).
    */
   async setCapability(
     organizationId: string,
@@ -74,16 +82,46 @@ export class StoreCapabilityService {
     if (row) {
       row.enabled = enabled;
       row.source = source;
-      return this.repo.save(row);
+      row = await this.repo.save(row);
+    } else {
+      row = this.repo.create({
+        organization_id: organizationId,
+        capability_key: capabilityKey,
+        enabled,
+        source,
+      });
+      row = await this.repo.save(row);
     }
 
-    row = this.repo.create({
-      organization_id: organizationId,
-      capability_key: capabilityKey,
-      enabled,
-      source,
+    // Capability → Channel 자동 생성
+    if (enabled) {
+      const channelType = CAPABILITY_CHANNEL_MAP[capabilityKey];
+      if (channelType) {
+        await this.ensureChannel(organizationId, channelType);
+      }
+    }
+
+    return row;
+  }
+
+  /**
+   * Channel이 없으면 APPROVED 상태로 자동 생성
+   */
+  private async ensureChannel(organizationId: string, channelType: string): Promise<void> {
+    const channelRepo = this.dataSource.getRepository(OrganizationChannel);
+    const exists = await channelRepo.findOne({
+      where: { organization_id: organizationId, channel_type: channelType as any },
     });
-    return this.repo.save(row);
+    if (!exists) {
+      await channelRepo.save(
+        channelRepo.create({
+          organization_id: organizationId,
+          channel_type: channelType as any,
+          status: 'APPROVED',
+          approved_at: new Date(),
+        }),
+      );
+    }
   }
 
   /**

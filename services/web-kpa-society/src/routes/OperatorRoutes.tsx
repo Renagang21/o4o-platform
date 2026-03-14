@@ -17,8 +17,10 @@
 
 import { Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
+import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
+import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
 import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
@@ -65,6 +67,9 @@ export function OperatorRoutes() {
           {/* 포럼 관리 */}
           <Route path="forum-management" element={<ForumManagementPage />} />
 
+          {/* 커뮤니티 관리 (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
+          <Route path="community-management" element={<CommunityManagementPage />} />
+
           {/* 포럼 통계 */}
           <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />
 
@@ -109,6 +114,10 @@ export function OperatorRoutes() {
 
           {/* 상품 판매 신청 관리 (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1) */}
           <Route path="product-applications" element={<ProductApplicationManagementPage />} />
+
+          {/* 매장 관리 (WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1) */}
+          <Route path="stores" element={<OperatorStoresPage />} />
+          <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
 
           {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
           <Route path="operators" element={

@@ -97,6 +97,7 @@ import { createBranchMemberController } from './controllers/branch-member.contro
 import { createInstructorController } from './controllers/instructor.controller.js';
 import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
+import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
@@ -183,6 +184,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Forum Requests (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/', createForumRequestController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Community Hub — Ads/Sponsors (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
+  router.use('/', createCommunityHubController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // OPERATOR ROUTES — requireKpaScope('kpa:operator') enforced
