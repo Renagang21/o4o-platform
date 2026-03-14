@@ -20,6 +20,7 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import logger from '../../utils/logger.js';
 
 /* ═══════════════════════════════════════════
@@ -248,9 +249,24 @@ function generateWeight(patientSeed: number): ReadingRow[] {
  * ═══════════════════════════════════════════ */
 
 function verifyAdminSecret(req: Request, res: Response): boolean {
-  const secret = req.headers['x-admin-secret'] as string;
   const jwtSecret = process.env.JWT_SECRET;
+
+  // Option 1: X-Admin-Secret header (= JWT_SECRET)
+  const secret = req.headers['x-admin-secret'] as string;
   if (secret && jwtSecret && secret === jwtSecret) return true;
+
+  // Option 2: Bearer token with platform:admin role
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ') && jwtSecret) {
+    try {
+      const token = authHeader.slice(7);
+      const decoded = jwt.verify(token, jwtSecret) as { roles?: string[] };
+      if (decoded.roles?.includes('platform:admin') || decoded.roles?.includes('platform:super_admin')) {
+        return true;
+      }
+    } catch { /* invalid token */ }
+  }
+
   res.status(401).json({ success: false, error: 'Invalid admin secret', code: 'ADMIN_SECRET_REQUIRED' });
   return false;
 }
