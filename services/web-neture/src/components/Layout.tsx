@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { FloatingAiButton } from './ai/FloatingAiButton';
+import { CopilotButton } from './copilot-prototype';
 
 interface LayoutProps {
   serviceName: string;
@@ -37,6 +38,7 @@ export function Layout({
         pageType={pageType}
         contextData={contextData}
       />
+      <CopilotButton />
     </div>
   );
 }
