@@ -120,3 +120,22 @@ export async function fetchLiveSignals(): Promise<LiveSignals> {
   const res = await request<{ success: boolean; data: LiveSignals }>('/store-hub/live-signals');
   return res.data ?? { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 };
 }
+
+// ─────────────────────────────────────────────────────
+// Store Capabilities (WO-O4O-CAPABILITY-MENU-INTEGRATION-V1)
+// ─────────────────────────────────────────────────────
+
+export interface StoreCapabilityOverview {
+  key: string;
+  label: string;
+  category: string;
+  enabled: boolean;
+  source: string;
+}
+
+export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[]> {
+  const res = await request<{ success: boolean; data: StoreCapabilityOverview[] }>(
+    '/store-hub/capabilities',
+  );
+  return res.data ?? [];
+}

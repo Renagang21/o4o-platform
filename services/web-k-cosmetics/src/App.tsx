@@ -75,7 +75,8 @@ const SignageTemplatesPage = lazy(() => import('@/pages/operator/signage/Templat
 const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/TemplateDetailPage'));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, StorePlaceholderPage, COSMETICS_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 
 // Market Trial (WO-MARKET-TRIAL-B2B-API-UNIFICATION-V1)
 const MarketTrialListPage = lazy(() => import('@/pages/store/MarketTrialListPage'));
@@ -146,9 +147,12 @@ function RoleBasedHome() {
 function StoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const enabledCaps = useStoreCapabilities();
+  const resolvedConfig = resolveStoreMenu(COSMETICS_STORE_CONFIG, enabledCaps);
+
   return (
     <StoreDashboardLayout
-      config={COSMETICS_STORE_CONFIG}
+      config={resolvedConfig}
       userName={user?.name || user?.email || ''}
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}

@@ -712,6 +712,9 @@ importers:
       '@o4o/block-renderer':
         specifier: workspace:*
         version: link:../../packages/block-renderer
+      '@o4o/capabilities':
+        specifier: workspace:*
+        version: link:../../packages/capabilities
       '@o4o/cosmetics-sample-display-extension':
         specifier: workspace:*
         version: link:../../packages/cosmetics-sample-display-extension
@@ -1799,6 +1802,8 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
+
+  packages/capabilities: {}
 
   packages/cgm-glucoseview:
     dependencies:

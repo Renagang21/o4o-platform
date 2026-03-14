@@ -20,6 +20,7 @@ import {
   Clock,
   XCircle,
   Package,
+  Settings,
 } from 'lucide-react';
 import { getAccessToken } from '@/contexts/AuthContext';
 
@@ -55,6 +56,15 @@ interface ChannelData {
   createdAt: string;
 }
 
+interface CapabilityData {
+  key: string;
+  label: string;
+  category: string;
+  enabled: boolean;
+  source: string;
+  updatedAt: string | null;
+}
+
 interface StoreProduct {
   id: string;
   isActive: boolean;
@@ -70,12 +80,14 @@ interface StoreProduct {
 
 // ─── API Helper ──────────────────────────────────────────────
 
-async function apiFetch<T>(path: string): Promise<T> {
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = getAccessToken();
   const res = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
     },
     credentials: 'include',
   });
@@ -119,6 +131,8 @@ export default function StoreDetailPage() {
 
   const [store, setStore] = useState<StoreDetail | null>(null);
   const [channels, setChannels] = useState<ChannelData[]>([]);
+  const [capabilities, setCapabilities] = useState<CapabilityData[]>([]);
+  const [capabilityLoading, setCapabilityLoading] = useState<string | null>(null);
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [productTotal, setProductTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -131,14 +145,16 @@ export default function StoreDetailPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const [detailData, channelData, productData] = await Promise.all([
+        const [detailData, channelData, capData, productData] = await Promise.all([
           apiFetch<{ success: boolean; store: StoreDetail }>(`/api/v1/operator/stores/${storeId}`),
           apiFetch<{ success: boolean; channels: ChannelData[] }>(`/api/v1/operator/stores/${storeId}/channels`),
+          apiFetch<{ success: boolean; capabilities: CapabilityData[] }>(`/api/v1/operator/stores/${storeId}/capabilities`),
           apiFetch<{ success: boolean; products: StoreProduct[]; pagination: { total: number } }>(`/api/v1/operator/stores/${storeId}/products?limit=10`),
         ]);
 
         if (detailData.success) setStore(detailData.store);
         if (channelData.success) setChannels(channelData.channels);
+        if (capData.success) setCapabilities(capData.capabilities);
         if (productData.success) {
           setProducts(productData.products);
           setProductTotal(productData.pagination.total);
@@ -166,6 +182,24 @@ export default function StoreDetailPage() {
   const formatPrice = (price: number | null) => {
     if (price === null || price === undefined) return '-';
     return `${price.toLocaleString()}원`;
+  };
+
+  const handleToggleCapability = async (capKey: string, currentEnabled: boolean) => {
+    if (!storeId) return;
+    setCapabilityLoading(capKey);
+    try {
+      await apiFetch(`/api/v1/operator/stores/${storeId}/capabilities`, {
+        method: 'PUT',
+        body: JSON.stringify({ capabilities: [{ key: capKey, enabled: !currentEnabled }] }),
+      });
+      setCapabilities((prev) =>
+        prev.map((c) => (c.key === capKey ? { ...c, enabled: !currentEnabled } : c)),
+      );
+    } catch (err) {
+      console.error('Failed to toggle capability:', err);
+    } finally {
+      setCapabilityLoading(null);
+    }
   };
 
   const typeLabel: Record<string, string> = {
@@ -282,6 +316,44 @@ export default function StoreDetailPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Capabilities */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-primary-600" />
+          매장 기능
+          <span className="text-sm font-normal text-slate-400 ml-1">({capabilities.length})</span>
+        </h2>
+        {capabilities.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-400">설정된 기능이 없습니다</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {capabilities.map((cap) => (
+              <div key={cap.key} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
+                <div>
+                  <p className="text-sm font-medium text-slate-800">
+                    {cap.label || cap.key}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {cap.key} · {cap.source}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleToggleCapability(cap.key, cap.enabled)}
+                  disabled={capabilityLoading === cap.key}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                    cap.enabled ? 'bg-primary-500' : 'bg-slate-300'
+                  } ${capabilityLoading === cap.key ? 'opacity-50' : ''}`}
+                >
+                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                    cap.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                  }`} />
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -44,8 +44,9 @@ interface ChannelData {
 }
 
 interface CapabilityData {
-  id: string;
-  capabilityKey: string;
+  key: string;
+  label: string;
+  category: string;
   enabled: boolean;
   source: string;
 }
@@ -84,18 +85,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ─── Constants ───
 
-const CAPABILITY_LABELS: Record<string, string> = {
-  B2C_COMMERCE: '온라인 스토어 (B2C)',
-  TABLET: '태블릿 디스플레이',
-  KIOSK: '키오스크',
-  QR_MARKETING: 'QR 마케팅',
-  POP_PRINT: 'POP 인쇄물',
-  SIGNAGE: '디지털 사이니지',
-  BLOG: '블로그/콘텐츠',
-  LIBRARY: '자산 라이브러리',
-  AI_CONTENT: 'AI 콘텐츠',
-  LOCAL_PRODUCTS: '지역 상품',
-};
 
 const channelLabel: Record<string, string> = {
   B2C: '온라인 스토어',
@@ -172,7 +161,7 @@ export default function OperatorStoreDetailPage() {
         body: JSON.stringify({ capabilities: [{ key: capKey, enabled: !currentEnabled }] }),
       });
       setCapabilities((prev) =>
-        prev.map((c) => (c.capabilityKey === capKey ? { ...c, enabled: !currentEnabled } : c)),
+        prev.map((c) => (c.key === capKey ? { ...c, enabled: !currentEnabled } : c)),
       );
     } catch (err) {
       console.error('Failed to toggle capability:', err);
@@ -339,21 +328,21 @@ export default function OperatorStoreDetailPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {capabilities.map((cap) => (
-              <div key={cap.capabilityKey} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
+              <div key={cap.key} className="flex items-center justify-between p-4 rounded-lg border border-slate-100 bg-slate-50">
                 <div>
                   <p className="text-sm font-medium text-slate-800">
-                    {CAPABILITY_LABELS[cap.capabilityKey] || cap.capabilityKey}
+                    {cap.label || cap.key}
                   </p>
                   <p className="text-xs text-slate-400">
-                    {cap.capabilityKey} · {cap.source}
+                    {cap.key} · {cap.source}
                   </p>
                 </div>
                 <button
-                  onClick={() => handleToggleCapability(cap.capabilityKey, cap.enabled)}
-                  disabled={capabilityLoading === cap.capabilityKey}
+                  onClick={() => handleToggleCapability(cap.key, cap.enabled)}
+                  disabled={capabilityLoading === cap.key}
                   className={`relative w-11 h-6 rounded-full transition-colors ${
                     cap.enabled ? 'bg-green-500' : 'bg-slate-300'
-                  } ${capabilityLoading === cap.capabilityKey ? 'opacity-50' : ''}`}
+                  } ${capabilityLoading === cap.key ? 'opacity-50' : ''}`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
                     cap.enabled ? 'translate-x-5' : 'translate-x-0.5'

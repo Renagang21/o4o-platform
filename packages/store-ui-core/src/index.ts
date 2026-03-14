@@ -36,6 +36,9 @@ export type { StoreTopBarProps, StoreNavItem } from './components/StoreTopBar';
 export { StoreSidebar } from './components/StoreSidebar';
 export type { StoreSidebarProps } from './components/StoreSidebar';
 
+// Capability Menu Integration (WO-O4O-CAPABILITY-MENU-INTEGRATION-V1)
+export { MENU_CAPABILITY_MAP, resolveStoreMenu } from './config/menuCapabilityMap';
+
 // Engine (WO-STORE-AI-INSIGHT-LAYER-V1)
 export type { StoreInsight, StoreInsightAction, StoreInsightInput, InsightLevel } from './engine/storeInsightEngine';
 export { computeStoreInsights } from './engine/storeInsightEngine';

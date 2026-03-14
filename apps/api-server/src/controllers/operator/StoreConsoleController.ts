@@ -10,6 +10,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { StoreCapabilityService } from '../../modules/store-core/services/store-capability.service.js';
 import { StoreChannelService } from '../../modules/store-core/services/store-channel.service.js';
 import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
+import { getCapabilityMeta } from '@o4o/capabilities';
 
 export class StoreConsoleController {
   private capabilityService: StoreCapabilityService;
@@ -350,8 +351,11 @@ export class StoreConsoleController {
         success: true,
         capabilities: allKeys.map(key => {
           const row = capMap.get(key);
+          const meta = getCapabilityMeta(key);
           return {
             key,
+            label: meta?.label ?? key,
+            category: meta?.category ?? 'commerce',
             enabled: row?.enabled ?? false,
             source: row?.source ?? 'system',
             updatedAt: row?.updated_at ?? null,
@@ -407,8 +411,11 @@ export class StoreConsoleController {
         success: true,
         capabilities: allKeys.map(key => {
           const row = capMap.get(key);
+          const meta = getCapabilityMeta(key);
           return {
             key,
+            label: meta?.label ?? key,
+            category: meta?.category ?? 'commerce',
             enabled: row?.enabled ?? false,
             source: row?.source ?? 'system',
             updatedAt: row?.updated_at ?? null,

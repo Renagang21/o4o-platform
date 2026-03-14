@@ -145,7 +145,8 @@ const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').the
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
 
 // Store Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1)
-import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, GLYCOPHARM_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 const StoreOverviewPage = lazy(() => import('@/pages/store/StoreOverviewPage'));
 const StoreEntryPage = lazy(() => import('@/pages/store/StoreEntryPage'));
 const StoreAssetsPage = lazy(() => import('@/pages/store/StoreAssetsPage'));
@@ -283,9 +284,12 @@ function SoftGuardOutlet({ feature, allowedRoles }: {
 function StoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const enabledCaps = useStoreCapabilities();
+  const resolvedConfig = resolveStoreMenu(GLYCOPHARM_STORE_CONFIG, enabledCaps);
+
   return (
     <StoreDashboardLayout
-      config={GLYCOPHARM_STORE_CONFIG}
+      config={resolvedConfig}
       userName={user?.name || user?.email || ''}
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}

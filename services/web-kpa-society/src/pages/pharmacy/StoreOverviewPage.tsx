@@ -26,18 +26,6 @@ const CHANNEL_LABEL: Record<string, string> = {
   KIOSK: '키오스크',
 };
 
-const CAPABILITY_LABELS: Record<string, string> = {
-  B2C_COMMERCE: '온라인 스토어 (B2C)',
-  TABLET: '태블릿 디스플레이',
-  KIOSK: '키오스크',
-  QR_MARKETING: 'QR 마케팅',
-  POP_PRINT: 'POP 인쇄물',
-  SIGNAGE: '디지털 사이니지',
-  BLOG: '블로그/콘텐츠',
-  LIBRARY: '자산 라이브러리',
-  AI_CONTENT: 'AI 콘텐츠',
-  LOCAL_PRODUCTS: '지역 상품',
-};
 
 const STATUS_LABEL: Record<string, { text: string; color: string }> = {
   APPROVED: { text: '활성', color: '#22c55e' },
@@ -139,7 +127,7 @@ export function StoreOverviewPage() {
             {capabilities.map((cap) => (
               <div key={cap.key} style={styles.capChip}>
                 <span style={{ fontSize: '14px', fontWeight: 500, color: '#334155' }}>
-                  {CAPABILITY_LABELS[cap.key] || cap.key}
+                  {cap.label || cap.key}
                 </span>
                 <span
                   style={{

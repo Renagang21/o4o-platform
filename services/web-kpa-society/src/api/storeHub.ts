@@ -152,6 +152,8 @@ export async function fetchLiveSignals(): Promise<LiveSignals> {
 
 export interface StoreCapabilityOverview {
   key: string;
+  label: string;
+  category: string;
   enabled: boolean;
   source: string;
 }

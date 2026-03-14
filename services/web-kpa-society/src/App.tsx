@@ -109,7 +109,8 @@ import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join
 import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
-import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG } from '@o4o/store-ui-core';
+import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
+import { useStoreCapabilities } from './hooks/useStoreCapabilities';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -283,12 +284,14 @@ function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
   const { currentService } = useService();
   const navigate = useNavigate();
+  const enabledCaps = useStoreCapabilities();
 
   const orgName = getDisplayOrganizationName(currentService, user) || undefined;
+  const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
 
   return (
     <StoreDashboardLayout
-      config={KPA_SOCIETY_STORE_CONFIG}
+      config={resolvedConfig}
       userName={user?.name || user?.email || ''}
       homeLink="/"
       onLogout={() => { logout(); navigate('/'); }}

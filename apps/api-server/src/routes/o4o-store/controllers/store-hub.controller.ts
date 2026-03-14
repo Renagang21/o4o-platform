@@ -18,6 +18,7 @@ import { optionalStoreAuth } from '../../../auth/auth-context.middleware.js';
 import { cacheAside, hashCacheKey, READ_CACHE_TTL } from '../../../cache/read-cache.js';
 import { OrganizationChannel } from '../../../modules/store-core/entities/organization-channel.entity.js';
 import { StoreCapabilityService } from '../../../modules/store-core/services/store-capability.service.js';
+import { getCapabilityMeta } from '@o4o/capabilities';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -582,6 +583,8 @@ export function createStoreHubController(
           success: true,
           data: caps.map((c) => ({
             key: c.capability_key,
+            label: getCapabilityMeta(c.capability_key)?.label ?? c.capability_key,
+            category: getCapabilityMeta(c.capability_key)?.category ?? 'commerce',
             enabled: c.enabled,
             source: c.source,
           })),
