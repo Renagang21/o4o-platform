@@ -24,7 +24,7 @@ const RISK_ITEMS = [
 export default function CareRiskSummary({ population }: Props) {
   const navigate = useNavigate();
 
-  const { total, atRiskPct, explanation } = useMemo(() => {
+  const { total, explanation } = useMemo(() => {
     if (!population) return { total: 0, atRiskPct: 0, explanation: '' };
 
     const { high, moderate, low } = population.riskDistribution;

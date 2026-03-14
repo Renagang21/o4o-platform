@@ -184,7 +184,7 @@ function EventContent({ event }: { event: TimelineEventDto }) {
         <>
           <p className="text-sm font-medium text-slate-800">분석 완료</p>
           <p className="text-xs text-slate-500 mt-0.5">
-            위험도: {risk.label} · TIR {p.tir ?? '-'}% · CV {p.cv ?? '-'}%
+            위험도: {risk.label} · TIR {String(p.tir ?? '-')}% · CV {String(p.cv ?? '-')}%
           </p>
         </>
       );
