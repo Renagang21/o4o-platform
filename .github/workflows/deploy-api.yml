@@ -81,6 +81,7 @@ jobs:
         pnpm --filter '@o4o/platform-core' run build
         pnpm --filter '@o4o/cpt-registry' run build
         pnpm --filter '@o4o/ai-core' run build
+        pnpm --filter '@o4o/ai-prompts' run build
         pnpm --filter '@o4o/security-core' run build
         pnpm --filter '@o4o/store-core' run build
         pnpm --filter '@o4o/asset-copy-core' run build
