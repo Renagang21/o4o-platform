@@ -99,6 +99,24 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     }
   }, [isOpen]);
 
+  // Step 3: 가입 완료 후 3초 뒤 자동 종료
+  const [autoCloseCount, setAutoCloseCount] = useState(3);
+  useEffect(() => {
+    if (step !== 3) return;
+    setAutoCloseCount(3);
+    const interval = setInterval(() => {
+      setAutoCloseCount((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          closeModal();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [step, closeModal]);
+
   // ESC 키로 닫기 + 배경 스크롤 방지
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -558,16 +576,19 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
             </form>
           )}
 
-          {/* Step 3: 완료 */}
+          {/* Step 3: 완료 → 3초 후 자동 종료 */}
           {step === 3 && (
             <div className="text-center py-8">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 가입 신청이 완료되었습니다
               </h3>
-              <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+              <p className="text-sm text-gray-500 mb-4 leading-relaxed">
                 운영자 승인 후 서비스를 이용하실 수 있습니다.<br />
                 승인 완료 시 이메일로 안내드리겠습니다.
+              </p>
+              <p className="text-xs text-gray-400 mb-6">
+                {autoCloseCount}초 후 자동으로 닫힙니다
               </p>
               <button
                 onClick={closeModal}
