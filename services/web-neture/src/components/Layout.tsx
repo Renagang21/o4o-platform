@@ -1,13 +1,12 @@
 import type { ReactNode } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { FloatingAiButton } from './ai/FloatingAiButton';
-import { CopilotButton } from './copilot-prototype';
+import { CopilotEntry } from './copilot';
 
 interface LayoutProps {
   serviceName: string;
   children: ReactNode;
-  // Phase 2: AI 컨텍스트 정보
+  // AI 컨텍스트 정보
   storeId?: string;
   productId?: string;
   categoryId?: string;
@@ -22,23 +21,19 @@ export function Layout({
   productId,
   categoryId,
   pageType,
-  contextData
 }: LayoutProps) {
   return (
     <div style={styles.container}>
       <Header serviceName={serviceName} />
       <main style={styles.main}>{children}</main>
       <Footer />
-      {/* Phase 2: Floating AI Button */}
-      <FloatingAiButton
+      <CopilotEntry
         serviceId="neture"
         storeId={storeId}
         productId={productId}
         categoryId={categoryId}
         pageType={pageType}
-        contextData={contextData}
       />
-      <CopilotButton />
     </div>
   );
 }

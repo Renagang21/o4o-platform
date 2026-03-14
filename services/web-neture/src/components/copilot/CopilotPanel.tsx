@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { CopilotChat } from './CopilotChat';
 import { CopilotInsight } from './CopilotInsight';
 import { CopilotSummary } from './CopilotSummary';
+import type { CopilotEntryProps } from './CopilotEntry';
 
 type Tab = 'chat' | 'insight' | 'summary';
 
@@ -14,9 +15,10 @@ const TABS: { key: Tab; label: string }[] = [
 
 interface Props {
   onClose: () => void;
+  context?: CopilotEntryProps;
 }
 
-export function CopilotPanel({ onClose }: Props) {
+export function CopilotPanel({ onClose, context }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('chat');
 
   return (
@@ -49,9 +51,9 @@ export function CopilotPanel({ onClose }: Props) {
 
         {/* Content */}
         <div style={styles.content}>
-          {activeTab === 'chat' && <CopilotChat />}
+          {activeTab === 'chat' && <CopilotChat context={context} />}
           {activeTab === 'insight' && <CopilotInsight />}
-          {activeTab === 'summary' && <CopilotSummary />}
+          {activeTab === 'summary' && <CopilotSummary context={context} />}
         </div>
       </div>
     </>

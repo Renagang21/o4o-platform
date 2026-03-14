@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { CopilotPanel } from './CopilotPanel';
 
-export function CopilotButton() {
+export interface CopilotEntryProps {
+  serviceId?: string;
+  storeId?: string;
+  productId?: string;
+  categoryId?: string;
+  pageType?: 'home' | 'store' | 'product' | 'category' | 'content';
+}
+
+export function CopilotEntry(props: CopilotEntryProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -15,14 +23,14 @@ export function CopilotButton() {
       >
         <Sparkles size={22} />
       </button>
-      {isOpen && <CopilotPanel onClose={() => setIsOpen(false)} />}
+      {isOpen && <CopilotPanel onClose={() => setIsOpen(false)} context={props} />}
     </>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
   button: {
-    position: 'fixed', bottom: '90px', right: '24px', zIndex: 9990,
+    position: 'fixed', bottom: '24px', right: '24px', zIndex: 9990,
     width: '48px', height: '48px', borderRadius: '50%',
     background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
     color: '#fff', border: 'none', cursor: 'pointer',

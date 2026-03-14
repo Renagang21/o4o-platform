@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../lib/api/client';
+import type { CopilotEntryProps } from './CopilotEntry';
 
-export function CopilotSummary() {
+interface Props {
+  context?: CopilotEntryProps;
+}
+
+export function CopilotSummary({ context }: Props) {
   const [summary, setSummary] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,7 +20,9 @@ export function CopilotSummary() {
         body: JSON.stringify({
           question: '현재 페이지를 요약해주세요.',
           contextType: 'service' as const,
-          serviceId: 'neture',
+          serviceId: context?.serviceId || 'neture',
+          storeId: context?.storeId,
+          productId: context?.productId,
         }),
       });
       const data = await res.json();

@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { API_BASE_URL } from '../../lib/api/client';
+import type { CopilotEntryProps } from './CopilotEntry';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
-export function CopilotChat() {
+interface Props {
+  context?: CopilotEntryProps;
+}
+
+export function CopilotChat({ context }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +37,11 @@ export function CopilotChat() {
         body: JSON.stringify({
           question: q,
           contextType: 'service' as const,
-          serviceId: 'neture',
+          serviceId: context?.serviceId || 'neture',
+          storeId: context?.storeId,
+          productId: context?.productId,
+          categoryId: context?.categoryId,
+          pageType: context?.pageType,
         }),
       });
       const data = await res.json();

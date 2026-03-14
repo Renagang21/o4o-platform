@@ -6,4 +6,3 @@
  */
 
 export { AiPreviewModal, AiSummaryModal, AiSummaryButton } from '@o4o/ai-components';
-export { FloatingAiButton } from './FloatingAiButton';
