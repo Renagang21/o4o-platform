@@ -997,6 +997,51 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
     }
   });
 
+  // GET /:slug/tablet/interest/:id — Interest request status (public, kiosk polling)
+  // WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
+  router.get('/:slug/tablet/interest/:id', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      const resolved = await resolvePublicStore(dataSource, req.params.slug, req, res);
+      if (!resolved) return;
+
+      const interestRepo = dataSource.getRepository(TabletInterestRequest);
+      const request = await interestRepo.findOne({
+        where: { id, organizationId: resolved.storeId },
+      });
+
+      if (!request) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'INTEREST_NOT_FOUND', message: '요청을 찾을 수 없습니다.' },
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: {
+          id: request.id,
+          status: request.status,
+          productName: request.productName,
+          customerName: request.customerName,
+          customerNote: request.customerNote,
+          createdAt: request.createdAt,
+          acknowledgedAt: request.acknowledgedAt,
+          completedAt: request.completedAt,
+          cancelledAt: request.cancelledAt,
+        },
+      });
+    } catch (error: any) {
+      console.error('[UnifiedStore] GET /:slug/tablet/interest/:id error:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: '요청 조회에 실패했습니다.' },
+      });
+    }
+  });
+
   // GET /:slug/tablet/requests/:id — Tablet request status
   // WO-TABLET-BOUNDARY-FIX-V1: slug → pharmacyId 복합 조건 (Boundary Policy §7 Rule 1)
   router.get('/:slug/tablet/requests/:id', async (req: Request, res: Response): Promise<void> => {

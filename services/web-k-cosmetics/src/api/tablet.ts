@@ -1,17 +1,16 @@
 /**
  * Tablet API Client — Public (no auth)
  *
- * WO-STORE-TABLET-REQUEST-CHANNEL-V1
- * WO-STORE-SLUG-UNIFICATION-V1: unified /api/v1/stores namespace
- * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Interest-based consultation flow
+ * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
  *
  * Calls /api/v1/stores/:slug/tablet/* endpoints directly.
  * No authentication required for tablet kiosk mode.
  */
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
+
 function getApiBase(): string {
-  const base = import.meta.env.VITE_API_BASE_URL || '';
-  return `${base}/api/v1/stores`;
+  return `${API_URL}/api/v1/stores`;
 }
 
 export interface TabletProduct {
@@ -27,21 +26,22 @@ export interface TabletProduct {
   channel_price?: number;
 }
 
-export interface TabletRequestResult {
+export interface InterestSubmitResult {
   requestId: string;
   status: string;
+  productName: string;
   createdAt: string;
 }
 
-export interface TabletRequestDetail {
+export interface InterestStatusDetail {
   id: string;
-  status: 'requested' | 'acknowledged' | 'served' | 'cancelled';
-  items: Array<{ productId: string; quantity: number; productName: string; price: number }>;
-  note?: string;
+  status: 'REQUESTED' | 'ACKNOWLEDGED' | 'COMPLETED' | 'CANCELLED';
+  productName: string;
   customerName?: string;
+  customerNote?: string;
   createdAt: string;
   acknowledgedAt?: string;
-  servedAt?: string;
+  completedAt?: string;
   cancelledAt?: string;
 }
 
@@ -61,27 +61,6 @@ export async function fetchTabletProducts(
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || 'Failed to fetch products');
   return { data: json.data, meta: json.meta };
-}
-
-// ==================== Interest Request API ====================
-
-export interface InterestSubmitResult {
-  requestId: string;
-  status: string;
-  productName: string;
-  createdAt: string;
-}
-
-export interface InterestStatusDetail {
-  id: string;
-  status: 'REQUESTED' | 'ACKNOWLEDGED' | 'COMPLETED' | 'CANCELLED';
-  productName: string;
-  customerName?: string;
-  customerNote?: string;
-  createdAt: string;
-  acknowledgedAt?: string;
-  completedAt?: string;
-  cancelledAt?: string;
 }
 
 export async function submitTabletInterest(
@@ -104,36 +83,6 @@ export async function checkTabletInterestStatus(
   interestId: string,
 ): Promise<InterestStatusDetail> {
   const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/interest/${interestId}`;
-  const res = await fetch(url);
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');
-  return json.data;
-}
-
-// ==================== Service Request API (Legacy) ====================
-
-/** @deprecated Use submitTabletInterest instead */
-export async function submitTabletRequest(
-  slug: string,
-  body: { items: Array<{ productId: string; quantity: number }>; note?: string; customerName?: string },
-): Promise<TabletRequestResult> {
-  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || '요청 생성에 실패했습니다.');
-  return json.data;
-}
-
-/** @deprecated Use checkTabletInterestStatus instead */
-export async function checkTabletRequestStatus(
-  slug: string,
-  requestId: string,
-): Promise<TabletRequestDetail> {
-  const url = `${getApiBase()}/${encodeURIComponent(slug)}/tablet/requests/${requestId}`;
   const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || '요청 조회에 실패했습니다.');

@@ -2,13 +2,15 @@
  * CustomerRequestsPage
  *
  * WO-O4O-COMMON-REQUEST-IMPLEMENTATION-PHASE1
+ * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Interest tab added
  *
  * 고객 요청 목록 및 처리 페이지
  * - 대기 중인 요청 목록 표시
  * - 승인/거절 처리
+ * - 관심 요청 탭 (Interest Request management)
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Users,
   Check,
@@ -32,6 +34,11 @@ import {
 } from 'lucide-react';
 import type { StoreApiResponse } from '@/types/store';
 import { getAccessToken } from '@/contexts/AuthContext';
+import {
+  fetchInterestRequests,
+  updateInterestAction,
+  type StaffInterestRequest,
+} from '@/api/tabletInterest';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
@@ -126,6 +133,58 @@ const ACTION_STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function CustomerRequestsPage() {
+  // Page-level tab: customer requests vs interest requests
+  type PageTab = 'customer-requests' | 'interest-requests';
+  const [pageTab, setPageTab] = useState<PageTab>('customer-requests');
+
+  // Interest Request state
+  const [interestRequests, setInterestRequests] = useState<StaffInterestRequest[]>([]);
+  const [interestLoading, setInterestLoading] = useState(false);
+  const [interestError, setInterestError] = useState<string | null>(null);
+  const interestPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const loadInterests = useCallback(async () => {
+    try {
+      const data = await fetchInterestRequests();
+      setInterestRequests(data);
+      setInterestError(null);
+    } catch (e: any) {
+      setInterestError(e.message);
+    } finally {
+      setInterestLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pageTab !== 'interest-requests') {
+      if (interestPollRef.current) clearInterval(interestPollRef.current);
+      return;
+    }
+    setInterestLoading(true);
+    loadInterests();
+    interestPollRef.current = setInterval(loadInterests, 5000);
+    return () => {
+      if (interestPollRef.current) clearInterval(interestPollRef.current);
+    };
+  }, [pageTab, loadInterests]);
+
+  const handleInterestAction = async (id: string, action: 'acknowledge' | 'complete' | 'cancel') => {
+    try {
+      await updateInterestAction(id, action);
+      await loadInterests();
+    } catch (e: any) {
+      setInterestError(e.message);
+    }
+  };
+
+  const formatInterestElapsed = (createdAt: string): string => {
+    const diff = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
+    if (diff < 60) return `${diff}초 전`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+    return `${Math.floor(diff / 3600)}시간 전`;
+  };
+
+  // Customer Request state
   const [requests, setRequests] = useState<CustomerRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -289,6 +348,119 @@ export default function CustomerRequestsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Page-Level Tabs */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setPageTab('customer-requests')}
+          className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+            pageTab === 'customer-requests'
+              ? 'bg-primary-600 text-white'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          고객 요청
+        </button>
+        <button
+          onClick={() => setPageTab('interest-requests')}
+          className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+            pageTab === 'interest-requests'
+              ? 'bg-primary-600 text-white'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          관심 요청 ({interestRequests.length})
+        </button>
+      </div>
+
+      {/* Interest Requests Tab */}
+      {pageTab === 'interest-requests' && (
+        <>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-800">관심 요청</h1>
+              <p className="text-slate-500 mt-1">태블릿에서 접수된 상품 관심 요청을 관리합니다.</p>
+            </div>
+          </div>
+
+          {interestError && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {interestError}
+            </div>
+          )}
+
+          {interestLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+            </div>
+          ) : interestRequests.length === 0 ? (
+            <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+              <AlertCircle className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-slate-400">현재 대기 중인 관심 요청이 없습니다</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {interestRequests.map((req) => {
+                const isNew = req.status === 'REQUESTED';
+                return (
+                  <div
+                    key={req.id}
+                    className={`bg-white rounded-xl shadow-sm p-4 ${isNew ? 'ring-2 ring-amber-400' : 'border border-slate-200'}`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        {isNew && (
+                          <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded">NEW</span>
+                        )}
+                        {req.status === 'ACKNOWLEDGED' && (
+                          <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">확인됨</span>
+                        )}
+                        {req.customerName && (
+                          <span className="text-sm font-semibold text-slate-800">{req.customerName}</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-400">{formatInterestElapsed(req.createdAt)}</span>
+                    </div>
+
+                    <p className="text-sm font-semibold text-slate-700 mb-2">{req.productName}</p>
+
+                    {req.customerNote && (
+                      <div className="text-xs text-slate-500 bg-slate-50 rounded-md p-2 mb-3">
+                        {req.customerNote}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      {req.status === 'REQUESTED' && (
+                        <button
+                          onClick={() => handleInterestAction(req.id, 'acknowledge')}
+                          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                        >
+                          확인
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleInterestAction(req.id, 'complete')}
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
+                      >
+                        완료
+                      </button>
+                      <button
+                        onClick={() => handleInterestAction(req.id, 'cancel')}
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium bg-white text-red-500 border border-red-200 hover:bg-red-50 transition-colors"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Customer Requests Tab (existing) */}
+      {pageTab === 'customer-requests' && (<>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -593,6 +765,7 @@ export default function CustomerRequestsPage() {
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 }

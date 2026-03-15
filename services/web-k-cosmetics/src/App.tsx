@@ -110,6 +110,10 @@ const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
 const StoreTabletDisplaysPage = lazy(() => import('@/pages/store/StoreTabletDisplaysPage'));
 
+// WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1: Tablet 키오스크 + Interest 관리
+const TabletStorePage = lazy(() => import('@/pages/tablet/TabletStorePage'));
+const InterestRequestsPage = lazy(() => import('@/pages/store/InterestRequestsPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -325,8 +329,13 @@ function AppRoutes() {
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />
         <Route path="market-trial" element={<MarketTrialListPage />} />
+        {/* Interest 관리 (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
+        <Route path="interest-requests" element={<InterestRequestsPage />} />
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
+
+      {/* Tablet Kiosk — Public, no auth (WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1) */}
+      <Route path="tablet/:slug" element={<TabletStorePage />} />
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
