@@ -100,9 +100,9 @@ export default function HqMediaPage() {
     try {
       const data = await apiFetch(`/api/signage/${SERVICE_KEY}/media?source=hq`);
       setMediaList(data.data || []);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : '미디어 목록을 불러오는데 실패했습니다.';
-      setError(message);
+    } catch {
+      // 401/403 등 권한 부족 시 빈 목록으로 처리
+      setMediaList([]);
     } finally {
       setIsLoading(false);
     }

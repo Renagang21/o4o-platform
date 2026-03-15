@@ -95,10 +95,11 @@ export default function ForumManagementPage() {
       if (data.success) {
         setRequests(data.data || []);
       } else {
-        setError(data.error || '목록 로딩 실패');
+        setRequests([]);
       }
     } catch {
-      setError('신청 목록을 불러오는데 실패했습니다.');
+      // 404/403 등 API 미존재 또는 권한 부족 시 빈 목록으로 처리
+      setRequests([]);
     } finally {
       setIsLoading(false);
     }
