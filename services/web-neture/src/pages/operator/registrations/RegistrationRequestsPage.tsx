@@ -19,7 +19,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../../components/common/SimpleTable';
-import { adminRegistrationApi } from '../../../lib/api';
+import { operatorRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
 type UserRole = 'supplier' | 'partner' | 'consumer' | 'seller' | 'pharmacist' | 'ALL';
@@ -82,23 +82,22 @@ export default function RegistrationRequestsPage() {
   const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await adminRegistrationApi.getRequests();
-      // Map API response to local RegistrationRequest type
-      const mapped: RegistrationRequest[] = (data || []).map((r: any) => ({
+      const data = await operatorRegistrationApi.getRegistrations();
+      const mapped: RegistrationRequest[] = (data || []).map((r) => ({
         id: r.id,
         email: r.email || '',
         name: r.name || '',
         phone: r.phone || '',
-        role: r.role || 'consumer',
+        role: (r.role as UserRole) || 'consumer',
         service: r.service || 'neture',
-        companyName: r.companyName || r.company_name,
-        businessNumber: r.businessNumber || r.business_number,
-        licenseNumber: r.licenseNumber || r.license_number,
-        status: r.status || 'PENDING',
-        createdAt: r.createdAt || r.created_at || new Date().toISOString(),
-        processedAt: r.processedAt || r.processed_at,
-        processedBy: r.processedBy || r.processed_by,
-        rejectReason: r.rejectReason || r.reject_reason,
+        companyName: r.companyName,
+        businessNumber: r.businessNumber,
+        licenseNumber: r.licenseNumber,
+        status: (r.status?.toUpperCase() as 'PENDING' | 'APPROVED' | 'REJECTED') || 'PENDING',
+        createdAt: r.createdAt || new Date().toISOString(),
+        processedAt: r.processedAt,
+        processedBy: r.processedBy,
+        rejectReason: r.rejectReason,
       }));
       setRequests(mapped);
     } catch (error) {
@@ -117,16 +116,15 @@ export default function RegistrationRequestsPage() {
       setProcessing(true);
       setMessage(null);
 
-      setRequests(prev =>
-        prev.map(r =>
-          r.id === request.id
-            ? { ...r, status: 'APPROVED' as const, processedAt: new Date().toISOString() }
-            : r
-        )
-      );
+      const result = await operatorRegistrationApi.approve(request.id);
+      if (!result.success) {
+        setMessage({ type: 'error', text: '승인 처리에 실패했습니다.' });
+        return;
+      }
 
       setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 승인되었습니다.` });
       setSelectedRequest(null);
+      await fetchRequests();
     } catch (error) {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
     } finally {
@@ -144,18 +142,17 @@ export default function RegistrationRequestsPage() {
       setProcessing(true);
       setMessage(null);
 
-      setRequests(prev =>
-        prev.map(r =>
-          r.id === request.id
-            ? { ...r, status: 'REJECTED' as const, processedAt: new Date().toISOString(), rejectReason }
-            : r
-        )
-      );
+      const result = await operatorRegistrationApi.reject(request.id, rejectReason);
+      if (!result.success) {
+        setMessage({ type: 'error', text: '거부 처리에 실패했습니다.' });
+        return;
+      }
 
       setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다.` });
       setSelectedRequest(null);
       setShowRejectModal(false);
       setRejectReason('');
+      await fetchRequests();
     } catch (error) {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
     } finally {

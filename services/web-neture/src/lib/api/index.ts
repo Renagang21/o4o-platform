@@ -99,6 +99,8 @@ export {
   adminMasterApi,
   adminServiceApprovalApi,
   adminRegistrationApi,
+  operatorRegistrationApi,
+  type RegistrationRecord,
   adminPartnerSettlementApi,
   type NetureOperatorInfo,
   type AdminSupplier,

@@ -30,6 +30,7 @@ import { createAdminSettlementController } from './controllers/admin-settlement.
 import { createPartnerController } from './controllers/partner.controller.js';
 import { createSellerController, createPartnerContractController } from './controllers/seller.controller.js';
 import { createContactController } from './controllers/contact.controller.js';
+import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -66,6 +67,9 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // Admin domain
   router.use('/admin', createAdminController(dataSource));
   router.use('/admin', createAdminSettlementController(dataSource));
+
+  // Operator domain — registration management
+  router.use('/operator', createOperatorRegistrationController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

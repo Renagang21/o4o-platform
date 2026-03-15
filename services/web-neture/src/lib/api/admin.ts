@@ -825,7 +825,7 @@ export const adminPartnerSettlementApi = {
   },
 };
 
-// ==================== Admin Registration ====================
+// ==================== Admin Registration (Legacy — product_approvals) ====================
 
 export const adminRegistrationApi = {
   async getRequests(filters?: { status?: string }): Promise<any[]> {
@@ -842,5 +842,70 @@ export const adminRegistrationApi = {
       console.warn('[Admin API] Failed to fetch registration requests:', error);
       return [];
     }
+  },
+};
+
+// ==================== Operator Registration (users + service_memberships) ====================
+// WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
+
+export interface RegistrationRecord {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  role: string;
+  status: string;
+  service: string;
+  companyName?: string;
+  businessNumber?: string;
+  licenseNumber?: string;
+  createdAt: string;
+  processedAt?: string;
+  processedBy?: string;
+  rejectReason?: string;
+}
+
+export const operatorRegistrationApi = {
+  async getRegistrations(filters?: { status?: string }): Promise<RegistrationRecord[]> {
+    try {
+      const qs = filters?.status ? `?status=${filters.status}` : '';
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/operator/registrations${qs}`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Operator API] Failed to fetch registrations:', error);
+      return [];
+    }
+  },
+
+  async approve(userId: string): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/neture/operator/registrations/${userId}/approve`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+    const result = await response.json();
+    return result;
+  },
+
+  async reject(userId: string, reason: string): Promise<{ success: boolean }> {
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/neture/operator/registrations/${userId}/reject`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      },
+    );
+    const result = await response.json();
+    return result;
   },
 };
