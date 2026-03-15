@@ -144,22 +144,12 @@ export class ForumController {
         totalCount,
       });
     } catch (error: any) {
-      // Graceful fallback: return empty data if table doesn't exist
-      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-        logger.warn('Forum tables not found - returning empty posts');
-        res.json({
-          success: true,
-          data: [],
-          pagination: { page: 1, limit: 20, totalPages: 0 },
-          totalCount: 0,
-          message: 'Forum module not initialized - run migrations',
-        });
-        return;
-      }
-      logger.error('Error listing forum posts:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to list posts',
+      logger.warn('Error listing forum posts (returning empty):', error.message);
+      res.json({
+        success: true,
+        data: [],
+        pagination: { page: 1, limit: 20, totalPages: 0 },
+        totalCount: 0,
       });
     }
   }
@@ -487,21 +477,11 @@ export class ForumController {
         count: categories.length,
       });
     } catch (error: any) {
-      // Graceful fallback: return empty data if table doesn't exist
-      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-        logger.warn('Forum tables not found - returning empty categories');
-        res.json({
-          success: true,
-          data: [],
-          count: 0,
-          message: 'Forum module not initialized - run migrations',
-        });
-        return;
-      }
-      logger.error('Error listing forum categories:', error);
-      res.status(500).json({
-        success: false,
-        error: error.message || 'Failed to list categories',
+      logger.warn('Error listing forum categories (returning empty):', error.message);
+      res.json({
+        success: true,
+        data: [],
+        count: 0,
       });
     }
   }

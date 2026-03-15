@@ -37,8 +37,12 @@ export function createGlycopharmCommunityHubController(
         res.status(400).json({ success: false, error: 'INVALID_TYPE', message: 'type must be hero or page' });
         return;
       }
-      const ads = await service.getActiveAds(SERVICE_CODE, type);
-      res.json({ success: true, data: { ads } });
+      try {
+        const ads = await service.getActiveAds(SERVICE_CODE, type);
+        res.json({ success: true, data: { ads } });
+      } catch {
+        res.json({ success: true, data: { ads: [] } });
+      }
     }),
   );
 
@@ -46,8 +50,12 @@ export function createGlycopharmCommunityHubController(
   router.get(
     '/community/sponsors',
     asyncHandler(async (req: Request, res: Response): Promise<void> => {
-      const sponsors = await service.getActiveSponsors(SERVICE_CODE);
-      res.json({ success: true, data: { sponsors } });
+      try {
+        const sponsors = await service.getActiveSponsors(SERVICE_CODE);
+        res.json({ success: true, data: { sponsors } });
+      } catch {
+        res.json({ success: true, data: { sponsors: [] } });
+      }
     }),
   );
 
