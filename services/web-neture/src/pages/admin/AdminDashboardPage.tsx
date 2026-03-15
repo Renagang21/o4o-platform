@@ -68,19 +68,19 @@ function buildAdminConfig(summary: AdminDashboardSummary): AdminDashboardConfig 
       key: 'ai-policy',
       label: 'AI 엔진 정책',
       status: 'configured',
-      link: '/admin/ai',
+      link: '/workspace/admin/ai',
     },
     {
       key: 'approval-policy',
       label: '공급자 승인 정책',
       status: (stats.pendingRequests ?? 0) > 0 ? 'partial' : 'configured',
-      link: '/admin/suppliers',
+      link: '/workspace/admin/suppliers',
     },
     {
       key: 'email-settings',
       label: '이메일 설정 (SMTP)',
       status: 'configured',
-      link: '/admin/settings/email',
+      link: '/workspace/admin/settings/email',
     },
   ];
 
@@ -92,7 +92,7 @@ function buildAdminConfig(summary: AdminDashboardSummary): AdminDashboardConfig 
       id: 'ga-pending',
       message: `승인 대기 ${stats.pendingRequests}건이 있습니다. 검토가 필요합니다.`,
       level: (stats.pendingRequests ?? 0) > 5 ? 'warning' : 'info',
-      link: '/admin/suppliers',
+      link: '/workspace/admin/suppliers',
     });
   }
 
@@ -101,7 +101,7 @@ function buildAdminConfig(summary: AdminDashboardSummary): AdminDashboardConfig 
       id: 'ga-partnership',
       message: `미처리 파트너십 요청 ${stats.openPartnershipRequests}건이 있습니다.`,
       level: 'info',
-      link: '/admin/partners',
+      link: '/workspace/admin/partners',
     });
   }
 
@@ -116,12 +116,11 @@ function buildAdminConfig(summary: AdminDashboardSummary): AdminDashboardConfig 
 
   // Block D: Structure Actions
   const structureActions: StructureAction[] = [
-    { id: 'sa-suppliers', label: '공급자 관리', link: '/admin/suppliers', icon: '📦', description: '공급자 등록/승인' },
-    { id: 'sa-partners', label: '파트너 관리', link: '/admin/partners', icon: '🤝', description: '파트너십 관리' },
-    { id: 'sa-services', label: '서비스 관리', link: '/admin/services', icon: '🏪', description: '서비스 구조 설정' },
+    { id: 'sa-suppliers', label: '공급자 관리', link: '/workspace/admin/suppliers', icon: '📦', description: '공급자 등록/승인' },
+    { id: 'sa-partners', label: '파트너 관리', link: '/workspace/admin/partners', icon: '🤝', description: '파트너십 관리' },
     { id: 'sa-operators', label: '운영자 관리', link: '/workspace/admin/operators', icon: '👥', description: '운영자 권한 관리' },
-    { id: 'sa-ai', label: 'AI 제어판', link: '/admin/ai', icon: '🎛️', description: 'AI 엔진/정책 설정' },
-    { id: 'sa-email', label: '이메일 설정', link: '/admin/settings/email', icon: '📧', description: 'SMTP 구성' },
+    { id: 'sa-ai', label: 'AI 제어판', link: '/workspace/admin/ai', icon: '🎛️', description: 'AI 엔진/정책 설정' },
+    { id: 'sa-email', label: '이메일 설정', link: '/workspace/admin/settings/email', icon: '📧', description: 'SMTP 구성' },
   ];
 
   return { structureMetrics, policies, governanceAlerts, structureActions };

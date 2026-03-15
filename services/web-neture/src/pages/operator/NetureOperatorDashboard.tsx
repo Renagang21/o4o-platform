@@ -380,9 +380,7 @@ function formatDate(dateStr: string): string {
 
 const QUICK_LINKS = [
   { label: '가입 승인', path: '/workspace/operator/registrations' },
-  { label: '공급자 관리', path: '/workspace/suppliers' },
   { label: '공급 현황', path: '/workspace/operator/supply' },
-  { label: '콘텐츠 관리', path: '/workspace/content' },
   { label: '포럼 관리', path: '/workspace/operator/forum-management' },
   { label: 'AI 리포트', path: '/workspace/operator/ai-report' },
 ];
@@ -391,8 +389,7 @@ function inferActionPath(action: string, nav: (path: string) => void) {
   const lower = action.toLowerCase();
   if (lower.includes('승인') || lower.includes('가입')) nav('/workspace/operator/registrations');
   else if (lower.includes('매장') || lower.includes('store')) nav('/workspace/operator/supply');
-  else if (lower.includes('공급자') || lower.includes('supplier')) nav('/workspace/suppliers');
+  else if (lower.includes('공급자') || lower.includes('supplier')) nav('/workspace/operator/supply');
   else if (lower.includes('상품') || lower.includes('product')) nav('/workspace/operator/supply');
-  else if (lower.includes('콘텐츠') || lower.includes('content')) nav('/workspace/content');
   else if (lower.includes('주문') || lower.includes('order')) nav('/workspace/operator/supply');
 }
