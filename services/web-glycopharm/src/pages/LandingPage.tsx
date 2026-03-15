@@ -3,6 +3,8 @@
  * WO-GLYCOPHARM-ENTRY-SCREENS-V1
  * WO-GLYCOPHARM-GATEWAY-ENTRY-SPLIT-V1:
  *   운영자 로그인 버튼 분리 (환자용 → GlucoseView / 약국용 → GlycoPharm)
+ * WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
+ *   약사용 → /login?type=pharmacist, 환자 운영자 → glucoseview/admin
  *
  * MainLayout 밖에서 렌더링 (헤더/푸터 없음).
  */
@@ -33,17 +35,17 @@ export default function LandingPage() {
           환자용 시스템
         </button>
         <button
-          onClick={() => navigate('/pharmacy')}
+          onClick={() => navigate('/login?type=pharmacist')}
           className="w-full py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
         >
-          약국/약사용 시스템
+          약사용 시스템
         </button>
 
         <div className="pt-2">
           <div className="border-t border-slate-200 mb-4" />
           <div className="space-y-2">
             <a
-              href={`${GLUCOSEVIEW_URL}/login`}
+              href={`${GLUCOSEVIEW_URL}/admin`}
               className="block w-full py-3 text-sm font-medium text-slate-600 bg-white rounded-xl border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors text-center"
             >
               환자용 운영자 로그인

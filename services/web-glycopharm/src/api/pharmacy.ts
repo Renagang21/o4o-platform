@@ -614,6 +614,21 @@ class PharmacyApiClient {
   }
 
   /**
+   * 환자 등록 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1)
+   */
+  async createCustomer(data: {
+    name: string;
+    phone?: string;
+    email?: string;
+    notes?: string;
+  }): Promise<StoreApiResponse<{ id: string; name: string; phone: string; email: string; created_at: string }>> {
+    return this.request('/api/v1/glycopharm/pharmacy/customers', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
    * 고객 상세 조회
    */
   async getCustomerDetail(customerId: string): Promise<StoreApiResponse<PharmacyCustomer>> {

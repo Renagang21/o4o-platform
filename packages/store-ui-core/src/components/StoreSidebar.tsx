@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   Store,
   Package,
+  ShoppingBag,
   LayoutGrid,
   ShoppingCart,
   FileText,
@@ -32,6 +33,7 @@ import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
 const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   products: Package,
+  'local-products': ShoppingBag,
   channels: LayoutGrid,
   orders: ShoppingCart,
   content: FileText,
@@ -48,6 +50,7 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   pop: Megaphone,
   signage: Monitor,
   products: Package,
+  'local-products': ShoppingBag,
   orders: ShoppingCart,
   'analytics-marketing': BarChart3,
 };

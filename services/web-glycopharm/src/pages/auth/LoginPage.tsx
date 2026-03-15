@@ -62,7 +62,7 @@ export default function LoginPage() {
       } else if (loginType === 'patient') {
         navigate('/patient');
       } else if (loginType === 'pharmacist') {
-        navigate('/pharmacy');
+        navigate('/care');
       } else if (loginType === 'operator') {
         navigate('/admin');
       } else {

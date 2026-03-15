@@ -21,6 +21,8 @@ import {
   CheckCircle,
   ArrowDown,
   ArrowUp,
+  UserPlus,
+  X,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
@@ -55,6 +57,12 @@ export default function PatientsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [riskFilter, setRiskFilter] = useState<RiskLevel>('all');
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
+
+  // WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 환자 등록 모달 상태
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerForm, setRegisterForm] = useState({ name: '', phone: '', email: '', notes: '' });
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -146,6 +154,34 @@ export default function PatientsPage() {
 
   const SortIcon = sortDirection === 'desc' ? ArrowDown : ArrowUp;
 
+  const handleRegisterSubmit = async () => {
+    if (!registerForm.name.trim()) {
+      setRegisterError('이름을 입력해주세요.');
+      return;
+    }
+    setRegisterLoading(true);
+    setRegisterError(null);
+    try {
+      const res = await pharmacyApi.createCustomer({
+        name: registerForm.name.trim(),
+        phone: registerForm.phone.trim() || undefined,
+        email: registerForm.email.trim() || undefined,
+        notes: registerForm.notes.trim() || undefined,
+      });
+      if (res.success) {
+        setShowRegisterModal(false);
+        setRegisterForm({ name: '', phone: '', email: '', notes: '' });
+        loadData();
+      } else {
+        setRegisterError('환자 등록에 실패했습니다.');
+      }
+    } catch {
+      setRegisterError('환자 등록 중 오류가 발생했습니다.');
+    } finally {
+      setRegisterLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       <CareSubNav />
@@ -207,6 +243,14 @@ export default function PatientsPage() {
               <option value="low">양호</option>
             </select>
           </div>
+
+          <button
+            onClick={() => setShowRegisterModal(true)}
+            className="ml-auto inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            환자 등록
+          </button>
         </div>
 
         {/* Error Banner */}
@@ -320,6 +364,89 @@ export default function PatientsPage() {
           )}
         </div>
       </div>
+
+      {/* 환자 등록 모달 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1) */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowRegisterModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-slate-900">환자 등록</h2>
+              <button
+                onClick={() => setShowRegisterModal(false)}
+                className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={registerForm.name}
+                  onChange={(e) => setRegisterForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="환자 이름"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">연락처</label>
+                <input
+                  type="tel"
+                  value={registerForm.phone}
+                  onChange={(e) => setRegisterForm(f => ({ ...f, phone: e.target.value }))}
+                  placeholder="010-0000-0000"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">이메일</label>
+                <input
+                  type="email"
+                  value={registerForm.email}
+                  onChange={(e) => setRegisterForm(f => ({ ...f, email: e.target.value }))}
+                  placeholder="example@email.com"
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">메모</label>
+                <textarea
+                  value={registerForm.notes}
+                  onChange={(e) => setRegisterForm(f => ({ ...f, notes: e.target.value }))}
+                  placeholder="특이사항 등"
+                  rows={2}
+                  className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              {registerError && (
+                <p className="text-sm text-red-600">{registerError}</p>
+              )}
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={() => setShowRegisterModal(false)}
+                  className="flex-1 py-2.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleRegisterSubmit}
+                  disabled={registerLoading}
+                  className="flex-1 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+                >
+                  {registerLoading ? '등록 중...' : '등록하기'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

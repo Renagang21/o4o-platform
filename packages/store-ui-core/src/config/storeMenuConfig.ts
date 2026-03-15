@@ -17,6 +17,7 @@
 export type StoreMenuKey =
   | 'dashboard'
   | 'products'
+  | 'local-products'
   | 'channels'
   | 'orders'
   | 'content'
@@ -56,6 +57,7 @@ export interface StoreMenuItemDef {
 export const ALL_STORE_MENUS: StoreMenuItemDef[] = [
   { key: 'dashboard', label: '대시보드', subPath: '' },
   { key: 'products', label: '상품 관리', subPath: '/products' },
+  { key: 'local-products', label: '자체 상품', subPath: '/local-products' },
   { key: 'channels', label: '채널 관리', subPath: '/channels' },
   { key: 'orders', label: '주문 관리', subPath: '/orders' },
   { key: 'content', label: '콘텐츠 관리', subPath: '/content' },
@@ -70,7 +72,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
   serviceName: 'K-Cosmetics',
   basePath: '/store',
   enabledMenus: [
-    'dashboard', 'products', 'channels', 'orders',
+    'dashboard', 'products', 'local-products', 'channels', 'orders',
     'billing', 'content', 'settings',
   ],
 };
@@ -81,7 +83,7 @@ export const GLYCOPHARM_STORE_CONFIG: StoreDashboardConfig = {
   serviceName: 'GlycoPharm',
   basePath: '/store',
   enabledMenus: [
-    'dashboard', 'products', 'channels', 'orders',
+    'dashboard', 'products', 'local-products', 'channels', 'orders',
     'content', 'signage', 'billing', 'settings',
   ],
 };
@@ -114,6 +116,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: 'Commerce', items: [
       { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
+      { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
     ]},
     { label: 'Analytics', items: [

@@ -91,3 +91,7 @@ export { ProductMarketingPage } from './ProductMarketingPage';
 
 // 사이버 공간 템플릿 갤러리
 export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';
+
+// WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
+export { default as StoreLocalProductsPage } from './StoreLocalProductsPage';
+export { default as StoreTabletDisplaysPage } from './StoreTabletDisplaysPage';

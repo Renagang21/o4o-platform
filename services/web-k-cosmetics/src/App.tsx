@@ -106,6 +106,10 @@ const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityMan
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
 
+// WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
+const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
+const StoreTabletDisplaysPage = lazy(() => import('@/pages/store/StoreTabletDisplaysPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -313,6 +317,8 @@ function AppRoutes() {
       >
         <Route index element={<StoreCockpitPage />} />
         <Route path="products" element={<StorePlaceholderPage title="상품 관리" />} />
+        <Route path="local-products" element={<StoreLocalProductsPage />} />
+        <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />

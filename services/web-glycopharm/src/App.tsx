@@ -158,6 +158,10 @@ const StoreApplyPage = lazy(() => import('@/pages/pharmacy/StoreApplyPage'));
 // WO-STORE-BILLING-FOUNDATION-V1: 정산/인보이스
 const StoreBillingPage = lazy(() => import('@/pages/pharmacy/StoreBillingPage'));
 
+// WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
+const StoreLocalProductsPage = lazy(() => import('@/pages/pharmacy/StoreLocalProductsPage'));
+const StoreTabletDisplaysPage = lazy(() => import('@/pages/pharmacy/StoreTabletDisplaysPage'));
+
 // Consumer Store
 const StoreFront = lazy(() => import('@/pages/store/StoreFront'));
 const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
@@ -239,6 +243,21 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
   }
 
   return <>{children}</>;
+}
+
+/**
+ * WO-GLYCOPHARM-CARE-UI-ADJUST-V1 + WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
+ * Patient Auth Guard — 비로그인 → /login?type=patient 리다이렉트
+ */
+function PatientAuthGuardOutlet() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) return <PageLoading />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login?type=patient" state={{ from: location.pathname }} replace />;
+  }
+  return <Outlet />;
 }
 
 /**
@@ -325,15 +344,17 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
-      {/* WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: 환자 메뉴형 시스템 */}
-      <Route path="patient" element={<PatientMainPage />} />
-      <Route path="patient/profile" element={<PatientProfilePage />} />
-      <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
-      <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
-      <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
-      <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
-      <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
-      <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
+      {/* WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 환자 라우트 인증 가드 */}
+      <Route element={<PatientAuthGuardOutlet />}>
+        <Route path="patient" element={<PatientMainPage />} />
+        <Route path="patient/profile" element={<PatientProfilePage />} />
+        <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
+        <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
+        <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
+        <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
+        <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
+        <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
+      </Route>
       {/* WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1: /pharmacist → /pharmacy */}
       <Route path="pharmacy" element={<PharmacistPlaceholderPage />} />
       <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
@@ -540,6 +561,8 @@ function AppRoutes() {
         <Route path="hub" element={<StoreOverviewPage />} />
         <Route path="identity" element={<StoreMainPage />} />
         <Route path="products" element={<PharmacyProducts />} />
+        <Route path="local-products" element={<StoreLocalProductsPage />} />
+        <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
         <Route path="orders" element={<PharmacyOrders />} />

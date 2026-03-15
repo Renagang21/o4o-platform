@@ -280,6 +280,56 @@ export function createPharmacyController(
     }
   );
 
+  /**
+   * POST /pharmacy/customers
+   * Create a new customer for the authenticated user's pharmacy
+   *
+   * WO-GLYCOPHARM-CARE-UI-ADJUST-V1: Care 환자 등록 기능
+   */
+  router.post(
+    '/customers',
+    requireAuth,
+    requirePharmacyContext,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId!;
+        const pharmacistId = (pcReq as any).user?.id;
+
+        if (!pharmacistId) {
+          res.status(401).json({
+            error: { code: 'UNAUTHORIZED', message: 'User not authenticated' },
+          });
+          return;
+        }
+
+        const { name, phone, email, notes } = req.body;
+
+        if (!name || typeof name !== 'string' || !name.trim()) {
+          res.status(400).json({
+            error: { code: 'VALIDATION_ERROR', message: 'Name is required' },
+          });
+          return;
+        }
+
+        const result = await dataSource.query(
+          `INSERT INTO glucoseview_customers
+             (pharmacist_id, organization_id, name, phone, email, notes, last_visit, visit_count, sync_status, data_sharing_consent)
+           VALUES ($1, $2, $3, $4, $5, $6, NOW(), 1, 'pending', false)
+           RETURNING id, name, phone, email, created_at`,
+          [pharmacistId, pharmacyId, name.trim(), phone || null, email || null, notes || null],
+        );
+
+        res.status(201).json({ success: true, data: result[0] });
+      } catch (error: any) {
+        console.error('Failed to create pharmacy customer:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
   return router;
 }
 
