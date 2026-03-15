@@ -1,8 +1,15 @@
 /**
  * OperatorRegistrationService
  * WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
+ * WO-O4O-NETURE-REGISTRATION-AUTH-GUARD-FIX-V1
  *
  * 가입 신청 조회/승인/거부 — users + service_memberships 기반
+ *
+ * Column naming:
+ * - users 테이블: camelCase (TypeORM default, SnakeNamingStrategy 비활성)
+ *   → "businessInfo", "createdAt", "approvedAt", "approvedBy", "updatedAt"
+ * - service_memberships 테이블: snake_case (Entity에 explicit name 지정)
+ *   → service_key, approved_at, approved_by, rejection_reason, created_at, updated_at
  */
 import type { DataSource } from 'typeorm';
 
@@ -29,18 +36,18 @@ export class OperatorRegistrationService {
               u.phone,
               sm.role,
               sm.status,
-              u.business_info->>'businessName' AS "companyName",
-              u.business_info->>'businessNumber' AS "businessNumber",
-              u.business_info->>'licenseNumber' AS "licenseNumber",
+              u."businessInfo"->>'businessName' AS "companyName",
+              u."businessInfo"->>'businessNumber' AS "businessNumber",
+              u."businessInfo"->>'licenseNumber' AS "licenseNumber",
               sm.service_key AS "service",
-              u.created_at AS "createdAt",
+              u."createdAt" AS "createdAt",
               sm.approved_at AS "processedAt",
               sm.approved_by AS "processedBy",
               sm.rejection_reason AS "rejectReason"
        FROM users u
        JOIN service_memberships sm ON sm.user_id = u.id
        WHERE ${conditions.join(' AND ')}
-       ORDER BY u.created_at DESC`,
+       ORDER BY u."createdAt" DESC`,
       params,
     );
 
@@ -57,7 +64,7 @@ export class OperatorRegistrationService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. service_memberships 승인
+      // 1. service_memberships 승인 (snake_case columns)
       const smResult = await queryRunner.query(
         `UPDATE service_memberships
          SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
@@ -70,10 +77,10 @@ export class OperatorRegistrationService {
         throw new Error('REGISTRATION_NOT_FOUND');
       }
 
-      // 2. users 상태 활성화
+      // 2. users 상태 활성화 (camelCase columns)
       await queryRunner.query(
         `UPDATE users
-         SET status = 'ACTIVE', approved_at = NOW(), approved_by = $1, updated_at = NOW()
+         SET status = 'ACTIVE', "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
          WHERE id = $2 AND status = 'PENDING'`,
         [approvedBy, userId],
       );
@@ -123,14 +130,14 @@ export class OperatorRegistrationService {
               u.name,
               u.phone,
               sm.role,
-              u.business_info->>'businessName' AS "companyName",
-              u.business_info->>'businessNumber' AS "businessNumber",
-              u.business_info->>'licenseNumber' AS "licenseNumber",
-              u.created_at AS "createdAt"
+              u."businessInfo"->>'businessName' AS "companyName",
+              u."businessInfo"->>'businessNumber' AS "businessNumber",
+              u."businessInfo"->>'licenseNumber' AS "licenseNumber",
+              u."createdAt" AS "createdAt"
        FROM users u
        JOIN service_memberships sm ON sm.user_id = u.id
        WHERE sm.service_key = 'neture' AND sm.status = 'pending'
-       ORDER BY u.created_at DESC`,
+       ORDER BY u."createdAt" DESC`,
     );
 
     const high: typeof rows = [];
