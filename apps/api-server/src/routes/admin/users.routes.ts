@@ -29,10 +29,11 @@ const isValidRole = (value: string) => {
 // All admin user routes require authentication
 router.use(authenticate);
 
-// User management routes (admin/manager only)
-router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUsers);
-router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUserStatistics);
-router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminUserController.getUser);
+// User management routes (admin/manager/operator)
+// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: OPERATOR 추가 — Operator Dashboard 사용자 조회 허용
+router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUsers);
+router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUserStatistics);
+router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUser);
 
 // User creation (admin only)
 router.post('/',
@@ -50,9 +51,9 @@ router.post('/',
   adminUserController.createUser
 );
 
-// User updates (admin/manager only)
+// User updates (admin/manager/operator)
 router.put('/:id',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -66,9 +67,9 @@ router.put('/:id',
   adminUserController.updateUser
 );
 
-// Update user status (admin/manager only)
+// Update user status (admin/manager/operator)
 router.patch('/:id/status',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
+  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]),
   [
     body('status').isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],

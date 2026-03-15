@@ -10,6 +10,14 @@ import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
+// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Token storage for Bearer auth
+const TOKEN_KEY = 'o4o_accessToken';
+const REFRESH_TOKEN_KEY = 'o4o_refreshToken';
+
+export function getAccessToken(): string | null {
+  return typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+}
+
 export type UserRole = 'admin' | 'supplier' | 'partner' | 'seller' | 'operator' | 'user';
 
 export interface User {
@@ -70,8 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // httpOnly Cookie 기반 세션 확인
     const checkSession = async () => {
       try {
+        // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
+        const token = getAccessToken();
         const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
           credentials: 'include',
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
         });
 
         if (response.ok) {
@@ -100,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, includeLegacyTokens: true }),
         credentials: 'include',
       });
 
@@ -111,6 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return { success: false, error: data.error, passwordSyncAvailable: true, syncToken: data.syncToken };
         }
         return { success: false, error: resolveAuthError(data, response.status) };
+      }
+
+      // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Store tokens for Bearer auth
+      if (data.data?.tokens?.accessToken) {
+        localStorage.setItem(TOKEN_KEY, data.data.tokens.accessToken);
+      }
+      if (data.data?.tokens?.refreshToken) {
+        localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
       }
 
       const { user: apiUser } = parseAuthResponse(data);
@@ -170,6 +191,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // 로그아웃 실패해도 로컬 상태 정리
     }
+    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Clear stored tokens
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     setUser(null);
   };
 

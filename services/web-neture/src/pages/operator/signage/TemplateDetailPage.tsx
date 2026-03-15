@@ -15,6 +15,7 @@ import {
   Grid3X3,
   ExternalLink,
 } from 'lucide-react';
+import { getAccessToken } from '../../../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'neture';
@@ -79,10 +80,13 @@ export default function TemplateDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
+    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
+    const token = getAccessToken();
     const res = await fetch(`${API_BASE}${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options?.headers,
       },
       credentials: 'include',

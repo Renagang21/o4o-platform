@@ -2,6 +2,13 @@
  * Dashboard Summary APIs
  */
 import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { getAccessToken } from '../../contexts/AuthContext';
+
+// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token headers for cross-domain
+function authHeaders(): HeadersInit {
+  const token = getAccessToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 // ==================== Supplier Dashboard Summary Types ====================
 
@@ -181,6 +188,7 @@ export const dashboardApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/summary`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (!response.ok) {
         console.warn('[Dashboard API] Supplier dashboard summary not available');
@@ -198,6 +206,7 @@ export const dashboardApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/summary`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (!response.ok) {
         console.warn('[Dashboard API] Admin dashboard summary not available');
@@ -215,6 +224,7 @@ export const dashboardApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/partner-kpi`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (!response.ok) return null;
       const result = await response.json();
@@ -229,7 +239,7 @@ export const dashboardApi = {
     try {
       const response = await fetchWithTimeout(
         `${API_BASE_URL}/api/v1/dashboard/assets/seller-signal`,
-        { credentials: 'include' }
+        { credentials: 'include', headers: authHeaders() }
       );
       if (!response.ok) return { success: false, hasApprovedSeller: false };
       return response.json();
@@ -242,6 +252,7 @@ export const dashboardApi = {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/dashboard/summary`, {
         credentials: 'include',
+        headers: authHeaders(),
       });
       if (!response.ok) {
         console.warn('[Dashboard API] Partner dashboard summary not available');

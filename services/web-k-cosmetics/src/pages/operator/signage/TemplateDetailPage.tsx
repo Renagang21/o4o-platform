@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getAccessToken } from '../../../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'k-cosmetics';
@@ -60,9 +61,11 @@ const ZONE_TYPE_LABELS: Record<string, string> = {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
+  const token = getAccessToken();
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options?.headers },
     credentials: 'include',
   });
   if (!res.ok) {
