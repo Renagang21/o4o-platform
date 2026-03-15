@@ -2,20 +2,30 @@
  * OperatorRegistrationController
  * WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
  * WO-O4O-NETURE-REGISTRATION-AUTH-GUARD-FIX-V1
+ * WO-O4O-NETURE-REGISTRATION-LIST-NOT-SHOWING-V1
  *
  * 가입 신청 조회/승인/거부 API
  * Mounted at: /operator (→ /api/v1/neture/operator/registrations/*)
  *
- * Auth: requireAuth + requireAdmin (legacy role guard)
- * - admin, operator, super_admin + service-prefixed roles (neture:admin, neture:operator)
- * - User.hasRole() 이 `:admin`/`:operator` suffix 매칭을 처리
+ * Auth: requireAuth + requireRole (DB-based role_assignments 조회)
+ * - JWT payload.roles 기반 체크 → role_assignments 실시간 DB 조회로 변경
+ * - JWT 갱신 없이도 role_assignments 변경 즉시 반영
  */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../../middleware/permission.middleware.js';
+import { requireAuth, requireRole } from '../../../middleware/auth.middleware.js';
 import { OperatorRegistrationService } from '../services/operator-registration.service.js';
 import logger from '../../../utils/logger.js';
+
+/**
+ * Operator/Admin role guard — DB-based (role_assignments 실시간 조회)
+ * JWT 갱신 불요: role_assignments 테이블 변경 즉시 반영
+ */
+const requireOperatorOrAdmin = requireRole([
+  'admin', 'super_admin', 'operator',
+  'platform:admin', 'platform:super_admin',
+  'neture:admin', 'neture:operator',
+]);
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };
@@ -32,7 +42,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.get(
     '/registrations',
     requireAuth,
-    requireAdmin,
+    requireOperatorOrAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { status } = req.query;
@@ -58,7 +68,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.post(
     '/registrations/:userId/approve',
     requireAuth,
-    requireAdmin,
+    requireOperatorOrAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -96,7 +106,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.post(
     '/registrations/:userId/reject',
     requireAuth,
-    requireAdmin,
+    requireOperatorOrAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -136,7 +146,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.get(
     '/registrations/copilot',
     requireAuth,
-    requireAdmin,
+    requireOperatorOrAdmin,
     async (_req: AuthenticatedRequest, res: Response) => {
       try {
         const data = await registrationService.getRegistrationCopilot();
