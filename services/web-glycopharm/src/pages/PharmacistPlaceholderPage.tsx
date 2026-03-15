@@ -1,15 +1,19 @@
 /**
  * PharmacistPlaceholderPage — 약사용 시스템 임시 페이지
  * WO-GLYCOPHARM-ENTRY-SCREENS-V1
+ * WO-GLYCOPHARM-PHARMACY-BIZ-MENU-V1:
+ *   "약국 경영" 아코디언 메뉴 추가 (커뮤니티, 약국 HUB, 내 매장)
  */
 
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Users, UserPlus, Calendar } from 'lucide-react';
+import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store } from 'lucide-react';
 
 export default function PharmacistPlaceholderPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [bizOpen, setBizOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -57,6 +61,44 @@ export default function PharmacistPlaceholderPage() {
           >
             Care 대시보드
           </button>
+
+          {/* 약국 경영 아코디언 */}
+          <div className="border border-emerald-200 rounded-xl overflow-hidden">
+            <button
+              onClick={() => setBizOpen(!bizOpen)}
+              className="w-full py-3 text-sm font-medium text-emerald-700 bg-white hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
+            >
+              <Briefcase className="w-4 h-4" />
+              약국 경영
+              <ChevronDown className={`w-4 h-4 transition-transform ${bizOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {bizOpen && (
+              <div className="border-t border-emerald-100 bg-emerald-50/50 space-y-1 p-2">
+                <button
+                  onClick={() => navigate('/community')}
+                  className="w-full py-2.5 text-sm font-medium text-slate-700 bg-white rounded-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
+                  커뮤니티
+                </button>
+                <button
+                  onClick={() => navigate('/hub')}
+                  className="w-full py-2.5 text-sm font-medium text-slate-700 bg-white rounded-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <LayoutGrid className="w-4 h-4 text-emerald-600" />
+                  약국 HUB
+                </button>
+                <button
+                  onClick={() => navigate('/store')}
+                  className="w-full py-2.5 text-sm font-medium text-slate-700 bg-white rounded-lg hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Store className="w-4 h-4 text-emerald-600" />
+                  내 매장
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={handleLogout}
             className="w-full py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors flex items-center justify-center gap-2"
