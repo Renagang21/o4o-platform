@@ -123,5 +123,29 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
     },
   );
 
+  /**
+   * GET /operator/registrations/copilot
+   * 가입 승인 Copilot — 우선순위별 분류
+   * WO-O4O-NETURE-OPERATOR-COPILOT-REGISTRATION-V1
+   */
+  router.get(
+    '/registrations/copilot',
+    requireAuth,
+    requireNetureScope('neture:operator'),
+    async (_req: AuthenticatedRequest, res: Response) => {
+      try {
+        const data = await registrationService.getRegistrationCopilot();
+        res.json({ success: true, data });
+      } catch (error) {
+        logger.error('[Operator] Error fetching registration copilot:', error);
+        res.status(500).json({
+          success: false,
+          error: 'INTERNAL_ERROR',
+          message: 'Failed to fetch registration copilot',
+        });
+      }
+    },
+  );
+
   return router;
 }

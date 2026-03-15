@@ -3,21 +3,23 @@
  *
  * WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1
  *
- * 8-Block Copilot:
+ * 9-Block Copilot:
  *  1. 플랫폼 KPI (slate)
  *  2. AI 플랫폼 요약 (indigo)
  *  3. 신규 매장 (slate)
  *  4. 공급자 활동 (slate)
  *  5. 상품 승인 대기 (slate)
- *  6. 플랫폼 트렌드 (emerald)
- *  7. 위험 알림 (red/amber)
- *  8. 운영 액션 (violet)
+ *  6. 가입 승인 Copilot (amber) — WO-O4O-NETURE-OPERATOR-COPILOT-REGISTRATION-V1
+ *  7. 플랫폼 트렌드 (emerald)
+ *  8. 위험 알림 (red/amber)
+ *  9. 운영 액션 (violet)
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   operatorCopilotApi,
+  operatorRegistrationApi,
   type OperatorKpiSummary,
   type RecentStoreItem,
   type SupplierActivityItem,
@@ -25,6 +27,7 @@ import {
   type PlatformTrends,
   type AlertItem,
   type OperatorAiSummary,
+  type RegistrationCopilotData,
 } from '../../lib/api';
 
 export default function NetureOperatorDashboard() {
@@ -37,6 +40,7 @@ export default function NetureOperatorDashboard() {
   const [products, setProducts] = useState<PendingProductItem[]>([]);
   const [trends, setTrends] = useState<PlatformTrends | null>(null);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [regCopilot, setRegCopilot] = useState<RegistrationCopilotData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,6 +84,10 @@ export default function NetureOperatorDashboard() {
 
     operatorCopilotApi.getAlerts()
       .then(d => setAlerts(d))
+      .catch(() => {});
+
+    operatorRegistrationApi.getCopilotSummary()
+      .then(d => setRegCopilot(d))
       .catch(() => {});
 
     setLoading(false);
@@ -232,7 +240,65 @@ export default function NetureOperatorDashboard() {
         )}
       </div>
 
-      {/* Block 6 + 7: 2-column */}
+      {/* Block 6: 가입 승인 Copilot (amber) */}
+      <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <h2 className="text-base font-semibold text-amber-900">가입 승인 Copilot</h2>
+            {regCopilot && regCopilot.pendingCount > 0 && (
+              <span className="px-2 py-0.5 bg-amber-200 text-amber-800 text-xs font-bold rounded-full">
+                {regCopilot.pendingCount}건 대기
+              </span>
+            )}
+          </div>
+          <Link
+            to="/workspace/operator/registrations"
+            className="text-xs text-amber-700 hover:text-amber-900 font-medium"
+          >
+            전체 보기 &rarr;
+          </Link>
+        </div>
+        {!regCopilot ? (
+          <p className="text-sm text-amber-400 py-8 text-center">가입 신청 데이터를 불러오는 중...</p>
+        ) : regCopilot.pendingCount === 0 ? (
+          <p className="text-sm text-amber-600 py-8 text-center">대기 중인 가입 신청이 없습니다.</p>
+        ) : (
+          <div className="space-y-4">
+            {regCopilot.high.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-red-600 mb-2">HIGH PRIORITY</p>
+                <div className="space-y-2">
+                  {regCopilot.high.slice(0, 3).map(item => (
+                    <RegistrationRow key={item.id} item={item} priority="high" />
+                  ))}
+                </div>
+              </div>
+            )}
+            {regCopilot.medium.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-amber-700 mb-2">MEDIUM</p>
+                <div className="space-y-2">
+                  {regCopilot.medium.slice(0, 3).map(item => (
+                    <RegistrationRow key={item.id} item={item} priority="medium" />
+                  ))}
+                </div>
+              </div>
+            )}
+            {regCopilot.low.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-slate-500 mb-2">LOW</p>
+                <div className="space-y-2">
+                  {regCopilot.low.slice(0, 2).map(item => (
+                    <RegistrationRow key={item.id} item={item} priority="low" />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Block 7 + 8: 2-column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Block 6: 플랫폼 트렌드 (emerald) */}
         <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-6">
@@ -376,6 +442,35 @@ function formatDate(dateStr: string): string {
   } catch {
     return '';
   }
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  supplier: '공급자',
+  partner: '파트너',
+  seller: '판매자',
+  user: '사용자',
+};
+
+function RegistrationRow({ item, priority }: {
+  item: { id: string; name: string; role: string; companyName?: string; businessNumber?: string; licenseNumber?: string; createdAt: string };
+  priority: 'high' | 'medium' | 'low';
+}) {
+  const bgColor = priority === 'high' ? 'bg-red-50' : priority === 'medium' ? 'bg-amber-100/50' : 'bg-white/60';
+  const detail = item.companyName || item.licenseNumber || item.businessNumber || '';
+  return (
+    <Link
+      to="/workspace/operator/registrations"
+      className={`flex items-center gap-3 p-3 ${bgColor} rounded-lg hover:opacity-80 transition-opacity`}
+    >
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-800 truncate">
+          {item.name} <span className="text-xs text-slate-500">({ROLE_LABELS[item.role] || item.role})</span>
+        </p>
+        {detail && <p className="text-xs text-slate-500 truncate">{detail}</p>}
+      </div>
+      <span className="text-xs text-slate-400 whitespace-nowrap">{formatDate(item.createdAt)}</span>
+    </Link>
+  );
 }
 
 const QUICK_LINKS = [

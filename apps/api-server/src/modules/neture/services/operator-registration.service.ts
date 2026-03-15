@@ -111,4 +111,48 @@ export class OperatorRegistrationService {
 
     return { success: true, userId };
   }
+
+  /**
+   * Copilot: 가입 신청 우선순위 분석
+   * WO-O4O-NETURE-OPERATOR-COPILOT-REGISTRATION-V1
+   */
+  async getRegistrationCopilot() {
+    const rows = await this.dataSource.query(
+      `SELECT u.id,
+              u.email,
+              u.name,
+              u.phone,
+              sm.role,
+              u.business_info->>'businessName' AS "companyName",
+              u.business_info->>'businessNumber' AS "businessNumber",
+              u.business_info->>'licenseNumber' AS "licenseNumber",
+              u.created_at AS "createdAt"
+       FROM users u
+       JOIN service_memberships sm ON sm.user_id = u.id
+       WHERE sm.service_key = 'neture' AND sm.status = 'pending'
+       ORDER BY u.created_at DESC`,
+    );
+
+    const high: typeof rows = [];
+    const medium: typeof rows = [];
+    const low: typeof rows = [];
+
+    for (const r of rows) {
+      const role = (r.role || '').toLowerCase();
+      if (role === 'partner' || (role === 'supplier' && (r.businessNumber || r.licenseNumber))) {
+        high.push(r);
+      } else if (role === 'supplier' || role === 'seller') {
+        medium.push(r);
+      } else {
+        low.push(r);
+      }
+    }
+
+    return {
+      pendingCount: rows.length,
+      high,
+      medium,
+      low,
+    };
+  }
 }

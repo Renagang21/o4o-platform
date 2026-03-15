@@ -101,6 +101,8 @@ export {
   adminRegistrationApi,
   operatorRegistrationApi,
   type RegistrationRecord,
+  type RegistrationCopilotData,
+  type RegistrationCopilotItem,
   adminPartnerSettlementApi,
   type NetureOperatorInfo,
   type AdminSupplier,

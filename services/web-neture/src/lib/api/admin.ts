@@ -908,4 +908,38 @@ export const operatorRegistrationApi = {
     const result = await response.json();
     return result;
   },
+
+  async getCopilotSummary(): Promise<RegistrationCopilotData> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/neture/operator/registrations/copilot`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return { pendingCount: 0, high: [], medium: [], low: [] };
+      const result = await response.json();
+      return result.data || { pendingCount: 0, high: [], medium: [], low: [] };
+    } catch (error) {
+      console.warn('[Operator API] Failed to fetch registration copilot:', error);
+      return { pendingCount: 0, high: [], medium: [], low: [] };
+    }
+  },
 };
+
+export interface RegistrationCopilotItem {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  role: string;
+  companyName?: string;
+  businessNumber?: string;
+  licenseNumber?: string;
+  createdAt: string;
+}
+
+export interface RegistrationCopilotData {
+  pendingCount: number;
+  high: RegistrationCopilotItem[];
+  medium: RegistrationCopilotItem[];
+  low: RegistrationCopilotItem[];
+}
