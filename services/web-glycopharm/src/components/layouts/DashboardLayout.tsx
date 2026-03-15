@@ -28,10 +28,7 @@ import {
   Tag,
   Store,
   BarChart3,
-  Boxes,
   CreditCard,
-  Megaphone,
-  HelpCircle,
   FileText,
   Briefcase,
 } from 'lucide-react';
