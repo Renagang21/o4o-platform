@@ -19,7 +19,13 @@ import {
 } from 'typeorm';
 import type { User } from '../../../modules/auth/entities/User.js';
 
-export type GlycopharmApplicationStatus = 'submitted' | 'approved' | 'rejected';
+export type GlycopharmApplicationStatus =
+  | 'draft'
+  | 'submitted'
+  | 'reviewing'
+  | 'supplementing'
+  | 'approved'
+  | 'rejected';
 export type GlycopharmServiceType = 'dropshipping' | 'sample_sales' | 'digital_signage';
 export type GlycopharmOrganizationType = 'pharmacy' | 'pharmacy_chain';
 

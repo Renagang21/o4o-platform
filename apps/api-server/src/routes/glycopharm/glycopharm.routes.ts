@@ -12,6 +12,7 @@ import { createDisplayController } from './controllers/display.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
+import { createStoreApplicationsController } from './controllers/store-applications.controller.js';
 import { createCheckoutController } from './controllers/checkout.controller.js'; // Phase 4-B: E-commerce Core Integration
 import { createGlycopharmPaymentController } from './controllers/glycopharm-payment.controller.js'; // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
 import { createCockpitController } from './controllers/cockpit.controller.js';
@@ -112,6 +113,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     requireGlycopharmScope
   );
   router.use('/', adminController);
+
+  // Store Applications routes (WO-O4O-STORE-APPLICATIONS-API-IMPLEMENTATION-V1)
+  const storeApplicationsController = createStoreApplicationsController(
+    dataSource,
+    coreRequireAuth as any,
+  );
+  router.use('/store-applications', storeApplicationsController);
 
   // ============================================================================
   // Checkout Routes - Phase 4-B: E-commerce Core Integration
