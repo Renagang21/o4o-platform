@@ -37,7 +37,7 @@ export class MembershipConsoleController {
 
       if (search) {
         conditions.push(
-          `(u.first_name ILIKE $${paramIdx} OR u.last_name ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx} OR u.company ILIKE $${paramIdx})`
+          `(u."firstName" ILIKE $${paramIdx} OR u."lastName" ILIKE $${paramIdx} OR u.email ILIKE $${paramIdx} OR u.name ILIKE $${paramIdx})`
         );
         params.push(`%${search}%`);
         paramIdx++;
@@ -61,13 +61,13 @@ export class MembershipConsoleController {
 
       // Sorting
       const validSortFields: Record<string, string> = {
-        createdAt: 'u.created_at',
-        updatedAt: 'u.updated_at',
+        createdAt: 'u."createdAt"',
+        updatedAt: 'u."updatedAt"',
         email: 'u.email',
-        firstName: 'u.first_name',
-        lastName: 'u.last_name',
+        firstName: 'u."firstName"',
+        lastName: 'u."lastName"',
       };
-      const sortField = validSortFields[sortBy as string] || 'u.created_at';
+      const sortField = validSortFields[sortBy as string] || 'u."createdAt"';
       const order = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
       // Count total
@@ -78,10 +78,11 @@ export class MembershipConsoleController {
       const total = countResult[0]?.total || 0;
       const totalPages = Math.ceil(total / limitNum);
 
-      // Fetch users
+      // Fetch users (users 테이블: camelCase columns — SnakeNamingStrategy 비활성)
       const users = await AppDataSource.query(
-        `SELECT u.id, u.email, u.first_name, u.last_name, u.name, u.company, u.phone,
-                u.status, u.is_active, u.created_at, u.updated_at
+        `SELECT u.id, u.email, u."firstName", u."lastName", u.name, u.phone,
+                u.status, u."isActive", u."createdAt", u."updatedAt",
+                u."businessInfo"->>'businessName' AS company
          FROM users u
          ${whereClause}
          ORDER BY ${sortField} ${order}
@@ -140,17 +141,17 @@ export class MembershipConsoleController {
       const enrichedUsers = users.map((u: any) => ({
         id: u.id,
         email: u.email,
-        firstName: u.first_name,
-        lastName: u.last_name,
+        firstName: u.firstName,
+        lastName: u.lastName,
         name: u.name,
         company: u.company,
         phone: u.phone,
         status: u.status,
-        isActive: u.is_active,
+        isActive: u.isActive,
         roles: roleMap[u.id] || [],
         memberships: membershipMap[u.id] || [],
-        createdAt: u.created_at,
-        updatedAt: u.updated_at,
+        createdAt: u.createdAt,
+        updatedAt: u.updatedAt,
       }));
 
       res.json({
@@ -172,10 +173,11 @@ export class MembershipConsoleController {
     try {
       const { userId } = req.params;
 
-      // Fetch user
+      // Fetch user (users 테이블: camelCase columns)
       const userRows = await AppDataSource.query(
-        `SELECT id, email, first_name, last_name, name, company, phone,
-                status, is_active, created_at, updated_at
+        `SELECT id, email, "firstName", "lastName", name, phone,
+                status, "isActive", "createdAt", "updatedAt",
+                "businessInfo"->>'businessName' AS company
          FROM users WHERE id = $1`,
         [userId]
       );
@@ -210,15 +212,15 @@ export class MembershipConsoleController {
         user: {
           id: u.id,
           email: u.email,
-          firstName: u.first_name,
-          lastName: u.last_name,
+          firstName: u.firstName,
+          lastName: u.lastName,
           name: u.name,
           company: u.company,
           phone: u.phone,
           status: u.status,
-          isActive: u.is_active,
-          createdAt: u.created_at,
-          updatedAt: u.updated_at,
+          isActive: u.isActive,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt,
         },
         roles: roleRows.map((r: any) => ({
           id: r.id,
