@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { adminProductApi, type AdminProduct } from '../../lib/api';
+import { ContentPreview } from '@o4o/content-editor';
 
 const statusLabels: Record<string, string> = {
   PENDING: '승인대기',
@@ -34,6 +35,7 @@ export default function AdminProductApprovalPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [rejectModal, setRejectModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [detailProduct, setDetailProduct] = useState<AdminProduct | null>(null);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -157,7 +159,7 @@ export default function AdminProductApprovalPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filtered.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={p.id} className="hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setDetailProduct(p)}>
                   <td className="px-6 py-4">
                     <p className="font-medium text-slate-800">{p.marketingName}</p>
                     <p className="text-xs text-slate-400 mt-0.5">{p.id.slice(0, 8)}...</p>
@@ -177,7 +179,7 @@ export default function AdminProductApprovalPage() {
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(p.createdAt).toLocaleDateString('ko-KR')}
                   </td>
-                  <td className="px-6 py-4 text-center space-x-2">
+                  <td className="px-6 py-4 text-center space-x-2" onClick={(e) => e.stopPropagation()}>
                     {p.approvalStatus === 'PENDING' && (
                       <>
                         <button
@@ -229,6 +231,96 @@ export default function AdminProductApprovalPage() {
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {actionLoading === rejectModal.id ? '처리중...' : '반려'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {detailProduct && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-2xl shadow-xl max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+              <div>
+                <h3 className="text-lg font-bold text-slate-800">{detailProduct.marketingName}</h3>
+                <p className="text-sm text-slate-500 mt-0.5">{detailProduct.supplierName} · {distLabels[detailProduct.distributionType] || detailProduct.distributionType}</p>
+              </div>
+              <button onClick={() => setDetailProduct(null)} className="text-slate-400 hover:text-slate-600 text-xl leading-none">&times;</button>
+            </div>
+            <div className="overflow-y-auto p-6 space-y-6">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div><span className="text-slate-500">상태:</span> <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[detailProduct.approvalStatus] || 'bg-gray-100 text-gray-700'}`}>{statusLabels[detailProduct.approvalStatus] || detailProduct.approvalStatus}</span></div>
+                <div><span className="text-slate-500">등록일:</span> <span className="ml-1 text-slate-800">{new Date(detailProduct.createdAt).toLocaleDateString('ko-KR')}</span></div>
+              </div>
+
+              {(detailProduct.consumerShortDescription || detailProduct.consumerDetailDescription) && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-2">B2C 상품 설명</h4>
+                  {detailProduct.consumerShortDescription && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">소비자용 간이 설명</p>
+                      <div className="border border-slate-200 rounded-lg p-3">
+                        <ContentPreview html={detailProduct.consumerShortDescription} />
+                      </div>
+                    </div>
+                  )}
+                  {detailProduct.consumerDetailDescription && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">소비자용 상세 설명</p>
+                      <div className="border border-slate-200 rounded-lg p-3">
+                        <ContentPreview html={detailProduct.consumerDetailDescription} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {(detailProduct.businessShortDescription || detailProduct.businessDetailDescription) && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-slate-700 border-b border-slate-100 pb-2">B2B 상품 설명</h4>
+                  {detailProduct.businessShortDescription && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">B2B 간이 설명</p>
+                      <div className="border border-slate-200 rounded-lg p-3">
+                        <ContentPreview html={detailProduct.businessShortDescription} />
+                      </div>
+                    </div>
+                  )}
+                  {detailProduct.businessDetailDescription && (
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">B2B 상세 설명</p>
+                      <div className="border border-slate-200 rounded-lg p-3">
+                        <ContentPreview html={detailProduct.businessDetailDescription} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!detailProduct.consumerShortDescription && !detailProduct.consumerDetailDescription &&
+               !detailProduct.businessShortDescription && !detailProduct.businessDetailDescription && (
+                <p className="text-sm text-slate-400 text-center py-4">등록된 설명이 없습니다</p>
+              )}
+            </div>
+            <div className="flex gap-2 justify-end p-6 border-t border-slate-100">
+              {detailProduct.approvalStatus === 'PENDING' && (
+                <>
+                  <button
+                    onClick={() => { handleApprove(detailProduct.id); setDetailProduct(null); }}
+                    className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                  >
+                    승인
+                  </button>
+                  <button
+                    onClick={() => { setRejectModal({ id: detailProduct.id, name: detailProduct.marketingName }); setDetailProduct(null); }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  >
+                    반려
+                  </button>
+                </>
+              )}
+              <button onClick={() => setDetailProduct(null)} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">
+                닫기
               </button>
             </div>
           </div>

@@ -90,6 +90,24 @@ export class SupplierProductOffer {
   @Column({ name: 'consumer_reference_price', type: 'int', nullable: true })
   consumerReferencePrice: number | null;
 
+  // ==================== Description (WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1) ====================
+
+  /** B2C 간이 설명 (Tiptap HTML) */
+  @Column({ name: 'consumer_short_description', type: 'text', nullable: true })
+  consumerShortDescription: string | null;
+
+  /** B2C 상세 설명 (Tiptap HTML) */
+  @Column({ name: 'consumer_detail_description', type: 'text', nullable: true })
+  consumerDetailDescription: string | null;
+
+  /** B2B 간이 설명 (Tiptap HTML) */
+  @Column({ name: 'business_short_description', type: 'text', nullable: true })
+  businessShortDescription: string | null;
+
+  /** B2B 상세 설명 (Tiptap HTML) */
+  @Column({ name: 'business_detail_description', type: 'text', nullable: true })
+  businessDetailDescription: string | null;
+
   // ==================== Inventory (WO-O4O-INVENTORY-ENGINE-V1) ====================
 
   /** 총 재고 수량 */

@@ -499,6 +499,11 @@ export const supplierApi = {
     priceGold?: number | null;
     pricePlatinum?: number | null;
     consumerReferencePrice?: number | null;
+    // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+    consumerShortDescription?: string | null;
+    consumerDetailDescription?: string | null;
+    businessShortDescription?: string | null;
+    businessDetailDescription?: string | null;
   }): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
@@ -524,6 +529,11 @@ export const supplierApi = {
       priceGold?: number | null;
       pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
+      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+      consumerShortDescription?: string | null;
+      consumerDetailDescription?: string | null;
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {

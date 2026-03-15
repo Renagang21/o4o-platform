@@ -280,6 +280,10 @@ export interface AdminProduct {
   approvalStatus: string;
   isActive: boolean;
   createdAt: string;
+  consumerShortDescription?: string | null;
+  consumerDetailDescription?: string | null;
+  businessShortDescription?: string | null;
+  businessDetailDescription?: string | null;
 }
 
 export const adminProductApi = {

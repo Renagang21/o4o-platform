@@ -698,6 +698,10 @@ export class NetureService {
         priceGold: o.priceGold,
         pricePlatinum: o.pricePlatinum,
         consumerReferencePrice: o.consumerReferencePrice,
+        consumerShortDescription: o.consumerShortDescription,
+        consumerDetailDescription: o.consumerDetailDescription,
+        businessShortDescription: o.businessShortDescription,
+        businessDetailDescription: o.businessDetailDescription,
         createdAt: o.createdAt,
       }));
     } catch (error) {
@@ -1364,6 +1368,11 @@ export class NetureService {
         priceGold: o.priceGold,
         pricePlatinum: o.pricePlatinum,
         consumerReferencePrice: o.consumerReferencePrice,
+        // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+        consumerShortDescription: o.consumerShortDescription,
+        consumerDetailDescription: o.consumerDetailDescription,
+        businessShortDescription: o.businessShortDescription,
+        businessDetailDescription: o.businessDetailDescription,
         pendingRequestCount: pendingMap.get(o.id) || 0,
         activeServiceCount: serviceMap.get(o.id) || 0,
         createdAt: o.createdAt,
@@ -1408,6 +1417,11 @@ export class NetureService {
       priceGold?: number | null;
       pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
+      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+      consumerShortDescription?: string | null;
+      consumerDetailDescription?: string | null;
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
     }
   ) {
     try {
@@ -1466,6 +1480,11 @@ export class NetureService {
         priceGold: data.priceGold ?? null,
         pricePlatinum: data.pricePlatinum ?? null,
         consumerReferencePrice: data.consumerReferencePrice ?? null,
+        // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+        consumerShortDescription: data.consumerShortDescription ?? null,
+        consumerDetailDescription: data.consumerDetailDescription ?? null,
+        businessShortDescription: data.businessShortDescription ?? null,
+        businessDetailDescription: data.businessDetailDescription ?? null,
       });
 
       const savedOffer = await this.offerRepo.save(offer);
@@ -1510,6 +1529,11 @@ export class NetureService {
       priceGold?: number | null;
       pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
+      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+      consumerShortDescription?: string | null;
+      consumerDetailDescription?: string | null;
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
     }
   ) {
     try {
@@ -1544,6 +1568,20 @@ export class NetureService {
       }
       if (updates.consumerReferencePrice !== undefined) {
         offer.consumerReferencePrice = updates.consumerReferencePrice;
+      }
+
+      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+      if (updates.consumerShortDescription !== undefined) {
+        offer.consumerShortDescription = updates.consumerShortDescription;
+      }
+      if (updates.consumerDetailDescription !== undefined) {
+        offer.consumerDetailDescription = updates.consumerDetailDescription;
+      }
+      if (updates.businessShortDescription !== undefined) {
+        offer.businessShortDescription = updates.businessShortDescription;
+      }
+      if (updates.businessDetailDescription !== undefined) {
+        offer.businessDetailDescription = updates.businessDetailDescription;
       }
 
       // Validation: PRIVATE requires at least one seller ID
