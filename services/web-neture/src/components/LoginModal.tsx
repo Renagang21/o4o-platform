@@ -69,7 +69,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     };
   }, [isOpen, onClose]);
 
-  // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles 기반 대시보드 결정
+  // WO-O4O-NETURE-LOGIN-RETURNURL-FIX-V1: workspace returnUrl 충돌 수정
   const handleLoginSuccess = (role?: string, roles?: string[]) => {
     if (rememberEmail) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
@@ -77,14 +77,18 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
       localStorage.removeItem(REMEMBER_EMAIL_KEY);
     }
     onClose();
-    if (returnUrl) {
-      navigate(returnUrl);
-    } else {
-      const dashboardPath = (roles && roles.length > 0)
+
+    const dashboardPath =
+      (roles && roles.length > 0)
         ? getPrimaryDashboardRoute(roles, ROUTE_OVERRIDES)
         : role
           ? getPrimaryDashboardRoute([role], ROUTE_OVERRIDES)
           : '/';
+
+    // workspace 경로는 returnUrl보다 역할 우선
+    if (returnUrl && !returnUrl.startsWith('/workspace/')) {
+      navigate(returnUrl);
+    } else {
       navigate(dashboardPath);
     }
   };
