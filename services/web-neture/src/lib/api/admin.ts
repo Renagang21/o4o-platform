@@ -867,19 +867,17 @@ export interface RegistrationRecord {
 
 export const operatorRegistrationApi = {
   async getRegistrations(filters?: { status?: string }): Promise<RegistrationRecord[]> {
-    try {
-      const qs = filters?.status ? `?status=${filters.status}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/operator/registrations${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
-    } catch (error) {
-      console.warn('[Operator API] Failed to fetch registrations:', error);
-      return [];
+    const qs = filters?.status ? `?status=${filters.status}` : '';
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/api/v1/neture/operator/registrations${qs}`,
+      { credentials: 'include' },
+    );
+    if (!response.ok) {
+      console.error(`[Operator API] Registration fetch failed: HTTP ${response.status}`);
+      throw new Error(`HTTP_${response.status}`);
     }
+    const result = await response.json();
+    return result.data || [];
   },
 
   async approve(userId: string): Promise<{ success: boolean }> {

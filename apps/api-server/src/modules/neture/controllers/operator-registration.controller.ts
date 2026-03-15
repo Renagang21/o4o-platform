@@ -1,14 +1,19 @@
 /**
  * OperatorRegistrationController
  * WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
+ * WO-O4O-NETURE-REGISTRATION-AUTH-GUARD-FIX-V1
  *
  * 가입 신청 조회/승인/거부 API
  * Mounted at: /operator (→ /api/v1/neture/operator/registrations/*)
+ *
+ * Auth: requireAuth + requireAdmin (legacy role guard)
+ * - admin, operator, super_admin + service-prefixed roles (neture:admin, neture:operator)
+ * - User.hasRole() 이 `:admin`/`:operator` suffix 매칭을 처리
  */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
-import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { requireAdmin } from '../../../middleware/permission.middleware.js';
 import { OperatorRegistrationService } from '../services/operator-registration.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -27,7 +32,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.get(
     '/registrations',
     requireAuth,
-    requireNetureScope('neture:operator'),
+    requireAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { status } = req.query;
@@ -53,7 +58,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.post(
     '/registrations/:userId/approve',
     requireAuth,
-    requireNetureScope('neture:operator'),
+    requireAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -91,7 +96,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.post(
     '/registrations/:userId/reject',
     requireAuth,
-    requireNetureScope('neture:operator'),
+    requireAdmin,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -131,7 +136,7 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
   router.get(
     '/registrations/copilot',
     requireAuth,
-    requireNetureScope('neture:operator'),
+    requireAdmin,
     async (_req: AuthenticatedRequest, res: Response) => {
       try {
         const data = await registrationService.getRegistrationCopilot();

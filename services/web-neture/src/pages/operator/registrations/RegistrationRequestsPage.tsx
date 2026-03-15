@@ -78,10 +78,12 @@ export default function RegistrationRequestsPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
+      setFetchError(null);
       const data = await operatorRegistrationApi.getRegistrations();
       const mapped: RegistrationRequest[] = (data || []).map((r) => ({
         id: r.id,
@@ -102,6 +104,12 @@ export default function RegistrationRequestsPage() {
       setRequests(mapped);
     } catch (error) {
       console.error('Failed to fetch registration requests:', error);
+      const errMsg = error instanceof Error ? error.message : 'UNKNOWN';
+      if (errMsg.includes('403')) {
+        setFetchError('가입 신청 데이터에 접근할 권한이 없습니다. 관리자에게 문의하세요.');
+      } else {
+        setFetchError('가입 신청 데이터를 불러오지 못했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -275,6 +283,23 @@ export default function RegistrationRequestsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Fetch Error Alert */}
+        {fetchError && (
+          <div className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-red-50 text-red-700 border border-red-200">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="font-medium">에러 발생</p>
+              <p className="text-sm">{fetchError}</p>
+            </div>
+            <button
+              onClick={() => fetchRequests()}
+              className="px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded-md transition-colors"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
+
         {/* Message Alert */}
         {message && (
           <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
