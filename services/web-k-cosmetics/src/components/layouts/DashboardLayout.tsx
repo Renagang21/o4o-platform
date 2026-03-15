@@ -183,11 +183,20 @@ const roleConfig: Record<string, RoleConfig> = {
     title: '관리자',
     icon: icons.Shield,
     color: 'red',
-    menuItems: [
-      { path: '/admin', label: '대시보드', icon: icons.LayoutDashboard },
-      { path: '/admin/stores', label: '매장 네트워크', icon: icons.Store },
-      { path: '/admin/users', label: '회원 관리', icon: icons.Users },
-      { path: '/admin/settings', label: '설정', icon: icons.Settings },
+    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹 */
+    menuGroups: [
+      { label: 'Overview', icon: icons.LayoutDashboard, items: [
+        { label: '대시보드', path: '/admin', exact: true },
+      ]},
+      { label: 'Users', icon: icons.Users, items: [
+        { label: '회원 관리', path: '/admin/users' },
+      ]},
+      { label: 'Approvals', icon: icons.Store, items: [
+        { label: '매장 네트워크', path: '/admin/stores' },
+      ]},
+      { label: 'System', icon: icons.Settings, items: [
+        { label: '설정', path: '/admin/settings' },
+      ]},
     ],
   },
   partner: {

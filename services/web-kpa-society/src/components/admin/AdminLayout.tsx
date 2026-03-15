@@ -1,31 +1,20 @@
 /**
  * AdminLayout - 지부 관리자 레이아웃
+ *
+ * WO-O4O-ADMIN-DASHBOARD-REFINE-V1:
+ * - inline style → Tailwind 전환
  */
 
 import { Outlet } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
-import { colors } from '../../styles/theme';
 
 export function AdminLayout() {
   return (
-    <div style={styles.container}>
+    <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
-      <main style={styles.main}>
+      <main className="flex-1 ml-[260px] min-h-screen">
         <Outlet />
       </main>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: colors.neutral100,
-  },
-  main: {
-    flex: 1,
-    marginLeft: '260px',
-    minHeight: '100vh',
-  },
-};

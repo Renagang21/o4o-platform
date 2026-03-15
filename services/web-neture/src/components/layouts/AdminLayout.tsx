@@ -17,7 +17,6 @@ import {
   Users,
   Truck,
   Package,
-  Handshake,
   ShoppingCart,
   Brain,
   Settings,
@@ -35,14 +34,19 @@ import AccountMenu from '../AccountMenu';
 type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
+/**
+ * WO-O4O-ADMIN-DASHBOARD-REFINE-V1:
+ * 표준 Admin Capability 그룹 (순서 고정):
+ * Overview → Users → Approvals → Products → Finance → Content → Analytics → System
+ */
 const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
-    label: 'Dashboard',
+    label: 'Overview',
     icon: Home,
     items: [{ label: '대시보드', path: '/workspace/admin', exact: true }],
   },
   {
-    label: '사용자 관리',
+    label: 'Users',
     icon: Users,
     items: [
       { label: '운영자', path: '/workspace/admin/operators' },
@@ -50,7 +54,7 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    label: '공급자 관리',
+    label: 'Approvals',
     icon: Truck,
     items: [
       { label: '공급자 승인', path: '/workspace/admin/service-approvals' },
@@ -58,7 +62,7 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    label: '상품 관리',
+    label: 'Products',
     icon: Package,
     items: [
       { label: '상품 승인', path: '/workspace/admin/products' },
@@ -67,30 +71,24 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    label: '파트너 관리',
-    icon: Handshake,
+    label: 'Finance',
+    icon: ShoppingCart,
     items: [
       { label: '파트너 목록', path: '/workspace/admin/partners' },
       { label: '파트너 정산', path: '/workspace/admin/partner-settlements' },
-    ],
-  },
-  {
-    label: '주문·정산',
-    icon: ShoppingCart,
-    items: [
       { label: '정산 관리', path: '/workspace/admin/settlements' },
       { label: '수수료 관리', path: '/workspace/admin/commissions' },
     ],
   },
   {
-    label: '커뮤니티',
+    label: 'Content',
     icon: Megaphone,
     items: [
       { label: '광고·스폰서', path: '/workspace/admin/community' },
     ],
   },
   {
-    label: 'AI 관리',
+    label: 'Analytics',
     icon: Brain,
     items: [
       { label: 'AI 대시보드', path: '/workspace/admin/ai' },
@@ -99,7 +97,7 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     ],
   },
   {
-    label: '시스템 설정',
+    label: 'System',
     icon: Settings,
     items: [
       { label: '이메일 설정', path: '/workspace/admin/settings/email' },

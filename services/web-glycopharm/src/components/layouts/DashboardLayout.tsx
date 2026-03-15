@@ -52,11 +52,20 @@ const roleConfig: Record<string, RoleConfig> = {
     title: '관리자',
     icon: Shield,
     color: 'red',
-    menuItems: [
-      { path: '/admin', label: '대시보드', icon: LayoutDashboard },
-      { path: '/admin/pharmacies', label: '약국 네트워크', icon: Store },
-      { path: '/admin/users', label: '회원 관리', icon: Users },
-      { path: '/admin/settings', label: '설정', icon: Settings },
+    /* WO-O4O-ADMIN-DASHBOARD-REFINE-V1: 표준 Admin Capability 그룹 */
+    menuGroups: [
+      { label: 'Overview', icon: LayoutDashboard, items: [
+        { label: '대시보드', path: '/admin', exact: true },
+      ]},
+      { label: 'Users', icon: Users, items: [
+        { label: '회원 관리', path: '/admin/users' },
+      ]},
+      { label: 'Approvals', icon: Store, items: [
+        { label: '약국 네트워크', path: '/admin/pharmacies' },
+      ]},
+      { label: 'System', icon: Settings, items: [
+        { label: '설정', path: '/admin/settings' },
+      ]},
     ],
   },
   pharmacy: {
