@@ -529,8 +529,8 @@ function App() {
           <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubContentLibraryPage /></PharmacyGuard></Layout>} />
           <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubB2BCatalogPage /></PharmacyGuard></Layout>} />
           <Route path="/hub/signage" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubSignageLibraryPage /></PharmacyGuard></Layout>} />
-          {/* Operator Routes — 5-Block 대시보드 + 서브페이지 */}
-          <Route path="/operator/*" element={<Layout serviceName={SERVICE_NAME}><OperatorRoutes /></Layout>} />
+          {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
+          <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
           <Route path="/branch/*" element={<Navigate to="/branch-services" replace />} />
 

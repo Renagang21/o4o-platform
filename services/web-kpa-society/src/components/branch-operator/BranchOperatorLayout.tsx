@@ -14,13 +14,15 @@ export function BranchOperatorLayout() {
   const location = useLocation();
   const basePath = `/branch-services/${branchId}/operator`;
 
+  // WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: 표준 Capability 순서
+  // Dashboard → Content(공지,자료) → Signage(콘텐츠허브) → Forum(게시판,포럼관리) → System(운영자관리)
   const navItems = [
     { label: '대시보드', path: basePath },
     { label: '공지사항', path: `${basePath}/news` },
-    { label: '게시판', path: `${basePath}/forum` },
     { label: '자료실', path: `${basePath}/docs` },
-    { label: '포럼 관리', path: `${basePath}/forum-management` },
     { label: '콘텐츠 허브', path: `${basePath}/signage/content` },
+    { label: '게시판', path: `${basePath}/forum` },
+    { label: '포럼 관리', path: `${basePath}/forum-management` },
     { label: '운영자 관리', path: `${basePath}/operators` },
   ];
 

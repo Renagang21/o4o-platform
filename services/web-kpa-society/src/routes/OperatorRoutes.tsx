@@ -15,8 +15,7 @@
  * - 인라인 Guard → RoleGuard 통일
  */
 
-import { Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
-import { ChevronLeft } from 'lucide-react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
@@ -34,34 +33,18 @@ import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
-
-/** 모든 서브 페이지에 "운영자 대시보드" 돌아가기 링크 표시 */
-function OperatorSubPageLayout() {
-  return (
-    <>
-      <div className="max-w-7xl mx-auto px-6 pt-5 pb-0">
-        <Link
-          to="/operator"
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-blue-600 no-underline transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          운영자 대시보드
-        </Link>
-      </div>
-      <Outlet />
-    </>
-  );
-}
+// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Sidebar Console layout
+import KpaOperatorLayout from '../components/kpa-operator/KpaOperatorLayout';
 
 export function OperatorRoutes() {
   return (
     <RoleGuard allowedRoles={[...PLATFORM_ROLES]}>
       <Routes>
-        {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
-        <Route index element={<KpaOperatorDashboard />} />
+        {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout sidebar wraps all routes */}
+        <Route element={<KpaOperatorLayout />}>
+          {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
+          <Route index element={<KpaOperatorDashboard />} />
 
-        {/* 서브 페이지: 돌아가기 링크 포함 Layout */}
-        <Route element={<OperatorSubPageLayout />}>
           {/* AI 리포트 */}
           <Route path="ai-report" element={<OperatorAiReportPage />} />
 

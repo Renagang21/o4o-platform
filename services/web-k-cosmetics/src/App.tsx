@@ -89,13 +89,15 @@ const OperatorApplicationsPage = lazy(() => import('@/pages/operator/Application
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
 const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
-const OperatorInventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
-const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
-const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
-const OperatorMarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
+// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated (mock) — removed from sidebar & routes
+// const OperatorInventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
+// const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
+// const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
+// const OperatorMarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
-const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
+// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated (mock) — removed from sidebar & routes
+// const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
@@ -284,10 +286,7 @@ function AppRoutes() {
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OperatorOrdersPage />} />
-        <Route path="inventory" element={<OperatorInventoryPage />} />
-        <Route path="settlements" element={<OperatorSettlementsPage />} />
-        <Route path="analytics" element={<OperatorAnalyticsPage />} />
-        <Route path="marketing" element={<OperatorMarketingPage />} />
+        {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated routes removed (inventory, settlements, analytics, marketing) */}
         <Route path="signage/content" element={<SignageContentHubPage />} />
               <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
               <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
@@ -298,7 +297,7 @@ function AppRoutes() {
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
-        <Route path="support" element={<OperatorSupportPage />} />
+        {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: support route removed (mock) */}
         {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="users/:id" element={<OperatorUserDetailPage />} />

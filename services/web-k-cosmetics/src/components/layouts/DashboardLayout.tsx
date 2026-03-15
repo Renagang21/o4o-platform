@@ -3,7 +3,7 @@
  * GlycoPharm 스타일 적용
  */
 
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth, type UserRole } from '@/contexts/AuthContext';
 
@@ -138,6 +138,11 @@ const icons = {
       <rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" />
     </svg>
   ),
+  ChevronRight: ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  ),
 };
 
 type IconType = (props: { className?: string }) => React.JSX.Element;
@@ -148,11 +153,24 @@ interface MenuItem {
   icon: IconType;
 }
 
+interface SidebarItem {
+  label: string;
+  path: string;
+  exact?: boolean;
+}
+
+interface SidebarGroup {
+  label: string;
+  icon: IconType;
+  items: SidebarItem[];
+}
+
 interface RoleConfig {
   title: string;
   icon: IconType;
   color: string;
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
+  menuGroups?: SidebarGroup[];
 }
 
 /**
@@ -190,23 +208,43 @@ const roleConfig: Record<string, RoleConfig> = {
     title: '운영자 관리',
     icon: icons.Shield,
     color: 'pink',
-    menuItems: [
-      { path: '/operator', label: '대시보드', icon: icons.LayoutDashboard },
-      { path: '/operator/store-cockpit', label: '내 매장', icon: icons.Home },
-      { path: '/operator/applications', label: '신청 관리', icon: icons.FileCheck },
-      { path: '/operator/products', label: '상품 관리', icon: icons.Package },
-      { path: '/operator/orders', label: '주문 관리', icon: icons.ShoppingCart },
-      { path: '/operator/inventory', label: '재고/공급', icon: icons.Boxes },
-      { path: '/operator/settlements', label: '정산 관리', icon: icons.CreditCard },
-      { path: '/operator/analytics', label: '분석/리포트', icon: icons.BarChart3 },
-      { path: '/operator/marketing', label: '마케팅', icon: icons.Megaphone },
-      { path: '/operator/signage/content', label: '사이니지 콘텐츠', icon: icons.Monitor },
-      { path: '/operator/signage/hq-media', label: 'HQ 미디어', icon: icons.Monitor },
-      { path: '/operator/signage/hq-playlists', label: 'HQ 플레이리스트', icon: icons.Monitor },
-      { path: '/operator/signage/templates', label: '템플릿', icon: icons.FileText },
-      { path: '/operator/support', label: '고객지원', icon: icons.HelpCircle },
-      { path: '/operator/ai-report', label: 'AI 리포트', icon: icons.BarChart3 },
-      { path: '/operator/users', label: '회원 관리', icon: icons.Users },
+    /**
+     * WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1:
+     * 표준 Capability 그룹 기반 sidebar.
+     * Deprecated 제거: inventory, settlements, analytics, marketing, support (all mock).
+     */
+    menuGroups: [
+      { label: 'Dashboard', icon: icons.LayoutDashboard, items: [
+        { label: '대시보드', path: '/operator', exact: true },
+      ]},
+      { label: 'Users', icon: icons.Users, items: [
+        { label: '회원 관리', path: '/operator/users' },
+      ]},
+      { label: 'Approvals', icon: icons.FileCheck, items: [
+        { label: '신청 관리', path: '/operator/applications' },
+      ]},
+      { label: 'Products', icon: icons.Package, items: [
+        { label: '상품 관리', path: '/operator/products' },
+      ]},
+      { label: 'Stores', icon: icons.Store, items: [
+        { label: '내 매장', path: '/operator/store-cockpit' },
+        { label: '매장 관리', path: '/operator/stores' },
+      ]},
+      { label: 'Orders', icon: icons.ShoppingCart, items: [
+        { label: '주문 관리', path: '/operator/orders' },
+      ]},
+      { label: 'Signage', icon: icons.Monitor, items: [
+        { label: '사이니지 콘텐츠', path: '/operator/signage/content' },
+        { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
+        { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
+        { label: '템플릿', path: '/operator/signage/templates' },
+      ]},
+      { label: 'Forum', icon: icons.MessageSquare, items: [
+        { label: '커뮤니티 관리', path: '/operator/community' },
+      ]},
+      { label: 'Analytics', icon: icons.BarChart3, items: [
+        { label: 'AI 리포트', path: '/operator/ai-report' },
+      ]},
     ],
   },
 };
@@ -214,6 +252,7 @@ const roleConfig: Record<string, RoleConfig> = {
 export default function DashboardLayout({ role }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
@@ -222,6 +261,31 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
     return <div>Invalid role configuration</div>;
   }
   const RoleIcon = config.icon;
+
+  // ── Collapsible group state (for menuGroups mode) ──
+  const isItemActive = (path: string, exact?: boolean) =>
+    exact ? pathname === path : pathname.startsWith(path);
+
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    const initial = new Set<string>();
+    if (config.menuGroups) {
+      for (const g of config.menuGroups) {
+        if (g.items.some((it) => isItemActive(it.path, it.exact))) {
+          initial.add(g.label);
+        }
+      }
+    }
+    return initial;
+  });
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  };
 
   const handleLogout = () => {
     logout();
@@ -325,25 +389,93 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {config.menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === `/${role}`}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                      ? `${colors.light} ${colors.text}`
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </NavLink>
-              );
-            })}
+            {config.menuGroups ? (
+              // ── Collapsible group rendering (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1) ──
+              config.menuGroups.map((group) => {
+                const GroupIcon = group.icon;
+                // Single-item group → direct NavLink
+                if (group.items.length === 1) {
+                  const item = group.items[0];
+                  return (
+                    <NavLink
+                      key={group.label}
+                      to={item.path}
+                      end={item.exact}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                          ? `${colors.light} ${colors.text}`
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        }`
+                      }
+                    >
+                      <GroupIcon className="w-5 h-5" />
+                      {item.label}
+                    </NavLink>
+                  );
+                }
+                // Multi-item group → collapsible
+                const isOpen = openGroups.has(group.label);
+                const hasActive = group.items.some((it) => isItemActive(it.path, it.exact));
+                return (
+                  <div key={group.label}>
+                    <button
+                      onClick={() => toggleGroup(group.label)}
+                      className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        hasActive ? `${colors.light} ${colors.text}` : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <GroupIcon className="w-5 h-5" />
+                        {group.label}
+                      </span>
+                      <icons.ChevronRight
+                        className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-90' : ''}`}
+                      />
+                    </button>
+                    {isOpen && (
+                      <div className="ml-8 mt-1 space-y-1">
+                        {group.items.map((item) => (
+                          <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.exact}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 rounded-lg text-sm transition-all ${isActive
+                                ? `${colors.text} font-medium bg-white`
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                              }`
+                            }
+                          >
+                            {item.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              // ── Flat list rendering (admin/partner) ──
+              config.menuItems?.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.path === `/${role}`}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                        ? `${colors.light} ${colors.text}`
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`
+                    }
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                  </NavLink>
+                );
+              })
+            )}
           </nav>
 
           {/* Sidebar Footer */}

@@ -164,9 +164,9 @@ function buildDashboardConfig(
     { id: 'qa-applications', label: '신청 관리', link: '/operator/applications', icon: '📋' },
     { id: 'qa-products', label: '상품 관리', link: '/operator/products', icon: '📦' },
     { id: 'qa-orders', label: '주문 관리', link: '/operator/orders', icon: '🛒' },
-    { id: 'qa-analytics', label: '분석 보기', link: '/operator/analytics', icon: '📊' },
     { id: 'qa-settlements', label: '정산 관리', link: '/operator/settlements', icon: '💰' },
-    { id: 'qa-marketing', label: '마케팅', link: '/operator/marketing', icon: '📢' },
+    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
+    { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '🤖' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog, quickActions };

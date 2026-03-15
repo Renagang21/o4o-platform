@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/types';
@@ -12,6 +12,7 @@ import {
   X,
   LogOut,
   ChevronDown,
+  ChevronRight,
   Building2,
   Truck,
   Shield,
@@ -40,11 +41,16 @@ interface DashboardLayoutProps {
 }
 
 /**
- * WO-GLYCOPHARM-ADMIN-AREA-V1:
- * - admin config 추가 (구조 관리: 약국 네트워크, 회원 관리, 설정)
- * - operator에서 구조 기능 제거 (pharmacies, users, settings → /admin)
+ * WO-GLYCOPHARM-ADMIN-AREA-V1 + WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1:
+ * - admin/pharmacy/supplier: flat menuItems
+ * - operator: grouped menuGroups (11 Capability 표준)
  */
-const roleConfig: Record<string, { title: string; icon: typeof Building2; color: string; menuItems: Array<{ path: string; label: string; icon: typeof LayoutDashboard }> }> = {
+type MenuItem = { path: string; label: string; icon: typeof LayoutDashboard };
+type SidebarItem = { label: string; path: string; exact?: boolean };
+type SidebarGroup = { label: string; icon: typeof LayoutDashboard; items: SidebarItem[] };
+type RoleConfig = { title: string; icon: typeof Building2; color: string; menuItems?: MenuItem[]; menuGroups?: SidebarGroup[] };
+
+const roleConfig: Record<string, RoleConfig> = {
   admin: {
     title: '관리자',
     icon: Shield,
@@ -96,30 +102,49 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
     title: '운영자 관리',
     icon: Shield,
     color: 'red',
-    menuItems: [
-      { path: '/operator', label: '대시보드', icon: LayoutDashboard },
-      { path: '/operator/applications', label: '신청 관리', icon: FileCheck },
-      { path: '/operator/products', label: '상품 관리', icon: Package },
-      { path: '/operator/orders', label: '주문 관리', icon: ShoppingCart },
-      { path: '/operator/inventory', label: '재고/공급', icon: Boxes },
-      { path: '/operator/settlements', label: '정산 관리', icon: CreditCard },
-      { path: '/operator/analytics', label: '분석/리포트', icon: BarChart3 },
-      { path: '/operator/reports', label: '청구 리포트', icon: FileText },
-      { path: '/operator/billing-preview', label: '청구 미리보기', icon: Briefcase },
-      { path: '/operator/invoices', label: '인보이스', icon: CreditCard },
-      { path: '/operator/marketing', label: '마케팅', icon: Megaphone },
-      { path: '/operator/forum-requests', label: '포럼 신청', icon: MessageSquare },
-      { path: '/operator/forum-management', label: '포럼 관리', icon: FileText },
-      { path: '/operator/market-trial', label: 'Trial 관리', icon: Tag },
-      { path: '/operator/signage/content', label: '콘텐츠 허브', icon: Monitor },
-      { path: '/operator/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
-      { path: '/operator/signage/my', label: '내 사이니지', icon: Tv },
-      { path: '/operator/signage/hq-media', label: 'HQ 미디어', icon: Monitor },
-      { path: '/operator/signage/hq-playlists', label: 'HQ 플레이리스트', icon: Monitor },
-      { path: '/operator/signage/templates', label: '템플릿', icon: Monitor },
-      { path: '/operator/support', label: '고객지원', icon: HelpCircle },
-      { path: '/operator/ai-report', label: 'AI 리포트', icon: BarChart3 },
-      { path: '/operator/users', label: '회원 관리', icon: Users },
+    menuGroups: [
+      { label: 'Dashboard', icon: LayoutDashboard, items: [
+        { label: '대시보드', path: '/operator', exact: true },
+      ]},
+      { label: 'Users', icon: Users, items: [
+        { label: '회원 관리', path: '/operator/users' },
+      ]},
+      { label: 'Approvals', icon: FileCheck, items: [
+        { label: '신청 관리', path: '/operator/applications' },
+        { label: '매장 승인', path: '/operator/store-approvals' },
+      ]},
+      { label: 'Products', icon: Package, items: [
+        { label: '상품 관리', path: '/operator/products' },
+      ]},
+      { label: 'Stores', icon: Store, items: [
+        { label: '매장 관리', path: '/operator/stores' },
+        { label: '매장 템플릿', path: '/operator/store-template' },
+      ]},
+      { label: 'Orders', icon: ShoppingCart, items: [
+        { label: '주문 관리', path: '/operator/orders' },
+      ]},
+      { label: 'Finance', icon: CreditCard, items: [
+        { label: '정산 관리', path: '/operator/settlements' },
+        { label: '청구 리포트', path: '/operator/reports' },
+        { label: '청구 미리보기', path: '/operator/billing-preview' },
+        { label: '인보이스', path: '/operator/invoices' },
+      ]},
+      { label: 'Signage', icon: Monitor, items: [
+        { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
+        { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
+        { label: '템플릿', path: '/operator/signage/templates' },
+        { label: '콘텐츠 허브', path: '/operator/signage/content' },
+        { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
+        { label: '내 사이니지', path: '/operator/signage/my' },
+      ]},
+      { label: 'Forum', icon: MessageSquare, items: [
+        { label: '포럼 관리', path: '/operator/forum-management' },
+        { label: '포럼 신청', path: '/operator/forum-requests' },
+        { label: '커뮤니티 관리', path: '/operator/community' },
+      ]},
+      { label: 'Analytics', icon: BarChart3, items: [
+        { label: 'AI 리포트', path: '/operator/ai-report' },
+      ]},
     ],
   },
 };
@@ -127,11 +152,37 @@ const roleConfig: Record<string, { title: string; icon: typeof Building2; color:
 export default function DashboardLayout({ role }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const config = roleConfig[role];
   const RoleIcon = config.icon;
+
+  // Collapsible group state (for menuGroups)
+  const isItemActive = (path: string, exact?: boolean) => {
+    if (exact) return pathname === path;
+    if (path.includes('/signage/hq-media')) return pathname.startsWith('/operator/signage');
+    return pathname === path || pathname.startsWith(path + '/');
+  };
+
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    if (!config.menuGroups) return new Set<string>();
+    return new Set(
+      config.menuGroups
+        .filter(g => g.items.some(i => isItemActive(i.path, i.exact)))
+        .map(g => g.label)
+    );
+  });
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  };
 
   const handleLogout = () => {
     logout();
@@ -263,26 +314,95 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
-            {config.menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === '/admin' || item.path === `/${role}`}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
-                      ? `bg-${config.color}-50 text-${config.color}-700`
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </NavLink>
-              );
-            })}
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {config.menuGroups ? (
+              /* Grouped sidebar (operator) — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1 */
+              config.menuGroups.map((group) => {
+                const GroupIcon = group.icon;
+                const isOpen = openGroups.has(group.label);
+                const hasActive = group.items.some(i => isItemActive(i.path, i.exact));
+
+                // Single-item group: render as direct link
+                if (group.items.length === 1) {
+                  const item = group.items[0];
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      end={item.exact}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
+                          ? `bg-${config.color}-50 text-${config.color}-700`
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                        }`
+                      }
+                    >
+                      <GroupIcon className="w-5 h-5" />
+                      {item.label}
+                    </NavLink>
+                  );
+                }
+
+                // Multi-item group: collapsible
+                return (
+                  <div key={group.label}>
+                    <button
+                      onClick={() => toggleGroup(group.label)}
+                      className={`flex items-center justify-between w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                        hasActive ? `text-${config.color}-700` : 'text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <GroupIcon className="w-5 h-5" />
+                        {group.label}
+                      </span>
+                      {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                    </button>
+                    {isOpen && (
+                      <div className="ml-8 mt-0.5 space-y-0.5">
+                        {group.items.map(item => (
+                          <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.exact}
+                            className={({ isActive }) =>
+                              `block px-4 py-2 rounded-lg text-sm transition-all ${
+                                isActive
+                                  ? `text-${config.color}-700 bg-${config.color}-50 font-medium`
+                                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                              }`
+                            }
+                          >
+                            {item.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              /* Flat sidebar (admin, pharmacy, supplier) */
+              config.menuItems?.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.path === '/admin' || item.path === `/${role}`}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
+                        ? `bg-${config.color}-50 text-${config.color}-700`
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      }`
+                    }
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                  </NavLink>
+                );
+              })
+            )}
           </nav>
 
           {/* Sidebar Footer */}

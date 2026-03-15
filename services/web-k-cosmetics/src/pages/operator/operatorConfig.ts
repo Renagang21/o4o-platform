@@ -122,14 +122,15 @@ export function buildKCosmeticsOperatorConfig(
   activityLog.splice(10);
 
   // Block 5: Quick Actions
+  // WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated items removed (analytics, support)
   const quickActions: QuickActionItem[] = [
     { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
     { id: 'qa-applications', label: '입점 신청', link: '/operator/applications', icon: '📋' },
     { id: 'qa-products', label: '상품 관리', link: '/operator/products', icon: '🛍️' },
     { id: 'qa-orders', label: '주문 관리', link: '/operator/orders', icon: '📦' },
-    { id: 'qa-analytics', label: '매출 분석', link: '/operator/analytics', icon: '📊' },
-    { id: 'qa-signage', label: '사이니지', link: '/operator/signage', icon: '🖥️' },
-    { id: 'qa-support', label: '고객 지원', link: '/operator/support', icon: '💬' },
+    { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
+    { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '🤖' },
+    { id: 'qa-community', label: '커뮤니티', link: '/operator/community', icon: '💬' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog, quickActions };

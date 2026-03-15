@@ -94,7 +94,7 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 
 // Market Trial Extension
 const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
-const OperatorTrialSelectorPage = lazy(() => import('@/pages/operator/market-trial').then(m => ({ default: m.OperatorTrialSelectorPage })));
+// OperatorTrialSelectorPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
 
 // B2B Order & Supply
 const B2BOrderPage = lazy(() => import('@/pages/pharmacy/b2b-order').then(m => ({ default: m.B2BOrderPage })));
@@ -131,14 +131,11 @@ const ProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'
 const OperatorStoresPage = lazy(() => import('@/pages/operator/StoresPage'));
 const OperatorStoreDetailPage = lazy(() => import('@/pages/operator/StoreDetailPage'));
 const OrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
-const InventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
 const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
-const AnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
-const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage')); // Phase 3-B: Billing Report
-const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage')); // Phase 3-C: Billing Preview
-const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage')); // Phase 3-D: Invoice Finalization
-const MarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
-const SupportPage = lazy(() => import('@/pages/operator/SupportPage'));
+const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage'));
+const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage'));
+const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
+// InventoryPage, AnalyticsPage, MarketingPage, SupportPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
 
 // Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1)
 const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').then(m => ({ default: m.GlycoPharmHubPage })));
@@ -483,21 +480,16 @@ function AppRoutes() {
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OrdersPage />} />
-        <Route path="inventory" element={<InventoryPage />} />
         <Route path="settlements" element={<SettlementsPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="billing-preview" element={<BillingPreviewPage />} />
         <Route path="invoices" element={<InvoicesPage />} />
-        <Route path="marketing" element={<MarketingPage />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-management" element={<OperatorForumManagementPage />} />
         <Route path="community" element={<CommunityManagementPage />} />
-        <Route path="market-trial" element={<OperatorTrialSelectorPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />
         <Route path="store-approvals/:id" element={<StoreApprovalDetailPage />} />
         <Route path="store-template" element={<StoreTemplateManagerPage />} />
-        <Route path="support" element={<SupportPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="ai-report" element={<AiReportPage />} />

@@ -1,31 +1,29 @@
 /**
- * OperatorLayout - 플랫폼 운영자 전용 레이아웃
+ * KpaOperatorLayout - KPA-A 서비스 운영자 전용 레이아웃
  *
- * WO-O4O-OPERATOR-LAYOUT-SPLIT-V1
- * WO-O4O-NETURE-OPERATOR-LAYOUT-SIDEBAR-MIGRATION-V1:
- *   Top Navigation → Sidebar Console 구조 전환
- *   AdminLayout 패턴 재사용, Operator 메뉴 6개 그룹
- *
- * 목적:
- * - /workspace/operator 하위 모든 페이지에 사용
- * - Admin Console과 동일한 Sidebar UX 패턴
- * - 16개 Operator 라우트를 6개 논리 그룹으로 정리
+ * WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1:
+ *   Neture OperatorLayout 패턴 기반 Sidebar Console 구조.
+ *   표준 Capability 그룹 적용.
  */
 
 import { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
-  UserCheck,
-  Truck,
+  Users,
+  FileCheck,
+  Store,
+  FileText,
   Monitor,
-  Brain,
+  MessageSquare,
+  BarChart3,
   Settings,
   ChevronRight,
   ChevronDown,
+  LogOut,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import AccountMenu from '../AccountMenu';
+import { useAuth } from '../../contexts/AuthContext';
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -34,84 +32,107 @@ import AccountMenu from '../AccountMenu';
 type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
 
-/**
- * WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1:
- * 표준 Capability 그룹 기반 sidebar.
- * 기존 '콘텐츠 관리' 그룹 → Content + Signage + Forum 분리.
- * 그룹명 표준화: 가입 관리→Approvals, 공급 운영→Products, AI 운영→Analytics, 설정→System.
- */
 const OPERATOR_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Dashboard',
     icon: Home,
-    items: [{ label: '대시보드', path: '/workspace/operator', exact: true }],
+    items: [{ label: '대시보드', path: '/operator', exact: true }],
   },
   {
-    label: 'Approvals',
-    icon: UserCheck,
+    label: 'Users',
+    icon: Users,
     items: [
-      { label: '가입 승인', path: '/workspace/operator/registrations' },
+      { label: '회원 관리', path: '/operator/members' },
+      { label: '조직 가입 요청', path: '/operator/organization-requests' },
+      { label: '약국 서비스 신청', path: '/operator/pharmacy-requests' },
     ],
   },
   {
-    label: 'Products',
-    icon: Truck,
+    label: 'Approvals',
+    icon: FileCheck,
     items: [
-      { label: '공급 현황', path: '/workspace/operator/supply' },
+      { label: '상품 신청 관리', path: '/operator/product-applications' },
+    ],
+  },
+  {
+    label: 'Stores',
+    icon: Store,
+    items: [
+      { label: '매장 관리', path: '/operator/stores' },
+      { label: '채널 관리', path: '/operator/store-channels' },
     ],
   },
   {
     label: 'Content',
-    icon: Monitor,
+    icon: FileText,
     items: [
-      { label: '홈페이지 CMS', path: '/workspace/operator/homepage-cms' },
+      { label: '공지사항', path: '/operator/news' },
+      { label: '자료실', path: '/operator/docs' },
+      { label: '콘텐츠 관리', path: '/operator/content' },
     ],
   },
   {
     label: 'Signage',
     icon: Monitor,
     items: [
-      { label: '사이니지', path: '/workspace/operator/signage/hq-media' },
+      { label: '콘텐츠 허브', path: '/operator/signage/content' },
+      { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
+      { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
+      { label: '템플릿', path: '/operator/signage/templates' },
     ],
   },
   {
     label: 'Forum',
-    icon: Monitor,
+    icon: MessageSquare,
     items: [
-      { label: '포럼 관리', path: '/workspace/operator/forum-management' },
+      { label: '커뮤니티 관리', path: '/operator/community-management' },
+      { label: '포럼 관리', path: '/operator/forum-management' },
+      { label: '포럼 분석', path: '/operator/forum-analytics' },
+      { label: '게시판', path: '/operator/forum' },
     ],
   },
   {
     label: 'Analytics',
-    icon: Brain,
+    icon: BarChart3,
     items: [
-      { label: 'AI 리포트', path: '/workspace/operator/ai-report' },
-      { label: 'AI 카드 리포트', path: '/workspace/operator/ai-card-report' },
-      { label: 'AI 운영', path: '/workspace/operator/ai-operations' },
-      { label: 'Asset Quality', path: '/workspace/operator/ai/asset-quality' },
+      { label: 'AI 리포트', path: '/operator/ai-report' },
     ],
   },
   {
     label: 'System',
     icon: Settings,
     items: [
-      { label: '알림 설정', path: '/workspace/operator/settings/notifications' },
+      { label: '법률 관리', path: '/operator/legal' },
+      { label: '감사 로그', path: '/operator/audit-logs' },
+      { label: '운영자 관리', path: '/operator/operators' },
     ],
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  OperatorLayout                                                     */
+/*  KpaOperatorLayout                                                   */
 /* ------------------------------------------------------------------ */
 
-export default function OperatorLayout() {
+export default function KpaOperatorLayout() {
   const { pathname } = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const isItemActive = (path: string, exact?: boolean) => {
     if (exact) return pathname === path;
-    // 사이니지 하위 경로 전체 활성 처리
-    if (path === '/workspace/operator/signage/hq-media') {
-      return pathname.startsWith('/workspace/operator/signage');
+    if (path === '/operator/signage/hq-media') {
+      return pathname.startsWith('/operator/signage/hq-media');
+    }
+    if (path === '/operator/signage/hq-playlists') {
+      return pathname.startsWith('/operator/signage/hq-playlists');
+    }
+    if (path === '/operator/signage/templates') {
+      return pathname.startsWith('/operator/signage/templates');
     }
     return pathname === path || pathname.startsWith(path + '/');
   };
@@ -119,7 +140,6 @@ export default function OperatorLayout() {
   const isGroupActive = (group: SidebarGroup) =>
     group.items.some((item) => isItemActive(item.path, item.exact));
 
-  // 현재 활성 그룹은 자동 펼침
   const [openGroups, setOpenGroups] = useState<Set<string>>(
     () => new Set(OPERATOR_SIDEBAR_GROUPS.filter((g) => isGroupActive(g)).map((g) => g.label)),
   );
@@ -140,22 +160,33 @@ export default function OperatorLayout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center gap-4">
-              <Link to="/workspace/operator" className="flex items-center gap-2">
-                <span className="text-xl font-bold text-primary-600">Neture</span>
+              <Link to="/operator" className="flex items-center gap-2">
+                <span className="text-xl font-bold text-blue-600">KPA Society</span>
                 <span className="text-xs font-medium text-slate-500 border-l border-slate-300 pl-2">
                   Operator
                 </span>
               </Link>
               <Link
                 to="/"
-                className="flex items-center gap-1 text-xs text-slate-400 hover:text-primary-500 transition-colors"
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-blue-500 transition-colors"
                 title="메인 사이트로 이동"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span>메인</span>
               </Link>
             </div>
-            <AccountMenu />
+            <div className="flex items-center gap-3">
+              {user && (
+                <span className="text-sm text-slate-600">{user.name}</span>
+              )}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1 text-sm text-slate-500 hover:text-red-600 transition-colors"
+              >
+                <LogOut size={16} />
+                로그아웃
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -172,7 +203,6 @@ export default function OperatorLayout() {
                 const isOpen = openGroups.has(group.label);
                 const isSingle = group.items.length === 1;
 
-                // 단일 항목 그룹 → 직접 링크
                 if (isSingle) {
                   const item = group.items[0];
                   return (
@@ -181,7 +211,7 @@ export default function OperatorLayout() {
                       to={item.path}
                       className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
                         isItemActive(item.path, item.exact)
-                          ? 'bg-primary-50 text-primary-600 border-primary-600'
+                          ? 'bg-blue-50 text-blue-600 border-blue-600'
                           : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
@@ -191,14 +221,13 @@ export default function OperatorLayout() {
                   );
                 }
 
-                // 복수 항목 그룹 → collapsible
                 return (
                   <div key={group.label}>
                     <button
                       onClick={() => toggleGroup(group.label)}
                       className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
                         active
-                          ? 'text-primary-600 border-primary-600'
+                          ? 'text-blue-600 border-blue-600'
                           : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
@@ -219,7 +248,7 @@ export default function OperatorLayout() {
                             to={item.path}
                             className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
                               isItemActive(item.path, item.exact)
-                                ? 'text-primary-600 bg-primary-50 font-medium'
+                                ? 'text-blue-600 bg-blue-50 font-medium'
                                 : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                             }`}
                           >
@@ -247,7 +276,7 @@ export default function OperatorLayout() {
                     to={firstPath}
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
                       active
-                        ? 'bg-primary-50 text-primary-600'
+                        ? 'bg-blue-50 text-blue-600'
                         : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
@@ -271,13 +300,9 @@ export default function OperatorLayout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <div className="text-center sm:text-left">
-              <p>&copy; 2026 Neture. 플랫폼 운영</p>
+              <p>&copy; 2026 KPA Society. 플랫폼 운영</p>
               <p className="mt-1 text-xs text-gray-400">
-                <Link to="/o4o" className="hover:text-primary-600">
-                  o4o 플랫폼 소개
-                </Link>
-                {' · '}
-                <Link to="/" className="hover:text-primary-600">
+                <Link to="/" className="hover:text-blue-600">
                   메인으로
                 </Link>
               </p>
