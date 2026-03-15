@@ -64,9 +64,9 @@ export default function LoginPage() {
       } else if (loginType === 'pharmacist') {
         navigate('/care');
       } else if (loginType === 'operator') {
-        navigate('/admin');
+        navigate('/operator');
       } else {
-        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? [], { operator: '/admin' }));
+        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');

@@ -240,7 +240,7 @@ export default function UserDetailPage() {
     setActionLoading('delete');
     try {
       await apiFetch(`/api/v1/admin/users/${id}`, { method: 'DELETE' });
-      navigate('/admin/users');
+      navigate('/operator/users');
     } catch (err: any) {
       alert(`오류: ${err.message}`);
     } finally {
@@ -289,7 +289,7 @@ export default function UserDetailPage() {
   if (error || !user) {
     return (
       <div className="p-6">
-        <button onClick={() => navigate('/admin/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+        <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
           <ArrowLeft className="w-4 h-4" />뒤로가기
         </button>
         <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
@@ -302,7 +302,7 @@ export default function UserDetailPage() {
   return (
     <div className="p-6 max-w-5xl">
       {/* Back Button */}
-      <button onClick={() => navigate('/admin/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+      <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
         <ArrowLeft className="w-4 h-4" />회원 목록
       </button>
 

@@ -1,12 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
-// 테스트 계정 목록 (비밀번호 통일: TestPassword)
-const TEST_PASSWORD = 'TestPassword';
-const TEST_ACCOUNTS = [
-  { label: '약사', email: 'pharmacist@o4o.com', password: TEST_PASSWORD, role: 'pharmacist' },
-];
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -17,13 +12,6 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // 역할에 따른 대시보드 경로
-  const getDashboardPath = (role: string) => {
-    if (role === 'admin') return '/admin';
-    if (role === 'operator') return '/operator';
-    return '/';
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -32,10 +20,7 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
       if (result.success) {
-        // 로그인한 계정의 역할 확인
-        const account = TEST_ACCOUNTS.find(a => a.email === email);
-        const path = account ? getDashboardPath(account.role) : '/';
-        navigate(path);
+        navigate(getPrimaryDashboardRoute(result.roles ?? []));
       } else {
         setError(result.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
       }
@@ -44,13 +29,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // 테스트 계정 정보를 입력 필드에 채우기
-  const fillTestAccount = (account: { email: string; password: string }) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setError('');
   };
 
   return (
@@ -147,27 +125,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* 테스트 계정 */}
+          {/* Sign up link */}
           <div className="mt-4 pt-4 border-t border-slate-100">
-            <p className="text-xs text-slate-400 mb-3">테스트 계정 (클릭 시 입력됨)</p>
-            <div className="space-y-2">
-              {TEST_ACCOUNTS.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => fillTestAccount(account)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 text-left bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-700">
-                      {account.label}
-                    </span>
-                    <span className="text-sm text-slate-600">{account.email}</span>
-                  </div>
-                  <span className="text-xs text-slate-400">클릭하여 입력</span>
-                </button>
-              ))}
-            </div>
+            <p className="text-center text-sm text-slate-500">
+              계정이 없으신가요?{' '}
+              <a href="/register" className="text-blue-600 font-medium hover:text-blue-700">
+                회원가입
+              </a>
+            </p>
           </div>
         </div>
 

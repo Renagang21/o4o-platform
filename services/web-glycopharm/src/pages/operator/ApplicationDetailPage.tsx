@@ -97,7 +97,7 @@ export default function ApplicationDetailPage() {
 
     try {
       await glycopharmApi.reviewApplication(id!, { status: 'approved' });
-      navigate('/admin/applications', { replace: true });
+      navigate('/operator/applications', { replace: true });
     } catch (err: any) {
       setReviewError(err.message || '승인 처리에 실패했습니다.');
     } finally {
@@ -119,7 +119,7 @@ export default function ApplicationDetailPage() {
         status: 'rejected',
         rejectionReason: rejectionReason.trim(),
       });
-      navigate('/admin/applications', { replace: true });
+      navigate('/operator/applications', { replace: true });
     } catch (err: any) {
       setReviewError(err.message || '반려 처리에 실패했습니다.');
     } finally {

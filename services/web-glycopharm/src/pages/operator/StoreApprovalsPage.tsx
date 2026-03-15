@@ -352,7 +352,7 @@ export default function StoreApprovalsPage() {
                     </td>
                     <td className="px-4 py-4">
                       <Link
-                        to={`/admin/store-approvals/${app.id}`}
+                        to={`/operator/store-approvals/${app.id}`}
                         className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-sm font-medium"
                       >
                         상세

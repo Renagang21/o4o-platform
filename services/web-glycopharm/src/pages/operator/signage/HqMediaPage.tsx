@@ -221,7 +221,7 @@ export default function HqMediaPage() {
               ) : media.map(m => {
                 const sc = statusConfig[m.status] || { text: m.status, cls: 'bg-slate-100 text-slate-600' };
                 return (
-                  <tr key={m.id} onClick={() => navigate(`/admin/signage/hq-media/${m.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
+                  <tr key={m.id} onClick={() => navigate(`/operator/signage/hq-media/${m.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
                     <td className="px-4 py-3">
                       <p className="font-medium text-slate-800 text-sm">{m.name}</p>
                     </td>

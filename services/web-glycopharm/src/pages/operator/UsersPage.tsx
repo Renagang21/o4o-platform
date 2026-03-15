@@ -393,7 +393,7 @@ export default function UsersPage() {
                 <tr
                   key={user.id}
                   className="hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate(`/admin/users/${user.id}`)}
+                  onClick={() => navigate(`/operator/users/${user.id}`)}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">

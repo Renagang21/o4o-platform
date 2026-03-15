@@ -192,7 +192,7 @@ export default function HqPlaylistsPage() {
               ) : playlists.map(p => {
                 const sc = statusConfig[p.status] || { text: p.status, cls: 'bg-slate-100 text-slate-600' };
                 return (
-                  <tr key={p.id} onClick={() => navigate(`/admin/signage/hq-playlists/${p.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
+                  <tr key={p.id} onClick={() => navigate(`/operator/signage/hq-playlists/${p.id}`)} className="hover:bg-slate-50 transition-colors cursor-pointer">
                     <td className="px-4 py-3 font-medium text-slate-800 text-sm">{p.name}</td>
                     <td className="px-4 py-3 text-center">
                       <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium bg-primary-100 text-primary-700">{p.itemCount}</span>

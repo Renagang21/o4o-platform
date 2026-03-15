@@ -45,7 +45,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isPending: boolean;
   isRejected: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; passwordSyncAvailable?: boolean; syncToken?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }>;
   passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; passwordSyncAvailable?: boolean; syncToken?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
@@ -145,13 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // 승인 상태에 따른 메시지
         if (approvalStatus === 'pending') {
-          return { success: true, message: 'pending' };
+          return { success: true, message: 'pending', roles };
         }
         if (approvalStatus === 'rejected') {
-          return { success: true, message: 'rejected' };
+          return { success: true, message: 'rejected', roles };
         }
 
-        return { success: true };
+        return { success: true, roles };
       }
 
       return { success: false, message: '로그인 응답이 올바르지 않습니다.' };

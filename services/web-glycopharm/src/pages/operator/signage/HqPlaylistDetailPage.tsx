@@ -150,7 +150,7 @@ export default function HqPlaylistDetailPage() {
   if (error || !playlist) {
     return (
       <div className="space-y-4">
-        <button onClick={() => navigate('/admin/signage/hq-playlists')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+        <button onClick={() => navigate('/operator/signage/hq-playlists')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
           <ArrowLeft className="w-4 h-4" /> HQ 플레이리스트 목록
         </button>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -164,7 +164,7 @@ export default function HqPlaylistDetailPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <button onClick={() => navigate('/admin/signage/hq-playlists')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
+      <button onClick={() => navigate('/operator/signage/hq-playlists')} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800">
         <ArrowLeft className="w-4 h-4" /> HQ 플레이리스트 목록
       </button>
 

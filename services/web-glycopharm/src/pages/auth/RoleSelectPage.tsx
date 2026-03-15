@@ -47,7 +47,7 @@ export default function RoleSelectPage() {
       admin: '/admin',
       pharmacy: '/',
       supplier: '/supplier',
-      operator: '/admin',
+      operator: '/operator',
       consumer: '/',
     };
 
