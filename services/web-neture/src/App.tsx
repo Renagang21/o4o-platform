@@ -264,6 +264,7 @@ const AdminPartnerSettlementsPage = lazy(() => import('./pages/admin/AdminPartne
 const AdminPartnerMonitoringPage = lazy(() => import('./pages/admin/AdminPartnerMonitoringPage'));
 const AdminPartnerDetailPage = lazy(() => import('./pages/admin/AdminPartnerDetailPage'));
 const AdminContactMessagesPage = lazy(() => import('./pages/admin/AdminContactMessagesPage'));
+const CommunityManagementPage = lazy(() => import('./pages/admin/CommunityManagementPage'));
 
 // Partner HUB (WO-O4O-PARTNER-HUB-DASHBOARD-V1)
 const PartnerHubDashboardPage = lazy(() =>
@@ -640,6 +641,7 @@ function App() {
               <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
               <Route path="/workspace/admin/catalog-import/history" element={<ImportHistoryPage />} />
               <Route path="/workspace/admin/contact-messages" element={<AdminContactMessagesPage />} />
+              <Route path="/workspace/admin/community" element={<CommunityManagementPage />} />
             </Route>
 
             {/* ================================================================

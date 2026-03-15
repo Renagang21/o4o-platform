@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   Brain,
   Settings,
+  Megaphone,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -79,6 +80,13 @@ const ADMIN_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       { label: '정산 관리', path: '/workspace/admin/settlements' },
       { label: '수수료 관리', path: '/workspace/admin/commissions' },
+    ],
+  },
+  {
+    label: '커뮤니티',
+    icon: Megaphone,
+    items: [
+      { label: '광고·스폰서', path: '/workspace/admin/community' },
     ],
   },
   {
