@@ -56,7 +56,10 @@ export class OperatorRegistrationService {
 
   /**
    * 가입 승인
-   * service_memberships.status → 'active' + users.status → 'ACTIVE'
+   * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
+   *   1. service_memberships.status → 'active'
+   *   2. users.status → 'ACTIVE' (pending/rejected 모두 처리)
+   *   3. role_assignment 생성 (idempotent)
    */
   async approveRegistration(userId: string, approvedBy: string) {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -64,12 +67,12 @@ export class OperatorRegistrationService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. service_memberships 승인 (snake_case columns)
+      // 1. service_memberships 승인 (pending 또는 rejected → active)
       const smResult = await queryRunner.query(
         `UPDATE service_memberships
          SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-         WHERE user_id = $2 AND service_key = 'neture' AND status = 'pending'
-         RETURNING id`,
+         WHERE user_id = $2 AND service_key = 'neture' AND status IN ('pending', 'rejected')
+         RETURNING id, role`,
         [approvedBy, userId],
       );
 
@@ -80,9 +83,18 @@ export class OperatorRegistrationService {
       // 2. users 상태 활성화 (camelCase columns)
       await queryRunner.query(
         `UPDATE users
-         SET status = 'ACTIVE', "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status = 'PENDING'`,
+         SET status = 'ACTIVE', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
+         WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
         [approvedBy, userId],
+      );
+
+      // 3. role_assignment 생성 (idempotent — ON CONFLICT 시 is_active 복원)
+      const memberRole = smResult[0]?.role || 'member';
+      await queryRunner.query(
+        `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
+         VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
+         ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()`,
+        [userId, memberRole, approvedBy],
       );
 
       await queryRunner.commitTransaction();

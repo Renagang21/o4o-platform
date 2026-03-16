@@ -1,0 +1,110 @@
+/**
+ * Shared Operator Dashboard Query Helpers
+ *
+ * WO-O4O-OPERATOR-CODE-CLEANUP-AND-REFRACTOR-V1
+ *
+ * Common care/audit queries used by both GlycoPharm and GlucoseView
+ * operator dashboards. Eliminates duplicate SQL across controllers.
+ */
+
+import type { DataSource } from 'typeorm';
+import type { ActivityItem } from '../types/operator-dashboard.types.js';
+
+// === Query Result Types ===
+
+export interface CareAlertRow {
+  alert_type: string;
+  severity: string;
+  message: string;
+  created_at: string;
+}
+
+export interface AuditActionRow {
+  action_key: string;
+  meta: any;
+  created_at: string;
+}
+
+export interface CareMetrics {
+  highRiskPatients: number;
+  openCareAlerts: number;
+  recentCareAlerts: CareAlertRow[];
+  careEnabledPharmacies: number;
+  weeklyCareActivity: number;
+}
+
+// === Shared Queries ===
+
+export async function fetchCareMetrics(dataSource: DataSource): Promise<CareMetrics> {
+  const [highRisk, openAlerts, recentAlerts, careEnabled, weeklyActivity] = await Promise.all([
+    dataSource.query(`
+      SELECT COUNT(DISTINCT patient_id)::int AS cnt
+      FROM care_kpi_snapshots WHERE risk_level = 'high'
+    `) as Promise<Array<{ cnt: number }>>,
+    dataSource.query(`
+      SELECT COUNT(*)::int AS cnt FROM care_alerts WHERE status = 'open'
+    `) as Promise<Array<{ cnt: number }>>,
+    dataSource.query(`
+      SELECT alert_type, severity, message, created_at
+      FROM care_alerts
+      ORDER BY created_at DESC
+      LIMIT 3
+    `) as Promise<CareAlertRow[]>,
+    dataSource.query(`
+      SELECT COUNT(DISTINCT pharmacy_id)::int AS cnt FROM care_kpi_snapshots
+    `) as Promise<Array<{ cnt: number }>>,
+    dataSource.query(`
+      SELECT COUNT(*)::int AS cnt FROM care_coaching_sessions
+      WHERE created_at > NOW() - INTERVAL '7 days'
+    `) as Promise<Array<{ cnt: number }>>,
+  ]);
+
+  return {
+    highRiskPatients: highRisk[0]?.cnt || 0,
+    openCareAlerts: openAlerts[0]?.cnt || 0,
+    recentCareAlerts: recentAlerts,
+    careEnabledPharmacies: careEnabled[0]?.cnt || 0,
+    weeklyCareActivity: weeklyActivity[0]?.cnt || 0,
+  };
+}
+
+export async function fetchRecentAuditActions(
+  dataSource: DataSource,
+  serviceKey: string
+): Promise<AuditActionRow[]> {
+  return dataSource.query(`
+    SELECT action_key, meta, created_at
+    FROM action_logs
+    WHERE service_key = $1 AND source = 'manual'
+    ORDER BY created_at DESC
+    LIMIT 3
+  `, [serviceKey]);
+}
+
+// === Activity Log Helpers ===
+
+export function buildCareActivityItems(alerts: CareAlertRow[]): ActivityItem[] {
+  return alerts.map((alert, i) => ({
+    id: `care-${i}`,
+    message: `[${alert.severity}] ${alert.message}`,
+    timestamp: alert.created_at || new Date().toISOString(),
+  }));
+}
+
+export function buildAuditActivityItems(
+  actions: AuditActionRow[],
+  serviceKey: string
+): ActivityItem[] {
+  return actions.map((action, i) => ({
+    id: `audit-${i}`,
+    message: `[운영] ${action.action_key.replace(`${serviceKey}.`, '')}`,
+    timestamp: action.created_at || new Date().toISOString(),
+  }));
+}
+
+export function mergeActivityLog(...sources: ActivityItem[][]): ActivityItem[] {
+  return sources
+    .flat()
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 5);
+}

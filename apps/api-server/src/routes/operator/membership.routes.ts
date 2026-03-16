@@ -1,6 +1,8 @@
 /**
  * Operator Membership Console Routes — Extension Layer
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
+ *   서비스별 operator/admin role 추가 (neture:operator 등)
  *
  * Core Freeze F10 준수: 기존 admin/users 라우트 미수정
  */
@@ -13,8 +15,17 @@ const router: Router = Router();
 const controller = new MembershipConsoleController();
 
 // All routes require authentication + operator-level role + service scope
+// Platform roles + service-prefixed operator/admin roles
 router.use(authenticate);
-router.use(requireRole(['admin', 'super_admin', 'operator', 'manager']));
+router.use(requireRole([
+  'admin', 'super_admin', 'operator', 'manager',
+  'platform:admin', 'platform:super_admin',
+  'neture:admin', 'neture:operator',
+  'glycopharm:admin', 'glycopharm:operator',
+  'glucoseview:admin', 'glucoseview:operator',
+  'k-cosmetics:admin', 'k-cosmetics:operator',
+  'kpa-society:admin', 'kpa-society:operator',
+]));
 router.use(injectServiceScope);
 
 // Member list with memberships + roles
