@@ -129,9 +129,14 @@ export function createAdminController(
         // Fetch user info for each application
         const userIds = [...new Set(applications.map((app) => app.userId))];
         const users = userIds.length > 0
-          ? await userRepo.findByIds(userIds)
+          ? await dataSource.query(
+              `SELECT u.id, u.name, u.email, u.phone FROM users u
+               JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'glycopharm'
+               WHERE u.id = ANY($1)`,
+              [userIds],
+            )
           : [];
-        const userMap = new Map(users.map((u) => [u.id, u]));
+        const userMap = new Map<string, any>(users.map((u: any) => [u.id, u]));
 
         res.json({
           success: true,

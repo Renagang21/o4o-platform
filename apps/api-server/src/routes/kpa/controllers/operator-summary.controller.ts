@@ -89,6 +89,10 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM signage_playlists
         WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL
       `),
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: DESIGN-ACCEPT
+      // Forum is Community domain (Boundary Policy F6, primary boundary = organizationId).
+      // Public posts (organization_id IS NULL) are shared across services by design.
+      // forum_post/forum_category have no serviceKey column — isolation is via organizationId.
       dataSource.query(`
         SELECT COUNT(*) as count FROM forum_post
         WHERE status = 'publish' AND organization_id IS NULL
@@ -219,7 +223,7 @@ export function createOperatorSummaryController(
       dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_media WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_playlists WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL`),
-      dataSource.query(`SELECT COUNT(*)::int as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`), // DESIGN-ACCEPT: Community domain shared (F6)
       dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_media WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),

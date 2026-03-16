@@ -126,16 +126,22 @@ export function createPharmacyRequestRoutes(
         take: limit,
       });
 
-      // Enrich with user info
-      const enriched = await Promise.all(
-        items.map(async (item) => {
-          const [userData] = await dataSource.query(
-            `SELECT name, email FROM users WHERE id = $1`,
-            [item.user_id]
-          );
-          return { ...item, user: userData || null };
-        })
-      );
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: batch-fetch with service_memberships filter
+      const userIds = items.map((item) => item.user_id).filter(Boolean);
+      const userMap = new Map<string, { name: string; email: string }>();
+      if (userIds.length > 0) {
+        const users: Array<{ id: string; name: string; email: string }> = await dataSource.query(
+          `SELECT u.id, u.name, u.email FROM users u
+           JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'kpa-society'
+           WHERE u.id = ANY($1)`,
+          [userIds],
+        );
+        for (const u of users) userMap.set(u.id, { name: u.name, email: u.email });
+      }
+      const enriched = items.map((item) => ({
+        ...item,
+        user: userMap.get(item.user_id) || null,
+      }));
 
       return res.json({
         success: true,

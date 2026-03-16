@@ -18,7 +18,6 @@ import { KpaBranchOfficer } from '../entities/kpa-branch-officer.entity.js';
 import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
-import { User } from '../../../modules/auth/entities/User.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { requireOrgRole } from '../middleware/kpa-org-role.middleware.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
@@ -449,16 +448,23 @@ export function createBranchAdminDashboardController(
           select: ['id', 'user_id', 'pharmacy_name', 'license_number'],
         });
 
-        // Join user names
-        const userRepo = dataSource.getRepository(User);
-        const data = await Promise.all(members.map(async (m) => {
-          const user = await userRepo.findOne({ where: { id: m.user_id }, select: ['id', 'name'] });
-          return {
-            id: m.id,
-            user_name: user?.name || 'Unknown',
-            pharmacy_name: m.pharmacy_name,
-            license_number: m.license_number,
-          };
+        // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: batch-fetch with service_memberships filter
+        const userIds = members.map((m) => m.user_id).filter(Boolean);
+        const userNameMap = new Map<string, string>();
+        if (userIds.length > 0) {
+          const users: Array<{ id: string; name: string }> = await dataSource.query(
+            `SELECT u.id, u.name FROM users u
+             JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'kpa-society'
+             WHERE u.id = ANY($1)`,
+            [userIds],
+          );
+          for (const u of users) userNameMap.set(u.id, u.name);
+        }
+        const data = members.map((m) => ({
+          id: m.id,
+          user_name: userNameMap.get(m.user_id) || 'Unknown',
+          pharmacy_name: m.pharmacy_name,
+          license_number: m.license_number,
         }));
 
         res.json({ success: true, data });
@@ -524,9 +530,13 @@ export function createBranchAdminDashboardController(
         });
         if (!member) { res.status(404).json({ error: { code: 'MEMBER_NOT_FOUND', message: 'Member not found in this organization' } }); return; }
 
-        // Derive name from user
-        const userRepo = dataSource.getRepository(User);
-        const memberUser = await userRepo.findOne({ where: { id: member.user_id } });
+        // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: derive name with service_memberships filter
+        const [memberUser] = await dataSource.query(
+          `SELECT u.name, u.email FROM users u
+           JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'kpa-society'
+           WHERE u.id = $1`,
+          [member.user_id],
+        ) as Array<{ name: string; email: string }>;
 
         const repo = dataSource.getRepository(KpaBranchOfficer);
         const officer = repo.create({
@@ -578,8 +588,13 @@ export function createBranchAdminDashboardController(
           });
           if (!member) { res.status(404).json({ error: { code: 'MEMBER_NOT_FOUND', message: 'Member not found in this organization' } }); return; }
 
-          const userRepo = dataSource.getRepository(User);
-          const memberUser = await userRepo.findOne({ where: { id: member.user_id } });
+          // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: derive name with service_memberships filter
+          const [memberUser] = await dataSource.query(
+            `SELECT u.name FROM users u
+             JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'kpa-society'
+             WHERE u.id = $1`,
+            [member.user_id],
+          ) as Array<{ name: string }>;
           existing.member_id = member.id;
           existing.name = memberUser?.name || existing.name;
           existing.pharmacy_name = member.pharmacy_name || existing.pharmacy_name;

@@ -447,7 +447,7 @@ export function createNetureController(dataSource: DataSource): Router {
         forumService.listRecentPosts(5),
         dataSource.query(`SELECT COUNT(*) as count FROM signage_media WHERE "serviceKey" = 'neture' AND status = 'active'`),
         dataSource.query(`SELECT COUNT(*) as count FROM signage_playlists WHERE "serviceKey" = 'neture' AND status = 'active'`),
-        dataSource.query(`SELECT COUNT(*) as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`),
+        dataSource.query(`SELECT COUNT(*) as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`), // DESIGN-ACCEPT: Community domain shared (F6)
       ]);
 
       res.json({

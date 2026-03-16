@@ -379,7 +379,9 @@ export class NetureService {
       const userStatusMap = new Map<string, { status: string; email: string }>();
       if (userIds.length > 0) {
         const rows: Array<{ id: string; status: string; email: string }> = await AppDataSource.query(
-          `SELECT id, status, email FROM users WHERE id = ANY($1)`,
+          `SELECT u.id, u.status, u.email FROM users u
+           JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
+           WHERE u.id = ANY($1)`,
           [userIds],
         );
         for (const row of rows) {
@@ -500,7 +502,9 @@ export class NetureService {
       const userStatusMap = new Map<string, { status: string; email: string }>();
       if (userIds.length > 0) {
         const rows: Array<{ id: string; status: string; email: string }> = await AppDataSource.query(
-          `SELECT id, status, email FROM users WHERE id = ANY($1)`,
+          `SELECT u.id, u.status, u.email FROM users u
+           JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
+           WHERE u.id = ANY($1)`,
           [userIds],
         );
         for (const row of rows) {
