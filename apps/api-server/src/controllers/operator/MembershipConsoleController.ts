@@ -392,6 +392,70 @@ export class MembershipConsoleController {
   };
 
   /**
+   * PATCH /api/v1/operator/members/:userId/status
+   * 사용자 상태 변경 (approved, rejected, suspended 등)
+   */
+  updateMemberStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId } = req.params;
+      const { status } = req.body;
+      const updatedBy = (req as any).user?.id || null;
+
+      if (!status) {
+        res.status(400).json({ success: false, error: 'status is required' });
+        return;
+      }
+
+      // Service boundary check
+      if (!scope.isPlatformAdmin) {
+        const accessCheck = await AppDataSource.query(
+          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
+          [userId, scope.serviceKeys]
+        );
+        if (accessCheck.length === 0) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
+
+      // Map frontend status to DB status
+      const dbStatus = status === 'approved' ? 'ACTIVE' : status.toUpperCase();
+      const isActive = status === 'approved' || status === 'active';
+
+      await AppDataSource.query(
+        `UPDATE users SET status = $1, "isActive" = $2,
+         "approvedAt" = CASE WHEN $1 = 'ACTIVE' THEN NOW() ELSE "approvedAt" END,
+         "approvedBy" = CASE WHEN $1 = 'ACTIVE' THEN $3 ELSE "approvedBy" END,
+         "updatedAt" = NOW()
+         WHERE id = $4`,
+        [dbStatus, isActive, updatedBy, userId]
+      );
+
+      // If approving, also activate service memberships
+      if (status === 'approved' || status === 'active') {
+        const serviceFilter = scope.isPlatformAdmin
+          ? ''
+          : `AND service_key = ANY($2)`;
+        const params = scope.isPlatformAdmin
+          ? [userId]
+          : [userId, scope.serviceKeys];
+
+        await AppDataSource.query(
+          `UPDATE service_memberships SET status = 'active', approved_by = '${updatedBy}', approved_at = NOW(), updated_at = NOW()
+           WHERE user_id = $1 AND status = 'pending' ${serviceFilter}`,
+          params
+        );
+      }
+
+      res.json({ success: true, message: `User status updated to ${status}` });
+    } catch (error) {
+      console.error('[MembershipConsole] updateMemberStatus error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update user status' });
+    }
+  };
+
+  /**
    * PUT /api/v1/operator/members/:userId
    * 사용자 정보 수정 (비밀번호 변경 등)
    */
@@ -484,7 +548,6 @@ export class MembershipConsoleController {
         params
       );
 
-      const getCount = (s: string) => rows.find((r: any) => r.status?.toLowerCase() === s)?.count || 0;
       const total = rows.reduce((sum: number, r: any) => sum + (r.count || 0), 0);
 
       res.json({

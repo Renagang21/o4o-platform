@@ -37,8 +37,9 @@ router.get('/stats', controller.getStats);
 // Member detail
 router.get('/:userId', controller.getMemberDetail);
 
-// Member update (password change) / delete
+// Member update (password change) / status change / delete
 router.put('/:userId', controller.updateMember);
+router.patch('/:userId/status', controller.updateMemberStatus);
 router.delete('/:userId', controller.deleteMember);
 
 // Membership approval/rejection

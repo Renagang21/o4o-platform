@@ -137,7 +137,7 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
     setLoading(true);
     setError('');
     try {
-      await apiFetch(`/api/v1/admin/users/${userId}`, {
+      await apiFetch(`/api/v1/operator/members/${userId}`, {
         method: 'PUT',
         body: JSON.stringify({ password }),
       });
@@ -223,7 +223,7 @@ export default function UserDetailPage() {
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
     try {
-      await apiFetch(`/api/v1/admin/users/${id}/status`, {
+      await apiFetch(`/api/v1/operator/members/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       });
@@ -240,7 +240,7 @@ export default function UserDetailPage() {
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading('delete');
     try {
-      await apiFetch(`/api/v1/admin/users/${id}`, { method: 'DELETE' });
+      await apiFetch(`/api/v1/operator/members/${id}`, { method: 'DELETE' });
       navigate('/operator/users');
     } catch (err: any) {
       alert(`오류: ${err.message}`);
