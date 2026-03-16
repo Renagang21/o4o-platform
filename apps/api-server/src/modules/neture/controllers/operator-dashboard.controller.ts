@@ -86,7 +86,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           FROM supplier_product_offers
         `) as Promise<Array<{ total: number; active: number; pending: number }>>,
 
-        // 4. Order statistics (last 30 days)
+        // 4. Order statistics (last 30 days) — .catch: neture_orders migration 미존재 방어
         dataSource.query(`
           SELECT
             COUNT(*)::int AS total_orders,
@@ -94,7 +94,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
             COALESCE(SUM(final_amount) FILTER (WHERE status IN ('paid','preparing','shipped','delivered')), 0)::int AS total_revenue
           FROM neture.neture_orders
           WHERE created_at >= NOW() - INTERVAL '30 days'
-        `) as Promise<Array<{ total_orders: number; paid_orders: number; total_revenue: number }>>,
+        `).catch(() => [{ total_orders: 0, paid_orders: 0, total_revenue: 0 }]) as Promise<Array<{ total_orders: number; paid_orders: number; total_revenue: number }>>,
 
         // 5. Pending registrations (service_memberships)
         dataSource.query(`
@@ -112,19 +112,13 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           WHERE "serviceKey" = 'neture'
         `) as Promise<Array<{ total: number; published: number }>>,
 
-        // 7. Recent activity (multi-source: orders, suppliers, products, partners, contacts)
+        // 7. Recent activity (multi-source: suppliers, products, contacts — orders/partners deferred until migration)
         dataSource.query(`
-          (SELECT 'order' AS source, order_number AS ref, status AS detail, created_at
-           FROM neture.neture_orders ORDER BY created_at DESC LIMIT 2)
-          UNION ALL
           (SELECT 'supplier' AS source, company_name AS ref, status AS detail, created_at
-           FROM neture_suppliers ORDER BY created_at DESC LIMIT 1)
+           FROM neture_suppliers ORDER BY created_at DESC LIMIT 2)
           UNION ALL
           (SELECT 'product' AS source, name AS ref, approval_status AS detail, created_at
            FROM supplier_product_offers ORDER BY created_at DESC LIMIT 1)
-          UNION ALL
-          (SELECT 'partner' AS source, COALESCE(company_name, 'Partner') AS ref, status AS detail, created_at
-           FROM neture.neture_partners ORDER BY created_at DESC LIMIT 1)
           UNION ALL
           (SELECT 'contact' AS source, subject AS ref, status AS detail, created_at
            FROM neture_contact_messages ORDER BY created_at DESC LIMIT 1)
@@ -132,12 +126,12 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           LIMIT 5
         `) as Promise<Array<{ source: string; ref: string; detail: string; created_at: string }>>,
 
-        // 8. Active partners
+        // 8. Active partners — .catch: neture_partners migration 미존재 방어
         dataSource.query(`
           SELECT COUNT(*)::int AS cnt
           FROM neture.neture_partners
           WHERE status = 'active'
-        `) as Promise<Array<{ cnt: number }>>,
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
 
         // 9. Pending settlements
         dataSource.query(`
@@ -272,6 +266,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const status = (req.query.status as string) || null;
       const search = (req.query.search as string) || null;
 
+      // neture_orders migration 미존재 — .catch 방어
       const [orders, statsResult] = await Promise.all([
         dataSource.query(`
           SELECT id, order_number, status, payment_status, final_amount,
@@ -281,7 +276,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
             AND ($2::text IS NULL OR order_number ILIKE '%' || $2 || '%' OR buyer_name ILIKE '%' || $2 || '%')
           ORDER BY created_at DESC
           LIMIT $3 OFFSET $4
-        `, [status, search, limit, offset]),
+        `, [status, search, limit, offset]).catch(() => []),
 
         dataSource.query(`
           SELECT
@@ -293,7 +288,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           FROM neture.neture_orders
           WHERE ($1::text IS NULL OR status = $1)
             AND ($2::text IS NULL OR order_number ILIKE '%' || $2 || '%' OR buyer_name ILIKE '%' || $2 || '%')
-        `, [status, search]),
+        `, [status, search]).catch(() => [{ total: 0, pending: 0, processing: 0, shipped: 0, delivered: 0 }]),
       ]);
 
       const s = statsResult[0] || { total: 0, pending: 0, processing: 0, shipped: 0, delivered: 0 };
