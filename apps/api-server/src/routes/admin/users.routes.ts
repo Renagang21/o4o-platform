@@ -28,11 +28,14 @@ const isValidRole = (value: string) => {
 // All admin user routes require authentication
 router.use(authenticate);
 
-// User management routes (admin only)
-// WO-O4O-USER-DOMAIN-ALIGNMENT-V1: operator/manager 제거 — 서비스 운영자는 /api/v1/operator/members 사용
-router.get('/', requireRole(['admin', 'super_admin']), adminUserController.getUsers);
-router.get('/statistics', requireRole(['admin', 'super_admin']), adminUserController.getUserStatistics);
-router.get('/:id', requireRole(['admin', 'super_admin']), adminUserController.getUser);
+// WO-O4O-ADMIN-GUARD-PLATFORM-PREFIX-FIX-V1: RBAC SSOT platform prefix 반영
+// WO-O4O-USER-DOMAIN-ALIGNMENT-V1: operator/manager 제외 유지 — 서비스 운영자는 /api/v1/operator/members 사용
+const ADMIN_ROLES = ['admin', 'super_admin', 'platform:admin', 'platform:super_admin'];
+
+// User management routes (platform admin only)
+router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);
+router.get('/statistics', requireRole(ADMIN_ROLES), adminUserController.getUserStatistics);
+router.get('/:id', requireRole(ADMIN_ROLES), adminUserController.getUser);
 
 // User creation (admin only)
 router.post('/',
@@ -50,9 +53,9 @@ router.post('/',
   adminUserController.createUser
 );
 
-// User updates (admin only) — WO-O4O-USER-DOMAIN-ALIGNMENT-V1
+// User updates (platform admin only) — WO-O4O-ADMIN-GUARD-PLATFORM-PREFIX-FIX-V1
 router.put('/:id',
-  requireRole(['admin', 'super_admin']),
+  requireRole(ADMIN_ROLES),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -66,9 +69,9 @@ router.put('/:id',
   adminUserController.updateUser
 );
 
-// Update user status (admin only) — WO-O4O-USER-DOMAIN-ALIGNMENT-V1
+// Update user status (platform admin only) — WO-O4O-ADMIN-GUARD-PLATFORM-PREFIX-FIX-V1
 router.patch('/:id/status',
-  requireRole(['admin', 'super_admin']),
+  requireRole(ADMIN_ROLES),
   [
     body('status').isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],
