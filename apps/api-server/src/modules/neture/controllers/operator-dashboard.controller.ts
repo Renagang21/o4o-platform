@@ -114,7 +114,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
 
         // 7. Recent activity (multi-source: suppliers, products, contacts — orders/partners deferred until migration)
         dataSource.query(`
-          (SELECT 'supplier' AS source, company_name AS ref, status AS detail, created_at
+          (SELECT 'supplier' AS source, name AS ref, status AS detail, created_at
            FROM neture_suppliers ORDER BY created_at DESC LIMIT 2)
           UNION ALL
           (SELECT 'product' AS source, name AS ref, approval_status AS detail, created_at
