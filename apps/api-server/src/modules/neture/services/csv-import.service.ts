@@ -2,9 +2,12 @@
  * CSV Import Service
  *
  * B2B 공급자 CSV 대량 유입 파이프라인
- * Master 보호형 — CSV는 Offer 생성 도구, Master는 MFDS 검증 기반만 허용
  *
  * WO-O4O-B2B-CSV-INGEST-PIPELINE-V1
+ * WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1
+ *   - image_url 컬럼 지원 (3.2)
+ *   - manualData 컬럼 지원: regulatory_name, manufacturer_name, brand (3.3)
+ *   - MFDS 실패 + manualData 존재 → Master 수동 생성 (isMfdsVerified=false)
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -16,19 +19,17 @@ import {
   CsvRowValidationStatus,
   CsvRowActionType,
   SupplierProductOffer,
-  OfferDistributionType,
-  OfferApprovalStatus,
   ProductMaster,
   NetureSupplier,
   SupplierStatus,
 } from '../entities/index.js';
 import { validateGtin } from '../../../utils/gtin.js';
 import { verifyProductByBarcode } from './mfds.service.js';
-import { ProductAiContentService } from '../../store-ai/services/product-ai-content.service.js';
+import { ProductImportCommonService } from './product-import-common.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
 
-/** CSV 허용 컬럼 — Master 관련 컬럼은 무시 */
+/** CSV 허용 컬럼 */
 const ALLOWED_CSV_COLUMNS = [
   'barcode',
   'supplier_sku',
@@ -37,6 +38,11 @@ const ALLOWED_CSV_COLUMNS = [
   'stock_qty',
   'distribution_type',
   'description',
+  // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1
+  'image_url',
+  'regulatory_name',
+  'manufacturer_name',
+  'brand',
 ];
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
@@ -47,7 +53,7 @@ export class CsvImportService {
   private masterRepo: Repository<ProductMaster>;
   private offerRepo: Repository<SupplierProductOffer>;
   private supplierRepo: Repository<NetureSupplier>;
-  private aiContentService: ProductAiContentService;
+  private importCommon: ProductImportCommonService;
 
   constructor(private dataSource: DataSource) {
     this.batchRepo = dataSource.getRepository(SupplierCsvImportBatch);
@@ -55,7 +61,7 @@ export class CsvImportService {
     this.masterRepo = dataSource.getRepository(ProductMaster);
     this.offerRepo = dataSource.getRepository(SupplierProductOffer);
     this.supplierRepo = dataSource.getRepository(NetureSupplier);
-    this.aiContentService = new ProductAiContentService(dataSource);
+    this.importCommon = new ProductImportCommonService(dataSource);
   }
 
   // ==================== Upload + Validate ====================
@@ -215,9 +221,17 @@ export class CsvImportService {
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
         } else {
-          // MFDS 미검증 → reject (CSV에서 수동 생성 금지)
-          this.rejectRow(row, 'MASTER_NOT_FOUND_IN_MFDS');
-          rejectedCount++;
+          // MFDS 미검증 → manualData 확인 (WO-REFINEMENT-V1 3.3)
+          const hasManualData = this.extractManualData(raw) !== null;
+          if (hasManualData) {
+            // manualData 존재 → CREATE_MASTER (수동 생성 경로)
+            row.actionType = CsvRowActionType.CREATE_MASTER;
+            row.validationStatus = CsvRowValidationStatus.VALID;
+            validCount++;
+          } else {
+            this.rejectRow(row, 'MASTER_NOT_FOUND_NO_MANUAL_DATA');
+            rejectedCount++;
+          }
         }
       }
 
@@ -265,9 +279,13 @@ export class CsvImportService {
    * 2-Phase Apply — 검증 완료된 batch를 실제 테이블에 반영
    *
    * Transaction 내부:
-   * - CREATE_MASTER → resolveOrCreateMaster (MFDS 경로만)
+   * - CREATE_MASTER → MFDS 검증 or manualData fallback
    * - LINK_EXISTING → master_id 이미 설정됨
    * - Offer upsert: ON CONFLICT (master_id, supplier_id) DO UPDATE
+   *
+   * Post-transaction (fire-and-forget):
+   * - 이미지 다운로드 + GCS 업로드 (3.2)
+   * - AI 콘텐츠 생성
    */
   async applyBatch(
     batchId: string,
@@ -314,6 +332,7 @@ export class CsvImportService {
     let appliedOffers = 0;
     let createdMasters = 0;
     const aiContentInputs: ProductContentInput[] = [];
+    const imageJobs: Array<{ masterId: string; imageUrl: string }> = [];
 
     await this.dataSource.transaction(async (manager) => {
       for (const row of validRows) {
@@ -321,17 +340,20 @@ export class CsvImportService {
         let masterName = '';
         let masterManufacturer = '';
 
-        // CREATE_MASTER → MFDS 검증 후 생성
+        // CREATE_MASTER → MFDS 검증 or manualData fallback
         if (row.actionType === CsvRowActionType.CREATE_MASTER) {
           const barcode = row.parsedBarcode!;
+          const raw = row.rawJson as Record<string, string>;
           const mfdsResult = await verifyProductByBarcode(barcode);
 
-          if (mfdsResult.verified && mfdsResult.product) {
-            const masterRepo = manager.getRepository(ProductMaster);
+          const masterRepo = manager.getRepository(ProductMaster);
 
-            // UNIQUE(barcode) 보호 — 동시 batch에서 같은 barcode가 이미 생성됐을 수 있음
-            let master = await masterRepo.findOne({ where: { barcode } });
-            if (!master) {
+          // UNIQUE(barcode) 보호 — 동시 batch에서 같은 barcode가 이미 생성됐을 수 있음
+          let master = await masterRepo.findOne({ where: { barcode } });
+
+          if (!master) {
+            if (mfdsResult.verified && mfdsResult.product) {
+              // MFDS 검증 성공 → MFDS 데이터로 생성
               master = masterRepo.create({
                 barcode,
                 regulatoryType: mfdsResult.product.regulatoryType,
@@ -345,15 +367,33 @@ export class CsvImportService {
               });
               master = await masterRepo.save(master);
               createdMasters++;
+            } else {
+              // MFDS 실패 → manualData fallback (3.3)
+              const manualData = this.extractManualData(raw);
+              if (manualData) {
+                master = masterRepo.create({
+                  barcode,
+                  regulatoryType: 'UNKNOWN',
+                  regulatoryName: manualData.regulatoryName,
+                  marketingName: manualData.regulatoryName,
+                  manufacturerName: manualData.manufacturerName,
+                  mfdsProductId: barcode,
+                  isMfdsVerified: false,
+                  mfdsSyncedAt: null,
+                });
+                master = await masterRepo.save(master);
+                createdMasters++;
+                logger.info(`[CsvImport] Created manual Master for barcode ${barcode} (MFDS unverified)`);
+              } else {
+                logger.warn(`[CsvImport] MFDS failed and no manualData for barcode ${barcode}, skipping row ${row.rowNumber}`);
+                continue;
+              }
             }
-            masterId = master.id;
-            masterName = master.regulatoryName;
-            masterManufacturer = master.manufacturerName;
-          } else {
-            // MFDS 검증 실패 (stub 상태에서 발생 가능) → skip
-            logger.warn(`[CsvImport] MFDS verification failed during apply for barcode ${row.parsedBarcode}, skipping row ${row.rowNumber}`);
-            continue;
           }
+
+          masterId = master.id;
+          masterName = master.regulatoryName;
+          masterManufacturer = master.manufacturerName;
         }
 
         if (!masterId) {
@@ -361,24 +401,19 @@ export class CsvImportService {
           continue;
         }
 
-        // Offer upsert — ON CONFLICT (master_id, supplier_id) DO UPDATE
+        // Offer upsert via common service (3.5)
         const distributionType = row.parsedDistributionType || 'PRIVATE';
         const supplyPrice = row.parsedSupplyPrice ?? 0;
-        const slug = `${row.parsedBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
-
-        await manager.query(
-          `INSERT INTO supplier_product_offers
-            (id, master_id, supplier_id, distribution_type, approval_status, is_active,
-             price_general, slug, created_at, updated_at)
-           VALUES
-            (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, NOW(), NOW())
-           ON CONFLICT (master_id, supplier_id) DO UPDATE SET
-             price_general = EXCLUDED.price_general,
-             distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
-             updated_at = NOW()`,
-          [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, supplyPrice, slug],
+        await this.importCommon.upsertSupplierOffer(
+          manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!,
         );
         appliedOffers++;
+
+        // Collect image job (3.2)
+        const imageUrl = ((row.rawJson as Record<string, string>).image_url || '').trim();
+        if (imageUrl) {
+          imageJobs.push({ masterId, imageUrl });
+        }
 
         // Collect AI content input
         aiContentInputs.push({
@@ -397,9 +432,17 @@ export class CsvImportService {
 
     logger.info(`[CsvImport] Batch ${batchId} applied — offers: ${appliedOffers}, masters: ${createdMasters}`);
 
-    // Fire-and-forget: AI content generation (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1)
+    // Fire-and-forget: Image pipeline via common service (3.2 + 3.5)
+    if (imageJobs.length > 0) {
+      const imageJobsGrouped = imageJobs.map((j) => ({ masterId: j.masterId, imageUrls: [j.imageUrl] }));
+      this.importCommon.processImportImages(imageJobsGrouped).catch((err) => {
+        logger.error('[CsvImport] Image pipeline error:', err);
+      });
+    }
+
+    // Fire-and-forget: AI content generation via common service (3.5)
     if (aiContentInputs.length > 0) {
-      this.triggerAiContentGeneration(aiContentInputs).catch((err) => {
+      this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {
         logger.error('[CsvImport] AI content generation error:', err);
       });
     }
@@ -408,19 +451,6 @@ export class CsvImportService {
       success: true,
       data: { appliedOffers, createdMasters },
     };
-  }
-
-  // ==================== Post-Apply Pipeline (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1) ====================
-
-  private async triggerAiContentGeneration(inputs: ProductContentInput[]): Promise<void> {
-    for (const input of inputs) {
-      try {
-        await this.aiContentService.generateAllContents(input);
-        logger.info(`[CsvImport] AI content generated for master=${input.id}`);
-      } catch (err) {
-        logger.warn(`[CsvImport] AI content failed for master=${input.id}:`, err);
-      }
-    }
   }
 
   // ==================== Batch 조회 ====================
@@ -464,5 +494,20 @@ export class CsvImportService {
     row.validationStatus = CsvRowValidationStatus.REJECTED;
     row.validationError = error;
     row.actionType = CsvRowActionType.REJECT;
+  }
+
+  /**
+   * CSV raw row에서 manualData 추출 (3.3)
+   * regulatory_name + manufacturer_name이 모두 존재해야 유효
+   */
+  private extractManualData(
+    raw: Record<string, string>,
+  ): { regulatoryName: string; manufacturerName: string; brand?: string } | null {
+    const regulatoryName = (raw.regulatory_name || '').trim();
+    const manufacturerName = (raw.manufacturer_name || '').trim();
+    if (!regulatoryName || !manufacturerName) return null;
+
+    const brand = (raw.brand || '').trim() || undefined;
+    return { regulatoryName, manufacturerName, brand };
   }
 }

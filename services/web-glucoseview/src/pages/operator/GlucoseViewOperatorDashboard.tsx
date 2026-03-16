@@ -16,9 +16,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
 import { fetchOperatorDashboard } from '../../services/operatorDashboard';
 import { buildGlucoseViewOperatorConfig } from './operatorConfig';
+import OperatorAlerts from '../../components/OperatorAlerts';
+
+interface AlertItem {
+  id: string;
+  type: 'network' | 'commerce' | 'care' | 'system';
+  level: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+}
 
 export default function GlucoseViewOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +41,7 @@ export default function GlucoseViewOperatorDashboard() {
         setError('운영자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
       } else {
         setConfig(buildGlucoseViewOperatorConfig(data));
+        setAlerts((data as any).operatorAlerts ?? []);
       }
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
@@ -65,5 +76,10 @@ export default function GlucoseViewOperatorDashboard() {
     );
   }
 
-  return <OperatorDashboardLayout config={config} />;
+  return (
+    <>
+      <OperatorAlerts alerts={alerts} />
+      <OperatorDashboardLayout config={config} />
+    </>
+  );
 }

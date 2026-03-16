@@ -1,9 +1,9 @@
 /**
  * GlycoPharm Test Account Audit (TEMPORARY)
  * IR-GLYCOPHARM-TEST-ACCOUNT-EXTRACT-V2
+ * WO-O4O-USER-DOMAIN-ALIGNMENT-V1: Platform admin auth required
  *
  * READ-ONLY: SELECT queries only.
- * No auth required (same pattern as rbac-db-audit).
  * Remove after test account extraction is complete.
  *
  * GET /__debug__/glycopharm-test-accounts
@@ -12,11 +12,12 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 export function createGlycopharmTestAccountsRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.get('/', async (_req: Request, res: Response): Promise<void> => {
+  router.get('/', authenticate as any, requireAdmin as any, async (_req: Request, res: Response): Promise<void> => {
     if (!dataSource.isInitialized) {
       res.status(503).json({ error: 'Database not initialized' });
       return;

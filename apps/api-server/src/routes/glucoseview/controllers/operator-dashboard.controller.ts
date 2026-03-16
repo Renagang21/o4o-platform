@@ -22,8 +22,13 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireGlucoseViewScope } from '../../../middleware/glucoseview-scope.middleware.js';
 import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
+import { computeOperatorAlerts } from '../../../utils/operator-alert.utils.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 
-export function createOperatorDashboardController(dataSource: DataSource): Router {
+export function createOperatorDashboardController(
+  dataSource: DataSource,
+  actionLogService?: ActionLogService
+): Router {
   const router = Router();
   const copilotEngine = new CopilotEngineService();
 
@@ -45,6 +50,12 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         pendingApplications,
         cmsPublished,
         recentApplications,
+        highRiskPatients,
+        openCareAlerts,
+        recentCareAlerts,
+        careEnabledResult,
+        weeklyCareActivityResult,
+        recentOperatorActions,
       ] = await Promise.all([
         // 1. Pharmacies by status
         dataSource.query(`
@@ -87,6 +98,42 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           ORDER BY submitted_at DESC
           LIMIT 5
         `) as Promise<Array<{ pharmacy_name: string; status: string; submitted_at: string }>>,
+
+        // 8. High risk patients (Care)
+        dataSource.query(`
+          SELECT COUNT(DISTINCT patient_id)::int AS cnt
+          FROM care_kpi_snapshots WHERE risk_level = 'high'
+        `) as Promise<Array<{ cnt: number }>>,
+
+        // 9. Open care alerts count (Care Action Queue)
+        dataSource.query(`
+          SELECT COUNT(*)::int AS cnt FROM care_alerts WHERE status = 'open'
+        `) as Promise<Array<{ cnt: number }>>,
+
+        // 10. Recent care alerts (Care Activity Log)
+        dataSource.query(`
+          SELECT alert_type, severity, message, created_at
+          FROM care_alerts
+          ORDER BY created_at DESC
+          LIMIT 3
+        `) as Promise<Array<{ alert_type: string; severity: string; message: string; created_at: string }>>,
+        // 11. Care enabled pharmacies (distinct pharmacies with care data)
+        dataSource.query(`
+          SELECT COUNT(DISTINCT pharmacy_id)::int AS cnt FROM care_kpi_snapshots
+        `) as Promise<Array<{ cnt: number }>>,
+        // 12. Weekly care activity (coaching sessions last 7 days)
+        dataSource.query(`
+          SELECT COUNT(*)::int AS cnt FROM care_coaching_sessions
+          WHERE created_at > NOW() - INTERVAL '7 days'
+        `) as Promise<Array<{ cnt: number }>>,
+        // 13. Recent operator actions (from action_logs)
+        dataSource.query(`
+          SELECT action_key, meta, created_at
+          FROM action_logs
+          WHERE service_key = 'glucoseview' AND source = 'manual'
+          ORDER BY created_at DESC
+          LIMIT 3
+        `) as Promise<Array<{ action_key: string; meta: any; created_at: string }>>,
       ]);
 
       const activePharmacies = pharmacyCounts.find(r => r.status === 'active')?.cnt || 0;
@@ -96,16 +143,25 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const activeVendors = vendorCount[0]?.cnt || 0;
       const pendingApps = pendingApplications[0]?.cnt || 0;
       const publishedContent = cmsPublished[0]?.cnt || 0;
+      const highRiskCount = highRiskPatients[0]?.cnt || 0;
+      const openAlertsCount = openCareAlerts[0]?.cnt || 0;
+      const careEnabledPharmacies = careEnabledResult[0]?.cnt || 0;
+      const weeklyCareActivityCount = weeklyCareActivityResult[0]?.cnt || 0;
+      const totalPharmacies = pharmacyCounts.reduce((sum, r) => sum + r.cnt, 0);
+      const careAdoptionRate = totalPharmacies > 0 ? Math.round((careEnabledPharmacies / totalPharmacies) * 100) : 0;
 
       // === Build 5-block response ===
 
-      // Block 1: KPIs
+      // Block 1: KPIs (8개 — Network / Care / Commerce)
       const kpis: KpiItem[] = [
         { key: 'active-pharmacies', label: '활성 약국', value: activePharmacies, status: 'neutral' },
         { key: 'approved-pharmacists', label: '승인 약사', value: approvedPharmacists, status: 'neutral' },
         { key: 'total-customers', label: '등록 고객', value: totalCustomers, status: 'neutral' },
+        { key: 'high-risk-patients', label: '고위험 환자', value: highRiskCount, status: highRiskCount > 0 ? 'warning' : 'neutral' },
         { key: 'active-vendors', label: '활성 벤더', value: activeVendors, status: 'neutral' },
-        { key: 'cms-published', label: '게시 콘텐츠', value: publishedContent, status: 'neutral' },
+        { key: 'pending-applications', label: '신청 대기', value: pendingApps, status: pendingApps > 0 ? 'warning' : 'neutral' },
+        { key: 'care-adoption-rate', label: 'Care 도입률', value: `${careAdoptionRate}%`, status: careAdoptionRate < 30 ? 'warning' : 'neutral' },
+        { key: 'weekly-care-activity', label: '주간 Care 활동', value: weeklyCareActivityCount, status: 'neutral' },
       ];
 
       // Block 2: AI Summary (Copilot Engine)
@@ -116,6 +172,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         customers: { total: totalCustomers },
         vendors: { active: activeVendors },
         applications: { pending: pendingApps },
+        care: { highRisk: highRiskCount, openAlerts: openAlertsCount, adoptionRate: careAdoptionRate, weeklyActivity: weeklyCareActivityCount },
       };
       const copilotUser = {
         id: (_req as any).user?.id || '',
@@ -129,14 +186,27 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const actionQueue: ActionItem[] = [
         { id: 'pending-applications', label: '신청 승인 대기', count: pendingApps, link: '/operator/applications' },
         { id: 'pending-pharmacists', label: '약사 승인 대기', count: pendingPharmacists, link: '/operator/users' },
+        { id: 'care-alerts', label: '케어 알림 미확인', count: openAlertsCount, link: '/operator/care/alerts' },
       ];
 
-      // Block 4: Activity Log
-      const activityLog: ActivityItem[] = recentApplications.map((app, i) => ({
-        id: `app-${i}`,
-        message: `${app.pharmacy_name} — 참여 신청 (${app.status === 'submitted' ? '대기' : app.status === 'approved' ? '승인' : '반려'})`,
-        timestamp: app.submitted_at || new Date().toISOString(),
-      }));
+      // Block 4: Activity Log (applications + care alerts + operator actions, sorted by time)
+      const activityLog: ActivityItem[] = [
+        ...recentApplications.map((app, i) => ({
+          id: `app-${i}`,
+          message: `${app.pharmacy_name} — 참여 신청 (${app.status === 'submitted' ? '대기' : app.status === 'approved' ? '승인' : '반려'})`,
+          timestamp: app.submitted_at || new Date().toISOString(),
+        })),
+        ...recentCareAlerts.map((alert, i) => ({
+          id: `care-${i}`,
+          message: `[${alert.severity}] ${alert.message}`,
+          timestamp: alert.created_at || new Date().toISOString(),
+        })),
+        ...recentOperatorActions.map((action, i) => ({
+          id: `audit-${i}`,
+          message: `[운영] ${action.action_key.replace('glucoseview.', '')}`,
+          timestamp: action.created_at || new Date().toISOString(),
+        })),
+      ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
 
       // Block 5: Quick Actions
       const quickActions: QuickActionItem[] = [
@@ -144,12 +214,24 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         { id: 'manage-users', label: '회원 관리', link: '/operator/users', icon: 'users' },
         { id: 'manage-products', label: '상품 관리', link: '/operator/products', icon: 'package' },
         { id: 'manage-stores', label: '매장 관리', link: '/operator/stores', icon: 'store' },
+        { id: 'manage-care', label: '케어 관리', link: '/operator/care', icon: 'heart' },
         { id: 'ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: 'bar-chart' },
       ];
+
+      // Block 6: Operator Alerts (rule-based, computed at request time)
+      const operatorAlerts = computeOperatorAlerts({
+        openCareAlerts: openAlertsCount,
+        careAdoptionRate,
+        highRiskPatients: highRiskCount,
+        weeklyCareActivity: weeklyCareActivityCount,
+        pendingApplications: pendingApps,
+        pendingApprovals: pendingPharmacists,
+      });
 
       const response: OperatorDashboardConfig = {
         kpis,
         aiSummary,
+        operatorAlerts,
         actionQueue,
         activityLog,
         quickActions,

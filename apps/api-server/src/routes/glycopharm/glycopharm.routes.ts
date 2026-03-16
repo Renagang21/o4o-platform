@@ -332,7 +332,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   // Operator Dashboard routes (WO-GLYCOPHARM-DASHBOARD-P1-A)
   const operatorController = createOperatorController(
     dataSource,
-    coreRequireAuth as any
+    coreRequireAuth as any,
+    actionLogService
   );
   router.use('/operator', operatorController);
 

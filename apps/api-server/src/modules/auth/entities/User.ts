@@ -117,7 +117,11 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   domain?: string;
 
-  // P0-T2: Service key for data isolation
+  /**
+   * @deprecated WO-O4O-USER-DOMAIN-FINALIZATION-V1
+   * Legacy column — SSOT is service_memberships table.
+   * Do NOT write to this column. Read from service_memberships instead.
+   */
   @Column({ type: 'varchar', length: 100, nullable: true, name: 'service_key' })
   serviceKey?: string;
 

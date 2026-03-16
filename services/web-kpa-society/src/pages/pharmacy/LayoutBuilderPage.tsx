@@ -14,7 +14,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../contexts/AuthContext';
-import { listPlatformServices, applyForService } from '../../api/platform-services';
+import { listPlatformServices } from '../../api/platform-services';
 import type { PlatformServiceItem } from '../../api/platform-services';
 import {
   StoreBlockRegistry,
@@ -39,8 +39,6 @@ export function LayoutBuilderPage() {
   // No-store state
   const [noStore, setNoStore] = useState(false);
   const [glycopharmSvc, setGlycopharmSvc] = useState<PlatformServiceItem | null>(null);
-  const [applying, setApplying] = useState(false);
-  const [applyDone, setApplyDone] = useState(false);
 
   // Resolve slug from cockpit
   useEffect(() => {
@@ -144,20 +142,6 @@ export function LayoutBuilderPage() {
     }
   };
 
-  // Apply for GlycoPharm service
-  const handleApplyGlycopharm = async () => {
-    if (!glycopharmSvc || applying) return;
-    setApplying(true);
-    try {
-      await applyForService(glycopharmSvc.code);
-      setApplyDone(true);
-    } catch {
-      setError('서비스 신청에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setApplying(false);
-    }
-  };
-
   /** Registry lookup — label, description, defaultConfig */
   const getBlockMeta = (type: StoreBlockType) => {
     const def = StoreBlockRegistry[type];
@@ -194,25 +178,7 @@ export function LayoutBuilderPage() {
             사이버 공간이 설정되지 않았습니다
           </h3>
 
-          {applyDone ? (
-            <>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-                서비스 이용 신청이 완료되었습니다.<br />
-                운영자 승인 후 사이버 공간을 이용하실 수 있습니다.
-              </p>
-              <span style={{
-                display: 'inline-block',
-                padding: '8px 20px',
-                borderRadius: '8px',
-                backgroundColor: '#f1f5f9',
-                color: '#64748b',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}>
-                승인 대기 중
-              </span>
-            </>
-          ) : enrolled === 'applied' ? (
+          {enrolled === 'applied' ? (
             <>
               <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
                 서비스 이용 신청이 접수되어 있습니다.<br />
@@ -235,33 +201,9 @@ export function LayoutBuilderPage() {
               서비스가 승인되었으나 매장 설정이 완료되지 않았습니다.<br />
               잠시 후 다시 시도해주세요.
             </p>
-          ) : glycopharmSvc ? (
-            <>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-                사이버 공간(온라인 매장)을 이용하려면 서비스 신청이 필요합니다.
-              </p>
-              <button
-                onClick={handleApplyGlycopharm}
-                disabled={applying}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: '#1e40af',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: applying ? 'not-allowed' : 'pointer',
-                  opacity: applying ? 0.6 : 1,
-                }}
-              >
-                {applying ? '신청 중...' : '사이버 공간 이용 신청'}
-              </button>
-            </>
           ) : (
             <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-              매장 정보를 불러올 수 없습니다.<br />
-              약국 HUB에서 서비스를 확인해주세요.
+              사이버 공간(온라인 매장)을 이용하려면 약국 HUB에서 서비스를 확인해주세요.
             </p>
           )}
 

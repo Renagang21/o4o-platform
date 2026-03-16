@@ -98,11 +98,21 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   router.get('/master/:masterId/offers', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
     const { masterId } = req.params;
 
+    // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1 (3.4)
+    // 확장 필드: descriptions, price tiers, brand, manufacturer
     const offers = await dataSource.query(
       `SELECT spo.id, spo.supplier_id AS "supplierId", s.name AS "supplierName",
-              spo.price_general AS "priceGeneral", spo.distribution_type AS "distributionType"
+              spo.price_general AS "priceGeneral",
+              spo.price_gold AS "priceGold",
+              spo.price_platinum AS "pricePlatinum",
+              spo.distribution_type AS "distributionType",
+              spo.consumer_short_description AS "consumerShortDescription",
+              spo.business_short_description AS "businessShortDescription",
+              pm.brand_name AS "brandName",
+              pm.manufacturer_name AS "manufacturerName"
        FROM supplier_product_offers spo
        JOIN neture_suppliers s ON s.id = spo.supplier_id
+       LEFT JOIN product_masters pm ON pm.id = spo.master_id
        WHERE spo.master_id = $1
          AND spo.approval_status = 'APPROVED'
          AND spo.is_active = true

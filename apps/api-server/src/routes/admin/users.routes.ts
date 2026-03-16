@@ -28,11 +28,11 @@ const isValidRole = (value: string) => {
 // All admin user routes require authentication
 router.use(authenticate);
 
-// User management routes (admin/manager/operator)
-// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: OPERATOR 추가 — Operator Dashboard 사용자 조회 허용
-router.get('/', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUsers);
-router.get('/statistics', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUserStatistics);
-router.get('/:id', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUser);
+// User management routes (admin only)
+// WO-O4O-USER-DOMAIN-ALIGNMENT-V1: operator/manager 제거 — 서비스 운영자는 /api/v1/operator/members 사용
+router.get('/', requireRole(['admin', 'super_admin']), adminUserController.getUsers);
+router.get('/statistics', requireRole(['admin', 'super_admin']), adminUserController.getUserStatistics);
+router.get('/:id', requireRole(['admin', 'super_admin']), adminUserController.getUser);
 
 // User creation (admin only)
 router.post('/',
@@ -50,9 +50,9 @@ router.post('/',
   adminUserController.createUser
 );
 
-// User updates (admin/manager/operator)
+// User updates (admin only) — WO-O4O-USER-DOMAIN-ALIGNMENT-V1
 router.put('/:id',
-  requireRole(['admin', 'super_admin', 'manager', 'operator']),
+  requireRole(['admin', 'super_admin']),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -66,9 +66,9 @@ router.put('/:id',
   adminUserController.updateUser
 );
 
-// Update user status (admin/manager/operator)
+// Update user status (admin only) — WO-O4O-USER-DOMAIN-ALIGNMENT-V1
 router.patch('/:id/status',
-  requireRole(['admin', 'super_admin', 'manager', 'operator']),
+  requireRole(['admin', 'super_admin']),
   [
     body('status').isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],

@@ -3,10 +3,9 @@
  *
  * GET   /api/v1/admin/platform-services              — 전체 목록
  * PATCH /api/v1/admin/platform-services/:code        — 설정 수정
- * GET   /api/v1/admin/platform-services/:code/enrollments — 신청 목록
- * PATCH /api/v1/admin/platform-services/enrollments/:id   — 승인/거절
  *
  * WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1
+ * WO-O4O-USER-DOMAIN-CLEANUP-V1: enrollment 관리 라우트 제거 (service_memberships SSOT)
  */
 
 import { Router, Response } from 'express';
@@ -83,84 +82,6 @@ export function createAdminPlatformServicesRoutes(dataSource: DataSource): Route
       res.status(500).json({
         success: false,
         error: 'Failed to update service',
-        code: 'INTERNAL_ERROR',
-      });
-    }
-  });
-
-  /**
-   * GET /:code/enrollments — 서비스별 신청 목록
-   */
-  router.get('/:code/enrollments', async (req: AuthRequest, res: Response) => {
-    try {
-      const { code } = req.params;
-      const status = req.query.status as string | undefined;
-
-      const enrollments = await catalogService.listEnrollmentsByService(
-        code,
-        status ? { status: status as 'applied' | 'approved' | 'rejected' } : undefined,
-      );
-
-      res.json({
-        success: true,
-        data: enrollments,
-      });
-    } catch (error) {
-      logger.error('[AdminPlatformServices] Error listing enrollments:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to list enrollments',
-        code: 'INTERNAL_ERROR',
-      });
-    }
-  });
-
-  /**
-   * PATCH /enrollments/:id — 신청 승인/거절
-   */
-  router.patch('/enrollments/:id', async (req: AuthRequest, res: Response) => {
-    try {
-      const { id } = req.params;
-      const { status, note } = req.body;
-      const decidedBy = req.user!.id;
-
-      if (!status || !['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({
-          success: false,
-          error: 'status must be "approved" or "rejected"',
-          code: 'VALIDATION_ERROR',
-        });
-      }
-
-      const enrollment = await catalogService.reviewEnrollment(id, status, decidedBy, note);
-
-      if (!enrollment) {
-        return res.status(404).json({
-          success: false,
-          error: '신청을 찾을 수 없습니다',
-          code: 'ENROLLMENT_NOT_FOUND',
-        });
-      }
-
-      res.json({
-        success: true,
-        data: enrollment,
-      });
-    } catch (error) {
-      const message = (error as Error).message;
-
-      if (message === 'INVALID_STATUS') {
-        return res.status(400).json({
-          success: false,
-          error: '승인 대기 상태가 아닙니다',
-          code: 'INVALID_STATUS',
-        });
-      }
-
-      logger.error('[AdminPlatformServices] Error reviewing enrollment:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to review enrollment',
         code: 'INTERNAL_ERROR',
       });
     }

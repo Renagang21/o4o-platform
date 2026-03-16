@@ -13,7 +13,6 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
   Index,
 } from 'typeorm';
 
@@ -74,8 +73,4 @@ export class PlatformService {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
-
-  // ESM mandatory: string-based relation
-  @OneToMany('UserServiceEnrollment', 'service')
-  enrollments: unknown[];
 }

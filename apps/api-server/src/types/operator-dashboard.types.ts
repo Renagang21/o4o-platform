@@ -43,9 +43,18 @@ export interface QuickActionItem {
   icon?: string;
 }
 
+export interface OperatorAlertItem {
+  id: string;
+  type: 'network' | 'commerce' | 'care' | 'system';
+  level: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+}
+
 export interface OperatorDashboardConfig {
   kpis: KpiItem[];
   aiSummary?: AiSummaryItem[];
+  operatorAlerts?: OperatorAlertItem[];
   actionQueue: ActionItem[];
   activityLog: ActivityItem[];
   quickActions: QuickActionItem[];

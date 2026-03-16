@@ -25,8 +25,7 @@ import {
 import { CatalogImportValidator } from './catalog-import-validator.js';
 import { CatalogImportResolver } from './catalog-import-resolver.js';
 import { CatalogImportOfferService } from './catalog-import-offer.service.js';
-import { ImageStorageService } from '../../neture/services/image-storage.service.js';
-import { ProductAiContentService } from '../../store-ai/services/product-ai-content.service.js';
+import { ProductImportCommonService } from '../../neture/services/product-import-common.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { csvParserExtension } from '../extensions/csv/csv-parser.extension.js';
 import { firstmallParserExtension } from '../extensions/firstmall/firstmall-parser.extension.js';
@@ -44,8 +43,7 @@ export class CatalogImportService {
   private validator: CatalogImportValidator;
   private resolver: CatalogImportResolver;
   private offerService: CatalogImportOfferService;
-  private imageStorageService: ImageStorageService;
-  private aiContentService: ProductAiContentService;
+  private importCommon: ProductImportCommonService;
 
   constructor() {
     this.jobRepo = AppDataSource.getRepository(CatalogImportJob);
@@ -54,8 +52,7 @@ export class CatalogImportService {
     this.validator = new CatalogImportValidator(this.masterRepo);
     this.resolver = new CatalogImportResolver();
     this.offerService = new CatalogImportOfferService();
-    this.imageStorageService = new ImageStorageService();
-    this.aiContentService = new ProductAiContentService(AppDataSource);
+    this.importCommon = new ProductImportCommonService(AppDataSource);
   }
 
   // ==================== Create Job ====================
@@ -269,16 +266,15 @@ export class CatalogImportService {
 
       logger.info(`[CatalogImport] Job ${jobId} applied — offers: ${appliedOffers}, masters: ${createdMasters}`);
 
-      // Fire-and-forget: Image pipeline (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1)
+      // Fire-and-forget via common service (WO-REFINEMENT-V1 3.5)
       if (imageJobs.length > 0) {
-        this.processImportImages(imageJobs).catch((err) => {
+        this.importCommon.processImportImages(imageJobs).catch((err) => {
           logger.error('[CatalogImport] Image pipeline error:', err);
         });
       }
 
-      // Fire-and-forget: AI content generation (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1)
       if (aiContentInputs.length > 0) {
-        this.triggerAiContentGeneration(aiContentInputs).catch((err) => {
+        this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {
           logger.error('[CatalogImport] AI content generation error:', err);
         });
       }
@@ -289,64 +285,6 @@ export class CatalogImportService {
       await this.jobRepo.save(job);
       logger.error(`[CatalogImport] Job ${jobId} apply failed:`, err);
       return { success: false, error: `APPLY_FAILED: ${(err as Error).message}` };
-    }
-  }
-
-  // ==================== Post-Apply Pipelines (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1) ====================
-
-  /**
-   * Download external images → upload to GCS → create ProductImage records.
-   * Fire-and-forget — failures do not affect offer creation.
-   */
-  private async processImportImages(
-    jobs: Array<{ masterId: string; imageUrls: string[] }>,
-  ): Promise<void> {
-    for (const job of jobs) {
-      for (let i = 0; i < job.imageUrls.length; i++) {
-        try {
-          const url = job.imageUrls[i];
-          const response = await fetch(url);
-          if (!response.ok) {
-            logger.warn(`[CatalogImport] Image fetch failed (${response.status}): ${url}`);
-            continue;
-          }
-          const buffer = Buffer.from(await response.arrayBuffer());
-          const contentType = response.headers.get('content-type') || 'image/jpeg';
-          const ext = contentType.includes('png') ? '.png' : contentType.includes('webp') ? '.webp' : '.jpg';
-          const filename = `import-${Date.now()}-${i}${ext}`;
-
-          const { url: gcsUrl, gcsPath } = await this.imageStorageService.uploadImage(
-            job.masterId, buffer, contentType, filename,
-          );
-
-          // ProductImage record — skip if already exists for this master
-          await AppDataSource.query(
-            `INSERT INTO product_images (id, master_id, image_url, gcs_path, sort_order, is_primary, created_at, updated_at)
-             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW(), NOW())
-             ON CONFLICT DO NOTHING`,
-            [job.masterId, gcsUrl, gcsPath, i, i === 0],
-          );
-
-          logger.info(`[CatalogImport] Image uploaded for master=${job.masterId}: ${gcsPath}`);
-        } catch (err) {
-          logger.warn(`[CatalogImport] Failed to process image for master=${job.masterId}:`, err);
-        }
-      }
-    }
-  }
-
-  /**
-   * Trigger AI content generation for each master.
-   * Fire-and-forget — failures do not affect offer creation.
-   */
-  private async triggerAiContentGeneration(inputs: ProductContentInput[]): Promise<void> {
-    for (const input of inputs) {
-      try {
-        await this.aiContentService.generateAllContents(input);
-        logger.info(`[CatalogImport] AI content generated for master=${input.id}`);
-      } catch (err) {
-        logger.warn(`[CatalogImport] AI content failed for master=${input.id}:`, err);
-      }
     }
   }
 

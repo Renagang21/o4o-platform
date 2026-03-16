@@ -1,10 +1,11 @@
 /**
  * Platform Services API Client
  *
- * 플랫폼 서비스 카탈로그 조회 및 이용 신청.
+ * 플랫폼 서비스 카탈로그 조회.
  * 경로: /api/v1/platform-services (KPA namespace 밖)
  *
  * WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1
+ * WO-O4O-USER-DOMAIN-CLEANUP-V1: enrollment 제거 → service_memberships 기반
  */
 
 import { getAccessToken } from '../contexts/AuthContext';
@@ -25,17 +26,8 @@ interface PlatformServiceItem {
   featuredOrder: number;
   status: 'active' | 'hidden';
   iconEmoji: string | null;
-  enrollmentStatus?: 'not_applied' | 'applied' | 'approved' | 'rejected';
-}
-
-interface EnrollmentItem {
-  id: string;
-  userId: string;
-  serviceCode: string;
-  status: 'not_applied' | 'applied' | 'approved' | 'rejected';
-  appliedAt: string | null;
-  decidedAt: string | null;
-  service?: PlatformServiceItem;
+  /** Membership status from service_memberships (mapped: active→approved, pending→applied) */
+  enrollmentStatus?: 'applied' | 'approved' | 'rejected';
 }
 
 interface ApiResponse<T> {
@@ -66,22 +58,10 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<Api
   return response.json();
 }
 
-/** 가시 서비스 목록 (로그인 시 enrollment status 포함) */
+/** 가시 서비스 목록 (로그인 시 membership status 포함) */
 export async function listPlatformServices(): Promise<PlatformServiceItem[]> {
   const res = await fetchApi<PlatformServiceItem[]>('');
   return res.data || [];
 }
 
-/** 내 서비스 목록 (applied + approved) */
-export async function getMyServices(): Promise<EnrollmentItem[]> {
-  const res = await fetchApi<EnrollmentItem[]>('/my');
-  return res.data || [];
-}
-
-/** 서비스 이용 신청 */
-export async function applyForService(code: string): Promise<EnrollmentItem> {
-  const res = await fetchApi<EnrollmentItem>(`/${code}/apply`, { method: 'POST' });
-  return res.data;
-}
-
-export type { PlatformServiceItem, EnrollmentItem };
+export type { PlatformServiceItem };

@@ -3,19 +3,22 @@
  *
  * GET /__debug__/service-users?service=glycopharm
  *
+ * WO-O4O-USER-DOMAIN-ALIGNMENT-V1: Platform admin auth required
+ *
  * 제약:
- * - 인증 불필요
+ * - Platform admin 인증 필수
  * - SELECT만 실행 (UPDATE/DELETE 절대 금지)
  * - 운영 중 안전하게 호출 가능
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 export function createServiceUsersAuditRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.get('/', async (req: Request, res: Response): Promise<void> => {
+  router.get('/', authenticate as any, requireAdmin as any, async (req: Request, res: Response): Promise<void> => {
     const base = {
       timestamp: new Date().toISOString(),
       warning: 'READ-ONLY diagnostic endpoint. No data is modified.',
@@ -79,7 +82,7 @@ export function createServiceUsersAuditRouter(dataSource: DataSource): Router {
           ) AS active_roles
         FROM users u
         LEFT JOIN role_assignments ra ON ra.user_id = u.id AND ra.is_active = true
-        WHERE (u.domain = $1 OR u.service_key = $1)
+        WHERE (u.domain = $1 OR EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id = u.id AND sm.service_key = $1))
           AND u.id NOT IN (
             SELECT DISTINCT ra2.user_id FROM role_assignments ra2
             WHERE ra2.role LIKE $2 AND ra2.is_active = true

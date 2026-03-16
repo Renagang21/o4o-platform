@@ -2,12 +2,13 @@
  * RBAC DB Audit Endpoint
  *
  * WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1
+ * WO-O4O-USER-DOMAIN-ALIGNMENT-V1: Platform admin auth required
  *
  * Phase 5B Step 1 전용 진단 엔드포인트.
  * GET /__debug__/rbac-db-audit
  *
  * 제약:
- * - 인증 불필요
+ * - Platform admin 인증 필수
  * - SELECT만 실행 (UPDATE/DELETE 절대 금지)
  * - 운영 중 안전하게 호출 가능
  * - 캐싱 없음 (매 호출마다 최신 DB 상태 반환)
@@ -15,11 +16,12 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 export function createRbacDbAuditRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.get('/', async (req: Request, res: Response): Promise<void> => {
+  router.get('/', authenticate as any, requireAdmin as any, async (req: Request, res: Response): Promise<void> => {
     const base = {
       timestamp: new Date().toISOString(),
       warning: 'READ-ONLY diagnostic endpoint. No data is modified.',

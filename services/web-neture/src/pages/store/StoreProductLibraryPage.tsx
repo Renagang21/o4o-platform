@@ -91,22 +91,39 @@ function OfferModal({
                   key={offer.id}
                   className="border border-slate-100 rounded-lg p-3 hover:border-emerald-200 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
                       <p className="font-medium text-slate-800 text-sm">{offer.supplierName}</p>
-                      <div className="flex items-center gap-2 mt-1">
+                      {offer.brandName && (
+                        <p className="text-xs text-blue-600 mt-0.5">{offer.brandName}</p>
+                      )}
+                      {/* Price tiers */}
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <span className="text-emerald-700 font-semibold text-sm">
                           ₩{formatPrice(offer.priceGeneral)}
                         </span>
+                        {offer.priceGold != null && (
+                          <span className="text-xs text-amber-600">Gold ₩{formatPrice(offer.priceGold)}</span>
+                        )}
+                        {offer.pricePlatinum != null && (
+                          <span className="text-xs text-purple-600">Platinum ₩{formatPrice(offer.pricePlatinum)}</span>
+                        )}
                         <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
                           <Truck size={10} className="inline mr-0.5" />
                           {offer.distributionType === 'PUBLIC' ? '공개' : '비공개'}
                         </span>
                       </div>
+                      {/* Descriptions */}
+                      {offer.consumerShortDescription && (
+                        <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{offer.consumerShortDescription}</p>
+                      )}
+                      {offer.businessShortDescription && !offer.consumerShortDescription && (
+                        <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{offer.businessShortDescription}</p>
+                      )}
                     </div>
                     <button
                       onClick={() => onSelect(offer.id)}
-                      className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition-colors whitespace-nowrap"
+                      className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition-colors whitespace-nowrap flex-shrink-0"
                     >
                       진열하기
                     </button>

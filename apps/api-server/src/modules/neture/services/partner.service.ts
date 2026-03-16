@@ -330,6 +330,7 @@ export class PartnerService {
     const offsetIdx = params.length + 2;
     params.push(limit, offset);
 
+    // WO-O4O-USER-DOMAIN-ALIGNMENT-V1: service_memberships JOIN for service boundary
     const [partners, countResult] = await Promise.all([
       this.dataSource.query(
         `SELECT
@@ -343,6 +344,7 @@ export class PartnerService {
            MIN(pc.created_at) AS first_commission_at
          FROM partner_commissions pc
          JOIN users u ON u.id = pc.partner_id
+         JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
          ${searchClause}
          GROUP BY u.id, u."displayName", u.email
          ORDER BY commission DESC
@@ -353,6 +355,7 @@ export class PartnerService {
         `SELECT COUNT(DISTINCT pc.partner_id)::int AS total
          FROM partner_commissions pc
          JOIN users u ON u.id = pc.partner_id
+         JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
          ${searchClause}`,
         search ? [params[0]] : [],
       ),
@@ -382,7 +385,7 @@ export class PartnerService {
    * WO-O4O-ADMIN-PARTNER-MONITORING-V1
    */
   async getAdminPartnerDetail(partnerId: string): Promise<{ summary: any; commissions: any[] } | null> {
-    // Partner summary
+    // Partner summary — WO-O4O-USER-DOMAIN-ALIGNMENT-V1: service boundary
     const [summary] = await this.dataSource.query(
       `SELECT
          u.id AS partner_id,
@@ -394,6 +397,7 @@ export class PartnerService {
          COALESCE(SUM(CASE WHEN pc.status = 'paid' THEN pc.commission_amount ELSE 0 END), 0)::int AS paid
        FROM partner_commissions pc
        JOIN users u ON u.id = pc.partner_id
+       JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = 'neture'
        WHERE pc.partner_id = $1
        GROUP BY u.id, u."displayName", u.email`,
       [partnerId],
@@ -535,12 +539,14 @@ export class PartnerService {
     }
 
     const [settlements, countResult] = await Promise.all([
+      // WO-O4O-USER-DOMAIN-ALIGNMENT-V1: service boundary on user JOIN
       this.dataSource.query(
         `SELECT ps.*,
                 u."displayName" AS partner_name,
                 u.email AS partner_email
          FROM partner_settlements ps
          LEFT JOIN users u ON u.id = ps.partner_id
+           AND EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id = u.id AND sm.service_key = 'neture')
          ${statusClause}
          ORDER BY ps.created_at DESC
          LIMIT ${limit} OFFSET ${offset}`,
@@ -561,12 +567,14 @@ export class PartnerService {
    * WO-O4O-PARTNER-COMMISSION-SETTLEMENT-V1
    */
   async getAdminSettlementDetail(settlementId: string): Promise<{ settlement: any; items: any[] } | null> {
+    // WO-O4O-USER-DOMAIN-ALIGNMENT-V1: service boundary on user JOIN
     const [settlement] = await this.dataSource.query(
       `SELECT ps.*,
               u."displayName" AS partner_name,
               u.email AS partner_email
        FROM partner_settlements ps
        LEFT JOIN users u ON u.id = ps.partner_id
+         AND EXISTS (SELECT 1 FROM service_memberships sm WHERE sm.user_id = u.id AND sm.service_key = 'neture')
        WHERE ps.id = $1`,
       [settlementId],
     );

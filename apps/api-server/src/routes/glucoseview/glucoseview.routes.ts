@@ -20,6 +20,7 @@ import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware
 import { GlucoseViewPharmacist } from './entities/index.js';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
 import { requireGlucoseViewScope } from '../../middleware/glucoseview-scope.middleware.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 /**
  * GlucoseView Admin middleware factory
@@ -119,8 +120,11 @@ export function createGlucoseViewRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
 
+  // ActionLogService (shared)
+  const actionLogService = new ActionLogService(dataSource);
+
   // Operator Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
-  const operatorDashboardController = createOperatorDashboardController(dataSource);
+  const operatorDashboardController = createOperatorDashboardController(dataSource, actionLogService);
   router.use('/operator', operatorDashboardController);
 
   // Mount routes

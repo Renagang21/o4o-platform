@@ -17,9 +17,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
 import { fetchOperatorDashboard } from '../../api/operatorDashboard';
 import { buildGlycoPharmOperatorConfig } from './operatorConfig';
+import OperatorAlerts from '../../components/OperatorAlerts';
+
+interface AlertItem {
+  id: string;
+  type: 'network' | 'commerce' | 'care' | 'system';
+  level: 'info' | 'warning' | 'critical';
+  title: string;
+  message: string;
+}
 
 export default function GlycoPharmOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +42,7 @@ export default function GlycoPharmOperatorDashboard() {
         setError('운영자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
       } else {
         setConfig(buildGlycoPharmOperatorConfig(data));
+        setAlerts((data as any).operatorAlerts ?? []);
       }
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);
@@ -66,5 +77,10 @@ export default function GlycoPharmOperatorDashboard() {
     );
   }
 
-  return <OperatorDashboardLayout config={config} />;
+  return (
+    <>
+      <OperatorAlerts alerts={alerts} />
+      <OperatorDashboardLayout config={config} />
+    </>
+  );
 }

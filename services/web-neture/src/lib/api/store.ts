@@ -269,7 +269,13 @@ export interface StoreOfferItem {
   supplierId: string;
   supplierName: string;
   priceGeneral: number;
+  priceGold: number | null;
+  pricePlatinum: number | null;
   distributionType: string;
+  consumerShortDescription: string | null;
+  businessShortDescription: string | null;
+  brandName: string | null;
+  manufacturerName: string | null;
 }
 
 export interface StoreListingItem {

@@ -2,17 +2,15 @@
  * RecommendedServicesSection - 플랫폼이 권하는 서비스 카드 그리드
  *
  * 약국경영 대시보드에서 표시되는 추천 서비스
- * 원래 MyServicesSection에서 분리됨
+ * WO-O4O-USER-DOMAIN-CLEANUP-V1: enrollment 제거 → entryUrl 직접 링크
  */
 
 import { useState, useEffect } from 'react';
-import { listPlatformServices, applyForService } from '../../../api/platform-services';
+import { listPlatformServices } from '../../../api/platform-services';
 import type { PlatformServiceItem } from '../../../api/platform-services';
 
 export function RecommendedServicesSection() {
   const [services, setServices] = useState<PlatformServiceItem[]>([]);
-  const [applyingCode, setApplyingCode] = useState<string | null>(null);
-  const [successApplied, setSuccessApplied] = useState<{ code: string; name: string } | null>(null);
 
   useEffect(() => {
     listPlatformServices()
@@ -20,28 +18,10 @@ export function RecommendedServicesSection() {
       .catch(() => {});
   }, []);
 
-  // 추천 서비스만 필터 (미등록 + featured)
+  // 추천 서비스만 필터 (미가입 + featured)
   const recommendedServices = services.filter(
     (s) => s.isFeatured && s.enrollmentStatus !== 'approved',
   );
-
-  const handleApply = async (code: string, name: string) => {
-    setApplyingCode(code);
-    try {
-      await applyForService(code);
-      const updated = await listPlatformServices();
-      setServices(updated);
-      setSuccessApplied({ code, name });
-    } catch {
-      // silent
-    } finally {
-      setApplyingCode(null);
-    }
-  };
-
-  const handleCloseSuccess = () => {
-    setSuccessApplied(null);
-  };
 
   if (recommendedServices.length === 0) return null;
 
@@ -138,8 +118,11 @@ export function RecommendedServicesSection() {
                 }}>
                   승인 대기
                 </span>
-              ) : svc.enrollmentStatus === 'rejected' ? (
-                <button
+              ) : svc.entryUrl ? (
+                <a
+                  href={svc.entryUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     display: 'block',
                     width: '100%',
@@ -151,100 +134,31 @@ export function RecommendedServicesSection() {
                     fontWeight: 600,
                     border: '1px solid #1e40af',
                     cursor: 'pointer',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    boxSizing: 'border-box',
                   }}
-                  onClick={() => handleApply(svc.code, svc.name)}
-                  disabled={applyingCode === svc.code}
                 >
-                  재신청
-                </button>
+                  바로 이동
+                </a>
               ) : (
-                <button
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '8px 16px',
-                    borderRadius: '8px',
-                    backgroundColor: '#ffffff',
-                    color: '#1e40af',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    border: '1px solid #1e40af',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleApply(svc.code, svc.name)}
-                  disabled={applyingCode === svc.code}
-                >
-                  이용 신청
-                </button>
+                <span style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: '#f1f5f9',
+                  color: '#94a3b8',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                }}>
+                  준비 중
+                </span>
               )}
             </div>
           </div>
         ))}
       </div>
-
-      {/* Success Modal */}
-      {successApplied && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '16px',
-        }}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            padding: '32px',
-            maxWidth: '400px',
-            width: '100%',
-            textAlign: 'center',
-          }}>
-            <div style={{ marginBottom: '16px' }}>
-              <span style={{ fontSize: '3rem' }}>✅</span>
-            </div>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#0f172a',
-              margin: '0 0 12px',
-            }}>
-              가입신청이 완료되었습니다
-            </h3>
-            <p style={{
-              fontSize: '14px',
-              color: '#64748b',
-              lineHeight: 1.6,
-              margin: '0 0 24px',
-            }}>
-              <strong>{successApplied.name}</strong> 서비스 이용 신청이 접수되었습니다.<br />
-              운영자 승인 후 서비스를 이용하실 수 있습니다.
-            </p>
-            <button
-              style={{
-                display: 'inline-block',
-                padding: '10px 32px',
-                borderRadius: '8px',
-                backgroundColor: '#1e40af',
-                color: '#ffffff',
-                fontSize: '15px',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-              }}
-              onClick={handleCloseSuccess}
-            >
-              확인
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

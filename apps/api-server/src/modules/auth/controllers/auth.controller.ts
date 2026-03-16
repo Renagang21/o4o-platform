@@ -460,7 +460,8 @@ export class AuthController extends BaseController {
         newUser.nickname = data.nickname || resolvedName;
 
         // role column removed - Phase3-E: roles is populated from role_assignments
-        newUser.serviceKey = serviceKey;
+        // WO-O4O-USER-DOMAIN-FINALIZATION-V1: users.service_key deprecated — SSOT is service_memberships
+        // newUser.serviceKey = serviceKey; // REMOVED — written to service_memberships below
         if (data.phone) {
           newUser.phone = data.phone.replace(/\D/g, '');
         }

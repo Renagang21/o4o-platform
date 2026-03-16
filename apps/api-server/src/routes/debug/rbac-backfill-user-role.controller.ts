@@ -2,15 +2,17 @@
  * RBAC Backfill User Role Controller
  *
  * WO-RBAC-DATA-NORMALIZATION-EXECUTION-V1
+ * WO-O4O-USER-DOMAIN-ALIGNMENT-V1: Platform admin auth required
  *
  * GET  /__debug__/rbac-backfill-user-role          — dry-run (count only)
  * POST /__debug__/rbac-backfill-user-role/execute   — assign 'user' role to RA-less active users
  *
- * Security: X-Admin-Secret header required for POST
+ * Security: authenticate + requireAdmin (POST also requires X-Admin-Secret)
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 function verifyAdminSecret(req: Request, res: Response): boolean {
   const secret = req.headers['x-admin-secret'] as string;
@@ -26,6 +28,9 @@ function verifyAdminSecret(req: Request, res: Response): boolean {
 
 export function createRbacBackfillUserRoleRouter(dataSource: DataSource): Router {
   const router = Router();
+
+  // WO-O4O-USER-DOMAIN-ALIGNMENT-V1: All debug routes require platform admin auth
+  router.use(authenticate as any, requireAdmin as any);
 
   // GET / — dry-run: show RA-less active users
   router.get('/', async (_req: Request, res: Response): Promise<void> => {

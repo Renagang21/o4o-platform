@@ -181,7 +181,30 @@ import type { RelatedEntity } from './related.entity.js';
 
 ---
 
-## 11. 플랫폼 개발 참조
+## 11. Operator Dashboard 표준
+
+> 📄 상세: `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
+
+### Admin / Operator 역할 구분
+
+| 역할 | 범위 | 핵심 기능 |
+|------|------|----------|
+| **Admin** | 구조 + 정책 + 거버넌스 + 금융 | 승인 관리, 사용자 CRUD, 정산/커미션, 시스템 설정 |
+| **Operator** | 운영 + 콘텐츠 + 모니터링 | Dashboard, 콘텐츠 CRUD, 사이니지, 포럼, AI 리포트 |
+
+### 필수 규칙
+
+1. **Guard**: `requireAuth` → `require{Service}Scope('{service}:{role}')` — 인라인 역할 체크, 레거시 `requireAdmin` 서비스 레벨 사용 금지
+2. **Layout**: Admin / Operator 독립 레이아웃 — 좌측 사이드바 + Capability Group (접이식)
+3. **Dashboard**: 5-Block (`KPI` + `AI Summary` + `Action Queue` + `Activity Log` + `Quick Actions`) — `OperatorDashboardLayout` 컴포넌트 사용
+4. **KPI**: Capability 분류(Network/Commerce/Care/Content/Signage/Community/Analytics) 기반 4~8개 — Backend 집계 필수, serviceKey 격리, KPI→Action Queue 연결
+5. **AI Summary**: Backend `CopilotEngineService.generateInsights()` 사용 — Frontend client-side 생성 금지
+6. **Sidebar**: 11-Capability Group 순서 준수 — Dashboard → Users → Approvals → Products → Stores → Orders → Content → Signage → Forum → Analytics → System
+7. **Route**: Backend `/api/v1/{service}/operator/*`, `/api/v1/{service}/admin/*` — Frontend `/operator/*`, `/admin/*`
+
+---
+
+## 12. 플랫폼 개발 참조
 
 Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
@@ -191,12 +214,13 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | LMS Core | `docs/platform/lms/LMS-CORE-EXTENSION-PRINCIPLES.md` |
 | Navigation | `docs/platform/navigation/OPERATOR-DASHBOARD-NAVIGATION.md` |
 | Extension | `docs/platform/extensions/EXTENSION-GENERAL-GUIDE.md` |
+| **Operator Dashboard** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
 
 핵심: Content 단일 출처 / Core 불변 / 데이터 소유권 분리 / 이벤트 기반 통신
 
 ---
 
-## 12. APP 표준화 (Baseline Lock)
+## 13. APP 표준화 (Baseline Lock)
 
 모든 APP = `@o4o/types/{app}` + `{App}QueryService` + 표준 UI 패턴
 
@@ -210,7 +234,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 ---
 
-## 13. Frozen Baselines
+## 14. Frozen Baselines
 
 모든 Freeze 항목 공통: **버그 수정·성능 개선·문서·테스트는 허용. 구조 변경은 명시적 WO 필수.**
 
@@ -265,9 +289,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | RBAC Runbook | `docs/rbac/RBAC-RUNBOOK-V1.md` |
 | RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
 | **O4O Core Freeze** | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
+| **Operator Dashboard 표준** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
 
 ---
 
-*Updated: 2026-02-28*
-*Version: 6.5*
+*Updated: 2026-03-16*
+*Version: 7.0*
 *Status: Active Constitution*

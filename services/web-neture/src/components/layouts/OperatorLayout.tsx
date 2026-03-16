@@ -17,7 +17,10 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
   Home,
   UserCheck,
+  Users,
   Truck,
+  Store,
+  ShoppingCart,
   Monitor,
   Brain,
   Settings,
@@ -39,12 +42,22 @@ type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
  * 표준 Capability 그룹 기반 sidebar.
  * 기존 '콘텐츠 관리' 그룹 → Content + Signage + Forum 분리.
  * 그룹명 표준화: 가입 관리→Approvals, 공급 운영→Products, AI 운영→Analytics, 설정→System.
+ *
+ * WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1:
+ * 11-Capability 표준 완성: Users, Stores, Orders 그룹 추가.
  */
 const OPERATOR_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Dashboard',
     icon: Home,
     items: [{ label: '대시보드', path: '/workspace/operator', exact: true }],
+  },
+  {
+    label: 'Users',
+    icon: Users,
+    items: [
+      { label: '회원 관리', path: '/workspace/operator/users' },
+    ],
   },
   {
     label: 'Approvals',
@@ -58,6 +71,20 @@ const OPERATOR_SIDEBAR_GROUPS: SidebarGroup[] = [
     icon: Truck,
     items: [
       { label: '공급 현황', path: '/workspace/operator/supply' },
+    ],
+  },
+  {
+    label: 'Stores',
+    icon: Store,
+    items: [
+      { label: '매장 관리', path: '/workspace/operator/stores' },
+    ],
+  },
+  {
+    label: 'Orders',
+    icon: ShoppingCart,
+    items: [
+      { label: '주문 관리', path: '/workspace/operator/orders' },
     ],
   },
   {

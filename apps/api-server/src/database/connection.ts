@@ -359,7 +359,6 @@ import { PlatformInquiry } from '../entities/PlatformInquiry.js';
 // PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
 // ============================================================================
 import { PlatformService } from '../entities/PlatformService.js';
-import { UserServiceEnrollment } from '../entities/UserServiceEnrollment.js';
 
 // ============================================================================
 // PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
@@ -825,7 +824,6 @@ export const AppDataSource = new DataSource({
     // PLATFORM SERVICE CATALOG (WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1)
     // ============================================================================
     PlatformService,
-    UserServiceEnrollment,
     // ============================================================================
     // PLATFORM PAYMENT ENTITY (WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1)
     // ============================================================================

@@ -1,24 +1,24 @@
 /**
  * PlatformServiceCatalogService
  *
- * 플랫폼 서비스 카탈로그 및 사용자 등록 관리.
+ * 플랫폼 서비스 카탈로그 관리.
  * WO-PLATFORM-SERVICE-CATALOG-AND-MY-V1
+ * WO-O4O-USER-DOMAIN-CLEANUP-V1: enrollment 제거 → service_memberships 기반
  */
 
 import { Repository, DataSource } from 'typeorm';
 import { PlatformService } from '../entities/PlatformService.js';
-import { UserServiceEnrollment } from '../entities/UserServiceEnrollment.js';
 import type { PlatformServiceStatus } from '../entities/PlatformService.js';
-import type { EnrollmentStatus } from '../entities/UserServiceEnrollment.js';
-import logger from '../utils/logger.js';
+
+export type MembershipStatus = 'active' | 'pending' | 'suspended' | undefined;
 
 export class PlatformServiceCatalogService {
   private serviceRepo: Repository<PlatformService>;
-  private enrollmentRepo: Repository<UserServiceEnrollment>;
+  private dataSource: DataSource;
 
   constructor(dataSource: DataSource) {
     this.serviceRepo = dataSource.getRepository(PlatformService);
-    this.enrollmentRepo = dataSource.getRepository(UserServiceEnrollment);
+    this.dataSource = dataSource;
   }
 
   // ===== Service Catalog =====
@@ -52,7 +52,13 @@ export class PlatformServiceCatalogService {
 
   // ===== User-Facing =====
 
-  async listVisibleServicesForUser(userId?: string): Promise<Array<PlatformService & { enrollmentStatus?: EnrollmentStatus }>> {
+  /**
+   * 가시 서비스 목록 (로그인 시 service_memberships 기반 멤버십 상태 포함)
+   *
+   * WO-O4O-USER-DOMAIN-CLEANUP-V1: user_service_enrollments → service_memberships
+   * 매핑: active → 'approved', pending → 'applied', suspended → 'rejected'
+   */
+  async listVisibleServicesForUser(userId?: string): Promise<Array<PlatformService & { enrollmentStatus?: string }>> {
     const services = await this.serviceRepo.find({
       where: { status: 'active' as PlatformServiceStatus },
       order: { featuredOrder: 'ASC', name: 'ASC' },
@@ -62,110 +68,25 @@ export class PlatformServiceCatalogService {
       return services.map((s) => ({ ...s, enrollmentStatus: undefined }));
     }
 
-    const enrollments = await this.enrollmentRepo.find({
-      where: { userId },
-    });
+    // WO-O4O-USER-DOMAIN-CLEANUP-V1: service_memberships SSOT 기반
+    const memberships: Array<{ service_key: string; status: string }> = await this.dataSource.query(
+      `SELECT service_key, status FROM service_memberships WHERE user_id = $1`,
+      [userId],
+    );
 
-    const enrollmentMap = new Map<string, EnrollmentStatus>();
-    enrollments.forEach((e) => enrollmentMap.set(e.serviceCode, e.status));
+    const membershipMap = new Map<string, string>();
+    memberships.forEach((m) => {
+      // Map service_memberships status to frontend-compatible enrollment status
+      const mapped = m.status === 'active' ? 'approved'
+        : m.status === 'pending' ? 'applied'
+        : m.status === 'suspended' ? 'rejected'
+        : undefined;
+      if (mapped) membershipMap.set(m.service_key, mapped);
+    });
 
     return services.map((s) => ({
       ...s,
-      enrollmentStatus: enrollmentMap.get(s.code) || undefined,
+      enrollmentStatus: membershipMap.get(s.code) || undefined,
     }));
-  }
-
-  async getUserEnrollments(userId: string): Promise<Array<UserServiceEnrollment & { service?: PlatformService }>> {
-    return this.enrollmentRepo
-      .createQueryBuilder('e')
-      .leftJoinAndSelect('e.service', 'service')
-      .where('e.userId = :userId', { userId })
-      .andWhere('e.status IN (:...statuses)', { statuses: ['applied', 'approved'] })
-      .orderBy('e.createdAt', 'DESC')
-      .getMany() as Promise<Array<UserServiceEnrollment & { service?: PlatformService }>>;
-  }
-
-  async applyForService(userId: string, serviceCode: string): Promise<UserServiceEnrollment> {
-    const service = await this.serviceRepo.findOne({ where: { code: serviceCode, status: 'active' as PlatformServiceStatus } });
-    if (!service) {
-      throw new Error('SERVICE_NOT_FOUND');
-    }
-
-    // Check existing enrollment
-    const existing = await this.enrollmentRepo.findOne({
-      where: { userId, serviceCode },
-    });
-
-    if (existing) {
-      if (existing.status === 'approved') {
-        throw new Error('ALREADY_APPROVED');
-      }
-      if (existing.status === 'applied') {
-        throw new Error('ALREADY_APPLIED');
-      }
-      // If rejected or not_applied, allow re-apply
-      existing.status = 'applied';
-      existing.appliedAt = new Date();
-      existing.decidedAt = null as unknown as Date;
-      existing.decidedBy = null as unknown as string;
-      existing.note = null as unknown as string;
-      return this.enrollmentRepo.save(existing);
-    }
-
-    // Auto-approve if service doesn't require approval
-    const status: EnrollmentStatus = service.approvalRequired ? 'applied' : 'approved';
-
-    const enrollment = this.enrollmentRepo.create({
-      userId,
-      serviceCode,
-      status,
-      appliedAt: new Date(),
-      ...(status === 'approved' ? { decidedAt: new Date() } : {}),
-    });
-
-    return this.enrollmentRepo.save(enrollment);
-  }
-
-  // ===== Admin =====
-
-  async listEnrollmentsByService(
-    serviceCode: string,
-    filters?: { status?: EnrollmentStatus },
-  ): Promise<UserServiceEnrollment[]> {
-    const qb = this.enrollmentRepo
-      .createQueryBuilder('e')
-      .leftJoinAndSelect('e.user', 'user')
-      .where('e.serviceCode = :serviceCode', { serviceCode });
-
-    if (filters?.status) {
-      qb.andWhere('e.status = :status', { status: filters.status });
-    }
-
-    qb.orderBy('e.appliedAt', 'DESC');
-
-    return qb.getMany();
-  }
-
-  async reviewEnrollment(
-    enrollmentId: string,
-    status: 'approved' | 'rejected',
-    decidedBy: string,
-    note?: string,
-  ): Promise<UserServiceEnrollment | null> {
-    const enrollment = await this.enrollmentRepo.findOne({ where: { id: enrollmentId } });
-    if (!enrollment) return null;
-
-    if (enrollment.status !== 'applied') {
-      throw new Error('INVALID_STATUS');
-    }
-
-    enrollment.status = status;
-    enrollment.decidedAt = new Date();
-    enrollment.decidedBy = decidedBy;
-    if (note) enrollment.note = note;
-
-    logger.info(`[PlatformServiceCatalog] Enrollment ${enrollmentId} ${status} by ${decidedBy}`);
-
-    return this.enrollmentRepo.save(enrollment);
   }
 }

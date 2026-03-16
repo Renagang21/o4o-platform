@@ -26,23 +26,14 @@ import DataTable, { Column } from '@/components/common/DataTable';
 
 // Service role definitions
 // WO-OPERATOR-ROLE-CLEANUP-V1: Super Admin = 전체 접근, 각 서비스 = Admin + Operator만
+// WO-O4O-KPA-CODE-CLEANUP-V1: kpa-b/kpa-c 제거
 const SERVICE_ROLES = {
   platform: [
     { value: 'platform:super_admin', label: 'Super Admin', description: '모든 서비스 접근 가능' },
   ],
-  'kpa-a': [
+  kpa: [
     { value: 'kpa:admin', label: 'Admin', description: 'KPA 커뮤니티 관리자' },
     { value: 'kpa:operator', label: 'Operator', description: 'KPA 커뮤니티 운영자' },
-  ],
-  'kpa-b': [
-    { value: 'kpa-b:district-admin', label: '지부 Admin', description: '데모 서비스 지부 관리자' },
-    { value: 'kpa-b:district', label: '지부 Operator', description: '데모 서비스 지부 운영자' },
-    { value: 'kpa-b:branch-admin', label: '분회 Admin', description: '데모 서비스 분회 관리자' },
-    { value: 'kpa-b:branch', label: '분회 Operator', description: '데모 서비스 분회 운영자' },
-  ],
-  'kpa-c': [
-    { value: 'kpa-c:admin', label: 'Admin', description: '분회서비스 관리자' },
-    { value: 'kpa-c:operator', label: 'Operator', description: '분회서비스 운영자' },
   ],
   neture: [
     { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
@@ -65,9 +56,7 @@ const SERVICE_ROLES = {
 // Section header display names
 const SERVICE_DISPLAY_NAMES: Record<string, string> = {
   platform: 'Platform',
-  'kpa-a': 'KPA-a 커뮤니티',
-  'kpa-b': 'KPA-b 데모서비스',
-  'kpa-c': 'KPA-c 분회서비스',
+  kpa: 'KPA',
   neture: 'Neture',
   glycopharm: 'GlycoPharm',
   cosmetics: 'K-Cosmetics',
@@ -158,17 +147,8 @@ const OperatorsPage: React.FC = () => {
       if (serviceFilter !== 'all') {
         const hasServiceRole = op.roles.some(role => {
           const roleLower = role.toLowerCase();
-          if (serviceFilter === 'platform') {
-            return roleLower.startsWith('platform:');
-          }
-          if (serviceFilter === 'kpa-a') {
-            return roleLower.startsWith('kpa:') || roleLower.startsWith('kpa-a:');
-          }
-          if (serviceFilter === 'kpa-b') {
-            return roleLower.startsWith('kpa-b:');
-          }
-          if (serviceFilter === 'kpa-c') {
-            return roleLower.startsWith('kpa-c:');
+          if (serviceFilter === 'kpa') {
+            return roleLower.startsWith('kpa:');
           }
           return roleLower.startsWith(`${serviceFilter}:`);
         });
@@ -192,9 +172,6 @@ const OperatorsPage: React.FC = () => {
   // Service name mapping
   const getServiceName = (role: string): string => {
     if (role.startsWith('platform:')) return 'Platform';
-    if (role.startsWith('kpa-a:')) return 'KPA 커뮤니티';
-    if (role.startsWith('kpa-b:')) return 'KPA 데모';
-    if (role.startsWith('kpa-c:')) return 'KPA 분회서비스';
     if (role.startsWith('kpa:')) return 'KPA';
     if (role.startsWith('neture:')) return 'Neture';
     if (role.startsWith('glycopharm:')) return 'GlycoPharm';
@@ -454,9 +431,7 @@ const OperatorsPage: React.FC = () => {
   const serviceTabs = [
     { id: 'all' as ServiceFilter, label: 'All', icon: Users },
     { id: 'platform' as ServiceFilter, label: 'Platform', icon: Shield },
-    { id: 'kpa-a' as ServiceFilter, label: 'KPA 커뮤니티', icon: Shield },
-    { id: 'kpa-b' as ServiceFilter, label: 'KPA 데모', icon: Shield },
-    { id: 'kpa-c' as ServiceFilter, label: 'KPA 분회', icon: Shield },
+    { id: 'kpa' as ServiceFilter, label: 'KPA', icon: Shield },
     { id: 'neture' as ServiceFilter, label: 'Neture', icon: Shield },
     { id: 'glycopharm' as ServiceFilter, label: 'GlycoPharm', icon: Shield },
     { id: 'cosmetics' as ServiceFilter, label: 'K-Cosmetics', icon: Shield },

@@ -321,6 +321,17 @@ const SupplyDashboardPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
 );
 
+// WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
+const UsersManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.UsersManagementPage }))
+);
+const StoreManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.StoreManagementPage }))
+);
+const OrdersManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OrdersManagementPage }))
+);
+
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 const SignageHqMediaPage = lazy(() => import('./pages/operator/signage/HqMediaPage'));
 const SignageHqMediaDetailPage = lazy(() => import('./pages/operator/signage/HqMediaDetailPage'));
@@ -663,6 +674,9 @@ function App() {
               </ProtectedRoute>
             }>
               <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
+              <Route path="/workspace/operator/users" element={<UsersManagementPage />} />
+              <Route path="/workspace/operator/stores" element={<StoreManagementPage />} />
+              <Route path="/workspace/operator/orders" element={<OrdersManagementPage />} />
               <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
               <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />

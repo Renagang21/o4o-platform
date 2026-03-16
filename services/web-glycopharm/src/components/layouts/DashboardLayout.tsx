@@ -31,6 +31,7 @@ import {
   CreditCard,
   FileText,
   Briefcase,
+  Heart,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -112,6 +113,9 @@ const roleConfig: Record<string, RoleConfig> = {
       { label: 'Dashboard', icon: LayoutDashboard, items: [
         { label: '대시보드', path: '/operator', exact: true },
       ]},
+      { label: 'Pharmacies', icon: Building2, items: [
+        { label: '약국 관리', path: '/operator/pharmacies' },
+      ]},
       { label: 'Users', icon: Users, items: [
         { label: '회원 관리', path: '/operator/users' },
       ]},
@@ -148,8 +152,15 @@ const roleConfig: Record<string, RoleConfig> = {
         { label: '포럼 신청', path: '/operator/forum-requests' },
         { label: '커뮤니티 관리', path: '/operator/community' },
       ]},
+      { label: 'Care', icon: Heart, items: [
+        { label: '케어 현황', path: '/operator/care' },
+        { label: '케어 알림', path: '/operator/care/alerts' },
+      ]},
       { label: 'Analytics', icon: BarChart3, items: [
         { label: 'AI 리포트', path: '/operator/ai-report' },
+      ]},
+      { label: 'Settings', icon: Settings, items: [
+        { label: '서비스 설정', path: '/operator/settings' },
       ]},
     ],
   },
