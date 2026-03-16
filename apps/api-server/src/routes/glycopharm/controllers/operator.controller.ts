@@ -19,6 +19,7 @@ import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
 import { requireGlycopharmScope } from '../../../middleware/glycopharm-scope.middleware.js';
+import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -41,6 +42,7 @@ export function createOperatorController(
   requireAuth: AuthMiddleware
 ): Router {
   const router = Router();
+  const copilotEngine = new CopilotEngineService();
 
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Router-level guard
   // Replaces per-handler isOperatorOrAdmin() inline check
@@ -108,31 +110,19 @@ export function createOperatorController(
           { key: 'cms-published', label: '게시 콘텐츠', value: cmsPublished, status: 'neutral' },
         ];
 
-        // Block 2: AI Summary
-        const aiSummary: AiSummaryItem[] = [];
-        if (pendingApprovals > 0) {
-          aiSummary.push({
-            id: 'pending-apps',
-            message: `입점 신청 승인 대기 ${pendingApprovals}건이 있습니다.`,
-            level: 'warning',
-            link: '/operator/applications',
-          });
-        }
-        if (draftProducts > 0) {
-          aiSummary.push({
-            id: 'draft-products',
-            message: `임시저장 상품 ${draftProducts}건이 있습니다.`,
-            level: 'info',
-            link: '/operator/products?status=draft',
-          });
-        }
-        if (aiSummary.length === 0) {
-          aiSummary.push({
-            id: 'all-clear',
-            message: '현재 긴급한 처리 항목이 없습니다.',
-            level: 'info',
-          });
-        }
+        // Block 2: AI Summary (Copilot Engine)
+        const copilotMetrics = {
+          pharmacies: { active: activePharmacies, inactive: inactivePharmacies },
+          applications: { pending: pendingApprovals },
+          products: { active: activeProducts, draft: draftProducts, total: totalProducts },
+        };
+        const copilotUser = {
+          id: (req as any).user?.id || '',
+          role: 'glycopharm:operator',
+        };
+        const { insights: aiSummary } = await copilotEngine.generateInsights(
+          'glycopharm', copilotMetrics, copilotUser,
+        );
 
         // Block 3: Action Queue
         const actionQueue: ActionItem[] = [

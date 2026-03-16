@@ -1203,6 +1203,15 @@ const startServer = async () => {
       logger.error('Failed to register Operator Copilot routes:', operatorCopilotError);
     }
 
+    // 29e-2. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
+    try {
+      const { createCopilotEngineController } = await import('./copilot/copilot-engine.controller.js');
+      app.use('/api/v1/platform/copilot', createCopilotEngineController());
+      logger.info('✅ Copilot Engine routes registered at /api/v1/platform/copilot/*');
+    } catch (copilotEngineError) {
+      logger.error('Failed to register Copilot Engine routes:', copilotEngineError);
+    }
+
     // 29f. Register Catalog Import routes (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     try {
       const catalogImportRoutes = createCatalogImportRoutes(AppDataSource);

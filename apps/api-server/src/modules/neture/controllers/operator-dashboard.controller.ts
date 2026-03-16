@@ -20,6 +20,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
+import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import logger from '../../../utils/logger.js';
 
 // 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
@@ -38,6 +39,7 @@ interface OperatorDashboardConfig {
 
 export function createOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
+  const copilotEngine = new CopilotEngineService();
 
   // Router-level guard: neture:operator (includes neture:admin via scopeRoleMapping)
   router.use(requireAuth);
@@ -144,39 +146,22 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         { key: 'cms-published', label: '게시 콘텐츠', value: cms.published, status: 'neutral' },
       ];
 
-      // Block 2: AI Summary (static insights based on data)
-      const aiSummary: AiSummaryItem[] = [];
-      if (pendingSuppliers > 0) {
-        aiSummary.push({
-          id: 'pending-suppliers',
-          message: `승인 대기 공급사 ${pendingSuppliers}건이 있습니다.`,
-          level: 'warning',
-          link: '/workspace/operator/suppliers?status=PENDING',
-        });
-      }
-      if (pendingRegs > 0) {
-        aiSummary.push({
-          id: 'pending-registrations',
-          message: `가입 승인 대기 ${pendingRegs}건이 있습니다.`,
-          level: 'warning',
-          link: '/workspace/operator/registrations',
-        });
-      }
-      if (products.pending > 0) {
-        aiSummary.push({
-          id: 'pending-products',
-          message: `상품 승인 대기 ${products.pending}건이 있습니다.`,
-          level: 'info',
-          link: '/workspace/operator/products?status=PENDING',
-        });
-      }
-      if (aiSummary.length === 0) {
-        aiSummary.push({
-          id: 'all-clear',
-          message: '현재 긴급한 처리 항목이 없습니다.',
-          level: 'info',
-        });
-      }
+      // Block 2: AI Summary (Copilot Engine)
+      const copilotMetrics = {
+        stores: { active: activeOrgs, inactive: inactiveOrgs },
+        suppliers: { active: activeSuppliers, pending: pendingSuppliers, total: totalSuppliers },
+        products: { active: products.active, pending: products.pending, total: products.total },
+        orders: { monthly: orders.total_orders, revenue: orders.total_revenue },
+        registrations: { pending: pendingRegs },
+        cms: { published: cms.published, total: cms.total },
+      };
+      const copilotUser = {
+        id: (_req as any).user?.id || '',
+        role: 'neture:operator',
+      };
+      const { insights: aiSummary } = await copilotEngine.generateInsights(
+        'neture', copilotMetrics, copilotUser,
+      );
 
       // Block 3: Action Queue
       const actionQueue: ActionItem[] = [

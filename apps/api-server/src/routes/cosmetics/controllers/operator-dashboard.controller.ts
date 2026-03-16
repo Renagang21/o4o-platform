@@ -21,6 +21,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireCosmeticsScope } from '../../../middleware/cosmetics-scope.middleware.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
+import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 
 // 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
 interface KpiItem { key: string; label: string; value: number | string; delta?: number; status?: 'neutral' | 'warning' | 'critical'; link?: string; }
@@ -39,6 +40,7 @@ interface OperatorDashboardConfig {
 export function createCosmeticsOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
   const storeSummaryService = new CosmeticsStoreSummaryService(dataSource);
+  const copilotEngine = new CopilotEngineService();
 
   // Router-level guard: cosmetics:operator (includes cosmetics:admin via scopeRoleMapping)
   router.use(requireAuth);
@@ -93,31 +95,19 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
         { key: 'cms-published', label: '게시 콘텐츠', value: cms.published, status: 'neutral' },
       ];
 
-      // Block 2: AI Summary
-      const aiSummary: AiSummaryItem[] = [];
-      if (adminSummary.activeOrders > 0) {
-        aiSummary.push({
-          id: 'active-orders',
-          message: `진행 중인 주문 ${adminSummary.activeOrders}건이 있습니다.`,
-          level: 'info',
-          link: '/operator/orders',
-        });
-      }
-      if (products.pending > 0) {
-        aiSummary.push({
-          id: 'pending-products',
-          message: `승인 대기 상품 ${products.pending}건이 있습니다.`,
-          level: 'warning',
-          link: '/operator/products?status=PENDING',
-        });
-      }
-      if (aiSummary.length === 0) {
-        aiSummary.push({
-          id: 'all-clear',
-          message: '현재 긴급한 처리 항목이 없습니다.',
-          level: 'info',
-        });
-      }
+      // Block 2: AI Summary (Copilot Engine)
+      const copilotMetrics = {
+        products: { active: products.active, pending: products.pending, total: products.total },
+        orders: { active: adminSummary.activeOrders },
+        stores: { active: adminSummary.totalStores },
+      };
+      const copilotUser = {
+        id: (_req as any).user?.id || '',
+        role: 'cosmetics:operator',
+      };
+      const { insights: aiSummary } = await copilotEngine.generateInsights(
+        'cosmetics', copilotMetrics, copilotUser,
+      );
 
       // Block 3: Action Queue
       const actionQueue: ActionItem[] = [

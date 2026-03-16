@@ -21,6 +21,7 @@ import { OrganizationStore } from '../../../modules/store-core/entities/organiza
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
 import { KpaOrganizationJoinRequest } from '../entities/kpa-organization-join-request.entity.js';
+import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 
 interface OperatorSummaryServices {
   contentService: ContentQueryService;
@@ -35,6 +36,7 @@ export function createOperatorSummaryController(
   services: OperatorSummaryServices,
 ): Router {
   const router = Router();
+  const copilotEngine = new CopilotEngineService();
   const { contentService, signageService, forumService } = services;
 
   // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: Operator scope enforced at router level
@@ -253,14 +255,21 @@ export function createOperatorSummaryController(
       { key: 'forum-posts', label: '포럼 게시글', value: forumPosts, status: 'neutral' as const },
     ];
 
-    // Block 2: AI Summary
-    const aiSummary: Array<{ id: string; message: string; level: 'info' | 'warning' | 'critical'; link?: string }> = [];
-    if (pendingContent > 0) aiSummary.push({ id: 'pending-content', message: `콘텐츠 승인 대기 ${pendingContent}건`, level: 'warning', link: '/operator/content?status=pending' });
-    if (pendingMedia + pendingPlaylists > 0) aiSummary.push({ id: 'pending-signage', message: `사이니지 승인 대기 ${pendingMedia + pendingPlaylists}건`, level: 'warning', link: '/operator/signage' });
-    if (forumPending > 0) aiSummary.push({ id: 'pending-forum', message: `포럼 카테고리 요청 ${forumPending}건`, level: 'warning', link: '/operator/forum' });
-    if (memberPending > 0) aiSummary.push({ id: 'pending-membership', message: `가입 승인 대기 ${memberPending}건`, level: 'warning', link: '/operator/members' });
-    if (expirySoon > 0) aiSummary.push({ id: 'expiry-soon', message: `강제노출 만료 임박 ${expirySoon}건`, level: 'critical', link: '/operator/store-assets' });
-    if (aiSummary.length === 0) aiSummary.push({ id: 'all-clear', message: '현재 긴급한 처리 항목이 없습니다.', level: 'info' });
+    // Block 2: AI Summary (Copilot Engine)
+    const copilotMetrics = {
+      members: { active: 0, pending: memberPending },
+      content: { published: publishedContent, pending: pendingContent },
+      signage: { pending: pendingMedia + pendingPlaylists },
+      forum: { pending: forumPending },
+      storeAssets: { expiringSoon: expirySoon },
+    };
+    const copilotUser = {
+      id: (req as any).user?.id || '',
+      role: 'kpa:operator',
+    };
+    const { insights: aiSummary } = await copilotEngine.generateInsights(
+      'kpa', copilotMetrics, copilotUser,
+    );
 
     // Block 3: Action Queue
     const actionQueue = [

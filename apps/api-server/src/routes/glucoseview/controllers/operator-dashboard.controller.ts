@@ -20,6 +20,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireGlucoseViewScope } from '../../../middleware/glucoseview-scope.middleware.js';
+import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 
 // 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
 interface KpiItem { key: string; label: string; value: number | string; delta?: number; status?: 'neutral' | 'warning' | 'critical'; link?: string; }
@@ -37,6 +38,7 @@ interface OperatorDashboardConfig {
 
 export function createOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();
+  const copilotEngine = new CopilotEngineService();
 
   router.use(requireAuth);
   router.use(requireGlucoseViewScope('glucoseview:operator') as any);
@@ -119,31 +121,22 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         { key: 'cms-published', label: '게시 콘텐츠', value: publishedContent, status: 'neutral' },
       ];
 
-      // Block 2: AI Summary
-      const aiSummary: AiSummaryItem[] = [];
-      if (pendingApps > 0) {
-        aiSummary.push({
-          id: 'pending-apps',
-          message: `참여 신청 대기 ${pendingApps}건이 있습니다.`,
-          level: 'warning',
-          link: '/operator/applications',
-        });
-      }
-      if (pendingPharmacists > 0) {
-        aiSummary.push({
-          id: 'pending-pharmacists',
-          message: `약사 승인 대기 ${pendingPharmacists}명이 있습니다.`,
-          level: 'warning',
-          link: '/operator/users',
-        });
-      }
-      if (aiSummary.length === 0) {
-        aiSummary.push({
-          id: 'all-clear',
-          message: '현재 긴급한 처리 항목이 없습니다.',
-          level: 'info',
-        });
-      }
+      // Block 2: AI Summary (Copilot Engine)
+      const inactivePharmacies = pharmacyCounts.find(r => r.status === 'inactive')?.cnt || 0;
+      const copilotMetrics = {
+        pharmacies: { active: activePharmacies, inactive: inactivePharmacies },
+        pharmacists: { approved: approvedPharmacists, pending: pendingPharmacists },
+        customers: { total: totalCustomers },
+        vendors: { active: activeVendors },
+        applications: { pending: pendingApps },
+      };
+      const copilotUser = {
+        id: (_req as any).user?.id || '',
+        role: 'glucoseview:operator',
+      };
+      const { insights: aiSummary } = await copilotEngine.generateInsights(
+        'glucoseview', copilotMetrics, copilotUser,
+      );
 
       // Block 3: Action Queue
       const actionQueue: ActionItem[] = [
