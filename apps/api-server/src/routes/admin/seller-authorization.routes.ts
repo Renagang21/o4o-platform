@@ -1,6 +1,6 @@
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { requireAdmin } from '../../middleware/auth.middleware.js';
 
 /**
  * Phase 9: Seller Authorization System - Admin Routes

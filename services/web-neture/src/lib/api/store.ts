@@ -244,6 +244,56 @@ export interface AdminSettlementKpi {
   paid_amount: number;
 }
 
+// ==================== Store Product Library Types (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) ====================
+
+export interface StoreProductSearchResult {
+  id: string;
+  barcode: string;
+  marketingName: string;
+  regulatoryName: string;
+  manufacturerName: string;
+  specification: string | null;
+  category: { id: string; name: string } | null;
+  brand: { id: string; name: string } | null;
+  primaryImageUrl: string | null;
+  offerCount: number;
+}
+
+export interface StoreProductSearchResponse {
+  data: StoreProductSearchResult[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
+export interface StoreOfferItem {
+  id: string;
+  supplierId: string;
+  supplierName: string;
+  priceGeneral: number;
+  distributionType: string;
+}
+
+export interface StoreListingItem {
+  id: string;
+  isActive: boolean;
+  price: number | null;
+  createdAt: string;
+  updatedAt: string;
+  masterId: string;
+  barcode: string;
+  marketingName: string;
+  regulatoryName: string;
+  manufacturerName: string;
+  primaryImage: string | null;
+  offerPrice: number;
+  distributionType: string;
+  supplierName: string;
+}
+
+export interface StoreListingsResponse {
+  data: StoreListingItem[];
+  meta: { page: number; limit: number; total: number; totalPages: number };
+}
+
 // ==================== Store API ====================
 
 export const storeApi = {
@@ -313,6 +363,106 @@ export const storeApi = {
     } catch (error) {
       console.warn('[Store API] Failed to fetch order:', error);
       return null;
+    }
+  },
+
+  // ── Store Product Library (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) ──
+
+  async searchProducts(params?: {
+    q?: string; categoryId?: string; brandId?: string; page?: number; limit?: number;
+  }): Promise<StoreProductSearchResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.q) sp.set('q', params.q);
+      if (params?.categoryId) sp.set('categoryId', params.categoryId);
+      if (params?.brandId) sp.set('brandId', params.brandId);
+      if (params?.page) sp.set('page', String(params.page));
+      if (params?.limit) sp.set('limit', String(params.limit));
+      const qs = sp.toString();
+      const url = `${API_BASE_URL}/api/v1/store/products/search${qs ? `?${qs}` : ''}`;
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Store API] searchProducts failed:', response.status);
+        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      }
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Store API] searchProducts error:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  async getMasterOffers(masterId: string): Promise<StoreOfferItem[]> {
+    try {
+      const response = await fetchWithTimeout(
+        `${API_BASE_URL}/api/v1/store/products/master/${masterId}/offers`,
+        { credentials: 'include' },
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('[Store API] getMasterOffers error:', error);
+      return [];
+    }
+  },
+
+  async createListing(data: { offerId: string; price?: number | null }): Promise<{ success: boolean; data?: any; message?: string; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/store/products/list`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return { success: false, error: result.error?.message || 'LISTING_FAILED' };
+      }
+      return { success: true, data: result.data, message: result.message };
+    } catch (error) {
+      console.error('[Store API] createListing error:', error);
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  async getMyListings(params?: { page?: number; limit?: number }): Promise<StoreListingsResponse> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.set('page', String(params.page));
+      if (params?.limit) sp.set('limit', String(params.limit));
+      const qs = sp.toString();
+      const url = `${API_BASE_URL}/api/v1/store/products${qs ? `?${qs}` : ''}`;
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
+      if (!response.ok) {
+        console.warn('[Store API] getMyListings failed:', response.status);
+        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      }
+      const result = await response.json();
+      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    } catch (error) {
+      console.warn('[Store API] getMyListings error:', error);
+      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+    }
+  },
+
+  async updateListing(id: string, data: { isActive?: boolean; price?: number | null }): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/store/products/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return { success: false, error: result.error?.message || 'UPDATE_FAILED' };
+      }
+      return { success: true, data: result.data };
+    } catch (error) {
+      console.error('[Store API] updateListing error:', error);
+      return { success: false, error: 'NETWORK_ERROR' };
     }
   },
 };

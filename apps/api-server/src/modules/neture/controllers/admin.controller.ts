@@ -229,6 +229,40 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   /**
+   * POST /admin/offers/bulk-approve
+   * 일괄 승인 — WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1
+   */
+  router.post('/offers/bulk-approve', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { offerIds } = req.body;
+      if (!Array.isArray(offerIds) || offerIds.length === 0) {
+        return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'offerIds array required' } });
+      }
+      if (offerIds.length > 100) {
+        return res.status(400).json({ success: false, error: { code: 'TOO_MANY', message: 'Max 100 offers per request' } });
+      }
+
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const result = await netureService.approveProducts(offerIds, adminUserId);
+
+      if (result.approved.length > 0) {
+        netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.bulk_approve', {
+          meta: { count: result.approved.length, offerIds: result.approved },
+        }).catch(() => {});
+      }
+
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error bulk-approving offers:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to bulk approve offers' } });
+    }
+  });
+
+  /**
    * POST /admin/products/:id/reject
    * 상품 반려 (isActive 유지 false)
    */

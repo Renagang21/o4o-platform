@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import { PartnerController } from '../controllers/partner/partnerController.js';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { requireAnyRole } from '../middleware/permission.middleware.js';
-import { UserRole } from '../entities/User.js';
+import { requireRole } from '../middleware/auth.middleware.js';
 
 const router: Router = Router();
 
 // Partner dashboard routes (partner and admin access)
-const partnerOrAdmin = requireAnyRole([UserRole.PARTNER, UserRole.ADMIN, UserRole.SUPER_ADMIN]);
+const partnerOrAdmin = requireRole(['partner', 'admin', 'super_admin']);
 
 // ====================================
 // Phase K: Consumer-facing Partner API

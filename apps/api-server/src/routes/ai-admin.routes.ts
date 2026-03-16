@@ -16,7 +16,7 @@
 
 import { Router, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { requireAdmin } from '../middleware/permission.middleware.js';
+import { requireAdmin } from '../middleware/auth.middleware.js';
 import { aiAdminService } from '../services/ai-admin.service.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';

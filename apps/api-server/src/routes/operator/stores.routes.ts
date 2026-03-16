@@ -6,16 +6,16 @@
  */
 import { Router } from 'express';
 import { StoreConsoleController } from '../../controllers/operator/StoreConsoleController.js';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAnyRole } from '../../middleware/permission.middleware.js';
-import { UserRole } from '../../entities/User.js';
+import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
+import { injectServiceScope } from '../../utils/serviceScope.js';
 
 const router: Router = Router();
 const controller = new StoreConsoleController();
 
-// All routes require authentication + operator-level role
+// All routes require authentication + operator-level role + service scope
 router.use(authenticate);
-router.use(requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.OPERATOR, UserRole.MANAGER]));
+router.use(requireRole(['admin', 'super_admin', 'operator', 'manager']));
+router.use(injectServiceScope);
 
 // Store list with slug + owner + channel_count + product_count
 router.get('/', controller.getStores);

@@ -7,7 +7,7 @@
 
 import { Router, Response } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { requireAdmin } from '../../middleware/auth.middleware.js';
 import adminDashboardController from '../../controllers/admin/adminDashboardController.js';
 import type { AuthRequest } from '../../types/auth.js';
 

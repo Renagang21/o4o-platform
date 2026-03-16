@@ -12,7 +12,7 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { requireAdmin } from '../middleware/permission.middleware.js';
+import { requireAdmin } from '../middleware/auth.middleware.js';
 import { ServiceMonitorService } from '../services/service-monitor.service.js';
 import logger from '../utils/logger.js';
 

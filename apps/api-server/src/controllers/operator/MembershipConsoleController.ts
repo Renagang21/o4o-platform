@@ -7,6 +7,7 @@
  */
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
+import type { ServiceScope } from '../../utils/serviceScope.js';
 
 export class MembershipConsoleController {
 
@@ -16,6 +17,7 @@ export class MembershipConsoleController {
    */
   getMembers = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const {
         page = 1,
         limit = 20,
@@ -49,7 +51,16 @@ export class MembershipConsoleController {
         paramIdx++;
       }
 
-      if (serviceKey && serviceKey !== 'all') {
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
+      // Platform admin: optional serviceKey filter from query param
+      // Service operator: mandatory filter from scope (overrides query param)
+      if (!scope.isPlatformAdmin) {
+        conditions.push(
+          `EXISTS (SELECT 1 FROM service_memberships sm2 WHERE sm2.user_id = u.id AND sm2.service_key = ANY($${paramIdx}))`
+        );
+        params.push(scope.serviceKeys);
+        paramIdx++;
+      } else if (serviceKey && serviceKey !== 'all') {
         conditions.push(
           `EXISTS (SELECT 1 FROM service_memberships sm2 WHERE sm2.user_id = u.id AND sm2.service_key = $${paramIdx})`
         );
@@ -114,14 +125,22 @@ export class MembershipConsoleController {
         roleMap[row.user_id] = row.roles || [];
       }
 
-      // Batch fetch service_memberships
-      const membershipRows = await AppDataSource.query(
-        `SELECT id, user_id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at
-         FROM service_memberships
-         WHERE user_id = ANY($1)
-         ORDER BY created_at DESC`,
-        [userIds]
-      );
+      // Batch fetch service_memberships (scoped by service)
+      const membershipRows = scope.isPlatformAdmin
+        ? await AppDataSource.query(
+            `SELECT id, user_id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at
+             FROM service_memberships
+             WHERE user_id = ANY($1)
+             ORDER BY created_at DESC`,
+            [userIds]
+          )
+        : await AppDataSource.query(
+            `SELECT id, user_id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at
+             FROM service_memberships
+             WHERE user_id = ANY($1) AND service_key = ANY($2)
+             ORDER BY created_at DESC`,
+            [userIds, scope.serviceKeys]
+          );
       const membershipMap: Record<string, any[]> = {};
       for (const row of membershipRows) {
         if (!membershipMap[row.user_id]) membershipMap[row.user_id] = [];
@@ -171,7 +190,22 @@ export class MembershipConsoleController {
    */
   getMemberDetail = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary check
+      // Non-platform-admin can only view users that have a membership in their service
+      if (!scope.isPlatformAdmin) {
+        const accessCheck = await AppDataSource.query(
+          `SELECT 1 FROM service_memberships
+           WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
+          [userId, scope.serviceKeys]
+        );
+        if (accessCheck.length === 0) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
 
       // Fetch user (users 테이블: camelCase columns)
       const userRows = await AppDataSource.query(
@@ -198,14 +232,22 @@ export class MembershipConsoleController {
         [userId]
       );
 
-      // Fetch service_memberships
-      const membershipRows = await AppDataSource.query(
-        `SELECT id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at, updated_at
-         FROM service_memberships
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [userId]
-      );
+      // Fetch service_memberships (scoped by service)
+      const membershipRows = scope.isPlatformAdmin
+        ? await AppDataSource.query(
+            `SELECT id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at, updated_at
+             FROM service_memberships
+             WHERE user_id = $1
+             ORDER BY created_at DESC`,
+            [userId]
+          )
+        : await AppDataSource.query(
+            `SELECT id, service_key, status, role, approved_by, approved_at, rejection_reason, created_at, updated_at
+             FROM service_memberships
+             WHERE user_id = $1 AND service_key = ANY($2)
+             ORDER BY created_at DESC`,
+            [userId, scope.serviceKeys]
+          );
 
       res.json({
         success: true,
@@ -257,16 +299,26 @@ export class MembershipConsoleController {
    */
   approveMembership = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { membershipId } = req.params;
       const approvedBy = (req as any).user?.id || null;
 
-      const result = await AppDataSource.query(
-        `UPDATE service_memberships
-         SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-         WHERE id = $2 AND status IN ('pending', 'rejected')
-         RETURNING id, user_id, service_key, status`,
-        [approvedBy, membershipId]
-      );
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary on write
+      const result = scope.isPlatformAdmin
+        ? await AppDataSource.query(
+            `UPDATE service_memberships
+             SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+             WHERE id = $2 AND status IN ('pending', 'rejected')
+             RETURNING id, user_id, service_key, status`,
+            [approvedBy, membershipId]
+          )
+        : await AppDataSource.query(
+            `UPDATE service_memberships
+             SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+             WHERE id = $2 AND status IN ('pending', 'rejected') AND service_key = ANY($3)
+             RETURNING id, user_id, service_key, status`,
+            [approvedBy, membershipId, scope.serviceKeys]
+          );
 
       if (result.length === 0) {
         res.status(404).json({ success: false, error: 'Membership not found or already active' });
@@ -286,16 +338,26 @@ export class MembershipConsoleController {
    */
   rejectMembership = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { membershipId } = req.params;
       const { reason } = req.body;
 
-      const result = await AppDataSource.query(
-        `UPDATE service_memberships
-         SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
-         WHERE id = $2 AND status IN ('pending', 'active')
-         RETURNING id, user_id, service_key, status`,
-        [reason || null, membershipId]
-      );
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary on write
+      const result = scope.isPlatformAdmin
+        ? await AppDataSource.query(
+            `UPDATE service_memberships
+             SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
+             WHERE id = $2 AND status IN ('pending', 'active')
+             RETURNING id, user_id, service_key, status`,
+            [reason || null, membershipId]
+          )
+        : await AppDataSource.query(
+            `UPDATE service_memberships
+             SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
+             WHERE id = $2 AND status IN ('pending', 'active') AND service_key = ANY($3)
+             RETURNING id, user_id, service_key, status`,
+            [reason || null, membershipId, scope.serviceKeys]
+          );
 
       if (result.length === 0) {
         res.status(404).json({ success: false, error: 'Membership not found or already rejected' });

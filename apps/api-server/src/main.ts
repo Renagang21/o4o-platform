@@ -1185,6 +1185,15 @@ const startServer = async () => {
       logger.error('Failed to register Supplier Copilot routes:', supplierCopilotError);
     }
 
+    // 29d-2. Register Product Library routes (WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1)
+    try {
+      const { createProductLibraryController } = await import('./modules/neture/controllers/product-library.controller.js');
+      app.use('/api/v1/neture', createProductLibraryController(AppDataSource));
+      logger.info('✅ Product Library routes registered at /api/v1/neture/products/library/*');
+    } catch (productLibraryError) {
+      logger.error('Failed to register Product Library routes:', productLibraryError);
+    }
+
     // 29e. Register Operator Copilot routes (WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1)
     try {
       const { createOperatorCopilotRouter } = await import('./modules/operator/operator-copilot.controller.js');
@@ -1240,6 +1249,17 @@ const startServer = async () => {
       logger.info('✅ Store Library routes registered at /api/v1/store');
     } catch (storeLibraryError) {
       logger.error('Failed to register Store Library routes:', storeLibraryError);
+    }
+
+    // 31-e. Register Store Product Library routes (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
+    try {
+      const { createStoreProductLibraryController } = await import(
+        './routes/o4o-store/controllers/store-product-library.controller.js'
+      );
+      app.use('/api/v1/store/products', createStoreProductLibraryController(AppDataSource));
+      logger.info('✅ Store Product Library routes registered at /api/v1/store/products');
+    } catch (storeProductLibError) {
+      logger.error('Failed to register Store Product Library routes:', storeProductLibError);
     }
 
     // 32. Register CMS Content routes (WO-P2-IMPLEMENT-CONTENT)

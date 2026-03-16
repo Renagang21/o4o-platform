@@ -7,8 +7,6 @@
 /** All known service keys in the O4O platform */
 export type ServiceKey =
   | 'kpa'
-  | 'kpa-b'
-  | 'kpa-c'
   | 'neture'
   | 'glycopharm'
   | 'cosmetics'

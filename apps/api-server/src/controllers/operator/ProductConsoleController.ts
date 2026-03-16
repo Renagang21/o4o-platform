@@ -7,6 +7,17 @@
  */
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
+import type { ServiceScope } from '../../utils/serviceScope.js';
+
+/**
+ * WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Product scope filter via organization listings.
+ * product_masters is platform reference data — service scope applies through
+ * organization_product_listings linkage to organization_service_enrollments.
+ */
+const PRODUCT_SCOPE_EXISTS = `EXISTS (
+  SELECT 1 FROM organization_product_listings opl
+  JOIN organization_service_enrollments ose ON ose.organization_id = opl.organization_id
+  WHERE opl.master_id = pm.id AND ose.service_code = ANY`;
 
 export class ProductConsoleController {
 
@@ -16,6 +27,7 @@ export class ProductConsoleController {
    */
   getProducts = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const {
         page = 1,
         limit = 20,
@@ -33,6 +45,13 @@ export class ProductConsoleController {
       const conditions: string[] = [];
       const params: any[] = [];
       let paramIdx = 1;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
+      if (!scope.isPlatformAdmin) {
+        conditions.push(`${PRODUCT_SCOPE_EXISTS}($${paramIdx}))`);
+        params.push(scope.serviceKeys);
+        paramIdx++;
+      }
 
       if (search) {
         conditions.push(
@@ -89,19 +108,29 @@ export class ProductConsoleController {
         [...params, limitNum, offset]
       );
 
-      // Stats query
+      // Stats query — WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: scoped
+      const scopeFilter = scope.isPlatformAdmin
+        ? ''
+        : `WHERE ${PRODUCT_SCOPE_EXISTS}($1))`;
+      const scopeParams = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+
       const statsResult = await AppDataSource.query(
         `SELECT
            COUNT(*)::int as total_products,
-           COUNT(CASE WHEN EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.master_id = pm2.id) THEN 1 END)::int as with_image,
-           COUNT(CASE WHEN EXISTS (SELECT 1 FROM supplier_product_offers spo2 WHERE spo2.master_id = pm2.id) THEN 1 END)::int as with_supplier
-         FROM product_masters pm2`
+           COUNT(CASE WHEN EXISTS (SELECT 1 FROM product_images pi2 WHERE pi2.master_id = pm.id) THEN 1 END)::int as with_image,
+           COUNT(CASE WHEN EXISTS (SELECT 1 FROM supplier_product_offers spo2 WHERE spo2.master_id = pm.id) THEN 1 END)::int as with_supplier
+         FROM product_masters pm
+         ${scopeFilter}`,
+        scopeParams
       );
 
       const duplicateResult = await AppDataSource.query(
         `SELECT COUNT(*)::int as duplicate_barcodes FROM (
-           SELECT barcode FROM product_masters GROUP BY barcode HAVING COUNT(*) > 1
-         ) sub`
+           SELECT pm.barcode FROM product_masters pm
+           ${scopeFilter}
+           GROUP BY pm.barcode HAVING COUNT(*) > 1
+         ) sub`,
+        scopeParams
       );
 
       res.json({
@@ -139,8 +168,16 @@ export class ProductConsoleController {
    * GET /api/v1/operator/products/duplicates
    * 바코드 중복 상품 그룹
    */
-  getDuplicates = async (_req: Request, res: Response): Promise<void> => {
+  getDuplicates = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
+      const scopeFilter = scope.isPlatformAdmin
+        ? ''
+        : `WHERE ${PRODUCT_SCOPE_EXISTS}($1))`;
+      const scopeParams = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+
       const duplicates = await AppDataSource.query(
         `SELECT pm.barcode, COUNT(*)::int as count,
                 JSON_AGG(JSON_BUILD_OBJECT(
@@ -151,9 +188,11 @@ export class ProductConsoleController {
                   'createdAt', pm.created_at
                 ) ORDER BY pm.created_at) as products
          FROM product_masters pm
+         ${scopeFilter}
          GROUP BY pm.barcode
          HAVING COUNT(*) > 1
-         ORDER BY COUNT(*) DESC`
+         ORDER BY COUNT(*) DESC`,
+        scopeParams
       );
 
       res.json({
@@ -177,7 +216,16 @@ export class ProductConsoleController {
    */
   getProductDetail = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { productId } = req.params;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary on product detail
+      const scopeCondition = scope.isPlatformAdmin
+        ? ''
+        : `AND ${PRODUCT_SCOPE_EXISTS}($2))`;
+      const productParams = scope.isPlatformAdmin
+        ? [productId]
+        : [productId, scope.serviceKeys];
 
       // Fetch product
       const productRows = await AppDataSource.query(
@@ -193,8 +241,8 @@ export class ProductConsoleController {
          FROM product_masters pm
          LEFT JOIN brands b ON pm.brand_id = b.id
          LEFT JOIN product_categories pc ON pm.category_id = pc.id
-         WHERE pm.id = $1`,
-        [productId]
+         WHERE pm.id = $1 ${scopeCondition}`,
+        productParams
       );
 
       if (productRows.length === 0) {

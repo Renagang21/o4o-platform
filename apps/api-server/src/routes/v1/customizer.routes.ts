@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { requireAdmin } from '../../middleware/auth.middleware.js';
 import { SettingsService } from '../../services/settingsService.js';
 import {
   ScrollToTopSchema,

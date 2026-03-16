@@ -40,13 +40,23 @@ export class StoreChannelService {
     search?: string;
     page: number;
     limit: number;
+    serviceKeys?: string[];
   }): Promise<{ channels: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
-    const { status, channelType, search, page, limit } = filters;
+    const { status, channelType, search, page, limit, serviceKeys } = filters;
     const offset = (page - 1) * limit;
 
     const conditions: string[] = [];
     const params: any[] = [];
     let idx = 1;
+
+    // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter via enrollment
+    if (serviceKeys && serviceKeys.length > 0) {
+      conditions.push(
+        `EXISTS (SELECT 1 FROM organization_service_enrollments ose WHERE ose.organization_id = oc.organization_id AND ose.service_code = ANY($${idx}))`
+      );
+      params.push(serviceKeys);
+      idx++;
+    }
 
     if (status) {
       conditions.push(`oc.status = $${idx++}`);

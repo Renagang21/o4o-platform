@@ -17,7 +17,7 @@
 
 import { Router, Response } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
-import { requireAdmin } from '../middleware/permission.middleware.js';
+import { requireAdmin } from '../middleware/auth.middleware.js';
 import { aiQueryController } from '../controllers/ai/AiQueryController.js';
 import { aiCardExposureService } from '../services/ai-card-exposure.service.js';
 import { aiOperationsService } from '../services/ai-operations.service.js';

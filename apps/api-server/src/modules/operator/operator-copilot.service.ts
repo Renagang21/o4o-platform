@@ -2,11 +2,14 @@
  * OperatorCopilotService
  *
  * WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1
+ * WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Added service scope filtering
  *
  * Platform-level copilot data: KPI, stores, suppliers, products, trends, alerts.
  */
 
 import type { DataSource } from 'typeorm';
+import type { ServiceScope } from '../../utils/serviceScope.js';
+import { hasServiceAccess } from '../../utils/serviceScope.js';
 
 export interface OperatorKpiSummary {
   totalStores: number;
@@ -63,21 +66,52 @@ export class OperatorCopilotService {
     }
   }
 
-  async getKpiSummary(): Promise<OperatorKpiSummary> {
+  private async safeCountParam(label: string, sql: string, params: any[]): Promise<number> {
+    try {
+      const rows = await this.dataSource.query(sql, params);
+      const val = rows[0] ? Object.values(rows[0])[0] : 0;
+      return (val as number) ?? 0;
+    } catch (err) {
+      console.error(`[OperatorCopilot] KPI "${label}" failed:`, (err as Error).message);
+      return 0;
+    }
+  }
+
+  async getKpiSummary(scope?: ServiceScope): Promise<OperatorKpiSummary> {
+    const isScoped = scope && !scope.isPlatformAdmin;
+    const isNeture = !scope || scope.isPlatformAdmin || hasServiceAccess(scope, 'neture');
+
     const [totalStores, totalSuppliers, totalProducts, recentOrders] = await Promise.all([
-      this.safeCount('totalStores',
-        `SELECT COUNT(DISTINCT o.id)::int AS val
-         FROM organizations o
-         JOIN organization_service_enrollments ose ON ose.organization_id = o.id
-         WHERE o."isActive" = true`),
-      this.safeCount('totalSuppliers',
-        `SELECT COUNT(*)::int AS val FROM neture_suppliers WHERE status = 'ACTIVE'`),
-      this.safeCount('totalProducts',
-        `SELECT COUNT(*)::int AS val FROM supplier_product_offers WHERE is_active = true`),
-      this.safeCount('recentOrders',
-        `SELECT COUNT(DISTINCT id)::int AS val
-         FROM neture.neture_orders
-         WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`),
+      // Stores: filter by enrollment service_code
+      isScoped
+        ? this.safeCountParam('totalStores',
+            `SELECT COUNT(DISTINCT o.id)::int AS val
+             FROM organizations o
+             JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+             WHERE o."isActive" = true AND ose.service_code = ANY($1)`,
+            [scope!.serviceKeys])
+        : this.safeCount('totalStores',
+            `SELECT COUNT(DISTINCT o.id)::int AS val
+             FROM organizations o
+             JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+             WHERE o."isActive" = true`),
+      // Suppliers: Neture-specific
+      isNeture
+        ? this.safeCount('totalSuppliers',
+            `SELECT COUNT(*)::int AS val FROM neture_suppliers WHERE status = 'ACTIVE'`)
+        : Promise.resolve(0),
+      // Products: Neture-specific (supplier_product_offers)
+      isNeture
+        ? this.safeCount('totalProducts',
+            `SELECT COUNT(*)::int AS val FROM supplier_product_offers WHERE is_active = true`)
+        : Promise.resolve(0),
+      // Orders: Neture-specific
+      isNeture
+        ? this.safeCount('recentOrders',
+            `SELECT COUNT(DISTINCT id)::int AS val
+             FROM neture.neture_orders
+             WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`)
+        : Promise.resolve(0),
     ]);
 
     return { totalStores, totalSuppliers, totalProducts, recentOrders };
@@ -92,17 +126,28 @@ export class OperatorCopilotService {
     }
   }
 
-  async getRecentStores(limit = 5): Promise<RecentStoreItem[]> {
+  async getRecentStores(limit = 5, scope?: ServiceScope): Promise<RecentStoreItem[]> {
     return this.safeQuery('getRecentStores', async () => {
-      const rows = await this.dataSource.query(
-        `SELECT o.id, o.name, o.created_at AS "createdAt"
-         FROM organizations o
-         JOIN organization_service_enrollments ose ON ose.organization_id = o.id
-         WHERE o."isActive" = true
-         ORDER BY o.created_at DESC
-         LIMIT $1`,
-        [limit]
-      );
+      const isScoped = scope && !scope.isPlatformAdmin;
+      const rows = isScoped
+        ? await this.dataSource.query(
+            `SELECT DISTINCT o.id, o.name, o.created_at AS "createdAt"
+             FROM organizations o
+             JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+             WHERE o."isActive" = true AND ose.service_code = ANY($1)
+             ORDER BY o.created_at DESC
+             LIMIT $2`,
+            [scope!.serviceKeys, limit]
+          )
+        : await this.dataSource.query(
+            `SELECT o.id, o.name, o.created_at AS "createdAt"
+             FROM organizations o
+             JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+             WHERE o."isActive" = true
+             ORDER BY o.created_at DESC
+             LIMIT $1`,
+            [limit]
+          );
       return rows.map((r: any) => ({
         id: r.id,
         name: r.name || '(이름 없음)',
@@ -111,7 +156,11 @@ export class OperatorCopilotService {
     }, []);
   }
 
-  async getSupplierActivity(limit = 5): Promise<SupplierActivityItem[]> {
+  async getSupplierActivity(limit = 5, scope?: ServiceScope): Promise<SupplierActivityItem[]> {
+    // Neture-specific: only show if user has neture access or is platform admin
+    if (scope && !scope.isPlatformAdmin && !hasServiceAccess(scope, 'neture')) {
+      return [];
+    }
     return this.safeQuery('getSupplierActivity', async () => {
       const rows = await this.dataSource.query(
         `SELECT
@@ -133,7 +182,11 @@ export class OperatorCopilotService {
     }, []);
   }
 
-  async getPendingProducts(limit = 10): Promise<PendingProductItem[]> {
+  async getPendingProducts(limit = 10, scope?: ServiceScope): Promise<PendingProductItem[]> {
+    // Neture-specific: only show if user has neture access or is platform admin
+    if (scope && !scope.isPlatformAdmin && !hasServiceAccess(scope, 'neture')) {
+      return [];
+    }
     return this.safeQuery('getPendingProducts', async () => {
       const rows = await this.dataSource.query(
         `SELECT
@@ -158,47 +211,65 @@ export class OperatorCopilotService {
     }, []);
   }
 
-  async getPlatformTrends(): Promise<PlatformTrends> {
+  async getPlatformTrends(scope?: ServiceScope): Promise<PlatformTrends> {
     const DEFAULT_TRENDS: PlatformTrends = {
       currentOrders: 0, previousOrders: 0, orderGrowth: 0, newStores: 0, newSuppliers: 0,
     };
+    const isScoped = scope && !scope.isPlatformAdmin;
+    const isNeture = !scope || scope.isPlatformAdmin || hasServiceAccess(scope, 'neture');
 
     return this.safeQuery('getPlatformTrends', async () => {
       const [orderRows, storeRows, supplierRows] = await Promise.all([
-        this.dataSource.query(
-          `WITH current_week AS (
-             SELECT COUNT(*)::int AS orders
-             FROM neture.neture_orders
-             WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
-               AND status IN ('paid','preparing','shipped','delivered')
-           ),
-           prev_week AS (
-             SELECT COUNT(*)::int AS orders
-             FROM neture.neture_orders
-             WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
-               AND created_at < CURRENT_DATE - INTERVAL '7 days'
-               AND status IN ('paid','preparing','shipped','delivered')
-           )
-           SELECT
-             cw.orders AS "currentOrders",
-             pw.orders AS "previousOrders",
-             CASE WHEN pw.orders > 0
-               THEN ROUND((cw.orders - pw.orders)::numeric / pw.orders * 100)::int
-               ELSE CASE WHEN cw.orders > 0 THEN 100 ELSE 0 END
-             END AS "orderGrowth"
-           FROM current_week cw, prev_week pw`
-        ).catch(() => [{}]),
-        this.dataSource.query(
-          `SELECT COUNT(DISTINCT o.id)::int AS "newStores"
-           FROM organizations o
-           JOIN organization_service_enrollments ose ON ose.organization_id = o.id
-           WHERE o.created_at >= CURRENT_DATE - INTERVAL '7 days'`
-        ).catch(() => [{}]),
-        this.dataSource.query(
-          `SELECT COUNT(*)::int AS "newSuppliers"
-           FROM neture_suppliers
-           WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
-        ).catch(() => [{}]),
+        // Orders: Neture-specific
+        isNeture
+          ? this.dataSource.query(
+              `WITH current_week AS (
+                 SELECT COUNT(*)::int AS orders
+                 FROM neture.neture_orders
+                 WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'
+                   AND status IN ('paid','preparing','shipped','delivered')
+               ),
+               prev_week AS (
+                 SELECT COUNT(*)::int AS orders
+                 FROM neture.neture_orders
+                 WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
+                   AND created_at < CURRENT_DATE - INTERVAL '7 days'
+                   AND status IN ('paid','preparing','shipped','delivered')
+               )
+               SELECT
+                 cw.orders AS "currentOrders",
+                 pw.orders AS "previousOrders",
+                 CASE WHEN pw.orders > 0
+                   THEN ROUND((cw.orders - pw.orders)::numeric / pw.orders * 100)::int
+                   ELSE CASE WHEN cw.orders > 0 THEN 100 ELSE 0 END
+                 END AS "orderGrowth"
+               FROM current_week cw, prev_week pw`
+            ).catch(() => [{}])
+          : Promise.resolve([{}]),
+        // Stores: scoped by enrollment
+        isScoped
+          ? this.dataSource.query(
+              `SELECT COUNT(DISTINCT o.id)::int AS "newStores"
+               FROM organizations o
+               JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+               WHERE o.created_at >= CURRENT_DATE - INTERVAL '7 days'
+                 AND ose.service_code = ANY($1)`,
+              [scope!.serviceKeys]
+            ).catch(() => [{}])
+          : this.dataSource.query(
+              `SELECT COUNT(DISTINCT o.id)::int AS "newStores"
+               FROM organizations o
+               JOIN organization_service_enrollments ose ON ose.organization_id = o.id
+               WHERE o.created_at >= CURRENT_DATE - INTERVAL '7 days'`
+            ).catch(() => [{}]),
+        // Suppliers: Neture-specific
+        isNeture
+          ? this.dataSource.query(
+              `SELECT COUNT(*)::int AS "newSuppliers"
+               FROM neture_suppliers
+               WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
+            ).catch(() => [{}])
+          : Promise.resolve([{}]),
       ]);
 
       return {
@@ -211,27 +282,48 @@ export class OperatorCopilotService {
     }, DEFAULT_TRENDS);
   }
 
-  async getAlerts(): Promise<AlertItem[]> {
+  async getAlerts(scope?: ServiceScope): Promise<AlertItem[]> {
+    const isNeture = !scope || scope.isPlatformAdmin || hasServiceAccess(scope, 'neture');
+
     return this.safeQuery('getAlerts', async () => {
       const alerts: AlertItem[] = [];
 
       // Each alert query is independent — use Promise.allSettled
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: scope-aware alert queries
+      const isScoped = scope && !scope.isPlatformAdmin;
+
       const [pendingResult, inactiveResult, orderResult] = await Promise.allSettled([
-        this.dataSource.query(
-          `SELECT COUNT(*)::int AS cnt
-           FROM users
-           WHERE is_active = false AND created_at >= CURRENT_DATE - INTERVAL '30 days'`
-        ),
-        this.dataSource.query(
-          `SELECT COUNT(*)::int AS cnt
-           FROM supplier_product_offers
-           WHERE is_active = false AND created_at >= CURRENT_DATE - INTERVAL '14 days'`
-        ),
-        this.dataSource.query(
-          `SELECT COUNT(DISTINCT id)::int AS cnt
-           FROM neture.neture_orders
-           WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
-        ),
+        // Pending registrations — scoped by service_memberships
+        isScoped
+          ? this.dataSource.query(
+              `SELECT COUNT(*)::int AS cnt
+               FROM service_memberships
+               WHERE status = 'pending' AND service_key = ANY($1)
+                 AND created_at >= CURRENT_DATE - INTERVAL '30 days'`,
+              [scope!.serviceKeys]
+            )
+          : this.dataSource.query(
+              `SELECT COUNT(*)::int AS cnt
+               FROM service_memberships
+               WHERE status = 'pending'
+                 AND created_at >= CURRENT_DATE - INTERVAL '30 days'`
+            ),
+        // Inactive products — Neture-specific
+        isNeture
+          ? this.dataSource.query(
+              `SELECT COUNT(*)::int AS cnt
+               FROM supplier_product_offers
+               WHERE is_active = false AND created_at >= CURRENT_DATE - INTERVAL '14 days'`
+            )
+          : Promise.resolve([{ cnt: 0 }]),
+        // Recent orders — Neture-specific
+        isNeture
+          ? this.dataSource.query(
+              `SELECT COUNT(DISTINCT id)::int AS cnt
+               FROM neture.neture_orders
+               WHERE created_at >= CURRENT_DATE - INTERVAL '7 days'`
+            )
+          : Promise.resolve([{ cnt: 0 }]),
       ]);
 
       if (pendingResult.status === 'fulfilled') {
@@ -259,7 +351,7 @@ export class OperatorCopilotService {
       }
 
       if (orderResult.status === 'fulfilled') {
-        if ((orderResult.value[0]?.cnt ?? 0) === 0) {
+        if (isNeture && (orderResult.value[0]?.cnt ?? 0) === 0) {
           alerts.push({
             id: 'alert-no-orders',
             message: '최근 7일간 주문이 없습니다. 플랫폼 활동을 확인하세요.',

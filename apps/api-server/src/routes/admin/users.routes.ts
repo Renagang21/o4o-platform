@@ -7,8 +7,7 @@
 import { Router } from 'express';
 import { AdminUserController } from '../../controllers/admin/AdminUserController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware.js';
-import { UserRole } from '../../entities/User.js';
+import { requireRole, requireAdmin } from '../../middleware/auth.middleware.js';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -31,9 +30,9 @@ router.use(authenticate);
 
 // User management routes (admin/manager/operator)
 // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: OPERATOR 추가 — Operator Dashboard 사용자 조회 허용
-router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUsers);
-router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUserStatistics);
-router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]), adminUserController.getUser);
+router.get('/', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUsers);
+router.get('/statistics', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUserStatistics);
+router.get('/:id', requireRole(['admin', 'super_admin', 'manager', 'operator']), adminUserController.getUser);
 
 // User creation (admin only)
 router.post('/',
@@ -53,7 +52,7 @@ router.post('/',
 
 // User updates (admin/manager/operator)
 router.put('/:id',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]),
+  requireRole(['admin', 'super_admin', 'manager', 'operator']),
   [
     body('email').optional().isEmail().withMessage('Valid email is required'),
     body('password').optional().isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -69,7 +68,7 @@ router.put('/:id',
 
 // Update user status (admin/manager/operator)
 router.patch('/:id/status',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.OPERATOR]),
+  requireRole(['admin', 'super_admin', 'manager', 'operator']),
   [
     body('status').isIn(['approved', 'pending', 'rejected', 'suspended']).withMessage('Invalid status')
   ],

@@ -1,7 +1,9 @@
 /**
  * OperatorManagementPage - KPA 서비스 운영자 관리
  *
- * KPA 서비스 관리자(kpa-a:operator, kpa-b:district 등)가
+ * WO-O4O-KPA-CODE-CLEANUP-V1: kpa-b/kpa-c 역할 제거, kpa-a: → kpa: prefix 통일
+ *
+ * KPA 서비스 관리자(kpa:operator 등)가
  * 자신의 서비스 운영자를 등록/수정/삭제할 수 있는 페이지
  */
 
@@ -22,13 +24,9 @@ import {
 import { authClient } from '@o4o/auth-client';
 
 // KPA 서비스 역할 정의
-// WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: kpa-c:operator 제거 — 분회 역할은 KpaMember.role이 SSOT
+// WO-O4O-KPA-CODE-CLEANUP-V1: kpa-b/kpa-c 제거, kpa-a: → kpa: prefix 통일
 const KPA_ROLES = [
-  { value: 'kpa-a:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
-  { value: 'kpa-b:district-admin', label: '데모서비스 지부 Admin', description: '지부/분회 데모 서비스 지부 관리자 (/demo)' },
-  { value: 'kpa-b:district', label: '데모서비스 지부 Operator', description: '지부/분회 데모 서비스 지부 운영자 (/demo)' },
-  { value: 'kpa-b:branch-admin', label: '데모서비스 분회 Admin', description: '지부/분회 데모 서비스 분회 관리자 (/demo)' },
-  { value: 'kpa-b:branch', label: '데모서비스 분회 Operator', description: '지부/분회 데모 서비스 분회 운영자 (/demo)' },
+  { value: 'kpa:operator', label: '커뮤니티 운영자', description: 'KPA 커뮤니티 서비스 운영자 (kpa-society.co.kr)' },
 ];
 
 interface Operator {
@@ -122,10 +120,7 @@ export function OperatorManagementPage() {
   };
 
   const getRoleColor = (role: string) => {
-    if (role.includes('kpa-a')) return 'bg-blue-100 text-blue-800';
-    if (role.includes('kpa-b:district')) return 'bg-purple-100 text-purple-800';
-    if (role.includes('kpa-b:branch')) return 'bg-indigo-100 text-indigo-800';
-    if (role.includes('kpa-c')) return 'bg-green-100 text-green-800';
+    if (role.startsWith('kpa:')) return 'bg-blue-100 text-blue-800';
     return 'bg-gray-100 text-gray-800';
   };
 

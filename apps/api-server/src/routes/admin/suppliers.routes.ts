@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { AdminSupplierController } from '../../controllers/admin/AdminSupplierController.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAnyRole, requireAdmin } from '../../middleware/permission.middleware.js';
-import { UserRole } from '../../entities/User.js';
+import { requireRole, requireAdmin } from '../../middleware/auth.middleware.js';
 import { body } from 'express-validator';
 
 const router: Router = Router();
@@ -12,9 +11,9 @@ const adminSupplierController = new AdminSupplierController();
 router.use(authenticate);
 
 // Supplier management routes (admin/manager only)
-router.get('/', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSuppliers);
-router.get('/statistics', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSupplierStatistics);
-router.get('/:id', requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]), adminSupplierController.getSupplier);
+router.get('/', requireRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSuppliers);
+router.get('/statistics', requireRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSupplierStatistics);
+router.get('/:id', requireRole(['admin', 'super_admin', 'manager']), adminSupplierController.getSupplier);
 
 // Supplier creation (admin only)
 router.post('/',
@@ -36,7 +35,7 @@ router.post('/',
 
 // Supplier updates (admin/manager only)
 router.put('/:id',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
+  requireRole(['admin', 'super_admin', 'manager']),
   [
     body('businessName').optional().notEmpty().withMessage('Business name cannot be empty'),
     body('businessNumber').optional().notEmpty().withMessage('Business number cannot be empty'),
@@ -54,7 +53,7 @@ router.put('/:id',
 
 // Update supplier status (admin/manager only)
 router.patch('/:id/status',
-  requireAnyRole([UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER]),
+  requireRole(['admin', 'super_admin', 'manager']),
   [
     body('isActive').isBoolean().withMessage('isActive must be a boolean')
   ],

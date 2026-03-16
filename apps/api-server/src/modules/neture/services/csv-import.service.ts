@@ -24,6 +24,8 @@ import {
 } from '../entities/index.js';
 import { validateGtin } from '../../../utils/gtin.js';
 import { verifyProductByBarcode } from './mfds.service.js';
+import { ProductAiContentService } from '../../store-ai/services/product-ai-content.service.js';
+import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
 
 /** CSV 허용 컬럼 — Master 관련 컬럼은 무시 */
@@ -45,6 +47,7 @@ export class CsvImportService {
   private masterRepo: Repository<ProductMaster>;
   private offerRepo: Repository<SupplierProductOffer>;
   private supplierRepo: Repository<NetureSupplier>;
+  private aiContentService: ProductAiContentService;
 
   constructor(private dataSource: DataSource) {
     this.batchRepo = dataSource.getRepository(SupplierCsvImportBatch);
@@ -52,6 +55,7 @@ export class CsvImportService {
     this.masterRepo = dataSource.getRepository(ProductMaster);
     this.offerRepo = dataSource.getRepository(SupplierProductOffer);
     this.supplierRepo = dataSource.getRepository(NetureSupplier);
+    this.aiContentService = new ProductAiContentService(dataSource);
   }
 
   // ==================== Upload + Validate ====================
@@ -309,10 +313,13 @@ export class CsvImportService {
     // 4. Transaction 내 적용
     let appliedOffers = 0;
     let createdMasters = 0;
+    const aiContentInputs: ProductContentInput[] = [];
 
     await this.dataSource.transaction(async (manager) => {
       for (const row of validRows) {
         let masterId = row.masterId;
+        let masterName = '';
+        let masterManufacturer = '';
 
         // CREATE_MASTER → MFDS 검증 후 생성
         if (row.actionType === CsvRowActionType.CREATE_MASTER) {
@@ -340,6 +347,8 @@ export class CsvImportService {
               createdMasters++;
             }
             masterId = master.id;
+            masterName = master.regulatoryName;
+            masterManufacturer = master.manufacturerName;
           } else {
             // MFDS 검증 실패 (stub 상태에서 발생 가능) → skip
             logger.warn(`[CsvImport] MFDS verification failed during apply for barcode ${row.parsedBarcode}, skipping row ${row.rowNumber}`);
@@ -355,20 +364,29 @@ export class CsvImportService {
         // Offer upsert — ON CONFLICT (master_id, supplier_id) DO UPDATE
         const distributionType = row.parsedDistributionType || 'PRIVATE';
         const supplyPrice = row.parsedSupplyPrice ?? 0;
+        const slug = `${row.parsedBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
 
         await manager.query(
           `INSERT INTO supplier_product_offers
             (id, master_id, supplier_id, distribution_type, approval_status, is_active,
-             price_general, created_at, updated_at)
+             price_general, slug, created_at, updated_at)
            VALUES
-            (gen_random_uuid(), $1, $2, $3, $4, false, $5, NOW(), NOW())
+            (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, NOW(), NOW())
            ON CONFLICT (master_id, supplier_id) DO UPDATE SET
              price_general = EXCLUDED.price_general,
              distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
              updated_at = NOW()`,
-          [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, supplyPrice],
+          [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, supplyPrice, slug],
         );
         appliedOffers++;
+
+        // Collect AI content input
+        aiContentInputs.push({
+          id: masterId,
+          regulatoryName: masterName || row.parsedBarcode || 'Unknown',
+          marketingName: masterName || row.parsedBarcode || 'Unknown',
+          manufacturerName: masterManufacturer || 'Unknown',
+        });
       }
     });
 
@@ -379,10 +397,30 @@ export class CsvImportService {
 
     logger.info(`[CsvImport] Batch ${batchId} applied — offers: ${appliedOffers}, masters: ${createdMasters}`);
 
+    // Fire-and-forget: AI content generation (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1)
+    if (aiContentInputs.length > 0) {
+      this.triggerAiContentGeneration(aiContentInputs).catch((err) => {
+        logger.error('[CsvImport] AI content generation error:', err);
+      });
+    }
+
     return {
       success: true,
       data: { appliedOffers, createdMasters },
     };
+  }
+
+  // ==================== Post-Apply Pipeline (WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1) ====================
+
+  private async triggerAiContentGeneration(inputs: ProductContentInput[]): Promise<void> {
+    for (const input of inputs) {
+      try {
+        await this.aiContentService.generateAllContents(input);
+        logger.info(`[CsvImport] AI content generated for master=${input.id}`);
+      } catch (err) {
+        logger.warn(`[CsvImport] AI content failed for master=${input.id}:`, err);
+      }
+    }
   }
 
   // ==================== Batch 조회 ====================

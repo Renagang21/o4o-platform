@@ -11,6 +11,7 @@ import { StoreCapabilityService } from '../../modules/store-core/services/store-
 import { StoreChannelService } from '../../modules/store-core/services/store-channel.service.js';
 import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
 import { getCapabilityMeta } from '@o4o/capabilities';
+import type { ServiceScope } from '../../utils/serviceScope.js';
 
 export class StoreConsoleController {
   private capabilityService: StoreCapabilityService;
@@ -37,11 +38,27 @@ export class StoreConsoleController {
   }
 
   /**
+   * WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Enrollment boundary check.
+   * Returns true if storeId belongs to the operator's service(s).
+   * Platform admin always passes.
+   */
+  private async assertStoreAccess(storeId: string, scope: ServiceScope): Promise<boolean> {
+    if (scope.isPlatformAdmin) return true;
+    const rows = await AppDataSource.query(
+      `SELECT 1 FROM organization_service_enrollments
+       WHERE organization_id = $1 AND service_code = ANY($2) LIMIT 1`,
+      [storeId, scope.serviceKeys]
+    );
+    return rows.length > 0;
+  }
+
+  /**
    * GET /api/v1/operator/stores
    * 매장 목록 + slug + owner + channel_count + product_count
    */
   getStores = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const {
         page = 1,
         limit = 20,
@@ -58,6 +75,15 @@ export class StoreConsoleController {
       const conditions: string[] = [`o.type IN ('pharmacy', 'store', 'branch')`];
       const params: any[] = [];
       let paramIdx = 1;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter via enrollment
+      if (!scope.isPlatformAdmin) {
+        conditions.push(
+          `EXISTS (SELECT 1 FROM organization_service_enrollments ose WHERE ose.organization_id = o.id AND ose.service_code = ANY($${paramIdx}))`
+        );
+        params.push(scope.serviceKeys);
+        paramIdx++;
+      }
 
       if (search) {
         conditions.push(
@@ -112,27 +138,38 @@ export class StoreConsoleController {
         [...params, limitNum, offset]
       );
 
-      // Stats query
+      // Stats query — WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: scoped by service
+      const enrollmentJoin = scope.isPlatformAdmin
+        ? ''
+        : 'INNER JOIN organization_service_enrollments ose_s ON ose_s.organization_id = o.id AND ose_s.service_code = ANY($1)';
+      const statsParams = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+
       const statsResult = await AppDataSource.query(
         `SELECT
-           COUNT(*)::int as total_stores,
-           COUNT(CASE WHEN o."isActive" = true THEN 1 END)::int as active_stores
+           COUNT(DISTINCT o.id)::int as total_stores,
+           COUNT(DISTINCT CASE WHEN o."isActive" = true THEN o.id END)::int as active_stores
          FROM organizations o
-         WHERE o.type IN ('pharmacy', 'store', 'branch')`
+         ${enrollmentJoin}
+         WHERE o.type IN ('pharmacy', 'store', 'branch')`,
+        statsParams
       );
 
       const channelStatsResult = await AppDataSource.query(
         `SELECT COUNT(DISTINCT oc.organization_id)::int as with_channel
          FROM organization_channels oc
          INNER JOIN organizations o ON oc.organization_id = o.id
-         WHERE o.type IN ('pharmacy', 'store', 'branch')`
+         ${scope.isPlatformAdmin ? '' : 'INNER JOIN organization_service_enrollments ose_c ON ose_c.organization_id = o.id AND ose_c.service_code = ANY($1)'}
+         WHERE o.type IN ('pharmacy', 'store', 'branch')`,
+        statsParams
       );
 
       const productStatsResult = await AppDataSource.query(
         `SELECT COUNT(DISTINCT opl.organization_id)::int as with_products
          FROM organization_product_listings opl
          INNER JOIN organizations o ON opl.organization_id = o.id
-         WHERE o.type IN ('pharmacy', 'store', 'branch') AND opl.is_active = true`
+         ${scope.isPlatformAdmin ? '' : 'INNER JOIN organization_service_enrollments ose_p ON ose_p.organization_id = o.id AND ose_p.service_code = ANY($1)'}
+         WHERE o.type IN ('pharmacy', 'store', 'branch') AND opl.is_active = true`,
+        statsParams
       );
 
       res.json({
@@ -175,7 +212,14 @@ export class StoreConsoleController {
    */
   getStoreDetail = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId } = req.params;
+
+      // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Enrollment boundary
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
 
       const storeRows = await AppDataSource.query(
         `SELECT o.id, o.name, o.code, o.type, o."isActive",
@@ -238,7 +282,13 @@ export class StoreConsoleController {
    */
   getStoreChannels = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
 
       const channels = await AppDataSource.query(
         `SELECT oc.id, oc.channel_type, oc.status,
@@ -277,7 +327,13 @@ export class StoreConsoleController {
    */
   getStoreProducts = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
       const { page = 1, limit = 20 } = req.query;
 
       const pageNum = Math.max(1, Number(page));
@@ -339,7 +395,14 @@ export class StoreConsoleController {
    */
   getStoreCapabilities = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
+
       const svc = this.getCapabilityService();
       const capabilities = await svc.getCapabilities(storeId);
 
@@ -376,7 +439,14 @@ export class StoreConsoleController {
    */
   updateStoreCapabilities = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
+
       const { capabilities } = req.body;
 
       if (!Array.isArray(capabilities)) {
@@ -436,6 +506,7 @@ export class StoreConsoleController {
    */
   getAllChannels = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const {
         page = 1,
         limit = 20,
@@ -451,6 +522,7 @@ export class StoreConsoleController {
         search: search as string | undefined,
         page: Math.max(1, Number(page)),
         limit: Math.min(100, Math.max(1, Number(limit))),
+        serviceKeys: scope.isPlatformAdmin ? undefined : scope.serviceKeys,
       });
 
       res.json({ success: true, ...result });
@@ -468,7 +540,14 @@ export class StoreConsoleController {
    */
   updateChannelStatus = async (req: Request, res: Response): Promise<void> => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const { storeId, channelId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
+
       const { status } = req.body;
 
       const ALLOWED_STATUSES = ['APPROVED', 'SUSPENDED', 'TERMINATED'];

@@ -3,7 +3,7 @@ import { AppManager } from '../../services/AppManager.js';
 import { DependencyError } from '../../services/AppDependencyResolver.js';
 import { OwnershipValidationError } from '../../services/AppTableOwnershipResolver.js';
 import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { requireAdmin } from '../../middleware/auth.middleware.js';
 import {
   APPS_CATALOG,
   getCatalogItem,

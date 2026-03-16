@@ -8,8 +8,8 @@
  * Step 3: Offer 정보 (가격, 유통방식)
  */
 
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
   supplierApi,
@@ -59,7 +59,9 @@ function flattenCategories(
 
 export default function SupplierProductCreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState<Step>('barcode');
+  const autoSearchDone = useRef(false);
 
   // Step 1: Barcode
   const [barcode, setBarcode] = useState('');
@@ -119,6 +121,30 @@ export default function SupplierProductCreatePage() {
     productApi.getCategories().then(setCategories);
     productApi.getBrands().then(setBrands);
   }, []);
+
+  // WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1: Auto-search from URL barcode param
+  useEffect(() => {
+    const barcodeParam = searchParams.get('barcode');
+    if (barcodeParam && !autoSearchDone.current) {
+      autoSearchDone.current = true;
+      setBarcode(barcodeParam);
+      // Trigger search
+      (async () => {
+        setSearching(true);
+        setSearchError('');
+        setMaster(null);
+        setMasterNotFound(false);
+        const result = await productApi.getMasterByBarcode(barcodeParam.trim());
+        setSearching(false);
+        if (result) {
+          setMaster(result);
+          setStep('offer');
+        } else {
+          setMasterNotFound(true);
+        }
+      })();
+    }
+  }, [searchParams]);
 
   const flatCats = flattenCategories(categories);
 

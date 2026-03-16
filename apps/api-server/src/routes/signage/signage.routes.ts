@@ -10,7 +10,7 @@ import {
   requireSignageCommunity,
   validateServiceKey,
 } from '../../middleware/signage-role.middleware.js';
-import { ensureAuthenticated } from '../../middleware/permission.middleware.js';
+import { requireAuth } from '../../middleware/auth.middleware.js';
 
 /**
  * Create Signage Routes
@@ -33,7 +33,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   const controller = new SignageController(dataSource);
 
   // Apply authentication and service key validation to all routes
-  router.use(ensureAuthenticated);
+  router.use(requireAuth);
   router.use(validateServiceKey);
 
   // ========== Store Playlist Routes (Store-owned content) ==========

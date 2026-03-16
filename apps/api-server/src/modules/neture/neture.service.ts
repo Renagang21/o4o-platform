@@ -616,6 +616,33 @@ export class NetureService {
   }
 
   /**
+   * POST /admin/offers/bulk-approve — 일괄 승인
+   * WO-O4O-NETURE-BULK-IMPORT-INTEGRATION-V1
+   */
+  async approveProducts(
+    offerIds: string[],
+    adminUserId: string,
+  ): Promise<{ approved: string[]; failed: Array<{ id: string; error: string }> }> {
+    const approved: string[] = [];
+    const failed: Array<{ id: string; error: string }> = [];
+
+    for (const offerId of offerIds) {
+      try {
+        const result = await this.approveProduct(offerId, adminUserId);
+        if (result.success) {
+          approved.push(offerId);
+        } else {
+          failed.push({ id: offerId, error: result.error || 'UNKNOWN' });
+        }
+      } catch (err) {
+        failed.push({ id: offerId, error: (err as Error).message || 'UNKNOWN' });
+      }
+    }
+
+    return { approved, failed };
+  }
+
+  /**
    * POST /admin/products/:id/reject — 상품 반려 (isActive 유지 false)
    */
   async rejectProduct(
@@ -1789,6 +1816,47 @@ export class NetureService {
    */
   async getAllProductMasters() {
     return this.masterRepo.find({ relations: ['category', 'brand'], order: { createdAt: 'DESC' } });
+  }
+
+  /**
+   * Master 검색 — WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1
+   * 텍스트(이름/바코드/제조사) + 카테고리/브랜드 필터 + 페이지네이션
+   */
+  async searchProductMasters(params: {
+    q?: string;
+    categoryId?: string;
+    brandId?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{ data: ProductMaster[]; total: number }> {
+    const page = params.page || 1;
+    const limit = Math.min(params.limit || 20, 50);
+    const offset = (page - 1) * limit;
+
+    const qb = this.masterRepo
+      .createQueryBuilder('m')
+      .leftJoinAndSelect('m.category', 'c')
+      .leftJoinAndSelect('m.brand', 'b');
+
+    if (params.q) {
+      qb.andWhere(
+        '(m.marketing_name ILIKE :q OR m.regulatory_name ILIKE :q OR m.barcode ILIKE :q OR m.manufacturer_name ILIKE :q)',
+        { q: `%${params.q}%` },
+      );
+    }
+    if (params.categoryId) {
+      qb.andWhere('m.category_id = :categoryId', { categoryId: params.categoryId });
+    }
+    if (params.brandId) {
+      qb.andWhere('m.brand_id = :brandId', { brandId: params.brandId });
+    }
+
+    qb.orderBy('m.marketing_name', 'ASC')
+      .skip(offset)
+      .take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total };
   }
 
   // ==================== ProductCategory — 카테고리 관리 (WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1) ====================

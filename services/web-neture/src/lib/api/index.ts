@@ -122,6 +122,8 @@ export {
   type CategoryTreeItem,
   type BrandItem,
   type ProductImage,
+  type MasterSearchResult,
+  type MasterSearchResponse,
 } from './product.js';
 
 // Catalog Import API
@@ -196,4 +198,9 @@ export {
   type SettlementKpi,
   type SettlementsResponse,
   type AdminSettlementKpi,
+  type StoreProductSearchResult,
+  type StoreProductSearchResponse,
+  type StoreOfferItem,
+  type StoreListingItem,
+  type StoreListingsResponse,
 } from './store.js';

@@ -171,6 +171,9 @@ const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHu
 // Supplier Product Create
 const SupplierProductCreatePage = lazy(() => import('./pages/supplier/SupplierProductCreatePage'));
 
+// Supplier Product Library (WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1)
+const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
+
 // Supplier Account
 const SupplierAccountDashboardPage = lazy(() => import('./pages/account/SupplierAccountDashboardPage'));
 const SupplierProductsListPage = lazy(() => import('./pages/account/SupplierProductsListPage'));
@@ -185,6 +188,9 @@ const StoreOrdersPage = lazy(() => import('./pages/store/StoreOrdersPage'));
 const StoreOrderDetailPage = lazy(() => import('./pages/store/StoreOrderDetailPage'));
 const StoreBlogListPage = lazy(() => import('./pages/store/StoreBlogListPage'));
 const StoreBlogPage = lazy(() => import('./pages/store/StoreBlogPage'));
+// Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1)
+const StoreListingsPage = lazy(() => import('./pages/store/StoreListingsPage'));
+const StoreProductLibraryPage = lazy(() => import('./pages/store/StoreProductLibraryPage'));
 
 // Partner Account
 const PartnerAccountDashboardPage = lazy(() =>
@@ -449,6 +455,7 @@ function App() {
             <Route element={<SupplierSpaceLayout />}>
               <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
+              <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
               <Route path="/supplier/products/new" element={<SupplierProductCreatePage />} />
               <Route path="/supplier/offers" element={<SupplyRequestsPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
@@ -520,6 +527,9 @@ function App() {
               <Route path="/store/cart" element={<StoreCartPage />} />
               <Route path="/store/orders" element={<StoreOrdersPage />} />
               <Route path="/store/orders/:id" element={<StoreOrderDetailPage />} />
+              {/* Store Owner Manage (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) */}
+              <Route path="/store/manage/products" element={<StoreListingsPage />} />
+              <Route path="/store/manage/products/library" element={<StoreProductLibraryPage />} />
             </Route>
 
             {/* ================================================================

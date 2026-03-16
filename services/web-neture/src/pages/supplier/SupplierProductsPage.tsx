@@ -22,7 +22,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Package, Users, Clock, ToggleLeft, ToggleRight, AlertCircle, Globe, Lock, X, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Package, Users, Clock, ToggleLeft, ToggleRight, AlertCircle, Globe, Lock, X, Check, Search, Plus } from 'lucide-react';
 import { supplierApi, type SupplierProduct, type SupplierProductPurpose, type DistributionType, type InventoryItem, getInventoryStatus } from '../../lib/api';
 
 const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; color: string; bgColor: string }> = {
@@ -39,6 +40,7 @@ const STOCK_STATUS_CONFIG: Record<string, { label: string; color: string; bgColo
 };
 
 export default function SupplierProductsPage() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [inventoryMap, setInventoryMap] = useState<Map<string, InventoryItem>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -123,10 +125,38 @@ export default function SupplierProductsPage() {
     <div>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>내 제품 관리</h1>
-        <p style={styles.subtitle}>
-          공급하는 제품을 관리하고, 판매자 신청 허용 여부를 설정합니다.
-        </p>
+        <div>
+          <h1 style={styles.title}>내 제품 관리</h1>
+          <p style={styles.subtitle}>
+            공급하는 제품을 관리하고, 판매자 신청 허용 여부를 설정합니다.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => navigate('/supplier/products/library')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', backgroundColor: '#f1f5f9', color: '#475569',
+              border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            <Search size={16} />
+            라이브러리 검색
+          </button>
+          <button
+            onClick={() => navigate('/supplier/products/new')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', backgroundColor: '#059669', color: '#fff',
+              border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={16} />
+            상품 등록
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -359,6 +389,9 @@ export default function SupplierProductsPage() {
 const styles: Record<string, React.CSSProperties> = {
   header: {
     marginBottom: '24px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   title: {
     fontSize: '24px',

@@ -42,7 +42,7 @@
  * │ PUBLIC (no auth / optionalAuth)                                     │
  * │  /branches          - 분회 공개 정보                                    │
  * │  /forum (GET)       - 포럼 조회                                        │
- * │  /demo-forum        - 데모 포럼                                        │
+ * │  (demo-forum removed — WO-O4O-KPA-CODE-CLEANUP-V1)                     │
  * │  /lms/courses (GET) - 강좌 목록                                        │
  * │  /home              - 홈 페이지 데이터                                  │
  * │  /news (GET)        - 공지사항/뉴스 조회                                │
@@ -137,8 +137,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   const router = Router();
 
   // APP-CONTENT Phase 2: shared content query service
+  // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society' (backward compat includes legacy 'kpa')
   const contentService = new ContentQueryService(dataSource, {
-    serviceKeys: ['kpa', 'kpa-society'],
+    serviceKeys: ['kpa-society', 'kpa'],
     defaultTypes: ['notice', 'news', 'hero', 'promo'],
   });
 
@@ -380,43 +381,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/forum', forumRouter);
 
   // ============================================================================
-  // Demo Forum Routes - /api/v1/kpa/demo-forum/*
-  // WO-FORUM-DEMO-SCOPE-ISOLATION-V1: Separate demo forum with demo scope
-  // /demo/forum 경로는 커뮤니티 콘텐츠를 보여주면 안 됨
-  // ============================================================================
-  const demoForumRouter = Router();
-  const demoForumController = new ForumController();
-
-  demoForumRouter.use(optionalAuth as any);
-
-  // Demo scope — returns empty results (no community content)
-  demoForumRouter.use(forumContextMiddleware({
-    serviceCode: 'kpa-demo',
-    scope: 'demo',
-  }));
-
-  // Same endpoints as forum, but with demo scope
-  demoForumRouter.get('/health', demoForumController.health.bind(demoForumController));
-  demoForumRouter.get('/stats', optionalAuth, demoForumController.getStats.bind(demoForumController));
-  demoForumRouter.get('/posts', optionalAuth, demoForumController.listPosts.bind(demoForumController));
-  demoForumRouter.get('/posts/:id', optionalAuth, demoForumController.getPost.bind(demoForumController));
-  demoForumRouter.post('/posts', authenticate, demoForumController.createPost.bind(demoForumController));
-  demoForumRouter.put('/posts/:id', authenticate, demoForumController.updatePost.bind(demoForumController));
-  demoForumRouter.delete('/posts/:id', authenticate, demoForumController.deletePost.bind(demoForumController));
-  demoForumRouter.post('/posts/:id/like', authenticate, demoForumController.toggleLike.bind(demoForumController));
-  demoForumRouter.get('/posts/:postId/comments', demoForumController.listComments.bind(demoForumController));
-  demoForumRouter.post('/comments', authenticate, demoForumController.createComment.bind(demoForumController));
-  demoForumRouter.get('/categories', demoForumController.listCategories.bind(demoForumController));
-  demoForumRouter.get('/categories/:id', demoForumController.getCategory.bind(demoForumController));
-  demoForumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), demoForumController.createCategory.bind(demoForumController));
-  demoForumRouter.put('/categories/:id', authenticate, requireKpaScope('kpa:admin'), demoForumController.updateCategory.bind(demoForumController));
-  demoForumRouter.delete('/categories/:id', authenticate, requireKpaScope('kpa:admin'), demoForumController.deleteCategory.bind(demoForumController));
-  demoForumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), demoForumController.getModerationQueue.bind(demoForumController));
-  demoForumRouter.post('/moderation/:type/:id', authenticate, requireKpaScope('kpa:operator'), demoForumController.moderateContent.bind(demoForumController));
-
-  router.use('/demo-forum', demoForumRouter);
-
-  // ============================================================================
   // LMS Routes - /api/v1/kpa/lms/*
   // ============================================================================
   const lmsRouter = Router();
@@ -559,7 +523,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ─── WO-KPA-A-CONTENT-CMS-PHASE1-V1: Operator CRUD ──────────────────
   const contentRepo = dataSource.getRepository(CmsContent);
   const auditRepo = dataSource.getRepository(KpaAuditLog);
-  const KPA_SERVICE_KEY = 'kpa';
+  // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society'
+  const KPA_SERVICE_KEY = 'kpa-society';
+  const KPA_SERVICE_KEYS = ['kpa-society', 'kpa']; // backward compat for reads
   const ALLOWED_TYPES = ['notice', 'news'];
 
   // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: helper
@@ -593,7 +559,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
     const qb = contentRepo.createQueryBuilder('c')
-      .where('c.serviceKey = :sk', { sk: KPA_SERVICE_KEY });
+      .where('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS });
 
     if (type && ALLOWED_TYPES.includes(type)) {
       qb.andWhere('c.type = :type', { type });
@@ -644,9 +610,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // PUT /news/:id — 콘텐츠 수정
   newsRouter.put('/:id', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const existing = await contentRepo.findOne({
-      where: { id: req.params.id, serviceKey: KPA_SERVICE_KEY },
-    });
+    const existing = await contentRepo.createQueryBuilder('c')
+      .where('c.id = :id', { id: req.params.id })
+      .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .getOne();
     if (!existing) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;
@@ -671,9 +638,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // DELETE /news/:id — Soft delete (status → archived)
   newsRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const existing = await contentRepo.findOne({
-      where: { id: req.params.id, serviceKey: KPA_SERVICE_KEY },
-    });
+    const existing = await contentRepo.createQueryBuilder('c')
+      .where('c.id = :id', { id: req.params.id })
+      .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .getOne();
     if (!existing) {
       res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
       return;

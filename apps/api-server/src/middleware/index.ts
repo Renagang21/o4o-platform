@@ -10,5 +10,4 @@ export * from './validateRequest.js';
 export * from './validation.js';
 
 // Role-based access control
-export * from './permission.middleware.js';
 export * from './signage-role.middleware.js';

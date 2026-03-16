@@ -15,9 +15,7 @@
  */
 export type ServiceKey =
   | 'platform'      // Platform-wide roles
-  | 'kpa'          // KPA-a 커뮤니티 서비스
-  | 'kpa-b'        // KPA-b 데모 서비스
-  | 'kpa-c'        // KPA-c 분회서비스
+  | 'kpa'          // KPA 커뮤니티 서비스
   | 'neture'       // Neture service
   | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
@@ -45,23 +43,6 @@ export type KpaRole =
   | 'kpa:branch_admin'     // Branch-level admin
   | 'kpa:branch_operator'  // Branch-level operator
   | 'kpa:pharmacist';      // General pharmacist/member
-
-/**
- * KPA-b 데모 서비스 roles
- */
-export type KpaBRole =
-  | 'kpa-b:district-admin'  // 지부 관리자
-  | 'kpa-b:district'        // 지부 운영자
-  | 'kpa-b:branch-admin'    // 분회 관리자
-  | 'kpa-b:branch';         // 분회 운영자
-
-/**
- * KPA-c 분회서비스 roles
- */
-export type KpaCRole =
-  | 'kpa-c:admin'       // 분회서비스 관리자
-  | 'kpa-c:operator'    // 분회서비스 운영자
-  | 'kpa-c:pharmacist'; // 분회서비스 약사
 
 /**
  * Neture service roles
@@ -111,8 +92,6 @@ export type GlucoseViewRole =
 export type PrefixedRole =
   | PlatformRole
   | KpaRole
-  | KpaBRole
-  | KpaCRole
   | NetureRole
   | GlycoPharmRole
   | CosmeticsRole
@@ -313,66 +292,6 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     label: 'Pharmacist',
     description: 'General pharmacist/member',
     service: 'kpa',
-    category: 'service',
-    deprecated: false
-  },
-
-  // KPA-b 데모 roles
-  'kpa-b:district-admin': {
-    role: 'kpa-b:district-admin',
-    label: 'District Admin',
-    description: '데모 서비스 지부 관리자',
-    service: 'kpa-b',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa-b:district': {
-    role: 'kpa-b:district',
-    label: 'District Operator',
-    description: '데모 서비스 지부 운영자',
-    service: 'kpa-b',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa-b:branch-admin': {
-    role: 'kpa-b:branch-admin',
-    label: 'Branch Admin',
-    description: '데모 서비스 분회 관리자',
-    service: 'kpa-b',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa-b:branch': {
-    role: 'kpa-b:branch',
-    label: 'Branch Operator',
-    description: '데모 서비스 분회 운영자',
-    service: 'kpa-b',
-    category: 'service',
-    deprecated: false
-  },
-
-  // KPA-c 분회서비스 roles
-  'kpa-c:admin': {
-    role: 'kpa-c:admin',
-    label: 'KPA-c Admin',
-    description: '분회서비스 관리자',
-    service: 'kpa-c',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa-c:operator': {
-    role: 'kpa-c:operator',
-    label: 'KPA-c Operator',
-    description: '분회서비스 운영자',
-    service: 'kpa-c',
-    category: 'service',
-    deprecated: false
-  },
-  'kpa-c:pharmacist': {
-    role: 'kpa-c:pharmacist',
-    label: 'KPA-c Pharmacist',
-    description: '분회서비스 약사',
-    service: 'kpa-c',
     category: 'service',
     deprecated: false
   },

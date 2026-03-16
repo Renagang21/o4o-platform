@@ -15,22 +15,25 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate } from '../../middleware/auth.middleware.js';
-import { requireAdmin } from '../../middleware/permission.middleware.js';
+import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
+import { injectServiceScope } from '../../utils/serviceScope.js';
+import type { ServiceScope } from '../../utils/serviceScope.js';
 import { OperatorCopilotService } from './operator-copilot.service.js';
 
 export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   const router = Router();
   const service = new OperatorCopilotService(dataSource);
 
-  // All endpoints require admin/operator access
+  // All endpoints require admin/operator access + service scope
   router.use(authenticate);
   router.use(requireAdmin);
+  router.use(injectServiceScope);
 
   // GET /copilot/kpi
-  router.get('/copilot/kpi', async (_req: Request, res: Response) => {
+  router.get('/copilot/kpi', async (req: Request, res: Response) => {
     try {
-      const data = await service.getKpiSummary();
+      const scope: ServiceScope = (req as any).serviceScope;
+      const data = await service.getKpiSummary(scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] KPI error:', error);
@@ -41,8 +44,9 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   // GET /copilot/stores
   router.get('/copilot/stores', async (req: Request, res: Response) => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const limit = Math.min(Number(req.query.limit) || 5, 20);
-      const data = await service.getRecentStores(limit);
+      const data = await service.getRecentStores(limit, scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] Stores error:', error);
@@ -53,8 +57,9 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   // GET /copilot/suppliers
   router.get('/copilot/suppliers', async (req: Request, res: Response) => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const limit = Math.min(Number(req.query.limit) || 5, 20);
-      const data = await service.getSupplierActivity(limit);
+      const data = await service.getSupplierActivity(limit, scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] Suppliers error:', error);
@@ -65,8 +70,9 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   // GET /copilot/products
   router.get('/copilot/products', async (req: Request, res: Response) => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       const limit = Math.min(Number(req.query.limit) || 10, 50);
-      const data = await service.getPendingProducts(limit);
+      const data = await service.getPendingProducts(limit, scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] Products error:', error);
@@ -75,9 +81,10 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   });
 
   // GET /copilot/trends
-  router.get('/copilot/trends', async (_req: Request, res: Response) => {
+  router.get('/copilot/trends', async (req: Request, res: Response) => {
     try {
-      const data = await service.getPlatformTrends();
+      const scope: ServiceScope = (req as any).serviceScope;
+      const data = await service.getPlatformTrends(scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] Trends error:', error);
@@ -86,9 +93,10 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   });
 
   // GET /copilot/alerts
-  router.get('/copilot/alerts', async (_req: Request, res: Response) => {
+  router.get('/copilot/alerts', async (req: Request, res: Response) => {
     try {
-      const data = await service.getAlerts();
+      const scope: ServiceScope = (req as any).serviceScope;
+      const data = await service.getAlerts(scope);
       res.json({ success: true, data });
     } catch (error) {
       console.error('[OperatorCopilot] Alerts error:', error);
@@ -99,11 +107,12 @@ export function createOperatorCopilotRouter(dataSource: DataSource): Router {
   // GET /copilot/ai-summary
   router.get('/copilot/ai-summary', async (req: Request, res: Response) => {
     try {
+      const scope: ServiceScope = (req as any).serviceScope;
       // Gather platform context — each call is already resilient (safeQuery)
       const [kpi, trends, alerts] = await Promise.all([
-        service.getKpiSummary(),
-        service.getPlatformTrends(),
-        service.getAlerts(),
+        service.getKpiSummary(scope),
+        service.getPlatformTrends(scope),
+        service.getAlerts(scope),
       ]);
 
       // Try AI insight
