@@ -1194,16 +1194,7 @@ const startServer = async () => {
       logger.error('Failed to register Product Library routes:', productLibraryError);
     }
 
-    // 29e. Register Operator Copilot routes (WO-O4O-OPERATOR-COPILOT-DASHBOARD-V1)
-    try {
-      const { createOperatorCopilotRouter } = await import('./modules/operator/operator-copilot.controller.js');
-      app.use('/api/v1/operator', createOperatorCopilotRouter(AppDataSource));
-      logger.info('✅ Operator Copilot routes registered at /api/v1/operator/copilot/*');
-    } catch (operatorCopilotError) {
-      logger.error('Failed to register Operator Copilot routes:', operatorCopilotError);
-    }
-
-    // 29e-2. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
+    // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('./copilot/copilot-engine.controller.js');
       app.use('/api/v1/platform/copilot', createCopilotEngineController());
