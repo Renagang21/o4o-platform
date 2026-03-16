@@ -138,7 +138,7 @@ describe('KPA-a CMS: organizationId Prohibition', () => {
 
   it('CMS queries scope by serviceKey', () => {
     expect(cmsSection).toContain('serviceKey');
-    expect(cmsSection).toContain("sk: KPA_SERVICE_KEY");
+    expect(cmsSection).toContain("sks: KPA_SERVICE_KEYS");
   });
 
   it('CMS queries do NOT use organizationId', () => {

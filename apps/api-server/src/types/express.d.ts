@@ -3,12 +3,35 @@
  *
  * This file extends the Express Request interface with custom properties
  * used throughout the api-server.
+ *
+ * NOTE: Express.User must be augmented directly (not inline on Request.user)
+ * because @types/express defines `Request.user?: User` — the User interface
+ * is the merge target, not the `user` property itself.
  */
 
 import 'express';
 
 declare global {
   namespace Express {
+    /**
+     * Authenticated user data attached by auth middleware
+     */
+    interface User {
+      id?: string;
+      userId?: string;
+      email?: string;
+      role?: string;
+      roles?: string[];
+      status?: string;
+      name?: string;
+      firstName?: string;
+      lastName?: string;
+      permissions?: string[];
+      isActive?: boolean;
+      domain?: string;
+      betaUserId?: string;
+    }
+
     interface Request {
       /**
        * Analytics tracking data attached by AnalyticsMiddleware
@@ -19,26 +42,6 @@ declare global {
         betaUserId?: string;
         userAgent: string;
         ipAddress: string;
-      };
-
-      /**
-       * Authenticated user data attached by auth middleware
-       */
-      user?: {
-        id?: string;
-        userId?: string;
-        email?: string;
-        role?: string;
-        roles?: string[];
-        status?: string;
-        name?: string;
-        firstName?: string;
-        lastName?: string;
-        permissions?: string[];
-        isActive?: boolean;
-        domain?: string;
-        betaUserId?: string;
-        [key: string]: unknown;
       };
 
       /**
