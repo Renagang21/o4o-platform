@@ -434,18 +434,19 @@ export class MembershipConsoleController {
 
       // If approving, also activate service memberships
       if (status === 'approved' || status === 'active') {
-        const serviceFilter = scope.isPlatformAdmin
-          ? ''
-          : `AND service_key = ANY($2)`;
-        const params = scope.isPlatformAdmin
-          ? [userId]
-          : [userId, scope.serviceKeys];
-
-        await AppDataSource.query(
-          `UPDATE service_memberships SET status = 'active', approved_by = '${updatedBy}', approved_at = NOW(), updated_at = NOW()
-           WHERE user_id = $1 AND status = 'pending' ${serviceFilter}`,
-          params
-        );
+        if (scope.isPlatformAdmin) {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+             WHERE user_id = $2 AND status = 'pending'`,
+            [updatedBy, userId]
+          );
+        } else {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+             WHERE user_id = $2 AND status = 'pending' AND service_key = ANY($3)`,
+            [updatedBy, userId, scope.serviceKeys]
+          );
+        }
       }
 
       res.json({ success: true, message: `User status updated to ${status}` });
