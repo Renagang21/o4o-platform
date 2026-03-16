@@ -335,12 +335,13 @@ export class MembershipConsoleController {
         [approvedBy, approvedUserId]
       );
 
-      // Ensure role_assignment exists (idempotent — ON CONFLICT 시 is_active 복원)
+      // Ensure role_assignment exists (idempotent — ON CONFLICT 시 updated_at 갱신)
       const memberRole = result[0].role || 'member';
       await AppDataSource.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-         ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()`,
+         ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+         DO UPDATE SET updated_at = NOW(), is_active = true`,
         [approvedUserId, memberRole, approvedBy]
       );
 
@@ -387,6 +388,115 @@ export class MembershipConsoleController {
     } catch (error) {
       console.error('[MembershipConsole] rejectMembership error:', error);
       res.status(500).json({ success: false, error: 'Failed to reject membership' });
+    }
+  };
+
+  /**
+   * PUT /api/v1/operator/members/:userId
+   * 사용자 정보 수정 (비밀번호 변경 등)
+   */
+  updateMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId } = req.params;
+      const { password } = req.body;
+
+      // Service boundary check
+      if (!scope.isPlatformAdmin) {
+        const accessCheck = await AppDataSource.query(
+          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
+          [userId, scope.serviceKeys]
+        );
+        if (accessCheck.length === 0) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
+
+      if (password) {
+        const bcrypt = await import('bcryptjs');
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await AppDataSource.query(
+          `UPDATE users SET password = $1, "updatedAt" = NOW() WHERE id = $2`,
+          [hashedPassword, userId]
+        );
+      }
+
+      res.json({ success: true, message: 'User updated' });
+    } catch (error) {
+      console.error('[MembershipConsole] updateMember error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update member' });
+    }
+  };
+
+  /**
+   * DELETE /api/v1/operator/members/:userId
+   * 사용자 삭제 (service_memberships + user)
+   */
+  deleteMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId } = req.params;
+
+      // Service boundary check
+      if (!scope.isPlatformAdmin) {
+        const accessCheck = await AppDataSource.query(
+          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
+          [userId, scope.serviceKeys]
+        );
+        if (accessCheck.length === 0) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
+
+      // Delete memberships first, then user (CASCADE should handle but be explicit)
+      await AppDataSource.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
+      await AppDataSource.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
+      await AppDataSource.query(`DELETE FROM users WHERE id = $1`, [userId]);
+
+      res.json({ success: true, message: 'User deleted' });
+    } catch (error) {
+      console.error('[MembershipConsole] deleteMember error:', error);
+      res.status(500).json({ success: false, error: 'Failed to delete member' });
+    }
+  };
+
+  /**
+   * GET /api/v1/operator/members/stats
+   * 서비스 멤버십 통계 (operator 전용)
+   */
+  getStats = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+
+      const serviceFilter = scope.isPlatformAdmin
+        ? ''
+        : `WHERE sm.service_key = ANY($1)`;
+      const params = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
+
+      const rows = await AppDataSource.query(
+        `SELECT u.status, COUNT(*)::int AS count
+         FROM users u
+         INNER JOIN service_memberships sm ON sm.user_id = u.id
+         ${serviceFilter}
+         GROUP BY u.status`,
+        params
+      );
+
+      const getCount = (s: string) => rows.find((r: any) => r.status?.toLowerCase() === s)?.count || 0;
+      const total = rows.reduce((sum: number, r: any) => sum + (r.count || 0), 0);
+
+      res.json({
+        success: true,
+        statistics: {
+          total,
+          byStatus: rows,
+        },
+      });
+    } catch (error) {
+      console.error('[MembershipConsole] getStats error:', error);
+      res.json({ success: true, statistics: { total: 0, byStatus: [] } });
     }
   };
 }

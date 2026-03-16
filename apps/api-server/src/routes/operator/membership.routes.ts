@@ -31,8 +31,15 @@ router.use(injectServiceScope);
 // Member list with memberships + roles
 router.get('/', controller.getMembers);
 
+// Member statistics (operator-level)
+router.get('/stats', controller.getStats);
+
 // Member detail
 router.get('/:userId', controller.getMemberDetail);
+
+// Member update (password change) / delete
+router.put('/:userId', controller.updateMember);
+router.delete('/:userId', controller.deleteMember);
 
 // Membership approval/rejection
 router.patch('/:membershipId/approve', controller.approveMembership);

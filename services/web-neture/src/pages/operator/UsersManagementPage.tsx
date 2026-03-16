@@ -132,7 +132,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
     setLoading(true);
     setError('');
     try {
-      await apiFetch(`/api/v1/admin/users/${user.id}`, {
+      await apiFetch(`/api/v1/operator/members/${user.id}`, {
         method: 'PUT',
         body: JSON.stringify({ password }),
       });
@@ -220,9 +220,9 @@ export default function UsersManagementPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const data = await apiFetch<any>('/api/v1/admin/users/statistics');
+      const data = await apiFetch<any>('/api/v1/operator/members/stats');
       const byStatus = data.statistics?.byStatus || [];
-      const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
+      const getCount = (s: string) => byStatus.find((b: any) => b.status?.toLowerCase() === s)?.count || 0;
       setStats({
         total: data.statistics?.total || 0,
         active: getCount('active') + getCount('approved'),
@@ -283,7 +283,7 @@ export default function UsersManagementPage() {
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading(user.id);
     try {
-      await apiFetch(`/api/v1/admin/users/${user.id}`, { method: 'DELETE' });
+      await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
