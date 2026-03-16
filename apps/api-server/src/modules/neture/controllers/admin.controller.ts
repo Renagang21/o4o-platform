@@ -579,52 +579,6 @@ export function createAdminController(dataSource: DataSource): Router {
     }
   });
 
-  // ==================== Admin: Dashboard Summary ====================
-
-  /**
-   * GET /admin/dashboard/summary
-   * Get admin/operator dashboard summary (requires admin role)
-   *
-   * WO-P1-SERVICE-ROLE-PREFIX-ROLLING-IMPLEMENTATION-V1 (Phase 3: Neture)
-   * Security Fix: Changed from requireAuth to requireAdmin
-   * - Enforces platform:admin or platform:super_admin (via Phase 2 middleware update)
-   */
-  router.get('/dashboard/summary', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const summary = await netureService.getAdminDashboardSummary();
-
-      res.json({
-        success: true,
-        data: summary,
-      });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching admin dashboard summary:', error);
-      res.status(500).json({
-        success: false,
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to fetch admin dashboard summary',
-      });
-    }
-  });
-
-  /**
-   * GET /admin/dashboard/partner-kpi
-   * WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1
-   */
-  router.get('/dashboard/partner-kpi', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const data = await netureService.getPartnerKpiSummary();
-      res.json({ success: true, data });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching partner KPI:', error);
-      res.status(500).json({
-        success: false,
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to fetch partner KPI',
-      });
-    }
-  });
-
   // ==================== Admin Request Management (WO-S2S-FLOW-RECOVERY-PHASE2-V1 T2) ====================
 
   /**

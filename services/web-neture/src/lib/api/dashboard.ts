@@ -48,98 +48,14 @@ export interface SupplierDashboardSummary {
   recentActivity: RecentActivity[];
 }
 
-// ==================== Admin Dashboard Summary Types ====================
+// ==================== Operator Dashboard 5-Block Types (WO-O4O-LEGACY-ADMIN-DASHBOARD-SUNSET-V1) ====================
 
-export interface AdminDashboardStats {
-  totalSuppliers: number;
-  activeSuppliers: number;
-  totalRequests: number;
-  pendingRequests: number;
-  approvedRequests: number;
-  rejectedRequests: number;
-  totalPartnershipRequests: number;
-  openPartnershipRequests: number;
-  totalContents: number;
-  publishedContents: number;
-}
-
-export interface ServiceStatus {
-  serviceId: string;
-  serviceName: string;
-  suppliers: number;
-  partners: number;
-  status: string;
-}
-
-export interface RecentApplication {
-  id: string;
-  name: string;
-  type: string;
-  date: string;
-  status: string;
-}
-
-export interface RecentActivityItem {
-  id: string;
-  type: string;
-  text: string;
-  time: string;
-}
-
-export interface AppContentSummary {
-  totalPublished: number;
-  recentItems: Array<{
-    id: string;
-    type: string;
-    title: string;
-    summary: string | null;
-    imageUrl: string | null;
-    isPinned: boolean;
-    publishedAt: string | null;
-    createdAt: string;
-  }>;
-}
-
-export interface AppSignageSummary {
-  totalMedia: number;
-  totalPlaylists: number;
-  recentMedia: Array<{
-    id: string;
-    name: string;
-    mediaType: string;
-    url: string | null;
-    thumbnailUrl: string | null;
-    duration: number | null;
-    metadata: Record<string, unknown>;
-  }>;
-  recentPlaylists: Array<{
-    id: string;
-    name: string;
-    description: string | null;
-    itemCount: number;
-    totalDuration: number;
-  }>;
-}
-
-export interface AppForumSummary {
-  totalPosts: number;
-  recentPosts: Array<{
-    id: string;
-    title: string;
-    authorName: string | null;
-    createdAt: string;
-    categoryName: string | null;
-  }>;
-}
-
-export interface AdminDashboardSummary {
-  stats: AdminDashboardStats;
-  content?: AppContentSummary;
-  signage?: AppSignageSummary;
-  forum?: AppForumSummary;
-  serviceStatus: ServiceStatus[];
-  recentApplications: RecentApplication[];
-  recentActivities: RecentActivityItem[];
+export interface OperatorDashboardData {
+  kpis: Array<{ key: string; label: string; value: number | string; delta?: number; status?: string; link?: string }>;
+  aiSummary?: Array<{ id: string; message: string; level: string; link?: string }>;
+  actionQueue: Array<{ id: string; label: string; count: number; link: string }>;
+  activityLog: Array<{ id: string; message: string; timestamp: string }>;
+  quickActions: Array<{ id: string; label: string; link: string; icon?: string }>;
 }
 
 // ==================== Partner Dashboard Summary Types ====================
@@ -172,15 +88,6 @@ export interface PartnerDashboardSummary {
   notifications: Notification[];
 }
 
-// ==================== Admin Partner KPI Types (WO-O4O-NETURE-ADMIN-DASHBOARD-PARTNER-KPI-V1) ====================
-
-export interface PartnerKpiSummary {
-  activePartners: number;
-  totalCommission: number;
-  pendingCommission: number;
-  pendingSettlements: number;
-}
-
 // ==================== Dashboard API ====================
 
 export const dashboardApi = {
@@ -202,35 +109,20 @@ export const dashboardApi = {
     }
   },
 
-  async getAdminDashboardSummary(): Promise<AdminDashboardSummary | null> {
+  async getOperatorDashboard(): Promise<OperatorDashboardData | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/summary`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/neture/operator/dashboard`, {
         credentials: 'include',
         headers: authHeaders(),
       });
       if (!response.ok) {
-        console.warn('[Dashboard API] Admin dashboard summary not available');
+        console.warn('[Dashboard API] Operator dashboard not available');
         return null;
       }
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.warn('[Dashboard API] Failed to fetch admin dashboard summary:', error);
-      return null;
-    }
-  },
-
-  async getPartnerKpiSummary(): Promise<PartnerKpiSummary | null> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/admin/dashboard/partner-kpi`, {
-        credentials: 'include',
-        headers: authHeaders(),
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data;
-    } catch (error) {
-      console.warn('[Dashboard API] Failed to fetch partner KPI:', error);
+      console.warn('[Dashboard API] Failed to fetch operator dashboard:', error);
       return null;
     }
   },

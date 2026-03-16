@@ -480,19 +480,10 @@ class GlycopharmApiClient {
 
   /**
    * 운영자 대시보드 통계 조회
-   * NOTE: Operator frontend now uses fetchOperatorDashboard() from api/operatorDashboard.ts
-   * This method is kept for the admin dashboard which needs the old format.
+   * NOTE: Operator frontend uses fetchOperatorDashboard() from api/operatorDashboard.ts
    */
   async getOperatorDashboard(): Promise<OperatorDashboardResponse> {
     return this.request('/api/v1/glycopharm/operator/dashboard');
-  }
-
-  /**
-   * 관리자 대시보드 조회 (old-format OperatorDashboardData shape)
-   * WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1
-   */
-  async getAdminDashboard(): Promise<OperatorDashboardResponse> {
-    return this.request('/api/v1/glycopharm/admin/dashboard');
   }
 
   /**

@@ -516,52 +516,5 @@ export function createCosmeticsController(
     }
   );
 
-  /**
-   * GET /cosmetics/admin/dashboard/summary
-   * Get operator dashboard summary
-   *
-   * WO-KCOS-STORES-PHASE2: Real store/order data from DB
-   * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: cosmetics:operator 접근 허용
-   */
-  router.get(
-    '/admin/dashboard/summary',
-    requireAuth,
-    requireScope('cosmetics:operator'),
-    async (_req: Request, res: Response) => {
-      try {
-        // Get real store/order data from summary service
-        const adminSummary = await storeSummaryService.getAdminSummary();
-
-        // Get catalog stats from existing service
-        const catalogStats = await service.getOperatorDashboardSummary();
-
-        // Merge: real store/order data + catalog data
-        const result = {
-          stats: {
-            totalStores: adminSummary.totalStores,
-            activeOrders: adminSummary.activeOrders,
-            monthlyRevenue: adminSummary.monthlyRevenue > 0
-              ? `₩${adminSummary.monthlyRevenue.toLocaleString()}`
-              : '₩0',
-            newSignups: catalogStats.stats.newSignups,
-          },
-          recentOrders: adminSummary.recentOrders.map((o) => ({
-            id: o.id,
-            store: o.channel || 'N/A',
-            amount: `₩${o.totalAmount.toLocaleString()}`,
-            status: o.status,
-            time: o.createdAt,
-          })),
-          recentApplications: catalogStats.recentApplications,
-        };
-
-        res.json({ success: true, data: result });
-      } catch (error: any) {
-        console.error('[Cosmetics] Get dashboard summary error:', error);
-        errorResponse(res, 500, 'COSMETICS_500', 'Internal server error');
-      }
-    }
-  );
-
   return router;
 }

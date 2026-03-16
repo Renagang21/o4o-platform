@@ -455,7 +455,7 @@ export default function HubPage() {
       ];
 
       if (isAdmin) {
-        basePromises.push(dashboardApi.getAdminDashboardSummary());
+        basePromises.push(dashboardApi.getOperatorDashboard());
       }
 
       const results = await Promise.allSettled(basePromises);
@@ -496,13 +496,17 @@ export default function HubPage() {
         data.sellerInsight = aiRes.data;
       }
 
-      // Admin stats
-      if (adminSummary?.stats) {
+      // Admin stats (from 5-block operator dashboard KPIs)
+      if (adminSummary?.kpis) {
+        const findKpi = (key: string) => {
+          const kpi = adminSummary.kpis.find((k: any) => k.key === key);
+          return typeof kpi?.value === 'number' ? kpi.value : 0;
+        };
         data.adminStats = {
-          pendingRequests: adminSummary.stats.pendingRequests,
-          openPartnershipRequests: adminSummary.stats.openPartnershipRequests,
-          totalSuppliers: adminSummary.stats.totalSuppliers,
-          activeSuppliers: adminSummary.stats.activeSuppliers,
+          pendingRequests: adminSummary.actionQueue?.find((a: any) => a.id === 'aq-pending-products')?.count ?? 0,
+          openPartnershipRequests: adminSummary.actionQueue?.find((a: any) => a.id === 'aq-pending-registrations')?.count ?? 0,
+          totalSuppliers: findKpi('active-suppliers'),
+          activeSuppliers: findKpi('active-suppliers'),
         };
       }
 

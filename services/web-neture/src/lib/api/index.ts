@@ -136,19 +136,11 @@ export {
   type SupplierDashboardStats,
   type ServiceStat,
   type RecentActivity,
-  type AdminDashboardSummary,
-  type AdminDashboardStats,
-  type AppContentSummary,
-  type AppSignageSummary,
-  type AppForumSummary,
-  type ServiceStatus,
-  type RecentApplication,
-  type RecentActivityItem,
+  type OperatorDashboardData,
   type PartnerDashboardSummary,
   type PartnerDashboardStats,
   type ConnectedService,
   type Notification,
-  type PartnerKpiSummary,
 } from './dashboard.js';
 
 // Operator API

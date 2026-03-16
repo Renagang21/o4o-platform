@@ -240,19 +240,6 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     }
   });
 
-  /**
-   * GET /api/v1/neture/admin/dashboard/summary
-   */
-  router.get('/admin/dashboard/summary', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
-    try {
-      const summary = await netureService.getAdminDashboardSummary();
-      res.json({ success: true, data: summary });
-    } catch (error) {
-      logger.error('[Neture API] Error fetching admin dashboard summary:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch admin dashboard summary' });
-    }
-  });
-
   // ==================== Store Product Detail (Public) ====================
 
   /**
