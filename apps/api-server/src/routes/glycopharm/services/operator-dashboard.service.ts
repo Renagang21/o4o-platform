@@ -60,7 +60,7 @@ export async function buildGlycoPharmDashboardConfig(
     dataSource.query(`
       SELECT COUNT(*)::int AS cnt FROM patient_health_profiles
     `) as Promise<Array<{ cnt: number }>>,
-    fetchCareMetrics(dataSource),
+    fetchCareMetrics(dataSource, 'glycopharm'),
     fetchRecentAuditActions(dataSource, 'glycopharm'),
   ]);
 

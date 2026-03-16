@@ -222,6 +222,23 @@ export default function UserDetailPage() {
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
     try {
+      // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
+      // Operator → membership API (admin API 접근 불가)
+      if (status === 'approved' || status === 'rejected') {
+        const pendingMembership = memberships.find(
+          (m: any) => m.status === 'pending' || m.status === 'rejected'
+        );
+        if (pendingMembership) {
+          const endpoint = status === 'approved' ? 'approve' : 'reject';
+          await apiFetch(`/api/v1/operator/members/${pendingMembership.id}/${endpoint}`, {
+            method: 'PATCH',
+            ...(status === 'rejected' ? { body: JSON.stringify({ reason: '운영자 거부' }) } : {}),
+          });
+          fetchDetail();
+          return;
+        }
+      }
+      // Fallback: admin API (admin/super_admin only)
       await apiFetch(`/api/v1/admin/users/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),

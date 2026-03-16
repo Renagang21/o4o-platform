@@ -309,14 +309,14 @@ export class MembershipConsoleController {
             `UPDATE service_memberships
              SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'rejected')
-             RETURNING id, user_id, service_key, status`,
+             RETURNING id, user_id, service_key, role, status`,
             [approvedBy, membershipId]
           )
         : await AppDataSource.query(
             `UPDATE service_memberships
              SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'rejected') AND service_key = ANY($3)
-             RETURNING id, user_id, service_key, status`,
+             RETURNING id, user_id, service_key, role, status`,
             [approvedBy, membershipId, scope.serviceKeys]
           );
 
@@ -324,6 +324,25 @@ export class MembershipConsoleController {
         res.status(404).json({ success: false, error: 'Membership not found or already active' });
         return;
       }
+
+      // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
+      // Activate user account if pending/rejected (idempotent)
+      const approvedUserId = result[0].user_id;
+      await AppDataSource.query(
+        `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+         "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
+         WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
+        [approvedBy, approvedUserId]
+      );
+
+      // Ensure role_assignment exists (idempotent — ON CONFLICT 시 is_active 복원)
+      const memberRole = result[0].role || 'member';
+      await AppDataSource.query(
+        `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
+         VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
+         ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()`,
+        [approvedUserId, memberRole, approvedBy]
+      );
 
       res.json({ success: true, message: 'Membership approved', membership: result[0] });
     } catch (error) {
@@ -348,14 +367,14 @@ export class MembershipConsoleController {
             `UPDATE service_memberships
              SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'active')
-             RETURNING id, user_id, service_key, status`,
+             RETURNING id, user_id, service_key, role, status`,
             [reason || null, membershipId]
           )
         : await AppDataSource.query(
             `UPDATE service_memberships
              SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'active') AND service_key = ANY($3)
-             RETURNING id, user_id, service_key, status`,
+             RETURNING id, user_id, service_key, role, status`,
             [reason || null, membershipId, scope.serviceKeys]
           );
 

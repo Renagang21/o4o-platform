@@ -35,28 +35,34 @@ export interface CareMetrics {
 
 // === Shared Queries ===
 
-export async function fetchCareMetrics(dataSource: DataSource): Promise<CareMetrics> {
+export async function fetchCareMetrics(dataSource: DataSource, serviceCode?: string): Promise<CareMetrics> {
+  // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: filter care tables by service via organization_service_enrollments
+  const svcFilter = serviceCode
+    ? `JOIN organization_service_enrollments ose ON ose.organization_id = t.pharmacy_id AND ose.service_code = $1`
+    : '';
+  const svcParams = serviceCode ? [serviceCode] : [];
+
   const [highRisk, openAlerts, recentAlerts, careEnabled, weeklyActivity] = await Promise.all([
     dataSource.query(`
-      SELECT COUNT(DISTINCT patient_id)::int AS cnt
-      FROM care_kpi_snapshots WHERE risk_level = 'high'
-    `) as Promise<Array<{ cnt: number }>>,
+      SELECT COUNT(DISTINCT t.patient_id)::int AS cnt
+      FROM care_kpi_snapshots t ${svcFilter} WHERE t.risk_level = 'high'
+    `, svcParams) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
-      SELECT COUNT(*)::int AS cnt FROM care_alerts WHERE status = 'open'
-    `) as Promise<Array<{ cnt: number }>>,
+      SELECT COUNT(*)::int AS cnt FROM care_alerts t ${svcFilter} WHERE t.status = 'open'
+    `, svcParams) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
-      SELECT alert_type, severity, message, created_at
-      FROM care_alerts
-      ORDER BY created_at DESC
+      SELECT t.alert_type, t.severity, t.message, t.created_at
+      FROM care_alerts t ${svcFilter}
+      ORDER BY t.created_at DESC
       LIMIT 3
-    `) as Promise<CareAlertRow[]>,
+    `, svcParams) as Promise<CareAlertRow[]>,
     dataSource.query(`
-      SELECT COUNT(DISTINCT pharmacy_id)::int AS cnt FROM care_kpi_snapshots
-    `) as Promise<Array<{ cnt: number }>>,
+      SELECT COUNT(DISTINCT t.pharmacy_id)::int AS cnt FROM care_kpi_snapshots t ${svcFilter}
+    `, svcParams) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
-      SELECT COUNT(*)::int AS cnt FROM care_coaching_sessions
-      WHERE created_at > NOW() - INTERVAL '7 days'
-    `) as Promise<Array<{ cnt: number }>>,
+      SELECT COUNT(*)::int AS cnt FROM care_coaching_sessions t ${svcFilter}
+      WHERE t.created_at > NOW() - INTERVAL '7 days'
+    `, svcParams) as Promise<Array<{ cnt: number }>>,
   ]);
 
   return {

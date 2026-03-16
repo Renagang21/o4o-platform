@@ -60,7 +60,7 @@ export async function buildGlucoseViewDashboardConfig(
       ORDER BY submitted_at DESC
       LIMIT 5
     `) as Promise<Array<{ pharmacy_name: string; status: string; submitted_at: string }>>,
-    fetchCareMetrics(dataSource),
+    fetchCareMetrics(dataSource, 'glucoseview'),
     fetchRecentAuditActions(dataSource, 'glucoseview'),
   ]);
 
