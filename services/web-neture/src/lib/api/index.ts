@@ -155,15 +155,10 @@ export {
 export {
   operatorSupplyApi,
   type OperatorSupplyProduct,
-  operatorCopilotApi,
-  type OperatorKpiSummary,
-  type RecentStoreItem,
-  type SupplierActivityItem,
-  type PendingProductItem,
-  type PlatformTrends,
-  type AlertItem,
-  type OperatorAiSummary,
 } from './operator.js';
+
+// Operator Dashboard API (WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1)
+export { fetchOperatorDashboard } from './operatorDashboard.js';
 
 // Contact API
 export {

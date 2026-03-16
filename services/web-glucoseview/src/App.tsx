@@ -30,6 +30,8 @@ import OperatorStoresPage from './pages/operator/StoresPage';
 import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
 // Operator Layout
 import OperatorLayout from './components/layouts/OperatorLayout';
+// Operator Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
+import GlucoseViewOperatorDashboard from './pages/operator/GlucoseViewOperatorDashboard';
 // Patient Layout (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1)
 import PatientLayout from './components/layouts/PatientLayout';
 
@@ -151,6 +153,8 @@ function AppRoutes() {
           <OperatorLayout />
         </RoleProtectedRoute>
       }>
+        {/* Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1) */}
+        <Route index element={<GlucoseViewOperatorDashboard />} />
         <Route path="applications" element={<OperatorApplicationsPage />} />
         <Route path="applications/:id" element={<OperatorApplicationDetailPage />} />
         {/* 회원 관리 (WO-O4O-MEMBERSHIP-CONSOLE-V1) */}

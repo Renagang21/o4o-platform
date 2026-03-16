@@ -521,11 +521,12 @@ export function createCosmeticsController(
    * Get operator dashboard summary
    *
    * WO-KCOS-STORES-PHASE2: Real store/order data from DB
+   * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: cosmetics:operator 접근 허용
    */
   router.get(
     '/admin/dashboard/summary',
     requireAuth,
-    requireScope('cosmetics:admin'),
+    requireScope('cosmetics:operator'),
     async (_req: Request, res: Response) => {
       try {
         // Get real store/order data from summary service

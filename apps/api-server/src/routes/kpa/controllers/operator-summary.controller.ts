@@ -188,6 +188,130 @@ export function createOperatorSummaryController(
   }));
 
   /**
+   * GET /operator/dashboard
+   * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 4)
+   * 5-block OperatorDashboardConfig response — same data as /summary, unified shape.
+   */
+  router.get('/dashboard', asyncHandler(async (req: Request, res: Response) => {
+    const [
+      recentContent,
+      _signageHome,
+      recentPosts,
+      contentTotalCount,
+      signageMediaTotalCount,
+      signagePlaylistTotalCount,
+      forumPostTotalCount,
+      contentDraftCount,
+      contentPendingCount,
+      signagePendingMediaCount,
+      signagePendingPlaylistCount,
+      forumPendingRequestCount,
+      instructorPendingCount,
+      coursePendingCount,
+      membershipPendingCount,
+      forcedExpirySoonCount,
+    ] = await Promise.all([
+      contentService.listForHome(['notice', 'news', 'hero', 'promo'], 5),
+      signageService.listForHome(3, 3),
+      forumService.listRecentPosts(5),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'published'`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM signage_media WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM signage_playlists WHERE "serviceKey" = 'kpa-society' AND status = 'active' AND "deletedAt" IS NULL`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM forum_post WHERE status = 'publish' AND organization_id IS NULL`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'draft'`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM signage_media WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM signage_playlists WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),
+      dataSource.query(`SELECT (SELECT COUNT(*) FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society') + (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'forum_category') AS count`),
+      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'instructor_qualification') + (SELECT COUNT(*) FROM kpa_instructor_qualifications WHERE status = 'pending') AS count`),
+      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'submitted' AND entity_type = 'course') + (SELECT COUNT(*) FROM kpa_course_requests WHERE status = 'submitted') AS count`),
+      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'membership') + (SELECT COUNT(*) FROM kpa_organization_join_requests WHERE status = 'pending') AS count`),
+      dataSource.query(`SELECT COUNT(*)::int as count FROM kpa_store_asset_controls WHERE is_forced = true AND forced_end_at IS NOT NULL AND forced_end_at > NOW() AND forced_end_at <= NOW() + INTERVAL '7 days'`),
+    ]);
+
+    const p = (rows: any[]) => parseInt(rows[0]?.count || '0', 10);
+
+    const publishedContent = p(contentTotalCount);
+    const drafts = p(contentDraftCount);
+    const pendingContent = p(contentPendingCount);
+    const mediaCount = p(signageMediaTotalCount);
+    const playlistCount = p(signagePlaylistTotalCount);
+    const pendingMedia = p(signagePendingMediaCount);
+    const pendingPlaylists = p(signagePendingPlaylistCount);
+    const forumPosts = p(forumPostTotalCount);
+    const forumPending = p(forumPendingRequestCount);
+    const instrPending = p(instructorPendingCount);
+    const coursePending = p(coursePendingCount);
+    const memberPending = p(membershipPendingCount);
+    const expirySoon = p(forcedExpirySoonCount);
+
+    // Block 1: KPIs
+    const kpis = [
+      { key: 'published-content', label: '게시 콘텐츠', value: publishedContent, status: 'neutral' as const },
+      { key: 'signage-media', label: '사이니지 미디어', value: mediaCount, status: 'neutral' as const },
+      { key: 'signage-playlists', label: '플레이리스트', value: playlistCount, status: 'neutral' as const },
+      { key: 'forum-posts', label: '포럼 게시글', value: forumPosts, status: 'neutral' as const },
+    ];
+
+    // Block 2: AI Summary
+    const aiSummary: Array<{ id: string; message: string; level: 'info' | 'warning' | 'critical'; link?: string }> = [];
+    if (pendingContent > 0) aiSummary.push({ id: 'pending-content', message: `콘텐츠 승인 대기 ${pendingContent}건`, level: 'warning', link: '/operator/content?status=pending' });
+    if (pendingMedia + pendingPlaylists > 0) aiSummary.push({ id: 'pending-signage', message: `사이니지 승인 대기 ${pendingMedia + pendingPlaylists}건`, level: 'warning', link: '/operator/signage' });
+    if (forumPending > 0) aiSummary.push({ id: 'pending-forum', message: `포럼 카테고리 요청 ${forumPending}건`, level: 'warning', link: '/operator/forum' });
+    if (memberPending > 0) aiSummary.push({ id: 'pending-membership', message: `가입 승인 대기 ${memberPending}건`, level: 'warning', link: '/operator/members' });
+    if (expirySoon > 0) aiSummary.push({ id: 'expiry-soon', message: `강제노출 만료 임박 ${expirySoon}건`, level: 'critical', link: '/operator/store-assets' });
+    if (aiSummary.length === 0) aiSummary.push({ id: 'all-clear', message: '현재 긴급한 처리 항목이 없습니다.', level: 'info' });
+
+    // Block 3: Action Queue
+    const actionQueue = [
+      { id: 'content-draft', label: '콘텐츠 임시저장', count: drafts, link: '/operator/content?status=draft' },
+      { id: 'content-pending', label: '콘텐츠 승인 대기', count: pendingContent, link: '/operator/content?status=pending' },
+      { id: 'signage-pending', label: '사이니지 승인 대기', count: pendingMedia + pendingPlaylists, link: '/operator/signage' },
+      { id: 'forum-pending', label: '포럼 카테고리 요청', count: forumPending, link: '/operator/forum' },
+      { id: 'instructor-pending', label: '강사 자격 승인', count: instrPending, link: '/operator/approvals' },
+      { id: 'course-pending', label: '과정 승인', count: coursePending, link: '/operator/approvals' },
+      { id: 'member-pending', label: '가입 승인', count: memberPending, link: '/operator/members' },
+    ];
+
+    // Block 4: Activity Log (recent content + forum posts, time-ordered)
+    const activityLog: Array<{ id: string; message: string; timestamp: string }> = [];
+    if (Array.isArray(recentContent)) {
+      for (const item of recentContent.slice(0, 3)) {
+        activityLog.push({
+          id: `content-${(item as any).id}`,
+          message: `콘텐츠: ${(item as any).title || '(제목 없음)'}`,
+          timestamp: (item as any).createdAt || (item as any).publishedAt || new Date().toISOString(),
+        });
+      }
+    }
+    if (Array.isArray(recentPosts)) {
+      for (const post of recentPosts.slice(0, 3)) {
+        activityLog.push({
+          id: `forum-${(post as any).id}`,
+          message: `포럼: ${(post as any).title || '(제목 없음)'}`,
+          timestamp: (post as any).createdAt || new Date().toISOString(),
+        });
+      }
+    }
+    activityLog.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    // Block 5: Quick Actions
+    const quickActions = [
+      { id: 'content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
+      { id: 'signage', label: '사이니지 관리', link: '/operator/signage', icon: 'monitor' },
+      { id: 'signage-media', label: '미디어 관리', link: '/operator/signage/media', icon: 'image' },
+      { id: 'forum', label: '포럼 관리', link: '/operator/forum', icon: 'message-square' },
+      { id: 'smart-display', label: '스마트 디스플레이', link: '/operator/smart-display', icon: 'tv' },
+      { id: 'settings', label: '설정', link: '/operator/settings', icon: 'settings' },
+    ];
+
+    res.json({
+      success: true,
+      data: { kpis, aiSummary, actionQueue, activityLog, quickActions },
+    });
+  }));
+
+  /**
    * GET /operator/forum-analytics
    * 포럼 운영 통계: KPI 4개 + Top 5 활성 포럼 + 무활동 포럼
    */

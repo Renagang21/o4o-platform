@@ -19,6 +19,7 @@ import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createHubTriggerController } from './controllers/hub-trigger.controller.js'; // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
 import { createSignageController } from './controllers/signage.controller.js';
 import { createOperatorController } from './controllers/operator.controller.js';
+import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
 import { createTabletController } from '../o4o-store/controllers/tablet.controller.js'; // WO-STORE-TABLET-REQUEST-CHANNEL-V1
@@ -335,6 +336,13 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     coreRequireAuth as any
   );
   router.use('/operator', operatorController);
+
+  // Admin Dashboard routes (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
+  const adminDashboardController = createAdminDashboardController(
+    dataSource,
+    coreRequireAuth as any,
+  );
+  router.use('/admin', adminDashboardController);
 
   // ============================================================================
   // Store HUB Controllers (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1)

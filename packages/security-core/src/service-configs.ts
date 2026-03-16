@@ -87,3 +87,49 @@ export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'cosmetics', 'glucoseview'],
 };
+
+/**
+ * K-Cosmetics Service Configuration
+ *
+ * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Extracted from inline cosmetics.routes.ts
+ *
+ * Platform bypass enabled: platform:super_admin can access.
+ * Scope-level role mapping for hierarchical access control.
+ */
+export const COSMETICS_SCOPE_CONFIG: ServiceScopeGuardConfig = {
+  serviceKey: 'cosmetics',
+  allowedRoles: [
+    'cosmetics:admin',
+    'cosmetics:operator',
+  ],
+  platformBypass: true,
+  legacyRoles: [],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'glucoseview'],
+  scopeRoleMapping: {
+    'cosmetics:admin': ['cosmetics:admin'],
+    'cosmetics:operator': ['cosmetics:operator', 'cosmetics:admin'],
+  },
+};
+
+/**
+ * GlucoseView Service Configuration
+ *
+ * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Extracted from inline glucoseview.routes.ts
+ *
+ * Platform bypass enabled: platform:super_admin can access.
+ * Scope-level role mapping for hierarchical access control.
+ */
+export const GLUCOSEVIEW_SCOPE_CONFIG: ServiceScopeGuardConfig = {
+  serviceKey: 'glucoseview',
+  allowedRoles: [
+    'glucoseview:admin',
+    'glucoseview:operator',
+  ],
+  platformBypass: true,
+  legacyRoles: [],
+  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
+  scopeRoleMapping: {
+    'glucoseview:admin': ['glucoseview:admin'],
+    'glucoseview:operator': ['glucoseview:operator', 'glucoseview:admin'],
+  },
+};

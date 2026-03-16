@@ -15,25 +15,11 @@ import { createBranchController } from './controllers/branch.controller.js';
 import { createPharmacistController } from './controllers/pharmacist.controller.js';
 import { createGlucoseViewApplicationController } from './controllers/application.controller.js';
 import { createGlucoseViewPharmacyController } from './controllers/pharmacy.controller.js';
+import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
 import { GlucoseViewPharmacist } from './entities/index.js';
-import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
-
-/**
- * GlucoseView Scope Guard — WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
- *
- * Replaces inline implementation with membership-aware scope guard.
- * Behavior: membership check + glucoseview roles, platform bypass, cross-service deny.
- */
-const GLUCOSEVIEW_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'glucoseview',
-  allowedRoles: ['glucoseview:admin', 'glucoseview:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'cosmetics'],
-};
-const requireGlucoseViewScope = createMembershipScopeGuard(GLUCOSEVIEW_SCOPE_CONFIG);
+// WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
+import { requireGlucoseViewScope } from '../../middleware/glucoseview-scope.middleware.js';
 
 /**
  * GlucoseView Admin middleware factory
@@ -132,6 +118,10 @@ export function createGlucoseViewRoutes(dataSource: DataSource): Router {
     dataSource,
     coreRequireAuth as any
   );
+
+  // Operator Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
+  const operatorDashboardController = createOperatorDashboardController(dataSource);
+  router.use('/operator', operatorDashboardController);
 
   // Mount routes
   router.use('/', glucoseviewController);

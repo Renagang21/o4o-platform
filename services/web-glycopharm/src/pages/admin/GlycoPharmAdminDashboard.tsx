@@ -11,7 +11,7 @@
  *  [C] Governance Alerts  — 네트워크 구조 리스크
  *  [D] Structure Actions  — 구조 변경 진입점
  *
- * API 재사용: glycopharmApi.getOperatorDashboard()
+ * API: glycopharmApi.getAdminDashboard() — WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -148,7 +148,7 @@ export default function GlycoPharmAdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const res = await glycopharmApi.getOperatorDashboard();
+      const res = await glycopharmApi.getAdminDashboard();
       if (res.success && res.data) {
         setConfig(buildAdminConfig(res.data));
       }

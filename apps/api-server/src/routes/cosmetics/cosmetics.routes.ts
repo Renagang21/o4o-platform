@@ -11,12 +11,14 @@
 import { Router } from 'express';
 import { DataSource } from 'typeorm';
 import { createCosmeticsController } from './controllers/cosmetics.controller.js';
+// WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 3): Standard operator path
+import { createCosmeticsOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
 import { createCosmeticsOrderController } from './controllers/cosmetics-order.controller.js';
 import { createCosmeticsPaymentController } from './controllers/cosmetics-payment.controller.js';
 import { createCosmeticsStoreController } from './controllers/cosmetics-store.controller.js';
 import { requireAuth as coreRequireAuth } from '../../middleware/auth.middleware.js';
-import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
-import type { ServiceScopeGuardConfig } from '@o4o/security-core';
+// WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
+import { requireCosmeticsScope } from '../../middleware/cosmetics-scope.middleware.js';
 // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Store HUB controllers
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createStoreChannelProductsController } from '../o4o-store/controllers/store-channel-products.controller.js';
@@ -32,21 +34,6 @@ import { createStoreAssetControlController } from '../o4o-store/controllers/stor
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
-
-/**
- * Cosmetics Scope Guard — WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
- *
- * Replaces inline implementation with membership-aware scope guard.
- * Behavior: membership check + cosmetics roles, platform bypass, cross-service deny.
- */
-const COSMETICS_SCOPE_CONFIG: ServiceScopeGuardConfig = {
-  serviceKey: 'cosmetics',
-  allowedRoles: ['cosmetics:admin', 'cosmetics:operator'],
-  platformBypass: true,
-  legacyRoles: [],
-  blockedServicePrefixes: ['kpa', 'neture', 'glycopharm', 'glucoseview'],
-};
-const requireCosmeticsScope = createMembershipScopeGuard(COSMETICS_SCOPE_CONFIG);
 
 /**
  * Create cosmetics routes
@@ -83,6 +70,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // Mount controllers
   router.use('/', cosmeticsController);
+  // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 3): /operator/dashboard
+  router.use('/operator', createCosmeticsOperatorDashboardController(dataSource));
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
   router.use('/payments', paymentController); // Payment EventHub 연결
   router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리

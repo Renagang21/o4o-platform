@@ -1,24 +1,23 @@
 /**
- * GlycoPharmOperatorDashboard — 5-Block Unified Operator Dashboard
+ * GlucoseViewOperatorDashboard — 5-Block Unified Operator Dashboard
  *
  * WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1:
- *   Normalized to Neture pass-through pattern.
- *   Single API call to /api/v1/glycopharm/operator/dashboard returns all data.
+ *   Single API call to /api/v1/glucoseview/operator/dashboard returns all data.
  *
  * Block 구조:
- *  [1] KPI Grid       — 약국, 상품, 콘텐츠
+ *  [1] KPI Grid       — 약국, 약사, 고객, 벤더, 콘텐츠
  *  [2] AI Summary     — 상태 기반 인사이트 (승인 대기 등)
  *  [3] Action Queue   — 즉시 처리 항목
- *  [4] Activity Log   — 최근 활동
+ *  [4] Activity Log   — 최근 신청 활동
  *  [5] Quick Actions   — 주요 기능 바로가기
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { OperatorDashboardLayout, type OperatorDashboardConfig } from '@o4o/operator-ux-core';
-import { fetchOperatorDashboard } from '../../api/operatorDashboard';
-import { buildGlycoPharmOperatorConfig } from './operatorConfig';
+import { fetchOperatorDashboard } from '../../services/operatorDashboard';
+import { buildGlucoseViewOperatorConfig } from './operatorConfig';
 
-export default function GlycoPharmOperatorDashboard() {
+export default function GlucoseViewOperatorDashboard() {
   const [config, setConfig] = useState<OperatorDashboardConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +30,7 @@ export default function GlycoPharmOperatorDashboard() {
       if (!data) {
         setError('운영자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
       } else {
-        setConfig(buildGlycoPharmOperatorConfig(data));
+        setConfig(buildGlucoseViewOperatorConfig(data));
       }
     } catch (err) {
       console.error('Failed to fetch operator dashboard:', err);

@@ -2,98 +2,38 @@
  * Glycopharm Operator Dashboard Controller
  *
  * WO-GLYCOPHARM-DASHBOARD-P1-A: Real database queries for operator dashboard
+ * WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1:
+ *   Phase 1 — Router-level scope guard
+ *   Phase 4 — 5-block OperatorDashboardConfig response
+ *
  * - Platform-wide statistics for operators/admins
  * - Uses existing entities only (no new schema)
- * - Returns empty state for unavailable data
+ * - Returns 5-block format matching @o4o/operator-ux-core
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
-import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmApplication } from '../entities/glycopharm-application.entity.js';
 // GlycopharmOrder - REMOVED (Phase 4-A: Legacy Order System Deprecation)
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { CmsContent } from '@o4o-apps/cms-core';
-import type { AuthRequest } from '../../../types/auth.js';
-import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+// WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
+import { requireGlycopharmScope } from '../../../middleware/glycopharm-scope.middleware.js';
 
 type AuthMiddleware = RequestHandler;
 
-// Response interfaces matching frontend expectations
-interface ServiceStatus {
-  activePharmacies: number;
-  approvedStores: number; // Same as active pharmacies (no separate store entity)
-  warnings: number; // Suspended pharmacies
-  lastUpdated: string;
-}
-
-interface StoreStatus {
-  pendingApprovals: number; // Applications with status 'submitted'
-  supplementRequests: number; // Applications with status 'supplementing'
-  activeStores: number;
-  inactiveStores: number;
-}
-
-interface ChannelStatus {
-  web: { active: number; pending: number; inactive: number };
-  kiosk: { active: number; pending: number; inactive: number };
-  tablet: { active: number; pending: number; inactive: number };
-}
-
-interface ContentStatus {
-  hero: { total: number; active: number };
-  featured: { total: number; operatorPicked: number };
-  eventNotice: { total: number; active: number };
-}
-
-interface TrialStatus {
-  activeTrials: number;
-  connectedPharmacies: number;
-  pendingConnections: number;
-}
-
-interface ForumStatus {
-  open: number;
-  readonly: number;
-  closed: number;
-  totalPosts: number;
-}
-
-interface OperatorDashboardResponse {
-  serviceStatus: ServiceStatus;
-  storeStatus: StoreStatus;
-  channelStatus: ChannelStatus;
-  contentStatus: ContentStatus;
-  trialStatus: TrialStatus;
-  forumStatus: ForumStatus;
-  productStats: {
-    total: number;
-    active: number;
-    draft: number;
-  };
-  orderStats: {
-    totalOrders: number;
-    paidOrders: number;
-    totalRevenue: number;
-  };
-}
-
-/**
- * Check if user has operator/admin role
- *
- * WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
- * - **GlycoPharm 서비스는 오직 glycopharm:* role만 신뢰**
- * - Priority 1: GlycoPharm prefixed roles ONLY (glycopharm:admin, glycopharm:operator)
- * - Priority 2: Legacy role detection → Log + DENY
- * - platform:admin 허용 (플랫폼 감독)
- */
-function isOperatorOrAdmin(roles: string[] = []): boolean {
-  return hasAnyServiceRole(roles, [
-    'glycopharm:admin',
-    'glycopharm:operator',
-    'platform:admin',
-    'platform:super_admin',
-  ]);
+// 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
+interface KpiItem { key: string; label: string; value: number | string; delta?: number; status?: 'neutral' | 'warning' | 'critical'; link?: string; }
+interface AiSummaryItem { id: string; message: string; level: 'info' | 'warning' | 'critical'; link?: string; }
+interface ActionItem { id: string; label: string; count: number; link: string; }
+interface ActivityItem { id: string; message: string; timestamp: string; }
+interface QuickActionItem { id: string; label: string; link: string; icon?: string; }
+interface OperatorDashboardConfig {
+  kpis: KpiItem[];
+  aiSummary?: AiSummaryItem[];
+  actionQueue: ActionItem[];
+  activityLog: ActivityItem[];
+  quickActions: QuickActionItem[];
 }
 
 export function createOperatorController(
@@ -102,146 +42,125 @@ export function createOperatorController(
 ): Router {
   const router = Router();
 
+  // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Router-level guard
+  // Replaces per-handler isOperatorOrAdmin() inline check
+  router.use(requireAuth);
+  router.use(requireGlycopharmScope('glycopharm:operator') as any);
+
   /**
    * GET /operator/dashboard
-   * Get platform-wide operator dashboard statistics
+   * Glycopharm operator dashboard — 5-block response
    */
   router.get(
     '/dashboard',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userRoles = authReq.user?.roles || [];
-
-        // Check operator/admin permission
-        if (!isOperatorOrAdmin(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Operator or administrator role required' },
-          });
-          return;
-        }
-
         // Get repositories
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
-        // orderRepo - REMOVED (Phase 4-A: Legacy Order System Deprecation)
         const productRepo = dataSource.getRepository(GlycopharmProduct);
-
-        // === Service Status (organizations + enrollment JOIN) ===
-        const pharmacyCounts: Array<{ is_active: boolean; cnt: number }> = await dataSource.query(`
-          SELECT o."isActive" AS is_active, COUNT(*)::int AS cnt
-          FROM organizations o
-          JOIN organization_service_enrollments ose
-            ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
-          GROUP BY o."isActive"
-        `);
-        const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;
-        const inactivePharmacies = pharmacyCounts.find(r => r.is_active === false)?.cnt || 0;
-        const totalPharmacies = activePharmacies + inactivePharmacies;
-
-        const serviceStatus: ServiceStatus = {
-          activePharmacies,
-          approvedStores: activePharmacies,
-          warnings: 0, // 'suspended' concept removed in organizations model
-          lastUpdated: new Date().toISOString(),
-        };
-
-        // === Store Status ===
-        const [pendingApprovals] = await Promise.all([
-          applicationRepo.count({ where: { status: 'submitted' } }),
-        ]);
-        const supplementRequests = 0; // No supplementing status in current schema
-
-        const storeStatus: StoreStatus = {
-          pendingApprovals,
-          supplementRequests,
-          activeStores: activePharmacies,
-          inactiveStores: inactivePharmacies,
-        };
-
-        // === Channel Status (Empty - no entity) ===
-        const channelStatus: ChannelStatus = {
-          web: { active: activePharmacies, pending: 0, inactive: 0 },
-          kiosk: { active: 0, pending: 0, inactive: 0 },
-          tablet: { active: 0, pending: 0, inactive: 0 },
-        };
-
-        // === Content Status (WO-P2-IMPLEMENT-CONTENT: Real CMS data) ===
         const contentRepo = dataSource.getRepository(CmsContent);
         const serviceKey = 'glycopharm';
 
+        // === Parallel data fetch ===
         const [
-          heroTotal,
-          heroActive,
-          featuredTotal,
-          featuredOperatorPicked,
-          noticeTotal,
-          noticeActive,
-          eventTotal,
-          eventActive,
+          pharmacyCounts,
+          pendingApprovals,
+          totalProducts,
+          activeProducts,
+          draftProducts,
+          cmsTotal,
+          cmsPublished,
+          recentApplications,
         ] = await Promise.all([
-          contentRepo.count({ where: { serviceKey, type: 'hero' } }),
-          contentRepo.count({ where: { serviceKey, type: 'hero', status: 'published' } }),
-          contentRepo.count({ where: { serviceKey, type: 'featured' } }),
-          contentRepo.count({ where: { serviceKey, type: 'featured', isOperatorPicked: true } }),
-          contentRepo.count({ where: { serviceKey, type: 'notice' } }),
-          contentRepo.count({ where: { serviceKey, type: 'notice', status: 'published' } }),
-          contentRepo.count({ where: { serviceKey, type: 'event' } }),
-          contentRepo.count({ where: { serviceKey, type: 'event', status: 'published' } }),
-        ]);
-
-        const contentStatus: ContentStatus = {
-          hero: { total: heroTotal, active: heroActive },
-          featured: { total: featuredTotal, operatorPicked: featuredOperatorPicked },
-          eventNotice: { total: noticeTotal + eventTotal, active: noticeActive + eventActive },
-        };
-
-        // === Trial Status (Empty - no entity) ===
-        const trialStatus: TrialStatus = {
-          activeTrials: 0,
-          connectedPharmacies: 0,
-          pendingConnections: 0,
-        };
-
-        // === Forum Status (Empty - no glycopharm-specific forum entity) ===
-        const forumStatus: ForumStatus = {
-          open: 0,
-          readonly: 0,
-          closed: 0,
-          totalPosts: 0,
-        };
-
-        // === Product Stats ===
-        const [totalProducts, activeProducts, draftProducts] = await Promise.all([
+          // Organizations enrolled in glycopharm
+          dataSource.query(`
+            SELECT o."isActive" AS is_active, COUNT(*)::int AS cnt
+            FROM organizations o
+            JOIN organization_service_enrollments ose
+              ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
+            GROUP BY o."isActive"
+          `) as Promise<Array<{ is_active: boolean; cnt: number }>>,
+          applicationRepo.count({ where: { status: 'submitted' } }),
           productRepo.count(),
           productRepo.count({ where: { status: 'active' } }),
           productRepo.count({ where: { status: 'draft' } }),
+          contentRepo.count({ where: { serviceKey } }),
+          contentRepo.count({ where: { serviceKey, status: 'published' } }),
+          // Recent applications for activity log
+          applicationRepo.find({
+            where: { status: 'submitted' },
+            order: { submittedAt: 'DESC' },
+            take: 5,
+          }),
         ]);
 
-        // === Order Stats ===
-        // Phase 4-A: Legacy Order System removed
-        // Order stats will be available via E-commerce Core after integration
-        const totalOrders = 0;
-        const paidOrders = 0;
-        const totalRevenue = 0;
+        const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;
+        const inactivePharmacies = pharmacyCounts.find(r => r.is_active === false)?.cnt || 0;
 
-        const response: OperatorDashboardResponse = {
-          serviceStatus,
-          storeStatus,
-          channelStatus,
-          contentStatus,
-          trialStatus,
-          forumStatus,
-          productStats: {
-            total: totalProducts,
-            active: activeProducts,
-            draft: draftProducts,
-          },
-          orderStats: {
-            totalOrders,
-            paidOrders,
-            totalRevenue,
-          },
+        // === Build 5-block response ===
+
+        // Block 1: KPIs
+        const kpis: KpiItem[] = [
+          { key: 'active-pharmacies', label: '활성 약국', value: activePharmacies, status: 'neutral' },
+          { key: 'inactive-pharmacies', label: '비활성 약국', value: inactivePharmacies, status: inactivePharmacies > 0 ? 'warning' : 'neutral' },
+          { key: 'active-products', label: '판매 상품', value: activeProducts, status: 'neutral' },
+          { key: 'total-products', label: '전체 상품', value: totalProducts, status: 'neutral' },
+          { key: 'cms-published', label: '게시 콘텐츠', value: cmsPublished, status: 'neutral' },
+        ];
+
+        // Block 2: AI Summary
+        const aiSummary: AiSummaryItem[] = [];
+        if (pendingApprovals > 0) {
+          aiSummary.push({
+            id: 'pending-apps',
+            message: `입점 신청 승인 대기 ${pendingApprovals}건이 있습니다.`,
+            level: 'warning',
+            link: '/operator/applications',
+          });
+        }
+        if (draftProducts > 0) {
+          aiSummary.push({
+            id: 'draft-products',
+            message: `임시저장 상품 ${draftProducts}건이 있습니다.`,
+            level: 'info',
+            link: '/operator/products?status=draft',
+          });
+        }
+        if (aiSummary.length === 0) {
+          aiSummary.push({
+            id: 'all-clear',
+            message: '현재 긴급한 처리 항목이 없습니다.',
+            level: 'info',
+          });
+        }
+
+        // Block 3: Action Queue
+        const actionQueue: ActionItem[] = [
+          { id: 'pending-apps', label: '입점 신청 대기', count: pendingApprovals, link: '/operator/applications' },
+          { id: 'draft-products', label: '임시저장 상품', count: draftProducts, link: '/operator/products?status=draft' },
+        ];
+
+        // Block 4: Activity Log (from recent applications)
+        const activityLog: ActivityItem[] = recentApplications.map((app, i) => ({
+          id: `app-${i}`,
+          message: `${app.organizationName} — 입점 신청 (${app.organizationType})`,
+          timestamp: app.submittedAt?.toISOString?.() || new Date().toISOString(),
+        }));
+
+        // Block 5: Quick Actions
+        const quickActions: QuickActionItem[] = [
+          { id: 'manage-pharmacies', label: '약국 관리', link: '/operator/pharmacies', icon: 'store' },
+          { id: 'manage-products', label: '상품 관리', link: '/operator/products', icon: 'package' },
+          { id: 'manage-applications', label: '입점 심사', link: '/operator/applications', icon: 'clipboard' },
+          { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/content', icon: 'file-text' },
+        ];
+
+        const response: OperatorDashboardConfig = {
+          kpis,
+          aiSummary,
+          actionQueue,
+          activityLog,
+          quickActions,
         };
 
         res.json({ success: true, data: response });
@@ -263,19 +182,8 @@ export function createOperatorController(
    */
   router.get(
     '/recent-orders',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userRoles = authReq.user?.roles || [];
-
-        if (!isOperatorOrAdmin(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Operator or administrator role required' },
-          });
-          return;
-        }
-
         // Phase 4-A: Legacy Order System removed
         // Return empty array until E-commerce Core integration
         res.json({
@@ -298,19 +206,8 @@ export function createOperatorController(
    */
   router.get(
     '/pending-applications',
-    requireAuth,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const authReq = req as AuthRequest;
-        const userRoles = authReq.user?.roles || [];
-
-        if (!isOperatorOrAdmin(userRoles)) {
-          res.status(403).json({
-            error: { code: 'FORBIDDEN', message: 'Operator or administrator role required' },
-          });
-          return;
-        }
-
         const limit = parseInt(req.query.limit as string) || 10;
         const applicationRepo = dataSource.getRepository(GlycopharmApplication);
 

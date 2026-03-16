@@ -32,8 +32,21 @@ export default function OperatorLayout() {
           </div>
 
           {/* Center - Navigation */}
-          {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: 표준 Capability 순서 (Users→Approvals→Products→Stores→Analytics) */}
+          {/* WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1: Dashboard first */}
           <nav className="flex items-center gap-1">
+            <NavLink
+              to="/operator"
+              end
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`
+              }
+            >
+              대시보드
+            </NavLink>
             <NavLink
               to="/operator/users"
               className={({ isActive }) =>

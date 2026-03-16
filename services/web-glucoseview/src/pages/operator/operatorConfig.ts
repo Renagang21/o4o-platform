@@ -1,20 +1,14 @@
 /**
- * GlycoPharm Operator Dashboard Config Builder
+ * GlucoseView Operator Dashboard Config Builder
  *
  * WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1:
  *   API returns OperatorDashboardConfig (5-block) shape directly from the backend.
- *   This file provides a pass-through with empty-state fallback,
- *   following the Neture/KPA operatorConfig.ts pattern.
+ *   This file provides a pass-through with empty-state fallback.
  */
 
 import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
 
-/**
- * Build dashboard config from API response.
- * API returns the 5-block shape directly, so this is a pass-through
- * with defaults for any missing fields.
- */
-export function buildGlycoPharmOperatorConfig(
+export function buildGlucoseViewOperatorConfig(
   data: OperatorDashboardConfig | null,
 ): OperatorDashboardConfig {
   if (!data) {

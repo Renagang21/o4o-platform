@@ -1,31 +1,14 @@
 /**
  * Operator Dashboard API
  * K-Cosmetics 운영자 대시보드 API
+ *
+ * WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1:
+ *   Switched to /cosmetics/operator/dashboard (5-block direct)
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
+import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
 
-export interface OperatorDashboardSummary {
-  stats: {
-    totalStores: number;
-    activeOrders: number;
-    monthlyRevenue: string;
-    newSignups: number;
-  };
-  recentOrders: Array<{
-    id: string;
-    store: string;
-    amount: string;
-    status: string;
-    time: string;
-  }>;
-  recentApplications: Array<{
-    name: string;
-    type: string;
-    date: string;
-    status: string;
-  }>;
-}
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
 
 async function getAuthToken(): Promise<string | null> {
   // Try to get token from localStorage
@@ -83,8 +66,8 @@ async function fetchWithAuth<T>(endpoint: string, options?: RequestInit): Promis
 }
 
 export const operatorApi = {
-  async getDashboardSummary(): Promise<OperatorDashboardSummary | null> {
-    return fetchWithAuth<OperatorDashboardSummary>('/cosmetics/admin/dashboard/summary');
+  async getDashboardSummary(): Promise<OperatorDashboardConfig | null> {
+    return fetchWithAuth<OperatorDashboardConfig>('/cosmetics/operator/dashboard');
   },
 
   async getMembers(includeInactive = false): Promise<StoreMemberInfo[] | null> {
