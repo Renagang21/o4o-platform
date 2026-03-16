@@ -29,7 +29,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co
 // ─── Types ───────────────────────────────────────────────────
 
 type TabType = 'all' | 'pending' | 'processing' | 'shipped' | 'completed';
-type OrderStatus = 'pending_payment' | 'paid' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'created';
 
 interface OrderData {
   id: string;

@@ -237,15 +237,39 @@ export default function UsersManagementPage() {
   useEffect(() => { fetchUsers(1); }, [fetchUsers]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
-  const handleStatusChange = async (userId: string, status: string) => {
-    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status;
+  /**
+   * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
+   * 승인/거부 → Neture 등록 API (operator 접근 가능)
+   * 정지/활성화 → Membership Console API
+   */
+  const handleStatusChange = async (userId: string, status: string, currentStatus?: string) => {
+    const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status === 'suspended' ? '정지' : '활성화';
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading(userId);
     try {
-      await apiFetch(`/api/v1/admin/users/${userId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      });
+      if (status === 'approved' && (currentStatus === 'pending' || currentStatus === 'rejected')) {
+        // 승인: Neture registration endpoint (service_membership + user + role_assignment 동시 처리)
+        await apiFetch(`/api/v1/neture/operator/registrations/${userId}/approve`, {
+          method: 'POST',
+        });
+      } else if (status === 'rejected') {
+        // 거부: Neture registration endpoint
+        await apiFetch(`/api/v1/neture/operator/registrations/${userId}/reject`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: '운영자 거부' }),
+        });
+      } else {
+        // 정지/활성화: Membership Console
+        // 해당 사용자의 neture membership을 찾아서 membershipId로 처리
+        const user = users.find((u) => u.id === userId);
+        const netureMembership = user?.memberships?.find((m) => m.serviceKey === 'neture');
+        if (netureMembership) {
+          const endpoint = status === 'suspended'
+            ? `/api/v1/operator/members/${netureMembership.id}/reject`
+            : `/api/v1/operator/members/${netureMembership.id}/approve`;
+          await apiFetch(endpoint, { method: 'PATCH' });
+        }
+      }
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
@@ -425,26 +449,26 @@ export default function UsersManagementPage() {
                         <>
                           {user.status === 'pending' && (
                             <>
-                              <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
+                              <button onClick={() => handleStatusChange(user.id, 'approved', 'pending')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
                                 <UserCheck className="w-4 h-4" />
                               </button>
-                              <button onClick={() => handleStatusChange(user.id, 'rejected')} title="거부" className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg">
+                              <button onClick={() => handleStatusChange(user.id, 'rejected', 'pending')} title="거부" className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg">
                                 <UserX className="w-4 h-4" />
                               </button>
                             </>
                           )}
                           {user.status === 'rejected' && (
-                            <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
+                            <button onClick={() => handleStatusChange(user.id, 'approved', 'rejected')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
                               <UserCheck className="w-4 h-4" />
                             </button>
                           )}
                           {(user.status === 'active' || user.status === 'approved') && (
-                            <button onClick={() => handleStatusChange(user.id, 'suspended')} title="정지" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg">
+                            <button onClick={() => handleStatusChange(user.id, 'suspended', 'active')} title="정지" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg">
                               <XCircle className="w-4 h-4" />
                             </button>
                           )}
                           {user.status === 'suspended' && (
-                            <button onClick={() => handleStatusChange(user.id, 'approved')} title="활성화" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
+                            <button onClick={() => handleStatusChange(user.id, 'approved', 'suspended')} title="활성화" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg">
                               <CheckCircle className="w-4 h-4" />
                             </button>
                           )}

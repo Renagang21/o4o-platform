@@ -100,7 +100,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         dataSource.query(`
           SELECT COUNT(*)::int AS cnt
           FROM service_memberships
-          WHERE service_code = 'neture' AND status = 'pending'
+          WHERE service_key = 'neture' AND status = 'pending'
         `) as Promise<Array<{ cnt: number }>>,
 
         // 6. CMS content counts
