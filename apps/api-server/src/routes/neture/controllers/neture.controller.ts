@@ -491,19 +491,25 @@ export function createNetureController(dataSource: DataSource): Router {
   /**
    * GET /admin/operators
    * Neture 역할 보유 사용자 목록 (neture:admin, neture:operator)
+   * WO-O4O-NETURE-OPERATOR-DASHBOARD-500-FIX-V1:
+   *   users.roles 컬럼 삭제됨 (RBAC SSOT) → role_assignments JOIN으로 전환
    */
   router.get('/admin/operators', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {
     try {
       const includeInactive = req.query.includeInactive === 'true';
 
-      const whereClause = includeInactive
-        ? `WHERE u.roles && ARRAY['neture:admin', 'neture:operator']::text[]`
-        : `WHERE u.roles && ARRAY['neture:admin', 'neture:operator']::text[] AND u."isActive" = true`;
+      const activeFilter = includeInactive ? '' : `AND u."isActive" = true`;
 
       const operators = await dataSource.query(
-        `SELECT u.id, u.name, u.email, u.roles, u."isActive", u."createdAt", u."updatedAt"
+        `SELECT u.id, u.name, u.email, u."isActive", u."createdAt", u."updatedAt",
+                array_agg(ra.role) AS roles
          FROM "user" u
-         ${whereClause}
+         JOIN role_assignments ra
+           ON ra."userId" = u.id
+           AND ra."isActive" = true
+           AND ra.role IN ('neture:admin', 'neture:operator')
+         WHERE 1=1 ${activeFilter}
+         GROUP BY u.id, u.name, u.email, u."isActive", u."createdAt", u."updatedAt"
          ORDER BY u."createdAt" DESC`
       );
 

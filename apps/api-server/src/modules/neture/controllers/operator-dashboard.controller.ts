@@ -68,14 +68,14 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           JOIN organization_service_enrollments ose
             ON ose.organization_id = o.id AND ose.service_code = 'neture'
           GROUP BY o."isActive"
-        `) as Promise<Array<{ is_active: boolean; cnt: number }>>,
+        `).catch(() => []) as Promise<Array<{ is_active: boolean; cnt: number }>>,
 
         // 2. Supplier status counts
         dataSource.query(`
           SELECT status, COUNT(*)::int AS cnt
           FROM neture_suppliers
           GROUP BY status
-        `) as Promise<Array<{ status: string; cnt: number }>>,
+        `).catch(() => []) as Promise<Array<{ status: string; cnt: number }>>,
 
         // 3. Product offer counts
         dataSource.query(`
@@ -84,7 +84,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
             COUNT(*) FILTER (WHERE is_active = true AND approval_status = 'APPROVED')::int AS active,
             COUNT(*) FILTER (WHERE approval_status = 'PENDING')::int AS pending
           FROM supplier_product_offers
-        `) as Promise<Array<{ total: number; active: number; pending: number }>>,
+        `).catch(() => [{ total: 0, active: 0, pending: 0 }]) as Promise<Array<{ total: number; active: number; pending: number }>>,
 
         // 4. Order statistics (last 30 days) — .catch: neture_orders migration 미존재 방어
         dataSource.query(`
@@ -101,7 +101,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           SELECT COUNT(*)::int AS cnt
           FROM service_memberships
           WHERE service_key = 'neture' AND status = 'pending'
-        `) as Promise<Array<{ cnt: number }>>,
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
 
         // 6. CMS content counts
         dataSource.query(`
@@ -110,21 +110,26 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
             COUNT(*) FILTER (WHERE status = 'published')::int AS published
           FROM cms_contents
           WHERE "serviceKey" = 'neture'
-        `) as Promise<Array<{ total: number; published: number }>>,
+        `).catch(() => [{ total: 0, published: 0 }]) as Promise<Array<{ total: number; published: number }>>,
 
-        // 7. Recent activity (multi-source: suppliers, products, contacts — orders/partners deferred until migration)
+        // 7. Recent activity (multi-source: suppliers, products, contacts)
+        // WO-O4O-NETURE-OPERATOR-DASHBOARD-500-FIX-V1:
+        //   - supplier_product_offers has no 'name' column → JOIN product_masters
+        //   - neture_contact_messages uses "createdAt" (camelCase), not created_at
         dataSource.query(`
           (SELECT 'supplier' AS source, name AS ref, status AS detail, created_at
            FROM neture_suppliers ORDER BY created_at DESC LIMIT 2)
           UNION ALL
-          (SELECT 'product' AS source, name AS ref, approval_status AS detail, created_at
-           FROM supplier_product_offers ORDER BY created_at DESC LIMIT 1)
+          (SELECT 'product' AS source, pm.name AS ref, spo.approval_status AS detail, spo.created_at
+           FROM supplier_product_offers spo
+           JOIN product_masters pm ON pm.id = spo.master_id
+           ORDER BY spo.created_at DESC LIMIT 1)
           UNION ALL
-          (SELECT 'contact' AS source, subject AS ref, status AS detail, created_at
-           FROM neture_contact_messages ORDER BY created_at DESC LIMIT 1)
+          (SELECT 'contact' AS source, subject AS ref, status AS detail, "createdAt" AS created_at
+           FROM neture_contact_messages ORDER BY "createdAt" DESC LIMIT 1)
           ORDER BY created_at DESC
           LIMIT 5
-        `) as Promise<Array<{ source: string; ref: string; detail: string; created_at: string }>>,
+        `).catch(() => []) as Promise<Array<{ source: string; ref: string; detail: string; created_at: string }>>,
 
         // 8. Active partners — .catch: neture_partners migration 미존재 방어
         dataSource.query(`
@@ -138,21 +143,21 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           SELECT COUNT(*)::int AS cnt
           FROM neture_settlements
           WHERE status = 'pending'
-        `) as Promise<Array<{ cnt: number }>>,
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
 
         // 10. Unread contact messages
         dataSource.query(`
           SELECT COUNT(*)::int AS cnt
           FROM neture_contact_messages
           WHERE status != 'resolved'
-        `) as Promise<Array<{ cnt: number }>>,
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
 
         // 11. Open partnership requests
         dataSource.query(`
           SELECT COUNT(*)::int AS cnt
           FROM neture_partnership_requests
           WHERE status = 'OPEN'
-        `) as Promise<Array<{ cnt: number }>>,
+        `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
       ]);
 
       // === Parse results ===
