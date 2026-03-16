@@ -22,20 +22,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import logger from '../../../utils/logger.js';
-
-// 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
-interface KpiItem { key: string; label: string; value: number | string; delta?: number; status?: 'neutral' | 'warning' | 'critical'; link?: string; }
-interface AiSummaryItem { id: string; message: string; level: 'info' | 'warning' | 'critical'; link?: string; }
-interface ActionItem { id: string; label: string; count: number; link: string; }
-interface ActivityItem { id: string; message: string; timestamp: string; }
-interface QuickActionItem { id: string; label: string; link: string; icon?: string; }
-interface OperatorDashboardConfig {
-  kpis: KpiItem[];
-  aiSummary?: AiSummaryItem[];
-  actionQueue: ActionItem[];
-  activityLog: ActivityItem[];
-  quickActions: QuickActionItem[];
-}
+import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createOperatorDashboardController(dataSource: DataSource): Router {
   const router = Router();

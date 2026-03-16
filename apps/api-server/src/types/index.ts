@@ -152,3 +152,4 @@ export {
   PerformanceReport, SlowQueryInfo, PerformanceAlert, PerformanceAlertData,
   CompressionLevel, RedisInfo, CacheMetrics, SystemMetrics, QueryPerformanceMetrics
 } from './performance-types.js';
+export * from './operator-dashboard.types.js';

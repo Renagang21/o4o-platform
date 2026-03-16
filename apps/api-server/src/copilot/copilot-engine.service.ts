@@ -15,14 +15,7 @@
 
 import type { AIServiceId, AIInsight } from '@o4o/ai-core';
 import { generateRuleBasedInsights } from './insight-rules.js';
-
-// Inline type to avoid importing from frozen operator-ux-core in backend
-interface AiSummaryItem {
-  id: string;
-  message: string;
-  level: 'info' | 'warning' | 'critical';
-  link?: string;
-}
+import type { AiSummaryItem } from '../types/operator-dashboard.types.js';
 
 /** Timeout for AI provider calls (ms) */
 const AI_TIMEOUT_MS = 3000;

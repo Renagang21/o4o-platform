@@ -14,14 +14,7 @@
  */
 
 import type { AIServiceId } from '@o4o/ai-core';
-
-// Inline type to avoid importing from frozen operator-ux-core in backend
-interface AiSummaryItem {
-  id: string;
-  message: string;
-  level: 'info' | 'warning' | 'critical';
-  link?: string;
-}
+import type { AiSummaryItem } from '../types/operator-dashboard.types.js';
 
 // ─────────────────────────────────────────────────────
 // Metric Helpers

@@ -20,22 +20,9 @@ import { CmsContent } from '@o4o-apps/cms-core';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
 import { requireGlycopharmScope } from '../../../middleware/glycopharm-scope.middleware.js';
 import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 type AuthMiddleware = RequestHandler;
-
-// 5-Block types matching @o4o/operator-ux-core OperatorDashboardConfig
-interface KpiItem { key: string; label: string; value: number | string; delta?: number; status?: 'neutral' | 'warning' | 'critical'; link?: string; }
-interface AiSummaryItem { id: string; message: string; level: 'info' | 'warning' | 'critical'; link?: string; }
-interface ActionItem { id: string; label: string; count: number; link: string; }
-interface ActivityItem { id: string; message: string; timestamp: string; }
-interface QuickActionItem { id: string; label: string; link: string; icon?: string; }
-interface OperatorDashboardConfig {
-  kpis: KpiItem[];
-  aiSummary?: AiSummaryItem[];
-  actionQueue: ActionItem[];
-  activityLog: ActivityItem[];
-  quickActions: QuickActionItem[];
-}
 
 export function createOperatorController(
   dataSource: DataSource,
