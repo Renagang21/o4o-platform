@@ -128,7 +128,6 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
       { label: 'Stores', icon: Store, items: [
         { label: '매장 관리', path: '/operator/stores' },
-        { label: '매장 템플릿', path: '/operator/store-template' },
       ]},
       { label: 'Orders', icon: ShoppingCart, items: [
         { label: '주문 관리', path: '/operator/orders' },
