@@ -7,8 +7,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 const PASSWORD_RULES = [
   { key: 'length', label: '8자 이상', test: (p: string) => p.length >= 8 },
@@ -90,21 +89,16 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      });
+      const response = await api.post('/auth/reset-password', { token, password });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (response.data.success) {
         setIsSuccess(true);
       } else {
-        setError(data.error || data.message || '비밀번호 재설정에 실패했습니다. 링크가 만료되었을 수 있습니다.');
+        setError(response.data.error || response.data.message || '비밀번호 재설정에 실패했습니다. 링크가 만료되었을 수 있습니다.');
       }
-    } catch {
-      setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } catch (err: any) {
+      const data = err.response?.data;
+      setError(data?.error || data?.message || '서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

@@ -5,7 +5,7 @@
  */
 
 // Client utilities
-export { API_BASE_URL, fetchWithTimeout } from './client.js';
+export { API_BASE_URL, api } from './client.js';
 
 // Core Neture API
 export {

@@ -1,11 +1,12 @@
 /**
  * GlycoPharm API Client
  * 실제 API 서버와 통신하는 클라이언트
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1:
+ * authClient.api (Axios) 기반으로 전환 — 401 자동 갱신 지원
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 interface ApiResponse<T> {
   data?: T;
@@ -20,40 +21,35 @@ interface ApiResponse<T> {
   totalPages?: number;
 }
 
+/**
+ * Strip `/api/v1` prefix from path since `api` already has baseURL ending with `/api/v1`.
+ * e.g. `/api/v1/glycopharm/foo` → `/glycopharm/foo`
+ */
+function stripPrefix(path: string): string {
+  return path.startsWith('/api/v1') ? path.slice('/api/v1'.length) : path;
+}
+
 class ApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(
     method: string,
     path: string,
     body?: unknown,
     options?: { headers?: Record<string, string> }
   ): Promise<ApiResponse<T>> {
-    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
-    const accessToken = getAccessToken();
-
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-      ...options?.headers,
-    };
+    const url = stripPrefix(path);
 
     try {
-      // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
-      const response = await fetch(`${this.baseUrl}${path}`, {
+      const response = await api.request<ApiResponse<T>>({
         method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        credentials: 'include',
+        url,
+        data: body,
+        headers: options?.headers,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data) {
+        const data = error.response.data;
         return {
           error: data.error || {
             code: 'API_ERROR',
@@ -61,9 +57,6 @@ class ApiClient {
           },
         };
       }
-
-      return data;
-    } catch (error) {
       return {
         error: {
           code: 'NETWORK_ERROR',
@@ -94,7 +87,7 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient();
 
 // Auth API
 export const authApi = {

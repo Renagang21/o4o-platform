@@ -2,14 +2,13 @@
  * Pharmacy Products API Client — GlycoPharm
  *
  * WO-O4O-HUB-REVENUE-PRIORITY-IMPLEMENTATION-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
  * B2B 상품 카탈로그 조회 (Hub B2B Revenue Section용).
  * KPA pharmacyProducts 클라이언트 패턴 동일.
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 export interface CatalogProduct {
   id: string;
@@ -49,22 +48,6 @@ export async function getCatalog(params?: {
   if (params?.offset != null) searchParams.set('offset', params.offset.toString());
 
   const queryString = searchParams.toString();
-  const url = `${API_BASE_URL}/api/v1/kpa/pharmacy/products/catalog${queryString ? `?${queryString}` : ''}`;
-
-  const accessToken = getAccessToken();
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error(`Catalog API error: ${response.status}`);
-  }
-
-  return response.json();
+  const res = await api.get(`/kpa/pharmacy/products/catalog${queryString ? `?${queryString}` : ''}`);
+  return res.data;
 }

@@ -5,10 +5,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAccessToken } from '@/contexts/AuthContext';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 import { LayoutTemplate, RefreshCw, ChevronRight } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'glycopharm';
 
 interface TemplateItem {
@@ -31,19 +30,9 @@ export default function TemplatesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const apiFetch = useCallback(async (path: string) => {
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error || body?.message || `API error ${res.status}`);
-    }
-    return res.json();
+    const url = path.startsWith('/api/v1') ? path.replace(/^\/api\/v1/, '') : `${API_BASE_URL}${path}`;
+    const response = await api.get(url);
+    return response.data;
   }, []);
 
   const fetchTemplates = useCallback(async () => {

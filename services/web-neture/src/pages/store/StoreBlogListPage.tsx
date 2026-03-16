@@ -19,7 +19,7 @@ import {
   ChevronRight,
   Store,
 } from 'lucide-react';
-import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
+import { api } from '../../lib/api/index.js';
 
 // ── Types ──
 
@@ -70,16 +70,10 @@ export default function StoreBlogListPage() {
     setError(null);
 
     try {
-      const res = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/stores/${encodeURIComponent(storeSlug)}/blog?page=${p}&limit=${LIMIT}`,
+      const res = await api.get(
+        `/stores/${encodeURIComponent(storeSlug)}/blog?page=${p}&limit=${LIMIT}`,
       );
-
-      if (!res.ok) {
-        setError('블로그 글을 불러올 수 없습니다.');
-        return;
-      }
-
-      const result = await res.json();
+      const result = res.data;
       if (result.success) {
         setPosts(result.data || []);
         setMeta(result.meta || null);

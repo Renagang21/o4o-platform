@@ -9,6 +9,9 @@
  *
  * WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1:
  * - globalContentApi 삭제 (clone 경로 전면 제거)
+ *
+ * NOTE: Signage uses /api/signage/ prefix (NOT /api/v1/), so raw fetch is used
+ * with API_BASE_URL for these endpoints.
  */
 
 import type {
@@ -37,9 +40,9 @@ interface ApiResponse<T> {
 type PaginatedResponse<T> = SignagePaginatedResponse<T>;
 
 // WO-FIX-SIGNAGE-API: Use direct API URL to avoid nginx proxy issues on Cloud Run
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+import { api, API_BASE_URL } from '../apiClient';
 const getBaseUrl = (serviceKey: string = 'neture') =>
-  `${API_BASE}/api/signage/${serviceKey}`;
+  `${API_BASE_URL}/api/signage/${serviceKey}`;
 
 /**
  * Public Content API - 인증 불필요
@@ -56,9 +59,7 @@ export const publicContentApi = {
       const query = searchParams.toString();
       const url = query ? `${base}/public/media?${query}` : `${base}/public/media`;
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
+      const { data } = await api.get(url);
       return { success: true, data };
     } catch (error) {
       console.error('Failed to list public media:', error);
@@ -76,9 +77,7 @@ export const publicContentApi = {
       const query = searchParams.toString();
       const url = query ? `${base}/public/playlists?${query}` : `${base}/public/playlists`;
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
+      const { data } = await api.get(url);
       return { success: true, data };
     } catch (error) {
       console.error('Failed to list public playlists:', error);
@@ -89,9 +88,7 @@ export const publicContentApi = {
   async getPlaylist(id: string, serviceKey?: string): Promise<ApiResponse<SignagePlaylist>> {
     try {
       const base = getBaseUrl(serviceKey);
-      const response = await fetch(`${base}/public/playlists/${id}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json = await response.json();
+      const { data: json } = await api.get(`${base}/public/playlists/${id}`);
       return { success: true, data: json.data };
     } catch (error) {
       console.error('Failed to get public playlist:', error);
@@ -102,9 +99,7 @@ export const publicContentApi = {
   async getMedia(id: string, serviceKey?: string): Promise<ApiResponse<SignageMedia>> {
     try {
       const base = getBaseUrl(serviceKey);
-      const response = await fetch(`${base}/public/media/${id}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json = await response.json();
+      const { data: json } = await api.get(`${base}/public/media/${id}`);
       return { success: true, data: json.data };
     } catch (error) {
       console.error('Failed to get public media:', error);
@@ -112,4 +107,3 @@ export const publicContentApi = {
     }
   },
 };
-

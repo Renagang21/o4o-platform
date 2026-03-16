@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getAccessToken } from '@/contexts/AuthContext';
+import { api } from '@/lib/apiClient';
 import {
   User,
   Mail,
@@ -26,8 +26,6 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 const roleLabels: Record<string, string> = {
   admin: '관리자',
@@ -84,31 +82,17 @@ export default function MyPage() {
     setSaving(true);
     setFeedback(null);
     try {
-      const accessToken = getAccessToken();
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-      body: JSON.stringify({
-          name: editData.name,
-          phone: editData.phone,
-        }),
+      await api.put('/users/profile', {
+        name: editData.name,
+        phone: editData.phone,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || data.error || '프로필 수정에 실패했습니다.');
-      }
 
       updateUser({ name: editData.name, phone: editData.phone });
       setIsEditing(false);
       setFeedback({ type: 'success', message: '프로필이 수정되었습니다.' });
       setTimeout(() => setFeedback(null), 3000);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '프로필 수정에 실패했습니다.';
+    } catch (err: any) {
+      const message = err.response?.data?.message || err.response?.data?.error || (err instanceof Error ? err.message : '프로필 수정에 실패했습니다.');
       setFeedback({ type: 'error', message });
     } finally {
       setSaving(false);
@@ -134,25 +118,11 @@ export default function MyPage() {
     setChangingPassword(true);
     setPasswordFeedback(null);
     try {
-      const accessToken = getAccessToken();
-      const response = await fetch(`${API_BASE_URL}/api/v1/users/password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-          newPasswordConfirm: passwordData.newPasswordConfirm,
-        }),
+      await api.put('/users/password', {
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+        newPasswordConfirm: passwordData.newPasswordConfirm,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || data.error || '비밀번호 변경에 실패했습니다.');
-      }
 
       setPasswordFeedback({ type: 'success', message: '비밀번호가 변경되었습니다.' });
       setTimeout(() => {
@@ -160,8 +130,8 @@ export default function MyPage() {
         setPasswordData({ currentPassword: '', newPassword: '', newPasswordConfirm: '' });
         setPasswordFeedback(null);
       }, 1500);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.';
+    } catch (err: any) {
+      const message = err.response?.data?.message || err.response?.data?.error || (err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.');
       setPasswordFeedback({ type: 'error', message });
     } finally {
       setChangingPassword(false);

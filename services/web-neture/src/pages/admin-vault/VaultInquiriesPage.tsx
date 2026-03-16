@@ -9,8 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { Mail, MessageSquare, Clock, CheckCircle, AlertCircle, RefreshCw, ChevronDown, ChevronUp, Building2 } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 interface PlatformInquiry {
   id: string;
@@ -70,10 +69,7 @@ export default function VaultInquiriesPage() {
       if (filter.type) params.append('type', filter.type);
       if (filter.status) params.append('status', filter.status);
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/admin/platform/inquiries?${params.toString()}`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
+      const { data } = await api.get(`/admin/platform/inquiries?${params.toString()}`);
 
       if (data.success) {
         setInquiries(data.data.items);
@@ -81,8 +77,9 @@ export default function VaultInquiriesPage() {
       } else {
         setError(data.error || '문의 목록을 불러올 수 없습니다.');
       }
-    } catch (err: any) {
-      setError(err.message || '문의 목록을 불러올 수 없습니다.');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : '문의 목록을 불러올 수 없습니다.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -94,13 +91,7 @@ export default function VaultInquiriesPage() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/admin/platform/inquiries/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status }),
-      });
-      const data = await response.json();
+      const { data } = await api.patch(`/admin/platform/inquiries/${id}`, { status });
 
       if (data.success) {
         setInquiries(prev =>

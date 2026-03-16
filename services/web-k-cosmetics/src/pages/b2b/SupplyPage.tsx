@@ -23,8 +23,7 @@ import {
 } from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 interface Supplier {
   id: string;
@@ -65,25 +64,11 @@ export default function SupplyPage() {
       setIsLoading(true);
       try {
         if (activeTab === 'suppliers') {
-          const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/suppliers`, {
-            credentials: 'include',
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setSuppliers(data.data || []);
-          } else {
-            setSuppliers([]);
-          }
+          const response = await api.get('/cosmetics/suppliers');
+          setSuppliers(response.data?.data || []);
         } else {
-          const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/supply/products`, {
-            credentials: 'include',
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setProducts(data.data || []);
-          } else {
-            setProducts([]);
-          }
+          const response = await api.get('/cosmetics/supply/products');
+          setProducts(response.data?.data || []);
         }
       } catch {
         setSuppliers([]);

@@ -1,31 +1,10 @@
 /**
  * Store Hub API — GlycoPharm 통합 매장 허브
  * WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1
- *
- * KPA storeHub.ts 패턴과 동일하지만 /api/v1/glycopharm/ 네임스페이스 사용
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const accessToken = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}/api/v1/glycopharm${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-      ...options.headers,
-    },
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw { status: response.status, code: err.code, message: err.error || 'Request failed' };
-  }
-  return response.json();
-}
+import { api } from '@/lib/apiClient';
 
 // ─────────────────────────────────────────────────────
 // Types
@@ -87,38 +66,33 @@ export interface LiveSignals {
 // ─────────────────────────────────────────────────────
 
 export async function fetchStoreHubOverview(): Promise<StoreHubOverview | null> {
-  const res = await request<{ success: boolean; data: StoreHubOverview | null }>('/store-hub/overview');
-  return res.data;
+  const res = await api.get('/glycopharm/store-hub/overview');
+  return res.data?.data ?? null;
 }
 
 export async function fetchChannelOverview(): Promise<ChannelOverview[]> {
-  const res = await request<{ success: boolean; data: ChannelOverview[] }>('/store-hub/channels');
-  return res.data ?? [];
+  const res = await api.get('/glycopharm/store-hub/channels');
+  return res.data?.data ?? [];
 }
 
 export async function fetchChannelOverviewWithCode(): Promise<ChannelOverviewWithCode> {
-  const res = await request<{ success: boolean; data: ChannelOverview[]; organizationCode?: string | null }>(
-    '/store-hub/channels',
-  );
-  return { channels: res.data ?? [], organizationCode: res.organizationCode ?? null };
+  const res = await api.get('/glycopharm/store-hub/channels');
+  return { channels: res.data?.data ?? [], organizationCode: res.data?.organizationCode ?? null };
 }
 
 export async function createChannel(channelType: ChannelType): Promise<ChannelOverview> {
-  const res = await request<{ success: boolean; data: ChannelOverview }>('/store-hub/channels', {
-    method: 'POST',
-    body: JSON.stringify({ channelType }),
-  });
-  return res.data;
+  const res = await api.post('/glycopharm/store-hub/channels', { channelType });
+  return res.data?.data;
 }
 
 export async function fetchStoreKpiSummary(): Promise<StoreKpiSummary> {
-  const res = await request<{ success: boolean; data: StoreKpiSummary }>('/store-hub/kpi-summary');
-  return res.data ?? { todayOrders: 0, weekOrders: 0, monthOrders: 0, monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0 };
+  const res = await api.get('/glycopharm/store-hub/kpi-summary');
+  return res.data?.data ?? { todayOrders: 0, weekOrders: 0, monthOrders: 0, monthRevenue: 0, avgOrderValue: 0, lastMonthRevenue: 0 };
 }
 
 export async function fetchLiveSignals(): Promise<LiveSignals> {
-  const res = await request<{ success: boolean; data: LiveSignals }>('/store-hub/live-signals');
-  return res.data ?? { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 };
+  const res = await api.get('/glycopharm/store-hub/live-signals');
+  return res.data?.data ?? { newOrders: 0, pendingTabletRequests: 0, pendingSalesRequests: 0, surveyRequests: 0 };
 }
 
 // ─────────────────────────────────────────────────────
@@ -134,8 +108,6 @@ export interface StoreCapabilityOverview {
 }
 
 export async function fetchStoreCapabilities(): Promise<StoreCapabilityOverview[]> {
-  const res = await request<{ success: boolean; data: StoreCapabilityOverview[] }>(
-    '/store-hub/capabilities',
-  );
-  return res.data ?? [];
+  const res = await api.get('/glycopharm/store-hub/capabilities');
+  return res.data?.data ?? [];
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../lib/api/client';
+import { api, API_BASE_URL } from '../../lib/apiClient';
 import type { CopilotEntryProps } from './CopilotEntry';
 
 interface Props {
@@ -13,19 +13,13 @@ export function CopilotSummary({ context }: Props) {
   const generate = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/ai/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          question: '현재 페이지를 요약해주세요.',
-          contextType: 'service' as const,
-          serviceId: context?.serviceId || 'neture',
-          storeId: context?.storeId,
-          productId: context?.productId,
-        }),
+      const { data } = await api.post(`${API_BASE_URL}/api/ai/query`, {
+        question: '현재 페이지를 요약해주세요.',
+        contextType: 'service' as const,
+        serviceId: context?.serviceId || 'neture',
+        storeId: context?.storeId,
+        productId: context?.productId,
       });
-      const data = await res.json();
       setSummary(data.answer || data.error || 'No response');
     } catch {
       setSummary('요약 생성에 실패했습니다.');

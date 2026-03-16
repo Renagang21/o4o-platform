@@ -9,8 +9,8 @@
  */
 
 import { useEffect, useState } from 'react';
+import { api } from '../lib/apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const ACCESS_TOKEN_KEY = 'glycopharm_access_token';
 const REFRESH_TOKEN_KEY = 'glycopharm_refresh_token';
 
@@ -32,15 +32,10 @@ export default function HandoffPage() {
 
     const exchange = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
+        const response = await api.post<{ success: boolean; data: { tokens: { accessToken: string; refreshToken: string } }; error?: string }>('/auth/handoff/exchange', { token });
+        const data = response.data;
 
-        const data = await response.json();
-
-        if (response.ok && data.success && data.data?.tokens) {
+        if (data.success && data.data?.tokens) {
           // Store tokens in localStorage (GlycoPharm uses localStorage strategy)
           localStorage.setItem(ACCESS_TOKEN_KEY, data.data.tokens.accessToken);
           localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
@@ -50,9 +45,9 @@ export default function HandoffPage() {
           setStatus('error');
           setError(data.error || '서비스 이동에 실패했습니다.');
         }
-      } catch {
+      } catch (err: any) {
         setStatus('error');
-        setError('네트워크 오류가 발생했습니다.');
+        setError(err.response?.data?.error || '네트워크 오류가 발생했습니다.');
       }
     };
 

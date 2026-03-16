@@ -8,8 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface AiEngine {
   id: number;
@@ -33,10 +32,7 @@ export default function AiEnginesPage() {
   const fetchEngines = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/admin/engines`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
+      const { data } = await api.get(`${API_BASE_URL}/api/ai/admin/engines`);
       if (data?.success) {
         setEngines(data.data);
       }
@@ -50,11 +46,7 @@ export default function AiEnginesPage() {
   const activateEngine = async (engineId: number) => {
     setActivating(engineId);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/admin/engines/${engineId}/activate`, {
-        method: 'PUT',
-        credentials: 'include',
-      });
-      const data = await response.json();
+      const { data } = await api.put(`${API_BASE_URL}/api/ai/admin/engines/${engineId}/activate`);
       if (data?.success) {
         fetchEngines();
       } else {

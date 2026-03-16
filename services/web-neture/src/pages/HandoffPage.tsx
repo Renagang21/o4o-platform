@@ -9,8 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../lib/apiClient';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
@@ -30,16 +29,9 @@ export default function HandoffPage() {
 
     const exchange = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ token }),
-        });
+        const { data } = await api.post('/auth/handoff/exchange', { token });
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
+        if (data.success) {
           setStatus('success');
           // Full reload to pick up new cookies in AuthContext
           window.location.href = '/';

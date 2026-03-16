@@ -17,7 +17,7 @@ import {
   XCircle,
 } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../lib/apiClient';
 
 interface MarketTrialItem {
   id: string;
@@ -74,14 +74,9 @@ export default function MarketTrialListPage() {
     const fetchTrials = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/market-trial?serviceKey=k-cosmetics`, {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const json = await response.json();
-          if (json.success && json.data) {
-            setTrials(json.data);
-          }
+        const response = await api.get(`${API_BASE_URL}/api/market-trial?serviceKey=k-cosmetics`);
+        if (response.data?.success && response.data?.data) {
+          setTrials(response.data.data);
         }
       } catch {
         setTrials([]);

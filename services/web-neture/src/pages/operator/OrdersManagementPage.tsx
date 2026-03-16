@@ -22,9 +22,7 @@ import {
   Loader2,
   Calendar,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -54,24 +52,6 @@ interface PaginationData {
   limit: number;
   total: number;
   totalPages: number;
-}
-
-// ─── API Helper ──────────────────────────────────────────────
-
-async function apiFetch<T>(path: string): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
-  }
-  return res.json();
 }
 
 // ─── Status Badge ────────────────────────────────────────────
@@ -145,14 +125,14 @@ export default function OrdersManagementPage() {
       if (statusFilter) params.set('status', statusFilter);
       if (searchTerm) params.set('search', searchTerm);
 
-      const data = await apiFetch<{
+      const { data } = await api.get<{
         success: boolean;
         data: {
           orders: OrderData[];
           stats: OrderStats;
           pagination: PaginationData;
         };
-      }>(`/api/v1/neture/operator/orders?${params}`);
+      }>(`/neture/operator/orders?${params}`);
 
       if (data.success && data.data) {
         setOrders(data.data.orders);

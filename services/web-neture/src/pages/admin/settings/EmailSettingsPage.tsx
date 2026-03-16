@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Server, Shield, Send, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface SmtpSettings {
   host: string;
@@ -48,16 +49,9 @@ export default function EmailSettingsPage() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/admin/settings/email`, {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setSettings(data.data);
-        }
+      const { data } = await api.get(`${API_BASE_URL}/api/admin/settings/email`);
+      if (data.success && data.data) {
+        setSettings(data.data);
       }
     } catch (error) {
       console.error('Failed to fetch email settings:', error);
@@ -71,15 +65,7 @@ export default function EmailSettingsPage() {
       setSaving(true);
       setMessage(null);
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/admin/settings/email`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
-      });
-
-      const data = await response.json();
+      const { data } = await api.put(`${API_BASE_URL}/api/admin/settings/email`, settings);
 
       if (data.success) {
         setMessage({ type: 'success', text: 'SMTP 설정이 저장되었습니다.' });
@@ -103,15 +89,7 @@ export default function EmailSettingsPage() {
       setTesting(true);
       setMessage(null);
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/admin/settings/email/test`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: testEmail }),
-      });
-
-      const data = await response.json();
+      const { data } = await api.post(`${API_BASE_URL}/api/admin/settings/email/test`, { to: testEmail });
 
       if (data.success) {
         setMessage({ type: 'success', text: `테스트 이메일이 ${testEmail}로 발송되었습니다.` });

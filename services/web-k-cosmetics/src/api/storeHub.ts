@@ -1,44 +1,23 @@
 /**
  * Store Hub API — K-Cosmetics 통합 매장 허브
  * WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  *
- * GlycoPharm storeHub.ts 패턴 동일, /api/v1/cosmetics/ 네임스페이스 사용
+ * GlycoPharm storeHub.ts 패턴 동일, /cosmetics/ 네임스페이스 사용
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
+import { api } from '../lib/apiClient';
 
-async function getAuthToken(): Promise<string | null> {
-  try {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      return parsed.accessToken || parsed.token || null;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-}
+async function request<T>(endpoint: string, options?: { method?: string; data?: any }): Promise<T> {
+  const method = (options?.method || 'GET').toLowerCase() as 'get' | 'post' | 'patch' | 'put' | 'delete';
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = await getAuthToken();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  let response;
+  if (method === 'get' || method === 'delete') {
+    response = await (api as any)[method](`/cosmetics${endpoint}`);
+  } else {
+    response = await (api as any)[method](`/cosmetics${endpoint}`, options?.data);
   }
-
-  const response = await fetch(`${API_URL}/cosmetics${endpoint}`, {
-    ...options,
-    headers: { ...headers, ...options.headers as Record<string, string> },
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw { status: response.status, code: err.code, message: err.error || 'Request failed' };
-  }
-  return response.json();
+  return response.data;
 }
 
 // ─────────────────────────────────────────────────────
@@ -120,7 +99,7 @@ export async function fetchChannelOverviewWithCode(): Promise<ChannelOverviewWit
 export async function createChannel(channelType: ChannelType): Promise<ChannelOverview> {
   const res = await request<{ success: boolean; data: ChannelOverview }>('/store-hub/channels', {
     method: 'POST',
-    body: JSON.stringify({ channelType }),
+    data: { channelType },
   });
   return res.data;
 }

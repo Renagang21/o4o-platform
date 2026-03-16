@@ -18,7 +18,7 @@ import {
   List,
   Share2,
 } from 'lucide-react';
-import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
+import { api } from '../../lib/api/index.js';
 
 // ── Types ──
 
@@ -63,20 +63,10 @@ export default function StoreBlogPage() {
 
     (async () => {
       try {
-        const res = await fetchWithTimeout(
-          `${API_BASE_URL}/api/v1/stores/${encodeURIComponent(storeSlug)}/blog/${encodeURIComponent(postSlug)}`,
+        const res = await api.get(
+          `/stores/${encodeURIComponent(storeSlug)}/blog/${encodeURIComponent(postSlug)}`,
         );
-
-        if (!res.ok) {
-          if (res.status === 404) {
-            setError('블로그 글을 찾을 수 없습니다.');
-          } else {
-            setError('블로그 글을 불러올 수 없습니다.');
-          }
-          return;
-        }
-
-        const result = await res.json();
+        const result = res.data;
         if (result.success && result.data) {
           setPost(result.data);
         } else {

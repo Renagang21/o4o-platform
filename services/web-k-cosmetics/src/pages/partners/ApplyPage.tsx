@@ -10,6 +10,7 @@
 
 import { useState } from 'react';
 import { Building2, Mail, Phone, User, FileText, CheckCircle, Send } from '@/components/icons';
+import { api } from '../../lib/apiClient';
 
 type ServiceInterest = 'DIGITAL_SIGNAGE' | 'PHARMACY_SUPPLY' | 'ADVERTISEMENT';
 
@@ -70,30 +71,20 @@ export default function PartnerApplyPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/v1/partner/applications', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          companyName: form.companyName,
-          businessNumber: form.businessNumber,
-          contactName: form.contactName,
-          email: form.email,
-          phone: form.phone || undefined,
-          serviceInterest: form.serviceInterest.length > 0 ? form.serviceInterest : undefined,
-          message: form.message || undefined,
-        }),
+      await api.post('/partner/applications', {
+        companyName: form.companyName,
+        businessNumber: form.businessNumber,
+        contactName: form.contactName,
+        email: form.email,
+        phone: form.phone || undefined,
+        serviceInterest: form.serviceInterest.length > 0 ? form.serviceInterest : undefined,
+        message: form.message || undefined,
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error?.message || '신청 처리 중 오류가 발생했습니다.');
-      }
-
       setIsSubmitted(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '신청 처리 중 오류가 발생했습니다.');
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.response?.data?.error || '신청 처리 중 오류가 발생했습니다.';
+      setError(typeof msg === 'string' ? msg : '신청 처리 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }

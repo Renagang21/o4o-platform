@@ -2,6 +2,7 @@
  * AdminContactMessagesPage - 문의 관리
  *
  * WO-O4O-NETURE-CONTACT-PAGE-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  *
  * 기능:
  * - 문의 목록 조회 (contactType, status 필터)
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/client';
+import { api } from '../../lib/api/client';
 
 interface ContactMessage {
   id: string;
@@ -68,11 +69,8 @@ export default function AdminContactMessagesPage() {
       if (statusFilter !== 'all') params.set('status', statusFilter);
       if (typeFilter !== 'all') params.set('contactType', typeFilter);
 
-      const res = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/contact-messages?${params}`,
-        { credentials: 'include' },
-      );
-      const data = await res.json();
+      const response = await api.get(`/neture/admin/contact-messages?${params}`);
+      const data = response.data;
       if (data.success) {
         setMessages(data.data.items);
         setPagination(data.data.pagination);
@@ -91,16 +89,11 @@ export default function AdminContactMessagesPage() {
   const handleStatusChange = async (id: string, newStatus: string) => {
     setUpdatingId(id);
     try {
-      const res = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/contact-messages/${id}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: newStatus }),
-        },
+      const response = await api.patch(
+        `/neture/admin/contact-messages/${id}`,
+        { status: newStatus },
       );
-      const data = await res.json();
+      const data = response.data;
       if (data.success) {
         setMessages((prev) => prev.map((m) => (m.id === id ? data.data : m)));
       }

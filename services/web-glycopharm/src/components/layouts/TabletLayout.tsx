@@ -27,8 +27,7 @@ import { storeApi } from '@/api/store';
 import type { PharmacyStore } from '@/types/store';
 import { StoreModeProvider, useStoreMode } from '@/contexts/StoreModeContext';
 import { StoreThemeProvider } from '@/contexts/StoreThemeContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 type RequestPurpose = 'consultation' | 'sample' | 'order';
 type RequestDialogState = 'closed' | 'select' | 'confirm' | 'submitting' | 'done' | 'cooldown';
@@ -66,18 +65,14 @@ function TabletHeader({ store }: { store: PharmacyStore }) {
     setDialogState('submitting');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/events`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pharmacyId,
-          eventType: 'click',
-          sourceType: 'tablet',
-          purpose: selectedPurpose,
-        }),
+      const res = await api.post<{ success: boolean; data?: { promoted: boolean }; error?: string }>('/glycopharm/events', {
+        pharmacyId,
+        eventType: 'click',
+        sourceType: 'tablet',
+        purpose: selectedPurpose,
       });
 
-      const data = await res.json();
+      const data = res.data;
 
       if (data.success) {
         if (data.data?.promoted) {

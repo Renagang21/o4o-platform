@@ -17,49 +17,35 @@ import type {
   HeroContent,
 } from '@/types/store';
 import { DEFAULT_SERVICE_CONTEXT } from '@/types/store';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 class StoreApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const method = (options.method || 'GET').toUpperCase();
+    const body = options.body ? JSON.parse(options.body as string) : undefined;
 
-    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
-    const accessToken = getAccessToken();
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-      ...options.headers,
-    };
-
-    // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    try {
+      const response = method === 'GET'
+        ? await api.get(endpoint)
+        : method === 'POST'
+          ? await api.post(endpoint, body)
+          : method === 'PATCH'
+            ? await api.patch(endpoint, body)
+            : method === 'PUT'
+              ? await api.put(endpoint, body)
+              : await api.delete(endpoint);
+      return response.data;
+    } catch (error: any) {
+      const errorData = error.response?.data || {};
       throw {
-        status: response.status,
+        status: error.response?.status || 0,
         code: errorData.code || 'UNKNOWN_ERROR',
         message: errorData.message || errorData.error || 'Request failed',
       };
     }
-
-    return response.json();
   }
 
   // ============================================================================
@@ -70,7 +56,7 @@ class StoreApiClient {
    * 약국 몰 정보 조회 (slug 기준)
    */
   async getStoreBySlug(slug: string): Promise<StoreApiResponse<PharmacyStore>> {
-    return this.request(`/api/v1/glycopharm/stores/${slug}`);
+    return this.request(`/glycopharm/stores/${slug}`);
   }
 
   /**
@@ -82,7 +68,7 @@ class StoreApiClient {
     storeSlug: string,
     serviceContext: ServiceContext = DEFAULT_SERVICE_CONTEXT
   ): Promise<StoreApiResponse<StoreCategory[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/categories?serviceContext=${serviceContext}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/categories?serviceContext=${serviceContext}`);
   }
 
   /**
@@ -111,7 +97,7 @@ class StoreApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products?${queryString}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/products?${queryString}`);
   }
 
   /**
@@ -125,14 +111,14 @@ class StoreApiClient {
     limit = 8,
     serviceContext: ServiceContext = DEFAULT_SERVICE_CONTEXT
   ): Promise<StoreApiResponse<StoreProduct[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products/featured?limit=${limit}&serviceContext=${serviceContext}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/products/featured?limit=${limit}&serviceContext=${serviceContext}`);
   }
 
   /**
    * 상품 상세 조회
    */
   async getProductDetail(storeSlug: string, productId: string): Promise<StoreApiResponse<StoreProduct>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/products/${productId}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/products/${productId}`);
   }
 
   // ============================================================================
@@ -143,7 +129,7 @@ class StoreApiClient {
    * 스토어 설정 조회 (theme, template)
    */
   async getStorefrontConfig(storeSlug: string): Promise<StoreApiResponse<Record<string, any>>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/storefront-config`);
+    return this.request(`/glycopharm/stores/${storeSlug}/storefront-config`);
   }
 
   /**
@@ -153,7 +139,7 @@ class StoreApiClient {
     storeSlug: string,
     config: { theme?: string; template?: string }
   ): Promise<StoreApiResponse<Record<string, any>>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/storefront-config`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/storefront-config`, {
       method: 'PUT',
       body: JSON.stringify(config),
     });
@@ -167,7 +153,7 @@ class StoreApiClient {
    * Hero 콘텐츠 조회
    */
   async getStoreHero(storeSlug: string): Promise<StoreApiResponse<HeroContent[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/hero`);
+    return this.request(`/glycopharm/stores/${storeSlug}/hero`);
   }
 
   /**
@@ -177,7 +163,7 @@ class StoreApiClient {
     storeSlug: string,
     heroContents: HeroContent[]
   ): Promise<StoreApiResponse<HeroContent[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/hero`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/hero`, {
       method: 'PUT',
       body: JSON.stringify({ heroContents }),
     });
@@ -191,7 +177,7 @@ class StoreApiClient {
    * 장바구니 조회
    */
   async getCart(storeSlug: string): Promise<StoreApiResponse<CartItem[]>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/cart`);
+    return this.request(`/glycopharm/stores/${storeSlug}/cart`);
   }
 
   /**
@@ -202,7 +188,7 @@ class StoreApiClient {
     productId: string,
     quantity: number
   ): Promise<StoreApiResponse<CartItem>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/cart`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/cart`, {
       method: 'POST',
       body: JSON.stringify({ productId, quantity }),
     });
@@ -216,7 +202,7 @@ class StoreApiClient {
     cartItemId: string,
     quantity: number
   ): Promise<StoreApiResponse<CartItem>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
       method: 'PATCH',
       body: JSON.stringify({ quantity }),
     });
@@ -226,7 +212,7 @@ class StoreApiClient {
    * 장바구니 상품 삭제
    */
   async removeFromCart(storeSlug: string, cartItemId: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/cart/${cartItemId}`, {
       method: 'DELETE',
     });
   }
@@ -235,7 +221,7 @@ class StoreApiClient {
    * 장바구니 비우기
    */
   async clearCart(storeSlug: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/cart`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/cart`, {
       method: 'DELETE',
     });
   }
@@ -262,7 +248,7 @@ class StoreApiClient {
       paymentMethod: string;
     }
   ): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/orders`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/orders`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -280,21 +266,21 @@ class StoreApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/orders/mine${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/orders/mine${queryString ? `?${queryString}` : ''}`);
   }
 
   /**
    * 주문 상세 조회
    */
   async getOrderDetail(storeSlug: string, orderId: string): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/orders/${orderId}`);
+    return this.request(`/glycopharm/stores/${storeSlug}/orders/${orderId}`);
   }
 
   /**
    * 주문 취소
    */
   async cancelOrder(storeSlug: string, orderId: string, reason?: string): Promise<StoreApiResponse<StoreOrder>> {
-    return this.request(`/api/v1/glycopharm/stores/${storeSlug}/orders/${orderId}/cancel`, {
+    return this.request(`/glycopharm/stores/${storeSlug}/orders/${orderId}/cancel`, {
       method: 'POST',
       body: JSON.stringify({ reason }),
     });
@@ -308,7 +294,7 @@ class StoreApiClient {
    * 판매 참여 신청서 조회 (임시저장 포함)
    */
   async getMyStoreApplication(): Promise<StoreApiResponse<StoreApplication | null>> {
-    return this.request('/api/v1/glycopharm/store-applications/mine');
+    return this.request('/glycopharm/store-applications/mine');
   }
 
   /**
@@ -317,7 +303,7 @@ class StoreApiClient {
   async saveStoreApplicationDraft(
     form: Partial<StoreApplicationForm>
   ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request('/api/v1/glycopharm/store-applications/draft', {
+    return this.request('/glycopharm/store-applications/draft', {
       method: 'POST',
       body: JSON.stringify(form),
     });
@@ -329,7 +315,7 @@ class StoreApiClient {
   async submitStoreApplication(
     form: StoreApplicationForm
   ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request('/api/v1/glycopharm/store-applications', {
+    return this.request('/glycopharm/store-applications', {
       method: 'POST',
       body: JSON.stringify(form),
     });
@@ -355,14 +341,14 @@ class StoreApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/store-applications${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/glycopharm/store-applications${queryString ? `?${queryString}` : ''}`);
   }
 
   /**
    * 판매 참여 신청 상세 조회 (운영자)
    */
   async getStoreApplicationDetail(id: string): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request(`/api/v1/glycopharm/store-applications/${id}`);
+    return this.request(`/glycopharm/store-applications/${id}`);
   }
 
   /**
@@ -372,7 +358,7 @@ class StoreApiClient {
     id: string,
     storeSlug: string
   ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request(`/api/v1/glycopharm/store-applications/${id}/approve`, {
+    return this.request(`/glycopharm/store-applications/${id}/approve`, {
       method: 'POST',
       body: JSON.stringify({ storeSlug }),
     });
@@ -385,7 +371,7 @@ class StoreApiClient {
     id: string,
     reason: string
   ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request(`/api/v1/glycopharm/store-applications/${id}/reject`, {
+    return this.request(`/glycopharm/store-applications/${id}/reject`, {
       method: 'POST',
       body: JSON.stringify({ reason }),
     });
@@ -398,7 +384,7 @@ class StoreApiClient {
     id: string,
     request: string
   ): Promise<StoreApiResponse<StoreApplication>> {
-    return this.request(`/api/v1/glycopharm/store-applications/${id}/supplement`, {
+    return this.request(`/glycopharm/store-applications/${id}/supplement`, {
       method: 'POST',
       body: JSON.stringify({ request }),
     });
@@ -406,7 +392,7 @@ class StoreApiClient {
 }
 
 // Export singleton instance
-export const storeApi = new StoreApiClient(API_BASE_URL);
+export const storeApi = new StoreApiClient();
 
 // Also export the class for testing
 export { StoreApiClient };

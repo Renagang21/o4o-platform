@@ -7,8 +7,8 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronDown, Check, ExternalLink, UserPlus, Settings } from 'lucide-react';
+import { api } from '../lib/apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
 
 interface ServiceInfo {
@@ -57,8 +57,7 @@ export default function ServiceSwitcher({ currentServiceKey }: ServiceSwitcherPr
     if (loaded) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/auth/services`, { credentials: 'include' });
-      const data = await res.json();
+      const { data } = await api.get('/auth/services');
       if (data.success && data.data?.services) {
         setServices(data.data.services);
       }
@@ -77,13 +76,7 @@ export default function ServiceSwitcher({ currentServiceKey }: ServiceSwitcherPr
   const handleOpen = async (serviceKey: string) => {
     setActionKey(serviceKey);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/auth/handoff`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ targetServiceKey: serviceKey }),
-      });
-      const data = await res.json();
+      const { data } = await api.post('/auth/handoff', { targetServiceKey: serviceKey });
       if (data.success && data.data?.targetUrl) {
         window.location.href = data.data.targetUrl;
         return;
@@ -96,11 +89,7 @@ export default function ServiceSwitcher({ currentServiceKey }: ServiceSwitcherPr
   const handleJoin = async (serviceKey: string) => {
     setActionKey(serviceKey);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/auth/services/${serviceKey}/join`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      const data = await res.json();
+      const { data } = await api.post(`/auth/services/${serviceKey}/join`);
       if (data.success) {
         setLoaded(false);
         await fetchServices();

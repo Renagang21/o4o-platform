@@ -5,29 +5,13 @@
  *   Calls /api/v1/glucoseview/operator/dashboard — returns 5-block OperatorDashboardConfig.
  */
 
-import { getAccessToken } from '../contexts/AuthContext';
+import { api } from '../lib/apiClient';
 import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 export async function fetchOperatorDashboard(): Promise<OperatorDashboardConfig | null> {
   try {
-    const token = getAccessToken();
-    const headers: Record<string, string> = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}/api/v1/glucoseview/operator/dashboard`, {
-      credentials: 'include',
-      headers,
-    });
-    if (!response.ok) {
-      console.warn(`[GlucoseView Operator Dashboard] HTTP ${response.status}`);
-      return null;
-    }
-    const result = await response.json();
-    return result.data ?? null;
+    const response = await api.get('/glucoseview/operator/dashboard');
+    return response.data?.data ?? null;
   } catch (error) {
     console.warn('[GlucoseView Operator Dashboard] Fetch failed:', error);
     return null;

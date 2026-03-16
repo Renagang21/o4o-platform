@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { API_BASE_URL } from '../../lib/api/client';
+import { api, API_BASE_URL } from '../../lib/apiClient';
 import type { CopilotEntryProps } from './CopilotEntry';
 
 interface Message {
@@ -30,21 +30,15 @@ export function CopilotChat({ context }: Props) {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/ai/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          question: q,
-          contextType: 'service' as const,
-          serviceId: context?.serviceId || 'neture',
-          storeId: context?.storeId,
-          productId: context?.productId,
-          categoryId: context?.categoryId,
-          pageType: context?.pageType,
-        }),
+      const { data } = await api.post(`${API_BASE_URL}/api/ai/query`, {
+        question: q,
+        contextType: 'service' as const,
+        serviceId: context?.serviceId || 'neture',
+        storeId: context?.storeId,
+        productId: context?.productId,
+        categoryId: context?.categoryId,
+        pageType: context?.pageType,
       });
-      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: data.answer || data.error || 'No response' },

@@ -1,9 +1,10 @@
 /**
  * Store API - K-Cosmetics 매장 콕핏 API
  * WO-KCOS-STORES-PHASE3-STORE-COCKPIT-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
+import { api } from '../lib/apiClient';
 
 // ============================================================================
 // Types
@@ -106,44 +107,13 @@ export interface StoreInsightsResult {
 }
 
 // ============================================================================
-// Auth Helper
+// Helper
 // ============================================================================
-
-async function getAuthToken(): Promise<string | null> {
-  try {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      return parsed.accessToken || parsed.token || null;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-}
 
 async function fetchWithAuth<T>(endpoint: string): Promise<T | null> {
   try {
-    const token = await getAuthToken();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_URL}/cosmetics/stores${endpoint}`, {
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      console.error(`[StoreAPI] ${endpoint} failed:`, response.status);
-      return null;
-    }
-
-    const json = await response.json();
-    return json.data || null;
+    const response = await api.get(`/cosmetics/stores${endpoint}`);
+    return response.data?.data || null;
   } catch (error) {
     console.error(`[StoreAPI] ${endpoint} error:`, error);
     return null;
@@ -152,28 +122,20 @@ async function fetchWithAuth<T>(endpoint: string): Promise<T | null> {
 
 async function mutateWithAuth<T>(endpoint: string, method: string, body?: any): Promise<T | null> {
   try {
-    const token = await getAuthToken();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    const m = method.toLowerCase();
+    let response;
+    if (m === 'post') {
+      response = await api.post(`/cosmetics/stores${endpoint}`, body);
+    } else if (m === 'patch') {
+      response = await api.patch(`/cosmetics/stores${endpoint}`, body);
+    } else if (m === 'put') {
+      response = await api.put(`/cosmetics/stores${endpoint}`, body);
+    } else if (m === 'delete') {
+      response = await api.delete(`/cosmetics/stores${endpoint}`);
+    } else {
+      response = await api.get(`/cosmetics/stores${endpoint}`);
     }
-
-    const response = await fetch(`${API_URL}/cosmetics/stores${endpoint}`, {
-      method,
-      headers,
-      credentials: 'include',
-      body: body ? JSON.stringify(body) : undefined,
-    });
-
-    if (!response.ok) {
-      console.error(`[StoreAPI] ${method} ${endpoint} failed:`, response.status);
-      return null;
-    }
-
-    const json = await response.json();
-    return json.data || null;
+    return response.data?.data || null;
   } catch (error) {
     console.error(`[StoreAPI] ${method} ${endpoint} error:`, error);
     return null;
@@ -211,20 +173,9 @@ export const storeApi = {
     const qs = params.toString();
 
     try {
-      const token = await getAuthToken();
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const url = `${API_URL}/cosmetics/stores/${storeId}/listings${qs ? `?${qs}` : ''}`;
-      const response = await fetch(url, { headers, credentials: 'include' });
-
-      if (!response.ok) return null;
-
-      const json = await response.json();
+      const url = `/cosmetics/stores/${storeId}/listings${qs ? `?${qs}` : ''}`;
+      const response = await api.get(url);
+      const json = response.data;
       return {
         listings: json.data || [],
         meta: json.meta || { total: 0 },

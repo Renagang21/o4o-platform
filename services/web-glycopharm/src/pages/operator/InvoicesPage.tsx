@@ -31,9 +31,7 @@ import {
   Clock,
   Mail,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 type InvoiceStatus = 'DRAFT' | 'CONFIRMED' | 'ARCHIVED';
 type BillingUnit = 'consultation_action' | 'approved_request';
@@ -176,12 +174,8 @@ export default function InvoicesPage() {
   useEffect(() => {
     (async () => {
       try {
-        const accessToken = getAccessToken();
-        const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/reports/pharmacies`, {
-          headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-          credentials: 'include',
-        });
-        const json = await res.json();
+        const res = await api.get<{ success: boolean; data: PharmacyOption[] }>('/glycopharm/reports/pharmacies');
+        const json = res.data;
         if (json.success) setPharmacies(json.data || []);
       } catch { /* silent */ }
     })();
@@ -191,23 +185,17 @@ export default function InvoicesPage() {
     setLoading(true);
     setError(null);
     try {
-      const accessToken = getAccessToken();
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.set('status', statusFilter);
 
-      const res = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/invoices?${params.toString()}`,
-        {
-          headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-          credentials: 'include',
-        },
+      const res = await api.get<{ success: boolean; data: Invoice[]; error?: string }>(
+        `/glycopharm/invoices?${params.toString()}`
       );
-      if (!res.ok) throw new Error('Failed to fetch invoices');
-      const json = await res.json();
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Unknown error');
       setInvoices(json.data || []);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }
@@ -222,29 +210,20 @@ export default function InvoicesPage() {
     setCreating(true);
     setCreateError(null);
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          periodFrom: createForm.periodFrom,
-          periodTo: createForm.periodTo,
-          pharmacyId: createForm.pharmacyId || undefined,
-          supplierId: createForm.supplierId || undefined,
-          unit: createForm.unit,
-          unitPrice: createForm.unitPrice,
-        }),
+      const res = await api.post<{ success: boolean; error?: string }>('/glycopharm/invoices', {
+        periodFrom: createForm.periodFrom,
+        periodTo: createForm.periodTo,
+        pharmacyId: createForm.pharmacyId || undefined,
+        supplierId: createForm.supplierId || undefined,
+        unit: createForm.unit,
+        unitPrice: createForm.unitPrice,
       });
-      const json = await res.json();
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Failed to create invoice');
       setShowCreateModal(false);
       fetchInvoices();
     } catch (err: any) {
-      setCreateError(err.message);
+      setCreateError(err.response?.data?.error || err.message);
     } finally {
       setCreating(false);
     }
@@ -254,21 +233,13 @@ export default function InvoicesPage() {
   const handleConfirm = async (invoiceId: string) => {
     setConfirming(true);
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}/confirm`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-        credentials: 'include',
-      });
-      const json = await res.json();
+      const res = await api.post<{ success: boolean; error?: string }>(`/glycopharm/invoices/${invoiceId}/confirm`, {});
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Failed to confirm');
       setConfirmingId(null);
       fetchInvoices();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.response?.data?.error || err.message);
     } finally {
       setConfirming(false);
     }
@@ -277,16 +248,12 @@ export default function InvoicesPage() {
   // View detail
   const handleViewDetail = async (invoiceId: string) => {
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}`, {
-        headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-        credentials: 'include',
-      });
-      const json = await res.json();
+      const res = await api.get<{ success: boolean; data: Invoice; error?: string }>(`/glycopharm/invoices/${invoiceId}`);
+      const json = res.data;
       if (!json.success) throw new Error(json.error);
       setDetailInvoice(json.data);
     } catch (err: any) {
-      alert(err.message);
+      alert(err.response?.data?.error || err.message);
     }
   };
 
@@ -296,23 +263,14 @@ export default function InvoicesPage() {
     setSending(true);
     setSendError(null);
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${sendInvoiceId}/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-        credentials: 'include',
-        body: JSON.stringify({ recipientEmail: sendEmail }),
-      });
-      const json = await res.json();
+      const res = await api.post<{ success: boolean; error?: string }>(`/glycopharm/invoices/${sendInvoiceId}/send`, { recipientEmail: sendEmail });
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Failed to send');
       setSendInvoiceId(null);
       setSendEmail('');
       fetchInvoices();
     } catch (err: any) {
-      setSendError(err.message);
+      setSendError(err.response?.data?.error || err.message);
     } finally {
       setSending(false);
     }
@@ -321,32 +279,20 @@ export default function InvoicesPage() {
   // Mark received (Phase 3-E)
   const handleMarkReceived = async (invoiceId: string) => {
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}/received`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-        },
-        credentials: 'include',
-      });
-      const json = await res.json();
+      const res = await api.post<{ success: boolean; error?: string }>(`/glycopharm/invoices/${invoiceId}/received`, {});
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Failed to mark received');
       fetchInvoices();
     } catch (err: any) {
-      alert(err.message);
+      alert(err.response?.data?.error || err.message);
     }
   };
 
   // View dispatch log (Phase 3-E)
   const handleViewDispatchLog = async (invoiceId: string) => {
     try {
-      const accessToken = getAccessToken();
-      const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/invoices/${invoiceId}/dispatch-log`, {
-        headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-        credentials: 'include',
-      });
-      const json = await res.json();
+      const res = await api.get<{ success: boolean; data: { invoiceId: string; dispatchLog: DispatchLogEntry[]; dispatchStatus: string }; error?: string }>(`/glycopharm/invoices/${invoiceId}/dispatch-log`);
+      const json = res.data;
       if (!json.success) throw new Error(json.error);
       setDispatchLogInvoice({
         invoiceId: json.data.invoiceId,
@@ -354,7 +300,7 @@ export default function InvoicesPage() {
         dispatchStatus: json.data.dispatchStatus,
       });
     } catch (err: any) {
-      alert(err.message);
+      alert(err.response?.data?.error || err.message);
     }
   };
 

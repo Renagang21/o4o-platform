@@ -25,9 +25,7 @@ import {
   X,
   ChevronRight,
 } from 'lucide-react';
-import { getAccessToken } from '../../contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -65,22 +63,17 @@ type Tab = 'all' | 'pending';
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options?.headers,
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
+  // WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반
+  const axiosPath = path.replace(/^\/api\/v1/, '') || '/';
+  const method = (options?.method || 'GET').toLowerCase();
+  let body: any = undefined;
+  if (options?.body && typeof options.body === 'string') {
+    try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
-  return res.json();
+  const response = method === 'get' || method === 'delete'
+    ? await api[method as 'get' | 'delete'](axiosPath)
+    : await (api as any)[method](axiosPath, body);
+  return response.data;
 }
 
 // ─── Status Config ───────────────────────────────────────────

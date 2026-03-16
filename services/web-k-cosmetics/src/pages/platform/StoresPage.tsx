@@ -24,8 +24,7 @@ import {
 } from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 interface DashboardStats {
   todaySales: number;
@@ -108,15 +107,8 @@ export default function StoresPage() {
     const fetchDashboardStats = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/stores/dashboard`, {
-          credentials: 'include',
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setStats(data.data || null);
-        } else {
-          setStats(null);
-        }
+        const response = await api.get('/cosmetics/stores/dashboard');
+        setStats(response.data?.data || null);
       } catch {
         setStats(null);
       } finally {

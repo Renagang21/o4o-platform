@@ -1,7 +1,9 @@
 /**
  * Seller API
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from '../apiClient';
 import type { OperatorSupplyProduct } from './operator.js';
 
 export interface SellerApprovedProduct {
@@ -28,13 +30,8 @@ export const sellerApi = {
     serviceName: string;
   }): Promise<{ success: boolean; error?: string; data?: { id: string; status: string; createdAt: string } }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.post('/neture/supplier/requests', data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -46,10 +43,8 @@ export const sellerApi = {
     error?: string;
   }> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/seller/my-products`, {
-        credentials: 'include',
-      });
-      return response.json();
+      const response = await api.get('/neture/seller/my-products');
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -57,12 +52,8 @@ export const sellerApi = {
 
   async getAvailableSupplyProducts(): Promise<OperatorSupplyProduct[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/seller/available-supply-products`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/seller/available-supply-products');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Seller API] Failed to fetch available supply products:', error);

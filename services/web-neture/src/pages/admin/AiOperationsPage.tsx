@@ -11,8 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../lib/apiClient';
 
 // 타입 정의
 type AiOperationalStatus = 'normal' | 'warning' | 'unstable';
@@ -107,10 +106,7 @@ export default function AiOperationsPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/operations`, {
-        credentials: 'include',
-      });
-      const result = await response.json();
+      const { data: result } = await api.get(`${API_BASE_URL}/api/ai/operations`);
       if (result?.success) {
         setData(result.data);
         setError(null);
@@ -118,7 +114,7 @@ export default function AiOperationsPage() {
         // 데이터가 없으면 샘플 데이터
         setData(getSampleData());
       }
-    } catch (err: any) {
+    } catch {
       setData(getSampleData());
     } finally {
       setLoading(false);
@@ -165,12 +161,7 @@ export default function AiOperationsPage() {
 
   const acknowledgeAlert = async (alertId: string) => {
     try {
-      await fetch(`${API_BASE_URL}/api/ai/operations/acknowledge-alert`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ alertId }),
-      });
+      await api.post(`${API_BASE_URL}/api/ai/operations/acknowledge-alert`, { alertId });
       fetchDashboardData();
     } catch (err) {
       console.error('Failed to acknowledge alert:', err);

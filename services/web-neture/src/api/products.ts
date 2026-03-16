@@ -4,8 +4,7 @@
  */
 
 import type { Product } from '../types';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../lib/apiClient';
 
 export interface ProductsResponse {
   data: Product[];
@@ -14,31 +13,15 @@ export interface ProductsResponse {
   limit: number;
 }
 
-async function fetchApi<T>(endpoint: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error(`API error: ${response.status}`);
-  }
-
-  return response.json();
-}
-
 export const productsApi = {
   // 상품 목록 조회
-  getProducts: (params?: {
+  getProducts: async (params?: {
     categoryId?: string;
     supplierId?: string;
     status?: string;
     limit?: number;
     page?: number;
-  }) => {
+  }): Promise<ProductsResponse> => {
     const query = new URLSearchParams();
     if (params?.categoryId) query.set('category', params.categoryId);
     if (params?.supplierId) query.set('supplier', params.supplierId);
@@ -46,10 +29,13 @@ export const productsApi = {
     if (params?.limit) query.set('limit', String(params.limit));
     if (params?.page) query.set('page', String(params.page));
     const queryStr = query.toString();
-    return fetchApi<ProductsResponse>(`/api/v1/neture/products${queryStr ? `?${queryStr}` : ''}`);
+    const { data } = await api.get(`/neture/products${queryStr ? `?${queryStr}` : ''}`);
+    return data;
   },
 
   // 상품 상세 조회
-  getProduct: (id: string) =>
-    fetchApi<{ data: Product }>(`/api/v1/neture/products/${id}`),
+  getProduct: async (id: string): Promise<{ data: Product }> => {
+    const { data } = await api.get(`/neture/products/${id}`);
+    return data;
+  },
 };

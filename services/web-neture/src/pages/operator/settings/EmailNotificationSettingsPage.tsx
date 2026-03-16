@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, Mail, Settings, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface NotificationSettings {
   operatorEmail: string;
@@ -83,16 +84,9 @@ export default function EmailNotificationSettingsPage() {
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/operator/settings/notifications`, {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setSettings(data.data);
-        }
+      const { data } = await api.get(`${API_BASE_URL}/api/operator/settings/notifications`);
+      if (data.success && data.data) {
+        setSettings(data.data);
       }
     } catch (error) {
       console.error('Failed to fetch notification settings:', error);
@@ -111,15 +105,7 @@ export default function EmailNotificationSettingsPage() {
       setSaving(true);
       setMessage(null);
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/operator/settings/notifications`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings),
-      });
-
-      const data = await response.json();
+      const { data } = await api.put(`${API_BASE_URL}/api/operator/settings/notifications`, settings);
 
       if (data.success) {
         setMessage({ type: 'success', text: '알림 설정이 저장되었습니다.' });

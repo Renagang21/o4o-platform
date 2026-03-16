@@ -1,11 +1,13 @@
 /**
  * Partner Dashboard API Client
  * WO-PARTNER-DASHBOARD-API-FE-INTEGRATION-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  *
  * K-Cosmetics Partner API Integration
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../lib/apiClient';
+
 const PARTNER_SERVICE_ID = 'k-cosmetics';
 
 interface ApiResponse<T> {
@@ -22,28 +24,25 @@ async function apiRequest<T>(
   body?: unknown
 ): Promise<ApiResponse<T>> {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      credentials: 'include',
-    });
+    const m = method.toLowerCase();
+    let response;
+    if (m === 'get' || m === 'delete') {
+      response = await (api as any)[m](path);
+    } else {
+      response = await (api as any)[m](path, body);
+    }
 
-    const data = await response.json();
-
-    if (!response.ok) {
+    return response.data;
+  } catch (error: any) {
+    const errData = error?.response?.data;
+    if (errData) {
       return {
-        error: data.error || {
+        error: errData.error || {
           code: 'API_ERROR',
-          message: data.message || 'API request failed',
+          message: errData.message || 'API request failed',
         },
       };
     }
-
-    return data;
-  } catch (error) {
     return {
       error: {
         code: 'NETWORK_ERROR',
@@ -101,33 +100,33 @@ export interface PartnerStatusData {
 export const partnerApi = {
   // Overview
   getOverview: () =>
-    apiRequest<PartnerOverviewData>('GET', `/api/v1/partner/overview?serviceId=${PARTNER_SERVICE_ID}`),
+    apiRequest<PartnerOverviewData>('GET', `/partner/overview?serviceId=${PARTNER_SERVICE_ID}`),
 
   // Targets (Read Only)
   getTargets: () =>
-    apiRequest<PartnerTarget[]>('GET', `/api/v1/partner/targets?serviceId=${PARTNER_SERVICE_ID}`),
+    apiRequest<PartnerTarget[]>('GET', `/partner/targets?serviceId=${PARTNER_SERVICE_ID}`),
 
   // Contents CRUD
   getContents: () =>
-    apiRequest<PartnerContent[]>('GET', `/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`),
+    apiRequest<PartnerContent[]>('GET', `/partner/content?serviceId=${PARTNER_SERVICE_ID}`),
 
   createContent: (data: { type: 'text' | 'image' | 'link'; title: string; body?: string; url?: string }) =>
-    apiRequest<PartnerContent>('POST', `/api/v1/partner/content?serviceId=${PARTNER_SERVICE_ID}`, data),
+    apiRequest<PartnerContent>('POST', `/partner/content?serviceId=${PARTNER_SERVICE_ID}`, data),
 
   updateContent: (id: string, data: { title?: string; body?: string; url?: string; isActive?: boolean }) =>
-    apiRequest<PartnerContent>('PATCH', `/api/v1/partner/content/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+    apiRequest<PartnerContent>('PATCH', `/partner/content/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
 
   // Events CRUD
   getEvents: () =>
-    apiRequest<PartnerEvent[]>('GET', `/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`),
+    apiRequest<PartnerEvent[]>('GET', `/partner/events?serviceId=${PARTNER_SERVICE_ID}`),
 
   createEvent: (data: { name: string; startDate: string; endDate: string; region?: string; targetScope?: string }) =>
-    apiRequest<PartnerEvent>('POST', `/api/v1/partner/events?serviceId=${PARTNER_SERVICE_ID}`, data),
+    apiRequest<PartnerEvent>('POST', `/partner/events?serviceId=${PARTNER_SERVICE_ID}`, data),
 
   updateEvent: (id: string, data: { name?: string; startDate?: string; endDate?: string; region?: string; targetScope?: string; isActive?: boolean }) =>
-    apiRequest<PartnerEvent>('PATCH', `/api/v1/partner/events/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
+    apiRequest<PartnerEvent>('PATCH', `/partner/events/${id}?serviceId=${PARTNER_SERVICE_ID}`, data),
 
   // Status
   getStatus: () =>
-    apiRequest<PartnerStatusData>('GET', `/api/v1/partner/status?serviceId=${PARTNER_SERVICE_ID}`),
+    apiRequest<PartnerStatusData>('GET', `/partner/status?serviceId=${PARTNER_SERVICE_ID}`),
 };

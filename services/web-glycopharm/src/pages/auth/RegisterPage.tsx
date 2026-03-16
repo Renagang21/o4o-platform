@@ -22,6 +22,7 @@ import {
   ArrowLeft,
   X,
 } from 'lucide-react';
+import { api } from '../../lib/apiClient';
 
 const SERVICE_LABELS: Record<string, string> = {
   neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
@@ -76,13 +77,8 @@ export default function RegisterPage() {
   const handleEmailBlur = async () => {
     if (!formData.email || !formData.email.includes('@')) return;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, service: 'glycopharm' }),
-      });
-      const result = await res.json();
+      const res = await api.post<{ success: boolean; data: { exists: boolean; alreadyJoined?: boolean; services?: Array<{key: string, status: string}> } }>('/auth/check-email', { email: formData.email, service: 'glycopharm' });
+      const result = res.data;
       if (result.success && result.data.exists) {
         if (result.data.alreadyJoined) {
           setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
@@ -104,57 +100,25 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          passwordConfirm: formData.passwordConfirm,
-          lastName: '',
-          firstName: formData.name,
-          nickname: formData.name,
-          phone: formData.phone.replace(/\D/g, ''),
-          role: memberType === 'pharmacist' ? 'user' : 'consumer',
-          service: 'glycopharm',
-          ...(memberType === 'pharmacist' && {
-            licenseNumber: formData.licenseNumber,
-            businessName: formData.businessName || undefined,
-            businessNumber: formData.businessNumber || undefined,
-          }),
-          tos: formData.agreeTerms,
-          privacyAccepted: formData.agreePrivacy,
-          marketingAccepted: formData.agreeMarketing,
+      await api.post('/auth/register', {
+        email: formData.email,
+        password: formData.password,
+        passwordConfirm: formData.passwordConfirm,
+        lastName: '',
+        firstName: formData.name,
+        nickname: formData.name,
+        phone: formData.phone.replace(/\D/g, ''),
+        role: memberType === 'pharmacist' ? 'user' : 'consumer',
+        service: 'glycopharm',
+        ...(memberType === 'pharmacist' && {
+          licenseNumber: formData.licenseNumber,
+          businessName: formData.businessName || undefined,
+          businessNumber: formData.businessNumber || undefined,
         }),
+        tos: formData.agreeTerms,
+        privacyAccepted: formData.agreePrivacy,
+        marketingAccepted: formData.agreeMarketing,
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-        }
-        if (response.status === 409) {
-          if (data.code === 'SERVICE_ALREADY_JOINED') {
-            throw new Error('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
-          }
-          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
-        }
-        let errorMsg = data.error || data.message || '회원가입에 실패했습니다.';
-        if (data.details && Array.isArray(data.details) && data.details.length > 0) {
-          const fieldErrors = data.details
-            .map((d: { property?: string; constraints?: Record<string, string> }) => {
-              const msgs = d.constraints ? Object.values(d.constraints).join(', ') : d.property;
-              return `${d.property}: ${msgs}`;
-            })
-            .join('\n');
-          errorMsg += '\n' + fieldErrors;
-        }
-        throw new Error(errorMsg);
-      }
 
       // 약사: 승인 대기 메시지 표시, 환자: 로그인 이동
       if (memberType === 'pharmacist') {
@@ -162,8 +126,36 @@ export default function RegisterPage() {
       } else {
         navigate('/login?type=patient');
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+    } catch (err: any) {
+      if (err.response?.data) {
+        const data = err.response.data;
+        const status = err.response.status;
+        if (status === 401 && data.code === 'PASSWORD_MISMATCH') {
+          setExistingAccountMode(true);
+          if (data.services) setExistingServices(data.services);
+          setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
+        } else if (status === 409) {
+          if (data.code === 'SERVICE_ALREADY_JOINED') {
+            setError('이미 GlycoPharm 서비스에 가입된 계정입니다. 로그인해 주세요.');
+          } else {
+            setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+          }
+        } else {
+          let errorMsg = data.error || data.message || '회원가입에 실패했습니다.';
+          if (data.details && Array.isArray(data.details) && data.details.length > 0) {
+            const fieldErrors = data.details
+              .map((d: { property?: string; constraints?: Record<string, string> }) => {
+                const msgs = d.constraints ? Object.values(d.constraints).join(', ') : d.property;
+                return `${d.property}: ${msgs}`;
+              })
+              .join('\n');
+            errorMsg += '\n' + fieldErrors;
+          }
+          setError(errorMsg);
+        }
+      } else {
+        setError('회원가입에 실패했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }

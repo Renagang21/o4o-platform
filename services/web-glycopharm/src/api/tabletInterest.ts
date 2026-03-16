@@ -2,14 +2,12 @@
  * Tablet Interest Staff API Client — Authenticated
  *
  * WO-O4O-TABLET-INTEREST-UX-REFACTOR-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
  * Uses /api/v1/store/interest/* endpoints (auth-based org, no slug needed).
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const BASE = `${API_BASE_URL}/api/v1/store`;
+import { api } from '@/lib/apiClient';
 
 export interface StaffInterestRequest {
   id: string;
@@ -22,33 +20,20 @@ export interface StaffInterestRequest {
   acknowledgedAt?: string;
 }
 
-async function authFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const accessToken = getAccessToken();
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-      ...(options.headers || {}),
-    },
-    credentials: 'include',
-  });
-  const json = await res.json();
-  if (!json.success) throw new Error(json.error?.message || 'Request failed');
-  return json.data;
-}
-
 export async function fetchInterestRequests(): Promise<StaffInterestRequest[]> {
-  return authFetch(`${BASE}/interest/recent`);
+  const res = await api.get('/store/interest/recent');
+  return res.data?.data;
 }
 
 export async function fetchInterestPendingCount(): Promise<{ count: number }> {
-  return authFetch(`${BASE}/interest/pending-count`);
+  const res = await api.get('/store/interest/pending-count');
+  return res.data?.data;
 }
 
 export async function updateInterestAction(
   id: string,
   action: 'acknowledge' | 'complete' | 'cancel',
 ): Promise<{ id: string; status: string; updatedAt: string }> {
-  return authFetch(`${BASE}/interest/${id}/${action}`, { method: 'PATCH' });
+  const res = await api.patch(`/store/interest/${id}/${action}`);
+  return res.data?.data;
 }

@@ -1,7 +1,9 @@
 /**
  * Supplier API + Supplier Profile API
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from '../apiClient';
 import type { ContactVisibility } from './neture.js';
 import type {
   StoreOrder,
@@ -165,11 +167,8 @@ export interface SupplierPartnerCommission {
 export const supplierCommissionApi = {
   async getCommissions(): Promise<SupplierPartnerCommission[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/partner-commissions');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Commission API] Failed to fetch commissions:', error);
@@ -184,13 +183,8 @@ export const supplierCommissionApi = {
     end_date?: string;
   }): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.post('/neture/supplier/partner-commissions', data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -201,13 +195,8 @@ export const supplierCommissionApi = {
     data: { commission_per_unit?: number; start_date?: string; end_date?: string | null }
   ): Promise<{ success: boolean; error?: string; data?: SupplierPartnerCommission }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.put(`/neture/supplier/partner-commissions/${id}`, data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -215,11 +204,8 @@ export const supplierCommissionApi = {
 
   async remove(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/partner-commissions/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      return response.json();
+      const response = await api.delete(`/neture/supplier/partner-commissions/${id}`);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -276,11 +262,8 @@ export interface SupplierAiInsight {
 export const supplierCopilotApi = {
   async getKpi(): Promise<SupplierKpiSummary> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/kpi`, {
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/copilot/kpi');
+      const result = response.data;
       return result.data || { registeredProducts: 0, activeProducts: 0, storeListings: 0, recentOrders: 0 };
     } catch (error) {
       console.warn('[Supplier Copilot] KPI fetch failed:', error);
@@ -290,11 +273,8 @@ export const supplierCopilotApi = {
 
   async getProductPerformance(): Promise<ProductPerformanceItem[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/products/performance`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/copilot/products/performance');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Performance fetch failed:', error);
@@ -304,11 +284,8 @@ export const supplierCopilotApi = {
 
   async getDistribution(): Promise<DistributionItem[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/distribution`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/copilot/distribution');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Distribution fetch failed:', error);
@@ -318,11 +295,8 @@ export const supplierCopilotApi = {
 
   async getTrendingProducts(): Promise<TrendingProductItem[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/copilot/products/trending`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/copilot/products/trending');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier Copilot] Trending fetch failed:', error);
@@ -332,11 +306,8 @@ export const supplierCopilotApi = {
 
   async getAiInsight(): Promise<SupplierAiInsight | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/ai-insight`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/dashboard/ai-insight');
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier Copilot] AI insight fetch failed:', error);
@@ -376,14 +347,10 @@ export const supplierApi = {
       if (filters?.status) params.append('status', filters.status);
       if (filters?.serviceId) params.append('serviceId', filters.serviceId);
 
-      const url = `${API_BASE_URL}/api/v1/neture/supplier/requests${params.toString() ? `?${params}` : ''}`;
+      const url = `/neture/supplier/requests${params.toString() ? `?${params}` : ''}`;
 
-      const response = await fetch(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Supplier API] Requests API not available');
-        return [];
-      }
-      const result = await response.json();
+      const response = await api.get(url);
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch requests:', error);
@@ -393,11 +360,8 @@ export const supplierApi = {
 
   async getRequestById(id: string): Promise<SupplierRequestDetail | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/requests/${id}`);
+      const result = response.data;
       return result.data;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch request detail:', error);
@@ -407,12 +371,8 @@ export const supplierApi = {
 
   async approveRequest(id: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/requests/${id}/approve`, {});
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -420,13 +380,8 @@ export const supplierApi = {
 
   async rejectRequest(id: string, reason?: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ reason }),
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/requests/${id}/reject`, { reason });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -434,13 +389,8 @@ export const supplierApi = {
 
   async suspendRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/suspend`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ note }),
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/requests/${id}/suspend`, { note });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -448,13 +398,8 @@ export const supplierApi = {
 
   async reactivateRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/reactivate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ note }),
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/requests/${id}/reactivate`, { note });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -462,13 +407,8 @@ export const supplierApi = {
 
   async revokeRequest(id: string, note?: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/requests/${id}/revoke`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ note }),
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/requests/${id}/revoke`, { note });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -476,14 +416,8 @@ export const supplierApi = {
 
   async getProducts(): Promise<SupplierProduct[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        console.warn('[Supplier API] Products API not available');
-        return [];
-      }
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/products');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch products:', error);
@@ -506,13 +440,8 @@ export const supplierApi = {
     businessDetailDescription?: string | null;
   }): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.post('/neture/supplier/products', data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -537,13 +466,8 @@ export const supplierApi = {
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/products/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(updates),
-      });
-      return response.json();
+      const response = await api.patch(`/neture/supplier/products/${id}`, updates);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -551,14 +475,8 @@ export const supplierApi = {
 
   async getOrdersSummary(): Promise<OrderSummaryResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/summary`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        console.warn('[Supplier API] Orders summary API not available');
-        return { services: [], totalApprovedSellers: 0, totalPendingRequests: 0 };
-      }
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/orders/summary');
+      const result = response.data;
       return result.data || { services: [], totalApprovedSellers: 0, totalPendingRequests: 0 };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch orders summary:', error);
@@ -574,14 +492,8 @@ export const supplierApi = {
       if (opts?.page) params.append('page', String(opts.page));
       if (opts?.limit) params.append('limit', String(opts.limit));
       const query = params.toString();
-      const url = `${API_BASE_URL}/api/v1/neture/library${query ? `?${query}` : ''}`;
-
-      const response = await fetch(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Supplier API] Library API not available');
-        return [];
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/library${query ? `?${query}` : ''}`);
+      const result = response.data;
       return result.data?.items || [];
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch library items:', error);
@@ -600,13 +512,8 @@ export const supplierApi = {
     isPublic?: boolean;
   }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.post('/neture/library', data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -623,13 +530,8 @@ export const supplierApi = {
     isPublic?: boolean;
   }): Promise<{ success: boolean; error?: string; data?: SupplierLibraryItem }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.patch(`/neture/library/${id}`, data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -637,11 +539,8 @@ export const supplierApi = {
 
   async deleteLibraryItem(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/library/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      return response.json();
+      const response = await api.delete(`/neture/library/${id}`);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -655,14 +554,8 @@ export const supplierApi = {
       if (params?.limit) searchParams.set('limit', String(params.limit));
       if (params?.status) searchParams.set('status', params.status);
       const qs = searchParams.toString();
-      const url = `${API_BASE_URL}/api/v1/neture/supplier/orders${qs ? `?${qs}` : ''}`;
-
-      const response = await fetch(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Supplier API] Failed to fetch orders:', response.status);
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/orders${qs ? `?${qs}` : ''}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch orders:', error);
@@ -672,11 +565,8 @@ export const supplierApi = {
 
   async getOrderById(id: string): Promise<StoreOrder | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/orders/${id}`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch order detail:', error);
@@ -686,13 +576,8 @@ export const supplierApi = {
 
   async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status }),
-      });
-      return response.json();
+      const response = await api.patch(`/neture/supplier/orders/${id}/status`, { status });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -700,13 +585,8 @@ export const supplierApi = {
 
   async getOrderKpi(): Promise<SupplierOrderKpi> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/kpi`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        return { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
-      }
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/orders/kpi');
+      const result = response.data;
       return result.data || { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch order KPI:', error);
@@ -717,11 +597,8 @@ export const supplierApi = {
   // Inventory
   async getInventory(): Promise<InventoryItem[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/inventory');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch inventory:', error);
@@ -731,11 +608,8 @@ export const supplierApi = {
 
   async getInventoryItem(offerId: string): Promise<InventoryItem | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory/${offerId}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/inventory/${offerId}`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch inventory item:', error);
@@ -748,13 +622,8 @@ export const supplierApi = {
     updates: { stock_quantity?: number; low_stock_threshold?: number; track_inventory?: boolean }
   ): Promise<{ success: boolean; error?: string; data?: InventoryItem }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/inventory/${offerId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(updates),
-      });
-      return response.json();
+      const response = await api.patch(`/neture/supplier/inventory/${offerId}`, updates);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -766,13 +635,8 @@ export const supplierApi = {
     data: { carrier_code: string; carrier_name: string; tracking_number: string }
   ): Promise<{ success: boolean; data?: Shipment; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${orderId}/shipment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.post(`/neture/supplier/orders/${orderId}/shipment`, data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -780,11 +644,8 @@ export const supplierApi = {
 
   async getShipment(orderId: string): Promise<Shipment | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/orders/${orderId}/shipment`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/orders/${orderId}/shipment`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch shipment:', error);
@@ -797,13 +658,8 @@ export const supplierApi = {
     data: { status: string; tracking_number?: string }
   ): Promise<{ success: boolean; data?: Shipment; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/shipments/${shipmentId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.patch(`/neture/supplier/shipments/${shipmentId}`, data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -820,14 +676,8 @@ export const supplierApi = {
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/neture/supplier/settlements${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) {
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/settlements${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch settlements:', error);
@@ -837,12 +687,8 @@ export const supplierApi = {
 
   async getSettlementDetail(id: string): Promise<SettlementDetail | null> {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/neture/supplier/settlements/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/supplier/settlements/${id}`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch settlement detail:', error);
@@ -852,14 +698,8 @@ export const supplierApi = {
 
   async getSettlementKpi(): Promise<SettlementKpi> {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/neture/supplier/settlements/kpi`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) {
-        return { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
-      }
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/settlements/kpi');
+      const result = response.data;
       return result.data || { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch settlement KPI:', error);
@@ -873,11 +713,8 @@ export const supplierApi = {
 export const supplierProfileApi = {
   async getProfile(): Promise<SupplierProfile | null> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/supplier/profile`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/profile');
+      const result = response.data;
       return result.data;
     } catch (error) {
       console.warn('[Supplier Profile API] Failed to fetch profile:', error);
@@ -887,11 +724,8 @@ export const supplierProfileApi = {
 
   async getCompleteness(): Promise<ProfileCompleteness | null> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/supplier/profile/completeness`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get('/neture/supplier/profile/completeness');
+      const result = response.data;
       return result.data;
     } catch (error) {
       console.warn('[Supplier Profile API] Failed to fetch completeness:', error);
@@ -910,13 +744,8 @@ export const supplierProfileApi = {
     contactKakaoVisibility?: ContactVisibility;
   }): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/profile`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await api.patch('/neture/supplier/profile', data);
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }

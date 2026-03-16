@@ -2,14 +2,13 @@
  * Community Hub Admin API Client — Neture
  *
  * WO-O4O-NETURE-COMMUNITY-OPERATOR-MANAGEMENT-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  *
  * Public: getHeroAds, getPageAds, getSponsors
  * Operator: CRUD for ads and sponsors
  */
 
-import { API_BASE_URL } from './client';
-
-const BASE = `${API_BASE_URL}/api/v1/neture`;
+import { api } from '../apiClient';
 
 // ==================== Types ====================
 
@@ -47,42 +46,25 @@ export interface CommunitySponsorFull extends CommunitySponsor {
 // ==================== Helpers ====================
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { credentials: 'include' });
-  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
-  const json = await res.json();
+  const response = await api.get(`/neture${path}`);
+  const json = response.data;
   return json.data ?? json;
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`POST ${path} failed: ${res.status}`);
-  const json = await res.json();
+  const response = await api.post(`/neture${path}`, body);
+  const json = response.data;
   return json.data ?? json;
 }
 
 async function put<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`PUT ${path} failed: ${res.status}`);
-  const json = await res.json();
+  const response = await api.put(`/neture${path}`, body);
+  const json = response.data;
   return json.data ?? json;
 }
 
 async function del(path: string): Promise<void> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: 'DELETE',
-    credentials: 'include',
-  });
-  if (!res.ok) throw new Error(`DELETE ${path} failed: ${res.status}`);
+  await api.delete(`/neture${path}`);
 }
 
 // ==================== Public API ====================

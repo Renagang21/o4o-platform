@@ -1,7 +1,9 @@
 /**
  * Neture Core API - Suppliers & Partnership
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from '../apiClient';
 
 // 제품 목적 타입 (WO-NETURE-EXTENSION-P3)
 export type ProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
@@ -110,38 +112,24 @@ export interface PartnershipRequestDetail extends PartnershipRequest {
  */
 export const netureApi = {
   async getSuppliers(): Promise<Supplier[]> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/suppliers`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`[Neture API] Suppliers ${response.status}`);
-    }
-    const data = await response.json();
+    const response = await api.get('/neture/suppliers');
+    const data = response.data;
     return data.suppliers || [];
   },
 
   async getSupplierBySlug(slug: string): Promise<SupplierDetail> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/suppliers/${slug}`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch supplier detail');
-    }
-    return response.json();
+    const response = await api.get(`/neture/suppliers/${slug}`);
+    return response.data;
   },
 
   async getPartnershipRequests(status?: 'OPEN' | 'MATCHED' | 'CLOSED'): Promise<PartnershipRequest[]> {
     try {
       const url = status
-        ? `${API_BASE_URL}/api/v1/neture/partnership/requests?status=${status}`
-        : `${API_BASE_URL}/api/v1/neture/partnership/requests`;
+        ? `/neture/partnership/requests?status=${status}`
+        : '/neture/partnership/requests';
 
-      const response = await fetchWithTimeout(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Neture API] Partnership requests API not available, returning empty array');
-        return [];
-      }
-      const data = await response.json();
+      const response = await api.get(url);
+      const data = response.data;
       return data.requests || [];
     } catch (error) {
       console.warn('[Neture API] Failed to fetch partnership requests:', error);
@@ -150,13 +138,8 @@ export const netureApi = {
   },
 
   async getPartnershipRequestById(id: string): Promise<PartnershipRequestDetail> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests/${id}`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch partnership request detail');
-    }
-    return response.json();
+    const response = await api.get(`/neture/partnership/requests/${id}`);
+    return response.data;
   },
 
   async createPartnershipRequest(data: {
@@ -175,16 +158,7 @@ export const netureApi = {
     contactKakao?: string;
     products?: Array<{ name: string; category?: string }>;
   }): Promise<{ success: boolean; data?: { id: string; status: string; createdAt: string }; error?: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partnership/requests`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-    return result;
+    const response = await api.post('/neture/partnership/requests', data);
+    return response.data;
   },
 };

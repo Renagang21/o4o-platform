@@ -14,9 +14,8 @@ import {
   Search,
   Monitor,
 } from 'lucide-react';
-import { getAccessToken } from '../../../contexts/AuthContext';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'neture';
 
 interface TemplateItem {
@@ -49,30 +48,11 @@ export default function TemplatesPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error || body?.message || `API error ${res.status}`);
-    }
-    return res.json();
-  }, []);
-
   const loadTemplates = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiFetch(`/api/signage/${SERVICE_KEY}/templates`);
+      const { data } = await api.get(`${API_BASE_URL}/api/signage/${SERVICE_KEY}/templates`);
       setTemplates(data.data || []);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '템플릿 목록을 불러오는데 실패했습니다.';
@@ -80,7 +60,7 @@ export default function TemplatesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [apiFetch]);
+  }, []);
 
   useEffect(() => {
     loadTemplates();

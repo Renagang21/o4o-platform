@@ -2,12 +2,13 @@
  * CMS API Client — GlycoPharm
  *
  * WO-O4O-HUB-DATA-UNIFICATION-V1
- * 기존 KPA CMS 클라이언트 패턴 동일. serviceKey만 'glycopharm'.
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
+ *
+ * CMS는 공개 API이므로 인증 토큰이 필수가 아니지만,
+ * 일관성을 위해 api (Axios) 경유로 변경.
  */
 
-const CMS_API_BASE_URL = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/cms`
-  : '/api/v1/cms';
+import { api } from '@/lib/apiClient';
 
 export interface CmsSlotContent {
   id: string;
@@ -39,27 +40,6 @@ interface SlotsResponse {
     organizationId: string | null;
     total: number;
   };
-}
-
-async function fetchFromCms<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-  const url = new URL(`${CMS_API_BASE_URL}${endpoint}`, window.location.origin);
-  if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value) url.searchParams.append(key, value);
-    });
-  }
-
-  const response = await fetch(url.toString(), {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    throw new Error(`CMS API error: ${response.status}`);
-  }
-
-  return response.json();
 }
 
 export interface CmsContent {
@@ -95,10 +75,11 @@ export const cmsApi = {
     slotKey: string,
     options?: { serviceKey?: string; activeOnly?: boolean }
   ): Promise<SlotsResponse> => {
-    return fetchFromCms<SlotsResponse>(`/slots/${slotKey}`, {
-      serviceKey: options?.serviceKey || 'glycopharm',
-      activeOnly: options?.activeOnly !== false ? 'true' : 'false',
-    });
+    const params = new URLSearchParams();
+    params.set('serviceKey', options?.serviceKey || 'glycopharm');
+    params.set('activeOnly', options?.activeOnly !== false ? 'true' : 'false');
+    const res = await api.get(`/cms/slots/${slotKey}?${params.toString()}`);
+    return res.data;
   },
 
   getContents: async (options?: {
@@ -109,13 +90,14 @@ export const cmsApi = {
     limit?: number;
     offset?: number;
   }): Promise<ContentsResponse> => {
-    return fetchFromCms<ContentsResponse>('/contents', {
-      serviceKey: options?.serviceKey || 'glycopharm',
-      type: options?.type || '',
-      status: options?.status || '',
-      authorRole: options?.authorRole || '',
-      limit: String(options?.limit || 20),
-      offset: String(options?.offset || 0),
-    });
+    const params = new URLSearchParams();
+    params.set('serviceKey', options?.serviceKey || 'glycopharm');
+    if (options?.type) params.set('type', options.type);
+    if (options?.status) params.set('status', options.status);
+    if (options?.authorRole) params.set('authorRole', options.authorRole);
+    params.set('limit', String(options?.limit || 20));
+    params.set('offset', String(options?.offset || 0));
+    const res = await api.get(`/cms/contents?${params.toString()}`);
+    return res.data;
   },
 };

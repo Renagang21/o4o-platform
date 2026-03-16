@@ -5,12 +5,15 @@
  * Phase B-2: forum-core API 연동 (읽기)
  * Phase B-3: 글 작성 API 연동 (쓰기)
  *
- * 역할: Mock ↔ Real API 전환을 env로 제어
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
+ *
+ * 역할: Mock <-> Real API 전환을 env로 제어
  */
 
 // Feature flag for API switching
 const USE_REAL_API = import.meta.env.VITE_USE_REAL_FORUM_API === 'true';
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+
+import { api } from '../lib/apiClient';
 
 // ============================================================================
 // Types — imported from @o4o/types/forum (Single Source of Truth)
@@ -263,10 +266,8 @@ export async function fetchForumPosts(params: {
     if (params.search) queryParams.append('search', params.search);
     if (params.sortBy) queryParams.append('sortBy', params.sortBy);
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`, {
-      credentials: 'include',
-    });
-    const data = await response.json();
+    const response = await api.get(`/forum/posts?${queryParams}`);
+    const data = response.data;
 
     if (!data.success) {
       throw new Error(data.error || 'Failed to fetch posts');
@@ -319,12 +320,10 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
 
   // Real API call - get post by slug directly
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${encodeURIComponent(slug)}`, {
-      credentials: 'include',
-    });
-    const data = await response.json();
+    const response = await api.get(`/forum/posts/${encodeURIComponent(slug)}`);
+    const data = response.data;
 
-    if (!response.ok || !data.success) {
+    if (!data.success) {
       return null;
     }
 
@@ -358,10 +357,8 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
 
   // Real API call
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/comments`, {
-      credentials: 'include',
-    });
-    return await response.json();
+    const response = await api.get(`/forum/posts/${postId}/comments`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
     return {
@@ -386,8 +383,8 @@ export async function fetchForumCategories(): Promise<ForumCategoryListResponse>
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories`);
-    return await response.json();
+    const response = await api.get('/forum/categories');
+    return response.data;
   } catch (error) {
     console.error('Error fetching forum categories:', error);
     return {
@@ -421,8 +418,8 @@ export async function fetchPopularForums(limit: number = 6): Promise<{ success: 
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories/popular?limit=${limit}`);
-    return await response.json();
+    const response = await api.get(`/forum/categories/popular?limit=${limit}`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching popular forums:', error);
     return { success: false, data: [] };
@@ -476,15 +473,8 @@ export async function fetchUserContactSettings(): Promise<UserContactSettings | 
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/users/me/contact`, {
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
+    const response = await api.get('/users/me/contact');
+    const data = response.data;
     return data.data || data;
   } catch (error) {
     console.error('Error fetching user contact settings:', error);
@@ -505,30 +495,14 @@ export async function updateUserContactSettings(
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/users/me/contact`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(settings),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: data.message || data.error || '설정 저장에 실패했습니다.',
-      };
-    }
-
+    await api.patch('/users/me/contact', settings);
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error updating user contact settings:', error);
     return {
       success: false,
-      error: '네트워크 오류가 발생했습니다.',
+      error: responseData?.message || responseData?.error || '설정 저장에 실패했습니다.',
     };
   }
 }
@@ -640,40 +614,26 @@ export async function createForumPost(
 
   // Real API call
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        title: payload.title,
-        content: payload.content,
-        categorySlug: payload.categorySlug,
-        type: 'discussion',
-        // WO-NETURE-EXTERNAL-CONTACT-V1
-        showContactOnPost: payload.showContactOnPost || false,
-      }),
+    const response = await api.post('/forum/posts', {
+      title: payload.title,
+      content: payload.content,
+      categorySlug: payload.categorySlug,
+      type: 'discussion',
+      // WO-NETURE-EXTERNAL-CONTACT-V1
+      showContactOnPost: payload.showContactOnPost || false,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: data.message || data.error || '게시글 작성에 실패했습니다.',
-      };
-    }
-
+    const data = response.data;
     return {
       success: true,
       data: data.data,
     };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error creating forum post:', error);
     return {
       success: false,
-      error: '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+      error: responseData?.message || responseData?.error || '게시글 작성에 실패했습니다.',
     };
   }
 }
@@ -687,28 +647,15 @@ export async function createForumComment(
   parentId?: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ postId, content, parentId }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: data.message || data.error || '댓글 작성에 실패했습니다.',
-      };
-    }
-
+    const response = await api.post('/forum/comments', { postId, content, parentId });
+    const data = response.data;
     return { success: true, data: data.data };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error creating forum comment:', error);
     return {
       success: false,
-      error: '네트워크 오류가 발생했습니다.',
+      error: responseData?.message || responseData?.error || '댓글 작성에 실패했습니다.',
     };
   }
 }
@@ -721,42 +668,30 @@ export async function updateForumPost(
   payload: { title?: string; content?: any; categorySlug?: string }
 ): Promise<{ success: boolean; data?: ForumPost; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, error: data.message || data.error || '게시글 수정에 실패했습니다.' };
-    }
+    const response = await api.put(`/forum/posts/${postId}`, payload);
+    const data = response.data;
     return { success: true, data: data.data };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error updating forum post:', error);
-    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+    return { success: false, error: responseData?.message || responseData?.error || '게시글 수정에 실패했습니다.' };
   }
 }
 
 /**
- * Delete a forum post
+ * Toggle forum post like
  */
 export async function toggleForumPostLike(
   postId: string
 ): Promise<{ success: boolean; data?: { likeCount: number; isLiked: boolean }; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/like`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, error: data.message || data.error || '좋아요 처리에 실패했습니다.' };
-    }
+    const response = await api.post(`/forum/posts/${postId}/like`, {});
+    const data = response.data;
     return { success: true, data: data.data };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error toggling forum post like:', error);
-    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+    return { success: false, error: responseData?.message || responseData?.error || '좋아요 처리에 실패했습니다.' };
   }
 }
 
@@ -764,18 +699,12 @@ export async function deleteForumPost(
   postId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, error: data.message || data.error || '게시글 삭제에 실패했습니다.' };
-    }
+    await api.delete(`/forum/posts/${postId}`);
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error deleting forum post:', error);
-    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+    return { success: false, error: responseData?.message || responseData?.error || '게시글 삭제에 실패했습니다.' };
   }
 }
 
@@ -787,20 +716,13 @@ export async function updateForumComment(
   content: string
 ): Promise<{ success: boolean; data?: ForumComment; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ content }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, error: data.message || data.error || '댓글 수정에 실패했습니다.' };
-    }
+    const response = await api.put(`/forum/comments/${commentId}`, { content });
+    const data = response.data;
     return { success: true, data: data.data };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error updating forum comment:', error);
-    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+    return { success: false, error: responseData?.message || responseData?.error || '댓글 수정에 실패했습니다.' };
   }
 }
 
@@ -811,17 +733,11 @@ export async function deleteForumComment(
   commentId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/comments/${commentId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return { success: false, error: data.message || data.error || '댓글 삭제에 실패했습니다.' };
-    }
+    await api.delete(`/forum/comments/${commentId}`);
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
+    const responseData = error?.response?.data;
     console.error('Error deleting forum comment:', error);
-    return { success: false, error: '네트워크 오류가 발생했습니다.' };
+    return { success: false, error: responseData?.message || responseData?.error || '댓글 삭제에 실패했습니다.' };
   }
 }

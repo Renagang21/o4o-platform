@@ -33,14 +33,12 @@ import {
   Info,
 } from 'lucide-react';
 import type { StoreApiResponse } from '@/types/store';
-import { getAccessToken } from '@/contexts/AuthContext';
+import { api } from '@/lib/apiClient';
 import {
   fetchInterestRequests,
   updateInterestAction,
   type StaffInterestRequest,
 } from '@/api/tabletInterest';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 /** 요청 목적 */
 type CustomerRequestPurpose =
@@ -205,7 +203,6 @@ export default function CustomerRequestsPage() {
     setError(null);
 
     try {
-      const accessToken = getAccessToken();
       const params = new URLSearchParams();
       params.set('page', page.toString());
       params.set('pageSize', '10');
@@ -213,22 +210,11 @@ export default function CustomerRequestsPage() {
         params.set('status', statusFilter);
       }
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/requests?${params.toString()}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-          },
-          credentials: 'include',
-        }
+      const response = await api.get<StoreApiResponse<PaginatedResponse>>(
+        `/glycopharm/requests?${params.toString()}`
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch requests');
-      }
-
-      const result: StoreApiResponse<PaginatedResponse> = await response.json();
+      const result = response.data;
 
       if (result.success && result.data) {
         setRequests(result.data.items);
@@ -237,7 +223,7 @@ export default function CustomerRequestsPage() {
       }
     } catch (err: any) {
       console.error('Failed to fetch requests:', err);
-      setError(err.message || '요청 목록을 불러오는데 실패했습니다.');
+      setError(err.response?.data?.message || err.message || '요청 목록을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -252,23 +238,7 @@ export default function CustomerRequestsPage() {
     setProcessingId(id);
 
     try {
-      const accessToken = getAccessToken();
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/requests/${id}/approve`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-          },
-          credentials: 'include',
-          body: JSON.stringify({}),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to approve request');
-      }
+      await api.patch(`/glycopharm/requests/${id}/approve`, {});
 
       // Refresh list
       await fetchRequests();
@@ -297,24 +267,11 @@ export default function CustomerRequestsPage() {
     setRejectModalOpen(false);
 
     try {
-      const accessToken = getAccessToken();
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/requests/${rejectTargetId}/reject`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            note: rejectNote || undefined,
-            rejectReason,
-          }),
-        }
-      );
+      await api.patch(`/glycopharm/requests/${rejectTargetId}/reject`, {
+        note: rejectNote || undefined,
+        rejectReason,
+      });
 
-      if (!response.ok) throw new Error('Failed to reject request');
       await fetchRequests();
     } catch (err: any) {
       console.error('Failed to reject request:', err);

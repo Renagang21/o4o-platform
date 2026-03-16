@@ -10,8 +10,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../lib/apiClient';
 
 // 타입 정의
 interface ReportStats {
@@ -62,17 +61,14 @@ export default function AiCardReportPage() {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/card-report?period=${period}`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
+      const { data } = await api.get(`${API_BASE_URL}/api/ai/card-report?period=${period}`);
       if (data?.success) {
         setStats(data.data);
       } else {
         // API가 없거나 데이터가 없는 경우 샘플 데이터 표시
         setStats(getSampleData());
       }
-    } catch (err: any) {
+    } catch {
       // API가 없거나 권한이 없는 경우 샘플 데이터 표시
       setStats(getSampleData());
     } finally {

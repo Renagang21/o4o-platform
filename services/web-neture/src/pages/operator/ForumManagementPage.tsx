@@ -16,8 +16,7 @@ import {
   AlertCircle,
   Plus,
 } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
 
@@ -57,15 +56,6 @@ function formatDate(dateString: string): string {
   });
 }
 
-async function fetchApi(path: string, options?: RequestInit) {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-  });
-  return res.json();
-}
-
 export default function ForumManagementPage() {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +81,7 @@ export default function ForumManagementPage() {
     try {
       const query = new URLSearchParams({ serviceCode: 'neture' });
       if (statusFilter !== 'all') query.set('status', statusFilter);
-      const data = await fetchApi(`/api/v1/forum/category-requests?${query}`);
+      const { data } = await api.get(`/forum/category-requests?${query}`);
       if (data.success) {
         setRequests(data.data || []);
       } else {
@@ -116,9 +106,9 @@ export default function ForumManagementPage() {
     if (!selectedRequest) return;
     setIsProcessing(true);
     try {
-      const data = await fetchApi(
-        `/api/v1/forum/category-requests/${selectedRequest.id}/${action}`,
-        { method: 'PATCH', body: JSON.stringify({ review_comment: reviewComment || undefined }) }
+      const { data } = await api.patch(
+        `/forum/category-requests/${selectedRequest.id}/${action}`,
+        { review_comment: reviewComment || undefined },
       );
       if (data.success) {
         setRequests((prev) =>
@@ -140,13 +130,10 @@ export default function ForumManagementPage() {
     if (!createName.trim() || !createDescription.trim()) return;
     setIsProcessing(true);
     try {
-      const data = await fetchApi('/api/v1/forum/categories', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: createName.trim(),
-          description: createDescription.trim(),
-          accessLevel: 'all',
-        }),
+      const { data } = await api.post('/forum/categories', {
+        name: createName.trim(),
+        description: createDescription.trim(),
+        accessLevel: 'all',
       });
       if (data.success) {
         setShowCreateModal(false);

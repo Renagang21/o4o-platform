@@ -2,13 +2,15 @@
  * Community Hub API Client - K-Cosmetics
  *
  * WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  *
  * Public: getHeroAds, getPageAds, getSponsors
  * Operator: CRUD for ads and sponsors
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
-const BASE = `${API_URL}/api/v1/cosmetics`;
+import { api } from '../lib/apiClient';
+
+const BASE = '/cosmetics';
 
 // ==================== Types ====================
 
@@ -43,36 +45,13 @@ export interface CommunitySponsorFull extends CommunitySponsor {
   updatedAt?: string;
 }
 
-// ==================== Auth Helper ====================
-
-function getAuthToken(): string | null {
-  try {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      return parsed.accessToken || parsed.token || null;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-}
-
-function authHeaders(): HeadersInit {
-  const token = getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-}
-
 // ==================== Public API ====================
 
 export const communityApi = {
   async getHeroAds(): Promise<{ success: boolean; data: { ads: CommunityAd[] } }> {
     try {
-      const res = await fetch(`${BASE}/community/ads?type=hero`);
-      return await res.json();
+      const res = await api.get(`${BASE}/community/ads?type=hero`);
+      return res.data;
     } catch {
       return { success: false, data: { ads: [] } };
     }
@@ -80,8 +59,8 @@ export const communityApi = {
 
   async getPageAds(): Promise<{ success: boolean; data: { ads: CommunityAd[] } }> {
     try {
-      const res = await fetch(`${BASE}/community/ads?type=page`);
-      return await res.json();
+      const res = await api.get(`${BASE}/community/ads?type=page`);
+      return res.data;
     } catch {
       return { success: false, data: { ads: [] } };
     }
@@ -89,8 +68,8 @@ export const communityApi = {
 
   async getSponsors(): Promise<{ success: boolean; data: { sponsors: CommunitySponsor[] } }> {
     try {
-      const res = await fetch(`${BASE}/community/sponsors`);
-      return await res.json();
+      const res = await api.get(`${BASE}/community/sponsors`);
+      return res.data;
     } catch {
       return { success: false, data: { sponsors: [] } };
     }
@@ -103,8 +82,8 @@ export const communityManageApi = {
   // Ads
   async listAds(type?: string): Promise<{ success: boolean; data: { ads: CommunityAdFull[] } }> {
     const params = type ? `?type=${type}` : '';
-    const res = await fetch(`${BASE}/community/manage/ads${params}`, { headers: authHeaders() });
-    return res.json();
+    const res = await api.get(`${BASE}/community/manage/ads${params}`);
+    return res.data;
   },
 
   async createAd(data: {
@@ -112,53 +91,41 @@ export const communityManageApi = {
     linkUrl?: string; startDate?: string; endDate?: string;
     displayOrder?: number; isActive?: boolean;
   }): Promise<{ success: boolean; data: CommunityAdFull }> {
-    const res = await fetch(`${BASE}/community/manage/ads`, {
-      method: 'POST', headers: authHeaders(), body: JSON.stringify(data),
-    });
-    return res.json();
+    const res = await api.post(`${BASE}/community/manage/ads`, data);
+    return res.data;
   },
 
   async updateAd(id: string, data: Record<string, unknown>): Promise<{ success: boolean; data: CommunityAdFull }> {
-    const res = await fetch(`${BASE}/community/manage/ads/${id}`, {
-      method: 'PUT', headers: authHeaders(), body: JSON.stringify(data),
-    });
-    return res.json();
+    const res = await api.put(`${BASE}/community/manage/ads/${id}`, data);
+    return res.data;
   },
 
   async deleteAd(id: string): Promise<{ success: boolean }> {
-    const res = await fetch(`${BASE}/community/manage/ads/${id}`, {
-      method: 'DELETE', headers: authHeaders(),
-    });
-    return res.json();
+    const res = await api.delete(`${BASE}/community/manage/ads/${id}`);
+    return res.data;
   },
 
   // Sponsors
   async listSponsors(): Promise<{ success: boolean; data: { sponsors: CommunitySponsorFull[] } }> {
-    const res = await fetch(`${BASE}/community/manage/sponsors`, { headers: authHeaders() });
-    return res.json();
+    const res = await api.get(`${BASE}/community/manage/sponsors`);
+    return res.data;
   },
 
   async createSponsor(data: {
     name: string; logoUrl: string; linkUrl?: string;
     displayOrder?: number; isActive?: boolean;
   }): Promise<{ success: boolean; data: CommunitySponsorFull }> {
-    const res = await fetch(`${BASE}/community/manage/sponsors`, {
-      method: 'POST', headers: authHeaders(), body: JSON.stringify(data),
-    });
-    return res.json();
+    const res = await api.post(`${BASE}/community/manage/sponsors`, data);
+    return res.data;
   },
 
   async updateSponsor(id: string, data: Record<string, unknown>): Promise<{ success: boolean; data: CommunitySponsorFull }> {
-    const res = await fetch(`${BASE}/community/manage/sponsors/${id}`, {
-      method: 'PUT', headers: authHeaders(), body: JSON.stringify(data),
-    });
-    return res.json();
+    const res = await api.put(`${BASE}/community/manage/sponsors/${id}`, data);
+    return res.data;
   },
 
   async deleteSponsor(id: string): Promise<{ success: boolean }> {
-    const res = await fetch(`${BASE}/community/manage/sponsors/${id}`, {
-      method: 'DELETE', headers: authHeaders(),
-    });
-    return res.json();
+    const res = await api.delete(`${BASE}/community/manage/sponsors/${id}`);
+    return res.data;
   },
 };

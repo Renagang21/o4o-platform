@@ -8,8 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface PolicySettings {
   freeDailyLimit: number;
@@ -40,10 +39,7 @@ export default function AiPolicyPage() {
   const fetchPolicy = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/admin/policy`, {
-        credentials: 'include',
-      });
-      const data = await response.json();
+      const { data } = await api.get(`${API_BASE_URL}/api/ai/admin/policy`);
       if (data?.success) {
         setPolicy(data.data);
         setFormData({
@@ -69,13 +65,7 @@ export default function AiPolicyPage() {
     e.preventDefault();
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/ai/admin/policy`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
+      const { data } = await api.put(`${API_BASE_URL}/api/ai/admin/policy`, formData);
       if (data?.success) {
         setPolicy(data.data);
         alert('정책이 업데이트되었습니다.');

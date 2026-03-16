@@ -3676,6 +3676,9 @@ importers:
       '@o4o/ai-components':
         specifier: workspace:*
         version: link:../../packages/o4o-ai-components
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../../packages/auth-client
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils

@@ -16,8 +16,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { MessageCircle, Package, ShoppingCart, CheckCircle, AlertCircle } from 'lucide-react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 /** 승격 가능 purpose */
 const PROMOTABLE_PURPOSES = ['consultation', 'sample', 'order'] as const;
@@ -90,23 +89,15 @@ export default function QrLandingPage() {
     setState('submitting');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/glycopharm/events`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pharmacyId,
-          eventType: 'qr_scan',
-          sourceType: 'qr',
-          sourceId: sourceId || undefined,
-          purpose,
-        }),
+      const response = await api.post<{ success: boolean; data?: { promoted: boolean }; error?: string }>('/glycopharm/events', {
+        pharmacyId,
+        eventType: 'qr_scan',
+        sourceType: 'qr',
+        sourceId: sourceId || undefined,
+        purpose,
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
 
       if (result.success) {
         if (result.data?.promoted) {
@@ -119,7 +110,7 @@ export default function QrLandingPage() {
       }
     } catch (err: any) {
       console.error('Failed to submit request:', err);
-      setErrorMsg(err.message || '네트워크 오류가 발생했습니다.');
+      setErrorMsg(err.response?.data?.error || err.message || '네트워크 오류가 발생했습니다.');
       setState('error');
     }
   };

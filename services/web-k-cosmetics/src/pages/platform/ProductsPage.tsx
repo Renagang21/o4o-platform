@@ -20,8 +20,7 @@ import {
 } from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 interface Product {
   id: string;
@@ -63,16 +62,10 @@ export default function ProductsPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/cosmetics/products`, {
-          credentials: 'include',
-        });
-        if (!response.ok) {
-          throw new Error('상품 목록을 불러오는데 실패했습니다');
-        }
-        const data = await response.json();
-        setProducts(data.data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '오류가 발생했습니다');
+        const response = await api.get('/cosmetics/products');
+        setProducts(response.data?.data || []);
+      } catch (err: any) {
+        setError(err.response?.data?.error || '상품 목록을 불러오는데 실패했습니다');
         setProducts([]);
       } finally {
         setIsLoading(false);

@@ -10,9 +10,7 @@ import type {
 } from '@/types/store';
 import type { StoreMainData, CopyOptions } from '@/types/store-main';
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 // 약국 대시보드 통계
 export interface PharmacyStats {
@@ -250,44 +248,32 @@ export interface ProductSearchResultData {
 }
 
 class PharmacyApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const method = (options.method || 'GET').toUpperCase();
+    const body = options.body ? JSON.parse(options.body as string) : undefined;
 
-    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
-    const accessToken = getAccessToken();
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-      ...options.headers,
-    };
-
-    // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+    try {
+      const response = method === 'GET'
+        ? await api.get(endpoint)
+        : method === 'POST'
+          ? await api.post(endpoint, body)
+          : method === 'PATCH'
+            ? await api.patch(endpoint, body)
+            : method === 'PUT'
+              ? await api.put(endpoint, body)
+              : await api.delete(endpoint);
+      return response.data;
+    } catch (error: any) {
+      const errorData = error.response?.data || {};
       throw {
-        status: response.status,
+        status: error.response?.status || 0,
         code: errorData.code || 'UNKNOWN_ERROR',
         message: errorData.message || errorData.error || 'Request failed',
       };
     }
-
-    return response.json();
   }
 
   // ============================================================================
@@ -298,21 +284,21 @@ class PharmacyApiClient {
    * 약국 대시보드 통계 조회
    */
   async getDashboardStats(): Promise<StoreApiResponse<PharmacyStats>> {
-    return this.request('/api/v1/glycopharm/pharmacy/dashboard/stats');
+    return this.request('/glycopharm/pharmacy/dashboard/stats');
   }
 
   /**
    * 최근 주문 목록
    */
   async getRecentOrders(limit = 5): Promise<StoreApiResponse<RecentOrder[]>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/dashboard/recent-orders?limit=${limit}`);
+    return this.request(`/glycopharm/pharmacy/dashboard/recent-orders?limit=${limit}`);
   }
 
   /**
    * 인기 상품 목록
    */
   async getTopProducts(limit = 5): Promise<StoreApiResponse<TopProduct[]>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/dashboard/top-products?limit=${limit}`);
+    return this.request(`/glycopharm/pharmacy/dashboard/top-products?limit=${limit}`);
   }
 
   // ============================================================================
@@ -323,84 +309,84 @@ class PharmacyApiClient {
    * 약국 상태 정보 조회
    */
   async getPharmacyStatus(): Promise<StoreApiResponse<PharmacyStatus>> {
-    return this.request('/api/v1/glycopharm/pharmacy/cockpit/status');
+    return this.request('/glycopharm/pharmacy/cockpit/status');
   }
 
   /**
    * 오늘의 운영 액션 조회
    */
   async getTodayActions(): Promise<StoreApiResponse<TodayActions>> {
-    return this.request('/api/v1/glycopharm/pharmacy/cockpit/today-actions');
+    return this.request('/glycopharm/pharmacy/cockpit/today-actions');
   }
 
   /**
    * 프랜차이즈 서비스 활용 현황
    */
   async getFranchiseServices(): Promise<StoreApiResponse<FranchiseServices>> {
-    return this.request('/api/v1/glycopharm/pharmacy/cockpit/franchise-services');
+    return this.request('/glycopharm/pharmacy/cockpit/franchise-services');
   }
 
   /**
    * 콘텐츠 작업 공간
    */
   async getContentWorkspace(): Promise<StoreApiResponse<ContentWorkspace>> {
-    return this.request('/api/v1/glycopharm/pharmacy/cockpit/content-workspace');
+    return this.request('/glycopharm/pharmacy/cockpit/content-workspace');
   }
 
   /**
    * 매장 메인 데이터 조회 (WO-STORE-MAIN-PAGE-PHASE1-V1)
    */
   async getStoreMain(): Promise<StoreApiResponse<StoreMainData>> {
-    return this.request('/api/v1/glycopharm/pharmacy/cockpit/store-main');
+    return this.request('/glycopharm/pharmacy/cockpit/store-main');
   }
 
   /**
    * Store AI 요약 조회 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
    */
   async getStoreAiSummary(): Promise<StoreApiResponse<StoreAiSummaryData | null>> {
-    return this.request('/api/v1/store-hub/ai/summary');
+    return this.request('/store-hub/ai/summary');
   }
 
   /**
    * Store AI 스냅샷 생성 + 인사이트 트리거 (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
    */
   async createStoreAiSnapshot(): Promise<StoreApiResponse<{ id: string }>> {
-    return this.request('/api/v1/store-hub/ai/snapshot', { method: 'POST' });
+    return this.request('/store-hub/ai/snapshot', { method: 'POST' });
   }
 
   /**
    * 상품 AI 인사이트 조회 (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
    */
   async getProductAiInsight(): Promise<StoreApiResponse<ProductAiInsightData | null>> {
-    return this.request('/api/v1/store-hub/ai/products/insight');
+    return this.request('/store-hub/ai/products/insight');
   }
 
   /**
    * 상품 AI 스냅샷 생성 + 인사이트 트리거 (WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1)
    */
   async createProductAiSnapshot(): Promise<StoreApiResponse<{ count: number }>> {
-    return this.request('/api/v1/store-hub/ai/products/snapshot', { method: 'POST' });
+    return this.request('/store-hub/ai/products/snapshot', { method: 'POST' });
   }
 
   /**
    * 상품 AI 태그 조회 (WO-O4O-PRODUCT-AI-TAGGING-V1)
    */
   async getProductAiTags(productId: string): Promise<StoreApiResponse<{ aiTags: ProductAiTagData[]; manualTags: ProductAiTagData[] }>> {
-    return this.request(`/api/v1/products/${productId}/ai-tags`);
+    return this.request(`/products/${productId}/ai-tags`);
   }
 
   /**
    * 상품 AI 태그 재생성 (WO-O4O-PRODUCT-AI-TAGGING-V1)
    */
   async regenerateProductAiTags(productId: string): Promise<StoreApiResponse<{ message: string }>> {
-    return this.request(`/api/v1/products/${productId}/ai-tags/regenerate`, { method: 'POST' });
+    return this.request(`/products/${productId}/ai-tags/regenerate`, { method: 'POST' });
   }
 
   /**
    * 수동 태그 추가 (WO-O4O-PRODUCT-AI-TAGGING-V1)
    */
   async addProductManualTag(productId: string, tag: string): Promise<StoreApiResponse<ProductAiTagData>> {
-    return this.request(`/api/v1/products/${productId}/ai-tags/manual`, {
+    return this.request(`/products/${productId}/ai-tags/manual`, {
       method: 'POST',
       body: JSON.stringify({ tag }),
     });
@@ -410,42 +396,42 @@ class PharmacyApiClient {
    * 태그 삭제 (WO-O4O-PRODUCT-AI-TAGGING-V1)
    */
   async deleteProductAiTag(productId: string, tagId: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/api/v1/products/${productId}/ai-tags/${tagId}`, { method: 'DELETE' });
+    return this.request(`/products/${productId}/ai-tags/${tagId}`, { method: 'DELETE' });
   }
 
   /**
    * AI 태그 기반 상품 검색 (WO-O4O-AI-TAG-SEARCH-V1)
    */
   async searchProductsByAiTag(query: string): Promise<StoreApiResponse<{ products: ProductSearchResultData[]; query: string; total: number }>> {
-    return this.request(`/api/v1/products/search/ai?q=${encodeURIComponent(query)}`);
+    return this.request(`/products/search/ai?q=${encodeURIComponent(query)}`);
   }
 
   /**
    * 태그 기반 상품 추천 (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
    */
   async getProductRecommendations(tags: string[]): Promise<StoreApiResponse<{ products: RecommendedProductData[]; total: number; context: string }>> {
-    return this.request(`/api/v1/products/recommend?tags=${encodeURIComponent(tags.join(','))}`);
+    return this.request(`/products/recommend?tags=${encodeURIComponent(tags.join(','))}`);
   }
 
   /**
    * 매장 컨텍스트 기반 상품 추천 (WO-O4O-AI-PRODUCT-RECOMMENDATION-V1)
    */
   async getStoreProductRecommendations(): Promise<StoreApiResponse<{ products: RecommendedProductData[]; total: number; context: string }>> {
-    return this.request('/api/v1/products/recommend/store');
+    return this.request('/products/recommend/store');
   }
 
   /**
    * KPI 요약 조회 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
    */
   async getKpiSummary(): Promise<StoreApiResponse<KpiSummaryData>> {
-    return this.request('/api/v1/store-hub/kpi-summary');
+    return this.request('/store-hub/kpi-summary');
   }
 
   /**
    * 상품 스냅샷 조회 (WO-O4O-STORE-COPILOT-DASHBOARD-V1)
    */
   async getProductSnapshots(): Promise<StoreApiResponse<ProductSnapshotData[]>> {
-    return this.request('/api/v1/store-hub/ai/products/snapshots');
+    return this.request('/store-hub/ai/products/snapshots');
   }
 
   /**
@@ -455,7 +441,7 @@ class PharmacyApiClient {
     itemId: string,
     options: CopyOptions
   ): Promise<StoreApiResponse<{ id: string; message: string }>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/cockpit/store-main/${itemId}/copy`, {
+    return this.request(`/glycopharm/pharmacy/cockpit/store-main/${itemId}/copy`, {
       method: 'POST',
       body: JSON.stringify(options),
     });
@@ -483,14 +469,14 @@ class PharmacyApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/pharmacy/products${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/glycopharm/pharmacy/products${queryString ? `?${queryString}` : ''}`);
   }
 
   /**
    * 상품 상세 조회
    */
   async getProductDetail(productId: string): Promise<StoreApiResponse<PharmacyProduct>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/products/${productId}`);
+    return this.request(`/glycopharm/pharmacy/products/${productId}`);
   }
 
   /**
@@ -501,7 +487,7 @@ class PharmacyApiClient {
     price?: number;
     stock?: number;
   }): Promise<StoreApiResponse<PharmacyProduct>> {
-    return this.request('/api/v1/glycopharm/pharmacy/products', {
+    return this.request('/glycopharm/pharmacy/products', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -514,7 +500,7 @@ class PharmacyApiClient {
     productId: string,
     data: Partial<{ price: number; salePrice: number; stock: number; status: string }>
   ): Promise<StoreApiResponse<PharmacyProduct>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/products/${productId}`, {
+    return this.request(`/glycopharm/pharmacy/products/${productId}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
@@ -524,7 +510,7 @@ class PharmacyApiClient {
    * 상품 삭제
    */
   async deleteProduct(productId: string): Promise<StoreApiResponse<void>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/products/${productId}`, {
+    return this.request(`/glycopharm/pharmacy/products/${productId}`, {
       method: 'DELETE',
     });
   }
@@ -533,7 +519,7 @@ class PharmacyApiClient {
    * 상품 카테고리 목록
    */
   async getCategories(): Promise<StoreApiResponse<{ id: string; name: string }[]>> {
-    return this.request('/api/v1/glycopharm/pharmacy/categories');
+    return this.request('/glycopharm/pharmacy/categories');
   }
 
   // ============================================================================
@@ -556,14 +542,14 @@ class PharmacyApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/pharmacy/orders${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/glycopharm/pharmacy/orders${queryString ? `?${queryString}` : ''}`);
   }
 
   /**
    * 주문 상세 조회
    */
   async getOrderDetail(orderId: string): Promise<StoreApiResponse<PharmacyOrder>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/orders/${orderId}`);
+    return this.request(`/glycopharm/pharmacy/orders/${orderId}`);
   }
 
   /**
@@ -574,7 +560,7 @@ class PharmacyApiClient {
     status: 'confirmed' | 'shipped' | 'delivered' | 'cancelled',
     trackingNumber?: string
   ): Promise<StoreApiResponse<PharmacyOrder>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/orders/${orderId}/status`, {
+    return this.request(`/glycopharm/pharmacy/orders/${orderId}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status, trackingNumber }),
     });
@@ -585,7 +571,7 @@ class PharmacyApiClient {
    * 약국이 주문을 확인하고 운영 책임을 인지했음을 표시
    */
   async receiveOrder(orderId: string): Promise<StoreApiResponse<PharmacyOrder>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/orders/${orderId}/receive`, {
+    return this.request(`/glycopharm/pharmacy/orders/${orderId}/receive`, {
       method: 'PATCH',
     });
   }
@@ -610,7 +596,7 @@ class PharmacyApiClient {
     if (params?.pageSize) searchParams.set('pageSize', params.pageSize.toString());
 
     const queryString = searchParams.toString();
-    return this.request(`/api/v1/glycopharm/pharmacy/customers${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/glycopharm/pharmacy/customers${queryString ? `?${queryString}` : ''}`);
   }
 
   /**
@@ -622,7 +608,7 @@ class PharmacyApiClient {
     email?: string;
     notes?: string;
   }): Promise<StoreApiResponse<{ id: string; name: string; phone: string; email: string; created_at: string }>> {
-    return this.request('/api/v1/glycopharm/pharmacy/customers', {
+    return this.request('/glycopharm/pharmacy/customers', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -632,7 +618,7 @@ class PharmacyApiClient {
    * 고객 상세 조회
    */
   async getCustomerDetail(customerId: string): Promise<StoreApiResponse<PharmacyCustomer>> {
-    return this.request(`/api/v1/glycopharm/pharmacy/customers/${customerId}`);
+    return this.request(`/glycopharm/pharmacy/customers/${customerId}`);
   }
 
   /**
@@ -648,7 +634,7 @@ class PharmacyApiClient {
 
     const queryString = searchParams.toString();
     return this.request(
-      `/api/v1/glycopharm/pharmacy/customers/${customerId}/orders${queryString ? `?${queryString}` : ''}`
+      `/glycopharm/pharmacy/customers/${customerId}/orders${queryString ? `?${queryString}` : ''}`
     );
   }
 
@@ -660,7 +646,7 @@ class PharmacyApiClient {
    * 내 약국 정보 조회
    */
   async getMyStore(): Promise<StoreApiResponse<PharmacyStore>> {
-    return this.request('/api/v1/glycopharm/pharmacy/store');
+    return this.request('/glycopharm/pharmacy/store');
   }
 
   /**
@@ -672,7 +658,7 @@ class PharmacyApiClient {
     shippingInfo: PharmacyStore['shippingInfo'];
     returnPolicy: string;
   }>): Promise<StoreApiResponse<PharmacyStore>> {
-    return this.request('/api/v1/glycopharm/pharmacy/store', {
+    return this.request('/glycopharm/pharmacy/store', {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
@@ -683,59 +669,59 @@ class PharmacyApiClient {
   // ============================================================================
 
   async getCareDashboardSummary(): Promise<CareDashboardSummary> {
-    return this.request('/api/v1/care/dashboard');
+    return this.request('/care/dashboard');
   }
 
   async getRiskPatients(): Promise<RiskPatientsResponse> {
-    return this.request('/api/v1/care/risk-patients');
+    return this.request('/care/risk-patients');
   }
 
   // WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1
   async getPriorityPatients(): Promise<{ priorityPatients: PriorityPatientDto[] }> {
-    return this.request('/api/v1/care/priority-patients');
+    return this.request('/care/priority-patients');
   }
 
   // WO-O4O-CARE-POPULATION-DASHBOARD-V1
   async getPopulationDashboard(): Promise<PopulationDashboardDto> {
-    return this.request('/api/v1/care/population-dashboard');
+    return this.request('/care/population-dashboard');
   }
 
   // WO-O4O-CARE-TODAY-PRIORITY-PATIENTS-V1
   async getTodayPriorityPatients(): Promise<TodayPriorityPatientDto[]> {
-    return this.request('/api/v1/care/today-priority');
+    return this.request('/care/today-priority');
   }
 
   // WO-O4O-CARE-ALERT-ENGINE-V1
   async getCareAlerts(): Promise<CareAlertDto[]> {
-    return this.request('/api/v1/care/alerts');
+    return this.request('/care/alerts');
   }
 
   async acknowledgeCareAlert(alertId: string): Promise<void> {
-    return this.request(`/api/v1/care/alerts/${alertId}/ack`, {
+    return this.request(`/care/alerts/${alertId}/ack`, {
       method: 'PATCH',
     });
   }
 
   async resolveCareAlert(alertId: string): Promise<void> {
-    return this.request(`/api/v1/care/alerts/${alertId}/resolve`, {
+    return this.request(`/care/alerts/${alertId}/resolve`, {
       method: 'PATCH',
     });
   }
 
   // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 3: Patient Timeline
   async getPatientTimeline(patientId: string, limit = 50): Promise<TimelineEventDto[]> {
-    return this.request(`/api/v1/care/timeline/${patientId}?limit=${limit}`);
+    return this.request(`/care/timeline/${patientId}?limit=${limit}`);
   }
 
   // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 4: AI Priority
   async getAiPriorityPatients(limit = 5): Promise<{ priorityPatients: AiPriorityPatientDto[] }> {
-    return this.request(`/api/v1/care/ai-priority-patients?limit=${limit}`);
+    return this.request(`/care/ai-priority-patients?limit=${limit}`);
   }
 
   // WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
   async sendCareAiChat(message: string, patientId?: string): Promise<AiChatResponseDto> {
     const res = await this.request<{ success: boolean; data: AiChatResponseDto }>(
-      '/api/v1/care/ai-chat',
+      '/care/ai-chat',
       { method: 'POST', body: JSON.stringify({ message, patientId }) },
     );
     return (res as { data: AiChatResponseDto }).data ?? (res as unknown as AiChatResponseDto);
@@ -743,15 +729,15 @@ class PharmacyApiClient {
 
   // WO-O4O-CARE-LLM-INSIGHT-V1
   async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
-    return this.request(`/api/v1/care/llm-insight/${patientId}`);
+    return this.request(`/care/llm-insight/${patientId}`);
   }
 
   async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
-    return this.request(`/api/v1/care/analysis/${patientId}`);
+    return this.request(`/care/analysis/${patientId}`);
   }
 
   async getCareKpi(patientId: string): Promise<KpiComparisonDto> {
-    return this.request(`/api/v1/care/kpi/${patientId}`);
+    return this.request(`/care/kpi/${patientId}`);
   }
 
   async createCoachingSession(data: {
@@ -759,33 +745,33 @@ class PharmacyApiClient {
     summary: string;
     actionPlan: string;
   }): Promise<CoachingSession> {
-    return this.request('/api/v1/care/coaching', {
+    return this.request('/care/coaching', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   async getCoachingSessions(patientId: string): Promise<CoachingSession[]> {
-    return this.request(`/api/v1/care/coaching/${patientId}`);
+    return this.request(`/care/coaching/${patientId}`);
   }
 
   // WO-O4O-CARE-AI-COACHING-DRAFT-V1
   async getCoachingDraft(patientId: string): Promise<CoachingDraftDto | null> {
-    return this.request(`/api/v1/care/coaching-drafts/${patientId}`);
+    return this.request(`/care/coaching-drafts/${patientId}`);
   }
 
   async approveCoachingDraft(
     draftId: string,
     data?: { summary?: string; actionPlan?: string },
   ): Promise<CoachingSession> {
-    return this.request(`/api/v1/care/coaching-drafts/${draftId}/approve`, {
+    return this.request(`/care/coaching-drafts/${draftId}/approve`, {
       method: 'POST',
       body: JSON.stringify(data || {}),
     });
   }
 
   async discardCoachingDraft(draftId: string): Promise<void> {
-    return this.request(`/api/v1/care/coaching-drafts/${draftId}/discard`, {
+    return this.request(`/care/coaching-drafts/${draftId}/discard`, {
       method: 'POST',
     });
   }
@@ -798,7 +784,7 @@ class PharmacyApiClient {
     measuredAt: string;
     metadata?: Record<string, unknown>;
   }): Promise<HealthReadingDto> {
-    return this.request('/api/v1/care/health-readings', {
+    return this.request('/care/health-readings', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -813,24 +799,24 @@ class PharmacyApiClient {
     if (params?.to) query.set('to', params.to);
     if (params?.metricType) query.set('metricType', params.metricType);
     const qs = query.toString();
-    return this.request(`/api/v1/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
+    return this.request(`/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
   }
 
   // ── Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
 
   async getPharmacyLinkRequests(): Promise<PharmacyLinkRequestDto[]> {
-    return this.request('/api/v1/care/pharmacy-link/requests');
+    return this.request('/care/pharmacy-link/requests');
   }
 
   async approvePharmacyLink(requestId: string): Promise<void> {
-    return this.request('/api/v1/care/pharmacy-link/approve', {
+    return this.request('/care/pharmacy-link/approve', {
       method: 'POST',
       body: JSON.stringify({ requestId }),
     });
   }
 
   async rejectPharmacyLink(requestId: string, reason?: string): Promise<void> {
-    return this.request('/api/v1/care/pharmacy-link/reject', {
+    return this.request('/care/pharmacy-link/reject', {
       method: 'POST',
       body: JSON.stringify({ requestId, reason }),
     });
@@ -840,22 +826,22 @@ class PharmacyApiClient {
 
   async getPharmacyAppointments(status?: string): Promise<PharmacyAppointmentDto[]> {
     const qs = status ? `?status=${status}` : '';
-    return this.request(`/api/v1/care/appointments/pharmacy${qs}`);
+    return this.request(`/care/appointments/pharmacy${qs}`);
   }
 
   async confirmAppointment(id: string): Promise<void> {
-    return this.request(`/api/v1/care/appointments/${id}/confirm`, { method: 'PATCH' });
+    return this.request(`/care/appointments/${id}/confirm`, { method: 'PATCH' });
   }
 
   async rejectAppointment(id: string, reason?: string): Promise<void> {
-    return this.request(`/api/v1/care/appointments/${id}/reject`, {
+    return this.request(`/care/appointments/${id}/reject`, {
       method: 'PATCH',
       body: JSON.stringify({ reason }),
     });
   }
 
   async completeAppointment(id: string): Promise<void> {
-    return this.request(`/api/v1/care/appointments/${id}/complete`, { method: 'PATCH' });
+    return this.request(`/care/appointments/${id}/complete`, { method: 'PATCH' });
   }
 }
 
@@ -1095,7 +1081,7 @@ export interface AiChatResponseDto {
 }
 
 // Export singleton instance
-export const pharmacyApi = new PharmacyApiClient(API_BASE_URL);
+export const pharmacyApi = new PharmacyApiClient();
 
 // Also export the class for testing
 export { PharmacyApiClient };

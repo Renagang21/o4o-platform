@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../lib/apiClient';
 
 const SERVICE_LABELS: Record<string, string> = {
   'neture': 'Neture',
@@ -66,13 +67,8 @@ export default function RegisterPage() {
   const handleEmailBlur = async () => {
     if (!form.email || !form.email.includes('@')) return;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, service: 'glucoseview' }),
-      });
-      const data = await res.json();
+      const res = await api.post('/auth/check-email', { email: form.email, service: 'glucoseview' });
+      const data = res.data;
       if (data.success && data.data.exists) {
         if (data.data.alreadyJoined) {
           setError('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
@@ -141,49 +137,43 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-          name: form.realName,
-          phone: normalizedPhone,
-          role: 'pharmacist',
-          service: 'glucoseview',
-          licenseNumber: form.licenseNumber || undefined,
-          displayName: form.displayName || undefined,
-          pharmacyName: form.pharmacyName || undefined,
-          branchId: form.branchId || undefined,
-          chapterId: form.chapterId || undefined,
-        }),
+      await api.post('/auth/register', {
+        email: form.email,
+        password: form.password,
+        name: form.realName,
+        phone: normalizedPhone,
+        role: 'pharmacist',
+        service: 'glucoseview',
+        licenseNumber: form.licenseNumber || undefined,
+        displayName: form.displayName || undefined,
+        pharmacyName: form.pharmacyName || undefined,
+        branchId: form.branchId || undefined,
+        chapterId: form.chapterId || undefined,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-        }
-        if (response.status === 409) {
-          const msg = (data.error || '').toLowerCase();
-          if (data.code === 'SERVICE_ALREADY_JOINED') {
-            throw new Error('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
-          }
-          if (msg.includes('license') || msg.includes('면허')) {
-            throw new Error('이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.');
-          }
-          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
-        }
-        throw new Error(data.error || '회원가입에 실패했습니다.');
-      }
-
       setSuccess(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입 중 오류가 발생했습니다.');
+    } catch (err: any) {
+      const status = err.response?.status;
+      const data = err.response?.data;
+
+      if (status === 401 && data?.code === 'PASSWORD_MISMATCH') {
+        setExistingAccountMode(true);
+        if (data.services) setExistingServices(data.services);
+        setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
+      } else if (status === 409) {
+        const msg = (data?.error || '').toLowerCase();
+        if (data?.code === 'SERVICE_ALREADY_JOINED') {
+          setError('이미 해당 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else if (msg.includes('license') || msg.includes('면허')) {
+          setError('이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.');
+        } else {
+          setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+        }
+      } else if (data?.error) {
+        setError(data.error);
+      } else {
+        setError(err instanceof Error ? err.message : '회원가입 중 오류가 발생했습니다.');
+      }
     } finally {
       setIsLoading(false);
     }

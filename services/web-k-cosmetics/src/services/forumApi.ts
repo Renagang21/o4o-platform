@@ -2,9 +2,10 @@
  * Forum API Service - K-Cosmetics
  *
  * Based on web-neture/src/services/forumApi.ts
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.k-cosmetics.site';
+import { api } from '../lib/apiClient';
 
 // ============================================================================
 // Types — imported from @o4o/types/forum (Single Source of Truth)
@@ -53,8 +54,8 @@ export async function fetchForumPosts(params: {
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts?${queryParams}`);
-    const data = await response.json();
+    const response = await api.get(`/forum/posts?${queryParams}`);
+    const data = response.data;
 
     if (!data.success) {
       throw new Error(data.error || 'Failed to fetch posts');
@@ -90,8 +91,8 @@ export async function fetchPinnedPosts(limit: number = 2): Promise<ForumPost[]> 
  */
 export async function fetchForumPostById(postId: string): Promise<PostResponse | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}`);
-    const data = await response.json();
+    const response = await api.get(`/forum/posts/${postId}`);
+    const data = response.data;
 
     if (!data.success) {
       return null;
@@ -109,8 +110,8 @@ export async function fetchForumPostById(postId: string): Promise<PostResponse |
  */
 export async function fetchForumComments(postId: string): Promise<CommentsResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/posts/${postId}/comments`);
-    return await response.json();
+    const response = await api.get(`/forum/posts/${postId}/comments`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching forum comments:', error);
     return {
@@ -142,8 +143,8 @@ export interface PopularForum {
 
 export async function fetchPopularForums(limit: number = 6): Promise<{ success: boolean; data: PopularForum[] }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/forum/categories/popular?limit=${limit}`);
-    return await response.json();
+    const response = await api.get(`/forum/categories/popular?limit=${limit}`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching popular forums:', error);
     return { success: false, data: [] };

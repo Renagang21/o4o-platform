@@ -2,27 +2,13 @@
  * Operator Dashboard API
  * K-Cosmetics 운영자 대시보드 API
  *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  * WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1:
  *   Switched to /cosmetics/operator/dashboard (5-block direct)
  */
 
 import type { OperatorDashboardConfig } from '@o4o/operator-ux-core';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
-
-async function getAuthToken(): Promise<string | null> {
-  // Try to get token from localStorage
-  try {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      return parsed.accessToken || parsed.token || null;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-}
+import { api } from '../lib/apiClient';
 
 export interface StoreMemberInfo {
   id: string;
@@ -36,29 +22,13 @@ export interface StoreMemberInfo {
   createdAt: string;
 }
 
-async function fetchWithAuth<T>(endpoint: string, options?: RequestInit): Promise<T | null> {
+async function fetchWithAuth<T>(endpoint: string, options?: { method?: string }): Promise<T | null> {
   try {
-    const token = await getAuthToken();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: { ...headers, ...(options?.headers || {}) },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      console.error(`[OperatorAPI] ${endpoint} failed:`, response.status);
-      return null;
-    }
-
-    const json = await response.json();
-    return json.data || null;
+    const method = (options?.method || 'GET').toLowerCase();
+    const response = method === 'patch'
+      ? await api.patch(endpoint)
+      : await api.get(endpoint);
+    return response.data?.data || response.data || null;
   } catch (error) {
     console.error(`[OperatorAPI] ${endpoint} error:`, error);
     return null;

@@ -1,7 +1,9 @@
 /**
  * Partner APIs - Recruiting, Dashboard, Recruitment, Commission
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from '../apiClient';
 
 // ==================== Recruiting Products ====================
 
@@ -24,14 +26,8 @@ export interface RecruitingProduct {
 export const recruitingApi = {
   async getRecruitingProducts(): Promise<RecruitingProduct[]> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/recruiting-products`, {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        console.warn('[Neture API] Recruiting products API not available');
-        return [];
-      }
-      const result = await response.json();
+      const response = await api.get('/neture/partner/recruiting-products');
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Neture API] Failed to fetch recruiting products:', error);
@@ -86,112 +82,65 @@ export interface LinkedContent {
 
 export const partnerDashboardApi = {
   async addItem(productId: string, serviceId?: string): Promise<{ success: boolean; already_exists?: boolean; data?: PartnerDashboardItem }> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ productId, serviceId }),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to add dashboard item: ${response.status}`);
-    }
-    return response.json();
+    const response = await api.post('/neture/partner/dashboard/items', { productId, serviceId });
+    return response.data;
   },
 
   async getItems(): Promise<PartnerDashboardItem[]> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
+    try {
+      const response = await api.get('/neture/partner/dashboard/items');
+      const result = response.data;
+      return result.data || [];
+    } catch {
       console.warn('[Neture API] Dashboard items API not available');
       return [];
     }
-    const result = await response.json();
-    return result.data || [];
   },
 
   async toggleStatus(itemId: string, status: 'active' | 'inactive'): Promise<{ id: string; status: string; updatedAt: string }> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ status }),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to toggle status: ${response.status}`);
-    }
-    const result = await response.json();
+    const response = await api.patch(`/neture/partner/dashboard/items/${itemId}`, { status });
+    const result = response.data;
     return result.data;
   },
 
   async browseContents(source?: string): Promise<BrowsableContent[]> {
-    const params = source && source !== 'all' ? `?source=${source}` : '';
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/contents${params}`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
+    try {
+      const params = source && source !== 'all' ? `?source=${source}` : '';
+      const response = await api.get(`/neture/partner/contents${params}`);
+      const result = response.data;
+      return result.data || [];
+    } catch {
       console.warn('[Neture API] Browse contents API not available');
       return [];
     }
-    const result = await response.json();
-    return result.data || [];
   },
 
   async linkContent(itemId: string, contentId: string, contentSource: string): Promise<{ success: boolean; already_linked?: boolean }> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ contentId, contentSource }),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to link content: ${response.status}`);
-    }
-    return response.json();
+    const response = await api.post(`/neture/partner/dashboard/items/${itemId}/contents`, { contentId, contentSource });
+    return response.data;
   },
 
   async unlinkContent(itemId: string, linkId: string): Promise<void> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/${linkId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to unlink content: ${response.status}`);
-    }
+    await api.delete(`/neture/partner/dashboard/items/${itemId}/contents/${linkId}`);
   },
 
   async getLinkedContents(itemId: string): Promise<LinkedContent[]> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
+    try {
+      const response = await api.get(`/neture/partner/dashboard/items/${itemId}/contents`);
+      const result = response.data;
+      return result.data || [];
+    } catch {
       console.warn('[Neture API] Linked contents API not available');
       return [];
     }
-    const result = await response.json();
-    return result.data || [];
   },
 
   async reorderContents(itemId: string, orderedIds: string[]): Promise<void> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/reorder`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ orderedIds }),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to reorder contents');
-    }
+    await api.patch(`/neture/partner/dashboard/items/${itemId}/contents/reorder`, { orderedIds });
   },
 
   async setPrimaryContent(itemId: string, linkId: string): Promise<void> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/partner/dashboard/items/${itemId}/contents/${linkId}/primary`, {
-      method: 'PATCH',
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to set primary content');
-    }
+    await api.patch(`/neture/partner/dashboard/items/${itemId}/contents/${linkId}/primary`, {});
   },
 };
 
@@ -216,31 +165,25 @@ export interface PartnerRecruitment {
 export const partnerRecruitmentApi = {
   async getRecruitments(status?: string): Promise<PartnerRecruitment[]> {
     const url = status
-      ? `${API_BASE_URL}/api/v1/neture/partner/recruitments?status=${status}`
-      : `${API_BASE_URL}/api/v1/neture/partner/recruitments`;
-    const response = await fetchWithTimeout(url, { credentials: 'include' });
-    if (!response.ok) {
-      throw new Error(`[Recruitment API] ${response.status}`);
-    }
-    const result = await response.json();
+      ? `/neture/partner/recruitments?status=${status}`
+      : '/neture/partner/recruitments';
+    const response = await api.get(url);
+    const result = response.data;
     return result.data || [];
   },
 
   async apply(recruitmentId: string): Promise<{ success: boolean; error?: string }> {
-    const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/applications`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ recruitmentId }),
-    });
-    const result = await response.json();
-    if (response.status === 409) {
-      return { success: false, error: 'DUPLICATE_APPLICATION' };
+    try {
+      await api.post('/neture/partner/applications', { recruitmentId });
+      return { success: true };
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const result = error?.response?.data;
+      if (status === 409) {
+        return { success: false, error: 'DUPLICATE_APPLICATION' };
+      }
+      return { success: false, error: result?.error || 'UNKNOWN_ERROR' };
     }
-    if (!response.ok) {
-      return { success: false, error: result.error || 'UNKNOWN_ERROR' };
-    }
-    return { success: true };
   },
 };
 
@@ -302,12 +245,8 @@ export const partnerCommissionApi = {
   /** GET /api/v1/neture/partner/commissions/kpi */
   async getKpi(): Promise<PartnerCommissionKpi> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/commissions/kpi`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return PARTNER_COMMISSION_KPI_DEFAULT;
-      const result = await response.json();
+      const response = await api.get('/neture/partner/commissions/kpi');
+      const result = response.data;
       return result.data || PARTNER_COMMISSION_KPI_DEFAULT;
     } catch {
       return PARTNER_COMMISSION_KPI_DEFAULT;
@@ -325,12 +264,8 @@ export const partnerCommissionApi = {
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/commissions${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      const result = await response.json();
+      const response = await api.get(`/neture/partner/commissions${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch {
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
@@ -340,12 +275,8 @@ export const partnerCommissionApi = {
   /** GET /api/v1/neture/partner/commissions/:id */
   async getDetail(id: string): Promise<CommissionDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/commissions/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/partner/commissions/${id}`);
+      const result = response.data;
       return result.data || null;
     } catch { return null; }
   },
@@ -383,12 +314,8 @@ export interface ReferralLink {
 export const partnerAffiliateApi = {
   async getProductPool(): Promise<PoolProduct[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/product-pool`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/partner/product-pool');
+      const result = response.data;
       return result.data || [];
     } catch {
       return [];
@@ -397,17 +324,8 @@ export const partnerAffiliateApi = {
 
   async createReferralLink(productId: string): Promise<{ referral_url: string; referral_token: string } | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/referral-links`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ product_id: productId }),
-        },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.post('/neture/partner/referral-links', { product_id: productId });
+      const result = response.data;
       return result.data || null;
     } catch {
       return null;
@@ -416,12 +334,8 @@ export const partnerAffiliateApi = {
 
   async getReferralLinks(): Promise<ReferralLink[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/referral-links`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get('/neture/partner/referral-links');
+      const result = response.data;
       return result.data || [];
     } catch {
       return [];
@@ -465,12 +379,8 @@ export const partnerSettlementApi = {
       if (params?.page) sp.append('page', String(params.page));
       if (params?.limit) sp.append('limit', String(params.limit));
       const qs = sp.toString() ? `?${sp}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/settlements${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      const result = await response.json();
+      const response = await api.get(`/neture/partner/settlements${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch {
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
@@ -480,12 +390,8 @@ export const partnerSettlementApi = {
   /** GET /api/v1/neture/partner/settlements/:id */
   async getDetail(id: string): Promise<PartnerSettlementDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/partner/settlements/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/partner/settlements/${id}`);
+      const result = response.data;
       return result.data || null;
     } catch { return null; }
   },

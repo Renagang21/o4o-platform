@@ -18,9 +18,8 @@ import {
   Film,
   GripVertical,
 } from 'lucide-react';
-import { getAccessToken } from '../../../contexts/AuthContext';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'neture';
 
 type PlaylistStatus = 'draft' | 'pending' | 'active' | 'archived';
@@ -110,31 +109,12 @@ export default function HqPlaylistDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error || body?.message || `API error ${res.status}`);
-    }
-    return res.json();
-  }, []);
-
   const loadPlaylist = useCallback(async () => {
     if (!playlistId) return;
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiFetch(`/api/signage/${SERVICE_KEY}/playlists/${playlistId}`);
+      const { data } = await api.get(`${API_BASE_URL}/api/signage/${SERVICE_KEY}/playlists/${playlistId}`);
       const playlistData = data.data || null;
       setPlaylist(playlistData);
       setItems(playlistData?.items || []);
@@ -144,7 +124,7 @@ export default function HqPlaylistDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [playlistId, apiFetch]);
+  }, [playlistId]);
 
   useEffect(() => {
     loadPlaylist();
@@ -154,10 +134,7 @@ export default function HqPlaylistDetailPage() {
     if (!playlistId) return;
     setIsUpdating(true);
     try {
-      const data = await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists/${playlistId}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const { data } = await api.patch(`${API_BASE_URL}/api/signage/${SERVICE_KEY}/hq/playlists/${playlistId}/status`, { status: newStatus });
       if (data.data) {
         setPlaylist(data.data);
       } else {

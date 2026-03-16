@@ -1,22 +1,17 @@
 /**
  * AuthContext - K-Cosmetics 인증 및 역할 관리
- * httpOnly Cookie 기반 인증
  *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
  */
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
+import { api } from '../lib/apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-
-// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Token storage for Bearer auth
-const TOKEN_KEY = 'o4o_accessToken';
-const REFRESH_TOKEN_KEY = 'o4o_refreshToken';
-
-export function getAccessToken(): string | null {
-  return typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
-}
+// Re-export for backward compatibility
+export { getAccessToken };
 
 export type UserRole = 'admin' | 'supplier' | 'seller' | 'partner' | 'operator';
 
@@ -75,24 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     try {
-      // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
-      const token = getAccessToken();
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
-        credentials: 'include',
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const { user: apiUser } = parseAuthResponse(data);
-        if (apiUser) {
-          const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
-          const base = normalizeUser(apiUser);
-          const memberships = (apiUser as any).memberships || [];
-          setUser({ ...base, roles, memberships });
-        }
+      const response = await api.get('/auth/me');
+      const data = response.data;
+      const { user: apiUser } = parseAuthResponse(data);
+      if (apiUser) {
+        const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
+        const base = normalizeUser(apiUser);
+        const memberships = (apiUser as any).memberships || [];
+        setUser({ ...base, roles, memberships });
       }
     } catch {
       // 세션 없음 - 정상
@@ -106,29 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, includeLegacyTokens: true }),
-        credentials: 'include',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.code === 'PASSWORD_MISMATCH' && data.passwordSyncAvailable) {
-          return { success: false, error: data.error, passwordSyncAvailable: true, syncToken: data.syncToken };
-        }
-        return { success: false, error: resolveAuthError(data, response.status) };
-      }
-
-      // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Store tokens for Bearer auth
-      if (data.data?.tokens?.accessToken) {
-        localStorage.setItem(TOKEN_KEY, data.data.tokens.accessToken);
-      }
-      if (data.data?.tokens?.refreshToken) {
-        localStorage.setItem(REFRESH_TOKEN_KEY, data.data.tokens.refreshToken);
-      }
+      const response = await api.post('/auth/login', { email, password, includeLegacyTokens: true });
+      const data = response.data;
 
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
@@ -141,7 +105,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       return { success: false, error: data.message || data.error || '로그인 응답이 올바르지 않습니다.' };
-    } catch (error) {
+    } catch (error: any) {
+      // Handle PASSWORD_MISMATCH from error response
+      const errData = error?.response?.data;
+      if (errData?.code === 'PASSWORD_MISMATCH' && errData?.passwordSyncAvailable) {
+        return { success: false, error: errData.error, passwordSyncAvailable: true, syncToken: errData.syncToken };
+      }
+      if (errData) {
+        return { success: false, error: resolveAuthError(errData, error?.response?.status) };
+      }
       return { success: false, error: '로그인에 실패했습니다.' };
     } finally {
       setIsLoading(false);
@@ -150,16 +122,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; error?: string; role?: UserRole }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, syncToken, newPassword }),
-        credentials: 'include',
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return { success: false, error: data.error || '비밀번호 변경에 실패했습니다.' };
-      }
+      const response = await api.post('/auth/password-sync', { email, syncToken, newPassword });
+      const data = response.data;
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
@@ -177,16 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await api.post('/auth/logout', {});
     } catch {
       // 로그아웃 실패해도 로컬 상태 정리
     }
-    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Clear stored tokens
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    clearAllTokens();
     setUser(null);
   };
 

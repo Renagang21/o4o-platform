@@ -1,8 +1,10 @@
 /**
  * Contact API — WO-O4O-NETURE-CONTACT-PAGE-V1
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
 
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from './client.js';
 
 export interface ContactFormData {
   contactType: 'supplier' | 'partner' | 'service' | 'other';
@@ -21,11 +23,7 @@ export interface ContactSubmitResult {
 
 export const contactApi = {
   async submitContactMessage(data: ContactFormData): Promise<ContactSubmitResult> {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    return response.json();
+    const response = await api.post('/neture/contact', data);
+    return response.data;
   },
 };

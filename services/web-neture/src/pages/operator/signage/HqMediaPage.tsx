@@ -15,9 +15,8 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react';
-import { getAccessToken } from '../../../contexts/AuthContext';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'neture';
 
 type MediaStatus = 'draft' | 'pending' | 'active' | 'archived';
@@ -79,30 +78,11 @@ export default function HqMediaPage() {
   const [formSourceType, setFormSourceType] = useState<SourceType>('url');
   const [formSourceUrl, setFormSourceUrl] = useState('');
 
-  const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    // WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token for cross-domain
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error || body?.message || `API error ${res.status}`);
-    }
-    return res.json();
-  }, []);
-
   const loadMedia = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await apiFetch(`/api/signage/${SERVICE_KEY}/media?source=hq`);
+      const { data } = await api.get(`${API_BASE_URL}/api/signage/${SERVICE_KEY}/media?source=hq`);
       setMediaList(data.data || []);
     } catch {
       // 401/403 등 권한 부족 시 빈 목록으로 처리
@@ -110,7 +90,7 @@ export default function HqMediaPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [apiFetch]);
+  }, []);
 
   useEffect(() => {
     loadMedia();
@@ -120,14 +100,11 @@ export default function HqMediaPage() {
     if (!formName.trim()) return;
     setIsSubmitting(true);
     try {
-      const data = await apiFetch(`/api/signage/${SERVICE_KEY}/hq/media`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name: formName.trim(),
-          mediaType: formMediaType,
-          sourceType: formSourceType,
-          sourceUrl: formSourceUrl.trim() || undefined,
-        }),
+      const { data } = await api.post(`${API_BASE_URL}/api/signage/${SERVICE_KEY}/hq/media`, {
+        name: formName.trim(),
+        mediaType: formMediaType,
+        sourceType: formSourceType,
+        sourceUrl: formSourceUrl.trim() || undefined,
       });
       if (data.data?.id) {
         setShowCreateForm(false);

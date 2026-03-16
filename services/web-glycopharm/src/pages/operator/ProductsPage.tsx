@@ -20,9 +20,7 @@ import {
   Truck,
   Copy,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -57,19 +55,9 @@ interface PaginationData {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
-  }
-  return res.json();
+  const url = path.replace(/^\/api\/v1/, '') || '/';
+  const response = await api.get(url);
+  return response.data;
 }
 
 // ─── Component ───────────────────────────────────────────────

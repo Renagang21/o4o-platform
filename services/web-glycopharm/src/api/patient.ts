@@ -1,13 +1,12 @@
 /**
  * Patient API Client
  * WO-GLYCOPHARM-PATIENT-PROFILE-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
  * 환자 본인용 API (프로필 조회/수정)
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 interface ApiResponse<T> {
   success?: boolean;
@@ -23,37 +22,21 @@ async function request<T>(
   path: string,
   body?: unknown,
 ): Promise<ApiResponse<T>> {
-  const accessToken = getAccessToken();
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-  };
-
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : undefined,
-      credentials: 'include',
-    });
+    const response = method === 'GET'
+      ? await api.get(path)
+      : method === 'POST'
+        ? await api.post(path, body)
+        : method === 'PUT'
+          ? await api.put(path, body)
+          : await api.delete(path);
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: data.error || { code: 'API_ERROR', message: data.message || 'Request failed' },
-      };
-    }
-
-    return data;
-  } catch (error) {
+    return response.data;
+  } catch (error: any) {
+    const data = error.response?.data;
     return {
       success: false,
-      error: {
-        code: 'NETWORK_ERROR',
-        message: error instanceof Error ? error.message : 'Network request failed',
-      },
+      error: data?.error || { code: 'API_ERROR', message: data?.message || 'Request failed' },
     };
   }
 }
@@ -157,16 +140,16 @@ export interface AppointmentDto {
 
 export const patientApi = {
   getMyProfile: () =>
-    request<PatientProfile>('GET', '/api/v1/care/patient-profile/me'),
+    request<PatientProfile>('GET', '/care/patient-profile/me'),
 
   createProfile: (data: HealthProfilePayload) =>
-    request<PatientProfile>('POST', '/api/v1/care/patient-profile', data),
+    request<PatientProfile>('POST', '/care/patient-profile', data),
 
   updateProfile: (data: HealthProfilePayload) =>
-    request<PatientProfile>('PUT', '/api/v1/care/patient-profile', data),
+    request<PatientProfile>('PUT', '/care/patient-profile', data),
 
   postGlucoseReading: (data: GlucoseReadingPayload) =>
-    request<GlucoseReading>('POST', '/api/v1/care/patient/health-readings', data),
+    request<GlucoseReading>('POST', '/care/patient/health-readings', data),
 
   getGlucoseReadings: (params?: { from?: string; to?: string; metricType?: string }) => {
     const query = new URLSearchParams();
@@ -176,30 +159,30 @@ export const patientApi = {
     const qs = query.toString();
     return request<GlucoseReading[]>(
       'GET',
-      `/api/v1/care/patient/health-readings${qs ? `?${qs}` : ''}`,
+      `/care/patient/health-readings${qs ? `?${qs}` : ''}`,
     );
   },
 
   getMyCoaching: () =>
-    request<PatientCoachingRecord[]>('GET', '/api/v1/care/patient/coaching'),
+    request<PatientCoachingRecord[]>('GET', '/care/patient/coaching'),
 
   // Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1)
   getPharmacies: () =>
-    request<PharmacyListItem[]>('GET', '/api/v1/care/pharmacy-link/pharmacies'),
+    request<PharmacyListItem[]>('GET', '/care/pharmacy-link/pharmacies'),
 
   getMyLinkStatus: () =>
-    request<MyLinkStatus>('GET', '/api/v1/care/pharmacy-link/my-status'),
+    request<MyLinkStatus>('GET', '/care/pharmacy-link/my-status'),
 
   requestPharmacyLink: (pharmacyId: string, message?: string) =>
-    request<{ id: string }>('POST', '/api/v1/care/pharmacy-link/request', { pharmacyId, message }),
+    request<{ id: string }>('POST', '/care/pharmacy-link/request', { pharmacyId, message }),
 
   // Appointments (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
   getMyAppointments: () =>
-    request<AppointmentDto[]>('GET', '/api/v1/care/appointments/my'),
+    request<AppointmentDto[]>('GET', '/care/appointments/my'),
 
   createAppointment: (scheduledAt: string, notes?: string) =>
-    request<{ id: string }>('POST', '/api/v1/care/appointments', { scheduledAt, notes }),
+    request<{ id: string }>('POST', '/care/appointments', { scheduledAt, notes }),
 
   cancelAppointment: (id: string) =>
-    request<void>('DELETE', `/api/v1/care/appointments/${id}`),
+    request<void>('DELETE', `/care/appointments/${id}`),
 };

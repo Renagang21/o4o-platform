@@ -15,9 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -52,24 +50,6 @@ interface PaginationData {
   totalPages: number;
 }
 
-// ─── API Helper ──────────────────────────────────────────────
-
-async function apiFetch<T>(path: string): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
-  }
-  return res.json();
-}
-
 // ─── Component ───────────────────────────────────────────────
 
 export default function StoreManagementPage() {
@@ -94,12 +74,12 @@ export default function StoreManagementPage() {
       });
       if (searchTerm) params.set('search', searchTerm);
 
-      const data = await apiFetch<{
+      const { data } = await api.get<{
         success: boolean;
         stores: StoreData[];
         stats: StatsData;
         pagination: PaginationData;
-      }>(`/api/v1/operator/stores?${params}`);
+      }>(`/operator/stores?${params}`);
 
       if (data.success) {
         setStores(data.stores);

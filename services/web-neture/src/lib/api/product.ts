@@ -1,7 +1,9 @@
 /**
  * Public Product API - Categories, Brands, Images, Library Search
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from './client.js';
 import type { AdminMaster } from './admin.js';
 
 // WO-O4O-GLOBAL-PRODUCT-LIBRARY-SEARCH-V1
@@ -52,13 +54,8 @@ export interface ProductImage {
 export const productApi = {
   async getCategories(): Promise<CategoryTreeItem[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/categories`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get('/neture/categories');
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Product API] Failed to fetch categories:', error);
       return [];
@@ -67,13 +64,8 @@ export const productApi = {
 
   async getBrands(): Promise<BrandItem[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/brands`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get('/neture/brands');
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Product API] Failed to fetch brands:', error);
       return [];
@@ -82,13 +74,8 @@ export const productApi = {
 
   async getMasterByBarcode(barcode: string): Promise<AdminMaster | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/masters/barcode/${encodeURIComponent(barcode)}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/masters/barcode/${encodeURIComponent(barcode)}`);
+      return response.data.data || null;
     } catch (error) {
       console.warn('[Product API] Failed to fetch master by barcode:', error);
       return null;
@@ -97,13 +84,8 @@ export const productApi = {
 
   async getProductImages(masterId: string): Promise<ProductImage[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/products/${masterId}/images`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/products/${masterId}/images`);
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Product API] Failed to fetch product images:', error);
       return [];
@@ -114,12 +96,10 @@ export const productApi = {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/products/${masterId}/images`,
-        { method: 'POST', credentials: 'include', body: formData },
-        30000,
-      );
-      return response.json();
+      const response = await api.post(`/neture/products/${masterId}/images`, formData, {
+        timeout: 30000,
+      });
+      return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };
     }
@@ -127,16 +107,8 @@ export const productApi = {
 
   async setPrimaryImage(imageId: string, masterId: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/products/images/${imageId}/primary`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ masterId }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/products/images/${imageId}/primary`, { masterId });
+      return true;
     } catch {
       return false;
     }
@@ -144,16 +116,10 @@ export const productApi = {
 
   async deleteProductImage(imageId: string, masterId: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/products/images/${imageId}`,
-        {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ masterId }),
-        },
-      );
-      return response.ok;
+      await api.delete(`/neture/products/images/${imageId}`, {
+        data: { masterId },
+      });
+      return true;
     } catch {
       return false;
     }
@@ -176,14 +142,8 @@ export const productApi = {
       if (params.limit) sp.set('limit', String(params.limit));
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/products/library/search${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) {
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/products/library/search${qs}`);
+      const result = response.data;
       return {
         data: result.data || [],
         meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 },

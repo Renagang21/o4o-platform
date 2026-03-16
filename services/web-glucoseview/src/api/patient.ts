@@ -1,13 +1,13 @@
 /**
  * Patient API Client — GlucoseView
  * WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1
  *
  * glycopharm patient.ts 에서 이식.
- * 인증: httpOnly Cookie (credentials: 'include')
- * Bearer token 사용하지 않음.
+ * authClient.api (Axios) 기반 — 401 자동 갱신 지원
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api as axiosApi } from '../lib/apiClient';
 
 interface ApiResponse<T> {
   success?: boolean;
@@ -23,25 +23,37 @@ async function request<T>(
   path: string,
   body?: unknown,
 ): Promise<ApiResponse<T>> {
+  // Strip /api/v1 prefix — authClient baseURL already includes it
+  const stripped = path.replace(/^\/api\/v1/, '');
+
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-      credentials: 'include',
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
+    let response;
+    switch (method.toUpperCase()) {
+      case 'GET':
+        response = await axiosApi.get(stripped);
+        break;
+      case 'POST':
+        response = await axiosApi.post(stripped, body);
+        break;
+      case 'PUT':
+        response = await axiosApi.put(stripped, body);
+        break;
+      case 'DELETE':
+        response = await axiosApi.delete(stripped);
+        break;
+      default:
+        response = await axiosApi.request({ method, url: stripped, data: body });
+    }
+    return response.data;
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response: { data: { error?: { code: string; message: string }; message?: string } } };
+      const errData = axiosError.response?.data;
       return {
         success: false,
-        error: data.error || { code: 'API_ERROR', message: data.message || 'Request failed' },
+        error: errData?.error || { code: 'API_ERROR', message: errData?.message || 'Request failed' },
       };
     }
-
-    return data;
-  } catch (error) {
     return {
       success: false,
       error: {

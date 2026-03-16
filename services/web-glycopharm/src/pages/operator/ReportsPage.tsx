@@ -16,9 +16,7 @@ import {
   ArrowDown,
   ChevronDown,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 type PeriodDays = 7 | 30;
 type SourceFilter = 'all' | 'qr' | 'tablet';
@@ -103,12 +101,8 @@ export default function ReportsPage() {
   useEffect(() => {
     (async () => {
       try {
-        const accessToken = getAccessToken();
-        const res = await fetch(`${API_BASE_URL}/api/v1/glycopharm/reports/pharmacies`, {
-          headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-          credentials: 'include',
-        });
-        const json = await res.json();
+        const res = await api.get<{ success: boolean; data: PharmacyOption[] }>('/glycopharm/reports/pharmacies');
+        const json = res.data;
         if (json.success) setPharmacies(json.data || []);
       } catch {
         // Silent - pharmacy list is optional
@@ -120,7 +114,6 @@ export default function ReportsPage() {
     setLoading(true);
     setError(null);
     try {
-      const accessToken = getAccessToken();
       const now = new Date();
       const from = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
       const params = new URLSearchParams();
@@ -129,19 +122,14 @@ export default function ReportsPage() {
       if (sourceFilter !== 'all') params.set('sourceType', sourceFilter);
       if (pharmacyId) params.set('pharmacyId', pharmacyId);
 
-      const res = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/reports/consultation?${params.toString()}`,
-        {
-          headers: { ...(accessToken && { Authorization: `Bearer ${accessToken}` }) },
-          credentials: 'include',
-        },
+      const res = await api.get<{ success: boolean; data: ReportData; error?: string }>(
+        `/glycopharm/reports/consultation?${params.toString()}`
       );
-      if (!res.ok) throw new Error('Failed to fetch report');
-      const json = await res.json();
+      const json = res.data;
       if (!json.success) throw new Error(json.error || 'Unknown error');
       setData(json.data);
     } catch (err: any) {
-      setError(err.message || '데이터를 불러올 수 없습니다.');
+      setError(err.response?.data?.error || err.message || '데이터를 불러올 수 없습니다.');
     } finally {
       setLoading(false);
     }

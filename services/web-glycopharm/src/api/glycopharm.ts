@@ -7,9 +7,7 @@
  * - Pharmacies: /api/v1/glycopharm/pharmacies (약국 정보)
  */
 
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 // ============================================================================
 // Types
@@ -345,46 +343,34 @@ export interface ReviewApplicationResponse {
 // ============================================================================
 
 class GlycopharmApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const method = (options.method || 'GET').toUpperCase();
+    const body = options.body ? JSON.parse(options.body as string) : undefined;
 
-    // Cross-domain: Bearer Token 인증 (localStorage에서 토큰 가져옴)
-    const accessToken = getAccessToken();
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
-      ...options.headers,
-    };
-
-    // credentials: 'include'는 같은 도메인에서만 쿠키를 전송 (폴백)
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const error: ApiError = {
-        status: response.status,
+    try {
+      const response = method === 'GET'
+        ? await api.get(endpoint)
+        : method === 'POST'
+          ? await api.post(endpoint, body)
+          : method === 'PATCH'
+            ? await api.patch(endpoint, body)
+            : method === 'PUT'
+              ? await api.put(endpoint, body)
+              : await api.delete(endpoint);
+      return response.data;
+    } catch (error: any) {
+      const errorData = error.response?.data || {};
+      const apiError: ApiError = {
+        status: error.response?.status || 0,
         error: errorData.error || 'Request failed',
         code: errorData.code || 'UNKNOWN_ERROR',
         message: errorData.message,
       };
-      throw error;
+      throw apiError;
     }
-
-    return response.json();
   }
 
   // ============================================================================
@@ -395,7 +381,7 @@ class GlycopharmApiClient {
    * 약국 참여 / 서비스 신청
    */
   async submitApplication(data: SubmitApplicationRequest): Promise<SubmitApplicationResponse> {
-    return this.request('/api/v1/glycopharm/applications', {
+    return this.request('/glycopharm/applications', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -406,8 +392,8 @@ class GlycopharmApiClient {
    */
   async getMyApplications(status?: ApplicationStatus): Promise<MyApplicationsResponse> {
     const endpoint = status
-      ? `/api/v1/glycopharm/applications/mine?status=${status}`
-      : '/api/v1/glycopharm/applications/mine';
+      ? `/glycopharm/applications/mine?status=${status}`
+      : '/glycopharm/applications/mine';
 
     return this.request(endpoint);
   }
@@ -416,7 +402,7 @@ class GlycopharmApiClient {
    * 신청 상세 조회
    */
   async getApplication(id: string): Promise<{ success: boolean; application: GlycopharmApplication }> {
-    return this.request(`/api/v1/glycopharm/applications/${id}`);
+    return this.request(`/glycopharm/applications/${id}`);
   }
 
   // ============================================================================
@@ -427,7 +413,7 @@ class GlycopharmApiClient {
    * 내 약국 정보 조회 (참여 후)
    */
   async getMyPharmacy(): Promise<MyPharmacyResponse> {
-    return this.request('/api/v1/glycopharm/pharmacies/me');
+    return this.request('/glycopharm/pharmacies/me');
   }
 
   // ============================================================================
@@ -452,7 +438,7 @@ class GlycopharmApiClient {
     if (params?.limit) searchParams.set('limit', params.limit.toString());
 
     const queryString = searchParams.toString();
-    const endpoint = `/api/v1/glycopharm/applications/admin/all${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/glycopharm/applications/admin/all${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }
@@ -461,14 +447,14 @@ class GlycopharmApiClient {
    * 신청 상세 조회 (운영자 전용)
    */
   async getAdminApplicationDetail(id: string): Promise<AdminApplicationDetailResponse> {
-    return this.request(`/api/v1/glycopharm/applications/${id}/admin`);
+    return this.request(`/glycopharm/applications/${id}/admin`);
   }
 
   /**
    * 신청 승인/반려 (운영자 전용)
    */
   async reviewApplication(id: string, data: ReviewApplicationRequest): Promise<ReviewApplicationResponse> {
-    return this.request(`/api/v1/glycopharm/applications/${id}/review`, {
+    return this.request(`/glycopharm/applications/${id}/review`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
@@ -483,7 +469,7 @@ class GlycopharmApiClient {
    * NOTE: Operator frontend uses fetchOperatorDashboard() from api/operatorDashboard.ts
    */
   async getOperatorDashboard(): Promise<OperatorDashboardResponse> {
-    return this.request('/api/v1/glycopharm/operator/dashboard');
+    return this.request('/glycopharm/operator/dashboard');
   }
 
   /**
@@ -504,7 +490,7 @@ class GlycopharmApiClient {
     if (params?.search) searchParams.set('search', params.search);
 
     const queryString = searchParams.toString();
-    const endpoint = `/api/v1/glycopharm/operator/recent-orders${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/glycopharm/operator/recent-orders${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }
@@ -527,7 +513,7 @@ class GlycopharmApiClient {
     if (params?.search) searchParams.set('search', params.search);
 
     const queryString = searchParams.toString();
-    const endpoint = `/api/v1/glycopharm/operator/products${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/glycopharm/operator/products${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }
@@ -552,7 +538,7 @@ class GlycopharmApiClient {
     if (params?.search) searchParams.set('search', params.search);
 
     const queryString = searchParams.toString();
-    const endpoint = `/api/v1/glycopharm/operator/pharmacies${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/glycopharm/operator/pharmacies${queryString ? `?${queryString}` : ''}`;
 
     return this.request(endpoint);
   }
@@ -566,7 +552,7 @@ class GlycopharmApiClient {
    * 파트너 모집 설정/해제
    */
   async togglePartnerRecruiting(productId: string, value: boolean): Promise<any> {
-    return this.request(`/api/v1/glycopharm/operator/products/${productId}/partner-recruiting`, {
+    return this.request(`/glycopharm/operator/products/${productId}/partner-recruiting`, {
       method: 'PATCH',
       body: JSON.stringify({ is_partner_recruiting: value }),
     });
@@ -588,7 +574,7 @@ class GlycopharmApiClient {
     searchParams.set('service', params.service);
     searchParams.set('context', params.context);
 
-    const endpoint = `/api/v1/glycopharm/operator/featured-products?${searchParams.toString()}`;
+    const endpoint = `/glycopharm/operator/featured-products?${searchParams.toString()}`;
     return this.request(endpoint);
   }
 
@@ -600,7 +586,7 @@ class GlycopharmApiClient {
     context: string;
     productId: string;
   }): Promise<any> {
-    const endpoint = `/api/v1/glycopharm/operator/featured-products`;
+    const endpoint = `/glycopharm/operator/featured-products`;
     return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -611,7 +597,7 @@ class GlycopharmApiClient {
    * Featured 상품 순서 변경
    */
   async reorderFeaturedProducts(ids: string[]): Promise<any> {
-    const endpoint = `/api/v1/glycopharm/operator/featured-products/order`;
+    const endpoint = `/glycopharm/operator/featured-products/order`;
     return this.request(endpoint, {
       method: 'PATCH',
       body: JSON.stringify({ ids }),
@@ -622,7 +608,7 @@ class GlycopharmApiClient {
    * Featured 상품 활성/비활성
    */
   async updateFeaturedProductActive(id: string, isActive: boolean): Promise<any> {
-    const endpoint = `/api/v1/glycopharm/operator/featured-products/${id}`;
+    const endpoint = `/glycopharm/operator/featured-products/${id}`;
     return this.request(endpoint, {
       method: 'PATCH',
       body: JSON.stringify({ isActive }),
@@ -633,7 +619,7 @@ class GlycopharmApiClient {
    * Featured 상품 제거
    */
   async removeFeaturedProduct(id: string): Promise<any> {
-    const endpoint = `/api/v1/glycopharm/operator/featured-products/${id}`;
+    const endpoint = `/glycopharm/operator/featured-products/${id}`;
     return this.request(endpoint, {
       method: 'DELETE',
     });
@@ -649,13 +635,13 @@ class GlycopharmApiClient {
   async checkSlugAvailability(value: string): Promise<SlugCheckResponse> {
     const searchParams = new URLSearchParams();
     searchParams.set('value', value);
-    const endpoint = `/api/v1/platform/slug/check?${searchParams.toString()}`;
+    const endpoint = `/platform/slug/check?${searchParams.toString()}`;
     return this.request(endpoint);
   }
 }
 
 // Export singleton instance
-export const glycopharmApi = new GlycopharmApiClient(API_BASE_URL);
+export const glycopharmApi = new GlycopharmApiClient();
 
 // Also export the class for testing
 export { GlycopharmApiClient };

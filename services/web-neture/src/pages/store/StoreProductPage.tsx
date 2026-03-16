@@ -41,7 +41,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
-import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
+import { api } from '../../lib/api/index.js';
 import { addToCart } from '../../lib/cart.js';
 import { captureReferralToken } from '../../lib/referral.js';
 
@@ -95,24 +95,21 @@ export default function StoreProductPage() {
   }, []);
 
   useEffect(() => {
-    let url: string | null = null;
+    let path: string | null = null;
     const orgId = searchParams.get('org');
     const orgParam = orgId ? `?org=${encodeURIComponent(orgId)}` : '';
 
     if (storeSlug && productSlug) {
-      url = `${API_BASE_URL}/api/v1/neture/store/${storeSlug}/product/${productSlug}${orgParam}`;
+      path = `/neture/store/${storeSlug}/product/${productSlug}${orgParam}`;
     } else if (offerId) {
-      url = `${API_BASE_URL}/api/v1/neture/store/product/${offerId}${orgParam}`;
+      path = `/neture/store/product/${offerId}${orgParam}`;
     }
-    if (!url) { setLoading(false); return; }
+    if (!path) { setLoading(false); return; }
 
     (async () => {
       try {
-        const res = await fetchWithTimeout(url!);
-        if (res.ok) {
-          const result = await res.json();
-          setProduct(result.data || null);
-        }
+        const res = await api.get(path!);
+        setProduct(res.data.data || null);
       } catch {
         // ignore
       } finally {
@@ -165,10 +162,10 @@ export default function StoreProductPage() {
     try {
       const orgId = searchParams.get('org');
       const orgParam = orgId ? `&org=${encodeURIComponent(orgId)}` : '';
-      const url = `${API_BASE_URL}/api/v1/neture/store/product/${product.offer_id}/flyer?template=${template}${orgParam}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed');
-      const blob = await res.blob();
+      const res = await api.get(`/neture/store/product/${product.offer_id}/flyer?template=${template}${orgParam}`, {
+        responseType: 'blob',
+      });
+      const blob = res.data as Blob;
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = `flyer-${product.product_name}-${template}.pdf`;

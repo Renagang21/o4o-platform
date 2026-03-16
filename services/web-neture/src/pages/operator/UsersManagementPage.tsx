@@ -22,9 +22,7 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -57,26 +55,6 @@ interface PaginationData {
 }
 
 type Tab = 'all' | 'pending';
-
-// ─── API Helper ──────────────────────────────────────────────
-
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options?.headers,
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
-  }
-  return res.json();
-}
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -132,10 +110,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
     setLoading(true);
     setError('');
     try {
-      await apiFetch(`/api/v1/operator/members/${user.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ password }),
-      });
+      await api.put(`/operator/members/${user.id}`, { password });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -208,7 +183,7 @@ export default function UsersManagementPage() {
       }
       if (search) params.set('search', search);
 
-      const data = await apiFetch<any>(`/api/v1/operator/members?${params}`);
+      const { data } = await api.get(`/operator/members?${params}`);
       setUsers(data.users || []);
       setPagination(data.pagination || { page, limit: 20, total: 0, totalPages: 0 });
     } catch (err: any) {
@@ -220,7 +195,7 @@ export default function UsersManagementPage() {
 
   const fetchStats = useCallback(async () => {
     try {
-      const data = await apiFetch<any>('/api/v1/operator/members/stats');
+      const { data } = await api.get('/operator/members/stats');
       const byStatus = data.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b: any) => b.status?.toLowerCase() === s)?.count || 0;
       setStats({
@@ -249,15 +224,10 @@ export default function UsersManagementPage() {
     try {
       if (status === 'approved' && (currentStatus === 'pending' || currentStatus === 'rejected')) {
         // 승인: Neture registration endpoint (service_membership + user + role_assignment 동시 처리)
-        await apiFetch(`/api/v1/neture/operator/registrations/${userId}/approve`, {
-          method: 'POST',
-        });
+        await api.post(`/neture/operator/registrations/${userId}/approve`);
       } else if (status === 'rejected') {
         // 거부: Neture registration endpoint
-        await apiFetch(`/api/v1/neture/operator/registrations/${userId}/reject`, {
-          method: 'POST',
-          body: JSON.stringify({ reason: '운영자 거부' }),
-        });
+        await api.post(`/neture/operator/registrations/${userId}/reject`, { reason: '운영자 거부' });
       } else {
         // 정지/활성화: Membership Console
         // 해당 사용자의 neture membership을 찾아서 membershipId로 처리
@@ -265,9 +235,9 @@ export default function UsersManagementPage() {
         const netureMembership = user?.memberships?.find((m) => m.serviceKey === 'neture');
         if (netureMembership) {
           const endpoint = status === 'suspended'
-            ? `/api/v1/operator/members/${netureMembership.id}/reject`
-            : `/api/v1/operator/members/${netureMembership.id}/approve`;
-          await apiFetch(endpoint, { method: 'PATCH' });
+            ? `/operator/members/${netureMembership.id}/reject`
+            : `/operator/members/${netureMembership.id}/approve`;
+          await api.patch(endpoint);
         }
       }
       fetchUsers(pagination.page);
@@ -283,7 +253,7 @@ export default function UsersManagementPage() {
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading(user.id);
     try {
-      await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
+      await api.delete(`/operator/members/${user.id}`);
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {

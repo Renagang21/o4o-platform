@@ -19,8 +19,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { contentAssetApi, dashboardApi } from '../../lib/api';
 import { HubLayout, createSignal, createActionSignal } from '@o4o/hub-core';
 import type { HubSectionDefinition, HubSignal, HubActionResult } from '@o4o/hub-core';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 // Action key constants (mirrors @o4o/ai-core ACTION_KEYS — frontend uses inline to avoid heavy dep)
 const NETURE_KEYS = {
@@ -419,16 +418,8 @@ function SellerInsightCards({ insight }: { insight?: SellerInsightData }) {
 async function executeHubTrigger(
   endpoint: string,
 ): Promise<{ success: boolean; message?: string }> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/neture/hub/trigger/${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.message || `Trigger failed: ${response.status}`);
-  }
-  return response.json();
+  const { data } = await api.post(`/neture/hub/trigger/${endpoint}`);
+  return data;
 }
 
 // ─── Component ───
@@ -449,9 +440,7 @@ export default function HubPage() {
         contentAssetApi.getSupplierSignal(),
         dashboardApi.getSellerSignal(),
         dashboardApi.getSupplierDashboardSummary(),
-        fetch(`${API_BASE_URL}/api/v1/neture/seller/dashboard/ai-insight`, {
-          credentials: 'include',
-        }).then(r => r.ok ? r.json() : null).catch(() => null),
+        api.get('/neture/seller/dashboard/ai-insight').then((r: { data: unknown }) => r.data).catch(() => null),
       ];
 
       if (isAdmin) {

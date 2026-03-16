@@ -8,7 +8,7 @@
  * - 인증 없이 접근 가능한 공개 콘텐츠
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '@/lib/apiClient';
 
 // ============================================================================
 // Types
@@ -147,32 +147,14 @@ const fallbackNotices: Notice[] = [
 // ============================================================================
 
 class PublicApiClient {
-  private baseUrl: string;
-
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
-
   private async request<T>(endpoint: string): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    // Paths under /api/v1 → strip prefix for api (baseURL already includes /api/v1)
+    const url = endpoint.startsWith('/api/v1')
+      ? endpoint.slice('/api/v1'.length)
+      : `${API_BASE_URL}${endpoint}`;
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw {
-        status: response.status,
-        code: errorData.error?.code || 'UNKNOWN_ERROR',
-        message: errorData.error?.message || 'Request failed',
-      };
-    }
-
-    return response.json();
+    const response = await api.get<T>(url);
+    return response.data;
   }
 
   /**
@@ -220,25 +202,17 @@ class PublicApiClient {
   /**
    * WO-HOME-LIVE-PREVIEW-V1: Home Preview 집계 데이터
    * 인증 토큰이 있으면 pharmacy-scoped, 없으면 global aggregate
+   * Note: api instance auto-attaches auth token from authClient
    */
-  async getHomePreview(accessToken?: string | null): Promise<HomePreviewData> {
+  async getHomePreview(_accessToken?: string | null): Promise<HomePreviewData> {
     const fallback: HomePreviewData = {
       care: { totalPatients: 0, highRiskCount: 0, recentCoaching: 0, recentAnalysis: 0, recentChanges: [] },
       store: { monthlyOrders: 0, pendingRequests: 0, activeProducts: 0, monthlyRevenue: 0 },
     };
 
     try {
-      const url = `${this.baseUrl}/api/v1/home/preview`;
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
-
-      const response = await fetch(url, { method: 'GET', headers });
-      if (!response.ok) return fallback;
-
-      const json = await response.json();
-      return json.data || fallback;
+      const response = await api.get<{ data: HomePreviewData }>('/home/preview');
+      return response.data?.data || fallback;
     } catch {
       return fallback;
     }
@@ -246,7 +220,7 @@ class PublicApiClient {
 }
 
 // Export singleton instance
-export const publicApi = new PublicApiClient(API_BASE_URL);
+export const publicApi = new PublicApiClient();
 
 // Export fallback data for direct use
 export { fallbackNowRunning, fallbackNotices };

@@ -5,8 +5,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, ArrowLeft, CheckCircle, AlertCircle, Search, KeyRound } from 'lucide-react';
+import { api } from '../../lib/apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const SERVICE_URL = import.meta.env.VITE_SERVICE_URL || 'https://glycopharm.co.kr';
 
 type Tab = 'find-id' | 'find-password';
@@ -74,16 +74,18 @@ function FindIdTab() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/find-id`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone.replace(/[^0-9]/g, '') }),
-      });
-      const data = await response.json();
+      const response = await api.post('/auth/find-id', { phone: phone.replace(/[^0-9]/g, '') });
+      const data = response.data as any;
       const result = data.data ?? data;
       setResult(result);
-    } catch {
-      setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } catch (err: any) {
+      if (err.response?.data) {
+        const data = err.response.data;
+        const result = data.data ?? data;
+        setResult(result);
+      } else {
+        setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -173,19 +175,14 @@ function FindPasswordTab() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, serviceUrl: SERVICE_URL }),
-      });
-
-      if (response.ok) {
-        setIsSubmitted(true);
-      } else {
+      await api.post('/auth/forgot-password', { email, serviceUrl: SERVICE_URL });
+      setIsSubmitted(true);
+    } catch (err: any) {
+      if (err.response) {
         setError('요청 처리에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      } else {
+        setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
       }
-    } catch {
-      setError('서버와의 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }

@@ -9,8 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../lib/apiClient';
 
 type HandoffStatus = 'loading' | 'success' | 'error';
 
@@ -30,25 +29,21 @@ export default function HandoffPage() {
 
     const exchange = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/handoff/exchange`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ token }),
-        });
+        const response = await api.post('/auth/handoff/exchange', { token });
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
+        if (response.data.success) {
+          const d = response.data.data;
+          if (d?.accessToken) localStorage.setItem('o4o_accessToken', d.accessToken);
+          if (d?.refreshToken) localStorage.setItem('o4o_refreshToken', d.refreshToken);
           setStatus('success');
           window.location.href = '/';
         } else {
           setStatus('error');
-          setError(data.error || '서비스 이동에 실패했습니다.');
+          setError(response.data.error || '서비스 이동에 실패했습니다.');
         }
-      } catch {
+      } catch (err: any) {
         setStatus('error');
-        setError('네트워크 오류가 발생했습니다.');
+        setError(err.response?.data?.error || '네트워크 오류가 발생했습니다.');
       }
     };
 

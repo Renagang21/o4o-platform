@@ -1,7 +1,9 @@
 /**
  * Store API + Order/Shipment/Settlement/Inventory types
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from '../apiClient';
 
 // ==================== Store Order Types ====================
 
@@ -305,20 +307,12 @@ export interface StoreListingsResponse {
 export const storeApi = {
   async createOrder(data: CreateStoreOrderRequest): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/seller/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        return { success: false, error: result.message || result.error || 'ORDER_FAILED' };
-      }
-      return { success: true, data: result.data };
-    } catch (error) {
+      const response = await api.post('/neture/seller/orders', data);
+      return { success: true, data: response.data?.data };
+    } catch (error: any) {
+      const result = error?.response?.data;
       console.error('[Store API] Failed to create order:', error);
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: result?.message || result?.error || 'ORDER_FAILED' };
     }
   },
 
@@ -329,14 +323,8 @@ export const storeApi = {
       if (params?.limit) searchParams.set('limit', String(params.limit));
       if (params?.status) searchParams.set('status', params.status);
       const qs = searchParams.toString();
-      const url = `${API_BASE_URL}/api/v1/neture/seller/orders${qs ? `?${qs}` : ''}`;
-
-      const response = await fetchWithTimeout(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Store API] Failed to fetch orders:', response.status);
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/seller/orders${qs ? `?${qs}` : ''}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Store API] Failed to fetch orders:', error);
@@ -346,11 +334,8 @@ export const storeApi = {
 
   async getShipment(orderId: string): Promise<Shipment | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/seller/orders/${orderId}/shipment`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/seller/orders/${orderId}/shipment`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Store API] Failed to fetch shipment:', error);
@@ -360,11 +345,8 @@ export const storeApi = {
 
   async getOrderById(id: string): Promise<StoreOrder | null> {
     try {
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/neture/seller/orders/${id}`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
+      const response = await api.get(`/neture/seller/orders/${id}`);
+      const result = response.data;
       return result.data || null;
     } catch (error) {
       console.warn('[Store API] Failed to fetch order:', error);
@@ -385,13 +367,8 @@ export const storeApi = {
       if (params?.page) sp.set('page', String(params.page));
       if (params?.limit) sp.set('limit', String(params.limit));
       const qs = sp.toString();
-      const url = `${API_BASE_URL}/api/v1/store/products/search${qs ? `?${qs}` : ''}`;
-      const response = await fetchWithTimeout(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Store API] searchProducts failed:', response.status);
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/store/products/search${qs ? `?${qs}` : ''}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Store API] searchProducts error:', error);
@@ -401,12 +378,8 @@ export const storeApi = {
 
   async getMasterOffers(masterId: string): Promise<StoreOfferItem[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/store/products/master/${masterId}/offers`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
+      const response = await api.get(`/store/products/master/${masterId}/offers`);
+      const result = response.data;
       return result.data || [];
     } catch (error) {
       console.warn('[Store API] getMasterOffers error:', error);
@@ -416,20 +389,13 @@ export const storeApi = {
 
   async createListing(data: { offerId: string; price?: number | null }): Promise<{ success: boolean; data?: any; message?: string; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/store/products/list`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        return { success: false, error: result.error?.message || 'LISTING_FAILED' };
-      }
+      const response = await api.post('/store/products/list', data);
+      const result = response.data;
       return { success: true, data: result.data, message: result.message };
-    } catch (error) {
+    } catch (error: any) {
+      const result = error?.response?.data;
       console.error('[Store API] createListing error:', error);
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: result?.error?.message || 'LISTING_FAILED' };
     }
   },
 
@@ -439,13 +405,8 @@ export const storeApi = {
       if (params?.page) sp.set('page', String(params.page));
       if (params?.limit) sp.set('limit', String(params.limit));
       const qs = sp.toString();
-      const url = `${API_BASE_URL}/api/v1/store/products${qs ? `?${qs}` : ''}`;
-      const response = await fetchWithTimeout(url, { credentials: 'include' });
-      if (!response.ok) {
-        console.warn('[Store API] getMyListings failed:', response.status);
-        return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      }
-      const result = await response.json();
+      const response = await api.get(`/store/products${qs ? `?${qs}` : ''}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Store API] getMyListings error:', error);
@@ -455,20 +416,12 @@ export const storeApi = {
 
   async updateListing(id: string, data: { isActive?: boolean; price?: number | null }): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/store/products/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (!response.ok) {
-        return { success: false, error: result.error?.message || 'UPDATE_FAILED' };
-      }
-      return { success: true, data: result.data };
-    } catch (error) {
+      const response = await api.patch(`/store/products/${id}`, data);
+      return { success: true, data: response.data?.data };
+    } catch (error: any) {
+      const result = error?.response?.data;
       console.error('[Store API] updateListing error:', error);
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: result?.error?.message || 'UPDATE_FAILED' };
     }
   },
 };

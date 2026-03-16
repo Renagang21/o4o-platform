@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, CheckCircle, ArrowLeft } from 'lucide-react';
 import { useLoginModal } from '../contexts';
+import { api } from '../lib/apiClient';
 
 type SignupRole = 'supplier' | 'partner' | 'seller' | 'user';
 
@@ -158,13 +159,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const handleEmailBlur = async () => {
     if (!formData.email || !formData.email.includes('@')) return;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, service: 'neture' }),
-      });
-      const result = await res.json();
+      const { data: result } = await api.post('/auth/check-email', { email: formData.email, service: 'neture' });
       if (result.success && result.data.exists) {
         if (result.data.alreadyJoined) {
           setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
@@ -192,38 +187,31 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     setLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          phone: formData.phone.replace(/\D/g, ''),
-          role: selectedRole,
-          service: 'neture',
-        }),
+      await api.post('/auth/register', {
+        ...formData,
+        phone: formData.phone.replace(/\D/g, ''),
+        role: selectedRole,
+        service: 'neture',
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
-          setExistingAccountMode(true);
-          if (data.services) setExistingServices(data.services);
-          throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
-        }
-        if (response.status === 409) {
-          if (data.code === 'SERVICE_ALREADY_JOINED') {
-            throw new Error('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
-          }
-          throw new Error('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
-        }
-        throw new Error(data.error || '회원가입에 실패했습니다.');
-      }
-
       setStep(3);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: { code?: string; error?: string; services?: Array<{key: string, status: string}> } } };
+      const status = axiosErr.response?.status;
+      const data = axiosErr.response?.data;
+      if (status === 401 && data?.code === 'PASSWORD_MISMATCH') {
+        setExistingAccountMode(true);
+        if (data.services) setExistingServices(data.services);
+        setError('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');
+      } else if (status === 409) {
+        if (data?.code === 'SERVICE_ALREADY_JOINED') {
+          setError('이미 Neture 서비스에 가입된 계정입니다. 로그인해 주세요.');
+        } else {
+          setError('이미 가입된 이메일입니다. 기존 계정으로 로그인해 주세요.');
+        }
+      } else {
+        setError(data?.error || (err instanceof Error ? err.message : '회원가입에 실패했습니다.'));
+      }
     } finally {
       setLoading(false);
     }

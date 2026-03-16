@@ -12,8 +12,7 @@ import { useState, useEffect, CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchPopularForums, type PopularForum } from '../../services/forumApi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.o4o.world';
+import { api } from '../../lib/apiClient';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
 
@@ -25,18 +24,6 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: 'announcement', label: 'Announcement' },
 ];
 
-function getAuthToken(): string | null {
-  try {
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsed = JSON.parse(authData);
-      return parsed.accessToken || parsed.token || null;
-    }
-  } catch {
-    // Ignore
-  }
-  return null;
-}
 
 /** Convert plain text to Block[] format */
 function textToBlocks(text: string): Array<{ type: string; content: string }> {
@@ -83,37 +70,24 @@ export default function ForumWritePage() {
       return;
     }
 
-    const token = getAuthToken();
-    if (!token) {
-      alert('Please log in to write a post.');
-      return;
-    }
-
     try {
       setSubmitting(true);
       const blocks = textToBlocks(content);
-      const res = await fetch(`${API_URL}/api/v1/forum/posts`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          categoryId,
-          type: postType,
-          content: blocks,
-        }),
+      const res = await api.post('/forum/posts', {
+        title: title.trim(),
+        categoryId,
+        type: postType,
+        content: blocks,
       });
 
-      const data = await res.json();
+      const data = res.data;
       if (data.success && data.data?.id) {
         navigate(`/forum/post/${data.data.id}`);
       } else {
         alert(data.error || 'Failed to create post.');
       }
-    } catch {
-      alert('Network error. Please try again.');
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Network error. Please try again.');
     } finally {
       setSubmitting(false);
     }

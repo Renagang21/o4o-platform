@@ -1,7 +1,9 @@
 /**
  * Admin APIs - Operator, Supplier, Product, Master, Service Approval, Registration, Settlement
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
+import { api } from './client.js';
 import type {
   SettlementStatus,
   SettlementsResponse,
@@ -29,29 +31,18 @@ export const adminOperatorApi = {
   async getOperators(includeInactive = false): Promise<NetureOperatorInfo[]> {
     try {
       const qs = includeInactive ? '?includeInactive=true' : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/operators${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) {
-        console.warn('[Admin API] Operators API not available');
-        return [];
-      }
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/admin/operators${qs}`);
+      return response.data.data || [];
     } catch (error) {
-      console.warn('[Admin API] Failed to fetch operators:', error);
+      console.warn('[Admin API] Operators API not available');
       return [];
     }
   },
 
   async deactivateOperator(userId: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/operators/${userId}/deactivate`,
-        { method: 'PATCH', credentials: 'include' },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/operators/${userId}/deactivate`);
+      return true;
     } catch {
       return false;
     }
@@ -59,11 +50,8 @@ export const adminOperatorApi = {
 
   async reactivateOperator(userId: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/operators/${userId}/reactivate`,
-        { method: 'PATCH', credentials: 'include' },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/operators/${userId}/reactivate`);
+      return true;
     } catch {
       return false;
     }
@@ -85,13 +73,8 @@ export const adminSupplierApi = {
   async getSuppliers(status?: string): Promise<AdminSupplier[]> {
     try {
       const qs = status ? `?status=${status}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/suppliers${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/admin/suppliers${qs}`);
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch suppliers:', error);
       return [];
@@ -100,13 +83,8 @@ export const adminSupplierApi = {
 
   async getPendingSuppliers(): Promise<AdminSupplier[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/suppliers/pending`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get('/neture/admin/suppliers/pending');
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch pending suppliers:', error);
       return [];
@@ -115,36 +93,22 @@ export const adminSupplierApi = {
 
   async approveSupplier(id: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/approve`,
-        { method: 'POST', credentials: 'include' },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/suppliers/${id}/approve`);
+      return true;
     } catch { return false; }
   },
 
   async rejectSupplier(id: string, reason?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/reject`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ reason }),
-        },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/suppliers/${id}/reject`, { reason });
+      return true;
     } catch { return false; }
   },
 
   async deactivateSupplier(id: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/suppliers/${id}/deactivate`,
-        { method: 'POST', credentials: 'include' },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/suppliers/${id}/deactivate`);
+      return true;
     } catch { return false; }
   },
 };
@@ -168,12 +132,8 @@ export const adminSettlementApi = {
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      const result = await response.json();
+      const response = await api.get(`/neture/admin/settlements${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch (error) {
       console.warn('[Admin Settlement API] Failed to fetch settlements:', error);
@@ -183,13 +143,8 @@ export const adminSettlementApi = {
 
   async getKpi(): Promise<AdminSettlementKpi> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/kpi`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return ADMIN_SETTLEMENT_KPI_DEFAULT;
-      const result = await response.json();
-      return result.data || ADMIN_SETTLEMENT_KPI_DEFAULT;
+      const response = await api.get('/neture/admin/settlements/kpi');
+      return response.data.data || ADMIN_SETTLEMENT_KPI_DEFAULT;
     } catch {
       return ADMIN_SETTLEMENT_KPI_DEFAULT;
     }
@@ -197,73 +152,39 @@ export const adminSettlementApi = {
 
   async getDetail(id: string): Promise<SettlementDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/admin/settlements/${id}`);
+      return response.data.data || null;
     } catch { return null; }
   },
 
   async calculate(periodStart: string, periodEnd: string): Promise<{ success: boolean; data?: any; error?: string; message?: string }> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/calculate`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ period_start: periodStart, period_end: periodEnd }),
-        },
-      );
-      return await response.json();
+      const response = await api.post('/neture/admin/settlements/calculate', {
+        period_start: periodStart,
+        period_end: periodEnd,
+      });
+      return response.data;
     } catch { return { success: false, error: 'NETWORK_ERROR' }; }
   },
 
   async approve(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/approve`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/settlements/${id}/approve`, { notes });
+      return true;
     } catch { return false; }
   },
 
   async pay(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/pay`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/settlements/${id}/pay`, { notes });
+      return true;
     } catch { return false; }
   },
 
   async cancel(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/settlements/${id}/status`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: 'cancelled', notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/settlements/${id}/status`, { status: 'cancelled', notes });
+      return true;
     } catch { return false; }
   },
 };
@@ -290,13 +211,8 @@ export const adminProductApi = {
   async getProducts(status?: string): Promise<AdminProduct[]> {
     try {
       const qs = status ? `?status=${status}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/products${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/admin/products${qs}`);
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch products:', error);
       return [];
@@ -305,13 +221,8 @@ export const adminProductApi = {
 
   async getPendingProducts(): Promise<AdminProduct[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/products/pending`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get('/neture/admin/products/pending');
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch pending products:', error);
       return [];
@@ -320,26 +231,15 @@ export const adminProductApi = {
 
   async approveProduct(id: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/products/${id}/approve`,
-        { method: 'POST', credentials: 'include' },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/products/${id}/approve`);
+      return true;
     } catch { return false; }
   },
 
   async rejectProduct(id: string, reason?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/products/${id}/reject`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ reason }),
-        },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/products/${id}/reject`, { reason });
+      return true;
     } catch { return false; }
   },
 };
@@ -369,13 +269,8 @@ export interface AdminMaster {
 export const adminMasterApi = {
   async getMasters(): Promise<AdminMaster[]> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/masters`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get('/neture/admin/masters');
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch masters:', error);
       return [];
@@ -384,13 +279,8 @@ export const adminMasterApi = {
 
   async getMasterByBarcode(barcode: string): Promise<AdminMaster | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/masters/barcode/${encodeURIComponent(barcode)}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/admin/masters/barcode/${encodeURIComponent(barcode)}`);
+      return response.data.data || null;
     } catch (error) {
       console.warn('[Admin API] Failed to fetch master by barcode:', error);
       return null;
@@ -399,31 +289,15 @@ export const adminMasterApi = {
 
   async resolveMaster(data: { barcode: string; manualData?: Record<string, unknown> }): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/masters/resolve`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(data),
-        },
-      );
-      return response.ok;
+      await api.post('/neture/admin/masters/resolve', data);
+      return true;
     } catch { return false; }
   },
 
   async updateMaster(id: string, data: Partial<AdminMaster>): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/masters/${id}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(data),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/masters/${id}`, data);
+      return true;
     } catch { return false; }
   },
 };
@@ -446,13 +320,8 @@ export const adminServiceApprovalApi = {
   async getServiceApprovals(status?: string): Promise<ServiceApproval[]> {
     try {
       const qs = status ? `?status=${status}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/service-approvals${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/admin/service-approvals${qs}`);
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch service approvals:', error);
       return [];
@@ -461,41 +330,22 @@ export const adminServiceApprovalApi = {
 
   async approveServiceApproval(id: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/approve`,
-        { method: 'POST', credentials: 'include' },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/service-approvals/${id}/approve`);
+      return true;
     } catch { return false; }
   },
 
   async rejectServiceApproval(id: string, reason?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/reject`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ reason }),
-        },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/service-approvals/${id}/reject`, { reason });
+      return true;
     } catch { return false; }
   },
 
   async revokeServiceApproval(id: string, reason?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/service-approvals/${id}/revoke`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ reason }),
-        },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/service-approvals/${id}/revoke`, { reason });
+      return true;
     } catch { return false; }
   },
 };
@@ -528,12 +378,8 @@ export const adminCommissionApi = {
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      const result = await response.json();
+      const response = await api.get(`/neture/admin/commissions${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch {
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
@@ -542,13 +388,8 @@ export const adminCommissionApi = {
 
   async getKpi(): Promise<AdminCommissionKpi> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/kpi`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return ADMIN_COMMISSION_KPI_DEFAULT;
-      const result = await response.json();
-      return result.data || ADMIN_COMMISSION_KPI_DEFAULT;
+      const response = await api.get('/neture/admin/commissions/kpi');
+      return response.data.data || ADMIN_COMMISSION_KPI_DEFAULT;
     } catch {
       return ADMIN_COMMISSION_KPI_DEFAULT;
     }
@@ -556,73 +397,39 @@ export const adminCommissionApi = {
 
   async getDetail(id: string): Promise<CommissionDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/admin/commissions/${id}`);
+      return response.data.data || null;
     } catch { return null; }
   },
 
   async calculate(periodStart: string, periodEnd: string): Promise<{ success: boolean; data?: any; error?: string; message?: string }> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/calculate`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ period_start: periodStart, period_end: periodEnd }),
-        },
-      );
-      return await response.json();
+      const response = await api.post('/neture/admin/commissions/calculate', {
+        period_start: periodStart,
+        period_end: periodEnd,
+      });
+      return response.data;
     } catch { return { success: false, error: 'NETWORK_ERROR' }; }
   },
 
   async approve(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/approve`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/commissions/${id}/approve`, { notes });
+      return true;
     } catch { return false; }
   },
 
   async pay(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/pay`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/commissions/${id}/pay`, { notes });
+      return true;
     } catch { return false; }
   },
 
   async cancel(id: string, notes?: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/commissions/${id}/status`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: 'cancelled', notes }),
-        },
-      );
-      return response.ok;
+      await api.patch(`/neture/admin/commissions/${id}/status`, { status: 'cancelled', notes });
+      return true;
     } catch { return false; }
   },
 };
@@ -721,18 +528,8 @@ export const adminPartnerMonitoringApi = {
       if (params?.limit) sp.append('limit', String(params.limit));
       if (params?.search) sp.append('search', params.search);
       const qs = sp.toString() ? `?${sp}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partners${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) {
-        return {
-          data: [],
-          meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
-          kpi: { total_partners: 0, total_commission: 0, total_payable: 0, total_paid: 0 },
-        };
-      }
-      const result = await response.json();
+      const response = await api.get(`/neture/admin/partners${qs}`);
+      const result = response.data;
       return {
         data: result.data || [],
         meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 },
@@ -749,13 +546,8 @@ export const adminPartnerMonitoringApi = {
 
   async getDetail(partnerId: string): Promise<PartnerMonitoringDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partners/${partnerId}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/admin/partners/${partnerId}`);
+      return response.data.data || null;
     } catch { return null; }
   },
 };
@@ -764,34 +556,19 @@ export const adminPartnerSettlementApi = {
   /** POST /api/v1/neture/admin/partner-settlements — 정산 배치 생성 */
   async create(partnerId: string): Promise<{ success: boolean; data?: PartnerSettlement; error?: string }> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ partner_id: partnerId }),
-        },
-      );
-      const result = await response.json();
-      if (!response.ok) return { success: false, error: result.message || 'Failed' };
-      return { success: true, data: result.data };
-    } catch { return { success: false, error: 'Network error' }; }
+      const response = await api.post('/neture/admin/partner-settlements', { partner_id: partnerId });
+      return { success: true, data: response.data.data };
+    } catch (error: any) {
+      const result = error?.response?.data;
+      return { success: false, error: result?.message || 'Failed' };
+    }
   },
 
   /** POST /api/v1/neture/admin/partner-settlements/:id/pay — 지급 완료 */
   async pay(id: string): Promise<boolean> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements/${id}/pay`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({}),
-        },
-      );
-      return response.ok;
+      await api.post(`/neture/admin/partner-settlements/${id}/pay`, {});
+      return true;
     } catch { return false; }
   },
 
@@ -803,12 +580,8 @@ export const adminPartnerSettlementApi = {
       if (params?.limit) sp.append('limit', String(params.limit));
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
-      const result = await response.json();
+      const response = await api.get(`/neture/admin/partner-settlements${qs}`);
+      const result = response.data;
       return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
     } catch {
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
@@ -818,13 +591,8 @@ export const adminPartnerSettlementApi = {
   /** GET /api/v1/neture/admin/partner-settlements/:id — 상세 */
   async getDetail(id: string): Promise<PartnerSettlementDetail | null> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/partner-settlements/${id}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data || null;
+      const response = await api.get(`/neture/admin/partner-settlements/${id}`);
+      return response.data.data || null;
     } catch { return null; }
   },
 };
@@ -835,13 +603,8 @@ export const adminRegistrationApi = {
   async getRequests(filters?: { status?: string }): Promise<any[]> {
     try {
       const qs = filters?.status ? `?status=${filters.status}` : '';
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/admin/requests${qs}`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return [];
-      const result = await response.json();
-      return result.data || [];
+      const response = await api.get(`/neture/admin/requests${qs}`);
+      return response.data.data || [];
     } catch (error) {
       console.warn('[Admin API] Failed to fetch registration requests:', error);
       return [];
@@ -872,54 +635,30 @@ export interface RegistrationRecord {
 export const operatorRegistrationApi = {
   async getRegistrations(filters?: { status?: string }): Promise<RegistrationRecord[]> {
     const qs = filters?.status ? `?status=${filters.status}` : '';
-    const response = await fetchWithTimeout(
-      `${API_BASE_URL}/api/v1/neture/operator/registrations${qs}`,
-      { credentials: 'include' },
-    );
-    if (!response.ok) {
-      console.error(`[Operator API] Registration fetch failed: HTTP ${response.status}`);
-      throw new Error(`HTTP_${response.status}`);
-    }
-    const result = await response.json();
-    return result.data || [];
+    const response = await api.get(`/neture/operator/registrations${qs}`);
+    return response.data.data || [];
   },
 
   async approve(userId: string): Promise<{ success: boolean }> {
-    const response = await fetchWithTimeout(
-      `${API_BASE_URL}/api/v1/neture/operator/registrations/${userId}/approve`,
-      {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      },
+    const response = await api.post(
+      `/neture/operator/registrations/${userId}/approve`,
+      {},
     );
-    const result = await response.json();
-    return result;
+    return response.data;
   },
 
   async reject(userId: string, reason: string): Promise<{ success: boolean }> {
-    const response = await fetchWithTimeout(
-      `${API_BASE_URL}/api/v1/neture/operator/registrations/${userId}/reject`,
-      {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason }),
-      },
+    const response = await api.post(
+      `/neture/operator/registrations/${userId}/reject`,
+      { reason },
     );
-    const result = await response.json();
-    return result;
+    return response.data;
   },
 
   async getCopilotSummary(): Promise<RegistrationCopilotData> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/neture/operator/registrations/copilot`,
-        { credentials: 'include' },
-      );
-      if (!response.ok) return { pendingCount: 0, high: [], medium: [], low: [] };
-      const result = await response.json();
-      return result.data || { pendingCount: 0, high: [], medium: [], low: [] };
+      const response = await api.get('/neture/operator/registrations/copilot');
+      return response.data.data || { pendingCount: 0, high: [], medium: [], low: [] };
     } catch (error) {
       console.warn('[Operator API] Failed to fetch registration copilot:', error);
       return { pendingCount: 0, high: [], medium: [], low: [] };

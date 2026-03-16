@@ -5,10 +5,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAccessToken } from '@/contexts/AuthContext';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 import { ListMusic, RefreshCw, Plus, ChevronRight } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 const SERVICE_KEY = 'glycopharm';
 
 interface PlaylistItem {
@@ -44,21 +43,14 @@ export default function HqPlaylistsPage() {
   const [isCreating, setIsCreating] = useState(false);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    const token = getAccessToken();
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...options?.headers,
-      },
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error || body?.message || `API error ${res.status}`);
+    const url = path.startsWith('/api/v1') ? path.replace(/^\/api\/v1/, '') : `${API_BASE_URL}${path}`;
+    const method = (options?.method || 'GET').toUpperCase();
+    let body: any;
+    if (options?.body && typeof options.body === 'string') {
+      try { body = JSON.parse(options.body); } catch { body = options.body; }
     }
-    return res.json();
+    const response = await api.request({ method, url, data: body });
+    return response.data;
   }, []);
 
   const fetchPlaylists = useCallback(async () => {

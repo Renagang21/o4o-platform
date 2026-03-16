@@ -24,8 +24,7 @@ import {
 } from '@/components/icons';
 import { useAuth } from '../../contexts';
 import { AiSummaryButton } from '../../components/ai';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 interface ConnectedStore {
   id: string;
@@ -54,28 +53,13 @@ export default function TouristHubPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [storesResponse, statsResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/v1/cosmetics/tourist-hub/stores`, {
-            credentials: 'include',
-          }),
-          fetch(`${API_BASE_URL}/api/v1/cosmetics/tourist-hub/stats`, {
-            credentials: 'include',
-          }),
+        const [storesRes, statsRes] = await Promise.allSettled([
+          api.get('/cosmetics/tourist-hub/stores'),
+          api.get('/cosmetics/tourist-hub/stats'),
         ]);
 
-        if (storesResponse.ok) {
-          const storesData = await storesResponse.json();
-          setStores(storesData.data || []);
-        } else {
-          setStores([]);
-        }
-
-        if (statsResponse.ok) {
-          const statsData = await statsResponse.json();
-          setStats(statsData.data || null);
-        } else {
-          setStats(null);
-        }
+        setStores(storesRes.status === 'fulfilled' ? (storesRes.value.data?.data || []) : []);
+        setStats(statsRes.status === 'fulfilled' ? (statsRes.value.data?.data || null) : null);
       } catch {
         setStores([]);
         setStats(null);

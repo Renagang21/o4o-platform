@@ -9,9 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, RefreshCw, ArrowDown, AlertCircle } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '@/lib/apiClient';
 
 type PeriodDays = 7 | 30;
 type SourceFilter = 'all' | 'qr' | 'tablet';
@@ -45,7 +43,6 @@ export default function FunnelPage() {
     setError(null);
 
     try {
-      const accessToken = getAccessToken();
       const now = new Date();
       const from = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
       const params = new URLSearchParams();
@@ -55,24 +52,17 @@ export default function FunnelPage() {
         params.set('sourceType', sourceFilter);
       }
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/v1/glycopharm/funnel/consultation?${params.toString()}`,
-        {
-          headers: {
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-          },
-          credentials: 'include',
-        },
+      const response = await api.get<{ success: boolean; data: FunnelData; error?: string }>(
+        `/glycopharm/funnel/consultation?${params.toString()}`
       );
 
-      if (!response.ok) throw new Error('Failed to fetch funnel data');
-      const result = await response.json();
+      const result = response.data;
       if (!result.success) throw new Error(result.error || 'Unknown error');
 
       setData(result.data);
     } catch (err: any) {
       console.error('Funnel fetch error:', err);
-      setError(err.message || '데이터를 불러올 수 없습니다.');
+      setError(err.response?.data?.error || err.message || '데이터를 불러올 수 없습니다.');
     } finally {
       setLoading(false);
     }

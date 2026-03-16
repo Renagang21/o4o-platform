@@ -10,7 +10,7 @@
  * }
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../lib/apiClient';
 
 export interface HealthResponse {
   service: string;
@@ -19,16 +19,6 @@ export interface HealthResponse {
 }
 
 export async function checkHealth(): Promise<HealthResponse> {
-  const response = await fetch(`${API_BASE_URL}/health`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Health check failed: ${response.status}`);
-  }
-
-  return response.json();
+  const { data } = await api.get(`${API_BASE_URL}/health`);
+  return data;
 }

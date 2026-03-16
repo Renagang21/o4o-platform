@@ -18,7 +18,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QrCode, AlertCircle } from 'lucide-react';
-import { API_BASE_URL, fetchWithTimeout } from '../../lib/api/index.js';
+import { api } from '../../lib/api/index.js';
 
 interface QrData {
   id: string;
@@ -44,17 +44,8 @@ export default function QrLandingPage() {
 
     (async () => {
       try {
-        const res = await fetchWithTimeout(
-          `${API_BASE_URL}/api/v1/kpa/qr/public/${encodeURIComponent(slug)}`,
-        );
-
-        if (!res.ok) {
-          setError('QR 코드를 찾을 수 없습니다.');
-          return;
-        }
-
-        const result = await res.json();
-        const qr: QrData = result.data;
+        const result = await api.get(`/kpa/qr/public/${encodeURIComponent(slug)}`);
+        const qr: QrData = result.data.data;
 
         if (!qr) {
           setError('QR 코드를 찾을 수 없습니다.');

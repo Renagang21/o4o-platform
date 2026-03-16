@@ -22,9 +22,7 @@ import {
   Package,
   Settings,
 } from 'lucide-react';
-import { getAccessToken } from '@/contexts/AuthContext';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -81,21 +79,14 @@ interface StoreProduct {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getAccessToken();
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options?.headers,
-    },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
+  const url = path.replace(/^\/api\/v1/, '') || '/';
+  const method = (options?.method || 'GET').toUpperCase();
+  let body: any;
+  if (options?.body && typeof options.body === 'string') {
+    try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
-  return res.json();
+  const response = await api.request({ method, url, data: body });
+  return response.data;
 }
 
 // ─── Sub-components ──────────────────────────────────────────

@@ -2,9 +2,10 @@
  * GlucoseView API Service
  *
  * API client for GlucoseView backend
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반으로 전환
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
+import { api as axiosApi } from '../lib/apiClient';
 
 interface ApiResponse<T> {
   data: T;
@@ -282,41 +283,47 @@ export interface ReviewApplicationResponse {
 }
 
 class ApiService {
-  private token: string | null = null;
-
-  setToken(token: string | null) {
-    this.token = token;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+    // Strip /api/v1 prefix — authClient baseURL already includes it
+    const path = endpoint.replace(/^\/api\/v1/, '');
+    const method = (options.method || 'GET').toUpperCase();
+    const parsedBody = options.body ? JSON.parse(options.body as string) : undefined;
 
-    if (this.token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
+    try {
+      let response;
+      switch (method) {
+        case 'POST':
+          response = await axiosApi.post(path, parsedBody);
+          break;
+        case 'PUT':
+          response = await axiosApi.put(path, parsedBody);
+          break;
+        case 'PATCH':
+          response = await axiosApi.patch(path, parsedBody);
+          break;
+        case 'DELETE':
+          response = await axiosApi.delete(path);
+          break;
+        default:
+          response = await axiosApi.get(path);
+          break;
+      }
+
+      // Handle 204 No Content
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      return response.data as T;
+    } catch (err: any) {
+      const errorData = err.response?.data as ApiError | undefined;
+      throw new Error(
+        errorData?.error?.message || `HTTP ${err.response?.status || 'unknown'}`
+      );
     }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as ApiError;
-      throw new Error(errorData.error?.message || `HTTP ${response.status}`);
-    }
-
-    // Handle 204 No Content
-    if (response.status === 204) {
-      return undefined as T;
-    }
-
-    return response.json();
   }
 
   // Care Analysis endpoints (WO-CARE-ANALYSIS-PROVIDER-V1)

@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../lib/apiClient';
 
 interface LegalPageProps {
   slug: string;
@@ -27,10 +28,7 @@ export default function LegalPage({ slug, title }: LegalPageProps) {
   useEffect(() => {
     (async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-        const res = await fetch(`${baseUrl}/api/v1/cms/public/page/${slug}`);
-        if (!res.ok) throw new Error('not found');
-        const result = await res.json();
+        const { data: result } = await api.get(`/cms/public/page/${slug}`);
         if (result.success && result.data) {
           setPage(result.data);
         } else {

@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { api } from '../../lib/apiClient';
 
 type UserRole = 'consumer' | 'seller';
 
@@ -61,13 +62,8 @@ export default function RegisterPage() {
   const handleEmailBlur = async () => {
     if (!formData.email || !formData.email.includes('@')) return;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const res = await fetch(`${baseUrl}/api/v1/auth/check-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, service: 'k-cosmetics' }),
-      });
-      const result = await res.json();
+      const res = await api.post('/auth/check-email', { email: formData.email, service: 'k-cosmetics' });
+      const result = res.data;
       if (result.success && result.data.exists) {
         if (result.data.alreadyJoined) {
           setError('이미 K-Cosmetics 서비스에 가입된 계정입니다. 로그인해 주세요.');
@@ -94,22 +90,17 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
-      const response = await fetch(`${baseUrl}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          phone: formData.phone.replace(/\D/g, ''),
-          role: selectedRole,
-          service: 'k-cosmetics',
-        }),
+      const response = await api.post('/auth/register', {
+        ...formData,
+        phone: formData.phone.replace(/\D/g, ''),
+        role: selectedRole,
+        service: 'k-cosmetics',
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
-        if (response.status === 401 && data.code === 'PASSWORD_MISMATCH') {
+      if (!data.success) {
+        if (data.code === 'PASSWORD_MISMATCH') {
           setExistingAccountMode(true);
           if (data.services) setExistingServices(data.services);
           throw new Error('비밀번호가 일치하지 않습니다. O4O 계정 가입 시 사용한 기존 비밀번호를 입력해주세요.');

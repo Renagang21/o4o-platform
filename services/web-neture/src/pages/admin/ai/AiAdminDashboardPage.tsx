@@ -11,8 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface AiEngineInfo {
   id: number;
@@ -61,12 +60,12 @@ export default function AiAdminDashboardPage() {
     setLoading(true);
     try {
       const [dashRes, usageRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/ai/admin/dashboard`, { credentials: 'include' }),
-        fetch(`${API_BASE_URL}/api/ai/admin/usage?days=7`, { credentials: 'include' }),
+        api.get(`${API_BASE_URL}/api/ai/admin/dashboard`),
+        api.get(`${API_BASE_URL}/api/ai/admin/usage?days=7`),
       ]);
 
-      const dashData = await dashRes.json();
-      const usageData = await usageRes.json();
+      const dashData = dashRes.data;
+      const usageData = usageRes.data;
 
       if (dashData?.success) setDashboard(dashData.data);
       if (usageData?.success) setUsage(usageData.data);

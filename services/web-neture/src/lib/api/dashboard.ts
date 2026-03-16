@@ -1,14 +1,9 @@
 /**
  * Dashboard Summary APIs
+ *
+ * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { API_BASE_URL, fetchWithTimeout } from './client.js';
-import { getAccessToken } from '../../contexts/AuthContext';
-
-// WO-O4O-DASHBOARD-AUTH-API-NORMALIZE-V1: Bearer token headers for cross-domain
-function authHeaders(): HeadersInit {
-  const token = getAccessToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+import { api } from '../apiClient';
 
 // ==================== Supplier Dashboard Summary Types ====================
 
@@ -93,16 +88,8 @@ export interface PartnerDashboardSummary {
 export const dashboardApi = {
   async getSupplierDashboardSummary(): Promise<SupplierDashboardSummary | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/supplier/dashboard/summary`, {
-        credentials: 'include',
-        headers: authHeaders(),
-      });
-      if (!response.ok) {
-        console.warn('[Dashboard API] Supplier dashboard summary not available');
-        return null;
-      }
-      const result = await response.json();
-      return result.data;
+      const response = await api.get('/neture/supplier/dashboard/summary');
+      return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch supplier dashboard summary:', error);
       return null;
@@ -111,16 +98,8 @@ export const dashboardApi = {
 
   async getOperatorDashboard(): Promise<OperatorDashboardData | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/operator/dashboard`, {
-        credentials: 'include',
-        headers: authHeaders(),
-      });
-      if (!response.ok) {
-        console.warn('[Dashboard API] Operator dashboard not available');
-        return null;
-      }
-      const result = await response.json();
-      return result.data;
+      const response = await api.get('/neture/operator/dashboard');
+      return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch operator dashboard:', error);
       return null;
@@ -129,12 +108,8 @@ export const dashboardApi = {
 
   async getSellerSignal(): Promise<{ success: boolean; hasApprovedSeller: boolean }> {
     try {
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/v1/dashboard/assets/seller-signal`,
-        { credentials: 'include', headers: authHeaders() }
-      );
-      if (!response.ok) return { success: false, hasApprovedSeller: false };
-      return response.json();
+      const response = await api.get('/dashboard/assets/seller-signal');
+      return response.data;
     } catch {
       return { success: false, hasApprovedSeller: false };
     }
@@ -142,16 +117,8 @@ export const dashboardApi = {
 
   async getPartnerDashboardSummary(): Promise<PartnerDashboardSummary | null> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/neture/partner/dashboard/summary`, {
-        credentials: 'include',
-        headers: authHeaders(),
-      });
-      if (!response.ok) {
-        console.warn('[Dashboard API] Partner dashboard summary not available');
-        return null;
-      }
-      const result = await response.json();
-      return result.data;
+      const response = await api.get('/neture/partner/dashboard/summary');
+      return response.data?.data ?? null;
     } catch (error) {
       console.warn('[Dashboard API] Failed to fetch partner dashboard summary:', error);
       return null;

@@ -7,8 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
+import { api } from '../../lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -60,15 +59,9 @@ interface SupplierOffer {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body?.error || body?.message || `API error ${res.status}`);
-  }
-  return res.json();
+  const url = path.replace(/^\/api\/v1/, '') || '/';
+  const response = await api.get(url);
+  return response.data;
 }
 
 // ─── Component ───────────────────────────────────────────────
