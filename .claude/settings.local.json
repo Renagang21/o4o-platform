@@ -637,7 +637,18 @@
       "Bash(powershell.exe -Command \"Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
       "Bash(winget list:*)",
       "Bash(choco list:*)",
-      "Bash(git -C c:Userssohaeo4o-platform status -u)"
+      "WebFetch(domain:developers.coupangcorp.com)",
+      "WebFetch(domain:marketplace.coupangcorp.com)",
+      "WebFetch(domain:help.shopify.com)",
+      "WebFetch(domain:www.channelengine.com)",
+      "WebFetch(domain:marketplace.coupang.com)",
+      "WebFetch(domain:www.esellers.co.kr)",
+      "WebFetch(domain:www.coudae.info)",
+      "WebFetch(domain:flatfile.pro)",
+      "WebFetch(domain:www.webtoffee.com)",
+      "WebFetch(domain:seongjangdotori.com)",
+      "WebFetch(domain:multilifer.com)",
+      "Bash(__NEW_LINE_0b6517c3af708e82__ echo \"=== Neture Members ===\")"
     ],
     "deny": []
   }

@@ -207,6 +207,51 @@ export default function LoginPage() {
               </NavLink>
             </p>
           </div>
+
+          {/* 테스트 로그인 버튼 — DEV 환경에서만 표시 */}
+          {import.meta.env.DEV && (
+            <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
+              <p className="text-center text-xs text-slate-400 mb-3">테스트 환경 전용</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    setError('');
+                    setIsSubmitting(true);
+                    try {
+                      await login('patient_test@glycopharm.co.kr', 'O4oTestPass');
+                      navigate('/patient');
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : '테스트 로그인 실패');
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+                >
+                  테스트 환자 로그인
+                </button>
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    setError('');
+                    setIsSubmitting(true);
+                    try {
+                      await login('pharmacist_test@glycopharm.co.kr', 'O4oTestPass');
+                      navigate('/care');
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : '테스트 로그인 실패');
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+                >
+                  테스트 약사 로그인
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
