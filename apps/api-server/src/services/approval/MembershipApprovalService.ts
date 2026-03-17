@@ -58,7 +58,11 @@ export class MembershipApprovalService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Activate membership
+      // STEP1: Activate membership
+      logger.info('[APPROVAL][STEP1] membership UPDATE start', {
+        membershipId, approvedBy, isPlatformAdmin,
+      });
+
       const result = isPlatformAdmin
         ? await queryRunner.query(
             `UPDATE service_memberships
@@ -76,13 +80,23 @@ export class MembershipApprovalService {
           );
 
       if (result.length === 0) {
+        logger.warn('[APPROVAL][STEP1] membership not found or already active', {
+          membershipId, isPlatformAdmin, serviceKeys,
+        });
         await queryRunner.rollbackTransaction();
         return null;
       }
 
       const membership = result[0] as ApproveResult;
+      logger.info('[APPROVAL][STEP1] membership found', {
+        membership,
+      });
 
-      // 2. Activate user account (idempotent)
+      // STEP2: Activate user account (idempotent)
+      logger.info('[APPROVAL][STEP2] user UPDATE start', {
+        userId: membership.user_id,
+      });
+
       await queryRunner.query(
         `UPDATE users SET status = 'ACTIVE', "isActive" = true,
          "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
@@ -90,8 +104,12 @@ export class MembershipApprovalService {
         [approvedBy, membership.user_id]
       );
 
-      // 3. Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
+      // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
       const memberRole = membership.role || 'member';
+      logger.info('[APPROVAL][STEP3] role INSERT start', {
+        userId: membership.user_id, role: memberRole,
+      });
+
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
@@ -102,7 +120,7 @@ export class MembershipApprovalService {
 
       await queryRunner.commitTransaction();
 
-      logger.info('[ApprovalService] APPROVAL_SUCCESS', {
+      logger.info('[APPROVAL][SUCCESS]', {
         membershipId,
         userId: membership.user_id,
         role: memberRole,
@@ -113,11 +131,14 @@ export class MembershipApprovalService {
       return membership;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      logger.error('[ApprovalService] APPROVAL_FAILED', {
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error('[APPROVAL][FAILED]', {
         membershipId,
         approvedBy,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        errorMessage: err.message,
+        errorCode: (error as any)?.code,
+        errorDetail: (error as any)?.detail,
+        stack: err.stack,
       });
       throw error;
     } finally {
