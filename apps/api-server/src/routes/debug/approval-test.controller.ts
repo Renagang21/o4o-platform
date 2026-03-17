@@ -133,6 +133,10 @@ ${rowsHtml}
 ${nav}
 ${tableHtml}
 ${searchForm}
+<hr>
+<h2>Repair Tools</h2>
+<p><a class="btn btn-danger" href="/__debug__/approval-test/inconsistent">Inconsistent Users (부분실패 복구)</a>
+<span style="color:#888;margin-left:8px">membership=active인데 user!=ACTIVE인 유저 조회 + 복구</span></p>
 `));
     } catch (error) {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -346,6 +350,188 @@ ${roleHtml}
 <p>Membership ID: ${esc(req.params.membershipId)}</p>
 <pre class="err">${esc(JSON.stringify(errorDetail, null, 2))}</pre>
 <p><a href="/__debug__/approval-test">&larr; Back</a></p>`));
+    }
+  });
+
+  // ─── GET /inconsistent — 부분실패 유저 목록 (membership=active but user!=ACTIVE) ───
+  router.get('/inconsistent', async (_req, res) => {
+    try {
+      const rows = await dataSource.query(
+        `SELECT u.id AS user_id, u.email, u.name, u.status AS user_status, u."isActive" AS user_is_active,
+                u."approvedAt", u."createdAt",
+                sm.id AS membership_id, sm.service_key, sm.role, sm.status AS membership_status,
+                sm.approved_by, sm.approved_at
+         FROM users u
+         JOIN service_memberships sm ON sm.user_id = u.id AND sm.status = 'active'
+         WHERE u.status != 'ACTIVE' OR u."isActive" = false OR u."approvedAt" IS NULL
+         ORDER BY u."createdAt" DESC
+         LIMIT 100`
+      );
+
+      let tableHtml: string;
+      if (rows.length === 0) {
+        tableHtml = '<p class="ok">부분실패 유저가 없습니다. 모든 active 멤버십의 유저 상태가 정상입니다.</p>';
+      } else {
+        tableHtml = `
+<p class="warn">${rows.length}건의 불일치 발견</p>
+<table>
+<tr><th>Email</th><th>User Status</th><th>isActive</th><th>approvedAt</th><th>Service</th><th>Membership</th><th>Action</th></tr>
+${rows.map((r: any) => `<tr>
+  <td>${esc(r.email)}<br><small style="color:#666">${esc(r.name || '')}</small></td>
+  <td><span class="${r.user_status === 'ACTIVE' ? 'ok' : 'err'}">${esc(r.user_status)}</span></td>
+  <td>${r.user_is_active ? '<span class="ok">true</span>' : '<span class="err">false</span>'}</td>
+  <td>${r.approvedAt ? esc(r.approvedAt) : '<span class="err">NULL</span>'}</td>
+  <td>${esc(r.service_key)} (${esc(r.role)})</td>
+  <td><span class="ok">${esc(r.membership_status)}</span></td>
+  <td>
+    <a class="btn" href="/__debug__/approval-test/user?q=${encodeURIComponent(r.email)}">Check</a>
+    <a class="btn btn-danger" href="/__debug__/approval-test/repair/${esc(r.user_id)}">Repair</a>
+  </td>
+</tr>`).join('\n')}
+</table>`;
+      }
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(page('Inconsistent Users', `
+<p><a href="/__debug__/approval-test">&larr; Back</a></p>
+<h2>Inconsistent Users (membership=active, user!=ACTIVE)</h2>
+<p style="color:#888">이전 비트랜잭션 코드에서 membership만 active되고 user 상태가 갱신되지 않은 유저들</p>
+${tableHtml}
+${rows.length > 0 ? `<hr><p><a class="btn btn-danger" href="/__debug__/approval-test/repair-all">Repair ALL (${rows.length}건)</a></p>` : ''}
+`));
+    } catch (error) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.status(500).send(page('Error', `<pre class="err">${esc(String(error))}</pre>`));
+    }
+  });
+
+  // ─── GET /repair/:userId — 단일 유저 상태 복구 ───
+  router.get('/repair/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+
+      // 해당 유저의 active membership 확인
+      const membershipCheck = await dataSource.query(
+        `SELECT id, service_key, role FROM service_memberships
+         WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+        [userId]
+      );
+
+      if (membershipCheck.length === 0) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(page('Repair Failed', `
+<h2 class="err">No active membership</h2>
+<p>이 유저에게 active 멤버십이 없습니다. 복구 대상이 아닙니다.</p>
+<p><a href="/__debug__/approval-test/inconsistent">&larr; Back</a></p>`));
+        return;
+      }
+
+      // User 상태 복구
+      await dataSource.query(
+        `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+         "approvedAt" = COALESCE("approvedAt", NOW()), "updatedAt" = NOW()
+         WHERE id = $1`,
+        [userId]
+      );
+
+      // Role assignment 보장
+      const membership = membershipCheck[0];
+      const role = membership.role || 'member';
+      await dataSource.query(
+        `INSERT INTO role_assignments (user_id, role, is_active, valid_from, created_at, updated_at)
+         VALUES ($1, $2, true, NOW(), NOW(), NOW())
+         ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+         DO UPDATE SET is_active = true, updated_at = NOW()`,
+        [userId, role]
+      );
+
+      // 복구 후 상태 확인
+      const userAfter = await dataSource.query(
+        `SELECT id, email, name, status, "isActive", "approvedAt" FROM users WHERE id = $1`,
+        [userId]
+      );
+      const u = userAfter[0];
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(page('Repair Success', `
+<h2 class="ok">User Repaired</h2>
+<div class="card">
+  <b>${esc(u?.email)}</b> — ${esc(u?.name || '')}<br>
+  Status: <span class="ok">${esc(u?.status)}</span> |
+  isActive: <span class="ok">${u?.isActive}</span> |
+  approvedAt: ${esc(u?.approvedAt)}
+</div>
+<p>
+  <a href="/__debug__/approval-test/user?q=${encodeURIComponent(u?.email || userId)}">Check Full State</a> |
+  <a href="/__debug__/approval-test/inconsistent">&larr; Back to Inconsistent List</a>
+</p>`));
+    } catch (error) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.status(500).send(page('Repair Error', `
+<h2 class="err">Repair FAILED</h2>
+<pre class="err">${esc(JSON.stringify({
+  error: error instanceof Error ? error.message : String(error),
+  code: (error as any)?.code,
+  detail: (error as any)?.detail,
+}, null, 2))}</pre>
+<p><a href="/__debug__/approval-test/inconsistent">&larr; Back</a></p>`));
+    }
+  });
+
+  // ─── GET /repair-all — 전체 부분실패 유저 일괄 복구 ───
+  router.get('/repair-all', async (_req, res) => {
+    try {
+      // 부분실패 유저 조회
+      const rows = await dataSource.query(
+        `SELECT DISTINCT u.id AS user_id, u.email, sm.role
+         FROM users u
+         JOIN service_memberships sm ON sm.user_id = u.id AND sm.status = 'active'
+         WHERE u.status != 'ACTIVE' OR u."isActive" = false OR u."approvedAt" IS NULL`
+      );
+
+      if (rows.length === 0) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.send(page('Nothing to Repair', `
+<h2 class="ok">부분실패 유저가 없습니다.</h2>
+<p><a href="/__debug__/approval-test">&larr; Back</a></p>`));
+        return;
+      }
+
+      const results: string[] = [];
+      for (const r of rows) {
+        try {
+          await dataSource.query(
+            `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+             "approvedAt" = COALESCE("approvedAt", NOW()), "updatedAt" = NOW()
+             WHERE id = $1`,
+            [r.user_id]
+          );
+          const role = r.role || 'member';
+          await dataSource.query(
+            `INSERT INTO role_assignments (user_id, role, is_active, valid_from, created_at, updated_at)
+             VALUES ($1, $2, true, NOW(), NOW(), NOW())
+             ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+             DO UPDATE SET is_active = true, updated_at = NOW()`,
+            [r.user_id, role]
+          );
+          results.push(`<li class="ok">${esc(r.email)} — repaired (role: ${esc(role)})</li>`);
+        } catch (err) {
+          results.push(`<li class="err">${esc(r.email)} — FAILED: ${esc(String(err))}</li>`);
+        }
+      }
+
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.send(page('Repair All Complete', `
+<h2 class="ok">Bulk Repair Complete</h2>
+<p>${rows.length}건 처리</p>
+<ul>${results.join('\n')}</ul>
+<p>
+  <a href="/__debug__/approval-test/inconsistent">Check Remaining Inconsistencies</a> |
+  <a href="/__debug__/approval-test">&larr; Back</a>
+</p>`));
+    } catch (error) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.status(500).send(page('Repair Error', `<pre class="err">${esc(String(error))}</pre>`));
     }
   });
 
