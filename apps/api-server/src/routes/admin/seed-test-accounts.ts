@@ -53,7 +53,7 @@ router.post('/', async (_req: Request, res: Response): Promise<void> => {
       // 1. User (idempotent via ON CONFLICT)
       const userResult = await AppDataSource.query(
         `INSERT INTO users (id, email, password, name, status, "isActive", "isEmailVerified", "createdAt", "updatedAt")
-         VALUES (gen_random_uuid(), $1, $2, $3, 'ACTIVE', true, true, NOW(), NOW())
+         VALUES (gen_random_uuid(), $1, $2, $3, 'active', true, true, NOW(), NOW())
          ON CONFLICT (email) DO UPDATE SET "updatedAt" = NOW()
          RETURNING id`,
         [account.email, hashedPassword, account.name]
