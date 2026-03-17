@@ -655,32 +655,4 @@ export const operatorRegistrationApi = {
     return response.data;
   },
 
-  async getCopilotSummary(): Promise<RegistrationCopilotData> {
-    try {
-      const response = await api.get('/neture/operator/registrations/copilot');
-      return response.data.data || { pendingCount: 0, high: [], medium: [], low: [] };
-    } catch (error) {
-      console.warn('[Operator API] Failed to fetch registration copilot:', error);
-      return { pendingCount: 0, high: [], medium: [], low: [] };
-    }
-  },
 };
-
-export interface RegistrationCopilotItem {
-  id: string;
-  email: string;
-  name: string;
-  phone: string;
-  role: string;
-  companyName?: string;
-  businessNumber?: string;
-  licenseNumber?: string;
-  createdAt: string;
-}
-
-export interface RegistrationCopilotData {
-  pendingCount: number;
-  high: RegistrationCopilotItem[];
-  medium: RegistrationCopilotItem[];
-  low: RegistrationCopilotItem[];
-}

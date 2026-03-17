@@ -135,8 +135,6 @@ const SettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
 const ReportsPage = lazy(() => import('@/pages/operator/ReportsPage'));
 const BillingPreviewPage = lazy(() => import('@/pages/operator/BillingPreviewPage'));
 const InvoicesPage = lazy(() => import('@/pages/operator/InvoicesPage'));
-// InventoryPage, AnalyticsPage, MarketingPage, SupportPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
-
 // Hub Exploration (WO-O4O-HUB-EXPLORATION-CORE-V1)
 const GlycoPharmHubPage = lazy(() => import('@/pages/hub/GlycoPharmHubPage').then(m => ({ default: m.GlycoPharmHubPage })));
 const HubB2BCatalogPage = lazy(() => import('@/pages/hub/HubB2BCatalogPage').then(m => ({ default: m.HubB2BCatalogPage })));
