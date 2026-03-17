@@ -70,7 +70,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     email: '',
     password: '',
     passwordConfirm: '',
-    name: '',
+    lastName: '',
+    firstName: '',
     phone: '',
     companyName: '',
     businessNumber: '',
@@ -94,7 +95,8 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
         email: '',
         password: '',
         passwordConfirm: '',
-        name: '',
+        lastName: '',
+        firstName: '',
         phone: '',
         companyName: '',
         businessNumber: '',
@@ -189,6 +191,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
     try {
       await api.post('/auth/register', {
         ...formData,
+        name: `${formData.lastName}${formData.firstName}`,
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'neture',
@@ -226,7 +229,7 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
   const isFormValid = () => {
-    const base = formData.email && formData.password && formData.name &&
+    const base = formData.email && formData.password && formData.lastName && formData.firstName &&
       formData.phone && formData.phone.length >= 10 && formData.phone.length <= 11 &&
       (selectedRole === 'user' || formData.companyName) && formData.agreeTerms && formData.agreePrivacy;
     if (existingAccountMode) return base && formData.password.length > 0;
@@ -437,18 +440,32 @@ export default function RegisterModal({ isOpen }: RegisterModalProps) {
                 )}
               </div>
 
-              {/* 이름 + 전화번호 */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* 성 + 이름 */}
+              <div className="grid grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    성 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    placeholder="홍"
+                    required
+                    className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {selectedRole === 'user' ? '이름' : '담당자명'} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="name"
-                    value={formData.name}
+                    name="firstName"
+                    value={formData.firstName}
                     onChange={handleInputChange}
-                    placeholder="홍길동"
+                    placeholder="길동"
                     required
                     className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
                   />

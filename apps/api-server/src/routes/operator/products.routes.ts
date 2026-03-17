@@ -13,8 +13,17 @@ const router: Router = Router();
 const controller = new ProductConsoleController();
 
 // All routes require authentication + operator-level role + service scope
+// Platform roles + service-prefixed operator/admin roles
 router.use(authenticate);
-router.use(requireRole(['admin', 'super_admin', 'operator', 'manager']));
+router.use(requireRole([
+  'admin', 'super_admin', 'operator', 'manager',
+  'platform:admin', 'platform:super_admin',
+  'neture:admin', 'neture:operator',
+  'glycopharm:admin', 'glycopharm:operator',
+  'glucoseview:admin', 'glucoseview:operator',
+  'k-cosmetics:admin', 'k-cosmetics:operator',
+  'kpa-society:admin', 'kpa-society:operator',
+]));
 router.use(injectServiceScope);
 
 // Product list with images + brand + category + supplier count

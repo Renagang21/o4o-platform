@@ -109,10 +109,14 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// WO-O4O-NAME-NORMALIZATION-V1: lastName+firstName > name > email prefix > '사용자'
 function getUserName(u: UserDetail): string {
-  if (u.name) return u.name;
-  if (u.firstName || u.lastName) return `${u.lastName || ''} ${u.firstName || ''}`.trim();
-  return u.email.split('@')[0];
+  if (u.lastName || u.firstName) {
+    const full = `${u.lastName || ''}${u.firstName || ''}`.trim();
+    if (full) return full;
+  }
+  if (u.name && u.name !== u.email) return u.name;
+  return u.email?.split('@')[0] || '사용자';
 }
 
 // ─── Password Modal ──────────────────────────────────────────

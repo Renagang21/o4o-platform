@@ -91,6 +91,15 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
     return true;
   }
 
+  // Service-level operator/admin roles also grant signage access
+  // e.g. glycopharm:operator, glycopharm:admin → signage:glycopharm access
+  const userRoles: string[] = user.roles || [];
+  if (userRoles.some((r: string) =>
+    r === `${serviceKey}:operator` || r === `${serviceKey}:admin`
+  )) {
+    return true;
+  }
+
   return false;
 }
 

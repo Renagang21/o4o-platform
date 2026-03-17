@@ -15,6 +15,8 @@ export interface BusinessInfo {
 
   // 사업장 정보
   address?: string;               // 사업장 주소 (전체 주소 문자열)
+  address2?: string;              // 상세주소
+  businessCategory?: string;      // 업종
 
   // 전자상거래 법적 요건
   telecomLicense?: string;        // 통신판매업 신고번호 (제XXXX-XXXXX호)

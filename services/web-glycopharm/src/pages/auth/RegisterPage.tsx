@@ -1,10 +1,11 @@
 /**
  * RegisterPage — GlycoPharm 회원가입
- * WO-GLYCOPHARM-ENTRY-SCREENS-V1
+ * WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1
  *
- * - 환자/약사 유형 선택
- * - 약사: 면허번호 필수, 가입 후 PENDING_APPROVAL 메시지
- * - 환자: 기본 정보만, 가입 후 로그인 이동
+ * - 환자/약국 유형 선택
+ * - 약국: 사업자 정보 필수 (약국명, 사업자번호, 세금계산서 이메일)
+ * - 닉네임: 필수 입력
+ * - 면허번호: 제거
  */
 
 import { useState } from 'react';
@@ -21,6 +22,7 @@ import {
   Circle,
   ArrowLeft,
   X,
+  Building2,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 
@@ -31,7 +33,7 @@ const SERVICE_LABELS: Record<string, string> = {
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [memberType, setMemberType] = useState<'patient' | 'pharmacist'>('patient');
+  const [memberType, setMemberType] = useState<'patient' | 'pharmacy'>('patient');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +42,20 @@ export default function RegisterPage() {
   const [existingServices, setExistingServices] = useState<Array<{key: string, status: string}>>([]);
 
   const [formData, setFormData] = useState({
-    name: '',
+    lastName: '',
+    firstName: '',
+    nickname: '',
     email: '',
     password: '',
     passwordConfirm: '',
     phone: '',
-    licenseNumber: '',
     businessName: '',
     businessNumber: '',
+    taxEmail: '',
+    businessType: '',
+    businessCategory: '',
+    address1: '',
+    address2: '',
     agreeTerms: false,
     agreePrivacy: false,
     agreeMarketing: false,
@@ -57,7 +65,7 @@ export default function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    const numericFields = ['phone', 'businessNumber', 'licenseNumber'];
+    const numericFields = ['phone', 'businessNumber'];
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : numericFields.includes(name) ? value.replace(/\D/g, '') : value,
@@ -72,7 +80,6 @@ export default function RegisterPage() {
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
-  const isLicenseValid = formData.licenseNumber.length >= 4;
 
   const handleEmailBlur = async () => {
     if (!formData.email || !formData.email.includes('@')) return;
@@ -104,24 +111,28 @@ export default function RegisterPage() {
         email: formData.email,
         password: formData.password,
         passwordConfirm: formData.passwordConfirm,
-        lastName: '',
-        firstName: formData.name,
-        nickname: formData.name,
+        lastName: formData.lastName,
+        firstName: formData.firstName,
+        nickname: formData.nickname,
         phone: formData.phone.replace(/\D/g, ''),
-        role: memberType === 'pharmacist' ? 'user' : 'consumer',
+        role: memberType === 'pharmacy' ? 'seller' : 'customer',
         service: 'glycopharm',
-        ...(memberType === 'pharmacist' && {
-          licenseNumber: formData.licenseNumber,
+        ...(memberType === 'pharmacy' && {
           businessName: formData.businessName || undefined,
           businessNumber: formData.businessNumber || undefined,
+          taxEmail: formData.taxEmail || undefined,
+          businessType: formData.businessType || undefined,
+          businessCategory: formData.businessCategory || undefined,
+          address1: formData.address1 || undefined,
+          address2: formData.address2 || undefined,
         }),
         tos: formData.agreeTerms,
         privacyAccepted: formData.agreePrivacy,
         marketingAccepted: formData.agreeMarketing,
       });
 
-      // 약사: 승인 대기 메시지 표시, 환자: 로그인 이동
-      if (memberType === 'pharmacist') {
+      // 약국: 승인 대기 메시지 표시, 환자: 로그인 이동
+      if (memberType === 'pharmacy') {
         setRegistrationComplete(true);
       } else {
         navigate('/login?type=patient');
@@ -162,19 +173,19 @@ export default function RegisterPage() {
   };
 
   const isFormValid = () => {
-    const baseFields = formData.name && formData.email && isPhoneValid &&
-      formData.agreeTerms && formData.agreePrivacy;
+    const baseFields = formData.lastName && formData.firstName && formData.nickname &&
+      formData.email && isPhoneValid && formData.agreeTerms && formData.agreePrivacy;
     const passwordValid = existingAccountMode
       ? formData.password.length > 0
       : isPasswordStrong && formData.password === formData.passwordConfirm;
     const baseValid = baseFields && passwordValid;
-    if (memberType === 'pharmacist') {
-      return baseValid && isLicenseValid;
+    if (memberType === 'pharmacy') {
+      return baseValid && formData.businessName && formData.businessNumber && formData.taxEmail;
     }
     return baseValid;
   };
 
-  // 약사 가입 완료 화면
+  // 약국 가입 완료 화면
   if (registrationComplete) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-white">
@@ -182,11 +193,11 @@ export default function RegisterPage() {
           <CheckCircle2 className="w-16 h-16 text-blue-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-slate-800 mb-2">가입 신청 완료</h2>
           <p className="text-slate-500 mb-6">
-            약사 회원 가입 신청이 접수되었습니다.<br />
+            약국 회원 가입 신청이 접수되었습니다.<br />
             운영자 승인 후 이용하실 수 있습니다.
           </p>
           <NavLink
-            to="/login?type=pharmacist"
+            to="/login"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
           >
             로그인 페이지로
@@ -241,18 +252,18 @@ export default function RegisterPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMemberType('pharmacist')}
+                  onClick={() => setMemberType('pharmacy')}
                   className={`flex-1 py-3 rounded-xl font-medium text-sm border-2 transition-colors ${
-                    memberType === 'pharmacist'
+                    memberType === 'pharmacy'
                       ? 'border-blue-600 bg-blue-50 text-blue-700'
                       : 'border-slate-200 text-slate-500 hover:border-slate-300'
                   }`}
                 >
-                  약사
+                  약국
                 </button>
               </div>
-              {memberType === 'pharmacist' && (
-                <p className="text-xs text-slate-400 mt-2">약사 가입은 운영자 승인 후 이용 가능합니다.</p>
+              {memberType === 'pharmacy' && (
+                <p className="text-xs text-slate-400 mt-2">약국 가입은 운영자 승인 후 이용 가능합니다.</p>
               )}
             </div>
 
@@ -260,17 +271,52 @@ export default function RegisterPage() {
             <div className="pt-4 border-t">
               <h3 className="text-sm font-semibold text-slate-800 mb-3">기본 정보</h3>
               <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">성</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="홍"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="길동"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">이름</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    닉네임 <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="nickname"
+                      value={formData.nickname}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="홍길동"
+                      placeholder="서비스에서 사용할 닉네임"
                       required
                     />
                   </div>
@@ -399,45 +445,33 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* 약사 정보 (약사 선택 시에만 표시) */}
-            {memberType === 'pharmacist' && (
+            {/* 약국 정보 (약국 선택 시에만 표시) */}
+            {memberType === 'pharmacy' && (
               <div className="pt-4 border-t">
-                <h3 className="text-sm font-semibold text-slate-800 mb-3">약사 정보</h3>
+                <h3 className="text-sm font-semibold text-slate-800 mb-3">약국 정보</h3>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      약사 면허번호 <span className="text-red-500">*</span>
+                      약국명 <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      name="licenseNumber"
-                      inputMode="numeric"
-                      value={formData.licenseNumber}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="숫자만 입력"
-                      required
-                    />
-                    <p className="text-xs text-slate-400 mt-1">약사 면허증에 기재된 번호를 입력해 주세요</p>
-                    {formData.licenseNumber && !isLicenseValid && (
-                      <p className="text-xs text-red-500 mt-1">면허번호를 정확히 입력해 주세요</p>
-                    )}
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="건강약국"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">약국명 (선택)</label>
-                    <input
-                      type="text"
-                      name="businessName"
-                      value={formData.businessName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="건강약국"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">사업자등록번호 (선택)</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      사업자등록번호 <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       name="businessNumber"
@@ -447,6 +481,74 @@ export default function RegisterPage() {
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="숫자만 입력 (1234567890)"
                       maxLength={10}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      세금계산서 이메일 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="email"
+                        name="taxEmail"
+                        value={formData.taxEmail}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="tax@pharmacy.com"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">업태</label>
+                      <input
+                        type="text"
+                        name="businessType"
+                        value={formData.businessType}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="소매업"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">업종</label>
+                      <input
+                        type="text"
+                        name="businessCategory"
+                        value={formData.businessCategory}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="의약품"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">주소</label>
+                    <input
+                      type="text"
+                      name="address1"
+                      value={formData.address1}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="서울특별시 강남구 테헤란로 123"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">상세주소</label>
+                    <input
+                      type="text"
+                      name="address2"
+                      value={formData.address2}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="1층 건강약국"
                     />
                   </div>
                 </div>
@@ -543,23 +645,23 @@ export default function RegisterPage() {
                     <h3 className="font-bold text-base">제3조 (약관의 효력 및 변경)</h3>
                     <p>본 약관은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공지함으로써 효력이 발생합니다.</p>
                     <h3 className="font-bold text-base">제4조 (회원가입 및 서비스 이용)</h3>
-                    <p>1. 회원가입은 환자 또는 약사 회원으로 가능합니다.</p>
-                    <p>2. 약사 회원은 면허 확인 후 운영자 승인을 거쳐 이용이 가능합니다.</p>
+                    <p>1. 회원가입은 환자 또는 약국 회원으로 가능합니다.</p>
+                    <p>2. 약국 회원은 사업자 정보 확인 후 운영자 승인을 거쳐 이용이 가능합니다.</p>
                     <p>3. 회원은 가입 시 정확한 정보를 제공해야 하며, 허위 정보 제공 시 서비스 이용이 제한될 수 있습니다.</p>
-                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 2월 23일</p>
+                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>
                   </>
                 ) : (
                   <>
                     <h3 className="font-bold text-base">1. 개인정보의 수집 및 이용 목적</h3>
                     <p>GlycoPharm은 회원 가입 및 관리, 서비스 제공을 위하여 개인정보를 처리합니다.</p>
                     <h3 className="font-bold text-base">2. 수집하는 개인정보 항목</h3>
-                    <p><strong>필수 항목:</strong> 이메일, 비밀번호, 성명, 휴대전화 번호</p>
-                    <p><strong>약사 추가 항목:</strong> 약사 면허번호, 약국명, 사업자등록번호</p>
+                    <p><strong>필수 항목:</strong> 이메일, 비밀번호, 성명, 닉네임, 휴대전화 번호</p>
+                    <p><strong>약국 추가 항목:</strong> 약국명, 사업자등록번호, 세금계산서 이메일, 업태, 업종, 주소</p>
                     <h3 className="font-bold text-base">3. 개인정보의 보유 및 이용 기간</h3>
                     <p>회원 탈퇴 시까지 보유하며, 관계 법령에 따라 일정 기간 보존이 필요한 경우 해당 기간 동안 보관합니다.</p>
                     <h3 className="font-bold text-base">4. 정보주체의 권리</h3>
                     <p>정보주체는 언제든지 개인정보 열람, 정정, 삭제, 처리 정지 요구를 할 수 있습니다.</p>
-                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 2월 23일</p>
+                    <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>
                   </>
                 )}
               </div>

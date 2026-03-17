@@ -107,7 +107,7 @@ export class MembershipConsoleController {
 
       // Fetch users (users 테이블: camelCase columns — SnakeNamingStrategy 비활성)
       const users = await AppDataSource.query(
-        `SELECT u.id, u.email, u."firstName", u."lastName", u.name, u.phone,
+        `SELECT u.id, u.email, u."firstName", u."lastName", u.name, u.nickname, u.phone,
                 u.status, u."isActive", u."createdAt", u."updatedAt",
                 u."businessInfo"->>'businessName' AS company
          FROM users u
@@ -179,6 +179,7 @@ export class MembershipConsoleController {
         firstName: u.firstName,
         lastName: u.lastName,
         name: u.name,
+        nickname: u.nickname || null,
         company: u.company,
         phone: u.phone,
         status: u.status,
@@ -222,8 +223,9 @@ export class MembershipConsoleController {
 
       // Fetch user (users 테이블: camelCase columns)
       const userRows = await AppDataSource.query(
-        `SELECT id, email, "firstName", "lastName", name, phone,
+        `SELECT id, email, "firstName", "lastName", name, nickname, phone,
                 status, "isActive", "createdAt", "updatedAt",
+                "businessInfo",
                 "businessInfo"->>'businessName' AS company
          FROM users WHERE id = $1`,
         [userId]
@@ -270,10 +272,12 @@ export class MembershipConsoleController {
           firstName: u.firstName,
           lastName: u.lastName,
           name: u.name,
+          nickname: u.nickname || null,
           company: u.company,
           phone: u.phone,
           status: u.status,
           isActive: u.isActive,
+          businessInfo: u.businessInfo || null,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         },
@@ -469,13 +473,18 @@ export class MembershipConsoleController {
 
   /**
    * PUT /api/v1/operator/members/:userId
-   * 사용자 정보 수정 (비밀번호 변경 등)
+   * 사용자 정보 수정 (프로필 + 비밀번호 + 사업자 정보)
+   * WO-O4O-GLYCOPHARM-MEMBER-EDIT-V1
    */
   updateMember = async (req: Request, res: Response): Promise<void> => {
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
-      const { password } = req.body;
+      const {
+        password, lastName, firstName, nickname, phone,
+        businessName, businessNumber, taxEmail, businessType,
+        businessCategory, address1, address2,
+      } = req.body;
 
       if (!scope.isPlatformAdmin) {
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
@@ -485,6 +494,7 @@ export class MembershipConsoleController {
         }
       }
 
+      // 1. Password update (기존 로직)
       if (password) {
         const bcryptModule = await import('bcryptjs');
         const bcrypt = bcryptModule.default || bcryptModule;
@@ -492,6 +502,50 @@ export class MembershipConsoleController {
         await AppDataSource.query(
           `UPDATE users SET password = $1, "updatedAt" = NOW() WHERE id = $2`,
           [hashedPassword, userId]
+        );
+      }
+
+      // 2. Profile fields update
+      const sets: string[] = [];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (lastName !== undefined) { sets.push(`"lastName" = $${idx++}`); params.push(lastName); }
+      if (firstName !== undefined) { sets.push(`"firstName" = $${idx++}`); params.push(firstName); }
+      if (nickname !== undefined) { sets.push(`nickname = $${idx++}`); params.push(nickname); }
+      if (phone !== undefined) { sets.push(`phone = $${idx++}`); params.push(phone.replace(/\D/g, '')); }
+
+      // name 동기화 (lastName+firstName → name)
+      if (lastName !== undefined || firstName !== undefined) {
+        sets.push(`name = $${idx++}`);
+        params.push(`${lastName || ''}${firstName || ''}`.trim());
+      }
+
+      // 3. businessInfo JSONB 머지
+      const bizFields: Record<string, string> = {};
+      if (businessName !== undefined) bizFields.businessName = businessName;
+      if (businessNumber !== undefined) bizFields.businessNumber = businessNumber;
+      if (taxEmail !== undefined) bizFields.email = taxEmail;
+      if (businessType !== undefined) bizFields.businessType = businessType;
+      if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
+      if (address1 !== undefined) bizFields.address = address1;
+      if (address2 !== undefined) bizFields.address2 = address2;
+
+      if (Object.keys(bizFields).length > 0) {
+        const [existing] = await AppDataSource.query(
+          `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
+        );
+        const merged = { ...(existing?.businessInfo || {}), ...bizFields };
+        sets.push(`"businessInfo" = $${idx++}`);
+        params.push(JSON.stringify(merged));
+      }
+
+      if (sets.length > 0) {
+        sets.push(`"updatedAt" = NOW()`);
+        params.push(userId);
+        await AppDataSource.query(
+          `UPDATE users SET ${sets.join(', ')} WHERE id = $${idx}`,
+          params
         );
       }
 

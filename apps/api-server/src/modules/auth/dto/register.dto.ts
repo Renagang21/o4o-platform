@@ -109,6 +109,26 @@ export class RegisterRequestDto {
   @IsString()
   businessType?: string;
 
+  /** GlycoPharm: 세금계산서 이메일 */
+  @IsOptional()
+  @IsEmail({}, { message: 'Valid tax email is required' })
+  taxEmail?: string;
+
+  /** GlycoPharm: 업종 */
+  @IsOptional()
+  @IsString()
+  businessCategory?: string;
+
+  /** GlycoPharm: 주소 */
+  @IsOptional()
+  @IsString()
+  address1?: string;
+
+  /** GlycoPharm: 상세주소 */
+  @IsOptional()
+  @IsString()
+  address2?: string;
+
   // --- GlucoseView 전용 필드 ---
 
   /** GlucoseView: 표시 이름 (사이트에서 보일 이름) */

@@ -97,13 +97,12 @@ export default function Header() {
                   <div style={styles.dropdown}>
                     <div style={styles.dropdownHeader}>
                       <p style={styles.dropdownName}>
-                        {(() => {
-                          const extUser = user as any;
-                          if (extUser?.lastName || extUser?.firstName) {
-                            return `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() || '운영자';
-                          }
-                          return (user?.name && user.name !== user.email) ? user.name : '운영자';
-                        })()}님
+                        {/* WO-O4O-NAME-NORMALIZATION-V1 */}
+                        {(user as any)?.displayName
+                          || (((user as any)?.lastName || (user as any)?.firstName) ? `${(user as any).lastName || ''}${(user as any).firstName || ''}`.trim() : '')
+                          || (user?.name && user.name !== user.email ? user.name : '')
+                          || user?.email?.split('@')[0]
+                          || '사용자'}님
                       </p>
                       <p style={styles.dropdownEmail}>{user?.email}</p>
                       <p style={styles.dropdownRole}>{roleLabel}</p>

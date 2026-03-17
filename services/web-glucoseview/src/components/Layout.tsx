@@ -132,7 +132,7 @@ export default function Layout() {
                     <button
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="w-9 h-9 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center transition-colors"
-                      title={user?.displayName || user?.name}
+                      title={user?.displayName || user?.name || user?.email?.split('@')[0] || '사용자'}
                     >
                       <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -144,7 +144,7 @@ export default function Layout() {
                       <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
                         {/* 사용자 정보 */}
                         <div className="px-4 py-3 border-b border-slate-100">
-                          <p className="text-sm font-medium text-slate-900">{user?.displayName || user?.name}</p>
+                          <p className="text-sm font-medium text-slate-900">{user?.displayName || user?.name || user?.email?.split('@')[0] || '사용자'}</p>
                           <p className="text-xs text-slate-500">{user?.email}</p>
                           {user?.pharmacyName && (
                             <p className="text-xs text-slate-400 mt-1">{user.pharmacyName}</p>

@@ -104,14 +104,13 @@ export default function AccountMenu() {
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
   const isOperator = isSuperOperator(user);
 
-  // 표시 이름: lastName + firstName > name > '운영자' 우선순위
+  // WO-O4O-NAME-NORMALIZATION-V1: displayName > lastName+firstName > name > email prefix > '사용자'
   const extUser = user as any;
-  let displayName = '운영자';
-  if (extUser.lastName || extUser.firstName) {
-    displayName = `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() || displayName;
-  } else if (user.name && user.name !== user.email) {
-    displayName = user.name;
-  }
+  const displayName = extUser.displayName
+    || ((extUser.lastName || extUser.firstName) ? `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() : '')
+    || (user.name && user.name !== user.email ? user.name : '')
+    || user.email?.split('@')[0]
+    || '사용자';
 
   return (
     <div ref={menuRef} className="relative">

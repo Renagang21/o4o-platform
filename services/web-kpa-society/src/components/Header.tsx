@@ -35,27 +35,32 @@ function isSuperOperator(user: UserType | null): boolean {
 }
 
 /**
- * 사용자 표시 이름 헬퍼
- * 우선순위: lastName+firstName > name > '운영자'
- * name이 이메일과 동일한 경우 '운영자' 표시
+ * WO-O4O-NAME-NORMALIZATION-V1: 사용자 표시 이름 헬퍼
+ * 우선순위: displayName > lastName+firstName > name > email prefix > '사용자'
  */
 function getUserDisplayName(user: UserType | null): string {
   if (!user) return '사용자';
 
-  // 1. lastName + firstName 조합 시도
   const extendedUser = user as any;
+
+  // 1. API computed displayName
+  if (extendedUser.displayName) return extendedUser.displayName;
+
+  // 2. lastName + firstName 조합
   if (extendedUser.lastName || extendedUser.firstName) {
     const fullName = `${extendedUser.lastName || ''}${extendedUser.firstName || ''}`.trim();
     if (fullName) return fullName;
   }
 
-  // 2. name 필드 사용 (이메일과 다른 경우에만)
+  // 3. name 필드 (이메일과 다른 경우에만)
   if (user.name && user.name !== user.email) {
     return user.name;
   }
 
-  // 3. 기본값
-  return '운영자';
+  // 4. email prefix
+  if (user.email) return user.email.split('@')[0];
+
+  return '사용자';
 }
 
 interface MenuItem {

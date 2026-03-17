@@ -133,13 +133,12 @@ export default function Header() {
                     <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border py-2 z-50 animate-slide-in-right">
                       <div className="px-4 py-2 border-b">
                         <p className="text-sm font-medium text-slate-800">
-                          {(() => {
-                            const extUser = user as any;
-                            if (extUser?.lastName || extUser?.firstName) {
-                              return `${extUser.lastName || ''}${extUser.firstName || ''}`.trim() || '운영자';
-                            }
-                            return (user?.name && user.name !== user.email) ? user.name : '운영자';
-                          })()}
+                          {/* WO-O4O-NAME-NORMALIZATION-V1 */}
+                          {(user as any)?.displayName
+                            || (((user as any)?.lastName || (user as any)?.firstName) ? `${(user as any).lastName || ''}${(user as any).firstName || ''}`.trim() : '')
+                            || (user?.name && user.name !== user.email ? user.name : '')
+                            || user?.email?.split('@')[0]
+                            || '사용자'}
                         </p>
                         <p className="text-xs text-slate-500">{user?.email}</p>
                       </div>

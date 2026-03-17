@@ -264,6 +264,12 @@ export class AuthController extends BaseController {
         loginUser.kpaMembership = kpaMembership;
       } catch { /* non-critical */ }
 
+      // WO-O4O-NAME-NORMALIZATION-V1: displayName 추가
+      loginUser.displayName =
+        (result.user.lastName || result.user.firstName)
+          ? `${result.user.lastName || ''}${result.user.firstName || ''}`.trim()
+          : result.user.name || result.user.email?.split('@')[0] || '사용자';
+
       // Response: Cookie is primary, JSON tokens for cross-origin or legacy support
       return BaseController.ok(res, {
         message: 'Login successful',
@@ -425,6 +431,24 @@ export class AuthController extends BaseController {
           membership.role = effectiveRole;
           await txSmRepo.save(membership);
 
+          // WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1: businessInfo 머지 (기존 정보 보존 + 신규 추가)
+          const newBiz: Record<string, string> = {};
+          const effectiveBusinessName = data.businessName || data.companyName;
+          if (effectiveBusinessName) newBiz.businessName = effectiveBusinessName;
+          if (data.businessNumber) newBiz.businessNumber = data.businessNumber;
+          if (data.businessType) newBiz.businessType = data.businessType;
+          if (data.taxEmail) newBiz.email = data.taxEmail;
+          if (data.businessCategory) newBiz.businessCategory = data.businessCategory;
+          if (data.address1) newBiz.address = data.address1;
+          if (data.address2) newBiz.address2 = data.address2;
+          if (Object.keys(newBiz).length > 0) {
+            const merged = { ...(existingUser.businessInfo || {}), ...newBiz };
+            await manager.query(
+              `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
+              [JSON.stringify(merged), existingUser.id]
+            );
+          }
+
           // KPA Society: auto-create KPA member
           await AuthController.createKpaRecords(manager, existingUser.id, data);
         });
@@ -489,6 +513,18 @@ export class AuthController extends BaseController {
         }
         if (data.businessType) {
           businessInfo.businessType = data.businessType;
+        }
+        if (data.taxEmail) {
+          businessInfo.email = data.taxEmail;
+        }
+        if (data.businessCategory) {
+          businessInfo.businessCategory = data.businessCategory;
+        }
+        if (data.address1) {
+          businessInfo.address = data.address1;
+        }
+        if (data.address2) {
+          businessInfo.address2 = data.address2;
         }
         if (Object.keys(businessInfo).length > 0) {
           newUser.businessInfo = businessInfo;
@@ -800,6 +836,15 @@ export class AuthController extends BaseController {
       // roles / scopes 주입 (toPublicData 이미 roles 포함하지만 일관성 보장)
       userData.roles = roles;
       userData.scopes = scopes;
+
+      // WO-O4O-NAME-NORMALIZATION-V1: firstName, lastName, displayName 추가
+      const ud0 = userData as Record<string, unknown>;
+      ud0.firstName = req.user.firstName || null;
+      ud0.lastName = req.user.lastName || null;
+      ud0.displayName =
+        (req.user.lastName || req.user.firstName)
+          ? `${req.user.lastName || ''}${req.user.firstName || ''}`.trim()
+          : req.user.name || req.user.email?.split('@')[0] || '사용자';
 
       // WO-ROLE-NORMALIZATION-PHASE3-B-V1: derive from kpa_pharmacist_profiles + organization_members
       const qualification = await derivePharmacistQualification(req.user.id);

@@ -42,7 +42,8 @@ export default function RegisterPage() {
     email: '',
     password: '',
     passwordConfirm: '',
-    name: '',
+    lastName: '',
+    firstName: '',
     phone: '',
     businessName: '',
     businessNumber: '',
@@ -92,6 +93,7 @@ export default function RegisterPage() {
     try {
       const response = await api.post('/auth/register', {
         ...formData,
+        name: `${formData.lastName}${formData.firstName}`,
         phone: formData.phone.replace(/\D/g, ''),
         role: selectedRole,
         service: 'k-cosmetics',
@@ -133,7 +135,7 @@ export default function RegisterPage() {
   const isPhoneValid = /^\d{10,11}$/.test(formData.phone);
 
   const isFormValid = () => {
-    const base = formData.email && formData.name && formData.phone && isPhoneValid &&
+    const base = formData.email && formData.lastName && formData.firstName && formData.phone && isPhoneValid &&
       formData.agreeTerms && formData.agreePrivacy;
     if (existingAccountMode) return base && formData.password.length > 0;
     return base && isPasswordStrong && formData.password === formData.passwordConfirm;
@@ -279,15 +281,27 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div style={styles.inputRow}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 2fr', gap: '12px' }}>
+              <div style={styles.inputGroup}>
+                <label style={styles.label}>성 *</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  placeholder="홍"
+                  style={styles.input}
+                  required
+                />
+              </div>
               <div style={styles.inputGroup}>
                 <label style={styles.label}>이름 *</label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
-                  placeholder="홍길동"
+                  placeholder="길동"
                   style={styles.input}
                   required
                 />

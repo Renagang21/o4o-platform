@@ -49,7 +49,8 @@ export default function RegisterPage() {
 
   const [form, setForm] = useState({
     licenseNumber: '',
-    realName: '',
+    lastName: '',
+    firstName: '',
     displayName: '',
     phone: '',
     email: '',
@@ -99,7 +100,7 @@ export default function RegisterPage() {
     setError('');
 
     // 유효성 검사
-    if (!form.licenseNumber || !form.realName || !form.displayName ||
+    if (!form.licenseNumber || !form.lastName || !form.firstName || !form.displayName ||
         !form.phone || !form.email || !form.password ||
         !form.branchId || !form.chapterId || !form.pharmacyName) {
       setError('모든 필수 항목을 입력해주세요.');
@@ -140,7 +141,9 @@ export default function RegisterPage() {
       await api.post('/auth/register', {
         email: form.email,
         password: form.password,
-        name: form.realName,
+        lastName: form.lastName,
+        firstName: form.firstName,
+        name: `${form.lastName}${form.firstName}`,
         phone: normalizedPhone,
         role: 'pharmacist',
         service: 'glucoseview',
@@ -244,16 +247,28 @@ export default function RegisterPage() {
             </div>
 
             {/* 이름 */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">
-                  이름 (본명) <span className="text-red-500">*</span>
+                  성 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={form.realName}
-                  onChange={(e) => setForm({ ...form, realName: e.target.value })}
-                  placeholder="홍길동"
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                  placeholder="홍"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  이름 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                  placeholder="길동"
                   className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
