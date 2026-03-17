@@ -1421,6 +1421,15 @@ const startServer = async () => {
       logger.error('Failed to register RBAC Backfill User Role routes:', rbacBackfillError);
     }
 
+    // Approval Test debug endpoint
+    try {
+      const { createApprovalTestRouter } = await import('./routes/debug/approval-test.controller.js');
+      app.use('/__debug__/approval-test', createApprovalTestRouter(AppDataSource));
+      logger.info('✅ Approval Test endpoint registered at /__debug__/approval-test');
+    } catch (approvalTestError) {
+      logger.error('Failed to register Approval Test routes:', approvalTestError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
