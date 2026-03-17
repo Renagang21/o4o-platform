@@ -1430,6 +1430,15 @@ const startServer = async () => {
       logger.error('Failed to register Approval Test routes:', approvalTestError);
     }
 
+    // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1)
+    try {
+      const { createUserDebugRouter } = await import('./routes/debug/user-debug.controller.js');
+      app.use('/__debug__/user', createUserDebugRouter(AppDataSource));
+      logger.info('✅ User Debug endpoint registered at /__debug__/user');
+    } catch (userDebugError) {
+      logger.error('Failed to register User Debug routes:', userDebugError);
+    }
+
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
       const { createPlatformHubController } = await import('./modules/platform/platform-hub.controller.js');
