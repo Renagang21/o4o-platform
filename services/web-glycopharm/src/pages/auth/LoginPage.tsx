@@ -216,10 +216,14 @@ export default function LoginPage() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={async () => {
+                  const testEmail = 'patient_test@glycopharm.co.kr';
+                  const testPass = 'O4oTestPass';
+                  setEmail(testEmail);
+                  setPassword(testPass);
                   setError('');
                   setIsSubmitting(true);
                   try {
-                    await login('patient_test@glycopharm.co.kr', 'O4oTestPass');
+                    await login(testEmail, testPass);
                     navigate('/patient');
                   } catch (err) {
                     setError(err instanceof Error ? err.message : '테스트 로그인 실패');
@@ -234,10 +238,14 @@ export default function LoginPage() {
                 type="button"
                 disabled={isSubmitting}
                 onClick={async () => {
+                  const testEmail = 'pharmacist_test@glycopharm.co.kr';
+                  const testPass = 'O4oTestPass';
+                  setEmail(testEmail);
+                  setPassword(testPass);
                   setError('');
                   setIsSubmitting(true);
                   try {
-                    await login('pharmacist_test@glycopharm.co.kr', 'O4oTestPass');
+                    await login(testEmail, testPass);
                     navigate('/care');
                   } catch (err) {
                     setError(err instanceof Error ? err.message : '테스트 로그인 실패');

@@ -143,10 +143,14 @@ export default function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 onClick={async () => {
+                  const testEmail = 'patient_test@glycopharm.co.kr';
+                  const testPass = 'O4oTestPass';
+                  setEmail(testEmail);
+                  setPassword(testPass);
                   setError('');
                   setIsLoading(true);
                   try {
-                    const result = await login('patient_test@glycopharm.co.kr', 'O4oTestPass');
+                    const result = await login(testEmail, testPass);
                     if (result.success) {
                       navigate('/patient');
                     } else {
@@ -166,10 +170,14 @@ export default function LoginPage() {
                 type="button"
                 disabled={isLoading}
                 onClick={async () => {
+                  const testEmail = 'pharmacist_test@glycopharm.co.kr';
+                  const testPass = 'O4oTestPass';
+                  setEmail(testEmail);
+                  setPassword(testPass);
                   setError('');
                   setIsLoading(true);
                   try {
-                    const result = await login('pharmacist_test@glycopharm.co.kr', 'O4oTestPass');
+                    const result = await login(testEmail, testPass);
                     if (result.success) {
                       navigate('/care');
                     } else {
