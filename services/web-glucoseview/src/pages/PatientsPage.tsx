@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import PlaceholderChart from '../components/PlaceholderChart';
 import { useAuth } from '../contexts/AuthContext';
 import { GlucoseTable } from '../components/common/GlucoseTable';
@@ -85,7 +86,7 @@ export default function PatientsPage() {
 
   const handleRegisterCustomer = async () => {
     if (!newCustomer.name.trim()) {
-      alert('이름을 입력해주세요.');
+      toast.error('이름을 입력해주세요.');
       return;
     }
 
@@ -107,7 +108,7 @@ export default function PatientsPage() {
       setCurrentPage(1);
       await loadCustomers();
     } catch (err: any) {
-      alert(err.message || '고객 등록에 실패했습니다.');
+      toast.error(err.message || '고객 등록에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -130,7 +131,7 @@ export default function PatientsPage() {
   // 고객 정보 수정 저장
   const handleSaveEditCustomer = async () => {
     if (!editCustomer.name.trim()) {
-      alert('이름을 입력해주세요.');
+      toast.error('이름을 입력해주세요.');
       return;
     }
 
@@ -149,7 +150,7 @@ export default function PatientsPage() {
       setShowEditModal(false);
       await loadCustomers();
     } catch (err: any) {
-      alert(err.message || '고객 정보 수정에 실패했습니다.');
+      toast.error(err.message || '고객 정보 수정에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -225,7 +226,7 @@ export default function PatientsPage() {
       const fullText = `${shareTitle}\n\n${shareText}\n\n${shareUrl}`;
       try {
         await navigator.clipboard.writeText(fullText);
-        alert('링크가 클립보드에 복사되었습니다.\n카카오톡이나 메시지 앱에 붙여넣기 하세요.');
+        toast.success('링크가 클립보드에 복사되었습니다.\n카카오톡이나 메시지 앱에 붙여넣기 하세요.');
       } catch {
         prompt('아래 내용을 복사하세요:', fullText);
       }
@@ -247,7 +248,7 @@ export default function PatientsPage() {
 
   const handleAskAI = () => {
     if (!aiQuestion.trim()) return;
-    alert(`AI 질문: "${aiQuestion}"\n\n(실제 연동 시 AI 응답이 표시됩니다)`);
+    toast.info(`AI 질문: "${aiQuestion}"\n\n(실제 연동 시 AI 응답이 표시됩니다)`);
     setAiQuestion('');
   };
 

@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { joinRequestApi } from '../../api/joinRequestApi';
 import type { OrganizationJoinRequest } from '../../types/joinRequest';
 import {
@@ -51,7 +52,7 @@ export function OrganizationJoinRequestsPage() {
       setReviewNote('');
       await loadRequests();
     } catch (err: any) {
-      alert(`승인 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '승인에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -68,7 +69,7 @@ export function OrganizationJoinRequestsPage() {
       setReviewNote('');
       await loadRequests();
     } catch (err: any) {
-      alert(`반려 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '반려에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

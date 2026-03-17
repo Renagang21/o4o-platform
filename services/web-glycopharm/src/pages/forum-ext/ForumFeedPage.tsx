@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumExtPost, ForumReply, PostType } from '@/types';
 
@@ -201,10 +202,10 @@ export default function ForumFeedPage() {
     try {
       const response = await apiClient.post(`/api/v1/glycopharm/forums/posts/${postId}/replies`, { content });
       if (response.error) {
-        alert(response.error.message || '댓글 등록에 실패했습니다.');
+        toast.error(response.error.message || '댓글 등록에 실패했습니다.');
         return;
       }
-      alert('댓글이 등록되었습니다.');
+      toast.success('댓글이 등록되었습니다.');
       setReplyInputs((prev) => ({ ...prev, [postId]: '' }));
       // 댓글 목록 새로고침
       const repliesResponse = await apiClient.get<ForumReply[]>(`/api/v1/glycopharm/forums/posts/${postId}/replies`);
@@ -212,14 +213,14 @@ export default function ForumFeedPage() {
         setReplies((prev) => ({ ...prev, [postId]: repliesResponse.data || [] }));
       }
     } catch {
-      alert('댓글이 등록되었습니다.');
+      toast.success('댓글이 등록되었습니다.');
       setReplyInputs((prev) => ({ ...prev, [postId]: '' }));
     }
   };
 
   const handleCreatePost = async () => {
     if (!newPost.title || !newPost.content) {
-      alert('제목과 내용을 입력해주세요.');
+      toast.error('제목과 내용을 입력해주세요.');
       return;
     }
 
@@ -227,10 +228,10 @@ export default function ForumFeedPage() {
     try {
       const response = await apiClient.post(`/api/v1/glycopharm/forums/${forumId}/posts`, newPost);
       if (response.error) {
-        alert(response.error.message || '게시글 등록에 실패했습니다.');
+        toast.error(response.error.message || '게시글 등록에 실패했습니다.');
         return;
       }
-      alert('게시글이 등록되었습니다.');
+      toast.success('게시글이 등록되었습니다.');
       setShowCreateModal(false);
       setNewPost({ title: '', content: '', type: 'normal', linkedTrialId: '', linkedSignageId: '' });
       // 게시글 목록 새로고침
@@ -239,7 +240,7 @@ export default function ForumFeedPage() {
         setPosts(postsResponse.data);
       }
     } catch {
-      alert('게시글이 등록되었습니다.');
+      toast.success('게시글이 등록되었습니다.');
       setShowCreateModal(false);
     } finally {
       setIsSubmitting(false);

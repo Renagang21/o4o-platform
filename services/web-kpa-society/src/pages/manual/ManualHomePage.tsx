@@ -12,6 +12,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { ROLES, hasAnyRole } from '../../lib/role-constants';
 
@@ -79,7 +80,7 @@ export function ManualHomePage() {
 
   const handleCardClick = (card: ManualCard) => {
     if (card.requiredRoles && !hasAnyRole(userRoles, card.requiredRoles)) {
-      alert('해당 매뉴얼은 운영자 권한이 필요합니다.');
+      toast.error('해당 매뉴얼은 운영자 권한이 필요합니다.');
       return;
     }
     navigate(card.route);

@@ -14,6 +14,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 
@@ -182,10 +183,10 @@ export function AnnualReportFormPage() {
 
   const handleSubmit = () => {
     if (!formData.privacyConsent) {
-      alert('개인정보 수집·이용에 동의해 주세요.');
+      toast.error('개인정보 수집·이용에 동의해 주세요.');
       return;
     }
-    alert(`${formData.year}년도 약사 회원 신고서가 제출되었습니다.`);
+    toast.success(`${formData.year}년도 약사 회원 신고서가 제출되었습니다.`);
     navigate(`${servicePrefix}/mypage`);
   };
 

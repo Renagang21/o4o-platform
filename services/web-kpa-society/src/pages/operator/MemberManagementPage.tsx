@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import {
   Users,
   FileText,
@@ -269,7 +270,7 @@ function MembersTab({ onTotalChange }: { onTotalChange: (n: number) => void }) {
       });
       await fetchMembers();
     } catch (e: any) {
-      alert(`상태 변경 실패: ${e.message}`);
+      toast.error(e.message || '상태 변경에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -505,7 +506,7 @@ function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void })
       await fetchApps();
       onReviewComplete();
     } catch (e: any) {
-      alert(`처리 실패: ${e.message}`);
+      toast.error(e.message || '처리에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

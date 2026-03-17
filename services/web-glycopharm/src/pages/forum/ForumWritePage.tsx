@@ -14,6 +14,7 @@ import type { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '../../services/api';
+import { toast } from '@o4o/error-handling';
 
 interface ForumCategory {
   id: string;
@@ -67,15 +68,15 @@ export default function ForumWritePage() {
     e.preventDefault();
 
     if (!title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
     if (!categoryId) {
-      alert('카테고리를 선택해주세요.');
+      toast.error('카테고리를 선택해주세요.');
       return;
     }
     if (!content.trim()) {
-      alert('내용을 입력해주세요.');
+      toast.error('내용을 입력해주세요.');
       return;
     }
 
@@ -95,10 +96,10 @@ export default function ForumWritePage() {
       } else if (data.id) {
         navigate(`/forum/post/${data.id}`);
       } else {
-        alert(data.error || '게시글 작성에 실패했습니다.');
+        toast.error(data.error || '게시글 작성에 실패했습니다.');
       }
     } catch {
-      alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      toast.error('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setSubmitting(false);
     }

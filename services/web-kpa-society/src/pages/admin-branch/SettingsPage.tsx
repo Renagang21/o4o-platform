@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -76,24 +77,24 @@ export function SettingsPage() {
   ]);
 
   const handleSaveBranchInfo = () => {
-    alert('지부 정보 저장 (UI 데모)');
+    toast.info('지부 정보 저장 (UI 데모)');
   };
 
   const handleSaveFeeSettings = () => {
-    alert('연회비 설정 저장 (UI 데모)');
+    toast.info('연회비 설정 저장 (UI 데모)');
   };
 
   const handleAddAdmin = () => {
-    alert('관리자 추가 (UI 데모)');
+    toast.info('관리자 추가 (UI 데모)');
   };
 
   const handleEditAdmin = (id: string) => {
-    alert(`관리자 #${id} 수정 (UI 데모)`);
+    toast.info(`관리자 #${id} 수정 (UI 데모)`);
   };
 
   const handleRemoveAdmin = (id: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      alert(`관리자 #${id} 삭제 (UI 데모)`);
+      toast.info(`관리자 #${id} 삭제 (UI 데모)`);
     }
   };
 

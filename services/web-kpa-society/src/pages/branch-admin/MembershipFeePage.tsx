@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 
@@ -80,15 +81,15 @@ export function MembershipFeePage() {
   const pendingCount = records.filter((r) => r.year === filterYear && r.status === 'pending_confirm').length;
 
   const handleConfirmPayment = (recordId: string) => {
-    alert(`연회비 #${recordId} 납부 확인 완료`);
+    toast.success(`연회비 #${recordId} 납부 확인 완료`);
   };
 
   const handleSendReminder = () => {
     if (selectedRecords.length === 0) {
-      alert('대상을 선택하세요.');
+      toast.error('대상을 선택하세요.');
       return;
     }
-    alert(`${selectedRecords.length}명에게 납부 독촉 메시지 발송`);
+    toast.success(`${selectedRecords.length}명에게 납부 독촉 메시지 발송`);
   };
 
   const toggleSelectRecord = (id: string) => {

@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import { ROLES } from '../../lib/role-constants';
@@ -44,7 +45,7 @@ export function FeedbackNewPage() {
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
+      toast.error('제목과 내용을 모두 입력해주세요.');
       return;
     }
 
@@ -57,10 +58,10 @@ export function FeedbackNewPage() {
       // 임시: 로컬 저장 시뮬레이션
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      alert('피드백이 등록되었습니다.');
+      toast.success('피드백이 등록되었습니다.');
       navigate('/intranet/feedback');
     } catch {
-      alert('등록 중 오류가 발생했습니다.');
+      toast.error('등록 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }

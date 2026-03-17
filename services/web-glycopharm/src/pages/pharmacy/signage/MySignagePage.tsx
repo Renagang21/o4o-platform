@@ -33,6 +33,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { apiClient } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { LoadingState } from '@/components/common';
 import type { ContentItem, MySignageItem, ContentType } from '@/types';
 
@@ -143,7 +144,7 @@ export default function MySignagePage() {
     const item = items.find((i) => i.id === itemId);
     // 강제 광고는 삭제 불가
     if (item?.content.isForced) {
-      alert('운영자 광고는 삭제할 수 없습니다.');
+      toast.error('운영자 광고는 삭제할 수 없습니다.');
       return;
     }
     setItems((prev) => prev.filter((i) => i.id !== itemId));
@@ -205,13 +206,13 @@ export default function MySignagePage() {
         })),
       });
       if (response.error) {
-        alert(response.error.message || '저장에 실패했습니다.');
+        toast.error(response.error.message || '저장에 실패했습니다.');
         return;
       }
-      alert('편성이 저장되었습니다.');
+      toast.success('편성이 저장되었습니다.');
       setHasChanges(false);
     } catch {
-      alert('편성이 저장되었습니다.');
+      toast.success('편성이 저장되었습니다.');
       setHasChanges(false);
     } finally {
       setIsSaving(false);

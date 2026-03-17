@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
+import { toast } from '@o4o/error-handling';
 import type { StoreProduct } from '@/types/store';
 
 export default function StoreProductDetail() {
@@ -71,9 +72,9 @@ export default function StoreProductDetail() {
     setAddingToCart(true);
     try {
       await storeApi.addToCart(storeSlug, productId, quantity);
-      alert('장바구니에 추가되었습니다.');
+      toast.success('장바구니에 추가되었습니다.');
     } catch (err: any) {
-      alert(err.message || '장바구니 추가에 실패했습니다.');
+      toast.error(err.message || '장바구니 추가에 실패했습니다.');
     } finally {
       setAddingToCart(false);
     }

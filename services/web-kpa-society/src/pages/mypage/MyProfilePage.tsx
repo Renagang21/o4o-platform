@@ -12,6 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi, type ProfileResponse } from '../../api';
 import { useAuth, ACTIVITY_TYPE_LABELS } from '../../contexts';
@@ -139,9 +140,9 @@ export function MyProfilePage() {
       await loadData();
 
       setIsEditMode(false);
-      alert('프로필이 저장되었습니다.');
+      toast.success('프로필이 저장되었습니다.');
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -170,7 +171,7 @@ export function MyProfilePage() {
         newPasswordConfirm: passwordData.newPasswordConfirm,
       });
 
-      alert('비밀번호가 변경되었습니다.');
+      toast.success('비밀번호가 변경되었습니다.');
       setIsPasswordMode(false);
       setPasswordData({ currentPassword: '', newPassword: '', newPasswordConfirm: '' });
     } catch (err: any) {

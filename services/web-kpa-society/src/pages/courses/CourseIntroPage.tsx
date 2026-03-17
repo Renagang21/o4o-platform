@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -102,7 +103,7 @@ export function CourseIntroPage() {
         setLessonsAvailable(true);
       } catch { /* ignore */ }
     } catch {
-      alert('수강 신청에 실패했습니다.');
+      toast.error('수강 신청에 실패했습니다.');
     } finally {
       setEnrolling(false);
     }

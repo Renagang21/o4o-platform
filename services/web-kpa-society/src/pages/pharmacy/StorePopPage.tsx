@@ -10,6 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Megaphone, Plus, Trash2, ExternalLink, FileDown, QrCode } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
 import { StoreLibrarySelectorModal } from '../../components/store/StoreLibrarySelectorModal';
 import type { LibrarySelectorResult } from '../../components/store/StoreLibrarySelectorModal';
@@ -87,7 +88,7 @@ export function StorePopPage() {
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 60000);
     } catch {
-      alert('POP PDF 생성에 실패했습니다');
+      toast.error('POP PDF 생성에 실패했습니다');
     } finally {
       setGenerating(false);
     }

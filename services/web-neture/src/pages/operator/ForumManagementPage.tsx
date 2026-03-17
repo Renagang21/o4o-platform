@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Plus,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/apiClient';
 
 type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
@@ -117,10 +118,10 @@ export default function ForumManagementPage() {
         setSelectedRequest(null);
         setReviewComment('');
       } else {
-        alert(data.error || '처리 실패');
+        toast.error(data.error || '처리 실패');
       }
     } catch {
-      alert('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
     }
@@ -139,12 +140,12 @@ export default function ForumManagementPage() {
         setShowCreateModal(false);
         setCreateName('');
         setCreateDescription('');
-        alert('포럼 카테고리가 생성되었습니다.');
+        toast.success('포럼 카테고리가 생성되었습니다.');
       } else {
-        alert(data.error || '생성 실패');
+        toast.error(data.error || '생성 실패');
       }
     } catch {
-      alert('생성 중 오류가 발생했습니다.');
+      toast.error('생성 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
     }

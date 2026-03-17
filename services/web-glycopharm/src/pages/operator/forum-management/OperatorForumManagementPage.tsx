@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import type { Forum, ForumApplication, ForumStatus, ForumApplicationStatus, UserRole } from '@/types';
+import { toast } from '@o4o/error-handling';
 
 // Mock 포럼 신청 데이터
 const mockApplications: ForumApplication[] = [
@@ -187,12 +188,12 @@ export default function OperatorForumManagementPage() {
       )
     );
     // TODO: 실제로 포럼 생성 API 호출
-    alert('포럼 신청이 승인되었습니다. 새 포럼이 생성됩니다.');
+    toast.success('포럼 신청이 승인되었습니다. 새 포럼이 생성됩니다.');
   };
 
   const handleReject = () => {
     if (!rejectModal || !rejectReason.trim()) {
-      alert('반려 사유를 입력해주세요.');
+      toast.error('반려 사유를 입력해주세요.');
       return;
     }
     setApplications((prev) =>
@@ -204,7 +205,7 @@ export default function OperatorForumManagementPage() {
     );
     setRejectModal(null);
     setRejectReason('');
-    alert('포럼 신청이 반려되었습니다.');
+    toast.success('포럼 신청이 반려되었습니다.');
   };
 
   const handleStatusChange = (forumId: string, newStatus: ForumStatus) => {
@@ -214,7 +215,7 @@ export default function OperatorForumManagementPage() {
       )
     );
     setSelectedForum(null);
-    alert(`포럼 상태가 ${newStatus === 'open' ? 'Open' : newStatus === 'readonly' ? '읽기전용' : '아카이브'}으로 변경되었습니다.`);
+    toast.success(`포럼 상태가 ${newStatus === 'open' ? 'Open' : newStatus === 'readonly' ? '읽기전용' : '아카이브'}으로 변경되었습니다.`);
   };
 
   const filteredApplications = applications.filter((app) =>

@@ -22,6 +22,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyProduct, type ProductAiTagData, type ProductSearchResultData } from '@/api/pharmacy';
+import { toast } from '@o4o/error-handling';
 import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
 import { type RowAction } from '@/components/common/RowActions';
 
@@ -139,7 +140,7 @@ export default function PharmacyProducts() {
       await pharmacyApi.deleteProduct(productId);
       loadProducts();
     } catch (err: any) {
-      alert(err.message || '상품 삭제에 실패했습니다.');
+      toast.error(err.message || '상품 삭제에 실패했습니다.');
     }
   };
 

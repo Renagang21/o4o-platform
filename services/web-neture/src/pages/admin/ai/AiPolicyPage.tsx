@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface PolicySettings {
@@ -68,13 +69,13 @@ export default function AiPolicyPage() {
       const { data } = await api.put(`${API_BASE_URL}/api/ai/admin/policy`, formData);
       if (data?.success) {
         setPolicy(data.data);
-        alert('정책이 업데이트되었습니다.');
+        toast.success('정책이 업데이트되었습니다.');
       } else {
-        alert(data.error || '정책 업데이트에 실패했습니다.');
+        toast.error(data.error || '정책 업데이트에 실패했습니다.');
       }
     } catch (error) {
       console.error('Failed to update policy:', error);
-      alert('정책 업데이트 중 오류가 발생했습니다.');
+      toast.error('정책 업데이트 중 오류가 발생했습니다.');
     } finally {
       setSaving(false);
     }

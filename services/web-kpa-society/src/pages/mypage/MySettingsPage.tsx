@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -64,7 +65,7 @@ export function MySettingsPage() {
       await mypageApi.updateSettings({ [key]: newValue });
       setSettings({ ...settings, [key]: newValue });
     } catch (err) {
-      alert('설정 변경에 실패했습니다.');
+      toast.error('설정 변경에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -80,13 +81,13 @@ export function MySettingsPage() {
       await logoutAll();
       navigate(servicePrefix || '/');
     } catch (err) {
-      alert('로그아웃에 실패했습니다. 다시 시도해주세요.');
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
   const handleWithdrawRequest = async () => {
     if (!withdrawReason.trim()) {
-      alert('탈퇴 사유를 입력해주세요.');
+      toast.error('탈퇴 사유를 입력해주세요.');
       return;
     }
 
@@ -96,15 +97,11 @@ export function MySettingsPage() {
       // await mypageApi.requestWithdraw({ reason: withdrawReason });
 
       // 현재는 알림만 표시
-      alert(
-        '탈퇴 요청이 접수되었습니다.\n\n' +
-        '운영자 검토 후 처리됩니다.\n' +
-        '처리 결과는 등록된 이메일로 안내됩니다.'
-      );
+      toast.success('탈퇴 요청이 접수되었습니다. 운영자 검토 후 처리됩니다. 처리 결과는 등록된 이메일로 안내됩니다.');
       setShowWithdrawModal(false);
       setWithdrawReason('');
     } catch (err) {
-      alert('탈퇴 요청에 실패했습니다. 다시 시도해주세요.');
+      toast.error('탈퇴 요청에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }

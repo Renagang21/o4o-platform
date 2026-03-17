@@ -22,6 +22,7 @@ import type { StoreTemplate, StoreTheme } from '@/types/store';
 import { DEFAULT_STORE_TEMPLATE, DEFAULT_STORE_THEME, THEME_METAS } from '@/types/store';
 import { storeApi } from '@/api/store';
 import { pharmacyApi } from '@/api/pharmacy';
+import { toast } from '@o4o/error-handling';
 
 export default function PharmacySettings() {
   const [activeTab, setActiveTab] = useState('store');
@@ -100,7 +101,7 @@ export default function PharmacySettings() {
   // URL 복사 함수
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    alert('URL이 복사되었습니다.');
+    toast.success('URL이 복사되었습니다.');
   };
 
   // 기본 URL
@@ -110,7 +111,7 @@ export default function PharmacySettings() {
 
   const handleSave = async () => {
     if (!storeSettings.storeSlug) {
-      alert('매장 정보를 불러올 수 없습니다.');
+      toast.error('매장 정보를 불러올 수 없습니다.');
       return;
     }
     setSaving(true);
@@ -119,10 +120,10 @@ export default function PharmacySettings() {
         theme: storeSettings.theme,
         template: storeSettings.template,
       });
-      alert('설정이 저장되었습니다.');
+      toast.success('설정이 저장되었습니다.');
     } catch (err) {
       console.error('Failed to save settings:', err);
-      alert('설정 저장에 실패했습니다.');
+      toast.error('설정 저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -137,7 +138,7 @@ export default function PharmacySettings() {
       kioskRequestedAt: new Date().toISOString(),
     }));
     // TODO: API 호출
-    alert('키오스크 채널 신청이 완료되었습니다.\n운영자 승인을 기다려주세요.');
+    toast.success('키오스크 채널 신청이 완료되었습니다. 운영자 승인을 기다려주세요.');
   };
 
   // 태블릿 신청
@@ -149,7 +150,7 @@ export default function PharmacySettings() {
       tabletRequestedAt: new Date().toISOString(),
     }));
     // TODO: API 호출
-    alert('태블릿 채널 신청이 완료되었습니다.\n운영자 승인을 기다려주세요.');
+    toast.success('태블릿 채널 신청이 완료되었습니다. 운영자 승인을 기다려주세요.');
   };
 
   // 채널 상태 뱃지 렌더링

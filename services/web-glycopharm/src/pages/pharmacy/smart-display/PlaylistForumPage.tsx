@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { SharedPlaylist } from '@/types';
 import { displayApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 
 const sortOptions = [
   { value: 'popular', label: '인기순', icon: TrendingUp },
@@ -60,9 +61,9 @@ export default function PlaylistForumPage() {
   const handleImport = async (playlist: SharedPlaylist) => {
     try {
       await displayApi.importPlaylist(playlist.id, playlist.pharmacyId);
-      alert(`"${playlist.playlist.name}" 플레이리스트를 내 라이브러리에 추가했습니다.`);
+      toast.success(`"${playlist.playlist.name}" 플레이리스트를 내 라이브러리에 추가했습니다.`);
     } catch {
-      alert('플레이리스트 가져오기에 실패했습니다.');
+      toast.error('플레이리스트 가져오기에 실패했습니다.');
     }
   };
 

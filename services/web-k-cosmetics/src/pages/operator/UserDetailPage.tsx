@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import { toast } from '@o4o/error-handling';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -219,7 +220,7 @@ export default function UserDetailPage() {
       });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -233,7 +234,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${id}`, { method: 'DELETE' });
       navigate('/operator/users');
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -246,7 +247,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${membershipId}/approve`, { method: 'PATCH' });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -262,7 +263,7 @@ export default function UserDetailPage() {
       });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }

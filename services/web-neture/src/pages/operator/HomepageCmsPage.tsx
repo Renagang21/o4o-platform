@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Eye, EyeOff, ArrowUp, ArrowDown, X, Image } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { homepageCmsApi, type CmsContent } from '../../lib/api/content';
 
 type Section = 'hero' | 'ads' | 'logos';
@@ -98,7 +99,7 @@ export default function HomepageCmsPage() {
       setShowModal(false);
       await loadItems();
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -110,7 +111,7 @@ export default function HomepageCmsPage() {
       await homepageCmsApi.deleteContent(id);
       await loadItems();
     } catch {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 
@@ -120,7 +121,7 @@ export default function HomepageCmsPage() {
       await homepageCmsApi.updateStatus(item.id, newStatus);
       await loadItems();
     } catch {
-      alert('상태 변경에 실패했습니다.');
+      toast.error('상태 변경에 실패했습니다.');
     }
   };
 
@@ -130,7 +131,7 @@ export default function HomepageCmsPage() {
       await homepageCmsApi.updateContent(item.id, { sortOrder: newOrder });
       await loadItems();
     } catch {
-      alert('순서 변경에 실패했습니다.');
+      toast.error('순서 변경에 실패했습니다.');
     }
   };
 

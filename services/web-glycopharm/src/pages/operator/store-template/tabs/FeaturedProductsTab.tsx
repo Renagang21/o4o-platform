@@ -25,6 +25,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { glycopharmApi } from '@/api/glycopharm';
+import { toast } from '@o4o/error-handling';
 
 const SERVICE = 'glycopharm';
 const CONTEXT = 'store-home';
@@ -126,7 +127,7 @@ export function FeaturedProductsTab() {
       await loadFeaturedProducts();
     } catch (err: any) {
       console.error('Failed to add featured product:', err);
-      alert(err.message || 'Featured 추가에 실패했습니다');
+      toast.error(err.message || 'Featured 추가에 실패했습니다');
     }
   };
 
@@ -137,7 +138,7 @@ export function FeaturedProductsTab() {
       await loadFeaturedProducts();
     } catch (err: any) {
       console.error('Failed to remove featured product:', err);
-      alert(err.message || 'Featured 제거에 실패했습니다');
+      toast.error(err.message || 'Featured 제거에 실패했습니다');
     }
   };
 
@@ -154,7 +155,7 @@ export function FeaturedProductsTab() {
       await loadFeaturedProducts();
     } catch (err: any) {
       console.error('Failed to reorder:', err);
-      alert('순서 변경에 실패했습니다');
+      toast.error('순서 변경에 실패했습니다');
     }
   };
 
@@ -170,7 +171,7 @@ export function FeaturedProductsTab() {
       await loadFeaturedProducts();
     } catch (err: any) {
       console.error('Failed to reorder:', err);
-      alert('순서 변경에 실패했습니다');
+      toast.error('순서 변경에 실패했습니다');
     }
   };
 

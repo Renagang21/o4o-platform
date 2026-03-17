@@ -11,6 +11,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -183,7 +184,7 @@ export default function OperatorStoreDetailPage() {
         prev.map((c) => (c.id === channelId ? { ...c, status: newStatus } : c)),
       );
     } catch (err: any) {
-      alert(err?.message || '상태 변경 실패');
+      toast.error(err?.message || '상태 변경에 실패했습니다.');
     } finally {
       setChannelActionLoading(null);
     }

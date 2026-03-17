@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
 import { useAuth } from '../../contexts';
@@ -47,7 +48,7 @@ export function BranchForumWritePage() {
         categoryId: res.data.post.categoryId || 'general',
       });
     } catch (err) {
-      alert('게시글을 불러오는데 실패했습니다.');
+      toast.error('게시글을 불러오는데 실패했습니다.');
       navigate(`${basePath}/forum`);
     } finally {
       setLoading(false);
@@ -57,7 +58,7 @@ export function BranchForumWritePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title.trim() || !formData.content.trim()) {
-      alert('제목과 내용을 입력해주세요.');
+      toast.error('제목과 내용을 입력해주세요.');
       return;
     }
 
@@ -71,7 +72,7 @@ export function BranchForumWritePage() {
         navigate(`${basePath}/forum/post/${res.data.id}`);
       }
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

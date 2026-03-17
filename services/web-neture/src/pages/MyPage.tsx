@@ -12,6 +12,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { User, Mail, Shield, Edit3, Check, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuth, ROLE_LABELS, ROUTE_OVERRIDES } from '../contexts';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
@@ -183,7 +184,7 @@ export default function MyPage() {
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">보안 설정</h3>
         <button
-          onClick={() => alert('비밀번호 변경 기능은 준비 중입니다.')}
+          onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
           className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <span className="text-sm text-gray-700">비밀번호 변경</span>

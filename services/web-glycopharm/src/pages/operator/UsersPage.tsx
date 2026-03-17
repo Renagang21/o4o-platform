@@ -26,6 +26,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import { toast } from '@o4o/error-handling';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -247,7 +248,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -261,7 +262,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }

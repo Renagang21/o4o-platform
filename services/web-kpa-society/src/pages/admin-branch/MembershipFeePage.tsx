@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -122,15 +123,15 @@ export function MembershipFeePage() {
   };
 
   const handleConfirmPayment = (recordId: string) => {
-    alert(`연회비 #${recordId} 납부 확인 처리`);
+    toast.success(`연회비 #${recordId} 납부 확인 처리`);
   };
 
   const handleSendReminder = () => {
     if (selectedMembers.length === 0) {
-      alert('독촉 대상을 선택해주세요.');
+      toast.error('독촉 대상을 선택해주세요.');
       return;
     }
-    alert(`${selectedMembers.length}명에게 독촉 메시지 발송 (UI 데모)`);
+    toast.info(`${selectedMembers.length}명에게 독촉 메시지 발송 (UI 데모)`);
   };
 
   const formatCurrency = (amount: number) => {

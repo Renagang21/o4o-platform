@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { DayOfWeek } from '@/types';
 import { displayApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ScheduleData {
@@ -95,12 +96,12 @@ export default function SchedulesPage() {
     try {
       const response = await displayApi.deleteSchedule(id);
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         setSchedules(schedules.filter(s => s.id !== id));
       }
     } catch {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 
@@ -110,14 +111,14 @@ export default function SchedulesPage() {
         is_active: !schedule.is_active,
       });
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         setSchedules(schedules.map(s =>
           s.id === schedule.id ? { ...s, is_active: !s.is_active } : s
         ));
       }
     } catch {
-      alert('상태 변경에 실패했습니다.');
+      toast.error('상태 변경에 실패했습니다.');
     }
   };
 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 
 interface RequestData {
   id: string;
@@ -115,7 +116,7 @@ export default function ForumRequestsPage() {
         : await forumRequestApi.reject(selectedRequest.id, reviewData);
 
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         // Update local state
         setRequests((prev) =>
@@ -132,7 +133,7 @@ export default function ForumRequestsPage() {
         setReviewComment('');
       }
     } catch {
-      alert('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setIsProcessing(false);
     }

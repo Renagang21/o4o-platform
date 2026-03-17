@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { ForumBlockRenderer } from '@o4o/forum-core/public-ui';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { forumApi } from '../../api';
@@ -58,9 +59,9 @@ export function ForumDetailPage() {
     } catch (err: any) {
       const msg = err?.message || '';
       if (msg.includes('token') || msg.includes('expired') || msg.includes('401')) {
-        alert('로그인 세션이 만료되었습니다. 페이지를 새로고침해 주세요.');
+        toast.error('로그인 세션이 만료되었습니다. 페이지를 새로고침해 주세요.');
       } else {
-        alert('좋아요 처리에 실패했습니다.');
+        toast.error('좋아요 처리에 실패했습니다.');
       }
     } finally {
       setIsLiking(false);
@@ -77,7 +78,7 @@ export function ForumDetailPage() {
       setComments([...comments, res.data]);
       setNewComment('');
     } catch (err) {
-      alert('댓글 작성에 실패했습니다.');
+      toast.error('댓글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }
@@ -90,7 +91,7 @@ export function ForumDetailPage() {
       await forumApi.deletePost(post.id);
       navigate('/forum');
     } catch (err) {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 

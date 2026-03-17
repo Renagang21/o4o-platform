@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 
@@ -52,21 +53,21 @@ export function ForumManagementPage() {
   const reportedCount = posts.filter((p) => p.isReported && !p.isHidden).length;
 
   const handleHidePost = (id: string) => {
-    alert(`게시물 #${id} 숨김 처리`);
+    toast.success(`게시물 #${id} 숨김 처리`);
   };
 
   const handleShowPost = (id: string) => {
-    alert(`게시물 #${id} 숨김 해제`);
+    toast.success(`게시물 #${id} 숨김 해제`);
   };
 
   const handleDeletePost = (id: string) => {
     if (confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-      alert(`게시물 #${id} 삭제`);
+      toast.success(`게시물 #${id} 삭제`);
     }
   };
 
   const handleDismissReport = (id: string) => {
-    alert(`게시물 #${id} 신고 기각`);
+    toast.success(`게시물 #${id} 신고 기각`);
   };
 
   return (

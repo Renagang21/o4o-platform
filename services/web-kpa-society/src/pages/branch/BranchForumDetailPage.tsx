@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 
 import { useAuth } from '../../contexts';
@@ -51,7 +52,7 @@ export function BranchForumDetailPage() {
       setNewComment('');
       loadData();
     } catch (err) {
-      alert('댓글 작성에 실패했습니다.');
+      toast.error('댓글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

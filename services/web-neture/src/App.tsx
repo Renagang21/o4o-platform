@@ -19,6 +19,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from '
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
+import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 
 // Layouts
 import NetureLayout from './components/layouts/NetureLayout';
@@ -409,9 +410,11 @@ const ProtectedRoute = RoleGuard;
 
 function App() {
   return (
+    <O4OErrorBoundary>
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
+          <O4OToastProvider />
           <ModalRenderer />
           <Suspense fallback={<PageLoading />}>
             <Routes>
@@ -749,6 +752,7 @@ function App() {
         </BrowserRouter>
       </LoginModalProvider>
     </AuthProvider>
+    </O4OErrorBoundary>
   );
 }
 

@@ -13,6 +13,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   ArrowLeft,
   User,
@@ -104,12 +105,12 @@ export default function SellerRequestDetailPage() {
           status: 'approved',
           decidedAt: new Date().toISOString(),
         });
-        alert('신청이 승인되었습니다.');
+        toast.success('신청이 승인되었습니다.');
       } else {
-        alert(result.error || '승인 처리 중 오류가 발생했습니다.');
+        toast.error(result.error || '승인 처리 중 오류가 발생했습니다.');
       }
     } catch (err) {
-      alert('승인 처리 중 오류가 발생했습니다.');
+      toast.error('승인 처리 중 오류가 발생했습니다.');
     } finally {
       setProcessing(false);
     }
@@ -128,12 +129,12 @@ export default function SellerRequestDetailPage() {
           rejectReason: rejectReason,
         });
         setShowRejectModal(false);
-        alert('신청이 거절되었습니다.');
+        toast.success('신청이 거절되었습니다.');
       } else {
-        alert(result.error || '거절 처리 중 오류가 발생했습니다.');
+        toast.error(result.error || '거절 처리 중 오류가 발생했습니다.');
       }
     } catch (err) {
-      alert('거절 처리 중 오류가 발생했습니다.');
+      toast.error('거절 처리 중 오류가 발생했습니다.');
     } finally {
       setProcessing(false);
     }
@@ -148,12 +149,12 @@ export default function SellerRequestDetailPage() {
       const result = await supplierApi.suspendRequest(id, actionNote || undefined);
       if (result.success) {
         setRequest({ ...request, status: 'suspended', suspendedAt: new Date().toISOString() });
-        alert('공급이 일시 중단되었습니다.');
+        toast.success('공급이 일시 중단되었습니다.');
       } else {
-        alert(result.error || '처리 중 오류가 발생했습니다.');
+        toast.error(result.error || '처리 중 오류가 발생했습니다.');
       }
     } catch {
-      alert('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setProcessing(false);
     }
@@ -166,12 +167,12 @@ export default function SellerRequestDetailPage() {
       const result = await supplierApi.reactivateRequest(id, actionNote || undefined);
       if (result.success) {
         setRequest({ ...request, status: 'approved', suspendedAt: null });
-        alert('공급이 재활성화되었습니다.');
+        toast.success('공급이 재활성화되었습니다.');
       } else {
-        alert(result.error || '처리 중 오류가 발생했습니다.');
+        toast.error(result.error || '처리 중 오류가 발생했습니다.');
       }
     } catch {
-      alert('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setProcessing(false);
     }
@@ -185,12 +186,12 @@ export default function SellerRequestDetailPage() {
       if (result.success) {
         setRequest({ ...request, status: 'revoked', revokedAt: new Date().toISOString() });
         setShowRevokeModal(false);
-        alert('공급이 종료되었습니다.');
+        toast.success('공급이 종료되었습니다.');
       } else {
-        alert(result.error || '처리 중 오류가 발생했습니다.');
+        toast.error(result.error || '처리 중 오류가 발생했습니다.');
       }
     } catch {
-      alert('처리 중 오류가 발생했습니다.');
+      toast.error('처리 중 오류가 발생했습니다.');
     } finally {
       setProcessing(false);
     }

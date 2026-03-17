@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { PlaylistStatus } from '@/types';
 import { displayApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface PlaylistData {
@@ -88,13 +89,13 @@ export default function PlaylistsPage() {
     try {
       const response = await displayApi.deletePlaylist(id);
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         setPlaylists(playlists.filter(p => p.id !== id));
         setActiveMenu(null);
       }
     } catch {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 

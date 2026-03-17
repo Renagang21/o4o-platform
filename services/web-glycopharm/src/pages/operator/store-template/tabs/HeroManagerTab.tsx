@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import type { HeroContent } from '@/types/store';
 import { storeApi } from '@/api/store';
+import { toast } from '@o4o/error-handling';
 
 interface HeroFormData {
   title: string;
@@ -142,7 +143,7 @@ export function HeroManagerTab({ pharmacySlug }: HeroManagerTabProps) {
   // 저장
   const handleSave = () => {
     if (!form.title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
 

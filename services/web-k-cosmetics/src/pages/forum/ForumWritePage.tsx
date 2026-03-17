@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchPopularForums, type PopularForum } from '../../services/forumApi';
 import { api } from '../../lib/apiClient';
+import { toast } from '@o4o/error-handling';
 
 type PostType = 'discussion' | 'question' | 'guide' | 'poll' | 'announcement';
 
@@ -58,15 +59,15 @@ export default function ForumWritePage() {
     e.preventDefault();
 
     if (!title.trim()) {
-      alert('Please enter a title.');
+      toast.error('Please enter a title.');
       return;
     }
     if (!categoryId) {
-      alert('Please select a category.');
+      toast.error('Please select a category.');
       return;
     }
     if (!content.trim()) {
-      alert('Please enter content.');
+      toast.error('Please enter content.');
       return;
     }
 
@@ -84,10 +85,10 @@ export default function ForumWritePage() {
       if (data.success && data.data?.id) {
         navigate(`/forum/post/${data.data.id}`);
       } else {
-        alert(data.error || 'Failed to create post.');
+        toast.error(data.error || 'Failed to create post.');
       }
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Network error. Please try again.');
+      toast.error(err.response?.data?.error || 'Network error. Please try again.');
     } finally {
       setSubmitting(false);
     }

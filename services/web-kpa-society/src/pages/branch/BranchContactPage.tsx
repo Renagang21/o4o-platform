@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { useBranchContext } from '../../contexts/BranchContext';
 import { branchApi } from '../../api/branch';
@@ -52,17 +53,17 @@ export function BranchContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
-      alert('필수 항목을 입력해주세요.');
+      toast.error('필수 항목을 입력해주세요.');
       return;
     }
 
     try {
       setSubmitting(true);
       await branchApi.sendContactMessage(branchId!, formData);
-      alert('문의가 접수되었습니다.');
+      toast.success('문의가 접수되었습니다.');
       setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (err) {
-      alert('문의 접수에 실패했습니다.');
+      toast.error('문의 접수에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -60,7 +61,7 @@ export function LmsCourseDetailPage() {
 
   const handleEnroll = async () => {
     if (!user) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       return;
     }
 
@@ -68,9 +69,9 @@ export function LmsCourseDetailPage() {
       setEnrolling(true);
       const res = await lmsApi.enrollCourse(id!);
       setEnrollment(res.data);
-      alert('시작 등록이 완료되었습니다.');
+      toast.success('시작 등록이 완료되었습니다.');
     } catch (err) {
-      alert('시작 등록에 실패했습니다.');
+      toast.error('시작 등록에 실패했습니다.');
     } finally {
       setEnrolling(false);
     }

@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -102,20 +103,20 @@ export function DocsPage() {
   };
 
   const handleUpload = () => {
-    alert('파일 업로드 (UI 데모)');
+    toast.info('파일 업로드 (UI 데모)');
   };
 
   const handleEdit = (id: string) => {
-    alert(`자료 #${id} 수정 (UI 데모)`);
+    toast.info(`자료 #${id} 수정 (UI 데모)`);
   };
 
   const handleDownload = (_id: string, fileName: string) => {
-    alert(`${fileName} 다운로드 (UI 데모)`);
+    toast.info(`${fileName} 다운로드 (UI 데모)`);
   };
 
   const handleDelete = (id: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      alert(`자료 #${id} 삭제 (UI 데모)`);
+      toast.info(`자료 #${id} 삭제 (UI 데모)`);
     }
   };
 

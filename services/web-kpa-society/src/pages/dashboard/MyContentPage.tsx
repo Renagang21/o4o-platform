@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { dashboardApi, type DashboardAsset, type DashboardSortType, type DashboardKpi } from '../../api';
 import { useAuth } from '../../contexts/AuthContext';
@@ -213,7 +214,7 @@ export function MyContentPage() {
       }
     }
 
-    alert(`${ids.length}개 중 ${success}개 처리 완료${fail > 0 ? ` (${fail}개 실패)` : ''}`);
+    toast.success(`${ids.length}개 중 ${success}개 처리 완료${fail > 0 ? ` (${fail}개 실패)` : ''}`);
     setSelectedIds(new Set());
     setBulkLoading(false);
     loadAssets();
@@ -245,7 +246,7 @@ export function MyContentPage() {
       ));
       cancelEdit();
     } catch (err) {
-      alert('수정에 실패했습니다.');
+      toast.error('수정에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -270,7 +271,7 @@ export function MyContentPage() {
       ));
       dismissSupplierSignal();
     } catch (err) {
-      alert('공개에 실패했습니다.');
+      toast.error('공개에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -287,7 +288,7 @@ export function MyContentPage() {
       ));
       dismissSupplierSignal();
     } catch (err) {
-      alert('공개에 실패했습니다.');
+      toast.error('공개에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -303,7 +304,7 @@ export function MyContentPage() {
         a.id === id ? { ...a, status: 'archived' as const } : a
       ));
     } catch (err) {
-      alert('보관에 실패했습니다.');
+      toast.error('보관에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -317,7 +318,7 @@ export function MyContentPage() {
       await dashboardApi.deleteAsset(id, dashboardId);
       setAssets(prev => prev.filter(a => a.id !== id));
     } catch (err) {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

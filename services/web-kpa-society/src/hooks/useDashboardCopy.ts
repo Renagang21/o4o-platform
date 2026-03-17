@@ -10,6 +10,7 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { dashboardApi, type DashboardAssetSourceType, type CopyOptions } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -57,7 +58,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
       const errorMsg = '로그인이 필요합니다.';
       setState(prev => ({ ...prev, error: errorMsg }));
       options.onError?.(errorMsg);
-      alert(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -89,7 +90,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
 
     if (!user?.id) {
       const errorMsg = '사용자 정보를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해 주세요.';
-      alert(errorMsg);
+      toast.error(errorMsg);
       options.onError?.(errorMsg);
       closeCopyModal();
       return;
@@ -137,7 +138,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
         success: false,
       }));
 
-      alert(errorMsg);
+      toast.error(errorMsg);
       options.onError?.(errorMsg);
     }
   }, [user, options, modalState.sourceId, closeCopyModal, navigate]);
@@ -150,7 +151,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
       const errorMsg = !user ? '로그인이 필요합니다.' : '사용자 정보를 확인할 수 없습니다. 페이지를 새로고침 후 다시 시도해 주세요.';
       setState(prev => ({ ...prev, error: errorMsg }));
       options.onError?.(errorMsg);
-      alert(errorMsg);
+      toast.error(errorMsg);
       return;
     }
 
@@ -193,7 +194,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
         success: false,
       }));
 
-      alert(errorMsg);
+      toast.error(errorMsg);
       options.onError?.(errorMsg);
     }
   }, [user, options, navigate]);

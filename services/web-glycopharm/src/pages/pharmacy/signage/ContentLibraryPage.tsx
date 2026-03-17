@@ -28,6 +28,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { apiClient } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { LoadingState, EmptyState } from '@/components/common';
 import type { ContentItem, ContentType, ContentSource } from '@/types';
 
@@ -344,13 +345,13 @@ function ContentRegisterModal({ onClose }: { onClose: () => void }) {
     try {
       const response = await apiClient.post('/api/v1/glycopharm/signage/contents', formData);
       if (response.error) {
-        alert(response.error.message || '등록에 실패했습니다.');
+        toast.error(response.error.message || '등록에 실패했습니다.');
         return;
       }
-      alert('콘텐츠가 등록되었습니다.');
+      toast.success('콘텐츠가 등록되었습니다.');
       onClose();
     } catch {
-      alert('콘텐츠가 등록되었습니다.');
+      toast.success('콘텐츠가 등록되었습니다.');
       onClose();
     } finally {
       setIsSubmitting(false);

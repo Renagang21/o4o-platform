@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
 import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/utils';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
@@ -55,7 +56,7 @@ export function ForumWritePage() {
         });
       }
     } catch (err) {
-      alert('데이터를 불러오는데 실패했습니다.');
+      toast.error('데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ export function ForumWritePage() {
     e.preventDefault();
 
     if (!formData.title.trim() || !editorHtml.trim() || !formData.categoryId) {
-      alert('모든 필드를 입력해주세요.');
+      toast.error('모든 필드를 입력해주세요.');
       return;
     }
 
@@ -87,7 +88,7 @@ export function ForumWritePage() {
         navigate(`/forum/post/${res.data.id}`);
       }
     } catch (err) {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

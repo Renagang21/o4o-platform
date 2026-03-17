@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { IntranetHeader } from '../../components/intranet';
 import { colors } from '../../styles/theme';
 
@@ -28,11 +29,11 @@ export function NoticeWritePage() {
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
-      alert('제목과 내용을 입력해주세요.');
+      toast.error('제목과 내용을 입력해주세요.');
       return;
     }
 
-    alert(`공지 ${isEdit ? '수정' : '등록'} 완료 (UI 데모)`);
+    toast.info(`공지 ${isEdit ? '수정' : '등록'} 완료 (UI 데모)`);
     navigate('/intranet/notice');
   };
 

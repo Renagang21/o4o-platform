@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { IntranetHeader } from '../../components/intranet';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -74,16 +75,16 @@ export function NoticeDetailPage() {
 
     setComments([...comments, comment]);
     setNewComment('');
-    alert('댓글이 등록되었습니다. (UI 데모)');
+    toast.info('댓글이 등록되었습니다. (UI 데모)');
   };
 
   const handleEdit = () => {
-    alert('공지 수정 (UI 데모)');
+    toast.info('공지 수정 (UI 데모)');
   };
 
   const handleDelete = () => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      alert('공지 삭제 (UI 데모)');
+      toast.info('공지 삭제 (UI 데모)');
     }
   };
 

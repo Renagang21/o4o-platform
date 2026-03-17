@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, usePa
 import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
+import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import { ServiceProvider, useService } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
 import { getDisplayOrganizationName } from './lib/org-display';
@@ -313,12 +314,14 @@ function KpaRedirect({ to, suffix }: { to: string; suffix?: string }) {
 
 function App() {
   return (
+    <O4OErrorBoundary>
     <AuthProvider>
       <LoginModalProvider>
       <OrganizationProvider>
       <BrowserRouter>
         {/* WO-KPA-CONTEXT-SWITCHER-AND-ORG-RESOLUTION-V1: 라우트 기반 서비스 컨텍스트 */}
         <ServiceProvider>
+        <O4OToastProvider />
         {/* 전역 인증 모달 (WO-O4O-AUTH-MODAL-LOGIN-AND-ACCOUNT-STANDARD-V1, WO-O4O-AUTH-MODAL-REGISTER-STANDARD-V1) */}
         <LoginModal />
         <RegisterModal />
@@ -707,6 +710,7 @@ function App() {
       </OrganizationProvider>
       </LoginModalProvider>
     </AuthProvider>
+    </O4OErrorBoundary>
   );
 }
 

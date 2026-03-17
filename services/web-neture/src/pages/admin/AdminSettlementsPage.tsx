@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Calculator, Check, CreditCard, XCircle } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import {
   adminSettlementApi,
   type Settlement,
@@ -170,7 +171,7 @@ export default function AdminSettlementsPage() {
     const ok = await adminSettlementApi.approve(id);
     setActionLoading(null);
     if (ok) fetchData();
-    else alert('승인 처리 실패');
+    else toast.error('승인 처리 실패');
   }, [fetchData]);
 
   const handlePay = useCallback(async (id: string) => {
@@ -179,7 +180,7 @@ export default function AdminSettlementsPage() {
     const ok = await adminSettlementApi.pay(id);
     setActionLoading(null);
     if (ok) fetchData();
-    else alert('지급 처리 실패');
+    else toast.error('지급 처리 실패');
   }, [fetchData]);
 
   const handleCancel = useCallback(async (id: string) => {
@@ -188,7 +189,7 @@ export default function AdminSettlementsPage() {
     const ok = await adminSettlementApi.cancel(id);
     setActionLoading(null);
     if (ok) fetchData();
-    else alert('취소 처리 실패');
+    else toast.error('취소 처리 실패');
   }, [fetchData]);
 
   // ---- Filter / Page ----

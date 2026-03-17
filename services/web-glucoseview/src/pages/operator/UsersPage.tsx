@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   Users,
   Search,
@@ -250,7 +251,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
@@ -264,7 +265,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }

@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 
@@ -78,20 +79,20 @@ export function AnnualReportPage() {
   const pendingCount = reports.filter((r) => r.status === 'pending').length;
 
   const handleApprove = (reportId: string) => {
-    alert(`신상신고 #${reportId} 승인 처리`);
+    toast.success(`신상신고 #${reportId} 승인 처리`);
   };
 
   const handleReject = (reportId: string) => {
     const reason = prompt('반려 사유를 입력하세요:');
     if (reason) {
-      alert(`신상신고 #${reportId} 반려 처리: ${reason}`);
+      toast.success(`신상신고 #${reportId} 반려 처리: ${reason}`);
     }
   };
 
   const handleRequestRevision = (reportId: string) => {
     const note = prompt('수정 요청 사항을 입력하세요:');
     if (note) {
-      alert(`신상신고 #${reportId} 수정 요청: ${note}`);
+      toast.success(`신상신고 #${reportId} 수정 요청: ${note}`);
     }
   };
 

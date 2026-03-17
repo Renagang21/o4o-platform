@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -60,7 +61,7 @@ export function LmsCertificatesPage() {
         window.open(cert.downloadUrl, '_blank');
       }
     } catch (err) {
-      alert('다운로드에 실패했습니다.');
+      toast.error('다운로드에 실패했습니다.');
     }
   };
 

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumStatus, ForumApplicationFormData, UserRole } from '@/types';
 
@@ -129,7 +130,7 @@ export default function ForumListPage() {
 
   const handleApplySubmit = async () => {
     if (!formData.title || !formData.description || !formData.purpose) {
-      alert('필수 항목을 모두 입력해주세요.');
+      toast.error('필수 항목을 모두 입력해주세요.');
       return;
     }
 
@@ -137,10 +138,10 @@ export default function ForumListPage() {
     try {
       const response = await apiClient.post('/api/v1/glycopharm/forums/apply', formData);
       if (response.error) {
-        alert(response.error.message || '신청 중 오류가 발생했습니다.');
+        toast.error(response.error.message || '신청 중 오류가 발생했습니다.');
         return;
       }
-      alert('포럼 개설 신청이 완료되었습니다. 승인 후 오픈됩니다.');
+      toast.success('포럼 개설 신청이 완료되었습니다. 승인 후 오픈됩니다.');
       setShowApplyModal(false);
       setFormData({
         title: '',
@@ -151,7 +152,7 @@ export default function ForumListPage() {
         note: '',
       });
     } catch {
-      alert('포럼 개설 신청이 완료되었습니다. 승인 후 오픈됩니다.');
+      toast.success('포럼 개설 신청이 완료되었습니다. 승인 후 오픈됩니다.');
       setShowApplyModal(false);
     } finally {
       setIsSubmitting(false);

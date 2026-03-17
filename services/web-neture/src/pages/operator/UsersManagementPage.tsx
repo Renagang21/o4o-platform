@@ -22,6 +22,7 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { api } from '@/lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -243,7 +244,7 @@ export default function UsersManagementPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -257,7 +258,7 @@ export default function UsersManagementPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }

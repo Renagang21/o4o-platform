@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import { apiClient, supplierRequestApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import type { B2BProduct, CartItem, B2BOrderSource, CartItemWarning } from '@/types';
 
 // 카테고리 옵션
@@ -540,7 +541,7 @@ export default function B2BOrderPage() {
                   장바구니 보기
                 </button>
                 <button
-                  onClick={() => alert('주문 기능은 준비 중입니다.')}
+                  onClick={() => toast.info('주문 기능은 준비 중입니다.')}
                   className="px-6 py-2 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700"
                 >
                   주문하기
@@ -668,7 +669,7 @@ export default function B2BOrderPage() {
                   <button
                     onClick={() => {
                       setShowCartPanel(false);
-                      alert('주문 기능은 준비 중입니다.');
+                      toast.info('주문 기능은 준비 중입니다.');
                     }}
                     className="flex-1 py-3 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700"
                   >

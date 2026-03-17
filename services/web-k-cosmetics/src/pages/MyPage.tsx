@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { toast } from '@o4o/error-handling';
 
 export default function MyPage() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -122,7 +123,7 @@ export default function MyPage() {
             <span style={styles.settingDesc}>정기적인 비밀번호 변경을 권장합니다</span>
           </div>
           <button
-            onClick={() => alert('비밀번호 변경 기능은 준비 중입니다.')}
+            onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
             style={styles.settingButton}
           >
             변경

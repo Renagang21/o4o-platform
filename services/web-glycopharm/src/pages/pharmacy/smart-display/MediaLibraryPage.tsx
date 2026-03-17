@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { MediaSourceType } from '@/types';
 import { displayApi } from '@/services/api';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Vimeo 아이콘 컴포넌트
@@ -113,19 +114,19 @@ export default function MediaLibraryPage() {
     try {
       const response = await displayApi.deleteMedia(id);
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         setMedia(media.filter(m => m.id !== id));
       }
     } catch {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 
   const handleAddMedia = async () => {
     const parsed = parseVideoUrl(urlInput);
     if (!parsed.type || !parsed.embedId) {
-      alert('유효한 YouTube 또는 Vimeo URL을 입력하세요.');
+      toast.error('유효한 YouTube 또는 Vimeo URL을 입력하세요.');
       return;
     }
 
@@ -142,7 +143,7 @@ export default function MediaLibraryPage() {
       });
 
       if (response.error) {
-        alert(response.error.message);
+        toast.error(response.error.message);
       } else {
         setMedia([response.data as MediaData, ...media]);
         setUrlInput('');
@@ -151,7 +152,7 @@ export default function MediaLibraryPage() {
         setIsAddModalOpen(false);
       }
     } catch {
-      alert('추가에 실패했습니다.');
+      toast.error('추가에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
     }

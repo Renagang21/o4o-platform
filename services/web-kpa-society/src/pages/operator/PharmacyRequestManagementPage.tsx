@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import type { PharmacyRequest } from '../../api/pharmacyRequestApi';
 
@@ -55,7 +56,7 @@ export default function PharmacyRequestManagementPage() {
       setReviewNote('');
       await loadRequests();
     } catch (err: any) {
-      alert(`승인 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '승인에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -72,7 +73,7 @@ export default function PharmacyRequestManagementPage() {
       setReviewNote('');
       await loadRequests();
     } catch (err: any) {
-      alert(`반려 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '반려에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

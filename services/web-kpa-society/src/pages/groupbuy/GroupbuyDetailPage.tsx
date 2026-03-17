@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { groupbuyApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -127,7 +128,7 @@ export function GroupbuyDetailPage() {
 
             <div style={styles.actionSection}>
               {hasStore ? (
-                <button style={styles.orderButton} onClick={() => alert('주문 기능은 준비 중입니다.')}>
+                <button style={styles.orderButton} onClick={() => toast.info('주문 기능은 준비 중입니다.')}>
                   주문하기
                 </button>
               ) : user ? (

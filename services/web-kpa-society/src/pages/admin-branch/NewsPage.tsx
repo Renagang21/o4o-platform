@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -81,19 +82,19 @@ export function NewsPage() {
   };
 
   const handleCreate = () => {
-    alert('새 공지 작성 (UI 데모)');
+    toast.info('새 공지 작성 (UI 데모)');
   };
 
   const handleEdit = (id: string) => {
-    alert(`공지 #${id} 수정 (UI 데모)`);
+    toast.info(`공지 #${id} 수정 (UI 데모)`);
   };
 
   const handleTogglePublish = (id: string, currentState: boolean) => {
-    alert(`공지 #${id} ${currentState ? '비공개' : '게시'} 처리 (UI 데모)`);
+    toast.info(`공지 #${id} ${currentState ? '비공개' : '게시'} 처리 (UI 데모)`);
   };
 
   const handleTogglePin = (id: string, currentState: boolean) => {
-    alert(`공지 #${id} ${currentState ? '고정 해제' : '고정'} 처리 (UI 데모)`);
+    toast.info(`공지 #${id} ${currentState ? '고정 해제' : '고정'} 처리 (UI 데모)`);
   };
 
   return (

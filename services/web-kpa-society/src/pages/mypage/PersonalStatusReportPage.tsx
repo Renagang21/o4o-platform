@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { PageHeader, Card } from '../../components/common';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -112,7 +113,7 @@ export function PersonalStatusReportPage() {
     e.preventDefault();
 
     if (!formData.workplaceType) {
-      alert('근무형태를 선택해주세요.');
+      toast.error('근무형태를 선택해주세요.');
       return;
     }
 
@@ -121,7 +122,7 @@ export function PersonalStatusReportPage() {
     // Mock API call
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    alert('신상신고가 제출되었습니다.');
+    toast.success('신상신고가 제출되었습니다.');
     setIsSubmitting(false);
     setShowForm(false);
   };

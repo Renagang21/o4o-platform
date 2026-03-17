@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   FileText,
   Megaphone,
@@ -247,7 +248,7 @@ function ContentList({
       });
       await fetchItems();
     } catch (e: any) {
-      alert(`상태 변경 실패: ${e.message}`);
+      toast.error(e.message || '상태 변경에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -260,7 +261,7 @@ function ContentList({
       await apiFetch(`/api/v1/kpa/news/${item.id}`, { method: 'DELETE' });
       onDeleted();
     } catch (e: any) {
-      alert(`삭제 실패: ${e.message}`);
+      toast.error(e.message || '삭제에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

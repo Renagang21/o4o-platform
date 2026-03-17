@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 interface AiEngine {
@@ -50,11 +51,11 @@ export default function AiEnginesPage() {
       if (data?.success) {
         fetchEngines();
       } else {
-        alert(data.error || '엔진 활성화에 실패했습니다.');
+        toast.error(data.error || '엔진 활성화에 실패했습니다.');
       }
     } catch (error) {
       console.error('Failed to activate engine:', error);
-      alert('엔진 활성화 중 오류가 발생했습니다.');
+      toast.error('엔진 활성화 중 오류가 발생했습니다.');
     } finally {
       setActivating(null);
     }

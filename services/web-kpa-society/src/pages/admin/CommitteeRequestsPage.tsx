@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { colors } from '../../styles/theme';
 import {
   CommitteeChangeRequest,
@@ -113,7 +114,7 @@ export function CommitteeRequestsPage() {
       reason: '',
     });
     setActiveTab('requests');
-    alert('위원회 변경 요청이 제출되었습니다. 사이트 운영자 검토 후 처리됩니다.');
+    toast.success('위원회 변경 요청이 제출되었습니다. 사이트 운영자 검토 후 처리됩니다.');
   };
 
   const getStatusBadge = (status: CommitteeRequestStatus) => {

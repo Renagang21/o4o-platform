@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, DollarSign, Package, X, Check } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import {
   supplierCommissionApi,
   supplierApi,
@@ -132,7 +133,7 @@ export default function SupplierPartnerCommissionsPage() {
     if (!confirm('이 커미션 정책을 삭제하시겠습니까?')) return;
     const result = await supplierCommissionApi.remove(id);
     if (!result.success) {
-      alert(result.error === 'IN_USE' ? '이미 사용된 정책은 삭제할 수 없습니다' : result.error || 'Failed');
+      toast.error(result.error === 'IN_USE' ? '이미 사용된 정책은 삭제할 수 없습니다' : result.error || 'Failed');
       return;
     }
     fetchData();

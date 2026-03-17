@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import {
@@ -145,9 +146,9 @@ export function SettingsPage() {
         annual_report_deadline: settings.annualReportDeadline,
         fee_settings: feeSettings as any,
       });
-      alert('설정이 저장되었습니다.');
+      toast.success('설정이 저장되었습니다.');
     } catch (err: any) {
-      alert('저장에 실패했습니다: ' + (err.message || ''));
+      toast.error('저장에 실패했습니다: ' + (err.message || ''));
     } finally {
       setSaving(false);
     }
@@ -157,9 +158,9 @@ export function SettingsPage() {
     if (!confirm('정말 분회를 비활성화하시겠습니까? 회원들이 더 이상 접근할 수 없게 됩니다.')) return;
     try {
       await branchAdminApi.updateStatus({ is_active: false });
-      alert('분회가 비활성화되었습니다.');
+      toast.success('분회가 비활성화되었습니다.');
     } catch (err: any) {
-      alert('비활성화에 실패했습니다: ' + (err.message || ''));
+      toast.error('비활성화에 실패했습니다: ' + (err.message || ''));
     }
   };
 

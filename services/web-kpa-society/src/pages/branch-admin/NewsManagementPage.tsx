@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import { branchAdminApi } from '../../api/branchAdmin';
@@ -52,7 +53,7 @@ export function NewsManagementPage() {
       await branchAdminApi.updateNews(id, { is_pinned: !currentPinned });
       fetchNews();
     } catch (err: any) {
-      alert('고정 상태 변경에 실패했습니다: ' + (err.message || ''));
+      toast.error('고정 상태 변경에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -61,7 +62,7 @@ export function NewsManagementPage() {
       await branchAdminApi.updateNews(id, { is_published: !currentPublished });
       fetchNews();
     } catch (err: any) {
-      alert('게시 상태 변경에 실패했습니다: ' + (err.message || ''));
+      toast.error('게시 상태 변경에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -71,7 +72,7 @@ export function NewsManagementPage() {
       await branchAdminApi.deleteNews(id);
       fetchNews();
     } catch (err: any) {
-      alert('삭제에 실패했습니다: ' + (err.message || ''));
+      toast.error('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 

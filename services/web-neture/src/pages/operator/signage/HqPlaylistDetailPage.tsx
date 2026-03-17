@@ -18,6 +18,7 @@ import {
   Film,
   GripVertical,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 const SERVICE_KEY = 'neture';
@@ -142,7 +143,7 @@ export default function HqPlaylistDetailPage() {
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '상태 변경에 실패했습니다.';
-      alert(message);
+      toast.error(message);
     } finally {
       setIsUpdating(false);
     }

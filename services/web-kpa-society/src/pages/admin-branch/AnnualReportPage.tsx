@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -100,13 +101,13 @@ export function AnnualReportPage() {
   };
 
   const handleApprove = (reportId: string) => {
-    alert(`신상신고 #${reportId} 승인 처리`);
+    toast.success(`신상신고 #${reportId} 승인 처리`);
   };
 
   const handleReject = (reportId: string) => {
     const reason = prompt('반려 사유를 입력하세요:');
     if (reason) {
-      alert(`신상신고 #${reportId} 반려 처리: ${reason}`);
+      toast.success(`신상신고 #${reportId} 반려 처리: ${reason}`);
     }
   };
 

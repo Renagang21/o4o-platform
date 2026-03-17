@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -205,7 +206,7 @@ export function MemberStatusPage() {
   // 지부 보고
   const handleReportToDistrict = () => {
     if (confirm('지부에 현재 회원 현황을 보고하시겠습니까?')) {
-      alert('지부에 보고되었습니다.\n보고일시: ' + new Date().toLocaleString('ko-KR'));
+      toast.success('지부에 보고되었습니다.\n보고일시: ' + new Date().toLocaleString('ko-KR'));
     }
   };
 

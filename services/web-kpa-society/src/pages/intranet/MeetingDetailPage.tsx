@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { IntranetHeader } from '../../components/intranet';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -84,7 +85,7 @@ export function MeetingDetailPage() {
   };
 
   const handleSaveMinutes = () => {
-    alert('회의록 저장 (UI 데모)');
+    toast.info('회의록 저장 (UI 데모)');
   };
 
   return (

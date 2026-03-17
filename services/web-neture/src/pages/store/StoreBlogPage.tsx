@@ -18,6 +18,7 @@ import {
   List,
   Share2,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/api/index.js';
 
 // ── Types ──
@@ -90,7 +91,7 @@ export default function StoreBlogPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      alert('링크가 복사되었습니다.');
+      toast.success('링크가 복사되었습니다.');
     }
   };
 

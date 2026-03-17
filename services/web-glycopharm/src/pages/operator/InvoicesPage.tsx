@@ -32,6 +32,7 @@ import {
   Mail,
 } from 'lucide-react';
 import { api } from '@/lib/apiClient';
+import { toast } from '@o4o/error-handling';
 
 type InvoiceStatus = 'DRAFT' | 'CONFIRMED' | 'ARCHIVED';
 type BillingUnit = 'consultation_action' | 'approved_request';
@@ -239,7 +240,7 @@ export default function InvoicesPage() {
       setConfirmingId(null);
       fetchInvoices();
     } catch (err: any) {
-      alert(err.response?.data?.error || err.message);
+      toast.error(err.response?.data?.error || err.message);
     } finally {
       setConfirming(false);
     }
@@ -253,7 +254,7 @@ export default function InvoicesPage() {
       if (!json.success) throw new Error(json.error);
       setDetailInvoice(json.data);
     } catch (err: any) {
-      alert(err.response?.data?.error || err.message);
+      toast.error(err.response?.data?.error || err.message);
     }
   };
 
@@ -284,7 +285,7 @@ export default function InvoicesPage() {
       if (!json.success) throw new Error(json.error || 'Failed to mark received');
       fetchInvoices();
     } catch (err: any) {
-      alert(err.response?.data?.error || err.message);
+      toast.error(err.response?.data?.error || err.message);
     }
   };
 
@@ -300,7 +301,7 @@ export default function InvoicesPage() {
         dispatchStatus: json.data.dispatchStatus,
       });
     } catch (err: any) {
-      alert(err.response?.data?.error || err.message);
+      toast.error(err.response?.data?.error || err.message);
     }
   };
 

@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   ArrowLeft,
   Save,
@@ -152,23 +153,23 @@ export default function ContextAssetFormPage() {
 
     // 유효성 검사
     if (!formData.title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
     if (!formData.summary.trim()) {
-      alert('요약을 입력해주세요.');
+      toast.error('요약을 입력해주세요.');
       return;
     }
     if (formData.serviceScope.length === 0) {
-      alert('적용 서비스를 선택해주세요.');
+      toast.error('적용 서비스를 선택해주세요.');
       return;
     }
     if (formData.pageTypes.length === 0) {
-      alert('적용 페이지를 선택해주세요.');
+      toast.error('적용 페이지를 선택해주세요.');
       return;
     }
     if (formData.purposeTags.length === 0) {
-      alert('목적 태그를 선택해주세요.');
+      toast.error('목적 태그를 선택해주세요.');
       return;
     }
 
@@ -180,7 +181,7 @@ export default function ContextAssetFormPage() {
       navigate('/admin/ai/context-assets');
     } catch (error) {
       console.error('저장 실패:', error);
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }

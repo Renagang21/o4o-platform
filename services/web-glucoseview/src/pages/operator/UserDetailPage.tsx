@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   ArrowLeft,
   Loader2,
@@ -222,7 +223,7 @@ export default function UserDetailPage() {
       });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
@@ -236,7 +237,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${id}`, { method: 'DELETE' });
       navigate('/operator/users');
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
@@ -249,7 +250,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${membershipId}/approve`, { method: 'PATCH' });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }
@@ -265,7 +266,7 @@ export default function UserDetailPage() {
       });
       fetchDetail();
     } catch (err: any) {
-      alert(`오류: ${err.message}`);
+      toast.error(`오류: ${err.message}`);
     } finally {
       setActionLoading(null);
     }

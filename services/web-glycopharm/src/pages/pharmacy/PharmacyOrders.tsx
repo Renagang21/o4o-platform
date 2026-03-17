@@ -21,6 +21,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyOrder } from '@/api/pharmacy';
+import { toast } from '@o4o/error-handling';
 
 const statusConfig: Record<string, { icon: typeof Clock; label: string; color: string }> = {
   pending: { icon: Clock, label: '접수 대기', color: 'yellow' },
@@ -147,7 +148,7 @@ export default function PharmacyOrders() {
       await pharmacyApi.receiveOrder(orderId);
       loadOrders();
     } catch (err: any) {
-      alert(err.message || '접수 처리에 실패했습니다.');
+      toast.error(err.message || '접수 처리에 실패했습니다.');
     } finally {
       setUpdatingOrderId(null);
     }
@@ -162,7 +163,7 @@ export default function PharmacyOrders() {
       await pharmacyApi.updateOrderStatus(orderId, newStatus);
       loadOrders();
     } catch (err: any) {
-      alert(err.message || '상태 변경에 실패했습니다.');
+      toast.error(err.message || '상태 변경에 실패했습니다.');
     } finally {
       setUpdatingOrderId(null);
     }

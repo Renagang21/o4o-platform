@@ -21,6 +21,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { storeApi } from '@/api/store';
+import { toast } from '@o4o/error-handling';
 import type { StoreApplicationForm, StoreApplication } from '@/types/store';
 
 type Step = 'intro' | 'legal-info' | 'agreements' | 'confirm';
@@ -105,9 +106,9 @@ export default function StoreApplyPage() {
   const handleSaveDraft = async () => {
     try {
       await storeApi.saveStoreApplicationDraft(form);
-      alert('임시저장되었습니다.');
+      toast.success('임시저장되었습니다.');
     } catch (err: any) {
-      alert(err.message || '임시저장에 실패했습니다.');
+      toast.error(err.message || '임시저장에 실패했습니다.');
     }
   };
 

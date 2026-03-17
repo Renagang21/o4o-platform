@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { ArrowLeft, Package, Minus, Plus, Trash2, ShoppingCart, Loader2, AlertCircle, Info } from 'lucide-react';
 import { storeApi } from '@/api/store';
+import { toast } from '@o4o/error-handling';
 import type { CartItem } from '@/types/store';
 import { useStoreMode } from '@/contexts/StoreModeContext';
 
@@ -69,7 +70,7 @@ export default function StoreCart() {
         items.map(i => i.id === itemId ? { ...i, quantity: newQty } : i)
       );
     } catch (err: any) {
-      alert(err.message || '수량 변경에 실패했습니다.');
+      toast.error(err.message || '수량 변경에 실패했습니다.');
     } finally {
       setUpdatingItems(prev => {
         const next = new Set(prev);
@@ -90,7 +91,7 @@ export default function StoreCart() {
       await storeApi.removeFromCart(storeSlug, itemId);
       setCartItems(items => items.filter(i => i.id !== itemId));
     } catch (err: any) {
-      alert(err.message || '삭제에 실패했습니다.');
+      toast.error(err.message || '삭제에 실패했습니다.');
     } finally {
       setUpdatingItems(prev => {
         const next = new Set(prev);
@@ -328,7 +329,7 @@ export default function StoreCart() {
               onClick={() => {
                 // TODO: 주문 생성 API 호출 시 orderChannel 전달
                 console.log('Order channel:', orderChannel);
-                alert(`주문이 접수되었습니다. (채널: ${orderChannel})`);
+                toast.success(`주문이 접수되었습니다. (채널: ${orderChannel})`);
               }}
               className={`w-full ${fontSize === 'xlarge' ? 'py-5 text-xl' : 'py-3'} bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed`}
             >

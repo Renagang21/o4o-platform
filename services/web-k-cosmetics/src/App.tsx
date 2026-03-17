@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
+import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
@@ -344,15 +345,18 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <LoginModalProvider>
-          <LoginModal />
-          <Suspense fallback={<PageLoading />}>
-            <AppRoutes />
-          </Suspense>
-        </LoginModalProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <O4OErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <LoginModalProvider>
+            <O4OToastProvider />
+            <LoginModal />
+            <Suspense fallback={<PageLoading />}>
+              <AppRoutes />
+            </Suspense>
+          </LoginModalProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </O4OErrorBoundary>
   );
 }

@@ -24,6 +24,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import type { EventNoticeContent, EventNoticeType } from '@/types/store';
+import { toast } from '@o4o/error-handling';
 
 // Mock 데이터 (실제로는 API에서 가져옴)
 const MOCK_EVENT_NOTICES: EventNoticeContent[] = [
@@ -133,7 +134,7 @@ export function EventNoticeTab() {
   // 저장
   const handleSave = () => {
     if (!form.title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginModalProvider } from './contexts/LoginModalContext';
+import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import Layout from './components/Layout';
 import LoginModal from './components/LoginModal';
 import PatientsPage from './pages/PatientsPage';
@@ -242,15 +243,18 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <LoginModalProvider>
-          <PwaInstallPrompt />
-          <LoginModal />
-          <AppRoutes />
-        </LoginModalProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <O4OErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <LoginModalProvider>
+            <O4OToastProvider />
+            <PwaInstallPrompt />
+            <LoginModal />
+            <AppRoutes />
+          </LoginModalProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </O4OErrorBoundary>
   );
 }
 

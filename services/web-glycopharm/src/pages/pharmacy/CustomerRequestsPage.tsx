@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import type { StoreApiResponse } from '@/types/store';
 import { api } from '@/lib/apiClient';
+import { toast } from '@o4o/error-handling';
 import {
   fetchInterestRequests,
   updateInterestAction,
@@ -244,7 +245,7 @@ export default function CustomerRequestsPage() {
       await fetchRequests();
     } catch (err: any) {
       console.error('Failed to approve request:', err);
-      alert('요청 승인에 실패했습니다.');
+      toast.error('요청 승인에 실패했습니다.');
     } finally {
       setProcessingId(null);
     }
@@ -260,7 +261,7 @@ export default function CustomerRequestsPage() {
   const handleRejectConfirm = async () => {
     if (!rejectTargetId || processingId) return;
     if (!rejectReason) {
-      alert('거절 사유를 선택해주세요.');
+      toast.error('거절 사유를 선택해주세요.');
       return;
     }
     setProcessingId(rejectTargetId);
@@ -275,7 +276,7 @@ export default function CustomerRequestsPage() {
       await fetchRequests();
     } catch (err: any) {
       console.error('Failed to reject request:', err);
-      alert('요청 거절에 실패했습니다.');
+      toast.error('요청 거절에 실패했습니다.');
     } finally {
       setProcessingId(null);
       setRejectTargetId(null);

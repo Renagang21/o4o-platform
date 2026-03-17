@@ -15,6 +15,7 @@ import {
   AlertCircle,
   X,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { api, API_BASE_URL } from '../../../lib/apiClient';
 
 const SERVICE_KEY = 'neture';
@@ -116,7 +117,7 @@ export default function HqMediaPage() {
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : '미디어 생성에 실패했습니다.';
-      alert(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

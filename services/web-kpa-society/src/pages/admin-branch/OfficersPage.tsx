@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -135,15 +136,15 @@ export function OfficersPage() {
   };
 
   const handleEdit = (id: string) => {
-    alert(`임원 #${id} 정보 수정 (UI 데모)`);
+    toast.info(`임원 #${id} 정보 수정 (UI 데모)`);
   };
 
   const handleToggleActive = (id: string, currentState: boolean) => {
-    alert(`임원 #${id} ${currentState ? '비활성화' : '활성화'} (UI 데모)`);
+    toast.info(`임원 #${id} ${currentState ? '비활성화' : '활성화'} (UI 데모)`);
   };
 
   const handleAdd = () => {
-    alert('새 임원 추가 (UI 데모)');
+    toast.info('새 임원 추가 (UI 데모)');
   };
 
   const renderOfficerCard = (officer: Officer) => (

@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import { branchAdminApi } from '../../api/branchAdmin';
@@ -70,7 +71,7 @@ export function DocsManagementPage() {
       await branchAdminApi.deleteDoc(id);
       fetchDocs();
     } catch (err: any) {
-      alert('삭제에 실패했습니다: ' + (err.message || ''));
+      toast.error('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -79,7 +80,7 @@ export function DocsManagementPage() {
       await branchAdminApi.updateDoc(id, { is_public: !currentPublic });
       fetchDocs();
     } catch (err: any) {
-      alert('상태 변경에 실패했습니다: ' + (err.message || ''));
+      toast.error('상태 변경에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -93,7 +94,7 @@ export function DocsManagementPage() {
       setShowUploadModal(false);
       fetchDocs();
     } catch (err: any) {
-      alert('업로드에 실패했습니다: ' + (err.message || ''));
+      toast.error('업로드에 실패했습니다: ' + (err.message || ''));
     }
   };
 

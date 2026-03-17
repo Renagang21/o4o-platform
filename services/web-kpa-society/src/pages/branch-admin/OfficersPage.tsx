@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/branch-admin';
 import { colors } from '../../styles/theme';
 import { branchAdminApi } from '../../api/branchAdmin';
@@ -56,7 +57,7 @@ export function OfficersPage() {
       await branchAdminApi.deleteOfficer(id);
       fetchOfficers();
     } catch (err: any) {
-      alert('삭제에 실패했습니다: ' + (err.message || ''));
+      toast.error('삭제에 실패했습니다: ' + (err.message || ''));
     }
   };
 
@@ -83,11 +84,11 @@ export function OfficersPage() {
         setShowFormModal(false);
         fetchOfficers();
       } catch (err: any) {
-        alert('저장에 실패했습니다: ' + (err.message || ''));
+        toast.error('저장에 실패했습니다: ' + (err.message || ''));
       }
     } else {
       // POST: member_id required
-      if (!memberId) { alert('회원을 선택해주세요.'); return; }
+      if (!memberId) { toast.error('회원을 선택해주세요.'); return; }
       const createData = {
         member_id: memberId,
         position: ROLE_LABELS[roleValue] || roleValue,
@@ -102,7 +103,7 @@ export function OfficersPage() {
         setShowFormModal(false);
         fetchOfficers();
       } catch (err: any) {
-        alert('저장에 실패했습니다: ' + (err.message || ''));
+        toast.error('저장에 실패했습니다: ' + (err.message || ''));
       }
     }
   };

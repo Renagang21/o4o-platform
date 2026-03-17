@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from '@o4o/error-handling';
 import { adminApi } from '../../api/admin';
 import type { Steward, Organization, Member, StewardScopeType, AssignStewardDto } from '../../api/admin';
 import { PageHeader, LoadingSpinner, Card } from '../../components/common';
@@ -99,7 +100,7 @@ export function StewardManagementPage() {
 
   const handleAssign = async () => {
     if (!formData.organization_id || !formData.member_id || !formData.scope_type) {
-      alert('필수 항목을 선택해주세요.');
+      toast.error('필수 항목을 선택해주세요.');
       return;
     }
 
@@ -114,9 +115,9 @@ export function StewardManagementPage() {
       setFormData({ organization_id: '', member_id: '', scope_type: 'organization' });
       setFormNote('');
       await loadData();
-      alert('Steward가 배정되었습니다.');
+      toast.success('Steward가 배정되었습니다.');
     } catch (err: any) {
-      alert(`배정 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '배정에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -129,9 +130,9 @@ export function StewardManagementPage() {
     try {
       await adminApi.revokeSteward(id);
       await loadData();
-      alert('Steward 배정이 해제되었습니다.');
+      toast.success('Steward 배정이 해제되었습니다.');
     } catch (err: any) {
-      alert(`해제 실패: ${err.message || '알 수 없는 오류'}`);
+      toast.error(err.message || '해제에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '../contexts/AuthContext';
 
 // 슬라이드 배너 타입
@@ -210,7 +211,7 @@ export default function AdminPage() {
   }
 
   const handleApprove = (member: typeof samplePendingMembers[0]) => {
-    alert(`${member.realName}님의 가입을 승인했습니다.`);
+    toast.success(`${member.realName}님의 가입을 승인했습니다.`);
   };
 
   const handleRejectClick = (member: typeof samplePendingMembers[0]) => {
@@ -221,10 +222,10 @@ export default function AdminPage() {
 
   const handleRejectConfirm = () => {
     if (!rejectReason.trim()) {
-      alert('거절 사유를 입력해주세요.');
+      toast.error('거절 사유를 입력해주세요.');
       return;
     }
-    alert(`${selectedMember?.realName}님의 가입을 거절했습니다.\n사유: ${rejectReason}`);
+    toast.success(`${selectedMember?.realName}님의 가입을 거절했습니다.\n사유: ${rejectReason}`);
     setShowRejectModal(false);
   };
 
@@ -250,7 +251,7 @@ export default function AdminPage() {
   const handleSaveBanner = () => {
     if (!editingBanner) return;
     if (!editingBanner.title.trim()) {
-      alert('제목을 입력해주세요.');
+      toast.error('제목을 입력해주세요.');
       return;
     }
 
@@ -295,11 +296,11 @@ export default function AdminPage() {
   const handleSavePartner = () => {
     if (!editingPartner) return;
     if (!editingPartner.name.trim()) {
-      alert('업체명을 입력해주세요.');
+      toast.error('업체명을 입력해주세요.');
       return;
     }
     if (!editingPartner.websiteUrl.trim()) {
-      alert('웹사이트 URL을 입력해주세요.');
+      toast.error('웹사이트 URL을 입력해주세요.');
       return;
     }
 

@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 
 /** Inline media query hook */
 function useMediaQuery(query: string): boolean {
@@ -280,7 +281,7 @@ export function ForumPostPage() {
     if (result.success) {
       navigate('/forum');
     } else {
-      alert(result.error || '게시글 삭제에 실패했습니다.');
+      toast.error(result.error || '게시글 삭제에 실패했습니다.');
     }
   };
 
@@ -289,7 +290,7 @@ export function ForumPostPage() {
     if (result.success && result.data) {
       setComments(prev => prev.map(c => c.id === commentId ? toDisplayComment(result.data!) : c));
     } else {
-      alert(result.error || '댓글 수정에 실패했습니다.');
+      toast.error(result.error || '댓글 수정에 실패했습니다.');
     }
   };
 
@@ -298,7 +299,7 @@ export function ForumPostPage() {
     if (result.success) {
       setComments(prev => prev.filter(c => c.id !== commentId));
     } else {
-      alert(result.error || '댓글 삭제에 실패했습니다.');
+      toast.error(result.error || '댓글 삭제에 실패했습니다.');
     }
   };
 

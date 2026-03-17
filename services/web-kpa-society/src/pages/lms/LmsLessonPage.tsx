@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
@@ -68,10 +69,10 @@ export function LmsLessonPage() {
         const nextLesson = lessons[currentIndex + 1];
         navigate(`/lms/course/${courseId}/lesson/${nextLesson.id}`);
       } else {
-        alert('모든 단계를 완료했습니다!');
+        toast.success('모든 단계를 완료했습니다!');
       }
     } catch (err) {
-      alert('진도 업데이트에 실패했습니다.');
+      toast.error('진도 업데이트에 실패했습니다.');
     }
   };
 

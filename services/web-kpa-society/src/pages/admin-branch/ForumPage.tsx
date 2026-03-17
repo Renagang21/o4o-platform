@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
 import { colors } from '../../styles/theme';
 
@@ -107,17 +108,17 @@ export function ForumPage() {
   const reportedCount = posts.filter((p) => p.isReported).length;
 
   const handleHidePost = (postId: string) => {
-    alert(`게시물 #${postId} 숨김 처리 (UI 데모)`);
+    toast.info(`게시물 #${postId} 숨김 처리 (UI 데모)`);
   };
 
   const handleDeletePost = (postId: string) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      alert(`게시물 #${postId} 삭제 (UI 데모)`);
+      toast.info(`게시물 #${postId} 삭제 (UI 데모)`);
     }
   };
 
   const handleToggleBoardActive = (boardId: string, currentState: boolean) => {
-    alert(`게시판 ${boardId} ${currentState ? '비활성화' : '활성화'} (UI 데모)`);
+    toast.info(`게시판 ${boardId} ${currentState ? '비활성화' : '활성화'} (UI 데모)`);
   };
 
   return (

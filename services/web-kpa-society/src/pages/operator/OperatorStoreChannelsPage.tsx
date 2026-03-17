@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -134,7 +135,7 @@ export default function OperatorStoreChannelsPage() {
       });
       await fetchChannels();
     } catch (err: any) {
-      alert(err?.message || '상태 변경에 실패했습니다');
+      toast.error(err?.message || '상태 변경에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

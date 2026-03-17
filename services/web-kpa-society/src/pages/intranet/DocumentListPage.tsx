@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { IntranetHeader } from '../../components/intranet';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -112,11 +113,11 @@ export function DocumentListPage() {
   };
 
   const handleDownload = (doc: Document) => {
-    alert(`${doc.fileName} 다운로드 (UI 데모)`);
+    toast.info(`${doc.fileName} 다운로드 (UI 데모)`);
   };
 
   const handleUpload = () => {
-    alert('문서 업로드 (UI 데모)');
+    toast.info('문서 업로드 (UI 데모)');
   };
 
   return (

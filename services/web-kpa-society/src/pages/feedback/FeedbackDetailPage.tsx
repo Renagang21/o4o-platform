@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
 import { ROLES, hasAnyRole } from '../../lib/role-constants';
@@ -111,7 +112,7 @@ export function FeedbackDetailPage() {
 
   const handleStatusChange = (newStatus: FeedbackStatus) => {
     // 실제로는 API 호출
-    alert(`상태가 "${FEEDBACK_STATUS_LABELS[newStatus]}"(으)로 변경되었습니다.`);
+    toast.success(`상태가 "${FEEDBACK_STATUS_LABELS[newStatus]}"(으)로 변경되었습니다.`);
   };
 
   return (

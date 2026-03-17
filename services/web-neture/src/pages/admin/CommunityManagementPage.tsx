@@ -19,6 +19,7 @@ import {
   Monitor,
   Users,
 } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import { communityManageApi, type CommunityAdFull, type CommunitySponsorFull } from '../../lib/api/communityAdmin';
 
 type Tab = 'hero' | 'page' | 'sponsors';
@@ -63,7 +64,7 @@ export default function CommunityManagementPage() {
       }
       fetchData();
     } catch {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 
@@ -338,7 +339,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
       }
       onSaved();
     } catch {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     }
     setSaving(false);
   };

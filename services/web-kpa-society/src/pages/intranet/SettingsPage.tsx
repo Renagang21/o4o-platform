@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { toast } from '@o4o/error-handling';
 import { IntranetHeader } from '../../components/intranet';
 import { colors } from '../../styles/theme';
 
@@ -83,14 +84,14 @@ export function SettingsPage() {
   ]);
 
   const handleSaveOrgInfo = () => {
-    alert('조직 정보 저장 (UI 데모)');
+    toast.info('조직 정보 저장 (UI 데모)');
   };
 
   const handleRoleChange = (memberId: string, newRole: Member['role']) => {
     setMembers(members.map((m) =>
       m.id === memberId ? { ...m, role: newRole } : m
     ));
-    alert(`역할 변경 완료 (UI 데모)`);
+    toast.info(`역할 변경 완료 (UI 데모)`);
   };
 
   const handlePermissionToggle = (memberId: string, permission: keyof Member['permissions']) => {
