@@ -44,11 +44,7 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
     try {
       // 1. User 조회
       const users = await dataSource.query(`
-        SELECT
-          id, email, "firstName", "lastName", name, nickname, phone,
-          status, "isActive", "isEmailVerified",
-          service_key,
-          "createdAt", "lastLoginAt"
+        SELECT *
         FROM users
         WHERE email = $1
         LIMIT 1
