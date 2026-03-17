@@ -153,6 +153,14 @@ import type { RelatedEntity } from './related.entity.js';
 
 `/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
 
+### 디버그 SSR 테스트 페이지
+
+디버그용 데이터 조회/액션 테스트 페이지 생성 시 반드시 참조:
+
+> 📄 **`docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md`**
+
+핵심: **SSR ONLY** (클라이언트 JS 금지) / Factory Router 패턴 / `esc()` XSS 방지 / Raw JSON 덤프 포함
+
 ### JSON 응답 표준
 
 `{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`
@@ -290,9 +298,10 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | RBAC Role Catalog | `docs/rbac/RBAC-ROLE-CATALOG-V1.md` |
 | **O4O Core Freeze** | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
 | **Operator Dashboard 표준** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
+| **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
 
 ---
 
-*Updated: 2026-03-16*
-*Version: 7.0*
+*Updated: 2026-03-17*
+*Version: 7.1*
 *Status: Active Constitution*

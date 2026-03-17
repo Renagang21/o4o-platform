@@ -119,9 +119,9 @@ export class MembershipApprovalService {
       logger.info('[APPROVAL][STEP2] user UPDATE', { userId });
 
       await queryRunner.query(
-        `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+        `UPDATE users SET status = 'active', "isActive" = true,
          "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
+         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'rejected')`,
         [approvedBy, userId]
       );
 

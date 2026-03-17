@@ -16,6 +16,17 @@ const approvalService = new MembershipApprovalService();
 export class MembershipConsoleController {
 
   /**
+   * Service boundary check — non-platform-admin can only access users in their service scope
+   */
+  private async checkServiceBoundary(userId: string, serviceKeys: string[]): Promise<boolean> {
+    const result = await AppDataSource.query(
+      `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
+      [userId, serviceKeys]
+    );
+    return result.length > 0;
+  }
+
+  /**
    * GET /api/v1/operator/members
    * 회원 목록 + service_memberships + role_assignments
    */
@@ -200,14 +211,9 @@ export class MembershipConsoleController {
       const { userId } = req.params;
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary check
-      // Non-platform-admin can only view users that have a membership in their service
       if (!scope.isPlatformAdmin) {
-        const accessCheck = await AppDataSource.query(
-          `SELECT 1 FROM service_memberships
-           WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
-          [userId, scope.serviceKeys]
-        );
-        if (accessCheck.length === 0) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
@@ -364,13 +370,23 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to reject membership' });
+      logger.error('[MembershipConsole] rejectMembership error', {
+        membershipId: req.params.membershipId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to reject membership',
+      });
     }
   };
 
   /**
    * PATCH /api/v1/operator/members/:userId/status
    * 사용자 상태 변경 (approved, rejected, suspended 등)
+   *
+   * approved/active → MembershipApprovalService 위임 (atomic 3-table 일관성 보장)
+   * 기타 → user 상태만 변경
    */
   updateMemberStatus = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -384,46 +400,55 @@ export class MembershipConsoleController {
         return;
       }
 
-      // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const accessCheck = await AppDataSource.query(
-          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
-          [userId, scope.serviceKeys]
-        );
-        if (accessCheck.length === 0) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
       }
 
-      // Map frontend status to DB status
-      const dbStatus = status === 'approved' ? 'ACTIVE' : status.toUpperCase();
-      const isActive = status === 'approved' || status === 'active';
-
-      await AppDataSource.query(
-        `UPDATE users SET status = $1, "isActive" = $2,
-         "approvedAt" = CASE WHEN $1 = 'ACTIVE' THEN NOW() ELSE "approvedAt" END,
-         "approvedBy" = CASE WHEN $1 = 'ACTIVE' THEN $3 ELSE "approvedBy" END,
-         "updatedAt" = NOW()
-         WHERE id = $4`,
-        [dbStatus, isActive, updatedBy, userId]
-      );
-
-      // If approving, also activate service memberships
       if (status === 'approved' || status === 'active') {
-        if (scope.isPlatformAdmin) {
+        // Delegate to MembershipApprovalService for atomic 3-table consistency
+        // (membership + user + role_assignments in single transaction)
+        const pendingMemberships = scope.isPlatformAdmin
+          ? await AppDataSource.query(
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected')`,
+              [userId]
+            )
+          : await AppDataSource.query(
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)`,
+              [userId, scope.serviceKeys]
+            );
+
+        if (pendingMemberships.length > 0) {
+          for (const m of pendingMemberships) {
+            await approvalService.approveMembership({
+              membershipId: m.id,
+              approvedBy: updatedBy,
+              isPlatformAdmin: scope.isPlatformAdmin,
+              serviceKeys: scope.serviceKeys,
+            });
+          }
+        } else {
+          // No pending memberships — just activate user (idempotent)
           await AppDataSource.query(
-            `UPDATE service_memberships SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-             WHERE user_id = $2 AND status = 'pending'`,
+            `UPDATE users SET status = 'active', "isActive" = true,
+             "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
+             "updatedAt" = NOW()
+             WHERE id = $2`,
             [updatedBy, userId]
           );
-        } else {
-          await AppDataSource.query(
-            `UPDATE service_memberships SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-             WHERE user_id = $2 AND status = 'pending' AND service_key = ANY($3)`,
-            [updatedBy, userId, scope.serviceKeys]
-          );
         }
+      } else {
+        // Non-approval status (rejected, suspended, etc.) — user status only
+        // UserStatus enum uses lowercase: 'rejected', 'suspended', etc.
+        const dbStatus = status.toLowerCase();
+        await AppDataSource.query(
+          `UPDATE users SET status = $1, "isActive" = false, "updatedAt" = NOW()
+           WHERE id = $2`,
+          [dbStatus, userId]
+        );
       }
 
       res.json({ success: true, message: `User status updated to ${status}` });
@@ -431,8 +456,13 @@ export class MembershipConsoleController {
       logger.error('[MembershipConsole] updateMemberStatus error', {
         userId: req.params.userId,
         error: error instanceof Error ? error.message : String(error),
+        code: (error as any)?.code,
       });
-      res.status(500).json({ success: false, error: 'Failed to update user status' });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update user status',
+        code: (error as any)?.code,
+      });
     }
   };
 
@@ -446,13 +476,9 @@ export class MembershipConsoleController {
       const { userId } = req.params;
       const { password } = req.body;
 
-      // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const accessCheck = await AppDataSource.query(
-          `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
-          [userId, scope.serviceKeys]
-        );
-        if (accessCheck.length === 0) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
@@ -501,7 +527,14 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to delete member' });
+      logger.error('[MembershipConsole] deleteMember error', {
+        userId: req.params.userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to delete member',
+      });
     }
   };
 

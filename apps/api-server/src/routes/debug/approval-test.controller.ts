@@ -428,7 +428,7 @@ ${rows.length > 0 ? `<hr><p><a class="btn btn-danger" href="/__debug__/approval-
 
       // User 상태 복구
       await dataSource.query(
-        `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+        `UPDATE users SET status = 'active', "isActive" = true,
          "approvedAt" = COALESCE("approvedAt", NOW()), "updatedAt" = NOW()
          WHERE id = $1`,
         [userId]
@@ -501,7 +501,7 @@ ${rows.length > 0 ? `<hr><p><a class="btn btn-danger" href="/__debug__/approval-
       for (const r of rows) {
         try {
           await dataSource.query(
-            `UPDATE users SET status = 'ACTIVE', "isActive" = true,
+            `UPDATE users SET status = 'active', "isActive" = true,
              "approvedAt" = COALESCE("approvedAt", NOW()), "updatedAt" = NOW()
              WHERE id = $1`,
             [r.user_id]

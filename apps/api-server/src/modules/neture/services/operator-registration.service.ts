@@ -83,8 +83,8 @@ export class OperatorRegistrationService {
       // 2. users 상태 활성화 (camelCase columns)
       await queryRunner.query(
         `UPDATE users
-         SET status = 'ACTIVE', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
-         WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
+         SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
+         WHERE id = $2 AND status IN ('PENDING', 'pending', 'ACTIVE', 'rejected')`,
         [approvedBy, userId],
       );
 
