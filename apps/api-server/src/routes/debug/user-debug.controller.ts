@@ -164,7 +164,11 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
             <tr><td>User ID</td><td>${esc(user.id)}</td></tr>
             <tr><td>Email</td><td>${esc(user.email)}</td></tr>
             <tr><td>Name</td><td>${esc(user.name || user.firstName || '')}</td></tr>
-            <tr><td>Status</td><td>${badge(user.status || 'unknown')}</td></tr>
+            <tr><td>Status</td><td>${badge(user.status || 'unknown')}${
+              user.status !== 'active'
+                ? ` <a href="/__debug__/user/activate?email=${encodeURIComponent(email)}" style="color:#ff8800;margin-left:8px;">[Activate]</a>`
+                : ''
+            }</td></tr>
             <tr><td>isActive</td><td class="${user.isActive ? 'ok' : 'err'}">${user.isActive}</td></tr>
             <tr><td>Memberships</td><td>${memberships.length}개</td></tr>
             <tr><td>Active Roles</td><td class="ok">${activeRoles.join(', ') || 'none'}</td></tr>
@@ -191,6 +195,73 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
         <h1 class="err">Error</h1>
         <div class="card"><pre>${esc(error.message)}\n\n${esc(error.stack)}</pre></div>
         <a href="/__debug__/user">&larr; Back</a>
+      `));
+    }
+  });
+
+  // ── Activate: users.status → 'active' ──
+  router.get('/activate', async (req: Request, res: Response): Promise<void> => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+    if (!dataSource.isInitialized) {
+      res.status(503).send(page('DB Error', '<h1>Database not initialized</h1>'));
+      return;
+    }
+
+    const email = (req.query.email as string)?.trim() || '';
+    if (!email) {
+      res.status(400).send(page('Error', '<h1 class="err">email required</h1>'));
+      return;
+    }
+
+    try {
+      // 1. 현재 상태 확인
+      const before = await dataSource.query(
+        `SELECT id, email, status, "isActive" FROM users WHERE email = $1 LIMIT 1`,
+        [email],
+      );
+
+      if (!before[0]) {
+        res.send(page('Not Found', `<h1 class="err">User not found: ${esc(email)}</h1><a href="/__debug__/user">&larr; Back</a>`));
+        return;
+      }
+
+      const userId = before[0].id;
+      const oldStatus = before[0].status;
+
+      // 2. UPDATE
+      await dataSource.query(
+        `UPDATE users SET status = 'active', "isEmailVerified" = true, "updatedAt" = NOW() WHERE id = $1`,
+        [userId],
+      );
+
+      // 3. 결과 확인
+      const after = await dataSource.query(
+        `SELECT id, email, status, "isActive", "isEmailVerified" FROM users WHERE id = $1`,
+        [userId],
+      );
+
+      res.send(page('Activated', `
+        <h1>User Activated</h1>
+        <div class="card">
+          <table>
+            <tr><th>항목</th><th>Before</th><th>After</th></tr>
+            <tr><td>Email</td><td colspan="2">${esc(email)}</td></tr>
+            <tr><td>status</td><td class="warn">${esc(oldStatus)}</td><td class="ok">${esc(after[0]?.status)}</td></tr>
+            <tr><td>isEmailVerified</td><td class="warn">${esc(before[0].isEmailVerified)}</td><td class="ok">${esc(after[0]?.isEmailVerified)}</td></tr>
+          </table>
+        </div>
+        <div class="nav">
+          <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back to User</a> |
+          <a href="/__debug__/user">&larr; Search</a>
+        </div>
+      `));
+    } catch (error: any) {
+      console.error('DEBUG ACTIVATE ERROR:', error);
+      res.status(500).send(page('Error', `
+        <h1 class="err">Activate Failed</h1>
+        <div class="card"><pre>${esc(error.message)}</pre></div>
+        <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back</a>
       `));
     }
   });
