@@ -4,6 +4,7 @@ import { Taxonomy, Term, TermRelationship } from '../../entities/Taxonomy.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 import { TreeRepository } from 'typeorm';
+import logger from '../../utils/logger.js';
 
 export class TaxonomiesController {
   private taxonomyRepo = AppDataSource.getRepository(Taxonomy);
@@ -53,7 +54,7 @@ export class TaxonomiesController {
         }
       });
     } catch (error) {
-      console.error('Error fetching taxonomies:', error);
+      logger.error('Error fetching taxonomies:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch taxonomies' }
@@ -79,7 +80,7 @@ export class TaxonomiesController {
 
       res.json({ success: true, data: taxonomy });
     } catch (error) {
-      console.error('Error fetching taxonomy:', error);
+      logger.error('Error fetching taxonomy:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch taxonomy' }
@@ -151,7 +152,7 @@ export class TaxonomiesController {
         message: 'Taxonomy created successfully'
       });
     } catch (error) {
-      console.error('Error creating taxonomy:', error);
+      logger.error('Error creating taxonomy:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create taxonomy' }
@@ -198,7 +199,7 @@ export class TaxonomiesController {
         message: 'Taxonomy updated successfully'
       });
     } catch (error) {
-      console.error('Error updating taxonomy:', error);
+      logger.error('Error updating taxonomy:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update taxonomy' }
@@ -243,7 +244,7 @@ export class TaxonomiesController {
         message: 'Taxonomy deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting taxonomy:', error);
+      logger.error('Error deleting taxonomy:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete taxonomy' }
@@ -315,7 +316,7 @@ export class TaxonomiesController {
         }
       });
     } catch (error) {
-      console.error('Error fetching terms:', error);
+      logger.error('Error fetching terms:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch terms' }
@@ -341,7 +342,7 @@ export class TaxonomiesController {
 
       res.json({ success: true, data: term });
     } catch (error) {
-      console.error('Error fetching term:', error);
+      logger.error('Error fetching term:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch term' }
@@ -414,7 +415,7 @@ export class TaxonomiesController {
         message: 'Term created successfully'
       });
     } catch (error) {
-      console.error('Error creating term:', error);
+      logger.error('Error creating term:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create term' }
@@ -475,7 +476,7 @@ export class TaxonomiesController {
         message: 'Term updated successfully'
       });
     } catch (error) {
-      console.error('Error updating term:', error);
+      logger.error('Error updating term:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update term' }
@@ -526,7 +527,7 @@ export class TaxonomiesController {
         message: 'Term deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting term:', error);
+      logger.error('Error deleting term:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete term' }
@@ -576,7 +577,7 @@ export class TaxonomiesController {
         message: 'Terms assigned successfully'
       });
     } catch (error) {
-      console.error('Error assigning terms:', error);
+      logger.error('Error assigning terms:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to assign terms' }
@@ -609,7 +610,7 @@ export class TaxonomiesController {
         data: terms
       });
     } catch (error) {
-      console.error('Error fetching object terms:', error);
+      logger.error('Error fetching object terms:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch object terms' }

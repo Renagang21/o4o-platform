@@ -34,6 +34,12 @@ declare global {
 
     interface Request {
       /**
+       * Request correlation ID — set by requestLoggingMiddleware
+       * WO-O4O-STRUCTURED-LOGGING-IMPLEMENTATION-V1
+       */
+      requestId?: string;
+
+      /**
        * Analytics tracking data attached by AnalyticsMiddleware
        */
       analytics?: {

@@ -6,7 +6,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { cacheService } from '../services/CacheService.js';
 import crypto from 'crypto';
-import logger from '../utils/simpleLogger.js';
+import logger from '../utils/logger.js';
 
 // Cache configuration per route
 interface CacheConfig {

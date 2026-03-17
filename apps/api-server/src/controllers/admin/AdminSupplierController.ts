@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import { Supplier, SupplierStatus } from '../../entities/Supplier.js';
 import { User } from '../../entities/User.js';
 import { validationResult } from 'express-validator';
+import logger from '../../utils/logger.js';
 
 export class AdminSupplierController {
   
@@ -67,7 +68,7 @@ export class AdminSupplierController {
         }
       });
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      logger.error('Error fetching suppliers:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch suppliers'
@@ -99,7 +100,7 @@ export class AdminSupplierController {
         supplier
       });
     } catch (error) {
-      console.error('Error fetching supplier:', error);
+      logger.error('Error fetching supplier:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch supplier'
@@ -182,7 +183,7 @@ export class AdminSupplierController {
         message: 'Supplier created successfully'
       });
     } catch (error) {
-      console.error('Error creating supplier:', error);
+      logger.error('Error creating supplier:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to create supplier'
@@ -260,7 +261,7 @@ export class AdminSupplierController {
         message: 'Supplier updated successfully'
       });
     } catch (error) {
-      console.error('Error updating supplier:', error);
+      logger.error('Error updating supplier:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update supplier'
@@ -293,7 +294,7 @@ export class AdminSupplierController {
         message: `Supplier ${isActive ? 'activated' : 'deactivated'} successfully`
       });
     } catch (error) {
-      console.error('Error updating supplier status:', error);
+      logger.error('Error updating supplier status:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update supplier status'
@@ -326,7 +327,7 @@ export class AdminSupplierController {
         message: 'Supplier approved successfully'
       });
     } catch (error) {
-      console.error('Error approving supplier:', error);
+      logger.error('Error approving supplier:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to approve supplier'
@@ -356,7 +357,7 @@ export class AdminSupplierController {
         message: 'Supplier deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting supplier:', error);
+      logger.error('Error deleting supplier:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to delete supplier'
@@ -404,7 +405,7 @@ export class AdminSupplierController {
         }
       });
     } catch (error) {
-      console.error('Error fetching supplier statistics:', error);
+      logger.error('Error fetching supplier statistics:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch supplier statistics'

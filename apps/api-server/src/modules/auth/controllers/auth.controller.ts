@@ -22,6 +22,7 @@ import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import { getServiceName } from '../../../config/service-catalog.js';
 import { RedisService } from '../../../services/redis.service.js';
+import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 
 // Phase 5-B: Auth ↔ Infra Separation
 // Auth 계층은 DB 상태 검사를 수행하지 않음.
@@ -287,6 +288,9 @@ export class AuthController extends BaseController {
         email,
         stack: error.stack?.split('\n').slice(0, 3).join(' | '),
       });
+
+      // WO-O4O-MONITORING-IMPLEMENTATION-V1: Auth failure metric
+      monitoringMetrics.recordAuthFailure(error.code || 'UNKNOWN');
 
       // Handle specific auth errors with specific error codes
       if (error.code === 'INVALID_CREDENTIALS') {
@@ -745,6 +749,9 @@ export class AuthController extends BaseController {
         error: error.message,
         code: error.code,
       });
+
+      // WO-O4O-MONITORING-IMPLEMENTATION-V1: Auth failure metric
+      monitoringMetrics.recordAuthFailure(error.code || 'REFRESH_TOKEN_INVALID');
 
       // Phase 2.5: Always clear cookies on refresh failure
       authenticationService.clearAuthCookies(req, res);

@@ -10,6 +10,7 @@ import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js'
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import logger from '../../utils/logger.js';
 
 export class AdminUserController {
   
@@ -102,7 +103,7 @@ export class AdminUserController {
         }
       });
     } catch (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch users'
@@ -134,7 +135,7 @@ export class AdminUserController {
         user: userWithoutPassword
       });
     } catch (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch user'
@@ -228,7 +229,7 @@ export class AdminUserController {
         message: 'User created successfully'
       });
     } catch (error) {
-      console.error('Error creating user:', error);
+      logger.error('Error creating user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to create user'
@@ -319,7 +320,7 @@ export class AdminUserController {
         message: 'User updated successfully'
       });
     } catch (error) {
-      console.error('Error updating user:', error);
+      logger.error('Error updating user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update user'
@@ -362,7 +363,7 @@ export class AdminUserController {
         message: `User status updated to ${status}`
       });
     } catch (error) {
-      console.error('Error updating user status:', error);
+      logger.error('Error updating user status:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update user status'
@@ -410,7 +411,7 @@ export class AdminUserController {
         }
       }
     } catch (error) {
-      console.error('Error deleting user:', error);
+      logger.error('Error deleting user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to delete user'
@@ -458,7 +459,7 @@ export class AdminUserController {
         }
       });
     } catch (error) {
-      console.error('Error fetching user statistics:', error);
+      logger.error('Error fetching user statistics:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch user statistics'

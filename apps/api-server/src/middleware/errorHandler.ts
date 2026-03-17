@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import logger from '../utils/simpleLogger.js';
+import logger from '../utils/logger.js';
+import { getRequestId } from '../common/logger/request-context.js';
 
 // Custom error class for API errors
 export class ApiError extends Error {
@@ -100,6 +101,7 @@ export const errorHandler = (
 
   // Log error with structured logging
   logger.error(`API Error ${statusCode}: ${message}`, {
+    requestId: getRequestId(),
     code,
     path: req.path,
     method: req.method,

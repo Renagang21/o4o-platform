@@ -21,6 +21,7 @@ import { GlycopharmStoreDataAdapter } from '../services/glycopharm-store-data.ad
 import { runAIInsight } from '@o4o/ai-core';
 import type { ActionLogService } from '@o4o/action-log-core';
 import type { AuthRequest } from '../../../types/auth.js';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -161,10 +162,8 @@ export function createCockpitController(
 
         res.json({ success: true, data: response });
       } catch (error: any) {
-        console.error('Failed to get pharmacy status:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get pharmacy status', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -244,10 +243,8 @@ export function createCockpitController(
 
         res.json({ success: true, data: response });
       } catch (error: any) {
-        console.error('Failed to get today actions:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get today actions', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -310,10 +307,8 @@ export function createCockpitController(
 
         res.json({ success: true, data: response });
       } catch (error: any) {
-        console.error('Failed to get franchise services:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get franchise services', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -346,10 +341,8 @@ export function createCockpitController(
 
         res.json({ success: true, data: response });
       } catch (error: any) {
-        console.error('Failed to get content workspace:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get content workspace', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -392,10 +385,8 @@ export function createCockpitController(
         const summary = await summaryEngine.getSummary(pharmacy.id);
         res.json({ success: true, data: summary });
       } catch (error: any) {
-        console.error('Failed to get store KPI:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get store KPI', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -439,10 +430,8 @@ export function createCockpitController(
         const insights = insightsEngine.generate({ summary, lastMonthRevenue });
         res.json({ success: true, data: insights });
       } catch (error: any) {
-        console.error('Failed to get store insights:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get store insights', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -580,10 +569,8 @@ export function createCockpitController(
           },
         });
       } catch (error: any) {
-        console.error('Failed to get store main data:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to get store main data', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -645,10 +632,8 @@ export function createCockpitController(
           },
         });
       } catch (error: any) {
-        console.error('Failed to copy store item:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to copy store item', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );
@@ -794,7 +779,7 @@ export function createCockpitController(
           actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.cockpit.ai_summary', {
             organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'ai',
             meta: { totalPatients, highRiskCount, provider: aiResult.meta.provider },
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
           res.json({
             success: true,
@@ -812,7 +797,7 @@ export function createCockpitController(
           actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.cockpit.ai_summary', {
             organizationId: pharmacy.id, durationMs: Date.now() - start, source: 'manual',
             meta: { totalPatients, highRiskCount, provider: 'fallback' },
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
           // Graceful fallback — return rule-based summary instead
           res.json({
@@ -830,12 +815,10 @@ export function createCockpitController(
         if (authUserId) {
           actionLogService?.logFailure('glycopharm', authUserId, 'glycopharm.cockpit.ai_summary', error.message, {
             durationMs: Date.now() - start, source: 'ai',
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
         }
-        console.error('Failed to generate AI summary:', error);
-        res.status(500).json({
-          error: { code: 'INTERNAL_ERROR', message: error.message },
-        });
+        logger.error('[Cockpit] Failed to generate AI summary', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     }
   );

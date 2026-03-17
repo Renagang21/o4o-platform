@@ -14,6 +14,7 @@ import { KpaBranchNews } from '../entities/kpa-branch-news.entity.js';
 import { KpaBranchOfficer } from '../entities/kpa-branch-officer.entity.js';
 import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
+import logger from '../../../utils/logger.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 
 // UUID v4 regex for detecting direct ID lookups
@@ -145,8 +146,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           },
         });
       } catch (error: any) {
-        console.error('Failed to get branch info:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch info', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -195,8 +196,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           },
         });
       } catch (error: any) {
-        console.error('Failed to get branch news:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch news', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -210,7 +211,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
       try {
         const branch = await resolveBranch(dataSource, req.params.branchId);
         if (branch.isVirtual) {
-          res.status(404).json({ success: false, error: { message: 'News not found' } });
+          res.status(404).json({ success: false, error: 'News not found', code: 'NOT_FOUND' });
           return;
         }
 
@@ -218,19 +219,19 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           where: { id: req.params.id, organization_id: branch.id, is_published: true, is_deleted: false },
         });
         if (!news) {
-          res.status(404).json({ success: false, error: { message: 'News not found' } });
+          res.status(404).json({ success: false, error: 'News not found', code: 'NOT_FOUND' });
           return;
         }
 
         // Increment view count (fire and forget)
         dataSource.getRepository(KpaBranchNews)
           .increment({ id: news.id }, 'view_count', 1)
-          .catch(() => {});
+          .catch((e: any) => logger.warn('[ViewCount] increment failed', { error: e?.message }));
 
         res.json({ success: true, data: news });
       } catch (error: any) {
-        console.error('Failed to get branch news detail:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch news detail', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -255,8 +256,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
 
         res.json({ success: true, data: officers });
       } catch (error: any) {
-        console.error('Failed to get branch officers:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch officers', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -304,8 +305,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           },
         });
       } catch (error: any) {
-        console.error('Failed to get branch resources:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch resources', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -347,8 +348,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           },
         });
       } catch (error: any) {
-        console.error('Failed to get branch contact:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch contact', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -374,8 +375,8 @@ export function createBranchPublicController(dataSource: DataSource): Router {
           },
         });
       } catch (error: any) {
-        console.error('Failed to get branch forum posts:', error);
-        res.status(500).json({ success: false, error: { message: error.message } });
+        logger.error('[BranchPublic] Failed to get branch forum posts', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -400,7 +401,7 @@ export function createBranchPublicController(dataSource: DataSource): Router {
   router.get(
     '/:branchId/groupbuys/:id',
     async (_req: Request, res: Response): Promise<void> => {
-      res.status(404).json({ success: false, error: { message: 'Groupbuy not found' } });
+      res.status(404).json({ success: false, error: 'Groupbuy not found', code: 'NOT_FOUND' });
     },
   );
 

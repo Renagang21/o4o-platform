@@ -5,6 +5,7 @@ import { FormSubmission } from '../../entities/FormSubmission.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 import type { FormField, FormSettings, FormNotification, FormConfirmation } from '../../types/form-builder.js';
+import logger from '../../utils/logger.js';
 
 export class FormsController {
   private formRepo = AppDataSource.getRepository(Form);
@@ -61,7 +62,7 @@ export class FormsController {
         }
       });
     } catch (error: any) {
-      console.error('Error fetching forms:', error);
+      logger.error('Error fetching forms:', error);
 
       // If table doesn't exist, return empty array instead of error
       if (error?.code === '42P01') {
@@ -114,7 +115,7 @@ export class FormsController {
 
       res.json({ success: true, data: form });
     } catch (error) {
-      console.error('Error fetching form:', error);
+      logger.error('Error fetching form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch form' }
@@ -157,7 +158,7 @@ export class FormsController {
 
       res.json({ success: true, data: publicFormData });
     } catch (error) {
-      console.error('Error fetching form by name:', error);
+      logger.error('Error fetching form by name:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch form' }
@@ -235,7 +236,7 @@ export class FormsController {
         message: 'Form created successfully'
       });
     } catch (error) {
-      console.error('Error creating form:', error);
+      logger.error('Error creating form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create form' }
@@ -308,7 +309,7 @@ export class FormsController {
         message: 'Form updated successfully'
       });
     } catch (error) {
-      console.error('Error updating form:', error);
+      logger.error('Error updating form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update form' }
@@ -349,7 +350,7 @@ export class FormsController {
         message: 'Form deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting form:', error);
+      logger.error('Error deleting form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete form' }
@@ -409,7 +410,7 @@ export class FormsController {
         message: 'Form duplicated successfully'
       });
     } catch (error) {
-      console.error('Error duplicating form:', error);
+      logger.error('Error duplicating form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to duplicate form' }
@@ -455,7 +456,7 @@ export class FormsController {
         message: `Form ${status === 'active' ? 'activated' : status === 'inactive' ? 'deactivated' : 'set to draft'} successfully`
       });
     } catch (error) {
-      console.error('Error updating form status:', error);
+      logger.error('Error updating form status:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update form status' }
@@ -536,7 +537,7 @@ export class FormsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching form submissions:', error);
+      logger.error('Error fetching form submissions:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch form submissions' }
@@ -596,7 +597,7 @@ export class FormsController {
         }
       });
     } catch (error) {
-      console.error('Error submitting form:', error);
+      logger.error('Error submitting form:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to submit form' }

@@ -3,6 +3,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { FieldGroup, CustomField, CustomFieldValue } from '../../entities/CustomField.js';
 import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
+import logger from '../../utils/logger.js';
 
 export class FieldGroupsController {
   private fieldGroupRepo = AppDataSource.getRepository(FieldGroup);
@@ -49,7 +50,7 @@ export class FieldGroupsController {
         }
       });
     } catch (error) {
-      console.error('Error fetching field groups:', error);
+      logger.error('Error fetching field groups:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch field groups' }
@@ -75,7 +76,7 @@ export class FieldGroupsController {
 
       res.json({ success: true, data: fieldGroup });
     } catch (error) {
-      console.error('Error fetching field group:', error);
+      logger.error('Error fetching field group:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch field group' }
@@ -134,7 +135,7 @@ export class FieldGroupsController {
         message: 'Field group created successfully'
       });
     } catch (error) {
-      console.error('Error creating field group:', error);
+      logger.error('Error creating field group:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to create field group' }
@@ -202,7 +203,7 @@ export class FieldGroupsController {
         message: 'Field group updated successfully'
       });
     } catch (error) {
-      console.error('Error updating field group:', error);
+      logger.error('Error updating field group:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to update field group' }
@@ -250,7 +251,7 @@ export class FieldGroupsController {
         message: 'Field group deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting field group:', error);
+      logger.error('Error deleting field group:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to delete field group' }
@@ -318,7 +319,7 @@ export class FieldGroupsController {
         message: 'Field group duplicated successfully'
       });
     } catch (error) {
-      console.error('Error duplicating field group:', error);
+      logger.error('Error duplicating field group:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to duplicate field group' }
@@ -356,7 +357,7 @@ export class FieldGroupsController {
         message: `Field group ${fieldGroup.active ? 'activated' : 'deactivated'} successfully`
       });
     } catch (error) {
-      console.error('Error toggling field group status:', error);
+      logger.error('Error toggling field group status:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to toggle field group status' }
@@ -393,7 +394,7 @@ export class FieldGroupsController {
         message: 'Field groups reordered successfully'
       });
     } catch (error) {
-      console.error('Error reordering field groups:', error);
+      logger.error('Error reordering field groups:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to reorder field groups' }
@@ -432,7 +433,7 @@ export class FieldGroupsController {
         data: fieldGroups
       });
     } catch (error) {
-      console.error('Error fetching field groups by location:', error);
+      logger.error('Error fetching field groups by location:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch field groups by location' }

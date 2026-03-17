@@ -77,7 +77,7 @@ export function createStoreApplicationsController(
         const userId = user?.userId || user?.id;
 
         if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
           return;
         }
 
@@ -130,7 +130,7 @@ export function createStoreApplicationsController(
         const userId = user?.userId || user?.id;
 
         if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
           return;
         }
 
@@ -216,7 +216,7 @@ export function createStoreApplicationsController(
         const userId = user?.userId || user?.id;
 
         if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
           return;
         }
 
@@ -454,7 +454,7 @@ export function createStoreApplicationsController(
         const userRoles = user?.roles || [];
 
         if (!userId) {
-          res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+          res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
           return;
         }
 

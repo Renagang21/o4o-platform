@@ -109,7 +109,7 @@ export class DropshippingCPTController {
         data: productsWithFields
       });
     } catch (error) {
-      console.error('Error fetching products:', error);
+      logger.error('Error fetching products:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to fetch products' 
@@ -194,7 +194,7 @@ export class DropshippingCPTController {
         message: 'Product created successfully'
       });
     } catch (error) {
-      console.error('Error creating product:', error);
+      logger.error('Error creating product:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to create product' 
@@ -283,7 +283,7 @@ export class DropshippingCPTController {
         message: 'Product updated successfully'
       });
     } catch (error) {
-      console.error('Error updating product:', error);
+      logger.error('Error updating product:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to update product' 
@@ -328,7 +328,7 @@ export class DropshippingCPTController {
         message: 'Product deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting product:', error);
+      logger.error('Error deleting product:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to delete product' 
@@ -360,7 +360,7 @@ export class DropshippingCPTController {
         }
       });
     } catch (error) {
-      console.error('Error calculating margin:', error);
+      logger.error('Error calculating margin:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to calculate margin' 
@@ -386,7 +386,7 @@ export class DropshippingCPTController {
         data: partners
       });
     } catch (error) {
-      console.error('Error fetching partners:', error);
+      logger.error('Error fetching partners:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch partners'
@@ -473,7 +473,7 @@ export class DropshippingCPTController {
         message: 'Partner created successfully'
       });
     } catch (error) {
-      console.error('Error creating partner:', error);
+      logger.error('Error creating partner:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to create partner' 
@@ -556,7 +556,7 @@ export class DropshippingCPTController {
         message: 'Partner updated successfully'
       });
     } catch (error) {
-      console.error('Error updating partner:', error);
+      logger.error('Error updating partner:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to update partner' 
@@ -582,7 +582,7 @@ export class DropshippingCPTController {
         data: suppliers
       });
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      logger.error('Error fetching suppliers:', error);
       res.status(500).json({
         success: false,
         message: 'Failed to fetch suppliers'
@@ -663,7 +663,7 @@ export class DropshippingCPTController {
         message: 'Supplier created successfully'
       });
     } catch (error) {
-      console.error('Error creating supplier:', error);
+      logger.error('Error creating supplier:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to create supplier' 
@@ -746,7 +746,7 @@ export class DropshippingCPTController {
         message: 'Supplier updated successfully'
       });
     } catch (error) {
-      console.error('Error updating supplier:', error);
+      logger.error('Error updating supplier:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to update supplier' 
@@ -791,7 +791,7 @@ export class DropshippingCPTController {
         message: 'Supplier deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting supplier:', error);
+      logger.error('Error deleting supplier:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to delete supplier' 
@@ -836,7 +836,7 @@ export class DropshippingCPTController {
         message: 'Partner deleted successfully'
       });
     } catch (error) {
-      console.error('Error deleting partner:', error);
+      logger.error('Error deleting partner:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to delete partner' 
@@ -858,7 +858,7 @@ export class DropshippingCPTController {
         message: 'CPTs and ACF fields initialized successfully'
       });
     } catch (error) {
-      console.error('Error initializing CPTs:', error);
+      logger.error('Error initializing CPTs:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Failed to initialize CPTs' 

@@ -11,6 +11,7 @@ import {
   type UserContext,
   type RecommendationOptions,
 } from '../../services/forum/index.js';
+import logger from '../../utils/logger.js';
 
 export class ForumRecommendationController {
   /**
@@ -38,7 +39,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting recommendations:', error);
+      logger.error('Error getting recommendations:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get recommendations',
@@ -71,7 +72,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting cosmetics recommendations:', error);
+      logger.error('Error getting cosmetics recommendations:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get cosmetics recommendations',
@@ -104,7 +105,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting yaksa recommendations:', error);
+      logger.error('Error getting yaksa recommendations:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get yaksa recommendations',
@@ -133,7 +134,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting trending posts:', error);
+      logger.error('Error getting trending posts:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get trending posts',
@@ -172,7 +173,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting related posts:', error);
+      logger.error('Error getting related posts:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get related posts',
@@ -203,7 +204,7 @@ export class ForumRecommendationController {
         },
       });
     } catch (error) {
-      console.error('Error getting config:', error);
+      logger.error('Error getting config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get configuration',
@@ -239,7 +240,7 @@ export class ForumRecommendationController {
         message: 'Configuration updated successfully',
       });
     } catch (error) {
-      console.error('Error updating config:', error);
+      logger.error('Error updating config:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to update configuration',

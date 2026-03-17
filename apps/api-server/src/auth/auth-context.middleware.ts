@@ -23,7 +23,8 @@ export function requireStoreAuth(dataSource: DataSource) {
     if (!user?.id) {
       res.status(401).json({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
       });
       return;
     }
@@ -32,7 +33,8 @@ export function requireStoreAuth(dataSource: DataSource) {
     if (!isOwner || !organizationId) {
       res.status(403).json({
         success: false,
-        error: { code: 'STORE_OWNER_REQUIRED', message: 'Store owner access required' },
+        error: 'Store owner access required',
+        code: 'STORE_OWNER_REQUIRED',
       });
       return;
     }

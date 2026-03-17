@@ -12,6 +12,7 @@ import { StoreChannelService } from '../../modules/store-core/services/store-cha
 import { StoreCapability as Cap, type StoreCapabilityKey } from '../../modules/store-core/constants/store-capabilities.js';
 import { getCapabilityMeta } from '@o4o/capabilities';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import logger from '../../utils/logger.js';
 
 export class StoreConsoleController {
   private capabilityService: StoreCapabilityService;
@@ -201,7 +202,7 @@ export class StoreConsoleController {
         pagination: { page: pageNum, limit: limitNum, total, totalPages },
       });
     } catch (error) {
-      console.error('[StoreConsole] getStores error:', error);
+      logger.error('[StoreConsole] getStores error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch stores' });
     }
   };
@@ -271,7 +272,7 @@ export class StoreConsoleController {
         },
       });
     } catch (error) {
-      console.error('[StoreConsole] getStoreDetail error:', error);
+      logger.error('[StoreConsole] getStoreDetail error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch store detail' });
     }
   };
@@ -316,7 +317,7 @@ export class StoreConsoleController {
         })),
       });
     } catch (error) {
-      console.error('[StoreConsole] getStoreChannels error:', error);
+      logger.error('[StoreConsole] getStoreChannels error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch store channels' });
     }
   };
@@ -384,7 +385,7 @@ export class StoreConsoleController {
         pagination: { page: pageNum, limit: limitNum, total, totalPages },
       });
     } catch (error) {
-      console.error('[StoreConsole] getStoreProducts error:', error);
+      logger.error('[StoreConsole] getStoreProducts error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch store products' });
     }
   };
@@ -426,7 +427,7 @@ export class StoreConsoleController {
         }),
       });
     } catch (error) {
-      console.error('[StoreConsole] getStoreCapabilities error:', error);
+      logger.error('[StoreConsole] getStoreCapabilities error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch store capabilities' });
     }
   };
@@ -493,7 +494,7 @@ export class StoreConsoleController {
         }),
       });
     } catch (error) {
-      console.error('[StoreConsole] updateStoreCapabilities error:', error);
+      logger.error('[StoreConsole] updateStoreCapabilities error:', error);
       res.status(500).json({ success: false, error: 'Failed to update store capabilities' });
     }
   };
@@ -527,7 +528,7 @@ export class StoreConsoleController {
 
       res.json({ success: true, ...result });
     } catch (error) {
-      console.error('[StoreConsole] getAllChannels error:', error);
+      logger.error('[StoreConsole] getAllChannels error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch channels' });
     }
   };
@@ -581,7 +582,7 @@ export class StoreConsoleController {
         res.status(400).json({ success: false, error: error.message });
         return;
       }
-      console.error('[StoreConsole] updateChannelStatus error:', error);
+      logger.error('[StoreConsole] updateChannelStatus error:', error);
       res.status(500).json({ success: false, error: 'Failed to update channel status' });
     }
   };

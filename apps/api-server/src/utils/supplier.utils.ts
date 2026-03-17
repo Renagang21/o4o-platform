@@ -37,7 +37,8 @@ export function createRequireSupplier(dataSource: DataSource) {
     if (!user?.id) {
       res.status(401).json({
         success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        error: 'Authentication required',
+        code: 'AUTH_REQUIRED',
       });
       return;
     }
@@ -51,10 +52,8 @@ export function createRequireSupplier(dataSource: DataSource) {
 
     res.status(403).json({
       success: false,
-      error: {
-        code: 'SUPPLIER_REQUIRED',
-        message: 'Supplier access required',
-      },
+      error: 'Supplier access required',
+      code: 'SUPPLIER_REQUIRED',
     });
   };
 }

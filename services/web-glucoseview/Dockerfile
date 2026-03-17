@@ -32,6 +32,7 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build workspace dependencies
 RUN pnpm --filter @o4o/types build
+RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/auth-utils build
 
 # Build the service

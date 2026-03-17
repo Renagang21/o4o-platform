@@ -20,6 +20,7 @@ import { runAIInsight } from '@o4o/ai-core';
 import { createPharmacyContextMiddleware } from '../../../modules/care/care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../../../modules/care/care-pharmacy-context.middleware.js';
 import type { ActionLogService } from '@o4o/action-log-core';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -63,7 +64,7 @@ export function createHubTriggerController(
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.care_review', {
           organizationId: pharmacyId, durationMs: Date.now() - start,
           meta: { highRiskCount },
-        }).catch(() => {});
+        }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
         res.json({
           success: true,
@@ -80,10 +81,10 @@ export function createHubTriggerController(
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.care_review', error.message, {
             durationMs: Date.now() - start,
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
         }
-        console.error('Hub trigger care-review failed:', error);
-        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+        logger.error('[HubTrigger] care-review failed', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -126,7 +127,7 @@ export function createHubTriggerController(
           actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
             organizationId: pharmacyId, durationMs: Date.now() - start,
             meta: { createdCount: 0 },
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
           res.json({
             success: true,
@@ -168,7 +169,7 @@ export function createHubTriggerController(
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.create_session', {
           organizationId: pharmacyId, durationMs: Date.now() - start,
           meta: { createdCount, skippedCount },
-        }).catch(() => {});
+        }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
         const message = skippedCount > 0
           ? `${createdCount}명 세션 생성 (${skippedCount}명 오늘 이미 생성됨)`
@@ -187,10 +188,10 @@ export function createHubTriggerController(
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.create_session', error.message, {
             durationMs: Date.now() - start,
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
         }
-        console.error('Hub trigger coaching-auto-create failed:', error);
-        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+        logger.error('[HubTrigger] coaching-auto-create failed', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -282,7 +283,7 @@ export function createHubTriggerController(
         actionLogService?.logSuccess('glycopharm', userId, 'glycopharm.trigger.refresh_ai', {
           organizationId: pharmacyId, durationMs: Date.now() - start, source: 'ai',
           meta: { totalPatients, highRiskCount },
-        }).catch(() => {});
+        }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
 
         if (aiResult.success && aiResult.insight) {
           res.json({
@@ -311,10 +312,10 @@ export function createHubTriggerController(
         if (userId) {
           actionLogService?.logFailure('glycopharm', userId, 'glycopharm.trigger.refresh_ai', error.message, {
             durationMs: Date.now() - start, source: 'ai',
-          }).catch(() => {});
+          }).catch((e: any) => logger.warn('[ActionLog] fire-and-forget failed', { error: e?.message }));
         }
-        console.error('Hub trigger ai-refresh failed:', error);
-        res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
+        logger.error('[HubTrigger] ai-refresh failed', { error: error.message });
+        res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' });
       }
     },
   );

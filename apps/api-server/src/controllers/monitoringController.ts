@@ -4,7 +4,7 @@ import { AppDataSource } from '../database/connection.js';
 import { backupService } from '../services/BackupService.js';
 import { errorAlertService } from '../services/ErrorAlertService.js';
 import { securityAuditService } from '../services/SecurityAuditService.js';
-import logger from '../utils/simpleLogger.js';
+import logger from '../utils/logger.js';
 import { createSuccessResponse, createErrorResponse } from '../types/api-response.js';
 
 export class MonitoringController {

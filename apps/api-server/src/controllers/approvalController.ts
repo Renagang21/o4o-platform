@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { approvalWorkflowService } from '../services/approval-workflow.service.js';
+import logger from '../utils/logger.js';
 
 export class ApprovalController {
   
@@ -50,7 +51,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error creating pricing approval:', error);
+      logger.error('Error creating pricing approval:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -102,7 +103,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error processing autonomous pricing:', error);
+      logger.error('Error processing autonomous pricing:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -148,7 +149,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error approving request:', error);
+      logger.error('Error approving request:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -204,7 +205,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error rejecting request:', error);
+      logger.error('Error rejecting request:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -246,7 +247,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error getting pending requests:', error);
+      logger.error('Error getting pending requests:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -272,7 +273,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error getting approval queue:', error);
+      logger.error('Error getting approval queue:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -297,7 +298,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error getting request history:', error);
+      logger.error('Error getting request history:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -328,7 +329,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error checking compliance:', error);
+      logger.error('Error checking compliance:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'
@@ -368,7 +369,7 @@ export class ApprovalController {
       });
 
     } catch (error) {
-      console.error('Error getting user permissions:', error);
+      logger.error('Error getting user permissions:', error);
       res.status(500).json({
         success: false,
         message: 'Internal server error'

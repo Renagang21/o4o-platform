@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger.js';
+import { getRequestId } from '../logger/request-context.js';
+import { monitoringMetrics } from '../monitoring/metrics.service.js';
 
 /**
  * Custom Application Error Class
@@ -91,6 +93,7 @@ export const globalErrorHandler = (
 
   // Log error details (but don't expose sensitive info to client)
   logger.error('[GlobalErrorHandler] Error occurred', {
+    requestId: getRequestId(),
     statusCode,
     code,
     message,
@@ -99,6 +102,9 @@ export const globalErrorHandler = (
     stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     error: error instanceof Error ? error.message : String(error),
   });
+
+  // Record error code metric (WO-O4O-MONITORING-IMPLEMENTATION-V1)
+  monitoringMetrics.recordError(code);
 
   // Send error response
   return res.status(statusCode).json({
