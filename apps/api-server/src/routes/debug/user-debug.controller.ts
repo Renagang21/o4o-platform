@@ -47,7 +47,7 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
         SELECT
           id, email, "firstName", "lastName", name, nickname, phone,
           status, "isActive", "isEmailVerified",
-          domain, service_key,
+          service_key,
           "createdAt", "lastLoginAt"
         FROM users
         WHERE email = $1
@@ -75,7 +75,7 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
       // 3. Role Assignments 조회
       const roles = await dataSource.query(`
         SELECT
-          id, user_id, role, domain, service_key,
+          id, user_id, role, service_key,
           is_active, granted_by, granted_at, revoked_at
         FROM role_assignments
         WHERE user_id = $1
