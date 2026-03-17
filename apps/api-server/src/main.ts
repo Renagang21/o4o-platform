@@ -31,7 +31,6 @@ import { env } from './utils/env-validator.js';
 import logger from './utils/logger.js';
 
 // Middleware
-import { requestLoggingMiddleware } from './common/logger/http-logger.middleware.js';
 import { performanceMonitor } from './middleware/performanceMonitor.js';
 import { securityMiddleware, sqlInjectionDetection } from './middleware/securityMiddleware.js';
 import { tenantContextEnhanced } from './middleware/tenant-context.middleware.js';
@@ -294,16 +293,13 @@ const corsOptions: CorsOptions = {
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-  exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After', 'X-Request-Id'],
+  exposedHeaders: ['X-Total-Count', 'X-Page-Count', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'Retry-After'],
   maxAge: 86400,
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
-
-// Structured request logging + requestId (WO-O4O-STRUCTURED-LOGGING-V1)
-app.use(requestLoggingMiddleware as any);
 
 // Static file serving
 const projectRoot = path.resolve(__dirname, '../../../');
@@ -419,10 +415,6 @@ app.use(httpMetrics.middleware());
 // Slow request threshold logging — WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
 import { slowThresholdMiddleware } from './middleware/slow-threshold.middleware.js';
 app.use(slowThresholdMiddleware);
-
-// Monitoring metrics middleware — WO-O4O-MONITORING-IMPLEMENTATION-V1
-import { metricsMiddleware } from './common/monitoring/metrics.middleware.js';
-app.use(metricsMiddleware as any);
 
 // ============================================================================
 // CORE ROUTES SETUP (Phase 8-4 - Core Routes Registration)
@@ -589,10 +581,6 @@ app.use('/api/v1/users', usersRoutes);
 app.use('/api/v1/cpt', cptRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/health', healthRoutes); // Cloud Run HEALTHCHECK compatibility
-
-// Monitoring routes — WO-O4O-MONITORING-IMPLEMENTATION-V1
-import { createMonitoringRoutes } from './common/monitoring/monitoring.controller.js';
-app.use('/monitoring', createMonitoringRoutes());
 
 // Internal ops metrics — WO-O4O-INTERNAL-BETA-ROLL-OUT-V1
 try {
