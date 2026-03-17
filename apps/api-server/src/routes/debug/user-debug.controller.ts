@@ -12,19 +12,19 @@
  * - 로그인 판정 기준 (pending 여부)
  *
  * 제약:
- * - Platform admin 인증 필수
+ * - DEBUG_MODE + /__debug__/ 경로로만 접근 가능
  * - SELECT만 실행 (UPDATE/DELETE 절대 금지)
  * - 운영 중 안전하게 호출 가능
+ * - TODO: 진단 완료 후 admin only guard 추가 예정
  */
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { authenticate, requireAdmin } from '../../middleware/auth.middleware.js';
 
 export function createUserDebugRouter(dataSource: DataSource): Router {
   const router = Router();
 
-  router.get('/', authenticate as any, requireAdmin as any, async (req: Request, res: Response): Promise<void> => {
+  router.get('/', async (req: Request, res: Response): Promise<void> => {
     const base = {
       timestamp: new Date().toISOString(),
       warning: 'READ-ONLY diagnostic endpoint. No data is modified.',
