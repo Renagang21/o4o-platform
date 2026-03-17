@@ -326,7 +326,17 @@ export class MembershipConsoleController {
 
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
-      res.status(500).json({ success: false, error: 'Failed to approve membership' });
+      logger.error('[MembershipConsole] approveMembership error', {
+        membershipId: req.params.membershipId,
+        error: error instanceof Error ? error.message : String(error),
+        code: (error as any)?.code,
+        detail: (error as any)?.detail,
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to approve membership',
+        code: (error as any)?.code,
+      });
     }
   };
 
