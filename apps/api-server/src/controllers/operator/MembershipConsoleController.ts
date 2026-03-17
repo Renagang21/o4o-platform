@@ -10,6 +10,7 @@ import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
+import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 const approvalService = new MembershipApprovalService();
 
@@ -535,6 +536,106 @@ export class MembershipConsoleController {
       res.status(500).json({
         success: false,
         error: error instanceof Error ? error.message : 'Failed to delete member',
+      });
+    }
+  };
+
+  /**
+   * POST /api/v1/operator/members/:userId/roles
+   * 역할 할당 (role_assignments via roleAssignmentService)
+   */
+  assignMemberRole = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId } = req.params;
+      const { role } = req.body;
+      const assignedBy = (req as any).user?.id || null;
+
+      if (!role || typeof role !== 'string') {
+        res.status(400).json({ success: false, error: 'role is required' });
+        return;
+      }
+
+      // Service boundary check
+      if (!scope.isPlatformAdmin) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+        // Non-platform-admin can only assign roles matching their service prefix
+        const allowedPrefixes = scope.serviceKeys.map((k: string) => `${k}:`);
+        if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
+          res.status(403).json({ success: false, error: 'Cannot assign roles outside your service scope' });
+          return;
+        }
+      }
+
+      const assignment = await roleAssignmentService.assignRole({
+        userId,
+        role,
+        assignedBy,
+      });
+
+      res.json({ success: true, message: `Role ${role} assigned`, assignment });
+    } catch (error) {
+      logger.error('[MembershipConsole] assignMemberRole error', {
+        userId: req.params.userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to assign role',
+      });
+    }
+  };
+
+  /**
+   * DELETE /api/v1/operator/members/:userId/roles/:role
+   * 역할 제거 (soft delete via roleAssignmentService)
+   */
+  removeMemberRole = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId, role } = req.params;
+
+      if (!role) {
+        res.status(400).json({ success: false, error: 'role is required' });
+        return;
+      }
+
+      // Service boundary check
+      if (!scope.isPlatformAdmin) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+        // Non-platform-admin can only remove roles matching their service prefix
+        const allowedPrefixes = scope.serviceKeys.map((k: string) => `${k}:`);
+        if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
+          res.status(403).json({ success: false, error: 'Cannot remove roles outside your service scope' });
+          return;
+        }
+      }
+
+      const removed = await roleAssignmentService.removeRole(userId, role);
+
+      if (!removed) {
+        res.status(404).json({ success: false, error: 'Role not found or already inactive' });
+        return;
+      }
+
+      res.json({ success: true, message: `Role ${role} removed` });
+    } catch (error) {
+      logger.error('[MembershipConsole] removeMemberRole error', {
+        userId: req.params.userId,
+        role: req.params.role,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to remove role',
       });
     }
   };

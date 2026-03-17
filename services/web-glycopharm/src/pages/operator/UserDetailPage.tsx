@@ -21,6 +21,8 @@ import {
   UserCheck,
   UserX,
   X,
+  Plus,
+  MinusCircle,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -176,6 +178,80 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
   );
 }
 
+// ─── Role Modal ─────────────────────────────────────────────
+
+const ASSIGNABLE_ROLES = [
+  { value: 'glycopharm:admin', label: 'GlycoPharm Admin' },
+  { value: 'glycopharm:operator', label: 'GlycoPharm Operator' },
+];
+
+function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
+  userId: string; existingRoles: string[]; onClose: () => void; onSuccess: () => void;
+}) {
+  const [selectedRole, setSelectedRole] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const availableRoles = ASSIGNABLE_ROLES.filter(r => !existingRoles.includes(r.value));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRole) { setError('역할을 선택하세요.'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await apiFetch(`/api/v1/operator/members/${userId}/roles`, {
+        method: 'POST',
+        body: JSON.stringify({ role: selectedRole }),
+      });
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-800">역할 추가</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
+        </div>
+        {error && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />{error}
+          </div>
+        )}
+        {availableRoles.length === 0 ? (
+          <p className="text-sm text-slate-500 mb-4">할당 가능한 역할이 없습니다.</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">역할 선택...</option>
+              {availableRoles.map(r => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
+              <button type="submit" disabled={loading || !selectedRole} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+                {loading ? '처리 중...' : '추가'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UserDetailPage() {
@@ -189,6 +265,7 @@ export default function UserDetailPage() {
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -277,6 +354,22 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${membershipId}/reject`, {
         method: 'PATCH',
         body: JSON.stringify({ reason }),
+      });
+      fetchDetail();
+    } catch (err: any) {
+      toast.error(err.message || '오류가 발생했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemoveRole = async (role: string) => {
+    if (!id) return;
+    if (!confirm(`역할 "${role}"을(를) 제거하시겠습니까?`)) return;
+    setActionLoading(`role-${role}`);
+    try {
+      await apiFetch(`/api/v1/operator/members/${id}/roles/${encodeURIComponent(role)}`, {
+        method: 'DELETE',
       });
       fetchDetail();
     } catch (err: any) {
@@ -434,7 +527,13 @@ export default function UserDetailPage() {
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
           <Shield className="w-4 h-4 text-slate-500" />
           <h2 className="text-base font-semibold text-slate-800">역할 (Role Assignments)</h2>
-          <span className="text-xs text-slate-400 ml-auto">{roles.length}개</span>
+          <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
+          <button
+            onClick={() => setShowRoleModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1 text-xs bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            <Plus className="w-3.5 h-3.5" />역할 추가
+          </button>
         </div>
         {roles.length > 0 ? (
           <div className="overflow-x-auto">
@@ -445,6 +544,7 @@ export default function UserDetailPage() {
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">활성</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">범위</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">부여일</th>
+                  <th className="text-right px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">관리</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -462,6 +562,23 @@ export default function UserDetailPage() {
                       {r.scopeType ? `${r.scopeType}${r.scopeId ? `:${r.scopeId.slice(0, 8)}` : ''}` : '-'}
                     </td>
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
+                    <td className="px-5 py-2.5">
+                      <div className="flex items-center justify-end">
+                        {r.isActive && (
+                          actionLoading === `role-${r.role}` ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                          ) : (
+                            <button
+                              onClick={() => handleRemoveRole(r.role)}
+                              title="역할 제거"
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <MinusCircle className="w-4 h-4" />
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -542,6 +659,16 @@ export default function UserDetailPage() {
           userId={user.id}
           userName={`${getUserName(user)} (${user.email})`}
           onClose={() => setShowPasswordModal(false)}
+          onSuccess={fetchDetail}
+        />
+      )}
+
+      {/* Role Modal */}
+      {showRoleModal && (
+        <RoleModal
+          userId={user.id}
+          existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
+          onClose={() => setShowRoleModal(false)}
           onSuccess={fetchDetail}
         />
       )}

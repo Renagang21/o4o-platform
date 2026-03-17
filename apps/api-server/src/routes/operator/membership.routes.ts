@@ -42,6 +42,10 @@ router.put('/:userId', controller.updateMember);
 router.patch('/:userId/status', controller.updateMemberStatus);
 router.delete('/:userId', controller.deleteMember);
 
+// Role assignment/removal
+router.post('/:userId/roles', controller.assignMemberRole);
+router.delete('/:userId/roles/:role', controller.removeMemberRole);
+
 // Membership approval/rejection
 router.patch('/:membershipId/approve', controller.approveMembership);
 router.patch('/:membershipId/reject', controller.rejectMembership);
