@@ -485,7 +485,8 @@ export class MembershipConsoleController {
       }
 
       if (password) {
-        const bcrypt = await import('bcryptjs');
+        const bcryptModule = await import('bcryptjs');
+        const bcrypt = bcryptModule.default || bcryptModule;
         const hashedPassword = await bcrypt.hash(password, 10);
         await AppDataSource.query(
           `UPDATE users SET password = $1, "updatedAt" = NOW() WHERE id = $2`,
