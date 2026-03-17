@@ -29,6 +29,7 @@ COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
+COPY packages/error-handling/package.json ./packages/error-handling/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -47,6 +48,7 @@ COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
+COPY packages/error-handling/ ./packages/error-handling/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/
