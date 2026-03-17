@@ -8,6 +8,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import logger from '../../utils/logger.js';
 
 export class MembershipConsoleController {
 
@@ -298,6 +299,10 @@ export class MembershipConsoleController {
    * 서비스 멤버십 승인
    */
   approveMembership = async (req: Request, res: Response): Promise<void> => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { membershipId } = req.params;
@@ -305,14 +310,14 @@ export class MembershipConsoleController {
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service boundary on write
       const result = scope.isPlatformAdmin
-        ? await AppDataSource.query(
+        ? await queryRunner.query(
             `UPDATE service_memberships
              SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'rejected')
              RETURNING id, user_id, service_key, role, status`,
             [approvedBy, membershipId]
           )
-        : await AppDataSource.query(
+        : await queryRunner.query(
             `UPDATE service_memberships
              SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
              WHERE id = $2 AND status IN ('pending', 'rejected') AND service_key = ANY($3)
@@ -321,6 +326,7 @@ export class MembershipConsoleController {
           );
 
       if (result.length === 0) {
+        await queryRunner.rollbackTransaction();
         res.status(404).json({ success: false, error: 'Membership not found or already active' });
         return;
       }
@@ -328,7 +334,7 @@ export class MembershipConsoleController {
       // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
       // Activate user account if pending/rejected (idempotent)
       const approvedUserId = result[0].user_id;
-      await AppDataSource.query(
+      await queryRunner.query(
         `UPDATE users SET status = 'ACTIVE', "isActive" = true,
          "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
          WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
@@ -337,7 +343,7 @@ export class MembershipConsoleController {
 
       // Ensure role_assignment exists (idempotent — ON CONFLICT 시 updated_at 갱신)
       const memberRole = result[0].role || 'member';
-      await AppDataSource.query(
+      await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
          ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
@@ -345,10 +351,28 @@ export class MembershipConsoleController {
         [approvedUserId, memberRole, approvedBy]
       );
 
+      await queryRunner.commitTransaction();
+
+      logger.info('[MembershipConsole] approveMembership success', {
+        membershipId,
+        userId: approvedUserId,
+        role: memberRole,
+        approvedBy,
+        serviceKey: result[0].service_key,
+      });
+
       res.json({ success: true, message: 'Membership approved', membership: result[0] });
     } catch (error) {
-      console.error('[MembershipConsole] approveMembership error:', error);
+      await queryRunner.rollbackTransaction();
+      logger.error('[MembershipConsole] approveMembership error', {
+        membershipId: req.params.membershipId,
+        approvedBy: (req as any).user?.id,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       res.status(500).json({ success: false, error: 'Failed to approve membership' });
+    } finally {
+      await queryRunner.release();
     }
   };
 
@@ -384,9 +408,20 @@ export class MembershipConsoleController {
         return;
       }
 
+      logger.info('[MembershipConsole] rejectMembership success', {
+        membershipId,
+        userId: result[0].user_id,
+        reason: reason || null,
+        serviceKey: result[0].service_key,
+      });
+
       res.json({ success: true, message: 'Membership rejected', membership: result[0] });
     } catch (error) {
-      console.error('[MembershipConsole] rejectMembership error:', error);
+      logger.error('[MembershipConsole] rejectMembership error', {
+        membershipId: req.params.membershipId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       res.status(500).json({ success: false, error: 'Failed to reject membership' });
     }
   };
@@ -499,31 +534,47 @@ export class MembershipConsoleController {
    * 사용자 삭제 (service_memberships + user)
    */
   deleteMember = async (req: Request, res: Response): Promise<void> => {
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       const scope: ServiceScope = (req as any).serviceScope;
       const { userId } = req.params;
 
       // Service boundary check
       if (!scope.isPlatformAdmin) {
-        const accessCheck = await AppDataSource.query(
+        const accessCheck = await queryRunner.query(
           `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = ANY($2) LIMIT 1`,
           [userId, scope.serviceKeys]
         );
         if (accessCheck.length === 0) {
+          await queryRunner.rollbackTransaction();
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
       }
 
       // Delete memberships first, then user (CASCADE should handle but be explicit)
-      await AppDataSource.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
-      await AppDataSource.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
-      await AppDataSource.query(`DELETE FROM users WHERE id = $1`, [userId]);
+      await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
+      await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
+      await queryRunner.query(`DELETE FROM users WHERE id = $1`, [userId]);
+
+      await queryRunner.commitTransaction();
+
+      logger.info('[MembershipConsole] deleteMember success', { userId, deletedBy: (req as any).user?.id });
 
       res.json({ success: true, message: 'User deleted' });
     } catch (error) {
-      console.error('[MembershipConsole] deleteMember error:', error);
+      await queryRunner.rollbackTransaction();
+      logger.error('[MembershipConsole] deleteMember error', {
+        userId: req.params.userId,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       res.status(500).json({ success: false, error: 'Failed to delete member' });
+    } finally {
+      await queryRunner.release();
     }
   };
 
