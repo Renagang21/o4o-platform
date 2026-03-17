@@ -58,71 +58,93 @@ export class MembershipApprovalService {
     await queryRunner.startTransaction();
 
     try {
-      // STEP1: Activate membership
-      logger.info('[APPROVAL][STEP1] membership UPDATE start', {
+      // STEP0: SELECT membership FOR UPDATE (행 잠금 + 안전한 데이터 획득)
+      logger.info('[APPROVAL][STEP0] SELECT membership FOR UPDATE', {
         membershipId, approvedBy, isPlatformAdmin,
       });
 
-      const result = isPlatformAdmin
+      const selectResult = isPlatformAdmin
         ? await queryRunner.query(
-            `UPDATE service_memberships
-             SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-             WHERE id = $2 AND status IN ('pending', 'rejected')
-             RETURNING id, user_id, service_key, role, status`,
-            [approvedBy, membershipId]
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE id = $1 AND status IN ('pending', 'rejected')
+             FOR UPDATE`,
+            [membershipId]
           )
         : await queryRunner.query(
-            `UPDATE service_memberships
-             SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-             WHERE id = $2 AND status IN ('pending', 'rejected') AND service_key = ANY($3)
-             RETURNING id, user_id, service_key, role, status`,
-            [approvedBy, membershipId, serviceKeys]
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE id = $1 AND status IN ('pending', 'rejected') AND service_key = ANY($2)
+             FOR UPDATE`,
+            [membershipId, serviceKeys]
           );
 
-      if (result.length === 0) {
-        logger.warn('[APPROVAL][STEP1] membership not found or already active', {
+      if (!selectResult || selectResult.length === 0) {
+        logger.warn('[APPROVAL][STEP0] membership not found or already active', {
           membershipId, isPlatformAdmin, serviceKeys,
         });
         await queryRunner.rollbackTransaction();
         return null;
       }
 
-      const membership = result[0] as ApproveResult;
-      logger.info('[APPROVAL][STEP1] membership found', {
-        membership,
+      const membership = selectResult[0] as ApproveResult;
+      const userId = membership.user_id;
+
+      logger.info('[APPROVAL][STEP0] membership locked', {
+        membershipId: membership.id,
+        userId,
+        serviceKey: membership.service_key,
+        role: membership.role,
       });
 
+      if (!userId) {
+        logger.error('[APPROVAL][STEP0] CRITICAL: user_id is null in service_memberships', {
+          membershipId, rawResult: JSON.stringify(selectResult[0]),
+        });
+        await queryRunner.rollbackTransaction();
+        throw new Error(`CRITICAL: service_memberships.user_id is null for id=${membershipId}`);
+      }
+
+      // STEP1: Activate membership
+      logger.info('[APPROVAL][STEP1] membership UPDATE', { membershipId });
+
+      await queryRunner.query(
+        `UPDATE service_memberships
+         SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+         WHERE id = $2`,
+        [approvedBy, membershipId]
+      );
+
       // STEP2: Activate user account (idempotent)
-      logger.info('[APPROVAL][STEP2] user UPDATE start', {
-        userId: membership.user_id,
-      });
+      logger.info('[APPROVAL][STEP2] user UPDATE', { userId });
 
       await queryRunner.query(
         `UPDATE users SET status = 'ACTIVE', "isActive" = true,
          "approvedAt" = NOW(), "approvedBy" = $1, "updatedAt" = NOW()
          WHERE id = $2 AND status IN ('PENDING', 'pending', 'rejected')`,
-        [approvedBy, membership.user_id]
+        [approvedBy, userId]
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
       const memberRole = membership.role || 'member';
-      logger.info('[APPROVAL][STEP3] role INSERT start', {
-        userId: membership.user_id, role: memberRole,
-      });
+      logger.info('[APPROVAL][STEP3] role INSERT', { userId, role: memberRole });
 
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
          ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
          DO UPDATE SET updated_at = NOW(), is_active = true`,
-        [membership.user_id, memberRole, approvedBy]
+        [userId, memberRole, approvedBy]
       );
 
       await queryRunner.commitTransaction();
 
+      // 커밋 후 결과에 status 반영
+      membership.status = 'active';
+
       logger.info('[APPROVAL][SUCCESS]', {
         membershipId,
-        userId: membership.user_id,
+        userId,
         role: memberRole,
         approvedBy,
         serviceKey: membership.service_key,
