@@ -217,7 +217,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 onClick={async () => {
                   const testEmail = 'patient_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass';
+                  const testPass = 'O4oTestPass@1';
                   setEmail(testEmail);
                   setPassword(testPass);
                   setError('');
@@ -239,7 +239,7 @@ export default function LoginPage() {
                 disabled={isSubmitting}
                 onClick={async () => {
                   const testEmail = 'pharmacist_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass';
+                  const testPass = 'O4oTestPass@1';
                   setEmail(testEmail);
                   setPassword(testPass);
                   setError('');

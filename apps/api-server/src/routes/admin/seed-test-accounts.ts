@@ -47,7 +47,7 @@ router.post('/', async (_req: Request, res: Response): Promise<void> => {
   const logs: string[] = [];
 
   try {
-    const hashedPassword = await bcrypt.hash('O4oTestPass', 10);
+    const hashedPassword = await bcrypt.hash('O4oTestPass@1', 10);
 
     for (const account of TEST_ACCOUNTS) {
       // 1. User (idempotent via ON CONFLICT)
