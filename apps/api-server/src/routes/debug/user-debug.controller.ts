@@ -229,17 +229,46 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
       const userId = before[0].id;
       const oldStatus = before[0].status;
 
-      // 2. UPDATE
+      // 2. UPDATE users.status → active
       await dataSource.query(
         `UPDATE users SET status = 'active', "isEmailVerified" = true, "updatedAt" = NOW() WHERE id = $1`,
         [userId],
       );
 
-      // 3. 결과 확인
+      // 3. 누락된 서비스 멤버십 생성 (neture 등)
+      const allServices = ['neture', 'glycopharm', 'glucoseview', 'kpa-society', 'k-cosmetics'];
+      const existingMemberships = await dataSource.query(
+        `SELECT service_key FROM service_memberships WHERE user_id = $1`,
+        [userId],
+      );
+      const existingKeys = existingMemberships.map((m: any) => m.service_key);
+      const missing = allServices.filter(k => !existingKeys.includes(k));
+
+      // 요청된 서비스 (query param) 또는 기본 neture 생성
+      const addService = (req.query.service as string) || 'neture';
+      const servicesToAdd = addService === 'all' ? missing : missing.includes(addService) ? [addService] : [];
+
+      for (const svc of servicesToAdd) {
+        await dataSource.query(
+          `INSERT INTO service_memberships (user_id, service_key, status, role, created_at, updated_at)
+           VALUES ($1, $2, 'active', 'user', NOW(), NOW())`,
+          [userId, svc],
+        );
+      }
+
+      // 4. 결과 확인
       const after = await dataSource.query(
         `SELECT id, email, status, "isActive", "isEmailVerified" FROM users WHERE id = $1`,
         [userId],
       );
+      const afterMemberships = await dataSource.query(
+        `SELECT service_key, status FROM service_memberships WHERE user_id = $1 ORDER BY service_key`,
+        [userId],
+      );
+
+      const membershipRows = afterMemberships.map((m: any) =>
+        `<tr><td>${esc(m.service_key)}</td><td class="ok">${esc(m.status)}</td></tr>`
+      ).join('');
 
       res.send(page('Activated', `
         <h1>User Activated</h1>
@@ -247,9 +276,14 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
           <table>
             <tr><th>항목</th><th>Before</th><th>After</th></tr>
             <tr><td>Email</td><td colspan="2">${esc(email)}</td></tr>
-            <tr><td>status</td><td class="warn">${esc(oldStatus)}</td><td class="ok">${esc(after[0]?.status)}</td></tr>
+            <tr><td>users.status</td><td class="warn">${esc(oldStatus)}</td><td class="ok">${esc(after[0]?.status)}</td></tr>
             <tr><td>isEmailVerified</td><td class="warn">${esc(before[0].isEmailVerified)}</td><td class="ok">${esc(after[0]?.isEmailVerified)}</td></tr>
+            <tr><td>Memberships added</td><td>-</td><td class="ok">${servicesToAdd.length > 0 ? servicesToAdd.join(', ') : 'none (already exists)'}</td></tr>
           </table>
+        </div>
+        <h2>Current Memberships</h2>
+        <div class="card">
+          <table><tr><th>service_key</th><th>status</th></tr>${membershipRows}</table>
         </div>
         <div class="nav">
           <a href="/__debug__/user?email=${encodeURIComponent(email)}">&larr; Back to User</a> |
