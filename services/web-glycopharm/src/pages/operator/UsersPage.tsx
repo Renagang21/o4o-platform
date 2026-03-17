@@ -25,11 +25,10 @@ import {
   AlertCircle,
   X,
   ChevronRight,
-  Building2,
-  Mail,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
+import EditUserModal from './EditUserModal';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -186,236 +185,6 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
   );
 }
 
-// ─── Edit User Modal ─────────────────────────────────────────
-// WO-O4O-GLYCOPHARM-MEMBER-EDIT-V1
-
-interface BusinessInfoData {
-  businessName?: string;
-  businessNumber?: string;
-  email?: string;
-  businessType?: string;
-  businessCategory?: string;
-  address?: string;
-  address2?: string;
-}
-
-function EditUserModal({ userId, onClose, onSuccess }: { userId: string; onClose: () => void; onSuccess: () => void }) {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [hasBusinessInfo, setHasBusinessInfo] = useState(false);
-
-  const [form, setForm] = useState({
-    lastName: '',
-    firstName: '',
-    nickname: '',
-    phone: '',
-    businessName: '',
-    businessNumber: '',
-    taxEmail: '',
-    businessType: '',
-    businessCategory: '',
-    address1: '',
-    address2: '',
-  });
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await apiFetch<any>(`/api/v1/operator/members/${userId}`);
-        const u = data.user;
-        const biz: BusinessInfoData = u.businessInfo || {};
-        const hasBiz = !!(biz.businessName || u.company);
-        setHasBusinessInfo(hasBiz);
-        setForm({
-          lastName: u.lastName || '',
-          firstName: u.firstName || '',
-          nickname: u.nickname || '',
-          phone: u.phone || '',
-          businessName: biz.businessName || u.company || '',
-          businessNumber: biz.businessNumber || '',
-          taxEmail: biz.email || '',
-          businessType: biz.businessType || '',
-          businessCategory: biz.businessCategory || '',
-          address1: biz.address || '',
-          address2: biz.address2 || '',
-        });
-      } catch (err: any) {
-        setError(err.message || '데이터를 불러올 수 없습니다.');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [userId]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const numericFields = ['phone', 'businessNumber'];
-    setForm(prev => ({
-      ...prev,
-      [name]: numericFields.includes(name) ? value.replace(/\D/g, '') : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.nickname.trim()) { setError('닉네임은 필수입니다.'); return; }
-    setSaving(true);
-    setError('');
-    try {
-      const payload: Record<string, string> = {
-        lastName: form.lastName,
-        firstName: form.firstName,
-        nickname: form.nickname,
-        phone: form.phone,
-      };
-      if (hasBusinessInfo) {
-        payload.businessName = form.businessName;
-        payload.businessNumber = form.businessNumber;
-        payload.taxEmail = form.taxEmail;
-        payload.businessType = form.businessType;
-        payload.businessCategory = form.businessCategory;
-        payload.address1 = form.address1;
-        payload.address2 = form.address2;
-      }
-      await apiFetch(`/api/v1/operator/members/${userId}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      toast.success('회원정보가 수정되었습니다.');
-      onSuccess();
-      onClose();
-    } catch (err: any) {
-      setError(err.message || '수정에 실패했습니다.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-800">회원정보 수정</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-8">
-            <Loader2 className="w-6 h-6 text-primary-600 animate-spin mx-auto mb-2" />
-            <p className="text-sm text-slate-500">불러오는 중...</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                <AlertCircle className="w-4 h-4 shrink-0" />{error}
-              </div>
-            )}
-
-            {/* 기본 정보 */}
-            <div>
-              <h4 className="text-sm font-semibold text-slate-700 mb-3">기본 정보</h4>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">성</label>
-                    <input type="text" name="lastName" value={form.lastName} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">이름</label>
-                    <input type="text" name="firstName" value={form.firstName} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">닉네임 <span className="text-red-500">*</span></label>
-                  <input type="text" name="nickname" value={form.nickname} onChange={handleChange} required
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">휴대전화</label>
-                  <input type="tel" name="phone" inputMode="numeric" value={form.phone} onChange={handleChange}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="숫자만 입력" />
-                </div>
-              </div>
-            </div>
-
-            {/* 약국 정보 */}
-            {hasBusinessInfo && (
-              <div className="pt-3 border-t">
-                <div className="flex items-center gap-2 mb-3">
-                  <Building2 className="w-4 h-4 text-slate-500" />
-                  <h4 className="text-sm font-semibold text-slate-700">약국 정보</h4>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">약국명</label>
-                    <input type="text" name="businessName" value={form.businessName} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">사업자등록번호</label>
-                    <input type="text" name="businessNumber" inputMode="numeric" value={form.businessNumber} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      maxLength={10} placeholder="숫자만 입력" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">세금계산서 이메일</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="email" name="taxEmail" value={form.taxEmail} onChange={handleChange}
-                        className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="tax@pharmacy.com" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">업태</label>
-                      <input type="text" name="businessType" value={form.businessType} onChange={handleChange}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="소매업" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">업종</label>
-                      <input type="text" name="businessCategory" value={form.businessCategory} onChange={handleChange}
-                        className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        placeholder="의약품" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">주소</label>
-                    <input type="text" name="address1" value={form.address1} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="서울특별시 강남구 테헤란로 123" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">상세주소</label>
-                    <input type="text" name="address2" value={form.address2} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="1층 건강약국" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-2 pt-2">
-              <button type="button" onClick={onClose}
-                className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-              <button type="submit" disabled={saving}
-                className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-                {saving ? '저장 중...' : '저장'}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
@@ -565,16 +334,24 @@ export default function UsersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
-            placeholder="이름, 이메일로 검색 (Enter)"
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
+        <div className="relative flex-1 min-w-[200px] max-w-md flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
+              placeholder="이름, 이메일로 검색"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <button
+            onClick={() => fetchUsers(1)}
+            className="px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 shrink-0"
+          >
+            검색
+          </button>
         </div>
         {tab === 'all' && (
           <select

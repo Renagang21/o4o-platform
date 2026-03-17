@@ -23,9 +23,13 @@ import {
   X,
   Plus,
   MinusCircle,
+  Pencil,
+  Building2,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
+import EditUserModal from './EditUserModal';
+import type { BusinessInfoData } from './EditUserModal';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -59,10 +63,12 @@ interface UserDetail {
   firstName?: string;
   lastName?: string;
   name?: string;
+  nickname?: string;
   company?: string;
   phone?: string;
   status: string;
   isActive: boolean;
+  businessInfo?: BusinessInfoData;
   createdAt: string;
   updatedAt?: string;
 }
@@ -270,6 +276,7 @@ export default function UserDetailPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -438,6 +445,12 @@ export default function UserDetailPage() {
                 <td className="py-2.5 pr-4 text-slate-500 w-32">이름</td>
                 <td className="py-2.5 text-slate-800">{getUserName(user)}</td>
               </tr>
+              {user.nickname && (
+                <tr className="border-b border-slate-50">
+                  <td className="py-2.5 pr-4 text-slate-500">닉네임</td>
+                  <td className="py-2.5 text-slate-800">{user.nickname}</td>
+                </tr>
+              )}
               <tr className="border-b border-slate-50">
                 <td className="py-2.5 pr-4 text-slate-500">이메일</td>
                 <td className="py-2.5 text-slate-800">{user.email}</td>
@@ -446,12 +459,6 @@ export default function UserDetailPage() {
                 <tr className="border-b border-slate-50">
                   <td className="py-2.5 pr-4 text-slate-500">전화번호</td>
                   <td className="py-2.5 text-slate-800">{user.phone}</td>
-                </tr>
-              )}
-              {user.company && (
-                <tr className="border-b border-slate-50">
-                  <td className="py-2.5 pr-4 text-slate-500">회사</td>
-                  <td className="py-2.5 text-slate-800">{user.company}</td>
                 </tr>
               )}
               <tr className="border-b border-slate-50">
@@ -510,6 +517,12 @@ export default function UserDetailPage() {
               </button>
             )}
             <button
+              onClick={() => setShowEditModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+            >
+              <Pencil className="w-4 h-4" />정보 수정
+            </button>
+            <button
               onClick={() => setShowPasswordModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
             >
@@ -525,6 +538,61 @@ export default function UserDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* 사업자 정보 (businessInfo) */}
+      {user.businessInfo && (user.businessInfo.businessName || user.company) && (
+        <section className="bg-white rounded-xl shadow-sm mb-6">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-slate-500" />
+            <h2 className="text-base font-semibold text-slate-800">약국 정보</h2>
+          </div>
+          <div className="p-5">
+            <table className="w-full text-sm">
+              <tbody>
+                {(user.businessInfo.businessName || user.company) && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500 w-32">약국명</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessName || user.company}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessNumber && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">사업자등록번호</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessNumber}</td>
+                  </tr>
+                )}
+                {user.businessInfo.email && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">세금계산서 이메일</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.email}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessType && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">업태</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessType}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessCategory && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">업종</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessCategory}</td>
+                  </tr>
+                )}
+                {user.businessInfo.address && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">주소</td>
+                    <td className="py-2.5 text-slate-800">
+                      {user.businessInfo.address}
+                      {user.businessInfo.address2 && ` ${user.businessInfo.address2}`}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* 역할 (role_assignments) */}
       <section className="bg-white rounded-xl shadow-sm mb-6">
@@ -673,6 +741,15 @@ export default function UserDetailPage() {
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
           onClose={() => setShowRoleModal(false)}
+          onSuccess={fetchDetail}
+        />
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <EditUserModal
+          userId={user.id}
+          onClose={() => setShowEditModal(false)}
           onSuccess={fetchDetail}
         />
       )}
