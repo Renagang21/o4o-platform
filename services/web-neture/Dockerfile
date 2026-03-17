@@ -32,6 +32,7 @@ COPY packages/hub-core/package.json ./packages/hub-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
+COPY packages/error-handling/package.json ./packages/error-handling/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -52,6 +53,7 @@ COPY packages/hub-core/ ./packages/hub-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
+COPY packages/error-handling/ ./packages/error-handling/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
