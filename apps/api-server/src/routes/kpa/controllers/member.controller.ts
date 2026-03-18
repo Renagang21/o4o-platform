@@ -477,8 +477,40 @@ export function createMemberController(
         }
 
         const oldRole = member.role;
-        member.role = req.body.role;
+        const newRole = req.body.role;
+
+        // WO-KPA-ROLE-POLICY-ENFORCEMENT-V1: Self-escalation prevention
+        if (req.user!.id === member.user_id && newRole === 'admin') {
+          res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Cannot assign admin role to yourself' } });
+          return;
+        }
+
+        member.role = newRole;
         const saved = await memberRepo.save(member);
+
+        // WO-KPA-ROLE-POLICY-ENFORCEMENT-V1: Sync role_assignments (RBAC SSOT)
+        try {
+          const ROLE_MAP: Record<string, string> = {
+            member: 'kpa:pharmacist',
+            operator: 'kpa:operator',
+            admin: 'kpa:admin',
+          };
+          const oldRbacRole = ROLE_MAP[oldRole];
+          const newRbacRole = ROLE_MAP[newRole];
+
+          if (oldRbacRole && oldRbacRole !== newRbacRole) {
+            await roleAssignmentService.removeRole(member.user_id, oldRbacRole);
+          }
+          if (newRbacRole && oldRbacRole !== newRbacRole) {
+            await roleAssignmentService.assignRole({
+              userId: member.user_id,
+              role: newRbacRole,
+              assignedBy: req.user!.id,
+            });
+          }
+        } catch (syncError) {
+          console.error('[WO-KPA-ROLE-POLICY-ENFORCEMENT-V1] role_assignments sync failed:', syncError);
+        }
 
         // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: Record audit log
         try {
@@ -488,7 +520,7 @@ export function createMemberController(
             action_type: 'MEMBER_ROLE_CHANGED' as any,
             target_type: 'member',
             target_id: member.id,
-            metadata: { previousRole: oldRole, newRole: req.body.role },
+            metadata: { previousRole: oldRole, newRole },
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 

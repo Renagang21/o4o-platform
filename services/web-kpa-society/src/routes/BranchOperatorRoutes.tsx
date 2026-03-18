@@ -21,6 +21,8 @@ import { Routes, Route } from 'react-router-dom';
 import { BranchOperatorAuthGuard, BranchOperatorLayout } from '../components/branch-operator';
 import { BranchOperatorDashboard } from '../pages/branch-operator/BranchOperatorDashboard';
 import { ForumManagementPage, OperatorManagementPage } from '../pages/operator';
+import { RoleGuard } from '../components/auth/RoleGuard';
+import { ROLES } from '../lib/role-constants';
 import { NewsManagementPage, ForumManagementPage as BranchForumManagementPage, DocsManagementPage } from '../pages/branch-admin';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 
@@ -32,7 +34,11 @@ export function BranchOperatorRoutes() {
           <Route index element={<BranchOperatorDashboard />} />
           <Route path="forum-management" element={<ForumManagementPage />} />
           <Route path="signage/content" element={<ContentHubPage />} />
-          <Route path="operators" element={<OperatorManagementPage />} />
+          <Route path="operators" element={
+            <RoleGuard allowedRoles={[ROLES.KPA_ADMIN]}>
+              <OperatorManagementPage />
+            </RoleGuard>
+          } />
 
           {/* 콘텐츠 CRUD (WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: BranchAdmin에서 이동) */}
           <Route path="news" element={<NewsManagementPage />} />
