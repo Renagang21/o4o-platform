@@ -8,15 +8,13 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
-import { parseServiceRole } from '../../utils/role.utils.js';
 import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
+import { roleService } from '../../modules/auth/services/role.service.js';
 
 const approvalService = new MembershipApprovalService();
 
-/** Role suffixes that require admin-level authority to assign/remove */
-const ADMIN_ROLE_SUFFIXES = ['admin', 'super_admin'];
 
 export class MembershipConsoleController {
 
@@ -244,10 +242,12 @@ export class MembershipConsoleController {
 
       // Fetch role_assignments
       const roleRows = await AppDataSource.query(
-        `SELECT id, role, is_active, valid_from, valid_until, assigned_by, scope_type, scope_id, created_at
-         FROM role_assignments
-         WHERE user_id = $1
-         ORDER BY is_active DESC, created_at DESC`,
+        `SELECT ra.id, ra.role, ra.is_active, ra.valid_from, ra.valid_until, ra.assigned_by, ra.scope_type, ra.scope_id, ra.created_at,
+                COALESCE(r.is_admin_role, false) AS is_admin_role
+         FROM role_assignments ra
+         LEFT JOIN roles r ON ra.role = r.name
+         WHERE ra.user_id = $1
+         ORDER BY ra.is_active DESC, ra.created_at DESC`,
         [userId]
       );
 
@@ -289,6 +289,7 @@ export class MembershipConsoleController {
           id: r.id,
           role: r.role,
           isActive: r.is_active,
+          isAdminRole: r.is_admin_role || false,
           validFrom: r.valid_from,
           validUntil: r.valid_until,
           assignedBy: r.assigned_by,
@@ -614,8 +615,20 @@ export class MembershipConsoleController {
         return;
       }
 
+      // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
+      const roleEntity = await roleService.getRoleByName(role);
+      if (!roleEntity) {
+        res.status(400).json({ success: false, error: 'Invalid role' });
+        return;
+      }
+
       // Service boundary check
       if (!scope.isPlatformAdmin) {
+        // Assignability check
+        if (!roleEntity.isAssignable) {
+          res.status(403).json({ success: false, error: 'This role is not assignable' });
+          return;
+        }
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
@@ -628,8 +641,7 @@ export class MembershipConsoleController {
           return;
         }
         // 2. Admin role restriction — only service admins can manage admin-level roles
-        const parsed = parseServiceRole(role);
-        if (parsed && ADMIN_ROLE_SUFFIXES.includes(parsed.role)) {
+        if (roleEntity.isAdminRole) {
           const userRoles: string[] = (req as any).user?.roles || [];
           const callerIsServiceAdmin = scope.rolePrefixes.some(
             (p: string) => userRoles.includes(`${p}:admin`)
@@ -679,6 +691,13 @@ export class MembershipConsoleController {
         return;
       }
 
+      // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
+      const roleEntity = await roleService.getRoleByName(role);
+      if (!roleEntity) {
+        res.status(400).json({ success: false, error: 'Invalid role' });
+        return;
+      }
+
       // Service boundary check
       if (!scope.isPlatformAdmin) {
         const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
@@ -693,8 +712,7 @@ export class MembershipConsoleController {
           return;
         }
         // 2. Admin role restriction — only service admins can manage admin-level roles
-        const parsed = parseServiceRole(role);
-        if (parsed && ADMIN_ROLE_SUFFIXES.includes(parsed.role)) {
+        if (roleEntity.isAdminRole) {
           const userRoles: string[] = (req as any).user?.roles || [];
           const callerIsServiceAdmin = scope.rolePrefixes.some(
             (p: string) => userRoles.includes(`${p}:admin`)

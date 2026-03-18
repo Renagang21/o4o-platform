@@ -41,6 +41,7 @@ interface RoleData {
   id: string;
   role: string;
   isActive: boolean;
+  isAdminRole: boolean;
   validFrom?: string;
   validUntil?: string;
   assignedBy?: string;
@@ -194,12 +195,7 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
 
 // ─── Role Modal ─────────────────────────────────────────────
 
-// TODO: Backend API로 할당 가능 역할 목록 대체 예정
-const ASSIGNABLE_ROLES = [
-  { value: 'k-cosmetics:admin', label: 'K-Cosmetics Admin' },
-  { value: 'k-cosmetics:operator', label: 'K-Cosmetics Operator' },
-  { value: 'k-cosmetics:member', label: 'K-Cosmetics Member' },
-];
+interface AssignableRole { value: string; label: string; isAdminRole: boolean; }
 
 function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
   userId: string; existingRoles: string[]; isAdmin: boolean; onClose: () => void; onSuccess: () => void;
@@ -207,10 +203,27 @@ function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
   const [selectedRole, setSelectedRole] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [assignableRoles, setAssignableRoles] = useState<AssignableRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+
+  useEffect(() => {
+    apiFetch<{ success: boolean; data: any[] }>('/api/v1/operator/roles')
+      .then(res => {
+        if (res.success) {
+          setAssignableRoles(
+            res.data
+              .filter((r: any) => r.isAssignable)
+              .map((r: any) => ({ value: r.name, label: r.displayName, isAdminRole: r.isAdminRole }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setRolesLoading(false));
+  }, []);
 
   const filteredRoles = isAdmin
-    ? ASSIGNABLE_ROLES
-    : ASSIGNABLE_ROLES.filter(r => !r.value.endsWith(':admin'));
+    ? assignableRoles
+    : assignableRoles.filter(r => !r.isAdminRole);
   const availableRoles = filteredRoles.filter(r => !existingRoles.includes(r.value));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -244,7 +257,9 @@ function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
             <AlertCircle className="w-4 h-4 shrink-0" />{error}
           </div>
         )}
-        {availableRoles.length === 0 ? (
+        {rolesLoading ? (
+          <p className="text-sm text-slate-500 mb-4">역할 목록을 불러오는 중...</p>
+        ) : availableRoles.length === 0 ? (
           <p className="text-sm text-slate-500 mb-4">할당 가능한 역할이 없습니다.</p>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -644,7 +659,7 @@ export default function UserDetailPage() {
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                     <td className="px-5 py-2.5">
                       <div className="flex items-center justify-end">
-                        {r.isActive && (isCurrentUserAdmin || !r.role.endsWith(':admin')) && (
+                        {r.isActive && (isCurrentUserAdmin || !r.isAdminRole) && (
                           actionLoading === `role-${r.role}` ? (
                             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                           ) : (

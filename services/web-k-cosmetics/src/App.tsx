@@ -100,6 +100,7 @@ const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPag
 // WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated (mock) — removed from sidebar & routes
 // const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
+const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'));
 
@@ -267,6 +268,8 @@ function AppRoutes() {
         <Route path="users" element={<OperatorUsersPage />} />
         <Route path="users/:id" element={<OperatorUserDetailPage />} />
         <Route path="settings" element={<OperatorSettingsPage />} />
+        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
+        <Route path="roles" element={<OperatorRoleManagementPage />} />
       </Route>
 
       {/* Operator Dashboard */}

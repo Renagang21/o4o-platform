@@ -47,7 +47,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
 
 const ROUTE_OVERRIDES: Record<string, string> = {
   admin: '/workspace/admin',
-  operator: '/workspace/operator',
+  operator: '/operator',
   supplier: '/account/supplier',
   partner: '/account/partner',
   seller: '/seller/overview',

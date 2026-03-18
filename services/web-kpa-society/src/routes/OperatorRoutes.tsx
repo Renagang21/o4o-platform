@@ -16,7 +16,10 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, OperatorManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
+import UsersPage from '../pages/operator/UsersPage';
+import UserDetailPage from '../pages/operator/UserDetailPage';
+import RoleManagementPage from '../pages/operator/RoleManagementPage';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
@@ -32,7 +35,7 @@ import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
-import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
+import { PLATFORM_ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Sidebar Console layout
 import KpaOperatorLayout from '../components/kpa-operator/KpaOperatorLayout';
 
@@ -106,12 +109,15 @@ export function OperatorRoutes() {
           {/* 채널 관리 (WO-O4O-STORE-CHANNEL-LIFECYCLE-V1) */}
           <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
 
-          {/* 운영자 관리 - Admin only (WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1) */}
-          <Route path="operators" element={
-            <RoleGuard allowedRoles={[ROLES.KPA_ADMIN]}>
-              <OperatorManagementPage />
-            </RoleGuard>
-          } />
+          {/* 회원 관리 — MembershipConsole 표준 (WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1) */}
+          <Route path="users" element={<UsersPage />} />
+          <Route path="users/:id" element={<UserDetailPage />} />
+
+          {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
+          <Route path="roles" element={<RoleManagementPage />} />
+
+          {/* 레거시 리다이렉트 */}
+          <Route path="operators" element={<Navigate to="/operator/users" replace />} />
         </Route>
 
         {/* 404 → operator index */}

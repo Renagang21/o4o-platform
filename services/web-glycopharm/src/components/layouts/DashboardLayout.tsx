@@ -160,6 +160,7 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
       { label: 'Settings', icon: Settings, items: [
         { label: '서비스 설정', path: '/operator/settings' },
+        { label: '역할 관리', path: '/operator/roles' },
       ]},
     ],
   },

@@ -14,3 +14,5 @@ export { default as UsersManagementPage } from './UsersManagementPage';
 export { default as UserDetailPage } from './UserDetailPage';
 export { default as StoreManagementPage } from './StoreManagementPage';
 export { default as OrdersManagementPage } from './OrdersManagementPage';
+// WO-O4O-ROLE-MANAGEMENT-UI-V1
+export { default as RoleManagementPage } from './RoleManagementPage';

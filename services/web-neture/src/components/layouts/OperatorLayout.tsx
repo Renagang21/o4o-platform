@@ -7,7 +7,7 @@
  *   AdminLayout 패턴 재사용, Operator 메뉴 6개 그룹
  *
  * 목적:
- * - /workspace/operator 하위 모든 페이지에 사용
+ * - /operator 하위 모든 페이지에 사용
  * - Admin Console과 동일한 Sidebar UX 패턴
  * - 16개 Operator 라우트를 6개 논리 그룹으로 정리
  */
@@ -50,79 +50,80 @@ const OPERATOR_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Dashboard',
     icon: Home,
-    items: [{ label: '대시보드', path: '/workspace/operator', exact: true }],
+    items: [{ label: '대시보드', path: '/operator', exact: true }],
   },
   {
     label: 'Users',
     icon: Users,
     items: [
-      { label: '회원 관리', path: '/workspace/operator/users' },
+      { label: '회원 관리', path: '/operator/users' },
     ],
   },
   {
     label: 'Approvals',
     icon: UserCheck,
     items: [
-      { label: '가입 승인', path: '/workspace/operator/registrations' },
+      { label: '가입 승인', path: '/operator/registrations' },
     ],
   },
   {
     label: 'Products',
     icon: Truck,
     items: [
-      { label: '공급 현황', path: '/workspace/operator/supply' },
+      { label: '공급 현황', path: '/operator/supply' },
     ],
   },
   {
     label: 'Stores',
     icon: Store,
     items: [
-      { label: '매장 관리', path: '/workspace/operator/stores' },
+      { label: '매장 관리', path: '/operator/stores' },
     ],
   },
   {
     label: 'Orders',
     icon: ShoppingCart,
     items: [
-      { label: '주문 관리', path: '/workspace/operator/orders' },
+      { label: '주문 관리', path: '/operator/orders' },
     ],
   },
   {
     label: 'Content',
     icon: Monitor,
     items: [
-      { label: '홈페이지 CMS', path: '/workspace/operator/homepage-cms' },
+      { label: '홈페이지 CMS', path: '/operator/homepage-cms' },
     ],
   },
   {
     label: 'Signage',
     icon: Monitor,
     items: [
-      { label: '사이니지', path: '/workspace/operator/signage/hq-media' },
+      { label: '사이니지', path: '/operator/signage/hq-media' },
     ],
   },
   {
     label: 'Forum',
     icon: Monitor,
     items: [
-      { label: '포럼 관리', path: '/workspace/operator/forum-management' },
+      { label: '포럼 관리', path: '/operator/forum-management' },
     ],
   },
   {
     label: 'Analytics',
     icon: Brain,
     items: [
-      { label: 'AI 리포트', path: '/workspace/operator/ai-report' },
-      { label: 'AI 카드 리포트', path: '/workspace/operator/ai-card-report' },
-      { label: 'AI 운영', path: '/workspace/operator/ai-operations' },
-      { label: 'Asset Quality', path: '/workspace/operator/ai/asset-quality' },
+      { label: 'AI 리포트', path: '/operator/ai-report' },
+      { label: 'AI 카드 리포트', path: '/operator/ai-card-report' },
+      { label: 'AI 운영', path: '/operator/ai-operations' },
+      { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     ],
   },
   {
     label: 'System',
     icon: Settings,
     items: [
-      { label: '알림 설정', path: '/workspace/operator/settings/notifications' },
+      { label: '알림 설정', path: '/operator/settings/notifications' },
+      { label: '역할 관리', path: '/operator/roles' },
     ],
   },
 ];
@@ -137,8 +138,8 @@ export default function OperatorLayout() {
   const isItemActive = (path: string, exact?: boolean) => {
     if (exact) return pathname === path;
     // 사이니지 하위 경로 전체 활성 처리
-    if (path === '/workspace/operator/signage/hq-media') {
-      return pathname.startsWith('/workspace/operator/signage');
+    if (path === '/operator/signage/hq-media') {
+      return pathname.startsWith('/operator/signage');
     }
     return pathname === path || pathname.startsWith(path + '/');
   };
@@ -167,7 +168,7 @@ export default function OperatorLayout() {
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center gap-4">
-              <Link to="/workspace/operator" className="flex items-center gap-2">
+              <Link to="/operator" className="flex items-center gap-2">
                 <span className="text-xl font-bold text-primary-600">Neture</span>
                 <span className="text-xs font-medium text-slate-500 border-l border-slate-300 pl-2">
                   Operator

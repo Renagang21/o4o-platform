@@ -1,14 +1,17 @@
 /**
  * UserDetailPage — 회원 상세
- * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1
+ *
+ * MembershipConsole API 기반 (/api/v1/operator/members/:userId)
+ * GlycoPharm 표준 구현 복제
  *
  * 사용자 기본정보 + role_assignments + service_memberships 표시
- * API: GET /api/v1/operator/members/:userId
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { ROLES } from '../../lib/role-constants';
 import {
   ArrowLeft,
   Loader2,
@@ -27,7 +30,7 @@ import {
   Pencil,
   Building2,
 } from 'lucide-react';
-import { api } from '../../lib/apiClient';
+import { authClient } from '@o4o/auth-client';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
 import type { BusinessInfoData } from './EditUserModal';
@@ -84,7 +87,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   if (options?.body && typeof options.body === 'string') {
     try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
-  const response = await api.request({ method, url, data: body });
+  const response = await authClient.api.request({ method, url, data: body });
   return response.data;
 }
 
@@ -174,13 +177,13 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="새 비밀번호 (6자 이상)"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             minLength={6}
           />
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
               {loading ? '처리 중...' : '변경'}
             </button>
           </div>
@@ -263,7 +266,7 @@ function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">역할 선택...</option>
               {availableRoles.map(r => (
@@ -272,7 +275,7 @@ function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
             </select>
             <div className="flex gap-2">
               <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-              <button type="submit" disabled={loading || !selectedRole} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+              <button type="submit" disabled={loading || !selectedRole} className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {loading ? '처리 중...' : '추가'}
               </button>
             </div>
@@ -289,7 +292,8 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isCurrentUserAdmin = currentUser?.roles?.includes('admin') ?? false;
+  // KPA roles are prefixed (kpa:admin), check directly
+  const isCurrentUserAdmin = currentUser?.roles?.includes(ROLES.KPA_ADMIN) ?? false;
 
   const [user, setUser] = useState<UserDetail | null>(null);
   const [roles, setRoles] = useState<RoleData[]>([]);
@@ -325,8 +329,6 @@ export default function UserDetailPage() {
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
     try {
-      // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
-      // Operator → membership API (admin API 접근 불가)
       if (status === 'approved' || status === 'rejected') {
         const pendingMembership = memberships.find(
           (m: any) => m.status === 'pending' || m.status === 'rejected'
@@ -341,7 +343,6 @@ export default function UserDetailPage() {
           return;
         }
       }
-      // Fallback: admin API (admin/super_admin only)
       await apiFetch(`/api/v1/operator/members/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
@@ -416,7 +417,7 @@ export default function UserDetailPage() {
   if (loading) {
     return (
       <div className="p-6 text-center py-20">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-3" />
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
         <p className="text-slate-500 text-sm">불러오는 중...</p>
       </div>
     );
@@ -625,7 +626,7 @@ export default function UserDetailPage() {
           <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
           <button
             onClick={() => setShowRoleModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            className="flex items-center gap-1 px-2.5 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-3.5 h-3.5" />역할 추가
           </button>

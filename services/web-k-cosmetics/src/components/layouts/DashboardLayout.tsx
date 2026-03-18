@@ -196,6 +196,7 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
       { label: 'System', icon: icons.Settings, items: [
         { label: '설정', path: '/admin/settings' },
+        { label: '역할 관리', path: '/admin/roles' },
       ]},
     ],
   },

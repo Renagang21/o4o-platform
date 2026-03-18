@@ -23,6 +23,7 @@ import MyApplicationsPage from './pages/apply/MyApplicationsPage';
 import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import OperatorAiReportPage from './pages/operator/AiReportPage';
+import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
 import OperatorUsersPage from './pages/operator/UsersPage';
 import OperatorUserDetailPage from './pages/operator/UserDetailPage';
 import OperatorProductsPage from './pages/operator/ProductsPage';
@@ -169,6 +170,8 @@ function AppRoutes() {
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
+        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
+        <Route path="roles" element={<OperatorRoleManagementPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}

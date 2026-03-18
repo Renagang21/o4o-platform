@@ -12,6 +12,26 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
   const draftService = new CareCoachingDraftService(dataSource);
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
 
+  // GET /coaching — list all coaching sessions for pharmacy (cross-patient)
+  // WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
+  // Must be registered BEFORE /coaching/:patientId to avoid route conflict
+  router.get('/coaching', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const pharmacyId = pcReq.pharmacyId;
+
+      if (!pharmacyId) {
+        res.status(403).json({ message: 'Pharmacy context required' });
+        return;
+      }
+
+      const sessions = await service.listByPharmacy(pharmacyId);
+      res.json(sessions);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to retrieve coaching sessions' });
+    }
+  });
+
   // POST /coaching — create coaching session (pharmacy-scoped)
   router.post('/coaching', authenticate, requirePharmacyContext, async (req, res) => {
     try {

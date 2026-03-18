@@ -275,7 +275,7 @@ export default function HqPlaylistsPage() {
                 <tr
                   key={item.id}
                   className="hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate(`/workspace/operator/signage/hq-playlists/${item.id}`)}
+                  onClick={() => navigate(`/operator/signage/hq-playlists/${item.id}`)}
                 >
                   <td className="px-6 py-4">
                     <div className="font-medium text-slate-800">{item.name}</div>

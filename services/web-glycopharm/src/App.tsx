@@ -122,6 +122,7 @@ const StoreApprovalDetailPage = lazy(() => import('@/pages/operator/StoreApprova
 // StoreTemplateManagerPage 제거 — pharmacySlug="demo" 하드코딩으로 미완성 (글로벌 템플릿 저장소 미구현)
 const UsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
+const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 
@@ -504,6 +505,8 @@ function AppRoutes() {
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
+        <Route path="roles" element={<RoleManagementPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}

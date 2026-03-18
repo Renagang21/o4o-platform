@@ -335,6 +335,10 @@ const StoreManagementPage = lazy(() =>
 const OrdersManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OrdersManagementPage }))
 );
+// WO-O4O-ROLE-MANAGEMENT-UI-V1
+const RoleManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.RoleManagementPage }))
+);
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 const SignageHqMediaPage = lazy(() => import('./pages/operator/signage/HqMediaPage'));
@@ -672,35 +676,37 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Operator Dashboard (/workspace/operator/*)
+                Operator Dashboard (/operator/*)
             ================================================================ */}
             <Route element={
               <ProtectedRoute allowedRoles={['admin', 'operator']}>
                 <OperatorLayout />
               </ProtectedRoute>
             }>
-              <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
-              <Route path="/workspace/operator/users" element={<UsersManagementPage />} />
-              <Route path="/workspace/operator/users/:id" element={<UserDetailPage />} />
-              <Route path="/workspace/operator/stores" element={<StoreManagementPage />} />
-              <Route path="/workspace/operator/orders" element={<OrdersManagementPage />} />
-              <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
-              <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              <Route path="/workspace/operator/registrations" element={<RegistrationRequestsPage />} />
-              <Route path="/workspace/operator/forum-management" element={<ForumManagementPage />} />
-              <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
-              <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
-              <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
-              <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
+              <Route path="/operator" element={<NetureOperatorDashboard />} />
+              <Route path="/operator/users" element={<UsersManagementPage />} />
+              <Route path="/operator/users/:id" element={<UserDetailPage />} />
+              <Route path="/operator/stores" element={<StoreManagementPage />} />
+              <Route path="/operator/orders" element={<OrdersManagementPage />} />
+              <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
+              <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+              <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
+              <Route path="/operator/forum-management" element={<ForumManagementPage />} />
+              <Route path="/operator/supply" element={<SupplyDashboardPage />} />
+              <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/operator/ai-operations" element={<AiOperationsPage />} />
+              <Route path="/operator/ai/asset-quality" element={<AssetQualityPage />} />
               {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
-              <Route path="/workspace/operator/signage/hq-media" element={<SignageHqMediaPage />} />
-              <Route path="/workspace/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
-              <Route path="/workspace/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
-              <Route path="/workspace/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
-              <Route path="/workspace/operator/signage/templates" element={<SignageTemplatesPage />} />
-              <Route path="/workspace/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+              <Route path="/operator/signage/hq-media" element={<SignageHqMediaPage />} />
+              <Route path="/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
+              <Route path="/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
+              <Route path="/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
+              <Route path="/operator/signage/templates" element={<SignageTemplatesPage />} />
+              <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               {/* Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1) */}
-              <Route path="/workspace/operator/homepage-cms" element={<HomepageCmsPage />} />
+              <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
+              {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
+              <Route path="/operator/roles" element={<RoleManagementPage />} />
             </Route>
 
             {/* ================================================================
@@ -746,8 +752,8 @@ function App() {
             <Route path="/hub" element={<Navigate to="/workspace/hub" replace />} />
             <Route path="/admin" element={<Navigate to="/workspace/admin" replace />} />
             <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
-            <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
-            <Route path="/operator/*" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/workspace/operator" element={<Navigate to="/operator" replace />} />
+            <Route path="/workspace/operator/*" element={<Navigate to="/operator" replace />} />
 
             {/* Legacy supplier/partner 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />

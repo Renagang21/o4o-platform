@@ -19,7 +19,8 @@ export type ServiceKey =
   | 'neture'       // Neture service
   | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
-  | 'glucoseview'; // GlucoseView service
+  | 'glucoseview'  // GlucoseView service
+  | 'lms';         // LMS service
 
 /**
  * Platform-level roles (cross-service access)
@@ -42,7 +43,8 @@ export type KpaRole =
   | 'kpa:district_admin'   // District-level admin
   | 'kpa:branch_admin'     // Branch-level admin
   | 'kpa:branch_operator'  // Branch-level operator
-  | 'kpa:pharmacist';      // General pharmacist/member
+  | 'kpa:pharmacist'       // General pharmacist/member
+  | 'kpa:student';         // Student member
 
 /**
  * Neture service roles
@@ -87,6 +89,12 @@ export type GlucoseViewRole =
   | 'glucoseview:user';      // GlucoseView 사용자
 
 /**
+ * LMS roles
+ */
+export type LmsRole =
+  | 'lms:instructor';     // LMS 강사
+
+/**
  * Union of all service-prefixed roles
  */
 export type PrefixedRole =
@@ -95,7 +103,8 @@ export type PrefixedRole =
   | NetureRole
   | GlycoPharmRole
   | CosmeticsRole
-  | GlucoseViewRole;
+  | GlucoseViewRole
+  | LmsRole;
 
 /**
  * WO-OPERATOR-ROLE-CLEANUP-V1: All roles are now prefixed.
@@ -295,6 +304,14 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
+  'kpa:student': {
+    role: 'kpa:student',
+    label: 'Student',
+    description: 'Student member',
+    service: 'kpa',
+    category: 'service',
+    deprecated: false
+  },
 
   // Neture roles
   'neture:admin': {
@@ -476,6 +493,16 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     label: 'GlucoseView User',
     description: 'GlucoseView 사용자',
     service: 'glucoseview',
+    category: 'service',
+    deprecated: false
+  },
+
+  // LMS roles
+  'lms:instructor': {
+    role: 'lms:instructor',
+    label: 'LMS Instructor',
+    description: 'LMS 강사',
+    service: 'lms',
     category: 'service',
     deprecated: false
   }

@@ -12,10 +12,12 @@ export interface CreateCoachingSessionDto {
 }
 
 export class CareCoachingSessionService {
+  private dataSource: DataSource;
   private sessionRepo: Repository<CareCoachingSession>;
   private snapshotRepo: Repository<CareKpiSnapshot>;
 
   constructor(dataSource: DataSource) {
+    this.dataSource = dataSource;
     this.sessionRepo = dataSource.getRepository(CareCoachingSession);
     this.snapshotRepo = dataSource.getRepository(CareKpiSnapshot);
   }
@@ -62,6 +64,31 @@ export class CareCoachingSessionService {
       where,
       order: { createdAt: 'DESC' },
     });
+  }
+
+  /**
+   * List all coaching sessions for a pharmacy (cross-patient)
+   * WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
+   */
+  async listByPharmacy(
+    pharmacyId: string,
+    limit = 50
+  ): Promise<Array<CareCoachingSession & { patientName: string }>> {
+    const rows = await this.dataSource.query(
+      `SELECT s.id, s.patient_id AS "patientId", s.pharmacist_id AS "pharmacistId",
+              s.pharmacy_id AS "pharmacyId", s.snapshot_id AS "snapshotId",
+              s.summary, s.action_plan AS "actionPlan", s.created_at AS "createdAt",
+              COALESCE(gc.name, u.name, u.email) AS "patientName"
+       FROM care_coaching_sessions s
+       LEFT JOIN users u ON u.id = s.patient_id
+       LEFT JOIN glucoseview_customers gc
+         ON gc.email = u.email AND gc.organization_id = s.pharmacy_id
+       WHERE s.pharmacy_id = $1
+       ORDER BY s.created_at DESC
+       LIMIT $2`,
+      [pharmacyId, limit],
+    );
+    return rows;
   }
 
   /** Get latest coaching session by patient (pharmacy-scoped) */

@@ -104,7 +104,8 @@ const OPERATOR_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       { label: '법률 관리', path: '/operator/legal' },
       { label: '감사 로그', path: '/operator/audit-logs' },
-      { label: '운영자 관리', path: '/operator/operators' },
+      { label: '회원 관리 (통합)', path: '/operator/users' },
+      { label: '역할 관리', path: '/operator/roles' },
     ],
   },
 ];
