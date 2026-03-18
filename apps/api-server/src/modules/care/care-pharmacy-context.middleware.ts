@@ -33,6 +33,7 @@ export interface PharmacyContextRequest extends Request {
 
 const ADMIN_ROLES = [
   'glycopharm:admin',
+  'glycopharm:operator',
   'platform:admin',
   'platform:super_admin',
 ] as const;
@@ -119,6 +120,8 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
       pcReq.pharmacyId = org.id;
       next();
     } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error('[PharmacyContext] lookup error for userId:', userId, errMsg);
       res.status(500).json({
         success: false,
         error: { code: 'PHARMACY_LOOKUP_ERROR', message: 'Failed to resolve pharmacy context' },
