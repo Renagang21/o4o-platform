@@ -1,6 +1,6 @@
 /**
  * Header - GlycoPharm 헤더
- * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 4-메뉴 (로그인 무관)
+ * WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: Care 중심 4-메뉴
  */
 
 import { useState } from 'react';
@@ -16,25 +16,21 @@ import {
   Activity,
   Home,
   MessageSquare,
-  FileText,
   HeartPulse,
-  Users,
   Store,
   LayoutDashboard,
 } from 'lucide-react';
 import ServiceSwitcher from '../ServiceSwitcher';
 
 /**
- * WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: 통합 5-메뉴
- * 로그인 여부와 무관하게 동일한 메뉴 구조.
- * 비로그인 시 접근하면 기능 안내 페이지(FeatureIntroPage)를 표시.
+ * WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: 4-메뉴
+ * GlycoPharm = Care 운영 도구. 포럼/환자관리 메뉴 제거.
+ * 약국 로그인 시 Home → /care/patients (Care 메인)
  */
 const menuItems = [
-  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/', end: true },
+  { label: 'Home', icon: Home, pathPublic: '/', pathAuth: '/care/patients', end: true },
   { label: '커뮤니티', icon: MessageSquare, pathPublic: '/community', pathAuth: '/community', end: false },
-  { label: '포럼', icon: FileText, pathPublic: '/forum', pathAuth: '/forum', end: false },
   { label: 'Care 관리', icon: HeartPulse, pathPublic: '/care', pathAuth: '/care', end: false },
-  { label: '환자관리', icon: Users, pathPublic: '/care/patients', pathAuth: '/care/patients', end: false },
   { label: '약국 관리', icon: Store, pathPublic: '/store', pathAuth: '/store', end: false },
 ];
 
@@ -81,8 +77,8 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <NavLink to="/" className="flex items-center gap-2">
+          {/* Logo — WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: pharmacy → /care/patients */}
+          <NavLink to={isPharmacy ? '/care/patients' : '/'} className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25">
               <Activity className="w-5 h-5 text-white" />
             </div>
