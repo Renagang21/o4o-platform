@@ -19,6 +19,7 @@ import {
 import type { GlycopharmProduct } from './glycopharm-product.entity.js';
 import type { GlycopharmServiceType } from './glycopharm-application.entity.js';
 import type { KpaOrganization } from '../../kpa/entities/kpa-organization.entity.js';
+import type { StoreAddress } from '../../../types/store-address.js';
 
 export type GlycopharmPharmacyStatus = 'active' | 'inactive' | 'suspended';
 export type TemplateProfile = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
@@ -48,7 +49,7 @@ export class GlycopharmPharmacy {
 
   /** WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 */
   @Column({ name: 'address_detail', type: 'jsonb', nullable: true })
-  addressDetail?: import('../../../types/store-address.js').StoreAddress;
+  addressDetail?: StoreAddress;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   phone?: string;

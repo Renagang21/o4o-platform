@@ -17,6 +17,7 @@ import {
 import type { CosmeticsStoreMember } from './cosmetics-store-member.entity.js';
 import type { CosmeticsStoreListing } from './cosmetics-store-listing.entity.js';
 import type { CosmeticsStorePlaylist } from './cosmetics-store-playlist.entity.js';
+import type { StoreAddress } from '../../../types/store-address.js';
 
 export enum CosmeticsStoreStatus {
   DRAFT = 'draft',
@@ -54,7 +55,7 @@ export class CosmeticsStore {
 
   /** WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 */
   @Column({ name: 'address_detail', type: 'jsonb', nullable: true })
-  addressDetail?: import('../../../types/store-address.js').StoreAddress | null;
+  addressDetail?: StoreAddress | null;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   @Index()

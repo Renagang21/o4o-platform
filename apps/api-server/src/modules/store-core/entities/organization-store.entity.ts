@@ -21,6 +21,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import type { StoreAddress } from '../../../types/store-address.js';
 
 @Entity('organizations')
 export class OrganizationStore {
@@ -67,7 +68,7 @@ export class OrganizationStore {
 
   /** WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 */
   @Column({ type: 'jsonb', nullable: true })
-  address_detail: import('../../../types/store-address.js').StoreAddress | null;
+  address_detail: StoreAddress | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   phone: string | null;
