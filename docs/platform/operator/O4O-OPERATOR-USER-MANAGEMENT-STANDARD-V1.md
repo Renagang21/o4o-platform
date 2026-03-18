@@ -408,8 +408,8 @@ const displayName = (user.lastName && user.firstName)
 |--------|:---------:|:--------------:|:--------:|:----------:|------|
 | GlycoPharm | ✅ | ✅ | ✅ | ✅ | **표준 기준** |
 | K-Cosmetics | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
-| GlucoseView | ✅ | ⚠️ | ❌ | ❌ | 업그레이드 필요 |
-| Neture | ✅ | ❌ | ❌ | ❌ | 업그레이드 필요 |
+| GlucoseView | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
+| Neture | ✅ | ✅ | ✅ | ✅ | 표준 충족 |
 | KPA Society | ❌ | ❌ | ❌ | N/A | 독립 구현 필요 |
 
 ---

@@ -326,6 +326,9 @@ const SupplyDashboardPage = lazy(() =>
 const UsersManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.UsersManagementPage }))
 );
+const UserDetailPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.UserDetailPage }))
+);
 const StoreManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.StoreManagementPage }))
 );
@@ -678,6 +681,7 @@ function App() {
             }>
               <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
               <Route path="/workspace/operator/users" element={<UsersManagementPage />} />
+              <Route path="/workspace/operator/users/:id" element={<UserDetailPage />} />
               <Route path="/workspace/operator/stores" element={<StoreManagementPage />} />
               <Route path="/workspace/operator/orders" element={<OrdersManagementPage />} />
               <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />

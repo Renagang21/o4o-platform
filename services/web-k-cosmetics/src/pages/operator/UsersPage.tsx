@@ -335,10 +335,16 @@ export default function UsersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
-            placeholder="이름, 이메일로 검색 (Enter)"
+            placeholder="이름, 이메일로 검색"
             className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <button
+          onClick={() => fetchUsers(1)}
+          className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+        >
+          검색
+        </button>
         {tab === 'all' && (
           <select
             value={statusFilter}

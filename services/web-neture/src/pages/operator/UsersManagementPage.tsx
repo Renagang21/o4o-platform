@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   Search,
@@ -163,6 +164,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersManagementPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
@@ -331,10 +333,16 @@ export default function UsersManagementPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
-            placeholder="이름, 이메일로 검색 (Enter)"
+            placeholder="이름, 이메일로 검색"
             className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
         </div>
+        <button
+          onClick={() => fetchUsers(1)}
+          className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+        >
+          검색
+        </button>
         {tab === 'all' && (
           <select
             value={statusFilter}
@@ -382,7 +390,7 @@ export default function UsersManagementPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50">
+                <tr key={user.id} className="hover:bg-slate-50 cursor-pointer" onClick={() => navigate(`/workspace/operator/users/${user.id}`)}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
@@ -417,7 +425,7 @@ export default function UsersManagementPage() {
                   <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
                   <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                       {actionLoading === user.id ? (
                         <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       ) : (
