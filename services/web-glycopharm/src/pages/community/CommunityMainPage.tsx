@@ -2,105 +2,68 @@
  * CommunityMainPage — GlycoPharm Community Main Page
  *
  * WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1
+ * WO-GLYCOPHARM-COMMUNITY-FEED-DATA-INTEGRATION-V1
  *
  * Route: /community
- * 하드코딩 데이터 기반 1차 화면. API 연동 없음.
+ * Feed: /api/v1/glycopharm/forum/posts API 연동
+ * Sponsors/Ads: communityApi 연동
  *
  * 섹션 순서:
  *  1. Hero (스폰서 포함)
- *  2. Feed (탭 + 정렬 + 리스트)
- *  3. 광고 섹션 (2개 카드)
+ *  2. Feed (탭 + 정렬 + DataTable)
+ *  3. 광고 섹션
  *  4. 콘텐츠 미리보기
  *  5. 디지털 사이니지 미리보기
  *  6. 파트너 로고 슬라이드
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  MessageSquare,
-  GraduationCap,
   FileText,
   ChevronRight,
   Play,
   ListMusic,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
+import { apiClient } from '@/services/api';
+import { communityApi, type CommunityAd, type CommunitySponsor } from '@/services/communityApi';
 
-// ─── Hardcoded Data ─────────────────────────────────────────
+// ─── Types ──────────────────────────────────────────────────
 
-const sponsorItems = [
-  {
-    id: '1',
-    title: '글라이코팜 파트너십 프로그램',
-    description: '약국 운영 최적화를 위한 전문 컨설팅 제공',
-    link: '/apply',
-  },
-  {
-    id: '2',
-    title: '매장 디스플레이 솔루션',
-    description: '디지털 사이니지로 매장 환경을 업그레이드하세요',
-    link: '/signage',
-  },
-  {
-    id: '3',
-    title: '혈당 관리 교육 과정',
-    description: '약사를 위한 혈당 관리 전문 교육 프로그램',
-    link: '/education',
-  },
-];
-
-type FeedType = 'post' | 'lecture' | 'content';
-type FeedTab = '전체' | '운영 이야기' | '제품 경험' | '마케팅' | '강좌' | '콘텐츠';
+interface ForumPostRaw {
+  id: string;
+  title: string;
+  author?: { name?: string; email?: string } | null;
+  category?: { name?: string } | null;
+  viewCount: number;
+  commentCount: number;
+  createdAt: string;
+}
 
 interface FeedItem {
   id: string;
-  type: FeedType;
-  tab: FeedTab;
   title: string;
-  author?: string;
-  instructor?: string;
-  viewCount?: number;
-  commentCount?: number;
-  participants?: number;
+  author: string;
+  category: string;
+  viewCount: number;
+  commentCount: number;
   date: string;
 }
 
-const feedItems: FeedItem[] = [
-  { id: '1', type: 'post', tab: '운영 이야기', title: '올해 약국 인테리어 리뉴얼 후기 — 고객 동선 변경 효과', author: '김약사', viewCount: 342, commentCount: 28, date: '2026-03-18' },
-  { id: '2', type: 'lecture', tab: '강좌', title: '[실전] 혈당 모니터링 상담 기법 — CGM 데이터 해석', instructor: '박교수', participants: 45, date: '2026-03-20' },
-  { id: '3', type: 'post', tab: '제품 경험', title: 'CGM 센서 교체 주기별 정확도 비교 경험 공유', author: '이약사', viewCount: 189, commentCount: 15, date: '2026-03-17' },
-  { id: '4', type: 'content', tab: '콘텐츠', title: '당뇨 환자 식단 가이드 — 매장 배포용 리플렛', viewCount: 523, date: '2026-03-16' },
-  { id: '5', type: 'post', tab: '마케팅', title: '약국 SNS 마케팅 3개월 실험 결과 — 팔로워 300% 증가', author: '정약사', viewCount: 276, commentCount: 32, date: '2026-03-15' },
-  { id: '6', type: 'lecture', tab: '강좌', title: '[입문] 약국 경영 데이터 분석 — 매출 패턴과 재고 최적화', instructor: '최교수', participants: 62, date: '2026-03-22' },
-  { id: '7', type: 'post', tab: '운영 이야기', title: '직원 교육 프로그램 운영 경험 — 파트타임 약사 관리', author: '한약사', viewCount: 198, commentCount: 19, date: '2026-03-14' },
-  { id: '8', type: 'content', tab: '콘텐츠', title: '혈당 측정기 비교 차트 — 환자 상담 자료', viewCount: 412, date: '2026-03-13' },
-  { id: '9', type: 'post', tab: '제품 경험', title: '건강기능식품 진열 변경 후 매출 변화 분석', author: '윤약사', viewCount: 156, commentCount: 11, date: '2026-03-12' },
-  { id: '10', type: 'post', tab: '마케팅', title: '시즌별 프로모션 기획 — 봄철 알레르기 시즌 준비', author: '송약사', viewCount: 203, commentCount: 24, date: '2026-03-11' },
-];
+interface HubContentItem {
+  id: string;
+  title: string;
+  description?: string | null;
+  thumbnailUrl?: string | null;
+  linkUrl?: string | null;
+  createdAt: string;
+}
 
-const adsItems = [
-  {
-    id: '1',
-    title: '약국 운영 효율화 솔루션',
-    description: '재고 관리부터 고객 상담까지, 하나의 플랫폼으로 관리하세요.',
-    link: '/apply',
-  },
-  {
-    id: '2',
-    title: '전문 교육 프로그램 안내',
-    description: '약사 전문성 강화를 위한 온·오프라인 교육 과정을 확인하세요.',
-    link: '/education',
-  },
-];
+type FeedTab = '전체' | string;
 
-const contentItems = [
-  { id: '1', title: '혈당 관리 기본 가이드 — 환자 교육용' },
-  { id: '2', title: 'CGM 센서 사용법 안내 리플렛' },
-  { id: '3', title: '당뇨 환자 식단 관리 포스터' },
-  { id: '4', title: '건강기능식품 복용 안내 카드' },
-  { id: '5', title: '약국 위생 관리 체크리스트' },
-];
+// ─── Placeholder Data (API 미구현 섹션) ─────────────────────
+
 
 const signageVideos = [
   { id: '1', title: '혈당 관리의 중요성 — 환자 대기실 영상', url: '#' },
@@ -123,14 +86,10 @@ const partnerLogos = [
   { id: '8', name: 'Partner H' },
 ];
 
-// ─── Tabs ───────────────────────────────────────────────────
-
-const FEED_TABS: FeedTab[] = ['전체', '운영 이야기', '제품 경험', '마케팅', '강좌', '콘텐츠'];
-
 // ─── Feed Columns ───────────────────────────────────────────
 
 const feedColumns: Column<Record<string, any>>[] = [
-  { key: 'type', title: '유형', dataIndex: 'type', width: '70px' },
+  { key: 'category', title: '카테고리', dataIndex: 'category', width: '90px' },
   {
     key: 'title', title: '제목', dataIndex: 'title',
     sortable: true,
@@ -154,16 +113,75 @@ const feedColumns: Column<Record<string, any>>[] = [
   },
 ];
 
+function formatFeedDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
   const [activeTab, setActiveTab] = useState<FeedTab>('전체');
   const [sortBy, setSortBy] = useState<'latest' | 'popular'>('latest');
 
+  // Feed data (from forum posts API)
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [feedTabs, setFeedTabs] = useState<FeedTab[]>(['전체']);
+
+  // Sponsors & Ads (from communityApi)
+  const [sponsors, setSponsors] = useState<CommunitySponsor[]>([]);
+  const [ads, setAds] = useState<CommunityAd[]>([]);
+
+  // Content (from hub content API)
+  const [contentItems, setContentItems] = useState<HubContentItem[]>([]);
+  const [contentLoading, setContentLoading] = useState(true);
+
+  const loadFeed = useCallback(async () => {
+    setFeedLoading(true);
+    try {
+      const res = await apiClient.get<ForumPostRaw[]>('/api/v1/glycopharm/forum/posts?limit=30');
+      if (Array.isArray(res.data)) {
+        const items: FeedItem[] = res.data.map((raw) => ({
+          id: raw.id,
+          title: raw.title || '(제목 없음)',
+          author: raw.author?.name || raw.author?.email?.split('@')[0] || '익명',
+          category: raw.category?.name || '일반',
+          viewCount: raw.viewCount || 0,
+          commentCount: raw.commentCount || 0,
+          date: raw.createdAt,
+        }));
+        setFeedItems(items);
+
+        // Build dynamic tabs from categories
+        const cats = new Set(items.map((i) => i.category));
+        setFeedTabs(['전체', ...Array.from(cats)]);
+      }
+    } catch {
+      setFeedItems([]);
+    } finally {
+      setFeedLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFeed();
+    communityApi.getSponsors().then((r) => setSponsors(r.sponsors)).catch(() => {});
+    communityApi.getPageAds().then((r) => setAds(r.ads)).catch(() => {});
+    // Hub content (CMS)
+    apiClient.get<{ data: HubContentItem[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=cms&limit=5')
+      .then((res) => {
+        const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+        setContentItems(items);
+      })
+      .catch(() => setContentItems([]))
+      .finally(() => setContentLoading(false));
+  }, [loadFeed]);
+
   const filteredFeed = feedItems
-    .filter((item) => activeTab === '전체' || item.tab === activeTab)
+    .filter((item) => activeTab === '전체' || item.category === activeTab)
     .sort((a, b) => {
-      if (sortBy === 'popular') return (b.viewCount || 0) - (a.viewCount || 0);
+      if (sortBy === 'popular') return b.viewCount - a.viewCount;
       return b.date.localeCompare(a.date);
     });
 
@@ -200,16 +218,19 @@ export default function CommunityMainPage() {
 
             {/* Right: Sponsor Cards */}
             <div className="flex-1 flex flex-col gap-3">
-              {sponsorItems.map((s) => (
-                <Link
+              {sponsors.length > 0 ? sponsors.slice(0, 3).map((s) => (
+                <a
                   key={s.id}
-                  to={s.link}
+                  href={s.linkUrl || '#'}
                   className="block p-3.5 bg-white border border-slate-200 rounded-lg hover:border-primary-300 transition-colors"
                 >
-                  <p className="text-sm font-medium text-slate-800">{s.title}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{s.description}</p>
-                </Link>
-              ))}
+                  <p className="text-sm font-medium text-slate-800">{s.name}</p>
+                </a>
+              )) : (
+                <div className="p-3.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-400 text-center">
+                  스폰서 정보를 불러오는 중...
+                </div>
+              )}
             </div>
           </div>
 
@@ -223,7 +244,7 @@ export default function CommunityMainPage() {
         <section className="mb-10">
           {/* Tabs */}
           <div className="flex items-center gap-1 border-b border-slate-200 mb-3 overflow-x-auto">
-            {FEED_TABS.map((tab) => (
+            {feedTabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -262,80 +283,72 @@ export default function CommunityMainPage() {
           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
             <DataTable
               columns={feedColumns}
+              loading={feedLoading}
               dataSource={filteredFeed.map((item) => ({
                 id: item.id,
-                type: (
-                  <span className={`inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium rounded ${
-                    item.type === 'lecture'
-                      ? 'bg-amber-50 text-amber-700'
-                      : item.type === 'content'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    {item.type === 'lecture' && <GraduationCap className="w-3 h-3 mr-0.5" />}
-                    {item.type === 'content' && <FileText className="w-3 h-3 mr-0.5" />}
-                    {item.type === 'post' && <MessageSquare className="w-3 h-3 mr-0.5" />}
-                    {item.type === 'lecture' ? '강좌' : item.type === 'content' ? '콘텐츠' : '글'}
+                category: (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium rounded bg-slate-100 text-slate-600">
+                    {item.category}
                   </span>
                 ),
                 title: <span className="text-sm text-slate-800">{item.title}</span>,
-                author: (
-                  <span className="text-xs text-slate-500">
-                    {item.author || item.instructor || '—'}
-                  </span>
-                ),
-                views: (
-                  <span className="text-xs text-slate-400">
-                    {item.viewCount ?? item.participants ?? '—'}
-                  </span>
-                ),
-                comments: (
-                  <span className="text-xs text-slate-400">
-                    {item.commentCount ?? '—'}
-                  </span>
-                ),
-                date: <span className="text-xs text-slate-400">{item.date}</span>,
-                // Raw values for column sorters
+                author: <span className="text-xs text-slate-500">{item.author}</span>,
+                views: <span className="text-xs text-slate-400">{item.viewCount}</span>,
+                comments: <span className="text-xs text-slate-400">{item.commentCount}</span>,
+                date: <span className="text-xs text-slate-400">{formatFeedDate(item.date)}</span>,
                 _title: item.title,
-                _views: item.viewCount ?? item.participants ?? 0,
-                _comments: item.commentCount ?? 0,
+                _views: item.viewCount,
+                _comments: item.commentCount,
                 _date: item.date,
               }))}
               rowKey="id"
-              emptyText="해당 탭에 게시물이 없습니다."
+              emptyText="게시물이 없습니다."
             />
           </div>
         </section>
 
         {/* ─── 3. Ads Section ─── */}
-        <section className="mb-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {adsItems.map((ad) => (
-              <Link
-                key={ad.id}
-                to={ad.link}
-                className="block p-5 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
-              >
-                <p className="text-sm font-semibold text-slate-800 mb-1">{ad.title}</p>
-                <p className="text-xs text-slate-500">{ad.description}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
+        {ads.length > 0 && (
+          <section className="mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {ads.map((ad) => (
+                <a
+                  key={ad.id}
+                  href={ad.linkUrl || '#'}
+                  className="block p-5 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                >
+                  <p className="text-sm font-semibold text-slate-800 mb-1">{ad.title}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ─── 4. Content Preview ─── */}
         <section className="mb-10">
           <h2 className="text-lg font-bold text-slate-800 mb-3">매장에서 바로 쓰는 콘텐츠</h2>
           <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-            {contentItems.map((c) => (
-              <div key={c.id} className="flex items-center justify-between px-4 py-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <FileText className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span className="text-sm text-slate-700 truncate">{c.title}</span>
+            {contentLoading ? (
+              <div className="px-4 py-6 text-center text-xs text-slate-400">콘텐츠를 불러오는 중...</div>
+            ) : contentItems.length === 0 ? (
+              <div className="px-4 py-6 text-center text-xs text-slate-400">등록된 콘텐츠가 없습니다.</div>
+            ) : (
+              contentItems.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
+                  onClick={() => {
+                    if (c.linkUrl) window.open(c.linkUrl, '_blank');
+                  }}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="text-sm text-slate-700 truncate">{c.title}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <div className="mt-3 text-center">
             <Link to="/hub/content" className="text-sm text-primary-600 hover:text-primary-700 font-medium">

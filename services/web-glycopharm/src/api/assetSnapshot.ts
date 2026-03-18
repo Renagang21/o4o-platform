@@ -19,8 +19,11 @@ interface PaginatedStoreAssets {
 }
 
 export const storeAssetControlApi = {
-  list: async (params?: { limit?: number }) => {
-    const res = await api.get(`/glycopharm/store-assets?limit=${params?.limit ?? 200}`);
+  list: async (params?: { type?: string; limit?: number }) => {
+    const qp = new URLSearchParams();
+    if (params?.type) qp.set('type', params.type);
+    qp.set('limit', String(params?.limit ?? 200));
+    const res = await api.get(`/glycopharm/store-assets?${qp.toString()}`);
     return res.data as { success: boolean; data: PaginatedStoreAssets };
   },
 
