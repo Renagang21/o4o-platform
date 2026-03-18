@@ -166,8 +166,8 @@ export default function CommunityMainPage() {
 
   useEffect(() => {
     loadFeed();
-    communityApi.getSponsors().then((r) => setSponsors(r.sponsors)).catch(() => {});
-    communityApi.getPageAds().then((r) => setAds(r.ads)).catch(() => {});
+    communityApi.getSponsors().then((r) => setSponsors(r.data?.sponsors ?? [])).catch(() => {});
+    communityApi.getPageAds().then((r) => setAds(r.data?.ads ?? [])).catch(() => {});
     // Hub content (CMS)
     apiClient.get<{ data: HubContentItem[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=cms&limit=5')
       .then((res) => {

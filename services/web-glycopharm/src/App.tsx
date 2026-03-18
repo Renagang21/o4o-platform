@@ -496,7 +496,7 @@ function AppRoutes() {
         <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="signage/my" element={<MySignagePage />} />
+        {/* signage/my removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1 */}
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         <Route path="signage/hq-media" element={<HqMediaPage />} />
         <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />
