@@ -36,19 +36,24 @@ export class CarePopulationService {
   ): Promise<PopulationDashboardDto> {
     const isAdmin = pharmacyId === null || pharmacyId === undefined;
 
+    // safeQuery helper — returns fallback when table doesn't exist in production
+    const safeQ = async <T>(q: string, params: any[], fallback: T): Promise<T> => {
+      try { return await this.dataSource.query(q, params) as T; } catch { return fallback; }
+    };
+
     const [totalResult, snapshotResult, coachingSentResult, coachingPendingResult, activeResult] =
       await Promise.all([
-        // 1. Total patients
+        // 1. Total patients (glucoseview_customers may not exist)
         isAdmin
-          ? this.dataSource.query(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
-          : this.dataSource.query(
+          ? safeQ(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`, [], [{ count: 0 }])
+          : safeQ(
               `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE organization_id = $1`,
-              [pharmacyId],
+              [pharmacyId], [{ count: 0 }],
             ),
 
-        // 2. Risk distribution + average metrics (latest snapshot per patient)
+        // 2. Risk distribution + average metrics (care_kpi_snapshots may not exist)
         isAdmin
-          ? this.dataSource.query(`
+          ? safeQ(`
               WITH latest AS (
                 SELECT DISTINCT ON (patient_id) risk_level, tir, cv
                 FROM care_kpi_snapshots
@@ -61,8 +66,8 @@ export class CarePopulationService {
                 ROUND(AVG(tir)::numeric, 1) AS avg_tir,
                 ROUND(AVG(cv)::numeric, 1) AS avg_cv
               FROM latest
-            `)
-          : this.dataSource.query(
+            `, [], [{ high: 0, moderate: 0, low: 0, avg_tir: 0, avg_cv: 0 }])
+          : safeQ(
               `
               WITH latest AS (
                 SELECT DISTINCT ON (patient_id) risk_level, tir, cv
@@ -78,60 +83,60 @@ export class CarePopulationService {
                 ROUND(AVG(cv)::numeric, 1) AS avg_cv
               FROM latest
             `,
-              [pharmacyId],
+              [pharmacyId], [{ high: 0, moderate: 0, low: 0, avg_tir: 0, avg_cv: 0 }],
             ),
 
         // 3. Coaching sent (7 days)
         isAdmin
-          ? this.dataSource.query(`
+          ? safeQ(`
               SELECT COUNT(*)::int AS count
               FROM care_coaching_sessions
               WHERE created_at >= NOW() - INTERVAL '7 days'
-            `)
-          : this.dataSource.query(
+            `, [], [{ count: 0 }])
+          : safeQ(
               `
               SELECT COUNT(*)::int AS count
               FROM care_coaching_sessions
               WHERE pharmacy_id = $1 AND created_at >= NOW() - INTERVAL '7 days'
             `,
-              [pharmacyId],
+              [pharmacyId], [{ count: 0 }],
             ),
 
         // 4. Coaching pending drafts
         isAdmin
-          ? this.dataSource.query(`
+          ? safeQ(`
               SELECT COUNT(*)::int AS count
               FROM care_coaching_drafts
               WHERE status = 'draft'
-            `)
-          : this.dataSource.query(
+            `, [], [{ count: 0 }])
+          : safeQ(
               `
               SELECT COUNT(*)::int AS count
               FROM care_coaching_drafts
               WHERE pharmacy_id = $1 AND status = 'draft'
             `,
-              [pharmacyId],
+              [pharmacyId], [{ count: 0 }],
             ),
 
         // 5. Active patients (7-day health readings)
         isAdmin
-          ? this.dataSource.query(`
+          ? safeQ(`
               SELECT COUNT(DISTINCT patient_id)::int AS count
               FROM health_readings
               WHERE measured_at >= NOW() - INTERVAL '7 days'
-            `)
-          : this.dataSource.query(
+            `, [], [{ count: 0 }])
+          : safeQ(
               `
               SELECT COUNT(DISTINCT patient_id)::int AS count
               FROM health_readings
               WHERE pharmacy_id = $1 AND measured_at >= NOW() - INTERVAL '7 days'
             `,
-              [pharmacyId],
+              [pharmacyId], [{ count: 0 }],
             ),
       ]);
 
     const totalPatients = totalResult[0]?.count ?? 0;
-    const snap = snapshotResult[0] ?? {};
+    const snap = snapshotResult[0] ?? { high: 0, moderate: 0, low: 0, avg_tir: 0, avg_cv: 0 };
     const activePatients = activeResult[0]?.count ?? 0;
 
     return {

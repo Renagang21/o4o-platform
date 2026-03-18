@@ -6,6 +6,7 @@
  *
  * Routes:
  *   GET /operator/dashboard          — 5-block OperatorDashboardConfig
+ *   GET /operator/pharmacies         — Stub (pharmacy management 미구현)
  *   GET /operator/recent-orders      — Legacy stub (E-commerce Core 미통합)
  *   GET /operator/pending-applications — Pending applications list
  */
@@ -42,6 +43,30 @@ export function createOperatorController(
       res.json({ success: true, data: config });
     } catch (error: any) {
       console.error('Failed to get operator dashboard:', error);
+      res.status(500).json({
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * GET /operator/pharmacies
+   * Stub — returns empty until pharmacy management is implemented
+   */
+  router.get('/pharmacies', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      res.json({
+        success: true,
+        data: {
+          pharmacies: [],
+          pagination: { page, limit, total: 0, totalPages: 0 },
+        },
+        _notice: 'Pharmacy management will be available in a future release.',
+      });
+    } catch (error: any) {
+      console.error('Failed to list operator pharmacies:', error);
       res.status(500).json({
         error: { code: 'INTERNAL_ERROR', message: error.message },
       });

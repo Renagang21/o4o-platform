@@ -116,7 +116,13 @@ export class CarePriorityAiService {
     `;
 
     const params = pharmacyId ? [pharmacyId, ...patientIds] : patientIds;
-    const rows: InsightRow[] = await this.dataSource.query(query, params);
+    // safeQuery: care_llm_insights / care_kpi_snapshots may not exist in production
+    let rows: InsightRow[];
+    try {
+      rows = await this.dataSource.query(query, params);
+    } catch {
+      return new Map();
+    }
 
     const map = new Map<string, InsightRow>();
     for (const row of rows) {

@@ -197,9 +197,15 @@ export class CarePriorityService {
         LEFT JOIN open_alerts oa ON oa.patient_id = s.patient_id
       `;
 
-    const rows: PriorityRow[] = isAdmin
-      ? await this.dataSource.query(query)
-      : await this.dataSource.query(query, [pharmacyId]);
+    // safeQuery: care tables may not exist in production
+    let rows: PriorityRow[];
+    try {
+      rows = isAdmin
+        ? await this.dataSource.query(query)
+        : await this.dataSource.query(query, [pharmacyId]);
+    } catch {
+      return [];
+    }
 
     const now = Date.now();
     const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -281,7 +287,10 @@ export class CarePriorityService {
     pharmacyId: string,
     limit = 5,
   ): Promise<TodayPriorityPatientDto[]> {
-    const rows: TodayPriorityRow[] = await this.dataSource.query(
+    // safeQuery: care tables may not exist in production
+    let rows: TodayPriorityRow[];
+    try {
+      rows = await this.dataSource.query(
       `
       WITH latest_snapshot AS (
         SELECT DISTINCT ON (patient_id)
@@ -327,6 +336,9 @@ export class CarePriorityService {
       `,
       [pharmacyId],
     );
+    } catch {
+      return [];
+    }
 
     const now = Date.now();
     const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;

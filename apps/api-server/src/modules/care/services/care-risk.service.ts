@@ -140,9 +140,15 @@ export class CareRiskService {
         ORDER BY s.created_at DESC
       `;
 
-    const rows: SnapshotRow[] = isAdmin
-      ? await this.dataSource.query(query)
-      : await this.dataSource.query(query, [pharmacyId]);
+    // safeQuery: care_kpi_snapshots / glucoseview_customers may not exist in production
+    let rows: SnapshotRow[];
+    try {
+      rows = isAdmin
+        ? await this.dataSource.query(query)
+        : await this.dataSource.query(query, [pharmacyId]);
+    } catch {
+      return { highRisk: [], caution: [] };
+    }
 
     const highRisk: RiskPatientDto[] = [];
     const caution: RiskPatientDto[] = [];

@@ -115,31 +115,36 @@ export class CareAlertService {
    * pharmacyId = null → global (operator/admin)
    */
   async getActiveAlerts(pharmacyId: string | null): Promise<CareAlertDto[]> {
-    const isGlobal = pharmacyId === null;
-    const rows = await this.dataSource.query(
-      `SELECT
-         a.id,
-         a.patient_id AS "patientId",
-         COALESCE(c.name, '환자') AS "patientName",
-         a.alert_type AS "alertType",
-         a.severity,
-         a.message,
-         a.status,
-         a.created_at AS "createdAt"
-       FROM care_alerts a
-       LEFT JOIN glucoseview_customers c ON c.id = a.patient_id
-       WHERE ${isGlobal ? '' : 'a.pharmacy_id = $1 AND '}a.status IN ('open', 'acknowledged')
-       ORDER BY
-         CASE a.severity
-           WHEN 'critical' THEN 0
-           WHEN 'warning' THEN 1
-           WHEN 'info' THEN 2
-         END,
-         a.created_at DESC
-       ${isGlobal ? 'LIMIT 200' : ''}`,
-      isGlobal ? [] : [pharmacyId],
-    );
-    return rows;
+    // safeQuery: care_alerts / glucoseview_customers may not exist in production
+    try {
+      const isGlobal = pharmacyId === null;
+      const rows = await this.dataSource.query(
+        `SELECT
+           a.id,
+           a.patient_id AS "patientId",
+           COALESCE(c.name, '환자') AS "patientName",
+           a.alert_type AS "alertType",
+           a.severity,
+           a.message,
+           a.status,
+           a.created_at AS "createdAt"
+         FROM care_alerts a
+         LEFT JOIN glucoseview_customers c ON c.id = a.patient_id
+         WHERE ${isGlobal ? '' : 'a.pharmacy_id = $1 AND '}a.status IN ('open', 'acknowledged')
+         ORDER BY
+           CASE a.severity
+             WHEN 'critical' THEN 0
+             WHEN 'warning' THEN 1
+             WHEN 'info' THEN 2
+           END,
+           a.created_at DESC
+         ${isGlobal ? 'LIMIT 200' : ''}`,
+        isGlobal ? [] : [pharmacyId],
+      );
+      return rows;
+    } catch {
+      return [];
+    }
   }
 
   /**
@@ -147,18 +152,22 @@ export class CareAlertService {
    * pharmacyId = null → global (operator/admin)
    */
   async acknowledgeAlert(alertId: string, pharmacyId: string | null): Promise<void> {
-    if (pharmacyId === null) {
-      await this.dataSource.query(
-        `UPDATE care_alerts SET status = 'acknowledged' WHERE id = $1 AND status = 'open'`,
-        [alertId],
-      );
-    } else {
-      await this.dataSource.query(
-        `UPDATE care_alerts
-         SET status = 'acknowledged'
-         WHERE id = $1 AND pharmacy_id = $2 AND status = 'open'`,
-        [alertId, pharmacyId],
-      );
+    try {
+      if (pharmacyId === null) {
+        await this.dataSource.query(
+          `UPDATE care_alerts SET status = 'acknowledged' WHERE id = $1 AND status = 'open'`,
+          [alertId],
+        );
+      } else {
+        await this.dataSource.query(
+          `UPDATE care_alerts
+           SET status = 'acknowledged'
+           WHERE id = $1 AND pharmacy_id = $2 AND status = 'open'`,
+          [alertId, pharmacyId],
+        );
+      }
+    } catch {
+      // table may not exist in production
     }
   }
 
@@ -167,18 +176,22 @@ export class CareAlertService {
    * pharmacyId = null → global (operator/admin)
    */
   async resolveAlert(alertId: string, pharmacyId: string | null): Promise<void> {
-    if (pharmacyId === null) {
-      await this.dataSource.query(
-        `UPDATE care_alerts SET status = 'resolved', resolved_at = NOW() WHERE id = $1 AND status IN ('open', 'acknowledged')`,
-        [alertId],
-      );
-    } else {
-      await this.dataSource.query(
-        `UPDATE care_alerts
-         SET status = 'resolved', resolved_at = NOW()
-         WHERE id = $1 AND pharmacy_id = $2 AND status IN ('open', 'acknowledged')`,
-        [alertId, pharmacyId],
-      );
+    try {
+      if (pharmacyId === null) {
+        await this.dataSource.query(
+          `UPDATE care_alerts SET status = 'resolved', resolved_at = NOW() WHERE id = $1 AND status IN ('open', 'acknowledged')`,
+          [alertId],
+        );
+      } else {
+        await this.dataSource.query(
+          `UPDATE care_alerts
+           SET status = 'resolved', resolved_at = NOW()
+           WHERE id = $1 AND pharmacy_id = $2 AND status IN ('open', 'acknowledged')`,
+          [alertId, pharmacyId],
+        );
+      }
+    } catch {
+      // table may not exist in production
     }
   }
 

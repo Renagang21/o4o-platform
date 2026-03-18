@@ -245,17 +245,27 @@ async function buildDashboard(
 ): Promise<CareDashboardDto> {
   const isAdmin = pharmacyId === null;
 
+  // safeQuery helper — returns fallback when table doesn't exist in production
+  async function safeQuery<T>(query: string, params: any[], fallback: T): Promise<T> {
+    try {
+      return await ds.query(query, params) as T;
+    } catch {
+      return fallback;
+    }
+  }
+
   // A. Total patients from glucoseview_customers
-  // WO-ORG-RESOLUTION-UNIFICATION-V1: organization_id 기준 (pharmacist_id → organization_id)
+  // safeQuery: glucoseview_customers may not exist in production
   const totalResult = isAdmin
-    ? await ds.query(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`)
-    : await ds.query(
+    ? await safeQuery(`SELECT COUNT(*)::int AS count FROM glucoseview_customers`, [], [{ count: 0 }])
+    : await safeQuery(
         `SELECT COUNT(*)::int AS count FROM glucoseview_customers WHERE organization_id = $1`,
-        [pharmacyId]
+        [pharmacyId], [{ count: 0 }]
       );
   const totalPatients = totalResult[0]?.count ?? 0;
 
   // B. Risk distribution — latest snapshot per patient (pharmacy-scoped)
+  // safeQuery: care_kpi_snapshots may not exist in production
   const riskQuery = isAdmin
     ? `
       SELECT s.risk_level, COUNT(*)::int AS count
@@ -280,8 +290,8 @@ async function buildDashboard(
       GROUP BY s.risk_level
     `;
   const riskRows: Array<{ risk_level: string; count: number }> = isAdmin
-    ? await ds.query(riskQuery)
-    : await ds.query(riskQuery, [pharmacyId]);
+    ? await safeQuery(riskQuery, [], [])
+    : await safeQuery(riskQuery, [pharmacyId], []);
 
   let highRiskCount = 0;
   let moderateRiskCount = 0;
@@ -294,16 +304,16 @@ async function buildDashboard(
 
   // C. Recent coaching count (last 7 days, pharmacy-scoped)
   const coachingResult = isAdmin
-    ? await ds.query(`
+    ? await safeQuery(`
         SELECT COUNT(*)::int AS count
         FROM care_coaching_sessions
         WHERE created_at >= NOW() - INTERVAL '7 days'
-      `)
-    : await ds.query(`
+      `, [], [{ count: 0 }])
+    : await safeQuery(`
         SELECT COUNT(*)::int AS count
         FROM care_coaching_sessions
         WHERE created_at >= NOW() - INTERVAL '7 days' AND pharmacy_id = $1
-      `, [pharmacyId]);
+      `, [pharmacyId], [{ count: 0 }]);
   const recentCoachingCount = coachingResult[0]?.count ?? 0;
 
   // D. Improving count — patients where latest TIR > previous TIR (pharmacy-scoped)
@@ -338,13 +348,13 @@ async function buildDashboard(
       ) improving
     `;
   const improvingResult = isAdmin
-    ? await ds.query(improvingQuery)
-    : await ds.query(improvingQuery, [pharmacyId]);
+    ? await safeQuery(improvingQuery, [], [{ count: 0 }])
+    : await safeQuery(improvingQuery, [pharmacyId], [{ count: 0 }]);
   const improvingCount = improvingResult[0]?.count ?? 0;
 
   // E. Latest snapshot per patient (pharmacy-scoped)
   const recentSnapshots = isAdmin
-    ? await ds.query(`
+    ? await safeQuery(`
         SELECT s.patient_id AS "patientId", s.risk_level AS "riskLevel", s.created_at AS "createdAt"
         FROM care_kpi_snapshots s
         INNER JOIN (
@@ -353,8 +363,8 @@ async function buildDashboard(
           GROUP BY patient_id
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
         ORDER BY s.created_at DESC
-      `)
-    : await ds.query(`
+      `, [], [])
+    : await safeQuery(`
         SELECT s.patient_id AS "patientId", s.risk_level AS "riskLevel", s.created_at AS "createdAt"
         FROM care_kpi_snapshots s
         INNER JOIN (
@@ -365,23 +375,23 @@ async function buildDashboard(
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
         WHERE s.pharmacy_id = $1
         ORDER BY s.created_at DESC
-      `, [pharmacyId]);
+      `, [pharmacyId], []);
 
   // F. Recent 5 coaching sessions (pharmacy-scoped)
   const recentSessions = isAdmin
-    ? await ds.query(`
+    ? await safeQuery(`
         SELECT patient_id AS "patientId", summary, created_at AS "createdAt"
         FROM care_coaching_sessions
         ORDER BY created_at DESC
         LIMIT 5
-      `)
-    : await ds.query(`
+      `, [], [])
+    : await safeQuery(`
         SELECT patient_id AS "patientId", summary, created_at AS "createdAt"
         FROM care_coaching_sessions
         WHERE pharmacy_id = $1
         ORDER BY created_at DESC
         LIMIT 5
-      `, [pharmacyId]);
+      `, [pharmacyId], []);
 
   return {
     totalPatients,

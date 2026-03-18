@@ -63,6 +63,7 @@ describe('Pharmacy Context Middleware', () => {
   describe('admin bypass (pharmacyId = null)', () => {
     const adminRoles = [
       ['glycopharm:admin'],
+      ['glycopharm:operator'],
       ['platform:admin'],
       ['platform:super_admin'],
     ];
@@ -96,7 +97,7 @@ describe('Pharmacy Context Middleware', () => {
       ]);
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ id: 'pharmacist-user', roles: ['glycopharm:operator'] });
+      const user = createMockUser({ id: 'pharmacist-user', roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
@@ -123,7 +124,7 @@ describe('Pharmacy Context Middleware', () => {
       const ds = createMockDataSource([[], []]);
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ id: 'orphan-user', roles: ['glycopharm:operator'] });
+      const user = createMockUser({ id: 'orphan-user', roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
@@ -144,7 +145,7 @@ describe('Pharmacy Context Middleware', () => {
       ]);
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ roles: ['glycopharm:operator'] });
+      const user = createMockUser({ roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
@@ -167,7 +168,7 @@ describe('Pharmacy Context Middleware', () => {
       ]);
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ roles: ['glycopharm:operator'] });
+      const user = createMockUser({ roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
@@ -187,7 +188,7 @@ describe('Pharmacy Context Middleware', () => {
       const ds = createMockDataSource([], true); // throws
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ roles: ['glycopharm:operator'] });
+      const user = createMockUser({ roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
@@ -201,7 +202,7 @@ describe('Pharmacy Context Middleware', () => {
   });
 
   describe('pharmacy isolation: non-admin cannot get global access', () => {
-    it('glycopharm:operator → must have specific pharmacyId, not null', async () => {
+    it('glycopharm:pharmacist → must have specific pharmacyId, not null', async () => {
       const pharmacyId = 'pharmacy-specific';
       const ds = createMockDataSource([
         [{ id: pharmacyId, isActive: true }],
@@ -209,7 +210,7 @@ describe('Pharmacy Context Middleware', () => {
       ]);
       const middleware = createPharmacyContextMiddleware(ds);
 
-      const user = createMockUser({ roles: ['glycopharm:operator'] });
+      const user = createMockUser({ roles: ['glycopharm:pharmacist'] });
       const req = createMockRequest(user);
       const res = createMockResponse();
       const next = createMockNext();
