@@ -25,8 +25,10 @@ import {
   AlertCircle,
   X,
   ChevronRight,
+  Pencil,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import EditUserModal from './EditUserModal';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -196,6 +198,7 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
+  const [editUser, setEditUser] = useState<UserData | null>(null);
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0 });
@@ -485,6 +488,13 @@ export default function UsersPage() {
                             </button>
                           )}
                           <button
+                            onClick={(e) => { e.stopPropagation(); setEditUser(user); }}
+                            title="정보 수정"
+                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => setPasswordUser(user)}
                             title="비밀번호 변경"
                             className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
@@ -544,6 +554,15 @@ export default function UsersPage() {
         <PasswordModal
           user={passwordUser}
           onClose={() => setPasswordUser(null)}
+          onSuccess={() => { fetchUsers(pagination.page); }}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {editUser && (
+        <EditUserModal
+          userId={editUser.id}
+          onClose={() => setEditUser(null)}
           onSuccess={() => { fetchUsers(pagination.page); }}
         />
       )}
