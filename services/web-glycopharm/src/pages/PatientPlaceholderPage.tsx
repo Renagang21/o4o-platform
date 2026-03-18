@@ -91,7 +91,7 @@ export default function PatientMainPage() {
             <Activity className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-xl font-bold text-slate-800">
-            {user?.name || user?.email || '환자'}님
+            {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '환자'}님
           </h1>
           <p className="text-sm text-slate-500 mt-1">GlycoPharm 환자용 시스템</p>
         </div>
