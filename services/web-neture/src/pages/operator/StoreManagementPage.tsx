@@ -26,6 +26,7 @@ interface StoreData {
   type: string;
   isActive: boolean;
   address: string | null;
+  addressDetail: { zipCode?: string; baseAddress: string; detailAddress?: string; region?: string } | null;
   phone: string | null;
   businessNumber: string | null;
   ownerEmail: string | null;

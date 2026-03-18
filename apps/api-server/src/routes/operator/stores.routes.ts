@@ -45,6 +45,9 @@ router.put('/:storeId/channels/:channelId/status', controller.updateChannelStatu
 // Store product listings
 router.get('/:storeId/products', controller.getStoreProducts);
 
+// WO-O4O-STORE-PROFILE-UNIFICATION-V1: Store profile update
+router.put('/:storeId/profile', controller.updateStoreProfile);
+
 // Store capabilities (WO-O4O-STORE-CAPABILITY-SYSTEM-V1)
 router.get('/:storeId/capabilities', controller.getStoreCapabilities);
 router.put('/:storeId/capabilities', controller.updateStoreCapabilities);

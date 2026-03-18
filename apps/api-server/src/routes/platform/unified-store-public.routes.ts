@@ -467,6 +467,7 @@ export function createUnifiedStorePublicRoutes(dataSource: DataSource): Router {
           slug: req.params.slug,
           description: pharmacy.description,
           address: pharmacy.address,
+          addressDetail: (pharmacy as any).address_detail || null,
           phone: pharmacy.phone,
           logo: extension?.logo || null,
           hero_image: extension?.hero_image || null,

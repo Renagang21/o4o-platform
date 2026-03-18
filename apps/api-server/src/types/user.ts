@@ -2,6 +2,8 @@
  * User-related type definitions
  */
 
+import type { StoreAddress } from './store-address.js';
+
 /**
  * Business information for Korean e-commerce
  * Designed to comply with Korean business registration and e-commerce law
@@ -14,8 +16,9 @@ export interface BusinessInfo {
   ceoName?: string;               // 대표자명
 
   // 사업장 정보
-  address?: string;               // 사업장 주소 (전체 주소 문자열)
-  address2?: string;              // 상세주소
+  storeAddress?: StoreAddress;    // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소
+  address?: string;               // 사업장 주소 — 레거시 (하위 호환)
+  address2?: string;              // 상세주소 — 레거시 (하위 호환)
   businessCategory?: string;      // 업종
 
   // 전자상거래 법적 요건

@@ -535,6 +535,13 @@ export class MembershipConsoleController {
       if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
       if (address1 !== undefined) bizFields.address = address1;
       if (address2 !== undefined) bizFields.address2 = address2;
+      // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 동기화
+      if (address1 !== undefined || address2 !== undefined) {
+        (bizFields as any).storeAddress = {
+          baseAddress: address1 || '',
+          ...(address2 ? { detailAddress: address2 } : {}),
+        };
+      }
 
       if (Object.keys(bizFields).length > 0) {
         const [existing] = await AppDataSource.query(

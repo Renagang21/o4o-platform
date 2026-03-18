@@ -526,6 +526,13 @@ export class AuthController extends BaseController {
         if (data.address2) {
           businessInfo.address2 = data.address2;
         }
+        // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 dual write
+        if (data.address1) {
+          (businessInfo as any).storeAddress = {
+            baseAddress: data.address1,
+            ...(data.address2 ? { detailAddress: data.address2 } : {}),
+          };
+        }
         if (Object.keys(businessInfo).length > 0) {
           newUser.businessInfo = businessInfo;
         }

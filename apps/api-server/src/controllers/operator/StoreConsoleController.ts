@@ -121,7 +121,7 @@ export class StoreConsoleController {
       // Fetch stores
       const stores = await AppDataSource.query(
         `SELECT o.id, o.name, o.code, o.type, o."isActive",
-                o.address, o.phone, o.business_number,
+                o.address, o.address_detail, o.phone, o.business_number,
                 o.template_profile, o.created_by_user_id,
                 o."createdAt", o."updatedAt",
                 u.email as owner_email, u.name as owner_name,
@@ -182,6 +182,7 @@ export class StoreConsoleController {
           type: s.type,
           isActive: s.isActive,
           address: s.address,
+          addressDetail: s.address_detail || null,
           phone: s.phone,
           businessNumber: s.business_number,
           templateProfile: s.template_profile,
@@ -225,7 +226,7 @@ export class StoreConsoleController {
       const storeRows = await AppDataSource.query(
         `SELECT o.id, o.name, o.code, o.type, o."isActive",
                 o."parentId", o.level, o.path,
-                o.address, o.phone, o.description,
+                o.address, o.address_detail, o.phone, o.description,
                 o.business_number, o.created_by_user_id,
                 o.template_profile, o.storefront_config,
                 o.metadata, o."createdAt", o."updatedAt",
@@ -257,6 +258,7 @@ export class StoreConsoleController {
           level: s.level,
           path: s.path,
           address: s.address,
+          addressDetail: s.address_detail || null,
           phone: s.phone,
           description: s.description,
           businessNumber: s.business_number,
@@ -496,6 +498,60 @@ export class StoreConsoleController {
     } catch (error) {
       logger.error('[StoreConsole] updateStoreCapabilities error:', error);
       res.status(500).json({ success: false, error: 'Failed to update store capabilities' });
+    }
+  };
+
+  /**
+   * PUT /api/v1/operator/stores/:storeId/profile
+   * WO-O4O-STORE-PROFILE-UNIFICATION-V1
+   *
+   * Body: { name?, phone?, description?, addressDetail?: StoreAddress }
+   */
+  updateStoreProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { storeId } = req.params;
+
+      if (!(await this.assertStoreAccess(storeId, scope))) {
+        res.status(404).json({ success: false, error: 'Store not found' });
+        return;
+      }
+
+      const { name, phone, description, addressDetail } = req.body;
+
+      const sets: string[] = [];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (name !== undefined) { sets.push(`name = $${idx++}`); params.push(name); }
+      if (phone !== undefined) { sets.push(`phone = $${idx++}`); params.push(phone); }
+      if (description !== undefined) { sets.push(`description = $${idx++}`); params.push(description); }
+      if (addressDetail !== undefined) {
+        sets.push(`address_detail = $${idx++}`);
+        params.push(JSON.stringify(addressDetail));
+        // Sync legacy address column
+        const legacyAddr = [addressDetail?.baseAddress, addressDetail?.detailAddress].filter(Boolean).join(' ');
+        sets.push(`address = $${idx++}`);
+        params.push(legacyAddr || null);
+      }
+
+      if (sets.length === 0) {
+        res.status(400).json({ success: false, error: 'No fields to update' });
+        return;
+      }
+
+      sets.push(`"updatedAt" = NOW()`);
+      params.push(storeId);
+
+      await AppDataSource.query(
+        `UPDATE organizations SET ${sets.join(', ')} WHERE id = $${idx}`,
+        params
+      );
+
+      res.json({ success: true, message: 'Store profile updated' });
+    } catch (error) {
+      logger.error('[StoreConsole] updateStoreProfile error:', error);
+      res.status(500).json({ success: false, error: 'Failed to update store profile' });
     }
   };
 

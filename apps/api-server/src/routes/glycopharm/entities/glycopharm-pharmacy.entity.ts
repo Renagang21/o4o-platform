@@ -46,6 +46,10 @@ export class GlycopharmPharmacy {
   @Column({ type: 'text', nullable: true })
   address?: string;
 
+  /** WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 */
+  @Column({ name: 'address_detail', type: 'jsonb', nullable: true })
+  addressDetail?: import('../../../types/store-address.js').StoreAddress;
+
   @Column({ type: 'varchar', length: 50, nullable: true })
   phone?: string;
 

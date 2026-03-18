@@ -52,6 +52,10 @@ export class CosmeticsStore {
   @Column({ type: 'text', nullable: true })
   address?: string | null;
 
+  /** WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 */
+  @Column({ name: 'address_detail', type: 'jsonb', nullable: true })
+  addressDetail?: import('../../../types/store-address.js').StoreAddress | null;
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   @Index()
   region?: string | null;

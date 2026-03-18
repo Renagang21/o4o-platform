@@ -18,6 +18,7 @@ interface StoreDetail {
   type: string;
   isActive: boolean;
   address: string | null;
+  addressDetail: { zipCode?: string; baseAddress: string; detailAddress?: string; region?: string } | null;
   phone: string | null;
   description: string | null;
   businessNumber: string | null;
@@ -187,7 +188,7 @@ export default function StoreDetailPage() {
           <InfoRow label="코드" value={store.code || '-'} mono />
           <InfoRow label="Slug" value={store.slug || '-'} mono />
           <InfoRow label="사업자번호" value={store.businessNumber || '-'} />
-          <InfoRow label="주소" value={store.address || '-'} />
+          <InfoRow label="주소" value={store.addressDetail ? [store.addressDetail.baseAddress, store.addressDetail.detailAddress].filter(Boolean).join(' ') : (store.address || '-')} />
           <InfoRow label="전화" value={store.phone || '-'} />
           <InfoRow label="운영자" value={store.ownerName || '-'} />
           <InfoRow label="운영자 이메일" value={store.ownerEmail || '-'} />
