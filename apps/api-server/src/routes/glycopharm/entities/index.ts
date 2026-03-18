@@ -18,11 +18,7 @@ export {
 } from './glycopharm-application.entity.js';
 export { GlycopharmFeaturedProduct } from './glycopharm-featured-product.entity.js';
 
-// Smart Display
-export { DisplayPlaylist, type PlaylistStatus } from './display-playlist.entity.js';
-export { DisplayMedia, type MediaSourceType } from './display-media.entity.js';
-export { DisplayPlaylistItem, type TransitionType } from './display-playlist-item.entity.js';
-export { DisplaySchedule } from './display-schedule.entity.js';
+// Smart Display entities removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 
 // Forum Category Request (GlycoPharm legacy - renamed to avoid collision with forum-core)
 export { GlycopharmForumCategoryRequest, type GlycopharmCategoryRequestStatus } from './forum-category-request.entity.js';

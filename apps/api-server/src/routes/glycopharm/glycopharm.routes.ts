@@ -8,7 +8,7 @@
 import { Router, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { createGlycopharmController } from './controllers/glycopharm.controller.js';
-import { createDisplayController } from './controllers/display.controller.js';
+// display.controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createApplicationController } from './controllers/application.controller.js';
 import { createAdminController } from './controllers/admin.controller.js';
@@ -17,7 +17,7 @@ import { createCheckoutController } from './controllers/checkout.controller.js';
 import { createGlycopharmPaymentController } from './controllers/glycopharm-payment.controller.js'; // WO-O4O-PAYMENT-CORE-GLYCOPHARM-PILOT-V1
 import { createCockpitController } from './controllers/cockpit.controller.js';
 import { createHubTriggerController } from './controllers/hub-trigger.controller.js'; // WO-GLYCOPHARM-HUB-AI-TRIGGER-INTEGRATION-V1
-import { createSignageController } from './controllers/signage.controller.js';
+// signage.controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 import { createOperatorController } from './controllers/operator.controller.js';
 import { createPublicController } from './controllers/public.controller.js';
 import { createStoreController } from './controllers/store.controller.js'; // WO-O4O-STOREFRONT-ACTIVATION-V1
@@ -82,13 +82,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   );
   router.use('/', glycopharmController);
 
-  // Smart Display routes
-  const displayController = createDisplayController(
-    dataSource,
-    coreRequireAuth as any,
-    requireGlycopharmScope
-  );
-  router.use('/display', displayController);
+  // Smart Display routes removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 
   // Forum Category Request routes
   const forumRequestController = createForumRequestController(
@@ -323,11 +317,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   });
 
   // Signage routes (채널, 내 사이니지 편성)
-  const signageController = createSignageController(
-    dataSource,
-    coreRequireAuth as any
-  );
-  router.use('/signage', signageController);
+  // signage controller removed — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1
 
   // Operator Dashboard routes (WO-GLYCOPHARM-DASHBOARD-P1-A)
   const operatorController = createOperatorController(

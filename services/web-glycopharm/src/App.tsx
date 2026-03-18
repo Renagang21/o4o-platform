@@ -70,17 +70,12 @@ const PharmacyManagement = lazy(() => import('@/pages/pharmacy/PharmacyManagemen
 const PharmacyB2BProducts = lazy(() => import('@/pages/pharmacy/PharmacyB2BProducts'));
 const CustomerRequestsPage = lazy(() => import('@/pages/pharmacy/CustomerRequestsPage')); // Phase 1: Common Request
 
-// Smart Display (Legacy)
-const SmartDisplayPage = lazy(() => import('@/pages/pharmacy/smart-display/SmartDisplayPage'));
-const PlaylistsPage = lazy(() => import('@/pages/pharmacy/smart-display/PlaylistsPage'));
-const SchedulesPage = lazy(() => import('@/pages/pharmacy/smart-display/SchedulesPage'));
-const MediaLibraryPage = lazy(() => import('@/pages/pharmacy/smart-display/MediaLibraryPage'));
-const PlaylistForumPage = lazy(() => import('@/pages/pharmacy/smart-display/PlaylistForumPage'));
+// Store Signage (WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1: KPA standard)
+const StoreSignagePage = lazy(() => import('@/pages/pharmacy/StoreSignagePage'));
 
 // Signage Extension (New)
 const ContentLibraryPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentLibraryPage })));
 const ContentHubPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.ContentHubPage })));
-const MySignagePage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MySignagePage })));
 const SignagePreviewPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.SignagePreviewPage })));
 const SignagePlaylistDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.PlaylistDetailPage })));
 const SignageMediaDetailPage = lazy(() => import('@/pages/pharmacy/signage').then(m => ({ default: m.MediaDetailPage })));
@@ -568,16 +563,11 @@ function AppRoutes() {
         <Route path="apply" element={<StoreApplyPage />} />
         {/* billing: 정산/인보이스 (WO-STORE-BILLING-FOUNDATION-V1) */}
         <Route path="billing" element={<StoreBillingPage />} />
-        {/* Signage — Store Core v1.0 통합 (display + signage extension) */}
-        <Route path="signage" element={<SmartDisplayPage />} />
-        <Route path="signage/playlists" element={<PlaylistsPage />} />
-        <Route path="signage/schedules" element={<SchedulesPage />} />
-        <Route path="signage/media" element={<MediaLibraryPage />} />
-        <Route path="signage/forum" element={<PlaylistForumPage />} />
+        {/* Signage — WO-O4O-GLYCOPHARM-SIGNAGE-MIGRATION-V1: KPA standard StoreSignagePage */}
+        <Route path="signage" element={<StoreSignagePage />} />
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
         <Route path="signage/media/:id" element={<SignageMediaDetailPage />} />
-        <Route path="signage/my" element={<MySignagePage />} />
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
         <Route path="market-trial" element={<MarketTrialListPage />} />
