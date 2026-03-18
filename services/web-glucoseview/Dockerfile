@@ -34,6 +34,7 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/auth-utils build
+RUN pnpm --filter @o4o/ui build
 
 # Build the service
 WORKDIR /app/services/web-glucoseview
