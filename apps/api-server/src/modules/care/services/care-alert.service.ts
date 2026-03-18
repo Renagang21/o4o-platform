@@ -111,9 +111,11 @@ export class CareAlertService {
   }
 
   /**
-   * getActiveAlerts — status IN ('open', 'acknowledged'), pharmacy-scoped
+   * getActiveAlerts — status IN ('open', 'acknowledged')
+   * pharmacyId = null → global (operator/admin)
    */
-  async getActiveAlerts(pharmacyId: string): Promise<CareAlertDto[]> {
+  async getActiveAlerts(pharmacyId: string | null): Promise<CareAlertDto[]> {
+    const isGlobal = pharmacyId === null;
     const rows = await this.dataSource.query(
       `SELECT
          a.id,
@@ -126,41 +128,58 @@ export class CareAlertService {
          a.created_at AS "createdAt"
        FROM care_alerts a
        LEFT JOIN glucoseview_customers c ON c.id = a.patient_id
-       WHERE a.pharmacy_id = $1 AND a.status IN ('open', 'acknowledged')
+       WHERE ${isGlobal ? '' : 'a.pharmacy_id = $1 AND '}a.status IN ('open', 'acknowledged')
        ORDER BY
          CASE a.severity
            WHEN 'critical' THEN 0
            WHEN 'warning' THEN 1
            WHEN 'info' THEN 2
          END,
-         a.created_at DESC`,
-      [pharmacyId],
+         a.created_at DESC
+       ${isGlobal ? 'LIMIT 200' : ''}`,
+      isGlobal ? [] : [pharmacyId],
     );
     return rows;
   }
 
   /**
    * acknowledgeAlert — status → 'acknowledged'
+   * pharmacyId = null → global (operator/admin)
    */
-  async acknowledgeAlert(alertId: string, pharmacyId: string): Promise<void> {
-    await this.dataSource.query(
-      `UPDATE care_alerts
-       SET status = 'acknowledged'
-       WHERE id = $1 AND pharmacy_id = $2 AND status = 'open'`,
-      [alertId, pharmacyId],
-    );
+  async acknowledgeAlert(alertId: string, pharmacyId: string | null): Promise<void> {
+    if (pharmacyId === null) {
+      await this.dataSource.query(
+        `UPDATE care_alerts SET status = 'acknowledged' WHERE id = $1 AND status = 'open'`,
+        [alertId],
+      );
+    } else {
+      await this.dataSource.query(
+        `UPDATE care_alerts
+         SET status = 'acknowledged'
+         WHERE id = $1 AND pharmacy_id = $2 AND status = 'open'`,
+        [alertId, pharmacyId],
+      );
+    }
   }
 
   /**
    * resolveAlert — status → 'resolved', resolved_at = NOW()
+   * pharmacyId = null → global (operator/admin)
    */
-  async resolveAlert(alertId: string, pharmacyId: string): Promise<void> {
-    await this.dataSource.query(
-      `UPDATE care_alerts
-       SET status = 'resolved', resolved_at = NOW()
-       WHERE id = $1 AND pharmacy_id = $2 AND status IN ('open', 'acknowledged')`,
-      [alertId, pharmacyId],
-    );
+  async resolveAlert(alertId: string, pharmacyId: string | null): Promise<void> {
+    if (pharmacyId === null) {
+      await this.dataSource.query(
+        `UPDATE care_alerts SET status = 'resolved', resolved_at = NOW() WHERE id = $1 AND status IN ('open', 'acknowledged')`,
+        [alertId],
+      );
+    } else {
+      await this.dataSource.query(
+        `UPDATE care_alerts
+         SET status = 'resolved', resolved_at = NOW()
+         WHERE id = $1 AND pharmacy_id = $2 AND status IN ('open', 'acknowledged')`,
+        [alertId, pharmacyId],
+      );
+    }
   }
 
   // ── Private ──

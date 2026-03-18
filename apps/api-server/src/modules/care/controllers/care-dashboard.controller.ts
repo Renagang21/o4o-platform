@@ -103,15 +103,11 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
   });
 
   // WO-O4O-CARE-ALERT-ENGINE-V1
-  // GET /alerts — active alerts for pharmacy
+  // GET /alerts — active alerts (pharmacy-scoped or global for operator/admin)
   router.get('/alerts', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const pharmacyId = pcReq.pharmacyId;
-      if (!pharmacyId) {
-        res.json([]);
-        return;
-      }
+      const pharmacyId = pcReq.pharmacyId ?? null;
 
       const alerts = await alertService.getActiveAlerts(pharmacyId);
       res.json(alerts);
@@ -124,11 +120,7 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
   router.patch('/alerts/:id/ack', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const pharmacyId = pcReq.pharmacyId;
-      if (!pharmacyId) {
-        res.status(400).json({ message: 'Pharmacy context required' });
-        return;
-      }
+      const pharmacyId = pcReq.pharmacyId ?? null;
 
       await alertService.acknowledgeAlert(req.params.id, pharmacyId);
       res.json({ success: true });
@@ -141,11 +133,7 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
   router.patch('/alerts/:id/resolve', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const pharmacyId = pcReq.pharmacyId;
-      if (!pharmacyId) {
-        res.status(400).json({ message: 'Pharmacy context required' });
-        return;
-      }
+      const pharmacyId = pcReq.pharmacyId ?? null;
 
       await alertService.resolveAlert(req.params.id, pharmacyId);
       res.json({ success: true });

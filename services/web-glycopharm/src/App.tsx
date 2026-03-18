@@ -126,6 +126,10 @@ const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPag
 const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
 
+// Operator Care Pages (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1)
+const OperatorCareDashboardPage = lazy(() => import('@/pages/operator/care/OperatorCareDashboardPage'));
+const OperatorCareAlertsPage = lazy(() => import('@/pages/operator/care/OperatorCareAlertsPage'));
+
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
 const ProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
@@ -507,6 +511,9 @@ function AppRoutes() {
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<RoleManagementPage />} />
+        {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
+        <Route path="care" element={<OperatorCareDashboardPage />} />
+        <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
