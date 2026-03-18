@@ -25,6 +25,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
   roles: UserRole[];
   role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   memberships?: { serviceKey: string; status: string }[];
