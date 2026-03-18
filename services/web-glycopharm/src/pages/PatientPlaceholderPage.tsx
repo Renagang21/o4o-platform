@@ -90,9 +90,12 @@ export default function PatientMainPage() {
           <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mx-auto mb-3">
             <Activity className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-xl font-bold text-slate-800">
+          <button
+            onClick={() => navigate('/patient/profile')}
+            className="text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer"
+          >
             {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '환자'}님
-          </h1>
+          </button>
           <p className="text-sm text-slate-500 mt-1">GlycoPharm 환자용 시스템</p>
         </div>
 

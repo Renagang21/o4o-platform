@@ -26,6 +26,7 @@ import {
   Clock,
   AlertTriangle,
   Lightbulb,
+  LogOut,
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading, PatientCoachingRecord, MyLinkStatus, AiInsight } from '@/api/patient';
@@ -45,8 +46,13 @@ const QUICK_MENU = [
 ] as const;
 
 export default function PatientMainPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
   const [latestCoaching, setLatestCoaching] = useState<PatientCoachingRecord | null>(null);
@@ -107,9 +113,12 @@ export default function PatientMainPage() {
               <Activity className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-slate-800">
-                {user?.name || user?.email || '환자'}님
-              </h1>
+              <button
+                onClick={() => navigate('/patient/profile')}
+                className="text-lg font-bold text-slate-800 hover:text-teal-600 transition-colors cursor-pointer"
+              >
+                {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '환자'}님
+              </button>
               <p className="text-xs text-slate-400">{formatDate()}</p>
             </div>
           </div>
@@ -347,6 +356,17 @@ export default function PatientMainPage() {
                 })}
               </div>
             </section>
+
+            {/* Logout */}
+            <div className="text-center pt-4">
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                로그아웃
+              </button>
+            </div>
           </div>
         )}
       </div>

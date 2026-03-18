@@ -26,10 +26,13 @@ export default function PharmacistPlaceholderPage() {
         <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
           <Activity className="w-8 h-8 text-blue-600" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">약사용 시스템</h1>
-        <p className="text-slate-500 mb-1">
-          {user?.name || user?.email || '약사'}님 환영합니다.
-        </p>
+        <h1 className="text-2xl font-bold text-slate-800 mb-2">약국용 시스템</h1>
+        <button
+          onClick={() => navigate('/store/settings')}
+          className="text-slate-500 mb-1 hover:text-blue-600 transition-colors cursor-pointer"
+        >
+          {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '약국'}님 환영합니다.
+        </button>
         <p className="text-sm text-slate-400 mb-8">
           환자 관리와 코칭을 시작하세요.
         </p>
@@ -46,7 +49,7 @@ export default function PharmacistPlaceholderPage() {
             className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
-            연결 요청 확인
+            환자 연결 요청
           </button>
           <button
             onClick={() => navigate('/pharmacy/appointments')}
