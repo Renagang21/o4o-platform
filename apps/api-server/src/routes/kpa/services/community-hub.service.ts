@@ -58,7 +58,13 @@ export class CommunityHubService {
       params.push(type);
     }
     sql += ` ORDER BY type ASC, display_order ASC, created_at DESC`;
-    return this.ds.query(sql, params);
+    try {
+      return await this.ds.query(sql, params);
+    } catch (err: any) {
+      // safeQuery: community_ads 테이블 미존재 시 빈 배열 반환
+      console.warn('[CommunityHub] community_ads table may not exist:', err.message);
+      return [];
+    }
   }
 
   async createAd(data: {

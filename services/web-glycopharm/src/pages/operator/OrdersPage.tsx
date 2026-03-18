@@ -133,10 +133,10 @@ export default function OrdersPage() {
       });
 
       if (response.success && response.data) {
-        setOrders(response.data.orders);
-        setStats(response.data.stats);
-        setTotalPages(response.data.pagination.totalPages);
-        setTotalOrders(response.data.pagination.total);
+        setOrders(response.data.orders || []);
+        setStats(response.data.stats || EMPTY_STATS);
+        setTotalPages(response.data.pagination?.totalPages || 0);
+        setTotalOrders(response.data.pagination?.total || 0);
       } else {
         setOrders([]);
         setStats(EMPTY_STATS);

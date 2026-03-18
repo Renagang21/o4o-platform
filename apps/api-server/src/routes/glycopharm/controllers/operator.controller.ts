@@ -52,11 +52,17 @@ export function createOperatorController(
    * GET /operator/recent-orders
    * Legacy stub — returns empty until E-commerce Core integration
    */
-  router.get('/recent-orders', async (_req: Request, res: Response): Promise<void> => {
+  router.get('/recent-orders', async (req: Request, res: Response): Promise<void> => {
     try {
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
       res.json({
         success: true,
-        data: [],
+        data: {
+          orders: [],
+          stats: { todayOrders: 0, todayRevenue: 0, pendingOrders: 0, processingOrders: 0, shippedOrders: 0, avgOrderValue: 0 },
+          pagination: { page, limit, total: 0, totalPages: 0 },
+        },
         _notice: 'Order system migration in progress. Orders will be available via E-commerce Core.',
       });
     } catch (error: any) {

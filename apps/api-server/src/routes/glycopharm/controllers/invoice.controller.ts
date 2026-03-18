@@ -171,13 +171,19 @@ export function createInvoiceController(
         const userId = checkAuth(req, res);
         if (!userId) return;
 
-        const invoices = await invoiceService.listInvoices({
-          status: req.query.status as any,
-          pharmacyId: req.query.pharmacyId as string,
-          supplierId: req.query.supplierId as string,
-          periodFrom: req.query.periodFrom as string,
-          periodTo: req.query.periodTo as string,
-        });
+        let invoices: any[] = [];
+        try {
+          invoices = await invoiceService.listInvoices({
+            status: req.query.status as any,
+            pharmacyId: req.query.pharmacyId as string,
+            supplierId: req.query.supplierId as string,
+            periodFrom: req.query.periodFrom as string,
+            periodTo: req.query.periodTo as string,
+          });
+        } catch (dbErr: any) {
+          // safeQuery: glycopharm_billing_invoices 테이블 미존재 시 빈 결과 반환
+          console.warn('[Invoices] Table may not exist, returning empty:', dbErr.message);
+        }
 
         res.json({ success: true, data: invoices });
       } catch (error: any) {

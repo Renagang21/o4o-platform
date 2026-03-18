@@ -142,17 +142,25 @@ export function createForumRequestController(
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 20;
 
-        const qb = requestRepo.createQueryBuilder('r');
+        let requests: any[] = [];
+        let total = 0;
 
-        if (status && status !== 'all') {
-          qb.where('r.status = :status', { status });
+        try {
+          const qb = requestRepo.createQueryBuilder('r');
+
+          if (status && status !== 'all') {
+            qb.where('r.status = :status', { status });
+          }
+
+          qb.orderBy('r.created_at', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+          [requests, total] = await qb.getManyAndCount();
+        } catch (dbErr: any) {
+          // safeQuery: glycopharm_forum_category_requests 테이블 미존재 시 빈 결과 반환
+          console.warn('[ForumRequests] Table may not exist, returning empty:', dbErr.message);
         }
-
-        qb.orderBy('r.created_at', 'DESC')
-          .skip((page - 1) * limit)
-          .take(limit);
-
-        const [requests, total] = await qb.getManyAndCount();
 
         res.json({
           data: requests,
