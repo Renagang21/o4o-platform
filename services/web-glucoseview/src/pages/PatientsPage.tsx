@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import PlaceholderChart from '../components/PlaceholderChart';
 import { useAuth } from '../contexts/AuthContext';
-import { GlucoseTable } from '../components/common/GlucoseTable';
+import { DataTable, type Column } from '@o4o/ui';
 import { api } from '../services/api';
 import type { Customer, CreateCustomerRequest, UpdateCustomerRequest } from '../services/api';
 
@@ -387,47 +387,50 @@ export default function PatientsPage() {
 
               {/* Table (Spike - Condensed) */}
               <div className="max-h-[400px] overflow-y-auto">
-                <GlucoseTable
+                <DataTable
                   columns={[
-                    { id: 'patient', label: '환자', width: '40%' },
-                    { id: 'visit', label: '방문 정보', width: '35%' },
-                    { id: 'status', label: '상태', width: '25%', align: 'center' },
-                  ]}
-                  rows={paginatedMembers.map((member) => ({
+                    { key: 'patient', title: '환자', dataIndex: 'patient', width: '40%' },
+                    { key: 'visit', title: '방문 정보', dataIndex: 'visit', width: '35%' },
+                    { key: 'status', title: '상태', dataIndex: 'status', width: '25%', align: 'center' },
+                  ] as Column<Record<string, any>>[]}
+                  dataSource={paginatedMembers.map((member) => ({
                     id: member.id,
-                    data: {
-                      patient: (
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
-                            <span className="text-xs text-slate-500 font-medium">
-                              {member.name.slice(0, 2)}
-                            </span>
-                          </div>
-                          <span className="text-sm font-medium text-slate-900">{member.name}</span>
+                    patient: (
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs text-slate-500 font-medium">
+                            {member.name.slice(0, 2)}
+                          </span>
                         </div>
-                      ),
-                      visit: (
-                        <div className="text-sm text-slate-600">
-                          <p>{formatDate(member.last_visit)}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{member.visit_count}회 방문</p>
-                        </div>
-                      ),
-                      status: (
-                        <span className={`inline-block text-xs px-2 py-1 rounded ${
-                          member.sync_status === 'synced'
-                            ? 'bg-green-100 text-green-700'
-                            : member.sync_status === 'error'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {syncStatusLabel(member.sync_status)}
-                        </span>
-                      ),
-                    },
-                    onClick: () => setSelectedPatient(member.id),
-                    isSelected: selectedPatient === member.id,
+                        <span className="text-sm font-medium text-slate-900">{member.name}</span>
+                      </div>
+                    ),
+                    visit: (
+                      <div className="text-sm text-slate-600">
+                        <p>{formatDate(member.last_visit)}</p>
+                        <p className="text-xs text-slate-400 mt-0.5">{member.visit_count}회 방문</p>
+                      </div>
+                    ),
+                    status: (
+                      <span className={`inline-block text-xs px-2 py-1 rounded ${
+                        member.sync_status === 'synced'
+                          ? 'bg-green-100 text-green-700'
+                          : member.sync_status === 'error'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {syncStatusLabel(member.sync_status)}
+                      </span>
+                    ),
                   }))}
-                  emptyMessage="등록된 고객이 없습니다"
+                  rowKey="id"
+                  onRowClick={(record) => setSelectedPatient(record.id as string)}
+                  onRow={(record) => ({
+                    className: selectedPatient === record.id
+                      ? 'bg-blue-50 border-l-2 border-l-blue-500'
+                      : 'hover:bg-slate-50 cursor-pointer',
+                  })}
+                  emptyText="등록된 고객이 없습니다"
                 />
               </div>
 

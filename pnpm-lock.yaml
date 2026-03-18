@@ -3375,6 +3375,9 @@ importers:
       '@o4o/types':
         specifier: workspace:*
         version: link:../types
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -3719,6 +3722,9 @@ importers:
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)

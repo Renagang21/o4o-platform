@@ -18,7 +18,7 @@ import {
   ArrowLeft,
   AlertCircle,
 } from 'lucide-react';
-import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../../components/common/SimpleTable';
+import { DataTable, type Column } from '@o4o/ui';
 import { operatorRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
@@ -180,46 +180,45 @@ export default function RegistrationRequestsPage() {
 
   const pendingCount = requests.filter(r => r.status === 'PENDING').length;
 
-  // SimpleTable columns (축약 버전: 4개 컬럼)
-  const columns: SimpleTableColumn[] = [
-    { id: 'applicant', label: '신청자', width: '35%' },
-    { id: 'company', label: '회사 / 면허', width: '25%' },
-    { id: 'date', label: '신청일', width: '20%' },
-    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  // DataTable columns (축약 버전: 4개 컬럼 + 액션)
+  const columns: Column<Record<string, any>>[] = [
+    { key: 'applicant', title: '신청자', dataIndex: 'applicant', width: '30%' },
+    { key: 'company', title: '회사 / 면허', dataIndex: 'company', width: '20%' },
+    { key: 'date', title: '신청일', dataIndex: 'date', width: '15%' },
+    { key: 'status', title: '상태', dataIndex: 'status', width: '15%', align: 'center' },
+    { key: 'actions', title: '', dataIndex: 'actions', width: '20%' },
   ];
 
-  // SimpleTable rows
-  const tableRows: SimpleTableRow[] = filteredRequests.map((request) => ({
+  // DataTable rows
+  const tableRows = filteredRequests.map((request) => ({
     id: request.id,
-    data: {
-      applicant: (
-        <div>
-          <div className="font-medium text-gray-900">{request.name}</div>
-          <div className="text-sm text-gray-600">{roleLabels[request.role]}</div>
-          <div className="text-sm text-gray-500">{request.email}</div>
-        </div>
-      ),
-      company: (
-        <div className="text-sm text-gray-900">
-          {request.companyName || request.licenseNumber || '-'}
-          {request.businessNumber && (
-            <div className="text-sm text-gray-500 mt-1">{request.businessNumber}</div>
-          )}
-        </div>
-      ),
-      date: (
-        <div className="text-sm text-gray-600">
-          {new Date(request.createdAt).toLocaleDateString('ko-KR')}
-        </div>
-      ),
-      status: (
-        <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status]}`}>
-          {statusLabels[request.status]}
-        </span>
-      ),
-    },
+    applicant: (
+      <div>
+        <div className="font-medium text-gray-900">{request.name}</div>
+        <div className="text-sm text-gray-600">{roleLabels[request.role]}</div>
+        <div className="text-sm text-gray-500">{request.email}</div>
+      </div>
+    ),
+    company: (
+      <div className="text-sm text-gray-900">
+        {request.companyName || request.licenseNumber || '-'}
+        {request.businessNumber && (
+          <div className="text-sm text-gray-500 mt-1">{request.businessNumber}</div>
+        )}
+      </div>
+    ),
+    date: (
+      <div className="text-sm text-gray-600">
+        {new Date(request.createdAt).toLocaleDateString('ko-KR')}
+      </div>
+    ),
+    status: (
+      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status]}`}>
+        {statusLabels[request.status]}
+      </span>
+    ),
     actions: (
-      <>
+      <div className="flex gap-2">
         <button
           onClick={() => setSelectedRequest(request)}
           className="text-xs text-blue-600 hover:text-blue-800 font-medium"
@@ -247,7 +246,7 @@ export default function RegistrationRequestsPage() {
             </button>
           </>
         )}
-      </>
+      </div>
     ),
   }));
 
@@ -359,11 +358,12 @@ export default function RegistrationRequestsPage() {
 
         {/* Request List - SimpleTable */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <SimpleTable
+          <DataTable
             columns={columns}
-            rows={tableRows}
+            dataSource={tableRows}
+            rowKey="id"
             loading={loading}
-            emptyMessage="조건에 맞는 가입 신청이 없습니다"
+            emptyText="조건에 맞는 가입 신청이 없습니다"
           />
         </div>
 

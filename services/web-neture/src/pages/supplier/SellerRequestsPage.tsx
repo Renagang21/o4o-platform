@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Clock, CheckCircle, XCircle, PauseCircle, Ban } from 'lucide-react';
 import { supplierApi, type SupplierRequest, type SupplierRequestStatus } from '../../lib/api';
-import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
+import { DataTable, type Column } from '@o4o/ui';
 
 // 서비스 아이콘 맵핑
 const SERVICE_ICONS: Record<string, string> = {
@@ -73,52 +73,51 @@ export default function SellerRequestsPage() {
     return true;
   });
 
-  // SimpleTable columns (축약 버전: 4개 컬럼)
-  const columns: SimpleTableColumn[] = [
-    { id: 'seller', label: '판매자', width: '30%' },
-    { id: 'service', label: '서비스', width: '20%' },
-    { id: 'date', label: '신청일', width: '25%' },
-    { id: 'status', label: '상태', width: '25%', align: 'center' },
+  // DataTable columns (축약 버전: 4개 컬럼 + 액션)
+  const columns: Column<Record<string, any>>[] = [
+    { key: 'seller', title: '판매자', dataIndex: 'seller', width: '25%' },
+    { key: 'service', title: '서비스', dataIndex: 'service', width: '20%' },
+    { key: 'date', title: '신청일', dataIndex: 'date', width: '20%' },
+    { key: 'status', title: '상태', dataIndex: 'status', width: '20%', align: 'center' },
+    { key: 'actions', title: '', dataIndex: 'actions', width: '15%' },
   ];
 
-  // SimpleTable rows
-  const tableRows: SimpleTableRow[] = filteredRequests.map((req) => {
+  // DataTable rows
+  const tableRows = filteredRequests.map((req) => {
     const statusConfig = STATUS_CONFIG[req.status];
     const StatusIcon = statusConfig.icon;
 
     return {
       id: req.id,
-      data: {
-        seller: (
-          <div>
-            <div className="font-medium text-gray-900">{req.sellerName}</div>
-            <div className="text-sm text-gray-600">{req.productName}</div>
-          </div>
-        ),
-        service: (
-          <div className="flex items-center gap-2">
-            <span className="text-lg">{SERVICE_ICONS[req.serviceId] || '📦'}</span>
-            <span className="text-sm text-gray-700">{req.serviceName}</span>
-          </div>
-        ),
-        date: (
-          <div className="text-sm text-gray-600">
-            {new Date(req.requestedAt).toLocaleString('ko-KR')}
-          </div>
-        ),
-        status: (
-          <div
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
-            style={{
-              backgroundColor: statusConfig.bgColor,
-              color: statusConfig.color,
-            }}
-          >
-            <StatusIcon size={12} />
-            {statusConfig.label}
-          </div>
-        ),
-      },
+      seller: (
+        <div>
+          <div className="font-medium text-gray-900">{req.sellerName}</div>
+          <div className="text-sm text-gray-600">{req.productName}</div>
+        </div>
+      ),
+      service: (
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{SERVICE_ICONS[req.serviceId] || '📦'}</span>
+          <span className="text-sm text-gray-700">{req.serviceName}</span>
+        </div>
+      ),
+      date: (
+        <div className="text-sm text-gray-600">
+          {new Date(req.requestedAt).toLocaleString('ko-KR')}
+        </div>
+      ),
+      status: (
+        <div
+          className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium"
+          style={{
+            backgroundColor: statusConfig.bgColor,
+            color: statusConfig.color,
+          }}
+        >
+          <StatusIcon size={12} />
+          {statusConfig.label}
+        </div>
+      ),
       actions: (
         <button
           onClick={() => navigate(`/supplier/requests/${req.id}`)}
@@ -197,11 +196,12 @@ export default function SellerRequestsPage() {
 
       {/* Request List - SimpleTable */}
       <div style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <SimpleTable
+        <DataTable
           columns={columns}
-          rows={tableRows}
+          dataSource={tableRows}
+          rowKey="id"
           loading={loading}
-          emptyMessage="조건에 맞는 신청이 없습니다"
+          emptyText="조건에 맞는 신청이 없습니다"
         />
       </div>
     </div>

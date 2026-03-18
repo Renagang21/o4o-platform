@@ -11,14 +11,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FolderOpen, AlertCircle } from 'lucide-react';
 import { supplierApi, type SupplierLibraryItem } from '../../lib/api';
-import { SimpleTable, type SimpleTableColumn, type SimpleTableRow } from '../../components/common/SimpleTable';
+import { DataTable, type Column } from '@o4o/ui';
 
-const columns: SimpleTableColumn[] = [
-  { id: 'title', label: '제목', width: '35%' },
-  { id: 'category', label: '카테고리', width: '15%' },
-  { id: 'fileName', label: '파일명', width: '20%' },
-  { id: 'isPublic', label: '공개', width: '10%', align: 'center' },
-  { id: 'createdAt', label: '생성일', width: '20%' },
+const columns: Column<Record<string, any>>[] = [
+  { key: 'title', title: '제목', dataIndex: 'title', width: '30%' },
+  { key: 'category', title: '카테고리', dataIndex: 'category', width: '15%' },
+  { key: 'fileName', title: '파일명', dataIndex: 'fileName', width: '20%' },
+  { key: 'isPublic', title: '공개', dataIndex: 'isPublic', width: '10%', align: 'center' },
+  { key: 'createdAt', title: '생성일', dataIndex: 'createdAt', width: '15%' },
+  { key: 'actions', title: '', dataIndex: 'actions', width: '10%' },
 ];
 
 function formatDate(dateStr: string): string {
@@ -57,10 +58,9 @@ export default function SupplierLibraryPage() {
     }
   };
 
-  const rows: SimpleTableRow[] = items.map((item) => ({
+  const dataSource = items.map((item) => ({
     id: item.id,
-    data: {
-      title: (
+    title: (
         <div>
           <span style={{ fontWeight: 500 }}>{item.title}</span>
           {item.description && (
@@ -103,8 +103,7 @@ export default function SupplierLibraryPage() {
           {item.isPublic ? '공개' : '비공개'}
         </span>
       ),
-      createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
-    },
+    createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
     actions: (
       <div style={{ display: 'flex', gap: '8px' }}>
         <button
@@ -175,11 +174,12 @@ export default function SupplierLibraryPage() {
       </div>
 
       {/* Table */}
-      <SimpleTable
+      <DataTable
         columns={columns}
-        rows={rows}
+        dataSource={dataSource}
+        rowKey="id"
         loading={loading}
-        emptyMessage="등록된 자료가 없습니다"
+        emptyText="등록된 자료가 없습니다"
       />
 
       {/* Delete Confirm Modal */}

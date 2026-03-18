@@ -23,8 +23,7 @@ import {
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyProduct, type ProductAiTagData, type ProductSearchResultData } from '@/api/pharmacy';
 import { toast } from '@o4o/error-handling';
-import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
-import { type RowAction } from '@/components/common/RowActions';
+import { DataTable, type Column } from '@o4o/ui';
 
 export default function PharmacyProducts() {
   const [products, setProducts] = useState<PharmacyProduct[]>([]);
@@ -220,39 +219,20 @@ export default function PharmacyProducts() {
   // Format price
   const formatPrice = (price: number) => `${price.toLocaleString()}원`;
 
-  // WordPress Table Columns
-  const columns: WordPressTableColumn[] = [
-    { id: 'image', label: '이미지', width: '80px' },
-    { id: 'name', label: '상품명', sortable: true },
-    { id: 'supplier', label: '공급자', width: '150px' },
-    { id: 'category', label: '카테고리', width: '120px' },
-    { id: 'price', label: '가격', width: '120px', align: 'right', sortable: true },
-    { id: 'stock', label: '재고', width: '80px', align: 'center', sortable: true },
-    { id: 'status', label: '상태', width: '100px', align: 'center' },
+  // Table Columns
+  const columns: Column<Record<string, any>>[] = [
+    { key: 'image', title: '이미지', dataIndex: 'image', width: '80px' },
+    { key: 'name', title: '상품명', dataIndex: 'name', sortable: true },
+    { key: 'supplier', title: '공급자', dataIndex: 'supplier', width: '150px' },
+    { key: 'category', title: '카테고리', dataIndex: 'category', width: '120px' },
+    { key: 'price', title: '가격', dataIndex: 'price', width: '120px', align: 'right', sortable: true },
+    { key: 'stock', title: '재고', dataIndex: 'stock', width: '80px', align: 'center', sortable: true },
+    { key: 'status', title: '상태', dataIndex: 'status', width: '100px', align: 'center' },
+    { key: 'actions', title: '', dataIndex: 'actions', width: '140px' },
   ];
 
   // Transform products to table rows
-  const tableRows: WordPressTableRow[] = products.map((product) => {
-    const actions: RowAction[] = [
-      {
-        label: '보기',
-        onClick: () => console.log('View:', product.id),
-      },
-      {
-        label: 'AI 태그',
-        onClick: () => openTagModal(product.id, product.name),
-      },
-      {
-        label: '수정',
-        onClick: () => console.log('Edit:', product.id),
-      },
-      {
-        label: '삭제',
-        onClick: () => handleDeleteProduct(product.id),
-        className: 'text-red-600 hover:bg-red-50',
-      },
-    ];
-
+  const tableRows = products.map((product) => {
     // Status badge
     const renderStatusBadge = () => {
       if (product.status === 'out_of_stock') {
@@ -278,49 +258,74 @@ export default function PharmacyProducts() {
 
     return {
       id: product.id,
-      data: {
-        image: product.thumbnailUrl ? (
-          <img
-            src={product.thumbnailUrl}
-            alt={product.name}
-            className="w-12 h-12 object-cover rounded"
-          />
-        ) : (
-          <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
-            <Package className="w-6 h-6 text-slate-400" />
-          </div>
-        ),
-        name: (
-          <div>
-            <span className="font-medium">{product.name}</span>
-            {product.isDropshipping && (
-              <p className="text-xs text-primary-600 mt-1">공급자 직배송</p>
-            )}
-          </div>
-        ),
-        supplier: <span className="text-sm text-slate-600">{product.supplierName}</span>,
-        category: (
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
-            <Tag className="w-3 h-3" />
-            {product.categoryName}
-          </span>
-        ),
-        price: (
-          <div className="text-right">
-            {product.salePrice ? (
-              <>
-                <div className="font-bold text-red-600">{formatPrice(product.salePrice)}</div>
-                <div className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</div>
-              </>
-            ) : (
-              <div className="font-bold">{formatPrice(product.price)}</div>
-            )}
-          </div>
-        ),
-        stock: <span className={product.stock === 0 ? 'text-red-600' : ''}>{product.stock}</span>,
-        status: renderStatusBadge(),
-      },
-      actions,
+      image: product.thumbnailUrl ? (
+        <img
+          src={product.thumbnailUrl}
+          alt={product.name}
+          className="w-12 h-12 object-cover rounded"
+        />
+      ) : (
+        <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
+          <Package className="w-6 h-6 text-slate-400" />
+        </div>
+      ),
+      name: (
+        <div>
+          <span className="font-medium">{product.name}</span>
+          {product.isDropshipping && (
+            <p className="text-xs text-primary-600 mt-1">공급자 직배송</p>
+          )}
+        </div>
+      ),
+      supplier: <span className="text-sm text-slate-600">{product.supplierName}</span>,
+      category: (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 text-xs text-slate-600">
+          <Tag className="w-3 h-3" />
+          {product.categoryName}
+        </span>
+      ),
+      price: (
+        <div className="text-right">
+          {product.salePrice ? (
+            <>
+              <div className="font-bold text-red-600">{formatPrice(product.salePrice)}</div>
+              <div className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</div>
+            </>
+          ) : (
+            <div className="font-bold">{formatPrice(product.price)}</div>
+          )}
+        </div>
+      ),
+      stock: <span className={product.stock === 0 ? 'text-red-600' : ''}>{product.stock}</span>,
+      status: renderStatusBadge(),
+      actions: (
+        <div className="flex gap-2">
+          <button
+            onClick={() => console.log('View:', product.id)}
+            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+          >
+            보기
+          </button>
+          <button
+            onClick={() => openTagModal(product.id, product.name)}
+            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+          >
+            AI 태그
+          </button>
+          <button
+            onClick={() => console.log('Edit:', product.id)}
+            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+          >
+            수정
+          </button>
+          <button
+            onClick={() => handleDeleteProduct(product.id)}
+            className="text-xs text-red-600 hover:text-red-800 font-medium"
+          >
+            삭제
+          </button>
+        </div>
+      ),
     };
   });
 
@@ -647,11 +652,12 @@ export default function PharmacyProducts() {
           ) : (
             /* Table View */
             <div className="bg-white rounded-xl shadow-sm">
-              <WordPressTable
+              <DataTable
                 columns={columns}
-                rows={tableRows}
+                dataSource={tableRows}
+                rowKey="id"
                 loading={loading}
-                emptyMessage="등록된 상품이 없습니다"
+                emptyText="등록된 상품이 없습니다"
               />
             </div>
           )}

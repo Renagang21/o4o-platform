@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { CosmeticsTable, type CosmeticsTableColumn, type CosmeticsTableRow } from '../../components/common/CosmeticsTable';
+import { DataTable, type Column } from '@o4o/ui';
 
 const applications = [
   { id: 1, storeName: '뷰티마트 잠실점', owner: '김미영', phone: '010-1234-5678', type: '신규입점', status: '검토중', appliedDate: '2024-01-15' },
@@ -38,41 +38,40 @@ export default function ApplicationsPage() {
     statusFilter === 'all' || app.status === statusFilter
   );
 
-  // CosmeticsTable 컬럼 정의 (4개 - 축약형, 기존 7개에서 축약)
-  const columns: CosmeticsTableColumn[] = [
-    { id: 'store', label: '매장 정보', width: '35%' },
-    { id: 'application', label: '신청 내용', width: '25%' },
-    { id: 'contact', label: '연락처', width: '20%' },
-    { id: 'status', label: '상태', width: '20%', align: 'center' },
+  // DataTable 컬럼 정의 (4개 - 축약형 + 액션)
+  const columns: Column<Record<string, any>>[] = [
+    { key: 'store', title: '매장 정보', dataIndex: 'store', width: '30%' },
+    { key: 'application', title: '신청 내용', dataIndex: 'application', width: '25%' },
+    { key: 'contact', title: '연락처', dataIndex: 'contact', width: '15%' },
+    { key: 'status', title: '상태', dataIndex: 'status', width: '15%', align: 'center' },
+    { key: 'actions', title: '', dataIndex: 'actions', width: '15%' },
   ];
 
-  // CosmeticsTable 행 데이터 변환
-  const tableRows: CosmeticsTableRow[] = filteredApplications.map((app) => ({
+  // DataTable 행 데이터 변환
+  const tableRows = filteredApplications.map((app) => ({
     id: app.id.toString(),
-    data: {
-      store: (
-        <div>
-          <p className="font-medium text-slate-800">{app.storeName}</p>
-          <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
-        </div>
-      ),
-      application: (
-        <div>
-          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type]}`}>
-            {app.type}
-          </span>
-          <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
-        </div>
-      ),
-      contact: (
-        <p className="text-sm text-slate-600">{app.phone}</p>
-      ),
-      status: (
-        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status]}`}>
-          {app.status}
+    store: (
+      <div>
+        <p className="font-medium text-slate-800">{app.storeName}</p>
+        <p className="text-sm text-slate-600 mt-1">{app.owner}</p>
+      </div>
+    ),
+    application: (
+      <div>
+        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${typeColors[app.type]}`}>
+          {app.type}
         </span>
-      ),
-    },
+        <p className="text-sm text-slate-500 mt-1">{app.appliedDate}</p>
+      </div>
+    ),
+    contact: (
+      <p className="text-sm text-slate-600">{app.phone}</p>
+    ),
+    status: (
+      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors[app.status]}`}>
+        {app.status}
+      </span>
+    ),
     actions: (
       <button className="text-pink-600 hover:text-pink-700 font-medium text-sm">
         상세보기
@@ -131,10 +130,11 @@ export default function ApplicationsPage() {
 
       {/* Applications Table - Condensed (Spike) */}
       <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
-        <CosmeticsTable
+        <DataTable
           columns={columns}
-          rows={tableRows}
-          emptyMessage="신청이 없습니다"
+          dataSource={tableRows}
+          rowKey="id"
+          emptyText="신청이 없습니다"
         />
       </div>
     </div>

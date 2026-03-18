@@ -36,6 +36,7 @@ export * from './AGTag';
 export * from './AGTable';
 export * from './AGModal';
 export * from './AGKPIBlock';
+export * from './DataTable';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Design Core View Components v1.0 - End of File

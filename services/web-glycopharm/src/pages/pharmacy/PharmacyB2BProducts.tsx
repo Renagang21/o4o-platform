@@ -7,8 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, AlertCircle } from 'lucide-react';
-import { WordPressTable, type WordPressTableColumn, type WordPressTableRow } from '@/components/common/WordPressTable';
-import { type RowAction } from '@/components/common/RowActions';
+import { DataTable, type Column } from '@o4o/ui';
 import { pharmacyApi, type PharmacyProduct } from '@/api/pharmacy';
 
 export default function PharmacyB2BProducts() {
@@ -51,15 +50,16 @@ export default function PharmacyB2BProducts() {
     }
   };
 
-  // WordPress 테이블 컬럼 정의
-  const columns: WordPressTableColumn[] = [
-    { id: 'image', label: '이미지', width: '80px' },
-    { id: 'name', label: '상품명', sortable: true },
-    { id: 'supplier', label: '공급자', width: '150px' },
-    { id: 'category', label: '카테고리', width: '120px' },
-    { id: 'price', label: '가격', width: '120px', align: 'right' },
-    { id: 'stock', label: '재고', width: '80px', align: 'center', sortable: true },
-    { id: 'status', label: '상태', width: '100px', align: 'center' },
+  // 테이블 컬럼 정의
+  const columns: Column<Record<string, any>>[] = [
+    { key: 'image', title: '이미지', dataIndex: 'image', width: '80px' },
+    { key: 'name', title: '상품명', dataIndex: 'name', sortable: true },
+    { key: 'supplier', title: '공급자', dataIndex: 'supplier', width: '150px' },
+    { key: 'category', title: '카테고리', dataIndex: 'category', width: '120px' },
+    { key: 'price', title: '가격', dataIndex: 'price', width: '120px', align: 'right' },
+    { key: 'stock', title: '재고', dataIndex: 'stock', width: '80px', align: 'center', sortable: true },
+    { key: 'status', title: '상태', dataIndex: 'status', width: '100px', align: 'center' },
+    { key: 'actions', title: '', dataIndex: 'actions', width: '100px' },
   ];
 
   // 상태 배지 렌더링
@@ -83,54 +83,54 @@ export default function PharmacyB2BProducts() {
     return `₩${price.toLocaleString()}`;
   };
 
-  // WordPress 테이블 행 데이터 변환
-  const tableRows: WordPressTableRow[] = products.map((product) => {
-    const actions: RowAction[] = [
-      {
-        label: '보기',
-        onClick: () => console.log('View:', product.id),
-      },
-      {
-        label: '편집',
-        onClick: () => console.log('Edit:', product.id),
-      },
-    ];
-
-    return {
-      id: product.id,
-      data: {
-        image: product.thumbnailUrl ? (
-          <img
-            src={product.thumbnailUrl}
-            alt={product.name}
-            className="w-12 h-12 object-cover rounded"
-          />
+  // 테이블 행 데이터 변환
+  const tableRows = products.map((product) => ({
+    id: product.id,
+    image: product.thumbnailUrl ? (
+      <img
+        src={product.thumbnailUrl}
+        alt={product.name}
+        className="w-12 h-12 object-cover rounded"
+      />
+    ) : (
+      <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
+        NO IMAGE
+      </div>
+    ),
+    name: <span className="font-medium">{product.name}</span>,
+    supplier: product.supplierName,
+    category: product.categoryName,
+    price: (
+      <div className="text-right">
+        {product.salePrice ? (
+          <>
+            <div className="font-bold text-red-600">{formatPrice(product.salePrice)}</div>
+            <div className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</div>
+          </>
         ) : (
-          <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs">
-            NO IMAGE
-          </div>
-        ),
-        name: <span className="font-medium">{product.name}</span>,
-        supplier: product.supplierName,
-        category: product.categoryName,
-        price: (
-          <div className="text-right">
-            {product.salePrice ? (
-              <>
-                <div className="font-bold text-red-600">{formatPrice(product.salePrice)}</div>
-                <div className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</div>
-              </>
-            ) : (
-              <div className="font-bold">{formatPrice(product.price)}</div>
-            )}
-          </div>
-        ),
-        stock: <span className={product.stock === 0 ? 'text-red-600' : ''}>{product.stock}</span>,
-        status: renderStatusBadge(product.status),
-      },
-      actions,
-    };
-  });
+          <div className="font-bold">{formatPrice(product.price)}</div>
+        )}
+      </div>
+    ),
+    stock: <span className={product.stock === 0 ? 'text-red-600' : ''}>{product.stock}</span>,
+    status: renderStatusBadge(product.status),
+    actions: (
+      <div className="flex gap-2">
+        <button
+          onClick={() => console.log('View:', product.id)}
+          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+        >
+          보기
+        </button>
+        <button
+          onClick={() => console.log('Edit:', product.id)}
+          className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+        >
+          편집
+        </button>
+      </div>
+    ),
+  }));
 
   // 페이지네이션 처리
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -195,11 +195,12 @@ export default function PharmacyB2BProducts() {
           </button>
         </div>
       ) : (
-        <WordPressTable
+        <DataTable
           columns={columns}
-          rows={tableRows}
+          dataSource={tableRows}
+          rowKey="id"
           loading={loading}
-          emptyMessage="등록된 상품이 없습니다."
+          emptyText="등록된 상품이 없습니다."
         />
       )}
 
