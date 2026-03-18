@@ -118,8 +118,9 @@ describe('Pharmacy Context Middleware', () => {
     });
 
     it('user with no org → 403 GLYCOPHARM_ORG_NOT_FOUND', async () => {
-      // Query 1: org lookup → empty
-      const ds = createMockDataSource([[]]);
+      // Query 1: created_by_user_id lookup → empty
+      // Query 2: organization_members fallback → empty
+      const ds = createMockDataSource([[], []]);
       const middleware = createPharmacyContextMiddleware(ds);
 
       const user = createMockUser({ id: 'orphan-user', roles: ['glycopharm:operator'] });
@@ -132,8 +133,8 @@ describe('Pharmacy Context Middleware', () => {
       expect(next.called).toBe(false);
       expect(res.statusCode).toBe(403);
       expect(res.body.error.code).toBe('GLYCOPHARM_ORG_NOT_FOUND');
-      // Should have made only 1 query (stopped at step A)
-      expect(ds.query).toHaveBeenCalledTimes(1);
+      // 2 queries: created_by_user_id + organization_members fallback
+      expect(ds.query).toHaveBeenCalledTimes(2);
     });
 
     it('user with inactive org → 403 GLYCOPHARM_ORG_INACTIVE', async () => {

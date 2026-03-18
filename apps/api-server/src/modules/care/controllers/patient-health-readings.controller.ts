@@ -46,6 +46,20 @@ export function createPatientHealthReadingsRouter(dataSource: DataSource): Route
         return;
       }
 
+      // Resolve linked pharmacy from glucoseview_customers (source of truth)
+      let linkedPharmacyId: string | null = null;
+      try {
+        const linked = await dataSource.query(
+          `SELECT organization_id FROM glucoseview_customers WHERE email = $1 LIMIT 1`,
+          [user.email],
+        );
+        if (linked.length > 0) {
+          linkedPharmacyId = linked[0].organization_id;
+        }
+      } catch {
+        // Non-blocking: if lookup fails, save with null (patient data is never lost)
+      }
+
       const entity = repo.create({
         patientId: user.id,
         metricType: metricType || 'glucose',
@@ -55,7 +69,7 @@ export function createPatientHealthReadingsRouter(dataSource: DataSource): Route
         sourceType: 'patient_self',
         createdBy: user.id,
         metadata: metadata || {},
-        pharmacyId: null,
+        pharmacyId: linkedPharmacyId,
       });
 
       const saved = await repo.save(entity);
