@@ -13,6 +13,8 @@ export class ExtendRolesTable20260318100000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1. 컬럼 추가
     await queryRunner.query(`ALTER TABLE roles ALTER COLUMN name TYPE VARCHAR(100)`);
+    await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS display_name VARCHAR(200)`);
+    await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS description TEXT`);
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS service_key VARCHAR(50)`);
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS role_key VARCHAR(50)`);
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_admin_role BOOLEAN DEFAULT false`);
@@ -106,6 +108,8 @@ export class ExtendRolesTable20260318100000 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS is_admin_role`);
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS role_key`);
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS service_key`);
+    await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS description`);
+    await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS display_name`);
     await queryRunner.query(`ALTER TABLE roles ALTER COLUMN name TYPE VARCHAR(50)`);
   }
 }
