@@ -56,11 +56,15 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
       `);
 
       res.json({ success: true, data: pharmacies });
-    } catch (error) {
+    } catch (error: any) {
       console.error('[pharmacy-link] GET pharmacies failed:', error);
       res.status(500).json({
         success: false,
-        error: { code: 'INTERNAL_ERROR', message: 'Failed to load pharmacies' },
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to load pharmacies',
+          detail: error?.message || String(error),
+        },
       });
     }
   });
