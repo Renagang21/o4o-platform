@@ -220,7 +220,7 @@ export default function RegisterPage() {
           <Link to="/" className="inline-block mb-6">
             <h1 className="text-2xl font-bold text-slate-900">GlucoseView</h1>
           </Link>
-          <p className="text-slate-500">약사 회원가입</p>
+          <p className="text-slate-500">회원가입</p>
         </div>
 
         {/* Form */}

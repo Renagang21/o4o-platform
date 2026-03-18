@@ -165,7 +165,7 @@ export default function LoginModal() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-slate-900">
-            {syncMode ? '비밀번호 재설정' : '약사 로그인'}
+            {syncMode ? '비밀번호 재설정' : '로그인'}
           </h3>
           <button
             onClick={handleClose}
@@ -344,7 +344,7 @@ export default function LoginModal() {
                   className="text-blue-600 font-medium hover:text-blue-700 transition-colors"
                   onClick={handleClose}
                 >
-                  약사 회원가입
+                  회원가입
                 </Link>
               </div>
             </div>

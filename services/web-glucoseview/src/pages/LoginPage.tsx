@@ -191,7 +191,7 @@ export default function LoginPage() {
                 }}
                 className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
               >
-                테스트 약사 로그인
+                테스트 로그인
               </button>
             </div>
           </div>
