@@ -8,11 +8,15 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { parseServiceRole } from '../../utils/role.utils.js';
 import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 
 const approvalService = new MembershipApprovalService();
+
+/** Role suffixes that require admin-level authority to assign/remove */
+const ADMIN_ROLE_SUFFIXES = ['admin', 'super_admin'];
 
 export class MembershipConsoleController {
 
@@ -617,11 +621,28 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
-        // Non-platform-admin can only assign roles matching their service prefix
-        const allowedPrefixes = scope.serviceKeys.map((k: string) => `${k}:`);
+        // 1. Service prefix check (rolePrefixes = raw prefixes from JWT roles)
+        const allowedPrefixes = scope.rolePrefixes.map((p: string) => `${p}:`);
         if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
           res.status(403).json({ success: false, error: 'Cannot assign roles outside your service scope' });
           return;
+        }
+        // 2. Admin role restriction — only service admins can manage admin-level roles
+        const parsed = parseServiceRole(role);
+        if (parsed && ADMIN_ROLE_SUFFIXES.includes(parsed.role)) {
+          const userRoles: string[] = (req as any).user?.roles || [];
+          const callerIsServiceAdmin = scope.rolePrefixes.some(
+            (p: string) => userRoles.includes(`${p}:admin`)
+          );
+          if (!callerIsServiceAdmin) {
+            res.status(403).json({ success: false, error: 'Only admins can manage admin-level roles' });
+            return;
+          }
+          // 3. Self-assignment prevention for admin roles
+          if (assignedBy === userId) {
+            res.status(403).json({ success: false, error: 'Cannot assign admin role to yourself' });
+            return;
+          }
         }
       }
 
@@ -665,11 +686,29 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
-        // Non-platform-admin can only remove roles matching their service prefix
-        const allowedPrefixes = scope.serviceKeys.map((k: string) => `${k}:`);
+        // 1. Service prefix check (rolePrefixes = raw prefixes from JWT roles)
+        const allowedPrefixes = scope.rolePrefixes.map((p: string) => `${p}:`);
         if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
           res.status(403).json({ success: false, error: 'Cannot remove roles outside your service scope' });
           return;
+        }
+        // 2. Admin role restriction — only service admins can manage admin-level roles
+        const parsed = parseServiceRole(role);
+        if (parsed && ADMIN_ROLE_SUFFIXES.includes(parsed.role)) {
+          const userRoles: string[] = (req as any).user?.roles || [];
+          const callerIsServiceAdmin = scope.rolePrefixes.some(
+            (p: string) => userRoles.includes(`${p}:admin`)
+          );
+          if (!callerIsServiceAdmin) {
+            res.status(403).json({ success: false, error: 'Only admins can manage admin-level roles' });
+            return;
+          }
+          // 3. Self-removal prevention for admin roles
+          const requesterId = (req as any).user?.id;
+          if (requesterId === userId) {
+            res.status(403).json({ success: false, error: 'Cannot remove your own admin role' });
+            return;
+          }
         }
       }
 

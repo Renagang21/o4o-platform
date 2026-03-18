@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   ArrowLeft,
   Loader2,
@@ -197,14 +198,17 @@ const ASSIGNABLE_ROLES = [
   { value: 'glycopharm:member', label: 'GlycoPharm Member' },
 ];
 
-function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
-  userId: string; existingRoles: string[]; onClose: () => void; onSuccess: () => void;
+function RoleModal({ userId, existingRoles, isAdmin, onClose, onSuccess }: {
+  userId: string; existingRoles: string[]; isAdmin: boolean; onClose: () => void; onSuccess: () => void;
 }) {
   const [selectedRole, setSelectedRole] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const availableRoles = ASSIGNABLE_ROLES.filter(r => !existingRoles.includes(r.value));
+  const filteredRoles = isAdmin
+    ? ASSIGNABLE_ROLES
+    : ASSIGNABLE_ROLES.filter(r => !r.value.endsWith(':admin'));
+  const availableRoles = filteredRoles.filter(r => !existingRoles.includes(r.value));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,6 +273,8 @@ function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
 export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  const isCurrentUserAdmin = currentUser?.roles?.includes('admin') ?? false;
 
   const [user, setUser] = useState<UserDetail | null>(null);
   const [roles, setRoles] = useState<RoleData[]>([]);
@@ -638,7 +644,7 @@ export default function UserDetailPage() {
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
                     <td className="px-5 py-2.5">
                       <div className="flex items-center justify-end">
-                        {r.isActive && (
+                        {r.isActive && (isCurrentUserAdmin || !r.role.endsWith(':admin')) && (
                           actionLoading === `role-${r.role}` ? (
                             <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                           ) : (
@@ -742,6 +748,7 @@ export default function UserDetailPage() {
         <RoleModal
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
+          isAdmin={isCurrentUserAdmin}
           onClose={() => setShowRoleModal(false)}
           onSuccess={fetchDetail}
         />
