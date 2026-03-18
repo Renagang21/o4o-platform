@@ -21,12 +21,11 @@ import {
   MessageSquare,
   GraduationCap,
   FileText,
-  Eye,
-  MessageCircle,
   ChevronRight,
   Play,
   ListMusic,
 } from 'lucide-react';
+import { DataTable, type Column } from '@o4o/ui';
 
 // ─── Hardcoded Data ─────────────────────────────────────────
 
@@ -127,6 +126,33 @@ const partnerLogos = [
 // ─── Tabs ───────────────────────────────────────────────────
 
 const FEED_TABS: FeedTab[] = ['전체', '운영 이야기', '제품 경험', '마케팅', '강좌', '콘텐츠'];
+
+// ─── Feed Columns ───────────────────────────────────────────
+
+const feedColumns: Column<Record<string, any>>[] = [
+  { key: 'type', title: '유형', dataIndex: 'type', width: '70px' },
+  {
+    key: 'title', title: '제목', dataIndex: 'title',
+    sortable: true,
+    sorter: (a, b) => String(a._title ?? '').localeCompare(String(b._title ?? '')),
+  },
+  { key: 'author', title: '작성자', dataIndex: 'author', width: '90px' },
+  {
+    key: 'views', title: '조회', dataIndex: 'views', width: '60px', align: 'center',
+    sortable: true,
+    sorter: (a, b) => (a._views ?? 0) - (b._views ?? 0),
+  },
+  {
+    key: 'comments', title: '댓글', dataIndex: 'comments', width: '60px', align: 'center',
+    sortable: true,
+    sorter: (a, b) => (a._comments ?? 0) - (b._comments ?? 0),
+  },
+  {
+    key: 'date', title: '날짜', dataIndex: 'date', width: '100px',
+    sortable: true,
+    sorter: (a, b) => String(a._date ?? '').localeCompare(String(b._date ?? '')),
+  },
+];
 
 // ─── Main Component ─────────────────────────────────────────
 
@@ -232,16 +258,52 @@ export default function CommunityMainPage() {
             </button>
           </div>
 
-          {/* Feed List */}
-          <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-            {filteredFeed.map((item) => (
-              <FeedRow key={item.id} item={item} />
-            ))}
-            {filteredFeed.length === 0 && (
-              <div className="px-4 py-8 text-center text-sm text-slate-400">
-                해당 탭에 게시물이 없습니다.
-              </div>
-            )}
+          {/* Feed Table */}
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <DataTable
+              columns={feedColumns}
+              dataSource={filteredFeed.map((item) => ({
+                id: item.id,
+                type: (
+                  <span className={`inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium rounded ${
+                    item.type === 'lecture'
+                      ? 'bg-amber-50 text-amber-700'
+                      : item.type === 'content'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'bg-slate-100 text-slate-600'
+                  }`}>
+                    {item.type === 'lecture' && <GraduationCap className="w-3 h-3 mr-0.5" />}
+                    {item.type === 'content' && <FileText className="w-3 h-3 mr-0.5" />}
+                    {item.type === 'post' && <MessageSquare className="w-3 h-3 mr-0.5" />}
+                    {item.type === 'lecture' ? '강좌' : item.type === 'content' ? '콘텐츠' : '글'}
+                  </span>
+                ),
+                title: <span className="text-sm text-slate-800">{item.title}</span>,
+                author: (
+                  <span className="text-xs text-slate-500">
+                    {item.author || item.instructor || '—'}
+                  </span>
+                ),
+                views: (
+                  <span className="text-xs text-slate-400">
+                    {item.viewCount ?? item.participants ?? '—'}
+                  </span>
+                ),
+                comments: (
+                  <span className="text-xs text-slate-400">
+                    {item.commentCount ?? '—'}
+                  </span>
+                ),
+                date: <span className="text-xs text-slate-400">{item.date}</span>,
+                // Raw values for column sorters
+                _title: item.title,
+                _views: item.viewCount ?? item.participants ?? 0,
+                _comments: item.commentCount ?? 0,
+                _date: item.date,
+              }))}
+              rowKey="id"
+              emptyText="해당 탭에 게시물이 없습니다."
+            />
           </div>
         </section>
 
@@ -346,59 +408,3 @@ export default function CommunityMainPage() {
   );
 }
 
-// ─── Feed Row Component ─────────────────────────────────────
-
-function FeedRow({ item }: { item: FeedItem }) {
-  if (item.type === 'lecture') {
-    return (
-      <div className="px-4 py-3">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium bg-amber-50 text-amber-700 rounded">
-            <GraduationCap className="w-3 h-3 mr-0.5" />강좌
-          </span>
-          <span className="text-sm text-slate-800 truncate">{item.title}</span>
-        </div>
-        <div className="flex items-center gap-3 text-xs text-slate-400">
-          <span>{item.instructor}</span>
-          <span>참여 {item.participants}명</span>
-          <span>{item.date}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (item.type === 'content') {
-    return (
-      <div className="px-4 py-3">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium bg-blue-50 text-blue-700 rounded">
-            <FileText className="w-3 h-3 mr-0.5" />콘텐츠
-          </span>
-          <span className="text-sm text-slate-800 truncate">{item.title}</span>
-        </div>
-        <div className="flex items-center gap-3 text-xs text-slate-400">
-          <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{item.viewCount}</span>
-          <span>{item.date}</span>
-        </div>
-      </div>
-    );
-  }
-
-  // type === 'post'
-  return (
-    <div className="px-4 py-3">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium bg-slate-100 text-slate-600 rounded">
-          <MessageSquare className="w-3 h-3 mr-0.5" />글
-        </span>
-        <span className="text-sm text-slate-800 truncate">{item.title}</span>
-      </div>
-      <div className="flex items-center gap-3 text-xs text-slate-400">
-        <span>{item.author}</span>
-        <span className="flex items-center gap-0.5"><Eye className="w-3 h-3" />{item.viewCount}</span>
-        <span className="flex items-center gap-0.5"><MessageCircle className="w-3 h-3" />{item.commentCount}</span>
-        <span>{item.date}</span>
-      </div>
-    </div>
-  );
-}
