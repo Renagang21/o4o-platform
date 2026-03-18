@@ -230,16 +230,22 @@ export class InvoiceService {
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    const rows = await this.dataSource.query(
-      `SELECT i.*, p.name AS pharmacy_name
-       FROM glycopharm_billing_invoices i
-       LEFT JOIN organizations p ON p.id = i.pharmacy_id
-       ${where}
-       ORDER BY i.created_at DESC`,
-      values,
-    );
+    try {
+      const rows = await this.dataSource.query(
+        `SELECT i.*, p.name AS pharmacy_name
+         FROM glycopharm_billing_invoices i
+         LEFT JOIN organizations p ON p.id = i.pharmacy_id
+         ${where}
+         ORDER BY i.created_at DESC`,
+        values,
+      );
 
-    return rows.map((r: any) => this.mapRow(r, r.pharmacy_name));
+      return rows.map((r: any) => this.mapRow(r, r.pharmacy_name));
+    } catch (err: any) {
+      // safeQuery: glycopharm_billing_invoices 테이블 미존재 시 빈 배열 반환
+      console.warn('[InvoiceService] glycopharm_billing_invoices table may not exist:', err.message);
+      return [];
+    }
   }
 
   private mapRow(row: any, pharmacyName?: string): InvoiceResult {

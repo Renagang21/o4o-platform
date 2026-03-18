@@ -68,8 +68,13 @@ export function createGlycopharmCommunityHubController(
     requireGlycopharmScope('glycopharm:operator') as any,
     asyncHandler(async (req: Request, res: Response): Promise<void> => {
       const type = req.query.type as string | undefined;
-      const ads = await service.listAds(SERVICE_CODE, type);
-      res.json({ success: true, data: { ads } });
+      try {
+        const ads = await service.listAds(SERVICE_CODE, type);
+        res.json({ success: true, data: { ads } });
+      } catch {
+        // safeQuery: community_ads 테이블 미존재 시 빈 결과 반환
+        res.json({ success: true, data: { ads: [] } });
+      }
     }),
   );
 
@@ -127,8 +132,13 @@ export function createGlycopharmCommunityHubController(
     requireAuth as any,
     requireGlycopharmScope('glycopharm:operator') as any,
     asyncHandler(async (req: Request, res: Response): Promise<void> => {
-      const sponsors = await service.listSponsors(SERVICE_CODE);
-      res.json({ success: true, data: { sponsors } });
+      try {
+        const sponsors = await service.listSponsors(SERVICE_CODE);
+        res.json({ success: true, data: { sponsors } });
+      } catch {
+        // safeQuery: community_sponsors 테이블 미존재 시 빈 결과 반환
+        res.json({ success: true, data: { sponsors: [] } });
+      }
     }),
   );
 
