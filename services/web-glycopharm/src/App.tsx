@@ -167,6 +167,8 @@ const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
 // Community Hub (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
+// WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1: New community main page
+const CommunityMainPage = lazy(() => import('@/pages/community/CommunityMainPage'));
 const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
 
 // Forum & Education
@@ -359,8 +361,8 @@ function AppRoutes() {
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
         <Route path="role-select" element={<RoleSelectPage />} />
-        {/* Community Hub (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
-        <Route path="community" element={<CommunityHubPage />} />
+        {/* WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1 */}
+        <Route path="community" element={<CommunityMainPage />} />
         <Route path="forum" element={<ForumHubPage />} />
         <Route path="forum/write" element={<ForumWritePage />} />
         <Route path="forum/posts" element={<ForumPage />} />
