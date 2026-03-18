@@ -21,6 +21,8 @@ export class ExtendRolesTable20260318100000 implements MigrationInterface {
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_system BOOLEAN DEFAULT false`);
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true`);
     await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_assignable BOOLEAN DEFAULT true`);
+    await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now()`);
+    await queryRunner.query(`ALTER TABLE roles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now()`);
 
     // 2. 인덱스
     await queryRunner.query(`CREATE INDEX IF NOT EXISTS idx_roles_service_key ON roles(service_key)`);
@@ -106,6 +108,8 @@ export class ExtendRolesTable20260318100000 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP INDEX IF EXISTS idx_roles_service_role`);
     await queryRunner.query(`DROP INDEX IF EXISTS idx_roles_service_key`);
+    await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS updated_at`);
+    await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS created_at`);
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS is_assignable`);
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS is_active`);
     await queryRunner.query(`ALTER TABLE roles DROP COLUMN IF EXISTS is_system`);
