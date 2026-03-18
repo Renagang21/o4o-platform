@@ -11,8 +11,39 @@ import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
+import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 
 export class AdminUserController {
+
+  // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
+  private ensureServiceMemberships = async (userId: string, roles: string[]): Promise<void> => {
+    const smRepo = AppDataSource.getRepository<ServiceMembership>('ServiceMembership');
+    const processedServices = new Set<string>();
+
+    for (const r of roles) {
+      const parts = r.split(':');
+      if (parts.length === 2) {
+        const [serviceKey, roleName] = parts;
+        if (!processedServices.has(serviceKey)) {
+          processedServices.add(serviceKey);
+          const existing = await smRepo.findOne({ where: { userId, serviceKey } as any });
+          if (!existing) {
+            const membership = smRepo.create({
+              userId,
+              serviceKey,
+              status: 'active',
+              role: roleName,
+            } as any);
+            await smRepo.save(membership);
+          } else if ((existing as any).status !== 'active') {
+            (existing as any).status = 'active';
+            (existing as any).role = roleName;
+            await smRepo.save(existing);
+          }
+        }
+      }
+    }
+  };
   
   // Get all users with pagination and filters
   // WO-OPERATOR-FIX-V1: JOIN role_assignments to include roles in response
@@ -184,12 +215,17 @@ export class AdminUserController {
           await roleAssignmentService.assignRole({ userId: existingUser.id, role: r });
         }
 
+        // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
+        await this.ensureServiceMemberships(existingUser.id, rolesToAssign);
+
         const { password: _, ...userWithoutPassword } = existingUser;
 
         res.status(200).json({
           success: true,
           user: userWithoutPassword,
-          message: 'Roles added to existing user'
+          message: 'Roles added to existing user',
+          isExistingUser: true,
+          passwordPolicy: 'KEEP_EXISTING_PASSWORD'
         });
         return;
       }
@@ -212,13 +248,13 @@ export class AdminUserController {
 
       // WO-OPERATOR-FIX-V1: Support multiple roles from frontend
       // Write to role_assignments (SSOT)
-      if (Array.isArray(rolesArray) && rolesArray.length > 0) {
-        for (const r of rolesArray) {
-          await roleAssignmentService.assignRole({ userId: savedUser.id, role: r });
-        }
-      } else {
-        await roleAssignmentService.assignRole({ userId: savedUser.id, role });
+      const rolesToAssignNew = Array.isArray(rolesArray) && rolesArray.length > 0 ? rolesArray : [role];
+      for (const r of rolesToAssignNew) {
+        await roleAssignmentService.assignRole({ userId: savedUser.id, role: r });
       }
+
+      // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
+      await this.ensureServiceMemberships(savedUser.id, rolesToAssignNew);
 
       // Remove password from response
       const { password: _, ...userWithoutPassword } = savedUser;
