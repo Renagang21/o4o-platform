@@ -755,6 +755,11 @@ class PharmacyApiClient {
     return this.request(`/care/coaching/${patientId}`);
   }
 
+  // WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
+  async getAllCoachingSessions(): Promise<CoachingSessionWithPatient[]> {
+    return this.request('/care/coaching');
+  }
+
   // WO-O4O-CARE-AI-COACHING-DRAFT-V1
   async getCoachingDraft(patientId: string): Promise<CoachingDraftDto | null> {
     return this.request(`/care/coaching-drafts/${patientId}`);
@@ -1034,6 +1039,11 @@ export interface PriorityPatientDto {
   tir: number;
   lastReadingAt: string | null;
   reasons: string[];
+}
+
+// WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
+export interface CoachingSessionWithPatient extends CoachingSession {
+  patientName: string;
 }
 
 // WO-O4O-CARE-AI-COACHING-DRAFT-V1
