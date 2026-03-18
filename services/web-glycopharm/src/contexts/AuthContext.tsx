@@ -85,6 +85,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
 const ROLE_MAP: Record<string, UserRole> = {
   pharmacy: 'pharmacy',
+  pharmacist: 'pharmacy',  // WO-GLYCOPHARM-PHARMACY-ROLE-ALIGNMENT-V1: backward-compat
   seller: 'pharmacy',
   customer: 'pharmacy',
   user: 'pharmacy',

@@ -35,9 +35,9 @@ const TEST_ACCOUNTS: TestAccount[] = [
   },
   {
     email: 'pharmacist_test@glycopharm.co.kr',
-    name: '테스트 약사',
-    membershipRole: 'pharmacist',
-    assignedRole: 'pharmacist',
+    name: '테스트 약국',
+    membershipRole: 'pharmacy',
+    assignedRole: 'pharmacy',
   },
 ];
 

@@ -22,7 +22,8 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const returnUrl = (location.state as any)?.from;
-  const loginType = searchParams.get('type') // 'patient' | 'pharmacist' | 'operator' | null
+  const rawType = searchParams.get('type'); // 'patient' | 'pharmacy' | 'pharmacist' | 'operator' | null
+  const loginType = (rawType === 'pharmacist' ? 'pharmacy' : rawType)
     || (location.pathname.startsWith('/admin') ? 'operator' : null);
 
   const [email, setEmail] = useState('');
@@ -61,7 +62,7 @@ export default function LoginPage() {
         navigate(returnUrl);
       } else if (loginType === 'patient') {
         navigate('/patient');
-      } else if (loginType === 'pharmacist') {
+      } else if (loginType === 'pharmacy') {
         navigate('/care');
       } else if (loginType === 'operator') {
         navigate('/operator');
@@ -76,7 +77,7 @@ export default function LoginPage() {
 
   const subtitle = loginType === 'patient'
     ? '환자용 시스템 로그인'
-    : loginType === 'pharmacist'
+    : loginType === 'pharmacy'
       ? '약국용 시스템 로그인'
       : loginType === 'operator'
         ? '운영자 로그인'

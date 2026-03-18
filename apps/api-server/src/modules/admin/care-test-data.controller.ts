@@ -75,14 +75,14 @@ const TEST_PASSWORD = 'Test1234!';
 
 const TEST_USERS = [
   { id: TU.admin,  email: 'care.admin@test.glycopharm.com',   name: '[TEST] Care 운영자', roles: ['platform:admin'] },
-  { id: TU.pharmA, email: 'pharmacist.a@test.glycopharm.com', name: '[TEST] 약사 김',     roles: ['glycopharm:pharmacist'] },
-  { id: TU.pharmB, email: 'pharmacist.b@test.glycopharm.com', name: '[TEST] 약사 이',     roles: ['glycopharm:pharmacist'] },
+  { id: TU.pharmA, email: 'pharmacist.a@test.glycopharm.com', name: '[TEST] 약사 김',     roles: ['glycopharm:pharmacy'] },
+  { id: TU.pharmB, email: 'pharmacist.b@test.glycopharm.com', name: '[TEST] 약사 이',     roles: ['glycopharm:pharmacy'] },
 ];
 
 const TEST_ROLE_ASSIGNMENTS = [
   { id: TR.admin,  userId: TU.admin,  role: 'platform:admin',        scopeType: 'global',       scopeId: null },
-  { id: TR.pharmA, userId: TU.pharmA, role: 'glycopharm:pharmacist', scopeType: 'organization', scopeId: TO.pharmA },
-  { id: TR.pharmB, userId: TU.pharmB, role: 'glycopharm:pharmacist', scopeType: 'organization', scopeId: TO.pharmB },
+  { id: TR.pharmA, userId: TU.pharmA, role: 'glycopharm:pharmacy', scopeType: 'organization', scopeId: TO.pharmA },
+  { id: TR.pharmB, userId: TU.pharmB, role: 'glycopharm:pharmacy', scopeType: 'organization', scopeId: TO.pharmB },
 ];
 
 const TEST_ORGS = [
