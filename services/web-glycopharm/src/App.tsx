@@ -165,9 +165,7 @@ const StoreProducts = lazy(() => import('@/pages/store/StoreProducts'));
 const StoreProductDetail = lazy(() => import('@/pages/store/StoreProductDetail'));
 const StoreCart = lazy(() => import('@/pages/store/StoreCart'));
 
-// Community Hub (WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1)
-const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
-// WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1: New community main page
+// WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1: Community main page
 const CommunityMainPage = lazy(() => import('@/pages/community/CommunityMainPage'));
 const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
 
