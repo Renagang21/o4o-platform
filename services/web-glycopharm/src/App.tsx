@@ -514,6 +514,8 @@ function AppRoutes() {
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
         <Route path="care" element={<OperatorCareDashboardPage />} />
         <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
+        {/* Settings */}
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
 
       {/* Consumer Store (Subdirectory) */}
