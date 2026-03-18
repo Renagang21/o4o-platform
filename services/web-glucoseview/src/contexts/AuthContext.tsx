@@ -90,6 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
           const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+
+          // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+          if (!roles.includes('patient')) {
+            clearAllTokens();
+            setIsLoading(false);
+            return;
+          }
+
           const base = normalizeUser(apiUser);
           const userData: User = {
             ...base,
@@ -126,6 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+
+        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+        if (!roles.includes('patient')) {
+          clearAllTokens();
+          return { success: false, message: 'GlucoseView는 환자 전용 서비스입니다. 약사는 GlycoPharm을 이용해주세요.' };
+        }
+
         const base = normalizeUser(apiUser);
 
         // API 상태를 ApprovalStatus로 매핑
@@ -177,6 +192,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+
+        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+        if (!roles.includes('patient')) {
+          clearAllTokens();
+          return { success: false, message: 'GlucoseView는 환자 전용 서비스입니다.' };
+        }
+
         const base = normalizeUser(apiUser);
         const userData: User = {
           ...base,
