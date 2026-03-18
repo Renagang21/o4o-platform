@@ -10,7 +10,7 @@
  * Flow:
  * 1. Requires auth (req.user must exist — use after authenticate middleware)
  * 2. Admin bypass: glycopharm:admin / platform:admin → pharmacyId = null (global access)
- * 3. Looks up organization where created_by_user_id = userId
+ * 3. Looks up organization: created_by_user_id → organization_members fallback
  * 4. Checks glycopharm enrollment
  * 5. Sets req.pharmacyId
  *
@@ -61,11 +61,26 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
     }
 
     try {
-      // Step A: Find organization created by this user
-      const orgResult = await dataSource.query(
+      // Step A: Find organization for this user
+      // Priority 1: created_by_user_id (pharmacy owner/creator)
+      // Priority 2: organization_members (staff pharmacist, multi-user pharmacies)
+      let orgResult = await dataSource.query(
         `SELECT id, "isActive" FROM organizations WHERE created_by_user_id = $1 LIMIT 1`,
         [userId],
       );
+
+      if (orgResult.length === 0) {
+        // Fallback: check organization_members
+        orgResult = await dataSource.query(
+          `SELECT o.id, o."isActive"
+           FROM organizations o
+           JOIN organization_members om ON om.organization_id = o.id
+           WHERE om.user_id = $1 AND om.left_at IS NULL
+           ORDER BY om.is_primary DESC
+           LIMIT 1`,
+          [userId],
+        );
+      }
 
       if (orgResult.length === 0) {
         res.status(403).json({

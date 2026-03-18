@@ -80,6 +80,64 @@ router.post('/', async (_req: Request, res: Response): Promise<void> => {
         [userId, account.assignedRole]
       );
       logs.push(`[SEED]   role: ${account.assignedRole}`);
+
+      // 4. For pharmacy role: ensure organization + enrollment + membership
+      if (account.assignedRole === 'pharmacy') {
+        // 4a. Find or create organization for this pharmacist
+        const existingOrg = await AppDataSource.query(
+          `SELECT id FROM organizations WHERE created_by_user_id = $1 LIMIT 1`,
+          [userId],
+        );
+        let orgId: string;
+
+        if (existingOrg.length > 0) {
+          orgId = existingOrg[0].id;
+          logs.push(`[SEED]   org exists: ${orgId}`);
+        } else {
+          // Also check organization_members
+          const memberOrg = await AppDataSource.query(
+            `SELECT organization_id AS id FROM organization_members WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
+            [userId],
+          );
+
+          if (memberOrg.length > 0) {
+            orgId = memberOrg[0].id;
+            logs.push(`[SEED]   org (via membership): ${orgId}`);
+          } else {
+            // Create a test pharmacy organization
+            const orgCode = `TEST-SEED-${account.email.split('@')[0].toUpperCase()}`;
+            const orgResult = await AppDataSource.query(
+              `INSERT INTO organizations (id, name, code, type, level, path, "isActive", created_by_user_id, "createdAt", "updatedAt")
+               VALUES (gen_random_uuid(), $1, $2, 'pharmacy', 0, $3, true, $4, NOW(), NOW())
+               ON CONFLICT (code) DO UPDATE SET created_by_user_id = $4, "updatedAt" = NOW()
+               RETURNING id`,
+              [account.name, orgCode, `/${orgCode}`, userId],
+            );
+            orgId = orgResult[0].id;
+            logs.push(`[SEED]   org created: ${orgId} (${orgCode})`);
+          }
+        }
+
+        // 4b. Ensure organization_members record
+        await AppDataSource.query(
+          `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, $2, 'owner', true, NOW(), NOW(), NOW())
+           ON CONFLICT ON CONSTRAINT "UQ_org_member_org_user" DO NOTHING`,
+          [orgId, userId],
+        );
+        logs.push(`[SEED]   org_member: owner`);
+
+        // 4c. Ensure glycopharm + glucoseview enrollments
+        for (const svcCode of SERVICE_KEYS) {
+          await AppDataSource.query(
+            `INSERT INTO organization_service_enrollments (id, organization_id, service_code, status, enrolled_at, created_at, updated_at)
+             VALUES (gen_random_uuid(), $1, $2, 'active', NOW(), NOW(), NOW())
+             ON CONFLICT DO NOTHING`,
+            [orgId, svcCode],
+          );
+        }
+        logs.push(`[SEED]   enrollments: ${SERVICE_KEYS.join(', ')}`);
+      }
     }
 
     res.json({ success: true, logs });
