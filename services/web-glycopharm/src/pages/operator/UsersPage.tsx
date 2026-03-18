@@ -25,6 +25,8 @@ import {
   AlertCircle,
   X,
   ChevronRight,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
@@ -128,12 +130,13 @@ function getRoleLabel(u: UserData): string {
 
 function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: () => void; onSuccess: () => void }) {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) { setError('비밀번호는 최소 6자 이상이어야 합니다.'); return; }
+    if (password.length < 8) { setError('비밀번호는 최소 8자 이상이어야 합니다.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -141,10 +144,18 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
         method: 'PUT',
         body: JSON.stringify({ password }),
       });
+      toast.success('비밀번호가 변경되었습니다.');
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message);
+      const msg = err?.message || '비밀번호 변경에 실패했습니다.';
+      if (msg.includes('ROLE_REQUIRED') || msg.includes('role')) {
+        setError('비밀번호 변경 권한이 없습니다.');
+      } else if (msg.includes('not found') || msg.includes('404')) {
+        setError('사용자를 찾을 수 없습니다.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setLoading(false);
     }
@@ -164,15 +175,24 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="새 비밀번호 (6자 이상)"
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            required
-            minLength={6}
-          />
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="새 비밀번호 (8자 이상)"
+              className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              required
+              minLength={8}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
             <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">

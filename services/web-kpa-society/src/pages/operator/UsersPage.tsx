@@ -1,15 +1,16 @@
 /**
  * Operator Users Page — 회원 관리
- * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1
  *
- * /api/v1/operator/members API (Extension Layer)
+ * MembershipConsole API 기반 (/api/v1/operator/members)
+ * GlycoPharm 표준 구현 복제
+ *
  * 탭: 회원 목록 | 가입 신청
  * 기능: 승인, 거부, 비밀번호 변경, 삭제, 멤버십 표시, 상세 페이지 이동
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@o4o/error-handling';
 import {
   Users,
   Search,
@@ -20,16 +21,17 @@ import {
   UserCheck,
   UserX,
   KeyRound,
+  Pencil,
   Trash2,
   Loader2,
   AlertCircle,
   X,
   ChevronRight,
-  Pencil,
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { api } from '../../lib/apiClient';
+import { authClient } from '@o4o/auth-client';
+import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -48,6 +50,9 @@ interface UserData {
   firstName?: string;
   lastName?: string;
   name?: string;
+  nickname?: string;
+  phone?: string;
+  company?: string;
   status: string;
   roles?: string[];
   role?: string;
@@ -68,16 +73,13 @@ type Tab = 'all' | 'pending';
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  // WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반
-  const axiosPath = path.replace(/^\/api\/v1/, '') || '/';
-  const method = (options?.method || 'GET').toLowerCase();
-  let body: any = undefined;
+  const url = path.replace(/^\/api\/v1/, '') || '/';
+  const method = (options?.method || 'GET').toUpperCase();
+  let body: any;
   if (options?.body && typeof options.body === 'string') {
     try { body = JSON.parse(options.body); } catch { body = options.body; }
   }
-  const response = method === 'get' || method === 'delete'
-    ? await api[method as 'get' | 'delete'](axiosPath)
-    : await (api as any)[method](axiosPath, body);
+  const response = await authClient.api.request({ method, url, data: body });
   return response.data;
 }
 
@@ -278,7 +280,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -292,7 +294,7 @@ export default function UsersPage() {
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -354,23 +356,25 @@ export default function UsersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
-            placeholder="이름, 이메일로 검색"
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <div className="relative flex-1 min-w-[200px] max-w-md flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
+              placeholder="이름, 이메일로 검색"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            onClick={() => fetchUsers(1)}
+            className="px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 shrink-0"
+          >
+            검색
+          </button>
         </div>
-        <button
-          onClick={() => fetchUsers(1)}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          검색
-        </button>
         {tab === 'all' && (
           <select
             value={statusFilter}
@@ -508,7 +512,7 @@ export default function UsersPage() {
                             </button>
                           )}
                           <button
-                            onClick={(e) => { e.stopPropagation(); setEditUser(user); }}
+                            onClick={() => setEditUser(user)}
                             title="정보 수정"
                             className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
                           >
@@ -578,7 +582,7 @@ export default function UsersPage() {
         />
       )}
 
-      {/* Edit Modal */}
+      {/* Edit User Modal */}
       {editUser && (
         <EditUserModal
           userId={editUser.id}
