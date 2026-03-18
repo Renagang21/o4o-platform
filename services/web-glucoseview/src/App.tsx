@@ -94,6 +94,20 @@ function PendingRoute({ children }: { children: React.ReactNode }) {
  */
 const RoleProtectedRoute = RoleGuard;
 
+/**
+ * HomeRedirect — WO-O4O-GLUCOSEVIEW-BOOTSTRAP-FIX-V1
+ * 로그인 환자 → /patient, 그 외 → AboutPage
+ */
+function HomeRedirect() {
+  const { isAuthenticated, user } = useAuth();
+
+  if (isAuthenticated && user?.roles.includes('patient')) {
+    return <Navigate to="/patient" replace />;
+  }
+
+  return <AboutPage />;
+}
+
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
 function StoreLayoutWrapper() {
   const { user, logout } = useAuth();
@@ -188,13 +202,6 @@ function AppRoutes() {
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
-      {/* 환자 루트(/) → /patient 리다이렉트 */}
-      <Route path="/" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
-          <Navigate to="/patient" replace />
-        </RoleProtectedRoute>
-      } />
-
       {/* 환자 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
       <Route path="/patient" element={
         <RoleProtectedRoute allowedRoles={['patient']}>
@@ -211,8 +218,9 @@ function AppRoutes() {
         <Route path="care-guideline" element={<CareGuidelinePage />} />
       </Route>
 
-      {/* 약사/운영 레이아웃 (환자 홈은 위에서 처리) */}
+      {/* 메인 레이아웃 (WO-O4O-GLUCOSEVIEW-BOOTSTRAP-FIX-V1) */}
       <Route path="/" element={<Layout />}>
+        <Route index element={<HomeRedirect />} />
         <Route path="patients" element={
           <ProtectedRoute>
             <PatientsPage />
