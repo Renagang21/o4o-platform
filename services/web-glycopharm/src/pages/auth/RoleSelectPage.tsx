@@ -13,7 +13,7 @@ import type { UserRole } from '@/types';
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2; color: string }> = [
   {
     role: 'pharmacy',
-    label: '약사',
+    label: '약국',
     description: '약국 운영, 상품 판매, 고객 관리',
     icon: Building2,
     color: 'primary',
@@ -42,10 +42,9 @@ export default function RoleSelectPage() {
     selectRole(role);
 
     // Navigate to role-specific dashboard
-    // WO-MENU-REALIGN-V1: pharmacy는 / (CareDashboard)로 이동
     const dashboardPaths: Record<UserRole, string> = {
       admin: '/admin',
-      pharmacy: '/',
+      pharmacy: '/care',
       supplier: '/supplier',
       operator: '/operator',
       consumer: '/',
@@ -60,7 +59,7 @@ export default function RoleSelectPage() {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-slate-800">역할 선택</h1>
           <p className="text-slate-500 mt-2">
-            {user?.name}님, 어떤 역할로 접속하시겠습니까?
+            {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name}님, 어떤 역할로 접속하시겠습니까?
           </p>
         </div>
 

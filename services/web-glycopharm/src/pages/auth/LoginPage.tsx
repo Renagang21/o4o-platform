@@ -77,7 +77,7 @@ export default function LoginPage() {
   const subtitle = loginType === 'patient'
     ? '환자용 시스템 로그인'
     : loginType === 'pharmacist'
-      ? '약사용 시스템 로그인'
+      ? '약국용 시스템 로그인'
       : loginType === 'operator'
         ? '운영자 로그인'
         : 'GlycoPharm에 오신 것을 환영합니다';
@@ -208,53 +208,33 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* 테스트 로그인 버튼 — 사업자 테스트용 */}
+          {/* 테스트 계정 입력 보조 버튼 */}
           <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
             <p className="text-center text-xs text-slate-400 mb-3">테스트 계정</p>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={async () => {
-                  const testEmail = 'patient_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass@1';
-                  setEmail(testEmail);
-                  setPassword(testPass);
+                onClick={() => {
+                  setEmail('patient_test@glycopharm.co.kr');
+                  setPassword('O4oTestPass@1');
                   setError('');
-                  setIsSubmitting(true);
-                  try {
-                    await login(testEmail, testPass);
-                    navigate('/patient');
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : '테스트 로그인 실패');
-                    setIsSubmitting(false);
-                  }
                 }}
                 className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
               >
-                테스트 환자 로그인
+                테스트 환자
               </button>
               <button
                 type="button"
                 disabled={isSubmitting}
-                onClick={async () => {
-                  const testEmail = 'pharmacist_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass@1';
-                  setEmail(testEmail);
-                  setPassword(testPass);
+                onClick={() => {
+                  setEmail('pharmacist_test@glycopharm.co.kr');
+                  setPassword('O4oTestPass@1');
                   setError('');
-                  setIsSubmitting(true);
-                  try {
-                    await login(testEmail, testPass);
-                    navigate('/care');
-                  } catch (err) {
-                    setError(err instanceof Error ? err.message : '테스트 로그인 실패');
-                    setIsSubmitting(false);
-                  }
                 }}
                 className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
               >
-                테스트 약사 로그인
+                테스트 약국
               </button>
             </div>
           </div>

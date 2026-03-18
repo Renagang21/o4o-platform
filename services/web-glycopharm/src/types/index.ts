@@ -68,6 +68,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  lastName?: string;
+  firstName?: string;
   phone?: string;
   roles: UserRole[];
   role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]

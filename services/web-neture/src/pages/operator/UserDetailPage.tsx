@@ -1,13 +1,18 @@
 /**
  * UserDetailPage — 회원 상세
- * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
  *
- * 사용자 기본정보 + role_assignments + service_memberships 표시
- * API: GET /api/v1/operator/members/:userId
+ * 표준 기준: O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
+ * 참조 구현: GlycoPharm UserDetailPage
+ *
+ * Neture 예외: 가입 승인/거부 시 Neture registration endpoint 사용
+ *   POST /neture/operator/registrations/:userId/approve
+ *   POST /neture/operator/registrations/:userId/reject
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   ArrowLeft,
   Loader2,
@@ -26,8 +31,7 @@ import {
   Pencil,
   Building2,
 } from 'lucide-react';
-import { api } from '../../lib/apiClient';
-import { toast } from '@o4o/error-handling';
+import { api } from '@/lib/apiClient';
 import EditUserModal from './EditUserModal';
 import type { BusinessInfoData } from './EditUserModal';
 
@@ -73,19 +77,6 @@ interface UserDetail {
   updatedAt?: string;
 }
 
-// ─── API Helper ──────────────────────────────────────────────
-
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const url = path.replace(/^\/api\/v1/, '') || '/';
-  const method = (options?.method || 'GET').toUpperCase();
-  let body: any;
-  if (options?.body && typeof options.body === 'string') {
-    try { body = JSON.parse(options.body); } catch { body = options.body; }
-  }
-  const response = await api.request({ method, url, data: body });
-  return response.data;
-}
-
 // ─── Status Config ───────────────────────────────────────────
 
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
@@ -115,7 +106,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// WO-O4O-NAME-NORMALIZATION-V1: lastName+firstName > name > email prefix > '사용자'
+// WO-O4O-NAME-NORMALIZATION-V1
 function getUserName(u: UserDetail): string {
   if (u.lastName || u.firstName) {
     const full = `${u.lastName || ''}${u.firstName || ''}`.trim();
@@ -140,10 +131,7 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
     setLoading(true);
     setError('');
     try {
-      await apiFetch(`/api/v1/operator/members/${userId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ password }),
-      });
+      await api.put(`/operator/members/${userId}`, { password });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -192,9 +180,9 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
 
 // TODO: Backend API로 할당 가능 역할 목록 대체 예정
 const ASSIGNABLE_ROLES = [
-  { value: 'glycopharm:admin', label: 'GlycoPharm Admin' },
-  { value: 'glycopharm:operator', label: 'GlycoPharm Operator' },
-  { value: 'glycopharm:member', label: 'GlycoPharm Member' },
+  { value: 'neture:admin', label: 'Neture Admin' },
+  { value: 'neture:operator', label: 'Neture Operator' },
+  { value: 'neture:member', label: 'Neture Member' },
 ];
 
 function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
@@ -212,10 +200,7 @@ function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
     setLoading(true);
     setError('');
     try {
-      await apiFetch(`/api/v1/operator/members/${userId}/roles`, {
-        method: 'POST',
-        body: JSON.stringify({ role: selectedRole }),
-      });
+      await api.post(`/operator/members/${userId}/roles`, { role: selectedRole });
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -285,7 +270,7 @@ export default function UserDetailPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await apiFetch<any>(`/api/v1/operator/members/${id}`);
+      const { data } = await api.get(`/operator/members/${id}`);
       setUser(data.user);
       setRoles(data.roles || []);
       setMemberships(data.memberships || []);
@@ -298,33 +283,35 @@ export default function UserDetailPage() {
 
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
+  /**
+   * WO-NETURE-MEMBERSHIP-APPROVAL-FLOW-STABILIZATION-V1:
+   * 승인/거부 → Neture registration endpoint (pending/rejected 사용자)
+   * 정지/활성화 → MembershipConsole API
+   */
   const handleStatusChange = async (status: string) => {
     if (!id) return;
     const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status === 'suspended' ? '정지' : status;
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
     try {
-      // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
-      // Operator → membership API (admin API 접근 불가)
-      if (status === 'approved' || status === 'rejected') {
-        const pendingMembership = memberships.find(
-          (m: any) => m.status === 'pending' || m.status === 'rejected'
-        );
-        if (pendingMembership) {
-          const endpoint = status === 'approved' ? 'approve' : 'reject';
-          await apiFetch(`/api/v1/operator/members/${pendingMembership.id}/${endpoint}`, {
-            method: 'PATCH',
-            ...(status === 'rejected' ? { body: JSON.stringify({ reason: '운영자 거부' }) } : {}),
-          });
-          fetchDetail();
-          return;
+      if (status === 'approved' && (user?.status === 'pending' || user?.status === 'rejected')) {
+        // Neture 가입 승인: registration endpoint
+        await api.post(`/neture/operator/registrations/${id}/approve`);
+      } else if (status === 'rejected' && user?.status === 'pending') {
+        // Neture 가입 거부: registration endpoint
+        await api.post(`/neture/operator/registrations/${id}/reject`, { reason: '운영자 거부' });
+      } else {
+        // 정지/활성화: MembershipConsole
+        const netureMembership = memberships.find(m => m.serviceKey === 'neture');
+        if (netureMembership) {
+          const endpoint = status === 'suspended'
+            ? `/operator/members/${netureMembership.id}/reject`
+            : `/operator/members/${netureMembership.id}/approve`;
+          await api.patch(endpoint);
+        } else {
+          await api.patch(`/operator/members/${id}/status`, { status });
         }
       }
-      // Fallback: admin API (admin/super_admin only)
-      await apiFetch(`/api/v1/operator/members/${id}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status }),
-      });
       fetchDetail();
     } catch (err: any) {
       toast.error(err.message || '오류가 발생했습니다.');
@@ -338,8 +325,8 @@ export default function UserDetailPage() {
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
     setActionLoading('delete');
     try {
-      await apiFetch(`/api/v1/operator/members/${id}`, { method: 'DELETE' });
-      navigate('/operator/users');
+      await api.delete(`/operator/members/${id}`);
+      navigate('/workspace/operator/users');
     } catch (err: any) {
       toast.error(err.message || '오류가 발생했습니다.');
     } finally {
@@ -351,7 +338,7 @@ export default function UserDetailPage() {
     if (!confirm('이 서비스 멤버십을 승인하시겠습니까?')) return;
     setActionLoading(membershipId);
     try {
-      await apiFetch(`/api/v1/operator/members/${membershipId}/approve`, { method: 'PATCH' });
+      await api.patch(`/operator/members/${membershipId}/approve`);
       fetchDetail();
     } catch (err: any) {
       toast.error(err.message || '오류가 발생했습니다.');
@@ -364,10 +351,7 @@ export default function UserDetailPage() {
     const reason = prompt('거부 사유를 입력하세요 (선택사항):');
     setActionLoading(membershipId);
     try {
-      await apiFetch(`/api/v1/operator/members/${membershipId}/reject`, {
-        method: 'PATCH',
-        body: JSON.stringify({ reason }),
-      });
+      await api.patch(`/operator/members/${membershipId}/reject`, { reason });
       fetchDetail();
     } catch (err: any) {
       toast.error(err.message || '오류가 발생했습니다.');
@@ -381,9 +365,7 @@ export default function UserDetailPage() {
     if (!confirm(`역할 "${role}"을(를) 제거하시겠습니까?`)) return;
     setActionLoading(`role-${role}`);
     try {
-      await apiFetch(`/api/v1/operator/members/${id}/roles/${encodeURIComponent(role)}`, {
-        method: 'DELETE',
-      });
+      await api.delete(`/operator/members/${id}/roles/${encodeURIComponent(role)}`);
       fetchDetail();
     } catch (err: any) {
       toast.error(err.message || '오류가 발생했습니다.');
@@ -404,7 +386,7 @@ export default function UserDetailPage() {
   if (error || !user) {
     return (
       <div className="p-6">
-        <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+        <button onClick={() => navigate('/workspace/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
           <ArrowLeft className="w-4 h-4" />뒤로가기
         </button>
         <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
@@ -417,7 +399,7 @@ export default function UserDetailPage() {
   return (
     <div className="p-6 max-w-5xl">
       {/* Back Button */}
-      <button onClick={() => navigate('/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
+      <button onClick={() => navigate('/workspace/operator/users')} className="flex items-center gap-1 text-sm text-slate-600 hover:text-slate-800 mb-4">
         <ArrowLeft className="w-4 h-4" />회원 목록
       </button>
 
@@ -546,14 +528,14 @@ export default function UserDetailPage() {
         <section className="bg-white rounded-xl shadow-sm mb-6">
           <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
             <Building2 className="w-4 h-4 text-slate-500" />
-            <h2 className="text-base font-semibold text-slate-800">약국 정보</h2>
+            <h2 className="text-base font-semibold text-slate-800">사업자 정보</h2>
           </div>
           <div className="p-5">
             <table className="w-full text-sm">
               <tbody>
                 {(user.businessInfo.businessName || user.company) && (
                   <tr className="border-b border-slate-50">
-                    <td className="py-2.5 pr-4 text-slate-500 w-32">약국명</td>
+                    <td className="py-2.5 pr-4 text-slate-500 w-32">사업자명</td>
                     <td className="py-2.5 text-slate-800">{user.businessInfo.businessName || user.company}</td>
                   </tr>
                 )}

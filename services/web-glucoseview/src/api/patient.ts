@@ -68,6 +68,8 @@ async function request<T>(
 export interface PatientProfile {
   id: string | null;
   name: string;
+  lastName?: string;
+  firstName?: string;
   email: string;
   phone: string | null;
   gender: string | null;

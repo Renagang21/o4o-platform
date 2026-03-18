@@ -38,20 +38,21 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
       const pharmacies = await dataSource.query(`
         SELECT
           o.id,
-          o.name,
+          COALESCE(gp.name, o.name) AS name,
           COALESCE(pc.cnt, 0)::int AS "patientCount"
         FROM organizations o
         JOIN organization_service_enrollments e
           ON e.organization_id = o.id
           AND e.service_code = 'glycopharm'
           AND e.status = 'active'
+        LEFT JOIN glycopharm_pharmacies gp ON gp.id = o.id
         LEFT JOIN (
           SELECT organization_id, COUNT(*)::int AS cnt
           FROM glucoseview_customers
           GROUP BY organization_id
         ) pc ON pc.organization_id = o.id
         WHERE o."isActive" = true
-        ORDER BY o.name
+        ORDER BY COALESCE(gp.name, o.name)
       `);
 
       res.json({ success: true, data: pharmacies });
@@ -82,9 +83,11 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
 
       // Check existing link via glucoseview_customers
       const existing = await dataSource.query(
-        `SELECT gc.id, gc.organization_id AS "pharmacyId", o.name AS "pharmacyName"
+        `SELECT gc.id, gc.organization_id AS "pharmacyId",
+                COALESCE(gp.name, o.name) AS "pharmacyName"
          FROM glucoseview_customers gc
          LEFT JOIN organizations o ON o.id = gc.organization_id
+         LEFT JOIN glycopharm_pharmacies gp ON gp.id = gc.organization_id
          WHERE gc.email = $1
          LIMIT 1`,
         [user.email],
@@ -164,12 +167,13 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
 
       // Verify pharmacy exists and has glycopharm enrollment
       const pharmacy = await dataSource.query(
-        `SELECT o.id, o.name
+        `SELECT o.id, COALESCE(gp.name, o.name) AS name
          FROM organizations o
          JOIN organization_service_enrollments e
            ON e.organization_id = o.id
            AND e.service_code = 'glycopharm'
            AND e.status = 'active'
+         LEFT JOIN glycopharm_pharmacies gp ON gp.id = o.id
          WHERE o.id = $1 AND o."isActive" = true
          LIMIT 1`,
         [pharmacyId],

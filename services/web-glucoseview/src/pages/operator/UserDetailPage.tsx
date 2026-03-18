@@ -1,8 +1,11 @@
 /**
  * UserDetailPage — 회원 상세
- * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
  *
- * 사용자 기본정보 + role_assignments + service_memberships 표시
+ * 표준 기준: O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
+ * 참조 구현: GlycoPharm UserDetailPage
+ *
+ * 사용자 기본정보 + 사업자정보 + role_assignments(추가/제거) + service_memberships 표시
  * API: GET /api/v1/operator/members/:userId
  */
 
@@ -22,8 +25,14 @@ import {
   UserCheck,
   UserX,
   X,
+  Plus,
+  MinusCircle,
+  Pencil,
+  Building2,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import EditUserModal from './EditUserModal';
+import type { BusinessInfoData } from './EditUserModal';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -57,10 +66,12 @@ interface UserDetail {
   firstName?: string;
   lastName?: string;
   name?: string;
+  nickname?: string;
   company?: string;
   phone?: string;
   status: string;
   isActive: boolean;
+  businessInfo?: BusinessInfoData;
   createdAt: string;
   updatedAt?: string;
 }
@@ -68,7 +79,6 @@ interface UserDetail {
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  // WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반
   const axiosPath = path.replace(/^\/api\/v1/, '') || '/';
   const method = (options?.method || 'GET').toLowerCase();
   let body: any = undefined;
@@ -183,6 +193,82 @@ function PasswordModal({ userId, userName, onClose, onSuccess }: {
   );
 }
 
+// ─── Role Modal ─────────────────────────────────────────────
+
+// TODO: Backend API로 할당 가능 역할 목록 대체 예정
+const ASSIGNABLE_ROLES = [
+  { value: 'glucoseview:admin', label: 'GlucoseView Admin' },
+  { value: 'glucoseview:operator', label: 'GlucoseView Operator' },
+  { value: 'glucoseview:member', label: 'GlucoseView Member' },
+];
+
+function RoleModal({ userId, existingRoles, onClose, onSuccess }: {
+  userId: string; existingRoles: string[]; onClose: () => void; onSuccess: () => void;
+}) {
+  const [selectedRole, setSelectedRole] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const availableRoles = ASSIGNABLE_ROLES.filter(r => !existingRoles.includes(r.value));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRole) { setError('역할을 선택하세요.'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await apiFetch(`/api/v1/operator/members/${userId}/roles`, {
+        method: 'POST',
+        body: JSON.stringify({ role: selectedRole }),
+      });
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-800">역할 추가</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5" /></button>
+        </div>
+        {error && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />{error}
+          </div>
+        )}
+        {availableRoles.length === 0 ? (
+          <p className="text-sm text-slate-500 mb-4">할당 가능한 역할이 없습니다.</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">역할 선택...</option>
+              {availableRoles.map(r => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
+              <button type="submit" disabled={loading || !selectedRole} className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                {loading ? '처리 중...' : '추가'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UserDetailPage() {
@@ -196,6 +282,8 @@ export default function UserDetailPage() {
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -221,13 +309,30 @@ export default function UserDetailPage() {
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
     try {
+      // WO-O4O-OPERATOR-MEMBERSHIP-APPROVAL-COMPLETE-V1:
+      // Operator → membership API (admin API 접근 불가)
+      if (status === 'approved' || status === 'rejected') {
+        const pendingMembership = memberships.find(
+          (m: any) => m.status === 'pending' || m.status === 'rejected'
+        );
+        if (pendingMembership) {
+          const endpoint = status === 'approved' ? 'approve' : 'reject';
+          await apiFetch(`/api/v1/operator/members/${pendingMembership.id}/${endpoint}`, {
+            method: 'PATCH',
+            ...(status === 'rejected' ? { body: JSON.stringify({ reason: '운영자 거부' }) } : {}),
+          });
+          fetchDetail();
+          return;
+        }
+      }
+      // Fallback: status API
       await apiFetch(`/api/v1/operator/members/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       });
       fetchDetail();
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -241,7 +346,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${id}`, { method: 'DELETE' });
       navigate('/operator/users');
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -254,7 +359,7 @@ export default function UserDetailPage() {
       await apiFetch(`/api/v1/operator/members/${membershipId}/approve`, { method: 'PATCH' });
       fetchDetail();
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -270,7 +375,23 @@ export default function UserDetailPage() {
       });
       fetchDetail();
     } catch (err: any) {
-      toast.error(`오류: ${err.message}`);
+      toast.error(err.message || '오류가 발생했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemoveRole = async (role: string) => {
+    if (!id) return;
+    if (!confirm(`역할 "${role}"을(를) 제거하시겠습니까?`)) return;
+    setActionLoading(`role-${role}`);
+    try {
+      await apiFetch(`/api/v1/operator/members/${id}/roles/${encodeURIComponent(role)}`, {
+        method: 'DELETE',
+      });
+      fetchDetail();
+    } catch (err: any) {
+      toast.error(err.message || '오류가 발생했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -331,6 +452,12 @@ export default function UserDetailPage() {
                 <td className="py-2.5 pr-4 text-slate-500 w-32">이름</td>
                 <td className="py-2.5 text-slate-800">{getUserName(user)}</td>
               </tr>
+              {user.nickname && (
+                <tr className="border-b border-slate-50">
+                  <td className="py-2.5 pr-4 text-slate-500">닉네임</td>
+                  <td className="py-2.5 text-slate-800">{user.nickname}</td>
+                </tr>
+              )}
               <tr className="border-b border-slate-50">
                 <td className="py-2.5 pr-4 text-slate-500">이메일</td>
                 <td className="py-2.5 text-slate-800">{user.email}</td>
@@ -339,12 +466,6 @@ export default function UserDetailPage() {
                 <tr className="border-b border-slate-50">
                   <td className="py-2.5 pr-4 text-slate-500">전화번호</td>
                   <td className="py-2.5 text-slate-800">{user.phone}</td>
-                </tr>
-              )}
-              {user.company && (
-                <tr className="border-b border-slate-50">
-                  <td className="py-2.5 pr-4 text-slate-500">회사</td>
-                  <td className="py-2.5 text-slate-800">{user.company}</td>
                 </tr>
               )}
               <tr className="border-b border-slate-50">
@@ -403,6 +524,12 @@ export default function UserDetailPage() {
               </button>
             )}
             <button
+              onClick={() => setShowEditModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
+            >
+              <Pencil className="w-4 h-4" />정보 수정
+            </button>
+            <button
               onClick={() => setShowPasswordModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
             >
@@ -419,12 +546,73 @@ export default function UserDetailPage() {
         </div>
       </section>
 
+      {/* 사업자 정보 (businessInfo) */}
+      {user.businessInfo && (user.businessInfo.businessName || user.company) && (
+        <section className="bg-white rounded-xl shadow-sm mb-6">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-slate-500" />
+            <h2 className="text-base font-semibold text-slate-800">사업자 정보</h2>
+          </div>
+          <div className="p-5">
+            <table className="w-full text-sm">
+              <tbody>
+                {(user.businessInfo.businessName || user.company) && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500 w-32">사업자명</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessName || user.company}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessNumber && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">사업자등록번호</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessNumber}</td>
+                  </tr>
+                )}
+                {user.businessInfo.email && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">세금계산서 이메일</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.email}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessType && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">업태</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessType}</td>
+                  </tr>
+                )}
+                {user.businessInfo.businessCategory && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">업종</td>
+                    <td className="py-2.5 text-slate-800">{user.businessInfo.businessCategory}</td>
+                  </tr>
+                )}
+                {user.businessInfo.address && (
+                  <tr className="border-b border-slate-50">
+                    <td className="py-2.5 pr-4 text-slate-500">주소</td>
+                    <td className="py-2.5 text-slate-800">
+                      {user.businessInfo.address}
+                      {user.businessInfo.address2 && ` ${user.businessInfo.address2}`}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       {/* 역할 (role_assignments) */}
       <section className="bg-white rounded-xl shadow-sm mb-6">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
           <Shield className="w-4 h-4 text-slate-500" />
           <h2 className="text-base font-semibold text-slate-800">역할 (Role Assignments)</h2>
-          <span className="text-xs text-slate-400 ml-auto">{roles.length}개</span>
+          <span className="text-xs text-slate-400 ml-auto mr-2">{roles.length}개</span>
+          <button
+            onClick={() => setShowRoleModal(true)}
+            className="flex items-center gap-1 px-2.5 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            <Plus className="w-3.5 h-3.5" />역할 추가
+          </button>
         </div>
         {roles.length > 0 ? (
           <div className="overflow-x-auto">
@@ -435,6 +623,7 @@ export default function UserDetailPage() {
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">활성</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">범위</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">부여일</th>
+                  <th className="text-right px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">관리</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -452,6 +641,23 @@ export default function UserDetailPage() {
                       {r.scopeType ? `${r.scopeType}${r.scopeId ? `:${r.scopeId.slice(0, 8)}` : ''}` : '-'}
                     </td>
                     <td className="px-5 py-2.5 text-slate-600">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
+                    <td className="px-5 py-2.5">
+                      <div className="flex items-center justify-end">
+                        {r.isActive && (
+                          actionLoading === `role-${r.role}` ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                          ) : (
+                            <button
+                              onClick={() => handleRemoveRole(r.role)}
+                              title="역할 제거"
+                              className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                            >
+                              <MinusCircle className="w-4 h-4" />
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -532,6 +738,25 @@ export default function UserDetailPage() {
           userId={user.id}
           userName={`${getUserName(user)} (${user.email})`}
           onClose={() => setShowPasswordModal(false)}
+          onSuccess={fetchDetail}
+        />
+      )}
+
+      {/* Role Modal */}
+      {showRoleModal && (
+        <RoleModal
+          userId={user.id}
+          existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
+          onClose={() => setShowRoleModal(false)}
+          onSuccess={fetchDetail}
+        />
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <EditUserModal
+          userId={user.id}
+          onClose={() => setShowEditModal(false)}
           onSuccess={fetchDetail}
         />
       )}

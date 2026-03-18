@@ -42,8 +42,14 @@ export function createPatientProfileRouter(dataSource: DataSource): Router {
       }
 
       // 1. Basic info from user
+      const lastName = user.lastName || null;
+      const firstName = user.firstName || null;
       const basicInfo = {
-        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+        name: (lastName && firstName)
+          ? `${lastName}${firstName}`
+          : user.name || user.email,
+        lastName,
+        firstName,
         email: user.email,
         phone: user.phone || null,
       };
@@ -72,6 +78,8 @@ export function createPatientProfileRouter(dataSource: DataSource): Router {
         data: {
           id: healthProfile?.id || null,
           name: basicInfo.name,
+          lastName: basicInfo.lastName,
+          firstName: basicInfo.firstName,
           email: basicInfo.email,
           phone: basicInfo.phone,
           gender: customerInfo?.gender || null,

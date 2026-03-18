@@ -52,7 +52,8 @@ export default function MyPage() {
   const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
-    name: user?.name || '',
+    lastName: user?.lastName || '',
+    firstName: user?.firstName || '',
     phone: user?.phone || '',
   });
   const [saving, setSaving] = useState(false);
@@ -82,12 +83,22 @@ export default function MyPage() {
     setSaving(true);
     setFeedback(null);
     try {
+      const fullName = (editData.lastName && editData.firstName)
+        ? `${editData.lastName}${editData.firstName}`
+        : editData.lastName || editData.firstName || user.name;
       await api.put('/users/profile', {
-        name: editData.name,
+        name: fullName,
+        lastName: editData.lastName,
+        firstName: editData.firstName,
         phone: editData.phone,
       });
 
-      updateUser({ name: editData.name, phone: editData.phone });
+      updateUser({
+        name: fullName,
+        lastName: editData.lastName,
+        firstName: editData.firstName,
+        phone: editData.phone,
+      });
       setIsEditing(false);
       setFeedback({ type: 'success', message: '프로필이 수정되었습니다.' });
       setTimeout(() => setFeedback(null), 3000);
@@ -101,7 +112,7 @@ export default function MyPage() {
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditData({ name: user.name, phone: user.phone || '' });
+    setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', phone: user.phone || '' });
     setFeedback(null);
   };
 
@@ -176,7 +187,7 @@ export default function MyPage() {
                 <div className="w-24 h-24 rounded-2xl bg-white shadow-lg flex items-center justify-center overflow-hidden">
                   <div className="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
                     <span className="text-3xl font-bold text-white">
-                      {user?.name?.charAt(0) || '?'}
+                      {user?.lastName?.charAt(0) || user?.name?.charAt(0) || '?'}
                     </span>
                   </div>
                 </div>
@@ -192,7 +203,9 @@ export default function MyPage() {
           <div className="pt-16 pb-6 px-6">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-slate-800">{user.name}</h2>
+                <h2 className="text-xl font-bold text-slate-800">
+                  {(user.lastName && user.firstName) ? `${user.lastName}${user.firstName}` : user.name}
+                </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm text-slate-500">{roleLabels[user.roles[0]] || user.roles[0]}</span>
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${status.color}-100 text-${status.color}-700`}>
@@ -203,7 +216,7 @@ export default function MyPage() {
               {!isEditing ? (
                 <button
                   onClick={() => {
-                    setEditData({ name: user.name, phone: user.phone || '' });
+                    setEditData({ lastName: user.lastName || '', firstName: user.firstName || '', phone: user.phone || '' });
                     setIsEditing(true);
                   }}
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 border rounded-xl hover:bg-slate-50 transition-colors"
@@ -254,16 +267,37 @@ export default function MyPage() {
                   <User className="w-5 h-5 text-slate-400" />
                 </div>
                 <div className="flex-1">
+                  <p className="text-xs text-slate-400">성</p>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={editData.lastName}
+                      onChange={(e) => setEditData(prev => ({ ...prev, lastName: e.target.value }))}
+                      className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="성"
+                    />
+                  ) : (
+                    <p className="text-sm font-medium text-slate-800">{user.lastName || '-'}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
+                <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
+                  <User className="w-5 h-5 text-slate-400" />
+                </div>
+                <div className="flex-1">
                   <p className="text-xs text-slate-400">이름</p>
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editData.name}
-                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                      value={editData.firstName}
+                      onChange={(e) => setEditData(prev => ({ ...prev, firstName: e.target.value }))}
                       className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      placeholder="이름"
                     />
                   ) : (
-                    <p className="text-sm font-medium text-slate-800">{user.name}</p>
+                    <p className="text-sm font-medium text-slate-800">{user.firstName || '-'}</p>
                   )}
                 </div>
               </div>

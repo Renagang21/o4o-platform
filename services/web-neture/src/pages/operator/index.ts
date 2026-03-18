@@ -10,5 +10,7 @@ export { default as SupplyDashboardPage } from './SupplyDashboardPage';
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
 export { default as UsersManagementPage } from './UsersManagementPage';
+// WO-O4O-OPERATOR-USER-MANAGEMENT-ROLL-OUT-V1
+export { default as UserDetailPage } from './UserDetailPage';
 export { default as StoreManagementPage } from './StoreManagementPage';
 export { default as OrdersManagementPage } from './OrdersManagementPage';

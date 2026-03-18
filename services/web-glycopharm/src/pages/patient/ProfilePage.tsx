@@ -198,7 +198,8 @@ export default function ProfilePage() {
             기본 정보
           </h2>
           <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-            <InfoRow label="이름" value={profileData?.name || '-'} />
+            <InfoRow label="성" value={profileData?.lastName || '-'} />
+            <InfoRow label="이름" value={profileData?.firstName || '-'} />
             <InfoRow label="이메일" value={profileData?.email || '-'} />
             <InfoRow label="전화번호" value={profileData?.phone || '-'} />
             <InfoRow
