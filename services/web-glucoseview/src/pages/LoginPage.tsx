@@ -37,7 +37,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-slate-900">GlucoseView</h1>
-          <p className="text-slate-500 mt-2">약국 CGM 데이터 관리 서비스</p>
+          <p className="text-slate-500 mt-2">환자 전용 혈당 관리 서비스</p>
         </div>
 
         {/* Login Form */}
@@ -135,65 +135,36 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* 테스트 로그인 버튼 — 사업자 테스트용 */}
+          {/* 테스트 로그인 버튼 — 환자 테스트용 */}
           <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
             <p className="text-center text-xs text-slate-400 mb-3">테스트 계정</p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={async () => {
-                  const testEmail = 'patient_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass';
-                  setEmail(testEmail);
-                  setPassword(testPass);
-                  setError('');
-                  setIsLoading(true);
-                  try {
-                    const result = await login(testEmail, testPass);
-                    if (result.success) {
-                      navigate('/patient');
-                    } else {
-                      setError(result.message || '테스트 로그인 실패');
-                    }
-                  } catch {
-                    setError('테스트 로그인 실패');
-                  } finally {
-                    setIsLoading(false);
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={async () => {
+                const testEmail = 'patient_test@glycopharm.co.kr';
+                const testPass = 'O4oTestPass';
+                setEmail(testEmail);
+                setPassword(testPass);
+                setError('');
+                setIsLoading(true);
+                try {
+                  const result = await login(testEmail, testPass);
+                  if (result.success) {
+                    navigate('/patient');
+                  } else {
+                    setError(result.message || '테스트 로그인 실패');
                   }
-                }}
-                className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-              >
-                테스트 환자 로그인
-              </button>
-              <button
-                type="button"
-                disabled={isLoading}
-                onClick={async () => {
-                  const testEmail = 'pharmacist_test@glycopharm.co.kr';
-                  const testPass = 'O4oTestPass';
-                  setEmail(testEmail);
-                  setPassword(testPass);
-                  setError('');
-                  setIsLoading(true);
-                  try {
-                    const result = await login(testEmail, testPass);
-                    if (result.success) {
-                      navigate('/care');
-                    } else {
-                      setError(result.message || '테스트 로그인 실패');
-                    }
-                  } catch {
-                    setError('테스트 로그인 실패');
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-                className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
-              >
-                테스트 로그인
-              </button>
-            </div>
+                } catch {
+                  setError('테스트 로그인 실패');
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+            >
+              테스트 로그인
+            </button>
           </div>
         </div>
 

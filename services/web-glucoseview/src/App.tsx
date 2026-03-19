@@ -43,6 +43,7 @@ import StoreOverviewPage from './pages/store/StoreOverviewPage';
 
 // Patient Pages (WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1)
 import PatientMainPage from './pages/patient/PatientMainPage';
+import PatientLandingPage from './pages/patient/PatientLandingPage';
 import PatientProfilePage from './pages/patient/ProfilePage';
 import GlucoseInputPage from './pages/patient/GlucoseInputPage';
 import DataAnalysisPage from './pages/patient/DataAnalysisPage';
@@ -105,7 +106,7 @@ function HomeRedirect() {
     return <Navigate to="/patient" replace />;
   }
 
-  return <AboutPage />;
+  return <PatientLandingPage />;
 }
 
 /** Store Dashboard Layout Wrapper - connects auth context to shared layout */
