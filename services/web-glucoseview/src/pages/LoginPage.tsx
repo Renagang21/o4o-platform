@@ -135,35 +135,19 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* 테스트 로그인 버튼 — 환자 테스트용 */}
+          {/* 테스트 계정 — 입력만 채움, 자동 submit 없음 */}
           <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
             <p className="text-center text-xs text-slate-400 mb-3">테스트 계정</p>
             <button
               type="button"
-              disabled={isLoading}
-              onClick={async () => {
-                const testEmail = 'patient_test@glycopharm.co.kr';
-                const testPass = 'O4oTestPass';
-                setEmail(testEmail);
-                setPassword(testPass);
+              onClick={() => {
+                setEmail('patient_test@glycopharm.co.kr');
+                setPassword('O4oTestPass');
                 setError('');
-                setIsLoading(true);
-                try {
-                  const result = await login(testEmail, testPass);
-                  if (result.success) {
-                    navigate('/patient');
-                  } else {
-                    setError(result.message || '테스트 로그인 실패');
-                  }
-                } catch {
-                  setError('테스트 로그인 실패');
-                } finally {
-                  setIsLoading(false);
-                }
               }}
-              className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
+              className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50"
             >
-              테스트 로그인
+              테스트 환자
             </button>
           </div>
         </div>
