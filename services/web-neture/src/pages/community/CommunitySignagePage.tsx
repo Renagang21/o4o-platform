@@ -1,14 +1,16 @@
 /**
- * CommunitySignagePage - Digital Signage 소개
+ * CommunitySignagePage - Digital Signage 소개 + 콘텐츠 탐색
  *
  * Work Order: WO-O4O-NETURE-COMMUNITY-PAGE-V1
+ * Expansion: WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
  *
- * 정적 소개 페이지. API 호출 없음.
- * 공급자가 생성한 Signage 콘텐츠가 각 서비스 Store HUB에 등록되는 구조를 안내한다.
+ * 정적 소개 + Hub 콘텐츠 탐색 (매장에 적용 → StoreSignagePage 연결).
  */
 
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Monitor, Image, LayoutGrid, Zap, ArrowLeft, ArrowRight } from 'lucide-react';
+import { publicContentApi, type SignageMedia } from '../../lib/api/signageV2';
 
 const features = [
   {
@@ -44,6 +46,16 @@ const steps = [
 ];
 
 export default function CommunitySignagePage() {
+  const navigate = useNavigate();
+  const [media, setMedia] = useState<SignageMedia[]>([]);
+
+  useEffect(() => {
+    publicContentApi
+      .listMedia(undefined, 'neture', { limit: 4 })
+      .then((res: any) => setMedia(res?.data?.items ?? res?.data ?? []))
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -132,6 +144,47 @@ export default function CommunitySignagePage() {
         </div>
       </section>
 
+      {/* Signage Content Browse */}
+      {media.length > 0 && (
+        <section className="py-12 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">사이니지 콘텐츠</h2>
+              <Link
+                to="/supplier/signage/content"
+                className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+              >
+                전체보기 →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {media.slice(0, 4).map((item) => (
+                <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <Link to={`/supplier/signage/media/${item.id}`} className="block">
+                    <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                      {item.thumbnailUrl ? (
+                        <img src={item.thumbnailUrl} alt={item.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <Monitor className="w-8 h-8 text-gray-300" />
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-gray-700 px-3 py-2 truncate">{item.name}</p>
+                  </Link>
+                  <div className="px-3 pb-3">
+                    <button
+                      onClick={() => navigate(`/supplier/signage/manage?mediaId=${item.id}`)}
+                      className="w-full py-1.5 text-xs font-semibold text-violet-600 bg-violet-50 border border-violet-200 rounded-md hover:bg-violet-100 transition-colors"
+                    >
+                      매장에 적용 →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CTA */}
       <section className="py-12 bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -142,17 +195,17 @@ export default function CommunitySignagePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/supplier"
+              to="/supplier/signage/manage"
               className="inline-flex items-center justify-center px-8 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium"
             >
-              공급자 참여하기
+              매장 사이니지 관리
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
             <Link
-              to="/community"
+              to="/supplier/signage/content"
               className="inline-flex items-center justify-center px-8 py-3 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors font-medium"
             >
-              커뮤니티로 돌아가기
+              콘텐츠 탐색하기
             </Link>
           </div>
         </div>

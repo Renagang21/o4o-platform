@@ -15,6 +15,7 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
+import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
@@ -109,6 +110,8 @@ const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityMan
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
+// WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1
+const StoreSignagePage = lazy(() => import('@/pages/store/StoreSignagePage'));
 
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 const StoreLocalProductsPage = lazy(() => import('@/pages/store/StoreLocalProductsPage'));
@@ -277,7 +280,7 @@ function AppRoutes() {
         path="operator"
         element={
           <OperatorRoute>
-            <DashboardLayout role="operator" />
+            <OperatorLayoutWrapper />
           </OperatorRoute>
         }
       >
@@ -328,6 +331,7 @@ function AppRoutes() {
         <Route path="tablet-displays" element={<StoreTabletDisplaysPage />} />
         {/* channels: 채널 관리 (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1) */}
         <Route path="channels" element={<StoreChannelsPage />} />
+        <Route path="signage" element={<StoreSignagePage />} />
         <Route path="orders" element={<StorePlaceholderPage title="주문 관리" />} />
         <Route path="billing" element={<StorePlaceholderPage title="정산/인보이스" />} />
         <Route path="content" element={<StorePlaceholderPage title="콘텐츠 관리" />} />

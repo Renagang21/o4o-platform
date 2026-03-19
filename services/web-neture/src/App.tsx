@@ -27,7 +27,7 @@ import SupplierSpaceLayout from './components/layouts/SupplierSpaceLayout';
 import PartnerSpaceLayout from './components/layouts/PartnerSpaceLayout';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
-import OperatorLayout from './components/layouts/OperatorLayout';
+import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayout from './components/layouts/AdminLayout';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
@@ -341,6 +341,8 @@ const RoleManagementPage = lazy(() =>
 );
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
+// Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
+const StoreSignagePage = lazy(() => import('./pages/supplier/StoreSignagePage'));
 const SignageHqMediaPage = lazy(() => import('./pages/operator/signage/HqMediaPage'));
 const SignageHqMediaDetailPage = lazy(() => import('./pages/operator/signage/HqMediaDetailPage'));
 const SignageHqPlaylistsPage = lazy(() => import('./pages/operator/signage/HqPlaylistsPage'));
@@ -488,6 +490,7 @@ function App() {
               <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
+              <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" />} />
             </Route>
 
@@ -680,7 +683,7 @@ function App() {
             ================================================================ */}
             <Route element={
               <OperatorRoute>
-                <OperatorLayout />
+                <OperatorLayoutWrapper />
               </OperatorRoute>
             }>
               <Route path="/operator" element={<NetureOperatorDashboard />} />
@@ -690,8 +693,12 @@ function App() {
               <Route path="/operator/orders" element={<OrdersManagementPage />} />
               <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
               <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              <Route path="/operator/registrations" element={<RegistrationRequestsPage />} />
-              <Route path="/operator/forum-management" element={<ForumManagementPage />} />
+              {/* WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: registrations → applications */}
+              <Route path="/operator/applications" element={<RegistrationRequestsPage />} />
+              <Route path="/operator/registrations" element={<Navigate to="/operator/applications" replace />} />
+              {/* WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: forum-management → community */}
+              <Route path="/operator/community" element={<ForumManagementPage />} />
+              <Route path="/operator/forum-management" element={<Navigate to="/operator/community" replace />} />
               <Route path="/operator/supply" element={<SupplyDashboardPage />} />
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/operator/ai-operations" element={<AiOperationsPage />} />

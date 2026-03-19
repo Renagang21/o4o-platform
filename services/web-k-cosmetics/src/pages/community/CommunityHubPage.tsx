@@ -17,7 +17,7 @@
  */
 
 import { useState, useEffect, CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '../../services/communityApi';
 import { fetchPopularForums, fetchForumPosts, type PopularForum, type ForumPost } from '../../services/forumApi';
 import { publicContentApi, type SignageMedia } from '../../lib/api/signageV2';
@@ -26,6 +26,7 @@ import { AdSection } from '../../components/community/AdSection';
 import { SponsorBar } from '../../components/community/SponsorBar';
 
 export default function CommunityHubPage() {
+  const navigate = useNavigate();
   const [heroAds, setHeroAds] = useState<CommunityAd[]>([]);
   const [pageAds, setPageAds] = useState<CommunityAd[]>([]);
   const [sponsors, setSponsors] = useState<CommunitySponsor[]>([]);
@@ -127,21 +128,31 @@ export default function CommunityHubPage() {
         {/* 4. Page Ads */}
         <AdSection ads={pageAds} />
 
-        {/* 5. Video Section */}
+        {/* 5. Video Section (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1) */}
         <Section title="Videos" linkTo="/partner/signage/content" linkLabel="View All">
           {media.length > 0 ? (
             <div style={styles.mediaGrid}>
               {media.slice(0, 4).map((item) => (
-                <Link key={item.id} to={`/partner/signage/media/${item.id}`} style={styles.mediaCard}>
-                  <div style={styles.mediaThumb}>
-                    {item.thumbnailUrl ? (
-                      <img src={item.thumbnailUrl} alt={item.name} style={styles.mediaImg} />
-                    ) : (
-                      <div style={styles.mediaPlaceholder}>&#9654;</div>
-                    )}
+                <div key={item.id} style={styles.mediaCard}>
+                  <Link to={`/partner/signage/media/${item.id}`} style={{ textDecoration: 'none' }}>
+                    <div style={styles.mediaThumb}>
+                      {item.thumbnailUrl ? (
+                        <img src={item.thumbnailUrl} alt={item.name} style={styles.mediaImg} />
+                      ) : (
+                        <div style={styles.mediaPlaceholder}>&#9654;</div>
+                      )}
+                    </div>
+                    <p style={styles.mediaName}>{item.name}</p>
+                  </Link>
+                  <div style={styles.mediaAction}>
+                    <button
+                      onClick={() => navigate(`/store/signage?mediaId=${item.id}`)}
+                      style={styles.applyButton}
+                    >
+                      매장에 적용 &rarr;
+                    </button>
                   </div>
-                  <p style={styles.mediaName}>{item.name}</p>
-                </Link>
+                </div>
               ))}
             </div>
           ) : (
@@ -369,5 +380,20 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 14,
     color: '#475569',
     margin: 0,
+  },
+  // Media action
+  mediaAction: {
+    padding: '0 12px 10px',
+  },
+  applyButton: {
+    width: '100%',
+    padding: '6px 0',
+    fontSize: 12,
+    fontWeight: 600,
+    color: '#DB2777',
+    backgroundColor: '#fdf2f8',
+    border: '1px solid #fbcfe8',
+    borderRadius: 6,
+    cursor: 'pointer',
   },
 };
