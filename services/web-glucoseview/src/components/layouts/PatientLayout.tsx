@@ -1,5 +1,5 @@
 /**
- * PatientLayout — 환자 서비스 레이아웃
+ * PatientLayout — 당뇨인 서비스 레이아웃
  * WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1
  *
  * Outlet + MobileBottomNav 래퍼.

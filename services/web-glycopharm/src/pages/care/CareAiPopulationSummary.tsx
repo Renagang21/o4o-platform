@@ -26,10 +26,10 @@ export default function CareAiPopulationSummary({ summary, population }: Props) 
       const total = summary.totalPatients;
       if (total > 0 && summary.highRiskCount > 0) {
         const pct = Math.round((summary.highRiskCount / total) * 100);
-        lines.push(`전체 환자 ${total}명 중 고위험 ${summary.highRiskCount}명 (${pct}%) 입니다.`);
+        lines.push(`전체 당뇨인 ${total}명 중 고위험 ${summary.highRiskCount}명 (${pct}%) 입니다.`);
       }
       if (summary.moderateRiskCount > 0) {
-        lines.push(`주의 단계 환자가 ${summary.moderateRiskCount}명 있습니다.`);
+        lines.push(`주의 단계 당뇨인가 ${summary.moderateRiskCount}명 있습니다.`);
       }
       if (summary.recentCoachingCount > 0) {
         lines.push(`최근 7일간 코칭 ${summary.recentCoachingCount}건이 진행되었습니다.`);
@@ -41,7 +41,7 @@ export default function CareAiPopulationSummary({ summary, population }: Props) 
         lines.push(`대기 중인 AI 코칭 초안이 ${population.coaching.pending}건 있습니다.`);
       }
       if (population.activity.inactivePatients > 0) {
-        lines.push(`비활성 환자 ${population.activity.inactivePatients}명 — 관리가 필요합니다.`);
+        lines.push(`비활성 당뇨인 ${population.activity.inactivePatients}명 — 관리가 필요합니다.`);
       }
     }
 

@@ -1,5 +1,5 @@
 /**
- * PatientLandingPage — GlucoseView 환자 전용 랜딩
+ * PatientLandingPage — GlucoseView 당뇨인 전용 랜딩
  * WO-O4O-GLUCOSEVIEW-PATIENT-ENTRY-FLOW-V1
  *
  * 비로그인 사용자가 `/`에 접속했을 때 보여주는 첫 화면.
@@ -21,7 +21,7 @@ export default function PatientLandingPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">GlucoseView</h1>
           <p className="text-sm text-slate-500 leading-relaxed mb-8">
-            혈당 기록과 분석을 확인하는<br />환자 전용 서비스입니다.
+            혈당 기록과 분석을 확인하는<br />당뇨인 전용 서비스입니다.
           </p>
 
           {/* CTA Buttons */}

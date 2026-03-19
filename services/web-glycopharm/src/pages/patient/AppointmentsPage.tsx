@@ -1,5 +1,5 @@
 /**
- * PatientAppointmentsPage — 환자 상담 예약
+ * PatientAppointmentsPage — 당뇨인 상담 예약
  * WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1
  *
  * 약국 연결 확인 → 예약 생성 → 예약 목록/취소.

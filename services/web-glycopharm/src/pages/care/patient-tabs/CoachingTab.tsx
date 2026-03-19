@@ -236,7 +236,7 @@ export default function CoachingTab() {
             <textarea
               value={actionPlan}
               onChange={(e) => setActionPlan(e.target.value)}
-              placeholder="환자에게 권장할 행동 계획을 작성해 주세요..."
+              placeholder="당뇨인에게 권장할 행동 계획을 작성해 주세요..."
               rows={3}
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
               required

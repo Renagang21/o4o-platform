@@ -291,7 +291,7 @@ export default function PatientsPage() {
         <div className="max-w-5xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900">환자 관리</h1>
+              <h1 className="text-2xl font-semibold text-slate-900">당뇨인 관리</h1>
             </div>
             {/* Data Import Button */}
             <button
@@ -389,7 +389,7 @@ export default function PatientsPage() {
               <div className="max-h-[400px] overflow-y-auto">
                 <DataTable
                   columns={[
-                    { key: 'patient', title: '환자', dataIndex: 'patient', width: '40%' },
+                    { key: 'patient', title: '당뇨인', dataIndex: 'patient', width: '40%' },
                     { key: 'visit', title: '방문 정보', dataIndex: 'visit', width: '35%' },
                     { key: 'status', title: '상태', dataIndex: 'status', width: '25%', align: 'center' },
                   ] as Column<Record<string, any>>[]}
@@ -618,7 +618,7 @@ export default function PatientsPage() {
                       </button>
                     </div>
                     <p className="text-sm text-slate-500 mt-2">
-                      AI가 환자 데이터를 기반으로 추가 인사이트를 제공합니다
+                      AI가 당뇨인 데이터를 기반으로 추가 인사이트를 제공합니다
                     </p>
                   </div>
                 </div>
@@ -626,7 +626,7 @@ export default function PatientsPage() {
                 {/* Trend Chart */}
                 <PlaceholderChart type="trend" />
 
-                {/* Patient Report Section - 환자 전달용 */}
+                {/* Patient Report Section - 당뇨인 전달용 */}
                 <div className="bg-white rounded-xl border border-slate-200 p-5">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
@@ -635,13 +635,13 @@ export default function PatientsPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
-                      <h3 className="text-sm font-medium text-slate-700">환자용 리포트</h3>
+                      <h3 className="text-sm font-medium text-slate-700">당뇨인용 리포트</h3>
                     </div>
-                    <span className="text-xs text-slate-400">환자에게 전달</span>
+                    <span className="text-xs text-slate-400">당뇨인에게 전달</span>
                   </div>
 
                   <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                    아래 버튼을 통해 환자에게 혈당 관리 현황을 전달할 수 있습니다.
+                    아래 버튼을 통해 당뇨인에게 혈당 관리 현황을 전달할 수 있습니다.
                   </p>
 
                   <div className="grid grid-cols-3 gap-2">
@@ -688,8 +688,8 @@ export default function PatientsPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
-                <p className="text-base text-slate-600 mb-1">환자를 선택하세요</p>
-                <p className="text-sm text-slate-500">왼쪽 목록에서 환자를 클릭하면 상세 정보가 표시됩니다</p>
+                <p className="text-base text-slate-600 mb-1">당뇨인를 선택하세요</p>
+                <p className="text-sm text-slate-500">왼쪽 목록에서 당뇨인를 클릭하면 상세 정보가 표시됩니다</p>
               </div>
             )}
           </div>

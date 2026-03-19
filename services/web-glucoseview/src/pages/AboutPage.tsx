@@ -35,10 +35,10 @@ const features: Feature[] = [
 
   // 공유/리포트 (Sharing)
   { name: '공유 기능', description: '리포트 공유 (카카오톡, 문자 등)', status: 'done', category: 'sharing' },
-  { name: '리포트 인쇄', description: '환자용 리포트 출력', status: 'done', category: 'sharing' },
+  { name: '리포트 인쇄', description: '당뇨인용 리포트 출력', status: 'done', category: 'sharing' },
   { name: '이메일 전송', description: '리포트 이메일 발송', status: 'done', category: 'sharing' },
   { name: 'PDF 리포트 생성', description: 'PDF 파일 다운로드', status: 'planned', category: 'sharing' },
-  { name: '환자 앱 연동', description: '환자가 직접 데이터 확인', status: 'not-planned', category: 'sharing' },
+  { name: '당뇨인 앱 연동', description: '당뇨인가 직접 데이터 확인', status: 'not-planned', category: 'sharing' },
 
   // 관리 기능 (Admin)
   { name: '회원 목록 조회', description: '전체 약사 회원 관리', status: 'done', category: 'admin' },

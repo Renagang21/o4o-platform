@@ -3,7 +3,7 @@
  * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
  *
  * 데이터 소스:
- *   - pharmacyApi.getCustomerDetail(id) → 환자 기본정보
+ *   - pharmacyApi.getCustomerDetail(id) → 당뇨인 기본정보
  *   - pharmacyApi.getCareDashboardSummary() → snapshotMap (riskLevel, createdAt)
  *   - pharmacyApi.getCareKpi(id) → TIR/CV 실데이터
  *   - pharmacyApi.getCoachingSessions(id) → 코칭 횟수
@@ -133,7 +133,7 @@ export default function PatientDetailPage() {
     ? new Date(snapshot.createdAt).toLocaleDateString()
     : '-';
 
-  const patientName = patient?.name || `환자 ${id}`;
+  const patientName = patient?.name || `당뇨인 ${id}`;
   const initial = patientName.charAt(0) || '?';
 
   // ── Action Panel rules ──
@@ -143,7 +143,7 @@ export default function PatientDetailPage() {
     if (riskKey === 'high') {
       items.push({
         icon: AlertTriangle,
-        label: '고위험 환자 — 분석 확인 필요',
+        label: '고위험 당뇨인 — 분석 확인 필요',
         cls: 'bg-red-50 border-red-200 text-red-700',
         path: 'analysis',
       });
@@ -198,7 +198,7 @@ export default function PatientDetailPage() {
           className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
-          환자 목록으로
+          당뇨인 목록으로
         </button>
 
         {/* Patient Header Block */}

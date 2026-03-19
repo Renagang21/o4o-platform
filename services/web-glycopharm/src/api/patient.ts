@@ -3,7 +3,7 @@
  * WO-GLYCOPHARM-PATIENT-PROFILE-V1
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
  *
- * 환자 본인용 API (프로필 조회/수정)
+ * 당뇨인 본인용 API (프로필 조회/수정)
  */
 
 import { api } from '@/lib/apiClient';

@@ -1,5 +1,5 @@
 /**
- * Risk Score Calculator — 환자 혈당 위험도 계산
+ * Risk Score Calculator — 당뇨인 혈당 위험도 계산
  * WO-GLYCOPHARM-PATIENT-RISK-SCORE-V1
  *
  * 기준:

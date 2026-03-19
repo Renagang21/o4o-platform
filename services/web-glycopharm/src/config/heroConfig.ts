@@ -51,7 +51,7 @@ export const heroSlides: HeroSlide[] = [
   {
     id: 'data-frame',
     title: '데이터 기반\n약국 운영 프레임',
-    subtitle: 'CGM 데이터로 환자 맞춤 상담, 신뢰와 재방문을 만듭니다',
+    subtitle: 'CGM 데이터로 당뇨인 맞춤 상담, 신뢰와 재방문을 만듭니다',
     bgGradient: 'from-blue-600 via-blue-700 to-indigo-800',
     cta: {
       label: 'GlucoseView 연동 알아보기',

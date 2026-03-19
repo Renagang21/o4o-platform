@@ -1,5 +1,5 @@
 /**
- * AnalysisTab - 환자 분석 결과 (live)
+ * AnalysisTab - 당뇨인 분석 결과 (live)
  * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
  *
  * API:

@@ -2,10 +2,10 @@
  * CoachingPage - 코칭 관리 (cross-patient)
  * WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
  *
- * 약사가 연결된 전체 환자의 코칭을 확인하고 생성/관리하는 화면.
+ * 약사가 연결된 전체 당뇨인의 코칭을 확인하고 생성/관리하는 화면.
  * API:
  *   GET  /care/coaching           → 전체 코칭 세션 목록
- *   GET  /care/coaching/:patientId → 환자별 세션
+ *   GET  /care/coaching/:patientId → 당뇨인별 세션
  *   POST /care/coaching           → 새 코칭 세션 생성
  *   GET  /care/coaching-drafts/:patientId → AI 초안
  *   POST /care/coaching-drafts/:id/approve → AI 초안 전송
@@ -67,7 +67,7 @@ export default function CoachingPage() {
           Array.isArray(data) ? data : []
         ).map((s: CoachingSession) => ({
           ...s,
-          patientName: patient?.name || '환자',
+          patientName: patient?.name || '당뇨인',
         }));
         setSessions(mapped);
       } else {
@@ -226,7 +226,7 @@ export default function CoachingPage() {
               <Users className="w-5 h-5 text-slate-400" />
             </div>
             <div>
-              <p className="text-xs text-slate-400">연결 환자 수</p>
+              <p className="text-xs text-slate-400">연결 당뇨인 수</p>
               <p className="text-xl font-bold text-slate-800">{patients.length}명</p>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default function CoachingPage() {
               onChange={(e) => setSelectedPatientId(e.target.value)}
               className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
-              <option value="">전체 환자</option>
+              <option value="">전체 당뇨인</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -265,7 +265,7 @@ export default function CoachingPage() {
               <Sparkles className="w-4 h-4 text-blue-500" />
               <span className="text-sm font-semibold text-blue-700">AI 코칭 초안</span>
               <span className="text-xs text-blue-500">
-                ({patients.find((p) => p.id === selectedPatientId)?.name || '환자'})
+                ({patients.find((p) => p.id === selectedPatientId)?.name || '당뇨인'})
               </span>
             </div>
             <textarea
@@ -300,14 +300,14 @@ export default function CoachingPage() {
           <form onSubmit={handleSubmit} className="bg-primary-50 rounded-xl border border-primary-100 p-5 space-y-4">
             {!selectedPatientId && (
               <div>
-                <label className="block text-xs text-slate-600 font-medium mb-1">환자 선택</label>
+                <label className="block text-xs text-slate-600 font-medium mb-1">당뇨인 선택</label>
                 <select
                   value={formPatientId}
                   onChange={(e) => setFormPatientId(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   required
                 >
-                  <option value="">환자를 선택하세요</option>
+                  <option value="">당뇨인를 선택하세요</option>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -332,7 +332,7 @@ export default function CoachingPage() {
               <textarea
                 value={actionPlan}
                 onChange={(e) => setActionPlan(e.target.value)}
-                placeholder="환자에게 권장할 행동 계획을 작성해 주세요..."
+                placeholder="당뇨인에게 권장할 행동 계획을 작성해 주세요..."
                 rows={3}
                 className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                 required
@@ -375,7 +375,7 @@ export default function CoachingPage() {
                   <div className="flex items-center gap-2">
                     <MessageSquare className="w-4 h-4 text-primary-500" />
                     <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-primary-50 text-primary-700 rounded-full">
-                      {session.patientName || '환자'}
+                      {session.patientName || '당뇨인'}
                     </span>
                     <span className="text-xs text-slate-400">
                       {new Date(session.createdAt).toLocaleDateString()}

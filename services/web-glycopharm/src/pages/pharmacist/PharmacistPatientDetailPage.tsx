@@ -1,8 +1,8 @@
 /**
- * PharmacistPatientDetailPage — 약사 환자 상세
+ * PharmacistPatientDetailPage — 약사 당뇨인 상세
  * WO-GLYCOPHARM-PHARMACIST-PATIENT-DETAIL-SCREEN-V1
  *
- * 환자 기본 정보 + 혈당 상태 + 최근 기록 + 기능 버튼.
+ * 당뇨인 기본 정보 + 혈당 상태 + 최근 기록 + 기능 버튼.
  * 기존 pharmacyApi 100% 재사용.
  */
 
@@ -106,11 +106,11 @@ export default function PharmacistPatientDetailPage() {
 
       if (customerRes && 'data' in customerRes && customerRes.data) {
         const d = customerRes.data as { name?: string; createdAt?: string };
-        setPatientName(d.name || '환자');
+        setPatientName(d.name || '당뇨인');
         setCreatedAt(d.createdAt || null);
       } else if (customerRes && 'name' in customerRes) {
         const d = customerRes as { name?: string; createdAt?: string };
-        setPatientName(d.name || '환자');
+        setPatientName(d.name || '당뇨인');
         setCreatedAt(d.createdAt || null);
       }
 
@@ -146,7 +146,7 @@ export default function PharmacistPatientDetailPage() {
   if (!patientId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">환자 정보가 없습니다.</p>
+        <p className="text-slate-500">당뇨인 정보가 없습니다.</p>
       </div>
     );
   }
@@ -160,7 +160,7 @@ export default function PharmacistPatientDetailPage() {
           className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          환자 목록
+          당뇨인 목록
         </button>
 
         {loading ? (
@@ -263,7 +263,7 @@ export default function PharmacistPatientDetailPage() {
               <ActionButton
                 icon={<MessageSquarePlus className="w-5 h-5 text-blue-600" />}
                 label="코칭 작성"
-                description="환자에게 코칭 메시지 전달"
+                description="당뇨인에게 코칭 메시지 전달"
                 onClick={() => navigate(`/pharmacy/coaching/${patientId}`)}
               />
               <ActionButton
@@ -275,7 +275,7 @@ export default function PharmacistPatientDetailPage() {
               <ActionButton
                 icon={<Calendar className="w-5 h-5 text-orange-600" />}
                 label="예약 관리"
-                description="환자 상담 예약 확인 및 관리"
+                description="당뇨인 상담 예약 확인 및 관리"
                 onClick={() => navigate('/pharmacy/appointments')}
               />
             </section>

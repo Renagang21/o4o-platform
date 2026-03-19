@@ -72,12 +72,12 @@ export default function PatientSummaryCards(props: PatientSummaryCardsProps) {
     <div>
       <div className="mb-4">
         <h2 className="text-lg font-bold text-slate-800">Care 운영 현황</h2>
-        <p className="text-xs text-slate-500 mt-1">환자 관리 및 케어 현황</p>
+        <p className="text-xs text-slate-500 mt-1">당뇨인 관리 및 케어 현황</p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <KpiCard
           icon={Users}
-          label="등록 환자"
+          label="등록 당뇨인"
           value={props.totalPatients}
           unit="명"
           status={props.totalPatientsStatus}
@@ -95,7 +95,7 @@ export default function PatientSummaryCards(props: PatientSummaryCardsProps) {
         />
         <KpiCard
           icon={AlertTriangle}
-          label="주의 환자"
+          label="주의 당뇨인"
           value={props.cautionPatients}
           unit="명"
           status={props.cautionPatientsStatus}
@@ -104,7 +104,7 @@ export default function PatientSummaryCards(props: PatientSummaryCardsProps) {
         />
         <KpiCard
           icon={MessageSquare}
-          label="케어 환자"
+          label="케어 당뇨인"
           value={props.carePatients}
           unit="명"
           status={props.carePatientsStatus}

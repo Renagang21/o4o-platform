@@ -6,7 +6,7 @@
  * 7-Block 구조:
  * 1. Hero — GlycoPharm Care 메시지 + CTA
  * 2. PatientSummaryCards + PharmacyNewsPreview — KPI 요약 + 뉴스
- * 3. RiskPatientsSection — 주의 환자 (클릭→PatientDetail)
+ * 3. RiskPatientsSection — 주의 당뇨인 (클릭→PatientDetail)
  * 4. PatientActivitySection — 최근 활동 피드
  * 5. AnalysisSummarySection — 약국 전체 분석 요약
  * 6. BannerSection — 광고 배너 플레이스홀더
@@ -49,10 +49,10 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
               <span>혈당관리 전문 플랫폼</span>
             </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-              약국 중심{'\n'}환자 케어 대시보드
+              약국 중심{'\n'}당뇨인 케어 대시보드
             </h1>
             <p className="text-lg text-white/80 mb-6">
-              환자 상태 파악부터 맞춤 코칭까지
+              당뇨인 상태 파악부터 맞춤 코칭까지
               <br className="hidden md:block" />
               한눈에 관리하는 케어 워크스페이스
             </p>
@@ -166,7 +166,7 @@ export default function HomeLivePage() {
     if (!summary?.recentSnapshots) return [];
     const customerMap = new Map(customers.map((c) => [c.id, c]));
     return summary.recentSnapshots.slice(0, 5).map((s, i) => {
-      const name = customerMap.get(s.patientId)?.name || '환자';
+      const name = customerMap.get(s.patientId)?.name || '당뇨인';
       const riskLabel = s.riskLevel === 'high' ? '고위험' : s.riskLevel === 'moderate' ? '주의' : '양호';
       return {
         id: `snap-${i}`,
@@ -215,7 +215,7 @@ export default function HomeLivePage() {
             <section className="py-6 px-4 sm:px-6 max-w-7xl mx-auto">
               <div className="flex items-center gap-2 mb-4">
                 <Star className="w-5 h-5 text-orange-500" />
-                <h2 className="text-lg font-semibold text-slate-800">오늘 먼저 봐야 할 환자</h2>
+                <h2 className="text-lg font-semibold text-slate-800">오늘 먼저 봐야 할 당뇨인</h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {todayPriority.map((p) => {

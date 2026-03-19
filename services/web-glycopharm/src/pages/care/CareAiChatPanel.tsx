@@ -46,14 +46,14 @@ interface CareAiChatPanelProps {
 // ── Constants ──
 
 const POPULATION_QUESTIONS = [
-  '오늘 관리해야 할 환자는?',
-  '야간 저혈당 환자는?',
-  'TIR이 가장 낮은 환자는?',
-  '최근 7일 코칭이 필요한 환자는?',
+  '오늘 관리해야 할 당뇨인는?',
+  '야간 저혈당 당뇨인는?',
+  'TIR이 가장 낮은 당뇨인는?',
+  '최근 7일 코칭이 필요한 당뇨인는?',
 ];
 
 const PATIENT_QUESTIONS = [
-  '이 환자의 최근 혈당 추세는?',
+  '이 당뇨인의 최근 혈당 추세는?',
   '위험 요인을 요약해 주세요',
   '코칭에서 다뤄야 할 주제는?',
   '지난 주 대비 변화는?',
@@ -234,7 +234,7 @@ export default function CareAiChatPanel({
             <div>
               <h2 className="text-sm font-semibold text-slate-800">AI Care Copilot</h2>
               <p className="text-[11px] text-slate-500">
-                {patientId ? `${patientName || '환자'} 분석` : '전체 환자 분석'}
+                {patientId ? `${patientName || '당뇨인'} 분석` : '전체 당뇨인 분석'}
               </p>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function CareAiChatPanel({
             <div className="text-center py-8">
               <Sparkles className="w-10 h-10 text-blue-300 mx-auto mb-3" />
               <p className="text-sm font-medium text-slate-700 mb-1">
-                {patientId ? '이 환자에 대해 질문하세요' : '환자에 대해 질문하세요'}
+                {patientId ? '이 당뇨인에 대해 질문하세요' : '당뇨인에 대해 질문하세요'}
               </p>
               <p className="text-xs text-slate-400 mb-6">
                 Care 데이터 기반 AI 분석을 제공합니다

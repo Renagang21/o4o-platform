@@ -45,7 +45,7 @@ const sampleBanners: SlideBanner[] = [
   {
     id: '2',
     title: '혈당 관리의 새로운 패러다임',
-    subtitle: '환자별 CGM 데이터를 한눈에 파악하세요',
+    subtitle: '당뇨인별 CGM 데이터를 한눈에 파악하세요',
     bgColor: 'bg-gradient-to-r from-purple-600 to-pink-500',
     textColor: 'text-white',
     isActive: true,

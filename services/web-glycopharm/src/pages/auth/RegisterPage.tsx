@@ -2,7 +2,7 @@
  * RegisterPage — GlycoPharm 회원가입
  * WO-O4O-GLYCOPHARM-SIGNUP-REFORM-V1
  *
- * - 환자/약국 유형 선택
+ * - 당뇨인/약국 유형 선택
  * - 약국: 사업자 정보 필수 (약국명, 사업자번호, 세금계산서 이메일)
  * - 닉네임: 필수 입력
  * - 면허번호: 제거
@@ -131,7 +131,7 @@ export default function RegisterPage() {
         marketingAccepted: formData.agreeMarketing,
       });
 
-      // 약국: 승인 대기 메시지 표시, 환자: 로그인 이동
+      // 약국: 승인 대기 메시지 표시, 당뇨인: 로그인 이동
       if (memberType === 'pharmacy') {
         setRegistrationComplete(true);
       } else {
@@ -248,7 +248,7 @@ export default function RegisterPage() {
                       : 'border-slate-200 text-slate-500 hover:border-slate-300'
                   }`}
                 >
-                  환자
+                  당뇨인
                 </button>
                 <button
                   type="button"
@@ -645,7 +645,7 @@ export default function RegisterPage() {
                     <h3 className="font-bold text-base">제3조 (약관의 효력 및 변경)</h3>
                     <p>본 약관은 서비스 화면에 게시하거나 기타의 방법으로 회원에게 공지함으로써 효력이 발생합니다.</p>
                     <h3 className="font-bold text-base">제4조 (회원가입 및 서비스 이용)</h3>
-                    <p>1. 회원가입은 환자 또는 약국 회원으로 가능합니다.</p>
+                    <p>1. 회원가입은 당뇨인 또는 약국 회원으로 가능합니다.</p>
                     <p>2. 약국 회원은 사업자 정보 확인 후 운영자 승인을 거쳐 이용이 가능합니다.</p>
                     <p>3. 회원은 가입 시 정확한 정보를 제공해야 하며, 허위 정보 제공 시 서비스 이용이 제한될 수 있습니다.</p>
                     <p className="text-xs text-slate-400 pt-4 border-t">시행일: 2026년 3월 17일</p>

@@ -1,5 +1,5 @@
 /**
- * PatientAiSummary — 환자 AI 요약 패널
+ * PatientAiSummary — 당뇨인 AI 요약 패널
  * WO-GLYCOPHARM-CARE-CONTROL-TOWER-AI-UX-REFINE-V1
  *
  * PatientDetailPage 헤더 아래 / 탭 위에 표시.

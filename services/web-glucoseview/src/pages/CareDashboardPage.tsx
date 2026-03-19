@@ -1,9 +1,9 @@
 /**
- * CareDashboardPage - 환자 행동 Care Home
+ * CareDashboardPage - 당뇨인 행동 Care Home
  *
  * WO-O4O-GLUCOSEVIEW-HOME-BEHAVIOR-UI-V1
  *
- * 환자를 선택하면 5개 섹션 표시:
+ * 당뇨인를 선택하면 5개 섹션 표시:
  *   ① 오늘 건강 (glucose + BP + weight KPI)
  *   ② 데이터 입력 (3-button quick entry)
  *   ③ 최근 기록 (Health Readings)
@@ -11,7 +11,7 @@
  *   ⑤ 약사 코칭
  *
  * API:
- *   - listCustomers → 환자 목록
+ *   - listCustomers → 당뇨인 목록
  *   - getCareKpi → TIR/CV
  *   - getCareAnalysis → Risk/Insights
  *   - getCoachingSessions → 코칭 목록
@@ -109,7 +109,7 @@ export default function CareDashboardPage() {
         const result = await api.listCustomers({ limit: 200 });
         setPatients(result.data);
       } catch {
-        setError('환자 목록을 불러오지 못했습니다.');
+        setError('당뇨인 목록을 불러오지 못했습니다.');
       } finally {
         setLoadingPatients(false);
       }
@@ -204,12 +204,12 @@ export default function CareDashboardPage() {
           </div>
         </div>
         <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-slate-500 mb-4">등록된 환자가 없습니다.</p>
+          <p className="text-slate-500 mb-4">등록된 당뇨인가 없습니다.</p>
           <a
             href="/patients"
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
-            환자 등록하기
+            당뇨인 등록하기
           </a>
         </div>
       </div>
@@ -222,20 +222,20 @@ export default function CareDashboardPage() {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-6 py-6">
           <h1 className="text-xl font-bold text-slate-900">Care Home</h1>
-          <p className="text-sm text-slate-500 mt-1">환자를 선택하여 건강 상태와 행동을 확인합니다.</p>
+          <p className="text-sm text-slate-500 mt-1">당뇨인를 선택하여 건강 상태와 행동을 확인합니다.</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-6 space-y-5">
         {/* Patient Selector */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <label className="block text-sm font-medium text-slate-700 mb-2">환자 선택</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">당뇨인 선택</label>
           <select
             className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={selectedId ?? ''}
             onChange={(e) => e.target.value && handleSelectPatient(e.target.value)}
           >
-            <option value="">-- 환자를 선택하세요 --</option>
+            <option value="">-- 당뇨인를 선택하세요 --</option>
             {patients.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}{p.phone ? ` (${p.phone})` : ''}
@@ -262,7 +262,7 @@ export default function CareDashboardPage() {
         {/* Prompt */}
         {!selectedId && !loadingData && (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-400">
-            환자를 선택하면 건강 상태가 표시됩니다.
+            당뇨인를 선택하면 건강 상태가 표시됩니다.
           </div>
         )}
 

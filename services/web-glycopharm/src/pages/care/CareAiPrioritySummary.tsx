@@ -2,7 +2,7 @@
  * CareAiPrioritySummary — Priority Patients AI 요약
  * WO-GLYCOPHARM-CARE-CONTROL-TOWER-AI-UX-REFINE-V1
  *
- * Priority 환자 데이터에서 AI reason을 수집하여
+ * Priority 당뇨인 데이터에서 AI reason을 수집하여
  * 요약 설명 + "AI 분석 보기" 링크 제공.
  */
 
@@ -24,7 +24,7 @@ export default function CareAiPrioritySummary({ patients }: Props) {
 
     const highRiskCount = patients.filter(p => p.riskLevel === 'high').length;
     if (highRiskCount > 0) {
-      result.push(`고위험 환자 ${highRiskCount}명이 우선 관리 대상입니다.`);
+      result.push(`고위험 당뇨인 ${highRiskCount}명이 우선 관리 대상입니다.`);
       firstHighId = patients.find(p => p.riskLevel === 'high')?.patientId ?? null;
     }
 

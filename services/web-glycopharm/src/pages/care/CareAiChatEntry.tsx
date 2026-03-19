@@ -18,13 +18,13 @@ interface CareAiChatEntryProps {
 }
 
 const POPULATION_QUESTIONS = [
-  '오늘 관리해야 할 환자는?',
-  '야간 저혈당 환자는?',
-  'TIR이 가장 낮은 환자는?',
+  '오늘 관리해야 할 당뇨인는?',
+  '야간 저혈당 당뇨인는?',
+  'TIR이 가장 낮은 당뇨인는?',
 ];
 
 const PATIENT_QUESTIONS = [
-  '이 환자의 최근 혈당 추세는?',
+  '이 당뇨인의 최근 혈당 추세는?',
   '위험 요인을 요약해 주세요',
   '코칭에서 다뤄야 할 주제는?',
 ];
@@ -55,10 +55,10 @@ export default function CareAiChatEntry({ patientId, patientName }: CareAiChatEn
             </div>
             <div>
               <h3 className="text-sm font-semibold text-slate-800">
-                {patientId ? '이 환자에 대해 AI에게 물어보세요' : '환자에 대해 AI에게 물어보세요'}
+                {patientId ? '이 당뇨인에 대해 AI에게 물어보세요' : '당뇨인에 대해 AI에게 물어보세요'}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                {patientId ? '환자 데이터 기반 AI 분석' : '환자 데이터 기반 AI 분석을 질문할 수 있습니다'}
+                {patientId ? '당뇨인 데이터 기반 AI 분석' : '당뇨인 데이터 기반 AI 분석을 질문할 수 있습니다'}
               </p>
             </div>
           </div>

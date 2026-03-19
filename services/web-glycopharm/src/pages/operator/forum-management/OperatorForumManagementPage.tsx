@@ -39,8 +39,8 @@ const mockApplications: ForumApplication[] = [
   {
     id: 'app2',
     title: '당뇨 식단 정보 공유',
-    description: '당뇨 환자를 위한 식단 정보 공유 포럼',
-    purpose: '당뇨 환자 맞춤 식단 정보와 레시피를 공유하는 공간',
+    description: '당뇨인를 위한 식단 정보 공유 포럼',
+    purpose: '당뇨인 맞춤 식단 정보와 레시피를 공유하는 공간',
     targetRoles: ['pharmacy', 'supplier'],
     allowedWriteRoles: ['pharmacy', 'supplier', 'operator'],
     note: '영양사 협회와 연계 예정',

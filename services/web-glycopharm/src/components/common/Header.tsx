@@ -24,7 +24,7 @@ import ServiceSwitcher from '../ServiceSwitcher';
 
 /**
  * WO-O4O-GLYCOPHARM-NAVIGATION-CLEANUP-V1: 4-메뉴
- * GlycoPharm = Care 운영 도구. 포럼/환자관리 메뉴 제거.
+ * GlycoPharm = Care 운영 도구. 포럼/당뇨인관리 메뉴 제거.
  * 약국 로그인 시 Home → /care/patients (Care 메인)
  */
 const menuItems = [

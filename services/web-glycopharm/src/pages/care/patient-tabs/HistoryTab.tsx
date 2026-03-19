@@ -1,5 +1,5 @@
 /**
- * HistoryTab - 환자 타임라인 (통합)
+ * HistoryTab - 당뇨인 타임라인 (통합)
  * WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 Phase 3
  *
  * 4가지 이벤트를 시간축으로 통합 표시:

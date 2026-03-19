@@ -1,9 +1,9 @@
 /**
- * PharmacistPatientsPage — 약사 환자 목록
+ * PharmacistPatientsPage — 약사 당뇨인 목록
  * WO-GLYCOPHARM-PHARMACIST-PATIENT-LIST-SCREEN-V1
  * WO-GLYCOPHARM-PATIENT-RISK-SCORE-V1
  *
- * 약사가 관리하는 환자 목록 + 위험도 + 최근/평균 혈당 + 검색.
+ * 약사가 관리하는 당뇨인 목록 + 위험도 + 최근/평균 혈당 + 검색.
  * 클라이언트 측 calculateRisk() 기반 위험도 계산.
  */
 
@@ -140,9 +140,9 @@ export default function PharmacistPatientsPage() {
             <Users className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-800">환자 관리</h1>
+            <h1 className="text-xl font-bold text-slate-800">당뇨인 관리</h1>
             <p className="text-xs text-slate-400">
-              {enrichedPatients.length}명의 환자
+              {enrichedPatients.length}명의 당뇨인
             </p>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function PharmacistPatientsPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="환자 이름, 전화번호 검색"
+                placeholder="당뇨인 이름, 전화번호 검색"
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
               />
             </div>
@@ -215,7 +215,7 @@ export default function PharmacistPatientsPage() {
               <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center justify-center">
                 <Users className="w-12 h-12 text-slate-300 mb-3" />
                 <p className="text-sm text-slate-500 font-medium">
-                  {search ? '검색 결과가 없습니다' : '등록된 환자가 없습니다'}
+                  {search ? '검색 결과가 없습니다' : '등록된 당뇨인가 없습니다'}
                 </p>
               </div>
             ) : (

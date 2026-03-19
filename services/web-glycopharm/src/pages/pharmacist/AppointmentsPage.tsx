@@ -158,7 +158,7 @@ export default function PharmacistAppointmentsPage() {
             <Clock className="w-12 h-12 text-slate-300 mb-3" />
             <p className="text-sm text-slate-500 font-medium">예약이 없습니다</p>
             <p className="text-xs text-slate-400 mt-1">
-              환자가 상담을 예약하면 여기에 표시됩니다.
+              당뇨인가 상담을 예약하면 여기에 표시됩니다.
             </p>
           </div>
         ) : (
@@ -263,7 +263,7 @@ export default function PharmacistAppointmentsPage() {
                         <div className="bg-slate-50 rounded-lg p-3 mb-3">
                           <p className="text-xs text-slate-500 flex items-center gap-1 mb-1">
                             <MessageSquare className="w-3 h-3" />
-                            환자 메모
+                            당뇨인 메모
                           </p>
                           <p className="text-sm text-slate-700">{appt.notes}</p>
                         </div>

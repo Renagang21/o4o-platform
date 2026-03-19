@@ -36,13 +36,13 @@ export default function CareRiskSummary({ population }: Props) {
 
     let exp = '';
     if (high > 0 && moderate > 0) {
-      exp = `환자의 ${pct}%가 주의 이상 위험도입니다. 고위험 ${high}명에 대한 집중 관리가 필요합니다.`;
+      exp = `당뇨인의 ${pct}%가 주의 이상 위험도입니다. 고위험 ${high}명에 대한 집중 관리가 필요합니다.`;
     } else if (high > 0) {
-      exp = `고위험 환자 ${high}명에 대한 집중 관리가 필요합니다.`;
+      exp = `고위험 당뇨인 ${high}명에 대한 집중 관리가 필요합니다.`;
     } else if (moderate > 0) {
-      exp = `주의 단계 환자 ${moderate}명이 있습니다. 악화 방지를 위한 모니터링을 권장합니다.`;
+      exp = `주의 단계 당뇨인 ${moderate}명이 있습니다. 악화 방지를 위한 모니터링을 권장합니다.`;
     } else {
-      exp = `모든 환자가 양호한 상태입니다.`;
+      exp = `모든 당뇨인가 양호한 상태입니다.`;
     }
 
     return { total: t, atRiskPct: pct, explanation: exp };

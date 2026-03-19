@@ -2,7 +2,7 @@
  * PharmacistCoachingPage — 약사 코칭 화면
  * WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1
  *
- * 환자 분석 결과 + 문제 유형 + 코칭 입력/기록을 하나의 화면에 표시.
+ * 당뇨인 분석 결과 + 문제 유형 + 코칭 입력/기록을 하나의 화면에 표시.
  * 기존 care 백엔드 API 100% 재사용 (새 엔드포인트 없음).
  */
 
@@ -221,9 +221,9 @@ export default function PharmacistCoachingPage() {
 
       // Extract patient name from customer detail
       if (customerRes && 'data' in customerRes && customerRes.data) {
-        setPatientName((customerRes.data as { name?: string }).name || '환자');
+        setPatientName((customerRes.data as { name?: string }).name || '당뇨인');
       } else if (customerRes && 'name' in customerRes) {
-        setPatientName((customerRes as { name?: string }).name || '환자');
+        setPatientName((customerRes as { name?: string }).name || '당뇨인');
       }
 
       setAnalysis(analysisRes);
@@ -318,7 +318,7 @@ export default function PharmacistCoachingPage() {
   if (!patientId) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-500">환자 정보가 없습니다.</p>
+        <p className="text-slate-500">당뇨인 정보가 없습니다.</p>
       </div>
     );
   }
@@ -377,7 +377,7 @@ export default function PharmacistCoachingPage() {
                     <User className="w-5 h-5 text-slate-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-800">{patientName || '환자'}</p>
+                    <p className="font-semibold text-slate-800">{patientName || '당뇨인'}</p>
                     <p className="text-xs text-slate-400">
                       {stats?.lastDate
                         ? `최근 입력: ${new Date(stats.lastDate).toLocaleDateString('ko-KR')}`
@@ -568,7 +568,7 @@ export default function PharmacistCoachingPage() {
                       <textarea
                         value={summary}
                         onChange={(e) => setSummary(e.target.value)}
-                        placeholder="환자에게 전달할 코칭 요약..."
+                        placeholder="당뇨인에게 전달할 코칭 요약..."
                         rows={2}
                         className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
                       />

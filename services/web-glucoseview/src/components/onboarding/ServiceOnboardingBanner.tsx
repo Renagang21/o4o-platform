@@ -77,7 +77,7 @@ export function ServiceOnboardingBanner() {
             약국을 등록하고 GlucoseView를 시작하세요
           </p>
           <p className="text-sm text-slate-600 m-0 mt-1">
-            약국 CGM 데이터 관리 서비스를 이용하시면 환자 혈당 데이터를 한 곳에서 관리할 수 있습니다.
+            약국 CGM 데이터 관리 서비스를 이용하시면 당뇨인 혈당 데이터를 한 곳에서 관리할 수 있습니다.
           </p>
         </div>
         <Link

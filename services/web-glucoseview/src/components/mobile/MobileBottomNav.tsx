@@ -1,5 +1,5 @@
 /**
- * MobileBottomNav — 환자 모바일 하단 네비게이션
+ * MobileBottomNav — 당뇨인 모바일 하단 네비게이션
  * WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1
  *
  * 5탭: 홈, 입력, 분석, 코칭, 내정보

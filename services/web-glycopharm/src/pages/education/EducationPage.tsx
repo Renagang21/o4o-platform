@@ -29,8 +29,8 @@ const mockContents = [
   },
   {
     id: '2',
-    title: '당뇨 환자 상담 실전 매뉴얼',
-    description: '약국에서 당뇨 환자 상담 시 활용할 수 있는 실전 매뉴얼입니다.',
+    title: '당뇨인 상담 실전 매뉴얼',
+    description: '약국에서 당뇨인 상담 시 활용할 수 있는 실전 매뉴얼입니다.',
     type: 'pdf',
     category: '상담',
     pages: 32,
@@ -42,7 +42,7 @@ const mockContents = [
   {
     id: '3',
     title: '혈당 관리와 영양 웨비나',
-    description: '당뇨 환자의 영양 관리에 대한 전문가 웨비나입니다.',
+    description: '당뇨인의 영양 관리에 대한 전문가 웨비나입니다.',
     type: 'webinar',
     category: '영양',
     date: '2024-01-20',

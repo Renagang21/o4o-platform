@@ -1,5 +1,5 @@
 /**
- * PatientMainPage — 환자용 메인 메뉴 화면
+ * PatientMainPage — 당뇨인용 메인 메뉴 화면
  * WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1
  *
  * 메뉴형 시스템: 5개 기능 버튼으로 구성
@@ -94,9 +94,9 @@ export default function PatientMainPage() {
             onClick={() => navigate('/patient/profile')}
             className="text-xl font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer"
           >
-            {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '환자'}님
+            {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '당뇨인'}님
           </button>
-          <p className="text-sm text-slate-500 mt-1">GlycoPharm 환자용 시스템</p>
+          <p className="text-sm text-slate-500 mt-1">GlycoPharm 당뇨인용 시스템</p>
         </div>
 
         {/* Menu Items */}

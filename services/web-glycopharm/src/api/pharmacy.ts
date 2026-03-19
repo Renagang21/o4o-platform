@@ -600,7 +600,7 @@ class PharmacyApiClient {
   }
 
   /**
-   * 환자 등록 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1)
+   * 당뇨인 등록 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1)
    */
   async createCustomer(data: {
     name: string;

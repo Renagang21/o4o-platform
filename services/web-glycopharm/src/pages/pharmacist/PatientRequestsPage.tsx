@@ -2,7 +2,7 @@
  * PatientRequestsPage — 약사 연결 요청 관리
  * WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1
  *
- * 환자의 약국 연결 요청을 승인/거절하는 화면.
+ * 당뇨인의 약국 연결 요청을 승인/거절하는 화면.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -96,7 +96,7 @@ export default function PatientRequestsPage() {
             <p className="text-xs text-slate-400">
               {requests.length > 0
                 ? `${requests.length}건의 대기 중인 요청`
-                : '환자 연결 요청 관리'}
+                : '당뇨인 연결 요청 관리'}
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function PatientRequestsPage() {
               대기 중인 연결 요청이 없습니다
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              환자가 약국 연결을 요청하면 여기에 표시됩니다.
+              당뇨인가 약국 연결을 요청하면 여기에 표시됩니다.
             </p>
           </div>
         ) : (
@@ -146,7 +146,7 @@ export default function PatientRequestsPage() {
                   <div className="bg-slate-50 rounded-lg p-3 mb-3">
                     <p className="text-xs text-slate-500 flex items-center gap-1 mb-1">
                       <MessageSquare className="w-3 h-3" />
-                      환자 메시지
+                      당뇨인 메시지
                     </p>
                     <p className="text-sm text-slate-700">{req.message}</p>
                   </div>

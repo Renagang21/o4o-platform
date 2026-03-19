@@ -97,7 +97,7 @@ export default function CareDashboardPage() {
       setPopulation(populationRes);
       setAlerts(alertsRes);
     } catch {
-      setError('환자 정보를 불러오는데 실패했습니다.');
+      setError('당뇨인 정보를 불러오는데 실패했습니다.');
       setPatients([]);
     } finally {
       setLoading(false);
@@ -182,7 +182,7 @@ export default function CareDashboardPage() {
               <div className="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary-600" />
               </div>
-              <p className="text-sm text-slate-500">전체 환자</p>
+              <p className="text-sm text-slate-500">전체 당뇨인</p>
             </div>
             <p className="text-3xl font-bold text-slate-900">
               {summary?.totalPatients ?? patients.length}
@@ -234,7 +234,7 @@ export default function CareDashboardPage() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <Star className="w-5 h-5 text-orange-500" />
-              <h2 className="text-sm font-semibold text-slate-700">오늘의 우선 관리 환자</h2>
+              <h2 className="text-sm font-semibold text-slate-700">오늘의 우선 관리 당뇨인</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               {priorityPatients.map((pp) => {
@@ -426,11 +426,11 @@ export default function CareDashboardPage() {
                   </span>
                 </div>
                 <div className="border-t border-slate-100 pt-2 flex items-center justify-between">
-                  <span className="text-xs text-slate-500">활성 환자 (7일)</span>
+                  <span className="text-xs text-slate-500">활성 당뇨인 (7일)</span>
                   <span className="text-sm font-semibold text-green-600">{population.activity.activePatients}명</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-500">비활성 환자</span>
+                  <span className="text-xs text-slate-500">비활성 당뇨인</span>
                   <span className={`text-sm font-semibold ${population.activity.inactivePatients > 0 ? 'text-orange-500' : 'text-slate-800'}`}>
                     {population.activity.inactivePatients}명
                   </span>
@@ -477,7 +477,7 @@ export default function CareDashboardPage() {
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            환자 등록
+            당뇨인 등록
           </button>
         </div>
 
@@ -498,8 +498,8 @@ export default function CareDashboardPage() {
             <div className="text-center py-16">
               <p className="text-slate-500">
                 {debouncedSearch || riskFilter !== 'all'
-                  ? '조건에 맞는 환자가 없습니다.'
-                  : '등록된 환자가 없습니다.'}
+                  ? '조건에 맞는 당뇨인가 없습니다.'
+                  : '등록된 당뇨인가 없습니다.'}
               </p>
             </div>
           ) : (
@@ -507,7 +507,7 @@ export default function CareDashboardPage() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    환자명
+                    당뇨인명
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     위험도

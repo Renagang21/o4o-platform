@@ -3,7 +3,7 @@
  * WO-GLYCOPHARM-GLUCOSE-INPUT-PAGE-V1
  * WO-GLYCOPHARM-DATA-INPUT-EXPANSION-V1
  *
- * 환자 자가입력: 혈당 값 + 측정 구분 + 측정 시간
+ * 당뇨인 자가입력: 혈당 값 + 측정 구분 + 측정 시간
  * 추가 기록: 투약, 운동, 증상 (접이식 섹션)
  * 하단에 최근 기록 표시.
  */

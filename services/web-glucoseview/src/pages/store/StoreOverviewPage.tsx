@@ -14,7 +14,7 @@ export default function StoreOverviewPage() {
       {/* KPI Cards (Phase 2에서 실데이터 연결) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <p className="text-sm text-slate-500">등록 환자</p>
+          <p className="text-sm text-slate-500">등록 당뇨인</p>
           <p className="text-2xl font-bold text-slate-800 mt-1">-</p>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">

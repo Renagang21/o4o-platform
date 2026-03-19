@@ -4,7 +4,7 @@ import type { RiskPatientDto } from '@/api/pharmacy';
 /**
  * RiskPatientsSection — WO-O4O-CARE-RISK-PATIENT-DETECTION-V1
  *
- * Displays risk patients in two groups: 위험 환자 (high) + 주의 환자 (caution).
+ * Displays risk patients in two groups: 위험 당뇨인 (high) + 주의 당뇨인 (caution).
  * Uses composite risk score from the /api/v1/care/risk-patients endpoint.
  */
 
@@ -102,13 +102,13 @@ export default function RiskPatientsSection({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
-              주의 환자
+              주의 당뇨인
             </h2>
           </div>
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 text-center">
             <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
-            <p className="text-sm text-slate-500">고위험 환자가 없습니다</p>
-            <p className="text-xs text-slate-400 mt-1">모든 환자의 상태가 양호합니다</p>
+            <p className="text-sm text-slate-500">고위험 당뇨인가 없습니다</p>
+            <p className="text-xs text-slate-400 mt-1">모든 당뇨인의 상태가 양호합니다</p>
           </div>
         </>
       ) : useNewApi ? (
@@ -119,7 +119,7 @@ export default function RiskPatientsSection({
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-red-500" />
-                  위험 환자
+                  위험 당뇨인
                 </h2>
                 <span className="text-xs text-slate-500">{highList.length}명</span>
               </div>
@@ -143,7 +143,7 @@ export default function RiskPatientsSection({
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   <AlertCircle className="w-5 h-5 text-amber-500" />
-                  주의 환자
+                  주의 당뇨인
                 </h2>
                 <span className="text-xs text-slate-500">{cautionList.length}명</span>
               </div>
@@ -167,7 +167,7 @@ export default function RiskPatientsSection({
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
-              주의 환자
+              주의 당뇨인
             </h2>
             <span className="text-xs text-slate-500">{legacyPatients.length}명</span>
           </div>

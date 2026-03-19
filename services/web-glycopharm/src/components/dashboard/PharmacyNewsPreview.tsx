@@ -3,7 +3,7 @@ import { Newspaper } from 'lucide-react';
 const newsItems = [
   { id: '1', title: '2026년 혈당관리 약국 지원 정책 안내', date: '2026.03.05', source: '약업신문' },
   { id: '2', title: 'CGM 기기 급여화 추진 동향', date: '2026.03.03', source: '약사공론' },
-  { id: '3', title: '당뇨병 환자 복약지도 최신 가이드라인', date: '2026.02.28', source: '팜뉴스' },
+  { id: '3', title: '당뇨인 복약지도 최신 가이드라인', date: '2026.02.28', source: '팜뉴스' },
 ];
 
 export default function PharmacyNewsPreview() {

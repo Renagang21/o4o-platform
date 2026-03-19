@@ -220,7 +220,7 @@ export default function Layout() {
               <h3 className="text-lg font-semibold text-slate-900 mb-3">GlucoseView</h3>
               <p className="text-sm text-slate-500 leading-relaxed">
                 약국을 위한 CGM 데이터 정리 도구입니다.
-                환자별 혈당 데이터를 정리하여 효과적인 상담을 지원합니다.
+                당뇨인별 혈당 데이터를 정리하여 효과적인 상담을 지원합니다.
               </p>
             </div>
 
@@ -302,7 +302,7 @@ export default function Layout() {
         <AIChatButton
           userName={user?.displayName || user?.name}
           context={{
-            patientCount: 0, // TODO: 실제 환자 수 연동
+            patientCount: 0, // TODO: 실제 당뇨인 수 연동
           }}
         />
       )}

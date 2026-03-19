@@ -88,7 +88,7 @@ const fallbackNowRunning: NowRunningItem[] = [
   {
     id: '1',
     type: 'trial',
-    title: '당뇨병 환자용 신규 영양제 Trial',
+    title: '당뇨인용 신규 영양제 Trial',
     supplier: '글루코헬스',
     deadline: '2026.01.31',
     participants: 23,

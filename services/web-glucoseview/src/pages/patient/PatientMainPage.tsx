@@ -1,5 +1,5 @@
 /**
- * PatientMainPage — 환자 대시보드
+ * PatientMainPage — 당뇨인 대시보드
  * WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1
  *
  * 모바일 중심 대시보드:
@@ -117,7 +117,7 @@ export default function PatientMainPage() {
                 onClick={() => navigate('/patient/profile')}
                 className="text-lg font-bold text-slate-800 hover:text-teal-600 transition-colors cursor-pointer"
               >
-                {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '환자'}님
+                {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '당뇨인'}님
               </button>
               <p className="text-xs text-slate-400">{formatDate()}</p>
             </div>

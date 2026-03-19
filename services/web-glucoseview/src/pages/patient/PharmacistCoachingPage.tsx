@@ -1,5 +1,5 @@
 /**
- * PharmacistCoachingPage — 환자용 약사 코칭 확인 화면
+ * PharmacistCoachingPage — 당뇨인용 약사 코칭 확인 화면
  * WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1
  * WO-GLUCOSEVIEW-PATIENT-PHARMACY-LINK-FLOW-V1
  *

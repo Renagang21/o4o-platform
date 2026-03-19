@@ -37,7 +37,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-slate-900">GlucoseView</h1>
-          <p className="text-slate-500 mt-2">환자 전용 혈당 관리 서비스</p>
+          <p className="text-slate-500 mt-2">당뇨인 전용 혈당 관리 서비스</p>
         </div>
 
         {/* Login Form */}
@@ -147,7 +147,7 @@ export default function LoginPage() {
               }}
               className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50"
             >
-              테스트 환자
+              테스트 당뇨인
             </button>
           </div>
         </div>

@@ -1,8 +1,8 @@
 /**
- * SelectPharmacyPage — 환자 약국 선택/연결
+ * SelectPharmacyPage — 당뇨인 약국 선택/연결
  * WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1
  *
- * 환자가 약국을 선택하고 연결 요청을 보내는 화면.
+ * 당뇨인가 약국을 선택하고 연결 요청을 보내는 화면.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -247,7 +247,7 @@ export default function SelectPharmacyPage() {
                       </p>
                       <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
                         <Users className="w-3 h-3" />
-                        관리 환자 {pharmacy.patientCount}명
+                        관리 당뇨인 {pharmacy.patientCount}명
                       </p>
                     </div>
                   </button>

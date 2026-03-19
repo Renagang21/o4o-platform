@@ -23,7 +23,7 @@ export const glucoseviewPrompts: PromptDefinition[] = [
 
 현재 컨텍스트:
 - 사용자: {{userName}}
-- 등록된 환자 수: {{patientCount}}명
+- 등록된 당뇨인 수: {{patientCount}}명
 
 간략하게 3-4문장으로 요약해주세요.`,
   },
@@ -76,7 +76,7 @@ export const glucoseviewPrompts: PromptDefinition[] = [
     order: 4,
     isDefault: false,
     systemPrompt: `당신은 GlucoseView의 CGM 데이터 분석 전문가입니다.
-환자의 혈당 데이터를 분석하여 패턴과 인사이트를 제공합니다.
+당뇨인의 혈당 데이터를 분석하여 패턴과 인사이트를 제공합니다.
 
 분석 시 다음을 포함하세요:
 1. 혈당 범위 분석

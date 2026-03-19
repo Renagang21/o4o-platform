@@ -1,5 +1,5 @@
 /**
- * PatientsPage - 환자 목록 관리
+ * PatientsPage - 당뇨인 목록 관리
  *
  * WO-CARE-DATA-ALIGNMENT-PHASE1-V1
  *
@@ -58,7 +58,7 @@ export default function PatientsPage() {
   const [riskFilter, setRiskFilter] = useState<RiskLevel>('all');
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
-  // WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 환자 등록 모달 상태
+  // WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 당뇨인 등록 모달 상태
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registerForm, setRegisterForm] = useState({ name: '', phone: '', email: '', notes: '' });
   const [registerLoading, setRegisterLoading] = useState(false);
@@ -89,7 +89,7 @@ export default function PatientsPage() {
         setSummary(summaryRes);
       }
     } catch {
-      setError('환자 정보를 불러오는데 실패했습니다.');
+      setError('당뇨인 정보를 불러오는데 실패했습니다.');
       setPatients([]);
     } finally {
       setLoading(false);
@@ -173,10 +173,10 @@ export default function PatientsPage() {
         setRegisterForm({ name: '', phone: '', email: '', notes: '' });
         loadData();
       } else {
-        setRegisterError('환자 등록에 실패했습니다.');
+        setRegisterError('당뇨인 등록에 실패했습니다.');
       }
     } catch {
-      setRegisterError('환자 등록 중 오류가 발생했습니다.');
+      setRegisterError('당뇨인 등록 중 오류가 발생했습니다.');
     } finally {
       setRegisterLoading(false);
     }
@@ -190,9 +190,9 @@ export default function PatientsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">환자 관리</h1>
+              <h1 className="text-2xl font-bold text-white">당뇨인 관리</h1>
               <p className="text-primary-100 mt-1">
-                {loading ? '불러오는 중...' : `총 ${patients.length}명의 환자`}
+                {loading ? '불러오는 중...' : `총 ${patients.length}명의 당뇨인`}
               </p>
             </div>
 
@@ -249,7 +249,7 @@ export default function PatientsPage() {
             className="ml-auto inline-flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
             <UserPlus className="w-4 h-4" />
-            환자 등록
+            당뇨인 등록
           </button>
         </div>
 
@@ -271,8 +271,8 @@ export default function PatientsPage() {
               <Users className="w-12 h-12 text-slate-200 mx-auto mb-3" />
               <p className="text-slate-500">
                 {debouncedSearch || riskFilter !== 'all'
-                  ? '조건에 맞는 환자가 없습니다.'
-                  : '등록된 환자가 없습니다.'}
+                  ? '조건에 맞는 당뇨인가 없습니다.'
+                  : '등록된 당뇨인가 없습니다.'}
               </p>
             </div>
           ) : (
@@ -365,13 +365,13 @@ export default function PatientsPage() {
         </div>
       </div>
 
-      {/* 환자 등록 모달 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1) */}
+      {/* 당뇨인 등록 모달 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1) */}
       {showRegisterModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowRegisterModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-slate-900">환자 등록</h2>
+              <h2 className="text-lg font-semibold text-slate-900">당뇨인 등록</h2>
               <button
                 onClick={() => setShowRegisterModal(false)}
                 className="p-1 text-slate-400 hover:text-slate-600 transition-colors"
@@ -389,7 +389,7 @@ export default function PatientsPage() {
                   type="text"
                   value={registerForm.name}
                   onChange={(e) => setRegisterForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="환자 이름"
+                  placeholder="당뇨인 이름"
                   className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>

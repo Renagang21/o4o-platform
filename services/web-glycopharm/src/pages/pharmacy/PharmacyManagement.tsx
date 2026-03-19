@@ -95,7 +95,7 @@ const FEATURED_COURSES = [
   },
   {
     id: '2',
-    title: '당뇨 환자 상담 실전 매뉴얼',
+    title: '당뇨인 상담 실전 매뉴얼',
     description: '약국에서 활용할 수 있는 상담 매뉴얼',
     type: 'pdf' as const,
     pages: 32,

@@ -282,7 +282,7 @@ export default function HomePage() {
               to="/patients"
               className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              환자 관리 시작하기
+              당뇨인 관리 시작하기
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -308,13 +308,13 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-medium text-slate-900">환자별 데이터</h3>
+                    <h3 className="text-base font-medium text-slate-900">당뇨인별 데이터</h3>
                     {!isAuthenticated && (
                       <span className="px-2 py-0.5 text-xs font-medium text-slate-700 bg-slate-100 rounded">로그인 필요</span>
                     )}
                   </div>
                   <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-                    개별 환자의 CGM 데이터를 정리하여 확인합니다
+                    개별 당뇨인의 CGM 데이터를 정리하여 확인합니다
                   </p>
                 </div>
                 <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,7 +342,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <p className="text-sm text-slate-600 mt-1 leading-relaxed">
-                    관리 중인 환자들의 전체 흐름을 파악합니다
+                    관리 중인 당뇨인들의 전체 흐름을 파악합니다
                   </p>
                 </div>
                 <svg className="w-5 h-5 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

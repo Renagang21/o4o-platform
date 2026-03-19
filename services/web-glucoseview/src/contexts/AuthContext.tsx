@@ -60,7 +60,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
-// GlucoseView는 환자 전용 서비스 — user/customer 역할을 patient로 매핑
+// GlucoseView는 당뇨인 전용 서비스 — user/customer 역할을 patient로 매핑
 const ROLE_MAP: Record<string, UserRole> = {
   admin: 'admin',
   super_admin: 'admin',
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (apiUser) {
           const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
 
-          // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+          // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
           if (!roles.includes('patient')) {
             clearAllTokens();
             setIsLoading(false);
@@ -136,10 +136,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
 
-        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
         if (!roles.includes('patient')) {
           clearAllTokens();
-          return { success: false, message: 'GlucoseView는 환자 전용 서비스입니다. 약사는 GlycoPharm을 이용해주세요.' };
+          return { success: false, message: 'GlucoseView는 당뇨인 전용 서비스입니다. 약사는 GlycoPharm을 이용해주세요.' };
         }
 
         const base = normalizeUser(apiUser);
@@ -194,10 +194,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
 
-        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 환자 전용 서비스
+        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
         if (!roles.includes('patient')) {
           clearAllTokens();
-          return { success: false, message: 'GlucoseView는 환자 전용 서비스입니다.' };
+          return { success: false, message: 'GlucoseView는 당뇨인 전용 서비스입니다.' };
         }
 
         const base = normalizeUser(apiUser);

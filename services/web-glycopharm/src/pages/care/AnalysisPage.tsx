@@ -1,8 +1,8 @@
 /**
- * AnalysisPage — 환자 혈당 분석 (빠른 판단 화면)
+ * AnalysisPage — 당뇨인 혈당 분석 (빠른 판단 화면)
  * WO-O4O-GLYCOPHARM-CARE-ANALYSIS-PAGE-V1
  *
- * "3초 안에 환자 상태 판단"
+ * "3초 안에 당뇨인 상태 판단"
  *
  * API:
  *   GET /care/health-readings/:patientId → 혈당 데이터
@@ -322,7 +322,7 @@ export default function AnalysisPage() {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <BarChart3 className="w-5 h-5 text-primary-600" />
-            <h1 className="text-lg font-bold text-slate-800">환자 분석</h1>
+            <h1 className="text-lg font-bold text-slate-800">당뇨인 분석</h1>
           </div>
           <select
             value={selectedPatientId}
@@ -330,7 +330,7 @@ export default function AnalysisPage() {
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             disabled={patientsLoading}
           >
-            <option value="">환자 선택</option>
+            <option value="">당뇨인 선택</option>
             {patients.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -341,8 +341,8 @@ export default function AnalysisPage() {
         {!selectedPatientId ? (
           <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 flex flex-col items-center justify-center min-h-[300px]">
             <BarChart3 className="w-12 h-12 text-slate-300 mb-3" />
-            <p className="text-sm text-slate-500 font-medium">환자를 선택하세요</p>
-            <p className="text-xs text-slate-400 mt-1">환자의 혈당 데이터를 분석합니다.</p>
+            <p className="text-sm text-slate-500 font-medium">당뇨인를 선택하세요</p>
+            <p className="text-xs text-slate-400 mt-1">당뇨인의 혈당 데이터를 분석합니다.</p>
           </div>
         ) : dataLoading ? (
           <div className="flex items-center justify-center py-20">

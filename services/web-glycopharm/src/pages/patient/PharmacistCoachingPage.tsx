@@ -1,8 +1,8 @@
 /**
- * PharmacistCoachingPage — 환자용 약사 코칭 확인 화면
+ * PharmacistCoachingPage — 당뇨인용 약사 코칭 확인 화면
  * WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1
  *
- * 약사가 작성한 코칭 내용을 환자가 확인.
+ * 약사가 작성한 코칭 내용을 당뇨인가 확인.
  * - 최신 코칭 강조 표시
  * - 행동 가이드 (actionPlan)
  * - 과거 코칭 기록 목록

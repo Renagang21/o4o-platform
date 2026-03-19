@@ -2,7 +2,7 @@
  * LoginPage — GlycoPharm 로그인
  * WO-GLYCOPHARM-ENTRY-SCREENS-V1
  *
- * - type 쿼리 파라미터로 환자/약사 구분
+ * - type 쿼리 파라미터로 당뇨인/약사 구분
  * - 아이디 기억하기 (localStorage)
  * - 아이디 찾기 / 비밀번호 찾기 링크
  */
@@ -76,7 +76,7 @@ export default function LoginPage() {
   };
 
   const subtitle = loginType === 'patient'
-    ? '환자용 시스템 로그인'
+    ? '당뇨인용 시스템 로그인'
     : loginType === 'pharmacy'
       ? '약국용 시스템 로그인'
       : loginType === 'operator'
@@ -223,7 +223,7 @@ export default function LoginPage() {
                 }}
                 className="flex-1 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 disabled:opacity-50"
               >
-                테스트 환자
+                테스트 당뇨인
               </button>
               <button
                 type="button"

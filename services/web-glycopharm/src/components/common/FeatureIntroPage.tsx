@@ -21,9 +21,9 @@ const FEATURE_CONFIG: Record<FeatureType, {
 }> = {
   care: {
     icon: Users,
-    title: '환자 관리 기능',
-    description: '혈당 분석, 상담 기록, 성과 추적 등\n약국 중심 환자 데이터 관리 기능을 제공합니다.',
-    details: ['환자 등록·관리', 'CGM 데이터 분석', '맞춤 코칭·상담', '성과 리포트'],
+    title: '당뇨인 관리 기능',
+    description: '혈당 분석, 상담 기록, 성과 추적 등\n약국 중심 당뇨인 데이터 관리 기능을 제공합니다.',
+    details: ['당뇨인 등록·관리', 'CGM 데이터 분석', '맞춤 코칭·상담', '성과 리포트'],
   },
   store: {
     icon: Store,

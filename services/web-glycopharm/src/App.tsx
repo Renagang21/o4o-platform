@@ -336,7 +336,7 @@ function AppRoutes() {
       <Route path="register" element={<RegisterPage />} />
       <Route path="forgot-password" element={<AccountRecoveryPage />} />
       <Route path="reset-password" element={<ResetPasswordPage />} />
-      {/* WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 환자 라우트 인증 가드 */}
+      {/* WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 당뇨인 라우트 인증 가드 */}
       <Route element={<PatientAuthGuardOutlet />}>
         <Route path="patient" element={<PatientMainPage />} />
         <Route path="patient/profile" element={<PatientProfilePage />} />

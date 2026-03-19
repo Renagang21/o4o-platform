@@ -253,7 +253,7 @@ export default function OperatorCareAlertsPage() {
               type="text"
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              placeholder="환자명, 메시지 검색..."
+              placeholder="당뇨인명, 메시지 검색..."
               className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
@@ -265,7 +265,7 @@ export default function OperatorCareAlertsPage() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
-                  <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">환자</th>
+                  <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">당뇨인</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">유형</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">심각도</th>
                   <th className="text-left px-5 py-2.5 text-xs font-medium text-slate-500 uppercase">메시지</th>

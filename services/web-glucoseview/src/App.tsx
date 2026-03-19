@@ -97,7 +97,7 @@ const RoleProtectedRoute = RoleGuard;
 
 /**
  * HomeRedirect — WO-O4O-GLUCOSEVIEW-BOOTSTRAP-FIX-V1
- * 로그인 환자 → /patient, 그 외 → AboutPage
+ * 로그인 당뇨인 → /patient, 그 외 → AboutPage
  */
 function HomeRedirect() {
   const { isAuthenticated, user } = useAuth();
@@ -203,7 +203,7 @@ function AppRoutes() {
         <Route path="settings" element={<StorePlaceholderPage title="설정" />} />
       </Route>
 
-      {/* 환자 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
+      {/* 당뇨인 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
       <Route path="/patient" element={
         <RoleProtectedRoute allowedRoles={['patient']}>
           <PatientLayout />

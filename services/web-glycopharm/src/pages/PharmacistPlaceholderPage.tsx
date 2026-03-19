@@ -34,7 +34,7 @@ export default function PharmacistPlaceholderPage() {
           {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '약국'}님 환영합니다.
         </button>
         <p className="text-sm text-slate-400 mb-8">
-          환자 관리와 코칭을 시작하세요.
+          당뇨인 관리와 코칭을 시작하세요.
         </p>
         <div className="w-full max-w-xs mx-auto space-y-3">
           <button
@@ -42,14 +42,14 @@ export default function PharmacistPlaceholderPage() {
             className="w-full py-3.5 text-base font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
           >
             <Users className="w-5 h-5" />
-            환자 관리
+            당뇨인 관리
           </button>
           <button
             onClick={() => navigate('/pharmacy/patient-requests')}
             className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
-            환자 연결 요청
+            당뇨인 연결 요청
           </button>
           <button
             onClick={() => navigate('/pharmacy/appointments')}

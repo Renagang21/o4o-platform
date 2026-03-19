@@ -133,7 +133,7 @@ export default function OperatorCareDashboardPage() {
 
       {/* Stats Cards (4열) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard icon={Users} label="전체 환자" value={summary?.totalPatients ?? 0} color="text-slate-600" bg="bg-slate-50" />
+        <StatCard icon={Users} label="전체 당뇨인" value={summary?.totalPatients ?? 0} color="text-slate-600" bg="bg-slate-50" />
         <StatCard icon={ShieldAlert} label="고위험" value={summary?.highRiskCount ?? 0} color="text-red-600" bg="bg-red-50" />
         <StatCard icon={AlertTriangle} label="주의" value={summary?.moderateRiskCount ?? 0} color="text-amber-600" bg="bg-amber-50" />
         <StatCard icon={ShieldCheck} label="양호" value={summary?.lowRiskCount ?? 0} color="text-green-600" bg="bg-green-50" />
@@ -155,7 +155,7 @@ export default function OperatorCareDashboardPage() {
             icon={Activity}
           />
           <MetricCard
-            label="개선 환자"
+            label="개선 당뇨인"
             value={`${summary?.improvingCount ?? 0}명`}
             sub="TIR 상승 추세"
             icon={TrendingUp}
@@ -163,11 +163,11 @@ export default function OperatorCareDashboardPage() {
         </div>
       )}
 
-      {/* 우선 관리 환자 */}
+      {/* 우선 관리 당뇨인 */}
       <div className="bg-white rounded-xl shadow-sm">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
           <Heart className="w-4 h-4 text-red-500" />
-          <h2 className="text-base font-semibold text-slate-800">우선 관리 환자</h2>
+          <h2 className="text-base font-semibold text-slate-800">우선 관리 당뇨인</h2>
           <span className="text-xs text-slate-400 ml-auto">{priorityPatients.length}명</span>
         </div>
         {priorityPatients.length > 0 ? (
@@ -194,7 +194,7 @@ export default function OperatorCareDashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center text-sm text-slate-400">우선 관리 대상 환자가 없습니다.</div>
+          <div className="p-8 text-center text-sm text-slate-400">우선 관리 대상 당뇨인가 없습니다.</div>
         )}
       </div>
 
@@ -215,11 +215,11 @@ export default function OperatorCareDashboardPage() {
                   <span className="font-semibold text-slate-800">{population.coaching?.pending ?? 0}건</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">활성 환자 (7일)</span>
+                  <span className="text-slate-500">활성 당뇨인 (7일)</span>
                   <span className="font-semibold text-green-600">{population.activity?.activePatients ?? 0}명</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">비활성 환자</span>
+                  <span className="text-slate-500">비활성 당뇨인</span>
                   <span className="font-semibold text-slate-400">{population.activity?.inactivePatients ?? 0}명</span>
                 </div>
               </>

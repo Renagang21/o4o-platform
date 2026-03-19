@@ -1,5 +1,5 @@
 /**
- * SummaryTab - 환자 기본정보 요약
+ * SummaryTab - 당뇨인 기본정보 요약
  * WO-CARE-SUMMARY-DATA-ALIGNMENT-V1
  *
  * 데이터: PatientDetailPage outlet context (patient + snapshot)
