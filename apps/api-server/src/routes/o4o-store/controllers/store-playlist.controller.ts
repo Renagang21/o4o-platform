@@ -22,6 +22,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../../types/auth.js';
 import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
+import { AssetCopyService } from '@o4o/asset-copy-core';
 
 type AuthMiddleware = RequestHandler;
 
@@ -548,30 +549,43 @@ export function createStorePlaylistController(
 
         const lib = libItem[0];
 
+        // Step 1: Create or reuse snapshot via AssetCopyService (duplicate-safe)
+        const assetCopyService = new AssetCopyService(dataSource);
+        let snapshotId: string;
+        try {
+          const copyResult = await assetCopyService.copyResolved({
+            sourceService: 'store-library',
+            sourceAssetId: libraryItemId,
+            assetType: 'signage',
+            targetOrganizationId: organizationId,
+            createdBy: userId,
+            title: lib.title,
+            contentJson: {
+              fileUrl: lib.file_url,
+              fileName: lib.file_name,
+              mimeType: lib.mime_type,
+              category: lib.category,
+              source: 'store-library',
+            },
+          });
+          snapshotId = copyResult.snapshot.id;
+        } catch (err: any) {
+          if (err.message === 'DUPLICATE_SNAPSHOT') {
+            // Reuse existing snapshot
+            const existing = await dataSource.query(
+              `SELECT id FROM o4o_asset_snapshots
+               WHERE organization_id = $1 AND source_asset_id = $2 AND asset_type = 'signage'
+               LIMIT 1`,
+              [organizationId, libraryItemId],
+            );
+            snapshotId = existing[0].id;
+          } else {
+            throw err;
+          }
+        }
+
+        // Step 2: Add snapshot to playlist (with lock)
         const result = await dataSource.transaction(async (manager) => {
-          // Create asset snapshot from library item
-          const snapshotRows = await manager.query(
-            `INSERT INTO o4o_asset_snapshots (organization_id, source_service, source_asset_id, asset_type, title, content_json, created_by)
-             VALUES ($1, 'store-library', $2, 'signage', $3, $4, $5)
-             RETURNING id`,
-            [
-              organizationId,
-              libraryItemId,
-              lib.title,
-              JSON.stringify({
-                fileUrl: lib.file_url,
-                fileName: lib.file_name,
-                mimeType: lib.mime_type,
-                category: lib.category,
-                source: 'store-library',
-              }),
-              userId,
-            ],
-          );
-
-          const snapshotId = snapshotRows[0].id;
-
-          // Lock playlist and add item
           const locked = await manager.query(
             `SELECT id, playlist_type FROM store_playlists WHERE id = $1 FOR UPDATE`,
             [id],
