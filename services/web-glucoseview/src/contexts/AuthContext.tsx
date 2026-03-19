@@ -60,14 +60,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
+// GlucoseView는 환자 전용 서비스 — user/customer 역할을 patient로 매핑
 const ROLE_MAP: Record<string, UserRole> = {
   admin: 'admin',
   super_admin: 'admin',
   operator: 'operator',
   pharmacist: 'pharmacist',
   seller: 'pharmacist',
-  customer: 'pharmacist',
-  user: 'pharmacist',
+  customer: 'patient',
+  user: 'patient',
   patient: 'patient',
 };
 
