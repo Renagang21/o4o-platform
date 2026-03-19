@@ -50,6 +50,15 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // AI Insight (WO-O4O-AI-OPERATOR-INSIGHT-V1)
+  const [insight, setInsight] = useState<{
+    summary: string;
+    warnings: string[];
+    recommendations: string[];
+    metrics: { approvalRate: number; rejectionRate: number; totalActions: number; avgDaily: number };
+  } | null>(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+
   const loadSummary = useCallback(async () => {
     try {
       setLoading(true);
@@ -82,8 +91,23 @@ export default function AnalyticsPage() {
     }
   }, [actionsPage]);
 
+  const loadInsight = useCallback(async () => {
+    try {
+      setInsightLoading(true);
+      const res = await api.get('/operator/analytics/insight', {
+        params: { serviceKey: SERVICE_KEY, days },
+      });
+      setInsight(res.data?.data || null);
+    } catch {
+      // silent — insight is supplementary
+    } finally {
+      setInsightLoading(false);
+    }
+  }, [days]);
+
   useEffect(() => { loadSummary(); }, [loadSummary]);
   useEffect(() => { loadActions(); }, [loadActions]);
+  useEffect(() => { loadInsight(); }, [loadInsight]);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -121,6 +145,31 @@ export default function AnalyticsPage() {
           </button>
         ))}
       </div>
+
+      {/* AI Insight Card (WO-O4O-AI-OPERATOR-INSIGHT-V1) */}
+      {insightLoading ? (
+        <div style={{ padding: 16, marginBottom: 24, background: '#f0f9ff', borderRadius: 8, border: '1px solid #bae6fd', color: '#0369a1', fontSize: '0.8125rem' }}>
+          인사이트 분석 중...
+        </div>
+      ) : insight && (
+        <div style={{ padding: 20, marginBottom: 24, background: '#f0f9ff', borderRadius: 8, border: '1px solid #bae6fd' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#0c4a6e' }}>AI 운영 인사이트</h3>
+            <button onClick={loadInsight} style={{ padding: '4px 10px', fontSize: '0.75rem', border: '1px solid #7dd3fc', borderRadius: 4, background: 'transparent', color: '#0369a1', cursor: 'pointer' }}>새로고침</button>
+          </div>
+          <p style={{ margin: '0 0 8px', fontSize: '0.8125rem', color: '#0f172a' }}>{insight.summary}</p>
+          {insight.warnings.map((w, i) => (
+            <div key={`w-${i}`} style={{ padding: '6px 10px', marginBottom: 4, background: '#fef3c7', borderRadius: 4, fontSize: '0.8125rem', color: '#92400e' }}>
+              &#9888; {w}
+            </div>
+          ))}
+          {insight.recommendations.map((r, i) => (
+            <div key={`r-${i}`} style={{ padding: '6px 10px', marginBottom: 4, background: '#ecfdf5', borderRadius: 4, fontSize: '0.8125rem', color: '#065f46' }}>
+              &#128161; {r}
+            </div>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>불러오는 중...</div>
