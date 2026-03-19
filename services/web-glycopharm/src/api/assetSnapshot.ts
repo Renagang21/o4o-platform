@@ -11,6 +11,37 @@ import { api } from '@/lib/apiClient';
 
 export type { StoreAssetItem, AssetPublishStatus, ChannelMap };
 
+// ─── Asset Snapshot Copy ───────────────────────────
+
+interface CopyAssetRequest {
+  sourceAssetId: string;
+  assetType: 'cms' | 'signage';
+}
+
+interface CopyAssetResponse {
+  success: boolean;
+  data: {
+    id: string;
+    organizationId: string;
+    sourceService: string;
+    sourceAssetId: string;
+    assetType: string;
+    title: string;
+    contentJson: Record<string, unknown>;
+    createdBy: string;
+    createdAt: string;
+  };
+}
+
+export const assetSnapshotApi = {
+  copy: async (body: CopyAssetRequest) => {
+    const res = await api.post('/glycopharm/assets/copy', body);
+    return res.data as CopyAssetResponse;
+  },
+};
+
+// ─── Store Asset Control ───────────────────────────
+
 interface PaginatedStoreAssets {
   items: StoreAssetItem[];
   total: number;

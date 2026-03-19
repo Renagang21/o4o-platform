@@ -18,12 +18,13 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
   ChevronRight,
   Play,
   ListMusic,
+  ArrowRight,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
 import { apiClient } from '@/services/api';
@@ -62,18 +63,20 @@ interface HubContentItem {
 
 type FeedTab = '전체' | string;
 
-// ─── Placeholder Data (API 미구현 섹션) ─────────────────────
+// ─── Hub Signage Types ─────────────────────────────────────
 
+interface HubSignageMedia {
+  id: string;
+  title: string;
+  mediaType?: string;
+  thumbnailUrl?: string | null;
+}
 
-const signageVideos = [
-  { id: '1', title: '혈당 관리의 중요성 — 환자 대기실 영상', url: '#' },
-  { id: '2', title: '올바른 약 복용법 안내', url: '#' },
-];
-
-const signagePlaylists = [
-  { id: '1', title: '약국 대기실 기본 플레이리스트 (30분)' },
-  { id: '2', title: '건강 정보 시리즈 — 시즌 봄' },
-];
+interface HubSignagePlaylist {
+  id: string;
+  name: string;
+  itemCount?: number;
+}
 
 const partnerLogos = [
   { id: '1', name: 'Partner A' },
@@ -121,6 +124,7 @@ function formatFeedDate(dateStr: string): string {
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<FeedTab>('전체');
   const [sortBy, setSortBy] = useState<'latest' | 'popular'>('latest');
 
@@ -136,6 +140,11 @@ export default function CommunityMainPage() {
   // Content (from hub content API)
   const [contentItems, setContentItems] = useState<HubContentItem[]>([]);
   const [contentLoading, setContentLoading] = useState(true);
+
+  // Signage (from hub content API — signage domain)
+  const [signageMedia, setSignageMedia] = useState<HubSignageMedia[]>([]);
+  const [signagePlaylists, setSignagePlaylists] = useState<HubSignagePlaylist[]>([]);
+  const [signageLoading, setSignageLoading] = useState(true);
 
   const loadFeed = useCallback(async () => {
     setFeedLoading(true);
@@ -176,6 +185,21 @@ export default function CommunityMainPage() {
       })
       .catch(() => setContentItems([]))
       .finally(() => setContentLoading(false));
+    // Hub signage (media + playlists)
+    Promise.all([
+      apiClient.get<{ data: HubSignageMedia[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage&limit=4')
+        .then((res) => {
+          const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+          setSignageMedia(items);
+        })
+        .catch(() => setSignageMedia([])),
+      apiClient.get<{ data: HubSignagePlaylist[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-playlist&limit=4')
+        .then((res) => {
+          const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
+          setSignagePlaylists(items);
+        })
+        .catch(() => setSignagePlaylists([])),
+    ]).finally(() => setSignageLoading(false));
   }, [loadFeed]);
 
   const filteredFeed = feedItems
@@ -359,45 +383,65 @@ export default function CommunityMainPage() {
 
         {/* ─── 5. Digital Signage Preview ─── */}
         <section className="mb-10">
-          <h2 className="text-lg font-bold text-slate-800 mb-3">디지털 사이니지</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Videos */}
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">영상</p>
-              <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-                {signageVideos.map((v) => (
-                  <a
-                    key={v.id}
-                    href={v.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 transition-colors"
-                  >
-                    <Play className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span className="text-sm text-slate-700 truncate">{v.title}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Playlists */}
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">플레이리스트</p>
-              <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-                {signagePlaylists.map((p) => (
-                  <div key={p.id} className="flex items-center gap-2 px-4 py-3">
-                    <ListMusic className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span className="text-sm text-slate-700 truncate">{p.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="mt-3 text-center">
-            <Link to="/signage" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-              더보기
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-slate-800">디지털 사이니지</h2>
+            <Link to="/signage" className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium">
+              사이니지 관리 <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+          {signageLoading ? (
+            <div className="bg-white rounded-lg border border-slate-200 px-4 py-8 text-center text-xs text-slate-400">
+              사이니지 정보를 불러오는 중...
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Media */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">영상</p>
+                <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+                  {signageMedia.length === 0 ? (
+                    <div className="px-4 py-4 text-center text-xs text-slate-400">등록된 사이니지 미디어가 없습니다.</div>
+                  ) : (
+                    signageMedia.map((media) => (
+                      <div
+                        key={media.id}
+                        className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 transition-colors"
+                      >
+                        <Play className="w-4 h-4 text-slate-400 shrink-0" />
+                        <span className="text-sm text-slate-700 truncate flex-1">{media.title}</span>
+                        <button
+                          onClick={() => navigate(`/signage?mediaId=${media.id}`)}
+                          className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors shrink-0"
+                        >
+                          매장에 적용 <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Playlists */}
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">플레이리스트</p>
+                <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
+                  {signagePlaylists.length === 0 ? (
+                    <div className="px-4 py-4 text-center text-xs text-slate-400">플레이리스트가 없습니다.</div>
+                  ) : (
+                    signagePlaylists.map((p) => (
+                      <div key={p.id} className="flex items-center gap-2 px-4 py-3">
+                        <ListMusic className="w-4 h-4 text-slate-400 shrink-0" />
+                        <span className="text-sm text-slate-700 truncate flex-1">{p.name}</span>
+                        {p.itemCount != null && (
+                          <span className="text-xs text-slate-400 shrink-0">{p.itemCount}개</span>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ─── 6. Partner Logo Slide ─── */}

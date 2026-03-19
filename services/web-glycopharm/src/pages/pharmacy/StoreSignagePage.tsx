@@ -11,8 +11,8 @@
  * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → Playlist에 추가
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Monitor,
   Loader2,
@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import {
   storeAssetControlApi,
+  assetSnapshotApi,
   type StoreAssetItem,
   type AssetPublishStatus,
   type ChannelMap,
@@ -167,6 +168,8 @@ type ActiveTab = 'playlist' | 'assets';
 
 export default function StoreSignagePage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pendingMediaId = searchParams.get('mediaId');
   const [activeTab, setActiveTab] = useState<ActiveTab>('playlist');
 
   // ── Legacy asset state ──
@@ -194,6 +197,10 @@ export default function StoreSignagePage() {
   const [signageSnapshots, setSignageSnapshots] = useState<StoreAssetItem[]>([]);
   const [showAddPicker, setShowAddPicker] = useState(false);
   const [showLibrarySelector, setShowLibrarySelector] = useState(false);
+
+  // ── Pending media from Community "매장에 적용" ──
+  const [pendingBusy, setPendingBusy] = useState(false);
+  const pendingHandled = useRef(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -313,6 +320,53 @@ export default function StoreSignagePage() {
     }
   };
 
+  // ── Handle pending mediaId: copy snapshot → add to selected playlist ──
+  const handleApplyPendingMedia = useCallback(async (playlistId: string) => {
+    if (!pendingMediaId || pendingBusy) return;
+    setPendingBusy(true);
+    try {
+      // 1. Copy hub media → asset snapshot (idempotent: DUPLICATE_SNAPSHOT = already copied)
+      let snapshotId: string;
+      try {
+        const copyRes = await assetSnapshotApi.copy({
+          sourceAssetId: pendingMediaId,
+          assetType: 'signage',
+        });
+        snapshotId = copyRes.data.id;
+      } catch (err: any) {
+        // If duplicate, find existing snapshot from signageSnapshots
+        const existing = signageSnapshots.find(
+          (s) => (s as any).sourceAssetId === pendingMediaId,
+        );
+        if (existing) {
+          snapshotId = existing.id;
+        } else {
+          throw err;
+        }
+      }
+
+      // 2. Add snapshot to selected playlist
+      await addPlaylistItem(playlistId, snapshotId);
+      await loadPlaylistItems(playlistId);
+      await fetchItems();
+
+      // 3. Clear mediaId from URL
+      setSearchParams({}, { replace: true });
+    } catch {
+      // user can retry
+    } finally {
+      setPendingBusy(false);
+    }
+  }, [pendingMediaId, pendingBusy, signageSnapshots, fetchItems, loadPlaylistItems, setSearchParams]);
+
+  // Auto-handle pending media when a playlist is already selected
+  useEffect(() => {
+    if (pendingMediaId && selectedPlaylistId && !pendingHandled.current) {
+      pendingHandled.current = true;
+      handleApplyPendingMedia(selectedPlaylistId);
+    }
+  }, [pendingMediaId, selectedPlaylistId, handleApplyPendingMedia]);
+
   // KPI
   const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
@@ -421,6 +475,28 @@ export default function StoreSignagePage() {
         </button>
       </div>
 
+      {/* ─── Pending Media Banner ──────────────────── */}
+      {pendingMediaId && (
+        <div className="flex items-center gap-3 px-4 py-3 mb-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <Monitor className="w-5 h-5 text-blue-600 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-blue-900">커뮤니티에서 선택한 사이니지를 적용합니다</p>
+            <p className="text-xs text-blue-600 mt-0.5">
+              {selectedPlaylistId
+                ? pendingBusy ? '플레이리스트에 추가 중...' : '선택한 플레이리스트에 추가되었습니다.'
+                : '아래에서 플레이리스트를 선택하면 자동으로 추가됩니다.'}
+            </p>
+          </div>
+          {pendingBusy && <Loader2 className="w-4 h-4 animate-spin text-blue-600 shrink-0" />}
+          <button
+            onClick={() => setSearchParams({}, { replace: true })}
+            className="text-xs text-blue-500 hover:text-blue-700 shrink-0"
+          >
+            취소
+          </button>
+        </div>
+      )}
+
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
@@ -474,11 +550,19 @@ export default function StoreSignagePage() {
               {playlists.map(pl => (
                 <div
                   key={pl.id}
-                  onClick={() => setSelectedPlaylistId(pl.id)}
+                  onClick={() => {
+                    setSelectedPlaylistId(pl.id);
+                    if (pendingMediaId && !pendingBusy) {
+                      pendingHandled.current = true;
+                      handleApplyPendingMedia(pl.id);
+                    }
+                  }}
                   className={`p-4 rounded-lg border cursor-pointer transition-colors ${
                     selectedPlaylistId === pl.id
                       ? 'border-blue-400 bg-blue-50/50'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      : pendingMediaId
+                        ? 'border-blue-200 bg-blue-50/20 hover:border-blue-400 hover:bg-blue-50/50'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-2">
