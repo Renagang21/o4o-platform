@@ -25,9 +25,9 @@ RUN pnpm install --filter @o4o/web-siteguide...
 # Copy service source
 COPY services/web-siteguide/ ./services/web-siteguide/
 
-# Build the service
+# Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-siteguide
-RUN pnpm build
+RUN npx vite build
 
 # Production stage
 FROM node:20-alpine AS runner

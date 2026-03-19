@@ -1,5 +1,5 @@
 # GlucoseView Web - Cloud Run Dockerfile
-# 약사 전용 CGM 데이터 요약 서비스
+# 환자 전용 혈당 관리 서비스
 #
 # NOTE: 이 Dockerfile은 모노레포 루트에서 빌드 컨텍스트로 실행됩니다.
 # docker build -f services/web-glucoseview/Dockerfile .
@@ -37,8 +37,11 @@ RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/ui build
 
 # Build the service
+# NOTE: `pnpm build` = `tsc -b && vite build` — strict tsc가 workspace 타입
+# 불일치로 실패할 수 있다. Docker 빌드에서는 vite build만 실행하여
+# esbuild 트랜스파일로 번들링한다. 타입 체크는 CI/로컬에서 별도 수행.
 WORKDIR /app/services/web-glucoseview
-RUN pnpm build
+RUN npx vite build
 
 # Production stage
 FROM node:20-alpine AS runner

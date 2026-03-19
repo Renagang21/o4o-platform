@@ -34,9 +34,9 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 
-# Build the service
+# Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-account
-RUN pnpm build
+RUN npx vite build
 
 # Production stage
 FROM node:20-alpine AS runner

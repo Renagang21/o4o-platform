@@ -66,7 +66,8 @@ export function OperatorRoute({ children, fallback = '/' }: Omit<RoleGuardProps,
 
   if (!user) return <Navigate to="/" replace />;
 
-  const isAdmin = user.roles.some(r => r === 'admin' || r === 'super_admin');
+  // ROLE_MAP이 super_admin → 'admin'으로 정규화하므로 admin만 확인
+  const isAdmin = user.roles.some(r => r === 'admin');
   const hasOperatorMembership = user.memberships?.some(
     m => m.serviceKey === SERVICE_KEY && m.status === 'active'
   );

@@ -20,8 +20,9 @@ COPY services/signage-player-web ./services/signage-player-web
 ARG VITE_API_URL=https://api.neture.co.kr
 ENV VITE_API_URL=$VITE_API_URL
 
+# Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/signage-player-web
-RUN pnpm build
+RUN npx vite build
 
 # Production stage
 FROM nginx:alpine
