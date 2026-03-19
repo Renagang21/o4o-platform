@@ -14,6 +14,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
+import { OperatorActionType } from '@o4o/types';
 import { apiClient } from '../../api/client';
 
 // ============================================
@@ -64,9 +66,9 @@ export default function ProductApplicationManagementPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [rejectId, setRejectId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
+  const [actionTargetId, setActionTargetId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
 
   const loadStats = useCallback(async () => {
     try {
@@ -103,42 +105,36 @@ export default function ProductApplicationManagementPage() {
   useEffect(() => { loadStats(); }, [loadStats]);
   useEffect(() => { loadApplications(); }, [loadApplications]);
 
-  const handleApprove = async (app: ProductApplication) => {
-    if (!confirm(`"${app.product_name}" 신청을 승인하시겠습니까?\n승인 시 해당 약국의 매장 진열 상품에 자동 추가됩니다.`)) return;
-
-    setActionLoading(app.id);
-    try {
-      await apiClient.patch(`/operator/product-applications/${app.id}/approve`, {});
-      setToast({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
-      loadApplications();
-      loadStats();
-    } catch (e: any) {
-      setToast({ type: 'error', message: e.message || '승인 처리에 실패했습니다.' });
-    } finally {
-      setActionLoading(null);
-      setTimeout(() => setToast(null), 4000);
-    }
+  const openApproveModal = (appId: string) => {
+    setActionTargetId(appId);
+    requestAction(OperatorActionType.APPROVE);
   };
 
-  const handleRejectSubmit = async () => {
-    if (!rejectId) return;
-    const app = applications.find(a => a.id === rejectId);
+  const openRejectModal = (appId: string) => {
+    setActionTargetId(appId);
+    requestAction(OperatorActionType.REJECT);
+  };
+
+  const handleConfirmAction = async (reason?: string) => {
+    if (!actionTargetId) return;
+    const app = applications.find(a => a.id === actionTargetId);
     if (!app) return;
 
-    setActionLoading(rejectId);
-    try {
-      await apiClient.patch(`/operator/product-applications/${rejectId}/reject`, { reason: rejectReason || undefined });
-      setToast({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
-      setRejectId(null);
-      setRejectReason('');
+    setActionLoading(actionTargetId);
+    await executeAction(async () => {
+      if (pendingAction === OperatorActionType.APPROVE) {
+        await apiClient.patch(`/operator/product-applications/${actionTargetId}/approve`, {});
+        setToast({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
+      } else {
+        await apiClient.patch(`/operator/product-applications/${actionTargetId}/reject`, { reason: reason || undefined });
+        setToast({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });
+      }
       loadApplications();
       loadStats();
-    } catch (e: any) {
-      setToast({ type: 'error', message: e.message || '거절 처리에 실패했습니다.' });
-    } finally {
-      setActionLoading(null);
-      setTimeout(() => setToast(null), 4000);
-    }
+    });
+    setActionLoading(null);
+    setActionTargetId(null);
+    setTimeout(() => setToast(null), 4000);
   };
 
   const handleFilterChange = (filter: StatusFilter) => {
@@ -274,7 +270,7 @@ export default function ProductApplicationManagementPage() {
                         {app.status === 'pending' && (
                           <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
                             <button
-                              onClick={() => handleApprove(app)}
+                              onClick={() => openApproveModal(app.id)}
                               disabled={isActionTarget}
                               style={{
                                 padding: '4px 12px', borderRadius: 6, border: 'none',
@@ -286,7 +282,7 @@ export default function ProductApplicationManagementPage() {
                               {isActionTarget ? '처리중...' : '승인'}
                             </button>
                             <button
-                              onClick={() => { setRejectId(app.id); setRejectReason(''); }}
+                              onClick={() => openRejectModal(app.id)}
                               disabled={isActionTarget}
                               style={{
                                 padding: '4px 12px', borderRadius: 6,
@@ -336,58 +332,21 @@ export default function ProductApplicationManagementPage() {
         </>
       )}
 
-      {/* Reject Modal */}
-      {rejectId && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16,
-        }}>
-          <div style={{
-            backgroundColor: '#fff', borderRadius: 12, padding: 32,
-            maxWidth: 420, width: '100%', boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-          }}>
-            <h3 style={{ margin: '0 0 16px', fontSize: '1.125rem', fontWeight: 600 }}>
-              상품 신청 거절
-            </h3>
-            <p style={{ fontSize: '0.875rem', color: '#64748b', margin: '0 0 16px' }}>
-              거절 사유를 입력해주세요 (선택).
-            </p>
-            <textarea
-              value={rejectReason}
-              onChange={e => setRejectReason(e.target.value)}
-              placeholder="거절 사유 (선택)"
-              rows={3}
-              style={{
-                width: '100%', padding: 12, borderRadius: 8, border: '1px solid #e2e8f0',
-                fontSize: '0.875rem', resize: 'vertical', marginBottom: 16, boxSizing: 'border-box',
-              }}
-            />
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => { setRejectId(null); setRejectReason(''); }}
-                style={{
-                  padding: '8px 20px', borderRadius: 8, border: '1px solid #e2e8f0',
-                  fontSize: '0.875rem', cursor: 'pointer', backgroundColor: '#fff',
-                }}
-              >
-                취소
-              </button>
-              <button
-                onClick={handleRejectSubmit}
-                disabled={!!actionLoading}
-                style={{
-                  padding: '8px 20px', borderRadius: 8, border: 'none',
-                  fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
-                  backgroundColor: '#dc2626', color: '#fff',
-                  opacity: actionLoading ? 0.6 : 1,
-                }}
-              >
-                {actionLoading ? '처리중...' : '거절 확인'}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Action Confirm Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
+      {pendingAction && (
+        <OperatorConfirmModal
+          open
+          actionType={pendingAction}
+          onClose={() => { cancelAction(); setActionTargetId(null); }}
+          onConfirm={handleConfirmAction}
+          loading={actionHookLoading}
+          requireReason={pendingAction === OperatorActionType.REJECT ? false : undefined}
+          message={
+            pendingAction === OperatorActionType.APPROVE
+              ? '이 상품 신청을 승인하시겠습니까?\n승인 시 해당 약국의 매장 진열 상품에 자동 추가됩니다.'
+              : undefined
+          }
+        />
       )}
     </div>
   );

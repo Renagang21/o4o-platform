@@ -18,7 +18,8 @@ import {
   ArrowLeft,
   AlertCircle,
 } from 'lucide-react';
-import { DataTable, type Column } from '@o4o/ui';
+import { DataTable, type Column, OperatorConfirmModal } from '@o4o/ui';
+import { OperatorActionType } from '@o4o/types';
 import { operatorRegistrationApi } from '../../../lib/api';
 
 type RequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL';
@@ -75,7 +76,6 @@ export default function RegistrationRequestsPage() {
   const [roleFilter, setRoleFilter] = useState<UserRole | 'ALL'>('ALL');
   const [selectedRequest, setSelectedRequest] = useState<RegistrationRequest | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -140,8 +140,8 @@ export default function RegistrationRequestsPage() {
     }
   };
 
-  const handleReject = async (request: RegistrationRequest) => {
-    if (!rejectReason.trim()) {
+  const handleReject = async (request: RegistrationRequest, reason?: string) => {
+    if (!reason?.trim()) {
       setMessage({ type: 'error', text: '거부 사유를 입력해주세요.' });
       return;
     }
@@ -150,7 +150,7 @@ export default function RegistrationRequestsPage() {
       setProcessing(true);
       setMessage(null);
 
-      const result = await operatorRegistrationApi.reject(request.id, rejectReason);
+      const result = await operatorRegistrationApi.reject(request.id, reason);
       if (!result.success) {
         setMessage({ type: 'error', text: '거부 처리에 실패했습니다.' });
         return;
@@ -159,7 +159,6 @@ export default function RegistrationRequestsPage() {
       setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다.` });
       setSelectedRequest(null);
       setShowRejectModal(false);
-      setRejectReason('');
       await fetchRequests();
     } catch (error) {
       setMessage({ type: 'error', text: '처리 중 오류가 발생했습니다.' });
@@ -462,48 +461,18 @@ export default function RegistrationRequestsPage() {
           </div>
         )}
 
-        {/* Reject Modal */}
+        {/* Reject Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
         {showRejectModal && selectedRequest && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl max-w-md w-full mx-4">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">가입 신청 거부</h3>
-              </div>
-              <div className="p-6">
-                <p className="text-gray-600 mb-4">
-                  <span className="font-medium">{selectedRequest.name}</span>님의 가입 신청을 거부합니다.
-                  거부 사유를 입력해주세요.
-                </p>
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="거부 사유를 입력하세요..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 h-32"
-                />
-                <p className="mt-2 text-sm text-gray-500">
-                  거부 사유는 신청자에게 이메일로 전달됩니다.
-                </p>
-              </div>
-              <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setShowRejectModal(false);
-                    setRejectReason('');
-                  }}
-                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={() => handleReject(selectedRequest)}
-                  disabled={processing || !rejectReason.trim()}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-                >
-                  거부 확인
-                </button>
-              </div>
-            </div>
-          </div>
+          <OperatorConfirmModal
+            open
+            actionType={OperatorActionType.REJECT}
+            onClose={() => { setShowRejectModal(false); }}
+            onConfirm={(reason) => handleReject(selectedRequest, reason)}
+            loading={processing}
+            title="가입 신청 거부"
+            message={`${selectedRequest.name}님의 가입 신청을 거부합니다. 거부 사유를 입력해주세요.`}
+            confirmText="거부 확인"
+          />
         )}
       </main>
     </div>

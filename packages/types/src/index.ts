@@ -59,6 +59,9 @@ export * from './operator-capability.js';
 // Export operator route constants (WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1)
 export * from './operator-routes.js';
 
+// Export operator action types (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1)
+export * from './operator-action.js';
+
 // For backward compatibility, re-export partner types with affiliate names
 export type {
   PartnerUser as AffiliateUser,

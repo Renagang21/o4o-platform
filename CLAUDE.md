@@ -258,6 +258,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | F8 | **Neture Distribution Engine** — Distribution Tier 3단계·SERVICE 상태 머신·Checkout Guard 3계층·Listing 캐스케이드 | 2026-02-27 | `docs/baseline/NETURE-DISTRIBUTION-ENGINE-FREEZE-V1.md` |
 | F9 | **RBAC SSOT** — role_assignments 단일 소스, users.role/roles/user_roles 제거, write-path 통일 | 2026-02-27 | `docs/rbac/RBAC-FREEZE-DECLARATION-V1.md` |
 | F10 | **O4O Core** — Auth, Membership, Approval, RBAC 4개 모듈 Core Layer 고정 | 2026-03-11 | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
+| F11 | **User/Operator** — users·service_memberships·role_assignments 3테이블 고정, Operator=membership 기반, user.role 사용 금지. **KPA-a 예외**: OperatorRoute 대신 RoleGuard+allowedRoles 사용 (role은 membership에서 파생, 구조 동등) | 2026-03-19 | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 
 ---
 
@@ -299,6 +300,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **O4O Core Freeze** | `docs/architecture/O4O-CORE-FREEZE-V1.md` |
 | **Operator Dashboard 표준** | `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md` |
 | **디버그 SSR 테스트 페이지** | `docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md` |
+| **User/Operator Freeze** | `docs/architecture/USER-OPERATOR-FREEZE-V1.md` |
 
 ---
 

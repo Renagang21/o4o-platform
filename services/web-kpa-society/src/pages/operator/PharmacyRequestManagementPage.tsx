@@ -8,7 +8,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from '@o4o/error-handling';
+import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
+import { OperatorActionType } from '@o4o/types';
 import { pharmacyRequestApi } from '../../api/pharmacyRequestApi';
 import type { PharmacyRequest } from '../../api/pharmacyRequestApi';
 
@@ -25,6 +26,8 @@ export default function PharmacyRequestManagementPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [reviewNoteId, setReviewNoteId] = useState<string | null>(null);
   const [reviewNote, setReviewNote] = useState('');
+  const [actionTargetId, setActionTargetId] = useState<string | null>(null);
+  const { pendingAction, loading: actionHookLoading, requestAction, cancelAction, executeAction } = useOperatorAction();
 
   const loadRequests = useCallback(async () => {
     try {
@@ -45,38 +48,32 @@ export default function PharmacyRequestManagementPage() {
     loadRequests();
   }, [loadRequests]);
 
-  const handleApprove = async (id: string) => {
-    if (!confirm('이 약국 서비스 신청을 승인하시겠습니까?\n승인 시 해당 사용자에게 pharmacy_owner 권한이 부여됩니다.')) return;
-
-    setActionLoading(id);
-    try {
-      const note = reviewNoteId === id ? reviewNote : undefined;
-      await pharmacyRequestApi.approve(id, note);
-      setReviewNoteId(null);
-      setReviewNote('');
-      await loadRequests();
-    } catch (err: any) {
-      toast.error(err.message || '승인에 실패했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
+  const openApproveModal = (id: string) => {
+    setActionTargetId(id);
+    requestAction(OperatorActionType.APPROVE);
   };
 
-  const handleReject = async (id: string) => {
-    if (!confirm('이 약국 서비스 신청을 반려하시겠습니까?')) return;
+  const openRejectModal = (id: string) => {
+    setActionTargetId(id);
+    requestAction(OperatorActionType.REJECT);
+  };
 
-    setActionLoading(id);
-    try {
-      const note = reviewNoteId === id ? reviewNote : undefined;
-      await pharmacyRequestApi.reject(id, note);
+  const handleConfirmAction = async (reason?: string) => {
+    if (!actionTargetId) return;
+    setActionLoading(actionTargetId);
+    await executeAction(async () => {
+      const note = reviewNoteId === actionTargetId ? reviewNote : undefined;
+      if (pendingAction === OperatorActionType.APPROVE) {
+        await pharmacyRequestApi.approve(actionTargetId, note);
+      } else {
+        await pharmacyRequestApi.reject(actionTargetId, reason || note);
+      }
       setReviewNoteId(null);
       setReviewNote('');
       await loadRequests();
-    } catch (err: any) {
-      toast.error(err.message || '반려에 실패했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
+    });
+    setActionLoading(null);
+    setActionTargetId(null);
   };
 
   /** 사업자번호 포맷 (000-00-00000) */
@@ -279,7 +276,7 @@ export default function PharmacyRequestManagementPage() {
                     메모 {reviewNoteId === req.id ? '닫기' : '추가'}
                   </button>
                   <button
-                    onClick={() => handleApprove(req.id)}
+                    onClick={() => openApproveModal(req.id)}
                     disabled={actionLoading === req.id}
                     style={{
                       padding: '6px 16px',
@@ -295,7 +292,7 @@ export default function PharmacyRequestManagementPage() {
                     승인
                   </button>
                   <button
-                    onClick={() => handleReject(req.id)}
+                    onClick={() => openRejectModal(req.id)}
                     disabled={actionLoading === req.id}
                     style={{
                       padding: '6px 16px',
@@ -358,6 +355,22 @@ export default function PharmacyRequestManagementPage() {
             </div>
           )}
         </>
+      )}
+
+      {/* Action Confirm Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
+      {pendingAction && (
+        <OperatorConfirmModal
+          open
+          actionType={pendingAction}
+          onClose={() => { cancelAction(); setActionTargetId(null); }}
+          onConfirm={handleConfirmAction}
+          loading={actionHookLoading}
+          message={
+            pendingAction === OperatorActionType.APPROVE
+              ? '이 약국 서비스 신청을 승인하시겠습니까?\n승인 시 해당 사용자에게 pharmacy_owner 권한이 부여됩니다.'
+              : undefined
+          }
+        />
       )}
     </div>
   );

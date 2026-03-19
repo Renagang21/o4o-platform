@@ -6,6 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
+import { OperatorActionType } from '@o4o/types';
 import { api } from '../../services/api';
 import type { AdminApplication, GlucoseViewPharmacy, ApplicationStatus } from '../../services/api';
 
@@ -24,11 +26,10 @@ export default function OperatorApplicationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Review state
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [reviewError, setReviewError] = useState<string | null>(null);
+  // Review state (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1)
+  const { pendingAction, loading: isProcessing, error: reviewError, requestAction, cancelAction, executeAction } = useOperatorAction({
+    onSuccess: () => navigate('/operator/applications', { replace: true }),
+  });
 
   useEffect(() => {
     if (id) {
@@ -57,42 +58,14 @@ export default function OperatorApplicationDetailPage() {
     }
   };
 
-  const handleApprove = async () => {
-    if (!window.confirm('이 신청을 승인하시겠습니까?')) return;
-
-    setIsProcessing(true);
-    setReviewError(null);
-
-    try {
-      await api.reviewApplication(id!, { status: 'approved' });
-      navigate('/operator/applications', { replace: true });
-    } catch (err: any) {
-      setReviewError(err.message || '승인 처리에 실패했습니다.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!rejectionReason.trim()) {
-      setReviewError('반려 사유를 입력하세요.');
-      return;
-    }
-
-    setIsProcessing(true);
-    setReviewError(null);
-
-    try {
-      await api.reviewApplication(id!, {
-        status: 'rejected',
-        rejectionReason: rejectionReason.trim(),
-      });
-      navigate('/operator/applications', { replace: true });
-    } catch (err: any) {
-      setReviewError(err.message || '반려 처리에 실패했습니다.');
-    } finally {
-      setIsProcessing(false);
-    }
+  const handleConfirmAction = async (reason?: string) => {
+    await executeAction(async () => {
+      if (pendingAction === OperatorActionType.APPROVE) {
+        await api.reviewApplication(id!, { status: 'approved' });
+      } else {
+        await api.reviewApplication(id!, { status: 'rejected', rejectionReason: reason! });
+      }
+    });
   };
 
   if (loading) {
@@ -309,7 +282,7 @@ export default function OperatorApplicationDetailPage() {
 
                 <div className="space-y-3">
                   <button
-                    onClick={handleApprove}
+                    onClick={() => requestAction(OperatorActionType.APPROVE)}
                     disabled={isProcessing}
                     className="w-full py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
@@ -319,7 +292,7 @@ export default function OperatorApplicationDetailPage() {
                     승인
                   </button>
                   <button
-                    onClick={() => setShowRejectModal(true)}
+                    onClick={() => requestAction(OperatorActionType.REJECT)}
                     disabled={isProcessing}
                     className="w-full py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
@@ -335,43 +308,15 @@ export default function OperatorApplicationDetailPage() {
         </div>
       </div>
 
-      {/* Reject Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">반려 사유 입력</h3>
-            <textarea
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="반려 사유를 입력하세요..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              rows={4}
-            />
-            {reviewError && (
-              <p className="mt-2 text-sm text-red-600">{reviewError}</p>
-            )}
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => {
-                  setShowRejectModal(false);
-                  setRejectionReason('');
-                  setReviewError(null);
-                }}
-                disabled={isProcessing}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleReject}
-                disabled={isProcessing}
-                className="flex-1 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {isProcessing ? '처리 중...' : '반려 확정'}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Action Confirm Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
+      {pendingAction && (
+        <OperatorConfirmModal
+          open
+          actionType={pendingAction}
+          onClose={cancelAction}
+          onConfirm={handleConfirmAction}
+          loading={isProcessing}
+        />
       )}
     </div>
   );
