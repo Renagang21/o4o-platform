@@ -3722,6 +3722,9 @@ importers:
       '@o4o/store-ui-core':
         specifier: workspace:*
         version: link:../../packages/store-ui-core
+      '@o4o/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@o4o/ui':
         specifier: workspace:*
         version: link:../../packages/ui
