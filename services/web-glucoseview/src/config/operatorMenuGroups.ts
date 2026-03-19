@@ -13,6 +13,9 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   approvals: [{ label: '신청 관리', path: '/operator/applications' }],
   products: [{ label: '상품 관리', path: '/operator/products' }],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
-  analytics: [{ label: 'AI 리포트', path: '/operator/ai-report' }],
+  analytics: [
+    { label: 'AI 리포트', path: '/operator/ai-report' },
+    { label: '운영 분석', path: '/operator/analytics' },
+  ],
   system: [{ label: '역할 관리', path: '/operator/roles' }],
 };

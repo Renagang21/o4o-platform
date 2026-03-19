@@ -13,6 +13,7 @@
  */
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
+import type { ActionLogService } from '@o4o/action-log-core';
 import { requireAuth, requireRole } from '../../../middleware/auth.middleware.js';
 import { OperatorRegistrationService } from '../services/operator-registration.service.js';
 import logger from '../../../utils/logger.js';
@@ -31,7 +32,7 @@ type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };
 };
 
-export function createOperatorRegistrationController(dataSource: DataSource): Router {
+export function createOperatorRegistrationController(dataSource: DataSource, actionLogService?: ActionLogService): Router {
   const router = Router();
   const registrationService = new OperatorRegistrationService(dataSource);
 
@@ -79,6 +80,9 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
         }
 
         const result = await registrationService.approveRegistration(userId, approvedBy);
+        actionLogService?.logSuccess('neture', approvedBy, 'neture.operator.registration_approve', {
+          meta: { targetId: userId, statusBefore: 'pending', statusAfter: 'approved' },
+        }).catch(() => {});
         res.json({ success: true, data: result });
       } catch (error: any) {
         if (error?.message === 'REGISTRATION_NOT_FOUND') {
@@ -118,6 +122,9 @@ export function createOperatorRegistrationController(dataSource: DataSource): Ro
 
         const { reason } = req.body;
         const result = await registrationService.rejectRegistration(userId, rejectedBy, reason);
+        actionLogService?.logSuccess('neture', rejectedBy, 'neture.operator.registration_reject', {
+          meta: { targetId: userId, reason, statusBefore: 'pending', statusAfter: 'rejected' },
+        }).catch(() => {});
         res.json({ success: true, data: result });
       } catch (error: any) {
         if (error?.message === 'REGISTRATION_NOT_FOUND') {

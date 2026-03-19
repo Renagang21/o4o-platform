@@ -22,6 +22,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'AI 카드 리포트', path: '/operator/ai-card-report' },
     { label: 'AI 운영', path: '/operator/ai-operations' },
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
+    { label: '운영 분석', path: '/operator/analytics' },
   ],
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },

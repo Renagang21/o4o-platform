@@ -72,7 +72,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // Operator domain — dashboard + registration management
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 2)
   router.use('/operator', createOperatorDashboardController(dataSource));
-  router.use('/operator', createOperatorRegistrationController(dataSource));
+  router.use('/operator', createOperatorRegistrationController(dataSource, netureActionLogService));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

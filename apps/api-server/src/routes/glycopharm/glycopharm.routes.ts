@@ -74,6 +74,9 @@ const requireGlycopharmScope = createMembershipScopeGuard(GLYCOPHARM_SCOPE_CONFI
 export function createGlycopharmRoutes(dataSource: DataSource): Router {
   const router = Router();
 
+  // Shared ActionLogService (used by cockpit + hub-trigger + admin + store-applications)
+  const actionLogService = new ActionLogService(dataSource);
+
   // Core pharmacy/product routes
   const glycopharmController = createGlycopharmController(
     dataSource,
@@ -104,7 +107,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   const adminController = createAdminController(
     dataSource,
     coreRequireAuth as any,
-    requireGlycopharmScope
+    requireGlycopharmScope,
+    actionLogService,
   );
   router.use('/', adminController);
 
@@ -112,6 +116,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   const storeApplicationsController = createStoreApplicationsController(
     dataSource,
     coreRequireAuth as any,
+    actionLogService,
   );
   router.use('/store-applications', storeApplicationsController);
 
@@ -174,9 +179,6 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   forumRouter.post('/moderation/:type/:id', authenticate, forumController.moderateContent.bind(forumController));
 
   router.use('/forum', forumRouter);
-
-  // Shared ActionLogService (used by cockpit + hub-trigger)
-  const actionLogService = new ActionLogService(dataSource);
 
   // Cockpit routes (Pharmacy Dashboard 2.0)
   const cockpitController = createCockpitController(

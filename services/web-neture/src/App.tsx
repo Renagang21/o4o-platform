@@ -339,6 +339,10 @@ const OrdersManagementPage = lazy(() =>
 const RoleManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.RoleManagementPage }))
 );
+// WO-O4O-AUDIT-ANALYTICS-LAYER-V1
+const OperatorAnalyticsPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
+);
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 // Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
@@ -712,6 +716,8 @@ function App() {
               <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               {/* Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1) */}
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
+              {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
+              <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
               {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
               <Route path="/operator/roles" element={<RoleManagementPage />} />
             </Route>

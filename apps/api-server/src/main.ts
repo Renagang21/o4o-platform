@@ -509,6 +509,9 @@ import operatorStoreRoutes from './routes/operator/stores.routes.js';
 // Operator Role Catalog Routes (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
 import operatorRoleRoutes from './routes/operator/roles.routes.js';
 
+// Operator Analytics Routes (WO-O4O-AUDIT-ANALYTICS-LAYER-V1)
+import { createOperatorAnalyticsRoutes } from './routes/operator/analytics.routes.js';
+
 // Cosmetics Routes (Phase 7-A-1)
 import { createCosmeticsRoutes } from './routes/cosmetics/cosmetics.routes.js';
 
@@ -930,6 +933,10 @@ const startServer = async () => {
     // 24-g. Register Operator Role Catalog routes (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
     app.use('/api/v1/operator/roles', operatorRoleRoutes);
     logger.info('✅ Operator Role Catalog routes registered at /api/v1/operator/roles');
+
+    // 24-h. Register Operator Analytics routes (WO-O4O-AUDIT-ANALYTICS-LAYER-V1)
+    app.use('/api/v1/operator/analytics', createOperatorAnalyticsRoutes(AppDataSource));
+    logger.info('✅ Operator Analytics routes registered at /api/v1/operator/analytics');
 
     // 25. Register Cosmetics routes (Phase 7-A-1)
     try {

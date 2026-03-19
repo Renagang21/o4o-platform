@@ -15,6 +15,7 @@ import { OrganizationStore } from '../../../modules/store-core/entities/organiza
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
@@ -63,7 +64,8 @@ function generatePharmacyCode(): string {
 export function createAdminController(
   dataSource: DataSource,
   requireAuth: RequestHandler,
-  _requireScope: (scope: string) => RequestHandler
+  _requireScope: (scope: string) => RequestHandler,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
 
@@ -409,6 +411,10 @@ export function createAdminController(
         logger.info(
           `[Glycopharm Admin] Application ${id} ${status} by ${userId}`
         );
+        const actionKey = status === 'approved' ? 'glycopharm.operator.request_approve' : 'glycopharm.operator.request_reject';
+        actionLogService?.logSuccess('glycopharm', userId || 'unknown', actionKey, {
+          meta: { targetId: id, statusBefore: 'submitted', statusAfter: status },
+        }).catch(() => {});
 
         res.json({
           success: true,

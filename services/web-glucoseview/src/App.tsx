@@ -24,6 +24,7 @@ import OperatorApplicationsPage from './pages/operator/ApplicationsPage';
 import OperatorApplicationDetailPage from './pages/operator/ApplicationDetailPage';
 import OperatorAiReportPage from './pages/operator/AiReportPage';
 import OperatorRoleManagementPage from './pages/operator/RoleManagementPage';
+import OperatorAnalyticsPage from './pages/operator/AnalyticsPage';
 import OperatorUsersPage from './pages/operator/UsersPage';
 import OperatorUserDetailPage from './pages/operator/UserDetailPage';
 import OperatorProductsPage from './pages/operator/ProductsPage';
@@ -185,6 +186,8 @@ function AppRoutes() {
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         {/* AI Report (WO-AI-SERVICE-OPERATOR-REPORT-V1) */}
         <Route path="ai-report" element={<OperatorAiReportPage />} />
+        {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
+        <Route path="analytics" element={<OperatorAnalyticsPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<OperatorRoleManagementPage />} />
       </Route>

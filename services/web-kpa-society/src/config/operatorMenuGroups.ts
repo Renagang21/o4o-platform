@@ -36,7 +36,10 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '포럼 분석', path: '/operator/forum-analytics' },
     { label: '게시판', path: '/operator/forum' },
   ],
-  analytics: [{ label: 'AI 리포트', path: '/operator/ai-report' }],
+  analytics: [
+    { label: 'AI 리포트', path: '/operator/ai-report' },
+    { label: '운영 분석', path: '/operator/analytics' },
+  ],
   system: [
     { label: '법률 관리', path: '/operator/legal' },
     { label: '감사 로그', path: '/operator/audit-logs' },

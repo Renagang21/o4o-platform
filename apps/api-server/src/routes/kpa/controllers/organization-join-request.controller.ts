@@ -29,6 +29,7 @@ import { OrganizationMemberService } from '@o4o/organization-core';
 import { User } from '../../../modules/auth/entities/User.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 
 const VALID_REQUEST_TYPES: string[] = ['join', 'promotion', 'operator'];
@@ -40,7 +41,8 @@ const VALID_ROLES: RequestedRole[] = ['admin', 'manager', 'member', 'moderator']
 export function createOrganizationJoinRequestRoutes(
   dataSource: DataSource,
   requireAuth: RequestHandler,
-  requireScope: (scope: string) => RequestHandler
+  requireScope: (scope: string) => RequestHandler,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
   const getRepo = () => dataSource.getRepository(KpaOrganizationJoinRequest);
@@ -452,6 +454,9 @@ export function createOrganizationJoinRequestRoutes(
         await applyApproval(arRow.requester_id, arRow.organization_id, payload?.request_type || 'join', payload?.requested_role || 'member', payload?.requested_sub_role || null);
 
         logger.info(`Organization join request approved (unified): ${id} by ${user.id}`);
+        actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
+          meta: { targetId: id, requestType: payload?.request_type, statusBefore: 'pending', statusAfter: 'approved' },
+        }).catch(() => {});
 
         // Re-read for response
         const [updated] = await dataSource.query(`SELECT * FROM kpa_approval_requests WHERE id = $1`, [id]);
@@ -487,6 +492,9 @@ export function createOrganizationJoinRequestRoutes(
       await applyApproval(request.user_id, request.organization_id, request.request_type, request.requested_role, request.requested_sub_role);
 
       logger.info(`Organization join request approved (legacy): ${id} by ${user.id}`);
+      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_approve', {
+        meta: { targetId: id, requestType: request.request_type, statusBefore: 'pending', statusAfter: 'approved' },
+      }).catch(() => {});
 
       return res.json({
         success: true,
@@ -568,6 +576,9 @@ export function createOrganizationJoinRequestRoutes(
         await sendRejectionEmail(arRow.requester_id, payload?.request_type || 'join');
 
         logger.info(`Organization join request rejected (unified): ${id} by ${user.id}`);
+        actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
+          meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected' },
+        }).catch(() => {});
 
         const [updated] = await dataSource.query(`SELECT * FROM kpa_approval_requests WHERE id = $1`, [id]);
         return res.json({ success: true, data: updated });
@@ -602,6 +613,9 @@ export function createOrganizationJoinRequestRoutes(
       await sendRejectionEmail(request.user_id, request.request_type);
 
       logger.info(`Organization join request rejected (legacy): ${id} by ${user.id}`);
+      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.org_join_reject', {
+        meta: { targetId: id, reason: reviewNote?.trim(), statusBefore: 'pending', statusAfter: 'rejected' },
+      }).catch(() => {});
 
       return res.json({
         success: true,

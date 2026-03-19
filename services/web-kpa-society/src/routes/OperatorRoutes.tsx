@@ -34,6 +34,7 @@ import HqPlaylistsPage from '../pages/operator/signage/HqPlaylistsPage';
 import HqPlaylistDetailPage from '../pages/operator/signage/HqPlaylistDetailPage';
 import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
+import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
@@ -113,6 +114,9 @@ export function OperatorRoutes() {
           {/* 회원 관리 — MembershipConsole 표준 (WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1) */}
           <Route path="users" element={<UsersPage />} />
           <Route path="users/:id" element={<UserDetailPage />} />
+
+          {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
+          <Route path="analytics" element={<OperatorAnalyticsPage />} />
 
           {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
           <Route path="roles" element={<RoleManagementPage />} />

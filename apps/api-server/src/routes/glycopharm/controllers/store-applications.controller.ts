@@ -15,6 +15,7 @@ import { GlycopharmApplication } from '../entities/glycopharm-application.entity
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
 import { User } from '../../../modules/auth/entities/User.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
@@ -62,6 +63,7 @@ function generatePharmacyCode(): string {
 export function createStoreApplicationsController(
   dataSource: DataSource,
   requireAuth: RequestHandler,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
 
@@ -700,6 +702,9 @@ export function createStoreApplicationsController(
         }
 
         logger.info(`[StoreApplications] Application ${id} approved by ${userId}`);
+        actionLogService?.logSuccess('glycopharm', userId || 'unknown', 'glycopharm.operator.store_approve', {
+          meta: { targetId: id, statusBefore: 'submitted', statusAfter: 'approved' },
+        }).catch(() => {});
 
         res.json({
           success: true,
@@ -774,6 +779,9 @@ export function createStoreApplicationsController(
         await applicationRepo.save(application);
 
         logger.info(`[StoreApplications] Application ${id} rejected by ${userId}`);
+        actionLogService?.logSuccess('glycopharm', userId || 'unknown', 'glycopharm.operator.store_reject', {
+          meta: { targetId: id, reason, statusBefore: 'submitted', statusAfter: 'rejected' },
+        }).catch(() => {});
 
         res.json({
           success: true,

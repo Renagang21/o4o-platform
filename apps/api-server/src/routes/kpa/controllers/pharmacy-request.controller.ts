@@ -18,12 +18,14 @@
 import { Router } from 'express';
 import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
+import type { ActionLogService } from '@o4o/action-log-core';
 import { KpaPharmacyRequest } from '../entities/kpa-pharmacy-request.entity.js';
 
 export function createPharmacyRequestRoutes(
   dataSource: DataSource,
   requireAuth: RequestHandler,
-  requireScope: (scope: string) => RequestHandler
+  requireScope: (scope: string) => RequestHandler,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
   const getRepo = () => dataSource.getRepository(KpaPharmacyRequest);
@@ -196,6 +198,9 @@ export function createPharmacyRequestRoutes(
         );
       }
 
+      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {
+        meta: { targetId: req.params.id, statusBefore: 'pending', statusAfter: 'approved' },
+      }).catch(() => {});
       return res.json({ success: true, data: request });
     } catch (error: any) {
       console.error('[PharmacyRequest] Approve error:', error);
@@ -223,6 +228,9 @@ export function createPharmacyRequestRoutes(
       request.review_note = req.body.reviewNote || null;
       await repo.save(request);
 
+      actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_reject', {
+        meta: { targetId: req.params.id, reason: req.body.reviewNote, statusBefore: 'pending', statusAfter: 'rejected' },
+      }).catch(() => {});
       return res.json({ success: true, data: request });
     } catch (error: any) {
       console.error('[PharmacyRequest] Reject error:', error);

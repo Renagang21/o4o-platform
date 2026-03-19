@@ -16,3 +16,5 @@ export { default as StoreManagementPage } from './StoreManagementPage';
 export { default as OrdersManagementPage } from './OrdersManagementPage';
 // WO-O4O-ROLE-MANAGEMENT-UI-V1
 export { default as RoleManagementPage } from './RoleManagementPage';
+// WO-O4O-AUDIT-ANALYTICS-LAYER-V1
+export { default as OperatorAnalyticsPage } from './AnalyticsPage';

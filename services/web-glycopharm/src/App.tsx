@@ -121,6 +121,7 @@ const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
+const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 
 // Operator Care Pages (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1)
 const OperatorCareDashboardPage = lazy(() => import('@/pages/operator/care/OperatorCareDashboardPage'));
@@ -505,6 +506,8 @@ function AppRoutes() {
         <Route path="signage/hq-playlists/:playlistId" element={<HqPlaylistDetailPage />} />
         <Route path="signage/templates" element={<SignageTemplatesPage />} />
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+        {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
+        <Route path="analytics" element={<OperatorAnalyticsPage />} />
         {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
         <Route path="roles" element={<RoleManagementPage />} />
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}

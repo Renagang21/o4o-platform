@@ -109,6 +109,7 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -135,6 +136,7 @@ const requireKpaScope = createMembershipScopeGuard(KPA_SCOPE_CONFIG);
  */
 export function createKpaRoutes(dataSource: DataSource): Router {
   const router = Router();
+  const kpaActionLogService = new ActionLogService(dataSource);
 
   // APP-CONTENT Phase 2: shared content query service
   // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society' (backward compat includes legacy 'kpa')
@@ -202,7 +204,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
-  router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope));
+  router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
@@ -211,11 +213,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.use('/join-inquiries', createJoinInquiryAdminRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
-  router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
+  router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
   // Pharmacy Request routes (WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1)
   // 약국 서비스 신청 — 개인 신원 확장 (OrganizationJoinRequest에서 분리)
-  router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope));
+  router.use('/pharmacy-requests', createPharmacyRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));

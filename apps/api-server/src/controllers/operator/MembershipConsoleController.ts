@@ -12,11 +12,20 @@ import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { roleService } from '../../modules/auth/services/role.service.js';
+import { ActionLogService } from '@o4o/action-log-core';
 
 const approvalService = new MembershipApprovalService();
 
 
 export class MembershipConsoleController {
+  private actionLogService?: ActionLogService;
+
+  private getActionLogService(): ActionLogService {
+    if (!this.actionLogService && AppDataSource.isInitialized) {
+      this.actionLogService = new ActionLogService(AppDataSource);
+    }
+    return this.actionLogService!;
+  }
 
   /**
    * Service boundary check — non-platform-admin can only access users in their service scope
@@ -340,6 +349,10 @@ export class MembershipConsoleController {
         return;
       }
 
+      const serviceKey = membership.service_key || scope.serviceKeys[0] || 'platform';
+      this.getActionLogService()?.logSuccess(serviceKey, approvedBy || 'unknown', `${serviceKey}.operator.member_approve`, {
+        meta: { targetId: membershipId, statusBefore: 'pending', statusAfter: 'active' },
+      }).catch(() => {});
       res.json({ success: true, message: 'Membership approved', membership });
     } catch (error) {
       logger.error('[MembershipConsole] approveMembership error', {
@@ -378,6 +391,11 @@ export class MembershipConsoleController {
         return;
       }
 
+      const serviceKey = membership.service_key || scope.serviceKeys[0] || 'platform';
+      const rejectedBy = (req as any).user?.id || 'unknown';
+      this.getActionLogService()?.logSuccess(serviceKey, rejectedBy, `${serviceKey}.operator.member_reject`, {
+        meta: { targetId: membershipId, reason: reason || null, statusBefore: 'pending', statusAfter: 'rejected' },
+      }).catch(() => {});
       res.json({ success: true, message: 'Membership rejected', membership });
     } catch (error) {
       logger.error('[MembershipConsole] rejectMembership error', {

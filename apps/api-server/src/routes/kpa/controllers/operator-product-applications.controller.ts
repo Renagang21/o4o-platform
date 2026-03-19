@@ -19,6 +19,7 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { ProductApprovalV2Service } from '../../../modules/product-policy-v2/product-approval-v2.service.js';
+import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
@@ -28,6 +29,7 @@ export function createOperatorProductApplicationsController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
   requireScope: ScopeMiddleware,
+  actionLogService?: ActionLogService,
 ): Router {
   const router = Router();
   const approvalV2Service = new ProductApprovalV2Service(dataSource);
@@ -134,6 +136,9 @@ export function createOperatorProductApplicationsController(
     }
 
     logger.info(`[OperatorProductApplications] SERVICE approval approved: ${id} by ${approvedBy}`);
+    actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_approve', {
+      meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
+    }).catch(() => {});
     res.json({ success: true, data: result.data });
   }));
 
@@ -153,6 +158,9 @@ export function createOperatorProductApplicationsController(
     }
 
     logger.info(`[OperatorProductApplications] SERVICE approval rejected: ${id} by ${rejectedBy}`);
+    actionLogService?.logSuccess('kpa-society', rejectedBy, 'kpa.operator.product_reject', {
+      meta: { targetId: id, reason, statusBefore: 'pending', statusAfter: 'rejected' },
+    }).catch(() => {});
     res.json({ success: true, data: result.data });
   }));
 
