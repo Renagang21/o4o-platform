@@ -142,7 +142,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => {
                 setEmail('patient_test@glycopharm.co.kr');
-                setPassword('O4oTestPass');
+                setPassword('O4oTestPass@1');
                 setError('');
               }}
               className="w-full py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50"
