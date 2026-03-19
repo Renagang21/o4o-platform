@@ -1,5 +1,5 @@
 # GlucoseView Web - Cloud Run Dockerfile
-# 환자 전용 혈당 관리 서비스
+# 당뇨인 전용 혈당 관리 서비스
 #
 # NOTE: 이 Dockerfile은 모노레포 루트에서 빌드 컨텍스트로 실행됩니다.
 # docker build -f services/web-glucoseview/Dockerfile .
