@@ -214,49 +214,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/partner/status', label: '현황', icon: icons.FileCheck },
     ],
   },
-  operator: {
-    title: '운영자 관리',
-    icon: icons.Shield,
-    color: 'pink',
-    /**
-     * WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1:
-     * 표준 Capability 그룹 기반 sidebar.
-     * Deprecated 제거: inventory, settlements, analytics, marketing, support (all mock).
-     */
-    menuGroups: [
-      { label: 'Dashboard', icon: icons.LayoutDashboard, items: [
-        { label: '대시보드', path: '/operator', exact: true },
-      ]},
-      { label: 'Users', icon: icons.Users, items: [
-        { label: '회원 관리', path: '/operator/users' },
-      ]},
-      { label: 'Approvals', icon: icons.FileCheck, items: [
-        { label: '신청 관리', path: '/operator/applications' },
-      ]},
-      { label: 'Products', icon: icons.Package, items: [
-        { label: '상품 관리', path: '/operator/products' },
-      ]},
-      { label: 'Stores', icon: icons.Store, items: [
-        { label: '내 매장', path: '/operator/store-cockpit' },
-        { label: '매장 관리', path: '/operator/stores' },
-      ]},
-      { label: 'Orders', icon: icons.ShoppingCart, items: [
-        { label: '주문 관리', path: '/operator/orders' },
-      ]},
-      { label: 'Signage', icon: icons.Monitor, items: [
-        { label: '사이니지 콘텐츠', path: '/operator/signage/content' },
-        { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
-        { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
-        { label: '템플릿', path: '/operator/signage/templates' },
-      ]},
-      { label: 'Forum', icon: icons.MessageSquare, items: [
-        { label: '커뮤니티 관리', path: '/operator/community' },
-      ]},
-      { label: 'Analytics', icon: icons.BarChart3, items: [
-        { label: 'AI 리포트', path: '/operator/ai-report' },
-      ]},
-    ],
-  },
+  // operator config removed — WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: uses shared OperatorShell
 };
 
 export default function DashboardLayout({ role }: DashboardLayoutProps) {

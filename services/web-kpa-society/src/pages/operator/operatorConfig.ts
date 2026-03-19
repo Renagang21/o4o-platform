@@ -248,7 +248,7 @@ export function buildKpaOperatorConfig(
 
   // Block 5: Quick Actions (핵심 — Hub 기능 흡수)
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-community', label: '커뮤니티 관리', link: '/operator/community-management', icon: '🏠' },
+    { id: 'qa-community', label: '커뮤니티 관리', link: '/operator/community', icon: '🏠' },
     { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
     { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
     { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },

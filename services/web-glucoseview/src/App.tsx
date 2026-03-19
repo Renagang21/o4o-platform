@@ -31,7 +31,7 @@ import OperatorProductDetailPage from './pages/operator/ProductDetailPage';
 import OperatorStoresPage from './pages/operator/StoresPage';
 import OperatorStoreDetailPage from './pages/operator/StoreDetailPage';
 // Operator Layout
-import OperatorLayout from './components/layouts/OperatorLayout';
+import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 // Operator Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
 import GlucoseViewOperatorDashboard from './pages/operator/GlucoseViewOperatorDashboard';
 // Patient Layout (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1)
@@ -167,7 +167,7 @@ function AppRoutes() {
       {/* 운영자 페이지 — WO-O4O-OPERATOR-CONSOLE-ARCHITECTURE-V1: /operator 표준 경로 */}
       <Route path="/operator" element={
         <OperatorRoute>
-          <OperatorLayout />
+          <OperatorLayoutWrapper />
         </OperatorRoute>
       }>
         {/* Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1) */}

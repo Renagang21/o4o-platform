@@ -93,7 +93,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
         id: 'supplier-approval',
         title: '공급자 승인',
         description: '가입 신청 및 공급자 승인을 관리합니다.',
-        href: '/operator/registrations',
+        href: '/operator/applications',
         icon: '✅',
         signalKey: 'supplierApproval',
       },

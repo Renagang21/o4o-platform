@@ -36,15 +36,15 @@ import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
 import { PLATFORM_ROLES } from '../lib/role-constants';
-// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Sidebar Console layout
-import KpaOperatorLayout from '../components/kpa-operator/KpaOperatorLayout';
+// WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
+import KpaOperatorLayoutWrapper from '../components/kpa-operator/KpaOperatorLayoutWrapper';
 
 export function OperatorRoutes() {
   return (
     <RoleGuard allowedRoles={[...PLATFORM_ROLES]}>
       <Routes>
-        {/* WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout sidebar wraps all routes */}
-        <Route element={<KpaOperatorLayout />}>
+        {/* WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper */}
+        <Route element={<KpaOperatorLayoutWrapper />}>
           {/* /operator → 5-Block 대시보드 (WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1) */}
           <Route index element={<KpaOperatorDashboard />} />
 
@@ -54,8 +54,9 @@ export function OperatorRoutes() {
           {/* 포럼 관리 */}
           <Route path="forum-management" element={<ForumManagementPage />} />
 
-          {/* 커뮤니티 관리 (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
-          <Route path="community-management" element={<CommunityManagementPage />} />
+          {/* 커뮤니티 관리 (WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: community-management → community) */}
+          <Route path="community" element={<CommunityManagementPage />} />
+          <Route path="community-management" element={<Navigate to="/operator/community" replace />} />
 
           {/* 포럼 통계 */}
           <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />

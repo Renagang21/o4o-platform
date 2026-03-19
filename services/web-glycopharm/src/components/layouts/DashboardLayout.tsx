@@ -23,15 +23,12 @@ import {
   MessageSquare,
   BookOpen,
   Tv,
-  FileCheck,
   Monitor,
   Tag,
   Store,
   BarChart3,
-  CreditCard,
   FileText,
   Briefcase,
-  Heart,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -45,7 +42,7 @@ interface DashboardLayoutProps {
  */
 type MenuItem = { path: string; label: string; icon: typeof LayoutDashboard };
 type SidebarItem = { label: string; path: string; exact?: boolean };
-type SidebarGroup = { label: string; icon: typeof LayoutDashboard; items: SidebarItem[] };
+type SidebarGroup = { label: string; icon: typeof LayoutDashboard; items: SidebarItem[]; };
 type RoleConfig = { title: string; icon: typeof Building2; color: string; menuItems?: MenuItem[]; menuGroups?: SidebarGroup[] };
 
 const roleConfig: Record<string, RoleConfig> = {
@@ -105,65 +102,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/supplier/settings', label: '설정', icon: Settings },
     ],
   },
-  operator: {
-    title: '운영자 관리',
-    icon: Shield,
-    color: 'red',
-    menuGroups: [
-      { label: 'Dashboard', icon: LayoutDashboard, items: [
-        { label: '대시보드', path: '/operator', exact: true },
-      ]},
-      { label: 'Pharmacies', icon: Building2, items: [
-        { label: '약국 관리', path: '/operator/pharmacies' },
-      ]},
-      { label: 'Users', icon: Users, items: [
-        { label: '회원 관리', path: '/operator/users' },
-      ]},
-      { label: 'Approvals', icon: FileCheck, items: [
-        { label: '신청 관리', path: '/operator/applications' },
-        { label: '매장 승인', path: '/operator/store-approvals' },
-      ]},
-      { label: 'Products', icon: Package, items: [
-        { label: '상품 관리', path: '/operator/products' },
-      ]},
-      { label: 'Stores', icon: Store, items: [
-        { label: '매장 관리', path: '/operator/stores' },
-      ]},
-      { label: 'Orders', icon: ShoppingCart, items: [
-        { label: '주문 관리', path: '/operator/orders' },
-      ]},
-      { label: 'Finance', icon: CreditCard, items: [
-        { label: '정산 관리', path: '/operator/settlements' },
-        { label: '청구 리포트', path: '/operator/reports' },
-        { label: '청구 미리보기', path: '/operator/billing-preview' },
-        { label: '인보이스', path: '/operator/invoices' },
-      ]},
-      { label: 'Signage', icon: Monitor, items: [
-        { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
-        { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
-        { label: '템플릿', path: '/operator/signage/templates' },
-        { label: '콘텐츠 허브', path: '/operator/signage/content' },
-        { label: '콘텐츠 라이브러리', path: '/operator/signage/library' },
-        { label: '내 사이니지', path: '/operator/signage/my' },
-      ]},
-      { label: 'Forum', icon: MessageSquare, items: [
-        { label: '포럼 관리', path: '/operator/forum-management' },
-        { label: '포럼 신청', path: '/operator/forum-requests' },
-        { label: '커뮤니티 관리', path: '/operator/community' },
-      ]},
-      { label: 'Care', icon: Heart, items: [
-        { label: '케어 현황', path: '/operator/care' },
-        { label: '케어 알림', path: '/operator/care/alerts' },
-      ]},
-      { label: 'Analytics', icon: BarChart3, items: [
-        { label: 'AI 리포트', path: '/operator/ai-report' },
-      ]},
-      { label: 'Settings', icon: Settings, items: [
-        { label: '서비스 설정', path: '/operator/settings' },
-        { label: '역할 관리', path: '/operator/roles' },
-      ]},
-    ],
-  },
+  // operator config removed — WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: uses shared OperatorShell
 };
 
 export default function DashboardLayout({ role }: DashboardLayoutProps) {
@@ -172,7 +111,6 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
   const { pathname } = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
   const config = roleConfig[role];
   const RoleIcon = config.icon;
 

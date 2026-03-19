@@ -53,6 +53,12 @@ export * from './listing-display.js';
 // Export operator policy types (WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1)
 export * from './operator-policy.js';
 
+// Export operator capability types (WO-O4O-OPERATOR-CAPABILITY-LAYER-V1)
+export * from './operator-capability.js';
+
+// Export operator route constants (WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1)
+export * from './operator-routes.js';
+
 // For backward compatibility, re-export partner types with affiliate names
 export type {
   PartnerUser as AffiliateUser,

@@ -1,0 +1,62 @@
+/**
+ * OperatorShell Types
+ *
+ * WO-O4O-OPERATOR-UI-STANDARDIZATION-V1
+ * 모든 서비스의 Operator UI를 단일 OperatorShell로 통합.
+ */
+
+import type { ReactNode } from 'react';
+import type { OperatorCapability } from '@o4o/types';
+
+/**
+ * 단일 메뉴 항목 (그룹 내 라우트).
+ */
+export interface OperatorMenuItem {
+  /** 표시 라벨 */
+  label: string;
+  /** 라우트 경로 (e.g., '/operator/users') */
+  path: string;
+  /** true이면 정확 일치에서만 활성 (Dashboard 등) */
+  exact?: boolean;
+}
+
+/**
+ * 11-Capability Group 키.
+ * CLAUDE.md Section 11 표준 순서.
+ */
+export type OperatorGroupKey =
+  | 'dashboard'
+  | 'users'
+  | 'approvals'
+  | 'products'
+  | 'stores'
+  | 'orders'
+  | 'content'
+  | 'signage'
+  | 'forum'
+  | 'analytics'
+  | 'system';
+
+/**
+ * OperatorShell Props.
+ */
+export interface OperatorShellProps {
+  /** 서비스 표시명 (e.g., "Neture", "GlycoPharm") */
+  serviceName: string;
+  /** 그룹별 메뉴 항목 — 서비스가 라우트 매핑 제공 */
+  menuItems: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>;
+  /** 서비스 활성 Capability 목록 */
+  capabilities: OperatorCapability[];
+  /** 현재 사용자 */
+  user: { name: string; email?: string } | null;
+  /** 로그아웃 핸들러 */
+  onLogout: () => void;
+  /** 메인 사이트 링크 (default: "/") */
+  homeLink?: string;
+  /** Footer 커스텀. false = 숨김 */
+  footer?: ReactNode | false;
+  /** 헤더 우측 추가 액션 (e.g., AccountMenu) */
+  headerActions?: ReactNode;
+  /** Content 영역 — 일반적으로 <Outlet /> */
+  children: ReactNode;
+}

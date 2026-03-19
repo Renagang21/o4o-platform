@@ -8,6 +8,7 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 // Layouts (always needed)
 import MainLayout from '@/components/layouts/MainLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
+import OperatorLayoutWrapper from '@/components/layouts/OperatorLayoutWrapper';
 import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
@@ -322,7 +323,7 @@ function AdminAreaLayout() {
 }
 
 function OperatorAreaLayout() {
-  return <DashboardLayout role="operator" />;
+  return <OperatorLayoutWrapper />;
 }
 
 // App Routes
