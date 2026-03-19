@@ -61,15 +61,16 @@ export const usePermissions = () => {
 
   const isAdmin = () => {
     if (!user) return false;
-    // Admin role has all permissions
-    return user.role === 'admin';
+    const userRoles = user.roles || [];
+    return userRoles.includes('admin') || userRoles.includes('super_admin');
   }
 
   const hasPermission = (permission: Permission | PermissionKey | string): boolean => {
     if (!user) return false;
 
     // Admin has all permissions
-    if (user.role === 'admin') return true;
+    const userRoles = user.roles || [];
+    if (userRoles.includes('admin') || userRoles.includes('super_admin')) return true;
 
     // Check specific permission in user permissions
     return user.permissions?.includes(permission as Permission) ?? false;
@@ -117,7 +118,7 @@ export const usePermissions = () => {
     getRoleBasedPermissions,
     canAccessMenu,
     isAdmin: isAdmin(),
-    userRole: user?.role,
+    userRole: user?.roles?.[0],
     userPermissions: user?.permissions || []
   }
 }

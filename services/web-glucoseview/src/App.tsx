@@ -52,7 +52,7 @@ import SelectPharmacyPage from './pages/patient/SelectPharmacyPage';
 import PatientAppointmentsPage from './pages/patient/AppointmentsPage';
 import CareGuidelinePage from './pages/patient/CareGuidelinePage';
 
-import { RoleGuard } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute } from './components/auth/RoleGuard';
 import PwaInstallPrompt from './components/common/PwaInstallPrompt';
 import './index.css';
 
@@ -166,9 +166,9 @@ function AppRoutes() {
 
       {/* 운영자 페이지 — WO-O4O-OPERATOR-CONSOLE-ARCHITECTURE-V1: /operator 표준 경로 */}
       <Route path="/operator" element={
-        <RoleProtectedRoute allowedRoles={['admin', 'operator']}>
+        <OperatorRoute>
           <OperatorLayout />
-        </RoleProtectedRoute>
+        </OperatorRoute>
       }>
         {/* Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1) */}
         <Route index element={<GlucoseViewOperatorDashboard />} />

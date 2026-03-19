@@ -11,7 +11,7 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import StoreLayout from '@/components/layouts/StoreLayout';
 import KioskLayout from '@/components/layouts/KioskLayout';
 import TabletLayout from '@/components/layouts/TabletLayout';
-import { RoleGuard } from '@/components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
 import LandingPage from '@/pages/LandingPage';
@@ -466,9 +466,9 @@ function AppRoutes() {
       <Route
         path="operator"
         element={
-          <ProtectedRoute allowedRoles={['admin', 'operator']}>
+          <OperatorRoute>
             <OperatorAreaLayout />
-          </ProtectedRoute>
+          </OperatorRoute>
         }
       >
         <Route index element={<GlycoPharmOperatorDashboard />} />

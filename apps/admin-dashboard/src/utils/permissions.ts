@@ -7,7 +7,8 @@ export const hasPermission = (user: User | null, permission: Permission): boolea
   if (!user) return false;
 
   // Super admin and admin have all permissions
-  if (user.role === 'admin') return true;
+  const userRoles = user.roles || [];
+  if (userRoles.includes('admin') || userRoles.includes('super_admin')) return true;
 
   // Check if user has the specific permission
   return user.permissions?.includes(permission) ?? false;
@@ -20,7 +21,8 @@ export const hasAnyPermission = (user: User | null, permissions: Permission[]): 
   if (!user) return false;
 
   // Super admin and admin have all permissions
-  if (user.role === 'admin') return true;
+  const userRoles = user.roles || [];
+  if (userRoles.includes('admin') || userRoles.includes('super_admin')) return true;
 
   // Check if user has any of the permissions
   return permissions.some(permission =>

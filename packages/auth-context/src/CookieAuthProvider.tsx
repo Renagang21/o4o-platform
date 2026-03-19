@@ -202,15 +202,17 @@ export const CookieAuthProvider: FC<CookieAuthProviderProps> = ({
 
   // Check if user has specific role(s)
   const hasRole = useCallback((role: string | string[]) => {
-    if (!user || !user.role) return false;
-    const roles = Array.isArray(role) ? role : [role];
-    return roles.includes(user.role);
+    if (!user) return false;
+    const userRoles = user.roles || [];
+    const checkRoles = Array.isArray(role) ? role : [role];
+    return checkRoles.some(r => userRoles.includes(r));
   }, [user]);
 
   // Check if user has specific permission
   const hasPermission = useCallback((permission: string) => {
     if (!user) return false;
-    if (user.role === 'admin') return true; // Admin has all permissions
+    const userRoles = user.roles || [];
+    if (userRoles.includes('admin') || userRoles.includes('super_admin')) return true;
     return user.permissions?.includes(permission) || false;
   }, [user]);
 

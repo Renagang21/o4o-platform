@@ -114,7 +114,8 @@ export class RateLimitMiddleware {
         skip: (req: Request) => {
           // Skip rate limiting for admin users
           const authReq = req as AuthRequest;
-          return authReq.user?.role === 'admin';
+          const userRoles = authReq.user?.roles || [];
+          return userRoles.includes('admin') || userRoles.includes('super_admin');
         }
       }));
     }

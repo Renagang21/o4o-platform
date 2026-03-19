@@ -83,7 +83,7 @@ export class SellerWorkflowController {
     try {
       const { id } = req.params;
       const sellerId = req.user?.id;
-      const isAdmin = req.user?.role === 'admin';
+      const isAdmin = req.user?.roles?.some((r: string) => r === 'admin' || r === 'super_admin') ?? false;
 
       const session = await this.workflowService.getSession(id);
 
@@ -167,7 +167,7 @@ export class SellerWorkflowController {
     try {
       const { id } = req.params;
       const sellerId = req.user?.id;
-      const isAdmin = req.user?.role === 'admin';
+      const isAdmin = req.user?.roles?.some((r: string) => r === 'admin' || r === 'super_admin') ?? false;
 
       // First check ownership
       const existingSession = await this.workflowService.getSession(id);
@@ -222,7 +222,7 @@ export class SellerWorkflowController {
     try {
       const { id } = req.params;
       const sellerId = req.user?.id;
-      const isAdmin = req.user?.role === 'admin';
+      const isAdmin = req.user?.roles?.some((r: string) => r === 'admin' || r === 'super_admin') ?? false;
       const purchasedProducts = req.body.purchasedProducts;
 
       // First check ownership

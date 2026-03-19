@@ -65,28 +65,28 @@ export function useUserContext(): UseUserContextReturn {
       };
     }
 
-    const role = user.role?.toLowerCase() || '';
+    const userRoles = (user.roles || []).map((r: string) => r.toLowerCase());
     const permissions = user.permissions || [];
 
-    // Role에서 컨텍스트 파생
-    if (role === 'admin' || role === 'super_admin') {
+    // Roles에서 컨텍스트 파생
+    if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
       contexts.push('admin');
     }
 
-    if (role === 'seller' || permissions.includes('seller.dashboard')) {
+    if (userRoles.includes('seller') || permissions.includes('seller.dashboard')) {
       contexts.push('seller');
     }
 
-    if (role === 'supplier' || permissions.includes('supplier.dashboard')) {
+    if (userRoles.includes('supplier') || permissions.includes('supplier.dashboard')) {
       contexts.push('supplier');
     }
 
-    if (role === 'partner' || permissions.includes('partner.dashboard')) {
+    if (userRoles.includes('partner') || permissions.includes('partner.dashboard')) {
       contexts.push('partner');
     }
 
     // 운영자 컨텍스트 (membership/operator 흡수)
-    if (role === 'operator' || permissions.includes('membership.manage') || permissions.includes('operator.dashboard')) {
+    if (userRoles.includes('operator') || permissions.includes('membership.manage') || permissions.includes('operator.dashboard')) {
       contexts.push('operator');
     }
 

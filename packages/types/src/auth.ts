@@ -33,7 +33,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: UserRole; // Dynamic role from database
+  role: UserRole; // Legacy (deprecated, use roles[])
+  roles?: string[]; // RBAC: from role_assignments via JWT
   permissions?: Permission[]; // Dynamic permissions from database
   isApproved?: boolean;
   avatar?: string;

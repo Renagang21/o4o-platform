@@ -11,6 +11,7 @@ export interface AuthRequest extends Request {
     id: string;
     email: string;
     role: string;
+    roles?: string[];
     status: string;
     permissions?: string[];
   };
@@ -180,7 +181,8 @@ export class AuthMiddleware {
       }
       
       // Admin has all permissions
-      if (req.user.role === 'admin') {
+      const userRoles = req.user.roles || [];
+      if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
         next();
         return;
       }

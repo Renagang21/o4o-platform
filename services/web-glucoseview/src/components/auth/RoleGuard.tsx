@@ -38,3 +38,42 @@ export function RoleGuard({ children, allowedRoles, fallback = '/' }: RoleGuardP
 
   return <>{children}</>;
 }
+
+/**
+ * OperatorRoute — service_memberships 기반 Operator 접근 제어
+ *
+ * WO-O4O-OPERATOR-VISIBILITY-UNIFICATION-V1
+ * - Platform admin (admin/super_admin) → 항상 허용
+ * - 그 외 → 해당 서비스의 active membership 필요
+ */
+const SERVICE_KEY = 'glucoseview';
+
+export function OperatorRoute({ children, fallback = '/' }: Omit<RoleGuardProps, 'allowedRoles'>) {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to={fallback} state={{ from: location.pathname + location.search, requireLogin: true }} replace />;
+  }
+
+  if (!user) return <Navigate to="/" replace />;
+
+  const isAdmin = user.roles.some(r => r === 'admin' || r === 'super_admin');
+  const hasOperatorMembership = user.memberships?.some(
+    m => m.serviceKey === SERVICE_KEY && m.status === 'active'
+  );
+
+  if (!isAdmin && !hasOperatorMembership) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}

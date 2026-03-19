@@ -27,6 +27,7 @@ export interface AuthenticatedRequest extends Request {
     id: string;
     email?: string;
     role?: string;
+    roles?: string[];
   };
 }
 
@@ -203,7 +204,8 @@ export class MemberProfileController {
 
       // TODO: 관리자 권한 체크 (organization-core 연동)
       // 현재는 본인 조회만 허용
-      if (requestUser.id !== userId && requestUser.role !== 'admin') {
+      const userRoles = requestUser.roles || [];
+      if (requestUser.id !== userId && !userRoles.includes('admin') && !userRoles.includes('super_admin')) {
         res.status(403).json({
           success: false,
           error: 'FORBIDDEN',
@@ -256,7 +258,8 @@ export class MemberProfileController {
 
       // 시스템/관리자 권한 확인
       // TODO: 시스템 인증 토큰 또는 관리자 권한 체크
-      if (!requestUser || requestUser.role !== 'admin') {
+      const adminRoles = requestUser?.roles || [];
+      if (!requestUser || (!adminRoles.includes('admin') && !adminRoles.includes('super_admin'))) {
         res.status(403).json({
           success: false,
           error: 'FORBIDDEN',

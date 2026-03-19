@@ -188,7 +188,8 @@ export function requireOwnership(
       const resourceUserId = await resourceUserIdGetter(req);
 
       // Admin can access any resource
-      if (user.role === 'admin') {
+      const userRoles = user.roles || [];
+      if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
         next();
         return;
       }

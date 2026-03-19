@@ -73,7 +73,8 @@ export function createRequirePartnerAuth(profileRepository: Repository<PartnerPr
       const userId = req.user.id;
 
       // Admin can access all partner data
-      if (req.user.role === 'admin') {
+      const userRoles = req.user.roles || [];
+      if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
         // For admin, allow passing partnerId as query param for specific partner access
         const targetPartnerId = req.params.partnerId || req.query.partnerId as string;
         if (targetPartnerId) {
@@ -142,7 +143,8 @@ export function requirePartnerPermission(permission: string) {
     }
 
     // Admin has all permissions
-    if (user.role === 'admin') {
+    const userRoles = user.roles || [];
+    if (userRoles.includes('admin') || userRoles.includes('super_admin')) {
       next();
       return;
     }

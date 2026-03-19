@@ -27,6 +27,7 @@ export interface User {
     email: string;
     name: string;
     role: UserRole;
+    roles?: string[];
     permissions?: Permission[];
     isApproved?: boolean;
     avatar?: string;

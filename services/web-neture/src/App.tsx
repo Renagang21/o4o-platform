@@ -32,7 +32,7 @@ import AdminLayout from './components/layouts/AdminLayout';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute } from './components/auth/RoleGuard';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -679,9 +679,9 @@ function App() {
                 Operator Dashboard (/operator/*)
             ================================================================ */}
             <Route element={
-              <ProtectedRoute allowedRoles={['admin', 'operator']}>
+              <OperatorRoute>
                 <OperatorLayout />
-              </ProtectedRoute>
+              </OperatorRoute>
             }>
               <Route path="/operator" element={<NetureOperatorDashboard />} />
               <Route path="/operator/users" element={<UsersManagementPage />} />

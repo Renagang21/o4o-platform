@@ -15,7 +15,7 @@ import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
 import MainLayout from '@/components/layouts/MainLayout';
 import PartnerLayout from '@/components/layouts/PartnerLayout';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import { RoleGuard } from '@/components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute } from '@/components/auth/RoleGuard';
 
 // Public Pages (always loaded - first paint)
 import { HomePage, NotFoundPage } from '@/pages';
@@ -276,9 +276,9 @@ function AppRoutes() {
       <Route
         path="operator"
         element={
-          <ProtectedRoute allowedRoles={['admin', 'operator']}>
+          <OperatorRoute>
             <DashboardLayout role="operator" />
-          </ProtectedRoute>
+          </OperatorRoute>
         }
       >
         {/* Signal 기반 대시보드 (WO-K-COSMETICS-OPERATOR-DASHBOARD-UX-V1) */}

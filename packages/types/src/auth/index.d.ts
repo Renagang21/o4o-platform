@@ -61,6 +61,7 @@ export interface User {
     createdAt: string | Date;
     updatedAt: string | Date;
     role?: string;
+    roles?: string[];
     assignments?: RoleAssignment[];
     permissions?: string[];
     metadata?: Record<string, unknown>;

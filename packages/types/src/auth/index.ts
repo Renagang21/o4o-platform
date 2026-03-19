@@ -115,8 +115,11 @@ export interface User {
   createdAt: string | Date;
   updatedAt: string | Date;
 
-  // Legacy role field (deprecated, use assignments)
+  // Legacy role field (deprecated, use roles[])
   role?: string;
+
+  // RBAC: from role_assignments via JWT
+  roles?: string[];
 
   // P0 RBAC: Role assignments
   assignments?: RoleAssignment[];
