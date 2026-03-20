@@ -8,7 +8,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
-import { api } from '../lib/apiClient';
+import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility
 export { getAccessToken };
@@ -91,10 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const response = await api.post('/auth/login', { email, password, includeLegacyTokens: true });
-      const data = response.data;
-
-      const { user: apiUser } = parseAuthResponse(data);
+      // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
+      // which stores tokens to localStorage (api.post() alone does not)
+      const result = await authClient.login({ email, password });
+      const apiUser = result.user as any;
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
         const base = normalizeUser(apiUser);
@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: true, role: roles[0] };
       }
 
-      return { success: false, error: data.message || data.error || '로그인 응답이 올바르지 않습니다.' };
+      return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
     } catch (error: any) {
       // Handle PASSWORD_MISMATCH from error response
       const errData = error?.response?.data;
@@ -124,6 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await api.post('/auth/password-sync', { email, syncToken, newPassword });
       const data = response.data;
+      // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: store tokens from password-sync
+      const tokens = data?.data?.tokens;
+      if (tokens?.accessToken) {
+        localStorage.setItem('o4o_accessToken', tokens.accessToken);
+        if (tokens.refreshToken) {
+          localStorage.setItem('o4o_refreshToken', tokens.refreshToken);
+        }
+      }
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);

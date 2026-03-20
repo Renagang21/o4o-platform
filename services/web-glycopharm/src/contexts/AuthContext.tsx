@@ -10,7 +10,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import type { User, UserRole } from '@/types';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
-import { api } from '../lib/apiClient';
+import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility (API files, pages 등에서 import)
 export { getAccessToken } from '@o4o/auth-client';
@@ -158,20 +158,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Axios 기반 로그인 — 401 자동 갱신 지원
+    // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
+    // which stores tokens to localStorage (api.post() alone does not)
     try {
-      const response = await api.post('/auth/login', { email, password, includeLegacyTokens: true });
-      const data = response.data;
-
-      // Token 저장 (authClient interceptor가 이후 자동 갱신)
-      if (data.data?.tokens?.accessToken) {
-        localStorage.setItem('o4o_accessToken', data.data.tokens.accessToken);
-      }
-      if (data.data?.tokens?.refreshToken) {
-        localStorage.setItem('o4o_refreshToken', data.data.tokens.refreshToken);
-      }
-
-      const { user: apiUser } = parseAuthResponse(data);
+      const result = await authClient.login({ email, password });
+      const apiUser = result.user as any;
 
       if (apiUser) {
         const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
