@@ -8,7 +8,6 @@ import type { RiskPatientDto } from '@/api/pharmacy';
  * Uses composite risk score from the /api/v1/care/risk-patients endpoint.
  */
 
-// Keep RiskPatient for backward compatibility (used by HomeLivePage barrel export)
 export interface RiskPatient {
   patientId: string;
   patientName: string;

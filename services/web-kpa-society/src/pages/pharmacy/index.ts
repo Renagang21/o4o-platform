@@ -13,9 +13,6 @@ export { PharmacyServicesPage } from './PharmacyServicesPage';
 // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: 약국 서비스 신청 게이트
 export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 
-// WO-KPA-A-PAGE-ROLE-CLEANUP-V1: Dashboard
-export { PharmacyDashboardPage } from './PharmacyDashboardPage';
-
 // WO-O4O-HUB-MARKET-RESTRUCTURE-V1: 약국 공용공간 (Market Layer)
 export { PharmacyHubMarketPage } from './PharmacyHubMarketPage';
 
@@ -50,7 +47,6 @@ export { PharmacyTemplatePage } from './PharmacyTemplatePage';
 export { LayoutBuilderPage } from './LayoutBuilderPage';
 
 // WO-STORE-ADMIN-CONSOLIDATION-V1: 매장 관리 통합
-export { StoreOverviewPage } from './StoreOverviewPage';
 export { StoreChannelsPage } from './StoreChannelsPage';
 
 // WO-STORE-ORDERS-FOUNDATION-V1: 주문 관리

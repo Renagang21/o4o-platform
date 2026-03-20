@@ -1966,34 +1966,6 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
-  packages/corner-display-extension:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      express:
-        specifier: ^4.18.2
-        version: 4.21.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      typeorm:
-        specifier: ^0.3.20
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
   packages/cosmetics-partner-extension:
     dependencies:
       '@o4o/shortcodes':
@@ -2676,58 +2648,6 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
-  packages/member-yaksa:
-    dependencies:
-      '@o4o-apps/forum-yaksa':
-        specifier: workspace:*
-        version: link:../forum-yaksa
-      '@o4o/lms-yaksa':
-        specifier: workspace:*
-        version: link:../lms-yaksa
-      '@o4o/membership-yaksa':
-        specifier: workspace:*
-        version: link:../membership-yaksa
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      class-transformer:
-        specifier: ^0.5.0
-        version: 0.5.1
-      class-validator:
-        specifier: ^0.14.0
-        version: 0.14.2
-      express:
-        specifier: ^4.18.0
-        version: 4.21.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-router-dom:
-        specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
   packages/membership-yaksa:
     dependencies:
       '@o4o/organization-core':
@@ -3212,37 +3132,6 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  packages/signage-pharmacy-extension:
-    dependencies:
-      '@o4o-apps/content-core':
-        specifier: workspace:^
-        version: link:../content-core
-      '@o4o/digital-signage-contract':
-        specifier: workspace:*
-        version: link:../digital-signage-contract
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      axios:
-        specifier: ^1.11.0
-        version: 1.13.2
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      typescript:
-        specifier: 5.4.5
-        version: 5.4.5
-
   packages/siteguide-widget:
     devDependencies:
       '@rollup/plugin-node-resolve':
@@ -3425,46 +3314,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-
-  packages/yaksa-accounting:
-    dependencies:
-      '@o4o/annualfee-yaksa':
-        specifier: workspace:*
-        version: link:../annualfee-yaksa
-      '@o4o/membership-yaksa':
-        specifier: workspace:*
-        version: link:../membership-yaksa
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      '@o4o/yaksa-admin':
-        specifier: workspace:*
-        version: link:../yaksa-admin
-      express:
-        specifier: ^4.18.2
-        version: 4.21.2
-      typeorm:
-        specifier: ^0.3.20
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
-      uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/uuid':
-        specifier: ^9.0.7
-        version: 9.0.8
-      rimraf:
-        specifier: ^5.0.5
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
 
   packages/yaksa-admin:
     dependencies:

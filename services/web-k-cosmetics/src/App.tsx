@@ -91,15 +91,8 @@ const OperatorApplicationsPage = lazy(() => import('@/pages/operator/Application
 const OperatorProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
 const OperatorProductDetailPage = lazy(() => import('@/pages/operator/ProductDetailPage'));
 const OperatorOrdersPage = lazy(() => import('@/pages/operator/OrdersPage'));
-// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated (mock) — removed from sidebar & routes
-// const OperatorInventoryPage = lazy(() => import('@/pages/operator/InventoryPage'));
-// const OperatorSettlementsPage = lazy(() => import('@/pages/operator/SettlementsPage'));
-// const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
-// const OperatorMarketingPage = lazy(() => import('@/pages/operator/MarketingPage'));
 const OperatorUsersPage = lazy(() => import('@/pages/operator/UsersPage'));
 const OperatorUserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
-// WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: Deprecated (mock) — removed from sidebar & routes
-// const OperatorSupportPage = lazy(() => import('@/pages/operator/SupportPage'));
 const OperatorSettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const OperatorRoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const OperatorAiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
