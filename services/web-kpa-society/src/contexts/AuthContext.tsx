@@ -336,24 +336,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/api/v1/auth/password-sync`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, syncToken, newPassword }),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || '비밀번호 변경에 실패했습니다.');
-    }
-    const { user: apiUser, tokens } = parseAuthResponse(data);
-    if (tokens) {
-      localStorage.setItem('o4o_accessToken', tokens.accessToken);
-      if (tokens.refreshToken) {
-        localStorage.setItem('o4o_refreshToken', tokens.refreshToken);
-      }
-    }
+    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
+    const result = await authClient.passwordSync({ email, syncToken, newPassword });
+    const apiUser = result.user as any;
     if (apiUser) {
-      const userData = createUserFromApiResponse(apiUser);
+      const userData = createUserFromApiResponse(apiUser as ApiUser);
       const km = (apiUser as any).kpaMembership;
       if (km) {
         userData.kpaMembership = km;

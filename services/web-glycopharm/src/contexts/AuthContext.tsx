@@ -9,7 +9,7 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
-import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
+import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility (API files, pages 등에서 import)
@@ -199,18 +199,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<User> => {
     try {
-      const response = await api.post('/auth/password-sync', { email, syncToken, newPassword });
-      const data = response.data;
-
-      // Token 저장
-      if (data.data?.tokens?.accessToken) {
-        localStorage.setItem('o4o_accessToken', data.data.tokens.accessToken);
-      }
-      if (data.data?.tokens?.refreshToken) {
-        localStorage.setItem('o4o_refreshToken', data.data.tokens.refreshToken);
-      }
-
-      const { user: apiUser } = parseAuthResponse(data);
+      // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
+      const result = await authClient.passwordSync({ email, syncToken, newPassword });
+      const apiUser = result.user as any;
       if (apiUser) {
         const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
         const base = normalizeUser(apiUser);
@@ -233,12 +224,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      await api.post('/auth/logout', {});
-    } catch {
-      // 로그아웃 실패해도 로컬 상태 정리
-    }
-    clearAllTokens();
+    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
+    await authClient.logout();
     setUser(null);
     setAvailableRoles([]);
   };

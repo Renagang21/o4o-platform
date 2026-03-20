@@ -7,7 +7,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
-import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
+import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
@@ -135,17 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
-      const response = await api.post('/auth/password-sync', { email, syncToken, newPassword });
-      const data = response.data;
-      // Store tokens from password-sync response (same format as login)
-      const tokens = data?.data?.tokens;
-      if (tokens?.accessToken) {
-        localStorage.setItem('o4o_accessToken', tokens.accessToken);
-        if (tokens.refreshToken) {
-          localStorage.setItem('o4o_refreshToken', tokens.refreshToken);
-        }
-      }
-      const { user: apiUser } = parseAuthResponse(data);
+      // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
+      const result = await authClient.passwordSync({ email, syncToken, newPassword });
+      const apiUser = result.user as any;
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
         const base = normalizeUser(apiUser);
@@ -161,12 +153,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      await api.post('/auth/logout', {});
-    } catch {
-      // 로그아웃 실패해도 로컬 상태 정리
-    }
-    clearAllTokens();
+    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
+    await authClient.logout();
     setUser(null);
   };
 

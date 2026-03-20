@@ -215,6 +215,45 @@ export class AuthClient {
   }
 
   /**
+   * Password sync — stores tokens the same way as login()
+   * WO-O4O-AUTH-CLIENT-API-HARDENING-V1
+   *
+   * Server response format: { success: true, data: { user, tokens: { accessToken, refreshToken } } }
+   */
+  async passwordSync(params: { email: string; syncToken: string; newPassword: string }): Promise<AuthResponse> {
+    const response = await this.api.post('/auth/password-sync', params);
+    const rawData = response.data as {
+      success: boolean;
+      data?: {
+        user?: any;
+        tokens?: { accessToken?: string; refreshToken?: string; expiresIn?: number };
+        message?: string;
+      };
+    };
+
+    const accessToken = rawData.data?.tokens?.accessToken;
+    const refreshToken = rawData.data?.tokens?.refreshToken;
+    const user = rawData.data?.user;
+
+    if (this.strategy === 'localStorage' && accessToken) {
+      setAccessToken(accessToken);
+      if (refreshToken) {
+        setRefreshToken(refreshToken);
+      }
+      updateAuthStorage(accessToken, refreshToken);
+    }
+
+    return {
+      success: rawData.success,
+      message: rawData.data?.message,
+      accessToken,
+      refreshToken,
+      user,
+      expiresIn: rawData.data?.tokens?.expiresIn,
+    };
+  }
+
+  /**
    * Logout
    *
    * Phase 6-7: Cookie Auth Primary

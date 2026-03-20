@@ -183,3 +183,32 @@ export const TOKEN_STORAGE_CONFIG = {
   refreshKey: REFRESH_TOKEN_KEY,
   legacyKeys: LEGACY_TOKEN_KEYS,
 } as const;
+
+// ============================================================================
+// High-level helpers (WO-O4O-AUTH-CLIENT-API-HARDENING-V1)
+// ============================================================================
+
+/**
+ * Composite: store both tokens + update legacy auth storage
+ * Use this instead of calling setAccessToken/setRefreshToken/updateAuthStorage individually.
+ */
+export function storeTokens(tokens: { accessToken: string; refreshToken?: string }): void {
+  setAccessToken(tokens.accessToken);
+  if (tokens.refreshToken) {
+    setRefreshToken(tokens.refreshToken);
+  }
+  updateAuthStorage(tokens.accessToken, tokens.refreshToken);
+}
+
+/** Semantic alias for clearAllTokens */
+export const clearStoredTokens = clearAllTokens;
+
+/**
+ * Check & restore stored tokens (for session init).
+ * Returns null if no access token is stored.
+ */
+export function restoreStoredTokens(): { accessToken: string; refreshToken: string | null } | null {
+  const accessToken = getAccessToken();
+  if (!accessToken) return null;
+  return { accessToken, refreshToken: getRefreshToken() };
+}

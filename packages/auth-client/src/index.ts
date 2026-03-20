@@ -5,7 +5,12 @@ export * from './cookie-client.js';
 export * from './sso-client.js';
 
 // Token storage utilities (for localStorage strategy)
-export { getAccessToken, getRefreshToken, clearAllTokens } from './token-storage.js';
+export {
+  getAccessToken, getRefreshToken, clearAllTokens,
+  setAccessToken, setRefreshToken, updateAuthStorage,
+  storeTokens, clearStoredTokens, restoreStoredTokens,
+  hasAccessToken, TOKEN_STORAGE_CONFIG,
+} from './token-storage.js';
 
 // RBAC utilities
 export * from './rbac.js';
