@@ -165,8 +165,20 @@ export default function AccountMenu() {
                 </Link>
               </>
             ) : (
-              /* 일반 사용자 메뉴 */
+              /* 일반 사용자 메뉴 — WO-NETURE-ACCOUNTMENU-ROLE-DASHBOARD-ENTRY-V1 */
               <>
+                {/* 대시보드 - user 역할이 아닌 경우 최상단 표시 */}
+                {activeRole !== 'user' && (
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-gray-500" />
+                    {roleLabel} 대시보드
+                  </Link>
+                )}
+
                 {/* 마이페이지 */}
                 <Link
                   to="/my"
@@ -176,18 +188,6 @@ export default function AccountMenu() {
                   <Settings className="w-4 h-4 text-gray-500" />
                   마이페이지
                 </Link>
-
-                {/* 내 대시보드 - user 역할이 아닌 경우에만 표시 */}
-                {activeRole !== 'user' && (
-                  <Link
-                    to={dashboardPath}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    <LayoutDashboard className="w-4 h-4 text-gray-500" />
-                    내 대시보드
-                  </Link>
-                )}
               </>
             )}
 
