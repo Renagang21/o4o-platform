@@ -118,7 +118,12 @@ export class SocialAuthService {
   }> {
     // Generate tokens using tokenUtils (SSOT for token generation)
     const roles = await roleAssignmentService.getRoleNames(user.id);
-    const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr');
+    // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: include memberships in social auth tokens
+    const memberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      [user.id]
+    ).catch(() => []);
+    const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
 
     // Create SSO session
     const sessionId = SessionSyncService.generateSessionId();

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
+import { AppDataSource } from '../database/connection.js';
 import { User } from '../modules/auth/entities/User.js';
 import { BusinessInfo } from '../types/user.js';
 import {
@@ -114,7 +115,12 @@ class AuthService {
   async generateTokens(user: User, domain: string): Promise<AuthTokens> {
     // Use centralized token generation
     const roles = await roleAssignmentService.getRoleNames(user.id);
-    const tokens = tokenUtils.generateTokens(user, roles, domain);
+    // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: include memberships in legacy auth tokens
+    const memberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      [user.id]
+    ).catch(() => []);
+    const tokens = tokenUtils.generateTokens(user, roles, domain, memberships);
 
     // Extract token family from refresh token for backward compatibility
     const tokenFamily = tokenUtils.getTokenFamily(tokens.refreshToken);

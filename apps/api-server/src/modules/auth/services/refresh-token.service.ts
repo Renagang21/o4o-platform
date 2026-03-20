@@ -131,8 +131,14 @@ export class RefreshTokenService extends BaseService<RefreshToken> {
       // Phase3-E: Query RoleAssignment table for current roles
       const roles = await roleAssignmentService.getRoleNames(verification.user.id);
 
+      // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: include memberships in refreshed token
+      const memberships: { serviceKey: string; status: string }[] = await AppDataSource.query(
+        `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+        [verification.user.id]
+      ).catch(() => []);
+
       // Generate new access token via standard token utils
-      const accessToken = generateAccessToken(verification.user, roles);
+      const accessToken = generateAccessToken(verification.user, roles, 'neture.co.kr', memberships);
 
       // Update last used timestamp
       await this.repository.update(

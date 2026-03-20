@@ -14,6 +14,8 @@
  *
  * - security-core 수정 없음 (Frozen F1 준수)
  * - platform:super_admin은 platformBypass 설정에 따라 멤버십 검사 생략
+ * - WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: unprefixed legacy admin/operator도
+ *   platformBypass 서비스에서 platform:super_admin으로 승격하여 통과
  * - 멤버십 없음 → 403 MEMBERSHIP_NOT_FOUND
  * - 멤버십 비활성 → 403 MEMBERSHIP_NOT_ACTIVE
  * - 멤버십 active → 기존 scope guard로 위임
@@ -60,6 +62,19 @@ export function createMembershipScopeGuard(
 
       // Platform super_admin bypass (if config allows)
       if (config.platformBypass && user.roles?.includes('platform:super_admin')) {
+        return scopeHandler(req, res, next);
+      }
+
+      // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1
+      // Legacy unprefixed role compatibility for platform bypass services.
+      // Users with unprefixed 'admin'/'super_admin'/'operator' are legacy platform admins.
+      // When platformBypass is enabled, augment their roles with platform:super_admin
+      // so the scope guard can match them. KPA (platformBypass=false) is unaffected.
+      const LEGACY_PLATFORM_ROLES = ['admin', 'super_admin', 'operator'];
+      if (config.platformBypass && user.roles?.some((r: string) => LEGACY_PLATFORM_ROLES.includes(r))) {
+        if (!user.roles.includes('platform:super_admin')) {
+          user.roles = [...user.roles, 'platform:super_admin'];
+        }
         return scopeHandler(req, res, next);
       }
 
