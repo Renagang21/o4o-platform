@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Clock,
   XCircle,
+  ChevronRight,
 } from 'lucide-react';
 import { apiClient } from '@/services/api';
 import { LoadingState, EmptyState } from '@/components/common';
@@ -73,7 +74,9 @@ const statusFilters: { value: DisplayGroup | 'all'; label: string }[] = [
 
 export default function MarketTrialListPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<DisplayGroup | 'all'>('all');
+  // WO-O4O-MARKET-TRIAL-PHASE1-POST-STABILIZATION-VERIFY-V1:
+  // Default to 'active' to hide ended trials from primary view
+  const [statusFilter, setStatusFilter] = useState<DisplayGroup | 'all'>('active');
   const [connectionModal, setConnectionModal] = useState<{ trial: MarketTrialItem; type: 'signage' | 'store' | 'forum' } | null>(null);
 
   const [trials, setTrials] = useState<MarketTrialItem[]>([]);
@@ -206,9 +209,12 @@ export default function MarketTrialListPage() {
                         {trial.supplierName || '공급자'}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-1">
+                    <NavLink
+                      to={`/store/market-trial/${trial.id}`}
+                      className="text-lg font-bold text-slate-800 mb-1 hover:text-primary-600 transition-colors block"
+                    >
                       {trial.title}
-                    </h3>
+                    </NavLink>
                     <p className="text-sm text-slate-500 line-clamp-2">
                       {trial.description}
                     </p>
@@ -243,6 +249,14 @@ export default function MarketTrialListPage() {
 
               {/* Action Buttons */}
               <div className="p-4 flex flex-wrap gap-2">
+                <NavLink
+                  to={`/store/market-trial/${trial.id}`}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-primary-100 text-primary-700 hover:bg-primary-200"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  상세보기
+                </NavLink>
+
                 <button
                   onClick={() => handleConnection(trial, 'signage')}
                   disabled={group === 'ended'}

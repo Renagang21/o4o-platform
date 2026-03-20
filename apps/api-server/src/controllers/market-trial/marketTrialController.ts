@@ -27,6 +27,18 @@ const CLOSED_STATUSES: TrialStatus[] = [
   TrialStatus.CLOSED,
 ];
 
+/**
+ * WO-O4O-MARKET-TRIAL-PHASE1-POST-STABILIZATION-VERIFY-V1:
+ * Pre-launch statuses excluded from public API by default.
+ * DRAFT/SUBMITTED visible only to supplier (getMyTrials).
+ * APPROVED visible only to service operators (2nd approval list).
+ */
+const PRE_LAUNCH_STATUSES: TrialStatus[] = [
+  TrialStatus.DRAFT,
+  TrialStatus.SUBMITTED,
+  TrialStatus.APPROVED,
+];
+
 export class MarketTrialController {
   private static dataSource: DataSource | null = null;
   private static trialRepo: Repository<MarketTrial>;
@@ -158,15 +170,26 @@ export class MarketTrialController {
         qb.andWhere('trial.status IN (:...statuses)', { statuses: CLOSED_STATUSES });
       } else if (status && Object.values(TrialStatus).includes(status as TrialStatus)) {
         qb.andWhere('trial.status = :status', { status });
+      } else {
+        // WO-O4O-MARKET-TRIAL-PHASE1-POST-STABILIZATION-VERIFY-V1:
+        // Default: exclude pre-launch statuses (DRAFT/SUBMITTED/APPROVED)
+        // from public list. These are visible only via supplier/operator endpoints.
+        qb.andWhere('trial.status NOT IN (:...preLaunch)', { preLaunch: PRE_LAUNCH_STATUSES });
       }
 
       qb.orderBy('trial.createdAt', 'DESC');
 
       const trials = await qb.getMany();
 
+      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1:
+      // Evaluate RECRUITING trials that may have expired (fundingEndAt passed)
+      const evaluated = await Promise.all(
+        trials.map((t) => MarketTrialController.trialService.evaluateStatusIfNeeded(t)),
+      );
+
       res.json({
         success: true,
-        data: trials.map(toTrialDTO),
+        data: evaluated.map(toTrialDTO),
       });
     } catch (error) {
       console.error('Get trials error:', error);
@@ -193,9 +216,12 @@ export class MarketTrialController {
         });
       }
 
+      // WO-O4O-MARKET-TRIAL-PHASE1-STABILIZATION-V1: evaluate expired status
+      const evaluated = await MarketTrialController.trialService.evaluateStatusIfNeeded(trial);
+
       res.json({
         success: true,
-        data: toTrialDTO(trial),
+        data: toTrialDTO(evaluated),
       });
     } catch (error) {
       console.error('Get trial error:', error);
