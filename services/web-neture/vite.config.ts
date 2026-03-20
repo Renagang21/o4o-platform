@@ -10,6 +10,10 @@ export default defineConfig({
       // Map forum-core to dist (build fix)
       '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core/dist'),
     },
+    // WO-NETURE-OPERATOR-ROUTER-DEDUPE-FIX-V1:
+    // @o4o/ui (devDeps react-router-dom v6) vs web-neture (v7) 중복 인스턴스 방지
+    // 모든 import를 consumer 앱 기준 단일 인스턴스로 resolve
+    dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
   server: {
     port: 3000,
