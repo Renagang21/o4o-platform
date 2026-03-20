@@ -440,7 +440,8 @@ function App() {
             <Route path="/forgot-password" element={<AccountRecoveryPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
-            <Route path="/my" element={<MyPage />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/my" element={<Navigate to="/mypage" replace />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
 
             {/* ================================================================

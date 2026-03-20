@@ -20,7 +20,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut, Home } from 'lucide-react';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut, Home, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 
@@ -224,7 +224,17 @@ export function DemoHeader({ serviceName }: { serviceName: string }) {
                         <Settings style={{ width: 16, height: 16, color: demoColors.gray500 }} />
                         설정
                       </Link>
+                      {/* Account Center — WO-O4O-KPA-HEADER-VARIANT-REALIGNMENT-V1 */}
                       <div style={styles.userDropdownDivider} />
+                      <a
+                        href="https://account.neture.co.kr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ ...styles.userDropdownItem, color: demoColors.gray500 }}
+                      >
+                        <ExternalLink style={{ width: 16, height: 16, color: demoColors.gray500 }} />
+                        Account Center
+                      </a>
                       <button
                         style={styles.userDropdownLogout}
                         onClick={() => {

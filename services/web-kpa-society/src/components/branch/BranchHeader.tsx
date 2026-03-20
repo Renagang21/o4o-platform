@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, UserCircle, Settings, LogOut } from 'lucide-react';
+import { User, UserCircle, Settings, LogOut, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../contexts';
 import { useBranchContext } from '../../contexts/BranchContext';
 import { colors } from '../../styles/theme';
@@ -190,7 +190,17 @@ export function BranchHeader({ branchName }: BranchHeaderProps) {
                       <Settings style={{ width: 16, height: 16 }} />
                       설정
                     </Link>
+                    {/* Account Center — WO-O4O-KPA-HEADER-VARIANT-REALIGNMENT-V1 */}
                     <div style={styles.userDropdownDivider} />
+                    <a
+                      href="https://account.neture.co.kr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ ...styles.userDropdownItem, color: '#9ca3af' }}
+                    >
+                      <ExternalLink style={{ width: 16, height: 16, color: '#9ca3af' }} />
+                      Account Center
+                    </a>
                     <button style={styles.userDropdownLogout} onClick={handleLogout}>
                       <LogOut style={{ width: 16, height: 16 }} />
                       로그아웃

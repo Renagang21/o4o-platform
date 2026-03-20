@@ -16,7 +16,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut, ExternalLink } from 'lucide-react';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -104,9 +104,12 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // 운영 대시보드: kpa:admin 또는 kpa:operator만 노출
+  // ── 메뉴 필터링 (WO-O4O-KPA-HEADER-VARIANT-REALIGNMENT-V1 정리) ──
+  // /operator  → kpa:admin 또는 kpa:operator (PLATFORM_ROLES)
+  // /store     → 약국 개설자 (isStoreOwner)
+  // /hub       → 약국 개설자 (isStoreOwner)
+  // 나머지     → 전체 공개
   const isOperatorOrAdmin = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
-  // 내 매장관리: isStoreOwner만 노출 (WO-ROLE-NORMALIZATION-PHASE3-C-V1)
   const isPharmacyOwner = user?.isStoreOwner === true;
   const displayMenuItems = menuItems.filter(item => {
     if (item.href === '/operator') return isOperatorOrAdmin;
@@ -215,7 +218,12 @@ export function Header({ serviceName }: { serviceName: string }) {
                           </Link>
                         </>
                       ) : (
-                        /* 일반 사용자: 전체 메뉴 */
+                        /* 일반 사용자: 전체 메뉴
+                         * DashboardSwitcher: 2개 이상 대시보드 접근 가능 시 표시 (KPA 전용)
+                         * - "내 대시보드" (/dashboard): 모든 인증 사용자
+                         * - "약국경영" (/pharmacy): pharmacy context + non-admin/operator
+                         * 1개만 접근 가능하면 단순 대시보드 링크 표시
+                         */
                         <>
                           {accessibleDashboards.length >= 2 ? (
                             <>
@@ -251,6 +259,17 @@ export function Header({ serviceName }: { serviceName: string }) {
                         </>
                       )}
 
+                      {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+                      <div style={styles.userDropdownDivider} />
+                      <a
+                        href="https://account.neture.co.kr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ ...styles.userDropdownItem, color: colors.gray500 || '#6b7280' }}
+                      >
+                        <ExternalLink style={{ width: 16, height: 16, color: colors.gray400 || '#9ca3af' }} />
+                        Account Center
+                      </a>
                       <div style={styles.userDropdownDivider} />
                       <button
                         style={styles.userDropdownLogout}

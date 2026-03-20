@@ -9,6 +9,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { AIChatButton } from './ai';
 import ServiceSwitcher from './ServiceSwitcher';
+import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+
+const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
+const ROLE_LABELS: Record<string, string> = {
+  pharmacist: '약사',
+  admin: '관리자',
+  operator: '운영자',
+  patient: '당뇨인',
+};
 
 const navItems = [
   { path: '/', label: 'Home', protected: false },
@@ -142,17 +151,37 @@ export default function Layout() {
                     {/* 드롭다운 메뉴 */}
                     {showUserMenu && (
                       <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
-                        {/* 사용자 정보 */}
+                        {/* 사용자 정보 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
                         <div className="px-4 py-3 border-b border-slate-100">
                           <p className="text-sm font-medium text-slate-900">{user?.displayName || user?.name || user?.email?.split('@')[0] || '사용자'}</p>
                           <p className="text-xs text-slate-500">{user?.email}</p>
                           {user?.pharmacyName && (
                             <p className="text-xs text-slate-400 mt-1">{user.pharmacyName}</p>
                           )}
+                          {user?.roles?.[0] && (
+                            <p className="text-xs text-blue-600 mt-1">{ROLE_LABELS[user.roles[0]] || user.roles[0]}</p>
+                          )}
                         </div>
 
                         {/* 메뉴 항목 */}
                         <div className="py-1">
+                          {/* 대표 대시보드 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+                          {user?.roles?.[0] && user.roles[0] !== 'patient' && (() => {
+                            const dp = getPrimaryDashboardRoute(user.roles);
+                            const rl = ROLE_LABELS[user.roles[0]] || user.roles[0];
+                            return (
+                              <NavLink
+                                to={dp}
+                                onClick={() => setShowUserMenu(false)}
+                                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                              >
+                                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                                {rl} 대시보드
+                              </NavLink>
+                            );
+                          })()}
                           <NavLink
                             to="/mypage"
                             onClick={() => setShowUserMenu(false)}
@@ -176,8 +205,19 @@ export default function Layout() {
                           </NavLink>
                         </div>
 
-                        {/* 로그아웃 */}
+                        {/* Account Center + 로그아웃 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
                         <div className="border-t border-slate-100 pt-1 mt-1">
+                          <a
+                            href={ACCOUNT_CENTER_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 px-4 py-2 text-sm text-slate-500 hover:bg-slate-50"
+                          >
+                            <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Account Center
+                          </a>
                           <button
                             onClick={handleLogout}
                             className="flex items-center gap-3 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"

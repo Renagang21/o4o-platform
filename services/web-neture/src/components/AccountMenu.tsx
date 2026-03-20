@@ -10,7 +10,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, LayoutDashboard, Settings, Shield } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, Settings, Shield, ExternalLink } from 'lucide-react';
+
+const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
 import { useAuth, ROUTE_OVERRIDES, ROLE_LABELS, useLoginModal } from '../contexts';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import type { User as UserType } from '../contexts';
@@ -32,7 +34,6 @@ function isSuperOperator(user: UserType | null): boolean {
 
   // 역할 기반 판단
   const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
-  if (user.roles?.some(r => operatorRoles.includes(r))) return true;
   if (user.roles?.some(r => operatorRoles.includes(r))) return true;
 
   return false;
@@ -154,9 +155,8 @@ export default function AccountMenu() {
             {isOperator ? (
               /* Super Operator 전용 메뉴 (간소화) */
               <>
-                {/* 프로필 */}
                 <Link
-                  to="/my"
+                  to="/mypage"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
@@ -181,7 +181,7 @@ export default function AccountMenu() {
 
                 {/* 마이페이지 */}
                 <Link
-                  to="/my"
+                  to="/mypage"
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
@@ -191,7 +191,19 @@ export default function AccountMenu() {
               </>
             )}
 
-            {/* 로그아웃 - 공통 */}
+            {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+            <div className="border-t border-gray-100 my-1" />
+            <a
+              href={ACCOUNT_CENTER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
+            >
+              <ExternalLink className="w-4 h-4 text-gray-400" />
+              Account Center
+            </a>
+
+            {/* 로그아웃 */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

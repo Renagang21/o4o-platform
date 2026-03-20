@@ -50,7 +50,7 @@ export default function MyPage() {
           <h1 className="text-lg font-semibold text-gray-900 mb-2">로그인이 필요합니다</h1>
           <p className="text-sm text-gray-500 mb-6">마이페이지를 이용하려면 로그인해주세요.</p>
           <button
-            onClick={() => openLoginModal('/my')}
+            onClick={() => openLoginModal('/mypage')}
             className="w-full py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
           >
             로그인

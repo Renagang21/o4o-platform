@@ -6,10 +6,9 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { ChevronDown, Check, ExternalLink, UserPlus, Settings } from 'lucide-react';
+import { ChevronDown, Check, ExternalLink, UserPlus } from 'lucide-react';
 import { api } from '../lib/apiClient';
 
-const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
 
 interface ServiceInfo {
   key: string;
@@ -164,15 +163,6 @@ export default function ServiceSwitcher({ currentServiceKey }: ServiceSwitcherPr
                 </>
               )}
 
-              {/* Account Center */}
-              <div className="border-t border-gray-100 my-1" />
-              <a
-                href={ACCOUNT_CENTER_URL}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:bg-gray-50"
-              >
-                <Settings size={14} className="text-gray-400" />
-                서비스 관리
-              </a>
             </>
           )}
         </div>

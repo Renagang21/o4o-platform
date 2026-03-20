@@ -19,7 +19,10 @@ import {
   HeartPulse,
   Store,
   LayoutDashboard,
+  ExternalLink,
 } from 'lucide-react';
+
+const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
 import ServiceSwitcher from '../ServiceSwitcher';
 
 /**
@@ -157,6 +160,17 @@ export default function Header() {
                         <User className="w-4 h-4" />
                         내정보
                       </NavLink>
+                      {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+                      <div className="border-t border-slate-100 my-1" />
+                      <a
+                        href={ACCOUNT_CENTER_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:bg-slate-50"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        Account Center
+                      </a>
                       <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"

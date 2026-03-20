@@ -114,6 +114,22 @@ export default function Header() {
                     >
                       대시보드
                     </Link>
+                    <Link
+                      to="/mypage"
+                      style={styles.dropdownItem}
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      마이페이지
+                    </Link>
+                    {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+                    <a
+                      href="https://account.neture.co.kr"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ ...styles.dropdownItem, color: '#9ca3af' }}
+                    >
+                      Account Center ↗
+                    </a>
                     <button
                       onClick={handleLogout}
                       style={styles.dropdownLogout}
