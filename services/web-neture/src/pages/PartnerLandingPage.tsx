@@ -107,7 +107,7 @@ export default function PartnerLandingPage() {
           <div className="flex items-center justify-center gap-4 flex-wrap">
             {isPartner ? (
               <Link
-                to="/account/partner"
+                to="/partner/dashboard"
                 className="inline-flex items-center px-6 py-3 bg-white text-emerald-700 font-semibold rounded-lg hover:bg-emerald-50 transition-colors"
               >
                 Partner Dashboard

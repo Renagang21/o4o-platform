@@ -45,14 +45,14 @@ const ROLE_LABELS: Record<UserRole, string> = {
   user: '사용자',
 };
 
-// WO-O4O-NETURE-LEGACY-ROUTE-ENTRY-REALIGNMENT-V1: 역할별 대표 진입 경로
+// WO-O4O-NETURE-PARTNER-ENTRY-REALIGNMENT-V1: 역할별 대표 진입 경로
 // - admin: /workspace/admin (레거시, 2차 과제로 /admin 통일 검토)
-// - partner: /account/partner (개인 대시보드, /partner/dashboard은 별도 허브)
+// - partner: /partner/dashboard (운영 허브, /account/partner는 보조 공간)
 const ROUTE_OVERRIDES: Record<string, string> = {
   admin: '/workspace/admin',
   operator: '/operator',
   supplier: '/supplier/dashboard',
-  partner: '/account/partner',
+  partner: '/partner/dashboard',
   seller: '/seller/overview',
 };
 
