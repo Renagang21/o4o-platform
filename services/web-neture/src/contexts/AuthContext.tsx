@@ -8,7 +8,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
-import { api } from '../lib/apiClient';
+import { authClient, api } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
@@ -97,12 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const response = await api.post('/auth/login', { email, password, includeLegacyTokens: true });
-      const data = response.data;
-
-      // authClient handles token storage automatically via interceptors
-
-      const { user: apiUser } = parseAuthResponse(data);
+      // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: use authClient.login()
+      // which stores tokens to localStorage (api.post() alone does not)
+      const result = await authClient.login({ email, password });
+      const apiUser = result.user as any;
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
         const base = normalizeUser(apiUser);
@@ -139,6 +137,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await api.post('/auth/password-sync', { email, syncToken, newPassword });
       const data = response.data;
+      // Store tokens from password-sync response (same format as login)
+      const tokens = data?.data?.tokens;
+      if (tokens?.accessToken) {
+        localStorage.setItem('o4o_accessToken', tokens.accessToken);
+        if (tokens.refreshToken) {
+          localStorage.setItem('o4o_refreshToken', tokens.refreshToken);
+        }
+      }
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
         const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
