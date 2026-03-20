@@ -1,8 +1,8 @@
 /**
  * Trial API Client
- * Phase H8-FE: Trial Observation Frontend
  *
- * 기존 API만 사용 - 신규 API 생성 금지
+ * Phase H8-FE: Trial Observation Frontend
+ * WO-O4O-MARKET-TRIAL-PHASE1-V1: Supplier create/submit + Operator approval
  */
 
 import { api, API_BASE_URL } from '../lib/apiClient';
@@ -11,22 +11,64 @@ import { api, API_BASE_URL } from '../lib/apiClient';
 // Types
 // ============================================================================
 
+export type TrialStatus =
+  | 'draft' | 'submitted' | 'approved' | 'recruiting'
+  | 'development' | 'outcome_confirming' | 'fulfilled' | 'closed';
+
 export interface Trial {
   id: string;
   title: string;
   description?: string;
-  supplierName: string;
-  rewardOptions: RewardOption[];
-  status: 'draft' | 'active' | 'closed';
+  supplierId: string;
+  supplierName?: string;
+  status: TrialStatus;
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+    quantity?: number;
+    note?: string;
+  };
+  eligibleRoles?: string[];
+  rewardOptions?: string[];
+  visibleServiceKeys?: string[];
+  maxParticipants?: number;
   currentParticipants: number;
-  maxParticipants: number;
+  startDate?: string;
+  endDate?: string;
+  trialPeriodDays?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ServiceApproval {
+  id: string;
+  trialId: string;
+  serviceKey: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  reason?: string | null;
   createdAt: string;
 }
 
-export interface RewardOption {
-  type: 'cash' | 'product';
-  value: number | string;
+export interface OperatorTrial extends Trial {
+  serviceApprovals?: ServiceApproval[];
+}
+
+export interface CreateTrialPayload {
+  title: string;
   description?: string;
+  visibleServiceKeys: string[];
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+    quantity?: number;
+    note?: string;
+  };
+  maxParticipants?: number;
+  fundingStartAt: string;
+  fundingEndAt: string;
+  trialPeriodDays: number;
 }
 
 export interface Participation {
@@ -59,28 +101,19 @@ export interface Fulfillment {
 }
 
 // ============================================================================
-// API Functions
+// Public / Store API
 // ============================================================================
 
-/**
- * GET /api/market-trial - Trial 목록 조회
- */
 export async function getTrials(): Promise<Trial[]> {
   const { data } = await api.get(`${API_BASE_URL}/api/market-trial`);
   return data.data || data;
 }
 
-/**
- * GET /api/market-trial/:id - Trial 상세 조회
- */
 export async function getTrial(trialId: string): Promise<Trial> {
   const { data } = await api.get(`${API_BASE_URL}/api/market-trial/${trialId}`);
   return data.data || data;
 }
 
-/**
- * POST /api/market-trial/:id/join - Trial 참여
- */
 export async function joinTrial(
   trialId: string,
   rewardType: 'cash' | 'product'
@@ -89,9 +122,54 @@ export async function joinTrial(
   return data.data || data;
 }
 
-/**
- * POST /api/trial-shipping/:participationId - 배송 주소 등록
- */
+// ============================================================================
+// Supplier API (WO-O4O-MARKET-TRIAL-PHASE1-V1)
+// ============================================================================
+
+export async function createTrial(payload: CreateTrialPayload): Promise<Trial> {
+  const { data } = await api.post(`${API_BASE_URL}/api/market-trial`, payload);
+  return data.data || data;
+}
+
+export async function submitTrial(trialId: string): Promise<Trial> {
+  const { data } = await api.patch(`${API_BASE_URL}/api/market-trial/${trialId}/submit`);
+  return data.data || data;
+}
+
+export async function getMyTrials(): Promise<Trial[]> {
+  const { data } = await api.get(`${API_BASE_URL}/api/market-trial/my`);
+  return data.data || data;
+}
+
+// ============================================================================
+// Neture Operator API — 1차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1)
+// ============================================================================
+
+export async function getOperatorTrials(status?: string): Promise<OperatorTrial[]> {
+  const params = status ? `?status=${status}` : '';
+  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial${params}`);
+  return data.data || data;
+}
+
+export async function getOperatorTrialDetail(trialId: string): Promise<OperatorTrial> {
+  const { data } = await api.get(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}`);
+  return data.data || data;
+}
+
+export async function approveTrialFirst(trialId: string): Promise<OperatorTrial> {
+  const { data } = await api.patch(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/approve`);
+  return data.data || data;
+}
+
+export async function rejectTrialFirst(trialId: string, reason: string): Promise<OperatorTrial> {
+  const { data } = await api.patch(`${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/reject`, { reason });
+  return data.data || data;
+}
+
+// ============================================================================
+// Shipping / Fulfillment (existing)
+// ============================================================================
+
 export async function submitShippingAddress(
   participationId: string,
   address: Omit<ShippingAddress, 'participationId' | 'createdAt'>
@@ -100,9 +178,6 @@ export async function submitShippingAddress(
   return data.data || data;
 }
 
-/**
- * GET /api/trial-shipping/:participationId - 배송 주소 조회
- */
 export async function getShippingAddress(participationId: string): Promise<ShippingAddress | null> {
   try {
     const { data } = await api.get(`${API_BASE_URL}/api/trial-shipping/${participationId}`);
@@ -114,9 +189,6 @@ export async function getShippingAddress(participationId: string): Promise<Shipp
   }
 }
 
-/**
- * GET /api/trial-fulfillment/:participationId - Fulfillment 상태 조회
- */
 export async function getFulfillment(participationId: string): Promise<Fulfillment | null> {
   try {
     const { data } = await api.get(`${API_BASE_URL}/api/trial-fulfillment/${participationId}`);

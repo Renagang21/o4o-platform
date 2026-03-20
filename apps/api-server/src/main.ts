@@ -470,6 +470,9 @@ import aiAdminRoutes from './routes/ai-admin.routes.js';
 
 // Market Trial Controller (WO-MARKET-TRIAL-DB-PERSISTENCE-INTEGRATION-V1)
 import { MarketTrialController } from './controllers/market-trial/marketTrialController.js';
+// WO-O4O-MARKET-TRIAL-PHASE1-V1: Operator approval routes + controller
+import { MarketTrialOperatorController } from './controllers/market-trial/marketTrialOperatorController.js';
+import { createNetureOperatorTrialRoutes, createServiceOperatorTrialRoutes } from './routes/market-trial-operator.routes.js';
 
 // Trial Extensions (H8-2, H8-3)
 import trialShippingRoutes from './extensions/trial-shipping/index.js';
@@ -879,6 +882,12 @@ const startServer = async () => {
     MarketTrialController.setDataSource(AppDataSource);
     app.use('/api/market-trial', marketTrialRoutes);
     logger.info('✅ Market Trial routes registered at /api/market-trial');
+
+    // 22-mt. Market Trial Operator Routes (WO-O4O-MARKET-TRIAL-PHASE1-V1)
+    MarketTrialOperatorController.setDataSource(AppDataSource);
+    app.use('/api/v1/neture/operator/market-trial', createNetureOperatorTrialRoutes());
+    app.use('/api/v1/:serviceKey/operator/market-trial', createServiceOperatorTrialRoutes());
+    logger.info('✅ Market Trial Operator routes registered');
 
     // 22-ai. Register AI Query routes (Phase AI-1)
     app.use('/api/ai', aiQueryRoutes);

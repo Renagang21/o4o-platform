@@ -21,11 +21,19 @@ import {
 
 export interface CreateTrialDto {
   supplierId: string;
-  productId: string;
+  supplierName?: string;
   title: string;
   description?: string;
-  trialUnitPrice: number;
-  targetAmount: number;
+  outcomeSnapshot?: {
+    expectedType: 'product' | 'cash';
+    description: string;
+    quantity?: number;
+    note?: string;
+  };
+  visibleServiceKeys?: string[];
+  maxParticipants?: number;
+  trialUnitPrice?: number;
+  targetAmount?: number;
   fundingStartAt: Date;
   fundingEndAt: Date;
   trialPeriodDays: number;
@@ -56,55 +64,46 @@ export class MarketTrialService {
   }
 
   /**
-   * Create a new Market Trial
+   * Create a new Market Trial (status = DRAFT)
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1: DRAFT로 생성, 승인 후 RECRUITING 전환
    */
   async createTrial(dto: CreateTrialDto): Promise<MarketTrial> {
-    // Create trial entity
     const trial = this.trialRepo.create({
       supplierId: dto.supplierId,
-      productId: dto.productId,
+      supplierName: dto.supplierName || undefined,
       title: dto.title,
       description: dto.description || null,
-      trialUnitPrice: dto.trialUnitPrice,
-      targetAmount: dto.targetAmount,
+      outcomeSnapshot: dto.outcomeSnapshot || undefined,
+      visibleServiceKeys: dto.visibleServiceKeys || [],
+      maxParticipants: dto.maxParticipants || undefined,
+      trialUnitPrice: dto.trialUnitPrice || 0,
+      targetAmount: dto.targetAmount || 0,
       currentAmount: 0,
       fundingStartAt: dto.fundingStartAt,
       fundingEndAt: dto.fundingEndAt,
       trialPeriodDays: dto.trialPeriodDays,
-      status: TrialStatus.RECRUITING,
+      status: TrialStatus.DRAFT,
     });
 
-    const savedTrial = await this.trialRepo.save(trial);
-
-    // Create forum for this trial (placeholder - actual forum creation depends on forum-core)
-    // For Phase 1, we create the mapping record with a generated forum ID
-    // In production, this should call forum-core to create actual forum
-    const forumId = await this.createTrialForum(savedTrial);
-
-    if (forumId) {
-      const forumMapping = this.forumRepo.create({
-        marketTrialId: savedTrial.id,
-        forumId: forumId,
-      });
-      await this.forumRepo.save(forumMapping);
-    }
-
-    return savedTrial;
+    return this.trialRepo.save(trial);
   }
 
   /**
-   * Create a forum for the trial
-   * Phase 1: Returns a placeholder forum ID
-   * Future: Should integrate with forum-core
+   * Submit trial for operator review (DRAFT → SUBMITTED)
    */
-  private async createTrialForum(trial: MarketTrial): Promise<string | null> {
-    // Phase 1: Generate a placeholder forum ID
-    // In production, this should call forum-core service to create actual forum
-    // Example: const forum = await forumService.createBoard({ name: `Trial: ${trial.title}` });
-
-    // For now, we generate a UUID as placeholder
-    const placeholderForumId = `forum_${trial.id}`;
-    return placeholderForumId;
+  async submitTrial(trialId: string, supplierId: string): Promise<MarketTrial> {
+    const trial = await this.trialRepo.findOne({ where: { id: trialId } });
+    if (!trial) {
+      throw new Error('Market Trial not found');
+    }
+    if (trial.supplierId !== supplierId) {
+      throw new Error('Not authorized to submit this trial');
+    }
+    if (trial.status !== TrialStatus.DRAFT) {
+      throw new Error('Only DRAFT trials can be submitted');
+    }
+    trial.status = TrialStatus.SUBMITTED;
+    return this.trialRepo.save(trial);
   }
 
   /**

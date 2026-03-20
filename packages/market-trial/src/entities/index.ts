@@ -8,3 +8,4 @@ export { MarketTrial, TrialStatus, MarketTrialStatus } from './MarketTrial.entit
 export { MarketTrialParticipant, ParticipantType } from './MarketTrialParticipant.entity.js';
 export { MarketTrialForum } from './MarketTrialForum.entity.js';
 export { MarketTrialDecision, DecisionType } from './MarketTrialDecision.entity.js';
+export { MarketTrialServiceApproval, ServiceApprovalStatus } from './MarketTrialServiceApproval.entity.js';

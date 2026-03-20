@@ -14,6 +14,7 @@ import {
   MarketTrialParticipant,
   TrialStatus,
 } from '@o4o/market-trial';
+import { MarketTrialService } from '@o4o/market-trial';
 
 /** Trial 참여 가능 상태 목록 */
 const JOINABLE_STATUSES: TrialStatus[] = [
@@ -30,6 +31,7 @@ export class MarketTrialController {
   private static dataSource: DataSource | null = null;
   private static trialRepo: Repository<MarketTrial>;
   private static participantRepo: Repository<MarketTrialParticipant>;
+  private static trialService: MarketTrialService;
 
   /**
    * DataSource 설정 (main.ts에서 호출)
@@ -38,6 +40,98 @@ export class MarketTrialController {
     this.dataSource = ds;
     this.trialRepo = ds.getRepository(MarketTrial);
     this.participantRepo = ds.getRepository(MarketTrialParticipant);
+    this.trialService = new MarketTrialService(ds);
+  }
+
+  /**
+   * POST /api/market-trial
+   * 공급자 Trial 생성 (DRAFT)
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1
+   */
+  static async createTrial(req: AuthRequest, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      const userName = (req as any).user?.name || '';
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const {
+        title, description, visibleServiceKeys, outcomeSnapshot,
+        maxParticipants, fundingStartAt, fundingEndAt, trialPeriodDays,
+      } = req.body;
+
+      if (!title || !fundingStartAt || !fundingEndAt || !trialPeriodDays) {
+        return res.status(400).json({
+          success: false,
+          message: 'Required: title, fundingStartAt, fundingEndAt, trialPeriodDays',
+        });
+      }
+
+      const trial = await MarketTrialController.trialService.createTrial({
+        supplierId: userId,
+        supplierName: userName,
+        title,
+        description,
+        visibleServiceKeys: visibleServiceKeys || [],
+        outcomeSnapshot,
+        maxParticipants: maxParticipants || undefined,
+        fundingStartAt: new Date(fundingStartAt),
+        fundingEndAt: new Date(fundingEndAt),
+        trialPeriodDays: Number(trialPeriodDays),
+      });
+
+      res.status(201).json({ success: true, data: toTrialDTO(trial) });
+    } catch (error) {
+      console.error('Create trial error:', error);
+      res.status(500).json({ success: false, message: 'Failed to create trial' });
+    }
+  }
+
+  /**
+   * PATCH /api/market-trial/:id/submit
+   * Trial 제출 (DRAFT → SUBMITTED)
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1
+   */
+  static async submitTrial(req: AuthRequest, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const trial = await MarketTrialController.trialService.submitTrial(req.params.id, userId);
+      res.json({ success: true, data: toTrialDTO(trial) });
+    } catch (error: any) {
+      console.error('Submit trial error:', error);
+      const msg = error.message || 'Failed to submit trial';
+      const status = msg.includes('not found') ? 404 : msg.includes('Not authorized') ? 403 : 400;
+      res.status(status).json({ success: false, message: msg });
+    }
+  }
+
+  /**
+   * GET /api/market-trial/my
+   * 공급자 본인 Trial 목록
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1
+   */
+  static async getMyTrials(req: AuthRequest, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Authentication required' });
+      }
+
+      const trials = await MarketTrialController.trialRepo.find({
+        where: { supplierId: userId },
+        order: { createdAt: 'DESC' },
+      });
+
+      res.json({ success: true, data: trials.map(toTrialDTO) });
+    } catch (error) {
+      console.error('Get my trials error:', error);
+      res.status(500).json({ success: false, message: 'Failed to get trials' });
+    }
   }
 
   /**
@@ -224,7 +318,7 @@ export class MarketTrialController {
       const participation = MarketTrialController.participantRepo.create({
         marketTrialId: id,
         participantId: userId,
-        participantType: 'partner', // TODO: Get actual role from user
+        participantType: 'seller', // WO-O4O-MARKET-TRIAL-PHASE1-V1: seller only
         contributionAmount: 0,
         rewardType,
         rewardStatus: 'pending',

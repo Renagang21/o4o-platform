@@ -10,7 +10,10 @@ import type { OperatorGroupKey, OperatorMenuItem } from '@o4o/ui';
 export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
   dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
   users: [{ label: '회원 관리', path: '/operator/users' }],
-  approvals: [{ label: '가입 승인', path: '/operator/applications' }],
+  approvals: [
+    { label: '가입 승인', path: '/operator/applications' },
+    { label: 'Market Trial', path: '/operator/market-trial' },
+  ],
   products: [{ label: '공급 현황', path: '/operator/supply' }],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],

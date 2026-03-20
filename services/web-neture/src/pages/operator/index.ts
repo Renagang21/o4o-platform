@@ -18,3 +18,6 @@ export { default as OrdersManagementPage } from './OrdersManagementPage';
 export { default as RoleManagementPage } from './RoleManagementPage';
 // WO-O4O-AUDIT-ANALYTICS-LAYER-V1
 export { default as OperatorAnalyticsPage } from './AnalyticsPage';
+// WO-O4O-MARKET-TRIAL-PHASE1-V1
+export { default as MarketTrialApprovalsPage } from './MarketTrialApprovalsPage';
+export { default as MarketTrialApprovalDetailPage } from './MarketTrialApprovalDetailPage';

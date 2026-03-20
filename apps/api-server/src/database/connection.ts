@@ -323,6 +323,7 @@ import {
   MarketTrialParticipant,
   MarketTrialForum,
   MarketTrialDecision,
+  MarketTrialServiceApproval,
 } from '@o4o/market-trial';
 
 // MARKET-TRIAL EXTENSION ENTITIES
@@ -947,6 +948,7 @@ export const AppDataSource = new DataSource({
     MarketTrialParticipant,
     MarketTrialForum,
     MarketTrialDecision,
+    MarketTrialServiceApproval,
     MarketTrialShippingAddress,
     MarketTrialFulfillment,
     // ============================================================================

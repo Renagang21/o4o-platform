@@ -63,7 +63,6 @@ export function createMarketTrialController(dataSource: DataSource): Router {
 
       const trial = await service.createTrial({
         supplierId,
-        productId: validatedData.productId,
         title: validatedData.title,
         description: validatedData.description,
         trialUnitPrice: validatedData.trialUnitPrice,

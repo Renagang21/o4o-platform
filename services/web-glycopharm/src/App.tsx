@@ -92,6 +92,10 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 // Market Trial Extension
 const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
 // OperatorTrialSelectorPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
+// WO-O4O-MARKET-TRIAL-PHASE1-V1: Service approval + store detail pages
+const MarketTrialServiceApprovalsPage = lazy(() => import('@/pages/operator/market-trial/MarketTrialServiceApprovalsPage'));
+const MarketTrialServiceApprovalDetailPage = lazy(() => import('@/pages/operator/market-trial/MarketTrialServiceApprovalDetailPage'));
+const MarketTrialDetailPage = lazy(() => import('@/pages/pharmacy/market-trial/MarketTrialDetailPage'));
 
 // B2B Order & Supply
 const B2BOrderPage = lazy(() => import('@/pages/pharmacy/b2b-order').then(m => ({ default: m.B2BOrderPage })));
@@ -515,6 +519,9 @@ function AppRoutes() {
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
         <Route path="care" element={<OperatorCareDashboardPage />} />
         <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
+        {/* Market Trial 2차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
+        <Route path="market-trial" element={<MarketTrialServiceApprovalsPage />} />
+        <Route path="market-trial/:id" element={<MarketTrialServiceApprovalDetailPage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>
@@ -577,6 +584,7 @@ function AppRoutes() {
         <Route path="signage/preview" element={<SignagePreviewPage />} />
         {/* Extensions */}
         <Route path="market-trial" element={<MarketTrialListPage />} />
+        <Route path="market-trial/:id" element={<MarketTrialDetailPage />} />
         <Route path="b2b-order" element={<B2BOrderPage />} />
         <Route path="requests" element={<CustomerRequestsPage />} />
         <Route path="funnel" element={<FunnelPage />} />

@@ -155,6 +155,11 @@ const MyHandledProductsPage = lazy(() =>
   import('./pages/seller/MyHandledProductsPage')
 );
 
+// Supplier Market Trial (WO-O4O-MARKET-TRIAL-PHASE1-V1)
+const SupplierTrialCreatePage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierTrialCreatePage }))
+);
+
 // Supplier Library
 const SupplierLibraryPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierLibraryPage }))
@@ -343,6 +348,13 @@ const RoleManagementPage = lazy(() =>
 const OperatorAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
 );
+// WO-O4O-MARKET-TRIAL-PHASE1-V1
+const MarketTrialApprovalsPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalsPage }))
+);
+const MarketTrialApprovalDetailPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalDetailPage }))
+);
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 // Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
@@ -494,6 +506,8 @@ function App() {
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
+              {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 */}
+              <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
               <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" />} />
@@ -721,6 +735,9 @@ function App() {
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
               {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
               <Route path="/operator/roles" element={<RoleManagementPage />} />
+              {/* Market Trial 관리 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
+              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
+              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
             </Route>
 
             {/* ================================================================

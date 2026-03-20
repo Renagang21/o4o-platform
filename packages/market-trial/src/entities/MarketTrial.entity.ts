@@ -135,9 +135,10 @@ export class MarketTrial {
   supplierName?: string;
 
   /**
-   * Roles eligible to participate (e.g. ['partner', 'seller'])
+   * Roles eligible to participate
+   * WO-O4O-MARKET-TRIAL-PHASE1-V1: partner excluded, seller only
    */
-  @Column({ type: 'jsonb', default: '["partner","seller"]' })
+  @Column({ type: 'jsonb', default: '["seller"]' })
   eligibleRoles!: string[];
 
   /**
