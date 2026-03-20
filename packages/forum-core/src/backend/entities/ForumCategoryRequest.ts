@@ -1,12 +1,11 @@
 /**
- * @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
- * 이 Entity는 더 이상 사용되지 않습니다.
- * 승인 워크플로우가 KPA Extension 레이어의 KpaApprovalRequest로 이관되었습니다.
- * DB 테이블(forum_category_requests)은 유지됩니다 (기존 데이터 보존).
- * 후속 cleanup WO에서 파일 삭제 예정.
- *
- * ForumCategoryRequest Entity (DEPRECATED)
+ * ForumCategoryRequest Entity
  * 포럼 카테고리 생성 요청 (서비스 공통)
+ *
+ * WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1:
+ * - @deprecated 해제, 공통 엔티티로 재활성화
+ * - forumType, iconUrl, tags, metadata 컬럼 추가
+ * - status에 revision_requested 추가
  *
  * serviceCode로 서비스별 격리
  * organizationId로 조직별 범위 필터링 (KPA Society 등)
@@ -21,7 +20,7 @@ import {
   Index,
 } from 'typeorm';
 
-export type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
+export type CategoryRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
 
 @Entity('forum_category_requests')
 @Index(['serviceCode', 'status'])
@@ -39,8 +38,20 @@ export class ForumCategoryRequest {
   @Column({ type: 'text', nullable: true })
   reason?: string;
 
+  @Column({ name: 'forum_type', type: 'varchar', length: 20, default: 'open' })
+  forumType!: string;
+
   @Column({ name: 'icon_emoji', type: 'varchar', length: 10, nullable: true })
   iconEmoji?: string;
+
+  @Column({ name: 'icon_url', type: 'varchar', length: 500, nullable: true })
+  iconUrl?: string;
+
+  @Column({ name: 'tags', type: 'simple-array', nullable: true })
+  tags?: string[];
+
+  @Column({ name: 'metadata', type: 'jsonb', nullable: true, default: '{}' })
+  metadata?: Record<string, unknown>;
 
   @Column({
     type: 'varchar',

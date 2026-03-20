@@ -6,6 +6,7 @@ import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js'
 import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
 import recommendationRoutes from './forum.recommendation.routes.js';
+import categoryRequestRoutes from './forum-category-request.routes.js';
 
 const router: Router = Router();
 const controller = new ForumController();
@@ -122,9 +123,9 @@ router.use('/ai', aiRoutes);
 router.use('/recommendations', recommendationRoutes);
 
 // ============================================================================
-// Category Requests — @deprecated WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1
-// Moved to KPA Extension: /api/v1/kpa/forum-requests/*
-// Old endpoint /api/v1/forum/category-requests/* is no longer active.
+// Category Requests — WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1
+// Common forum category request API (serviceCode-scoped)
 // ============================================================================
+router.use('/category-requests', categoryRequestRoutes);
 
 export default router;

@@ -1,4 +1,8 @@
 /**
+ * @deprecated WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1
+ * 이 Entity는 레거시입니다. 데이터는 migration으로 forum_category_requests에 이관됨.
+ * 레거시 API 삭제 시 함께 제거 예정.
+ *
  * GlycoPharm Forum Category Request Entity (Legacy)
  * 포럼 카테고리 생성 신청 (GlycoPharm 전용 레거시)
  *

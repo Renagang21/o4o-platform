@@ -10,6 +10,7 @@ import {
   MessageSquarePlus,
   Loader2,
   AlertCircle,
+  RotateCcw,
 } from 'lucide-react';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
@@ -38,6 +39,11 @@ const statusConfig: Record<CategoryRequestStatus, { label: string; color: string
     label: '검토 중',
     color: 'bg-yellow-100 text-yellow-700',
     icon: Clock,
+  },
+  revision_requested: {
+    label: '보완 요청',
+    color: 'bg-orange-100 text-orange-700',
+    icon: RotateCcw,
   },
   approved: {
     label: '승인됨',
@@ -202,24 +208,30 @@ export default function MyRequestsPage() {
                       </div>
                     )}
 
-                    {/* Review Comment (for approved/rejected) */}
+                    {/* Review Comment (for approved/rejected/revision_requested) */}
                     {request.reviewComment && (
                       <div className={`p-4 rounded-lg ${
                         request.status === 'approved'
                           ? 'bg-green-50'
-                          : 'bg-red-50'
+                          : request.status === 'revision_requested'
+                            ? 'bg-orange-50'
+                            : 'bg-red-50'
                       }`}>
                         <h4 className={`text-sm font-medium mb-1 ${
                           request.status === 'approved'
                             ? 'text-green-700'
-                            : 'text-red-700'
+                            : request.status === 'revision_requested'
+                              ? 'text-orange-700'
+                              : 'text-red-700'
                         }`}>
-                          관리자 의견
+                          {request.status === 'revision_requested' ? '보완 요청 사항' : '관리자 의견'}
                         </h4>
                         <p className={
                           request.status === 'approved'
                             ? 'text-green-600'
-                            : 'text-red-600'
+                            : request.status === 'revision_requested'
+                              ? 'text-orange-600'
+                              : 'text-red-600'
                         }>
                           {request.reviewComment}
                         </p>

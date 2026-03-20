@@ -36,3 +36,12 @@ export {
   type ReasonCode,
   type ScoreBreakdown,
 } from './ForumRecommendationService.js';
+
+export {
+  ForumCategoryRequestService,
+  forumCategoryRequestService,
+  type RequestUser,
+  type CreateRequestInput,
+  type ListRequestsFilter,
+  type ReviewInput,
+} from './ForumCategoryRequestService.js';

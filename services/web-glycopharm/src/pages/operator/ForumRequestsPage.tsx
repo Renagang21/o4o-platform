@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Loader2,
   AlertCircle,
+  RotateCcw,
 } from 'lucide-react';
 import type { CategoryRequestStatus } from '@/types';
 import { forumRequestApi } from '@/services/api';
@@ -39,6 +40,11 @@ const statusConfig: Record<CategoryRequestStatus, { label: string; color: string
     color: 'text-yellow-700',
     bgColor: 'bg-yellow-100',
   },
+  revision_requested: {
+    label: '보완 요청',
+    color: 'text-orange-700',
+    bgColor: 'bg-orange-100',
+  },
   approved: {
     label: '승인됨',
     color: 'text-green-700',
@@ -60,6 +66,11 @@ function formatDate(dateString: string): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+/** 심사 가능 상태인지 확인 */
+function isReviewable(status: CategoryRequestStatus): boolean {
+  return status === 'pending' || status === 'revision_requested';
 }
 
 export default function ForumRequestsPage() {
@@ -102,35 +113,36 @@ export default function ForumRequestsPage() {
     return matchesSearch;
   });
 
-  const pendingCount = requests.filter((r) => r.status === 'pending').length;
+  const pendingCount = requests.filter((r) => r.status === 'pending' || r.status === 'revision_requested').length;
 
-  const handleReview = async (status: 'approved' | 'rejected') => {
+  const handleReview = async (action: 'approve' | 'reject' | 'revision') => {
     if (!selectedRequest) return;
+
+    if (action === 'revision' && !reviewComment.trim()) {
+      toast.error('보완 요청 시 의견을 입력해주세요.');
+      return;
+    }
 
     setIsProcessing(true);
 
     try {
-      const reviewData = { review_comment: reviewComment || undefined };
-      const response = status === 'approved'
-        ? await forumRequestApi.approve(selectedRequest.id, reviewData)
-        : await forumRequestApi.reject(selectedRequest.id, reviewData);
+      const response = await forumRequestApi.review(selectedRequest.id, {
+        action,
+        reviewComment: reviewComment || undefined,
+      });
 
       if (response.error) {
         toast.error(response.error.message);
       } else {
-        // Update local state
-        setRequests((prev) =>
-          prev.map((r) =>
-            r.id === selectedRequest.id
-              ? {
-                  ...r,
-                  ...(response.data as RequestData),
-                }
-              : r
-          )
-        );
+        // Reload list to get fresh data
+        await loadRequests();
         setSelectedRequest(null);
         setReviewComment('');
+        toast.success(
+          action === 'approve' ? '승인 완료' :
+          action === 'reject' ? '거절 완료' :
+          '보완 요청 완료'
+        );
       }
     } catch {
       toast.error('처리 중 오류가 발생했습니다.');
@@ -204,6 +216,7 @@ export default function ForumRequestsPage() {
           >
             <option value="all">모든 상태</option>
             <option value="pending">대기 중</option>
+            <option value="revision_requested">보완 요청</option>
             <option value="approved">승인됨</option>
             <option value="rejected">거절됨</option>
           </select>
@@ -261,7 +274,7 @@ export default function ForumRequestsPage() {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      {request.status === 'pending' && (
+                      {isReviewable(request.status) && (
                         <>
                           <button
                             onClick={() => {
@@ -354,8 +367,8 @@ export default function ForumRequestsPage() {
                   </div>
                 </div>
 
-                {/* Review section for pending requests */}
-                {selectedRequest.status === 'pending' && (
+                {/* Review section for reviewable requests */}
+                {isReviewable(selectedRequest.status) && (
                   <div className="pt-4 border-t border-slate-200">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       검토 의견
@@ -363,7 +376,7 @@ export default function ForumRequestsPage() {
                     <textarea
                       value={reviewComment}
                       onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="승인 또는 거절 사유를 입력하세요 (선택)"
+                      placeholder="승인/거절/보완 사유를 입력하세요 (보완 요청 시 필수)"
                       rows={3}
                       className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                     />
@@ -371,7 +384,7 @@ export default function ForumRequestsPage() {
                 )}
 
                 {/* Already reviewed */}
-                {selectedRequest.status !== 'pending' && selectedRequest.reviewComment && (
+                {!isReviewable(selectedRequest.status) && selectedRequest.reviewComment && (
                   <div className={`p-4 rounded-lg ${
                     selectedRequest.status === 'approved' ? 'bg-green-50' : 'bg-red-50'
                   }`}>
@@ -403,10 +416,18 @@ export default function ForumRequestsPage() {
               >
                 닫기
               </button>
-              {selectedRequest.status === 'pending' && (
+              {isReviewable(selectedRequest.status) && (
                 <>
                   <button
-                    onClick={() => handleReview('rejected')}
+                    onClick={() => handleReview('revision')}
+                    disabled={isProcessing}
+                    className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    보완
+                  </button>
+                  <button
+                    onClick={() => handleReview('reject')}
                     disabled={isProcessing}
                     className="flex-1 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
@@ -414,7 +435,7 @@ export default function ForumRequestsPage() {
                     거절
                   </button>
                   <button
-                    onClick={() => handleReview('approved')}
+                    onClick={() => handleReview('approve')}
                     disabled={isProcessing}
                     className="flex-1 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >

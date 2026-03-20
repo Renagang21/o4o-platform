@@ -64,6 +64,9 @@ export class ForumCategory {
   @Column({ type: 'boolean', default: false })
   isOrganizationExclusive!: boolean;
 
+  @Column({ name: 'forum_type', type: 'varchar', length: 20, default: 'open' })
+  forumType!: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

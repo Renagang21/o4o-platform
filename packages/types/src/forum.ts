@@ -40,6 +40,21 @@ export type ForumCommentStatus = 'publish' | 'pending' | 'deleted';
 /** 카테고리 접근 수준 */
 export type ForumCategoryAccessLevel = 'all' | 'member' | 'business' | 'admin';
 
+/**
+ * 포럼 유형 (운영 정책)
+ * - open: 일반 공개형
+ * - managed: 회원관리형
+ *
+ * accessLevel(권한 정책)과 분리해서 사용한다.
+ */
+export type ForumType = 'open' | 'managed';
+
+/**
+ * 포럼 개설신청 상태
+ * Phase 1: 4개 상태만 사용 (draft, under_review는 향후)
+ */
+export type ForumRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
+
 // =============================================================================
 // Embedded / Inline Types
 // =============================================================================
@@ -237,3 +252,80 @@ export const FORUM_ACCESS_LEVEL_LABELS: Record<ForumCategoryAccessLevel, string>
   business: '사업자',
   admin: '관리자',
 };
+
+/** 포럼 유형별 한글 라벨 */
+export const FORUM_TYPE_LABELS: Record<ForumType, string> = {
+  open: '공개형',
+  managed: '회원관리형',
+};
+
+/** 포럼 개설신청 상태별 한글 라벨 */
+export const FORUM_REQUEST_STATUS_LABELS: Record<ForumRequestStatus, string> = {
+  pending: '심사 대기',
+  revision_requested: '보완 요청',
+  approved: '승인',
+  rejected: '반려',
+};
+
+// =============================================================================
+// ForumCategoryRequest API DTOs — Phase 1
+// =============================================================================
+
+/** 포럼 개설신청 응답 */
+export interface ForumCategoryRequestResponse {
+  id: string;
+  serviceCode: string;
+  organizationId?: string | null;
+  requesterId: string;
+  requesterName: string;
+  requesterEmail?: string | null;
+  name: string;
+  description: string;
+  reason?: string | null;
+  forumType: ForumType;
+  iconEmoji?: string | null;
+  iconUrl?: string | null;
+  tags?: string[] | null;
+  metadata?: Record<string, unknown> | null;
+  status: ForumRequestStatus;
+  reviewerId?: string | null;
+  reviewerName?: string | null;
+  reviewComment?: string | null;
+  reviewedAt?: string | null;
+  createdCategoryId?: string | null;
+  createdCategorySlug?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 포럼 개설신청 생성 DTO */
+export interface ForumCategoryRequestCreateDTO {
+  serviceCode: string;
+  organizationId?: string;
+  name: string;
+  description: string;
+  reason?: string;
+  forumType: ForumType;
+  iconEmoji?: string;
+  iconUrl?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+/** 포럼 개설신청 수정 DTO (pending/revision_requested 상태에서만) */
+export interface ForumCategoryRequestUpdateDTO {
+  name?: string;
+  description?: string;
+  reason?: string;
+  forumType?: ForumType;
+  iconEmoji?: string;
+  iconUrl?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+/** 운영자 심사 DTO */
+export interface ForumCategoryRequestReviewDTO {
+  action: 'approve' | 'reject' | 'revision';
+  reviewComment?: string;
+}

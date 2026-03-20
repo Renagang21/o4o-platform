@@ -1,24 +1,34 @@
 // Forum Category Request Types
-// Phase 19-B: Shared types from @o4o/types/forum
+// WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1: Aligned with @o4o/types/forum
 
-import type { ForumCategoryResponse } from '@o4o/types/forum';
+import type { ForumCategoryResponse, ForumRequestStatus } from '@o4o/types/forum';
 
-export type { ForumCategoryResponse };
+export type { ForumCategoryResponse, ForumRequestStatus };
 
 /**
  * 카테고리 신청 상태
+ * @o4o/types/forum ForumRequestStatus와 동일
  */
-export type CategoryRequestStatus = 'pending' | 'approved' | 'rejected';
+export type CategoryRequestStatus = ForumRequestStatus;
 
 /**
  * 포럼 카테고리 신청
  */
 export interface CategoryRequest {
   id: string;
-  name: string;                   // 신청하는 카테고리 이름
-  description: string;            // 카테고리 설명
-  reason?: string;                // 신청 사유
+  name: string;
+  description: string;
+  reason?: string;
+  forumType?: string;
+  iconEmoji?: string;
+  iconUrl?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
   status: CategoryRequestStatus;
+
+  // 서비스/조직
+  serviceCode: string;
+  organizationId?: string;
 
   // 신청자 정보
   requesterId: string;
@@ -28,7 +38,7 @@ export interface CategoryRequest {
   // 검토 정보
   reviewerId?: string;
   reviewerName?: string;
-  reviewComment?: string;         // 승인/거절 사유
+  reviewComment?: string;
   reviewedAt?: string;
 
   // 승인 시 생성된 카테고리 정보
@@ -52,7 +62,7 @@ export interface CategoryRequestForm {
  * 카테고리 검토 폼 데이터
  */
 export interface CategoryReviewForm {
-  status: 'approved' | 'rejected';
+  action: 'approve' | 'reject' | 'revision';
   reviewComment?: string;
 }
 

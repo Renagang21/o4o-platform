@@ -1,5 +1,11 @@
 /**
- * Forum Category Request Controller
+ * @deprecated WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1
+ * 이 컨트롤러는 레거시입니다.
+ * - 사용자 API → /api/v1/forum/category-requests/*
+ * - 운영자 API → /api/v1/glycopharm/operator/forum-requests/*
+ * 프론트엔드 전환 완료 후 삭제 예정.
+ *
+ * Forum Category Request Controller (LEGACY)
  * 포럼 카테고리 생성 신청 API 엔드포인트
  */
 

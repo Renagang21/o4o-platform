@@ -176,40 +176,52 @@ export const displayApi = {
 };
 
 // Forum Category Request API
-// WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: /api/v1/glycopharm/forum-requests 사용
+// WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1: 공통 API + GlycoPharm operator API
 export const forumRequestApi = {
-  // User APIs
+  // User APIs — /api/v1/forum/category-requests/*
   create: (data: { name: string; description: string; reason?: string }) =>
-    apiClient.post<unknown>('/api/v1/glycopharm/forum-requests', data),
+    apiClient.post<unknown>('/api/v1/forum/category-requests', {
+      ...data,
+      serviceCode: 'glycopharm',
+    }),
 
   getMyRequests: async () => {
-    const res = await apiClient.get<unknown[]>('/api/v1/glycopharm/forum-requests/my');
+    const res = await apiClient.get<unknown[]>('/api/v1/forum/category-requests/my?serviceCode=glycopharm');
     if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
     return res;
   },
 
-  // Admin APIs
+  // Operator APIs — /api/v1/glycopharm/operator/forum-requests/*
   getAllRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
     const query = new URLSearchParams();
     if (params?.status) query.set('status', params.status);
     if (params?.page) query.set('page', params.page.toString());
     if (params?.limit) query.set('limit', params.limit.toString());
-    const res = await apiClient.get<unknown[]>(`/api/v1/glycopharm/forum-requests/admin/all?${query}`);
+    const res = await apiClient.get<unknown[]>(`/api/v1/glycopharm/operator/forum-requests?${query}`);
     if (res.error?.code === 'API_ERROR') return { data: [] as unknown[], total: 0 };
     return res;
   },
 
   getPendingCount: async () => {
-    const res = await apiClient.get<{ count: number }>('/api/v1/glycopharm/forum-requests/admin/pending-count');
+    const res = await apiClient.get<{ count: number }>('/api/v1/glycopharm/operator/forum-requests/pending-count');
     if (res.error?.code === 'API_ERROR') return { data: { count: 0 } };
     return res;
   },
 
+  review: (id: string, data: { action: 'approve' | 'reject' | 'revision'; reviewComment?: string }) =>
+    apiClient.patch<unknown>(`/api/v1/glycopharm/operator/forum-requests/${id}/review`, data),
+
   approve: (id: string, data: { review_comment?: string }) =>
-    apiClient.patch<unknown>(`/api/v1/glycopharm/forum-requests/${id}/review`, { status: 'approved', ...data }),
+    apiClient.patch<unknown>(`/api/v1/glycopharm/operator/forum-requests/${id}/review`, {
+      action: 'approve',
+      reviewComment: data.review_comment,
+    }),
 
   reject: (id: string, data: { review_comment?: string }) =>
-    apiClient.patch<unknown>(`/api/v1/glycopharm/forum-requests/${id}/review`, { status: 'rejected', ...data }),
+    apiClient.patch<unknown>(`/api/v1/glycopharm/operator/forum-requests/${id}/review`, {
+      action: 'reject',
+      reviewComment: data.review_comment,
+    }),
 };
 
 // WO-S2S-FLOW-RECOVERY-PHASE1-V1: Supplier Handling Request API
