@@ -2691,6 +2691,33 @@ export class NetureService {
         }
       });
 
+      // WO-NETURE-PARTNER-RBAC-ASSIGNMENT-FIX-V1: Sync membership + RBAC (matches supplier approval pattern)
+      // NOTE: Past approved partners without role_assignment may need backfill via admin SQL:
+      //   INSERT INTO role_assignments (user_id, role, is_active, assigned_by, assigned_at, valid_from)
+      //   SELECT pa.partner_id, 'neture:partner', true, pa.decided_by, pa.decided_at, pa.decided_at
+      //   FROM neture_partner_applications pa
+      //   WHERE pa.status = 'approved'
+      //     AND NOT EXISTS (SELECT 1 FROM role_assignments ra WHERE ra.user_id = pa.partner_id AND ra.role = 'neture:partner');
+      if (application.partnerId) {
+        // 1. Service membership: ensure active
+        const membership = await this.membershipRepo.findOne({
+          where: { userId: application.partnerId, serviceKey: 'neture' },
+        });
+        if (membership && membership.status !== 'active') {
+          membership.status = 'active';
+          await this.membershipRepo.save(membership);
+          logger.info(`[NetureService] Membership activated for partner user ${application.partnerId}`);
+        }
+
+        // 2. RBAC: assign neture:partner role (idempotent — assignRole handles duplicates)
+        await roleAssignmentService.assignRole({
+          userId: application.partnerId,
+          role: 'neture:partner',
+          assignedBy: sellerId,
+        });
+        logger.info(`[NetureService] Role neture:partner assigned to user ${application.partnerId}`);
+      }
+
       return { id: application.id, status: application.status };
     } catch (error) {
       logger.error('[NetureService] Error approving partner application:', error);
