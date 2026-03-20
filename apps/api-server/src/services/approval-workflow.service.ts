@@ -1,6 +1,4 @@
-import { AppDataSource } from '../database/connection.js';
-import { Repository } from 'typeorm';
-import { User } from '../entities/User.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import logger from '../utils/logger.js';
 
 export interface ApprovalRequest {
@@ -20,11 +18,6 @@ export interface ApprovalRequest {
 }
 
 export class ApprovalWorkflowService {
-  private userRepository: Repository<User>;
-
-  constructor() {
-    this.userRepository = AppDataSource.getRepository(User);
-  }
 
   /**
    * Create approval request for pricing changes
@@ -90,15 +83,11 @@ export class ApprovalWorkflowService {
 
   /**
    * Check if user has approval permissions
+   * WO-O4O-APPROVAL-WORKFLOW-RBAC-FIX-V1: use role_assignments (RBAC SSOT) instead of runtime user.roles
    */
   async canApprove(userId: string, requestType: string): Promise<boolean> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    
-    if (!user) return false;
-
-    // Only admins and managers can approve pricing changes
     const adminRoles = ['admin', 'super_admin', 'pricing_manager'];
-    return user.roles?.some(role => adminRoles.includes(role)) || false;
+    return roleAssignmentService.hasAnyRole(userId, adminRoles);
   }
 
   /**
