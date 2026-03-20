@@ -83,6 +83,29 @@ export class NetureSupplier {
   @Column({ name: 'contact_kakao_visibility', type: 'varchar', length: 10, default: ContactVisibility.PARTNERS })
   contactKakaoVisibility: ContactVisibility;
 
+  // === Business Profile Fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1) ===
+
+  @Column({ name: 'business_number', type: 'varchar', length: 20, nullable: true })
+  businessNumber: string | null;
+
+  @Column({ name: 'representative_name', type: 'varchar', length: 100, nullable: true })
+  representativeName: string | null;
+
+  @Column({ name: 'business_address', type: 'text', nullable: true })
+  businessAddress: string | null;
+
+  @Column({ name: 'manager_name', type: 'varchar', length: 100, nullable: true })
+  managerName: string | null;
+
+  @Column({ name: 'manager_phone', type: 'varchar', length: 50, nullable: true })
+  managerPhone: string | null;
+
+  @Column({ name: 'business_type', type: 'varchar', length: 100, nullable: true })
+  businessType: string | null;
+
+  @Column({ name: 'tax_email', type: 'varchar', length: 255, nullable: true })
+  taxEmail: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

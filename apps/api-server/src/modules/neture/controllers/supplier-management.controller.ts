@@ -180,11 +180,16 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         contactEmail, contactPhone, contactWebsite, contactKakao,
         contactEmailVisibility, contactPhoneVisibility,
         contactWebsiteVisibility, contactKakaoVisibility,
+        // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
+        businessNumber, representativeName, businessAddress,
+        managerName, managerPhone, businessType, taxEmail,
       } = req.body;
       const result = await netureService.updateSupplierProfile(supplierId, {
         contactEmail, contactPhone, contactWebsite, contactKakao,
         contactEmailVisibility, contactPhoneVisibility,
         contactWebsiteVisibility, contactKakaoVisibility,
+        businessNumber, representativeName, businessAddress,
+        managerName, managerPhone, businessType, taxEmail,
       });
       if (!result) {
         return res.status(404).json({ success: false, error: 'SUPPLIER_NOT_FOUND' });

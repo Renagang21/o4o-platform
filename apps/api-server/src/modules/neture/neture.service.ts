@@ -973,10 +973,48 @@ export class NetureService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return null;
 
+      // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1: pre-fill from users.businessInfo
+      let prefilled: Record<string, string | null> = {};
+      const needsPrefill =
+        supplier.userId &&
+        !supplier.businessNumber &&
+        !supplier.representativeName &&
+        !supplier.businessAddress;
+
+      if (needsPrefill) {
+        try {
+          const rows = await AppDataSource.query(
+            `SELECT "businessInfo" FROM users WHERE id = $1 LIMIT 1`,
+            [supplier.userId],
+          );
+          const bi = rows[0]?.businessInfo;
+          if (bi && typeof bi === 'object') {
+            prefilled = {
+              businessNumber: bi.businessNumber || null,
+              businessAddress: [bi.address, bi.address2].filter(Boolean).join(' ') || null,
+              businessType: bi.businessType || null,
+              taxEmail: bi.email || null,
+            };
+          }
+        } catch (prefillError) {
+          logger.warn('[NetureService] Pre-fill from businessInfo failed:', prefillError);
+        }
+      }
+
       return {
         id: supplier.id,
         name: supplier.name,
         slug: supplier.slug,
+        // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
+        businessNumber: supplier.businessNumber || prefilled.businessNumber || null,
+        representativeName: supplier.representativeName || null,
+        businessAddress: supplier.businessAddress || prefilled.businessAddress || null,
+        managerName: supplier.managerName || null,
+        managerPhone: supplier.managerPhone || null,
+        businessType: supplier.businessType || prefilled.businessType || null,
+        taxEmail: supplier.taxEmail || prefilled.taxEmail || null,
+        _prefilled: Object.keys(prefilled).length > 0,
+        // Contact (existing)
         contactEmail: supplier.contactEmail || null,
         contactPhone: supplier.contactPhone || null,
         contactWebsite: supplier.contactWebsite || null,
@@ -1003,12 +1041,21 @@ export class NetureService {
       contactPhoneVisibility?: ContactVisibility;
       contactWebsiteVisibility?: ContactVisibility;
       contactKakaoVisibility?: ContactVisibility;
+      // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
+      businessNumber?: string;
+      representativeName?: string;
+      businessAddress?: string;
+      managerName?: string;
+      managerPhone?: string;
+      businessType?: string;
+      taxEmail?: string;
     },
   ) {
     try {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return null;
 
+      // Existing contact fields
       if (data.contactEmail !== undefined) supplier.contactEmail = data.contactEmail || '';
       if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone ? data.contactPhone.replace(/\D/g, '') : '';
       if (data.contactWebsite !== undefined) supplier.contactWebsite = data.contactWebsite || '';
@@ -1018,10 +1065,28 @@ export class NetureService {
       if (data.contactWebsiteVisibility !== undefined) supplier.contactWebsiteVisibility = data.contactWebsiteVisibility;
       if (data.contactKakaoVisibility !== undefined) supplier.contactKakaoVisibility = data.contactKakaoVisibility;
 
+      // Business profile fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
+      if (data.businessNumber !== undefined) supplier.businessNumber = data.businessNumber || null;
+      if (data.representativeName !== undefined) supplier.representativeName = data.representativeName || null;
+      if (data.businessAddress !== undefined) supplier.businessAddress = data.businessAddress || null;
+      if (data.managerName !== undefined) supplier.managerName = data.managerName || null;
+      if (data.managerPhone !== undefined) supplier.managerPhone = data.managerPhone ? data.managerPhone.replace(/\D/g, '') : null;
+      if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
+      if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
+
       await this.supplierRepo.save(supplier);
 
       return {
         id: supplier.id,
+        // Business profile
+        businessNumber: supplier.businessNumber || null,
+        representativeName: supplier.representativeName || null,
+        businessAddress: supplier.businessAddress || null,
+        managerName: supplier.managerName || null,
+        managerPhone: supplier.managerPhone || null,
+        businessType: supplier.businessType || null,
+        taxEmail: supplier.taxEmail || null,
+        // Contact
         contactEmail: supplier.contactEmail || null,
         contactPhone: supplier.contactPhone || null,
         contactWebsite: supplier.contactWebsite || null,

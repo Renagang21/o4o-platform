@@ -322,6 +322,16 @@ export interface SupplierProfile {
   id: string;
   name: string;
   slug: string;
+  // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
+  businessNumber: string | null;
+  representativeName: string | null;
+  businessAddress: string | null;
+  managerName: string | null;
+  managerPhone: string | null;
+  businessType: string | null;
+  taxEmail: string | null;
+  _prefilled?: boolean;
+  // Contact
   contactEmail: string | null;
   contactPhone: string | null;
   contactWebsite: string | null;
@@ -742,6 +752,14 @@ export const supplierProfileApi = {
     contactPhoneVisibility?: ContactVisibility;
     contactWebsiteVisibility?: ContactVisibility;
     contactKakaoVisibility?: ContactVisibility;
+    // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
+    businessNumber?: string;
+    representativeName?: string;
+    businessAddress?: string;
+    managerName?: string;
+    managerPhone?: string;
+    businessType?: string;
+    taxEmail?: string;
   }): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.patch('/neture/supplier/profile', data);
