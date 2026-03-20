@@ -84,16 +84,17 @@ export function createSeedStoreHubRouter(dataSource: DataSource): Router {
       const passwordHash = await bcrypt.hash('Test1234!', 10);
 
       // 1. Users
+      // WO-O4O-LEGACY-RBAC-SEED-FIX-V1: users.roles column was DROPPED (RBAC SSOT = role_assignments)
       const users = [
-        { id: T.userOwner1, email: 'store.owner1@test.com', name: '테스트약국1', roles: ['kpa:pharmacist'] },
-        { id: T.userOwner2, email: 'store.owner2@test.com', name: '테스트약국2', roles: ['kpa:pharmacist'] },
-        { id: T.userOperator, email: 'operator@test.com', name: '운영자', roles: ['platform:admin', 'operator'] },
+        { id: T.userOwner1, email: 'store.owner1@test.com', name: '테스트약국1' },
+        { id: T.userOwner2, email: 'store.owner2@test.com', name: '테스트약국2' },
+        { id: T.userOperator, email: 'operator@test.com', name: '운영자' },
       ];
       for (const u of users) {
         await insertIfNotExists(dataSource, 'users', u.id,
-          `INSERT INTO users (id, email, password, name, roles, "isActive", "isEmailVerified", "createdAt", "updatedAt")
-           VALUES ($1, $2, $3, $4, $5::text[], true, true, NOW(), NOW())`,
-          [u.id, u.email, passwordHash, u.name, u.roles],
+          `INSERT INTO users (id, email, password, name, "isActive", "isEmailVerified", "createdAt", "updatedAt")
+           VALUES ($1, $2, $3, $4, true, true, NOW(), NOW())`,
+          [u.id, u.email, passwordHash, u.name],
           created, skipped, `user:${u.email}`,
         );
       }
