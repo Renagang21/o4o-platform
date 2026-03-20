@@ -37,10 +37,10 @@ function getNum(metrics: Record<string, unknown>, path: string): number {
 
 const SERVICE_LINKS: Record<AIServiceId, Record<string, string>> = {
   neture: {
-    suppliers: '/workspace/operator/suppliers?status=PENDING',
-    registrations: '/workspace/operator/registrations',
-    products: '/workspace/operator/products?status=PENDING',
-    orders: '/workspace/operator/orders',
+    suppliers: '/operator/supply',
+    registrations: '/operator/applications',
+    products: '/operator/supply',
+    orders: '/operator/orders',
   },
   glycopharm: {
     applications: '/operator/applications',

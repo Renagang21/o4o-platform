@@ -213,11 +213,11 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
 
       // Block 3: Action Queue (5개)
       const actionQueue: ActionItem[] = [
-        { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/workspace/operator/registrations' },
-        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/workspace/operator/suppliers?status=PENDING' },
-        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/workspace/operator/products?status=PENDING' },
-        { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/workspace/operator/registrations' },
-        { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/workspace/admin/contact-messages' },
+        { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
+        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/supply' },
+        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/supply' },
+        { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
+        { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/community' },
       ];
 
       // Block 4: Activity Log (multi-source: orders, suppliers, products, partners, contacts)
@@ -232,13 +232,13 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
 
       // Block 5: Quick Actions (7개)
       const quickActions: QuickActionItem[] = [
-        { id: 'manage-suppliers', label: '공급사 관리', link: '/workspace/operator/suppliers', icon: 'store' },
-        { id: 'manage-products', label: '상품 관리', link: '/workspace/operator/products', icon: 'package' },
-        { id: 'manage-orders', label: '주문 관리', link: '/workspace/operator/orders', icon: 'shopping-cart' },
-        { id: 'manage-content', label: '콘텐츠 관리', link: '/workspace/operator/content', icon: 'file-text' },
-        { id: 'manage-signage', label: '사이니지', link: '/workspace/operator/signage/hq-media', icon: 'monitor' },
-        { id: 'manage-forum', label: '포럼 관리', link: '/workspace/operator/forum-management', icon: 'message-square' },
-        { id: 'manage-registrations', label: '가입 관리', link: '/workspace/operator/registrations', icon: 'user-check' },
+        { id: 'manage-suppliers', label: '공급사 관리', link: '/operator/supply', icon: 'store' },
+        { id: 'manage-products', label: '상품 관리', link: '/operator/supply', icon: 'package' },
+        { id: 'manage-orders', label: '주문 관리', link: '/operator/orders', icon: 'shopping-cart' },
+        { id: 'manage-content', label: '콘텐츠 관리', link: '/operator/homepage-cms', icon: 'file-text' },
+        { id: 'manage-signage', label: '사이니지', link: '/operator/signage/hq-media', icon: 'monitor' },
+        { id: 'manage-forum', label: '포럼 관리', link: '/operator/community', icon: 'message-square' },
+        { id: 'manage-registrations', label: '가입 관리', link: '/operator/applications', icon: 'user-check' },
       ];
 
       const response: OperatorDashboardConfig = {
