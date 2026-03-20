@@ -66,6 +66,21 @@ export class UserManagementController extends BaseController {
       // Execute query
       const [users, total] = await queryBuilder.skip(skip).take(limit).getManyAndCount();
 
+      // WO-O4O-USER-MANAGEMENT-RBAC-ALIGNMENT-V1: batch-fetch roles from role_assignments (RBAC SSOT)
+      const userIds = users.map(u => u.id);
+      const roleMap = new Map<string, string[]>();
+      if (userIds.length > 0) {
+        const roleRows: Array<{ userId: string; role: string }> = await AppDataSource.query(
+          `SELECT "userId", role FROM role_assignments WHERE "userId" = ANY($1) AND "isActive" = true`,
+          [userIds],
+        ).catch((e) => { logger.warn('[UserManagement] batch role query failed:', e.message); return []; });
+        for (const r of roleRows) {
+          const existing = roleMap.get(r.userId) || [];
+          existing.push(r.role);
+          roleMap.set(r.userId, existing);
+        }
+      }
+
       return BaseController.okPaginated(
         res,
         users.map(u => ({
@@ -73,7 +88,7 @@ export class UserManagementController extends BaseController {
           email: u.email,
           name: u.name,
           status: u.status,
-          roles: u.roles || [],
+          roles: roleMap.get(u.id) || [],
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         })),
@@ -109,6 +124,9 @@ export class UserManagementController extends BaseController {
         return BaseController.notFound(res, 'User not found');
       }
 
+      // WO-O4O-USER-MANAGEMENT-RBAC-ALIGNMENT-V1: roles from role_assignments (RBAC SSOT)
+      const roleNames = await roleAssignmentService.getRoleNames(user.id);
+
       return BaseController.ok(res, {
         user: {
           id: user.id,
@@ -117,7 +135,7 @@ export class UserManagementController extends BaseController {
           phone: user.phone,
           avatar: user.avatar,
           status: user.status,
-          roles: user.roles?.map(role => ({ id: '', name: role, displayName: role })) || [],
+          roles: roleNames.map(role => ({ id: '', name: role, displayName: role })),
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         },
@@ -176,13 +194,16 @@ export class UserManagementController extends BaseController {
       user.updatedAt = new Date();
       await userRepository.save(user);
 
+      // WO-O4O-USER-MANAGEMENT-RBAC-ALIGNMENT-V1: fresh roles from role_assignments
+      const updatedRoles = await roleAssignmentService.getRoleNames(user.id);
+
       return BaseController.ok(res, {
         message: 'User updated successfully',
         user: {
           id: user.id,
           email: user.email,
           name: user.name,
-          roles: user.roles || [],
+          roles: updatedRoles,
           status: user.status,
         },
       });
