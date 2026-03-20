@@ -1,9 +1,2 @@
-export { HomePage } from './HomePage';
-export { OrganizationsPage } from './OrganizationsPage';
-export { OrganizationDetailPage } from './OrganizationDetailPage';
 export { MemberApplyPage } from './MemberApplyPage';
 export { MyApplicationsPage } from './MyApplicationsPage';
-export { AboutPage } from './AboutPage';
-export { NoticesPage } from './NoticesPage';
-export { ResourcesPage } from './ResourcesPage';
-export { EventsPage } from './EventsPage';

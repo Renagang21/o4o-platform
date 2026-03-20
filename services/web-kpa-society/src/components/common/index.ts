@@ -5,4 +5,3 @@ export { Pagination } from './Pagination';
 export { Card } from './Card';
 export { ContextIndicator } from './ContextIndicator';
 export { ContextGuard } from './ContextGuard';
-export { PlaceholderImage } from './PlaceholderImage';
