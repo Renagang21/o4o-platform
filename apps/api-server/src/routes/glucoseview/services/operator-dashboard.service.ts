@@ -11,12 +11,14 @@ import type { DataSource } from 'typeorm';
 import type { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 import { computeOperatorAlerts } from '../../../utils/operator-alert.utils.js';
+import logger from '../../../utils/logger.js';
 import {
   fetchCareMetrics,
   fetchRecentAuditActions,
   buildCareActivityItems,
   buildAuditActivityItems,
   mergeActivityLog,
+  type CareMetrics,
 } from '../../../utils/operator-dashboard-queries.js';
 
 export async function buildGlucoseViewDashboardConfig(
@@ -34,34 +36,38 @@ export async function buildGlucoseViewDashboardConfig(
     recentApplications,
     care,
     recentAuditActions,
+  // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
   ] = await Promise.all([
     dataSource.query(`
       SELECT status, COUNT(*)::int AS cnt
       FROM glucoseview_pharmacies
       GROUP BY status
-    `) as Promise<Array<{ status: string; cnt: number }>>,
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] pharmacyCounts failed:', e.message); return []; }) as Promise<Array<{ status: string; cnt: number }>>,
     dataSource.query(`
       SELECT approval_status, COUNT(*)::int AS cnt
       FROM glucoseview_pharmacists
       GROUP BY approval_status
-    `) as Promise<Array<{ approval_status: string; cnt: number }>>,
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] pharmacistCounts failed:', e.message); return []; }) as Promise<Array<{ approval_status: string; cnt: number }>>,
     dataSource.query(`
       SELECT COUNT(*)::int AS cnt FROM glucoseview_customers
-    `) as Promise<Array<{ cnt: number }>>,
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] customerCount failed:', e.message); return [{ cnt: 0 }]; }) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
       SELECT COUNT(*)::int AS cnt FROM glucoseview_vendors WHERE status = 'active'
-    `) as Promise<Array<{ cnt: number }>>,
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] vendorCount failed:', e.message); return [{ cnt: 0 }]; }) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
       SELECT COUNT(*)::int AS cnt FROM glucoseview_applications WHERE status = 'submitted'
-    `) as Promise<Array<{ cnt: number }>>,
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] pendingApplications failed:', e.message); return [{ cnt: 0 }]; }) as Promise<Array<{ cnt: number }>>,
     dataSource.query(`
       SELECT pharmacy_name, status, submitted_at
       FROM glucoseview_applications
       ORDER BY submitted_at DESC
       LIMIT 5
-    `) as Promise<Array<{ pharmacy_name: string; status: string; submitted_at: string }>>,
-    fetchCareMetrics(dataSource, 'glucoseview'),
-    fetchRecentAuditActions(dataSource, 'glucoseview'),
+    `).catch((e) => { logger.warn('[GlucoseViewDashboard] recentApplications failed:', e.message); return []; }) as Promise<Array<{ pharmacy_name: string; status: string; submitted_at: string }>>,
+    fetchCareMetrics(dataSource, 'glucoseview').catch((e) => {
+      logger.warn('[GlucoseViewDashboard] careMetrics failed:', e.message);
+      return { highRiskPatients: 0, openCareAlerts: 0, recentCareAlerts: [], careEnabledPharmacies: 0, weeklyCareActivity: 0 } as CareMetrics;
+    }),
+    fetchRecentAuditActions(dataSource, 'glucoseview').catch((e) => { logger.warn('[GlucoseViewDashboard] auditActions failed:', e.message); return []; }),
   ]);
 
   const activePharmacies = pharmacyCounts.find(r => r.status === 'active')?.cnt || 0;

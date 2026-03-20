@@ -22,6 +22,7 @@ import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireCosmeticsScope } from '../../../middleware/cosmetics-scope.middleware.js';
 import { CosmeticsStoreSummaryService } from '../services/cosmetics-store-summary.service.js';
 import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
+import logger from '../../../utils/logger.js';
 import type { KpiItem, AiSummaryItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 
 export function createCosmeticsOperatorDashboardController(dataSource: DataSource): Router {
@@ -44,9 +45,13 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
         adminSummary,
         productCounts,
         cmsCounts,
+      // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
       ] = await Promise.all([
         // 1. Store & order summary (reuses existing service)
-        storeSummaryService.getAdminSummary(),
+        storeSummaryService.getAdminSummary().catch((e) => {
+          logger.warn('[CosmeticsDashboard] adminSummary failed:', e.message);
+          return { totalStores: 0, activeOrders: 0, monthlyRevenue: 0, recentOrders: [] };
+        }),
 
         // 2. Product catalog stats
         dataSource.query(`
@@ -56,7 +61,7 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
             COUNT(*) FILTER (WHERE status = 'DRAFT')::int AS draft,
             COUNT(*) FILTER (WHERE status = 'PENDING')::int AS pending
           FROM cosmetics.cosmetics_products
-        `) as Promise<Array<{ total: number; active: number; draft: number; pending: number }>>,
+        `).catch((e) => { logger.warn('[CosmeticsDashboard] productCounts failed:', e.message); return [{ total: 0, active: 0, draft: 0, pending: 0 }]; }) as Promise<Array<{ total: number; active: number; draft: number; pending: number }>>,
 
         // 3. CMS content counts
         dataSource.query(`
@@ -65,7 +70,7 @@ export function createCosmeticsOperatorDashboardController(dataSource: DataSourc
             COUNT(*) FILTER (WHERE status = 'published')::int AS published
           FROM cms_contents
           WHERE "serviceKey" = 'cosmetics'
-        `) as Promise<Array<{ total: number; published: number }>>,
+        `).catch((e) => { logger.warn('[CosmeticsDashboard] cmsCounts failed:', e.message); return [{ total: 0, published: 0 }]; }) as Promise<Array<{ total: number; published: number }>>,
       ]);
 
       const products = productCounts[0] || { total: 0, active: 0, draft: 0, pending: 0 };

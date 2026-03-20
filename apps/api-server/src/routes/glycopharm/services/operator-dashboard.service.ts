@@ -13,12 +13,14 @@ import { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
 import type { CopilotEngineService } from '../../../copilot/copilot-engine.service.js';
 import type { KpiItem, ActionItem, ActivityItem, QuickActionItem, OperatorDashboardConfig } from '../../../types/operator-dashboard.types.js';
 import { computeOperatorAlerts } from '../../../utils/operator-alert.utils.js';
+import logger from '../../../utils/logger.js';
 import {
   fetchCareMetrics,
   fetchRecentAuditActions,
   buildCareActivityItems,
   buildAuditActivityItems,
   mergeActivityLog,
+  type CareMetrics,
 } from '../../../utils/operator-dashboard-queries.js';
 
 export async function buildGlycoPharmDashboardConfig(
@@ -40,6 +42,7 @@ export async function buildGlycoPharmDashboardConfig(
     totalPatients,
     care,
     recentAuditActions,
+  // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
   ] = await Promise.all([
     dataSource.query(`
       SELECT o."isActive" AS is_active, COUNT(*)::int AS cnt
@@ -47,21 +50,24 @@ export async function buildGlycoPharmDashboardConfig(
       JOIN organization_service_enrollments ose
         ON ose.organization_id = o.id AND ose.service_code = 'glycopharm'
       GROUP BY o."isActive"
-    `) as Promise<Array<{ is_active: boolean; cnt: number }>>,
-    applicationRepo.count({ where: { status: 'submitted' } }),
-    productRepo.count(),
-    productRepo.count({ where: { status: 'active' } }),
-    productRepo.count({ where: { status: 'draft' } }),
+    `).catch((e) => { logger.warn('[GlycoPharmDashboard] pharmacyCounts failed:', e.message); return []; }) as Promise<Array<{ is_active: boolean; cnt: number }>>,
+    applicationRepo.count({ where: { status: 'submitted' } }).catch((e) => { logger.warn('[GlycoPharmDashboard] pendingApprovals failed:', e.message); return 0; }),
+    productRepo.count().catch((e) => { logger.warn('[GlycoPharmDashboard] totalProducts failed:', e.message); return 0; }),
+    productRepo.count({ where: { status: 'active' } }).catch((e) => { logger.warn('[GlycoPharmDashboard] activeProducts failed:', e.message); return 0; }),
+    productRepo.count({ where: { status: 'draft' } }).catch((e) => { logger.warn('[GlycoPharmDashboard] draftProducts failed:', e.message); return 0; }),
     applicationRepo.find({
       where: { status: 'submitted' },
       order: { submittedAt: 'DESC' },
       take: 5,
-    }),
+    }).catch((e) => { logger.warn('[GlycoPharmDashboard] recentApplications failed:', e.message); return []; }),
     dataSource.query(`
       SELECT COUNT(*)::int AS cnt FROM patient_health_profiles
-    `).catch(() => [{ cnt: 0 }]) as Promise<Array<{ cnt: number }>>,
-    fetchCareMetrics(dataSource, 'glycopharm'),
-    fetchRecentAuditActions(dataSource, 'glycopharm'),
+    `).catch((e) => { logger.warn('[GlycoPharmDashboard] totalPatients failed:', e.message); return [{ cnt: 0 }]; }) as Promise<Array<{ cnt: number }>>,
+    fetchCareMetrics(dataSource, 'glycopharm').catch((e) => {
+      logger.warn('[GlycoPharmDashboard] careMetrics failed:', e.message);
+      return { highRiskPatients: 0, openCareAlerts: 0, recentCareAlerts: [], careEnabledPharmacies: 0, weeklyCareActivity: 0 } as CareMetrics;
+    }),
+    fetchRecentAuditActions(dataSource, 'glycopharm').catch((e) => { logger.warn('[GlycoPharmDashboard] auditActions failed:', e.message); return []; }),
   ]);
 
   const activePharmacies = pharmacyCounts.find(r => r.is_active === true)?.cnt || 0;

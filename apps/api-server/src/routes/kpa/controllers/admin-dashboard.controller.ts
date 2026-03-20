@@ -13,6 +13,7 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
 import { KpaApplication } from '../entities/kpa-application.entity.js';
+import logger from '../../../utils/logger.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -91,9 +92,10 @@ export function createAdminDashboardController(
         const appRepo = dataSource.getRepository(KpaApplication);
 
         // Query organization stats
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [branchCount, groupCount] = await Promise.all([
-          orgRepo.count({ where: { type: 'branch', isActive: true } }),
-          orgRepo.count({ where: { type: 'group', isActive: true } }),
+          orgRepo.count({ where: { type: 'branch', isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] branchCount failed:', e.message); return 0; }),
+          orgRepo.count({ where: { type: 'group', isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] groupCount failed:', e.message); return 0; }),
         ]);
         const totalBranches = branchCount + groupCount;
 
@@ -129,13 +131,14 @@ export function createAdminDashboardController(
       try {
         const orgRepo = dataSource.getRepository(OrganizationStore);
 
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [total, association, branch, group, active, inactive] = await Promise.all([
-          orgRepo.count(),
-          orgRepo.count({ where: { type: 'association' } }),
-          orgRepo.count({ where: { type: 'branch' } }),
-          orgRepo.count({ where: { type: 'group' } }),
-          orgRepo.count({ where: { isActive: true } }),
-          orgRepo.count({ where: { isActive: false } }),
+          orgRepo.count().catch((e) => { logger.warn('[KpaAdminDashboard] org total failed:', e.message); return 0; }),
+          orgRepo.count({ where: { type: 'association' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org association failed:', e.message); return 0; }),
+          orgRepo.count({ where: { type: 'branch' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org branch failed:', e.message); return 0; }),
+          orgRepo.count({ where: { type: 'group' } }).catch((e) => { logger.warn('[KpaAdminDashboard] org group failed:', e.message); return 0; }),
+          orgRepo.count({ where: { isActive: true } }).catch((e) => { logger.warn('[KpaAdminDashboard] org active failed:', e.message); return 0; }),
+          orgRepo.count({ where: { isActive: false } }).catch((e) => { logger.warn('[KpaAdminDashboard] org inactive failed:', e.message); return 0; }),
         ]);
 
         const stats: OrganizationStats = {
@@ -165,6 +168,7 @@ export function createAdminDashboardController(
       try {
         const memberRepo = dataSource.getRepository(KpaMember);
 
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [
           total,
           active,
@@ -175,14 +179,14 @@ export function createAdminDashboardController(
           operatorRole,
           adminRole,
         ] = await Promise.all([
-          memberRepo.count(),
-          memberRepo.count({ where: { status: 'active' } }),
-          memberRepo.count({ where: { status: 'pending' } }),
-          memberRepo.count({ where: { status: 'suspended' } }),
-          memberRepo.count({ where: { status: 'withdrawn' } }),
-          memberRepo.count({ where: { role: 'member' } }),
-          memberRepo.count({ where: { role: 'operator' } }),
-          memberRepo.count({ where: { role: 'admin' } }),
+          memberRepo.count().catch((e) => { logger.warn('[KpaAdminDashboard] member total failed:', e.message); return 0; }),
+          memberRepo.count({ where: { status: 'active' } }).catch((e) => { logger.warn('[KpaAdminDashboard] member active failed:', e.message); return 0; }),
+          memberRepo.count({ where: { status: 'pending' } }).catch((e) => { logger.warn('[KpaAdminDashboard] member pending failed:', e.message); return 0; }),
+          memberRepo.count({ where: { status: 'suspended' } }).catch((e) => { logger.warn('[KpaAdminDashboard] member suspended failed:', e.message); return 0; }),
+          memberRepo.count({ where: { status: 'withdrawn' } }).catch((e) => { logger.warn('[KpaAdminDashboard] member withdrawn failed:', e.message); return 0; }),
+          memberRepo.count({ where: { role: 'member' } }).catch((e) => { logger.warn('[KpaAdminDashboard] role member failed:', e.message); return 0; }),
+          memberRepo.count({ where: { role: 'operator' } }).catch((e) => { logger.warn('[KpaAdminDashboard] role operator failed:', e.message); return 0; }),
+          memberRepo.count({ where: { role: 'admin' } }).catch((e) => { logger.warn('[KpaAdminDashboard] role admin failed:', e.message); return 0; }),
         ]);
 
         const stats: MemberStats = {
@@ -211,6 +215,7 @@ export function createAdminDashboardController(
       try {
         const appRepo = dataSource.getRepository(KpaApplication);
 
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [
           total,
           submitted,
@@ -221,14 +226,14 @@ export function createAdminDashboardController(
           service,
           other,
         ] = await Promise.all([
-          appRepo.count(),
-          appRepo.count({ where: { status: 'submitted' } }),
-          appRepo.count({ where: { status: 'approved' } }),
-          appRepo.count({ where: { status: 'rejected' } }),
-          appRepo.count({ where: { status: 'cancelled' } }),
-          appRepo.count({ where: { type: 'membership' } }),
-          appRepo.count({ where: { type: 'service' } }),
-          appRepo.count({ where: { type: 'other' } }),
+          appRepo.count().catch((e) => { logger.warn('[KpaAdminDashboard] app total failed:', e.message); return 0; }),
+          appRepo.count({ where: { status: 'submitted' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app submitted failed:', e.message); return 0; }),
+          appRepo.count({ where: { status: 'approved' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app approved failed:', e.message); return 0; }),
+          appRepo.count({ where: { status: 'rejected' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app rejected failed:', e.message); return 0; }),
+          appRepo.count({ where: { status: 'cancelled' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app cancelled failed:', e.message); return 0; }),
+          appRepo.count({ where: { type: 'membership' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app membership failed:', e.message); return 0; }),
+          appRepo.count({ where: { type: 'service' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app service failed:', e.message); return 0; }),
+          appRepo.count({ where: { type: 'other' } }).catch((e) => { logger.warn('[KpaAdminDashboard] app other failed:', e.message); return 0; }),
         ]);
 
         const stats: ApplicationStats = {

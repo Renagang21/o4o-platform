@@ -19,6 +19,7 @@ import { KpaBranchDoc } from '../entities/kpa-branch-doc.entity.js';
 import { KpaBranchSettings } from '../entities/kpa-branch-settings.entity.js';
 import { KpaAuditLog } from '../entities/kpa-audit-log.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
+import logger from '../../../utils/logger.js';
 import { requireOrgRole } from '../middleware/kpa-org-role.middleware.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
@@ -133,9 +134,10 @@ export function createBranchAdminDashboardController(
         const memberRepo = dataSource.getRepository(KpaMember);
 
         // Query member stats for this organization
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [totalMembers, activeMembers] = await Promise.all([
-          memberRepo.count({ where: { organization_id: organizationId } }),
-          memberRepo.count({ where: { organization_id: organizationId, status: 'active' } }),
+          memberRepo.count({ where: { organization_id: organizationId } }).catch((e) => { logger.warn('[KpaBranchDashboard] totalMembers failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, status: 'active' } }).catch((e) => { logger.warn('[KpaBranchDashboard] activeMembers failed:', e.message); return 0; }),
         ]);
 
         const stats: BranchDashboardStats = {
@@ -247,6 +249,7 @@ export function createBranchAdminDashboardController(
 
         const memberRepo = dataSource.getRepository(KpaMember);
 
+        // WO-O4O-DASHBOARD-QUERY-STABILITY-V1: individual .catch() per query
         const [
           total,
           active,
@@ -256,13 +259,13 @@ export function createBranchAdminDashboardController(
           operatorRole,
           adminRole,
         ] = await Promise.all([
-          memberRepo.count({ where: { organization_id: organizationId } }),
-          memberRepo.count({ where: { organization_id: organizationId, status: 'active' } }),
-          memberRepo.count({ where: { organization_id: organizationId, status: 'pending' } }),
-          memberRepo.count({ where: { organization_id: organizationId, status: 'suspended' } }),
-          memberRepo.count({ where: { organization_id: organizationId, role: 'member' } }),
-          memberRepo.count({ where: { organization_id: organizationId, role: 'operator' } }),
-          memberRepo.count({ where: { organization_id: organizationId, role: 'admin' } }),
+          memberRepo.count({ where: { organization_id: organizationId } }).catch((e) => { logger.warn('[KpaBranchDashboard] member total failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, status: 'active' } }).catch((e) => { logger.warn('[KpaBranchDashboard] member active failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, status: 'pending' } }).catch((e) => { logger.warn('[KpaBranchDashboard] member pending failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, status: 'suspended' } }).catch((e) => { logger.warn('[KpaBranchDashboard] member suspended failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, role: 'member' } }).catch((e) => { logger.warn('[KpaBranchDashboard] role member failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, role: 'operator' } }).catch((e) => { logger.warn('[KpaBranchDashboard] role operator failed:', e.message); return 0; }),
+          memberRepo.count({ where: { organization_id: organizationId, role: 'admin' } }).catch((e) => { logger.warn('[KpaBranchDashboard] role admin failed:', e.message); return 0; }),
         ]);
 
         res.json({
