@@ -80,7 +80,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/store/signage', label: '스마트 디스플레이', icon: Tv },
       { path: '/store/content', label: '콘텐츠 가져오기', icon: Monitor },
       { path: '/store/signage/library', label: '콘텐츠 라이브러리', icon: Monitor },
-      { path: '/store/signage/my', label: '내 사이니지', icon: Tv },
+      { path: '/store/signage', label: '내 사이니지', icon: Tv },
       { path: '/store/market-trial', label: 'Market Trial', icon: Tag },
       { path: '/store/funnel', label: '전환 퍼널', icon: BarChart3 },
       { path: '/store/management', label: '약국 경영', icon: Briefcase },

@@ -245,7 +245,7 @@ export default function CommunityMainPage() {
               {sponsors.length > 0 ? sponsors.slice(0, 3).map((s) => (
                 <a
                   key={s.id}
-                  href={s.linkUrl || '#'}
+                  href={s.linkUrl ?? undefined}
                   className="block p-3.5 bg-white border border-slate-200 rounded-lg hover:border-primary-300 transition-colors"
                 >
                   <p className="text-sm font-medium text-slate-800">{s.name}</p>
@@ -338,7 +338,7 @@ export default function CommunityMainPage() {
               {ads.map((ad) => (
                 <a
                   key={ad.id}
-                  href={ad.linkUrl || '#'}
+                  href={ad.linkUrl ?? undefined}
                   className="block p-5 bg-white border border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
                 >
                   <p className="text-sm font-semibold text-slate-800 mb-1">{ad.title}</p>
