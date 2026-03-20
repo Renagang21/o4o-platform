@@ -6,6 +6,7 @@ import type { AuthRequest } from '../types/auth.js';
 import { Like, SelectQueryBuilder } from 'typeorm';
 import { emailService } from '../services/email.service.js';
 import logger from '../utils/logger.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export const getPendingUsers = async (req: Request, res: Response) => {
   try {
@@ -191,12 +192,14 @@ export const approveUser = async (req: AuthRequest, res: Response) => {
     });
 
     // Send approval email
+    // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments (RBAC SSOT) instead of DB user.roles
+    const userRoles = await roleAssignmentService.getRoleNames(userId);
     if (emailService.isServiceAvailable()) {
       try {
         await emailService.sendUserApprovalEmail(user.email, {
           userName: user.name || user.email,
           userEmail: user.email,
-          userRole: user.roles?.[0],
+          userRole: userRoles[0],
           approvalDate: new Date().toLocaleString('ko-KR'),
           notes
         });

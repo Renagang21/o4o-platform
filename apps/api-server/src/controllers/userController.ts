@@ -4,6 +4,7 @@ import { UserRole, AuthRequest } from '../types/auth.js';
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { ProfileCompletenessService } from '../services/profileCompletenessService.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export class UserController {
   constructor() {
@@ -29,12 +30,15 @@ export class UserController {
         });
       }
 
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use req.user.roles (JWT-injected) instead of DB-queried user.roles
+      const authRoles: string[] = (authReq.user as any).roles || [];
+
       res.json({
         success: true,
         data: {
           id: user.id,
           provider: user.provider,
-          role: user.roles?.[0],
+          role: authRoles[0],
           status: user.status,
           businessInfo: user.businessInfo,
           createdAt: user.createdAt,
@@ -197,29 +201,20 @@ export class UserController {
         });
       }
 
-      const userRepository = AppDataSource.getRepository(User);
-      const user = await userRepository.findOne({
-        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
-      });
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments (RBAC SSOT) instead of DB user.roles
+      const userId = (authReq.user as any).id || (authReq.user as any).userId;
+      const roles = await roleAssignmentService.getRoleNames(userId);
 
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-      }
-
-      // Phase3-E: dbRoles/activeRole/getActiveRole()/hasMultipleRoles() removed
-      const currentRole = user.roles?.[0] || 'user';
-      const defaultRole = user.roles?.[0] || null;
+      const currentRole = roles[0] || 'user';
+      const defaultRole = roles[0] || null;
 
       res.json({
         success: true,
         data: {
           currentRole,
           defaultRole,
-          availableRoles: user.roles || [],
-          canSwitchRoles: user.roles.length > 1
+          availableRoles: roles,
+          canSwitchRoles: roles.length > 1
         }
       });
     } catch (error) {
@@ -250,20 +245,11 @@ export class UserController {
         });
       }
 
-      const userRepository = AppDataSource.getRepository(User);
-      const user = await userRepository.findOne({
-        where: { id: (authReq.user as any).id || (authReq.user as any).userId }
-      });
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments (RBAC SSOT) instead of DB user.roles
+      const userId = (authReq.user as any).id || (authReq.user as any).userId;
+      const roles = await roleAssignmentService.getRoleNames(userId);
 
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-      }
-
-      // Phase3-E: dbRoles/activeRole removed — check roles array directly
-      const hasRole = user.roles?.includes(currentRole);
+      const hasRole = roles.includes(currentRole);
       if (!hasRole) {
         return res.status(403).json({
           success: false,
@@ -271,17 +257,15 @@ export class UserController {
         });
       }
 
-      // Phase3-E: activeRole assignment removed (no longer a persisted relation)
-
-      const defaultRole = user.roles?.[0] || null;
+      const defaultRole = roles[0] || null;
 
       res.json({
         success: true,
         data: {
           currentRole,
           defaultRole,
-          availableRoles: user.roles || [],
-          canSwitchRoles: user.roles.length > 1
+          availableRoles: roles,
+          canSwitchRoles: roles.length > 1
         },
         message: 'Role switched successfully'
       });

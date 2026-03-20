@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { Template } from '../entities/Template.js';
-import { User } from '../entities/User.js';
-// import { MockDataService } from '../services/MockDataService.js';
 import path from 'path';
 import fs from 'fs/promises';
 import type { AuthRequest } from '../types/auth.js';
+import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
 export class TemplatesController {
   private templateRepository = AppDataSource.getRepository(Template);
-  private userRepository = AppDataSource.getRepository(User);
 
   // GET /api/admin/templates
   async getTemplates(req: Request, res: Response) {
@@ -250,9 +248,10 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || !user.roles?.includes('admin')) {
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        if (!isAdmin) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to edit this template'
@@ -325,9 +324,10 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || !user.roles?.includes('admin')) {
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        if (!isAdmin) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to delete this template'
@@ -367,9 +367,10 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || !user.roles?.includes('admin')) {
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        if (!isAdmin) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to publish this template'
@@ -413,9 +414,10 @@ export class TemplatesController {
       }
 
       // Check if user owns the template or is admin
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: use role_assignments instead of DB user.roles
       if (template.authorId !== userId) {
-        const user = await this.userRepository.findOne({ where: { id: userId } });
-        if (!user || !user.roles?.includes('admin')) {
+        const isAdmin = await roleAssignmentService.hasAnyRole(userId!, ['admin', 'super_admin']);
+        if (!isAdmin) {
           return res.status(403).json({
             success: false,
             message: 'Not authorized to unpublish this template'

@@ -1187,8 +1187,9 @@ export class AuthenticationService {
         }
       }
 
+      // WO-O4O-USER-ROLES-RUNTIME-FIELD-CLEANUP-V1: user.roles is runtime-only (not from DB), use loop role directly
       testAccounts.push({
-        role: this.getRoleLabel(user.roles?.[0] || role),
+        role: this.getRoleLabel(role),
         email: user.email,
         password: testPassword
       });
