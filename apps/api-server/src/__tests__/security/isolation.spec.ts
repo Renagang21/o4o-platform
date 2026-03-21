@@ -15,9 +15,17 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { createMockUser, createMockRequest, createMockResponse, createMockNext } from './test-utils';
+
+// Mock roleAssignmentService before importing middleware
+// WO-O4O-AUTH-MIDDLEWARE-CONSOLIDATION-V1 changed admin check from JWT → DB lookup
+const mockHasAnyRole = jest.fn();
+jest.mock('../../modules/auth/services/role-assignment.service.js', () => ({
+  roleAssignmentService: { hasAnyRole: mockHasAnyRole },
+}));
+
 import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware';
 import type { PharmacyContextRequest } from '../../modules/care/care-pharmacy-context.middleware';
-import { createMockUser, createMockRequest, createMockResponse, createMockNext } from './test-utils';
 
 /**
  * Create a mock DataSource that returns sequential query results.
@@ -43,6 +51,10 @@ function createMockDataSource(
 // ─────────────────────────────────────────────────────
 
 describe('Pharmacy Context Middleware', () => {
+  beforeEach(() => {
+    mockHasAnyRole.mockReset();
+  });
+
   describe('unauthenticated', () => {
     it('returns 401 when no user', async () => {
       const ds = createMockDataSource();
@@ -69,6 +81,7 @@ describe('Pharmacy Context Middleware', () => {
     ];
 
     it.each(adminRoles)('roles %j → pharmacyId = null (global access)', async (roles) => {
+      mockHasAnyRole.mockResolvedValue(true);
       const ds = createMockDataSource();
       const middleware = createPharmacyContextMiddleware(ds);
 
@@ -87,6 +100,10 @@ describe('Pharmacy Context Middleware', () => {
   });
 
   describe('pharmacy resolution (2-step)', () => {
+    beforeEach(() => {
+      mockHasAnyRole.mockResolvedValue(false);
+    });
+
     it('user with active org + enrollment → pharmacyId set', async () => {
       const pharmacyId = 'pharmacy-001';
       // Query 1: org lookup → found + active
@@ -185,6 +202,7 @@ describe('Pharmacy Context Middleware', () => {
 
   describe('DB error handling', () => {
     it('database error → 500', async () => {
+      mockHasAnyRole.mockResolvedValue(false);
       const ds = createMockDataSource([], true); // throws
       const middleware = createPharmacyContextMiddleware(ds);
 
@@ -203,6 +221,7 @@ describe('Pharmacy Context Middleware', () => {
 
   describe('pharmacy isolation: non-admin cannot get global access', () => {
     it('glycopharm:pharmacist → must have specific pharmacyId, not null', async () => {
+      mockHasAnyRole.mockResolvedValue(false);
       const pharmacyId = 'pharmacy-specific';
       const ds = createMockDataSource([
         [{ id: pharmacyId, isActive: true }],
