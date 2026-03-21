@@ -42,6 +42,11 @@ export interface NormalizedProduct {
   supplierSku: string | null;
   imageUrls: string[];
   metadata: Record<string, unknown>;
+  // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1
+  msrp?: number | null;
+  stockQty?: number | null;
+  description?: string | null;
+  hasOptions?: boolean;
 }
 
 export interface CatalogParserExtension {

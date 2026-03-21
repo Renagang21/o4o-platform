@@ -401,11 +401,38 @@ export class CsvImportService {
           continue;
         }
 
-        // Offer upsert via common service (3.5)
+        // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1: Brand 해석 + extra 필드
+        const raw = row.rawJson as Record<string, string>;
+        const brandName = (raw.brand || '').trim();
+        if (brandName && masterId) {
+          try {
+            const brandId = await this.importCommon.resolveBrandId(manager, brandName, masterManufacturer || undefined);
+            if (row.actionType === CsvRowActionType.CREATE_MASTER) {
+              await manager.query(
+                `UPDATE product_masters SET brand_id = $1 WHERE id = $2 AND brand_id IS NULL`,
+                [brandId, masterId],
+              );
+            }
+          } catch (err) {
+            logger.warn(`[CsvImport] Brand resolution failed for row ${row.rowNumber}:`, err);
+          }
+        }
+
+        // Offer upsert via common service (3.5 + ENABLEMENT-V1)
         const distributionType = row.parsedDistributionType || 'PRIVATE';
         const supplyPrice = row.parsedSupplyPrice ?? 0;
+
+        const rawMsrp = (raw.msrp || '').trim();
+        const rawStockQty = (raw.stock_qty || '').trim();
+        const rawDescription = (raw.description || '').trim();
+        const extra = {
+          msrp: rawMsrp ? parseInt(rawMsrp, 10) || null : null,
+          stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
+          description: rawDescription || null,
+        };
+
         await this.importCommon.upsertSupplierOffer(
-          manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!,
+          manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!, extra,
         );
         appliedOffers++;
 

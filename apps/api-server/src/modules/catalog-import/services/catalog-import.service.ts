@@ -93,8 +93,38 @@ export class CatalogImportService {
     const savedJob = await this.jobRepo.save(job);
 
     // 4. Create Rows from NormalizedProduct
-    const rowEntities: CatalogImportRow[] = products.map(p =>
-      this.rowRepo.create({
+    // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1: 옵션 상품 REJECTED + 신규 필드 매핑
+    const rowEntities: CatalogImportRow[] = [];
+    let optionSkippedCount = 0;
+
+    for (const p of products) {
+      if (p.hasOptions) {
+        // 옵션 상품 → REJECTED 처리
+        optionSkippedCount++;
+        rowEntities.push(this.rowRepo.create({
+          jobId: savedJob.id,
+          rowNumber: p.rowNumber,
+          rawJson: p.rawData,
+          parsedBarcode: p.barcode,
+          parsedProductName: p.productName,
+          parsedPrice: p.price,
+          parsedDistributionType: p.distributionType,
+          parsedManufacturerName: p.manufacturerName,
+          parsedBrandName: p.brandName,
+          parsedSupplierSku: p.supplierSku,
+          parsedImageUrls: p.imageUrls.length > 0 ? p.imageUrls : null,
+          parsedMsrp: p.msrp ?? null,
+          parsedStockQty: p.stockQty ?? null,
+          parsedDescription: p.description ?? null,
+          validationStatus: CatalogImportRowStatus.REJECTED,
+          validationError: 'HAS_OPTIONS: 옵션 상품은 현재 미지원',
+          masterId: null,
+          actionType: CatalogImportRowAction.REJECT,
+        }));
+        continue;
+      }
+
+      rowEntities.push(this.rowRepo.create({
         jobId: savedJob.id,
         rowNumber: p.rowNumber,
         rawJson: p.rawData,
@@ -106,16 +136,19 @@ export class CatalogImportService {
         parsedBrandName: p.brandName,
         parsedSupplierSku: p.supplierSku,
         parsedImageUrls: p.imageUrls.length > 0 ? p.imageUrls : null,
+        parsedMsrp: p.msrp ?? null,
+        parsedStockQty: p.stockQty ?? null,
+        parsedDescription: p.description ?? null,
         validationStatus: CatalogImportRowStatus.PENDING,
         validationError: null,
         masterId: null,
         actionType: null,
-      })
-    );
+      }));
+    }
 
     await this.rowRepo.save(rowEntities);
 
-    logger.info(`[CatalogImport] Job ${savedJob.id} created — ${products.length} rows (extension: ${extensionKey})`);
+    logger.info(`[CatalogImport] Job ${savedJob.id} created — total: ${products.length}, options_skipped: ${optionSkippedCount} (extension: ${extensionKey})`);
 
     // Reload with rows
     const fullJob = await this.jobRepo.findOne({
@@ -234,10 +267,37 @@ export class CatalogImportService {
             continue;
           }
 
-          // Upsert offer
+          // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1: Brand 해석
+          if (row.parsedBrandName) {
+            try {
+              const brandId = await this.importCommon.resolveBrandId(
+                manager,
+                row.parsedBrandName,
+                row.parsedManufacturerName || undefined,
+              );
+              // Master에 brand_id 연결 (CREATE_MASTER인 경우만, 기존값 없을 때)
+              if (row.actionType === CatalogImportRowAction.CREATE_MASTER) {
+                await manager.query(
+                  `UPDATE product_masters SET brand_id = $1 WHERE id = $2 AND brand_id IS NULL`,
+                  [brandId, masterId],
+                );
+              }
+            } catch (err) {
+              logger.warn(`[CatalogImport] Brand resolution failed for row ${row.rowNumber}:`, err);
+            }
+          }
+
+          // Upsert offer (with extra fields)
           const distributionType = row.parsedDistributionType || 'PRIVATE';
           const price = row.parsedPrice ?? 0;
-          await this.offerService.upsertOffer(manager, masterId, supplierId, distributionType, price, row.parsedBarcode);
+          await this.offerService.upsertOffer(
+            manager, masterId, supplierId, distributionType, price, row.parsedBarcode,
+            {
+              msrp: row.parsedMsrp,
+              stockQty: row.parsedStockQty,
+              description: row.parsedDescription,
+            },
+          );
           appliedOffers++;
 
           // Collect image URLs for post-transaction processing

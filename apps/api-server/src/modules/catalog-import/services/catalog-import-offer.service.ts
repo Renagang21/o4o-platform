@@ -25,9 +25,10 @@ export class CatalogImportOfferService {
     distributionType: string,
     price: number,
     barcode: string,
+    extra?: { msrp?: number | null; stockQty?: number | null; description?: string | null },
   ): Promise<void> {
     await this.importCommon.upsertSupplierOffer(
-      manager, masterId, supplierId, distributionType, price, barcode,
+      manager, masterId, supplierId, distributionType, price, barcode, extra,
     );
   }
 }

@@ -65,6 +65,16 @@ export class CatalogImportRow {
   @Column({ name: 'parsed_image_urls', type: 'jsonb', nullable: true })
   parsedImageUrls: string[] | null;
 
+  // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1
+  @Column({ name: 'parsed_msrp', type: 'int', nullable: true })
+  parsedMsrp: number | null;
+
+  @Column({ name: 'parsed_stock_qty', type: 'int', nullable: true })
+  parsedStockQty: number | null;
+
+  @Column({ name: 'parsed_description', type: 'text', nullable: true })
+  parsedDescription: string | null;
+
   @Column({
     name: 'validation_status',
     type: 'enum',
