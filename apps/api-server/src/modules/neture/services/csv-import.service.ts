@@ -8,6 +8,10 @@
  *   - image_url 컬럼 지원 (3.2)
  *   - manualData 컬럼 지원: regulatory_name, manufacturer_name, brand (3.3)
  *   - MFDS 실패 + manualData 존재 → Master 수동 생성 (isMfdsVerified=false)
+ * WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
+ *   - marketing_name 컬럼 추가 (primary name for Master)
+ *   - MFDS 의존 제거: marketing_name만 있으면 Master 생성 가능
+ *   - manufacturer_name 필수 해제
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -43,6 +47,8 @@ const ALLOWED_CSV_COLUMNS = [
   'regulatory_name',
   'manufacturer_name',
   'brand',
+  // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
+  'marketing_name',
 ];
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
@@ -212,26 +218,20 @@ export class CsvImportService {
         row.validationStatus = CsvRowValidationStatus.VALID;
         validCount++;
       } else {
-        // Master 미존재 → MFDS 검증
-        const mfdsResult = await verifyProductByBarcode(barcode);
+        // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
+        // Master 미존재 → marketing_name 또는 regulatory_name이 있으면 CREATE_MASTER
+        // MFDS는 Apply 단계에서 advisory-only로 호출 (validation에서 gate 아님)
+        const marketingName = (raw.marketing_name || '').trim();
+        const regulatoryName = (raw.regulatory_name || '').trim();
+        const hasProductName = !!(marketingName || regulatoryName);
 
-        if (mfdsResult.verified && mfdsResult.product) {
-          // MFDS 검증 성공 → 생성 예정
+        if (hasProductName) {
           row.actionType = CsvRowActionType.CREATE_MASTER;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
         } else {
-          // MFDS 미검증 → manualData 확인 (WO-REFINEMENT-V1 3.3)
-          const hasManualData = this.extractManualData(raw) !== null;
-          if (hasManualData) {
-            // manualData 존재 → CREATE_MASTER (수동 생성 경로)
-            row.actionType = CsvRowActionType.CREATE_MASTER;
-            row.validationStatus = CsvRowValidationStatus.VALID;
-            validCount++;
-          } else {
-            this.rejectRow(row, 'MASTER_NOT_FOUND_NO_MANUAL_DATA');
-            rejectedCount++;
-          }
+          this.rejectRow(row, 'MISSING_MARKETING_NAME');
+          rejectedCount++;
         }
       }
 
@@ -340,11 +340,11 @@ export class CsvImportService {
         let masterName = '';
         let masterManufacturer = '';
 
-        // CREATE_MASTER → MFDS 검증 or manualData fallback
+        // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
+        // CREATE_MASTER → CSV 데이터 우선, MFDS advisory-only
         if (row.actionType === CsvRowActionType.CREATE_MASTER) {
           const barcode = row.parsedBarcode!;
           const raw = row.rawJson as Record<string, string>;
-          const mfdsResult = await verifyProductByBarcode(barcode);
 
           const masterRepo = manager.getRepository(ProductMaster);
 
@@ -352,47 +352,33 @@ export class CsvImportService {
           let master = await masterRepo.findOne({ where: { barcode } });
 
           if (!master) {
-            if (mfdsResult.verified && mfdsResult.product) {
-              // MFDS 검증 성공 → MFDS 데이터로 생성
-              master = masterRepo.create({
-                barcode,
-                regulatoryType: mfdsResult.product.regulatoryType,
-                regulatoryName: mfdsResult.product.regulatoryName,
-                marketingName: mfdsResult.product.regulatoryName,
-                manufacturerName: mfdsResult.product.manufacturerName,
-                mfdsPermitNumber: mfdsResult.product.permitNumber || null,
-                mfdsProductId: mfdsResult.product.productId || barcode,
-                isMfdsVerified: true,
-                mfdsSyncedAt: new Date(),
-              });
-              master = await masterRepo.save(master);
-              createdMasters++;
-            } else {
-              // MFDS 실패 → manualData fallback (3.3)
-              const manualData = this.extractManualData(raw);
-              if (manualData) {
-                master = masterRepo.create({
-                  barcode,
-                  regulatoryType: 'UNKNOWN',
-                  regulatoryName: manualData.regulatoryName,
-                  marketingName: manualData.regulatoryName,
-                  manufacturerName: manualData.manufacturerName,
-                  mfdsProductId: barcode,
-                  isMfdsVerified: false,
-                  mfdsSyncedAt: null,
-                });
-                master = await masterRepo.save(master);
-                createdMasters++;
-                logger.info(`[CsvImport] Created manual Master for barcode ${barcode} (MFDS unverified)`);
-              } else {
-                logger.warn(`[CsvImport] MFDS failed and no manualData for barcode ${barcode}, skipping row ${row.rowNumber}`);
-                continue;
-              }
-            }
+            // MFDS advisory 호출 — 실패해도 Master 생성 진행
+            const mfdsResult = await verifyProductByBarcode(barcode);
+            const mfds = mfdsResult.verified && mfdsResult.product ? mfdsResult.product : null;
+
+            // CSV 데이터 추출
+            const csvMarketingName = (raw.marketing_name || '').trim();
+            const csvRegulatoryName = (raw.regulatory_name || '').trim();
+            const csvManufacturerName = (raw.manufacturer_name || '').trim();
+
+            master = masterRepo.create({
+              barcode,
+              marketingName: csvMarketingName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
+              regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvMarketingName || 'UNKNOWN',
+              regulatoryType: mfds?.regulatoryType || 'UNKNOWN',
+              manufacturerName: csvManufacturerName || mfds?.manufacturerName || null,
+              mfdsPermitNumber: mfds?.permitNumber || null,
+              mfdsProductId: mfds?.productId || barcode,
+              isMfdsVerified: !!mfds,
+              mfdsSyncedAt: mfds ? new Date() : null,
+            });
+            master = await masterRepo.save(master);
+            createdMasters++;
+            logger.info(`[CsvImport] Created Master for barcode ${barcode} (mfdsVerified=${!!mfds})`);
           }
 
           masterId = master.id;
-          masterName = master.regulatoryName;
+          masterName = master.marketingName || master.regulatoryName;
           masterManufacturer = master.manufacturerName;
         }
 
@@ -521,20 +507,5 @@ export class CsvImportService {
     row.validationStatus = CsvRowValidationStatus.REJECTED;
     row.validationError = error;
     row.actionType = CsvRowActionType.REJECT;
-  }
-
-  /**
-   * CSV raw row에서 manualData 추출 (3.3)
-   * regulatory_name + manufacturer_name이 모두 존재해야 유효
-   */
-  private extractManualData(
-    raw: Record<string, string>,
-  ): { regulatoryName: string; manufacturerName: string; brand?: string } | null {
-    const regulatoryName = (raw.regulatory_name || '').trim();
-    const manufacturerName = (raw.manufacturer_name || '').trim();
-    if (!regulatoryName || !manufacturerName) return null;
-
-    const brand = (raw.brand || '').trim() || undefined;
-    return { regulatoryName, manufacturerName, brand };
   }
 }
