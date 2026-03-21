@@ -96,8 +96,13 @@ export default function CareDashboardPage() {
       setPriorityPatients(priorityRes?.priorityPatients ?? []);
       setPopulation(populationRes);
       setAlerts(alertsRes);
-    } catch {
-      setError('당뇨인 정보를 불러오는데 실패했습니다.');
+    } catch (err: any) {
+      const code = err?.response?.data?.error?.code;
+      if (code === 'GLYCOPHARM_ORG_NOT_FOUND' || code === 'GLYCOPHARM_NOT_ENROLLED') {
+        // 약국 연동 전 — 에러 배너 없이 빈 상태만 표시
+      } else {
+        setError('당뇨인 정보를 불러오는데 실패했습니다.');
+      }
       setPatients([]);
     } finally {
       setLoading(false);
@@ -496,10 +501,11 @@ export default function CareDashboardPage() {
             </div>
           ) : filteredPatients.length === 0 ? (
             <div className="text-center py-16">
+              <Users className="w-12 h-12 text-slate-200 mx-auto mb-3" />
               <p className="text-slate-500">
                 {debouncedSearch || riskFilter !== 'all'
-                  ? '조건에 맞는 당뇨인가 없습니다.'
-                  : '등록된 당뇨인가 없습니다.'}
+                  ? '조건에 맞는 당뇨인이 없습니다.'
+                  : '연결된 당뇨인이 없습니다.'}
               </p>
             </div>
           ) : (

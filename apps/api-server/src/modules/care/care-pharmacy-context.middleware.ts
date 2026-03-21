@@ -24,7 +24,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
-import { hasAnyServiceRole } from '../../utils/role.utils.js';
+import { roleAssignmentService } from '../auth/services/role-assignment.service.js';
 
 export interface PharmacyContextRequest extends Request {
   user?: any;
@@ -52,10 +52,11 @@ export function createPharmacyContextMiddleware(dataSource: DataSource) {
     }
 
     const userId = user.id;
-    const userRoles: string[] = user.roles || [];
 
     // Admin bypass: global access (pharmacyId = null means no filter)
-    if (hasAnyServiceRole(userRoles, [...ADMIN_ROLES] as any)) {
+    // WO-O4O-AUTH-MIDDLEWARE-CONSOLIDATION-V1: JWT snapshot → DB 실시간 조회 전환
+    const isAdmin = await roleAssignmentService.hasAnyRole(userId, [...ADMIN_ROLES]);
+    if (isAdmin) {
       pcReq.pharmacyId = null;
       next();
       return;
