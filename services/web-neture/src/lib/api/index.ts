@@ -127,6 +127,9 @@ export {
 // Catalog Import API
 export { catalogImportApi } from './catalog.js';
 
+// Supplier CSV Import API (WO-NETURE-CSV-IMPORT-UI-V1)
+export { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, type CsvApplyResult } from './csvImport.js';
+
 // Dashboard API
 export {
   dashboardApi,

@@ -170,6 +170,10 @@ const SupplierLibraryFormPage = lazy(() =>
 const SupplierPartnerCommissionsPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierPartnerCommissionsPage }))
 );
+// WO-NETURE-CSV-IMPORT-UI-V1
+const SupplierCsvImportPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.SupplierCsvImportPage }))
+);
 
 // Signage Content Hub
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
@@ -505,6 +509,8 @@ function App() {
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
+              {/* WO-NETURE-CSV-IMPORT-UI-V1 */}
+              <Route path="/supplier/csv-import" element={<SupplierCsvImportPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 */}
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />

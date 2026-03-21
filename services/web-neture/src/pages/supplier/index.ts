@@ -15,3 +15,4 @@ export { default as SupplierLibraryPage } from './SupplierLibraryPage';
 export { default as SupplierLibraryFormPage } from './SupplierLibraryFormPage';
 export { default as SupplierPartnerCommissionsPage } from './SupplierPartnerCommissionsPage';
 export { default as SupplierTrialCreatePage } from './SupplierTrialCreatePage';
+export { default as SupplierCsvImportPage } from './SupplierCsvImportPage';
