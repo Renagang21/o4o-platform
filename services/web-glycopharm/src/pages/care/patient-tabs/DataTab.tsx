@@ -185,29 +185,67 @@ export default function DataTab() {
                   <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">항목</th>
                   <th className="text-right py-3 px-4 text-xs font-medium text-slate-500 uppercase">값</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">단위</th>
+                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">부가 정보</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">입력 방식</th>
                 </tr>
               </thead>
               <tbody>
-                {readings.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
-                      {new Date(r.measuredAt).toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4 text-slate-700 font-medium whitespace-nowrap">
-                      {METRIC_LABELS[r.metricType] || r.metricType}
-                    </td>
-                    <td className="py-3 px-4 text-right text-slate-800 font-bold tabular-nums">
-                      {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(1) : '-'}
-                    </td>
-                    <td className="py-3 px-4 text-slate-500">{r.unit}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
-                        {r.sourceType === 'manual' ? '수동 입력' : r.sourceType}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {readings.map((r) => {
+                  const meta = r.metadata as Record<string, unknown> | undefined;
+                  const mealTiming = (meta?.mealTiming as string) || '';
+                  const medication = meta?.medication as { name?: string; dose?: string } | undefined;
+                  const exercise = meta?.exercise as { type?: string; duration?: number } | undefined;
+                  const symptoms = Array.isArray(meta?.symptoms) ? (meta.symptoms as string[]) : undefined;
+                  const MEAL_LABELS: Record<string, string> = {
+                    fasting: '공복', before_meal: '식전', after_meal: '식후', bedtime: '취침 전', random: '기타',
+                  };
+                  return (
+                    <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
+                        {new Date(r.measuredAt).toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4 text-slate-700 font-medium whitespace-nowrap">
+                        {METRIC_LABELS[r.metricType] || r.metricType}
+                      </td>
+                      <td className="py-3 px-4 text-right text-slate-800 font-bold tabular-nums">
+                        {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(1) : '-'}
+                      </td>
+                      <td className="py-3 px-4 text-slate-500">{r.unit}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-wrap gap-1">
+                          {mealTiming && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-600">
+                              {MEAL_LABELS[mealTiming] || mealTiming}
+                            </span>
+                          )}
+                          {medication?.name && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-600">
+                              투약 {medication.name}{medication.dose ? ` ${medication.dose}` : ''}
+                            </span>
+                          )}
+                          {exercise?.type && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-50 text-green-600">
+                              운동 {exercise.type}{exercise.duration ? ` ${exercise.duration}분` : ''}
+                            </span>
+                          )}
+                          {symptoms && symptoms.length > 0 && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700">
+                              증상 {symptoms.join(', ')}
+                            </span>
+                          )}
+                          {!mealTiming && !medication?.name && !exercise?.type && !(symptoms && symptoms.length > 0) && (
+                            <span className="text-xs text-slate-300">-</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
+                          {r.sourceType === 'manual' ? '수동 입력' : r.sourceType}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

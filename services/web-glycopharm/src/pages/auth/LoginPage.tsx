@@ -101,6 +101,11 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-800">로그인</h1>
           <p className="text-slate-500 mt-2">{subtitle}</p>
+          {loginType === 'patient' && (
+            <p className="text-xs text-slate-400 mt-2">
+              당뇨인 전용 서비스 <a href={import.meta.env.VITE_GLUCOSEVIEW_URL || 'https://glucoseview.co.kr'} className="text-blue-500 hover:underline">GlucoseView</a>도 이용 가능합니다
+            </p>
+          )}
         </div>
 
         {/* Login Form */}

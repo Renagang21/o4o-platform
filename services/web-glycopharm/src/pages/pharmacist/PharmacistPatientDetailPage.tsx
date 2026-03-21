@@ -294,15 +294,20 @@ export default function PharmacistPatientDetailPage() {
                 <div className="space-y-1.5">
                   {recentReadings.map((r) => {
                     const val = r.valueNumeric != null ? Number(r.valueNumeric) : null;
-                    const mealTiming = (r.metadata as Record<string, string>)?.mealTiming || '';
+                    const meta = r.metadata as Record<string, unknown>;
+                    const mealTiming = (meta?.mealTiming as string) || '';
                     const isOutOfRange = val != null && (val < 70 || val > 180);
+                    const medication = meta?.medication as { name?: string; dose?: string } | undefined;
+                    const exercise = meta?.exercise as { type?: string; duration?: number; intensity?: string } | undefined;
+                    const symptoms = Array.isArray(meta?.symptoms) ? (meta.symptoms as string[]) : undefined;
+                    const hasExtra = !!(medication?.name || exercise?.type || (symptoms && symptoms.length > 0));
 
                     return (
                       <div
                         key={r.id}
-                        className="bg-white rounded-xl border border-slate-200 px-4 py-3 flex items-center justify-between"
+                        className="bg-white rounded-xl border border-slate-200 px-4 py-3 flex items-start justify-between gap-3"
                       >
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-sm text-slate-600">
                             {new Date(r.measuredAt).toLocaleString('ko-KR', {
                               month: 'short',
@@ -314,8 +319,27 @@ export default function PharmacistPatientDetailPage() {
                           <p className="text-xs text-slate-400 mt-0.5">
                             {MEAL_LABELS[mealTiming] || mealTiming || '-'}
                           </p>
+                          {hasExtra && (
+                            <div className="flex flex-wrap gap-1 mt-1.5">
+                              {medication?.name && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-600">
+                                  투약 {medication.name}{medication.dose ? ` ${medication.dose}` : ''}
+                                </span>
+                              )}
+                              {exercise?.type && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-50 text-green-600">
+                                  운동 {exercise.type}{exercise.duration ? ` ${exercise.duration}분` : ''}
+                                </span>
+                              )}
+                              {symptoms && symptoms.length > 0 && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700">
+                                  증상 {symptoms.join(', ')}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <p className={`text-lg font-bold tabular-nums ${isOutOfRange ? 'text-red-600' : 'text-slate-800'}`}>
                             {val != null ? val.toFixed(0) : '-'}
                           </p>

@@ -130,7 +130,7 @@ export default function PatientMainPage() {
           className="w-full py-4 bg-teal-600 text-white text-lg font-semibold rounded-xl hover:bg-teal-700 transition-colors flex items-center justify-center gap-2 mb-6 shadow-sm"
         >
           <Plus className="w-5 h-5" />
-          혈당 기록하기
+          데이터 기록하기
         </button>
 
         {loading ? (
@@ -232,13 +232,17 @@ export default function PatientMainPage() {
               {readings.length > 0 ? (
                 <div className="space-y-2">
                   {readings.slice(0, 5).map((r) => {
-                    const meta = r.metadata as Record<string, string>;
+                    const meta = r.metadata as Record<string, unknown>;
+                    const medication = meta?.medication as { name?: string; dose?: string } | undefined;
+                    const exercise = meta?.exercise as { type?: string; duration?: number } | undefined;
+                    const symptoms = Array.isArray(meta?.symptoms) ? (meta.symptoms as string[]) : undefined;
+                    const hasExtra = !!(medication?.name || exercise?.type || (symptoms && symptoms.length > 0));
                     return (
                       <div
                         key={r.id}
-                        className="flex items-center justify-between py-2 border-b border-slate-100 last:border-b-0"
+                        className="flex items-start justify-between py-2 border-b border-slate-100 last:border-b-0 gap-3"
                       >
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs text-slate-400">
                             {new Date(r.measuredAt).toLocaleDateString('ko-KR', {
                               month: 'short',
@@ -248,10 +252,29 @@ export default function PatientMainPage() {
                             })}
                           </p>
                           <p className="text-xs text-slate-300">
-                            {MEAL_TIMING_LABELS[meta?.mealTiming] || ''}
+                            {MEAL_TIMING_LABELS[(meta?.mealTiming as string)] || ''}
                           </p>
+                          {hasExtra && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {medication?.name && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-600">
+                                  투약 {medication.name}
+                                </span>
+                              )}
+                              {exercise?.type && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-50 text-green-600">
+                                  운동 {exercise.type}
+                                </span>
+                              )}
+                              {symptoms && symptoms.length > 0 && (
+                                <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700">
+                                  증상 {symptoms.length}건
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <p className="text-lg font-bold text-slate-800 tabular-nums">
+                        <p className="text-lg font-bold text-slate-800 tabular-nums flex-shrink-0">
                           {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(0) : '-'}
                           <span className="text-xs font-normal text-slate-400 ml-0.5">mg/dL</span>
                         </p>

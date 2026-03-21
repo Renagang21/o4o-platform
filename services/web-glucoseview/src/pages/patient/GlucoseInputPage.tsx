@@ -4,7 +4,8 @@
  * WO-GLYCOPHARM-DATA-INPUT-EXPANSION-V1
  *
  * 당뇨인 자가입력: 혈당 값 + 측정 구분 + 측정 시간
- * 추가 기록: 투약, 운동, 증상 (접이식 섹션)
+ * 추가 기록: 투약, 운동, 증상 (기본 펼침)
+ * WO-O4O-PATIENT-INPUT-UX-FIX-V1: 접이식 기본 펼침 + 가시성 강화
  * 하단에 최근 기록 표시.
  */
 
@@ -80,20 +81,20 @@ export default function GlucoseInputPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
-  // Form state — Medication
-  const [medOpen, setMedOpen] = useState(false);
+  // Form state — Medication (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
+  const [medOpen, setMedOpen] = useState(true);
   const [medName, setMedName] = useState('');
   const [medDose, setMedDose] = useState('');
   const [medTakenAt, setMedTakenAt] = useState('');
 
-  // Form state — Exercise
-  const [exOpen, setExOpen] = useState(false);
+  // Form state — Exercise (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
+  const [exOpen, setExOpen] = useState(true);
   const [exType, setExType] = useState('walking');
   const [exDuration, setExDuration] = useState('');
   const [exIntensity, setExIntensity] = useState('moderate');
 
-  // Form state — Symptoms
-  const [symOpen, setSymOpen] = useState(false);
+  // Form state — Symptoms (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
+  const [symOpen, setSymOpen] = useState(true);
   const [symptoms, setSymptoms] = useState<string[]>([]);
 
   // Recent readings
@@ -219,7 +220,10 @@ export default function GlucoseInputPage() {
           <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
             <ClipboardEdit className="w-5 h-5 text-teal-600" />
           </div>
-          <h1 className="text-xl font-bold text-slate-800">혈당 기록</h1>
+          <div>
+            <h1 className="text-xl font-bold text-slate-800">데이터 입력 및 조회</h1>
+            <p className="text-xs text-slate-400 mt-0.5">혈당과 함께 투약, 운동, 증상을 기록할 수 있습니다</p>
+          </div>
         </div>
 
         {/* Error */}
@@ -314,9 +318,9 @@ export default function GlucoseInputPage() {
             <span className="flex items-center gap-2 text-sm font-semibold text-violet-600">
               <Pill className="w-4 h-4" />
               투약 기록
-              {medOpen && medName.trim() && (
-                <span className="text-xs font-normal text-slate-400">({medName.trim()})</span>
-              )}
+              <span className="text-xs font-normal text-slate-400">
+                {medOpen && medName.trim() ? `(${medName.trim()})` : '(선택)'}
+              </span>
             </span>
             {medOpen ? (
               <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -371,9 +375,9 @@ export default function GlucoseInputPage() {
             <span className="flex items-center gap-2 text-sm font-semibold text-emerald-600">
               <Footprints className="w-4 h-4" />
               운동 기록
-              {exOpen && exDuration && Number(exDuration) > 0 && (
-                <span className="text-xs font-normal text-slate-400">({exDuration}분)</span>
-              )}
+              <span className="text-xs font-normal text-slate-400">
+                {exOpen && exDuration && Number(exDuration) > 0 ? `(${exDuration}분)` : '(선택)'}
+              </span>
             </span>
             {exOpen ? (
               <ChevronUp className="w-4 h-4 text-slate-400" />
@@ -443,9 +447,9 @@ export default function GlucoseInputPage() {
             <span className="flex items-center gap-2 text-sm font-semibold text-amber-600">
               <AlertTriangle className="w-4 h-4" />
               증상 기록
-              {symOpen && symptoms.length > 0 && (
-                <span className="text-xs font-normal text-slate-400">({symptoms.length}개)</span>
-              )}
+              <span className="text-xs font-normal text-slate-400">
+                {symOpen && symptoms.length > 0 ? `(${symptoms.length}개)` : '(선택)'}
+              </span>
             </span>
             {symOpen ? (
               <ChevronUp className="w-4 h-4 text-slate-400" />

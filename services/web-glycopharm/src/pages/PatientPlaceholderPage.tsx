@@ -41,7 +41,7 @@ const MENU_ITEMS = [
   },
   {
     label: '데이터 입력 및 조회',
-    description: '혈당·식사·운동 데이터 기록',
+    description: '혈당·투약·운동·증상 데이터 기록',
     path: '/patient/glucose-input',
     icon: ClipboardEdit,
     color: 'text-blue-600',

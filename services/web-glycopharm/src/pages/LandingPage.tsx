@@ -24,22 +24,28 @@ export default function LandingPage() {
           <Activity className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-slate-800">GlycoPharm</h1>
-        <p className="text-sm text-slate-500 mt-1">혈당관리 전문 플랫폼</p>
+        <p className="text-sm text-slate-500 mt-1">약국·약사를 위한 혈당관리 전문 플랫폼</p>
       </div>
 
       <div className="w-full max-w-sm space-y-4">
-        <button
-          onClick={() => navigate('/patient')}
-          className="w-full py-4 text-lg font-medium text-slate-800 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors border border-slate-200"
-        >
-          당뇨인용 시스템
-        </button>
-        <button
-          onClick={() => navigate('/login?type=pharmacy')}
-          className="w-full py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
-        >
-          약국용 시스템
-        </button>
+        <div>
+          <button
+            onClick={() => navigate('/patient')}
+            className="w-full py-4 text-lg font-medium text-slate-800 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors border border-slate-200"
+          >
+            당뇨인용 시스템
+          </button>
+          <p className="text-xs text-slate-400 text-center mt-1.5">혈당·투약·운동·증상 기록 및 약사 코칭 확인</p>
+        </div>
+        <div>
+          <button
+            onClick={() => navigate('/login?type=pharmacy')}
+            className="w-full py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            약국용 시스템
+          </button>
+          <p className="text-xs text-slate-400 text-center mt-1.5">당뇨인 데이터 열람·분석 및 코칭 작성</p>
+        </div>
 
         <div className="pt-2">
           <div className="border-t border-slate-200 mb-4" />

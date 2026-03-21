@@ -38,6 +38,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-slate-900">GlucoseView</h1>
           <p className="text-slate-500 mt-2">당뇨인 전용 혈당 관리 서비스</p>
+          <p className="text-xs text-slate-400 mt-1">약사/약국 종사자는 <a href="https://glycopharm.co.kr" className="text-teal-500 hover:underline">GlycoPharm</a>을 이용해 주세요</p>
         </div>
 
         {/* Login Form */}
