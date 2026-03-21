@@ -12,6 +12,9 @@
  *   - marketing_name 컬럼 추가 (primary name for Master)
  *   - MFDS 의존 제거: marketing_name만 있으면 Master 생성 가능
  *   - manufacturer_name 필수 해제
+ * WO-NETURE-CSV-TEMPLATE-V1
+ *   - supply_price 필수화
+ *   - consumer_short_description 컬럼 추가 (Plain text only)
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -49,6 +52,8 @@ const ALLOWED_CSV_COLUMNS = [
   'brand',
   // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
   'marketing_name',
+  // WO-NETURE-CSV-TEMPLATE-V1
+  'consumer_short_description',
 ];
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
@@ -180,18 +185,22 @@ export class CsvImportService {
       }
       seenBarcodes.add(barcode);
 
-      // 3d. supply_price 검증
+      // 3d. supply_price 검증 (WO-NETURE-CSV-TEMPLATE-V1: 필수)
       const rawPrice = (raw.supply_price || '').trim();
-      if (rawPrice) {
-        const price = parseInt(rawPrice, 10);
-        if (isNaN(price) || price < 0) {
-          this.rejectRow(row, 'INVALID_PRICE');
-          rejectedCount++;
-          rowEntities.push(row);
-          continue;
-        }
-        row.parsedSupplyPrice = price;
+      if (!rawPrice) {
+        this.rejectRow(row, 'MISSING_SUPPLY_PRICE');
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
       }
+      const price = parseInt(rawPrice, 10);
+      if (isNaN(price) || price < 0) {
+        this.rejectRow(row, 'INVALID_PRICE');
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
+      }
+      row.parsedSupplyPrice = price;
 
       // 3e. distribution_type 검증
       const rawDist = (raw.distribution_type || '').trim().toUpperCase();
@@ -410,7 +419,8 @@ export class CsvImportService {
 
         const rawMsrp = (raw.msrp || '').trim();
         const rawStockQty = (raw.stock_qty || '').trim();
-        const rawDescription = (raw.description || '').trim();
+        // WO-NETURE-CSV-TEMPLATE-V1: consumer_short_description 우선, description 하위호환
+        const rawDescription = (raw.consumer_short_description || raw.description || '').trim();
         const extra = {
           msrp: rawMsrp ? parseInt(rawMsrp, 10) || null : null,
           stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
