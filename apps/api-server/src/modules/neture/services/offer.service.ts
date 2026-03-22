@@ -351,19 +351,19 @@ export class NetureOfferService {
       };
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
-      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      businessShortDescription?: string | null;
-      businessDetailDescription?: string | null;
     }
   ) {
     try {
       if (!data.barcode) {
         return { success: false, error: 'MISSING_BARCODE' };
+      }
+
+      // PUBLIC requires consumer description
+      if (data.distributionType === OfferDistributionType.PUBLIC && !data.consumerShortDescription?.trim()) {
+        return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
       }
 
       // masterId 직접 주입 차단
@@ -414,14 +414,13 @@ export class NetureOfferService {
         approvalStatus: OfferApprovalStatus.PENDING,
         allowedSellerIds: [],
         priceGeneral: data.priceGeneral ?? 0,
-        priceGold: data.priceGold ?? null,
-        pricePlatinum: data.pricePlatinum ?? null,
+        priceGold: null,
+        pricePlatinum: null,
         consumerReferencePrice: data.consumerReferencePrice ?? null,
-        // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
         consumerShortDescription: data.consumerShortDescription ?? null,
         consumerDetailDescription: data.consumerDetailDescription ?? null,
-        businessShortDescription: data.businessShortDescription ?? null,
-        businessDetailDescription: data.businessDetailDescription ?? null,
+        businessShortDescription: null,
+        businessDetailDescription: null,
       });
 
       const savedOffer = await this.offerRepo.save(offer);
@@ -463,14 +462,9 @@ export class NetureOfferService {
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
-      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      businessShortDescription?: string | null;
-      businessDetailDescription?: string | null;
     }
   ) {
     try {
@@ -497,28 +491,15 @@ export class NetureOfferService {
       if (updates.priceGeneral !== undefined) {
         offer.priceGeneral = updates.priceGeneral;
       }
-      if (updates.priceGold !== undefined) {
-        offer.priceGold = updates.priceGold;
-      }
-      if (updates.pricePlatinum !== undefined) {
-        offer.pricePlatinum = updates.pricePlatinum;
-      }
       if (updates.consumerReferencePrice !== undefined) {
         offer.consumerReferencePrice = updates.consumerReferencePrice;
       }
 
-      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
       if (updates.consumerShortDescription !== undefined) {
         offer.consumerShortDescription = updates.consumerShortDescription;
       }
       if (updates.consumerDetailDescription !== undefined) {
         offer.consumerDetailDescription = updates.consumerDetailDescription;
-      }
-      if (updates.businessShortDescription !== undefined) {
-        offer.businessShortDescription = updates.businessShortDescription;
-      }
-      if (updates.businessDetailDescription !== undefined) {
-        offer.businessDetailDescription = updates.businessDetailDescription;
       }
 
       // Validation: PRIVATE requires at least one seller ID

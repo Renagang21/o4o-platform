@@ -17,12 +17,6 @@ export default function CatalogImportDashboardPage() {
       icon: '📄',
     },
     {
-      title: 'Firstmall Import',
-      description: 'Firstmall 관리자 Excel 파일 Import',
-      path: '/workspace/admin/catalog-import/firstmall',
-      icon: '📊',
-    },
-    {
       title: 'Import History',
       description: '전체 Import 작업 이력 조회',
       path: '/workspace/admin/catalog-import/history',

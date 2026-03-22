@@ -4,7 +4,7 @@
  * WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1
  */
 
-export type CatalogImportExtensionKey = 'csv' | 'firstmall';
+export type CatalogImportExtensionKey = 'csv';
 
 export enum CatalogImportJobStatus {
   UPLOADED = 'UPLOADED',

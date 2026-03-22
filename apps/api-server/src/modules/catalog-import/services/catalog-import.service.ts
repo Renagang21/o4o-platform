@@ -28,12 +28,10 @@ import { CatalogImportOfferService } from './catalog-import-offer.service.js';
 import { ProductImportCommonService } from '../../neture/services/product-import-common.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import { csvParserExtension } from '../extensions/csv/csv-parser.extension.js';
-import { firstmallParserExtension } from '../extensions/firstmall/firstmall-parser.extension.js';
 import logger from '../../../utils/logger.js';
 
 const EXTENSION_REGISTRY: Record<CatalogImportExtensionKey, CatalogParserExtension> = {
   csv: csvParserExtension,
-  firstmall: firstmallParserExtension,
 };
 
 export class CatalogImportService {
