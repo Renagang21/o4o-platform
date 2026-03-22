@@ -12,6 +12,7 @@ import { createRequireActiveSupplier, createRequireLinkedSupplier } from '../mid
 import type { SupplierRequest, AuthenticatedRequest } from '../middleware/neture-identity.middleware.js';
 import { NetureService } from '../neture.service.js';
 import { CsvImportService } from '../services/csv-import.service.js';
+import { generateProductTemplate } from '../services/xlsx-template.service.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import logger from '../../../utils/logger.js';
 
@@ -155,6 +156,19 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier request detail:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier request detail' });
+    }
+  });
+
+  // GET /supplier/products/template — XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1)
+  router.get('/products/template', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
+    try {
+      const buffer = await generateProductTemplate();
+      res.setHeader('Content-Disposition', 'attachment; filename=neture_product_template.xlsx');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
+    } catch (error) {
+      logger.error('[Neture API] Error generating product template:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to generate template' });
     }
   });
 

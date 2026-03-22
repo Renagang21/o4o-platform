@@ -43,6 +43,19 @@ export interface CsvApplyResult {
 }
 
 export const csvImportApi = {
+  /** XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1) */
+  async downloadTemplate(): Promise<void> {
+    const response = await api.get('/neture/supplier/products/template', {
+      responseType: 'blob',
+    });
+    const url = URL.createObjectURL(response.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'neture_product_template.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
   async uploadCsv(file: File): Promise<{ success: boolean; error?: string; data?: CsvBatch }> {
     try {
       const formData = new FormData();

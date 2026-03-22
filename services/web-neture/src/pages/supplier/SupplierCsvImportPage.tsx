@@ -13,44 +13,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { csvImportApi, type CsvBatch, type CsvBatchDetail } from '../../lib/api/csvImport';
 
-// ─── CSV Template ───────────────────────────────────────────────────────────
-const CSV_TEMPLATE_HEADER = [
-  'barcode',
-  'marketing_name',
-  'supply_price',
-  'distribution_type',
-  'msrp',
-  'stock_qty',
-  'brand',
-  'manufacturer_name',
-  'image_url',
-  'consumer_short_description',
-].join(',');
-
-const CSV_TEMPLATE_EXAMPLE = [
-  '8801234567893',
-  '건강보조식품A',
-  '15000',
-  'PRIVATE',
-  '25000',
-  '100',
-  '헬스브랜드',
-  '(주)헬스제조',
-  '',
-  '건강에 좋은 보조식품입니다',
-].join(',');
-
-const CSV_TEMPLATE = `${CSV_TEMPLATE_HEADER}\n${CSV_TEMPLATE_EXAMPLE}`;
-
+// ─── XLSX Template Download ──────────────────────────────────────────────────
 function downloadTemplate() {
-  const BOM = '\uFEFF';
-  const blob = new Blob([BOM + CSV_TEMPLATE], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'neture-csv-template.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  csvImportApi.downloadTemplate().catch((err) => {
+    console.error('[Template] Download failed:', err);
+  });
 }
 
 // ─── Status Badge ───────────────────────────────────────────────────────────
@@ -187,9 +154,9 @@ export default function SupplierCsvImportPage() {
 
       {/* ═══ Section 1: Template Download ═══ */}
       <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">CSV 양식 다운로드</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">템플릿 다운로드</h2>
         <p className="text-sm text-gray-500 mb-3">
-          아래 양식을 다운로드하여 상품 정보를 입력한 후 업로드하세요.
+          아래 XLSX 양식을 다운로드하여 상품 정보를 입력한 후, CSV로 저장하여 업로드하세요.
         </p>
         <div className="mb-3 text-xs text-gray-400 space-y-1">
           <p><strong>필수 컬럼:</strong> barcode, marketing_name, supply_price</p>
@@ -199,7 +166,7 @@ export default function SupplierCsvImportPage() {
           onClick={downloadTemplate}
           className="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-900"
         >
-          CSV 양식 다운로드
+          XLSX 템플릿 다운로드
         </button>
       </section>
 
