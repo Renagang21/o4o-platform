@@ -254,7 +254,7 @@ function verifyAdminSecret(req: Request, res: Response): boolean {
   const secret = req.headers['x-admin-secret'] as string;
   if (secret && jwtSecret && secret === jwtSecret) return true;
 
-  // Option 2: Bearer token with platform:admin role (decode JWT payload without external import)
+  // Option 2: Bearer token with platform:admin role (decode JWT payload without library)
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
     try {
