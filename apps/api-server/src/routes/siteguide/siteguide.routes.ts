@@ -22,7 +22,7 @@ import {
   SiteGuideBusinessStatus,
   SiteGuideApiKeyStatus,
 } from './entities/index.js';
-import { callGemini } from '../../utils/gemini.helper.js';
+import { execute } from '@o4o/ai-core';
 import logger from '../../utils/logger.js';
 
 // Gemini API Key (환경변수에서 가져옴)
@@ -248,16 +248,17 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
         });
       }
 
-      // 4-5. AI 호출 (WO-O4O-AI-LLM-PATH-CONSOLIDATION)
+      // 4-5. AI 호출 (WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1)
       const { systemPrompt, userQuestion } = buildSiteGuidePrompts(body.pageContext, body.question);
-      const response = await callGemini(GEMINI_API_KEY, {
+      const aiResult = await execute({
         systemPrompt,
         userPrompt: userQuestion,
-        maxTokens: 500,
-        temperature: 0.7,
+        responseMode: 'text',
+        config: { apiKey: GEMINI_API_KEY, model: 'gemini-3.0-flash', temperature: 0.7, maxTokens: 500 },
+        meta: { service: 'siteguide', callerName: 'SiteGuideQuery' },
       });
 
-      if (!response.text) {
+      if (!aiResult.content) {
         logger.error('[SiteGuide] AI generation failed: empty response');
 
         await service.recordUsage(
@@ -292,7 +293,7 @@ export function createSiteGuideRoutes(dataSource: DataSource): Router {
       const newRemaining = await service.getRemainingUsage(businessId);
       return res.json({
         success: true,
-        answer: response.text,
+        answer: aiResult.content,
         remaining: newRemaining,
       });
     } catch (error) {

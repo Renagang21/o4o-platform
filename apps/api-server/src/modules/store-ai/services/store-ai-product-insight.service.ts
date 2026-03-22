@@ -1,10 +1,9 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
+import { execute } from '@o4o/ai-core';
 import { STORE_PRODUCT_INSIGHT_SYSTEM } from '@o4o/ai-prompts/store';
 import { StoreAiProductInsight } from '../entities/store-ai-product-insight.entity.js';
-import { AiModelSetting } from '../../care/entities/ai-model-setting.entity.js';
 import type { StoreAiProductSnapshot } from '../entities/store-ai-product-snapshot.entity.js';
+import { buildConfigResolver } from '../../../utils/ai-config-resolver.js';
 
 /**
  * StoreAiProductInsightService — WO-O4O-PRODUCT-STORE-AI-INSIGHT-V1
@@ -15,11 +14,8 @@ import type { StoreAiProductSnapshot } from '../entities/store-ai-product-snapsh
  * - LLM = 설명 (가격 조정/상품 삭제 등 자동 실행 금지)
  * - fire-and-forget: 실패해도 매장 데이터에 영향 없음
  * - org+date 당 1회 호출 (dedup)
- * - 1회 retry (2초 delay) — Store AI 패턴 복제
+ * - execute() 내부 retry (2회, 2초 delay)
  */
-
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 interface LlmResponse {
   summary: string;
@@ -30,13 +26,11 @@ interface LlmResponse {
 
 export class StoreAiProductInsightService {
   private insightRepo: Repository<StoreAiProductInsight>;
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
 
   constructor(private dataSource: DataSource) {
     this.insightRepo = dataSource.getRepository(StoreAiProductInsight);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'store');
   }
 
   /**
@@ -62,70 +56,38 @@ export class StoreAiProductInsightService {
         return;
       }
 
-      const config = await this.buildProviderConfig();
+      const userPrompt = this.buildUserPrompt(snapshots);
 
-      if (!config.apiKey) {
-        console.warn('[StoreAiProductInsight] No API key configured, skipping insight generation');
+      const result = await execute({
+        systemPrompt: STORE_PRODUCT_INSIGHT_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'store', callerName: 'StoreAiProductInsightService' },
+      });
+      const parsed = JSON.parse(result.content) as LlmResponse;
+
+      if (!parsed.summary) {
+        console.error('[StoreAiProductInsight] Invalid LLM response: missing summary', {
+          organizationId,
+          content: result.content.slice(0, 200),
+        });
         return;
       }
 
-      const userPrompt = this.buildUserPrompt(snapshots);
-
-      // Retry loop
-      let lastError: unknown = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const response = await this.gemini.complete(STORE_PRODUCT_INSIGHT_SYSTEM, userPrompt, config);
-          const parsed = JSON.parse(response.content) as LlmResponse;
-
-          if (!parsed.summary) {
-            console.error('[StoreAiProductInsight] Invalid LLM response: missing summary', {
-              organizationId,
-              content: response.content.slice(0, 200),
-            });
-            return;
-          }
-
-          const insight = this.insightRepo.create({
-            organizationId,
-            snapshotDate: today,
-            summary: parsed.summary,
-            productHighlights: parsed.productHighlights || [],
-            issues: parsed.issues || [],
-            actions: parsed.actions || [],
-            model: response.model,
-            promptTokens: response.promptTokens,
-            completionTokens: response.completionTokens,
-          });
-          await this.insightRepo.save(insight);
-          return; // success
-        } catch (err) {
-          lastError = err;
-          const msg = err instanceof Error ? err.message : String(err);
-
-          // Non-retryable
-          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-            console.error('[StoreAiProductInsight] non-retryable error:', { organizationId, error: msg });
-            return;
-          }
-
-          // Retryable: timeout, 5xx, network, JSON parse
-          if (attempt < MAX_ATTEMPTS) {
-            console.warn(`[StoreAiProductInsight] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-          }
-        }
-      }
-
-      // All attempts exhausted
-      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.error('[StoreAiProductInsight] generation failed after all attempts:', {
+      const insight = this.insightRepo.create({
         organizationId,
-        attempts: MAX_ATTEMPTS,
-        lastError: errMsg,
+        snapshotDate: today,
+        summary: parsed.summary,
+        productHighlights: parsed.productHighlights || [],
+        issues: parsed.issues || [],
+        actions: parsed.actions || [],
+        model: result.model,
+        promptTokens: result.promptTokens,
+        completionTokens: result.completionTokens,
       });
+      await this.insightRepo.save(insight);
     } catch (error) {
-      // Outer guard
+      // Quiet fail: LLM 실패가 매장 데이터에 영향 없음
       console.error('[StoreAiProductInsight] unexpected error:', error);
     }
   }
@@ -171,30 +133,5 @@ export class StoreAiProductInsightService {
     }
 
     return parts.join('\n');
-  }
-
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const setting = await this.settingRepo.findOne({ where: { service: 'store' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
-
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }

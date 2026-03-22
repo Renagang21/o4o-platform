@@ -1,10 +1,9 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
+import { execute } from '@o4o/ai-core';
 import { PRODUCT_TAGGING_SYSTEM } from '@o4o/ai-prompts/store';
 import { ProductAiTag } from '../entities/product-ai-tag.entity.js';
-import { AiModelSetting } from '../../care/entities/ai-model-setting.entity.js';
 import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
+import { buildConfigResolver } from '../../../utils/ai-config-resolver.js';
 
 /**
  * ProductAiTaggingService — WO-O4O-PRODUCT-AI-TAGGING-V1
@@ -15,11 +14,8 @@ import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
  * - LLM = 태그 추천 (자동 상품 변경 금지)
  * - fire-and-forget: 실패해도 상품 데이터에 영향 없음
  * - product_ai_tags 저장 + product_masters.tags 동기화
- * - 1회 retry (2초 delay) — Store AI 패턴
+ * - execute() 내부 retry (2회, 2초 delay)
  */
-
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 interface LlmTagResponse {
   tags: Array<{ tag: string; confidence: number }>;
@@ -38,14 +34,12 @@ export interface ProductTagInput {
 export class ProductAiTaggingService {
   private tagRepo: Repository<ProductAiTag>;
   private masterRepo: Repository<ProductMaster>;
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
 
   constructor(private dataSource: DataSource) {
     this.tagRepo = dataSource.getRepository(ProductAiTag);
     this.masterRepo = dataSource.getRepository(ProductMaster);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'store', { maxTokens: 1024 });
   }
 
   /**
@@ -53,74 +47,43 @@ export class ProductAiTaggingService {
    */
   async generateTags(product: ProductTagInput): Promise<void> {
     try {
-      const config = await this.buildProviderConfig();
+      const userPrompt = this.buildUserPrompt(product);
 
-      if (!config.apiKey) {
-        console.warn('[ProductAiTag] No API key configured, skipping tag generation');
+      const result = await execute({
+        systemPrompt: PRODUCT_TAGGING_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'store', callerName: 'ProductAiTaggingService' },
+      });
+      const parsed = JSON.parse(result.content) as LlmTagResponse;
+
+      if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
+        console.error('[ProductAiTag] Invalid LLM response: missing tags', {
+          productId: product.id,
+          content: result.content.slice(0, 200),
+        });
         return;
       }
 
-      const userPrompt = this.buildUserPrompt(product);
+      // 기존 AI 태그 삭제
+      await this.tagRepo.delete({ productId: product.id, source: 'ai' });
 
-      // Retry loop
-      let lastError: unknown = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const response = await this.gemini.complete(PRODUCT_TAGGING_SYSTEM, userPrompt, config);
-          const parsed = JSON.parse(response.content) as LlmTagResponse;
+      // 새 AI 태그 저장
+      const newTags = parsed.tags.slice(0, 8).map((t) =>
+        this.tagRepo.create({
+          productId: product.id,
+          tag: t.tag,
+          confidence: Math.min(1, Math.max(0, t.confidence)),
+          source: 'ai',
+          model: result.model,
+        }),
+      );
+      await this.tagRepo.save(newTags);
 
-          if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
-            console.error('[ProductAiTag] Invalid LLM response: missing tags', {
-              productId: product.id,
-              content: response.content.slice(0, 200),
-            });
-            return;
-          }
-
-          // 기존 AI 태그 삭제
-          await this.tagRepo.delete({ productId: product.id, source: 'ai' });
-
-          // 새 AI 태그 저장
-          const newTags = parsed.tags.slice(0, 8).map((t) =>
-            this.tagRepo.create({
-              productId: product.id,
-              tag: t.tag,
-              confidence: Math.min(1, Math.max(0, t.confidence)),
-              source: 'ai',
-              model: response.model,
-            }),
-          );
-          await this.tagRepo.save(newTags);
-
-          // product_masters.tags 동기화
-          await this.syncMasterTags(product.id);
-
-          return; // success
-        } catch (err) {
-          lastError = err;
-          const msg = err instanceof Error ? err.message : String(err);
-
-          // Non-retryable
-          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-            console.error('[ProductAiTag] non-retryable error:', { productId: product.id, error: msg });
-            return;
-          }
-
-          // Retryable
-          if (attempt < MAX_ATTEMPTS) {
-            console.warn(`[ProductAiTag] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-          }
-        }
-      }
-
-      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.error('[ProductAiTag] generation failed after all attempts:', {
-        productId: product.id,
-        attempts: MAX_ATTEMPTS,
-        lastError: errMsg,
-      });
+      // product_masters.tags 동기화
+      await this.syncMasterTags(product.id);
     } catch (error) {
+      // Quiet fail: LLM 실패가 상품 데이터에 영향 없음
       console.error('[ProductAiTag] unexpected error:', error);
     }
   }
@@ -195,30 +158,5 @@ export class ProductAiTaggingService {
     if (product.brandName) parts.push(`- 브랜드: ${product.brandName}`);
     parts.push(`- 제조사: ${product.manufacturerName}`);
     return parts.join('\n');
-  }
-
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const setting = await this.settingRepo.findOne({ where: { service: 'store' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 1024;
-
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }

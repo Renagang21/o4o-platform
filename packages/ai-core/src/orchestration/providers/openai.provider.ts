@@ -59,16 +59,17 @@ export class OpenAIProvider implements AIProvider {
       ],
       max_tokens: config.maxTokens ?? 2048,
       temperature: config.temperature ?? 0.3,
-      response_format: { type: 'json_object' },
+      ...(config.responseMode !== 'text' ? { response_format: { type: 'json_object' } } : {}),
     };
 
     // Attempt with retry on parse failure
     let lastError: Error | null = null;
+    const responseMode = config.responseMode;
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const data = await this.callAPI(config.apiKey, body);
-        return this.parseResponse(data, model);
+        const data = await this.callAPI(config.apiKey, body, config.timeoutMs);
+        return this.parseResponse(data, model, responseMode);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -83,9 +84,9 @@ export class OpenAIProvider implements AIProvider {
     throw lastError ?? new Error('OpenAI provider failed');
   }
 
-  private async callAPI(apiKey: string, body: object): Promise<OpenAIAPIResponse> {
+  private async callAPI(apiKey: string, body: object, timeoutMs?: number): Promise<OpenAIAPIResponse> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs ?? REQUEST_TIMEOUT_MS);
 
     try {
       const response = await fetch(OPENAI_API_URL, {
@@ -114,7 +115,7 @@ export class OpenAIProvider implements AIProvider {
     }
   }
 
-  private parseResponse(data: OpenAIAPIResponse, model: string): AIProviderResponse {
+  private parseResponse(data: OpenAIAPIResponse, model: string, responseMode?: string): AIProviderResponse {
     if (data.error) {
       throw new Error(`OpenAI API error: ${data.error.message} (${data.error.type})`);
     }
@@ -124,11 +125,13 @@ export class OpenAIProvider implements AIProvider {
       throw new Error('OpenAI returned empty response — no choices');
     }
 
-    // Validate JSON parsability
-    try {
-      JSON.parse(content);
-    } catch {
-      throw new Error(`OpenAI JSON parse failed: ${content.slice(0, 200)}`);
+    // Validate JSON parsability (skip for text mode)
+    if (responseMode !== 'text') {
+      try {
+        JSON.parse(content);
+      } catch {
+        throw new Error(`OpenAI JSON parse failed: ${content.slice(0, 200)}`);
+      }
     }
 
     return {

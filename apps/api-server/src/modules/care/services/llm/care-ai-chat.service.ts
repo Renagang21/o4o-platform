@@ -1,7 +1,6 @@
-import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
-import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
+import type { DataSource } from 'typeorm';
+import { execute } from '@o4o/ai-core';
+import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import { createHash } from 'crypto';
 
 /**
@@ -14,12 +13,10 @@ import { createHash } from 'crypto';
  *   - Patient (patientId 있음): 특정 환자 데이터 기반
  *
  * 캐싱: Map 기반 인메모리 (Population 5분, Patient 10분)
- * Retry: 2회 시도, 2초 delay (transient 에러만)
+ * Retry: execute() 내장 (2회, 2초 delay)
  * Synchronous: fire-and-forget 아님 — 에러 시 throw
  */
 
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 const POPULATION_CACHE_TTL = 5 * 60 * 1000;   // 5 minutes
 const PATIENT_CACHE_TTL = 10 * 60 * 1000;      // 10 minutes
 
@@ -85,13 +82,11 @@ interface CacheEntry {
 }
 
 export class CareAiChatService {
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
   private cache: Map<string, CacheEntry>;
 
   constructor(private dataSource: DataSource) {
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'care');
     this.cache = new Map();
   }
 
@@ -115,63 +110,40 @@ export class CareAiChatService {
     // 3. Build user prompt
     const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
 
-    // 4. Call Gemini with retry
-    const config = await this.buildProviderConfig();
-    if (!config.apiKey) {
-      throw new Error('AI_NOT_CONFIGURED');
+    // 4. Call via execute() — retry + apiKey check 내장
+    const response = await execute({
+      systemPrompt: CARE_COPILOT_SYSTEM,
+      userPrompt,
+      config: this.configResolver,
+      meta: { service: 'care', callerName: 'CareAiChat' },
+    });
+
+    const parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
+
+    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+    const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
+      .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
+
+    const result: AiChatResponse = {
+      summary: parsed.summary || '응답을 생성할 수 없습니다.',
+      details: Array.isArray(parsed.details) ? parsed.details : [],
+      recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+      relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
+      actions,
+      model: response.model,
+      respondedAt: new Date().toISOString(),
+    };
+
+    // 5. Cache result
+    const ttl = patientId ? PATIENT_CACHE_TTL : POPULATION_CACHE_TTL;
+    this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + ttl });
+
+    // Lazy eviction: remove expired entries occasionally
+    if (this.cache.size > 100) {
+      this.evictExpired();
     }
 
-    let lastError: unknown = null;
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      try {
-        const response = await this.gemini.complete(CARE_COPILOT_SYSTEM, userPrompt, config);
-        const parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
-
-        const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
-        const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
-          .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
-
-        const result: AiChatResponse = {
-          summary: parsed.summary || '응답을 생성할 수 없습니다.',
-          details: Array.isArray(parsed.details) ? parsed.details : [],
-          recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
-          relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
-          actions,
-          model: response.model,
-          respondedAt: new Date().toISOString(),
-        };
-
-        // 5. Cache result
-        const ttl = patientId ? PATIENT_CACHE_TTL : POPULATION_CACHE_TTL;
-        this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + ttl });
-
-        // Lazy eviction: remove expired entries occasionally
-        if (this.cache.size > 100) {
-          this.evictExpired();
-        }
-
-        return result;
-      } catch (err) {
-        lastError = err;
-        const msg = err instanceof Error ? err.message : String(err);
-
-        // Non-retryable errors
-        if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-          throw err;
-        }
-
-        // Retryable: wait and retry
-        if (attempt < MAX_ATTEMPTS) {
-          console.warn(`[CareAiChat] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-          await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-        }
-      }
-    }
-
-    // All attempts exhausted
-    const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-    console.error('[CareAiChat] all attempts failed:', errMsg);
-    throw new Error(`AI_CHAT_FAILED: ${errMsg}`);
+    return result;
   }
 
   // ── Population Context ──
@@ -404,37 +376,5 @@ export class CareAiChatService {
         this.cache.delete(key);
       }
     }
-  }
-
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    // 1. Load model settings from ai_model_settings (service = 'care')
-    let setting: AiModelSetting | null = null;
-    try {
-      setting = await this.settingRepo.findOne({ where: { service: 'care' } });
-    } catch {
-      // Table may not exist yet
-    }
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
-
-    // 2. Load API key: ai_settings (provider='gemini') → GEMINI_API_KEY env fallback
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }

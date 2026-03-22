@@ -1,9 +1,8 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
+import { execute } from '@o4o/ai-core';
 import { CARE_LLM_INSIGHT_SYSTEM } from '@o4o/ai-prompts/care';
 import { CareLlmInsight } from '../../entities/care-llm-insight.entity.js';
-import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
+import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import type { CareInsightDto } from '../../domain/dto.js';
 import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js';
 
@@ -16,11 +15,8 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
  * - LLM = 설명 (진단/처방/치료 권고 금지)
  * - fire-and-forget: 실패해도 기존 인사이트에 영향 없음
  * - snapshot 당 1회 호출 (캐시 기반, 중복 방어)
- * - 1회 retry (2초 delay) — WO-O4O-CARE-AI-RESILIENCE-FIX-V1
+ * - retry는 execute() 내장 (2회, 2초 delay)
  */
-
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 interface LlmResponse {
   pharmacyInsight: string;
@@ -29,19 +25,17 @@ interface LlmResponse {
 
 export class CareLlmInsightService {
   private insightRepo: Repository<CareLlmInsight>;
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
 
   constructor(private dataSource: DataSource) {
     this.insightRepo = dataSource.getRepository(CareLlmInsight);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'care');
   }
 
   /**
    * Fire-and-forget: generate + cache LLM insight for a snapshot.
    * - 중복 방어: snapshot_id 기존 존재 시 skip
-   * - 1회 retry (2초 delay, retryable 오류만)
+   * - retry는 execute() 내장 (2회, 2초 delay)
    * - 전체 try/catch — 실패 시 log만, throw 안 함.
    */
   async generateAndCache(
@@ -59,72 +53,39 @@ export class CareLlmInsightService {
         return;
       }
 
-      const config = await this.buildProviderConfig();
+      const userPrompt = this.buildUserPrompt(analysis);
 
-      // API key 없으면 skip (로컬 환경 등)
-      if (!config.apiKey) {
-        console.warn('[CareLlmInsight] No API key configured, skipping LLM insight generation');
+      const response = await execute({
+        systemPrompt: CARE_LLM_INSIGHT_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'care', callerName: 'CareLlmInsight' },
+      });
+
+      const parsed = JSON.parse(response.content) as LlmResponse;
+
+      // 필수 필드 검증
+      if (!parsed.pharmacyInsight || !parsed.patientMessage) {
+        console.error('[CareLlmInsight] Invalid LLM response: missing required fields', {
+          snapshotId: snapshot.id,
+          content: response.content.slice(0, 200),
+        });
         return;
       }
 
-      const userPrompt = this.buildUserPrompt(analysis);
-
-      // Retry loop: max 2 attempts, 2초 delay between
-      let lastError: unknown = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const response = await this.gemini.complete(CARE_LLM_INSIGHT_SYSTEM, userPrompt, config);
-          const parsed = JSON.parse(response.content) as LlmResponse;
-
-          // 필수 필드 검증 (non-retryable)
-          if (!parsed.pharmacyInsight || !parsed.patientMessage) {
-            console.error('[CareLlmInsight] Invalid LLM response: missing required fields', {
-              snapshotId: snapshot.id,
-              content: response.content.slice(0, 200),
-            });
-            return;
-          }
-
-          const insight = this.insightRepo.create({
-            snapshotId: snapshot.id,
-            pharmacyId,
-            patientId: analysis.patientId,
-            pharmacyInsight: parsed.pharmacyInsight,
-            patientMessage: parsed.patientMessage,
-            model: response.model,
-            promptTokens: response.promptTokens,
-            completionTokens: response.completionTokens,
-          });
-          await this.insightRepo.save(insight);
-          return; // success
-        } catch (err) {
-          lastError = err;
-          const msg = err instanceof Error ? err.message : String(err);
-
-          // Non-retryable: API key error, validation
-          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-            console.error('[CareLlmInsight] non-retryable error:', { snapshotId: snapshot.id, error: msg });
-            return;
-          }
-
-          // Retryable: timeout, 5xx, network, JSON parse
-          if (attempt < MAX_ATTEMPTS) {
-            console.warn(`[CareLlmInsight] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-          }
-        }
-      }
-
-      // All attempts exhausted
-      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.error('[CareLlmInsight] generation failed after all attempts:', {
+      const insight = this.insightRepo.create({
         snapshotId: snapshot.id,
+        pharmacyId,
         patientId: analysis.patientId,
-        attempts: MAX_ATTEMPTS,
-        lastError: errMsg,
+        pharmacyInsight: parsed.pharmacyInsight,
+        patientMessage: parsed.patientMessage,
+        model: response.model,
+        promptTokens: response.promptTokens,
+        completionTokens: response.completionTokens,
       });
+      await this.insightRepo.save(insight);
     } catch (error) {
-      // Outer guard: unexpected errors (DB, config loading, etc.)
+      // Outer guard: quiet fail — 실패 시 log만, throw 안 함
       console.error('[CareLlmInsight] unexpected error:', error);
     }
   }
@@ -207,35 +168,5 @@ export class CareLlmInsightService {
     }
 
     return parts.join('\n');
-  }
-
-  /**
-   * Build GeminiProvider config from DB settings + API key resolution.
-   */
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    // 1. Load model settings from ai_model_settings (service = 'care')
-    const setting = await this.settingRepo.findOne({ where: { service: 'care' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
-
-    // 2. Load API key: ai_settings (provider='gemini') → GEMINI_API_KEY env fallback
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }

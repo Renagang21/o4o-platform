@@ -95,6 +95,10 @@ export interface AIProviderConfig {
   model: string;
   maxTokens?: number;
   temperature?: number;
+  /** 'json' (default) — JSON 모드 강제 / 'text' — free-text 응답 */
+  responseMode?: 'json' | 'text';
+  /** Provider 타임아웃 override (ms) */
+  timeoutMs?: number;
 }
 
 /** Provider adapter — all LLM backends implement this */

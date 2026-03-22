@@ -62,17 +62,18 @@ export class GeminiProvider implements AIProvider {
       generationConfig: {
         temperature: config.temperature ?? 0.3,
         maxOutputTokens: config.maxTokens ?? 2048,
-        responseMimeType: 'application/json',
+        ...(config.responseMode !== 'text' ? { responseMimeType: 'application/json' } : {}),
       },
     };
 
     // Attempt with retry on parse failure
     let lastError: Error | null = null;
+    const responseMode = config.responseMode;
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const data = await this.callAPI(url, body);
-        return this.parseResponse(data, model);
+        const data = await this.callAPI(url, body, config.timeoutMs);
+        return this.parseResponse(data, model, responseMode);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
@@ -88,9 +89,9 @@ export class GeminiProvider implements AIProvider {
     throw lastError ?? new Error('Gemini provider failed');
   }
 
-  private async callAPI(url: string, body: object): Promise<GeminiAPIResponse> {
+  private async callAPI(url: string, body: object, timeoutMs?: number): Promise<GeminiAPIResponse> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs ?? REQUEST_TIMEOUT_MS);
 
     try {
       const response = await fetch(url, {
@@ -116,7 +117,7 @@ export class GeminiProvider implements AIProvider {
     }
   }
 
-  private parseResponse(data: GeminiAPIResponse, model: string): AIProviderResponse {
+  private parseResponse(data: GeminiAPIResponse, model: string, responseMode?: string): AIProviderResponse {
     // Check for API-level error
     if (data.error) {
       throw new Error(`Gemini API error: ${data.error.message} (${data.error.status})`);
@@ -128,11 +129,13 @@ export class GeminiProvider implements AIProvider {
       throw new Error('Gemini returned empty response — no candidates');
     }
 
-    // Validate JSON parsability (responseMimeType should enforce this, but verify)
-    try {
-      JSON.parse(content);
-    } catch {
-      throw new Error(`Gemini JSON parse failed: ${content.slice(0, 200)}`);
+    // Validate JSON parsability (skip for text mode)
+    if (responseMode !== 'text') {
+      try {
+        JSON.parse(content);
+      } catch {
+        throw new Error(`Gemini JSON parse failed: ${content.slice(0, 200)}`);
+      }
     }
 
     return {

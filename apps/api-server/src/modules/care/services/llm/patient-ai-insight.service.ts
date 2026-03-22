@@ -1,9 +1,8 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
+import { execute } from '@o4o/ai-core';
 import { PATIENT_AI_INSIGHT_SYSTEM } from '@o4o/ai-prompts/care';
 import { PatientAiInsight } from '../../entities/patient-ai-insight.entity.js';
-import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
+import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 
 /**
  * PatientAiInsightService — WO-GLUCOSEVIEW-AI-GLUCOSE-INSIGHT-V1
@@ -17,8 +16,6 @@ import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
 
 const CACHE_HOURS = 24;
 const MIN_READINGS = 3;
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 interface LlmInsightResponse {
   summary: string;
@@ -35,13 +32,11 @@ export interface PatientInsightResult {
 
 export class PatientAiInsightService {
   private insightRepo: Repository<PatientAiInsight>;
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
 
   constructor(private dataSource: DataSource) {
     this.insightRepo = dataSource.getRepository(PatientAiInsight);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'care');
   }
 
   /**
@@ -63,16 +58,20 @@ export class PatientAiInsightService {
       // 3. Compute stats
       const stats = this.computeStats(readings);
 
-      // 4. Call Gemini
-      const config = await this.buildProviderConfig();
-      if (!config.apiKey) {
-        console.warn('[PatientAiInsight] No API key configured, skipping');
-        return { summary: null, warning: null, tip: null, generatedAt: null };
-      }
-
+      // 4. Call via execute() — retry + apiKey check 내장
       const userPrompt = this.buildUserPrompt(stats);
-      const result = await this.callWithRetry(userPrompt, config);
-      if (!result) {
+
+      const response = await execute({
+        systemPrompt: PATIENT_AI_INSIGHT_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'care', callerName: 'PatientAiInsight' },
+      });
+
+      const parsed = JSON.parse(response.content) as LlmInsightResponse;
+
+      if (!parsed.summary) {
+        console.error('[PatientAiInsight] Invalid LLM response: missing summary');
         return { summary: null, warning: null, tip: null, generatedAt: null };
       }
 
@@ -80,20 +79,20 @@ export class PatientAiInsightService {
       const now = new Date();
       const entity = this.insightRepo.create({
         patientId: userId,
-        summary: result.summary,
-        warning: result.warning || '',
-        tip: result.tip || '',
-        model: result.model,
-        promptTokens: result.promptTokens,
-        completionTokens: result.completionTokens,
+        summary: parsed.summary,
+        warning: parsed.warning || '',
+        tip: parsed.tip || '',
+        model: response.model,
+        promptTokens: response.promptTokens,
+        completionTokens: response.completionTokens,
         generatedAt: now,
       });
       await this.insightRepo.save(entity);
 
       return {
-        summary: result.summary,
-        warning: result.warning || null,
-        tip: result.tip || null,
+        summary: parsed.summary,
+        warning: parsed.warning || null,
+        tip: parsed.tip || null,
         generatedAt: now.toISOString(),
       };
     } catch (error) {
@@ -228,75 +227,5 @@ export class PatientAiInsightService {
     }
 
     return parts.join('\n');
-  }
-
-  private async callWithRetry(
-    userPrompt: string,
-    config: AIProviderConfig,
-  ): Promise<LlmInsightResponse & { model: string; promptTokens: number; completionTokens: number } | null> {
-    let lastError: unknown = null;
-
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      try {
-        const response = await this.gemini.complete(PATIENT_AI_INSIGHT_SYSTEM, userPrompt, config);
-        const parsed = JSON.parse(response.content) as LlmInsightResponse;
-
-        if (!parsed.summary) {
-          console.error('[PatientAiInsight] Invalid LLM response: missing summary');
-          return null;
-        }
-
-        return {
-          summary: parsed.summary,
-          warning: parsed.warning || '',
-          tip: parsed.tip || '',
-          model: response.model,
-          promptTokens: response.promptTokens,
-          completionTokens: response.completionTokens,
-        };
-      } catch (err) {
-        lastError = err;
-        const msg = err instanceof Error ? err.message : String(err);
-
-        if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-          console.error('[PatientAiInsight] non-retryable error:', msg);
-          return null;
-        }
-
-        if (attempt < MAX_ATTEMPTS) {
-          console.warn(`[PatientAiInsight] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-          await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-        }
-      }
-    }
-
-    const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-    console.error('[PatientAiInsight] generation failed after all attempts:', errMsg);
-    return null;
-  }
-
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const setting = await this.settingRepo.findOne({ where: { service: 'care' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
-
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // DB read failed, fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }

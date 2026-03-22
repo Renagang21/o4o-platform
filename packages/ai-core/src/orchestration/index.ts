@@ -17,6 +17,10 @@
 // Entry point
 export { runAIInsight, onAudit } from './orchestrator.js';
 
+// Generic LLM execution (WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1)
+export { execute } from './execute.js';
+export type { ExecuteRequest, ExecuteResult, AIExecuteProviderId, ResponseMode } from './execute.js';
+
 // Types
 export type {
   AIServiceId,

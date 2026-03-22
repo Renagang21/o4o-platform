@@ -8,7 +8,7 @@ import { App } from '../entities/App.js';
 import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AIUsageLog, AIProvider } from '../entities/AIUsageLog.js';
-import { callGemini } from '../utils/gemini.helper.js';
+import { execute as executeAI } from '@o4o/ai-core';
 import logger from '../utils/logger.js';
 
 interface ExecuteOptions {
@@ -257,7 +257,7 @@ class AppRegistryService {
 
   /**
    * Execute app-specific logic
-   * WO-O4O-AI-LLM-PATH-CONSOLIDATION: google-ai.service → callGemini
+   * WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1: execute() via @o4o/ai-core
    */
   private async executeAppLogic(instance: AppInstance, action: string, payload: any): Promise<any> {
     const app = instance.app;
@@ -271,17 +271,23 @@ class AppRegistryService {
         if (!config.apiKey) {
           throw new Error('Google AI API key not configured');
         }
-        const result = await callGemini(config.apiKey, {
+        // WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1
+        const aiResult = await executeAI({
           systemPrompt: '',
           userPrompt: payload.prompt,
-          model: config.model || payload.model,
-          temperature: config.temperature || payload.temperature,
-          maxTokens: payload.maxOutputTokens,
+          responseMode: 'text',
+          config: {
+            apiKey: config.apiKey,
+            model: config.model || payload.model,
+            temperature: config.temperature || payload.temperature,
+            maxTokens: payload.maxOutputTokens ?? 2048,
+          },
+          meta: { service: 'app-registry', callerName: 'AppRegistryService' },
         });
         return {
-          data: { text: result.text },
-          usage: { inputTokens: result.promptTokens, outputTokens: result.completionTokens },
-          model: result.model,
+          data: { text: aiResult.content },
+          usage: { inputTokens: aiResult.promptTokens, outputTokens: aiResult.completionTokens },
+          model: aiResult.model,
         };
       }
 

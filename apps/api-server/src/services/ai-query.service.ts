@@ -15,7 +15,7 @@ import { AiQueryPolicy } from '../entities/AiQueryPolicy.js';
 import { AiQueryLog } from '../entities/AiQueryLog.js';
 import type { AiQueryContextType } from '../entities/AiQueryLog.js';
 import { AiSettings } from '../entities/AiSettings.js';
-import { callGemini } from '../utils/gemini.helper.js';
+import { execute } from '@o4o/ai-core';
 import { aiCardExposureService } from './ai-card-exposure.service.js';
 import { aiOperationsService } from './ai-operations.service.js';
 import type { AiCard, CardExposureContext, AiCardData } from '@o4o/ai-core';
@@ -474,16 +474,16 @@ class AiQueryService {
     );
 
     try {
-      // 4. Call Gemini API (WO-O4O-AI-LLM-PATH-CONSOLIDATION)
-      const response = await callGemini(apiKey, {
+      // 4. Call AI (WO-O4O-AI-CORE-SERVICE-UNIFICATION-V1)
+      const aiResult = await execute({
         systemPrompt,
         userPrompt: `[사용자 질문]\n${request.question}`,
-        model: policy.defaultModel,
-        temperature: 0.7,
-        maxTokens: 2048,
+        responseMode: 'text',
+        config: { apiKey, model: policy.defaultModel, temperature: 0.7, maxTokens: 2048 },
+        meta: { service: 'ai-query', callerName: 'AiQueryService' },
       });
 
-      const answer = response.text;
+      const answer = aiResult.content;
       const durationMs = Date.now() - startTime;
 
       // Operations: Record success

@@ -1,9 +1,8 @@
 import type { DataSource, Repository } from 'typeorm';
-import { GeminiProvider } from '@o4o/ai-core';
-import type { AIProviderConfig } from '@o4o/ai-core';
+import { execute } from '@o4o/ai-core';
 import { CARE_COACHING_DRAFT_SYSTEM } from '@o4o/ai-prompts/care';
 import { CareCoachingDraft } from '../../entities/care-coaching-draft.entity.js';
-import { AiModelSetting } from '../../entities/ai-model-setting.entity.js';
+import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import type { CareInsightDto } from '../../domain/dto.js';
 import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js';
 
@@ -16,11 +15,8 @@ import type { CareKpiSnapshot } from '../../entities/care-kpi-snapshot.entity.js
  * - AI = 초안 생성
  * - 약사 = 승인 결정
  * - fire-and-forget: 실패해도 기존 흐름에 영향 없음
- * - 중복 방어 + 1회 retry — WO-O4O-CARE-AI-RESILIENCE-FIX-V1
+ * - 중복 방어 — WO-O4O-CARE-AI-RESILIENCE-FIX-V1
  */
-
-const RETRY_DELAY_MS = 2_000;
-const MAX_ATTEMPTS = 2;
 
 interface DraftLlmResponse {
   draftMessage: string;
@@ -28,19 +24,17 @@ interface DraftLlmResponse {
 
 export class CareCoachingDraftService {
   private draftRepo: Repository<CareCoachingDraft>;
-  private settingRepo: Repository<AiModelSetting>;
-  private gemini: GeminiProvider;
+  private configResolver: () => Promise<import('@o4o/ai-core').AIProviderConfig>;
 
   constructor(private dataSource: DataSource) {
     this.draftRepo = dataSource.getRepository(CareCoachingDraft);
-    this.settingRepo = dataSource.getRepository(AiModelSetting);
-    this.gemini = new GeminiProvider();
+    this.configResolver = buildConfigResolver(dataSource, 'care');
   }
 
   /**
    * Fire-and-forget: generate + cache coaching draft for a snapshot.
    * - 중복 방어: snapshot_id 기존 존재 시 skip
-   * - 1회 retry (2초 delay, retryable 오류만)
+   * - retry는 execute() 내장 (2회, 2초 delay)
    */
   async generateAndCache(
     snapshot: CareKpiSnapshot,
@@ -57,68 +51,36 @@ export class CareCoachingDraftService {
         return;
       }
 
-      const config = await this.buildProviderConfig();
+      const userPrompt = this.buildUserPrompt(analysis);
 
-      if (!config.apiKey) {
-        console.warn('[CareCoachingDraft] No API key configured, skipping draft generation');
+      const response = await execute({
+        systemPrompt: CARE_COACHING_DRAFT_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'care', callerName: 'CareCoachingDraft' },
+      });
+
+      const parsed = JSON.parse(response.content) as DraftLlmResponse;
+
+      // 필수 필드 검증
+      if (!parsed.draftMessage) {
+        console.error('[CareCoachingDraft] Invalid LLM response: missing draftMessage', {
+          snapshotId: snapshot.id,
+          content: response.content.slice(0, 200),
+        });
         return;
       }
 
-      const userPrompt = this.buildUserPrompt(analysis);
-
-      // Retry loop: max 2 attempts, 2초 delay between
-      let lastError: unknown = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const response = await this.gemini.complete(CARE_COACHING_DRAFT_SYSTEM, userPrompt, config);
-          const parsed = JSON.parse(response.content) as DraftLlmResponse;
-
-          // 필수 필드 검증 (non-retryable)
-          if (!parsed.draftMessage) {
-            console.error('[CareCoachingDraft] Invalid LLM response: missing draftMessage', {
-              snapshotId: snapshot.id,
-              content: response.content.slice(0, 200),
-            });
-            return;
-          }
-
-          const draft = this.draftRepo.create({
-            patientId: analysis.patientId,
-            snapshotId: snapshot.id,
-            pharmacyId,
-            draftMessage: parsed.draftMessage,
-            status: 'draft',
-          });
-          await this.draftRepo.save(draft);
-          return; // success
-        } catch (err) {
-          lastError = err;
-          const msg = err instanceof Error ? err.message : String(err);
-
-          // Non-retryable: API key error, validation
-          if (msg.includes('not configured') || msg.includes('INVALID_ARGUMENT')) {
-            console.error('[CareCoachingDraft] non-retryable error:', { snapshotId: snapshot.id, error: msg });
-            return;
-          }
-
-          // Retryable: timeout, 5xx, network, JSON parse
-          if (attempt < MAX_ATTEMPTS) {
-            console.warn(`[CareCoachingDraft] attempt ${attempt} failed, retrying in ${RETRY_DELAY_MS}ms:`, msg);
-            await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-          }
-        }
-      }
-
-      // All attempts exhausted
-      const errMsg = lastError instanceof Error ? lastError.message : String(lastError);
-      console.error('[CareCoachingDraft] generation failed after all attempts:', {
-        snapshotId: snapshot.id,
+      const draft = this.draftRepo.create({
         patientId: analysis.patientId,
-        attempts: MAX_ATTEMPTS,
-        lastError: errMsg,
+        snapshotId: snapshot.id,
+        pharmacyId,
+        draftMessage: parsed.draftMessage,
+        status: 'draft',
       });
+      await this.draftRepo.save(draft);
     } catch (error) {
-      // Outer guard: unexpected errors (DB, config loading, etc.)
+      // Outer guard: quiet fail — 실패 시 log만, throw 안 함
       console.error('[CareCoachingDraft] unexpected error:', error);
     }
   }
@@ -204,30 +166,5 @@ export class CareCoachingDraftService {
     parts.push('위 데이터를 바탕으로 환자에게 전달할 건강 행동 코칭 메시지를 작성하세요.');
 
     return parts.join('\n');
-  }
-
-  private async buildProviderConfig(): Promise<AIProviderConfig> {
-    const setting = await this.settingRepo.findOne({ where: { service: 'care' } });
-    const model = setting?.model || 'gemini-3.0-flash';
-    const temperature = setting ? Number(setting.temperature) : 0.3;
-    const maxTokens = setting?.maxTokens || 2048;
-
-    let apiKey = '';
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT apikey FROM ai_settings WHERE provider = 'gemini' AND isactive = true LIMIT 1`,
-      );
-      if (rows[0]?.apikey) {
-        apiKey = rows[0].apikey;
-      }
-    } catch {
-      // fall through to env
-    }
-
-    if (!apiKey) {
-      apiKey = process.env.GEMINI_API_KEY || '';
-    }
-
-    return { apiKey, model, temperature, maxTokens };
   }
 }
