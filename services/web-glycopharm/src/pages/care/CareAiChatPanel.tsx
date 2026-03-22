@@ -43,6 +43,28 @@ interface CareAiChatPanelProps {
   initialQuestion?: string;
 }
 
+// ── Helpers ──
+
+/** 어떤 값이든 안전한 문자열로 변환. 객체 {code, message}가 JSX에 렌더링되는 것을 방지. */
+function safeStr(v: unknown): string {
+  if (v == null) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object' && v !== null) {
+    const obj = v as Record<string, unknown>;
+    if (typeof obj.message === 'string') return obj.message;
+    if (typeof obj.code === 'string') return obj.code;
+    try { return JSON.stringify(v); } catch { return String(v); }
+  }
+  return String(v);
+}
+
+/** AiChatResponseDto 구조 검증. 잘못된 응답(에러 객체 등)이면 false. */
+function isValidAiResponse(r: unknown): r is AiChatResponseDto {
+  if (!r || typeof r !== 'object') return false;
+  const obj = r as Record<string, unknown>;
+  return typeof obj.summary === 'string' && Array.isArray(obj.details);
+}
+
 // ── Constants ──
 
 const POPULATION_QUESTIONS = [
@@ -125,6 +147,11 @@ export default function CareAiChatPanel({
     try {
       const response = await pharmacyApi.sendCareAiChat(text.trim(), patientId);
 
+      // 응답이 AiChatResponseDto가 아니면 (에러 객체 {code, message} 등) 에러로 처리
+      if (!isValidAiResponse(response)) {
+        throw response;
+      }
+
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id
@@ -133,9 +160,9 @@ export default function CareAiChatPanel({
         ),
       );
     } catch (err) {
-      const errorMsg = err instanceof Error
-        ? err.message
-        : (err as any)?.message || 'AI 응답을 받지 못했습니다.';
+      const errorMsg = safeStr(
+        err instanceof Error ? err.message : (err as any)?.message ?? err,
+      ) || 'AI 응답을 받지 못했습니다.';
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id
@@ -382,7 +409,7 @@ function MessageBubble({
             <AlertCircle className="w-4 h-4 text-red-500" />
             <span className="text-xs text-red-600 font-medium">응답 실패</span>
           </div>
-          <p className="text-xs text-red-500 mb-2">{message.error}</p>
+          <p className="text-xs text-red-500 mb-2">{safeStr(message.error)}</p>
           <button
             onClick={onRetry}
             className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium"
@@ -403,36 +430,36 @@ function MessageBubble({
     <div className="flex justify-start">
       <div className="max-w-[90%] bg-slate-50 border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 space-y-3">
         {/* Summary */}
-        <p className="text-sm text-slate-800 leading-relaxed">{resp.summary}</p>
+        <p className="text-sm text-slate-800 leading-relaxed">{safeStr(resp.summary)}</p>
 
         {/* Details */}
-        {resp.details.length > 0 && (
+        {resp.details?.length > 0 && (
           <div className="space-y-1">
             {resp.details.map((d, i) => (
               <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
-                <span>{d}</span>
+                <span>{safeStr(d)}</span>
               </div>
             ))}
           </div>
         )}
 
         {/* Recommendations */}
-        {resp.recommendations.length > 0 && (
+        {resp.recommendations?.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {resp.recommendations.map((r, i) => (
               <span
                 key={i}
                 className="inline-flex items-center px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md"
               >
-                {r}
+                {safeStr(r)}
               </span>
             ))}
           </div>
         )}
 
         {/* Related Patients */}
-        {resp.relatedPatients.length > 0 && (
+        {resp.relatedPatients?.length > 0 && (
           <div className="pt-1 border-t border-slate-200 space-y-1">
             {resp.relatedPatients.map((p) => (
               <button
@@ -441,8 +468,8 @@ function MessageBubble({
                 className="w-full flex items-center gap-2 px-2.5 py-1.5 text-xs text-slate-600 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 <User className="w-3.5 h-3.5 text-slate-400" />
-                <span className="font-medium text-slate-700">{p.name}</span>
-                <span className="text-slate-400">{p.reason}</span>
+                <span className="font-medium text-slate-700">{safeStr(p.name)}</span>
+                <span className="text-slate-400">{safeStr(p.reason)}</span>
                 <ArrowRight className="w-3 h-3 text-slate-300 ml-auto" />
               </button>
             ))}
@@ -450,7 +477,7 @@ function MessageBubble({
         )}
 
         {/* Actions */}
-        {resp.actions && resp.actions.length > 0 && (
+        {resp.actions?.length > 0 && (
           <div className="pt-2 border-t border-slate-200 space-y-1.5">
             {resp.actions.map((action, i) => (
               <ActionButton key={i} action={action} onExecute={onActionExecute} />
@@ -460,7 +487,7 @@ function MessageBubble({
 
         {/* Meta */}
         <p className="text-[10px] text-slate-400">
-          {resp.model} · {new Date(resp.respondedAt).toLocaleTimeString('ko-KR')}
+          {safeStr(resp.model)} · {resp.respondedAt ? new Date(resp.respondedAt).toLocaleTimeString('ko-KR') : ''}
         </p>
       </div>
     </div>
@@ -521,7 +548,7 @@ function ActionButton({
         <Icon className="w-3.5 h-3.5" />
       )}
       <span className="font-medium">
-        {status === 'done' ? '완료' : action.label}
+        {status === 'done' ? '완료' : safeStr(action.label)}
       </span>
     </button>
   );
