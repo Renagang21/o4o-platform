@@ -281,6 +281,82 @@ export function createPharmacyController(
   );
 
   /**
+   * GET /pharmacy/customers/:id
+   * Get a single customer detail for the authenticated user's pharmacy
+   *
+   * WO-GLYCOPHARM-PATIENT-DETAIL-V1
+   * Boundary: organization_id 필터 필수 (CLAUDE.md §7 Guard Rule 1)
+   */
+  router.get(
+    '/customers/:id',
+    requireAuth,
+    requirePharmacyContext,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const pcReq = req as PharmacyContextRequest;
+        const pharmacyId = pcReq.pharmacyId;
+        const customerId = req.params.id;
+
+        // Build query with boundary check
+        const conditions = ['c.id = $1'];
+        const params: any[] = [customerId];
+
+        // Non-admin: enforce organization_id boundary
+        if (pharmacyId) {
+          conditions.push('c.organization_id = $2');
+          params.push(pharmacyId);
+        }
+
+        const whereClause = conditions.join(' AND ');
+
+        const rows = await dataSource.query(
+          `SELECT c.id, c.name, c.phone, c.email, c.birth_year, c.gender,
+                  c.visit_count, c.sync_status, c.last_visit, c.notes,
+                  c.created_at, c.updated_at
+           FROM glucoseview_customers c
+           WHERE ${whereClause}
+           LIMIT 1`,
+          params,
+        );
+
+        if (rows.length === 0) {
+          res.status(404).json({
+            success: false,
+            error: { code: 'CUSTOMER_NOT_FOUND', message: 'Customer not found' },
+          });
+          return;
+        }
+
+        const row = rows[0];
+        res.json({
+          success: true,
+          data: {
+            id: row.id,
+            name: row.name,
+            phone: row.phone || '',
+            email: row.email || undefined,
+            birthYear: row.birth_year || undefined,
+            gender: row.gender || undefined,
+            visitCount: row.visit_count || 0,
+            syncStatus: row.sync_status || undefined,
+            lastVisit: row.last_visit?.toISOString?.() || row.last_visit || undefined,
+            notes: row.notes || undefined,
+            totalOrders: 0,
+            totalSpent: 0,
+            status: 'active' as const,
+            createdAt: row.created_at?.toISOString?.() || row.created_at,
+          },
+        });
+      } catch (error: any) {
+        console.error('Failed to get customer detail:', error);
+        res.status(500).json({
+          error: { code: 'INTERNAL_ERROR', message: error.message },
+        });
+      }
+    }
+  );
+
+  /**
    * POST /pharmacy/customers
    * Create a new customer for the authenticated user's pharmacy
    *
