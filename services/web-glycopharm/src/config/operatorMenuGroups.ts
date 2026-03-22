@@ -41,6 +41,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
+    { label: 'AI 사용량', path: '/operator/ai-usage' },
+    { label: 'AI 정산', path: '/operator/ai-billing' },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
   system: [

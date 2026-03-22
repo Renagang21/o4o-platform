@@ -28,12 +28,19 @@ export enum AIUsageStatus {
 @Index(['userId', 'createdAt'])
 @Index(['provider', 'createdAt'])
 @Index(['status', 'createdAt'])
+@Index(['scope', 'createdAt'])
 export class AIUsageLog {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
-  userId!: string;
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  scope?: string;
+
+  @Column({ type: 'numeric', precision: 15, scale: 6, nullable: true })
+  costEstimated?: number;
 
   @ManyToOne('User')
   @JoinColumn({ name: 'userId' })

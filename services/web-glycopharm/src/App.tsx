@@ -125,6 +125,8 @@ const UserDetailPage = lazy(() => import('@/pages/operator/UserDetailPage'));
 const RoleManagementPage = lazy(() => import('@/pages/operator/RoleManagementPage'));
 const SettingsPage = lazy(() => import('@/pages/operator/SettingsPage'));
 const AiReportPage = lazy(() => import('@/pages/operator/AiReportPage'));
+const AiUsageDashboardPage = lazy(() => import('@/pages/operator/AiUsageDashboardPage'));
+const AiBillingPage = lazy(() => import('@/pages/operator/AiBillingPage'));
 const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'));
 
 // Operator Care Pages (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1)
@@ -507,6 +509,8 @@ function AppRoutes() {
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
         <Route path="ai-report" element={<AiReportPage />} />
+        <Route path="ai-usage" element={<AiUsageDashboardPage />} />
+        <Route path="ai-billing" element={<AiBillingPage />} />
         <Route path="signage/library" element={<ContentLibraryPage />} />
         <Route path="signage/content" element={<ContentHubPage />} />
         <Route path="signage/playlist/:id" element={<SignagePlaylistDetailPage />} />
