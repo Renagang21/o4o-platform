@@ -107,7 +107,7 @@ export default function SupplierLibraryPage() {
     actions: (
       <div style={{ display: 'flex', gap: '8px' }}>
         <button
-          onClick={() => navigate(`/workspace/supplier/library/${item.id}/edit`)}
+          onClick={() => navigate(`/supplier/library/${item.id}/edit`)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#2563eb', fontSize: '13px', fontWeight: 500 }}
         >
           수정
@@ -136,7 +136,7 @@ export default function SupplierLibraryPage() {
           </p>
         </div>
         <button
-          onClick={() => navigate('/workspace/supplier/library/new')}
+          onClick={() => navigate('/supplier/library/new')}
           disabled={false}
           style={{
             display: 'flex',

@@ -123,7 +123,7 @@ export default function SupplierLibraryFormPage() {
     setSaving(false);
 
     if (result.success) {
-      navigate('/workspace/supplier/library');
+      navigate('/supplier/library');
     } else {
       setError(result.error || '저장에 실패했습니다.');
     }
@@ -143,7 +143,7 @@ export default function SupplierLibraryFormPage() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <button
-          onClick={() => navigate('/workspace/supplier/library')}
+          onClick={() => navigate('/supplier/library')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -308,7 +308,7 @@ export default function SupplierLibraryFormPage() {
             {saving ? '저장 중...' : isEditMode ? '수정 저장' : '등록'}
           </button>
           <button
-            onClick={() => navigate('/workspace/supplier/library')}
+            onClick={() => navigate('/supplier/library')}
             style={{
               padding: '10px 24px',
               backgroundColor: '#f1f5f9',
