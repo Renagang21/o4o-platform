@@ -47,6 +47,11 @@ import { Taxonomy, Term, TermRelationship } from '../entities/Taxonomy.js';
 // AI Settings entity (unified - AISetting removed)
 import { AiSettings } from '../entities/AiSettings.js';
 import { AIUsageLog } from '../entities/AIUsageLog.js';
+// AI Policy entities (WO-O4O-AI-COST-LIMIT-QUOTA-V1 + WO-O4O-AI-BILLING-DATA-SYSTEM-V1)
+import { AiLlmPolicy } from '../modules/ai-policy/entities/ai-llm-policy.entity.js';
+import { AiUsageQuota } from '../modules/ai-policy/entities/ai-usage-quota.entity.js';
+import { AiUsageAggregate } from '../modules/ai-policy/entities/ai-usage-aggregate.entity.js';
+import { AiBillingSummary } from '../modules/ai-policy/entities/ai-billing-summary.entity.js';
 // App System entities
 import { App } from '../entities/App.js';
 import { AppInstance } from '../entities/AppInstance.js';
@@ -973,6 +978,13 @@ export const AppDataSource = new DataSource({
     ProductAiContent,
     // PRODUCT OCR TEXT (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
     ProductOcrText,
+    // ============================================================================
+    // AI POLICY ENTITIES (WO-O4O-AI-COST-LIMIT-QUOTA-V1 + WO-O4O-AI-BILLING-DATA-SYSTEM-V1)
+    // ============================================================================
+    AiLlmPolicy,
+    AiUsageQuota,
+    AiUsageAggregate,
+    AiBillingSummary,
     // ============================================================================
     // DOMAIN ENTITIES REMAIN REMOVED (Phase R1: Execution Boundary Cleanup)
     // ============================================================================
