@@ -9,7 +9,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 /* ─── Deterministic Test UUIDs (hex-safe) ─── */
 

@@ -12,7 +12,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserStatus } from '../entities/User.js';
 import { UserRole } from '../types/auth.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 

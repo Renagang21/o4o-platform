@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt, { Secret } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { JwtPayload } from '../types/email-auth.js';

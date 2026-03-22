@@ -8,7 +8,7 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import logger from '../utils/logger.js';
 
 interface CreateManagerOptions {
