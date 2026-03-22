@@ -19,6 +19,9 @@ const OperationsDashboard = lazy(() => import('@/pages/dashboard/phase2.4'));
 // Service Monitoring (Phase 9 Task 3)
 const ServiceOverview = lazy(() => import('@/pages/services/ServiceOverview'));
 
+// Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
+const AuthAnalyticsPage = lazy(() => import('@/pages/operator/AuthAnalyticsPage'));
+
 // Loading component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen">
@@ -102,6 +105,15 @@ export function PlatformRoutes() {
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <ServiceOverview />
+        </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    // Auth Analytics (WO-O4O-AUTH-ANALYTICS-UI-V1)
+    <Route key="/operator/analytics/auth" path="/operator/analytics/auth" element={
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'operator']}>
+        <Suspense fallback={<PageLoader />}>
+          <AuthAnalyticsPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
