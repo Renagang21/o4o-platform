@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { PasswordResetService } from '../../../services/passwordResetService.js';
 import { PasswordResetRequestDto, PasswordResetDto } from '../dto/index.js';
@@ -133,7 +133,7 @@ export class PasswordController extends BaseController {
       }
 
       // 3. Hash new password and update
-      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      const hashedPassword = await hashPassword(newPassword);
       user.password = hashedPassword;
       user.loginAttempts = 0;
       user.lockedUntil = null as any;

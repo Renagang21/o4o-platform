@@ -8,7 +8,7 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 
 interface CreateManagerOptions {
@@ -66,7 +66,7 @@ async function createManagerUser(options: CreateManagerOptions = {}) {
 
     // Hash password
     logger.info('🔐 Hashing password...');
-    const hashedPassword = await bcrypt.hash(managerPassword, 10);
+    const hashedPassword = await hashPassword(managerPassword);
 
     // Create user
     logger.info('👤 Creating user...');

@@ -19,7 +19,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 
 /* ═══════════════════════════════════════════
@@ -302,7 +302,7 @@ export function createCareTestDataRouter(dataSource: DataSource): Router {
 
     try {
       const log: string[] = [];
-      const passwordHash = await bcrypt.hash(TEST_PASSWORD, 10);
+      const passwordHash = await hashPassword(TEST_PASSWORD);
 
       // ──────────────────────────────────────
       // Phase 0: Cleanup all existing test data

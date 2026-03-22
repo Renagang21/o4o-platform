@@ -3,7 +3,6 @@ import { UserRepository, UserFilters, PaginationOptions } from '../repositories/
 import { ApprovalLog } from '../entities/ApprovalLog.js';
 import { AppDataSource } from '../database/connection.js';
 import type { AuthRequest } from '../types/auth.js';
-import * as bcrypt from 'bcryptjs';
 import { Parser } from 'json2csv';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 import logger from '../utils/logger.js';

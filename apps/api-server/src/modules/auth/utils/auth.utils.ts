@@ -7,7 +7,7 @@ import { UserRole } from '../entities/User.js';
  * @returns Hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = parseInt(process.env.BCRYPT_ROUNDS || '12');
+  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10');
   return await bcrypt.hash(password, saltRounds);
 }
 

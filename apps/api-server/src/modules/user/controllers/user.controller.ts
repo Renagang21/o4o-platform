@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword, comparePassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { AppDataSource } from '../../../database/connection.js';
@@ -160,13 +160,13 @@ export class UserController extends BaseController {
       }
 
       // Verify current password
-      const isValidPassword = await bcrypt.compare(data.currentPassword, user.password);
+      const isValidPassword = await comparePassword(data.currentPassword, user.password);
       if (!isValidPassword) {
         return BaseController.error(res, 'Current password is incorrect', 400);
       }
 
       // Hash new password
-      const hashedPassword = await bcrypt.hash(data.newPassword, env.getNumber('BCRYPT_ROUNDS', 12));
+      const hashedPassword = await hashPassword(data.newPassword);
       user.password = hashedPassword;
       user.updatedAt = new Date();
 

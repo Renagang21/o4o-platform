@@ -9,7 +9,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../utils/auth.utils.js';
 import { authenticate } from '../../common/middleware/auth.middleware.js';
 import { requireAdmin } from '../../common/middleware/auth.middleware.js';
 import AppDataSource from '../../database/data-source.js';
@@ -47,7 +47,7 @@ router.post('/', async (_req: Request, res: Response): Promise<void> => {
   const logs: string[] = [];
 
   try {
-    const hashedPassword = await bcrypt.hash('O4oTestPass@1', 10);
+    const hashedPassword = await hashPassword('O4oTestPass@1');
 
     for (const account of TEST_ACCOUNTS) {
       // 1. User (idempotent via ON CONFLICT)

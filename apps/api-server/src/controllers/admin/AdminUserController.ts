@@ -8,7 +8,7 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { User, UserRole, UserStatus } from '../../modules/auth/entities/User.js';
 import { validationResult } from 'express-validator';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../utils/auth.utils.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
 import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
@@ -231,7 +231,7 @@ export class AdminUserController {
       }
 
       // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await hashPassword(password);
 
       const newUser = userRepo.create({
         email,
@@ -342,7 +342,7 @@ export class AdminUserController {
 
       // Update password if provided
       if (password) {
-        user.password = await bcrypt.hash(password, 10);
+        user.password = await hashPassword(password);
       }
 
       const updatedUser = await userRepo.save(user);

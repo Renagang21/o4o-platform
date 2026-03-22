@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { hashPassword, comparePassword } from '../utils/auth.utils.js';
 import { Repository } from 'typeorm';
 import { Request, Response } from 'express';
 import { AppDataSource } from '../database/connection.js';
@@ -88,7 +88,7 @@ class AuthService {
     }
 
     // 비밀번호 검증
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       await this.handleFailedLogin(user);
       throw new Error('Invalid credentials');
@@ -175,8 +175,7 @@ class AuthService {
 
   // 비밀번호 해시화
   async hashPassword(password: string): Promise<string> {
-    const saltRounds = 12;
-    return await bcrypt.hash(password, saltRounds);
+    return await hashPassword(password);
   }
 
   // 사용자 생성

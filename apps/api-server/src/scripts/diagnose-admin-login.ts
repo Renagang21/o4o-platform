@@ -12,7 +12,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserStatus } from '../entities/User.js';
 import { UserRole } from '../types/auth.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword, comparePassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
 
@@ -58,7 +58,7 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
         message: `User not found: ${targetEmail}`,
         fix: async () => {
           logger.info('Creating admin user...');
-          const hashedPassword = await bcrypt.hash('Admin123!', 10);
+          const hashedPassword = await hashPassword('Admin123!');
           const newUser = userRepo.create({
             email: targetEmail,
             password: hashedPassword,
@@ -131,7 +131,7 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
         status: 'FAIL',
         message: 'No password hash found (social-only account?)',
         fix: async () => {
-          const hashedPassword = await bcrypt.hash('Admin123!', 10);
+          const hashedPassword = await hashPassword('Admin123!');
           user.password = hashedPassword;
           await userRepo.save(user);
           logger.info('✅ Password set to: Admin123!');
@@ -152,7 +152,7 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     const testPassword = 'Admin123!';
 
     if (user.password) {
-      const isValid = await bcrypt.compare(testPassword, user.password);
+      const isValid = await comparePassword(testPassword, user.password);
       logger.info(`   Testing password 'Admin123!': ${isValid ? 'MATCH' : 'NO MATCH'}`);
 
       if (!isValid) {
@@ -161,7 +161,7 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
           status: 'FAIL',
           message: `Password 'Admin123!' does not match stored hash`,
           fix: async () => {
-            const hashedPassword = await bcrypt.hash('Admin123!', 10);
+            const hashedPassword = await hashPassword('Admin123!');
             user.password = hashedPassword;
             await userRepo.save(user);
             logger.info('✅ Password reset to: Admin123!');

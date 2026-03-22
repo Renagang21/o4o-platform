@@ -9,7 +9,7 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../utils/auth.utils.js';
 
 /* ─── Deterministic Test UUIDs (hex-safe) ─── */
 
@@ -81,7 +81,7 @@ export function createSeedStoreHubRouter(dataSource: DataSource): Router {
     const skipped: string[] = [];
 
     try {
-      const passwordHash = await bcrypt.hash('Test1234!', 10);
+      const passwordHash = await hashPassword('Test1234!');
 
       // 1. Users
       // WO-O4O-LEGACY-RBAC-SEED-FIX-V1: users.roles column was DROPPED (RBAC SSOT = role_assignments)
