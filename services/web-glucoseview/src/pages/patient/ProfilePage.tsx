@@ -229,6 +229,8 @@ export default function ProfilePage() {
               type="date"
               value={form.birthDate || ''}
               onChange={(v) => updateForm('birthDate', v || null)}
+              max={new Date().toISOString().split('T')[0]}
+              min="1920-01-01"
             />
 
             {/* 키 / 몸무게 */}
