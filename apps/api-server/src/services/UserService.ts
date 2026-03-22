@@ -1,6 +1,6 @@
 import { AppDataSource } from '../database/connection.js';
 import { User, UserRole, UserStatus } from '../modules/auth/entities/User.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword as _hashPassword, comparePassword as _comparePassword } from '../utils/auth.utils.js';
 import { BusinessInfo } from '../types/user.js';
 import { MoreThan } from 'typeorm';
 import { roleAssignmentService } from '../modules/auth/services/role-assignment.service.js';
@@ -201,15 +201,14 @@ export class UserService {
    * Hash password
    */
   static async hashPassword(password: string): Promise<string> {
-    const saltRounds = parseInt(process.env.BCRYPT_ROUNDS || '12');
-    return await bcrypt.hash(password, saltRounds);
+    return await _hashPassword(password);
   }
 
   /**
    * Compare password
    */
   static async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
+    return await _comparePassword(password, hashedPassword);
   }
 
   /**

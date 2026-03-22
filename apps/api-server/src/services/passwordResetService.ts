@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../utils/auth.utils.js';
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { PasswordResetToken } from '../entities/PasswordResetToken.js';
@@ -82,7 +82,7 @@ export class PasswordResetService {
     }
 
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    const hashedPassword = await hashPassword(newPassword);
 
     // Update user password
     resetToken.user.password = hashedPassword;

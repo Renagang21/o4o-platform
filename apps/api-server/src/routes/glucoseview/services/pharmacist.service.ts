@@ -5,7 +5,7 @@
  */
 
 import { DataSource, Repository } from 'typeorm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../../utils/auth.utils.js';
 import { GlucoseViewPharmacist, GlucoseViewChapter } from '../entities/index.js';
 import { User } from '../../../modules/auth/entities/User.js';
 import type {
@@ -69,7 +69,7 @@ export class PharmacistService {
     }
 
     // 5. Core User 생성
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await hashPassword(data.password);
     const user = this.userRepository.create({
       email: data.email,
       password: hashedPassword,

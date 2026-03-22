@@ -5,8 +5,8 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { hashPassword, comparePassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import type { AuthRequest } from '../../../common/middleware/auth.middleware.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -403,7 +403,7 @@ export class AuthController extends BaseController {
         }
 
         // 2. 비밀번호 검증 (보안: 본인 확인)
-        const passwordMatch = await bcrypt.compare(data.password, existingUser.password);
+        const passwordMatch = await comparePassword(data.password, existingUser.password);
         if (!passwordMatch) {
           // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: 기존 가입 서비스 목록 포함
           const existingMemberships = await smRepository.find({
@@ -473,7 +473,7 @@ export class AuthController extends BaseController {
       }
 
       // ── 신규 사용자: 기존 로직 + ServiceMembership 추가 ──
-      const hashedPassword = await bcrypt.hash(data.password, env.getNumber('BCRYPT_ROUNDS', 12));
+      const hashedPassword = await hashPassword(data.password);
 
       const user = await AppDataSource.transaction(async (manager) => {
         const txUserRepo = manager.getRepository(User);

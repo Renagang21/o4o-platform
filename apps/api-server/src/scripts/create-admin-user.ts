@@ -9,7 +9,7 @@
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
 import { UserStatus } from '../types/auth.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 
 interface CreateAdminOptions {
@@ -78,7 +78,7 @@ async function createAdminUser(options: CreateAdminOptions = {}) {
 
     // Hash password
     logger.info('🔐 Hashing password...');
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    const hashedPassword = await hashPassword(adminPassword);
 
     // Create user
     logger.info('👤 Creating user...');

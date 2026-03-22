@@ -8,7 +8,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../../utils/auth.utils.js';
 
 const TEST_PASSWORD = 'TestPassword';
 
@@ -90,7 +90,7 @@ const TEST_ACCOUNTS = [
 
 export class SeedAdditionalTestAccounts1737100200000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10);
+    const hashedPassword = await hashPassword(TEST_PASSWORD);
 
     for (const account of TEST_ACCOUNTS) {
       // Check if account already exists (idempotent)

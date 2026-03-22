@@ -151,7 +151,7 @@ import { BaseService } from '../../../common/base.service.js';
 import { User } from '../entities/User.js';
 import { RegisterDto } from '../dto/register.dto.js';
 import { ConflictError, UnauthorizedError } from '../../../common/middleware/error-handler.middleware.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 class AuthService extends BaseService<User> {

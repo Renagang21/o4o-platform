@@ -7,7 +7,7 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 
 interface ResetOptions {
@@ -46,7 +46,7 @@ async function listAndResetAllUsers(options: ResetOptions = {}) {
 
     // Hash new password once
     logger.info('🔐 Hashing password...');
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await hashPassword(newPassword);
 
     logger.info('\n📋 Users List:\n');
 

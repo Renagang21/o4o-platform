@@ -8,6 +8,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
+import { hashPassword } from '../../utils/auth.utils.js';
 import logger from '../../utils/logger.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
@@ -519,9 +520,7 @@ export class MembershipConsoleController {
 
       // 1. Password update (기존 로직)
       if (password) {
-        const bcryptModule = await import('bcryptjs');
-        const bcrypt = bcryptModule.default || bcryptModule;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hashPassword(password);
         await AppDataSource.query(
           `UPDATE users SET password = $1, "updatedAt" = NOW() WHERE id = $2`,
           [hashedPassword, userId]

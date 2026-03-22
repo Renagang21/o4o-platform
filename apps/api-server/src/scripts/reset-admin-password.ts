@@ -7,7 +7,7 @@
 
 import { AppDataSource } from '../database/connection.js';
 import { User } from '../entities/User.js';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../utils/auth.utils.js';
 import logger from '../utils/logger.js';
 
 interface ResetPasswordOptions {
@@ -49,7 +49,7 @@ async function resetAdminPassword(options: ResetPasswordOptions = {}) {
 
     // Hash new password
     logger.info('\n🔐 Hashing new password...');
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await hashPassword(newPassword);
 
     // Update password directly (bypass BeforeUpdate hook)
     await userRepo
