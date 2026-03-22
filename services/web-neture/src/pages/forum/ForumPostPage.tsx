@@ -201,7 +201,7 @@ function CommentItem({ comment, currentUserId, isAdmin, onUpdate, onDelete, comp
   );
 }
 
-export function ForumPostPage() {
+export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {}) {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -279,7 +279,7 @@ export function ForumPostPage() {
     if (!post || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
     const result = await deleteForumPost(post.id);
     if (result.success) {
-      navigate('/forum');
+      navigate(basePath);
     } else {
       toast.error(result.error || '게시글 삭제에 실패했습니다.');
     }
@@ -432,7 +432,7 @@ export function ForumPostPage() {
                 <div style={styles.moreMenuDropdown}>
                   <button
                     style={styles.moreMenuItem}
-                    onClick={() => { setShowActionMenu(false); navigate(`/forum/write?edit=${post.id}`); }}
+                    onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
                   >
                     수정
                   </button>
@@ -456,7 +456,7 @@ export function ForumPostPage() {
         {/* Desktop: inline actions */}
         {!isMobile && (isAdmin || (currentUserId && post.authorId === currentUserId)) && (
           <div style={styles.postActions}>
-            <button style={styles.actionBtn} onClick={() => navigate(`/forum/write?edit=${post.id}`)}>수정</button>
+            <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>
             <button style={{ ...styles.actionBtn, color: '#dc2626' }} onClick={handleDeletePost}>삭제</button>
           </div>
         )}

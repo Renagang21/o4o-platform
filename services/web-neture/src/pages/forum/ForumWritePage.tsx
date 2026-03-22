@@ -43,11 +43,14 @@ const MIN_CONTENT_LENGTH = 5;
 interface ForumWritePageProps {
   categorySlug?: string;
   backPath?: string;
+  /** URL segment for post detail: 'post' (default) or 'article' (community) */
+  postSegment?: string;
 }
 
 export function ForumWritePage({
   categorySlug = 'neture-forum',
   backPath,
+  postSegment = 'post',
 }: ForumWritePageProps = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -153,9 +156,8 @@ export function ForumWritePage({
       // Convert HTML to Block[]
       const blocks = htmlToBlocks(editorHtml);
 
-      const postDetailPath = backPath
-        ? (slug: string) => `${backPath.replace(/\/$/, '')}/article/${slug}`
-        : (slug: string) => `/forum/post/${slug}`;
+      const base = (backPath || '/forum').replace(/\/$/, '');
+      const postDetailPath = (slug: string) => `${base}/${postSegment}/${slug}`;
 
       if (isEditMode && editPostId) {
         const response = await updateForumPost(editPostId, {
@@ -193,7 +195,8 @@ export function ForumWritePage({
 
   function handleCancel() {
     if (isEditMode && editSlug) {
-      navigate(`/forum/post/${editSlug}`);
+      const base = (backPath || '/forum').replace(/\/$/, '');
+      navigate(`${base}/${postSegment}/${editSlug}`);
       return;
     }
     if (title.trim() || editorHtml.trim()) {

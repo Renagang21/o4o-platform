@@ -484,7 +484,7 @@ function App() {
               <Route path="/community/forum/post/:slug" element={<ForumPostPage />} />
 
               {/* Community Articles (WO-O4O-COMMUNITY-ARTICLE-SYSTEM-V1) */}
-              <Route path="/community/write" element={<ForumWritePage categorySlug="article" backPath="/community" />} />
+              <Route path="/community/write" element={<ForumWritePage categorySlug="article" backPath="/community" postSegment="article" />} />
               <Route path="/community/article/:slug" element={<ForumPostPage />} />
 
               {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
@@ -516,7 +516,9 @@ function App() {
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />
               <Route path="/supplier/signage/content" element={<SignageContentHubPage />} />
               <Route path="/supplier/signage/manage" element={<StoreSignagePage />} />
-              <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" />} />
+              <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
+              <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
+              <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
             </Route>
 
             {/* ================================================================
@@ -561,7 +563,9 @@ function App() {
               <Route path="/partner/promotions" element={<PromotionsPage />} />
               <Route path="/partner/product-pool" element={<Navigate to="/partner/products" replace />} />
               <Route path="/partner/referrals" element={<Navigate to="/partner/links" replace />} />
-              <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" />} />
+              <Route path="/partner/forum" element={<ForumPage title="파트너 포럼" description="파트너 간 소통 공간" basePath="/partner/forum" />} />
+              <Route path="/partner/forum/write" element={<ForumWritePage backPath="/partner/forum" />} />
+              <Route path="/partner/forum/post/:slug" element={<ForumPostPage basePath="/partner/forum" />} />
             </Route>
 
             {/* ================================================================

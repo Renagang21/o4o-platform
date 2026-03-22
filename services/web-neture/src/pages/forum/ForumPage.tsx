@@ -88,11 +88,12 @@ const SORT_OPTIONS = [
 
 const PAGE_SIZE = 20;
 
-export function ForumPage({ boardSlug, title: customTitle, description: customDescription, noticeText: customNotice }: {
+export function ForumPage({ boardSlug, title: customTitle, description: customDescription, noticeText: customNotice, basePath = '/forum' }: {
   boardSlug?: string;
   title?: string;
   description?: string;
   noticeText?: string;
+  basePath?: string;
 }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -186,7 +187,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
     return () => { cancelled = true; };
   }, [filterKey]);
 
-  const handlePostClick = (post: DisplayPost) => navigate(`/forum/post/${post.slug}`);
+  const handlePostClick = (post: DisplayPost) => navigate(`${basePath}/post/${post.slug}`);
 
   const updateParam = (key: string, value: string) => {
     const next = new URLSearchParams(searchParams);
@@ -235,7 +236,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
               {customDescription || 'o4o 개념과 네뚜레 구조에 대한 질문과 의견을 나누는 공간입니다.'}
             </p>
           </div>
-          <Link to="/forum/write" style={s.writeButton}>글쓰기</Link>
+          <Link to={`${basePath}/write`} style={s.writeButton}>글쓰기</Link>
         </div>
       </header>
 
@@ -412,7 +413,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
                       ) : (
                         <>
                           <p style={s.emptyTitle}>아직 등록된 글이 없습니다</p>
-                          <Link to="/forum/write" style={s.emptyBtn}>글쓰기</Link>
+                          <Link to={`${basePath}/write`} style={s.emptyBtn}>글쓰기</Link>
                         </>
                       )}
                     </td>
