@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { ContentPreview } from '@o4o/content-editor';
 import { cmsApi } from '@/api/cms';
+import CareSubNav from './CareSubNav';
 
 interface GuideSection {
   id: string;
@@ -226,13 +227,18 @@ export default function PharmacistGuidelinePage() {
 
   if (cmsLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
-      </div>
+      <>
+        <CareSubNav />
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+        </div>
+      </>
     );
   }
 
   return (
+    <>
+    <CareSubNav />
     <div className="min-h-screen bg-white px-4 py-6">
       <div className="w-full max-w-2xl mx-auto">
         {/* Header */}
@@ -313,5 +319,6 @@ export default function PharmacistGuidelinePage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
