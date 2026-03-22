@@ -36,8 +36,6 @@ interface MasterFormData {
 
 interface OfferFormData {
   priceGeneral: string;
-  priceGold: string;
-  pricePlatinum: string;
   consumerReferencePrice: string;
   distributionType: string;
 }
@@ -87,8 +85,6 @@ export default function SupplierProductCreatePage() {
   // Step 3: Offer form
   const [offerForm, setOfferForm] = useState<OfferFormData>({
     priceGeneral: '',
-    priceGold: '',
-    pricePlatinum: '',
     consumerReferencePrice: '',
     distributionType: 'PUBLIC',
   });
@@ -97,16 +93,8 @@ export default function SupplierProductCreatePage() {
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
   const [brands, setBrands] = useState<BrandItem[]>([]);
 
-  // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1: Description fields
   const [consumerShortDesc, setConsumerShortDesc] = useState('');
   const [consumerDetailDesc, setConsumerDetailDesc] = useState('');
-  const [businessShortDesc, setBusinessShortDesc] = useState('');
-  const [businessDetailDesc, setBusinessDetailDesc] = useState('');
-
-  const copyB2CtoB2B = () => {
-    setBusinessShortDesc(consumerShortDesc);
-    setBusinessDetailDesc(consumerDetailDesc);
-  };
 
   // Image upload state
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -212,14 +200,9 @@ export default function SupplierProductCreatePage() {
       distributionType: offerForm.distributionType,
       manualData,
       priceGeneral,
-      priceGold: offerForm.priceGold ? Number(offerForm.priceGold) : null,
-      pricePlatinum: offerForm.pricePlatinum ? Number(offerForm.pricePlatinum) : null,
       consumerReferencePrice: offerForm.consumerReferencePrice ? Number(offerForm.consumerReferencePrice) : null,
-      // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
       consumerShortDescription: consumerShortDesc || null,
       consumerDetailDescription: consumerDetailDesc || null,
-      businessShortDescription: businessShortDesc || null,
-      businessDetailDescription: businessDetailDesc || null,
     });
     setSubmitting(false);
 
@@ -649,33 +632,6 @@ export default function SupplierProductCreatePage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Gold 공급가 (원)</label>
-                <input
-                  type="number"
-                  name="priceGold"
-                  value={offerForm.priceGold}
-                  onChange={handleOfferChange}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  placeholder="선택"
-                  min="0"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Platinum 공급가 (원)</label>
-                <input
-                  type="number"
-                  name="pricePlatinum"
-                  value={offerForm.pricePlatinum}
-                  onChange={handleOfferChange}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  placeholder="선택"
-                  min="0"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">소비자 참고가 (원)</label>
               <input
@@ -710,40 +666,6 @@ export default function SupplierProductCreatePage() {
                 value={consumerDetailDesc}
                 onChange={(c) => setConsumerDetailDesc(c.html)}
                 placeholder="소비자에게 보이는 상세 설명을 입력하세요..."
-                minHeight="200px"
-              />
-            </div>
-          </div>
-
-          {/* B2B Description */}
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-800">B2B 상품 설명</h3>
-              <button
-                type="button"
-                onClick={copyB2CtoB2B}
-                className="px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"
-              >
-                B2C 설명 복사
-              </button>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간이 설명</label>
-              <RichTextEditor
-                value={businessShortDesc}
-                onChange={(c) => setBusinessShortDesc(c.html)}
-                placeholder="사업자에게 보이는 간이 설명을 입력하세요..."
-                minHeight="120px"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
-              <RichTextEditor
-                value={businessDetailDesc}
-                onChange={(c) => setBusinessDetailDesc(c.html)}
-                placeholder="사업자에게 보이는 상세 설명을 입력하세요..."
                 minHeight="200px"
               />
             </div>

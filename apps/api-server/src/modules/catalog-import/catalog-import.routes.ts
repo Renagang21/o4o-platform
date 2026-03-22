@@ -49,7 +49,7 @@ export function createCatalogImportRoutes(_dataSource: DataSource): Router {
         return res.status(400).json({ success: false, error: 'SUPPLIER_ID_REQUIRED' });
       }
 
-      if (!['csv', 'firstmall'].includes(extensionKey)) {
+      if (!['csv'].includes(extensionKey)) {
         return res.status(400).json({ success: false, error: `INVALID_EXTENSION: ${extensionKey}` });
       }
 

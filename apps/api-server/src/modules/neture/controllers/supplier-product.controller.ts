@@ -26,15 +26,15 @@ export function createSupplierProductController(dataSource: DataSource): Router 
   router.post('/products', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { barcode, distributionType, manualData, priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
-              consumerShortDescription, consumerDetailDescription, businessShortDescription, businessDetailDescription } = req.body;
+      const { barcode, distributionType, manualData, priceGeneral, consumerReferencePrice,
+              consumerShortDescription, consumerDetailDescription } = req.body;
       if (!barcode) {
         return res.status(400).json({ success: false, error: 'MISSING_BARCODE', message: 'barcode is required' });
       }
       const result = await netureService.createSupplierOffer(supplierId, {
         barcode, manualData, distributionType,
-        priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
-        consumerShortDescription, consumerDetailDescription, businessShortDescription, businessDetailDescription,
+        priceGeneral, consumerReferencePrice,
+        consumerShortDescription, consumerDetailDescription,
       });
       if (!result.success) {
         const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403 : 400;
@@ -65,12 +65,12 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const supplierId = (req as SupplierRequest).supplierId;
       const { id } = req.params;
       const { isActive, distributionType, allowedSellerIds,
-              priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
-              consumerShortDescription, consumerDetailDescription, businessShortDescription, businessDetailDescription } = req.body;
+              priceGeneral, consumerReferencePrice,
+              consumerShortDescription, consumerDetailDescription } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
         isActive, distributionType, allowedSellerIds,
-        priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
-        consumerShortDescription, consumerDetailDescription, businessShortDescription, businessDetailDescription,
+        priceGeneral, consumerReferencePrice,
+        consumerShortDescription, consumerDetailDescription,
       });
       if (!result.success) {
         const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;

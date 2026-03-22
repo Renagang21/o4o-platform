@@ -39,7 +39,6 @@ import logger from '../../../utils/logger.js';
 /** CSV 허용 컬럼 */
 const ALLOWED_CSV_COLUMNS = [
   'barcode',
-  'supplier_sku',
   'supply_price',
   'msrp',
   'stock_qty',
@@ -214,7 +213,16 @@ export class CsvImportService {
         row.parsedDistributionType = rawDist;
       }
 
-      // 3f. 내부 Master 조회
+      // 3f. PUBLIC requires consumer_short_description
+      const distType = rawDist || 'PRIVATE';
+      if (distType === 'PUBLIC' && !((raw.consumer_short_description || '') as string).trim()) {
+        this.rejectRow(row, 'PUBLIC_REQUIRES_DESCRIPTION');
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
+      }
+
+      // 3g. 내부 Master 조회
       const existingMaster = await this.masterRepo.findOne({
         where: { barcode },
         select: ['id'],

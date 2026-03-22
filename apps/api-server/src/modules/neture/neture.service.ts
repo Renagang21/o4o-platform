@@ -260,13 +260,9 @@ export class NetureService {
       };
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      businessShortDescription?: string | null;
-      businessDetailDescription?: string | null;
     }
   ) {
     return this.offerService.createSupplierOffer(supplierId, data);
@@ -280,13 +276,9 @@ export class NetureService {
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
-      businessShortDescription?: string | null;
-      businessDetailDescription?: string | null;
     }
   ) {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);

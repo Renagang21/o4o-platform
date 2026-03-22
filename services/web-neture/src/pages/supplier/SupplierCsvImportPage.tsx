@@ -19,7 +19,6 @@ const CSV_TEMPLATE_HEADER = [
   'marketing_name',
   'supply_price',
   'distribution_type',
-  'supplier_sku',
   'msrp',
   'stock_qty',
   'brand',
@@ -33,7 +32,6 @@ const CSV_TEMPLATE_EXAMPLE = [
   '건강보조식품A',
   '15000',
   'PRIVATE',
-  'SKU-001',
   '25000',
   '100',
   '헬스브랜드',
@@ -195,7 +193,7 @@ export default function SupplierCsvImportPage() {
         </p>
         <div className="mb-3 text-xs text-gray-400 space-y-1">
           <p><strong>필수 컬럼:</strong> barcode, marketing_name, supply_price</p>
-          <p><strong>선택 컬럼:</strong> distribution_type, supplier_sku, msrp, stock_qty, brand, manufacturer_name, image_url, consumer_short_description</p>
+          <p><strong>선택 컬럼:</strong> distribution_type, msrp, stock_qty, brand, manufacturer_name, image_url, consumer_short_description</p>
         </div>
         <button
           onClick={downloadTemplate}

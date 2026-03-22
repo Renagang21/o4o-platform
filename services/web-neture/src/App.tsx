@@ -305,7 +305,6 @@ const QrLandingPage = lazy(() => import('./pages/store/QrLandingPage'));
 // Catalog Import
 const CatalogImportDashboardPage = lazy(() => import('./pages/admin/catalog-import/CatalogImportDashboardPage'));
 const CSVImportPage = lazy(() => import('./pages/admin/catalog-import/CSVImportPage'));
-const FirstmallImportPage = lazy(() => import('./pages/admin/catalog-import/FirstmallImportPage'));
 const ImportHistoryPage = lazy(() => import('./pages/admin/catalog-import/ImportHistoryPage'));
 
 // Hub
@@ -701,7 +700,6 @@ function App() {
               <Route path="/workspace/admin/partners/:id" element={<AdminPartnerDetailPage />} />
               <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
               <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
-              <Route path="/workspace/admin/catalog-import/firstmall" element={<FirstmallImportPage />} />
               <Route path="/workspace/admin/catalog-import/history" element={<ImportHistoryPage />} />
               <Route path="/workspace/admin/contact-messages" element={<AdminContactMessagesPage />} />
               <Route path="/workspace/admin/community" element={<CommunityManagementPage />} />
