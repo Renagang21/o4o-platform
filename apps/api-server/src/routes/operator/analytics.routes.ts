@@ -8,9 +8,10 @@
  * 서비스별 승인/거절 등 액션 통계와 최근 액션 이력을 제공합니다.
  *
  * Endpoints:
- *   GET /api/v1/operator/analytics/summary   — 기간별 액션 요약
- *   GET /api/v1/operator/analytics/actions    — 최근 액션 목록 (페이징)
- *   GET /api/v1/operator/analytics/insight    — AI 운영 인사이트 (규칙 기반 + AI 강화)
+ *   GET /api/v1/operator/analytics/summary    — 기간별 액션 요약
+ *   GET /api/v1/operator/analytics/actions     — 최근 액션 목록 (페이징)
+ *   GET /api/v1/operator/analytics/auth/logs   — Auth 이벤트 조회 (WO-O4O-AUTH-MONITORING-V1)
+ *   GET /api/v1/operator/analytics/insight     — AI 운영 인사이트 (규칙 기반 + AI 강화)
  */
 
 import { Router, Request, Response } from 'express';
@@ -187,6 +188,52 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
     } catch (error) {
       console.error('[OperatorAnalytics] Actions error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch action logs' });
+    }
+  });
+
+  /**
+   * GET /api/v1/operator/analytics/auth/logs
+   *
+   * WO-O4O-AUTH-MONITORING-V1
+   *
+   * Auth 이벤트 조회 (action_logs 기반).
+   * 로그인 성공/실패 이력을 운영자 대시보드에서 확인할 수 있다.
+   *
+   * Query params:
+   *   limit  — 최대 건수 (default 50, max 200)
+   *   status — 'success' | 'failure' 필터 (optional)
+   */
+  router.get('/auth/logs', async (req: Request, res: Response) => {
+    try {
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+      const status = req.query.status as string | undefined;
+
+      const conditions: string[] = [`action_key LIKE 'auth.login.%'`];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (status === 'success' || status === 'failure') {
+        conditions.push(`status = $${idx++}`);
+        params.push(status);
+      }
+
+      conditions.push(`created_at >= NOW() - INTERVAL '30 days'`);
+
+      const where = `WHERE ${conditions.join(' AND ')}`;
+
+      const rows = await dataSource.query(
+        `SELECT id, user_id, action_key, status, error_message, meta, created_at
+         FROM action_logs
+         ${where}
+         ORDER BY created_at DESC
+         LIMIT $${idx}`,
+        [...params, limit],
+      );
+
+      res.json({ success: true, data: rows });
+    } catch (error) {
+      console.error('[OperatorAnalytics] Auth logs error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch auth logs' });
     }
   });
 

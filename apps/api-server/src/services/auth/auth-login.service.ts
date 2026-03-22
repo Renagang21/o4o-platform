@@ -28,6 +28,7 @@ import {
   generateTokensWithContext,
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
+import { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../utils/logger.js';
 
 /**
@@ -42,6 +43,7 @@ export class AuthLoginService {
   private _userRepo?: Repository<User>;
   private _linkedAccountRepo?: Repository<LinkedAccount>;
   private _activityRepo?: Repository<AccountActivity>;
+  private _actionLogService?: ActionLogService;
 
   private get userRepository(): Repository<User> {
     if (!this._userRepo) {
@@ -62,6 +64,13 @@ export class AuthLoginService {
       this._activityRepo = AppDataSource.getRepository(AccountActivity);
     }
     return this._activityRepo;
+  }
+
+  private get actionLogService(): ActionLogService {
+    if (!this._actionLogService) {
+      this._actionLogService = new ActionLogService(AppDataSource);
+    }
+    return this._actionLogService;
   }
 
   /**
@@ -151,7 +160,7 @@ export class AuthLoginService {
     const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword) {
       await this.handleFailedLogin(user);
-      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'invalid_password');
+      await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'invalid_password', 'email', user.password?.substring(0, 4));
       throw new InvalidCredentialsError();
     }
 
@@ -475,7 +484,7 @@ export class AuthLoginService {
   }
 
   /**
-   * Log login attempt
+   * Log login attempt to AccountActivity + action_logs
    */
   private async logLoginAttempt(
     userId: string | null,
@@ -485,6 +494,7 @@ export class AuthLoginService {
     success: boolean,
     failureReason?: string,
     provider: AuthProvider = 'email',
+    hashPrefix?: string,
   ): Promise<void> {
     try {
       await this.activityRepository.save(
@@ -503,6 +513,25 @@ export class AuthLoginService {
       );
     } catch (error) {
       logger.warn('Failed to log login attempt:', error);
+    }
+
+    // action_logs — operator dashboard visibility
+    try {
+      const actionKey = `auth.login.${provider}`;
+      const meta = {
+        email,
+        ip: ipAddress,
+        ...(failureReason && { errorCode: failureReason }),
+        ...(hashPrefix && { hashPrefix }),
+      };
+
+      if (success) {
+        this.actionLogService.logSuccess('platform', userId || 'anonymous', actionKey, { meta }).catch(() => {});
+      } else {
+        this.actionLogService.logFailure('platform', userId || 'anonymous', actionKey, failureReason || 'unknown', { meta }).catch(() => {});
+      }
+    } catch {
+      // fire-and-forget
     }
   }
 }
