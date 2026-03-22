@@ -5,7 +5,14 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Router, type IRouter } from 'express';
-import { AuthController, PasswordController, VerificationController } from '../controllers/index.js';
+import {
+  AuthLoginController,
+  AuthRegisterController,
+  AuthSessionController,
+  AuthAccountController,
+  PasswordController,
+  VerificationController,
+} from '../controllers/index.js';
 import { HandoffController } from '../controllers/handoff.controller.js';
 import {
   validateDto,
@@ -36,35 +43,35 @@ const router: IRouter = Router();
 router.post(
   '/login',
   validateDto(LoginRequestDto),
-  asyncHandler(AuthController.login)
+  asyncHandler(AuthLoginController.login)
 );
 
 // POST /api/v1/auth/register - Register new user
 router.post(
   '/register',
   validateDto(RegisterRequestDto),
-  asyncHandler(AuthController.register)
+  asyncHandler(AuthRegisterController.register)
 );
 
 // POST /api/v1/auth/signup - Alias for register (backward compatibility)
 router.post(
   '/signup',
   validateDto(RegisterRequestDto),
-  asyncHandler(AuthController.register)
+  asyncHandler(AuthRegisterController.register)
 );
 
 // POST /api/v1/auth/check-email - Check email existence (multi-service registration UX)
 // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1
 router.post(
   '/check-email',
-  asyncHandler(AuthController.checkEmail)
+  asyncHandler(AuthRegisterController.checkEmail)
 );
 
 // POST /api/v1/auth/refresh - Refresh access token
 router.post(
   '/refresh',
   validateDto(RefreshTokenRequestDto),
-  asyncHandler(AuthController.refresh)
+  asyncHandler(AuthSessionController.refresh)
 );
 
 /**
@@ -77,7 +84,7 @@ router.post(
 router.get(
   '/me',
   requireAuth,
-  asyncHandler(AuthController.me)
+  asyncHandler(AuthAccountController.me)
 );
 
 // PATCH /api/v1/auth/me/profile - Update pharmacist profile
@@ -85,21 +92,21 @@ router.get(
 router.patch(
   '/me/profile',
   requireAuth,
-  asyncHandler(AuthController.updateProfile)
+  asyncHandler(AuthAccountController.updateProfile)
 );
 
 // POST /api/v1/auth/logout - Logout current session
 router.post(
   '/logout',
   requireAuth,
-  asyncHandler(AuthController.logout)
+  asyncHandler(AuthSessionController.logout)
 );
 
 // POST /api/v1/auth/logout-all - Logout from all devices
 router.post(
   '/logout-all',
   requireAuth,
-  asyncHandler(AuthController.logoutAll)
+  asyncHandler(AuthSessionController.logoutAll)
 );
 
 /**
@@ -204,14 +211,14 @@ router.post(
 router.get(
   '/status',
   optionalAuth,
-  asyncHandler(AuthController.status)
+  asyncHandler(AuthAccountController.status)
 );
 
 // GET /api/v1/auth/verify - Alias for /status (backward compatibility)
 router.get(
   '/verify',
   requireAuth,
-  asyncHandler(AuthController.me)
+  asyncHandler(AuthAccountController.me)
 );
 
 export default router;
