@@ -205,6 +205,9 @@ const PatientDetailPage = lazy(() => import('@/pages/care').then(m => ({ default
 const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.AnalysisPage })));
 const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
 
+// Pharmacist Guideline (WO-GLYCOPHARM-PHARMACIST-GUIDELINE-V1)
+const PharmacistGuidelinePage = lazy(() => import('@/pages/care/PharmacistGuidelinePage'));
+
 // Patient Detail Tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1)
 const DataTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.DataTab })));
 const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
@@ -417,6 +420,7 @@ function AppRoutes() {
           </Route>
           <Route path="analysis" element={<AnalysisPage />} />
           <Route path="coaching" element={<CoachingPage />} />
+          <Route path="guideline" element={<PharmacistGuidelinePage />} />
         </Route>
       </Route>
 

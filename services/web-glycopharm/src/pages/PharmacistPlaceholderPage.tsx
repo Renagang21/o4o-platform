@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store } from 'lucide-react';
+import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, BookOpen } from 'lucide-react';
 
 export default function PharmacistPlaceholderPage() {
   const { user, logout } = useAuth();
@@ -63,6 +63,13 @@ export default function PharmacistPlaceholderPage() {
             className="w-full py-3 text-sm font-medium text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
           >
             Care 대시보드
+          </button>
+          <button
+            onClick={() => navigate('/care/guideline')}
+            className="w-full py-3 text-sm font-medium text-amber-600 border border-amber-200 rounded-xl hover:bg-amber-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <BookOpen className="w-4 h-4" />
+            케어 가이드라인
           </button>
 
           {/* 약국 경영 아코디언 */}
