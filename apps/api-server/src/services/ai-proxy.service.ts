@@ -192,7 +192,7 @@ class AIProxyService {
   private resolveModel(provider: AIProvider, requestedModel?: string): string {
     const defaults = {
       openai: 'gpt-5-mini',
-      gemini: 'gemini-2.5-flash',
+      gemini: 'gemini-3.0-flash',
       claude: 'claude-sonnet-4.5',
     };
 

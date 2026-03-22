@@ -208,7 +208,7 @@ function getApiKey(provider: AIProviderId): string {
 }
 
 function getDefaultModel(provider: AIProviderId): string {
-  return provider === 'gemini' ? 'gemini-2.0-flash' : 'gpt-4o-mini';
+  return provider === 'gemini' ? 'gemini-3.0-flash' : 'gpt-4o-mini';
 }
 
 function simpleHash(str: string): string {

@@ -65,6 +65,24 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
         });
       }
 
+      // Gemini API errors — return 502 with specific detail
+      if (msg.includes('Gemini API error') || msg.includes('AI_CHAT_FAILED')) {
+        console.error('[CareAiChat] Gemini provider error:', msg);
+        return res.status(502).json({
+          success: false,
+          error: { code: 'AI_PROVIDER_ERROR', message: 'AI provider returned an error. Please try again later.' },
+        });
+      }
+
+      // Gemini timeout
+      if (msg.includes('timeout')) {
+        console.error('[CareAiChat] Gemini timeout:', msg);
+        return res.status(504).json({
+          success: false,
+          error: { code: 'AI_TIMEOUT', message: 'AI response timed out. Please try again.' },
+        });
+      }
+
       console.error('[CareAiChat] endpoint error:', error);
       res.status(500).json({
         success: false,

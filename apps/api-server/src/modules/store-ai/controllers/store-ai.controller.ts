@@ -41,7 +41,7 @@ export function createStoreAiRouter(dataSource: DataSource): Router {
         dbKeyActive = rows.length > 0;
       } catch { /* table may not exist */ }
 
-      let model = 'gemini-2.0-flash';
+      let model = 'gemini-3.0-flash';
       try {
         const rows = await dataSource.query(
           `SELECT model FROM ai_model_settings WHERE service = 'store' LIMIT 1`,

@@ -49,7 +49,7 @@ export class GeminiProvider implements AIProvider {
       throw new Error('GEMINI_API_KEY is not configured');
     }
 
-    const model = config.model || 'gemini-2.0-flash';
+    const model = config.model || 'gemini-3.0-flash';
     const url = `${GEMINI_API_BASE}/${model}:generateContent?key=${config.apiKey}`;
 
     const body = {

@@ -106,8 +106,8 @@ class AiAdminService {
 
       const defaultEngines: Partial<AiEngine>[] = [
         {
-          slug: 'gemini-2.0-flash',
-          name: 'Gemini 2.0 Flash',
+          slug: 'gemini-3.0-flash',
+          name: 'Gemini 3.0 Flash',
           description: '빠른 응답 속도와 비용 효율적인 모델. 일반적인 질의에 적합합니다.',
           provider: 'google',
           isActive: true,
@@ -244,7 +244,7 @@ class AiAdminService {
         globalDailyLimit: 1000,
         warningThreshold: 80,
         aiEnabled: true,
-        defaultModel: 'gemini-2.0-flash',
+        defaultModel: 'gemini-3.0-flash',
       });
       await this.policyRepo.save(policy);
     }

@@ -21,7 +21,7 @@ import logger from './logger.js';
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const REQUEST_TIMEOUT_MS = 10_000;
 const MAX_RETRIES = 1;
-const DEFAULT_MODEL = 'gemini-2.0-flash';
+const DEFAULT_MODEL = 'gemini-3.0-flash';
 const DEFAULT_TEMPERATURE = 0.7;
 const DEFAULT_MAX_TOKENS = 2048;
 

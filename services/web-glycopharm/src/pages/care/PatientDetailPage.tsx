@@ -255,7 +255,7 @@ export default function PatientDetailPage() {
                   const target = action.path === ''
                     ? `/care/patients/${id}`
                     : `/care/patients/${id}/${action.path}`;
-                  navigate(target);
+                  navigate(target, action.path === 'coaching' ? { state: { openForm: true } } : undefined);
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors hover:opacity-80 ${action.cls}`}
               >

@@ -33,7 +33,7 @@ export function createCareLlmInsightRouter(dataSource: DataSource): Router {
       } catch { /* table may not exist */ }
 
       // 3. ai_model_settings (model, temperature, max_tokens)
-      let model = 'gemini-2.0-flash';
+      let model = 'gemini-3.0-flash';
       let temperature = 0.3;
       let maxTokens = 2048;
       try {
