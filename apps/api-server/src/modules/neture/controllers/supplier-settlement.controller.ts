@@ -104,7 +104,7 @@ export function createSupplierSettlementController(dataSource: DataSource): Rout
         `SELECT spc.id, spc.supplier_product_id, spc.commission_per_unit,
                 spc.start_date, spc.end_date, spc.created_at,
                 COALESCE(pm.marketing_name, 'Unknown') AS product_name,
-                spo.barcode
+                pm.barcode
          FROM supplier_partner_commissions spc
          JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
          LEFT JOIN product_masters pm ON pm.id = spo.master_id

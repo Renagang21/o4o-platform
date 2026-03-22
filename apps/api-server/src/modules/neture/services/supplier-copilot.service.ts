@@ -4,6 +4,9 @@
  * WO-O4O-SUPPLIER-COPILOT-DASHBOARD-V1
  *
  * Copilot dashboard data: KPI, product performance, distribution, trending.
+ *
+ * Orders: checkout_orders table (JSONB items), NOT neture_orders.
+ * Column naming: snake_case (SnakeNamingStrategy was active at table creation).
  */
 
 import type { DataSource } from 'typeorm';
@@ -62,12 +65,10 @@ export class SupplierCopilotService {
 
     // Recent orders (7 days)
     const orderRows = await this.dataSource.query(
-      `SELECT COUNT(DISTINCT o.id)::int AS "recentOrders"
-       FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
-       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE spo.supplier_id = $1
-         AND o.created_at >= CURRENT_DATE - INTERVAL '7 days'`,
+      `SELECT COUNT(*)::int AS "recentOrders"
+       FROM checkout_orders
+       WHERE supplier_id = $1
+         AND created_at >= CURRENT_DATE - INTERVAL '7 days'`,
       [supplierId]
     );
 
@@ -85,13 +86,14 @@ export class SupplierCopilotService {
          pm.id AS "productId",
          pm.marketing_name AS "productName",
          COUNT(DISTINCT o.id)::int AS orders,
-         COALESCE(SUM(oi.total_price), 0)::int AS revenue,
+         COALESCE(SUM((item->>'subtotal')::int), 0)::int AS revenue,
          0 AS "qrScans"
        FROM supplier_product_offers spo
-       JOIN product_masters pm ON pm.id = spo.product_master_id
-       LEFT JOIN neture_order_items oi ON oi.product_id = spo.id::text
-       LEFT JOIN neture_orders o ON o.id = oi.order_id
-         AND o.status IN ('paid','preparing','shipped','delivered')
+       JOIN product_masters pm ON pm.id = spo.master_id
+       LEFT JOIN checkout_orders o ON o.supplier_id = $1
+         AND o.status IN ('paid','created')
+       LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
+         ON (item->>'productId')::uuid = spo.id
        WHERE spo.supplier_id = $1
        GROUP BY pm.id, pm.marketing_name
        ORDER BY revenue DESC
@@ -118,7 +120,7 @@ export class SupplierCopilotService {
            WHERE opl.created_at >= CURRENT_DATE - INTERVAL '7 days'
          )::int AS "newStores"
        FROM supplier_product_offers spo
-       JOIN product_masters pm ON pm.id = spo.product_master_id
+       JOIN product_masters pm ON pm.id = spo.master_id
        JOIN organization_product_listings opl ON opl.offer_id = spo.id AND opl.is_active = true
        WHERE spo.supplier_id = $1
        GROUP BY pm.id, pm.marketing_name
@@ -137,25 +139,27 @@ export class SupplierCopilotService {
   async getTrendingProducts(supplierId: string, limit = 5): Promise<TrendingProductItem[]> {
     const rows = await this.dataSource.query(
       `WITH current_period AS (
-         SELECT oi.product_id, COUNT(DISTINCT o.id)::int AS orders
-         FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         SELECT (item->>'productId') AS product_id, COUNT(DISTINCT o.id)::int AS orders
+         FROM checkout_orders o,
+              jsonb_array_elements(o.items) AS item
+         JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
          WHERE spo.supplier_id = $1
+           AND o.supplier_id = $1
            AND o.created_at >= CURRENT_DATE - INTERVAL '7 days'
-           AND o.status IN ('paid','preparing','shipped','delivered')
-         GROUP BY oi.product_id
+           AND o.status IN ('paid','created')
+         GROUP BY (item->>'productId')
        ),
        prev_period AS (
-         SELECT oi.product_id, COUNT(DISTINCT o.id)::int AS orders
-         FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
-         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         SELECT (item->>'productId') AS product_id, COUNT(DISTINCT o.id)::int AS orders
+         FROM checkout_orders o,
+              jsonb_array_elements(o.items) AS item
+         JOIN supplier_product_offers spo ON spo.id = (item->>'productId')::uuid
          WHERE spo.supplier_id = $1
+           AND o.supplier_id = $1
            AND o.created_at >= CURRENT_DATE - INTERVAL '14 days'
            AND o.created_at < CURRENT_DATE - INTERVAL '7 days'
-           AND o.status IN ('paid','preparing','shipped','delivered')
-         GROUP BY oi.product_id
+           AND o.status IN ('paid','created')
+         GROUP BY (item->>'productId')
        )
        SELECT
          pm.marketing_name AS "productName",
@@ -166,7 +170,7 @@ export class SupplierCopilotService {
            ELSE CASE WHEN COALESCE(cp.orders, 0) > 0 THEN 100 ELSE 0 END
          END AS "growthRate"
        FROM supplier_product_offers spo
-       JOIN product_masters pm ON pm.id = spo.product_master_id
+       JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN current_period cp ON cp.product_id = spo.id::text
        LEFT JOIN prev_period pp ON pp.product_id = spo.id::text
        WHERE spo.supplier_id = $1
