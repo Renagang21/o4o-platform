@@ -23,6 +23,10 @@
 
 > 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
+**로컬 도구:**
+- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회(`gcloud run services logs read`), 리비전 확인 등 디버깅에 활용 가능
+- ✅ `gh` CLI 설치됨 — GitHub PR/이슈 관리
+
 ---
 
 ## 1. 개발 기본 규칙
