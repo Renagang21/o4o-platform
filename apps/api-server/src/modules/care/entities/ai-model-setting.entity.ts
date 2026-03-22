@@ -19,7 +19,7 @@ export class AiModelSetting {
   @Column({ type: 'varchar', length: 50, unique: true })
   service!: string;
 
-  @Column({ type: 'varchar', length: 100, default: 'gemini-2.0-flash' })
+  @Column({ type: 'varchar', length: 100, default: 'gemini-3.0-flash' })
   model!: string;
 
   @Column({ type: 'numeric', precision: 3, scale: 2, default: 0.3 })

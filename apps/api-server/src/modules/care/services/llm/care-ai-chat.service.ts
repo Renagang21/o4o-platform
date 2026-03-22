@@ -414,7 +414,7 @@ export class CareAiChatService {
     } catch {
       // Table may not exist yet
     }
-    const model = setting?.model || 'gemini-2.0-flash';
+    const model = setting?.model || 'gemini-3.0-flash';
     const temperature = setting ? Number(setting.temperature) : 0.3;
     const maxTokens = setting?.maxTokens || 2048;
 

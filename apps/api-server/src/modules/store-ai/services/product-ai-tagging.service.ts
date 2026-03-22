@@ -199,7 +199,7 @@ export class ProductAiTaggingService {
 
   private async buildProviderConfig(): Promise<AIProviderConfig> {
     const setting = await this.settingRepo.findOne({ where: { service: 'store' } });
-    const model = setting?.model || 'gemini-2.0-flash';
+    const model = setting?.model || 'gemini-3.0-flash';
     const temperature = setting ? Number(setting.temperature) : 0.3;
     const maxTokens = setting?.maxTokens || 1024;
 

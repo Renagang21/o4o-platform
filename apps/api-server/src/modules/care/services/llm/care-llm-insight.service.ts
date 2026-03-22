@@ -215,7 +215,7 @@ export class CareLlmInsightService {
   private async buildProviderConfig(): Promise<AIProviderConfig> {
     // 1. Load model settings from ai_model_settings (service = 'care')
     const setting = await this.settingRepo.findOne({ where: { service: 'care' } });
-    const model = setting?.model || 'gemini-2.0-flash';
+    const model = setting?.model || 'gemini-3.0-flash';
     const temperature = setting ? Number(setting.temperature) : 0.3;
     const maxTokens = setting?.maxTokens || 2048;
 

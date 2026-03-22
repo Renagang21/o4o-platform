@@ -57,7 +57,16 @@ export interface CmsContent {
   sortOrder: number;
   authorRole?: string;
   visibilityScope?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CmsContentDetail extends CmsContent {
+  body: string | null;
+  bodyBlocks: Record<string, unknown> | null;
+  metadata: Record<string, any>;
+  attachments: any[] | null;
 }
 
 interface ContentsResponse {
@@ -98,6 +107,54 @@ export const cmsApi = {
     params.set('limit', String(options?.limit || 20));
     params.set('offset', String(options?.offset || 0));
     const res = await api.get(`/cms/contents?${params.toString()}`);
+    return res.data;
+  },
+
+  /**
+   * WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1: CRUD 메서드 추가
+   */
+
+  getContentById: async (id: string): Promise<{ success: boolean; data: CmsContentDetail }> => {
+    const res = await api.get(`/cms/contents/${id}`);
+    return res.data;
+  },
+
+  createContent: async (data: {
+    serviceKey?: string;
+    type: string;
+    title: string;
+    summary?: string;
+    body?: string;
+    bodyBlocks?: Record<string, unknown>;
+    metadata?: Record<string, any>;
+    visibilityScope?: string;
+  }): Promise<{ success: boolean; data: CmsContentDetail }> => {
+    const res = await api.post('/cms/contents', {
+      ...data,
+      serviceKey: data.serviceKey || 'glycopharm',
+    });
+    return res.data;
+  },
+
+  updateContent: async (
+    id: string,
+    data: {
+      title?: string;
+      summary?: string;
+      body?: string;
+      bodyBlocks?: Record<string, unknown>;
+      metadata?: Record<string, any>;
+    },
+  ): Promise<{ success: boolean; data: CmsContentDetail }> => {
+    const res = await api.put(`/cms/contents/${id}`, data);
+    return res.data;
+  },
+
+  updateContentStatus: async (
+    id: string,
+    status: string,
+  ): Promise<{ success: boolean }> => {
+    const res = await api.patch(`/cms/contents/${id}/status`, { status });
     return res.data;
   },
 };

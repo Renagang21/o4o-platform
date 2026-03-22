@@ -1,12 +1,14 @@
 /**
  * CareGuidelinePage — 당뇨 케어 가이드라인
  * WO-GLYCOPHARM-PATIENT-CARE-GUIDELINE-V1
+ * WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1: CMS 연동 + 정적 폴백
  *
  * 당뇨 관리 교육 자료 페이지.
- * 정적 콘텐츠 기반, 아코디언 UI.
+ * CMS에 발행된 가이드라인이 있으면 CMS HTML 렌더링,
+ * 없으면 정적 콘텐츠 아코디언 UI 폴백.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -19,7 +21,10 @@ import {
   Heart,
   Stethoscope,
   ChevronDown,
+  Loader2,
 } from 'lucide-react';
+import { ContentPreview } from '@o4o/content-editor';
+import { cmsApi } from '@/api/cms';
 
 interface GuideSection {
   id: string;
@@ -192,6 +197,31 @@ export default function CareGuidelinePage() {
   const navigate = useNavigate();
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(['monitoring']));
 
+  // CMS 연동 상태
+  const [cmsHtml, setCmsHtml] = useState<string | null>(null);
+  const [cmsTitle, setCmsTitle] = useState<string | null>(null);
+  const [cmsLoading, setCmsLoading] = useState(true);
+
+  useEffect(() => {
+    cmsApi
+      .getContents({ serviceKey: 'glycopharm', type: 'guide', status: 'published' })
+      .then((res) => {
+        const guide = res.data.find(
+          (c: any) => c.metadata?.guidelineTarget === 'patient',
+        );
+        if (guide) return cmsApi.getContentById(guide.id);
+        return null;
+      })
+      .then((detail) => {
+        if (detail?.data?.body) {
+          setCmsHtml(detail.data.body);
+          setCmsTitle(detail.data.title);
+        }
+      })
+      .catch(() => {}) // fallback to static
+      .finally(() => setCmsLoading(false));
+  }, []);
+
   const toggleSection = (id: string) => {
     setOpenSections((prev) => {
       const next = new Set(prev);
@@ -200,6 +230,14 @@ export default function CareGuidelinePage() {
       return next;
     });
   };
+
+  if (cmsLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white px-4 py-6">
@@ -217,7 +255,9 @@ export default function CareGuidelinePage() {
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
             <BookOpen className="w-5 h-5 text-amber-600" />
           </div>
-          <h1 className="text-xl font-bold text-slate-800">당뇨 케어 가이드라인</h1>
+          <h1 className="text-xl font-bold text-slate-800">
+            {cmsTitle || '당뇨 케어 가이드라인'}
+          </h1>
         </div>
         <p className="text-sm text-slate-500 mb-6 ml-[52px]">
           당뇨 관리에 도움이 되는 교육 자료입니다.
@@ -230,48 +270,55 @@ export default function CareGuidelinePage() {
           </p>
         </div>
 
-        {/* Accordion Sections */}
-        <div className="space-y-3">
-          {GUIDE_SECTIONS.map((section) => {
-            const isOpen = openSections.has(section.id);
-            return (
-              <div
-                key={section.id}
-                className="border border-slate-200 rounded-2xl overflow-hidden"
-              >
-                <button
-                  onClick={() => toggleSection(section.id)}
-                  className="w-full flex items-center gap-3 p-4 text-left hover:bg-slate-50 transition-colors"
+        {/* CMS Content or Static Fallback */}
+        {cmsHtml ? (
+          <div className="prose prose-sm max-w-none">
+            <ContentPreview html={cmsHtml} />
+          </div>
+        ) : (
+          /* Static Accordion Fallback */
+          <div className="space-y-3">
+            {GUIDE_SECTIONS.map((section) => {
+              const isOpen = openSections.has(section.id);
+              return (
+                <div
+                  key={section.id}
+                  className="border border-slate-200 rounded-2xl overflow-hidden"
                 >
-                  <div className={`w-9 h-9 rounded-lg ${section.bg} flex items-center justify-center flex-shrink-0`}>
-                    <span className={section.color}>{section.icon}</span>
-                  </div>
-                  <span className="flex-1 text-sm font-semibold text-slate-800">
-                    {section.title}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
+                  <button
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full flex items-center gap-3 p-4 text-left hover:bg-slate-50 transition-colors"
+                  >
+                    <div className={`w-9 h-9 rounded-lg ${section.bg} flex items-center justify-center flex-shrink-0`}>
+                      <span className={section.color}>{section.icon}</span>
+                    </div>
+                    <span className="flex-1 text-sm font-semibold text-slate-800">
+                      {section.title}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
 
-                {isOpen && (
-                  <div className="px-4 pb-4 space-y-4">
-                    {section.items.map((item, idx) => (
-                      <div key={idx} className="pl-12">
-                        <h3 className="text-sm font-medium text-slate-700 mb-1">
-                          {item.heading}
-                        </h3>
-                        <p className="text-xs text-slate-500 leading-relaxed">
-                          {item.body}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                  {isOpen && (
+                    <div className="px-4 pb-4 space-y-4">
+                      {section.items.map((item, idx) => (
+                        <div key={idx} className="pl-12">
+                          <h3 className="text-sm font-medium text-slate-700 mb-1">
+                            {item.heading}
+                          </h3>
+                          <p className="text-xs text-slate-500 leading-relaxed">
+                            {item.body}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="mt-8 mb-4 text-center">

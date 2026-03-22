@@ -131,6 +131,9 @@ const OperatorAnalyticsPage = lazy(() => import('@/pages/operator/AnalyticsPage'
 const OperatorCareDashboardPage = lazy(() => import('@/pages/operator/care/OperatorCareDashboardPage'));
 const OperatorCareAlertsPage = lazy(() => import('@/pages/operator/care/OperatorCareAlertsPage'));
 
+// Operator Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1)
+const GuidelineManagementPage = lazy(() => import('@/pages/operator/GuidelineManagementPage'));
+
 // Operator Semi-Franchise Pages
 const PharmaciesPage = lazy(() => import('@/pages/operator/PharmaciesPage'));
 const ProductsPage = lazy(() => import('@/pages/operator/ProductsPage'));
@@ -526,6 +529,8 @@ function AppRoutes() {
         {/* Market Trial 2차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
         <Route path="market-trial" element={<MarketTrialServiceApprovalsPage />} />
         <Route path="market-trial/:id" element={<MarketTrialServiceApprovalDetailPage />} />
+        {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
+        <Route path="guidelines" element={<GuidelineManagementPage />} />
         {/* Settings */}
         <Route path="settings" element={<SettingsPage />} />
       </Route>

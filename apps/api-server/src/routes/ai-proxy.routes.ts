@@ -105,7 +105,7 @@ router.post('/vision/analyze', authenticate, async (req, res: Response) => {
   "context": "추가 맥락 정보"
 }`;
 
-    const model = 'gemini-2.0-flash';
+    const model = 'gemini-3.0-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const controller = new AbortController();

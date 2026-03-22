@@ -24,6 +24,9 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '매장 관리', path: '/operator/stores' },
   ],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
+  content: [
+    { label: '가이드라인 관리', path: '/operator/guidelines' },
+  ],
   signage: [
     { label: 'HQ 미디어', path: '/operator/signage/hq-media' },
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },

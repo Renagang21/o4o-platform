@@ -133,7 +133,9 @@ export default function CareAiChatPanel({
         ),
       );
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'AI 응답을 받지 못했습니다.';
+      const errorMsg = err instanceof Error
+        ? err.message
+        : (err as any)?.message || 'AI 응답을 받지 못했습니다.';
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id

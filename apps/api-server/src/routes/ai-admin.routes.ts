@@ -327,7 +327,7 @@ router.get('/ops/care-status', authenticate, requireAdmin, async (_req, res: Res
     } catch { /* table may not exist */ }
 
     // Model settings
-    let model = 'gemini-2.0-flash';
+    let model = 'gemini-3.0-flash';
     let temperature = 0.3;
     let maxTokens = 2048;
     try {

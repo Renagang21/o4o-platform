@@ -7,7 +7,7 @@
  *   POST /api/v1/care/coaching → 새 코칭 세션 생성
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   MessageSquare,
   Calendar,
@@ -18,11 +18,14 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { pharmacyApi, type CoachingSession, type CoachingDraftDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 export default function CoachingTab() {
   const { patient, reload } = usePatientDetail();
+  const location = useLocation();
+  const openFormConsumed = useRef(false);
 
   const [sessions, setSessions] = useState<CoachingSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +69,16 @@ export default function CoachingTab() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Auto-open form when navigated from Action Panel CTA
+  useEffect(() => {
+    if ((location.state as any)?.openForm && !openFormConsumed.current) {
+      openFormConsumed.current = true;
+      setShowForm(true);
+      // Clear navigation state so back/forward doesn't re-trigger
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
