@@ -195,16 +195,7 @@ export default function GlucoseInputPage() {
 
       if (res.success) {
         setSaved(true);
-        setGlucoseValue('');
-        setMeasuredAt(getDefaultMeasuredAt());
-        // Reset optional sections
-        setMedName('');
-        setMedDose('');
-        setMedTakenAt('');
-        setExDuration('');
-        setSymptoms([]);
-        setTimeout(() => setSaved(false), 2500);
-        await loadReadings();
+        setTimeout(() => navigate(-1), 1200);
       } else {
         setError(res.error?.message || '저장에 실패했습니다.');
       }
