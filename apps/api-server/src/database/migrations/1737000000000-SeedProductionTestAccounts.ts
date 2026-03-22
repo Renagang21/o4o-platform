@@ -17,7 +17,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 // Test password (hashed at runtime)
 const TEST_PASSWORD = 'TestPassword';
@@ -73,7 +73,7 @@ const TEST_ACCOUNTS = [
 export class SeedProductionTestAccounts1737000000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Hash password once
-    const hashedPassword = await hashPassword(TEST_PASSWORD);
+    const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10);
 
     for (const account of TEST_ACCOUNTS) {
       // Check if account already exists (idempotent)

@@ -13,7 +13,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 export class CreateKpaAdminAccount20260216200001 implements MigrationInterface {
   name = 'CreateKpaAdminAccount20260216200001';
@@ -32,7 +32,7 @@ export class CreateKpaAdminAccount20260216200001 implements MigrationInterface {
       return;
     }
 
-    const hashedPassword = await hashPassword('O4oTestPass');
+    const hashedPassword = await bcrypt.hash('O4oTestPass', 10);
 
     // Create user with kpa:admin role
     const result = await queryRunner.query(

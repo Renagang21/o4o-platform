@@ -10,7 +10,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 const ADMIN_VAULT_ACCOUNT = {
   email: 'o4o-admin-id@admin.co.kr',
@@ -23,7 +23,7 @@ const ADMIN_VAULT_ACCOUNT = {
 
 export class CreateO4OAdminVaultAccount2026012100001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const hashedPassword = await hashPassword(ADMIN_VAULT_ACCOUNT.password);
+    const hashedPassword = await bcrypt.hash(ADMIN_VAULT_ACCOUNT.password, 10);
 
     // Check if account already exists (idempotent)
     const existing = await queryRunner.query(

@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 /**
  * Migration: Activate Admin Users
@@ -32,7 +32,7 @@ export class ActivateAdminUser1770601460383 implements MigrationInterface {
 
         if (!existingUser || existingUser.length === 0) {
             // Hash password: 3Lz157727791!
-            const hashedPassword = await hashPassword('3Lz157727791!');
+            const hashedPassword = await bcrypt.hash('3Lz157727791!', 10);
 
             await queryRunner.query(`
                 INSERT INTO users (

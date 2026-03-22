@@ -9,7 +9,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 const TEST_PASSWORD = 'TestPassword';
 
@@ -20,7 +20,7 @@ const GLUCOSEVIEW_ACCOUNTS = [
 
 export class UpdateGlucoseViewTestAccountPasswords1737100000000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const hashedPassword = await hashPassword(TEST_PASSWORD);
+    const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10);
 
     for (const email of GLUCOSEVIEW_ACCOUNTS) {
       const result = await queryRunner.query(

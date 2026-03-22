@@ -14,7 +14,7 @@
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { hashPassword } from '../../utils/auth.utils.js';
+import bcrypt from 'bcryptjs';
 
 const TEST_PASSWORD = 'kpaPass1';
 
@@ -184,7 +184,7 @@ export class SeedKpaTestAccounts20260207100000 implements MigrationInterface {
     console.log('[SEED] KPA Society Test Accounts - Starting...');
 
     // Step 1: Hash password
-    const hashedPassword = await hashPassword(TEST_PASSWORD);
+    const hashedPassword = await bcrypt.hash(TEST_PASSWORD, 10);
 
     // Step 2: Seed organizations
     console.log('[SEED] Creating KPA organizations...');
