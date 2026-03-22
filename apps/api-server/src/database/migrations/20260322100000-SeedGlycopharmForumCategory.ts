@@ -13,8 +13,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Idempotent: ON CONFLICT DO NOTHING / slug 중복 체크
  */
 
-const GLYCOPHARM_FORUM_ORG_ID = 'a1b2c3d4-0001-4000-a000-forum00000001';
-const GLYCOPHARM_CARE_FORUM_ID = 'f0000000-0a00-4000-f000-glycopharm01';
+const GLYCOPHARM_FORUM_ORG_ID = 'a1b2c3d4-0001-4000-a000-f00000000001';
+const GLYCOPHARM_CARE_FORUM_ID = 'f0000000-0a00-4000-b000-010c0fa00001';
 const GLYCOPHARM_CARE_FORUM_SLUG = 'glycopharm-diabetes-care-sharing';
 
 export class SeedGlycopharmForumCategory20260322100000 implements MigrationInterface {
