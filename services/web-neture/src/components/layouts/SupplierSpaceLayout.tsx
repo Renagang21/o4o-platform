@@ -1,40 +1,104 @@
 /**
  * SupplierSpaceLayout - 공급자 운영 공간 레이아웃
  *
- * Work Order: WO-O4O-NETURE-UI-REFACTORING-V1
+ * Work Order: WO-O4O-DASHBOARD-SIDEBAR-CONVERSION-V1
  *
  * 구조:
- * - 상단: NetureLayout 헤더 (Supplier 활성)
- * - 서브 nav: Dashboard | Products | Offers | Orders | Library | Forum
+ * - 상단: Neture 헤더 (h-14)
+ * - 좌측: 사이드바 (w-60, collapsible groups)
+ * - 모바일: 수평 아이콘 바
  * - 스코프: /supplier/*
  */
 
+import { useState } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
+import {
+  Home,
+  Package,
+  ShoppingCart,
+  CreditCard,
+  BookOpen,
+  MessageSquare,
+  ChevronRight,
+  ChevronDown,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts/AuthContext';
 
+/* ------------------------------------------------------------------ */
+/*  Sidebar 그룹 정의                                                   */
+/* ------------------------------------------------------------------ */
+
+type SidebarItem = { label: string; path: string; exact?: boolean };
+type SidebarGroup = { label: string; icon: LucideIcon; items: SidebarItem[] };
+
+const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
+  {
+    label: 'Overview',
+    icon: Home,
+    items: [{ label: 'Dashboard', path: '/supplier/dashboard', exact: true }],
+  },
+  {
+    label: 'Products',
+    icon: Package,
+    items: [
+      { label: '상품 관리', path: '/supplier/products' },
+      { label: 'Offers', path: '/supplier/offers' },
+      { label: 'CSV Import', path: '/supplier/csv-import' },
+    ],
+  },
+  {
+    label: 'Orders',
+    icon: ShoppingCart,
+    items: [{ label: '주문 현황', path: '/supplier/orders' }],
+  },
+  {
+    label: 'Finance',
+    icon: CreditCard,
+    items: [{ label: 'Partner Commissions', path: '/supplier/partner-commissions' }],
+  },
+  {
+    label: 'Content',
+    icon: BookOpen,
+    items: [{ label: 'Library', path: '/supplier/library' }],
+  },
+  {
+    label: 'Community',
+    icon: MessageSquare,
+    items: [{ label: 'Forum', path: '/supplier/forum' }],
+  },
+];
+
+/* ------------------------------------------------------------------ */
+/*  SupplierSpaceLayout                                                */
+/* ------------------------------------------------------------------ */
+
 export default function SupplierSpaceLayout() {
+  const { pathname } = useLocation();
   const location = useLocation();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  const isActive = (path: string) => {
-    if (path === '/supplier/dashboard') return location.pathname === '/supplier/dashboard';
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+  const isItemActive = (path: string, exact?: boolean) => {
+    if (exact) return pathname === path;
+    return pathname === path || pathname.startsWith(path + '/');
   };
 
-  const mainNavClass = (path: string) =>
-    `px-3 py-2 text-sm font-medium transition-colors ${
-      isActive(path)
-        ? 'text-primary-600'
-        : 'text-gray-700 hover:text-primary-600'
-    }`;
+  const isGroupActive = (group: SidebarGroup) =>
+    group.items.some((item) => isItemActive(item.path, item.exact));
 
-  const subNavClass = (path: string) =>
-    `px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-      isActive(path)
-        ? 'text-primary-600 border-primary-600'
-        : 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300'
-    }`;
+  const [openGroups, setOpenGroups] = useState<Set<string>>(
+    () => new Set(SUPPLIER_SIDEBAR_GROUPS.filter((g) => isGroupActive(g)).map((g) => g.label)),
+  );
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  };
 
   if (isLoading) {
     return (
@@ -62,71 +126,137 @@ export default function SupplierSpaceLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 shrink-0">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-primary-600">Neture</span>
+              <span className="text-xl font-bold text-primary-600">Neture</span>
+              <span className="text-xs font-medium text-slate-500 border-l border-slate-300 pl-2">
+                Supplier
+              </span>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/" className={mainNavClass('/')}>Home</Link>
-              <Link to="/supplier" className={mainNavClass('/supplier')}>Supplier</Link>
-              <Link to="/partner" className={mainNavClass('/partner')}>Partner</Link>
-              <Link to="/community" className={mainNavClass('/community')}>Community</Link>
-              <Link to="/contact" className={mainNavClass('/contact')}>Contact Us</Link>
-              <Link to="/about" className={mainNavClass('/about')}>About</Link>
+              <Link to="/" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Home</Link>
+              <Link to="/supplier" className="px-3 py-2 text-sm font-medium text-primary-600 transition-colors">Supplier</Link>
+              <Link to="/partner" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Partner</Link>
+              <Link to="/community" className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors">Community</Link>
             </nav>
 
-            <div className="flex items-center">
-              <AccountMenu />
-            </div>
+            <AccountMenu />
           </div>
         </div>
       </header>
 
-      {/* Sub Navigation */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-2 -mb-px">
-            <Link to="/supplier/dashboard" className={subNavClass('/supplier/dashboard')}>
-              Dashboard
-            </Link>
-            <Link to="/supplier/products" className={subNavClass('/supplier/products')}>
-              Products
-            </Link>
-            <Link to="/supplier/offers" className={subNavClass('/supplier/offers')}>
-              Offers
-            </Link>
-            <Link to="/supplier/orders" className={subNavClass('/supplier/orders')}>
-              Orders
-            </Link>
-            <Link to="/supplier/partner-commissions" className={subNavClass('/supplier/partner-commissions')}>
-              Partner Commissions
-            </Link>
-            <Link to="/supplier/csv-import" className={subNavClass('/supplier/csv-import')}>
-              CSV Import
-            </Link>
-            <Link to="/supplier/library" className={subNavClass('/supplier/library')}>
-              Library
-            </Link>
-            <Link to="/supplier/forum" className={subNavClass('/supplier/forum')}>
-              Forum
-            </Link>
-          </nav>
+      {/* Body: Sidebar + Content */}
+      <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex gap-6">
+          {/* Desktop Sidebar */}
+          <aside className="w-60 flex-shrink-0 hidden md:block">
+            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-6">
+              {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
+                const Icon = group.icon;
+                const active = isGroupActive(group);
+                const isOpen = openGroups.has(group.label);
+                const isSingle = group.items.length === 1;
+
+                if (isSingle) {
+                  const item = group.items[0];
+                  return (
+                    <Link
+                      key={group.label}
+                      to={item.path}
+                      className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                        isItemActive(item.path, item.exact)
+                          ? 'bg-primary-50 text-primary-600 border-primary-600'
+                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      {item.label}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div key={group.label}>
+                    <button
+                      onClick={() => toggleGroup(group.label)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors border-l-2 ${
+                        active
+                          ? 'text-primary-600 border-primary-600'
+                          : 'text-gray-600 border-transparent hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span className="flex-1 text-left">{group.label}</span>
+                      {isOpen ? (
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+
+                    {isOpen && (
+                      <div className="pb-1">
+                        {group.items.map((item) => (
+                          <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`block pl-11 pr-4 py-2 text-sm transition-colors ${
+                              isItemActive(item.path, item.exact)
+                                ? 'text-primary-600 bg-primary-50 font-medium'
+                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                          >
+                            {item.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
+          </aside>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden w-full mb-4">
+            <nav className="flex gap-1 overflow-x-auto bg-white rounded-xl border border-gray-200 p-1">
+              {SUPPLIER_SIDEBAR_GROUPS.map((group) => {
+                const Icon = group.icon;
+                const active = isGroupActive(group);
+                const firstPath = group.items[0].path;
+                return (
+                  <Link
+                    key={group.label}
+                    to={firstPath}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
+                      active
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Icon size={14} />
+                    {group.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Main Content */}
+          <main className="flex-1 min-w-0">
+            <Outlet />
+          </main>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main>
-        <Outlet />
-      </main>
-
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <footer className="bg-white border-t border-gray-200 mt-auto shrink-0">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500">
             <p>&copy; 2026 Neture. 공급자 &middot; 파트너 협업 플랫폼</p>
             <div className="flex items-center gap-4 text-xs text-gray-400">
