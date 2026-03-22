@@ -187,7 +187,7 @@ export default function CommunityMainPage() {
       .finally(() => setContentLoading(false));
     // Hub signage (media + playlists)
     Promise.all([
-      apiClient.get<{ data: HubSignageMedia[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage&limit=4')
+      apiClient.get<{ data: HubSignageMedia[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=signage-media&limit=4')
         .then((res) => {
           const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
           setSignageMedia(items);
