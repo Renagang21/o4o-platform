@@ -32,6 +32,7 @@ import {
 } from '../entities/index.js';
 import { validateGtin } from '../../../utils/gtin.js';
 import { verifyProductByBarcode } from './mfds.service.js';
+import { parseXlsxToRecords } from './xlsx-parser.service.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
@@ -106,18 +107,23 @@ export class CsvImportService {
     };
     error?: string;
   }> {
-    // 1. CSV 파싱
+    // 1. 파일 파싱 (CSV / XLSX 자동 감지) — WO-NETURE-XLSX-DIRECT-UPLOAD-V1
     let records: Record<string, string>[];
     try {
-      const csvString = file.buffer.toString('utf-8');
-      records = parse(csvString, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true,
-        bom: true,
-      }) as Record<string, string>[];
+      const isXlsx = /\.xlsx?$/i.test(file.originalname);
+      if (isXlsx) {
+        records = parseXlsxToRecords(file.buffer);
+      } else {
+        const csvString = file.buffer.toString('utf-8');
+        records = parse(csvString, {
+          columns: true,
+          skip_empty_lines: true,
+          trim: true,
+          bom: true,
+        }) as Record<string, string>[];
+      }
     } catch (err) {
-      return { success: false, error: `CSV_PARSE_ERROR: ${(err as Error).message}` };
+      return { success: false, error: `PARSE_ERROR: ${(err as Error).message}` };
     }
 
     if (records.length === 0) {
