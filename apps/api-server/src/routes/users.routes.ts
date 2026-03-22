@@ -1,7 +1,9 @@
-import { Router, Request } from 'express';
+import { Router, Request, Response } from 'express';
 import { UserManagementController } from '../controllers/UserManagementController.js';
-import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
+import { authenticate, requireAdmin, type AuthRequest } from '../middleware/auth.middleware.js';
+import { UserController } from '../modules/user/controllers/index.js';
 import { UserRole } from '../types/auth.js';
+import { asyncHandler } from '../middleware/error-handler.js';
 import { validationResult } from 'express-validator';
 import { body, param, query } from 'express-validator';
 
@@ -39,6 +41,30 @@ const paginationValidation = [
 
 // Protected routes - require authentication
 router.use(authenticate);
+
+// ============================================================================
+// Authenticated user routes (no admin role required)
+// WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings for any authenticated user
+// ============================================================================
+
+router.get(
+  '/me/contact',
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return UserController.getContactSettings(req, res);
+  })
+);
+
+router.patch(
+  '/me/contact',
+  [
+    body('contactEnabled').optional().isBoolean(),
+    body('kakaoOpenChatUrl').optional({ nullable: true }).isString(),
+    body('kakaoChannelUrl').optional({ nullable: true }).isString(),
+  ],
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    return UserController.updateContactSettings(req, res);
+  })
+);
 
 // Validation middleware
 const validateRequest = (req: any, res: any, next: any) => {
