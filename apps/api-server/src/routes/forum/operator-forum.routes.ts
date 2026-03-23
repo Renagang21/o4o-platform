@@ -430,13 +430,13 @@ router.get('/analytics/trend', async (req: Request, res: Response): Promise<void
     // Daily request counts
     const daily = await requestRepo()
       .createQueryBuilder('r')
-      .select(`TO_CHAR(r.createdAt, 'YYYY-MM-DD')`, 'date')
+      .select(`TO_CHAR(r.created_at, 'YYYY-MM-DD')`, 'date')
       .addSelect('COUNT(*)::int', 'requests')
       .addSelect(`COUNT(*) FILTER (WHERE r.status = 'approved')::int`, 'approved')
       .addSelect(`COUNT(*) FILTER (WHERE r.status = 'rejected')::int`, 'rejected')
       .where('r.serviceCode = :serviceCode', { serviceCode })
       .andWhere(`r.createdAt >= :fromDate`, { fromDate })
-      .groupBy(`TO_CHAR(r.createdAt, 'YYYY-MM-DD')`)
+      .groupBy(`TO_CHAR(r.created_at, 'YYYY-MM-DD')`)
       .orderBy('date', 'ASC')
       .getRawMany();
 

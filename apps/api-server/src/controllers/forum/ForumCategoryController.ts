@@ -287,9 +287,9 @@ export class ForumCategoryController extends ForumControllerBase {
         .addSelect('COUNT(post.id)', 'postCount7d')
         .addSelect('COALESCE(SUM(post."commentCount"), 0)', 'commentSum7d')
         .addSelect('COALESCE(SUM(post."viewCount"), 0)', 'viewSum7d')
-        .addSelect('MAX(post."createdAt")', 'lastPostAt')
+        .addSelect('MAX(post.created_at)', 'lastPostAt')
         .where('post.status = :status', { status: PostStatus.PUBLISHED })
-        .andWhere('post."createdAt" >= :since', { since: sevenDaysAgo })
+        .andWhere('post.created_at >= :since', { since: sevenDaysAgo })
         .andWhere('post."categoryId" IS NOT NULL');
       this.applyContextFilter(activityQb, 'post', ctx);
       activityQb.groupBy('post.categoryId');
