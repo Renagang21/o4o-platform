@@ -111,11 +111,13 @@ export class CareAiChatService {
     const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
 
     // 4. Call via execute() — retry + apiKey check 내장
+    // WO-O4O-AI-CHAT-TIMEOUT-FIX-V1: 60s timeout (ai-core default 10s → Gemini 응답 15~60s 수용)
     const response = await execute({
       systemPrompt: CARE_COPILOT_SYSTEM,
       userPrompt,
       config: this.configResolver,
       meta: { service: 'care', callerName: 'CareAiChat' },
+      timeoutMs: 60_000,
     });
 
     const parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
