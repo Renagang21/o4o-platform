@@ -97,8 +97,8 @@ export default function CareDashboardPage() {
       setPopulation(populationRes);
       setAlerts(alertsRes);
     } catch (err: any) {
-      const code = err?.response?.data?.error?.code;
-      if (code === 'GLYCOPHARM_ORG_NOT_FOUND' || code === 'GLYCOPHARM_NOT_ENROLLED') {
+      const code = err?.code;
+      if (code === 'GLYCOPHARM_ORG_NOT_FOUND' || code === 'GLYCOPHARM_NOT_ENROLLED' || code === 'GLYCOPHARM_ORG_INACTIVE') {
         // 약국 연동 전 — 에러 배너 없이 빈 상태만 표시
       } else {
         setError('당뇨인 정보를 불러오는데 실패했습니다.');

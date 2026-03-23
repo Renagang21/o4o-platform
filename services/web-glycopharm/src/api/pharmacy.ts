@@ -268,10 +268,11 @@ class PharmacyApiClient {
       return response.data;
     } catch (error: any) {
       const errorData = error.response?.data || {};
+      const nested = typeof errorData.error === 'object' ? errorData.error : {};
       throw {
         status: error.response?.status || 0,
-        code: errorData.code || 'UNKNOWN_ERROR',
-        message: errorData.message || errorData.error || 'Request failed',
+        code: errorData.code || nested.code || 'UNKNOWN_ERROR',
+        message: errorData.message || nested.message || (typeof errorData.error === 'string' ? errorData.error : 'Request failed'),
       };
     }
   }
