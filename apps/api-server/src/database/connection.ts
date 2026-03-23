@@ -98,7 +98,7 @@ import {
   ForumCategory,
   ForumComment,
   ForumTag,
-  // WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: ForumCategoryRequest removed — approval moved to KpaApprovalRequest
+  ForumCategoryRequest,
 } from '@o4o/forum-core/entities';
 
 // Forum Notification entity (Phase 13)
@@ -641,7 +641,7 @@ export const AppDataSource = new DataSource({
     ForumCategory,
     ForumComment,
     ForumTag,
-    // WO-PLATFORM-FORUM-APPROVAL-CORE-DECOUPLING-V1: ForumCategoryRequest removed — approval moved to KpaApprovalRequest
+    ForumCategoryRequest,
     // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
     // Digital Signage entities
