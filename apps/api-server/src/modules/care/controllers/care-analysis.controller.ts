@@ -61,10 +61,23 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
       // Patient ownership guard: verify patient belongs to this pharmacy
       if (pharmacyId) {
         const ownerCheck = await dataSource.query(
-          `SELECT id FROM glucoseview_customers WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-          [patientId, pharmacyId],
+          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+          [patientId],
         );
         if (ownerCheck.length === 0) {
+          console.warn('[CareAnalysis] scope-guard: patient not found', { patientId, pharmacyId });
+          return res.status(403).json({
+            success: false,
+            error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
+          });
+        }
+        const patient = ownerCheck[0];
+        const orgMatch = patient.organization_id === pharmacyId;
+        const pharmacistFallback = !orgMatch && patient.pharmacist_id === pcReq.user?.id;
+        if (!orgMatch && !pharmacistFallback) {
+          console.warn('[CareAnalysis] scope-guard: ownership mismatch', {
+            patientId, pharmacyId, patientOrgId: patient.organization_id, userId: pcReq.user?.id,
+          });
           return res.status(403).json({
             success: false,
             error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },

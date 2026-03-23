@@ -145,6 +145,9 @@ export default function CareAiChatPanel({
     setSending(true);
 
     try {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[CareAiChat] sendMessage', { patientId, text: text.substring(0, 50) });
+      }
       const response = await pharmacyApi.sendCareAiChat(text.trim(), patientId);
 
       // 응답이 AiChatResponseDto가 아니면 (에러 객체 {code, message} 등) 에러로 처리
@@ -160,9 +163,21 @@ export default function CareAiChatPanel({
         ),
       );
     } catch (err) {
-      const errorMsg = safeStr(
-        err instanceof Error ? err.message : (err as any)?.message ?? err,
-      ) || 'AI 응답을 받지 못했습니다.';
+      const errCode = (err as any)?.code;
+      const errMessage = (err as any)?.message;
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[CareAiChat] error', { errCode, errMessage, patientId });
+      }
+      // Specific user-friendly messages for known error codes
+      const friendlyMessages: Record<string, string> = {
+        PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
+        AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+        AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
+        AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
+      };
+      const errorMsg = friendlyMessages[errCode]
+        || safeStr(err instanceof Error ? err.message : errMessage ?? err)
+        || 'AI 응답을 받지 못했습니다.';
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id

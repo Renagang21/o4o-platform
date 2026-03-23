@@ -37,14 +37,35 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
       }
 
       const pharmacyId = pcReq.pharmacyId ?? null;
+      const userId = pcReq.user?.id;
 
       // Patient scope guard: verify patient belongs to this pharmacy
       if (patientId && pharmacyId) {
+        // Primary: organization_id match
         const check = await dataSource.query(
-          `SELECT id FROM glucoseview_customers WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-          [patientId, pharmacyId],
+          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+          [patientId],
         );
         if (check.length === 0) {
+          console.warn('[CareAiChat] scope-guard: patient not found at all', { patientId, pharmacyId, userId });
+          return res.status(403).json({
+            success: false,
+            error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
+          });
+        }
+        const patient = check[0];
+        const orgMatch = patient.organization_id === pharmacyId;
+        // Fallback: pharmacist_id → organization mapping (for patients with NULL organization_id)
+        const pharmacistFallback = !orgMatch && patient.pharmacist_id === userId;
+
+        if (!orgMatch && !pharmacistFallback) {
+          console.warn('[CareAiChat] scope-guard: ownership mismatch', {
+            patientId,
+            pharmacyId,
+            patientOrgId: patient.organization_id,
+            pharmacistId: patient.pharmacist_id,
+            userId,
+          });
           return res.status(403).json({
             success: false,
             error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
