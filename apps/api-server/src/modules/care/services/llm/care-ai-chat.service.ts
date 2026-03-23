@@ -175,11 +175,14 @@ export class CareAiChatService {
 
     const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
 
-    // 3. executeStream() — 120s timeout (streaming은 여유 있게)
+    // 3. executeStream() — 120s timeout, maxTokens 4096 (JSON 완성 보장)
     const stream = executeStream({
       systemPrompt: CARE_COPILOT_SYSTEM,
       userPrompt,
-      config: this.configResolver,
+      config: async () => {
+        const base = await this.configResolver();
+        return { ...base, maxTokens: 4096 };
+      },
       meta: { service: 'care', callerName: 'CareAiChat.stream' },
       timeoutMs: 120_000,
     });
