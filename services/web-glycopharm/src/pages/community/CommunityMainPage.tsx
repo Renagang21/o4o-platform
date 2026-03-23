@@ -3,6 +3,7 @@
  *
  * WO-GLYCOPHARM-COMMUNITY-MAIN-PAGE-V1
  * WO-GLYCOPHARM-COMMUNITY-FEED-DATA-INTEGRATION-V1
+ * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: 콘텐츠 카드 그리드 + 추천/최근 섹션
  *
  * Route: /community
  * Feed: /api/v1/glycopharm/forum/posts API 연동
@@ -12,7 +13,7 @@
  *  1. Hero (스폰서 포함)
  *  2. Feed (탭 + 정렬 + DataTable)
  *  3. 광고 섹션
- *  4. 콘텐츠 미리보기
+ *  4. 콘텐츠 (최근 + 추천 카드 그리드)
  *  5. 디지털 사이니지 미리보기
  *  6. 파트너 로고 슬라이드
  */
@@ -21,12 +22,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText,
-  ChevronRight,
   Play,
   ListMusic,
   ArrowRight,
+  Image as ImageIcon,
+  ExternalLink,
 } from 'lucide-react';
 import { DataTable, type Column } from '@o4o/ui';
+import { HUB_PRODUCER_LABELS, type HubProducer } from '@o4o/types/hub-content';
 import { apiClient } from '@/services/api';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '@/services/communityApi';
 
@@ -57,7 +60,11 @@ interface HubContentItem {
   title: string;
   description?: string | null;
   thumbnailUrl?: string | null;
+  imageUrl?: string | null;
   linkUrl?: string | null;
+  cmsType?: string | null;
+  isPinned?: boolean;
+  producer?: string;
   createdAt: string;
 }
 
@@ -121,6 +128,66 @@ function formatFeedDate(dateStr: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+// ─── Content Card ───────────────────────────────────────────
+
+function ContentCard({ item }: { item: HubContentItem }) {
+  const img = item.thumbnailUrl || item.imageUrl || null;
+  const hasLink = !!item.linkUrl;
+
+  return (
+    <div
+      onClick={() => { if (hasLink) window.open(item.linkUrl!, '_blank', 'noopener'); }}
+      className={`bg-white rounded-lg border border-slate-200 overflow-hidden transition-all ${
+        hasLink ? 'cursor-pointer hover:shadow-md hover:border-primary-200' : 'opacity-80'
+      }`}
+    >
+      {img ? (
+        <div className="aspect-[16/9] bg-slate-100 overflow-hidden">
+          <img
+            src={img}
+            alt={item.title}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        </div>
+      ) : (
+        <div className="aspect-[16/9] bg-slate-50 flex items-center justify-center">
+          <ImageIcon className="w-8 h-8 text-slate-200" />
+        </div>
+      )}
+      <div className="p-3">
+        <div className="flex items-center gap-1.5 mb-1.5">
+          {item.cmsType && (
+            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-500 rounded">
+              {item.cmsType}
+            </span>
+          )}
+          {item.isPinned && (
+            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">
+              추천
+            </span>
+          )}
+        </div>
+        <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 mb-1">{item.title}</h3>
+        {item.description && (
+          <p className="text-xs text-slate-500 line-clamp-2 mb-1.5">{item.description}</p>
+        )}
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-slate-400">{formatFeedDate(item.createdAt)}</span>
+          <div className="flex items-center gap-1">
+            {item.producer && (
+              <span className="text-[10px] text-slate-400">
+                {HUB_PRODUCER_LABELS[item.producer as HubProducer] ?? item.producer}
+              </span>
+            )}
+            {hasLink && <ExternalLink className="w-3 h-3 text-slate-300" />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function CommunityMainPage() {
@@ -177,8 +244,8 @@ export default function CommunityMainPage() {
     loadFeed();
     communityApi.getSponsors().then((r) => setSponsors(r.data?.sponsors ?? [])).catch(() => {});
     communityApi.getPageAds().then((r) => setAds(r.data?.ads ?? [])).catch(() => {});
-    // Hub content (CMS)
-    apiClient.get<{ data: HubContentItem[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=cms&limit=5')
+    // Hub content (CMS) — WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1
+    apiClient.get<{ data: HubContentItem[] }>('/api/v1/hub/contents?serviceKey=glycopharm&sourceDomain=cms&limit=50')
       .then((res) => {
         const items = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
         setContentItems(items);
@@ -208,6 +275,11 @@ export default function CommunityMainPage() {
       if (sortBy === 'popular') return b.viewCount - a.viewCount;
       return b.date.localeCompare(a.date);
     });
+
+  // Split content into recommended (isPinned) and recent
+  const recommendedContent = contentItems.filter((c) => c.isPinned).slice(0, 6);
+  const recommendedIds = new Set(recommendedContent.map((c) => c.id));
+  const recentContent = contentItems.filter((c) => !recommendedIds.has(c.id)).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -348,37 +420,51 @@ export default function CommunityMainPage() {
           </section>
         )}
 
-        {/* ─── 4. Content Preview ─── */}
+        {/* ─── 4. Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) ─── */}
         <section className="mb-10">
-          <h2 className="text-lg font-bold text-slate-800 mb-3">매장에서 바로 쓰는 콘텐츠</h2>
-          <div className="bg-white rounded-lg border border-slate-200 divide-y divide-slate-100">
-            {contentLoading ? (
-              <div className="px-4 py-6 text-center text-xs text-slate-400">콘텐츠를 불러오는 중...</div>
-            ) : contentItems.length === 0 ? (
-              <div className="px-4 py-6 text-center text-xs text-slate-400">등록된 콘텐츠가 없습니다.</div>
-            ) : (
-              contentItems.map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors"
-                  onClick={() => {
-                    if (c.linkUrl) window.open(c.linkUrl, '_blank');
-                  }}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="w-4 h-4 text-slate-400 shrink-0" />
-                    <span className="text-sm text-slate-700 truncate">{c.title}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 shrink-0" />
-                </div>
-              ))
-            )}
-          </div>
-          <div className="mt-3 text-center">
-            <Link to="/hub/content" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-              더보기
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-slate-800">콘텐츠</h2>
+            <Link to="/library/content" className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 font-medium">
+              전체보기 <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+
+          {contentLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600" />
+            </div>
+          ) : contentItems.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-sm text-slate-400">등록된 콘텐츠가 없습니다.</p>
+            </div>
+          ) : (
+            <>
+              {/* 최근 콘텐츠 */}
+              {recentContent.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">최근 콘텐츠</p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {recentContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 추천 콘텐츠 */}
+              {recommendedContent.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">추천 콘텐츠</p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {recommendedContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </section>
 
         {/* ─── 5. Digital Signage Preview ─── */}
@@ -464,4 +550,3 @@ export default function CommunityMainPage() {
     </div>
   );
 }
-

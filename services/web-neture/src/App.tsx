@@ -398,6 +398,9 @@ const SignageTemplateDetailPage = lazy(() => import('./pages/operator/signage/Te
 // Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1)
 const HomepageCmsPage = lazy(() => import('./pages/operator/HomepageCmsPage'));
 
+// Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
+const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
+
 // Loading fallback
 function PageLoading() {
   return (
@@ -515,6 +518,9 @@ function App() {
               {/* Knowledge (WO-O4O-KNOWLEDGE-LIBRARY-V1) */}
               <Route path="/knowledge" element={<KnowledgePage />} />
               <Route path="/knowledge/:id" element={<KnowledgeDetailPage />} />
+
+              {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
+              <Route path="/library/content" element={<ContentLibraryPage />} />
             </Route>
 
             {/* ================================================================

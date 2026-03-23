@@ -58,6 +58,9 @@ const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategor
 // Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
 
+// Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
+const ContentLibraryPage = lazy(() => import('@/pages/library/ContentLibraryPage'));
+
 // Partner Dashboard Pages
 const PartnerIndex = lazy(() => import('@/pages/partner/index'));
 const PartnerOverviewPage = lazy(() => import('@/pages/partner/OverviewPage'));
@@ -195,6 +198,8 @@ function AppRoutes() {
 
         {/* Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
         <Route path="community" element={<CommunityHubPage />} />
+        {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
+        <Route path="library/content" element={<ContentLibraryPage />} />
 
         {/* Forum */}
         <Route path="forum" element={<ForumHubPage />} />

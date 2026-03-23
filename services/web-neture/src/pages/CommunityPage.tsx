@@ -35,6 +35,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts';
 import { cmsApi, type CmsContent } from '../lib/api/content';
+import { hubContentApi } from '../lib/api/hubContent';
+import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import {
   fetchForumPosts,
   fetchForumCategories,
@@ -59,7 +61,7 @@ function formatRelativeDate(dateString: string): string {
 export default function CommunityPage() {
   const { isAuthenticated } = useAuth();
   const [notices, setNotices] = useState<CmsContent[]>([]);
-  const [contents, setContents] = useState<CmsContent[]>([]);
+  const [hubContents, setHubContents] = useState<HubContentItemResponse[]>([]);
   const [knowledges, setKnowledges] = useState<CmsContent[]>([]);
   const [articles, setArticles] = useState<ForumPost[]>([]);
   const [recentPosts, setRecentPosts] = useState<ForumPost[]>([]);
@@ -70,8 +72,9 @@ export default function CommunityPage() {
       .then(res => setNotices(res.data))
       .catch(() => {});
 
-    cmsApi.getContents({ sort: 'featured', limit: 6 })
-      .then(res => setContents(res.data))
+    // WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: hub content API로 교체
+    hubContentApi.list({ sourceDomain: 'cms', limit: 50 })
+      .then(res => setHubContents(Array.isArray(res.data) ? res.data : []))
       .catch(() => {});
 
     cmsApi.getContents({ type: 'knowledge', sort: 'latest', limit: 5 })
@@ -100,6 +103,11 @@ export default function CommunityPage() {
       .then(res => { if (res.data) setPopularCategories(res.data); })
       .catch(() => {});
   }, []);
+
+  // Split hub content into recommended (isPinned) and recent
+  const recommendedContent = hubContents.filter(c => c.isPinned).slice(0, 6);
+  const recommendedIds = new Set(recommendedContent.map(c => c.id));
+  const recentContent = hubContents.filter(c => !recommendedIds.has(c.id)).slice(0, 6);
 
   // 통계 집계
   const totalPosts7d = popularCategories.reduce((sum, c) => sum + c.postCount7d, 0);
@@ -162,8 +170,8 @@ export default function CommunityPage() {
         </section>
       )}
 
-      {/* 콘텐츠 하이라이트 */}
-      {contents.length > 0 && (
+      {/* 콘텐츠 (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
+      {hubContents.length > 0 && (
         <section className="py-12 bg-gray-50">
           <div className="max-w-5xl mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
@@ -172,56 +180,37 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold text-gray-900">콘텐츠</h2>
               </div>
               <Link
-                to="/partner/contents"
+                to="/library/content"
                 className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
-                더보기
+                전체보기
                 <ArrowRight className="ml-1 w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contents.map(content => (
-                <Link
-                  key={content.id}
-                  to={`/partner/contents/${content.id}`}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group"
-                >
-                  {content.imageUrl && (
-                    <div className="aspect-video bg-gray-100 overflow-hidden">
-                      <img
-                        src={content.imageUrl}
-                        alt={content.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                      />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
-                      {content.title}
-                    </h3>
-                    {content.summary && (
-                      <p className="text-xs text-gray-500 line-clamp-2 mb-2">
-                        {content.summary}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3 text-xs text-gray-400">
-                      {content.viewCount != null && content.viewCount > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
-                          {content.viewCount}
-                        </span>
-                      )}
-                      {content.recommendCount != null && content.recommendCount > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-3 h-3" />
-                          {content.recommendCount}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+
+            {/* 추천 콘텐츠 */}
+            {recommendedContent.length > 0 && (
+              <div className="mb-8">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">추천 콘텐츠</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recommendedContent.map(item => (
+                    <HubContentCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 최근 콘텐츠 */}
+            {recentContent.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">최근 콘텐츠</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {recentContent.map(item => (
+                    <HubContentCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -471,6 +460,62 @@ export default function CommunityPage() {
           </Link>
         </div>
       </section>
+    </div>
+  );
+}
+
+// ─── Hub Content Card (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) ───
+
+function HubContentCard({ item }: { item: HubContentItemResponse }) {
+  const img = item.thumbnailUrl || item.imageUrl || null;
+  const hasLink = !!item.linkUrl;
+
+  return (
+    <div
+      onClick={() => { if (hasLink) window.open(item.linkUrl!, '_blank', 'noopener'); }}
+      className={`bg-white rounded-xl border border-gray-200 overflow-hidden transition-shadow group ${
+        hasLink ? 'cursor-pointer hover:shadow-md' : 'opacity-80'
+      }`}
+    >
+      {img ? (
+        <div className="aspect-video bg-gray-100 overflow-hidden">
+          <img
+            src={img}
+            alt={item.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        </div>
+      ) : (
+        <div className="aspect-video bg-gray-50 flex items-center justify-center">
+          <FileText className="w-8 h-8 text-gray-200" />
+        </div>
+      )}
+      <div className="p-4">
+        <div className="flex items-center gap-1.5 mb-1">
+          {item.cmsType && (
+            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-gray-100 text-gray-500 rounded">
+              {item.cmsType}
+            </span>
+          )}
+          {item.isPinned && (
+            <span className="inline-block px-2 py-0.5 text-[10px] font-medium bg-primary-50 text-primary-600 rounded">
+              추천
+            </span>
+          )}
+        </div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-2">
+          {item.title}
+        </h3>
+        {item.description && (
+          <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+            {item.description}
+          </p>
+        )}
+        <p className="text-[10px] text-gray-400">
+          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+        </p>
+      </div>
     </div>
   );
 }

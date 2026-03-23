@@ -403,6 +403,8 @@ function AppRoutes() {
         <Route path="hub" element={<GlycoPharmHubPage />} />
         <Route path="hub/b2b" element={<HubB2BCatalogPage />} />
         <Route path="hub/content" element={<HubContentListPage />} />
+        {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
+        <Route path="library/content" element={<HubContentListPage />} />
         <Route path="mypage" element={
           <SoftGuard feature="mypage">
             <MyPage />

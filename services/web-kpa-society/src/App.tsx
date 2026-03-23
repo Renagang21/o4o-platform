@@ -97,6 +97,9 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 // Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
 import CommunityHubPage from './pages/community/CommunityHubPage';
 
+// Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
+import ContentLibraryPage from './pages/library/ContentLibraryPage';
+
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
 
@@ -354,6 +357,8 @@ function App() {
 
           {/* Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
           <Route path="/community" element={<Layout serviceName={SERVICE_NAME}><CommunityHubPage /></Layout>} />
+          {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
+          <Route path="/library/content" element={<Layout serviceName={SERVICE_NAME}><ContentLibraryPage /></Layout>} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
