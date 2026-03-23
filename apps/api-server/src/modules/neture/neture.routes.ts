@@ -32,6 +32,7 @@ import { createSellerController, createPartnerContractController } from './contr
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
+import { createOperatorProductCleanupController } from './controllers/operator-product-cleanup.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -73,6 +74,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 2)
   router.use('/operator', createOperatorDashboardController(dataSource));
   router.use('/operator', createOperatorRegistrationController(dataSource, netureActionLogService));
+  // WO-NETURE-PRODUCT-DATA-CLEANUP-V1
+  router.use('/operator/product-cleanup', createOperatorProductCleanupController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

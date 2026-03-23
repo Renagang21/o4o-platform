@@ -14,7 +14,10 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '가입 승인', path: '/operator/applications' },
     { label: 'Market Trial', path: '/operator/market-trial' },
   ],
-  products: [{ label: '공급 현황', path: '/operator/supply' }],
+  products: [
+    { label: '공급 현황', path: '/operator/supply' },
+    { label: '상품 데이터 정리', path: '/operator/product-cleanup' },
+  ],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [{ label: '홈페이지 CMS', path: '/operator/homepage-cms' }],

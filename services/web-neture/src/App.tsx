@@ -371,6 +371,10 @@ const MarketTrialApprovalsPage = lazy(() =>
 const MarketTrialApprovalDetailPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalDetailPage }))
 );
+// WO-NETURE-PRODUCT-DATA-CLEANUP-V1
+const ProductDataCleanupPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ProductDataCleanupPage }))
+);
 
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 // Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
@@ -766,6 +770,8 @@ function App() {
               {/* Market Trial 관리 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              {/* WO-NETURE-PRODUCT-DATA-CLEANUP-V1 */}
+              <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
             </Route>
 
             {/* ================================================================
