@@ -19,7 +19,10 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   orders: [{ label: '주문 관리', path: '/operator/orders' }],
   content: [{ label: '홈페이지 CMS', path: '/operator/homepage-cms' }],
   signage: [{ label: '사이니지', path: '/operator/signage/hq-media' }],
-  forum: [{ label: '포럼 관리', path: '/operator/community' }],
+  forum: [
+    { label: '포럼 신청', path: '/operator/community' },
+    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
+  ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
     { label: 'AI 카드 리포트', path: '/operator/ai-card-report' },

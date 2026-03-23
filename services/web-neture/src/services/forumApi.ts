@@ -806,3 +806,79 @@ export async function createForumCategoryRequest(
     return { success: false, error: msg };
   }
 }
+
+// ============================================================================
+// Operator Forum API — WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+// Common /api/v1/forum/operator/* endpoints (serviceCode=neture)
+// ============================================================================
+
+const OPERATOR_BASE = '/forum/operator';
+const SVC = 'serviceCode=neture';
+
+export const forumOperatorApi = {
+  getRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
+    const query = new URLSearchParams({ serviceCode: 'neture' });
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', params.page.toString());
+    if (params?.limit) query.set('limit', params.limit.toString());
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/requests?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: [], total: 0 };
+    }
+  },
+
+  getPendingCount: async () => {
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/requests/pending-count?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: { count: 0 } };
+    }
+  },
+
+  getRequestDetail: async (id: string) => {
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/requests/${id}?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: false, error: 'Failed to load detail' };
+    }
+  },
+
+  review: async (id: string, data: { action: 'approve' | 'reject' | 'revision'; reviewComment?: string }) => {
+    const res = await api.patch(`${OPERATOR_BASE}/requests/${id}/review?${SVC}`, data);
+    return res.data;
+  },
+
+  getDeleteRequests: async (params?: { status?: string }) => {
+    const query = new URLSearchParams({ serviceCode: 'neture' });
+    if (params?.status) query.set('status', params.status);
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/delete-requests?${query}`);
+      return res.data;
+    } catch {
+      return { success: true, data: [], count: 0 };
+    }
+  },
+
+  getDeletePendingCount: async () => {
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/delete-requests/pending-count?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: { count: 0 } };
+    }
+  },
+
+  approveDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await api.post(`${OPERATOR_BASE}/delete-requests/${id}/approve?${SVC}`, data || {});
+    return res.data;
+  },
+
+  rejectDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await api.post(`${OPERATOR_BASE}/delete-requests/${id}/reject?${SVC}`, data || {});
+    return res.data;
+  },
+};
