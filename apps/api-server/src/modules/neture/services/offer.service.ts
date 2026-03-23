@@ -603,6 +603,162 @@ export class NetureOfferService {
     }
   }
 
+  // ==================== Paginated Supplier Products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
+
+  async getSupplierProductsPaginated(
+    supplierId: string,
+    options: {
+      page?: number;
+      limit?: number;
+      keyword?: string;
+      distributionType?: string;
+      isActive?: string;
+      sort?: string;
+      order?: string;
+    } = {},
+  ) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(options.limit) || 50));
+    const offset = (page - 1) * limit;
+    const keyword = options.keyword?.trim() || '';
+    const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const validSortFields: Record<string, string> = {
+      createdAt: 'spo.created_at',
+      priceGeneral: 'spo.price_general',
+      name: 'pm.marketing_name',
+    };
+    const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
+
+    // Build WHERE conditions
+    const conditions: string[] = ['spo.supplier_id = $1'];
+    const params: any[] = [supplierId];
+    let idx = 2;
+
+    if (keyword) {
+      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx})`);
+      params.push(`%${keyword}%`);
+      idx++;
+    }
+    if (options.distributionType) {
+      conditions.push(`spo.distribution_type = $${idx}`);
+      params.push(options.distributionType);
+      idx++;
+    }
+    if (options.isActive === 'true' || options.isActive === 'false') {
+      conditions.push(`spo.is_active = $${idx}`);
+      params.push(options.isActive === 'true');
+      idx++;
+    }
+
+    const where = conditions.join(' AND ');
+
+    const [countResult, rows] = await Promise.all([
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM supplier_product_offers spo
+         JOIN product_masters pm ON pm.id = spo.master_id
+         WHERE ${where}`,
+        params,
+      ),
+      AppDataSource.query(
+        `SELECT
+           spo.id, spo.master_id AS "masterId", spo.is_active AS "isActive",
+           spo.distribution_type AS "distributionType",
+           spo.allowed_seller_ids AS "allowedSellerIds",
+           spo.approval_status AS "approvalStatus",
+           spo.price_general AS "priceGeneral",
+           spo.price_gold AS "priceGold",
+           spo.price_platinum AS "pricePlatinum",
+           spo.consumer_reference_price AS "consumerReferencePrice",
+           spo.consumer_short_description AS "consumerShortDescription",
+           spo.created_at AS "createdAt",
+           spo.updated_at AS "updatedAt",
+           pm.marketing_name AS "masterName",
+           pm.barcode,
+           pm.specification,
+           COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
+           pc.name AS "categoryName",
+           COALESCE(b.name, pm.brand_name) AS "brandName",
+           pi_img.image_url AS "primaryImageUrl",
+           COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
+           COALESCE(active.cnt, 0)::int AS "activeServiceCount"
+         FROM supplier_product_offers spo
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN product_categories pc ON pc.id = pm.category_id
+         LEFT JOIN product_brands b ON b.id = pm.brand_id
+         LEFT JOIN LATERAL (
+           SELECT image_url FROM product_images
+           WHERE master_id = pm.id AND is_primary = true LIMIT 1
+         ) pi_img ON true
+         LEFT JOIN LATERAL (
+           SELECT COUNT(*)::int AS cnt FROM product_approvals
+           WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'pending'
+         ) pending ON true
+         LEFT JOIN LATERAL (
+           SELECT COUNT(DISTINCT service_key)::int AS cnt FROM product_approvals
+           WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'approved'
+         ) active ON true
+         WHERE ${where}
+         ORDER BY ${sortField} ${sortOrder}
+         LIMIT $${idx} OFFSET $${idx + 1}`,
+        [...params, limit, offset],
+      ),
+    ]);
+
+    const total = countResult[0]?.total || 0;
+
+    // Derive purpose
+    const data = rows.map((r: any) => ({
+      ...r,
+      purpose:
+        r.isActive && r.activeServiceCount > 0 ? 'ACTIVE_SALES'
+        : r.isActive ? 'APPLICATION'
+        : 'CATALOG',
+    }));
+
+    return {
+      data,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  // ==================== Batch Update (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
+
+  async batchUpdateSupplierOffers(
+    supplierId: string,
+    updates: Array<{
+      offerId: string;
+      isActive?: boolean;
+      distributionType?: OfferDistributionType;
+      priceGeneral?: number;
+      consumerReferencePrice?: number | null;
+    }>,
+  ) {
+    const updated: string[] = [];
+    const failed: Array<{ id: string; error: string }> = [];
+
+    for (const item of updates) {
+      try {
+        const result = await this.updateSupplierOffer(item.offerId, supplierId, {
+          isActive: item.isActive,
+          distributionType: item.distributionType,
+          priceGeneral: item.priceGeneral,
+          consumerReferencePrice: item.consumerReferencePrice,
+        });
+        if (result.success) {
+          updated.push(item.offerId);
+        } else {
+          failed.push({ id: item.offerId, error: result.error || 'UNKNOWN' });
+        }
+      } catch (err) {
+        failed.push({ id: item.offerId, error: (err as Error).message });
+      }
+    }
+
+    return { updated, failed };
+  }
+
   // ==================== Operator Supply Dashboard ====================
 
   async getOperatorSupplyProducts(operatorUserId: string) {

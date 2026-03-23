@@ -242,6 +242,15 @@ export class NetureService {
     return this.offerService.getSupplierProducts(supplierId);
   }
 
+  // WO-NETURE-SUPPLIER-EXCEL-LIST-V1: paginated + batch
+  async getSupplierProductsPaginated(supplierId: string, options?: Parameters<typeof this.offerService.getSupplierProductsPaginated>[1]) {
+    return this.offerService.getSupplierProductsPaginated(supplierId, options);
+  }
+
+  async batchUpdateSupplierOffers(supplierId: string, updates: Parameters<typeof this.offerService.batchUpdateSupplierOffers>[1]) {
+    return this.offerService.batchUpdateSupplierOffers(supplierId, updates);
+  }
+
   async createSupplierOffer(
     supplierId: string,
     data: {
