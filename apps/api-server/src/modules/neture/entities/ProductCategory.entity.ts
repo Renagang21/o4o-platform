@@ -54,6 +54,10 @@ export class ProductCategory {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
+  /** 규제 카테고리 여부 — true 시 MFDS 필드(regulatoryType/regulatoryName) 필수 */
+  @Column({ name: 'is_regulated', type: 'boolean', default: false })
+  isRegulated: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

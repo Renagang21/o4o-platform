@@ -27,13 +27,15 @@ export function createSupplierProductController(dataSource: DataSource): Router 
   router.post('/products', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { barcode, distributionType, manualData, priceGeneral, consumerReferencePrice,
+      const { barcode, marketingName, categoryId, brandName,
+              distributionType, manualData, priceGeneral, consumerReferencePrice,
               consumerShortDescription, consumerDetailDescription } = req.body;
       if (!barcode) {
         return res.status(400).json({ success: false, error: 'MISSING_BARCODE', message: 'barcode is required' });
       }
       const result = await netureService.createSupplierOffer(supplierId, {
-        barcode, manualData, distributionType,
+        barcode, marketingName, categoryId, brandName,
+        manualData, distributionType,
         priceGeneral, consumerReferencePrice,
         consumerShortDescription, consumerDetailDescription,
       });
