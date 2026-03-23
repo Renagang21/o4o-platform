@@ -2,16 +2,18 @@
  * CommunityHubPage — KPA Community Hub Main Page
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1: 콘텐츠 섹션 추가
  *
  * Route: /community
  * Forum Core 수정 없음. 기존 Forum API / Home API 재활용.
  *
- * 7개 섹션:
+ * 8개 섹션:
  *  1. HeroBannerSection  — community_ads type=hero
  *  2. ForumSection       — 포럼 카테고리 카드 → /forum
  *  3. LatestPostsSection — 최근 글 5개
  *  4. AdSection          — community_ads type=page
  *  5. VideoSection       — signage media → /signage
+ *  5.5 ContentSection    — CMS hub content (최근 + 추천)
  *  6. ResourceSection    — 자료실 → /docs
  *  7. SponsorBar         — community_sponsors
  */
@@ -21,6 +23,8 @@ import { Link } from 'react-router-dom';
 import { communityApi, type CommunityAd, type CommunitySponsor } from '../../api/community';
 import { forumApi } from '../../api/forum';
 import { homeApi } from '../../api/home';
+import { hubContentApi } from '../../api/hubContent';
+import type { HubContentItemResponse } from '@o4o/types/hub-content';
 import { HeroBannerSection } from '../../components/community/HeroBannerSection';
 import { AdSection } from '../../components/community/AdSection';
 import { SponsorBar } from '../../components/community/SponsorBar';
@@ -59,6 +63,7 @@ export default function CommunityHubPage() {
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [media, setMedia] = useState<HomeMedia[]>([]);
+  const [contentItems, setContentItems] = useState<HubContentItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +74,8 @@ export default function CommunityHubPage() {
       forumApi.getCategories(),
       forumApi.getPosts({ limit: 5 }),
       homeApi.getSignage(4, 0),
-    ]).then(([heroRes, pageRes, sponsorRes, catRes, postsRes, signageRes]) => {
+      hubContentApi.list({ serviceKey: 'kpa', sourceDomain: 'cms', limit: 50 }).catch(() => ({ data: [] })),
+    ]).then(([heroRes, pageRes, sponsorRes, catRes, postsRes, signageRes, contentRes]) => {
       if (heroRes.status === 'fulfilled') setHeroAds((heroRes.value as any)?.data?.ads ?? (heroRes.value as any)?.ads ?? []);
       if (pageRes.status === 'fulfilled') setPageAds((pageRes.value as any)?.data?.ads ?? (pageRes.value as any)?.ads ?? []);
       if (sponsorRes.status === 'fulfilled') setSponsors((sponsorRes.value as any)?.data?.sponsors ?? (sponsorRes.value as any)?.sponsors ?? []);
@@ -82,9 +88,19 @@ export default function CommunityHubPage() {
         const sig = (signageRes.value as any)?.data ?? (signageRes.value as any) ?? {};
         setMedia(sig.media ?? []);
       }
+      if (contentRes.status === 'fulfilled') {
+        const v = contentRes.value as any;
+        const items = Array.isArray(v?.data) ? v.data : [];
+        setContentItems(items);
+      }
       setLoading(false);
     });
   }, []);
+
+  // Split content into recommended (isPinned) and recent
+  const recommendedContent = contentItems.filter((c) => c.isPinned).slice(0, 6);
+  const recommendedIds = new Set(recommendedContent.map((c) => c.id));
+  const recentContent = contentItems.filter((c) => !recommendedIds.has(c.id)).slice(0, 6);
 
   if (loading) {
     return (
@@ -169,6 +185,36 @@ export default function CommunityHubPage() {
           )}
         </Section>
 
+        {/* 5.5 Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
+        <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
+          {contentItems.length === 0 ? (
+            <p style={styles.empty}>등록된 콘텐츠가 없습니다.</p>
+          ) : (
+            <>
+              {recentContent.length > 0 && (
+                <div style={{ marginBottom: 20 }}>
+                  <p style={styles.contentSubTitle}>최근 콘텐츠</p>
+                  <div style={styles.contentGrid}>
+                    {recentContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {recommendedContent.length > 0 && (
+                <div>
+                  <p style={styles.contentSubTitle}>추천 콘텐츠</p>
+                  <div style={styles.contentGrid}>
+                    {recommendedContent.map((item) => (
+                      <ContentCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </Section>
+
         {/* 6. Resource Section */}
         <Section title="자료실" linkTo="/docs" linkLabel="자료실 바로가기 →">
           <div style={styles.resourceCard}>
@@ -179,6 +225,56 @@ export default function CommunityHubPage() {
 
         {/* 7. Sponsor Bar */}
         <SponsorBar sponsors={sponsors} />
+      </div>
+    </div>
+  );
+}
+
+// ─── Content Card ───
+
+function ContentCard({ item }: { item: HubContentItemResponse }) {
+  const img = item.thumbnailUrl || item.imageUrl || null;
+  const hasLink = !!item.linkUrl;
+
+  return (
+    <div
+      onClick={() => { if (hasLink) window.open(item.linkUrl!, '_blank', 'noopener'); }}
+      style={{
+        ...styles.contentCard,
+        cursor: hasLink ? 'pointer' : 'default',
+        opacity: hasLink ? 1 : 0.8,
+      }}
+    >
+      {img ? (
+        <div style={styles.contentThumb}>
+          <img
+            src={img}
+            alt={item.title}
+            style={styles.mediaImg}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        </div>
+      ) : (
+        <div style={{ ...styles.contentThumb, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 24, color: colors.neutral300 }}>📄</span>
+        </div>
+      )}
+      <div style={styles.contentBody}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+          {item.cmsType && (
+            <span style={styles.contentBadge}>{item.cmsType}</span>
+          )}
+          {item.isPinned && (
+            <span style={styles.contentPinnedBadge}>추천</span>
+          )}
+        </div>
+        <p style={styles.contentTitle}>{item.title}</p>
+        {item.description && (
+          <p style={styles.contentDesc}>{item.description}</p>
+        )}
+        <p style={styles.contentDate}>
+          {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+        </p>
       </div>
     </div>
   );
@@ -372,6 +468,81 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 11,
     color: colors.neutral400,
     padding: '0 12px 8px',
+    margin: 0,
+  },
+  // Content (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
+  contentGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: 12,
+  },
+  contentSubTitle: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: colors.neutral500,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.05em',
+    marginBottom: 10,
+    margin: '0 0 10px 0',
+  },
+  contentCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    border: '1px solid #e2e8f0',
+    overflow: 'hidden',
+    transition: 'box-shadow 0.2s',
+  },
+  contentThumb: {
+    width: '100%',
+    height: 100,
+    backgroundColor: '#f1f5f9',
+    overflow: 'hidden',
+  },
+  contentBody: {
+    padding: '8px 12px 10px',
+  },
+  contentBadge: {
+    display: 'inline-block',
+    padding: '1px 6px',
+    fontSize: 10,
+    fontWeight: 500,
+    backgroundColor: '#f1f5f9',
+    color: '#64748b',
+    borderRadius: 4,
+  },
+  contentPinnedBadge: {
+    display: 'inline-block',
+    padding: '1px 6px',
+    fontSize: 10,
+    fontWeight: 500,
+    backgroundColor: '#dbeafe',
+    color: colors.primary,
+    borderRadius: 4,
+  },
+  contentTitle: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: colors.neutral700,
+    margin: '0 0 4px 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical' as any,
+  },
+  contentDesc: {
+    fontSize: 11,
+    color: colors.neutral400,
+    margin: '0 0 4px 0',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical' as any,
+  },
+  contentDate: {
+    fontSize: 10,
+    color: colors.neutral300,
     margin: 0,
   },
   // Resources
