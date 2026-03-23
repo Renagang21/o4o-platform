@@ -342,6 +342,7 @@ export class NetureService {
     slug: string;
     parentId?: string | null;
     sortOrder?: number;
+    isRegulated?: boolean;
   }): Promise<ProductCategory> {
     return this.catalogService.createCategory(data);
   }
@@ -351,6 +352,7 @@ export class NetureService {
     slug: string;
     sortOrder: number;
     isActive: boolean;
+    isRegulated: boolean;
   }>): Promise<ProductCategory> {
     return this.catalogService.updateCategory(id, data);
   }
@@ -386,6 +388,14 @@ export class NetureService {
 
   async deleteBrand(id: string): Promise<void> {
     return this.catalogService.deleteBrand(id);
+  }
+
+  async searchBrands(search?: string): Promise<Array<Brand & { productCount: number }>> {
+    return this.catalogService.searchBrands(search);
+  }
+
+  async mergeBrands(sourceBrandId: string, targetBrandId: string): Promise<{ merged: number }> {
+    return this.catalogService.mergeBrands(sourceBrandId, targetBrandId);
   }
 
   // ==================== Product Images ====================
