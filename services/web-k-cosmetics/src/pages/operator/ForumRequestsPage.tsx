@@ -1,8 +1,8 @@
 /**
- * ForumManagementPage - 포럼 카테고리 요청 관리
+ * ForumRequestsPage - 포럼 카테고리 요청 관리
  *
  * WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
- * 운영자가 사용자의 포럼 생성 요청을 검토/승인/거절/보완요청
+ * K-Cosmetics 운영자 포럼 신청 검토 페이지
  * 공통 /api/v1/forum/operator/* API 사용
  */
 
@@ -19,7 +19,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { forumOperatorApi } from '../../services/forumApi';
+import { forumOperatorApi } from '@/services/forumApi';
 
 type CategoryRequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
 
@@ -64,7 +64,7 @@ function isReviewable(status: string): boolean {
   return status === 'pending' || status === 'revision_requested';
 }
 
-export default function ForumManagementPage() {
+export default function ForumRequestsPage() {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,7 +124,7 @@ export default function ForumManagementPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-pink-600 animate-spin" />
         <span className="ml-2 text-slate-600">로딩 중...</span>
       </div>
     );
@@ -136,7 +136,7 @@ export default function ForumManagementPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <FileCheck className="w-7 h-7 text-emerald-600" />
+            <FileCheck className="w-7 h-7 text-pink-600" />
             포럼 신청 관리
           </h1>
           <p className="text-slate-500 mt-1">
@@ -160,14 +160,14 @@ export default function ForumManagementPage() {
             placeholder="포럼명 또는 신청자 검색..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as CategoryRequestStatus | 'all')}
-            className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none bg-white"
+            className="pl-4 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 appearance-none bg-white"
           >
             <option value="all">모든 상태</option>
             <option value="pending">대기 중</option>
@@ -215,7 +215,7 @@ export default function ForumManagementPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end">
                       <button
                         onClick={() => { setSelectedRequest(request); setReviewComment(''); }}
                         className="p-2 rounded-lg hover:bg-slate-100 text-slate-600"
@@ -284,7 +284,7 @@ export default function ForumManagementPage() {
                     onChange={(e) => setReviewComment(e.target.value)}
                     placeholder="승인/거절/보완 요청 사유를 입력하세요 (선택)"
                     rows={3}
-                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
                   />
                 </div>
               )}

@@ -333,6 +333,9 @@ const RegistrationRequestsPage = lazy(() =>
 const ForumManagementPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumManagementPage }))
 );
+const ForumDeleteRequestsPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ForumDeleteRequestsPage }))
+);
 const SupplyDashboardPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
 );
@@ -736,6 +739,8 @@ function App() {
               {/* WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: forum-management → community */}
               <Route path="/operator/community" element={<ForumManagementPage />} />
               <Route path="/operator/forum-management" element={<Navigate to="/operator/community" replace />} />
+              {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
+              <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/operator/supply" element={<SupplyDashboardPage />} />
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/operator/ai-operations" element={<AiOperationsPage />} />

@@ -103,6 +103,9 @@ const StoreCockpitPage = lazy(() => import('@/pages/operator/StoreCockpitPage'))
 
 // Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityManagementPage'));
+// WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
+const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
@@ -327,6 +330,9 @@ function AppRoutes() {
         <Route path="store-cockpit" element={<StoreCockpitPage />} />
         {/* Community Management (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
         <Route path="community" element={<CommunityManagementPage />} />
+        {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
+        <Route path="forum-requests" element={<ForumRequestsPage />} />
+        <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}

@@ -6,6 +6,8 @@
 export { default as NetureOperatorDashboard } from './NetureOperatorDashboard';
 export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
+// WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
 export { default as SupplyDashboardPage } from './SupplyDashboardPage';
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1

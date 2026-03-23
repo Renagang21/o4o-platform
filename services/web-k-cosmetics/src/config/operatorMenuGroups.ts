@@ -23,6 +23,10 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'HQ 플레이리스트', path: '/operator/signage/hq-playlists' },
     { label: '템플릿', path: '/operator/signage/templates' },
   ],
-  forum: [{ label: '커뮤니티 관리', path: '/operator/community' }],
+  forum: [
+    { label: '커뮤니티 관리', path: '/operator/community' },
+    { label: '포럼 신청', path: '/operator/forum-requests' },
+    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
+  ],
   analytics: [{ label: 'AI 리포트', path: '/operator/ai-report' }],
 };

@@ -10,6 +10,7 @@ import notificationRoutes from './forum.notifications.routes.js';
 import aiRoutes from './forum.ai.routes.js';
 import recommendationRoutes from './forum.recommendation.routes.js';
 import categoryRequestRoutes from './forum-category-request.routes.js';
+import operatorForumRoutes from './operator-forum.routes.js';
 
 const router: Router = Router();
 const postController = new ForumPostController();
@@ -144,5 +145,11 @@ router.use('/recommendations', recommendationRoutes);
 // Common forum category request API (serviceCode-scoped)
 // ============================================================================
 router.use('/category-requests', categoryRequestRoutes);
+
+// ============================================================================
+// Operator Routes — WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
+// Common forum operator API (serviceCode-scoped, operator role required)
+// ============================================================================
+router.use('/operator', operatorForumRoutes);
 
 export default router;
