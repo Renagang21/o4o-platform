@@ -54,7 +54,7 @@ export class ProductImportCommonService {
   ): Promise<void> {
     const slug = `${barcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
     const msrp = extra?.msrp ?? null;
-    const stockQty = extra?.stockQty ?? null;
+    const stockQty = extra?.stockQty ?? 0;
     const descriptionHtml = extra?.description ? `<p>${extra.description}</p>` : null;
 
     await manager.query(
