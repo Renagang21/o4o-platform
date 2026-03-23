@@ -106,6 +106,8 @@ const CommunityManagementPage = lazy(() => import('@/pages/operator/CommunityMan
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
+// WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPage'));
 
 // Store Channel Management (WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1)
 const StoreChannelsPage = lazy(() => import('@/pages/store/StoreChannelsPage'));
@@ -333,6 +335,8 @@ function AppRoutes() {
         {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+        {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
+        <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}

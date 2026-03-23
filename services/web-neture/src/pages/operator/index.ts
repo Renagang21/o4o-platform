@@ -8,6 +8,8 @@ export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
 // WO-O4O-FORUM-OPERATOR-UNIFICATION-V1
 export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
+// WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+export { default as ForumAnalyticsPage } from './ForumAnalyticsPage';
 export { default as SupplyDashboardPage } from './SupplyDashboardPage';
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1

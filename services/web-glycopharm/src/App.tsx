@@ -116,6 +116,8 @@ const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdmi
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
 const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
+// WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+const ForumAnalyticsPage = lazy(() => import('@/pages/operator/ForumAnalyticsPage'));
 const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
@@ -504,6 +506,8 @@ function AppRoutes() {
         <Route path="invoices" element={<InvoicesPage />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+        {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
+        <Route path="forum-analytics" element={<ForumAnalyticsPage />} />
         <Route path="forum-management" element={<OperatorForumManagementPage />} />
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />

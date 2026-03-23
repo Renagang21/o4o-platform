@@ -339,3 +339,40 @@ export const forumOperatorApi = {
     return res.data;
   },
 };
+
+// ============================================================================
+// Forum Analytics API — WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+// ============================================================================
+
+export const forumAnalyticsApi = {
+  getSummary: async () => {
+    try {
+      const res = await api.get(`${OPERATOR_BASE}/analytics/summary?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: false, data: null };
+    }
+  },
+
+  getTrend: async (days?: number) => {
+    try {
+      const query = new URLSearchParams({ serviceCode: 'k-cosmetics' });
+      if (days) query.set('days', days.toString());
+      const res = await api.get(`${OPERATOR_BASE}/analytics/trend?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: { daily: [] } };
+    }
+  },
+
+  getActivity: async (limit?: number) => {
+    try {
+      const query = new URLSearchParams({ serviceCode: 'k-cosmetics' });
+      if (limit) query.set('limit', limit.toString());
+      const res = await api.get(`${OPERATOR_BASE}/analytics/activity?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+};

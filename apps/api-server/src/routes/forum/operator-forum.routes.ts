@@ -347,4 +347,139 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
   }
 });
 
+// ============================================================================
+// ANALYTICS — read-only aggregation queries
+// WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+// ============================================================================
+
+/** GET /analytics/summary — KPI summary for the service */
+router.get('/analytics/summary', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+
+    // Category stats (scoped via approved requests)
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    let totalForums = 0;
+    let activeForums = 0;
+    let totalPosts = 0;
+
+    if (categoryIds.length > 0) {
+      const catStats = await categoryRepo()
+        .createQueryBuilder('cat')
+        .select('COUNT(*)::int', 'total')
+        .addSelect('COUNT(*) FILTER (WHERE cat.isActive = true)::int', 'active')
+        .addSelect('COALESCE(SUM(cat.postCount), 0)::int', 'posts')
+        .where('cat.id IN (:...categoryIds)', { categoryIds })
+        .getRawOne();
+      totalForums = catStats?.total || 0;
+      activeForums = catStats?.active || 0;
+      totalPosts = catStats?.posts || 0;
+    }
+
+    // Request stats (scoped by serviceCode)
+    const reqStats = await requestRepo()
+      .createQueryBuilder('r')
+      .select('r.status', 'status')
+      .addSelect('COUNT(*)::int', 'cnt')
+      .where('r.serviceCode = :serviceCode', { serviceCode })
+      .groupBy('r.status')
+      .getRawMany();
+
+    const statusCounts: Record<string, number> = {};
+    for (const row of reqStats) {
+      statusCounts[row.status] = row.cnt;
+    }
+
+    // Delete request stats
+    let deleteRequestsPending = 0;
+    if (categoryIds.length > 0) {
+      deleteRequestsPending = await categoryRepo()
+        .createQueryBuilder('cat')
+        .where(`cat.metadata->>'deleteRequestStatus' = :status`, { status: 'pending' })
+        .andWhere('cat.id IN (:...categoryIds)', { categoryIds })
+        .getCount();
+    }
+
+    res.json({
+      success: true,
+      data: {
+        totalForums,
+        activeForums,
+        totalPosts,
+        pendingRequests: statusCounts['pending'] || 0,
+        revisionRequests: statusCounts['revision_requested'] || 0,
+        approvedRequests: statusCounts['approved'] || 0,
+        rejectedRequests: statusCounts['rejected'] || 0,
+        deleteRequestsPending,
+      },
+    });
+  } catch (error: any) {
+    logger.error('Error getting forum analytics summary:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** GET /analytics/trend — daily request/approval trend (last 30 days) */
+router.get('/analytics/trend', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const days = Math.min(parseInt(req.query.days as string) || 30, 90);
+
+    // Daily request counts
+    const daily = await requestRepo()
+      .createQueryBuilder('r')
+      .select(`TO_CHAR(r.createdAt, 'YYYY-MM-DD')`, 'date')
+      .addSelect('COUNT(*)::int', 'requests')
+      .addSelect(`COUNT(*) FILTER (WHERE r.status = 'approved')::int`, 'approved')
+      .addSelect(`COUNT(*) FILTER (WHERE r.status = 'rejected')::int`, 'rejected')
+      .where('r.serviceCode = :serviceCode', { serviceCode })
+      .andWhere('r.createdAt >= NOW() - INTERVAL :days', { days: `${days} days` })
+      .groupBy(`TO_CHAR(r.createdAt, 'YYYY-MM-DD')`)
+      .orderBy('date', 'ASC')
+      .getRawMany();
+
+    res.json({ success: true, data: { daily, days } });
+  } catch (error: any) {
+    logger.error('Error getting forum analytics trend:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** GET /analytics/activity — recent review activity */
+router.get('/analytics/activity', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+
+    // Recent reviewed requests
+    const reviewed = await requestRepo()
+      .createQueryBuilder('r')
+      .select([
+        'r.id', 'r.name', 'r.status', 'r.reviewerName',
+        'r.reviewComment', 'r.reviewedAt', 'r.requesterName',
+      ])
+      .where('r.serviceCode = :serviceCode', { serviceCode })
+      .andWhere('r.reviewedAt IS NOT NULL')
+      .orderBy('r.reviewedAt', 'DESC')
+      .limit(limit)
+      .getMany();
+
+    const activity = reviewed.map((r) => ({
+      id: r.id,
+      type: 'review' as const,
+      name: r.name,
+      status: r.status,
+      reviewerName: r.reviewerName,
+      reviewComment: r.reviewComment,
+      requesterName: r.requesterName,
+      timestamp: r.reviewedAt,
+    }));
+
+    res.json({ success: true, data: activity });
+  } catch (error: any) {
+    logger.error('Error getting forum analytics activity:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

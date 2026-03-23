@@ -253,6 +253,38 @@ export const forumDeleteRequestApi = {
     apiClient.post<unknown>(`/api/v1/glycopharm/operator/forum-delete-requests/${id}/reject`, data),
 };
 
+// Forum Analytics API — WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
+// Common /api/v1/forum/operator/analytics/* endpoints (serviceCode=glycopharm)
+export const forumAnalyticsApi = {
+  getSummary: async () => {
+    try {
+      return await apiClient.get<unknown>('/api/v1/forum/operator/analytics/summary?serviceCode=glycopharm');
+    } catch {
+      return { data: null };
+    }
+  },
+
+  getTrend: async (days?: number) => {
+    const query = new URLSearchParams({ serviceCode: 'glycopharm' });
+    if (days) query.set('days', days.toString());
+    try {
+      return await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/trend?${query}`);
+    } catch {
+      return { data: { daily: [] } };
+    }
+  },
+
+  getActivity: async (limit?: number) => {
+    const query = new URLSearchParams({ serviceCode: 'glycopharm' });
+    if (limit) query.set('limit', limit.toString());
+    try {
+      return await apiClient.get<unknown>(`/api/v1/forum/operator/analytics/activity?${query}`);
+    } catch {
+      return { data: [] };
+    }
+  },
+};
+
 // WO-S2S-FLOW-RECOVERY-PHASE1-V1: Supplier Handling Request API
 export const supplierRequestApi = {
   createHandlingRequest: (data: {

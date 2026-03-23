@@ -38,6 +38,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '포럼 신청', path: '/operator/forum-requests' },
     { label: '커뮤니티 관리', path: '/operator/community' },
+    { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },

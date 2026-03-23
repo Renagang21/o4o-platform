@@ -22,6 +22,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   forum: [
     { label: '포럼 신청', path: '/operator/community' },
     { label: '삭제 요청', path: '/operator/forum-delete-requests' },
+    { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
   analytics: [
     { label: 'AI 리포트', path: '/operator/ai-report' },
