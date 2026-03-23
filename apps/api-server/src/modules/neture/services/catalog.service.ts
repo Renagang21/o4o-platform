@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import type { DataSource } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
   ProductMaster,
@@ -292,6 +293,7 @@ export class NetureCatalogService {
     slug: string;
     parentId?: string | null;
     sortOrder?: number;
+    isRegulated?: boolean;
   }): Promise<ProductCategory> {
     let depth = 0;
     if (data.parentId) {
@@ -307,6 +309,7 @@ export class NetureCatalogService {
       depth,
       sortOrder: data.sortOrder || 0,
       isActive: true,
+      isRegulated: data.isRegulated ?? false,
     });
     return this.categoryRepo.save(cat);
   }
@@ -319,6 +322,7 @@ export class NetureCatalogService {
     slug: string;
     sortOrder: number;
     isActive: boolean;
+    isRegulated: boolean;
   }>): Promise<ProductCategory> {
     const cat = await this.categoryRepo.findOne({ where: { id } });
     if (!cat) throw new Error('CATEGORY_NOT_FOUND');
@@ -386,6 +390,74 @@ export class NetureCatalogService {
     const brand = await this.brandRepo.findOne({ where: { id } });
     if (!brand) throw new Error('BRAND_NOT_FOUND');
     await this.brandRepo.delete(id);
+  }
+
+  /**
+   * 브랜드 검색 (이름 ILIKE) + 상품 수 포함
+   * WO-NETURE-BRAND-MANAGEMENT-V1
+   */
+  async searchBrands(search?: string): Promise<Array<Brand & { productCount: number }>> {
+    const ds: DataSource = AppDataSource;
+    const params: any[] = [];
+    let searchFilter = '';
+    if (search && search.trim()) {
+      params.push(`%${search.trim()}%`);
+      searchFilter = `WHERE b.name ILIKE $${params.length}`;
+    }
+    const rows = await ds.query(`
+      SELECT b.*,
+             COALESCE(pc.cnt, 0)::int AS "productCount"
+      FROM brands b
+      LEFT JOIN (
+        SELECT brand_id, COUNT(*)::int AS cnt
+        FROM product_masters
+        WHERE brand_id IS NOT NULL
+        GROUP BY brand_id
+      ) pc ON pc.brand_id = b.id
+      ${searchFilter}
+      ORDER BY b.name ASC
+    `, params);
+    return rows;
+  }
+
+  /**
+   * 브랜드 병합 — source → target
+   * 1. product_masters.brand_id 변경
+   * 2. source 브랜드 삭제
+   * WO-NETURE-BRAND-MANAGEMENT-V1
+   */
+  async mergeBrands(sourceBrandId: string, targetBrandId: string): Promise<{ merged: number }> {
+    if (sourceBrandId === targetBrandId) throw new Error('SAME_BRAND');
+
+    const ds: DataSource = AppDataSource;
+    const source = await this.brandRepo.findOne({ where: { id: sourceBrandId } });
+    if (!source) throw new Error('SOURCE_BRAND_NOT_FOUND');
+    const target = await this.brandRepo.findOne({ where: { id: targetBrandId } });
+    if (!target) throw new Error('TARGET_BRAND_NOT_FOUND');
+
+    const queryRunner = ds.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      // 1. product_masters 이관
+      const updateResult = await queryRunner.query(
+        `UPDATE product_masters SET brand_id = $1 WHERE brand_id = $2`,
+        [targetBrandId, sourceBrandId],
+      );
+      const merged = updateResult?.[1] ?? 0;
+
+      // 2. source 삭제
+      await queryRunner.query(`DELETE FROM brands WHERE id = $1`, [sourceBrandId]);
+
+      await queryRunner.commitTransaction();
+      logger.info(`[Brand Merge] ${source.name} → ${target.name}: ${merged} products migrated`);
+      return { merged };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   // ==================== ProductImage — 상품 이미지 관리 (WO-O4O-NETURE-PRODUCT-IMAGE-STRUCTURE-V1) ====================

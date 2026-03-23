@@ -25,3 +25,7 @@ export { default as OperatorAnalyticsPage } from './AnalyticsPage';
 // WO-O4O-MARKET-TRIAL-PHASE1-V1
 export { default as MarketTrialApprovalsPage } from './MarketTrialApprovalsPage';
 export { default as MarketTrialApprovalDetailPage } from './MarketTrialApprovalDetailPage';
+// WO-NETURE-CATEGORY-MANAGEMENT-V1
+export { default as CategoryManagementPage } from './CategoryManagementPage';
+// WO-NETURE-BRAND-MANAGEMENT-V1
+export { default as BrandManagementPage } from './BrandManagementPage';
