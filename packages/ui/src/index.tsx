@@ -629,3 +629,9 @@ export * from './content-discovery';
 
 // Store Block Engine (WO-STORE-BLOCK-REGISTRY-V1)
 export * from './store-blocks';
+
+// Shared Operator Pages (WO-O4O-ROLE-MANAGEMENT-PAGE-COMMONIZATION-V1)
+export * from './pages/operator';
+
+// Operator User Detail (WO-O4O-USER-DETAIL-PAGE-COMMONIZATION-V1)
+export * from './operator-user-detail';
