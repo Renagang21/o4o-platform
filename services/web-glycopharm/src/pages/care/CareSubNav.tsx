@@ -6,7 +6,7 @@
  */
 
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, BarChart3, MessageSquare, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Users, BarChart3, MessageSquare, BookOpen, ClipboardList } from 'lucide-react';
 
 const careNavItems = [
   { path: '/care', label: '대시보드', icon: LayoutDashboard, end: true },
@@ -14,6 +14,7 @@ const careNavItems = [
   { path: '/care/analysis', label: '분석', icon: BarChart3, end: false },
   { path: '/care/coaching', label: '코칭', icon: MessageSquare, end: false },
   { path: '/care/guideline', label: '가이드라인', icon: BookOpen, end: false },
+  { path: '/care/records', label: '전체기록', icon: ClipboardList, end: false },
 ];
 
 export default function CareSubNav() {

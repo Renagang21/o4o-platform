@@ -1,6 +1,7 @@
 /**
  * DataTab - 건강 데이터 입력 + 최근 기록
  * WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1
+ * WO-O4O-GLYCOPHARM-PHARMACIST-DATA-ENTRY-METADATA-EXPANSION-V1
  *
  * API:
  *   POST /api/v1/care/health-readings → 데이터 입력
@@ -13,6 +14,11 @@ import {
   Loader2,
   CheckCircle,
   ClipboardPlus,
+  ChevronDown,
+  ChevronUp,
+  Pill,
+  Footprints,
+  AlertTriangle,
 } from 'lucide-react';
 import { pharmacyApi, type HealthReadingDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
@@ -33,6 +39,40 @@ const METRIC_LABELS: Record<string, string> = {
   weight: '체중',
 };
 
+const MEAL_TIMING_OPTIONS = [
+  { value: 'fasting', label: '공복' },
+  { value: 'before_meal', label: '식전' },
+  { value: 'after_meal', label: '식후' },
+  { value: 'bedtime', label: '취침 전' },
+  { value: 'random', label: '기타' },
+];
+
+const EXERCISE_TYPES = [
+  { value: 'walking', label: '걷기' },
+  { value: 'running', label: '달리기' },
+  { value: 'cycling', label: '자전거' },
+  { value: 'swimming', label: '수영' },
+  { value: 'strength', label: '근력운동' },
+  { value: 'yoga', label: '요가/스트레칭' },
+  { value: 'other', label: '기타' },
+];
+
+const INTENSITY_OPTIONS = [
+  { value: 'light', label: '가볍게' },
+  { value: 'moderate', label: '보통' },
+  { value: 'vigorous', label: '격렬하게' },
+];
+
+const SYMPTOM_OPTIONS = [
+  { value: '어지러움', label: '어지러움' },
+  { value: '식은땀', label: '식은땀' },
+  { value: '손떨림', label: '손떨림' },
+  { value: '피로', label: '피로' },
+  { value: '두통', label: '두통' },
+  { value: '갈증', label: '갈증' },
+  { value: '기타', label: '기타' },
+];
+
 export default function DataTab() {
   const { patient, reload } = usePatientDetail();
 
@@ -49,6 +89,26 @@ export default function DataTab() {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // ── Metadata Form State ──
+  const [mealTiming, setMealTiming] = useState('fasting');
+
+  const [medOpen, setMedOpen] = useState(false);
+  const [medName, setMedName] = useState('');
+  const [medDose, setMedDose] = useState('');
+  const [medTakenAt, setMedTakenAt] = useState('');
+
+  const [exOpen, setExOpen] = useState(false);
+  const [exType, setExType] = useState('walking');
+  const [exDuration, setExDuration] = useState('');
+  const [exIntensity, setExIntensity] = useState('moderate');
+
+  const [symOpen, setSymOpen] = useState(false);
+  const [symptoms, setSymptoms] = useState<string[]>([]);
+
+  const toggleSymptom = (v: string) => {
+    setSymptoms((prev) => prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]);
+  };
 
   const selectedMetric = METRIC_OPTIONS.find(m => m.value === metricType) || METRIC_OPTIONS[0];
 
@@ -75,14 +135,53 @@ export default function DataTab() {
 
     setSaving(true);
     try {
+      // ── Build metadata ──
+      const metadata: Record<string, unknown> = {};
+
+      if (metricType === 'glucose') {
+        metadata.mealTiming = mealTiming;
+        metadata.mealTimingLabel = MEAL_TIMING_OPTIONS.find((o) => o.value === mealTiming)?.label || '';
+      }
+      if (medOpen && medName.trim()) {
+        metadata.medication = {
+          name: medName.trim(),
+          dose: medDose.trim(),
+          takenAt: medTakenAt || measuredAt,
+        };
+      }
+      if (exOpen && exDuration) {
+        const dur = Number(exDuration);
+        if (dur > 0) {
+          metadata.exercise = { type: exType, duration: dur, intensity: exIntensity };
+        }
+      }
+      if (symOpen && symptoms.length > 0) {
+        metadata.symptoms = symptoms;
+      }
+
       await pharmacyApi.postHealthReading({
         patientId: patient.id,
         metricType,
         valueNumeric: Number(value),
         unit: selectedMetric.unit,
         measuredAt: new Date(measuredAt).toISOString(),
+        ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
       });
+
+      // ── Reset ──
       setValue('');
+      setMealTiming('fasting');
+      setMedOpen(false);
+      setMedName('');
+      setMedDose('');
+      setMedTakenAt('');
+      setExOpen(false);
+      setExType('walking');
+      setExDuration('');
+      setExIntensity('moderate');
+      setSymOpen(false);
+      setSymptoms([]);
+
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
       await loadReadings();
@@ -157,6 +256,186 @@ export default function DataTab() {
                 )}
                 {saved ? '저장됨' : '저장'}
               </button>
+            </div>
+          </div>
+
+          {/* ── MealTiming (glucose only) ── */}
+          {metricType === 'glucose' && (
+            <div className="mt-3 pt-3 border-t border-slate-100">
+              <label className="block text-xs text-slate-500 mb-2">측정 구분</label>
+              <div className="flex flex-wrap gap-1.5">
+                {MEAL_TIMING_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setMealTiming(opt.value)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                      mealTiming === opt.value
+                        ? 'bg-blue-50 border-blue-300 text-blue-700'
+                        : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Collapsible Metadata Sections ── */}
+          <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
+            {/* Medication */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setMedOpen(!medOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold text-violet-600">
+                  <Pill className="w-3.5 h-3.5" />
+                  투약 기록
+                  <span className="text-[10px] font-normal text-slate-400">
+                    {medOpen && medName.trim() ? `(${medName.trim()})` : '(선택)'}
+                  </span>
+                </span>
+                {medOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+              </button>
+              {medOpen && (
+                <div className="mt-1 grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-lg border border-violet-100 bg-white">
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">약품명</label>
+                    <input
+                      type="text"
+                      value={medName}
+                      onChange={(e) => setMedName(e.target.value)}
+                      placeholder="예: 메트포르민"
+                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">용량</label>
+                    <input
+                      type="text"
+                      value={medDose}
+                      onChange={(e) => setMedDose(e.target.value)}
+                      placeholder="예: 500mg 1정"
+                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">복용 시간</label>
+                    <input
+                      type="datetime-local"
+                      value={medTakenAt}
+                      onChange={(e) => setMedTakenAt(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Exercise */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setExOpen(!exOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold text-emerald-600">
+                  <Footprints className="w-3.5 h-3.5" />
+                  운동 기록
+                  <span className="text-[10px] font-normal text-slate-400">
+                    {exOpen && exDuration && Number(exDuration) > 0 ? `(${exDuration}분)` : '(선택)'}
+                  </span>
+                </span>
+                {exOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+              </button>
+              {exOpen && (
+                <div className="mt-1 grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-lg border border-emerald-100 bg-white">
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">운동 종류</label>
+                    <select
+                      value={exType}
+                      onChange={(e) => setExType(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      {EXERCISE_TYPES.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">시간 (분)</label>
+                    <input
+                      type="number"
+                      value={exDuration}
+                      onChange={(e) => setExDuration(e.target.value)}
+                      placeholder="예: 30"
+                      min="1"
+                      max="600"
+                      className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">강도</label>
+                    <div className="flex gap-1">
+                      {INTENSITY_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setExIntensity(opt.value)}
+                          className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-colors ${
+                            exIntensity === opt.value
+                              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+                              : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Symptoms */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setSymOpen(!symOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <span className="flex items-center gap-2 text-xs font-semibold text-amber-600">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  증상 기록
+                  <span className="text-[10px] font-normal text-slate-400">
+                    {symOpen && symptoms.length > 0 ? `(${symptoms.length}개)` : '(선택)'}
+                  </span>
+                </span>
+                {symOpen ? <ChevronUp className="w-3.5 h-3.5 text-slate-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+              </button>
+              {symOpen && (
+                <div className="mt-1 p-3 rounded-lg border border-amber-100 bg-white">
+                  <div className="flex flex-wrap gap-1.5">
+                    {SYMPTOM_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => toggleSymptom(opt.value)}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                          symptoms.includes(opt.value)
+                            ? 'bg-amber-50 border-amber-300 text-amber-700'
+                            : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </form>
