@@ -29,7 +29,7 @@ export function buildConfigResolver(
       // Table may not exist yet
     }
 
-    const model = setting?.model || 'gemini-3.0-flash';
+    const model = setting?.model || 'gemini-2.5-flash';
     const temperature = setting ? Number(setting.temperature) : 0.3;
     const maxTokens = overrides?.maxTokens ?? setting?.maxTokens ?? 2048;
 
