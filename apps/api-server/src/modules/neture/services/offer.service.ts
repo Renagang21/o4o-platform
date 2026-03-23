@@ -295,33 +295,48 @@ export class NetureOfferService {
         }
       }
 
-      return offers.map((o) => ({
-        id: o.id,
-        masterId: o.masterId,
-        masterName: o.master?.marketingName || o.master?.regulatoryName || '',
-        isActive: o.isActive,
-        distributionType: o.distributionType,
-        allowedSellerIds: o.allowedSellerIds,
-        approvalStatus: o.approvalStatus,
-        priceGeneral: o.priceGeneral,
-        priceGold: o.priceGold,
-        pricePlatinum: o.pricePlatinum,
-        consumerReferencePrice: o.consumerReferencePrice,
-        // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
-        consumerShortDescription: o.consumerShortDescription,
-        consumerDetailDescription: o.consumerDetailDescription,
-        businessShortDescription: o.businessShortDescription,
-        businessDetailDescription: o.businessDetailDescription,
-        pendingRequestCount: pendingMap.get(o.id) || 0,
-        activeServiceCount: serviceMap.get(o.id) || 0,
-        createdAt: o.createdAt,
-        updatedAt: o.updatedAt,
-        barcode: o.master?.barcode || '',
-        brandName: o.master?.brand?.name || o.master?.brandName || null,
-        categoryName: o.master?.category?.name || null,
-        specification: o.master?.specification || null,
-        primaryImageUrl: imageMap.get(o.masterId) || null,
-      }));
+      return offers.map((o) => {
+        const activeServiceCount = serviceMap.get(o.id) || 0;
+        const pendingRequestCount = pendingMap.get(o.id) || 0;
+        const productName = o.master?.marketingName || o.master?.regulatoryName || '';
+
+        // Derive purpose from state
+        const purpose: 'ACTIVE_SALES' | 'APPLICATION' | 'CATALOG' =
+          o.isActive && activeServiceCount > 0 ? 'ACTIVE_SALES'
+          : o.isActive ? 'APPLICATION'
+          : 'CATALOG';
+
+        return {
+          id: o.id,
+          masterId: o.masterId,
+          name: productName,
+          masterName: productName,
+          category: o.master?.category?.name || '',
+          isActive: o.isActive,
+          purpose,
+          distributionType: o.distributionType,
+          allowedSellerIds: o.allowedSellerIds,
+          approvalStatus: o.approvalStatus,
+          priceGeneral: o.priceGeneral,
+          priceGold: o.priceGold,
+          pricePlatinum: o.pricePlatinum,
+          consumerReferencePrice: o.consumerReferencePrice,
+          // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
+          consumerShortDescription: o.consumerShortDescription,
+          consumerDetailDescription: o.consumerDetailDescription,
+          businessShortDescription: o.businessShortDescription,
+          businessDetailDescription: o.businessDetailDescription,
+          pendingRequestCount,
+          activeServiceCount,
+          createdAt: o.createdAt,
+          updatedAt: o.updatedAt,
+          barcode: o.master?.barcode || '',
+          brandName: o.master?.brand?.name || o.master?.brandName || null,
+          categoryName: o.master?.category?.name || null,
+          specification: o.master?.specification || null,
+          primaryImageUrl: imageMap.get(o.masterId) || null,
+        };
+      });
     } catch (error) {
       logger.error('[NetureOfferService] Error fetching supplier offers:', error);
       throw error;

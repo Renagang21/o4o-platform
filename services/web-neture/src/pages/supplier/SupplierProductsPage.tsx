@@ -118,7 +118,7 @@ export default function SupplierProductsPage() {
   const stats = {
     total: products.length,
     active: products.filter((p) => p.isActive).length,
-    pendingTotal: products.reduce((sum, p) => sum + p.pendingRequestCount, 0),
+    pendingTotal: products.reduce((sum, p) => sum + (p.pendingRequestCount || 0), 0),
   };
 
   return (
@@ -203,7 +203,7 @@ export default function SupplierProductsPage() {
       ) : (
         <div style={styles.productList}>
           {products.map((product) => {
-            const purposeConfig = PURPOSE_CONFIG[product.purpose];
+            const purposeConfig = PURPOSE_CONFIG[product.purpose] || PURPOSE_CONFIG.CATALOG;
             const isUpdating = updating === product.id;
             const isEditingDist = editingDistribution === product.id;
             const isPrivate = product.distributionType === 'PRIVATE';
