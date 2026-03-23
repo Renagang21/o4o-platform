@@ -32,6 +32,7 @@ import { createSellerController, createPartnerContractController } from './contr
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
+import { createOperatorProductCleanupController } from './controllers/operator-product-cleanup.controller.js';
 import { createOperatorCategoryController } from './controllers/operator-category.controller.js';
 import { createOperatorBrandController } from './controllers/operator-brand.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
@@ -79,6 +80,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorCategoryController());
   // WO-NETURE-BRAND-MANAGEMENT-V1
   router.use('/operator', createOperatorBrandController());
+  // WO-NETURE-PRODUCT-DATA-CLEANUP-V1
+  router.use('/operator/product-cleanup', createOperatorProductCleanupController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

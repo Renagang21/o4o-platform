@@ -18,6 +18,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '공급 현황', path: '/operator/supply' },
     { label: '카테고리 관리', path: '/operator/categories' },
     { label: '브랜드 관리', path: '/operator/brands' },
+    { label: '상품 데이터 정리', path: '/operator/product-cleanup' },
   ],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],

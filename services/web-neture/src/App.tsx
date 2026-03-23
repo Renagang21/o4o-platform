@@ -371,6 +371,10 @@ const MarketTrialApprovalsPage = lazy(() =>
 const MarketTrialApprovalDetailPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalDetailPage }))
 );
+// WO-NETURE-PRODUCT-DATA-CLEANUP-V1
+const ProductDataCleanupPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ProductDataCleanupPage }))
+);
 
 // WO-NETURE-CATEGORY-MANAGEMENT-V1
 const CategoryManagementPage = lazy(() =>
@@ -779,6 +783,8 @@ function App() {
               <Route path="/operator/categories" element={<CategoryManagementPage />} />
               {/* 브랜드 관리 (WO-NETURE-BRAND-MANAGEMENT-V1) */}
               <Route path="/operator/brands" element={<BrandManagementPage />} />
+              {/* WO-NETURE-PRODUCT-DATA-CLEANUP-V1 */}
+              <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
             </Route>
 
             {/* ================================================================
