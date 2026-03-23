@@ -8,8 +8,10 @@
  */
 
 import { useState, useEffect, useCallback, CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { hubContentApi, type HubContentItemResponse } from '../../lib/api/hubContent';
+import { dashboardCopyApi } from '../../lib/api/dashboardCopy';
+import { useAuth } from '../../contexts/AuthContext';
 
 const TYPE_FILTERS = [
   { key: 'all', label: '전체' },
@@ -23,12 +25,44 @@ const TYPE_FILTERS = [
 const PAGE_SIZE = 12;
 
 export default function ContentLibraryPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState<HubContentItemResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    dashboardCopyApi.getCopiedSourceIds(user.id)
+      .then(ids => setCopiedIds(new Set(ids)))
+      .catch(() => {});
+  }, [user?.id]);
+
+  const handleCopy = async (e: React.MouseEvent, item: HubContentItemResponse) => {
+    e.stopPropagation();
+    if (!user?.id || copyingId) return;
+    setCopyingId(item.id);
+    try {
+      await dashboardCopyApi.copyAsset({
+        sourceType: 'hub_content',
+        sourceId: item.id,
+        targetDashboardId: user.id,
+      });
+      setCopiedIds(prev => new Set(prev).add(item.id));
+      if (confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?')) {
+        navigate('/my-content');
+      }
+    } catch (err: any) {
+      alert(err.message || '복사 중 오류가 발생했습니다.');
+    } finally {
+      setCopyingId(null);
+    }
+  };
 
   const fetchContents = useCallback(async (p: number) => {
     setLoading(true);
@@ -165,7 +199,21 @@ export default function ContentLibraryPage() {
                   {item.description && (
                     <p style={styles.cardDesc}>{item.description}</p>
                   )}
-                  <p style={styles.cardDate}>{formatDate(item.createdAt)}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                    <p style={styles.cardDate}>{formatDate(item.createdAt)}</p>
+                    {user && (
+                      <button
+                        onClick={(e) => handleCopy(e, item)}
+                        disabled={copiedIds.has(item.id) || copyingId === item.id}
+                        style={{
+                          ...styles.copyButton,
+                          ...(copiedIds.has(item.id) || copyingId === item.id ? styles.copyButtonDisabled : {}),
+                        }}
+                      >
+                        {copiedIds.has(item.id) ? '✓ 가져옴' : copyingId === item.id ? '복사 중...' : '↓ 내 콘텐츠로'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -340,5 +388,24 @@ const styles: Record<string, CSSProperties> = {
     backgroundColor: 'white',
     cursor: 'pointer',
     transition: 'background-color 0.2s',
+  },
+  copyButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 2,
+    padding: '3px 8px',
+    fontSize: 10,
+    fontWeight: 500,
+    borderRadius: 4,
+    border: 'none',
+    cursor: 'pointer',
+    backgroundColor: '#fdf2f8',
+    color: '#DB2777',
+    transition: 'background-color 0.2s',
+  },
+  copyButtonDisabled: {
+    backgroundColor: '#f1f5f9',
+    color: '#94a3b8',
+    cursor: 'default',
   },
 };

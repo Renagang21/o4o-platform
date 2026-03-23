@@ -8,7 +8,7 @@
 import { Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CmsMedia } from '@o4o-apps/cms-core';
+import { CmsMedia, CmsContent } from '@o4o-apps/cms-core';
 import {
   SignagePlaylist,
   SignageMedia,
@@ -54,7 +54,7 @@ export function createCopyAssetHandler(dataSource: DataSource) {
       }
 
       // Validate sourceType
-      const validSourceTypes: DashboardAssetSourceType[] = ['content', 'signage_media', 'signage_playlist'];
+      const validSourceTypes: DashboardAssetSourceType[] = ['content', 'signage_media', 'signage_playlist', 'hub_content'];
       if (!validSourceTypes.includes(sourceType)) {
         res.status(400).json({
           success: false,
@@ -87,6 +87,10 @@ export function createCopyAssetHandler(dataSource: DataSource) {
 
         case 'signage_playlist':
           result = await copySignagePlaylist(dataSource, sourceId, targetDashboardId, user.id, copyOptions);
+          break;
+
+        case 'hub_content':
+          result = await copyHubContent(dataSource, sourceId, targetDashboardId, user.id, copyOptions);
           break;
 
         default:
@@ -345,6 +349,74 @@ async function copySignagePlaylist(
     dashboardAssetId: newId,
     status: 'draft',
     sourceType: 'signage_playlist',
+    sourceId: sourceId,
+  };
+}
+
+/**
+ * Copy Hub Content (CmsContent) to dashboard as CmsMedia
+ *
+ * WO-O4O-CONTENT-LIBRARY-TO-MY-CONTENT-V1
+ *
+ * Hub Content API returns cms_contents.id, which is a different table from cms_media.
+ * This function reads from cms_contents and creates a new cms_media entry.
+ */
+async function copyHubContent(
+  dataSource: DataSource,
+  sourceId: string,
+  targetDashboardId: string,
+  userId: string,
+  options: CopyOptions
+): Promise<CopyAssetResponse> {
+  const contentRepo = dataSource.getRepository(CmsContent);
+  const original = await contentRepo.findOne({ where: { id: sourceId } });
+
+  if (!original) {
+    throw new Error('NOT_FOUND');
+  }
+
+  if (original.status !== 'published') {
+    throw new Error('NOT_PUBLIC');
+  }
+
+  const title = options.titleMode === 'edit' && options.title
+    ? options.title
+    : `${original.title} (복사본)`;
+
+  const description = options.descriptionMode === 'empty'
+    ? null
+    : original.summary;
+
+  const mediaRepo = dataSource.getRepository(CmsMedia);
+  const newId = uuidv4();
+  const newAsset = mediaRepo.create({
+    id: newId,
+    organizationId: targetDashboardId,
+    folderId: null,
+    uploadedBy: userId,
+    title,
+    description,
+    type: original.type || 'notice',
+    mimeType: 'text/html',
+    metadata: {
+      sourceContentId: original.id,
+      sourceType: 'hub_content',
+      templateType: options.templateType,
+      copiedAt: new Date().toISOString(),
+      copiedBy: userId,
+      originalImageUrl: original.imageUrl,
+      originalLinkUrl: original.linkUrl,
+    },
+    isActive: false,
+  });
+
+  await mediaRepo.save(newAsset);
+
+  return {
+    success: true,
+    dashboardAssetId: newId,
+    status: 'draft',
+    sourceType: 'hub_content',
     sourceId: sourceId,
   };
 }

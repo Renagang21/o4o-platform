@@ -11,9 +11,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, ExternalLink, Image as ImageIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, FileText, ExternalLink, Image as ImageIcon, Download, Check, Loader2 } from 'lucide-react';
 import { apiClient } from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { dashboardCopyApi } from '@/api/dashboardCopy';
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -56,12 +58,45 @@ const PAGE_SIZE = 12;
 // ─── Component ──────────────────────────────────────────────
 
 export function HubContentListPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState<HubContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [copiedIds, setCopiedIds] = useState<Set<string>>(new Set());
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+
+  // Load already-copied source IDs
+  useEffect(() => {
+    if (!user?.id) return;
+    dashboardCopyApi.getCopiedSourceIds(user.id)
+      .then(ids => setCopiedIds(new Set(ids)))
+      .catch(() => {});
+  }, [user?.id]);
+
+  const handleCopy = async (e: React.MouseEvent, item: HubContentItem) => {
+    e.stopPropagation();
+    if (!user?.id || copyingId) return;
+    setCopyingId(item.id);
+    try {
+      await dashboardCopyApi.copyAsset({
+        sourceType: 'hub_content',
+        sourceId: item.id,
+        targetDashboardId: user.id,
+      });
+      setCopiedIds(prev => new Set(prev).add(item.id));
+      if (confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?')) {
+        navigate('/my-content');
+      }
+    } catch (err: any) {
+      alert(err.message || '복사 중 오류가 발생했습니다.');
+    } finally {
+      setCopyingId(null);
+    }
+  };
 
   const fetchContents = useCallback(async (p: number, type: string) => {
     setLoading(true);
@@ -225,9 +260,32 @@ export function HubContentListPage() {
                       <ExternalLink className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-0.5" />
                     )}
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-2">
-                    {formatDate(item.publishedAt || item.createdAt)}
-                  </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-[10px] text-slate-400">
+                      {formatDate(item.publishedAt || item.createdAt)}
+                    </p>
+                    {user && (
+                      <button
+                        onClick={(e) => handleCopy(e, item)}
+                        disabled={copiedIds.has(item.id) || copyingId === item.id}
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+                          copiedIds.has(item.id)
+                            ? 'bg-slate-100 text-slate-400 cursor-default'
+                            : copyingId === item.id
+                              ? 'bg-slate-100 text-slate-400 cursor-wait'
+                              : 'bg-primary-50 text-primary-600 hover:bg-primary-100'
+                        }`}
+                      >
+                        {copiedIds.has(item.id) ? (
+                          <><Check className="w-3 h-3" /> 가져옴</>
+                        ) : copyingId === item.id ? (
+                          <><Loader2 className="w-3 h-3 animate-spin" /> 복사 중</>
+                        ) : (
+                          <><Download className="w-3 h-3" /> 내 콘텐츠로</>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

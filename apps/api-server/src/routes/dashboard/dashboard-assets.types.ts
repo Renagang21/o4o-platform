@@ -8,7 +8,7 @@
 /**
  * Source types for dashboard asset copy
  */
-export type DashboardAssetSourceType = 'content' | 'signage_media' | 'signage_playlist';
+export type DashboardAssetSourceType = 'content' | 'signage_media' | 'signage_playlist' | 'hub_content';
 
 /**
  * Copy options (Phase 2-B)
