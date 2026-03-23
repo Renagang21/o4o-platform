@@ -6,6 +6,7 @@
 export { default as KpaOperatorDashboard } from './KpaOperatorDashboard';
 export { default as OperatorAiReportPage } from './OperatorAiReportPage';
 export { default as ForumManagementPage } from './ForumManagementPage';
+export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
 export { LegalManagementPage } from './LegalManagementPage';
 
 export { default as ForumAnalyticsDashboard } from './ForumAnalyticsDashboard';

@@ -121,3 +121,116 @@ export const forumRequestApi = {
     }
   },
 };
+
+// ============================================================================
+// Operator Forum API — WO-O4O-KPA-A-FORUM-ALIGNMENT-V1
+// Common /api/v1/forum/operator/* endpoints (serviceCode=kpa-society)
+// ============================================================================
+
+const OPERATOR_BASE = '/forum/operator';
+const SVC = 'serviceCode=kpa-society';
+
+export const forumOperatorApi = {
+  getRequests: async (params?: { status?: string; page?: number; limit?: number }) => {
+    const query = new URLSearchParams({ serviceCode: 'kpa-society' });
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', params.page.toString());
+    if (params?.limit) query.set('limit', params.limit.toString());
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/requests?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: [], total: 0 };
+    }
+  },
+
+  getPendingCount: async () => {
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/requests/pending-count?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: { count: 0 } };
+    }
+  },
+
+  getRequestDetail: async (id: string) => {
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/requests/${id}?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: false, error: 'Failed to load detail' };
+    }
+  },
+
+  review: async (id: string, data: { action: 'approve' | 'reject' | 'revision'; reviewComment?: string }) => {
+    const res = await authClient.api.patch(`${OPERATOR_BASE}/requests/${id}/review?${SVC}`, data);
+    return res.data;
+  },
+
+  getDeleteRequests: async (params?: { status?: string }) => {
+    const query = new URLSearchParams({ serviceCode: 'kpa-society' });
+    if (params?.status) query.set('status', params.status);
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/delete-requests?${query}`);
+      return res.data;
+    } catch {
+      return { success: true, data: [], count: 0 };
+    }
+  },
+
+  getDeletePendingCount: async () => {
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/delete-requests/pending-count?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: { count: 0 } };
+    }
+  },
+
+  approveDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/delete-requests/${id}/approve?${SVC}`, data || {});
+    return res.data;
+  },
+
+  rejectDelete: async (id: string, data?: { reviewComment?: string }) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/delete-requests/${id}/reject?${SVC}`, data || {});
+    return res.data;
+  },
+};
+
+// ============================================================================
+// Forum Analytics API — WO-O4O-KPA-A-FORUM-ALIGNMENT-V1
+// ============================================================================
+
+export const forumAnalyticsApi = {
+  getSummary: async () => {
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/analytics/summary?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: false, data: null };
+    }
+  },
+
+  getTrend: async (days?: number) => {
+    try {
+      const query = new URLSearchParams({ serviceCode: 'kpa-society' });
+      if (days) query.set('days', days.toString());
+      const res = await authClient.api.get(`${OPERATOR_BASE}/analytics/trend?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: { daily: [] } };
+    }
+  },
+
+  getActivity: async (limit?: number) => {
+    try {
+      const query = new URLSearchParams({ serviceCode: 'kpa-society' });
+      if (limit) query.set('limit', limit.toString());
+      const res = await authClient.api.get(`${OPERATOR_BASE}/analytics/activity?${query}`);
+      return res.data;
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+};

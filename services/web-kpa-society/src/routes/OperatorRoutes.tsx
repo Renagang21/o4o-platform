@@ -16,7 +16,7 @@
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { OperatorAiReportPage, ForumManagementPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
+import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
 import UsersPage from '../pages/operator/UsersPage';
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
@@ -58,6 +58,9 @@ export function OperatorRoutes() {
           {/* 커뮤니티 관리 (WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: community-management → community) */}
           <Route path="community" element={<CommunityManagementPage />} />
           <Route path="community-management" element={<Navigate to="/operator/community" replace />} />
+
+          {/* 포럼 삭제 요청 (WO-O4O-KPA-A-FORUM-ALIGNMENT-V1) */}
+          <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
 
           {/* 포럼 통계 */}
           <Route path="forum-analytics" element={<ForumAnalyticsDashboard />} />

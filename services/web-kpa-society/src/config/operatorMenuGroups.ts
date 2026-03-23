@@ -33,6 +33,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   forum: [
     { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 관리', path: '/operator/forum-management' },
+    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
     { label: '게시판', path: '/operator/forum' },
   ],
