@@ -17,26 +17,36 @@ export class FixGeminiModelName1711209600000 implements MigrationInterface {
     );
     console.log(`[Migration] ai_model_settings: ${r1?.[1] ?? 0} row(s) updated`);
 
+    // Use PL/pgSQL EXCEPTION handler to avoid poisoning the PostgreSQL transaction
+    // (JavaScript try/catch does NOT prevent PG transaction abort on missing table)
+
     // ai_engines
-    try {
-      await queryRunner.query(
-        `UPDATE ai_engines SET slug = 'gemini-2.5-flash', name = 'Gemini 2.5 Flash' WHERE slug = 'gemini-3.0-flash'`,
-      );
-    } catch { /* table may not exist */ }
+    await queryRunner.query(`
+      DO $$ BEGIN
+        UPDATE ai_engines SET slug = 'gemini-2.5-flash', name = 'Gemini 2.5 Flash'
+        WHERE slug = 'gemini-3.0-flash';
+      EXCEPTION WHEN undefined_table THEN NULL;
+      WHEN unique_violation THEN NULL;
+      END $$;
+    `);
 
     // ai_query_policies
-    try {
-      await queryRunner.query(
-        `UPDATE ai_query_policies SET default_model = 'gemini-2.5-flash' WHERE default_model = 'gemini-3.0-flash'`,
-      );
-    } catch { /* table may not exist */ }
+    await queryRunner.query(`
+      DO $$ BEGIN
+        UPDATE ai_query_policies SET default_model = 'gemini-2.5-flash'
+        WHERE default_model = 'gemini-3.0-flash';
+      EXCEPTION WHEN undefined_table THEN NULL;
+      END $$;
+    `);
 
     // ai_llm_policies
-    try {
-      await queryRunner.query(
-        `UPDATE ai_llm_policies SET model = 'gemini-2.5-flash' WHERE model = 'gemini-3.0-flash'`,
-      );
-    } catch { /* table may not exist */ }
+    await queryRunner.query(`
+      DO $$ BEGIN
+        UPDATE ai_llm_policies SET model = 'gemini-2.5-flash'
+        WHERE model = 'gemini-3.0-flash';
+      EXCEPTION WHEN undefined_table THEN NULL;
+      END $$;
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
