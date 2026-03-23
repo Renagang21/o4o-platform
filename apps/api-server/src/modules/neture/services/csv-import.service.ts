@@ -230,7 +230,28 @@ export class CsvImportService {
         continue;
       }
 
-      // 3g. 내부 Master 조회
+      // 3g. category_name 필수 (WO-NETURE-XLSX-CATEGORY-STRICT-VALIDATION-V1)
+      const categoryName = (raw.category_name || '').trim();
+      if (!categoryName) {
+        this.rejectRow(row, 'MISSING_CATEGORY');
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
+      }
+
+      // 3h. category DB 매칭 확인 (case-insensitive)
+      const catMatchRows: Array<{ id: string }> = await this.dataSource.query(
+        `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
+        [categoryName],
+      );
+      if (catMatchRows.length === 0) {
+        this.rejectRow(row, `CATEGORY_NOT_FOUND: "${categoryName}"`);
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
+      }
+
+      // 3i. 내부 Master 조회
       const existingMaster = await this.masterRepo.findOne({
         where: { barcode },
         select: ['id'],
@@ -429,25 +450,29 @@ export class CsvImportService {
           }
         }
 
-        // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1: Category 해석
+        // WO-NETURE-XLSX-CATEGORY-STRICT-VALIDATION-V1: Category 필수 매칭
         const categoryName = (raw.category_name || '').trim();
         if (categoryName && masterId) {
-          try {
-            const catRows: Array<{ id: string }> = await manager.query(
-              `SELECT id FROM product_categories WHERE name = $1 AND is_active = true ORDER BY depth DESC LIMIT 1`,
-              [categoryName],
+          const catRows: Array<{ id: string }> = await manager.query(
+            `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
+            [categoryName],
+          );
+          if (catRows.length > 0) {
+            // CREATE_MASTER: 항상 설정 / LINK_EXISTING: NULL일 때만 설정
+            const condition = row.actionType === CsvRowActionType.CREATE_MASTER
+              ? ''
+              : ' AND category_id IS NULL';
+            await manager.query(
+              `UPDATE product_masters SET category_id = $1 WHERE id = $2${condition}`,
+              [catRows[0].id, masterId],
             );
-            if (catRows.length > 0) {
-              await manager.query(
-                `UPDATE product_masters SET category_id = $1 WHERE id = $2 AND category_id IS NULL`,
-                [catRows[0].id, masterId],
-              );
-            } else {
-              logger.warn(`[CsvImport] Category not found: "${categoryName}" (row ${row.rowNumber})`);
-            }
-          } catch (err) {
-            logger.warn(`[CsvImport] Category resolution failed for row ${row.rowNumber}:`, err);
+          } else {
+            // Validation에서 이미 검증됨 — 동시성 등 예외 상황 방어
+            throw new Error(`Category not found during apply: "${categoryName}" (row ${row.rowNumber})`);
           }
+        } else if (!categoryName) {
+          // Validation에서 이미 필수 검증됨 — 이중 안전장치
+          throw new Error(`categoryId 없음 상태로 생성 시도 (row ${row.rowNumber})`);
         }
 
         // Offer upsert via common service (3.5 + ENABLEMENT-V1)
