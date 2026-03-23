@@ -342,7 +342,7 @@ export default function SupplierCsvImportPage() {
                     </div>
                   )}
 
-                  {selectedBatch.status === 'VALIDATED' && selectedBatch.validRows > 0 && (
+                  {(selectedBatch.status === 'VALIDATED' || selectedBatch.status === 'READY') && selectedBatch.validRows > 0 && (
                     <button
                       onClick={handleApply}
                       disabled={applying}
