@@ -39,6 +39,7 @@ interface OpenAIAPIResponse {
 
 export class OpenAIProvider implements AIProvider {
   readonly id = 'openai' as const;
+  readonly supportsStreaming = false;
 
   async complete(
     systemPrompt: string,

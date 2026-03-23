@@ -112,5 +112,73 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
     }
   });
 
+  // ══════════════════════════════════════════════════════════
+  // POST /ai-chat/stream — SSE Streaming (WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1)
+  // ══════════════════════════════════════════════════════════
+  router.post('/ai-chat/stream', authenticate, requirePharmacyContext, async (req, res) => {
+    const pcReq = req as PharmacyContextRequest;
+    const { message, patientId } = req.body;
+
+    // Input validation (동일)
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_MESSAGE', message: 'Message is required' },
+      });
+    }
+    if (message.length > 500) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'MESSAGE_TOO_LONG', message: 'Message must be 500 characters or less' },
+      });
+    }
+
+    const pharmacyId = pcReq.pharmacyId ?? null;
+    const userId = pcReq.user?.id;
+
+    // Patient scope guard (동일)
+    if (patientId && pharmacyId) {
+      const check = await dataSource.query(
+        `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+        [patientId],
+      );
+      if (check.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
+        });
+      }
+      const patient = check[0];
+      const orgMatch = patient.organization_id === pharmacyId;
+      const pharmacistFallback = !orgMatch && patient.pharmacist_id === userId;
+      if (!orgMatch && !pharmacistFallback) {
+        return res.status(403).json({
+          success: false,
+          error: { code: 'PATIENT_NOT_IN_PHARMACY', message: 'Patient not found in your pharmacy' },
+        });
+      }
+    }
+
+    // SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    try {
+      for await (const { event, data } of chatService.chatStream(message.trim(), pharmacyId, patientId || null)) {
+        res.write(`event: ${event}\ndata: ${data}\n\n`);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[CareAiChat] stream error:', msg);
+      res.write(`event: error\ndata: ${JSON.stringify({ code: 'STREAM_ERROR', message: msg })}\n\n`);
+      res.write(`event: done\ndata: \n\n`);
+    }
+
+    res.end();
+  });
+
   return router;
 }

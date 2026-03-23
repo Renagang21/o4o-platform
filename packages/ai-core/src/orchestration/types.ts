@@ -120,6 +120,26 @@ export interface AIProviderResponse {
   completionTokens: number;
 }
 
+// ── Streaming Support (WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1) ──
+
+export interface AIStreamChunk {
+  text: string;
+  done: boolean;
+}
+
+export interface AIStreamProvider extends AIProvider {
+  readonly supportsStreaming: boolean;
+  streamComplete(
+    systemPrompt: string,
+    userPrompt: string,
+    config: AIProviderConfig,
+  ): AsyncGenerator<AIStreamChunk, AIProviderResponse, undefined>;
+}
+
+export function isStreamProvider(p: AIProvider): p is AIStreamProvider {
+  return 'supportsStreaming' in p && (p as any).supportsStreaming === true;
+}
+
 // ─────────────────────────────────────────────────────
 // Context & Prompt
 // ─────────────────────────────────────────────────────

@@ -1,9 +1,11 @@
 /**
  * CareAiChatPanel — AI Care Copilot 슬라이드 아웃 패널
  * WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
+ * WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1
  *
  * 우측 슬라이드 아웃 (420px). Population/Patient 모드.
  * 메시지 히스토리는 세션 내 유지 (client-side only).
+ * Streaming: SSE 기반 토큰 단위 실시간 응답 + 동기 API fallback.
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -22,6 +24,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api/pharmacy';
+import { API_BASE_URL } from '@/lib/apiClient';
 
 // ── Types ──
 
@@ -32,6 +35,7 @@ interface ChatMessage {
   response?: AiChatResponseDto;
   timestamp: Date;
   loading?: boolean;
+  streaming?: boolean;
   error?: string;
 }
 
@@ -97,6 +101,7 @@ export default function CareAiChatPanel({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const initialSentRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const suggestedQuestions = patientId ? PATIENT_QUESTIONS : POPULATION_QUESTIONS;
 
@@ -112,6 +117,15 @@ export default function CareAiChatPanel({
     }
   }, [isOpen]);
 
+  // Abort stream on unmount or close
+  useEffect(() => {
+    return () => { abortControllerRef.current?.abort(); };
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) abortControllerRef.current?.abort();
+  }, [isOpen]);
+
   // Escape key handler
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -121,7 +135,7 @@ export default function CareAiChatPanel({
     return () => document.removeEventListener('keydown', handleKey);
   }, [isOpen, onClose]);
 
-  // Send message
+  // Send message (streaming with fallback)
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || sending) return;
 
@@ -144,50 +158,173 @@ export default function CareAiChatPanel({
     setInput('');
     setSending(true);
 
+    // ── Try streaming first ──
+    let streamSuccess = false;
+    let tokensReceived = 0;
+
     try {
-      if (process.env.NODE_ENV === 'development') {
-        console.debug('[CareAiChat] sendMessage', { patientId, text: text.substring(0, 50) });
-      }
-      const response = await pharmacyApi.sendCareAiChat(text.trim(), patientId);
+      const abortCtrl = new AbortController();
+      abortControllerRef.current = abortCtrl;
 
-      // 응답이 AiChatResponseDto가 아니면 (에러 객체 {code, message} 등) 에러로 처리
-      if (!isValidAiResponse(response)) {
-        throw response;
+      const token = localStorage.getItem('accessToken') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('authToken');
+
+      const streamRes = await fetch(`${API_BASE_URL}/api/v1/care/ai-chat/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: text.trim(), patientId }),
+        signal: abortCtrl.signal,
+      });
+
+      if (!streamRes.ok || !streamRes.body) {
+        throw new Error(`Stream HTTP ${streamRes.status}`);
       }
 
+      // Switch to streaming state
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id
-            ? { ...m, loading: false, response, content: response.summary }
+            ? { ...m, loading: false, streaming: true }
             : m,
         ),
       );
+
+      const reader = streamRes.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        let currentEvent = '';
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            currentEvent = line.slice(7).trim();
+          } else if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+
+            if (currentEvent === 'token' && data) {
+              tokensReceived++;
+              setMessages(prev =>
+                prev.map(m =>
+                  m.id === aiPlaceholder.id
+                    ? { ...m, content: m.content + data }
+                    : m,
+                ),
+              );
+            } else if (currentEvent === 'cached' || currentEvent === 'complete') {
+              try {
+                const response = JSON.parse(data) as AiChatResponseDto;
+                if (isValidAiResponse(response)) {
+                  setMessages(prev =>
+                    prev.map(m =>
+                      m.id === aiPlaceholder.id
+                        ? { ...m, loading: false, streaming: false, response, content: response.summary }
+                        : m,
+                    ),
+                  );
+                  streamSuccess = true;
+                }
+              } catch { /* parse error handled below */ }
+            } else if (currentEvent === 'error') {
+              try {
+                const errData = JSON.parse(data);
+                throw new Error(errData.message || 'Stream error');
+              } catch (e) {
+                if (e instanceof SyntaxError) throw new Error('Stream error');
+                throw e;
+              }
+            }
+            // 'done' event — loop will end naturally
+          }
+        }
+      }
+
+      if (streamSuccess) {
+        // Finalize streaming state
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === aiPlaceholder.id ? { ...m, streaming: false } : m,
+          ),
+        );
+      }
     } catch (err) {
-      const errCode = (err as any)?.code;
-      const errMessage = (err as any)?.message;
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[CareAiChat] error', { errCode, errMessage, patientId });
+      if ((err as Error).name === 'AbortError') {
+        setSending(false);
+        return;
       }
-      // Specific user-friendly messages for known error codes
-      const friendlyMessages: Record<string, string> = {
-        PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
-        AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
-        AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
-        AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
-      };
-      const errorMsg = friendlyMessages[errCode]
-        || safeStr(err instanceof Error ? err.message : errMessage ?? err)
-        || 'AI 응답을 받지 못했습니다.';
-      setMessages(prev =>
-        prev.map(m =>
-          m.id === aiPlaceholder.id
-            ? { ...m, loading: false, error: errorMsg }
-            : m,
-        ),
-      );
-    } finally {
-      setSending(false);
+      // Only fallback if no tokens were received yet
+      if (tokensReceived === 0) {
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[CareAiChat] stream failed, falling back to sync', err);
+        }
+      }
     }
+
+    // ── Fallback to sync API if streaming failed ──
+    if (!streamSuccess) {
+      if (tokensReceived > 0) {
+        // Partial tokens received but no complete event — show error
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === aiPlaceholder.id
+              ? { ...m, loading: false, streaming: false, error: 'AI 응답이 중단되었습니다. 다시 시도해 주세요.' }
+              : m,
+          ),
+        );
+      } else {
+        // No tokens — fallback to synchronous API
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === aiPlaceholder.id
+              ? { ...m, loading: true, streaming: false, content: '' }
+              : m,
+          ),
+        );
+
+        try {
+          const response = await pharmacyApi.sendCareAiChat(text.trim(), patientId);
+          if (!isValidAiResponse(response)) throw response;
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === aiPlaceholder.id
+                ? { ...m, loading: false, response, content: response.summary }
+                : m,
+            ),
+          );
+        } catch (err) {
+          const errCode = (err as any)?.code;
+          const errMessage = (err as any)?.message;
+          const friendlyMessages: Record<string, string> = {
+            PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
+            AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+            AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
+            AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
+          };
+          const errorMsg = friendlyMessages[errCode]
+            || safeStr(err instanceof Error ? err.message : errMessage ?? err)
+            || 'AI 응답을 받지 못했습니다.';
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === aiPlaceholder.id
+                ? { ...m, loading: false, error: errorMsg }
+                : m,
+            ),
+          );
+        }
+      }
+    }
+
+    setSending(false);
   }, [sending, patientId]);
 
   // Auto-send initial question
@@ -401,8 +538,22 @@ function MessageBubble({
     );
   }
 
+  // AI message — streaming (tokens arriving)
+  if (message.streaming && message.content) {
+    return (
+      <div className="flex justify-start">
+        <div className="max-w-[90%] bg-slate-50 border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3">
+          <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+            {message.content}
+            <span className="inline-block w-1.5 h-4 bg-blue-500 ml-0.5 animate-pulse align-text-bottom" />
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // AI message — loading
-  if (message.loading) {
+  if (message.loading || message.streaming) {
     return (
       <div className="flex justify-start">
         <div className="max-w-[85%] bg-slate-100 rounded-2xl rounded-bl-md px-4 py-3">

@@ -1,5 +1,5 @@
 import type { DataSource } from 'typeorm';
-import { execute } from '@o4o/ai-core';
+import { execute, executeStream } from '@o4o/ai-core';
 import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import { createHash } from 'crypto';
 
@@ -146,6 +146,83 @@ export class CareAiChatService {
     }
 
     return result;
+  }
+
+  /**
+   * chatStream — SSE 스트리밍 응답 (WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1)
+   *
+   * 캐시 히트 → 'cached' 이벤트 즉시 전달
+   * 스트리밍 → 'token' 이벤트 점진 전달 → 'complete' → 'done'
+   */
+  async *chatStream(
+    message: string,
+    pharmacyId: string | null,
+    patientId: string | null,
+  ): AsyncGenerator<{ event: string; data: string }> {
+    // 1. Cache check
+    const cacheKey = this.buildCacheKey(pharmacyId, patientId, message);
+    const cached = this.cache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      yield { event: 'cached', data: JSON.stringify(cached.data) };
+      yield { event: 'done', data: '' };
+      return;
+    }
+
+    // 2. Build context (동일)
+    const context = patientId
+      ? await this.buildPatientContext(patientId, pharmacyId)
+      : await this.buildPopulationContext(pharmacyId);
+
+    const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
+
+    // 3. executeStream() — 120s timeout (streaming은 여유 있게)
+    const stream = executeStream({
+      systemPrompt: CARE_COPILOT_SYSTEM,
+      userPrompt,
+      config: this.configResolver,
+      meta: { service: 'care', callerName: 'CareAiChat.stream' },
+      timeoutMs: 120_000,
+    });
+
+    // 4. Yield tokens as they arrive
+    let accumulated = '';
+
+    for await (const chunk of stream) {
+      accumulated += chunk.text;
+      if (chunk.text) {
+        yield { event: 'token', data: chunk.text };
+      }
+    }
+
+    // 5. Parse accumulated JSON + validate
+    try {
+      const parsed = JSON.parse(accumulated) as Partial<AiChatResponse>;
+
+      const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+      const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
+        .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
+
+      const result: AiChatResponse = {
+        summary: parsed.summary || '응답을 생성할 수 없습니다.',
+        details: Array.isArray(parsed.details) ? parsed.details : [],
+        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+        relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
+        actions,
+        model: 'gemini',
+        respondedAt: new Date().toISOString(),
+      };
+
+      // Cache
+      const ttl = patientId ? PATIENT_CACHE_TTL : POPULATION_CACHE_TTL;
+      this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + ttl });
+      if (this.cache.size > 100) this.evictExpired();
+
+      yield { event: 'complete', data: JSON.stringify(result) };
+    } catch {
+      yield { event: 'error', data: JSON.stringify({ code: 'PARSE_ERROR', message: 'Failed to parse AI response' }) };
+    }
+
+    yield { event: 'done', data: '' };
   }
 
   // ── Population Context ──
