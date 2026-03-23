@@ -67,6 +67,9 @@ export class ForumCategory {
   @Column({ name: 'forum_type', type: 'varchar', length: 20, default: 'open' })
   forumType!: string;
 
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  metadata?: Record<string, any> | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

@@ -167,9 +167,12 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   forumRouter.get('/posts/:postId/comments', forumController.listComments.bind(forumController));
   forumRouter.post('/comments', authenticate, forumController.createComment.bind(forumController));
 
-  // Categories
+  // Categories — Named routes BEFORE :id
   forumRouter.get('/categories', forumController.listCategories.bind(forumController));
+  forumRouter.get('/categories/mine', authenticate, forumController.listMyCategories.bind(forumController));
   forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
+  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyCategory.bind(forumController));
+  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteCategory.bind(forumController));
   forumRouter.post('/categories', authenticate, forumController.createCategory.bind(forumController));
   forumRouter.put('/categories/:id', authenticate, forumController.updateCategory.bind(forumController));
   forumRouter.delete('/categories/:id', authenticate, forumController.deleteCategory.bind(forumController));

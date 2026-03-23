@@ -29,6 +29,8 @@ const moderationController = new ForumModerationController();
  * - Comments
  * - Statistics
  * - Moderation
+ * - Owner category management
+ * - Delete requests
  */
 
 // ============================================================================
@@ -84,7 +86,7 @@ router.put('/comments/:id', authenticate, commentController.updateComment.bind(c
 router.delete('/comments/:id', authenticate, commentController.deleteComment.bind(commentController));
 
 // ============================================================================
-// Categories
+// Categories — Named routes BEFORE :id to avoid parameter matching
 // ============================================================================
 // List categories (public)
 router.get('/categories', categoryController.listCategories.bind(categoryController));
@@ -92,8 +94,17 @@ router.get('/categories', categoryController.listCategories.bind(categoryControl
 // Popular categories by activity score (public) - must be before :id
 router.get('/categories/popular', categoryController.getPopularForums.bind(categoryController));
 
+// My categories (authenticated, owner) — WO-MY-CATEGORIES-API-V1
+router.get('/categories/mine', authenticate, categoryController.listMyCategories.bind(categoryController));
+
 // Get single category (public)
 router.get('/categories/:id', categoryController.getCategory.bind(categoryController));
+
+// Owner edit (authenticated, owner only) — WO-FORUM-OWNER-BASIC-EDIT-V1
+router.patch('/categories/:id/owner', authenticate, categoryController.updateMyCategory.bind(categoryController));
+
+// Delete request (authenticated, owner only) — WO-O4O-FORUM-DELETE-REQUEST-V1
+router.post('/categories/:id/delete-request', authenticate, categoryController.requestDeleteCategory.bind(categoryController));
 
 // Create category (authenticated - admin only)
 router.post('/categories', authenticate, categoryController.createCategory.bind(categoryController));

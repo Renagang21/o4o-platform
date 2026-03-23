@@ -222,6 +222,35 @@ export const forumRequestApi = {
       action: 'reject',
       reviewComment: data.review_comment,
     }),
+
+  // Owner category management — WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1
+  getMyCategories: () =>
+    apiClient.get<unknown[]>('/api/v1/glycopharm/forum/categories/mine'),
+
+  updateMyCategory: (id: string, data: { name?: string; description?: string; iconEmoji?: string; iconUrl?: string }) =>
+    apiClient.patch<unknown>(`/api/v1/glycopharm/forum/categories/${id}/owner`, data),
+
+  // Delete request — WO-O4O-FORUM-DELETE-REQUEST-V1
+  requestDeleteCategory: (id: string, data: { reason?: string }) =>
+    apiClient.post<unknown>(`/api/v1/glycopharm/forum/categories/${id}/delete-request`, data),
+};
+
+// Forum Delete Request Operator API — WO-O4O-FORUM-DELETE-REQUEST-V1
+export const forumDeleteRequestApi = {
+  getAll: (params?: { status?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    return apiClient.get<unknown[]>(`/api/v1/glycopharm/operator/forum-delete-requests?${query}`);
+  },
+
+  getPendingCount: () =>
+    apiClient.get<{ count: number }>('/api/v1/glycopharm/operator/forum-delete-requests/pending-count'),
+
+  approve: (id: string, data: { reviewComment?: string }) =>
+    apiClient.post<unknown>(`/api/v1/glycopharm/operator/forum-delete-requests/${id}/approve`, data),
+
+  reject: (id: string, data: { reviewComment?: string }) =>
+    apiClient.post<unknown>(`/api/v1/glycopharm/operator/forum-delete-requests/${id}/reject`, data),
 };
 
 // WO-S2S-FLOW-RECOVERY-PHASE1-V1: Supplier Handling Request API

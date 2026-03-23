@@ -19,6 +19,7 @@ import { CopilotEngineService } from '../../../copilot/copilot-engine.service.js
 import { buildGlycoPharmDashboardConfig } from '../services/operator-dashboard.service.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import { createOperatorForumRequestController } from './operator-forum-request.controller.js';
+import { createOperatorForumDeleteRequestController } from './operator-forum-delete-request.controller.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -135,6 +136,9 @@ export function createOperatorController(
 
   // Forum Request Review — WO-O4O-FORUM-REQUEST-UNIFICATION-PHASE1-V1
   router.use('/forum-requests', createOperatorForumRequestController());
+
+  // Forum Delete Request Review — WO-O4O-FORUM-DELETE-REQUEST-V1
+  router.use('/forum-delete-requests', createOperatorForumDeleteRequestController());
 
   return router;
 }

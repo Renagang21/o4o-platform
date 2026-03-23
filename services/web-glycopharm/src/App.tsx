@@ -115,6 +115,7 @@ const GlycoPharmAdminDashboard = lazy(() => import('@/pages/admin/GlycoPharmAdmi
 // Operator Dashboard
 const GlycoPharmOperatorDashboard = lazy(() => import('@/pages/operator/GlycoPharmOperatorDashboard'));
 const ForumRequestsPage = lazy(() => import('@/pages/operator/ForumRequestsPage'));
+const ForumDeleteRequestsPage = lazy(() => import('@/pages/operator/ForumDeleteRequestsPage'));
 const ApplicationsPage = lazy(() => import('@/pages/operator/ApplicationsPage'));
 const ApplicationDetailPage = lazy(() => import('@/pages/operator/ApplicationDetailPage'));
 const StoreApprovalsPage = lazy(() => import('@/pages/operator/StoreApprovalsPage'));
@@ -502,6 +503,7 @@ function AppRoutes() {
         <Route path="billing-preview" element={<BillingPreviewPage />} />
         <Route path="invoices" element={<InvoicesPage />} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
+        <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         <Route path="forum-management" element={<OperatorForumManagementPage />} />
         <Route path="community" element={<CommunityManagementPage />} />
         <Route path="store-approvals" element={<StoreApprovalsPage />} />

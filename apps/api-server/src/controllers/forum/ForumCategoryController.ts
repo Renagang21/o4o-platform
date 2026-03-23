@@ -7,7 +7,8 @@ import { ForumControllerBase } from './ForumControllerBase.js';
 /**
  * ForumCategoryController
  *
- * Handles category CRUD and popular forums ranking.
+ * Handles category CRUD, popular forums ranking,
+ * owner category management, and delete requests.
  */
 export class ForumCategoryController extends ForumControllerBase {
   /**
@@ -387,6 +388,138 @@ export class ForumCategoryController extends ForumControllerBase {
         success: false,
         error: error.message || 'Failed to get popular forums',
       });
+    }
+  }
+
+  // ============================================================================
+  // Owner APIs — WO-MY-CATEGORIES-API-V1 + WO-FORUM-OWNER-BASIC-EDIT-V1
+  // ============================================================================
+
+  /**
+   * GET /forum/categories/mine
+   * List categories created by the authenticated user
+   */
+  async listMyCategories(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const ctx = this.getForumContext(req);
+      const qb = this.categoryRepository
+        .createQueryBuilder('cat')
+        .where('cat.createdBy = :userId', { userId });
+
+      this.applyContextFilter(qb, 'cat', ctx);
+      qb.orderBy('cat.createdAt', 'DESC');
+
+      const categories = await qb.getMany();
+
+      res.json({ success: true, data: categories, count: categories.length });
+    } catch (error: any) {
+      logger.error('Error listing my categories:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to list my categories' });
+    }
+  }
+
+  /**
+   * PATCH /forum/categories/:id/owner
+   * Owner can update limited fields: name, description, iconEmoji, iconUrl
+   */
+  async updateMyCategory(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { id } = req.params;
+      const category = await this.categoryRepository.findOne({ where: { id } });
+
+      if (!category) {
+        res.status(404).json({ success: false, error: 'Category not found' });
+        return;
+      }
+      if (category.createdBy !== userId) {
+        res.status(403).json({ success: false, error: 'Only the forum owner can edit this forum' });
+        return;
+      }
+
+      const ALLOWED_FIELDS = ['name', 'description', 'iconEmoji', 'iconUrl'] as const;
+      for (const field of ALLOWED_FIELDS) {
+        if (req.body[field] !== undefined) {
+          (category as any)[field] = req.body[field];
+        }
+      }
+
+      if (req.body.name && req.body.name !== category.name) {
+        category.slug = this.generateSlug(req.body.name);
+      }
+
+      const saved = await this.categoryRepository.save(category);
+      res.json({ success: true, data: saved });
+    } catch (error: any) {
+      logger.error('Error updating my category:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to update category' });
+    }
+  }
+
+  // ============================================================================
+  // Delete Request — WO-O4O-FORUM-DELETE-REQUEST-V1
+  // ============================================================================
+
+  /**
+   * POST /forum/categories/:id/delete-request
+   * Forum owner submits a delete request (stored in metadata jsonb)
+   */
+  async requestDeleteCategory(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { id } = req.params;
+      const category = await this.categoryRepository.findOne({ where: { id } });
+
+      if (!category) {
+        res.status(404).json({ success: false, error: 'Category not found' });
+        return;
+      }
+      if (category.createdBy !== userId) {
+        res.status(403).json({ success: false, error: 'Only the forum owner can request deletion' });
+        return;
+      }
+
+      // Check for existing pending request
+      const meta = (category.metadata as any) || {};
+      if (meta.deleteRequestStatus === 'pending') {
+        res.status(409).json({ success: false, error: 'A delete request is already pending for this forum' });
+        return;
+      }
+
+      const { reason } = req.body;
+
+      category.metadata = {
+        ...meta,
+        deleteRequestStatus: 'pending',
+        deleteRequestedAt: new Date().toISOString(),
+        deleteRequestedBy: userId,
+        deleteRequestReason: reason || null,
+        deleteReviewedAt: null,
+        deleteReviewedBy: null,
+        deleteReviewComment: null,
+      };
+
+      const saved = await this.categoryRepository.save(category);
+      res.json({ success: true, data: saved });
+    } catch (error: any) {
+      logger.error('Error requesting category deletion:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to request deletion' });
     }
   }
 }

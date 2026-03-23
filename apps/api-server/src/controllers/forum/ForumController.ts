@@ -42,6 +42,13 @@ export class ForumController {
   deleteCategory = (req: Request, res: Response) => this.categories.deleteCategory(req, res);
   getPopularForums = (req: Request, res: Response) => this.categories.getPopularForums(req, res);
 
+  // ---- Owner Category APIs (WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1) ----
+  listMyCategories = (req: Request, res: Response) => this.categories.listMyCategories(req, res);
+  updateMyCategory = (req: Request, res: Response) => this.categories.updateMyCategory(req, res);
+
+  // ---- Delete Request (WO-O4O-FORUM-DELETE-REQUEST-V1) ----
+  requestDeleteCategory = (req: Request, res: Response) => this.categories.requestDeleteCategory(req, res);
+
   // ---- Comments ----
   listComments = (req: Request, res: Response) => this.comments.listComments(req, res);
   createComment = (req: Request, res: Response) => this.comments.createComment(req, res);
