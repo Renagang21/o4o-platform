@@ -24,3 +24,6 @@ export { AiSummaryBlock } from './blocks/AiSummaryBlock';
 export { ActionQueueBlock } from './blocks/ActionQueueBlock';
 export { ActivityLogBlock } from './blocks/ActivityLogBlock';
 export { QuickActionBlock } from './blocks/QuickActionBlock';
+
+// List Module (WO-O4O-LIST-BASE-MODULE-V1)
+export * from './list/index';
