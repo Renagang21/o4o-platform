@@ -74,10 +74,6 @@ export function createCopyAssetHandler(dataSource: DataSource) {
         templateType: options?.templateType || 'info',
       };
 
-      // TODO: Phase 2-A enhancement - verify dashboard ownership
-      // For now, we trust targetDashboardId and use it as organizationId
-      // In future, validate that user has access to this dashboard
-
       let result: CopyAssetResponse;
 
       switch (sourceType) {
@@ -141,20 +137,17 @@ async function copyContent(
 ): Promise<CopyAssetResponse> {
   const mediaRepo = dataSource.getRepository(CmsMedia);
 
-  // 1. Find original content
   const original = await mediaRepo.findOne({ where: { id: sourceId } });
 
   if (!original) {
     throw new Error('NOT_FOUND');
   }
 
-  // 2. Check if public (platform content = organizationId is null + active)
   const isPublic = original.isActive && !original.organizationId;
   if (!isPublic) {
     throw new Error('NOT_PUBLIC');
   }
 
-  // 3. Apply options (Phase 2-B)
   const title = options.titleMode === 'edit' && options.title
     ? options.title
     : `${original.title} (복사본)`;
@@ -163,14 +156,12 @@ async function copyContent(
     ? null
     : original.description;
 
-  // 4. Create new record
   const newId = uuidv4();
   const newAsset = mediaRepo.create({
     id: newId,
     organizationId: targetDashboardId,
     folderId: null,
     uploadedBy: userId,
-    // Apply title/description from options
     title,
     altText: original.altText,
     caption: original.caption,
@@ -182,7 +173,6 @@ async function copyContent(
     width: original.width,
     height: original.height,
     duration: original.duration,
-    // Metadata with source reference and template type
     metadata: {
       ...original.metadata,
       sourceContentId: original.id,
@@ -191,7 +181,6 @@ async function copyContent(
       copiedAt: new Date().toISOString(),
       copiedBy: userId,
     },
-    // New asset starts as draft
     isActive: false,
   });
 
@@ -218,14 +207,12 @@ async function copySignageMedia(
 ): Promise<CopyAssetResponse> {
   const mediaRepo = dataSource.getRepository(SignageMedia);
 
-  // 1. Find original media
   const original = await mediaRepo.findOne({ where: { id: sourceId } });
 
   if (!original) {
     throw new Error('NOT_FOUND');
   }
 
-  // 2. Check if public (status = active and scope = global or no organizationId)
   const isPublicContent = original.status === 'active' &&
     (original.scope === 'global' || !original.organizationId);
 
@@ -233,7 +220,6 @@ async function copySignageMedia(
     throw new Error('NOT_PUBLIC');
   }
 
-  // 3. Apply options (Phase 2-B)
   const name = options.titleMode === 'edit' && options.title
     ? options.title
     : `${original.name} (복사본)`;
@@ -242,14 +228,12 @@ async function copySignageMedia(
     ? null
     : original.description;
 
-  // 4. Create new record
   const newId = uuidv4();
   const newMedia = mediaRepo.create({
     id: newId,
     serviceKey: original.serviceKey,
     organizationId: targetDashboardId,
     createdByUserId: userId,
-    // Apply name/description from options
     name,
     description,
     mediaType: original.mediaType,
@@ -264,12 +248,10 @@ async function copySignageMedia(
     content: original.content,
     tags: original.tags,
     category: original.category,
-    // New media is store-specific and starts as draft
     source: 'store',
     scope: 'store',
     status: 'draft',
     parentMediaId: original.id,
-    // Metadata with source reference and template type
     metadata: {
       ...original.metadata,
       sourceContentId: original.id,
@@ -285,7 +267,7 @@ async function copySignageMedia(
   return {
     success: true,
     dashboardAssetId: newId,
-    status: 'draft', // Return draft for UI consistency
+    status: 'draft',
     sourceType: 'signage_media',
     sourceId: sourceId,
   };
@@ -303,7 +285,6 @@ async function copySignagePlaylist(
 ): Promise<CopyAssetResponse> {
   const playlistRepo = dataSource.getRepository(SignagePlaylist);
 
-  // 1. Find original playlist
   const original = await playlistRepo.findOne({
     where: { id: sourceId },
     relations: ['items'],
@@ -313,7 +294,6 @@ async function copySignagePlaylist(
     throw new Error('NOT_FOUND');
   }
 
-  // 2. Check if public (status = active and isPublic or scope = global)
   const isPublicContent = original.status === 'active' &&
     (original.isPublic || original.scope === 'global' || !original.organizationId);
 
@@ -321,7 +301,6 @@ async function copySignagePlaylist(
     throw new Error('NOT_PUBLIC');
   }
 
-  // 3. Apply options (Phase 2-B)
   const name = options.titleMode === 'edit' && options.title
     ? options.title
     : `${original.name} (복사본)`;
@@ -330,14 +309,12 @@ async function copySignagePlaylist(
     ? null
     : original.description;
 
-  // 4. Create new playlist record
   const newId = uuidv4();
   const newPlaylist = playlistRepo.create({
     id: newId,
     serviceKey: original.serviceKey,
     organizationId: targetDashboardId,
     createdByUserId: userId,
-    // Apply name/description from options
     name,
     description,
     loopEnabled: original.loopEnabled,
@@ -345,14 +322,12 @@ async function copySignagePlaylist(
     transitionType: original.transitionType,
     transitionDuration: original.transitionDuration,
     totalDuration: original.totalDuration,
-    itemCount: 0, // Items not copied in Phase 2-A
-    // New playlist is store-specific and draft
+    itemCount: 0,
     source: 'store',
     scope: 'store',
     status: 'draft',
     isPublic: false,
     parentPlaylistId: original.id,
-    // Metadata with source reference and template type
     metadata: {
       ...original.metadata,
       sourceContentId: original.id,
@@ -364,9 +339,6 @@ async function copySignagePlaylist(
   });
 
   await playlistRepo.save(newPlaylist);
-
-  // Note: Playlist items are NOT copied in Phase 2-A
-  // Items can be added/modified in the dashboard later
 
   return {
     success: true,

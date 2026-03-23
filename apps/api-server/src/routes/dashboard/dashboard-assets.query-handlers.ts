@@ -291,7 +291,6 @@ export function createGetSupplierSignalHandler(dataSource: DataSource) {
         return;
       }
 
-      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       let hasApprovedSupplier = false;
       try {
         const rows = await dataSource.query(
@@ -330,7 +329,6 @@ export function createGetSellerSignalHandler(dataSource: DataSource) {
         return;
       }
 
-      // WO-PRODUCT-POLICY-V2-SUPPLIER-REQUEST-DEPRECATION-V1: v2 product_approvals
       let hasApprovedSeller = false;
       try {
         const rows = await dataSource.query(
