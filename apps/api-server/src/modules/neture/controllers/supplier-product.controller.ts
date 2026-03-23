@@ -242,8 +242,9 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       }
       res.json(result);
     } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       logger.error('[Neture API] Error applying CSV batch:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to apply CSV batch' } });
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: errMsg } });
     }
   });
 
