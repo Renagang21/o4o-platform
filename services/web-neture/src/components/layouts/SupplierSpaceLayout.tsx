@@ -66,7 +66,10 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
   {
     label: 'Community',
     icon: MessageSquare,
-    items: [{ label: 'Forum', path: '/supplier/forum' }],
+    items: [
+      { label: 'Forum', path: '/supplier/forum' },
+      { label: '내 포럼', path: '/supplier/my-forum' },
+    ],
   },
 ];
 

@@ -78,4 +78,46 @@ export const forumApi = {
 
   deleteComment: (postId: string, commentId: string) =>
     apiClient.delete<ApiResponse<void>>(`${getForumBasePath()}/posts/${postId}/comments/${commentId}`),
+
+  // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
+  getMyCategories: () =>
+    apiClient.get<ApiResponse<ForumCategory[]>>(`${getForumBasePath()}/categories/mine`),
+
+  updateMyCategory: (id: string, data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null }) =>
+    apiClient.patch<ApiResponse<ForumCategory>>(`${getForumBasePath()}/categories/${id}/owner`, data),
+
+  requestDeleteCategory: (id: string, data: { reason?: string }) =>
+    apiClient.post<ApiResponse<void>>(`${getForumBasePath()}/categories/${id}/delete-request`, data),
+};
+
+// ============================================================================
+// Category Request API — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
+// Uses authClient.api (base: /api/v1) for common forum endpoints
+// ============================================================================
+import { authClient } from '@o4o/auth-client';
+
+export const forumRequestApi = {
+  getMyRequests: async (): Promise<{ success: boolean; data: any[] }> => {
+    try {
+      const response = await authClient.api.get('/forum/category-requests/my', {
+        params: { serviceCode: 'kpa-society' },
+      });
+      return response.data;
+    } catch {
+      return { success: false, data: [] };
+    }
+  },
+
+  create: async (data: { name: string; description: string; reason?: string }): Promise<{ success: boolean; data?: any; error?: string }> => {
+    try {
+      const response = await authClient.api.post('/forum/category-requests', {
+        ...data,
+        serviceCode: 'kpa-society',
+      });
+      return response.data;
+    } catch (error: any) {
+      const msg = error?.response?.data?.message || error?.response?.data?.error || '신청에 실패했습니다.';
+      return { success: false, error: msg };
+    }
+  },
 };

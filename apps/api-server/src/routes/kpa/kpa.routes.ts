@@ -370,6 +370,10 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Categories (읽기: 공개, 쓰기: admin scope — WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1)
   forumRouter.get('/categories', forumController.listCategories.bind(forumController));
+  // Owner routes — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 (before :id to avoid param matching)
+  forumRouter.get('/categories/mine', authenticate, forumController.listMyCategories.bind(forumController));
+  forumRouter.patch('/categories/:id/owner', authenticate, forumController.updateMyCategory.bind(forumController));
+  forumRouter.post('/categories/:id/delete-request', authenticate, forumController.requestDeleteCategory.bind(forumController));
   forumRouter.get('/categories/:id', forumController.getCategory.bind(forumController));
   // Structure creation/modification/deletion → Admin only
   forumRouter.post('/categories', authenticate, requireKpaScope('kpa:admin'), forumController.createCategory.bind(forumController));
