@@ -57,6 +57,9 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
           : scope.serviceKeys;
       }
 
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - days);
+
       const serviceFilter = serviceKeys.length > 0
         ? `AND service_key = ANY($1)`
         : '';
@@ -67,23 +70,23 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       const summary = await dataSource.query(
         `SELECT action_key, status, COUNT(*)::int AS count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}
          GROUP BY action_key, status
          ORDER BY count DESC`,
-        [...params, days],
+        [...params, fromDate],
       );
 
       // Daily counts for trend
       const daily = await dataSource.query(
         `SELECT DATE(created_at) AS date, COUNT(*)::int AS count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}
          GROUP BY DATE(created_at)
          ORDER BY date DESC
          LIMIT 30`,
-        [...params, days],
+        [...params, fromDate],
       );
 
       // Total counts
@@ -92,9 +95,9 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
                 COUNT(*) FILTER (WHERE status = 'success')::int AS success_count,
                 COUNT(*) FILTER (WHERE status = 'failure')::int AS failure_count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}`,
-        [...params, days],
+        [...params, fromDate],
       );
 
       res.json({
@@ -289,6 +292,9 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      const fromDate = new Date();
+      fromDate.setDate(fromDate.getDate() - days);
+
       const serviceFilter = serviceKeys.length > 0
         ? `AND service_key = ANY($1)`
         : '';
@@ -301,9 +307,9 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
                 COUNT(*) FILTER (WHERE status = 'success')::int AS success_count,
                 COUNT(*) FILTER (WHERE status = 'failure')::int AS failure_count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}`,
-        [...params, days],
+        [...params, fromDate],
       );
       const totals = totalRow[0] || { total: 0, success_count: 0, failure_count: 0 };
 
@@ -311,23 +317,23 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       const actionBreakdown = await dataSource.query(
         `SELECT action_key, COUNT(*)::int AS count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            AND status = 'success'
            ${serviceFilter}
          GROUP BY action_key`,
-        [...params, days],
+        [...params, fromDate],
       );
 
       // 3. Operator distribution
       const operatorDist = await dataSource.query(
         `SELECT user_id, COUNT(*)::int AS count
          FROM action_logs
-         WHERE created_at >= NOW() - INTERVAL '1 day' * $${dateParamIdx}
+         WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}
          GROUP BY user_id
          ORDER BY count DESC
          LIMIT 5`,
-        [...params, days],
+        [...params, fromDate],
       );
 
       // ── Derive metrics ──
