@@ -40,7 +40,9 @@ export function createSupplierProductController(dataSource: DataSource): Router 
         consumerShortDescription, consumerDetailDescription,
       });
       if (!result.success) {
-        const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403 : 400;
+        const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
+          : result.error === 'OFFER_ALREADY_EXISTS' ? 409
+          : 400;
         return res.status(statusCode).json(result);
       }
       res.status(201).json(result);

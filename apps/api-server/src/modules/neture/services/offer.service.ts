@@ -454,6 +454,15 @@ export class NetureOfferService {
         await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
       }
 
+      // Duplicate check: same master + same supplier → already exists
+      const existingOffer = await this.offerRepo.findOne({
+        where: { masterId: masterResult.data.id, supplierId },
+        select: ['id'],
+      });
+      if (existingOffer) {
+        return { success: false, error: 'OFFER_ALREADY_EXISTS', message: '이 바코드의 상품이 이미 등록되어 있습니다.' };
+      }
+
       // P1: slug 자동 생성 (barcode-supplierId-timestamp)
       const slugBase = masterResult.data.barcode || masterResult.data.id;
       const slug = `${slugBase}-${supplierId.slice(0, 8)}-${Date.now()}`;
