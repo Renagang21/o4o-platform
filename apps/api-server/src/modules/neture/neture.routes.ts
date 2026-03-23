@@ -32,6 +32,8 @@ import { createSellerController, createPartnerContractController } from './contr
 import { createContactController } from './controllers/contact.controller.js';
 import { createOperatorRegistrationController } from './controllers/operator-registration.controller.js';
 import { createOperatorDashboardController } from './controllers/operator-dashboard.controller.js';
+import { createOperatorCategoryController } from './controllers/operator-category.controller.js';
+import { createOperatorBrandController } from './controllers/operator-brand.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
@@ -69,10 +71,14 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/admin', createAdminController(dataSource));
   router.use('/admin', createAdminSettlementController(dataSource));
 
-  // Operator domain — dashboard + registration management
+  // Operator domain — dashboard + registration + category management
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 2)
   router.use('/operator', createOperatorDashboardController(dataSource));
   router.use('/operator', createOperatorRegistrationController(dataSource, netureActionLogService));
+  // WO-NETURE-CATEGORY-MANAGEMENT-V1
+  router.use('/operator', createOperatorCategoryController());
+  // WO-NETURE-BRAND-MANAGEMENT-V1
+  router.use('/operator', createOperatorBrandController());
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

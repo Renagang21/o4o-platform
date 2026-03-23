@@ -372,6 +372,15 @@ const MarketTrialApprovalDetailPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalDetailPage }))
 );
 
+// WO-NETURE-CATEGORY-MANAGEMENT-V1
+const CategoryManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.CategoryManagementPage }))
+);
+// WO-NETURE-BRAND-MANAGEMENT-V1
+const BrandManagementPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.BrandManagementPage }))
+);
+
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 // Store Signage (WO-O4O-SIGNAGE-STORE-ACTION-EXPANSION-V1)
 const StoreSignagePage = lazy(() => import('./pages/supplier/StoreSignagePage'));
@@ -766,6 +775,10 @@ function App() {
               {/* Market Trial 관리 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              {/* 카테고리 관리 (WO-NETURE-CATEGORY-MANAGEMENT-V1) */}
+              <Route path="/operator/categories" element={<CategoryManagementPage />} />
+              {/* 브랜드 관리 (WO-NETURE-BRAND-MANAGEMENT-V1) */}
+              <Route path="/operator/brands" element={<BrandManagementPage />} />
             </Route>
 
             {/* ================================================================
