@@ -41,7 +41,6 @@ export class ForumController {
   updateCategory = (req: Request, res: Response) => this.categories.updateCategory(req, res);
   deleteCategory = (req: Request, res: Response) => this.categories.deleteCategory(req, res);
   getPopularForums = (req: Request, res: Response) => this.categories.getPopularForums(req, res);
-
   // ---- Owner Category APIs (WO-MY-CATEGORIES-API-V1 / WO-FORUM-OWNER-BASIC-EDIT-V1) ----
   listMyCategories = (req: Request, res: Response) => this.categories.listMyCategories(req, res);
   updateMyCategory = (req: Request, res: Response) => this.categories.updateMyCategory(req, res);
