@@ -37,6 +37,7 @@ import {
   type CareLlmInsightDto,
 } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
+import { getPatientDisplayName } from '@/utils/patient-display';
 
 // ─── Constants ───
 
@@ -332,7 +333,7 @@ export default function AnalysisPage() {
           >
             <option value="">당뇨인 선택</option>
             {patients.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
+              <option key={p.id} value={p.id}>{getPatientDisplayName(p.name)}</option>
             ))}
           </select>
         </div>
@@ -367,7 +368,7 @@ export default function AnalysisPage() {
               ))}
               {selectedPatient && (
                 <span className="ml-auto text-sm text-slate-400 self-center">
-                  {selectedPatient.name}
+                  {getPatientDisplayName(selectedPatient.name)}
                 </span>
               )}
             </div>

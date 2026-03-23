@@ -37,6 +37,7 @@ import {
 import CareSubNav from './CareSubNav';
 import PatientAiSummary from './PatientAiSummary';
 import CareAiChatEntry from './CareAiChatEntry';
+import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
 
 // ── Shared types for tab context ──
 
@@ -133,8 +134,8 @@ export default function PatientDetailPage() {
     ? new Date(snapshot.createdAt).toLocaleDateString()
     : '-';
 
-  const patientName = patient?.name || `당뇨인 ${id}`;
-  const initial = patientName.charAt(0) || '?';
+  const patientName = getPatientDisplayName(patient?.name);
+  const initial = getPatientInitial(patient?.name);
 
   // ── Action Panel rules ──
   const actions = useMemo(() => {

@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
+import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
 
@@ -330,10 +331,10 @@ export default function PatientsPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-medium">
-                              {patient.name?.charAt(0) || '?'}
+                              {getPatientInitial(patient.name)}
                             </span>
                           </div>
-                          <span className="font-medium text-slate-900">{patient.name}</span>
+                          <span className="font-medium text-slate-900">{getPatientDisplayName(patient.name)}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-600">

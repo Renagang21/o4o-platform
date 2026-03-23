@@ -32,6 +32,7 @@ import {
   type PharmacyCustomer,
 } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
+import { getPatientDisplayName } from '@/utils/patient-display';
 
 export default function CoachingPage() {
   // Data state
@@ -244,7 +245,7 @@ export default function CoachingPage() {
               <option value="">전체 당뇨인</option>
               {patients.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name}
+                  {getPatientDisplayName(p.name)}
                 </option>
               ))}
             </select>
@@ -265,7 +266,7 @@ export default function CoachingPage() {
               <Sparkles className="w-4 h-4 text-blue-500" />
               <span className="text-sm font-semibold text-blue-700">AI 코칭 초안</span>
               <span className="text-xs text-blue-500">
-                ({patients.find((p) => p.id === selectedPatientId)?.name || '당뇨인'})
+                ({getPatientDisplayName(patients.find((p) => p.id === selectedPatientId)?.name)})
               </span>
             </div>
             <textarea
@@ -310,7 +311,7 @@ export default function CoachingPage() {
                   <option value="">당뇨인를 선택하세요</option>
                   {patients.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {getPatientDisplayName(p.name)}
                     </option>
                   ))}
                 </select>

@@ -36,6 +36,7 @@ import CareAiPopulationSummary from './CareAiPopulationSummary';
 import CareAiPrioritySummary from './CareAiPrioritySummary';
 import CareRiskSummary from './CareRiskSummary';
 import CareAiChatEntry from './CareAiChatEntry';
+import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
 
@@ -271,11 +272,11 @@ export default function CareDashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-[10px] font-medium">
-                            {pp.patientName.charAt(0)}
+                            {getPatientInitial(pp.patientName)}
                           </span>
                         </div>
                         <span className="text-sm font-medium text-slate-800 truncate">
-                          {pp.patientName}
+                          {getPatientDisplayName(pp.patientName)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -351,7 +352,7 @@ export default function CareDashboardPage() {
                         onClick={() => navigate(`/care/patients/${alert.patientId}`)}
                         className={`text-sm font-medium underline-offset-2 hover:underline ${severityLabel}`}
                       >
-                        {alert.patientName}
+                        {getPatientDisplayName(alert.patientName)}
                       </button>
                       <span className={`text-sm ${severityLabel}`}>{alert.message}</span>
                       <span className="text-xs text-slate-400 flex-shrink-0">
@@ -543,11 +544,11 @@ export default function CareDashboardPage() {
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-medium">
-                              {patient.name?.charAt(0) || '?'}
+                              {getPatientInitial(patient.name)}
                             </span>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-slate-900">{patient.name}</p>
+                            <p className="text-sm font-medium text-slate-900">{getPatientDisplayName(patient.name)}</p>
                             <p className="text-xs text-slate-500">{patient.phone || '-'}</p>
                           </div>
                         </div>
