@@ -435,6 +435,52 @@ export const supplierApi = {
     }
   },
 
+  // WO-NETURE-SUPPLIER-EXCEL-LIST-V1: Paginated product list
+  async getProductsPaginated(params?: {
+    page?: number; limit?: number; keyword?: string;
+    distributionType?: string; isActive?: string;
+    sort?: string; order?: string;
+  }): Promise<{ data: SupplierProduct[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params?.page) sp.set('page', String(params.page));
+      if (params?.limit) sp.set('limit', String(params.limit));
+      if (params?.keyword) sp.set('keyword', params.keyword);
+      if (params?.distributionType) sp.set('distributionType', params.distributionType);
+      if (params?.isActive) sp.set('isActive', params.isActive);
+      if (params?.sort) sp.set('sort', params.sort);
+      if (params?.order) sp.set('order', params.order);
+      const qs = sp.toString() ? `?${sp}` : '';
+      const response = await api.get(`/neture/supplier/products${qs}`);
+      const result = response.data;
+      return {
+        data: result.data || [],
+        pagination: result.pagination || { page: 1, limit: 50, total: 0, totalPages: 0 },
+      };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch paginated products:', error);
+      return { data: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } };
+    }
+  },
+
+  // WO-NETURE-SUPPLIER-EXCEL-LIST-V1: Batch update
+  async batchUpdateProducts(updates: Array<{
+    offerId: string;
+    isActive?: boolean;
+    distributionType?: string;
+    priceGeneral?: number;
+    consumerReferencePrice?: number | null;
+  }>): Promise<{ updated: string[]; failed: Array<{ id: string; error: string }> }> {
+    try {
+      const response = await api.patch('/neture/supplier/products/batch', { updates });
+      const result = response.data;
+      return result.data || { updated: [], failed: [] };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to batch update products:', error);
+      return { updated: [], failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
+    }
+  },
+
   async createProduct(data: {
     barcode: string;
     marketingName?: string;

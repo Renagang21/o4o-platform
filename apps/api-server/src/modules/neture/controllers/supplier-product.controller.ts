@@ -52,15 +52,51 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
-  // GET /supplier/products
+  // GET /supplier/products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1: pagination/search/filter 지원)
   router.get('/products', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const products = await netureService.getSupplierProducts(supplierId);
-      res.json({ success: true, data: products });
+      const { page, limit, keyword, distributionType, isActive, sort, order } = req.query;
+
+      // 쿼리 파라미터가 있으면 paginated, 없으면 기존 호환
+      if (page || limit || keyword || distributionType || isActive || sort) {
+        const result = await netureService.getSupplierProductsPaginated(supplierId, {
+          page: page as string | undefined ? Number(page) : undefined,
+          limit: limit as string | undefined ? Number(limit) : undefined,
+          keyword: keyword as string | undefined,
+          distributionType: distributionType as string | undefined,
+          isActive: isActive as string | undefined,
+          sort: sort as string | undefined,
+          order: order as string | undefined,
+        });
+        res.json({ success: true, ...result });
+      } else {
+        const products = await netureService.getSupplierProducts(supplierId);
+        res.json({ success: true, data: products });
+      }
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier products:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier products' });
+    }
+  });
+
+  // PATCH /supplier/products/batch (WO-NETURE-SUPPLIER-EXCEL-LIST-V1)
+  // 주의: /products/:id 보다 먼저 등록해야 'batch'가 :id로 매칭되지 않음
+  router.patch('/products/batch', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { updates } = req.body;
+      if (!Array.isArray(updates) || updates.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_UPDATES', message: 'updates array is required' });
+      }
+      if (updates.length > 100) {
+        return res.status(400).json({ success: false, error: 'TOO_MANY_UPDATES', message: 'Max 100 updates per request' });
+      }
+      const result = await netureService.batchUpdateSupplierOffers(supplierId, updates);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error batch updating supplier products:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to batch update' });
     }
   });
 
