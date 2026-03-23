@@ -51,6 +51,9 @@ const ForumHubPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.
 const ForumPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.ForumPage })));
 const PostDetailPage = lazy(() => import('@/pages/forum').then(m => ({ default: m.PostDetailPage })));
 const ForumWritePage = lazy(() => import('@/pages/forum/ForumWritePage'));
+// WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
+const MyForumDashboardPage = lazy(() => import('@/pages/forum/MyForumDashboardPage'));
+const ForumRequestCategoryPage = lazy(() => import('@/pages/forum/RequestCategoryPage'));
 
 // Community Hub (WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1)
 const CommunityHubPage = lazy(() => import('@/pages/community/CommunityHubPage'));
@@ -197,6 +200,23 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ForumWritePage />
+            </ProtectedRoute>
+          }
+        />
+        {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
+        <Route
+          path="forum/my-dashboard"
+          element={
+            <ProtectedRoute>
+              <MyForumDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="forum/request-category"
+          element={
+            <ProtectedRoute>
+              <ForumRequestCategoryPage />
             </ProtectedRoute>
           }
         />

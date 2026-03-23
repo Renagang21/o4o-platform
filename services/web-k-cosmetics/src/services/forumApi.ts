@@ -198,3 +198,68 @@ export function extractTextContent(content: string | object[] | undefined): stri
 
   return '';
 }
+
+// ============================================================================
+// Owner Category Management — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
+// ============================================================================
+
+export async function fetchMyCategories(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get('/forum/categories/mine');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my categories:', error);
+    return { success: false, data: [] };
+  }
+}
+
+export async function updateMyCategory(
+  id: string,
+  data: { name?: string; description?: string; iconEmoji?: string | null; iconUrl?: string | null },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.patch(`/forum/categories/${id}/owner`, data);
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '저장에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+export async function requestDeleteCategory(
+  id: string,
+  data: { reason?: string },
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await api.post(`/forum/categories/${id}/delete-request`, data);
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '삭제 요청에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}
+
+export async function fetchMyForumRequests(): Promise<{ success: boolean; data: any[] }> {
+  try {
+    const response = await api.get('/forum/category-requests/my?serviceCode=k-cosmetics');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my forum requests:', error);
+    return { success: false, data: [] };
+  }
+}
+
+export async function createForumCategoryRequest(
+  data: { name: string; description: string; reason?: string },
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const response = await api.post('/forum/category-requests', {
+      ...data,
+      serviceCode: 'k-cosmetics',
+    });
+    return response.data;
+  } catch (error: any) {
+    const msg = error?.response?.data?.message || error?.response?.data?.error || '신청에 실패했습니다.';
+    return { success: false, error: msg };
+  }
+}

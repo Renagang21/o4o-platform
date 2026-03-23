@@ -174,6 +174,13 @@ const SupplierPartnerCommissionsPage = lazy(() =>
 const SupplierCsvImportPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierCsvImportPage }))
 );
+// WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
+const MyForumDashboardPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.MyForumDashboardPage }))
+);
+const SupplierRequestCategoryPage = lazy(() =>
+  import('./pages/supplier').then((m) => ({ default: m.RequestCategoryPage }))
+);
 
 // Signage Content Hub
 const SignageContentHubPage = lazy(() => import('./pages/seller/SignageContentHubPage'));
@@ -518,6 +525,9 @@ function App() {
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
               <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
+              {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
+              <Route path="/supplier/my-forum" element={<MyForumDashboardPage />} />
+              <Route path="/supplier/forum/request-category" element={<SupplierRequestCategoryPage />} />
             </Route>
 
             {/* ================================================================

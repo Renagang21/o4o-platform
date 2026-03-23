@@ -4,3 +4,5 @@ export { MySettingsPage } from './MySettingsPage';
 export { MyCertificatesPage } from './MyCertificatesPage';
 export { PersonalStatusReportPage } from './PersonalStatusReportPage';
 export { AnnualReportFormPage } from './AnnualReportFormPage';
+export { default as MyForumDashboardPage } from './MyForumDashboardPage';
+export { default as RequestCategoryPage } from './RequestCategoryPage';
