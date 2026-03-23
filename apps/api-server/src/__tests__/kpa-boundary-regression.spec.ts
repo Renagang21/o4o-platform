@@ -25,13 +25,26 @@ const BRANCH_CONTROLLER_PATH = path.resolve(
   '../routes/kpa/controllers/branch-admin-dashboard.controller.ts'
 );
 
+// WO-O4O-BRANCH-ADMIN-DASHBOARD-CONTROLLER-SPLIT-V1: handlers were split into separate files
+const BRANCH_QUERY_HANDLERS_PATH = path.resolve(
+  __dirname,
+  '../routes/kpa/controllers/branch-admin-dashboard.query-handlers.ts'
+);
+const BRANCH_MUTATION_HANDLERS_PATH = path.resolve(
+  __dirname,
+  '../routes/kpa/controllers/branch-admin-dashboard.mutation-handlers.ts'
+);
+
 const KPA_ROUTES_PATH = path.resolve(
   __dirname,
   '../routes/kpa/kpa.routes.ts'
 );
 
-// Read source files once
-const branchController = fs.readFileSync(BRANCH_CONTROLLER_PATH, 'utf8');
+// Read source files once — combine controller + handlers for boundary analysis
+const branchControllerOnly = fs.readFileSync(BRANCH_CONTROLLER_PATH, 'utf8');
+const branchQueryHandlers = fs.readFileSync(BRANCH_QUERY_HANDLERS_PATH, 'utf8');
+const branchMutationHandlers = fs.readFileSync(BRANCH_MUTATION_HANDLERS_PATH, 'utf8');
+const branchController = branchControllerOnly + '\n' + branchQueryHandlers + '\n' + branchMutationHandlers;
 const kpaRoutes = fs.readFileSync(KPA_ROUTES_PATH, 'utf8');
 
 // ─────────────────────────────────────────────────────
@@ -63,16 +76,14 @@ describe('KPA-c Branch CMS: Hard Delete Prevention', () => {
   });
 
   it('uses is_deleted=true for all delete routes', () => {
-    // Every DELETE route handler must set is_deleted = true
-    const deleteRouteBlocks = branchController.split(/router\.delete\s*\(/);
-    // First element is before any DELETE route, skip it
-    const deleteHandlers = deleteRouteBlocks.slice(1);
+    // After controller split, delete logic lives in createDelete*Handler functions
+    // in the mutation-handlers file. Each must set is_deleted = true.
+    const deleteHandlerBlocks = branchMutationHandlers.split(/export function createDelete\w+Handler/);
+    const deleteHandlers = deleteHandlerBlocks.slice(1);
 
     expect(deleteHandlers.length).toBeGreaterThan(0);
 
     for (const handler of deleteHandlers) {
-      // Each handler block (up to next route) must contain is_deleted = true
-      // Auth boilerplate ~600 chars, so need ~2000 to reach query logic
       const handlerBlock = handler.slice(0, 2000);
       expect(handlerBlock).toContain('is_deleted');
     }
@@ -87,37 +98,36 @@ describe('KPA-c Branch CMS: Hard Delete Prevention', () => {
 // ─────────────────────────────────────────────────────
 
 describe('KPA-c Branch CMS: is_deleted Filter Enforcement', () => {
+  // After controller split, query logic lives in handler factory functions.
+  // Extract handler blocks from the split handler files.
   it('news list query filters is_deleted', () => {
-    // Look for the GET news list handler that uses createQueryBuilder
-    const newsListBlock = extractRouteBlock(branchController, "'/news'", 'router.get');
-    expect(newsListBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchQueryHandlers, 'createListNewsHandler', '');
+    expect(block).toContain('is_deleted');
   });
 
   it('officers list query filters is_deleted', () => {
-    // Officers use repo.find() with where condition
-    const officerBlock = extractRouteBlock(branchController, "'/officers'", 'router.get');
-    expect(officerBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchQueryHandlers, 'createListOfficersHandler', '');
+    expect(block).toContain('is_deleted');
   });
 
   it('docs list query filters is_deleted', () => {
-    const docsBlock = extractRouteBlock(branchController, "'/docs'", 'router.get');
-    expect(docsBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchQueryHandlers, 'createListDocsHandler', '');
+    expect(block).toContain('is_deleted');
   });
 
   it('news single-item query filters is_deleted', () => {
-    // PATCH/DELETE routes findOne with is_deleted: false
-    const updateBlock = extractRouteBlock(branchController, "'/news/:id'", 'router.patch');
-    expect(updateBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchMutationHandlers, 'createUpdateNewsHandler', '');
+    expect(block).toContain('is_deleted');
   });
 
   it('officers single-item query filters is_deleted', () => {
-    const updateBlock = extractRouteBlock(branchController, "'/officers/:id'", 'router.patch');
-    expect(updateBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchMutationHandlers, 'createUpdateOfficerHandler', '');
+    expect(block).toContain('is_deleted');
   });
 
   it('docs single-item query filters is_deleted', () => {
-    const updateBlock = extractRouteBlock(branchController, "'/docs/:id'", 'router.patch');
-    expect(updateBlock).toContain('is_deleted');
+    const block = extractRouteBlock(branchMutationHandlers, 'createUpdateDocHandler', '');
+    expect(block).toContain('is_deleted');
   });
 });
 
@@ -188,14 +198,17 @@ describe('KPA-a CMS: Soft Delete Enforcement', () => {
 
 describe('KPA-c Branch CMS: Organization Isolation', () => {
   it('uses getUserOrganizationId for org scoping', () => {
-    expect(branchController).toContain('getUserOrganizationId');
+    // After split, getUserOrganizationId is used in query & mutation handlers
+    const combined = branchQueryHandlers + branchMutationHandlers;
+    expect(combined).toContain('getUserOrganizationId');
   });
 
   it('does NOT use req.body.organizationId or req.params.organizationId for scoping', () => {
     // organizationId should never be taken from client input for DB queries
-    expect(branchController).not.toContain('req.body.organizationId');
-    expect(branchController).not.toContain('req.body.organization_id');
-    expect(branchController).not.toContain('req.params.organizationId');
+    const combined = branchQueryHandlers + branchMutationHandlers;
+    expect(combined).not.toContain('req.body.organizationId');
+    expect(combined).not.toContain('req.body.organization_id');
+    expect(combined).not.toContain('req.params.organizationId');
   });
 });
 
