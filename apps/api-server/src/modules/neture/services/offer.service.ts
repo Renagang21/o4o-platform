@@ -9,6 +9,8 @@ import {
 } from '../entities/index.js';
 import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
+import { ProductCategory } from '../entities/index.js';
+import { ProductImportCommonService } from './product-import-common.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
 
 /**
@@ -336,13 +338,15 @@ export class NetureOfferService {
     supplierId: string,
     data: {
       barcode: string;
+      marketingName?: string;
+      categoryId?: string;
+      brandName?: string;
       manualData?: {
         regulatoryType?: string;
-        regulatoryName: string;
-        manufacturerName: string;
+        regulatoryName?: string;
+        manufacturerName?: string;
         marketingName?: string;
         mfdsPermitNumber?: string | null;
-        // WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1: extended master fields
         categoryId?: string | null;
         brandId?: string | null;
         specification?: string | null;
@@ -380,25 +384,59 @@ export class NetureOfferService {
         return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
       }
 
+      // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1: Category + Regulatory auto-fill
+      const resolvedCategoryId: string | null = data.categoryId || data.manualData?.categoryId || null;
+      let isRegulated = false;
+      if (resolvedCategoryId) {
+        const categoryRepo = AppDataSource.getRepository(ProductCategory);
+        const category = await categoryRepo.findOne({ where: { id: resolvedCategoryId } });
+        if (!category) {
+          return { success: false, error: 'INVALID_CATEGORY' };
+        }
+        isRegulated = category.isRegulated;
+      }
+
+      const manualData = { ...data.manualData };
+      const marketingName = data.marketingName || manualData.marketingName || '';
+
+      if (isRegulated) {
+        if (!manualData.regulatoryType || !manualData.regulatoryName) {
+          return { success: false, error: 'REGULATED_FIELDS_REQUIRED' };
+        }
+      } else {
+        manualData.regulatoryType = manualData.regulatoryType || '일반';
+        manualData.regulatoryName = manualData.regulatoryName || marketingName || 'UNKNOWN';
+      }
+      if (marketingName) manualData.marketingName = marketingName;
+
+      // Brand resolution (reuse Import logic)
+      let resolvedBrandId: string | null = manualData.brandId || null;
+      if (!resolvedBrandId && data.brandName?.trim()) {
+        const importCommon = new ProductImportCommonService(AppDataSource);
+        resolvedBrandId = await importCommon.resolveBrandId(
+          AppDataSource.manager, data.brandName.trim(), manualData.manufacturerName,
+        );
+      }
+      if (resolvedCategoryId) manualData.categoryId = resolvedCategoryId;
+      if (resolvedBrandId) manualData.brandId = resolvedBrandId;
+
       // Master 파이프라인 강제 경유
-      const masterResult = await this.catalogService.resolveOrCreateMaster(data.barcode, data.manualData);
+      const masterResult = await this.catalogService.resolveOrCreateMaster(data.barcode, manualData);
       if (!masterResult.success || !masterResult.data) {
         return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
       }
 
-      // WO-O4O-SUPPLIER-PRODUCT-CREATE-PAGE-V1: extended fields 적용 (resolveOrCreateMaster 파이프라인 변경 없음)
-      if (data.manualData) {
-        const extFields: Record<string, unknown> = {};
-        if (data.manualData.categoryId !== undefined) extFields.categoryId = data.manualData.categoryId;
-        if (data.manualData.brandId !== undefined) extFields.brandId = data.manualData.brandId;
-        if (data.manualData.specification !== undefined) extFields.specification = data.manualData.specification;
-        if (data.manualData.originCountry !== undefined) extFields.originCountry = data.manualData.originCountry;
-        if (data.manualData.tags !== undefined) extFields.tags = data.manualData.tags;
-        if (data.manualData.marketingName !== undefined) extFields.marketingName = data.manualData.marketingName;
+      // Extended fields 적용
+      const extFields: Record<string, unknown> = {};
+      if (manualData.categoryId !== undefined) extFields.categoryId = manualData.categoryId;
+      if (manualData.brandId !== undefined) extFields.brandId = manualData.brandId;
+      if (manualData.specification !== undefined) extFields.specification = manualData.specification;
+      if (manualData.originCountry !== undefined) extFields.originCountry = manualData.originCountry;
+      if (manualData.tags !== undefined) extFields.tags = manualData.tags;
+      if (manualData.marketingName !== undefined) extFields.marketingName = manualData.marketingName;
 
-        if (Object.keys(extFields).length > 0) {
-          await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
-        }
+      if (Object.keys(extFields).length > 0) {
+        await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
       }
 
       // P1: slug 자동 생성 (barcode-supplierId-timestamp)

@@ -54,6 +54,8 @@ const ALLOWED_CSV_COLUMNS = [
   'marketing_name',
   // WO-NETURE-CSV-TEMPLATE-V1
   'consumer_short_description',
+  // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1
+  'category_name',
 ];
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
@@ -424,6 +426,27 @@ export class CsvImportService {
             }
           } catch (err) {
             logger.warn(`[CsvImport] Brand resolution failed for row ${row.rowNumber}:`, err);
+          }
+        }
+
+        // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1: Category 해석
+        const categoryName = (raw.category_name || '').trim();
+        if (categoryName && masterId) {
+          try {
+            const catRows: Array<{ id: string }> = await manager.query(
+              `SELECT id FROM product_categories WHERE name = $1 AND is_active = true ORDER BY depth DESC LIMIT 1`,
+              [categoryName],
+            );
+            if (catRows.length > 0) {
+              await manager.query(
+                `UPDATE product_masters SET category_id = $1 WHERE id = $2 AND category_id IS NULL`,
+                [catRows[0].id, masterId],
+              );
+            } else {
+              logger.warn(`[CsvImport] Category not found: "${categoryName}" (row ${row.rowNumber})`);
+            }
+          } catch (err) {
+            logger.warn(`[CsvImport] Category resolution failed for row ${row.rowNumber}:`, err);
           }
         }
 

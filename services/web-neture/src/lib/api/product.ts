@@ -32,6 +32,7 @@ export interface CategoryTreeItem {
   depth: number;
   sortOrder: number;
   isActive: boolean;
+  isRegulated: boolean;
   children: CategoryTreeItem[];
 }
 

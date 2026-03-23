@@ -91,8 +91,8 @@ export class NetureCatalogService {
     barcode: string,
     manualData?: {
       regulatoryType?: string;
-      regulatoryName: string;
-      manufacturerName: string;
+      regulatoryName?: string;
+      manufacturerName?: string;
       marketingName?: string;
       mfdsPermitNumber?: string | null;
     }
@@ -135,12 +135,14 @@ export class NetureCatalogService {
 
     // 4b. MFDS 미연동 + manualData 제공 → 수동 생성
     if (manualData) {
+      const effectiveRegName = manualData.regulatoryName || manualData.marketingName || 'UNKNOWN';
+      const effectiveMarketing = manualData.marketingName || manualData.regulatoryName || 'UNKNOWN';
       const master = this.masterRepo.create({
         barcode,
-        regulatoryType: manualData.regulatoryType || 'UNKNOWN',
-        regulatoryName: manualData.regulatoryName,
-        marketingName: manualData.marketingName || manualData.regulatoryName,
-        manufacturerName: manualData.manufacturerName,
+        regulatoryType: manualData.regulatoryType || '일반',
+        regulatoryName: effectiveRegName,
+        marketingName: effectiveMarketing,
+        manufacturerName: manualData.manufacturerName || '',
         mfdsPermitNumber: manualData.mfdsPermitNumber ?? null,
         mfdsProductId: barcode, // MFDS 미연동 시 barcode를 ID로 사용
         isMfdsVerified: false,

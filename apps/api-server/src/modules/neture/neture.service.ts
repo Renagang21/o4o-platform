@@ -246,10 +246,13 @@ export class NetureService {
     supplierId: string,
     data: {
       barcode: string;
+      marketingName?: string;
+      categoryId?: string;
+      brandName?: string;
       manualData?: {
         regulatoryType?: string;
-        regulatoryName: string;
-        manufacturerName: string;
+        regulatoryName?: string;
+        manufacturerName?: string;
         marketingName?: string;
         mfdsPermitNumber?: string | null;
         categoryId?: string | null;

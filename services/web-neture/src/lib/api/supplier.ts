@@ -437,6 +437,9 @@ export const supplierApi = {
 
   async createProduct(data: {
     barcode: string;
+    marketingName?: string;
+    categoryId?: string;
+    brandName?: string;
     distributionType?: string;
     manualData?: Record<string, any>;
     priceGeneral?: number;
