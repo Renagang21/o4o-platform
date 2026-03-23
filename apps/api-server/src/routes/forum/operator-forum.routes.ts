@@ -433,7 +433,7 @@ router.get('/analytics/trend', async (req: Request, res: Response): Promise<void
       .addSelect(`COUNT(*) FILTER (WHERE r.status = 'approved')::int`, 'approved')
       .addSelect(`COUNT(*) FILTER (WHERE r.status = 'rejected')::int`, 'rejected')
       .where('r.serviceCode = :serviceCode', { serviceCode })
-      .andWhere('r.createdAt >= NOW() - INTERVAL :days', { days: `${days} days` })
+      .andWhere(`r.createdAt >= NOW() - INTERVAL '1 day' * :days`, { days })
       .groupBy(`TO_CHAR(r.createdAt, 'YYYY-MM-DD')`)
       .orderBy('date', 'ASC')
       .getRawMany();
