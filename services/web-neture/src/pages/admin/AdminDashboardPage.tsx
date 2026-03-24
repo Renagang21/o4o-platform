@@ -25,6 +25,22 @@ import {
 } from '@o4o/admin-ux-core';
 import { dashboardApi, type OperatorDashboardData } from '../../lib/api';
 
+// ─── WO-O4O-ROLE-PRIORITY-FIX-V1: Operator→Admin 링크 변환 ───
+
+const OPERATOR_TO_ADMIN_LINK: Record<string, string> = {
+  '/operator/applications': '/workspace/admin/service-approvals',
+  '/operator/supply': '/workspace/admin/suppliers',
+  '/operator/orders': '/workspace/admin',
+  '/operator/community': '/workspace/admin/community',
+  '/operator/homepage-cms': '/workspace/admin/community',
+  '/operator/signage/hq-media': '/workspace/admin',
+};
+
+function toAdminLink(operatorLink?: string): string | undefined {
+  if (!operatorLink) return operatorLink;
+  return OPERATOR_TO_ADMIN_LINK[operatorLink] ?? operatorLink;
+}
+
 // ─── 5-Block → 4-Block Transformer ───
 
 function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
@@ -38,27 +54,27 @@ function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
       : 'stable' as const,
   }));
 
-  // Block B: ActionQueue → Policies
+  // Block B: ActionQueue → Policies (링크를 admin 경로로 변환)
   const policies: PolicyItem[] = data.actionQueue.map((action) => ({
     key: action.id,
     label: action.label,
     status: action.count > 0 ? 'partial' as const : 'configured' as const,
-    link: action.link,
+    link: toAdminLink(action.link),
   }));
 
-  // Block C: AiSummary → Governance Alerts
+  // Block C: AiSummary → Governance Alerts (링크를 admin 경로로 변환)
   const governanceAlerts: GovernanceAlert[] = (data.aiSummary ?? []).map((item) => ({
     id: item.id,
     message: item.message,
     level: item.level as 'info' | 'warning' | 'critical',
-    link: item.link,
+    link: toAdminLink(item.link),
   }));
 
-  // Block D: QuickActions → Structure Actions
+  // Block D: QuickActions → Structure Actions (링크를 admin 경로로 변환)
   const structureActions: StructureAction[] = data.quickActions.map((action) => ({
     id: action.id,
     label: action.label,
-    link: action.link,
+    link: toAdminLink(action.link)!,
     icon: action.icon,
   }));
 

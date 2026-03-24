@@ -70,13 +70,13 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
   }, [isOpen, onClose]);
 
   // WO-O4O-NETURE-LOGIN-RETURNURL-FIX-V1: workspace returnUrl 충돌 수정
+  // WO-O4O-ROLE-PRIORITY-FIX-V1: navigate를 onClose 전에 호출하여 모달 unmount에 의한 navigation 누락 방지
   const handleLoginSuccess = (role?: string, roles?: string[]) => {
     if (rememberEmail) {
       localStorage.setItem(REMEMBER_EMAIL_KEY, email);
     } else {
       localStorage.removeItem(REMEMBER_EMAIL_KEY);
     }
-    onClose();
 
     const dashboardPath =
       (roles && roles.length > 0)
@@ -85,12 +85,15 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
           ? getPrimaryDashboardRoute([role], ROUTE_OVERRIDES)
           : '/';
 
+    // 역할 우선순위 기반 리다이렉트 (admin > operator > ...)
     // workspace 경로는 returnUrl보다 역할 우선
-    if (returnUrl && !returnUrl.startsWith('/workspace/')) {
-      navigate(returnUrl);
-    } else {
-      navigate(dashboardPath);
-    }
+    const targetPath = (returnUrl && !returnUrl.startsWith('/workspace/'))
+      ? returnUrl
+      : dashboardPath;
+
+    // navigate를 먼저 호출 — onClose()가 모달 unmount를 트리거해도 navigation 보장
+    navigate(targetPath);
+    onClose();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
