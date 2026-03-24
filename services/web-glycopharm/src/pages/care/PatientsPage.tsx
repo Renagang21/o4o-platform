@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
   Loader2,
@@ -59,11 +59,20 @@ export default function PatientsPage() {
   const [riskFilter, setRiskFilter] = useState<RiskLevel>('all');
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
-  // WO-GLYCOPHARM-CARE-UI-ADJUST-V1: 당뇨인 등록 모달 상태
+  // WO-GLYCOPHARM-PHARMACY-PATIENT-REGISTER-FORM-COMPLETE-V1: 당뇨인 등록 모달 상태
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [registerForm, setRegisterForm] = useState({ name: '', phone: '', email: '', notes: '' });
+  const [registerForm, setRegisterForm] = useState({ name: '', phone: '', email: '', gender: '', birthYear: '', notes: '' });
   const [registerLoading, setRegisterLoading] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
+
+  // ?register=true 파라미터로 모달 자동 열기 (PharmacyPatients에서 진입)
+  useEffect(() => {
+    if (searchParams.get('register') === 'true') {
+      setShowRegisterModal(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Debounce search input
   useEffect(() => {
@@ -165,6 +174,18 @@ export default function PatientsPage() {
       setRegisterError('이름을 입력해주세요.');
       return;
     }
+    // 전화번호 검증 (입력 시)
+    const phoneDigits = registerForm.phone.replace(/\D/g, '');
+    if (registerForm.phone.trim() && phoneDigits.length < 10) {
+      setRegisterError('전화번호는 최소 10자리여야 합니다.');
+      return;
+    }
+    // 이메일 검증 (입력 시)
+    if (registerForm.email.trim() && !registerForm.email.includes('@')) {
+      setRegisterError('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
     setRegisterLoading(true);
     setRegisterError(null);
     try {
@@ -172,17 +193,27 @@ export default function PatientsPage() {
         name: registerForm.name.trim(),
         phone: registerForm.phone.trim() || undefined,
         email: registerForm.email.trim() || undefined,
+        gender: (registerForm.gender as 'male' | 'female') || undefined,
+        birthYear: registerForm.birthYear ? Number(registerForm.birthYear) : undefined,
         notes: registerForm.notes.trim() || undefined,
       });
-      if (res.success) {
+      if (res.success && res.data) {
         setShowRegisterModal(false);
-        setRegisterForm({ name: '', phone: '', email: '', notes: '' });
-        loadData();
+        setRegisterForm({ name: '', phone: '', email: '', gender: '', birthYear: '', notes: '' });
+        // 등록 후 환자 상세 페이지로 이동
+        navigate(`/care/patients/${res.data.id}`);
       } else {
         setRegisterError('당뇨인 등록에 실패했습니다.');
       }
-    } catch {
-      setRegisterError('당뇨인 등록 중 오류가 발생했습니다.');
+    } catch (err: any) {
+      const code = err?.code;
+      if (code === 'DUPLICATE_CUSTOMER') {
+        setRegisterError(err?.message || '동일한 연락처의 당뇨인이 이미 등록되어 있습니다.');
+      } else if (code === 'VALIDATION_ERROR') {
+        setRegisterError(err?.message || '입력값을 확인해주세요.');
+      } else {
+        setRegisterError('당뇨인 등록 중 오류가 발생했습니다.');
+      }
     } finally {
       setRegisterLoading(false);
     }
@@ -418,6 +449,32 @@ export default function PatientsPage() {
                   placeholder="example@email.com"
                   className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">성별</label>
+                  <select
+                    value={registerForm.gender}
+                    onChange={(e) => setRegisterForm(f => ({ ...f, gender: e.target.value }))}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                  >
+                    <option value="">선택 안 함</option>
+                    <option value="male">남성</option>
+                    <option value="female">여성</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">출생연도</label>
+                  <input
+                    type="number"
+                    value={registerForm.birthYear}
+                    onChange={(e) => setRegisterForm(f => ({ ...f, birthYear: e.target.value }))}
+                    placeholder="1960"
+                    min={1900}
+                    max={new Date().getFullYear()}
+                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">메모</label>

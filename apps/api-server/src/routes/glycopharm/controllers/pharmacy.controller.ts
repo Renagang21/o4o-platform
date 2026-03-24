@@ -361,6 +361,7 @@ export function createPharmacyController(
    * Create a new customer for the authenticated user's pharmacy
    *
    * WO-GLYCOPHARM-CARE-UI-ADJUST-V1: Care 환자 등록 기능
+   * WO-GLYCOPHARM-PHARMACY-PATIENT-REGISTER-FORM-COMPLETE-V1: gender/birthYear, 중복검사, 검증 강화
    */
   router.post(
     '/customers',
@@ -379,21 +380,65 @@ export function createPharmacyController(
           return;
         }
 
-        const { name, phone, email, notes } = req.body;
+        const { name, phone, email, gender, birthYear, notes } = req.body;
 
+        // 이름 필수
         if (!name || typeof name !== 'string' || !name.trim()) {
           res.status(400).json({
-            error: { code: 'VALIDATION_ERROR', message: 'Name is required' },
+            error: { code: 'VALIDATION_ERROR', message: '이름은 필수 입력입니다.' },
           });
           return;
         }
 
+        // 전화번호 정리 및 검증
+        const cleanPhone = phone ? String(phone).replace(/\D/g, '') : null;
+        if (cleanPhone && cleanPhone.length < 10) {
+          res.status(400).json({
+            error: { code: 'VALIDATION_ERROR', message: '전화번호는 최소 10자리여야 합니다.' },
+          });
+          return;
+        }
+
+        // 이메일 기본 형식 검증
+        const trimEmail = email ? String(email).trim() : null;
+        if (trimEmail && !trimEmail.includes('@')) {
+          res.status(400).json({
+            error: { code: 'VALIDATION_ERROR', message: '올바른 이메일 형식이 아닙니다.' },
+          });
+          return;
+        }
+
+        // 성별 검증
+        const validGender = gender && ['male', 'female'].includes(gender) ? gender : null;
+
+        // 출생연도 검증
+        const validBirthYear = birthYear && Number(birthYear) >= 1900 && Number(birthYear) <= new Date().getFullYear()
+          ? Number(birthYear)
+          : null;
+
+        // 전화번호 중복 검사 (같은 약국 내)
+        if (cleanPhone) {
+          const existing = await dataSource.query(
+            `SELECT id, name FROM glucoseview_customers WHERE organization_id = $1 AND phone = $2 LIMIT 1`,
+            [pharmacyId, cleanPhone],
+          );
+          if (existing.length > 0) {
+            res.status(409).json({
+              error: {
+                code: 'DUPLICATE_CUSTOMER',
+                message: `동일한 연락처의 당뇨인이 이미 등록되어 있습니다. (${existing[0].name})`,
+              },
+            });
+            return;
+          }
+        }
+
         const result = await dataSource.query(
           `INSERT INTO glucoseview_customers
-             (pharmacist_id, organization_id, name, phone, email, notes, last_visit, visit_count, sync_status, data_sharing_consent)
-           VALUES ($1, $2, $3, $4, $5, $6, NOW(), 1, 'pending', false)
-           RETURNING id, name, phone, email, created_at`,
-          [pharmacistId, pharmacyId, name.trim(), phone || null, email || null, notes || null],
+             (pharmacist_id, organization_id, name, phone, email, gender, birth_year, notes, last_visit, visit_count, sync_status, data_sharing_consent)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), 1, 'pending', false)
+           RETURNING id, name, phone, email, gender, birth_year, created_at`,
+          [pharmacistId, pharmacyId, name.trim(), cleanPhone, trimEmail, validGender, validBirthYear, notes || null],
         );
 
         res.status(201).json({ success: true, data: result[0] });

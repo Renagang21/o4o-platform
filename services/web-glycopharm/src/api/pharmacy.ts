@@ -601,14 +601,17 @@ class PharmacyApiClient {
   }
 
   /**
-   * 당뇨인 등록 (WO-GLYCOPHARM-CARE-UI-ADJUST-V1)
+   * 당뇨인 등록
+   * WO-GLYCOPHARM-PHARMACY-PATIENT-REGISTER-FORM-COMPLETE-V1
    */
   async createCustomer(data: {
     name: string;
     phone?: string;
     email?: string;
+    gender?: 'male' | 'female';
+    birthYear?: number;
     notes?: string;
-  }): Promise<StoreApiResponse<{ id: string; name: string; phone: string; email: string; created_at: string }>> {
+  }): Promise<StoreApiResponse<{ id: string; name: string; phone: string; email: string; gender: string | null; birth_year: number | null; created_at: string }>> {
     return this.request('/glycopharm/pharmacy/customers', {
       method: 'POST',
       body: JSON.stringify(data),
