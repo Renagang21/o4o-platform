@@ -79,8 +79,9 @@ export default function ForumAnalyticsPage() {
       forumAnalyticsApi.getTrend(30),
       forumAnalyticsApi.getActivity(15),
     ]);
-    if (s.data) setSummary(s.data);
-    if (t.data?.daily) setTrend(t.data.daily);
+    if (s.data) setSummary(s.data as SummaryData);
+    const tData = t.data as { daily?: TrendDay[] } | null;
+    if (tData?.daily) setTrend(tData.daily);
     if (Array.isArray(a.data)) setActivity(a.data);
     setIsLoading(false);
   };

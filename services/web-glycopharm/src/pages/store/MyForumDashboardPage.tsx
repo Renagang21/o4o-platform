@@ -203,8 +203,8 @@ export default function MyForumDashboardPage() {
       const res = await forumRequestApi.updateMyCategory(editingCategory.id, {
         name: trimmedName,
         description: editForm.description.trim() || undefined,
-        iconEmoji: editForm.iconEmoji.trim() || null,
-        iconUrl: editForm.iconUrl.trim() || null,
+        iconEmoji: editForm.iconEmoji.trim() || undefined,
+        iconUrl: editForm.iconUrl.trim() || undefined,
       });
       if (res.error) {
         setEditError(res.error.message);

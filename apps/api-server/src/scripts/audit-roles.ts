@@ -70,6 +70,7 @@ async function auditRoles(): Promise<RoleAuditResult> {
       glycopharm: 0,
       cosmetics: 0,
       glucoseview: 0,
+      lms: 0,
       none: 0
     },
     migrationStatus: {
@@ -84,6 +85,7 @@ async function auditRoles(): Promise<RoleAuditResult> {
       glycopharm: 0,
       cosmetics: 0,
       glucoseview: 0,
+      lms: 0,
       none: 0
     }
   };

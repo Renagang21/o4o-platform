@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Plus, Edit3, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { cmsApi, type CmsContent, type CmsContentDetail } from '@/api/cms';
-import { RichTextEditor, ContentPreview } from '@o4o/content-editor';
+import { RichTextEditor } from '@o4o/content-editor';
 
 /* ── 가이드라인 대상 정의 ── */
 
