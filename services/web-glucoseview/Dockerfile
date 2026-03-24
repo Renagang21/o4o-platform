@@ -54,6 +54,13 @@ RUN npm install -g serve
 # Copy built files
 COPY --from=builder /app/services/web-glucoseview/dist ./dist
 
+# WO-O4O-GLUCOSEVIEW-SW-CACHE-FIX-V1: inject build hash into service-worker.js
+# Extract JS bundle hash from index.html, fallback to timestamp if not found
+RUN HASH=$(grep -oE 'index-[A-Za-z0-9]+' dist/index.html | head -1 | sed 's/index-//') && \
+    if [ -z "$HASH" ]; then HASH=$(date +%s); fi && \
+    sed -i "s/__BUILD_HASH__/${HASH}/g" dist/service-worker.js && \
+    echo "SW cache name: glucoseview-${HASH}"
+
 # Cloud Run uses PORT env variable
 ENV PORT=8080
 
