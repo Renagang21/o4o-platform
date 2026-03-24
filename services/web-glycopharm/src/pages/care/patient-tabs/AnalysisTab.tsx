@@ -7,7 +7,7 @@
  *   GET /api/v1/care/kpi/:patientId → 트렌드 비교
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Activity,
   TrendingUp,
@@ -24,7 +24,7 @@ import {
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto } from '@/api/pharmacy';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 const RISK_DISPLAY = {
@@ -46,26 +46,240 @@ const BP_CATEGORY_DISPLAY: Record<string, { label: string; cls: string }> = {
   high_stage2: { label: '고혈압 2단계', cls: 'bg-red-100 text-red-700' },
 };
 
+// ─── Chart constants (from AnalysisPage) ───
+
+const TIR_LOW = 70;
+const TIR_HIGH = 180;
+
+const MEAL_COLORS: Record<string, { color: string; label: string }> = {
+  fasting: { color: '#7c3aed', label: '공복' },
+  before_meal: { color: '#2563eb', label: '식전' },
+  after_meal: { color: '#f97316', label: '식후' },
+  bedtime: { color: '#6366f1', label: '취침전' },
+  random: { color: '#64748b', label: '수시' },
+};
+
+// ─── GlucoseChartWithMeal — SVG 혈당 차트 + mealTiming 색분리 ───
+
+function GlucoseChartWithMeal({ readings }: { readings: HealthReadingDto[] }) {
+  const sorted = useMemo(
+    () =>
+      [...readings]
+        .filter((r) => r.valueNumeric != null && !isNaN(Number(r.valueNumeric)))
+        .sort((a, b) => new Date(a.measuredAt).getTime() - new Date(b.measuredAt).getTime()),
+    [readings],
+  );
+
+  if (sorted.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <BarChart3 className="w-8 h-8 text-slate-300 mb-2" />
+        <p className="text-sm text-slate-500">혈당 기록이 없습니다.</p>
+        <p className="text-xs text-slate-400 mt-1">데이터 탭에서 먼저 입력해 주세요.</p>
+      </div>
+    );
+  }
+
+  if (sorted.length < 2) {
+    return (
+      <div className="flex items-center justify-center py-8 text-sm text-slate-400">
+        차트를 표시하려면 2개 이상의 기록이 필요합니다.
+      </div>
+    );
+  }
+
+  const W = 360;
+  const H = 200;
+  const PAD_LEFT = 40;
+  const PAD_RIGHT = 12;
+  const PAD_TOP = 16;
+  const PAD_BOTTOM = 44; // Extra space for legend
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+  const values = sorted.map((r) => Number(r.valueNumeric));
+  const times = sorted.map((r) => new Date(r.measuredAt).getTime());
+
+  const minVal = Math.max(40, Math.min(...values) - 20);
+  const maxVal = Math.min(400, Math.max(...values) + 20);
+  const minTime = times[0];
+  const maxTime = times[times.length - 1];
+  const timeRange = maxTime - minTime || 1;
+
+  const toX = (t: number) => PAD_LEFT + ((t - minTime) / timeRange) * chartW;
+  const toY = (v: number) => PAD_TOP + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+  const points = sorted.map((_r, i) => ({
+    x: toX(times[i]),
+    y: toY(values[i]),
+    val: values[i],
+  }));
+
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+
+  const yTicks = 5;
+  const yLabels = Array.from({ length: yTicks }, (_, i) => {
+    const v = minVal + ((maxVal - minVal) * i) / (yTicks - 1);
+    return { v: Math.round(v), y: toY(v) };
+  });
+
+  const tirY1 = toY(Math.min(TIR_HIGH, maxVal));
+  const tirY2 = toY(Math.max(TIR_LOW, minVal));
+
+  // Determine which mealTiming values are present for the legend
+  const presentTimings = new Set<string>();
+  let hasOutOfRange = false;
+  sorted.forEach((r, i) => {
+    const inRange = values[i] >= TIR_LOW && values[i] <= TIR_HIGH;
+    if (!inRange) hasOutOfRange = true;
+    const mt = (r.metadata as Record<string, string>)?.mealTiming;
+    if (mt && MEAL_COLORS[mt]) presentTimings.add(mt);
+  });
+
+  const legendItems = [
+    ...Array.from(presentTimings).map((mt) => ({
+      color: MEAL_COLORS[mt].color,
+      label: MEAL_COLORS[mt].label,
+    })),
+    ...(hasOutOfRange ? [{ color: '#ef4444', label: '범위 초과' }] : []),
+  ];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+      {/* TIR band */}
+      <rect x={PAD_LEFT} y={tirY1} width={chartW} height={Math.max(0, tirY2 - tirY1)} fill="#dcfce7" opacity={0.5} />
+
+      {/* Grid + Y-axis labels */}
+      {yLabels.map((tick) => (
+        <g key={tick.v}>
+          <line x1={PAD_LEFT} y1={tick.y} x2={PAD_LEFT + chartW} y2={tick.y} stroke="#e2e8f0" strokeWidth={0.5} />
+          <text x={PAD_LEFT - 4} y={tick.y + 3} textAnchor="end" fontSize="9" fill="#94a3b8">{tick.v}</text>
+        </g>
+      ))}
+
+      {/* TIR boundary labels */}
+      {TIR_HIGH <= maxVal && (
+        <text x={PAD_LEFT + chartW + 2} y={tirY1 + 8} fontSize="7" fill="#16a34a" opacity={0.7}>180</text>
+      )}
+      {TIR_LOW >= minVal && (
+        <text x={PAD_LEFT + chartW + 2} y={tirY2 - 2} fontSize="7" fill="#16a34a" opacity={0.7}>70</text>
+      )}
+
+      {/* Line */}
+      <path d={pathD} fill="none" stroke="#94a3b8" strokeWidth={1.5} strokeLinejoin="round" opacity={0.5} />
+
+      {/* Data points with mealTiming colors */}
+      {points.map((p, i) => {
+        const inRange = p.val >= TIR_LOW && p.val <= TIR_HIGH;
+        const meta = sorted[i].metadata as Record<string, string>;
+        const mealTiming = meta?.mealTiming;
+        const dotColor = !inRange
+          ? '#ef4444'
+          : (mealTiming && MEAL_COLORS[mealTiming]?.color) || '#2563eb';
+        return (
+          <circle key={i} cx={p.x} cy={p.y} r={3.5} fill={dotColor} stroke="white" strokeWidth={1} />
+        );
+      })}
+
+      {/* X-axis date labels */}
+      <text x={PAD_LEFT} y={PAD_TOP + chartH + 14} fontSize="8" fill="#94a3b8" textAnchor="start">
+        {new Date(minTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+      <text x={PAD_LEFT + chartW} y={PAD_TOP + chartH + 14} fontSize="8" fill="#94a3b8" textAnchor="end">
+        {new Date(maxTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+
+      {/* Legend */}
+      {legendItems.length > 0 && (() => {
+        const legendY = H - 6;
+        const itemWidth = chartW / Math.max(legendItems.length, 1);
+        return legendItems.map((item, i) => (
+          <g key={item.label}>
+            <circle cx={PAD_LEFT + i * itemWidth + 4} cy={legendY - 3} r={3} fill={item.color} />
+            <text x={PAD_LEFT + i * itemWidth + 10} y={legendY} fontSize="8" fill="#64748b">{item.label}</text>
+          </g>
+        ));
+      })()}
+    </svg>
+  );
+}
+
+// ─── MiniStat ───
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-slate-50 rounded-lg border border-slate-100 px-3 py-2">
+      <p className="text-xs text-slate-400">{label}</p>
+      <p className="text-sm font-semibold text-slate-700 tabular-nums">{value}</p>
+    </div>
+  );
+}
+
 export default function AnalysisTab() {
   const { patient } = usePatientDetail();
   const [analysis, setAnalysis] = useState<CareInsightDto | null>(null);
   const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
   const [llmInsight, setLlmInsight] = useState<CareLlmInsightDto | null>(null);
+  const [readings, setReadings] = useState<HealthReadingDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!patient?.id) return;
     setLoading(true);
+
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+
     Promise.all([
       pharmacyApi.getCareAnalysis(patient.id).catch(() => null),
       pharmacyApi.getCareKpi(patient.id).catch(() => null),
       pharmacyApi.getCareLlmInsight(patient.id).catch(() => null),
-    ]).then(([a, k, llm]) => {
+      pharmacyApi.getHealthReadings(patient.id, { from: from.toISOString(), metricType: 'glucose' }).catch(() => [] as HealthReadingDto[]),
+    ]).then(([a, k, llm, r]) => {
       setAnalysis(a);
       setKpi(k);
       setLlmInsight(llm);
+      setReadings(r ?? []);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
+
+  // ── Glucose stats for mini cards ──
+  const glucoseStats = useMemo(() => {
+    const values = readings
+      .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
+      .filter((v) => !isNaN(v));
+    if (values.length === 0) return null;
+
+    const fastingReadings = readings.filter(
+      (r) => (r.metadata as Record<string, string>)?.mealTiming === 'fasting',
+    );
+    const fastingValues = fastingReadings
+      .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
+      .filter((v) => !isNaN(v));
+    const fastingAvg = fastingValues.length > 0
+      ? Math.round(fastingValues.reduce((a, b) => a + b, 0) / fastingValues.length)
+      : null;
+
+    const postMealReadings = readings.filter(
+      (r) => (r.metadata as Record<string, string>)?.mealTiming === 'after_meal',
+    );
+    const postMealValues = postMealReadings
+      .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
+      .filter((v) => !isNaN(v));
+    const postMealAvg = postMealValues.length > 0
+      ? Math.round(postMealValues.reduce((a, b) => a + b, 0) / postMealValues.length)
+      : null;
+
+    const lastMeasured = readings.length > 0
+      ? new Date(
+          [...readings].sort(
+            (a, b) => new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime(),
+          )[0].measuredAt,
+        ).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+      : null;
+
+    return { count: values.length, fastingAvg, postMealAvg, lastMeasured };
+  }, [readings]);
 
   if (loading) {
     return (
@@ -275,11 +489,25 @@ export default function AnalysisTab() {
         </>
       )}
 
-      {/* Chart Placeholder */}
-      <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 flex flex-col items-center justify-center min-h-[160px]">
-        <BarChart3 className="w-10 h-10 text-slate-300 mb-2" />
-        <p className="text-sm text-slate-500 font-medium">혈당 추이 차트</p>
-        <p className="text-xs text-slate-400 mt-1">Phase 2에서 구현 예정</p>
+      {/* 혈당 추이 차트 — WO-O4O-GLYCOPHARM-ANALYSIS-TAB-CHART-EXPANSION-V1 */}
+      <div>
+        <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+          <Activity className="w-4 h-4 text-blue-500" />
+          혈당 추이 (최근 30일)
+        </h4>
+        <div className="bg-white rounded-xl border border-slate-200 p-4">
+          <GlucoseChartWithMeal readings={readings} />
+        </div>
+
+        {/* 혈당 요약 */}
+        {glucoseStats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
+            <MiniStat label="측정 횟수" value={`${glucoseStats.count}회`} />
+            <MiniStat label="최근 측정" value={glucoseStats.lastMeasured || '-'} />
+            <MiniStat label="공복 평균" value={glucoseStats.fastingAvg != null ? `${glucoseStats.fastingAvg} mg/dL` : '-'} />
+            <MiniStat label="식후 평균" value={glucoseStats.postMealAvg != null ? `${glucoseStats.postMealAvg} mg/dL` : '-'} />
+          </div>
+        )}
       </div>
     </div>
   );
