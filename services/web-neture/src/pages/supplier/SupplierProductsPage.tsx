@@ -10,7 +10,7 @@
  * 편집 불가: 바코드, 상품명, 카테고리, 브랜드, 상태, 승인
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Sparkles } from 'lucide-react';
 import {
@@ -105,10 +105,15 @@ const columns: ListColumnDef<SupplierProduct>[] = [
     align: 'center',
     editable: true,
     render: (v) => {
-      const isPrivate = v === 'PRIVATE';
+      const config: Record<string, { label: string; cls: string }> = {
+        PUBLIC: { label: '전체 공개', cls: 'bg-green-50 text-green-700' },
+        SERVICE: { label: '서비스', cls: 'bg-blue-50 text-blue-700' },
+        PRIVATE: { label: '비공개', cls: 'bg-amber-50 text-amber-700' },
+      };
+      const c = config[v] || config.PUBLIC;
       return (
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${isPrivate ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700'}`}>
-          {isPrivate ? '비공개' : '공개'}
+        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.cls}`}>
+          {c.label}
         </span>
       );
     },
@@ -119,8 +124,8 @@ const columns: ListColumnDef<SupplierProduct>[] = [
         className="w-full px-2 py-1 text-sm border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         autoFocus
       >
-        <option value="PUBLIC">공개</option>
-        <option value="PRIVATE">비공개</option>
+        <option value="PUBLIC">전체 공개</option>
+        <option value="SERVICE">서비스</option>
       </select>
     ),
   },
@@ -225,6 +230,34 @@ export default function SupplierProductsPage() {
   const [saving, setSaving] = useState(false);
   const [generatingTagFor, setGeneratingTagFor] = useState<string | null>(null);
 
+  // WO-NETURE-OFFER-DISTRIBUTION-TYPE-V1: masterId 그룹 구분선
+  const enhancedColumns = useMemo(() => {
+    return columns.map((col) => {
+      if (col.key === 'name') {
+        return {
+          ...col,
+          render: (v: any, row: SupplierProduct, index: number) => {
+            const isGroupStart = index === 0 || row.masterId !== products[index - 1]?.masterId;
+            const groupSize = products.filter((p) => p.masterId === row.masterId).length;
+            return (
+              <div>
+                {isGroupStart && groupSize > 1 && (
+                  <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium mr-1">
+                    {groupSize} Offers
+                  </span>
+                )}
+                <span className={`font-medium ${!isGroupStart && groupSize > 1 ? 'pl-2 text-slate-500' : ''}`}>
+                  {v || '-'}
+                </span>
+              </div>
+            );
+          },
+        };
+      }
+      return col;
+    });
+  }, [products]);
+
   const handleGenerateAiTags = async (masterId: string) => {
     setGeneratingTagFor(masterId);
     await productApi.regenerateAiTags(masterId);
@@ -312,7 +345,7 @@ export default function SupplierProductsPage() {
       {/* Table */}
       <EditableDataTable
         columns={[
-          ...columns,
+          ...enhancedColumns,
           {
             key: 'masterId' as any,
             header: 'AI',
