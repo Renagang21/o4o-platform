@@ -455,16 +455,6 @@ import {
 } from '@o4o/education-extension/entities';
 
 // ============================================================================
-// LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
-// Core ID reference pattern - NOT entity duplication
-// ============================================================================
-import {
-  ProductContent,
-  QuizCampaign,
-  SurveyCampaign,
-} from '@o4o/lms-marketing/entities';
-
-// ============================================================================
 // MEMBERSHIP-YAKSA ENTITIES (Re-enabled for /api/v1/membership routes)
 // ============================================================================
 import {
@@ -490,7 +480,7 @@ import {
 // - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)
 // - @o4o/cosmetics-partner-extension
 // - @o4o/cosmetics-sample-display-extension
-// (lms-marketing은 R7에서 삭제됨)
+// - @o4o/lms-marketing (ProductContent, QuizCampaign, SurveyCampaign)
 //
 // These will be handled in Phase R4+ (domain service separation).
 // ============================================================================
@@ -893,13 +883,6 @@ export const AppDataSource = new DataSource({
     Certificate,
     LMSEvent,
     Attendance,
-    // ============================================================================
-    // LMS-MARKETING ENTITIES (Phase 2: Clean Rebuild)
-    // Core ID reference pattern - NOT entity duplication
-    // ============================================================================
-    ProductContent,
-    QuizCampaign,
-    SurveyCampaign,
     // ============================================================================
     // CMS-CORE ENTITIES (WO-NETURE-SMOKE-STABILIZATION-V1)
     // ============================================================================

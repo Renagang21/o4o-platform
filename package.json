@@ -29,7 +29,7 @@
     "build:pharmacy-ai-insight": "pnpm --filter @o4o/pharmacy-ai-insight run build",
     "build:yaksa-scheduler": "pnpm --filter @o4o/yaksa-scheduler run build",
     "build:diabetes-packages": "pnpm --filter @o4o/diabetes-core run build && pnpm --filter @o4o/diabetes-pharmacy run build",
-    "build:partner-packages": "pnpm --filter @o4o/partner-core run build && pnpm --filter @o4o/partnerops run build && pnpm --filter @o4o/partner-ai-builder run build",
+    "build:partner-packages": "pnpm --filter @o4o/partner-core run build && pnpm --filter @o4o/partnerops run build",
     "build:app-store-packages": "pnpm --filter @o4o/organization-core run build && pnpm --filter @o4o/forum-core run build && pnpm --filter @o4o/forum-core-yaksa run build",
     "typecheck:app-store-packages": "pnpm --filter @o4o/forum-core run typecheck && pnpm --filter @o4o/forum-core-yaksa run typecheck",
     "build:apps": "pnpm run build:main-site && pnpm run build:admin",
