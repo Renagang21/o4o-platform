@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api/pharmacy';
 import { API_BASE_URL } from '@/lib/apiClient';
+import { useStreamBuffer } from '@/hooks/useStreamBuffer';
 
 // ── Types ──
 
@@ -99,16 +100,29 @@ export default function CareAiChatPanel({
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const initialSentRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const renderTickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const streamBuffer = useStreamBuffer();
 
   const suggestedQuestions = patientId ? PATIENT_QUESTIONS : POPULATION_QUESTIONS;
 
-  // Auto-scroll to bottom
+  // Smart auto-scroll: only scroll if user is near bottom
+  const scrollToBottomIfNeeded = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distFromBottom < 80) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  // Auto-scroll on new messages (non-streaming updates)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    scrollToBottomIfNeeded();
+  }, [messages, scrollToBottomIfNeeded]);
 
   // Focus input when opened
   useEffect(() => {
@@ -117,13 +131,19 @@ export default function CareAiChatPanel({
     }
   }, [isOpen]);
 
-  // Abort stream on unmount or close
+  // Abort stream + clear render tick on unmount or close
   useEffect(() => {
-    return () => { abortControllerRef.current?.abort(); };
+    return () => {
+      abortControllerRef.current?.abort();
+      if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
+    };
   }, []);
 
   useEffect(() => {
-    if (!isOpen) abortControllerRef.current?.abort();
+    if (!isOpen) {
+      abortControllerRef.current?.abort();
+      if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
+    }
   }, [isOpen]);
 
   // Escape key handler
@@ -185,6 +205,7 @@ export default function CareAiChatPanel({
       }
 
       // Switch to streaming state
+      streamBuffer.reset();
       setMessages(prev =>
         prev.map(m =>
           m.id === aiPlaceholder.id
@@ -192,6 +213,17 @@ export default function CareAiChatPanel({
             : m,
         ),
       );
+
+      // Start render tick (20fps) — batched state updates instead of per-token
+      renderTickRef.current = setInterval(() => {
+        const displayText = streamBuffer.getDisplayText();
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === aiPlaceholder.id ? { ...m, content: displayText } : m,
+          ),
+        );
+        scrollToBottomIfNeeded();
+      }, 50);
 
       const reader = streamRes.body.getReader();
       const decoder = new TextDecoder();
@@ -214,14 +246,10 @@ export default function CareAiChatPanel({
 
             if (currentEvent === 'token' && data) {
               tokensReceived++;
-              setMessages(prev =>
-                prev.map(m =>
-                  m.id === aiPlaceholder.id
-                    ? { ...m, content: m.content + data }
-                    : m,
-                ),
-              );
+              streamBuffer.appendToken(data);
             } else if (currentEvent === 'cached' || currentEvent === 'complete') {
+              // Stop render tick before final state transition
+              if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
               try {
                 const response = JSON.parse(data) as AiChatResponseDto;
                 if (isValidAiResponse(response)) {
@@ -250,7 +278,8 @@ export default function CareAiChatPanel({
       }
 
       if (streamSuccess) {
-        // Finalize streaming state
+        // Stop render tick and finalize
+        if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
         setMessages(prev =>
           prev.map(m =>
             m.id === aiPlaceholder.id ? { ...m, streaming: false } : m,
@@ -258,6 +287,7 @@ export default function CareAiChatPanel({
         );
       }
     } catch (err) {
+      if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
       if ((err as Error).name === 'AbortError') {
         setSending(false);
         return;
@@ -428,7 +458,7 @@ export default function CareAiChatPanel({
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-8">
               <Sparkles className="w-10 h-10 text-blue-300 mx-auto mb-3" />
@@ -501,7 +531,7 @@ export default function CareAiChatPanel({
         </form>
       </div>
 
-      {/* Slide-in animation */}
+      {/* Slide-in animation + cursor blink */}
       <style>{`
         @keyframes slide-in-right {
           from { transform: translateX(100%); }
@@ -509,6 +539,13 @@ export default function CareAiChatPanel({
         }
         .animate-slide-in-right {
           animation: slide-in-right 0.25s ease-out;
+        }
+        @keyframes cursor-blink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+        .animate-cursor-blink {
+          animation: cursor-blink 530ms step-end infinite;
         }
       `}</style>
     </div>
@@ -545,7 +582,7 @@ function MessageBubble({
         <div className="max-w-[90%] bg-slate-50 border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3">
           <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
             {message.content}
-            <span className="inline-block w-1.5 h-4 bg-blue-500 ml-0.5 animate-pulse align-text-bottom" />
+            <span className="inline-block w-1.5 h-4 bg-blue-500 ml-0.5 align-text-bottom animate-cursor-blink" />
           </p>
         </div>
       </div>
