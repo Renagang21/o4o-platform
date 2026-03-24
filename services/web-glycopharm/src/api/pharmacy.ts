@@ -1091,6 +1091,7 @@ export interface AiChatResponseDto {
   relatedPatients: Array<{ patientId: string; name: string; reason: string }>;
   actions: AiChatActionDto[];
   model: string;
+  promptVersion?: string;
   respondedAt: string;
 }
 

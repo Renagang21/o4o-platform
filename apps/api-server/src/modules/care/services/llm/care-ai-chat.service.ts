@@ -1,6 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { execute, executeStream } from '@o4o/ai-core';
-import { CARE_COPILOT_SYSTEM } from '@o4o/ai-prompts/care';
+import { getCareCopilotPrompt } from '@o4o/ai-prompts/care';
 import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import { createHash } from 'crypto';
 
@@ -37,6 +37,7 @@ export interface AiChatResponse {
   relatedPatients: Array<{ patientId: string; name: string; reason: string }>;
   actions: CareAction[];
   model: string;
+  promptVersion: string;
   respondedAt: string;
 }
 
@@ -66,10 +67,13 @@ export class CareAiChatService {
       return cached.data;
     }
 
-    // 2. Build context
+    // 2. Build context + resolve prompt version
     const context = patientId
       ? await this.buildPatientContext(patientId, pharmacyId)
       : await this.buildPopulationContext(pharmacyId);
+
+    const promptVersion = await this.getPromptVersion();
+    const systemPrompt = getCareCopilotPrompt(promptVersion);
 
     // 3. Build user prompt
     const userPrompt = `[데이터]\n${context}\n\n[질문]\n${message}`;
@@ -77,7 +81,7 @@ export class CareAiChatService {
     // 4. Call via execute() — retry + apiKey check 내장
     // WO-O4O-AI-CHAT-TIMEOUT-FIX-V1: 60s timeout (ai-core default 10s → Gemini 응답 15~60s 수용)
     const response = await execute({
-      systemPrompt: CARE_COPILOT_SYSTEM,
+      systemPrompt,
       userPrompt,
       config: this.configResolver,
       meta: { service: 'care', callerName: 'CareAiChat' },
@@ -102,6 +106,7 @@ export class CareAiChatService {
       relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
       actions,
       model: response.model,
+      promptVersion,
       respondedAt: new Date().toISOString(),
     };
 
@@ -137,16 +142,18 @@ export class CareAiChatService {
       return;
     }
 
-    // 2. Build context (동일)
+    // 2. Build context + resolve prompt version
     const context = patientId
       ? await this.buildPatientContext(patientId, pharmacyId)
       : await this.buildPopulationContext(pharmacyId);
 
+    const promptVersion = await this.getPromptVersion();
+    const systemPrompt = getCareCopilotPrompt(promptVersion);
     const userPrompt = `[데이터]\n${context}\n\n[질문]\n${message}`;
 
     // 3. executeStream() — 120s timeout, maxTokens 4096 (JSON 완성 보장)
     const stream = executeStream({
-      systemPrompt: CARE_COPILOT_SYSTEM,
+      systemPrompt,
       userPrompt,
       config: async () => {
         const base = await this.configResolver();
@@ -185,6 +192,7 @@ export class CareAiChatService {
       relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
       actions,
       model: 'gemini',
+      promptVersion,
       respondedAt: new Date().toISOString(),
     };
 
@@ -415,6 +423,18 @@ export class CareAiChatService {
   }
 
   // ── Shared Utilities ──
+
+  /** ai_model_settings에서 prompt_version 조회 (fallback: 'v1') */
+  private async getPromptVersion(): Promise<string> {
+    try {
+      const rows = await this.dataSource.query(
+        `SELECT prompt_version FROM ai_model_settings WHERE service = 'care' LIMIT 1`,
+      );
+      return rows[0]?.prompt_version || 'v1';
+    } catch {
+      return 'v1';
+    }
+  }
 
   private buildCacheKey(pharmacyId: string | null, patientId: string | null, message: string): string {
     const raw = `${pharmacyId || 'global'}:${patientId || 'population'}:${message.trim().toLowerCase()}`;

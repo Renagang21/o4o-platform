@@ -690,7 +690,7 @@ function MessageBubble({
 
         {/* Meta */}
         <p className="text-[10px] text-slate-400">
-          {safeStr(resp.model)} · {resp.respondedAt ? new Date(resp.respondedAt).toLocaleTimeString('ko-KR') : ''}
+          {safeStr(resp.model)}{resp.promptVersion ? ` · ${resp.promptVersion}` : ''} · {resp.respondedAt ? new Date(resp.respondedAt).toLocaleTimeString('ko-KR') : ''}
         </p>
       </div>
     </div>
