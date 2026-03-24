@@ -385,6 +385,15 @@ export class NetureOfferService {
         barcode = generateInternalBarcode(supplierId);
       }
 
+      // WO-NETURE-OFFER-DISTRIBUTION-TYPE-V1: SERVICE requires serviceKeys
+      if (data.distributionType === OfferDistributionType.SERVICE && (!data.serviceKeys || data.serviceKeys.length === 0)) {
+        return { success: false, error: 'SERVICE_REQUIRES_KEYS', message: 'SERVICE 유통 시 서비스를 선택해야 합니다.' };
+      }
+      // PUBLIC은 serviceKeys 무시
+      if (data.distributionType === OfferDistributionType.PUBLIC) {
+        data.serviceKeys = [];
+      }
+
       // PUBLIC requires consumer description
       if (data.distributionType === OfferDistributionType.PUBLIC && !data.consumerShortDescription?.trim()) {
         return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
@@ -459,14 +468,7 @@ export class NetureOfferService {
         await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
       }
 
-      // Duplicate check: same master + same supplier → already exists
-      const existingOffer = await this.offerRepo.findOne({
-        where: { masterId: masterResult.data.id, supplierId },
-        select: ['id'],
-      });
-      if (existingOffer) {
-        return { success: false, error: 'OFFER_ALREADY_EXISTS', message: '이 바코드의 상품이 이미 등록되어 있습니다.' };
-      }
+      // WO-NETURE-OFFER-DISTRIBUTION-TYPE-V1: 동일 master+supplier 복수 Offer 허용 (UNIQUE 제거됨)
 
       // P1: slug 자동 생성 (barcode-supplierId-timestamp)
       const slugBase = masterResult.data.barcode || masterResult.data.id;
@@ -718,7 +720,7 @@ export class NetureOfferService {
            FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
          ) svc_appr ON true
          WHERE ${where}
-         ORDER BY ${sortField} ${sortOrder}
+         ORDER BY pm.id, ${sortField} ${sortOrder}
          LIMIT $${idx} OFFSET $${idx + 1}`,
         [...params, limit, offset],
       ),
