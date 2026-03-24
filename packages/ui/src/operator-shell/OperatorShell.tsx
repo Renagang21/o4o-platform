@@ -47,6 +47,7 @@ export function OperatorShell({
   user,
   onLogout,
   homeLink = '/',
+  dashboardLink = '/operator',
   footer,
   headerActions,
   children,
@@ -106,7 +107,7 @@ export function OperatorShell({
           <div className="flex justify-between items-center h-14">
             {/* Left — Logo & Section */}
             <div className="flex items-center gap-4">
-              <Link to="/operator" className="flex items-center gap-2">
+              <Link to={dashboardLink} className="flex items-center gap-2">
                 <span className="text-xl font-bold text-blue-600">{serviceName}</span>
                 <span className="text-xs font-medium text-slate-500 border-l border-slate-300 pl-2">
                   Operator

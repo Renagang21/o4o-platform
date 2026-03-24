@@ -25,23 +25,8 @@ import {
 } from '@o4o/admin-ux-core';
 import { dashboardApi, type OperatorDashboardData } from '../../lib/api';
 
-// ─── WO-O4O-ROLE-PRIORITY-FIX-V1: Operator→Admin 링크 변환 ───
-
-const OPERATOR_TO_ADMIN_LINK: Record<string, string> = {
-  '/operator/applications': '/workspace/admin/service-approvals',
-  '/operator/supply': '/workspace/admin/suppliers',
-  '/operator/orders': '/workspace/admin',
-  '/operator/community': '/workspace/admin/community',
-  '/operator/homepage-cms': '/workspace/admin/community',
-  '/operator/signage/hq-media': '/workspace/admin',
-};
-
-function toAdminLink(operatorLink?: string): string | undefined {
-  if (!operatorLink) return operatorLink;
-  return OPERATOR_TO_ADMIN_LINK[operatorLink] ?? operatorLink;
-}
-
 // ─── 5-Block → 4-Block Transformer ───
+// WO-O4O-OPERATOR-UI-UNIFICATION-V1: 통합 레이아웃으로 링크 변환 불필요
 
 function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
   // Block A: KPIs → Structure Metrics
@@ -59,7 +44,7 @@ function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
     key: action.id,
     label: action.label,
     status: action.count > 0 ? 'partial' as const : 'configured' as const,
-    link: toAdminLink(action.link),
+    link: action.link,
   }));
 
   // Block C: AiSummary → Governance Alerts (링크를 admin 경로로 변환)
@@ -67,14 +52,14 @@ function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
     id: item.id,
     message: item.message,
     level: item.level as 'info' | 'warning' | 'critical',
-    link: toAdminLink(item.link),
+    link: item.link,
   }));
 
   // Block D: QuickActions → Structure Actions (링크를 admin 경로로 변환)
   const structureActions: StructureAction[] = data.quickActions.map((action) => ({
     id: action.id,
     label: action.label,
-    link: toAdminLink(action.link)!,
+    link: action.link!,
     icon: action.icon,
   }));
 

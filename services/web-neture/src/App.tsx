@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider, LoginModalProvider, useLoginModal } from './contexts';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -28,7 +28,6 @@ import PartnerSpaceLayout from './components/layouts/PartnerSpaceLayout';
 import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
-import AdminLayout from './components/layouts/AdminLayout';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
@@ -235,8 +234,7 @@ const SettlementsPage = lazy(() =>
   import('./pages/partner/SettlementsPage').then((m) => ({ default: m.SettlementsPage }))
 );
 
-// Admin Dashboard
-const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+// Admin Dashboard (admin-only pages, now under /workspace/operator/*)
 const AiCardExplainPage = lazy(() => import('./pages/admin/AiCardExplainPage'));
 const AiCardReportPage = lazy(() => import('./pages/admin/AiCardReportPage'));
 const AiBusinessPackPage = lazy(() => import('./pages/admin/AiBusinessPackPage'));
@@ -461,6 +459,13 @@ function RegisterRedirect() {
   }, [openRegisterModal]);
 
   return <Navigate to="/" replace />;
+}
+
+// WO-O4O-OPERATOR-UI-UNIFICATION-V1: Legacy /operator/* → /workspace/operator/*
+function OperatorLegacyRedirect() {
+  const location = useLocation();
+  const subpath = location.pathname.replace(/^\/operator/, '');
+  return <Navigate to={`/workspace/operator${subpath}${location.search}`} replace />;
 }
 
 const ProtectedRoute = RoleGuard;
@@ -704,93 +709,79 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Admin Dashboard (/workspace/admin/*)
-            ================================================================ */}
-            <Route element={
-              <ProtectedRoute allowedRoles={['admin']}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/workspace/admin" element={<AdminDashboardPage />} />
-              <Route path="/workspace/admin/ai-card-rules" element={<AiCardExplainPage />} />
-              <Route path="/workspace/admin/ai-business-pack" element={<AiBusinessPackPage />} />
-              <Route path="/workspace/admin/ai" element={<AiAdminDashboardPage />} />
-              <Route path="/workspace/admin/ai/engines" element={<AiEnginesPage />} />
-              <Route path="/workspace/admin/ai/policy" element={<AiPolicyPage />} />
-              <Route path="/workspace/admin/ai/cost" element={<AiCostPage />} />
-              <Route path="/workspace/admin/ai/context-assets" element={<ContextAssetListPage />} />
-              <Route path="/workspace/admin/ai/context-assets/new" element={<ContextAssetFormPage />} />
-              <Route path="/workspace/admin/ai/context-assets/:id/edit" element={<ContextAssetFormPage />} />
-              <Route path="/workspace/admin/ai/composition-rules" element={<AnswerCompositionRulesPage />} />
-              <Route path="/workspace/admin/settings/email" element={<EmailSettingsPage />} />
-              <Route path="/workspace/admin/operators" element={<OperatorsPage />} />
-              <Route path="/workspace/admin/suppliers" element={<AdminSupplierApprovalPage />} />
-              <Route path="/workspace/admin/products" element={<AdminProductApprovalPage />} />
-              <Route path="/workspace/admin/masters" element={<AdminMasterManagementPage />} />
-              <Route path="/workspace/admin/service-approvals" element={<AdminServiceApprovalPage />} />
-              <Route path="/workspace/admin/settlements" element={<AdminSettlementsPage />} />
-              <Route path="/workspace/admin/commissions" element={<AdminCommissionsPage />} />
-              <Route path="/workspace/admin/partner-settlements" element={<AdminPartnerSettlementsPage />} />
-              <Route path="/workspace/admin/partners" element={<AdminPartnerMonitoringPage />} />
-              <Route path="/workspace/admin/partners/:id" element={<AdminPartnerDetailPage />} />
-              <Route path="/workspace/admin/catalog-import" element={<CatalogImportDashboardPage />} />
-              <Route path="/workspace/admin/catalog-import/csv" element={<CSVImportPage />} />
-              <Route path="/workspace/admin/catalog-import/history" element={<ImportHistoryPage />} />
-              <Route path="/workspace/admin/contact-messages" element={<AdminContactMessagesPage />} />
-              <Route path="/workspace/admin/community" element={<CommunityManagementPage />} />
-            </Route>
-
-            {/* ================================================================
-                Operator Dashboard (/operator/*)
+                Unified Operator Dashboard (/workspace/operator/*)
+                WO-O4O-OPERATOR-UI-UNIFICATION-V1
+                admin + operator 통합 레이아웃. 역할 기반 메뉴 필터링.
             ================================================================ */}
             <Route element={
               <OperatorRoute>
                 <OperatorLayoutWrapper />
               </OperatorRoute>
             }>
-              <Route path="/operator" element={<NetureOperatorDashboard />} />
-              <Route path="/operator/users" element={<UsersManagementPage />} />
-              <Route path="/operator/users/:id" element={<UserDetailPage />} />
-              <Route path="/operator/stores" element={<StoreManagementPage />} />
-              <Route path="/operator/orders" element={<OrdersManagementPage />} />
-              <Route path="/operator/ai-report" element={<OperatorAiReportPage />} />
-              <Route path="/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
-              {/* WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: registrations → applications */}
-              <Route path="/operator/applications" element={<RegistrationRequestsPage />} />
-              <Route path="/operator/registrations" element={<Navigate to="/operator/applications" replace />} />
-              {/* WO-O4O-OPERATOR-ROUTE-REFINEMENT-V1: forum-management → community */}
-              <Route path="/operator/community" element={<ForumManagementPage />} />
-              <Route path="/operator/forum-management" element={<Navigate to="/operator/community" replace />} />
-              {/* WO-O4O-FORUM-OPERATOR-UNIFICATION-V1 */}
-              <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
-              {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
-              <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
-              <Route path="/operator/supply" element={<SupplyDashboardPage />} />
-              <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
-              <Route path="/operator/ai-operations" element={<AiOperationsPage />} />
-              <Route path="/operator/ai/asset-quality" element={<AssetQualityPage />} />
-              {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
-              <Route path="/operator/signage/hq-media" element={<SignageHqMediaPage />} />
-              <Route path="/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
-              <Route path="/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
-              <Route path="/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
-              <Route path="/operator/signage/templates" element={<SignageTemplatesPage />} />
-              <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
-              {/* Homepage CMS (WO-O4O-NETURE-HOMEPAGE-CMS-V1) */}
-              <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
-              {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
-              <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
-              {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
-              <Route path="/operator/roles" element={<RoleManagementPage />} />
-              {/* Market Trial 관리 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
-              <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
-              <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
-              {/* 카테고리 관리 (WO-NETURE-CATEGORY-MANAGEMENT-V1) */}
-              <Route path="/operator/categories" element={<CategoryManagementPage />} />
-              {/* 브랜드 관리 (WO-NETURE-BRAND-MANAGEMENT-V1) */}
-              <Route path="/operator/brands" element={<BrandManagementPage />} />
-              {/* WO-NETURE-PRODUCT-DATA-CLEANUP-V1 */}
-              <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
+              {/* ─── 공통 라우트 (admin + operator 모두 접근) ─── */}
+              <Route path="/workspace/operator" element={<NetureOperatorDashboard />} />
+              <Route path="/workspace/operator/users" element={<UsersManagementPage />} />
+              <Route path="/workspace/operator/users/:id" element={<UserDetailPage />} />
+              <Route path="/workspace/operator/stores" element={<StoreManagementPage />} />
+              <Route path="/workspace/operator/orders" element={<OrdersManagementPage />} />
+              <Route path="/workspace/operator/ai-report" element={<OperatorAiReportPage />} />
+              <Route path="/workspace/operator/settings/notifications" element={<EmailNotificationSettingsPage />} />
+              <Route path="/workspace/operator/applications" element={<RegistrationRequestsPage />} />
+              <Route path="/workspace/operator/community" element={<ForumManagementPage />} />
+              <Route path="/workspace/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
+              <Route path="/workspace/operator/forum-analytics" element={<ForumAnalyticsPage />} />
+              <Route path="/workspace/operator/supply" element={<SupplyDashboardPage />} />
+              <Route path="/workspace/operator/ai-card-report" element={<AiCardReportPage />} />
+              <Route path="/workspace/operator/ai-operations" element={<AiOperationsPage />} />
+              <Route path="/workspace/operator/ai/asset-quality" element={<AssetQualityPage />} />
+              <Route path="/workspace/operator/signage/hq-media" element={<SignageHqMediaPage />} />
+              <Route path="/workspace/operator/signage/hq-media/:mediaId" element={<SignageHqMediaDetailPage />} />
+              <Route path="/workspace/operator/signage/hq-playlists" element={<SignageHqPlaylistsPage />} />
+              <Route path="/workspace/operator/signage/hq-playlists/:playlistId" element={<SignageHqPlaylistDetailPage />} />
+              <Route path="/workspace/operator/signage/templates" element={<SignageTemplatesPage />} />
+              <Route path="/workspace/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
+              <Route path="/workspace/operator/homepage-cms" element={<HomepageCmsPage />} />
+              <Route path="/workspace/operator/analytics" element={<OperatorAnalyticsPage />} />
+              <Route path="/workspace/operator/roles" element={<RoleManagementPage />} />
+              <Route path="/workspace/operator/market-trial" element={<MarketTrialApprovalsPage />} />
+              <Route path="/workspace/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
+              <Route path="/workspace/operator/categories" element={<CategoryManagementPage />} />
+              <Route path="/workspace/operator/brands" element={<BrandManagementPage />} />
+              <Route path="/workspace/operator/product-cleanup" element={<ProductDataCleanupPage />} />
+
+              {/* ─── Admin-only 라우트 (admin 역할 필수) ─── */}
+              <Route element={
+                <RoleGuard allowedRoles={['admin']}>
+                  <Outlet />
+                </RoleGuard>
+              }>
+                <Route path="/workspace/operator/operators" element={<OperatorsPage />} />
+                <Route path="/workspace/operator/contact-messages" element={<AdminContactMessagesPage />} />
+                <Route path="/workspace/operator/service-approvals" element={<AdminServiceApprovalPage />} />
+                <Route path="/workspace/operator/admin-suppliers" element={<AdminSupplierApprovalPage />} />
+                <Route path="/workspace/operator/product-approvals" element={<AdminProductApprovalPage />} />
+                <Route path="/workspace/operator/masters" element={<AdminMasterManagementPage />} />
+                <Route path="/workspace/operator/catalog-import" element={<CatalogImportDashboardPage />} />
+                <Route path="/workspace/operator/catalog-import/csv" element={<CSVImportPage />} />
+                <Route path="/workspace/operator/catalog-import/history" element={<ImportHistoryPage />} />
+                <Route path="/workspace/operator/partners" element={<AdminPartnerMonitoringPage />} />
+                <Route path="/workspace/operator/partners/:id" element={<AdminPartnerDetailPage />} />
+                <Route path="/workspace/operator/settlements" element={<AdminSettlementsPage />} />
+                <Route path="/workspace/operator/commissions" element={<AdminCommissionsPage />} />
+                <Route path="/workspace/operator/partner-settlements" element={<AdminPartnerSettlementsPage />} />
+                <Route path="/workspace/operator/community-admin" element={<CommunityManagementPage />} />
+                <Route path="/workspace/operator/ai-admin" element={<AiAdminDashboardPage />} />
+                <Route path="/workspace/operator/ai-admin/engines" element={<AiEnginesPage />} />
+                <Route path="/workspace/operator/ai-admin/policy" element={<AiPolicyPage />} />
+                <Route path="/workspace/operator/ai-admin/cost" element={<AiCostPage />} />
+                <Route path="/workspace/operator/ai-admin/context-assets" element={<ContextAssetListPage />} />
+                <Route path="/workspace/operator/ai-admin/context-assets/new" element={<ContextAssetFormPage />} />
+                <Route path="/workspace/operator/ai-admin/context-assets/:id/edit" element={<ContextAssetFormPage />} />
+                <Route path="/workspace/operator/ai-admin/composition-rules" element={<AnswerCompositionRulesPage />} />
+                <Route path="/workspace/operator/ai-card-rules" element={<AiCardExplainPage />} />
+                <Route path="/workspace/operator/ai-business-pack" element={<AiBusinessPackPage />} />
+                <Route path="/workspace/operator/settings/email" element={<EmailSettingsPage />} />
+              </Route>
             </Route>
 
             {/* ================================================================
@@ -832,12 +823,14 @@ function App() {
             <Route path="/content/:id" element={<RedirectContentDetail />} />
             <Route path="/my-content" element={<Navigate to="/workspace/my-content" replace />} />
 
-            {/* Hub/Admin/Operator 리다이렉트 */}
+            {/* Hub/Admin/Operator 리다이렉트 — WO-O4O-OPERATOR-UI-UNIFICATION-V1 */}
             <Route path="/hub" element={<Navigate to="/workspace/hub" replace />} />
-            <Route path="/admin" element={<Navigate to="/workspace/admin" replace />} />
-            <Route path="/admin/*" element={<Navigate to="/workspace/admin" replace />} />
-            <Route path="/workspace/operator" element={<Navigate to="/operator" replace />} />
-            <Route path="/workspace/operator/*" element={<Navigate to="/operator" replace />} />
+            <Route path="/admin" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/admin/*" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/workspace/admin" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/workspace/admin/*" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/operator" element={<Navigate to="/workspace/operator" replace />} />
+            <Route path="/operator/*" element={<OperatorLegacyRedirect />} />
 
             {/* Legacy supplier/partner 리다이렉트 */}
             <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />

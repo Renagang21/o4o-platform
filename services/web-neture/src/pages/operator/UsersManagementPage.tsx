@@ -393,7 +393,7 @@ export default function UsersManagementPage() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50 cursor-pointer" onClick={() => navigate(`/operator/users/${user.id}`)}>
+                <tr key={user.id} className="hover:bg-slate-50 cursor-pointer" onClick={() => navigate(`/workspace/operator/users/${user.id}`)}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">

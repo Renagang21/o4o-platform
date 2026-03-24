@@ -367,7 +367,7 @@ export default function ContextAssetListPage() {
   }, [assets]);
 
   const handleEdit = (id: string) => {
-    navigate(`/admin/ai/context-assets/${id}/edit`);
+    navigate(`/workspace/operator/ai-admin/context-assets/${id}/edit`);
   };
 
   const handleToggleStatus = (id: string) => {
@@ -405,43 +405,43 @@ export default function ContextAssetListPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-6">
             <Link
-              to="/admin/ai"
+              to="/workspace/operator/ai-admin"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               대시보드
             </Link>
             <Link
-              to="/admin/ai/engines"
+              to="/workspace/operator/ai-admin/engines"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               엔진 설정
             </Link>
             <Link
-              to="/admin/ai/policy"
+              to="/workspace/operator/ai-admin/policy"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               사용 기준 설정
             </Link>
             <Link
-              to="/admin/ai/asset-quality"
+              to="/workspace/operator/ai-admin/asset-quality"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               품질 관리
             </Link>
             <Link
-              to="/admin/ai/cost"
+              to="/workspace/operator/ai-admin/cost"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               비용 현황
             </Link>
             <Link
-              to="/admin/ai/context-assets"
+              to="/workspace/operator/ai-admin/context-assets"
               className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
             >
               Context Asset
             </Link>
             <Link
-              to="/admin/ai/composition-rules"
+              to="/workspace/operator/ai-admin/composition-rules"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               응답 규칙
@@ -461,7 +461,7 @@ export default function ContextAssetListPage() {
             </p>
           </div>
           <Link
-            to="/admin/ai/context-assets/new"
+            to="/workspace/operator/ai-admin/context-assets/new"
             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
             <Plus className="w-5 h-5" />
@@ -597,7 +597,7 @@ export default function ContextAssetListPage() {
               <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <div className="text-gray-500 mb-4">조건에 맞는 Asset이 없습니다.</div>
               <Link
-                to="/admin/ai/context-assets/new"
+                to="/workspace/operator/ai-admin/context-assets/new"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
               >
                 <Plus className="w-5 h-5" />

@@ -53,6 +53,8 @@ export interface OperatorShellProps {
   onLogout: () => void;
   /** 메인 사이트 링크 (default: "/") */
   homeLink?: string;
+  /** 대시보드 로고 링크 (default: "/operator") — WO-O4O-OPERATOR-UI-UNIFICATION-V1 */
+  dashboardLink?: string;
   /** Footer 커스텀. false = 숨김 */
   footer?: ReactNode | false;
   /** 헤더 우측 추가 액션 (e.g., AccountMenu) */

@@ -178,7 +178,7 @@ export default function ContextAssetFormPage() {
       // TODO: API 호출
       console.log('저장:', formData);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      navigate('/admin/ai/context-assets');
+      navigate('/workspace/operator/ai-admin/context-assets');
     } catch (error) {
       console.error('저장 실패:', error);
       toast.error('저장에 실패했습니다.');
@@ -203,7 +203,7 @@ export default function ContextAssetFormPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <Link
-                to="/admin/ai/context-assets"
+                to="/workspace/operator/ai-admin/context-assets"
                 className="flex items-center gap-2 text-gray-500 hover:text-gray-700"
               >
                 <ArrowLeft className="w-5 h-5" />

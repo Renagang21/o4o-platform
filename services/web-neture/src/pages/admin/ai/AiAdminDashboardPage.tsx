@@ -122,43 +122,43 @@ export default function AiAdminDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-6">
             <Link
-              to="/admin/ai"
+              to="/workspace/operator/ai-admin"
               className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
             >
               대시보드
             </Link>
             <Link
-              to="/admin/ai/engines"
+              to="/workspace/operator/ai-admin/engines"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               엔진 설정
             </Link>
             <Link
-              to="/admin/ai/policy"
+              to="/workspace/operator/ai-admin/policy"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               사용 기준 설정
             </Link>
             <Link
-              to="/admin/ai/asset-quality"
+              to="/workspace/operator/ai-admin/asset-quality"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               품질 관리
             </Link>
             <Link
-              to="/admin/ai/cost"
+              to="/workspace/operator/ai-admin/cost"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               비용 현황
             </Link>
             <Link
-              to="/admin/ai/context-assets"
+              to="/workspace/operator/ai-admin/context-assets"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               Context Asset
             </Link>
             <Link
-              to="/admin/ai/composition-rules"
+              to="/workspace/operator/ai-admin/composition-rules"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               응답 규칙
@@ -253,7 +253,7 @@ export default function AiAdminDashboardPage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-semibold text-gray-900">현재 정책</h2>
-                <Link to="/admin/ai/policy" className="text-sm text-primary-600 hover:text-primary-700">
+                <Link to="/workspace/operator/ai-admin/policy" className="text-sm text-primary-600 hover:text-primary-700">
                   설정 변경
                 </Link>
               </div>
@@ -328,21 +328,21 @@ export default function AiAdminDashboardPage() {
         {/* Quick Links */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            to="/admin/ai-operations"
+            to="/workspace/operator/ai-operations"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">실시간 운영 상태</div>
             <div className="text-sm text-gray-500">가드레일, 경고, 비정상 패턴</div>
           </Link>
           <Link
-            to="/admin/ai-card-report"
+            to="/workspace/operator/ai-card-report"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">카드 노출 리포트</div>
             <div className="text-sm text-gray-500">카드 노출 현황</div>
           </Link>
           <Link
-            to="/admin/ai-business-pack"
+            to="/workspace/operator/ai-business-pack"
             className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:border-primary-300 transition-colors"
           >
             <div className="font-medium text-gray-900">사업자용 안내</div>

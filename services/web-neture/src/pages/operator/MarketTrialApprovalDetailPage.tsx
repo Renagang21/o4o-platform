@@ -99,7 +99,7 @@ export default function MarketTrialApprovalDetailPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
-          onClick={() => navigate('/operator/market-trial')}
+          onClick={() => navigate('/workspace/operator/market-trial')}
           className="text-gray-400 hover:text-gray-600"
         >
           ← 목록

@@ -54,7 +54,7 @@ export default function AdminPartnerDetailPage() {
   if (!detail) {
     return (
       <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
-        <button onClick={() => navigate('/workspace/admin/partners')} style={backBtnStyle}>
+        <button onClick={() => navigate('/workspace/operator/partners')} style={backBtnStyle}>
           <ArrowLeft size={16} /> 목록으로
         </button>
         <p style={{ color: '#94a3b8', textAlign: 'center', marginTop: '60px' }}>파트너를 찾을 수 없습니다.</p>
@@ -72,7 +72,7 @@ export default function AdminPartnerDetailPage() {
   return (
     <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
       {/* Back + Title */}
-      <button onClick={() => navigate('/workspace/admin/partners')} style={backBtnStyle}>
+      <button onClick={() => navigate('/workspace/operator/partners')} style={backBtnStyle}>
         <ArrowLeft size={16} /> 목록으로
       </button>
 
@@ -105,7 +105,7 @@ export default function AdminPartnerDetailPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#0f172a', margin: 0 }}>최근 커미션 (최대 20건)</h2>
         <button
-          onClick={() => navigate('/workspace/admin/partner-settlements')}
+          onClick={() => navigate('/workspace/operator/partner-settlements')}
           style={{
             padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0',
             backgroundColor: '#fff', color: '#475569', fontSize: '13px', fontWeight: 500, cursor: 'pointer',

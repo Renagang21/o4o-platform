@@ -314,7 +314,7 @@ export default function HqMediaPage() {
                 <tr
                   key={item.id}
                   className="hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate(`/operator/signage/hq-media/${item.id}`)}
+                  onClick={() => navigate(`/workspace/operator/signage/hq-media/${item.id}`)}
                 >
                   <td className="px-6 py-4">
                     <span className="font-medium text-slate-800">{item.name}</span>
