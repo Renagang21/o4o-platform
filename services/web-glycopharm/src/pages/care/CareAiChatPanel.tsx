@@ -27,6 +27,55 @@ import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api
 import { API_BASE_URL } from '@/lib/apiClient';
 import { useStreamBuffer } from '@/hooks/useStreamBuffer';
 
+// ── HTTP 상태 기반 사용자 메시지 ──
+
+const HTTP_ERROR_MESSAGES: Record<number, string> = {
+  401: '인증이 만료되었습니다. 페이지를 새로고침 해 주세요.',
+  403: '이 기능에 대한 접근 권한이 없습니다.',
+  404: 'AI 서비스 경로를 찾지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  429: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  500: 'AI 서버에 일시적 오류가 발생했습니다. 다시 시도해 주세요.',
+  502: 'AI 서버에 일시적 문제가 있습니다. 잠시 후 다시 시도해 주세요.',
+  503: 'AI 서비스가 일시적으로 이용 불가합니다. 잠시 후 다시 시도해 주세요.',
+  504: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
+};
+
+/** 에러에서 사용자 친화적 메시지를 추출 */
+function getFriendlyErrorMessage(err: unknown): string {
+  // 에러 코드별 메시지 (백엔드 response body)
+  const friendlyByCode: Record<string, string> = {
+    PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
+    AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+    AI_RESPONSE_ERROR: 'AI 응답 처리 중 문제가 발생했습니다. 다시 시도해 주세요.',
+    AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
+    AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
+    AI_CHAT_ERROR: 'AI 채팅 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
+  };
+
+  const errObj = err as Record<string, unknown> | null;
+  const code = typeof errObj?.code === 'string' ? errObj.code : '';
+  const status = typeof errObj?.status === 'number' ? errObj.status : 0;
+  const message = typeof errObj?.message === 'string' ? errObj.message : '';
+
+  // 1) 에러 코드 기반
+  if (code && friendlyByCode[code]) return friendlyByCode[code];
+
+  // 2) HTTP 상태 기반
+  if (status && HTTP_ERROR_MESSAGES[status]) return HTTP_ERROR_MESSAGES[status];
+
+  // 3) 네트워크 실패
+  if (err instanceof TypeError && message.includes('fetch')) {
+    return '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해 주세요.';
+  }
+
+  // 4) 메시지가 있으면 사용 (단, 내부 디버그 문구는 필터)
+  if (message && !message.includes('Request failed') && message.length < 100) {
+    return message;
+  }
+
+  return 'AI 요청 처리 중 문제가 발생했습니다. 다시 시도해 주세요.';
+}
+
 // ── Types ──
 
 interface ChatMessage {
@@ -186,24 +235,36 @@ export default function CareAiChatPanel({
       const abortCtrl = new AbortController();
       abortControllerRef.current = abortCtrl;
 
-      // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: 표준 토큰 키 사용
-      const token = localStorage.getItem('o4o_accessToken') ||
-        localStorage.getItem('accessToken') ||
-        localStorage.getItem('token') ||
-        localStorage.getItem('authToken');
+      // 스트리밍 fetch 헬퍼 — 404/502/503 시 1회 재시도
+      const doStreamFetch = async (retried = false): Promise<Response> => {
+        const token = localStorage.getItem('o4o_accessToken') ||
+          localStorage.getItem('accessToken') ||
+          localStorage.getItem('token') ||
+          localStorage.getItem('authToken');
 
-      const streamRes = await fetch(`${API_BASE_URL}/api/v1/care/ai-chat/stream`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ message: text.trim(), patientId }),
-        signal: abortCtrl.signal,
-      });
+        const res = await fetch(`${API_BASE_URL}/api/v1/care/ai-chat/stream`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ message: text.trim(), patientId }),
+          signal: abortCtrl.signal,
+        });
+
+        // 404/502/503: 서버 일시 오류 → 500ms 후 1회 재시도
+        if ((res.status === 404 || res.status === 502 || res.status === 503) && !retried) {
+          await new Promise(r => setTimeout(r, 500));
+          return doStreamFetch(true);
+        }
+
+        return res;
+      };
+
+      const streamRes = await doStreamFetch();
 
       if (!streamRes.ok || !streamRes.body) {
-        throw new Error(`Stream HTTP ${streamRes.status}`);
+        throw { status: streamRes.status, message: `Stream HTTP ${streamRes.status}` };
       }
 
       // Switch to streaming state
@@ -268,9 +329,9 @@ export default function CareAiChatPanel({
             } else if (currentEvent === 'error') {
               try {
                 const errData = JSON.parse(data);
-                throw new Error(errData.message || 'Stream error');
+                throw { code: errData.code, message: errData.message || 'Stream error', status: errData.status || 0 };
               } catch (e) {
-                if (e instanceof SyntaxError) throw new Error('Stream error');
+                if (e instanceof SyntaxError) throw { message: 'AI 스트리밍 응답 처리 중 오류가 발생했습니다.' };
                 throw e;
               }
             }
@@ -294,11 +355,27 @@ export default function CareAiChatPanel({
         setSending(false);
         return;
       }
-      // Only fallback if no tokens were received yet
-      if (tokensReceived === 0) {
-        if (process.env.NODE_ENV === 'development') {
-          console.debug('[CareAiChat] stream failed, falling back to sync', err);
-        }
+
+      const errStatus = (err as Record<string, unknown>)?.status;
+
+      // 403: 권한 에러는 sync fallback도 동일 실패 → 바로 에러 표시
+      // (401은 sync fallback의 auto-refresh interceptor가 처리하므로 fallthrough)
+      if (errStatus === 403) {
+        const errorMsg = getFriendlyErrorMessage(err);
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === aiPlaceholder.id
+              ? { ...m, loading: false, streaming: false, error: errorMsg }
+              : m,
+          ),
+        );
+        setSending(false);
+        return;
+      }
+
+      // 그 외 — sync fallback 시도
+      if (tokensReceived === 0 && process.env.NODE_ENV === 'development') {
+        console.debug('[CareAiChat] stream failed, falling back to sync', err);
       }
     }
 
@@ -334,20 +411,7 @@ export default function CareAiChatPanel({
             ),
           );
         } catch (err) {
-          const errCode = (err as any)?.code;
-          const errMessage = (err as any)?.message;
-          // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: 에러 코드별 한국어 메시지
-          const friendlyMessages: Record<string, string> = {
-            PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
-            AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
-            AI_RESPONSE_ERROR: 'AI 응답 처리 중 문제가 발생했습니다. 다시 시도해 주세요.',
-            AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
-            AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
-            AI_CHAT_ERROR: 'AI 채팅 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
-          };
-          const errorMsg = friendlyMessages[errCode]
-            || safeStr(err instanceof Error ? err.message : errMessage ?? err)
-            || 'AI 응답을 받지 못했습니다.';
+          const errorMsg = getFriendlyErrorMessage(err);
           setMessages(prev =>
             prev.map(m =>
               m.id === aiPlaceholder.id
