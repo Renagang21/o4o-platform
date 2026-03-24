@@ -186,7 +186,9 @@ export default function CareAiChatPanel({
       const abortCtrl = new AbortController();
       abortControllerRef.current = abortCtrl;
 
-      const token = localStorage.getItem('accessToken') ||
+      // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: 표준 토큰 키 사용
+      const token = localStorage.getItem('o4o_accessToken') ||
+        localStorage.getItem('accessToken') ||
         localStorage.getItem('token') ||
         localStorage.getItem('authToken');
 
@@ -334,11 +336,14 @@ export default function CareAiChatPanel({
         } catch (err) {
           const errCode = (err as any)?.code;
           const errMessage = (err as any)?.message;
+          // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: 에러 코드별 한국어 메시지
           const friendlyMessages: Record<string, string> = {
             PATIENT_NOT_IN_PHARMACY: '이 환자의 약국 연동 정보가 확인되지 않습니다. 페이지를 새로고침 해 주세요.',
             AI_PROVIDER_ERROR: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+            AI_RESPONSE_ERROR: 'AI 응답 처리 중 문제가 발생했습니다. 다시 시도해 주세요.',
             AI_TIMEOUT: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.',
             AI_NOT_CONFIGURED: 'AI 서비스가 설정되지 않았습니다.',
+            AI_CHAT_ERROR: 'AI 채팅 처리 중 오류가 발생했습니다. 다시 시도해 주세요.',
           };
           const errorMsg = friendlyMessages[errCode]
             || safeStr(err instanceof Error ? err.message : errMessage ?? err)

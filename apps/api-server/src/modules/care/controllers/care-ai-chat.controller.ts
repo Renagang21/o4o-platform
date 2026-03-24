@@ -79,19 +79,12 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
 
-      if (msg === 'AI_NOT_CONFIGURED') {
+      // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: includes 기반 매칭
+      if (msg.includes('AI_NOT_CONFIGURED') || msg.includes('not configured')) {
+        console.error('[CareAiChat] AI not configured:', msg);
         return res.status(503).json({
           success: false,
-          error: { code: 'AI_NOT_CONFIGURED', message: 'AI service is not configured' },
-        });
-      }
-
-      // Gemini API errors — return 502 with specific detail
-      if (msg.includes('Gemini API error') || msg.includes('AI_CHAT_FAILED')) {
-        console.error('[CareAiChat] Gemini provider error:', msg);
-        return res.status(502).json({
-          success: false,
-          error: { code: 'AI_PROVIDER_ERROR', message: 'AI provider returned an error. Please try again later.' },
+          error: { code: 'AI_NOT_CONFIGURED', message: 'AI 서비스가 설정되지 않았습니다.' },
         });
       }
 
@@ -100,14 +93,32 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
         console.error('[CareAiChat] Gemini timeout:', msg);
         return res.status(504).json({
           success: false,
-          error: { code: 'AI_TIMEOUT', message: 'AI response timed out. Please try again.' },
+          error: { code: 'AI_TIMEOUT', message: 'AI 응답 시간이 초과되었습니다. 다시 시도해 주세요.' },
         });
       }
 
-      console.error('[CareAiChat] endpoint error:', error);
+      // Gemini empty response / parse failure / provider failure
+      if (msg.includes('empty response') || msg.includes('no candidates') || msg.includes('JSON parse failed') || msg.includes('provider failed')) {
+        console.error('[CareAiChat] Gemini response error:', msg);
+        return res.status(502).json({
+          success: false,
+          error: { code: 'AI_RESPONSE_ERROR', message: 'AI 응답 처리 중 문제가 발생했습니다. 다시 시도해 주세요.' },
+        });
+      }
+
+      // Gemini API HTTP errors (4xx/5xx)
+      if (msg.includes('Gemini API error') || msg.includes('AI_CHAT_FAILED')) {
+        console.error('[CareAiChat] Gemini provider error:', msg);
+        return res.status(502).json({
+          success: false,
+          error: { code: 'AI_PROVIDER_ERROR', message: 'AI 서비스에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' },
+        });
+      }
+
+      console.error('[CareAiChat] unexpected error:', msg, error);
       res.status(500).json({
         success: false,
-        error: { code: 'AI_CHAT_ERROR', message: 'AI chat processing failed' },
+        error: { code: 'AI_CHAT_ERROR', message: 'AI 채팅 처리 중 예기치 않은 오류가 발생했습니다.' },
       });
     }
   });
@@ -172,8 +183,14 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('[CareAiChat] stream error:', msg);
-      res.write(`event: error\ndata: ${JSON.stringify({ code: 'STREAM_ERROR', message: msg })}\n\n`);
+      // WO-GLYCOPHARM-CARE-AI-CHAT-ERROR-HANDLING-FIX-V1: classify stream errors
+      const code = msg.includes('AI_NOT_CONFIGURED') || msg.includes('not configured') ? 'AI_NOT_CONFIGURED'
+        : msg.includes('timeout') ? 'AI_TIMEOUT'
+        : msg.includes('empty response') || msg.includes('no candidates') || msg.includes('JSON parse failed') || msg.includes('provider failed') ? 'AI_RESPONSE_ERROR'
+        : msg.includes('Gemini API error') ? 'AI_PROVIDER_ERROR'
+        : 'STREAM_ERROR';
+      console.error(`[CareAiChat] stream error [${code}]:`, msg);
+      res.write(`event: error\ndata: ${JSON.stringify({ code, message: msg })}\n\n`);
       res.write(`event: done\ndata: \n\n`);
     }
 
