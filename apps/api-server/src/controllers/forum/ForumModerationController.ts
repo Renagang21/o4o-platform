@@ -54,7 +54,7 @@ export class ForumModerationController extends ForumControllerBase {
       const todayPostsQb = this.postRepository
         .createQueryBuilder('post')
         .where('post.status = :s', { s: PostStatus.PUBLISHED })
-        .andWhere('post.created_at >= :today', { today });
+        .andWhere('post.createdAt >= :today', { today });
       this.applyContextFilter(todayPostsQb, 'post', ctx);
 
       const activeCatQb = this.categoryRepository
