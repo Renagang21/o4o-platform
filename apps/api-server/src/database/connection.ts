@@ -259,6 +259,7 @@ import {
   NetureSettlement,
   NetureSettlementOrder,
   NetureContactMessage,
+  OfferServiceApproval,
 } from '../modules/neture/entities/index.js';
 
 // ============================================================================
@@ -779,6 +780,7 @@ export const AppDataSource = new DataSource({
     NetureSettlement,
     NetureSettlementOrder,
     NetureContactMessage,
+    OfferServiceApproval,
     // ============================================================================
     // CATALOG IMPORT ENTITIES (WO-O4O-CATALOG-IMPORT-APP-IMPLEMENTATION-V1)
     // ============================================================================

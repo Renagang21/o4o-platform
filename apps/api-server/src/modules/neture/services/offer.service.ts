@@ -11,6 +11,7 @@ import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
 import { ProductCategory } from '../entities/index.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
+import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
 
 /**
@@ -494,6 +495,12 @@ export class NetureOfferService {
 
       logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterResult.data.id} (PENDING approval)`);
 
+      // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1: auto-create pending service approvals
+      if (data.serviceKeys && data.serviceKeys.length > 0) {
+        const approvalService = new OfferServiceApprovalService(AppDataSource);
+        await approvalService.createPendingApprovals(savedOffer.id, data.serviceKeys);
+      }
+
       return {
         success: true,
         data: {
@@ -689,7 +696,8 @@ export class NetureOfferService {
            pm.brand_name AS "brandName",
            pi_img.image_url AS "primaryImageUrl",
            COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
-           COALESCE(active.cnt, 0)::int AS "activeServiceCount"
+           COALESCE(active.cnt, 0)::int AS "activeServiceCount",
+           svc_appr.approvals AS "serviceApprovals"
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories pc ON pc.id = pm.category_id
@@ -705,6 +713,10 @@ export class NetureOfferService {
            SELECT COUNT(DISTINCT service_key)::int AS cnt FROM product_approvals
            WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'approved'
          ) active ON true
+         LEFT JOIN LATERAL (
+           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
+           FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
+         ) svc_appr ON true
          WHERE ${where}
          ORDER BY ${sortField} ${sortOrder}
          LIMIT $${idx} OFFSET $${idx + 1}`,

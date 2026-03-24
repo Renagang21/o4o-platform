@@ -38,6 +38,7 @@ import { createOperatorBrandController } from './controllers/operator-brand.cont
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
+import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -82,6 +83,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorBrandController());
   // WO-NETURE-PRODUCT-DATA-CLEANUP-V1
   router.use('/operator/product-cleanup', createOperatorProductCleanupController(dataSource));
+  // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
+  router.use('/operator', createOperatorServiceApprovalController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

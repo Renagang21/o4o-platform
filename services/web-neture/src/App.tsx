@@ -373,6 +373,10 @@ const MarketTrialApprovalDetailPage = lazy(() =>
 const ProductDataCleanupPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ProductDataCleanupPage }))
 );
+// WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
+const ProductServiceApprovalPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.ProductServiceApprovalPage }))
+);
 
 // WO-NETURE-CATEGORY-MANAGEMENT-V1
 const CategoryManagementPage = lazy(() =>
@@ -748,6 +752,7 @@ function App() {
               <Route path="/workspace/operator/categories" element={<CategoryManagementPage />} />
               <Route path="/workspace/operator/brands" element={<BrandManagementPage />} />
               <Route path="/workspace/operator/product-cleanup" element={<ProductDataCleanupPage />} />
+              <Route path="/workspace/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
 
               {/* ─── Admin-only 라우트 (admin 역할 필수) ─── */}
               <Route element={

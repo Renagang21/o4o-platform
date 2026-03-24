@@ -19,3 +19,4 @@ export { ProductImage } from './ProductImage.entity.js';
 export { NetureSettlement } from './neture-settlement.entity.js';
 export { NetureSettlementOrder } from './neture-settlement-order.entity.js';
 export { NetureContactMessage } from './NetureContactMessage.entity.js';
+export { OfferServiceApproval } from './OfferServiceApproval.entity.js';

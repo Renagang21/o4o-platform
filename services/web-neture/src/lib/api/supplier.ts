@@ -113,6 +113,8 @@ export interface SupplierProduct {
   // WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
   tags?: string[];
   serviceKeys?: string[];
+  // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
+  serviceApprovals?: Array<{ serviceKey: string; status: string }>;
 }
 
 export interface ServiceSummary {

@@ -171,6 +171,29 @@ const columns: ListColumnDef<SupplierProduct>[] = [
     },
   },
   {
+    key: 'serviceApprovals',
+    header: '서비스 승인',
+    width: '180px',
+    render: (v: Array<{ serviceKey: string; status: string }> | undefined | null) => {
+      const approvals = Array.isArray(v) ? v : [];
+      if (approvals.length === 0) return <span className="text-xs text-slate-400">-</span>;
+      const colorMap: Record<string, string> = {
+        pending: 'bg-amber-50 text-amber-700',
+        approved: 'bg-green-50 text-green-700',
+        rejected: 'bg-red-50 text-red-700',
+      };
+      return (
+        <div className="flex flex-wrap gap-1">
+          {approvals.map((a, i) => (
+            <span key={i} className={`text-xs px-1.5 py-0.5 rounded font-medium ${colorMap[a.status] || 'bg-slate-100 text-slate-600'}`}>
+              {a.serviceKey}
+            </span>
+          ))}
+        </div>
+      );
+    },
+  },
+  {
     key: 'tags',
     header: '태그',
     width: '180px',
