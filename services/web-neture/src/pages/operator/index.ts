@@ -33,3 +33,5 @@ export { default as BrandManagementPage } from './BrandManagementPage';
 export { default as ProductDataCleanupPage } from './ProductDataCleanupPage';
 // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
 export { default as ProductServiceApprovalPage } from './ProductServiceApprovalPage';
+// WO-NETURE-PRODUCT-CURATION-V1
+export { default as ProductCurationPage } from './ProductCurationPage';

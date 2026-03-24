@@ -160,6 +160,9 @@ export {
   type ContactSubmitResult,
 } from './contact.js';
 
+// Operator Curation API (WO-NETURE-PRODUCT-CURATION-V1)
+export { operatorCurationApi, type CurationItem } from './operatorCuration.js';
+
 // Store API + Order/Fulfillment types
 export {
   storeApi,
