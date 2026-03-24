@@ -1,5 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { execute, executeStream } from '@o4o/ai-core';
+import { CARE_COPILOT_SYSTEM } from '@o4o/ai-prompts/care';
 import { buildConfigResolver } from '../../../../utils/ai-config-resolver.js';
 import { createHash } from 'crypto';
 
@@ -19,43 +20,6 @@ import { createHash } from 'crypto';
 
 const POPULATION_CACHE_TTL = 5 * 60 * 1000;   // 5 minutes
 const PATIENT_CACHE_TTL = 10 * 60 * 1000;      // 10 minutes
-
-const CARE_COPILOT_SYSTEM = `당신은 약국 환자 케어 데이터를 분석하는 AI 코파일럿입니다.
-
-역할:
-- 약사의 질문에 제공된 데이터를 기반으로 답변합니다.
-- 의료적 진단, 처방, 치료 권고를 절대 하지 않습니다.
-- 데이터에 근거한 관찰과 패턴만 설명합니다.
-- "~경향이 관찰됩니다", "~패턴이 보입니다" 형태로 표현합니다.
-- 데이터가 부족하면 솔직히 "현재 데이터로는 판단하기 어렵습니다"라고 답합니다.
-
-출력 형식 (반드시 아래 JSON만 출력):
-{
-  "summary": "질문에 대한 답변 요약 (2-4문장)",
-  "details": ["세부 설명 포인트 1", "세부 설명 포인트 2"],
-  "recommendations": ["약사에게 제안하는 후속 조치 1", "후속 조치 2"],
-  "relatedPatients": [{"patientId": "uuid", "name": "이름", "reason": "관련 이유"}],
-  "actions": [
-    {"type": "open_patient", "label": "김OO 환자 열기", "patientId": "uuid"},
-    {"type": "create_coaching", "label": "코칭 생성", "patientId": "uuid"},
-    {"type": "run_analysis", "label": "혈당 분석 실행", "patientId": "uuid"},
-    {"type": "resolve_alert", "label": "알림 확인", "alertId": "uuid"}
-  ]
-}
-
-actions 규칙:
-- 환자 조회/확인이 필요하면 open_patient 포함
-- 코칭이 필요한 환자가 있으면 create_coaching 포함
-- 분석이 오래된 환자가 있으면 run_analysis 포함
-- 활성 알림이 있으면 resolve_alert 포함
-- relatedPatients에 포함된 환자의 patientId를 actions에서 재사용
-- actions가 불필요하면 빈 배열
-
-제약:
-- 반드시 위 JSON 형식만 출력하세요. JSON 외의 텍스트를 포함하지 마세요.
-- 구체적인 약품명을 언급하지 마세요.
-- 중요 사안에 "전문의 상담을 권장합니다" 문구를 포함하세요.
-- relatedPatients는 질문과 관련된 환자가 있을 때만 포함합니다 (없으면 빈 배열).`;
 
 export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
 
@@ -108,7 +72,7 @@ export class CareAiChatService {
       : await this.buildPopulationContext(pharmacyId);
 
     // 3. Build user prompt
-    const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
+    const userPrompt = `[데이터]\n${context}\n\n[질문]\n${message}`;
 
     // 4. Call via execute() — retry + apiKey check 내장
     // WO-O4O-AI-CHAT-TIMEOUT-FIX-V1: 60s timeout (ai-core default 10s → Gemini 응답 15~60s 수용)
@@ -120,7 +84,12 @@ export class CareAiChatService {
       timeoutMs: 60_000,
     });
 
-    const parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
+    let parsed: Partial<AiChatResponse>;
+    try {
+      parsed = JSON.parse(response.content) as Partial<AiChatResponse>;
+    } catch {
+      parsed = { summary: extractFallbackSummary(response.content) };
+    }
 
     const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
     const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
@@ -173,7 +142,7 @@ export class CareAiChatService {
       ? await this.buildPatientContext(patientId, pharmacyId)
       : await this.buildPopulationContext(pharmacyId);
 
-    const userPrompt = `${context}\n\n[약사 질문]\n${message}`;
+    const userPrompt = `[데이터]\n${context}\n\n[질문]\n${message}`;
 
     // 3. executeStream() — 120s timeout, maxTokens 4096 (JSON 완성 보장)
     const stream = executeStream({
@@ -198,32 +167,33 @@ export class CareAiChatService {
     }
 
     // 5. Parse accumulated JSON + validate
+    let parsed: Partial<AiChatResponse>;
     try {
-      const parsed = JSON.parse(accumulated) as Partial<AiChatResponse>;
-
-      const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
-      const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
-        .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
-
-      const result: AiChatResponse = {
-        summary: parsed.summary || '응답을 생성할 수 없습니다.',
-        details: Array.isArray(parsed.details) ? parsed.details : [],
-        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
-        relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
-        actions,
-        model: 'gemini',
-        respondedAt: new Date().toISOString(),
-      };
-
-      // Cache
-      const ttl = patientId ? PATIENT_CACHE_TTL : POPULATION_CACHE_TTL;
-      this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + ttl });
-      if (this.cache.size > 100) this.evictExpired();
-
-      yield { event: 'complete', data: JSON.stringify(result) };
+      parsed = JSON.parse(accumulated) as Partial<AiChatResponse>;
     } catch {
-      yield { event: 'error', data: JSON.stringify({ code: 'PARSE_ERROR', message: 'Failed to parse AI response' }) };
+      parsed = { summary: extractFallbackSummary(accumulated) };
     }
+
+    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+    const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
+      .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
+
+    const result: AiChatResponse = {
+      summary: parsed.summary || '응답을 생성할 수 없습니다.',
+      details: Array.isArray(parsed.details) ? parsed.details : [],
+      recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+      relatedPatients: Array.isArray(parsed.relatedPatients) ? parsed.relatedPatients : [],
+      actions,
+      model: 'gemini',
+      respondedAt: new Date().toISOString(),
+    };
+
+    // Cache
+    const ttl = patientId ? PATIENT_CACHE_TTL : POPULATION_CACHE_TTL;
+    this.cache.set(cacheKey, { data: result, expiresAt: Date.now() + ttl });
+    if (this.cache.size > 100) this.evictExpired();
+
+    yield { event: 'complete', data: JSON.stringify(result) };
 
     yield { event: 'done', data: '' };
   }
@@ -459,4 +429,16 @@ export class CareAiChatService {
       }
     }
   }
+}
+
+/**
+ * JSON 파싱 실패 시 raw 텍스트에서 첫 문장을 추출하여 summary로 사용
+ */
+function extractFallbackSummary(raw: string): string {
+  // JSON 마크다운 펜스 제거
+  const cleaned = raw.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+  // 첫 문장 추출 (마침표/물음표/느낌표까지)
+  const match = cleaned.match(/^(.+?[.?!。])\s/);
+  const sentence = match ? match[1] : cleaned;
+  return sentence.substring(0, 200);
 }
