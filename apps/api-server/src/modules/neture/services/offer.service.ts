@@ -686,14 +686,13 @@ export class NetureOfferService {
            pm.specification,
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
            pc.name AS "categoryName",
-           COALESCE(b.name, pm.brand_name) AS "brandName",
+           pm.brand_name AS "brandName",
            pi_img.image_url AS "primaryImageUrl",
            COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
            COALESCE(active.cnt, 0)::int AS "activeServiceCount"
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories pc ON pc.id = pm.category_id
-         LEFT JOIN product_brands b ON b.id = pm.brand_id
          LEFT JOIN LATERAL (
            SELECT image_url FROM product_images
            WHERE master_id = pm.id AND is_primary = true LIMIT 1
