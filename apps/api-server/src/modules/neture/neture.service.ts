@@ -254,7 +254,7 @@ export class NetureService {
   async createSupplierOffer(
     supplierId: string,
     data: {
-      barcode: string;
+      barcode?: string;
       marketingName?: string;
       categoryId?: string;
       brandName?: string;
@@ -271,6 +271,7 @@ export class NetureService {
         tags?: string[];
       };
       distributionType?: OfferDistributionType;
+      serviceKeys?: string[];
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;

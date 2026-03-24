@@ -352,7 +352,7 @@ export class NetureOfferService {
   async createSupplierOffer(
     supplierId: string,
     data: {
-      barcode: string;
+      barcode?: string;
       marketingName?: string;
       categoryId?: string;
       brandName?: string;
@@ -369,6 +369,7 @@ export class NetureOfferService {
         tags?: string[];
       };
       distributionType?: OfferDistributionType;
+      serviceKeys?: string[];
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
@@ -376,8 +377,11 @@ export class NetureOfferService {
     }
   ) {
     try {
-      if (!data.barcode) {
-        return { success: false, error: 'MISSING_BARCODE' };
+      // WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1: 바코드 optional
+      let barcode = data.barcode?.trim() || '';
+      if (!barcode) {
+        const { generateInternalBarcode } = await import('../../../utils/gtin.js');
+        barcode = generateInternalBarcode(supplierId);
       }
 
       // PUBLIC requires consumer description
@@ -436,7 +440,7 @@ export class NetureOfferService {
       if (resolvedBrandId) manualData.brandId = resolvedBrandId;
 
       // Master 파이프라인 강제 경유
-      const masterResult = await this.catalogService.resolveOrCreateMaster(data.barcode, manualData);
+      const masterResult = await this.catalogService.resolveOrCreateMaster(barcode, manualData);
       if (!masterResult.success || !masterResult.data) {
         return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
       }
@@ -475,6 +479,7 @@ export class NetureOfferService {
         isActive: false,
         approvalStatus: OfferApprovalStatus.PENDING,
         allowedSellerIds: [],
+        serviceKeys: data.serviceKeys || [],
         priceGeneral: data.priceGeneral ?? 0,
         priceGold: null,
         pricePlatinum: null,
@@ -672,8 +677,10 @@ export class NetureOfferService {
            spo.price_platinum AS "pricePlatinum",
            spo.consumer_reference_price AS "consumerReferencePrice",
            spo.consumer_short_description AS "consumerShortDescription",
+           spo.service_keys AS "serviceKeys",
            spo.created_at AS "createdAt",
            spo.updated_at AS "updatedAt",
+           pm.tags,
            pm.marketing_name AS "masterName",
            pm.barcode,
            pm.specification,

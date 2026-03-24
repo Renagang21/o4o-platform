@@ -12,14 +12,14 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Sparkles } from 'lucide-react';
 import {
   EditableDataTable,
   SearchBar,
   Pagination,
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
-import { supplierApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
+import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 
 // ─── Badge configs ───
 
@@ -170,6 +170,25 @@ const columns: ListColumnDef<SupplierProduct>[] = [
       );
     },
   },
+  {
+    key: 'tags',
+    header: '태그',
+    width: '180px',
+    render: (v: string[] | undefined | null) => {
+      const tags = Array.isArray(v) ? v : [];
+      if (tags.length === 0) return <span className="text-xs text-slate-400">-</span>;
+      return (
+        <div className="flex flex-wrap gap-1">
+          {tags.slice(0, 3).map((tag, i) => (
+            <span key={i} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{tag}</span>
+          ))}
+          {tags.length > 3 && (
+            <span className="text-xs text-slate-400">+{tags.length - 3}</span>
+          )}
+        </div>
+      );
+    },
+  },
 ];
 
 // ─── Page Component ───
@@ -181,6 +200,17 @@ export default function SupplierProductsPage() {
   const [keyword, setKeyword] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generatingTagFor, setGeneratingTagFor] = useState<string | null>(null);
+
+  const handleGenerateAiTags = async (masterId: string) => {
+    setGeneratingTagFor(masterId);
+    await productApi.regenerateAiTags(masterId);
+    // 태그 생성은 fire-and-forget이므로 약간의 딜레이 후 새로고침
+    setTimeout(() => {
+      fetchProducts(pagination.page);
+      setGeneratingTagFor(null);
+    }, 2000);
+  };
 
   const fetchProducts = useCallback(async (page = 1, searchKeyword?: string) => {
     setLoading(true);
@@ -258,7 +288,25 @@ export default function SupplierProductsPage() {
 
       {/* Table */}
       <EditableDataTable
-        columns={columns}
+        columns={[
+          ...columns,
+          {
+            key: 'masterId' as any,
+            header: 'AI',
+            width: '60px',
+            align: 'center',
+            render: (_v: string, row: SupplierProduct) => (
+              <button
+                onClick={(e) => { e.stopPropagation(); handleGenerateAiTags(row.masterId); }}
+                disabled={generatingTagFor === row.masterId}
+                className="p-1 rounded hover:bg-blue-50 text-blue-600 disabled:opacity-50 disabled:animate-pulse"
+                title="AI 태그 생성"
+              >
+                <Sparkles size={14} />
+              </button>
+            ),
+          } as any,
+        ]}
         data={products}
         rowKey="id"
         loading={loading}

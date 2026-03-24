@@ -160,4 +160,15 @@ export const productApi = {
       return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
     }
   },
+
+  /** WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1: AI 태그 재생성 */
+  async regenerateAiTags(masterId: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await api.post(`/products/${masterId}/ai-tags/regenerate`);
+      return response.data;
+    } catch (error) {
+      console.warn('[Product API] Failed to regenerate AI tags:', error);
+      return { success: false, message: 'AI 태그 생성 실패' };
+    }
+  },
 };

@@ -110,6 +110,9 @@ export interface SupplierProduct {
   priceGold: number | null;
   pricePlatinum: number | null;
   consumerReferencePrice: number | null;
+  // WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
+  tags?: string[];
+  serviceKeys?: string[];
 }
 
 export interface ServiceSummary {
@@ -482,11 +485,12 @@ export const supplierApi = {
   },
 
   async createProduct(data: {
-    barcode: string;
+    barcode?: string;
     marketingName?: string;
     categoryId?: string;
     brandName?: string;
     distributionType?: string;
+    serviceKeys?: string[];
     manualData?: Record<string, any>;
     priceGeneral?: number;
     priceGold?: number | null;
