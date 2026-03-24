@@ -215,12 +215,239 @@ function MiniStat({ label, value }: { label: string; value: string }) {
   );
 }
 
+// ─── ChartEmptyState ───
+
+function ChartEmptyState({ icon: Icon, message, sub }: { icon: React.ComponentType<{ className?: string }>; message: string; sub: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <Icon className="w-8 h-8 text-slate-300 mb-2" />
+      <p className="text-sm text-slate-500">{message}</p>
+      <p className="text-xs text-slate-400 mt-1">{sub}</p>
+    </div>
+  );
+}
+
+// ─── BpChart — SVG 혈압 차트 (수축기/이완기 2선) ───
+
+function BpChart({ systolicReadings, diastolicReadings }: {
+  systolicReadings: HealthReadingDto[];
+  diastolicReadings: HealthReadingDto[];
+}) {
+  // Pair systolic/diastolic by measuredAt (same timestamp = same measurement)
+  const pairs = useMemo(() => {
+    const sysMap = new Map<string, number>();
+    systolicReadings.forEach((r) => {
+      const v = r.valueNumeric != null ? Number(r.valueNumeric) : NaN;
+      if (!isNaN(v)) sysMap.set(r.measuredAt, v);
+    });
+    const diaMap = new Map<string, number>();
+    diastolicReadings.forEach((r) => {
+      const v = r.valueNumeric != null ? Number(r.valueNumeric) : NaN;
+      if (!isNaN(v)) diaMap.set(r.measuredAt, v);
+    });
+
+    // Union of all timestamps that have both values
+    const allTimes = new Set([...sysMap.keys(), ...diaMap.keys()]);
+    const result: { time: number; sys: number | null; dia: number | null }[] = [];
+    allTimes.forEach((t) => {
+      const sys = sysMap.get(t) ?? null;
+      const dia = diaMap.get(t) ?? null;
+      if (sys !== null || dia !== null) {
+        result.push({ time: new Date(t).getTime(), sys, dia });
+      }
+    });
+    return result.sort((a, b) => a.time - b.time);
+  }, [systolicReadings, diastolicReadings]);
+
+  if (pairs.length === 0) {
+    return <ChartEmptyState icon={Heart} message="혈압 기록이 없습니다." sub="데이터 탭에서 먼저 입력해 주세요." />;
+  }
+  if (pairs.length < 2) {
+    return (
+      <div className="flex items-center justify-center py-8 text-sm text-slate-400">
+        차트를 표시하려면 2개 이상의 기록이 필요합니다.
+      </div>
+    );
+  }
+
+  const W = 360;
+  const H = 200;
+  const PAD_LEFT = 40;
+  const PAD_RIGHT = 12;
+  const PAD_TOP = 16;
+  const PAD_BOTTOM = 44;
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+  const allVals = pairs.flatMap((p) => [p.sys, p.dia].filter((v): v is number => v !== null));
+  const minVal = Math.max(40, Math.min(...allVals) - 10);
+  const maxVal = Math.min(220, Math.max(...allVals) + 10);
+  const minTime = pairs[0].time;
+  const maxTime = pairs[pairs.length - 1].time;
+  const timeRange = maxTime - minTime || 1;
+
+  const toX = (t: number) => PAD_LEFT + ((t - minTime) / timeRange) * chartW;
+  const toY = (v: number) => PAD_TOP + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+  const sysPoints = pairs.filter((p) => p.sys !== null).map((p) => ({ x: toX(p.time), y: toY(p.sys!), val: p.sys! }));
+  const diaPoints = pairs.filter((p) => p.dia !== null).map((p) => ({ x: toX(p.time), y: toY(p.dia!), val: p.dia! }));
+
+  const sysPathD = sysPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+  const diaPathD = diaPoints.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+
+  const yTicks = 5;
+  const yLabels = Array.from({ length: yTicks }, (_, i) => {
+    const v = minVal + ((maxVal - minVal) * i) / (yTicks - 1);
+    return { v: Math.round(v), y: toY(v) };
+  });
+
+  // Normal BP band: 90-120 systolic (light green)
+  const normalHigh = Math.min(120, maxVal);
+  const normalLow = Math.max(90, minVal);
+  const bandY1 = toY(normalHigh);
+  const bandY2 = toY(normalLow);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+      {/* Normal systolic band */}
+      {normalHigh > minVal && normalLow < maxVal && (
+        <rect x={PAD_LEFT} y={bandY1} width={chartW} height={Math.max(0, bandY2 - bandY1)} fill="#fce7f3" opacity={0.3} />
+      )}
+
+      {/* Grid */}
+      {yLabels.map((tick) => (
+        <g key={tick.v}>
+          <line x1={PAD_LEFT} y1={tick.y} x2={PAD_LEFT + chartW} y2={tick.y} stroke="#e2e8f0" strokeWidth={0.5} />
+          <text x={PAD_LEFT - 4} y={tick.y + 3} textAnchor="end" fontSize="9" fill="#94a3b8">{tick.v}</text>
+        </g>
+      ))}
+
+      {/* Systolic line + dots */}
+      <path d={sysPathD} fill="none" stroke="#e11d48" strokeWidth={1.5} strokeLinejoin="round" />
+      {sysPoints.map((p, i) => (
+        <circle key={`s${i}`} cx={p.x} cy={p.y} r={3} fill="#e11d48" stroke="white" strokeWidth={1} />
+      ))}
+
+      {/* Diastolic line + dots */}
+      <path d={diaPathD} fill="none" stroke="#3b82f6" strokeWidth={1.5} strokeLinejoin="round" />
+      {diaPoints.map((p, i) => (
+        <circle key={`d${i}`} cx={p.x} cy={p.y} r={3} fill="#3b82f6" stroke="white" strokeWidth={1} />
+      ))}
+
+      {/* X-axis */}
+      <text x={PAD_LEFT} y={PAD_TOP + chartH + 14} fontSize="8" fill="#94a3b8" textAnchor="start">
+        {new Date(minTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+      <text x={PAD_LEFT + chartW} y={PAD_TOP + chartH + 14} fontSize="8" fill="#94a3b8" textAnchor="end">
+        {new Date(maxTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+
+      {/* Legend */}
+      <circle cx={PAD_LEFT + 4} cy={H - 9} r={3} fill="#e11d48" />
+      <text x={PAD_LEFT + 10} y={H - 6} fontSize="8" fill="#64748b">수축기</text>
+      <circle cx={PAD_LEFT + 55} cy={H - 9} r={3} fill="#3b82f6" />
+      <text x={PAD_LEFT + 61} y={H - 6} fontSize="8" fill="#64748b">이완기</text>
+    </svg>
+  );
+}
+
+// ─── WeightChart — SVG 체중 차트 ───
+
+function WeightChart({ readings }: { readings: HealthReadingDto[] }) {
+  const sorted = useMemo(
+    () =>
+      [...readings]
+        .filter((r) => r.valueNumeric != null && !isNaN(Number(r.valueNumeric)))
+        .sort((a, b) => new Date(a.measuredAt).getTime() - new Date(b.measuredAt).getTime()),
+    [readings],
+  );
+
+  if (sorted.length === 0) {
+    return <ChartEmptyState icon={Weight} message="체중 기록이 없습니다." sub="데이터 탭에서 먼저 입력해 주세요." />;
+  }
+  if (sorted.length < 2) {
+    return (
+      <div className="flex items-center justify-center py-8 text-sm text-slate-400">
+        차트를 표시하려면 2개 이상의 기록이 필요합니다.
+      </div>
+    );
+  }
+
+  const W = 360;
+  const H = 180;
+  const PAD_LEFT = 40;
+  const PAD_RIGHT = 12;
+  const PAD_TOP = 16;
+  const PAD_BOTTOM = 28;
+  const chartW = W - PAD_LEFT - PAD_RIGHT;
+  const chartH = H - PAD_TOP - PAD_BOTTOM;
+
+  const values = sorted.map((r) => Number(r.valueNumeric));
+  const times = sorted.map((r) => new Date(r.measuredAt).getTime());
+
+  const minVal = Math.max(30, Math.min(...values) - 3);
+  const maxVal = Math.min(200, Math.max(...values) + 3);
+  const minTime = times[0];
+  const maxTime = times[times.length - 1];
+  const timeRange = maxTime - minTime || 1;
+
+  const toX = (t: number) => PAD_LEFT + ((t - minTime) / timeRange) * chartW;
+  const toY = (v: number) => PAD_TOP + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
+
+  const points = sorted.map((_r, i) => ({ x: toX(times[i]), y: toY(values[i]), val: values[i] }));
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
+
+  const yTicks = 4;
+  const yLabels = Array.from({ length: yTicks }, (_, i) => {
+    const v = minVal + ((maxVal - minVal) * i) / (yTicks - 1);
+    return { v: Math.round(v * 10) / 10, y: toY(v) };
+  });
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+      {/* Grid */}
+      {yLabels.map((tick) => (
+        <g key={tick.v}>
+          <line x1={PAD_LEFT} y1={tick.y} x2={PAD_LEFT + chartW} y2={tick.y} stroke="#e2e8f0" strokeWidth={0.5} />
+          <text x={PAD_LEFT - 4} y={tick.y + 3} textAnchor="end" fontSize="9" fill="#94a3b8">{tick.v}</text>
+        </g>
+      ))}
+
+      {/* Area fill */}
+      <path
+        d={`${pathD} L${points[points.length - 1].x},${PAD_TOP + chartH} L${points[0].x},${PAD_TOP + chartH} Z`}
+        fill="#818cf8"
+        opacity={0.1}
+      />
+
+      {/* Line */}
+      <path d={pathD} fill="none" stroke="#6366f1" strokeWidth={2} strokeLinejoin="round" />
+
+      {/* Dots */}
+      {points.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={3} fill="#6366f1" stroke="white" strokeWidth={1} />
+      ))}
+
+      {/* X-axis */}
+      <text x={PAD_LEFT} y={H - 4} fontSize="8" fill="#94a3b8" textAnchor="start">
+        {new Date(minTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+      <text x={PAD_LEFT + chartW} y={H - 4} fontSize="8" fill="#94a3b8" textAnchor="end">
+        {new Date(maxTime).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+      </text>
+    </svg>
+  );
+}
+
 export default function AnalysisTab() {
   const { patient } = usePatientDetail();
   const [analysis, setAnalysis] = useState<CareInsightDto | null>(null);
   const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
   const [llmInsight, setLlmInsight] = useState<CareLlmInsightDto | null>(null);
   const [readings, setReadings] = useState<HealthReadingDto[]>([]);
+  const [bpSysReadings, setBpSysReadings] = useState<HealthReadingDto[]>([]);
+  const [bpDiaReadings, setBpDiaReadings] = useState<HealthReadingDto[]>([]);
+  const [weightReadings, setWeightReadings] = useState<HealthReadingDto[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -229,17 +456,24 @@ export default function AnalysisTab() {
 
     const from = new Date();
     from.setDate(from.getDate() - 30);
+    const fromISO = from.toISOString();
 
     Promise.all([
       pharmacyApi.getCareAnalysis(patient.id).catch(() => null),
       pharmacyApi.getCareKpi(patient.id).catch(() => null),
       pharmacyApi.getCareLlmInsight(patient.id).catch(() => null),
-      pharmacyApi.getHealthReadings(patient.id, { from: from.toISOString(), metricType: 'glucose' }).catch(() => [] as HealthReadingDto[]),
-    ]).then(([a, k, llm, r]) => {
+      pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'glucose' }).catch(() => [] as HealthReadingDto[]),
+      pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'blood_pressure_systolic' }).catch(() => [] as HealthReadingDto[]),
+      pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'blood_pressure_diastolic' }).catch(() => [] as HealthReadingDto[]),
+      pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'weight' }).catch(() => [] as HealthReadingDto[]),
+    ]).then(([a, k, llm, glu, bpS, bpD, wt]) => {
       setAnalysis(a);
       setKpi(k);
       setLlmInsight(llm);
-      setReadings(r ?? []);
+      setReadings(glu ?? []);
+      setBpSysReadings(bpS ?? []);
+      setBpDiaReadings(bpD ?? []);
+      setWeightReadings(wt ?? []);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
 
@@ -280,6 +514,45 @@ export default function AnalysisTab() {
 
     return { count: values.length, fastingAvg, postMealAvg, lastMeasured };
   }, [readings]);
+
+  // ── BP stats ──
+  const bpStats = useMemo(() => {
+    const sysVals = bpSysReadings
+      .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
+      .filter((v) => !isNaN(v));
+    const diaVals = bpDiaReadings
+      .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
+      .filter((v) => !isNaN(v));
+    if (sysVals.length === 0 && diaVals.length === 0) return null;
+
+    const sysAvg = sysVals.length > 0 ? Math.round(sysVals.reduce((a, b) => a + b, 0) / sysVals.length) : null;
+    const diaAvg = diaVals.length > 0 ? Math.round(diaVals.reduce((a, b) => a + b, 0) / diaVals.length) : null;
+    const allBpReadings = [...bpSysReadings, ...bpDiaReadings];
+    const lastMeasured = allBpReadings.length > 0
+      ? new Date(
+          [...allBpReadings].sort(
+            (a, b) => new Date(b.measuredAt).getTime() - new Date(a.measuredAt).getTime(),
+          )[0].measuredAt,
+        ).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+      : null;
+
+    return { count: Math.max(sysVals.length, diaVals.length), sysAvg, diaAvg, lastMeasured };
+  }, [bpSysReadings, bpDiaReadings]);
+
+  // ── Weight stats ──
+  const weightStats = useMemo(() => {
+    const vals = weightReadings
+      .map((r) => ({ val: r.valueNumeric != null ? Number(r.valueNumeric) : NaN, at: r.measuredAt }))
+      .filter((v) => !isNaN(v.val))
+      .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+    if (vals.length === 0) return null;
+
+    const latest = vals[0].val;
+    const change = vals.length >= 2 ? Math.round((latest - vals[vals.length - 1].val) * 10) / 10 : null;
+    const lastMeasured = new Date(vals[0].at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+
+    return { count: vals.length, latest, change, lastMeasured };
+  }, [weightReadings]);
 
   if (loading) {
     return (
@@ -506,6 +779,44 @@ export default function AnalysisTab() {
             <MiniStat label="최근 측정" value={glucoseStats.lastMeasured || '-'} />
             <MiniStat label="공복 평균" value={glucoseStats.fastingAvg != null ? `${glucoseStats.fastingAvg} mg/dL` : '-'} />
             <MiniStat label="식후 평균" value={glucoseStats.postMealAvg != null ? `${glucoseStats.postMealAvg} mg/dL` : '-'} />
+          </div>
+        )}
+      </div>
+
+      {/* 혈압 추이 차트 — WO-O4O-GLYCOPHARM-ANALYSIS-TAB-BP-WEIGHT-CHART-EXPANSION-V1 */}
+      <div>
+        <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+          <Heart className="w-4 h-4 text-rose-500" />
+          혈압 추이 (최근 30일)
+        </h4>
+        <div className="bg-white rounded-xl border border-slate-200 p-4">
+          <BpChart systolicReadings={bpSysReadings} diastolicReadings={bpDiaReadings} />
+        </div>
+
+        {bpStats && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+            <MiniStat label="평균 혈압" value={bpStats.sysAvg != null && bpStats.diaAvg != null ? `${bpStats.sysAvg}/${bpStats.diaAvg} mmHg` : '-'} />
+            <MiniStat label="측정 횟수" value={`${bpStats.count}회`} />
+            <MiniStat label="최근 측정" value={bpStats.lastMeasured || '-'} />
+          </div>
+        )}
+      </div>
+
+      {/* 체중 추이 차트 */}
+      <div>
+        <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+          <Weight className="w-4 h-4 text-indigo-500" />
+          체중 추이 (최근 30일)
+        </h4>
+        <div className="bg-white rounded-xl border border-slate-200 p-4">
+          <WeightChart readings={weightReadings} />
+        </div>
+
+        {weightStats && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+            <MiniStat label="최근 체중" value={`${weightStats.latest} kg`} />
+            <MiniStat label="변화량" value={weightStats.change != null ? `${weightStats.change > 0 ? '+' : ''}${weightStats.change} kg` : '-'} />
+            <MiniStat label="최근 측정" value={weightStats.lastMeasured || '-'} />
           </div>
         )}
       </div>
