@@ -88,9 +88,9 @@ export function createProductLibraryController(dataSource: DataSource): Router {
       }
 
       // Fetch all images for this master
-      const images: Array<{ id: string; image_url: string; is_primary: boolean; sort_order: number }> =
+      const images: Array<{ id: string; image_url: string; is_primary: boolean; sort_order: number; type: string }> =
         await dataSource.query(
-          `SELECT id, image_url, is_primary, sort_order FROM product_images
+          `SELECT id, image_url, is_primary, sort_order, type FROM product_images
            WHERE master_id = $1 ORDER BY sort_order ASC`,
           [id],
         );
@@ -116,6 +116,7 @@ export function createProductLibraryController(dataSource: DataSource): Router {
             imageUrl: img.image_url,
             isPrimary: img.is_primary,
             sortOrder: img.sort_order,
+            type: img.type || 'detail',
           })),
           createdAt: master.createdAt,
         },

@@ -417,9 +417,10 @@ export class NetureService {
     masterId: string,
     imageUrl: string,
     gcsPath: string,
+    type?: 'thumbnail' | 'detail' | 'content',
     isPrimary?: boolean
-  ): Promise<ProductImage> {
-    return this.catalogService.addProductImage(masterId, imageUrl, gcsPath, isPrimary);
+  ): Promise<ProductImage & { replacedGcsPath?: string }> {
+    return this.catalogService.addProductImage(masterId, imageUrl, gcsPath, type, isPrimary);
   }
 
   async setPrimaryImage(imageId: string, masterId: string): Promise<void> {

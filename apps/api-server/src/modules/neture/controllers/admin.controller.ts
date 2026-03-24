@@ -551,26 +551,34 @@ export function createAdminController(dataSource: DataSource): Router {
     try {
       const { masterId } = req.params;
       const file = req.file as Express.Multer.File;
+      const imageType = (['thumbnail', 'detail', 'content'].includes(req.body?.type) ? req.body.type : 'detail') as 'thumbnail' | 'detail' | 'content';
 
       if (!file) {
         return res.status(400).json({ success: false, error: 'NO_FILE' });
       }
 
-      const processed = await sharp(file.buffer)
-        .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toBuffer();
+      // WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: type별 리사이즈 정책
+      const processed = imageType === 'thumbnail'
+        ? await sharp(file.buffer).resize(1000, 1000, { fit: 'cover' }).webp({ quality: 85 }).toBuffer()
+        : await sharp(file.buffer).resize(1200, 1200, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
 
-      const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname);
-      const image = await netureService.addProductImage(masterId, url, gcsPath);
+      const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname, imageType);
+      const image = await netureService.addProductImage(masterId, url, gcsPath, imageType);
+
+      // 교체된 썸네일 GCS 삭제
+      if (image.replacedGcsPath) {
+        imageStorageService.deleteImage(image.replacedGcsPath).catch(() => {});
+      }
 
       // Fire-and-forget: OCR 추출 (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
-      import('../../store-ai/services/product-ocr.service.js')
-        .then(({ ProductOcrService }) => {
-          const ocrService = new ProductOcrService(dataSource);
-          return ocrService.extractAndSave(masterId, image.id, url);
-        })
-        .catch(() => {});
+      if (imageType !== 'thumbnail') {
+        import('../../store-ai/services/product-ocr.service.js')
+          .then(({ ProductOcrService }) => {
+            const ocrService = new ProductOcrService(dataSource);
+            return ocrService.extractAndSave(masterId, image.id, url);
+          })
+          .catch(() => {});
+      }
 
       res.status(201).json({ success: true, data: image });
     } catch (error) {
@@ -779,35 +787,37 @@ export function createProductImageController(dataSource: DataSource): Router {
     try {
       const { masterId } = req.params;
       const file = req.file as Express.Multer.File;
+      const imageType = (['thumbnail', 'detail', 'content'].includes(req.body?.type) ? req.body.type : 'detail') as 'thumbnail' | 'detail' | 'content';
 
       if (!file) {
         return res.status(400).json({ success: false, error: 'NO_FILE' });
       }
 
-      // sharp: 리사이즈 + webp 변환
-      const processed = await sharp(file.buffer)
-        .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 85 })
-        .toBuffer();
+      // WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: type별 리사이즈 정책
+      const processed = imageType === 'thumbnail'
+        ? await sharp(file.buffer).resize(1000, 1000, { fit: 'cover' }).webp({ quality: 85 }).toBuffer()
+        : await sharp(file.buffer).resize(1200, 1200, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
 
       // GCS 업로드
-      const { url, gcsPath } = await imageStorageService.uploadImage(
-        masterId,
-        processed,
-        'image/webp',
-        file.originalname
-      );
+      const { url, gcsPath } = await imageStorageService.uploadImage(masterId, processed, 'image/webp', file.originalname, imageType);
 
       // DB 레코드 생성
-      const image = await netureService.addProductImage(masterId, url, gcsPath);
+      const image = await netureService.addProductImage(masterId, url, gcsPath, imageType);
+
+      // 교체된 썸네일 GCS 삭제
+      if (image.replacedGcsPath) {
+        imageStorageService.deleteImage(image.replacedGcsPath).catch(() => {});
+      }
 
       // Fire-and-forget: OCR 추출 (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
-      import('../../store-ai/services/product-ocr.service.js')
-        .then(({ ProductOcrService }) => {
-          const ocrService = new ProductOcrService(dataSource);
-          return ocrService.extractAndSave(masterId, image.id, url);
-        })
-        .catch(() => {});
+      if (imageType !== 'thumbnail') {
+        import('../../store-ai/services/product-ocr.service.js')
+          .then(({ ProductOcrService }) => {
+            const ocrService = new ProductOcrService(dataSource);
+            return ocrService.extractAndSave(masterId, image.id, url);
+          })
+          .catch(() => {});
+      }
 
       res.status(201).json({ success: true, data: image });
     } catch (error) {

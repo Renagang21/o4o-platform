@@ -154,8 +154,10 @@ export class ProductImportCommonService {
           const ext = contentType.includes('png') ? '.png' : contentType.includes('webp') ? '.webp' : '.jpg';
           const filename = `import-${Date.now()}-${i}${ext}`;
 
+          // WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 첫 이미지→thumbnail, 나머지→detail
+          const imgType = i === 0 ? 'thumbnail' : 'detail';
           const { url: gcsUrl, gcsPath } = await this.imageStorageService.uploadImage(
-            job.masterId, buffer, contentType, filename,
+            job.masterId, buffer, contentType, filename, imgType as 'thumbnail' | 'detail',
           );
 
           // Check existing image count for is_primary decision
@@ -166,10 +168,10 @@ export class ProductImportCommonService {
           const isPrimary = i === 0 && Number(existingImages[0]?.cnt ?? 0) === 0;
 
           await this.dataSource.query(
-            `INSERT INTO product_images (id, master_id, image_url, gcs_path, sort_order, is_primary, created_at, updated_at)
-             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, NOW(), NOW())
+            `INSERT INTO product_images (id, master_id, image_url, gcs_path, sort_order, is_primary, type, created_at, updated_at)
+             VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW(), NOW())
              ON CONFLICT DO NOTHING`,
-            [job.masterId, gcsUrl, gcsPath, i, isPrimary],
+            [job.masterId, gcsUrl, gcsPath, i, isPrimary, imgType],
           );
 
           logger.info(`[ImportCommon] Image uploaded: master=${job.masterId}, ${gcsUrl}`);

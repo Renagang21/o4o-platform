@@ -41,6 +41,10 @@ export class ProductImage {
   @Column({ name: 'is_primary', type: 'boolean', default: false })
   isPrimary: boolean;
 
+  /** WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 이미지 용도 분류 */
+  @Column({ name: 'type', type: 'varchar', length: 16, default: 'detail' })
+  type: 'thumbnail' | 'detail' | 'content';
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

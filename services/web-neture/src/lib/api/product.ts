@@ -50,6 +50,7 @@ export interface ProductImage {
   imageUrl: string;
   isPrimary: boolean;
   sortOrder: number;
+  type: 'thumbnail' | 'detail' | 'content';
 }
 
 export const productApi = {
@@ -93,10 +94,15 @@ export const productApi = {
     }
   },
 
-  async uploadProductImage(masterId: string, file: File): Promise<{ success: boolean; data?: ProductImage; error?: string }> {
+  async uploadProductImage(
+    masterId: string,
+    file: File,
+    type: 'thumbnail' | 'detail' | 'content' = 'detail'
+  ): Promise<{ success: boolean; data?: ProductImage; error?: string }> {
     try {
       const formData = new FormData();
       formData.append('image', file);
+      formData.append('type', type);
       const response = await api.post(`/neture/products/${masterId}/images`, formData, {
         timeout: 30000,
       });

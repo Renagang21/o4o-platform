@@ -27,10 +27,12 @@ export class ImageStorageService {
     masterId: string,
     buffer: Buffer,
     mimeType: string,
-    originalName: string
+    originalName: string,
+    imageType?: 'thumbnail' | 'detail' | 'content'
   ): Promise<{ url: string; gcsPath: string }> {
     const ext = this.getExtension(mimeType, originalName);
-    const gcsPath = `products/${masterId}/${randomUUID()}${ext}`;
+    const typeFolder = imageType || 'detail';
+    const gcsPath = `products/${masterId}/${typeFolder}/${randomUUID()}${ext}`;
 
     const bucket = this.storage.bucket(this.bucketName);
     const file = bucket.file(gcsPath);

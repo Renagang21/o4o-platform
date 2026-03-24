@@ -473,26 +473,46 @@ export class NetureCatalogService {
   }
 
   /**
-   * 이미지 추가 — 첫 이미지면 자동 대표
+   * 이미지 추가 — type 기반 관리 (WO-NETURE-IMAGE-ASSET-STRUCTURE-V1)
+   * - thumbnail: master당 1개, 기존 있으면 교체, isPrimary=true 강제
+   * - detail/content: 다수 허용, 첫 이미지면 자동 대표
    */
   async addProductImage(
     masterId: string,
     imageUrl: string,
     gcsPath: string,
+    type: 'thumbnail' | 'detail' | 'content' = 'detail',
     isPrimary?: boolean
-  ): Promise<ProductImage> {
-    // 기존 이미지 수 확인
+  ): Promise<ProductImage & { replacedGcsPath?: string }> {
+    let replacedGcsPath: string | undefined;
+
+    if (type === 'thumbnail') {
+      // 기존 썸네일 있으면 삭제 (교체)
+      const existing = await this.imageRepo.findOne({ where: { masterId, type: 'thumbnail' } });
+      if (existing) {
+        replacedGcsPath = existing.gcsPath;
+        await this.imageRepo.delete(existing.id);
+      }
+    }
+
     const existingCount = await this.imageRepo.count({ where: { masterId } });
 
     const image = this.imageRepo.create({
       masterId,
       imageUrl,
       gcsPath,
-      isPrimary: isPrimary ?? existingCount === 0, // 첫 이미지면 자동 대표
+      type,
+      isPrimary: type === 'thumbnail' ? true : (isPrimary ?? existingCount === 0),
       sortOrder: existingCount,
     });
 
-    return this.imageRepo.save(image);
+    // thumbnail이면 기존 primary 해제
+    if (type === 'thumbnail') {
+      await this.imageRepo.update({ masterId, isPrimary: true }, { isPrimary: false });
+    }
+
+    const saved = await this.imageRepo.save(image);
+    return Object.assign(saved, { replacedGcsPath });
   }
 
   /**

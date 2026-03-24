@@ -88,9 +88,13 @@ export default function SupplierProductCreatePage() {
   const [consumerShortDesc, setConsumerShortDesc] = useState('');
   const [consumerDetailDesc, setConsumerDetailDesc] = useState('');
 
-  // Images
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [detailFiles, setDetailFiles] = useState<File[]>([]);
+  const [detailPreviews, setDetailPreviews] = useState<string[]>([]);
+  const [contentFiles, setContentFiles] = useState<File[]>([]);
+  const [contentPreviews, setContentPreviews] = useState<string[]>([]);
 
   // Submit
   const [submitting, setSubmitting] = useState(false);
@@ -190,36 +194,67 @@ export default function SupplierProductCreatePage() {
     setSubmitting(false);
 
     if (result.success) {
-      // Upload images
+      // Upload images — type별 순서대로
       const masterId = result.data?.masterId;
-      if (masterId && imageFiles.length > 0) {
-        for (const file of imageFiles) {
-          await productApi.uploadProductImage(masterId, file);
+      if (masterId) {
+        if (thumbnailFile) {
+          await productApi.uploadProductImage(masterId, thumbnailFile, 'thumbnail');
+        }
+        for (const file of detailFiles) {
+          await productApi.uploadProductImage(masterId, file, 'detail');
+        }
+        for (const file of contentFiles) {
+          await productApi.uploadProductImage(masterId, file, 'content');
         }
       }
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+      detailPreviews.forEach((url) => URL.revokeObjectURL(url));
+      contentPreviews.forEach((url) => URL.revokeObjectURL(url));
       navigate('/workspace/supplier/products');
     } else {
       setSubmitError(result.error || '상품 등록에 실패했습니다.');
     }
   };
 
-  // Image handlers
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Image handlers — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) return;
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    e.target.value = '';
+  };
+
+  const removeThumbnail = () => {
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+  };
+
+  const handleMultiImageSelect = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
+    setPreviews: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
     const files = e.target.files;
     if (!files) return;
     const newFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (newFiles.length === 0) return;
-    setImageFiles((prev) => [...prev, ...newFiles]);
-    const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
-    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setFiles((prev) => [...prev, ...newFiles]);
+    setPreviews((prev) => [...prev, ...newFiles.map((f) => URL.createObjectURL(f))]);
     e.target.value = '';
   };
 
-  const removeImage = (idx: number) => {
-    URL.revokeObjectURL(imagePreviews[idx]);
-    setImageFiles((prev) => prev.filter((_, i) => i !== idx));
-    setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
+  const removeMultiImage = (
+    idx: number,
+    previews: string[],
+    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
+    setPreviews: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    URL.revokeObjectURL(previews[idx]);
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+    setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
   return (
@@ -454,42 +489,79 @@ export default function SupplierProductCreatePage() {
         </div>
       )}
 
-      {/* ==================== 상품 이미지 ==================== */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-4">
+      {/* ==================== 상품 이미지 (WO-NETURE-IMAGE-ASSET-STRUCTURE-V1) ==================== */}
+      <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-6">
         <h3 className="text-lg font-semibold text-slate-800">상품 이미지</h3>
 
-        {imagePreviews.length > 0 && (
-          <div className="grid grid-cols-4 gap-3">
-            {imagePreviews.map((src, idx) => (
-              <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
-                <img src={src} alt={`미리보기 ${idx + 1}`} className="w-full h-full object-cover" />
-                {idx === 0 && (
-                  <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
-                    대표
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => removeImage(idx)}
-                  className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  X
-                </button>
-              </div>
-            ))}
+        {/* 1. 대표 이미지 (썸네일) */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-700">대표 이미지 (썸네일)</span>
+            <span className="text-xs text-slate-400">1000x1000 정사각형 권장, 최대 1장</span>
           </div>
-        )}
+          {thumbnailPreview ? (
+            <div className="relative group w-32 h-32 rounded-lg overflow-hidden border-2 border-emerald-300">
+              <img src={thumbnailPreview} alt="썸네일 미리보기" className="w-full h-full object-cover" />
+              <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">대표</span>
+              <button type="button" onClick={removeThumbnail} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
+            </div>
+          ) : (
+            <label className="block w-32 h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors flex items-center justify-center">
+              <input type="file" accept="image/*" onChange={handleThumbnailSelect} className="hidden" />
+              <span className="text-slate-400 text-xs text-center">클릭하여<br />추가</span>
+            </label>
+          )}
+        </div>
 
-        <label className="block border-2 border-dashed border-slate-200 rounded-lg p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
-          <input type="file" accept="image/*" multiple onChange={handleImageSelect} className="hidden" />
-          <div className="text-slate-400 text-sm">
-            <p className="font-medium">클릭하여 이미지 추가</p>
-            <p className="mt-1 text-xs">JPG, PNG, WebP (최대 10MB)</p>
-            {imagePreviews.length > 0 && (
-              <p className="mt-1 text-xs text-emerald-600">{imagePreviews.length}장 선택됨</p>
-            )}
+        {/* 2. 상세 이미지 */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-700">상세 이미지</span>
+            <span className="text-xs text-slate-400">상품 다각도, 포장 등 (여러 장 가능)</span>
           </div>
-        </label>
+          {detailPreviews.length > 0 && (
+            <div className="grid grid-cols-4 gap-3">
+              {detailPreviews.map((src, idx) => (
+                <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
+                  <img src={src} alt={`상세 ${idx + 1}`} className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeMultiImage(idx, detailPreviews, setDetailFiles, setDetailPreviews)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <label className="block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
+            <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setDetailFiles, setDetailPreviews)} className="hidden" />
+            <div className="text-slate-400 text-sm">
+              <p className="font-medium">클릭하여 상세 이미지 추가</p>
+              {detailPreviews.length > 0 && <p className="mt-1 text-xs text-emerald-600">{detailPreviews.length}장 선택됨</p>}
+            </div>
+          </label>
+        </div>
+
+        {/* 3. 성분/라벨 이미지 (콘텐츠) */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-700">성분/라벨 이미지</span>
+            <span className="text-xs text-slate-400">성분표, 라벨, 인증마크 등 (AI 텍스트 추출 대상)</span>
+          </div>
+          {contentPreviews.length > 0 && (
+            <div className="grid grid-cols-4 gap-3">
+              {contentPreviews.map((src, idx) => (
+                <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
+                  <img src={src} alt={`콘텐츠 ${idx + 1}`} className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeMultiImage(idx, contentPreviews, setContentFiles, setContentPreviews)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <label className="block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
+            <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setContentFiles, setContentPreviews)} className="hidden" />
+            <div className="text-slate-400 text-sm">
+              <p className="font-medium">클릭하여 성분/라벨 이미지 추가</p>
+              {contentPreviews.length > 0 && <p className="mt-1 text-xs text-emerald-600">{contentPreviews.length}장 선택됨</p>}
+            </div>
+          </label>
+        </div>
       </div>
 
       {/* ==================== 소비자용 상품 설명 ==================== */}
