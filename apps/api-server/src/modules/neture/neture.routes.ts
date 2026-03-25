@@ -40,6 +40,7 @@ import { createNetureHubTriggerController } from './controllers/hub-trigger.cont
 import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
 import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
 import { createOperatorCurationController } from './controllers/operator-curation.controller.js';
+import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -87,6 +88,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
   router.use('/operator', createOperatorServiceApprovalController(dataSource));
   router.use('/operator', createOperatorCurationController(dataSource));
+  // WO-O4O-OPERATOR-ACTION-QUEUE-V1
+  router.use('/operator', createOperatorActionQueueController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

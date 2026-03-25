@@ -381,6 +381,9 @@ const ProductServiceApprovalPage = lazy(() =>
 const ProductCurationPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ProductCurationPage }))
 );
+const OperatorActionQueuePage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OperatorActionQueuePage }))
+);
 
 // WO-NETURE-CATEGORY-MANAGEMENT-V1
 const CategoryManagementPage = lazy(() =>
@@ -758,6 +761,7 @@ function App() {
               <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/curation" element={<ProductCurationPage />} />
+              <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
 
               {/* ─── Admin-only 라우트 (admin 역할 필수) ─── */}
               <Route element={
