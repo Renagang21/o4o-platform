@@ -108,6 +108,22 @@ export function filterMenuByRole(
   return filtered;
 }
 
+/**
+ * Admin 전용 메뉴 생성
+ * WO-O4O-ROLE-ROUTE-ISOLATION-V1
+ * 모든 항목 (adminOnly 포함) + /operator → /admin prefix 치환
+ */
+export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> {
+  const result: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {};
+  for (const [key, items] of Object.entries(UNIFIED_MENU) as [OperatorGroupKey, UnifiedMenuItem[]][]) {
+    result[key] = items.map(({ adminOnly: _, path, ...rest }) => ({
+      ...rest,
+      path: path.replace(/^\/operator/, '/admin'),
+    }));
+  }
+  return result;
+}
+
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
 export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {

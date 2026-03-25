@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
 interface ActionQueueItem {
@@ -42,6 +42,10 @@ const PRIORITY_STYLES: Record<string, string> = {
 };
 
 export default function OperatorActionQueuePage() {
+  const location = useLocation();
+  // WO-O4O-ROLE-ROUTE-ISOLATION-V1: /admin 또는 /operator prefix 감지
+  const routePrefix = location.pathname.startsWith('/admin') ? '/admin' : '/operator';
+
   const [data, setData] = useState<ActionQueueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,7 +158,7 @@ export default function OperatorActionQueuePage() {
 
             {/* Action button */}
             <Link
-              to={item.actionUrl}
+              to={item.actionUrl.replace(/^\/operator/, routePrefix)}
               className="inline-flex items-center px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg hover:bg-slate-700 transition-colors whitespace-nowrap"
             >
               {item.actionLabel}

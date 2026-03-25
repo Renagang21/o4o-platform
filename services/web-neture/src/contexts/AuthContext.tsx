@@ -44,10 +44,10 @@ const ROLE_LABELS: Record<UserRole, string> = {
   user: '사용자',
 };
 
-// WO-O4O-NETURE-ROUTE-UNIFICATION-BIG-SWITCH-V1: 역할별 대표 진입 경로
-// admin + operator → 통합 /operator
+// WO-O4O-ROLE-ROUTE-ISOLATION-V1: 역할별 대표 진입 경로
+// admin → /admin, operator → /operator (분리)
 const ROUTE_OVERRIDES: Record<string, string> = {
-  admin: '/operator',
+  admin: '/admin',
   operator: '/operator',
   supplier: '/supplier/dashboard',
   partner: '/partner/dashboard',
