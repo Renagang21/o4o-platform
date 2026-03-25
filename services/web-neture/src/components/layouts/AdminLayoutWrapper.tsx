@@ -1,30 +1,29 @@
 /**
- * Neture OperatorLayoutWrapper
+ * Neture AdminLayoutWrapper
  *
  * WO-O4O-ROLE-ROUTE-ISOLATION-V1
- * operator 전용 레이아웃. adminOnly 항목 제외.
+ * admin 전용 레이아웃. 전체 메뉴 항목을 /admin/* prefix로 표시.
  */
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import { OperatorShell } from '@o4o/ui';
 import { useAuth } from '../../contexts/AuthContext';
 import { ENABLED_CAPABILITIES } from '../../config/operatorCapabilities';
-import { UNIFIED_MENU, filterMenuByRole } from '../../config/operatorMenuGroups';
+import { getAdminMenu } from '../../config/operatorMenuGroups';
 import AccountMenu from '../AccountMenu';
 
-export default function OperatorLayoutWrapper() {
+export default function AdminLayoutWrapper() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  // WO-O4O-ROLE-ROUTE-ISOLATION-V1: operator 전용 — adminOnly 항목 제외
-  const menuItems = filterMenuByRole(UNIFIED_MENU, false);
+  const menuItems = getAdminMenu();
 
   return (
     <OperatorShell
-      serviceName="Neture"
+      serviceName="Neture Admin"
       menuItems={menuItems}
       capabilities={ENABLED_CAPABILITIES}
-      dashboardLink="/operator"
+      dashboardLink="/admin"
       user={user ? { name: user.name || '', email: user.email } : null}
       onLogout={() => { logout(); navigate('/'); }}
       headerActions={<AccountMenu />}
