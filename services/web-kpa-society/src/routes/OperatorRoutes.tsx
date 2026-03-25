@@ -36,7 +36,7 @@ import TemplatesPage from '../pages/operator/signage/TemplatesPage';
 import TemplateDetailPage from '../pages/operator/signage/TemplateDetailPage';
 import OperatorAnalyticsPage from '../pages/operator/AnalyticsPage';
 import { RoleGuard } from '../components/auth/RoleGuard';
-import { PLATFORM_ROLES } from '../lib/role-constants';
+import { PLATFORM_ROLES, ROLES } from '../lib/role-constants';
 // WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: shared OperatorShell wrapper
 import KpaOperatorLayoutWrapper from '../components/kpa-operator/KpaOperatorLayoutWrapper';
 
@@ -78,11 +78,11 @@ export function OperatorRoutes() {
           <Route path="signage/templates" element={<TemplatesPage />} />
           <Route path="signage/templates/:templateId" element={<TemplateDetailPage />} />
 
-          {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) */}
-          <Route path="legal" element={<LegalManagementPage />} />
+          {/* 약관 관리 (WO-KPA-LEGAL-PAGES-V1) — admin-only */}
+          <Route path="legal" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><LegalManagementPage /></RoleGuard>} />
 
-          {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) */}
-          <Route path="audit-logs" element={<AuditLogPage />} />
+          {/* 감사 로그 (WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1) — admin-only */}
+          <Route path="audit-logs" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><AuditLogPage /></RoleGuard>} />
 
           {/* ── 콘텐츠 CRUD (WO-KPA-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Admin에서 이동) ── */}
 
@@ -121,8 +121,8 @@ export function OperatorRoutes() {
           {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
           <Route path="analytics" element={<OperatorAnalyticsPage />} />
 
-          {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
-          <Route path="roles" element={<RoleManagementPage />} />
+          {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
+          <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
 
           {/* 레거시 리다이렉트 */}
           <Route path="operators" element={<Navigate to="/operator/users" replace />} />

@@ -188,8 +188,8 @@ function AppRoutes() {
         <Route path="ai-report" element={<OperatorAiReportPage />} />
         {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
-        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
-        <Route path="roles" element={<OperatorRoleManagementPage />} />
+        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
+        <Route path="roles" element={<RoleGuard allowedRoles={['glucoseview:admin', 'platform:super_admin']}><OperatorRoleManagementPage /></RoleGuard>} />
       </Route>
 
       {/* Store Owner Dashboard (WO-O4O-STORE-DASHBOARD-ARCHITECTURE-UNIFICATION-V1) */}
