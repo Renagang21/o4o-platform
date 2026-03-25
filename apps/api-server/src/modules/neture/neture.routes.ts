@@ -41,6 +41,7 @@ import { createNeureTier1TestController } from './controllers/neture-tier1-test.
 import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
 import { createOperatorCurationController } from './controllers/operator-curation.controller.js';
 import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
+import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -74,6 +75,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // Admin domain
   router.use('/admin', createAdminController(dataSource));
   router.use('/admin', createAdminSettlementController(dataSource));
+  // WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1
+  router.use('/admin', createAdminDashboardController(dataSource));
 
   // Operator domain — dashboard + registration + category management
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 2)
