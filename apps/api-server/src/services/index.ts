@@ -2,7 +2,7 @@
 
 // Export all service files
 export * from './AnalyticsService.js';
-export * from './AuthService.js';
+// AuthService removed (WO-O4O-AUTH-DEADCODE-CLEANUP-V1) — authentication.service.ts로 대체
 // AuthServiceV2 removed (WO-O4O-LEGACY-CLEANUP-V1)
 // AutoRecoveryService removed (WO-O4O-CODEBASE-CLEANUP-V1)
 // AutoScalingService removed (WO-O4O-CODEBASE-CLEANUP-V1)
