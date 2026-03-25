@@ -1,0 +1,259 @@
+- generic [ref=e39]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: 🏛️
+        - generic [ref=e7]:
+          - heading "약사 회원가입" [level=2] [ref=e40]
+          - paragraph [ref=e9]: KPA Society
+      - button [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+    - generic [ref=e14]:
+      - generic [ref=e41]:
+        - button "← 유형 다시 선택" [ref=e42] [cursor=pointer]
+        - generic [ref=e43]:
+          - img [ref=e44]
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: 승인제 가입 안내
+            - paragraph [ref=e48]: 약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - heading "기본 정보" [level=4] [ref=e51]
+          - generic [ref=e52]:
+            - generic [ref=e53]: 이메일 *
+            - textbox "example@email.com" [ref=e54]: test-industry2@o4o.com
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: 비밀번호 *
+              - generic [ref=e58]:
+                - textbox "영문 대/소문자, 숫자, 특수문자 포함" [ref=e59]: O4oTestPass1!
+                - button [ref=e60] [cursor=pointer]:
+                  - img [ref=e61]
+            - generic [ref=e64]:
+              - generic [ref=e65]: 비밀번호 확인 *
+              - textbox "재입력" [ref=e66]: O4oTestPass1!
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - generic [ref=e69]: 성 *
+              - textbox "홍" [ref=e70]: Test
+            - generic [ref=e71]:
+              - generic [ref=e72]: 이름 *
+              - textbox "길동" [ref=e73]: 산업약사
+          - generic [ref=e74]:
+            - generic [ref=e75]:
+              - generic [ref=e76]: 닉네임 *
+              - textbox "포럼 표시명" [ref=e77]: Test-industry2
+              - paragraph [ref=e78]: 포럼에 표시될 이름
+            - generic [ref=e79]:
+              - generic [ref=e80]: 핸드폰 번호 *
+              - textbox "숫자만 입력" [ref=e81]: "01090011003"
+              - paragraph [ref=e82]: "숫자만 입력 (예: 01012345678)"
+        - generic [ref=e83]:
+          - heading "약사 정보" [level=4] [ref=e84]
+          - generic [ref=e85]:
+            - generic [ref=e86]: 약사면허번호 *
+            - textbox "00000" [ref=e87]: "90022"
+            - paragraph [ref=e88]: 약사면허증에 기재된 면허번호
+            - paragraph [ref=e224]: 사용 가능한 면허번호입니다.
+        - generic [ref=e89]:
+          - heading "소속 분회 *" [level=4] [ref=e90]
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - generic [ref=e93]: 지부 (시/도)
+              - combobox [ref=e94]:
+                - option "지부 선택"
+                - option "경기도약사회" [selected]
+                - option "경상남도약사회"
+                - option "경상북도약사회"
+                - option "전라남도약사회"
+                - option "충청남도약사회"
+                - option "충청북도약사회"
+                - option "광주광역시약사회"
+                - option "대구광역시약사회"
+                - option "대전광역시약사회"
+                - option "부산광역시약사회"
+                - option "서울특별시약사회"
+                - option "울산광역시약사회"
+                - option "인천광역시약사회"
+                - option "강원특별자치도약사회"
+                - option "세종특별자치시약사회"
+                - option "전북특별자치도약사회"
+                - option "제주특별자치도약사회"
+            - generic [ref=e95]:
+              - generic [ref=e96]: 분회 (시/군/구)
+              - combobox [ref=e97]:
+                - option "분회 선택"
+                - option "가평군약사회"
+                - option "고양시약사회"
+                - option "과천시약사회"
+                - option "광명시약사회"
+                - option "광주시약사회"
+                - option "구리시약사회"
+                - option "군포시약사회"
+                - option "김포시약사회"
+                - option "부천시약사회"
+                - option "성남시약사회"
+                - option "수원시약사회" [selected]
+                - option "시흥시약사회"
+                - option "안산시약사회"
+                - option "안성시약사회"
+                - option "안양시약사회"
+                - option "양주시약사회"
+                - option "양평군약사회"
+                - option "여주시약사회"
+                - option "연천군약사회"
+                - option "오산시약사회"
+                - option "용인시약사회"
+                - option "의왕시약사회"
+                - option "이천시약사회"
+                - option "파주시약사회"
+                - option "평택시약사회"
+                - option "포천시약사회"
+                - option "하남시약사회"
+                - option "화성시약사회"
+                - option "남양주시약사회"
+                - option "동두천시약사회"
+                - option "의정부시약사회"
+        - generic [ref=e98]:
+          - paragraph [ref=e99]: 서비스 이용을 위해 아래 약관에 동의해 주세요. 약관을 클릭하여 내용을 확인할 수 있습니다.
+          - generic [ref=e100] [cursor=pointer]:
+            - checkbox "* 이용약관에 동의합니다" [ref=e101]
+            - generic [ref=e102]:
+              - text: "*"
+              - link "이용약관" [ref=e103]:
+                - /url: /policy
+              - text: 에 동의합니다
+          - generic [ref=e104] [cursor=pointer]:
+            - checkbox "* 개인정보처리방침에 동의합니다" [checked] [active] [ref=e105]
+            - generic [ref=e106]:
+              - text: "*"
+              - link "개인정보처리방침" [ref=e107]:
+                - /url: /privacy
+              - text: 에 동의합니다
+        - button "가입 신청하기" [disabled] [ref=e108]
+        - paragraph [ref=e109]:
+          - text: 이미 계정이 있으신가요?
+          - link "로그인" [ref=e110] [cursor=pointer]:
+            - /url: "#"
+  - generic [ref=e111]:
+    - banner [ref=e112]:
+      - generic [ref=e113]:
+        - link "💊 KPA-Society" [ref=e114] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e115]: 💊
+          - generic [ref=e116]: KPA-Society
+        - navigation [ref=e117]:
+          - list [ref=e118]:
+            - listitem [ref=e119]:
+              - link "홈" [ref=e120] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e121]:
+              - link "포럼" [ref=e122] [cursor=pointer]:
+                - /url: /forum
+            - listitem [ref=e123]:
+              - link "강의" [ref=e124] [cursor=pointer]:
+                - /url: /lms
+            - listitem [ref=e125]:
+              - link "콘텐츠" [ref=e126] [cursor=pointer]:
+                - /url: /news
+            - listitem [ref=e127]:
+              - link "매뉴얼" [ref=e128] [cursor=pointer]:
+                - /url: /manual
+            - listitem [ref=e129]:
+              - link "테스트 센터" [ref=e130] [cursor=pointer]:
+                - /url: /test
+        - button "사용자 메뉴" [ref=e133] [cursor=pointer]:
+          - img [ref=e134]
+    - main [ref=e137]:
+      - generic [ref=e138]:
+        - generic [ref=e141]:
+          - heading "Test병원약사님, 환영합니다" [level=1] [ref=e142]
+          - generic [ref=e143]:
+            - generic [ref=e144]: 약사
+            - generic [ref=e145]: 병원 약사
+        - main [ref=e146]:
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - heading "Test병원약사" [level=3] [ref=e150]
+              - paragraph [ref=e151]: test-hospital@o4o.com
+            - generic [ref=e152]:
+              - generic [ref=e153]: 약사
+              - generic [ref=e154]: 병원 약사
+          - generic [ref=e155]:
+            - heading "학술/연구" [level=3] [ref=e156]
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: 🔬
+                - generic [ref=e160]:
+                  - heading "학술 자료" [level=4] [ref=e161]
+                  - paragraph [ref=e162]: 병원 약사를 위한 학술 자료와 연구 정보를 확인하세요.
+              - generic [ref=e163]:
+                - link "교육/연수 →" [ref=e164] [cursor=pointer]:
+                  - /url: /lms
+                - link "자료실 →" [ref=e165] [cursor=pointer]:
+                  - /url: /docs
+          - generic [ref=e166]:
+            - heading "커뮤니티 바로가기" [level=3] [ref=e167]
+            - generic [ref=e168]:
+              - link "💬 포럼" [ref=e169] [cursor=pointer]:
+                - /url: /forum
+                - generic [ref=e170]: 💬
+                - generic [ref=e171]: 포럼
+              - link "📢 공지사항" [ref=e172] [cursor=pointer]:
+                - /url: /news
+                - generic [ref=e173]: 📢
+                - generic [ref=e174]: 공지사항
+              - link "📚 교육/연수" [ref=e175] [cursor=pointer]:
+                - /url: /lms
+                - generic [ref=e176]: 📚
+                - generic [ref=e177]: 교육/연수
+              - link "📁 자료실" [ref=e178] [cursor=pointer]:
+                - /url: /docs
+                - generic [ref=e179]: 📁
+                - generic [ref=e180]: 자료실
+          - generic [ref=e181]:
+            - heading "교육/연수" [level=3] [ref=e182]
+            - generic [ref=e183]:
+              - generic [ref=e184]:
+                - generic [ref=e185]: 🎓
+                - generic [ref=e186]:
+                  - heading "온라인 교육" [level=4] [ref=e187]
+                  - paragraph [ref=e188]: 약사 보수교육, 전문 강의 등 다양한 교육 콘텐츠를 수강하세요.
+              - link "교육 보기 →" [ref=e189] [cursor=pointer]:
+                - /url: /lms
+          - generic [ref=e190]:
+            - generic [ref=e191]: 🔔
+            - paragraph [ref=e192]: 알림 기능 준비 중입니다
+    - contentinfo [ref=e193]:
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - generic [ref=e197]: 💊
+            - generic [ref=e198]: 약사회
+          - navigation [ref=e199]:
+            - link "약사회 소개" [ref=e200] [cursor=pointer]:
+              - /url: /about
+            - generic [ref=e201]: "|"
+            - link "이용약관" [ref=e202] [cursor=pointer]:
+              - /url: /terms
+            - generic [ref=e203]: "|"
+            - link "개인정보처리방침" [ref=e204] [cursor=pointer]:
+              - /url: /privacy
+            - generic [ref=e205]: "|"
+            - link "사이트맵" [ref=e206] [cursor=pointer]:
+              - /url: /sitemap
+        - generic [ref=e207]:
+          - generic [ref=e208]:
+            - generic [ref=e209]: 주소
+            - generic [ref=e210]: 서울특별시 OO구 OO로 123 약사회관
+          - generic [ref=e211]:
+            - generic [ref=e212]: 전화
+            - generic [ref=e213]: 02-1234-5678
+            - generic [ref=e214]: 팩스
+            - generic [ref=e215]: 02-1234-5679
+          - generic [ref=e216]:
+            - generic [ref=e217]: 이메일
+            - generic [ref=e218]: info@kpa-society.kr
+        - generic [ref=e221]:
+          - paragraph [ref=e222]: Copyright © 2024 약사회. All Rights Reserved.
+          - paragraph [ref=e223]: "운영: ㈜쓰리라이프존 | 사업자등록번호 108-86-02873"
