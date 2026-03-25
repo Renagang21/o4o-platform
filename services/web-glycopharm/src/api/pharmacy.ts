@@ -811,6 +811,19 @@ class PharmacyApiClient {
     return this.request(`/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
   }
 
+  // ── CGM Event Analysis (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1) ──
+
+  async getCgmEventAnalysis(
+    patientId: string,
+    days?: number,
+  ): Promise<CgmEventAnalysisDto> {
+    const qs = days ? `?days=${days}` : '';
+    const res = await this.request<{ success: boolean; data: CgmEventAnalysisDto }>(
+      `/care/event-analysis/${patientId}${qs}`,
+    );
+    return (res as unknown as { data: CgmEventAnalysisDto }).data;
+  }
+
   // ── Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
 
   async getPharmacyLinkRequests(): Promise<PharmacyLinkRequestDto[]> {
@@ -1093,6 +1106,61 @@ export interface AiChatResponseDto {
   model: string;
   promptVersion?: string;
   respondedAt: string;
+}
+
+// ── CGM Event Analysis Types (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1) ──
+
+export type CgmEventType = 'meal' | 'exercise' | 'medication' | 'symptom';
+
+export interface EventAnalysisDto {
+  eventType: CgmEventType;
+  eventTime: string;
+  readingId: string;
+  detail: Record<string, unknown>;
+  label: string;
+  // meal
+  baseline?: number | null;
+  peak?: number | null;
+  delta?: number | null;
+  impact?: string | null;
+  // exercise
+  minAfter?: number | null;
+  drop?: number | null;
+  effect?: string | null;
+  // medication
+  varianceBefore?: number | null;
+  varianceAfter?: number | null;
+  // symptom
+  glucoseAtEvent?: number | null;
+  context?: string | null;
+  beforeCount?: number;
+  afterCount?: number;
+  nearCount?: number;
+}
+
+export interface DetectedPatternDto {
+  patternType: CgmEventType;
+  classification: string;
+  count: number;
+  label: string;
+}
+
+export interface CgmEventAnalysisDto {
+  patientId: string;
+  periodFrom: string;
+  periodTo: string;
+  events: EventAnalysisDto[];
+  patterns: DetectedPatternDto[];
+  summary: {
+    totalEvents: number;
+    eventsByType: Record<CgmEventType, number>;
+    insufficientDataEvents: number;
+  };
+  crossReadingAnalysis: {
+    fastingAvg: number | null;
+    postMealAvg: number | null;
+    delta: number | null;
+  } | null;
 }
 
 // Export singleton instance

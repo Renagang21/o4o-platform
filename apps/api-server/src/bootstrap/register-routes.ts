@@ -508,6 +508,17 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Care AI Chat routes:', aiChatError);
     }
 
+    // 28f-3. Register CGM Event Analysis routes (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1)
+    try {
+      const { createCgmEventAnalysisRouter } = await import(
+        '../modules/care/controllers/cgm-event-analysis.controller.js'
+      );
+      app.use('/api/v1/care', createCgmEventAnalysisRouter(dataSource));
+      logger.info('✅ CGM Event Analysis routes registered at /api/v1/care/event-analysis');
+    } catch (cgmEventErr) {
+      logger.error('Failed to register CGM Event Analysis routes:', cgmEventErr);
+    }
+
     // 28g-1. Register Patient Profile routes (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
     try {
       const { createPatientProfileRouter } = await import('../modules/care/controllers/patient-profile.controller.js');

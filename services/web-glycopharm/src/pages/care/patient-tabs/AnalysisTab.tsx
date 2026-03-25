@@ -24,7 +24,7 @@ import {
   ShieldAlert,
   Sparkles,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto } from '@/api/pharmacy';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 
 const RISK_DISPLAY = {
@@ -450,6 +450,7 @@ export default function AnalysisTab() {
   const [bpSysReadings, setBpSysReadings] = useState<HealthReadingDto[]>([]);
   const [bpDiaReadings, setBpDiaReadings] = useState<HealthReadingDto[]>([]);
   const [weightReadings, setWeightReadings] = useState<HealthReadingDto[]>([]);
+  const [eventAnalysis, setEventAnalysis] = useState<CgmEventAnalysisDto | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -468,7 +469,8 @@ export default function AnalysisTab() {
       pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'blood_pressure_systolic' }).catch(() => [] as HealthReadingDto[]),
       pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'blood_pressure_diastolic' }).catch(() => [] as HealthReadingDto[]),
       pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'weight' }).catch(() => [] as HealthReadingDto[]),
-    ]).then(([a, k, llm, glu, bpS, bpD, wt]) => {
+      pharmacyApi.getCgmEventAnalysis(patient.id, 30).catch(() => null),
+    ]).then(([a, k, llm, glu, bpS, bpD, wt, ev]) => {
       setAnalysis(a);
       setKpi(k);
       setLlmInsight(llm);
@@ -476,6 +478,7 @@ export default function AnalysisTab() {
       setBpSysReadings(bpS ?? []);
       setBpDiaReadings(bpD ?? []);
       setWeightReadings(wt ?? []);
+      setEventAnalysis(ev);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
 
@@ -821,6 +824,187 @@ export default function AnalysisTab() {
             <MiniStat label="변화량" value={weightStats.change != null ? `${weightStats.change > 0 ? '+' : ''}${weightStats.change} kg` : '-'} />
             <MiniStat label="최근 측정" value={weightStats.lastMeasured || '-'} />
           </div>
+        )}
+      </div>
+
+      {/* ── CGM-Event Analysis (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1) ── */}
+      <CgmEventAnalysisSection data={eventAnalysis} />
+    </div>
+  );
+}
+
+// ── CGM-Event Analysis UI ──
+
+const EVENT_ICONS: Record<string, string> = {
+  meal: '\uD83C\uDF5A',
+  exercise: '\uD83C\uDFC3',
+  medication: '\uD83D\uDC8A',
+  symptom: '\u26A0\uFE0F',
+};
+
+const EVENT_LABELS: Record<string, string> = {
+  meal: '식사',
+  exercise: '운동',
+  medication: '복약',
+  symptom: '증상',
+};
+
+const IMPACT_STYLES: Record<string, { bg: string; text: string }> = {
+  high: { bg: 'bg-red-100', text: 'text-red-700' },
+  moderate: { bg: 'bg-yellow-100', text: 'text-yellow-700' },
+  low: { bg: 'bg-green-100', text: 'text-green-700' },
+  effective: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+  weak: { bg: 'bg-slate-100', text: 'text-slate-600' },
+  hypoglycemia: { bg: 'bg-red-100', text: 'text-red-700' },
+  hyperglycemia: { bg: 'bg-red-100', text: 'text-red-700' },
+  normal: { bg: 'bg-green-100', text: 'text-green-700' },
+};
+
+const EVENT_BORDER: Record<string, string> = {
+  meal: 'border-l-orange-400',
+  exercise: 'border-l-emerald-400',
+  medication: 'border-l-violet-400',
+  symptom: 'border-l-amber-400',
+};
+
+function CgmEventAnalysisSection({ data }: { data: CgmEventAnalysisDto | null }) {
+  if (!data) return null;
+
+  const hasEvents = data.events.length > 0;
+  const hasPatterns = data.patterns.length > 0;
+
+  return (
+    <div>
+      <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-purple-500" />
+        CGM-Event \uBD84\uC11D (\uCD5C\uADFC 30\uC77C)
+      </h4>
+
+      {!hasEvents ? (
+        <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 text-center">
+          <AlertCircle className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-sm text-slate-500">\uB370\uC774\uD130 \uD0ED\uC5D0\uC11C \uC2DD\uC0AC/\uC6B4\uB3D9/\uBCF5\uC57D \uC815\uBCF4\uB97C \uD568\uAED8 \uAE30\uB85D\uD558\uBA74 \uBD84\uC11D\uC774 \uC2DC\uC791\uB429\uB2C8\uB2E4</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Patterns */}
+          {hasPatterns && (
+            <div className="flex flex-wrap gap-2">
+              {data.patterns.map((p, i) => {
+                const style = IMPACT_STYLES[p.classification] || IMPACT_STYLES.moderate;
+                return (
+                  <span
+                    key={i}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}
+                  >
+                    {EVENT_ICONS[p.patternType]} {p.label}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Cross-reading summary */}
+          {data.crossReadingAnalysis && (data.crossReadingAnalysis.fastingAvg != null || data.crossReadingAnalysis.postMealAvg != null) && (
+            <div className="grid grid-cols-3 gap-3">
+              <MiniStat
+                label="\uACF5\uBCF5 \uD3C9\uADE0"
+                value={data.crossReadingAnalysis.fastingAvg != null ? `${data.crossReadingAnalysis.fastingAvg} mg/dL` : '-'}
+              />
+              <MiniStat
+                label="\uC2DD\uD6C4 \uD3C9\uADE0"
+                value={data.crossReadingAnalysis.postMealAvg != null ? `${data.crossReadingAnalysis.postMealAvg} mg/dL` : '-'}
+              />
+              <MiniStat
+                label="\uC2DD\uD6C4 \uC0C1\uC2B9\uD3ED"
+                value={data.crossReadingAnalysis.delta != null ? `${data.crossReadingAnalysis.delta > 0 ? '+' : ''}${data.crossReadingAnalysis.delta} mg/dL` : '-'}
+              />
+            </div>
+          )}
+
+          {/* Event summary */}
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <span>\uCD1D {data.summary.totalEvents}\uAC74</span>
+            {Object.entries(data.summary.eventsByType).filter(([, c]) => c > 0).map(([t, c]) => (
+              <span key={t}>{EVENT_ICONS[t]} {EVENT_LABELS[t]} {c}</span>
+            ))}
+            {data.summary.insufficientDataEvents > 0 && (
+              <span className="text-amber-500">\uB370\uC774\uD130 \uBD80\uC871 {data.summary.insufficientDataEvents}\uAC74</span>
+            )}
+          </div>
+
+          {/* Event cards */}
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            {data.events.map((ev, i) => (
+              <EventCard key={i} event={ev} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventCard({ event: ev }: { event: CgmEventAnalysisDto['events'][number] }) {
+  const classification = ev.impact || ev.effect || ev.context || null;
+  const style = classification ? (IMPACT_STYLES[classification] || IMPACT_STYLES.moderate) : null;
+  const border = EVENT_BORDER[ev.eventType] || 'border-l-slate-300';
+  const dateStr = new Date(ev.eventTime).toLocaleString('ko-KR', {
+    month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+
+  return (
+    <div className={`bg-white rounded-lg border border-slate-200 border-l-4 ${border} p-3`}>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <span className="text-sm">{EVENT_ICONS[ev.eventType]}</span>
+          <span className="text-xs font-medium text-slate-700">{EVENT_LABELS[ev.eventType]}</span>
+          <span className="text-xs text-slate-400">{dateStr}</span>
+        </div>
+        {style && classification && (
+          <span className={`px-2 py-0.5 rounded text-xs font-medium ${style.bg} ${style.text}`}>
+            {ev.label}
+          </span>
+        )}
+      </div>
+      <div className="text-xs text-slate-500">
+        {ev.eventType === 'meal' && (
+          <>
+            {ev.baseline != null && <span>baseline {ev.baseline}</span>}
+            {ev.peak != null && <span> → peak {ev.peak}</span>}
+            {ev.delta != null && <span className="ml-1 font-medium">(delta {ev.delta > 0 ? '+' : ''}{ev.delta})</span>}
+            {ev.detail?.type && <span className="ml-2 text-orange-500">{String(ev.detail.type)}</span>}
+            {ev.detail?.amount && <span className="text-orange-400"> {String(ev.detail.amount)}</span>}
+          </>
+        )}
+        {ev.eventType === 'exercise' && (
+          <>
+            {ev.baseline != null && <span>baseline {ev.baseline}</span>}
+            {ev.minAfter != null && <span> → min {ev.minAfter}</span>}
+            {ev.drop != null && <span className="ml-1 font-medium">(drop -{ev.drop})</span>}
+            {ev.detail?.type && <span className="ml-2 text-emerald-500">{String(ev.detail.type)}</span>}
+            {ev.detail?.duration && <span className="text-emerald-400"> {String(ev.detail.duration)}\uBD84</span>}
+          </>
+        )}
+        {ev.eventType === 'medication' && (
+          <>
+            {ev.varianceBefore != null && ev.varianceAfter != null && (
+              <span>\uBCC0\uB3D9\uC131 {ev.varianceBefore} → {ev.varianceAfter}</span>
+            )}
+            {ev.detail?.name && <span className="ml-2 text-violet-500">{String(ev.detail.name)}</span>}
+            {ev.detail?.dose && <span className="text-violet-400"> {String(ev.detail.dose)}</span>}
+          </>
+        )}
+        {ev.eventType === 'symptom' && (
+          <>
+            {ev.glucoseAtEvent != null && <span>\uD608\uB2F9 {ev.glucoseAtEvent} mg/dL</span>}
+            {ev.detail?.items && Array.isArray(ev.detail.items) && (
+              <span className="ml-2 text-amber-500">{(ev.detail.items as string[]).join(', ')}</span>
+            )}
+          </>
+        )}
+        {ev.label === '\uB370\uC774\uD130 \uBD80\uC871' && (
+          <span className="text-amber-400">\uBD84\uC11D\uC5D0 \uD544\uC694\uD55C \uD608\uB2F9 \uB370\uC774\uD130\uAC00 \uBD80\uC871\uD569\uB2C8\uB2E4</span>
         )}
       </div>
     </div>
