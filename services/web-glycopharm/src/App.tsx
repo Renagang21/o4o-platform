@@ -506,10 +506,11 @@ function AppRoutes() {
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OrdersPage />} />
-        <Route path="settlements" element={<SettlementsPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="billing-preview" element={<BillingPreviewPage />} />
-        <Route path="invoices" element={<InvoicesPage />} />
+        {/* WO-O4O-ROUTE-GUARD-AUDIT-V1: admin-only 라우트 */}
+        <Route path="settlements" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><SettlementsPage /></RoleGuard>} />
+        <Route path="reports" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><ReportsPage /></RoleGuard>} />
+        <Route path="billing-preview" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><BillingPreviewPage /></RoleGuard>} />
+        <Route path="invoices" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><InvoicesPage /></RoleGuard>} />
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
@@ -537,8 +538,8 @@ function AppRoutes() {
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
         {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
-        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) */}
-        <Route path="roles" element={<RoleManagementPage />} />
+        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
+        <Route path="roles" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
         <Route path="care" element={<OperatorCareDashboardPage />} />
         <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
