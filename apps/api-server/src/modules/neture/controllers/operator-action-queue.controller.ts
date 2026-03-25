@@ -2,9 +2,10 @@
  * Neture Operator Action Queue Controller
  *
  * WO-O4O-OPERATOR-ACTION-QUEUE-V1
+ * WO-O4O-OPERATOR-ACTION-QUEUE-DATA-INTEGRATION-V1
  *
  * GET /api/v1/neture/operator/actions
- *   → 모든 대기 항목을 타입/우선순위/설명과 함께 반환
+ *   → 실제 운영 데이터 기반 대기 항목 반환 (8 parallel queries)
  *
  * Auth: requireAuth + requireNetureScope('neture:operator')
  */
@@ -38,7 +39,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
    */
   router.get('/actions', async (_req: Request, res: Response): Promise<void> => {
     try {
-      // 6 parallel queries
+      // WO-O4O-OPERATOR-ACTION-QUEUE-DATA-INTEGRATION-V1: 8 parallel queries
       const [
         pendingRegsRow,
         pendingSuppliersRow,
@@ -46,6 +47,8 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         uncuratedRow,
         unreadMessagesRow,
         partnerRequestsRow,
+        newApprovedRow,
+        activeProductsRow,
       ] = await Promise.all([
         // 1. 가입 승인 대기
         dataSource.query(
@@ -90,6 +93,19 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
            FROM neture_partnership_requests
            WHERE status = 'OPEN'`,
         ),
+        // 7. 신규 승인 상품 (24시간 이내)
+        dataSource.query(
+          `SELECT COUNT(*)::int AS cnt, MIN(updated_at) AS oldest
+           FROM supplier_product_offers
+           WHERE approval_status = 'APPROVED'
+             AND updated_at > NOW() - INTERVAL '24 hours'`,
+        ),
+        // 8. 활성 상품 총 수 (데이터 부족 감지)
+        dataSource.query(
+          `SELECT COUNT(*)::int AS cnt
+           FROM supplier_product_offers
+           WHERE approval_status = 'APPROVED' AND is_active = true`,
+        ),
       ]);
 
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
@@ -98,6 +114,8 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
       const uncurated = uncuratedRow[0]?.cnt || 0;
       const unreadMessages = unreadMessagesRow[0]?.cnt || 0;
       const partnerRequests = partnerRequestsRow[0]?.cnt || 0;
+      const newApproved = newApprovedRow[0]?.cnt || 0;
+      const totalActive = activeProductsRow[0]?.cnt || 0;
 
       // Build action items
       const definitions: Array<{
@@ -177,7 +195,34 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           actionLabel: '요청 관리',
           alwaysHigh: false,
         },
+        // (B) 신규 승인 상품 (24시간 이내)
+        {
+          id: 'new-approved',
+          type: 'product',
+          title: '신규 승인 상품',
+          description: `최근 24시간 내 ${newApproved}개 상품이 승인되었습니다.`,
+          count: newApproved,
+          oldest: newApprovedRow[0]?.oldest || null,
+          actionUrl: '/operator/supply',
+          actionLabel: '상품 확인',
+          alwaysHigh: false,
+        },
       ];
+
+      // (D) 데이터 부족: 활성 상품이 0개인 경우 경고
+      if (totalActive === 0) {
+        definitions.push({
+          id: 'low-activity',
+          type: 'product',
+          title: '운영 활동 부족',
+          description: '등록된 활성 상품이 없습니다. 상품 등록이 필요합니다.',
+          count: 1,
+          oldest: null,
+          actionUrl: '/operator/supply',
+          actionLabel: '상품 등록',
+          alwaysHigh: false,
+        });
+      }
 
       // Filter count > 0, assign priority, sort
       const items: ActionQueueItem[] = definitions
