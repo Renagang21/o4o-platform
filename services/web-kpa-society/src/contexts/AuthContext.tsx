@@ -209,7 +209,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<User>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -334,27 +333,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('auth:token-cleared', handleTokenCleared);
     return () => window.removeEventListener('auth:token-cleared', handleTokenCleared);
   }, []);
-
-  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<User> => {
-    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
-    const result = await authClient.passwordSync({ email, syncToken, newPassword });
-    const apiUser = result.user as any;
-    if (apiUser) {
-      const userData = createUserFromApiResponse(apiUser as ApiUser);
-      const km = (apiUser as any).kpaMembership;
-      if (km) {
-        userData.kpaMembership = km;
-        userData.membershipRole = km.role || undefined;
-        userData.membershipOrgId = km.organizationId || undefined;
-        userData.membershipOrgName = km.organizationName || undefined;
-        userData.membershipOrgType = km.organizationType || undefined;
-        userData.membershipStatus = km.status || undefined;
-      }
-      setUser(userData);
-      return userData;
-    }
-    throw new Error('응답이 올바르지 않습니다.');
-  };
 
   const login = async (email: string, password: string): Promise<User> => {
     const response = await authClient.login({ email, password });
@@ -489,7 +467,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
-        passwordSync,
         loginAsTestAccount,
         logout,
         logoutAll,

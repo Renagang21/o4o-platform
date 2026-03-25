@@ -163,12 +163,6 @@ router.post(
   asyncHandler(PasswordController.resetPassword)
 );
 
-// POST /api/v1/auth/password-sync - Password sync (WO-O4O-AUTH-PASSWORD-SYNC-V1)
-router.post(
-  '/password-sync',
-  asyncHandler(PasswordController.passwordSync)
-);
-
 // POST /api/v1/auth/find-id - Find account by phone
 router.post(
   '/find-id',

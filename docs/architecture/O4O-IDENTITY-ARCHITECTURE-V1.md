@@ -70,7 +70,6 @@ requireAdmin → roleAssignmentService.hasAnyRole(userId, ['admin','super_admin'
 |--------|------|------|------|
 | POST | `/api/v1/auth/forgot-password` | 비밀번호 재설정 요청 | Public |
 | POST | `/api/v1/auth/reset-password` | 비밀번호 재설정 (토큰) | Public |
-| POST | `/api/v1/auth/password-sync` | 비밀번호 동기화 | Public (syncToken) |
 | POST | `/api/v1/auth/find-id` | 전화번호로 계정 찾기 | Public |
 
 ### 3.3 서비스 Handoff 엔드포인트
@@ -241,46 +240,19 @@ Origin 헤더에서 도메인 추출 → SERVICE_DOMAINS 매칭 → 쿠키 domai
 
 ---
 
-## 9. Password Sync (WO-O4O-AUTH-PASSWORD-SYNC-V1)
+## 9. [REMOVED] Password Sync (WO-O4O-AUTH-PASSWORD-SYNC-V1)
 
-### 9.1 트리거
-
-로그인 시 비밀번호 불일치 (`INVALID_CREDENTIALS`) 발생 시:
-
-```json
-{
-  "success": false,
-  "code": "PASSWORD_MISMATCH",
-  "passwordSyncAvailable": true,
-  "syncToken": "<uuid>"
-}
-```
-
-### 9.2 흐름
-
-```
-[사용자] 이메일 + 비밀번호로 로그인 시도
-    ↓
-[API] INVALID_CREDENTIALS → syncToken 생성 (Redis, 5분 TTL)
-    ↓
-[프론트엔드] PASSWORD_MISMATCH 감지 → 비밀번호 재설정 폼 표시
-    ↓
-[사용자] 새 비밀번호 입력 + 확인
-    ↓
-[프론트엔드] POST /auth/password-sync { email, syncToken, newPassword }
-    ↓
-[API] syncToken 검증 (Redis, single-use) → 비밀번호 변경 → 인증 토큰 발급
-    ↓
-[프론트엔드] 자동 로그인 → 대시보드 이동
-```
-
-### 9.3 보안
-
-- **syncToken:** Redis 기반, 5분 TTL, single-use
-- **이메일 바인딩:** syncToken은 특정 이메일에 바인딩
-- **비밀번호 최소 길이:** 6자 이상
-- **bcrypt 해싱:** 12 rounds
-- **loginAttempts 초기화:** 비밀번호 변경 성공 시
+> **WO-O4O-AUTH-PASSWORD-SYNC-REMOVAL-V1 (2026-03-25)에 의해 완전 제거.**
+>
+> **제거 사유:** `users.email`이 UNIQUE 제약이므로 서비스 간 비밀번호 불일치는 구조적으로 불가능.
+> 모든 잘못된 비밀번호가 PASSWORD_MISMATCH → 비밀번호 강제 변경 UI를 트리거하여
+> 기존 비밀번호를 덮어쓰는 무한 루프를 발생시킴.
+>
+> **제거 범위:** `/api/v1/auth/password-sync` 엔드포인트, syncToken Redis 저장,
+> `@o4o/auth-client` passwordSync(), `@o4o/auth-utils` PASSWORD_MISMATCH 에러 코드,
+> 6개 서비스 AuthContext passwordSync 함수 + LoginModal sync UI.
+>
+> **비밀번호 변경:** forgot-password / reset-password 흐름으로만 가능.
 
 ---
 
@@ -379,7 +351,7 @@ localhost:3000-3003, localhost:5173-5177
 │                    로그인                                 │
 │  POST /auth/login { email, password }                   │
 │    → 성공: Cookie 설정 + (Body 토큰) → 대시보드           │
-│    → PASSWORD_MISMATCH: syncToken → 비밀번호 재설정 폼    │
+│    → INVALID_CREDENTIALS: "비밀번호가 일치하지 않습니다"    │
 │    → INVALID_USER: "이메일 또는 비밀번호가 올바르지..."     │
 │    → ACCOUNT_LOCKED: "계정이 잠겨있습니다"                 │
 └────────────────────────┬────────────────────────────────┘
@@ -415,5 +387,6 @@ localhost:3000-3003, localhost:5173-5177
 ---
 
 *Created: 2026-03-13*
-*Based on: WO-O4O-AUTH-PASSWORD-SYNC-V1, WO-O4O-SERVICE-SWITCHER-GLOBAL-V1, IR-O4O-AUTH-CLIENT-STRATEGY-AUDIT-V1*
+*Based on: WO-O4O-SERVICE-SWITCHER-GLOBAL-V1, IR-O4O-AUTH-CLIENT-STRATEGY-AUDIT-V1*
+*Updated: 2026-03-25 — WO-O4O-AUTH-PASSWORD-SYNC-REMOVAL-V1 (Section 9 removed)*
 *Status: Active Reference*

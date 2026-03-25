@@ -1,15 +1,10 @@
 import { Request, Response } from 'express';
-import { hashPassword } from '../../../utils/auth.utils.js';
 import { BaseController } from '../../../common/base.controller.js';
 import { PasswordResetService } from '../../../services/passwordResetService.js';
 import { PasswordResetRequestDto, PasswordResetDto } from '../dto/index.js';
 import { AppDataSource } from '../../../database/connection.js';
 import { User } from '../../../entities/User.js';
 import logger from '../../../utils/logger.js';
-import { RedisService } from '../../../services/redis.service.js';
-import { authenticationService } from '../../../services/authentication.service.js';
-import { roleAssignmentService } from '../services/role-assignment.service.js';
-import * as tokenUtils from '../../../utils/token.utils.js';
 
 /**
  * Password Controller - NextGen Pattern
@@ -88,98 +83,6 @@ export class PasswordController extends BaseController {
       });
 
       return BaseController.error(res, error.message || 'Failed to reset password', 400);
-    }
-  }
-
-  /**
-   * POST /api/v1/auth/password-sync
-   * WO-O4O-AUTH-PASSWORD-SYNC-V1
-   *
-   * Change password using a syncToken issued during PASSWORD_MISMATCH.
-   * Sets new password, generates auth tokens, and logs the user in.
-   */
-  static async passwordSync(req: Request, res: Response): Promise<any> {
-    const { email, syncToken, newPassword } = req.body;
-
-    if (!email || !syncToken || !newPassword) {
-      return BaseController.error(res, 'email, syncToken, newPassword are required', 400, 'VALIDATION_ERROR');
-    }
-
-    if (newPassword.length < 6) {
-      return BaseController.error(res, '비밀번호는 6자 이상이어야 합니다.', 400, 'VALIDATION_ERROR');
-    }
-
-    try {
-      // 1. Validate syncToken from Redis (single-use)
-      const redis = RedisService.getInstance();
-      const tokenData = await redis.get(`password-sync:${syncToken}`);
-      if (!tokenData) {
-        return BaseController.error(res, '토큰이 만료되었거나 유효하지 않습니다.', 401, 'SYNC_TOKEN_INVALID');
-      }
-
-      const parsed = JSON.parse(tokenData);
-      if (parsed.email !== email) {
-        return BaseController.error(res, '토큰이 유효하지 않습니다.', 401, 'SYNC_TOKEN_INVALID');
-      }
-
-      // Consume token (single-use)
-      await redis.del(`password-sync:${syncToken}`);
-
-      // 2. Load user
-      const userRepo = AppDataSource.getRepository(User);
-      const user = await userRepo.findOne({ where: { email } });
-      if (!user || !user.isActive) {
-        return BaseController.error(res, '사용자를 찾을 수 없습니다.', 404, 'USER_NOT_FOUND');
-      }
-
-      // 3. Hash new password and update
-      const hashedPassword = await hashPassword(newPassword);
-      user.password = hashedPassword;
-      user.loginAttempts = 0;
-      user.lockedUntil = null as any;
-      await userRepo.save(user);
-
-      // 4. Load roles and memberships
-      const roles = await roleAssignmentService.getRoleNames(user.id);
-      const memberships: { serviceKey: string; status: string }[] =
-        await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
-          [user.id],
-        );
-
-      // 5. Generate auth tokens
-      const tokens = tokenUtils.generateTokens(user, roles, 'neture.co.kr', memberships);
-
-      // 6. Set cookies
-      authenticationService.setAuthCookies(req, res, tokens);
-
-      logger.info('[PasswordController.passwordSync] Password changed and logged in', {
-        userId: user.id,
-        email: user.email,
-      });
-
-      // 7. Return success with tokens (for localStorage-strategy services)
-      return BaseController.ok(res, {
-        message: 'Password changed successfully',
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name || '',
-          roles,
-          memberships,
-        },
-        tokens: {
-          accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
-          expiresIn: tokens.expiresIn,
-        },
-      });
-    } catch (error: any) {
-      logger.error('[PasswordController.passwordSync] Error', {
-        error: error.message,
-        email,
-      });
-      return BaseController.error(res, 'Password sync failed', 500, 'PASSWORD_SYNC_FAILED');
     }
   }
 
