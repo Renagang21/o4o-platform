@@ -16,6 +16,7 @@ import {
   type ServiceApprovalItem,
   type ServiceApprovalStats,
 } from '../../lib/api/serviceApproval';
+import { useAuth } from '../../contexts/AuthContext';
 
 const STATUS_TABS = [
   { key: 'all', label: '전체' },
@@ -40,6 +41,11 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> 
 };
 
 export default function ProductServiceApprovalPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.roles?.some(
+    (r: string) => r === 'neture:admin' || r === 'platform:super_admin',
+  ) ?? false;
+
   const [items, setItems] = useState<ServiceApprovalItem[]>([]);
   const [stats, setStats] = useState<ServiceApprovalStats>({ pending: 0, approved: 0, rejected: 0, total: 0 });
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
@@ -196,15 +202,17 @@ export default function ProductServiceApprovalPage() {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => handleApprove(item.id)}
-                            disabled={actionLoading === item.id}
-                            className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50"
+                            disabled={!isAdmin || actionLoading === item.id}
+                            title={!isAdmin ? '관리자만 승인할 수 있습니다' : undefined}
+                            className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             승인
                           </button>
                           <button
                             onClick={() => { setRejectTarget(item.id); setRejectReason(''); }}
-                            disabled={actionLoading === item.id}
-                            className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50"
+                            disabled={!isAdmin || actionLoading === item.id}
+                            title={!isAdmin ? '관리자만 거절할 수 있습니다' : undefined}
+                            className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             거절
                           </button>
