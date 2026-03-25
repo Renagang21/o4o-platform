@@ -2,9 +2,10 @@
  * OperatorActionQueuePage — Action Queue 전용 페이지
  *
  * WO-O4O-OPERATOR-ACTION-QUEUE-V1
+ * WO-O4O-ACTION-QUEUE-TO-ACTION-ENGINE-V1
  *
- * 모든 대기 항목을 타입/우선순위/설명과 함께 표시.
- * 클릭 → 해당 관리 페이지로 이동.
+ * NAVIGATE 항목: 클릭 → 해당 관리 페이지로 이동
+ * EXECUTE 항목: 클릭 → API 직접 실행 → 상태 반영
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -21,6 +22,9 @@ interface ActionQueueItem {
   oldestAt: string | null;
   actionUrl: string;
   actionLabel: string;
+  actionType: 'EXECUTE' | 'NAVIGATE';
+  actionApi?: string;
+  actionMethod?: string;
 }
 
 interface ActionQueueData {
@@ -49,6 +53,8 @@ export default function OperatorActionQueuePage() {
   const [data, setData] = useState<ActionQueueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [executing, setExecuting] = useState<string | null>(null);
+  const [result, setResult] = useState<{ id: string; message: string; success: boolean } | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -66,6 +72,25 @@ export default function OperatorActionQueuePage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  const handleExecute = useCallback(async (item: ActionQueueItem) => {
+    if (!item.actionApi || executing) return;
+    setExecuting(item.id);
+    setResult(null);
+    try {
+      const method = (item.actionMethod || 'POST').toLowerCase() as 'post' | 'patch';
+      await api[method](item.actionApi);
+      setResult({ id: item.id, message: '처리 완료', success: true });
+      setTimeout(() => {
+        fetchData();
+        setResult(null);
+      }, 1500);
+    } catch (err) {
+      console.error('[Action Execute] Failed:', err);
+      setResult({ id: item.id, message: '실행 실패', success: false });
+    }
+    setExecuting(null);
+  }, [executing, fetchData]);
 
   if (loading) {
     return (
@@ -156,13 +181,30 @@ export default function OperatorActionQueuePage() {
               {item.count}건
             </span>
 
-            {/* Action button */}
-            <Link
-              to={item.actionUrl.replace(/^\/operator/, routePrefix)}
-              className="inline-flex items-center px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg hover:bg-slate-700 transition-colors whitespace-nowrap"
-            >
-              {item.actionLabel}
-            </Link>
+            {/* Action button — EXECUTE vs NAVIGATE */}
+            <div className="flex items-center gap-2">
+              {item.actionType === 'EXECUTE' ? (
+                <button
+                  onClick={() => handleExecute(item)}
+                  disabled={executing === item.id}
+                  className="inline-flex items-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition-colors whitespace-nowrap"
+                >
+                  {executing === item.id ? '처리 중...' : item.actionLabel}
+                </button>
+              ) : (
+                <Link
+                  to={item.actionUrl.replace(/^\/operator/, routePrefix)}
+                  className="inline-flex items-center px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg hover:bg-slate-700 transition-colors whitespace-nowrap"
+                >
+                  {item.actionLabel}
+                </Link>
+              )}
+              {result?.id === item.id && (
+                <span className={`text-xs font-medium ${result.success ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {result.message}
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>
