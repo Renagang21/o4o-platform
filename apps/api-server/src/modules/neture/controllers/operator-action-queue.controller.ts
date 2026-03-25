@@ -4,6 +4,7 @@
  * WO-O4O-OPERATOR-ACTION-QUEUE-V1
  * WO-O4O-ACTION-QUEUE-TO-ACTION-ENGINE-V1
  * WO-O4O-AI-ACTION-INTEGRATION-V2
+ * WO-O4O-AI-ACTION-LLM-UPGRADE-V3
  *
  * GET /api/v1/neture/operator/actions
  *   → SYSTEM + AI 액션 병합, 타입/우선순위/설명과 함께 반환
@@ -243,8 +244,8 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           return item;
         });
 
-      // ── AI actions ──
-      const aiRaw = aiService.generateActions({
+      // ── AI actions (Rule → LLM → Fallback) ──
+      const aiRaw = await aiService.generateActions({
         pendingApprovals: pendingProducts,
         pendingSuppliers,
         uncuratedProducts: uncurated,

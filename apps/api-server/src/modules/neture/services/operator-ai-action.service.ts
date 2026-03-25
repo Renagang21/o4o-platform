@@ -2,13 +2,20 @@
  * Operator AI Action Recommendation Service
  *
  * WO-O4O-AI-ACTION-INTEGRATION-V2
+ * WO-O4O-AI-ACTION-LLM-UPGRADE-V3
  *
- * Rule 기반 AI 추천 레이어.
- * 기존 Action Queue 데이터(OperatorContext)를 분석하여
- * 우선순위·이유·추천 Action을 생성한다.
+ * 3-tier 구조: Rule → LLM → Fallback
  *
- * 단계: Rule → (향후) LLM
+ * 1. Rule 기반 분석 (빠름, 결정적)
+ * 2. Rule 결과가 충분하면(>=2) LLM skip
+ * 3. Rule 부족 시 LLM 보완 호출
+ * 4. LLM 실패 시 Rule 결과만 반환 (graceful fallback)
+ *
+ * 병합: type 기준 중복 제거, LLM 항목 보완 추가
  */
+
+import { OperatorAiLlmService } from './operator-ai-llm.service.js';
+import logger from '../../../utils/logger.js';
 
 export interface OperatorContext {
   pendingApprovals: number;
@@ -36,10 +43,50 @@ export interface AiActionItem {
 }
 
 export class OperatorAiActionService {
-  generateActions(ctx: OperatorContext): AiActionItem[] {
+  private llmService = new OperatorAiLlmService();
+
+  /**
+   * Rule → LLM → Fallback 3-tier 추천 생성
+   */
+  async generateActions(ctx: OperatorContext): Promise<AiActionItem[]> {
+    // 1. Rule 기반 (항상 실행, 빠름)
+    const ruleActions = this.generateRuleActions(ctx);
+
+    // 2. Rule 충분하면 LLM skip
+    if (ruleActions.length >= 2) {
+      return ruleActions;
+    }
+
+    // 3. LLM 보완 호출
+    try {
+      const llmActions = await this.llmService.generate(ctx);
+
+      if (llmActions.length > 0) {
+        // 병합: Rule 기존 type과 중복되지 않는 LLM 항목만 추가
+        const ruleTypes = new Set(ruleActions.map((a) => a.type));
+        const uniqueLlm = llmActions.filter((a) => !ruleTypes.has(a.type));
+        const merged = [...ruleActions, ...uniqueLlm];
+
+        logger.info(`[OperatorAiAction] Merged: rule=${ruleActions.length}, llm_new=${uniqueLlm.length}, total=${merged.length}`);
+        return merged;
+      }
+    } catch (error) {
+      // LLM 실패 → Rule fallback (이미 수집됨)
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.warn(`[OperatorAiAction] LLM fallback: ${msg}`);
+    }
+
+    // 4. Fallback: Rule 결과만 반환
+    return ruleActions;
+  }
+
+  /**
+   * Rule 기반 Action 생성 (결정적, 동기)
+   */
+  private generateRuleActions(ctx: OperatorContext): AiActionItem[] {
     const actions: AiActionItem[] = [];
 
-    // Rule A — 큐레이션 부족: 승인 상품 대비 큐레이션 미등록 비율 높음
+    // Rule A — 큐레이션 부족
     if (ctx.uncuratedProducts >= 5) {
       actions.push({
         id: 'ai-curation',
@@ -57,7 +104,7 @@ export class OperatorAiActionService {
       });
     }
 
-    // Rule B — 문의 지연: 미처리 문의 존재
+    // Rule B — 문의 지연
     if (ctx.pendingInquiries > 0) {
       actions.push({
         id: 'ai-inquiry',
@@ -75,7 +122,7 @@ export class OperatorAiActionService {
       });
     }
 
-    // Rule C — 상품 승인 적체: 승인 대기 상품이 쌓임
+    // Rule C — 상품 승인 적체
     if (ctx.pendingApprovals > 0 && ctx.activeProducts === 0) {
       actions.push({
         id: 'ai-product-activate',
