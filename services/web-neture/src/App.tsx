@@ -320,6 +320,8 @@ const HubPage = lazy(() => import('./pages/hub/HubPage'));
 const NetureOperatorDashboard = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.NetureOperatorDashboard }))
 );
+// Admin Dashboard (WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1)
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
 const OperatorAiReportPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAiReportPage }))
 );
@@ -731,7 +733,7 @@ function App() {
               </AdminRoute>
             }>
               {/* ─── 공통 + Admin-only 전체 라우트 ─── */}
-              <Route path="/admin" element={<NetureOperatorDashboard />} />
+              <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="/admin/users" element={<UsersManagementPage />} />
               <Route path="/admin/users/:id" element={<UserDetailPage />} />
               <Route path="/admin/stores" element={<StoreManagementPage />} />

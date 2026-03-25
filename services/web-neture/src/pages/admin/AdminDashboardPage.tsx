@@ -1,72 +1,21 @@
 /**
- * AdminDashboardPage — 4-Block 통합 Admin 대시보드
+ * AdminDashboardPage — 4-Block Admin 전용 대시보드
  *
- * WO-O4O-LEGACY-ADMIN-DASHBOARD-SUNSET-V1:
- *   /operator/dashboard 5-Block 데이터를 4-Block AdminDashboardConfig로 변환.
- *   Legacy admin/dashboard/summary 엔드포인트 제거 후 전환.
+ * WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1
+ *
+ * Admin 전용 API (/neture/admin/dashboard) 직접 호출.
+ * 5-Block operator 데이터 변환 제거 — 백엔드에서 4-Block 직접 반환.
  *
  * Block 구조:
- *  [A] Structure Snapshot — KPIs → StructureMetrics 변환
- *  [B] Policy Overview   — ActionQueue → PolicyItems 변환
- *  [C] Governance Alerts  — AiSummary → GovernanceAlerts 변환
- *  [D] Structure Actions  — QuickActions → StructureActions 변환
- *
- * API: dashboardApi.getOperatorDashboard()
+ *  [A] Structure Snapshot — 구조 지표 (사용자, 공급사, 승인, 파트너)
+ *  [B] Policy Overview   — 승인 현황 (상품, 공급사, 가입, 파트너)
+ *  [C] Governance Alerts  — AI 기반 거버넌스 경고
+ *  [D] Structure Actions  — 구조 변경 진입점
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  AdminDashboardLayout,
-  type AdminDashboardConfig,
-  type StructureMetric,
-  type PolicyItem,
-  type GovernanceAlert,
-  type StructureAction,
-} from '@o4o/admin-ux-core';
-import { dashboardApi, type OperatorDashboardData } from '../../lib/api';
-
-// ─── 5-Block → 4-Block Transformer ───
-// WO-O4O-OPERATOR-UI-UNIFICATION-V1: 통합 레이아웃으로 링크 변환 불필요
-
-function buildAdminConfig(data: OperatorDashboardData): AdminDashboardConfig {
-  // Block A: KPIs → Structure Metrics
-  const structureMetrics: StructureMetric[] = data.kpis.map((kpi) => ({
-    key: kpi.key,
-    label: kpi.label,
-    value: kpi.value,
-    status: kpi.status === 'warning' ? 'attention' as const
-      : kpi.status === 'critical' ? 'critical' as const
-      : 'stable' as const,
-  }));
-
-  // Block B: ActionQueue → Policies (링크를 admin 경로로 변환)
-  const policies: PolicyItem[] = data.actionQueue.map((action) => ({
-    key: action.id,
-    label: action.label,
-    status: action.count > 0 ? 'partial' as const : 'configured' as const,
-    link: action.link,
-  }));
-
-  // Block C: AiSummary → Governance Alerts (링크를 admin 경로로 변환)
-  const governanceAlerts: GovernanceAlert[] = (data.aiSummary ?? []).map((item) => ({
-    id: item.id,
-    message: item.message,
-    level: item.level as 'info' | 'warning' | 'critical',
-    link: item.link,
-  }));
-
-  // Block D: QuickActions → Structure Actions (링크를 admin 경로로 변환)
-  const structureActions: StructureAction[] = data.quickActions.map((action) => ({
-    id: action.id,
-    label: action.label,
-    link: action.link!,
-    icon: action.icon,
-  }));
-
-  return { structureMetrics, policies, governanceAlerts, structureActions };
-}
-
-// ─── Component ───
+import { AdminDashboardLayout, type AdminDashboardConfig } from '@o4o/admin-ux-core';
+import { fetchAdminDashboard } from '../../lib/api/dashboard';
 
 export default function AdminDashboardPage() {
   const [config, setConfig] = useState<AdminDashboardConfig | null>(null);
@@ -77,8 +26,12 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await dashboardApi.getOperatorDashboard();
-      if (data) setConfig(buildAdminConfig(data));
+      const data = await fetchAdminDashboard();
+      if (data) {
+        setConfig(data as AdminDashboardConfig);
+      } else {
+        setError('관리자 권한이 필요하거나 데이터를 불러올 수 없습니다.');
+      }
     } catch (err) {
       console.error('Failed to fetch admin dashboard:', err);
       setError('데이터를 불러오지 못했습니다.');

@@ -83,6 +83,18 @@ export interface PartnerDashboardSummary {
   notifications: Notification[];
 }
 
+// ==================== Admin Dashboard 4-Block (WO-O4O-ADMIN-OPERATOR-DASHBOARD-SEPARATION-V1) ====================
+
+export async function fetchAdminDashboard() {
+  try {
+    const response = await api.get('/neture/admin/dashboard');
+    return response.data?.data ?? null;
+  } catch (error) {
+    console.warn('[Admin Dashboard] Fetch failed:', error);
+    return null;
+  }
+}
+
 // ==================== Dashboard API ====================
 
 export const dashboardApi = {
