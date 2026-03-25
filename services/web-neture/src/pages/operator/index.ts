@@ -35,3 +35,5 @@ export { default as ProductDataCleanupPage } from './ProductDataCleanupPage';
 export { default as ProductServiceApprovalPage } from './ProductServiceApprovalPage';
 // WO-NETURE-PRODUCT-CURATION-V1
 export { default as ProductCurationPage } from './ProductCurationPage';
+// WO-O4O-OPERATOR-ACTION-QUEUE-V1
+export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';

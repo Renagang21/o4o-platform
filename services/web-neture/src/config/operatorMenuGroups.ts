@@ -26,6 +26,7 @@ interface UnifiedMenuItem {
 export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> = {
   dashboard: [
     { label: '대시보드', path: '/operator', exact: true },
+    { label: 'Action Queue', path: '/operator/actions' },
   ],
   users: [
     { label: '회원 관리', path: '/operator/users' },
@@ -110,7 +111,10 @@ export function filterMenuByRole(
 // ─── Legacy export (하위호환, deprecated) ───
 /** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
 export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
-  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
+  dashboard: [
+    { label: '대시보드', path: '/operator', exact: true },
+    { label: 'Action Queue', path: '/operator/actions' },
+  ],
   users: [{ label: '회원 관리', path: '/operator/users' }],
   approvals: [
     { label: '가입 승인', path: '/operator/applications' },
