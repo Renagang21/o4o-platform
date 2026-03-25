@@ -41,9 +41,9 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   products: [
     { label: '공급 현황', path: '/operator/supply' },
-    { label: '카테고리 관리', path: '/operator/categories' },
-    { label: '브랜드 관리', path: '/operator/brands' },
-    { label: '상품 데이터 정리', path: '/operator/product-cleanup' },
+    { label: '카테고리 관리', path: '/operator/categories', adminOnly: true },
+    { label: '브랜드 관리', path: '/operator/brands', adminOnly: true },
+    { label: '상품 데이터 정리', path: '/operator/product-cleanup', adminOnly: true },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
     { label: '큐레이션', path: '/operator/curation' },
     { label: '상품 승인', path: '/operator/product-approvals', adminOnly: true },
@@ -84,7 +84,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },
-    { label: '역할 관리', path: '/operator/roles' },
+    { label: '역할 관리', path: '/operator/roles', adminOnly: true },
     { label: '이메일 설정', path: '/operator/settings/email', adminOnly: true },
   ],
 };
@@ -138,9 +138,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   products: [
     { label: '공급 현황', path: '/operator/supply' },
-    { label: '카테고리 관리', path: '/operator/categories' },
-    { label: '브랜드 관리', path: '/operator/brands' },
-    { label: '상품 데이터 정리', path: '/operator/product-cleanup' },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
     { label: '큐레이션', path: '/operator/curation' },
   ],
@@ -162,6 +159,5 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },
-    { label: '역할 관리', path: '/operator/roles' },
   ],
 };

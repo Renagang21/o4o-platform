@@ -222,7 +222,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = user?.id;
-  const isAdmin = user?.roles?.includes('admin') ?? false;
+  const isAdmin = user?.roles?.some(r => r === 'neture:admin' || r === 'platform:super_admin') ?? false;
 
   // Close action menu on outside click
   useEffect(() => {

@@ -8,7 +8,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
-import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -81,34 +81,66 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
-const ROLE_MAP: Record<string, UserRole> = {
-  pharmacy: 'pharmacy',
-  pharmacist: 'pharmacy',  // WO-GLYCOPHARM-PHARMACY-ROLE-ALIGNMENT-V1: backward-compat
-  seller: 'pharmacy',
-  customer: 'pharmacy',
-  user: 'pharmacy',
-  admin: 'admin',
-  super_admin: 'admin',
-  operator: 'operator',
-  supplier: 'supplier',
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: raw JWT prefixed roles 직접 사용
+// JWT roles are already prefixed (e.g. 'glycopharm:admin', 'platform:super_admin')
+
+/** Extract roles array from API user object — raw JWT roles, no mapping */
+function extractRoles(apiUser: any): string[] {
+  if (Array.isArray(apiUser.roles) && apiUser.roles.length > 0) {
+    return apiUser.roles;
+  }
+  // Fallback: single role field
+  if (apiUser.role) {
+    return [apiUser.role];
+  }
+  return [];
+}
+
+// GlycoPharm prefixed role constants
+export const GLYCOPHARM_ROLES = {
+  ADMIN: 'glycopharm:admin',
+  OPERATOR: 'glycopharm:operator',
+  PHARMACY: 'glycopharm:pharmacy',
+  SUPPLIER: 'glycopharm:supplier',
+  CONSUMER: 'glycopharm:consumer',
+  PLATFORM_SUPER_ADMIN: 'platform:super_admin',
+} as const;
+
+export const ROLE_LABELS: Record<string, string> = {
+  [GLYCOPHARM_ROLES.ADMIN]: '관리자',
+  [GLYCOPHARM_ROLES.PHARMACY]: '약국',
+  [GLYCOPHARM_ROLES.SUPPLIER]: '공급자',
+  [GLYCOPHARM_ROLES.OPERATOR]: '운영자',
+  [GLYCOPHARM_ROLES.CONSUMER]: '소비자',
+  [GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]: '슈퍼관리자',
 };
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  admin: '관리자',
-  pharmacy: '약국',
-  supplier: '공급자',
-  operator: '운영자',
-  consumer: '소비자',
+export const ROLE_ICONS: Record<string, string> = {
+  [GLYCOPHARM_ROLES.ADMIN]: '👑',
+  [GLYCOPHARM_ROLES.PHARMACY]: '💊',
+  [GLYCOPHARM_ROLES.SUPPLIER]: '📦',
+  [GLYCOPHARM_ROLES.OPERATOR]: '🛡️',
+  [GLYCOPHARM_ROLES.CONSUMER]: '👤',
+  [GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]: '👑',
 };
 
+// Dashboard routing for prefixed roles
+export const GLYCOPHARM_ROLE_PRIORITY: readonly string[] = [
+  GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN,
+  GLYCOPHARM_ROLES.ADMIN,
+  GLYCOPHARM_ROLES.OPERATOR,
+  GLYCOPHARM_ROLES.SUPPLIER,
+  GLYCOPHARM_ROLES.PHARMACY,
+  GLYCOPHARM_ROLES.CONSUMER,
+];
 
-export const ROLE_ICONS: Record<UserRole, string> = {
-  admin: '👑',
-  pharmacy: '💊',
-  supplier: '📦',
-  operator: '🛡️',
-  consumer: '👤',
+export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
+  [GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]: '/admin',
+  [GLYCOPHARM_ROLES.ADMIN]: '/admin',
+  [GLYCOPHARM_ROLES.OPERATOR]: '/operator',
+  [GLYCOPHARM_ROLES.SUPPLIER]: '/supplier',
+  [GLYCOPHARM_ROLES.PHARMACY]: '/care',
+  [GLYCOPHARM_ROLES.CONSUMER]: '/',
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -134,17 +166,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
+          const rawRoles = extractRoles(apiUser);
           const base = normalizeUser(apiUser);
           const userData: User = {
             ...apiUser,
             ...base,
-            roles: mappedRoles,
+            roles: rawRoles,
             memberships: (apiUser as any).memberships || [],
             status: (apiUser.status as string) || 'approved',
           } as User;
           setUser(userData);
-          setAvailableRoles(mappedRoles);
+          setAvailableRoles(rawRoles);
         }
       } catch {
         // 세션 없음 또는 refresh 실패 — 정상
@@ -164,18 +196,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const apiUser = result.user as any;
 
       if (apiUser) {
-        const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
+        const rawRoles = extractRoles(apiUser);
         const base = normalizeUser(apiUser);
         const typedUser: User = {
           ...apiUser,
           ...base,
-          roles: mappedRoles,
+          roles: rawRoles,
           memberships: (apiUser as any).memberships || [],
           status: (apiUser.status as string) || 'approved',
         } as User;
 
         setUser(typedUser);
-        setAvailableRoles(mappedRoles);
+        setAvailableRoles(rawRoles);
         return typedUser;
       }
 

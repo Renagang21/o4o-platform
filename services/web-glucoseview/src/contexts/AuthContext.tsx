@@ -1,21 +1,25 @@
 /**
  * AuthContext - GlucoseView 인증 및 역할 관리
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 auto-refresh
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  *
  * - authClient.api (Axios) 경유 → 401 자동 갱신
  * - localStorage 전략 (o4o_accessToken / o4o_refreshToken)
  */
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility (operatorDashboard.ts, UsersPage 등에서 import)
 export { getAccessToken } from '@o4o/auth-client';
 
-// 사용자 역할
-export type UserRole = 'pharmacist' | 'admin' | 'operator' | 'patient';
+/**
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
+ * e.g., 'glucoseview:admin', 'glucoseview:operator', 'platform:super_admin'
+ */
+export type UserRole = string;
 
 // 승인 상태
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
@@ -28,7 +32,6 @@ export interface User {
   firstName?: string;
   lastName?: string;
   roles: UserRole[];
-  role?: UserRole;  // WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: deprecated, use roles[]
   memberships?: { serviceKey: string; status: string }[];
   approvalStatus: ApprovalStatus;
   pharmacyName?: string;
@@ -58,18 +61,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
-// GlucoseView는 당뇨인 전용 서비스 — user/customer 역할을 patient로 매핑
-const ROLE_MAP: Record<string, UserRole> = {
-  admin: 'admin',
-  super_admin: 'admin',
-  operator: 'operator',
-  pharmacist: 'pharmacist',
-  seller: 'pharmacist',
-  customer: 'patient',
-  user: 'patient',
-  patient: 'patient',
-};
+/**
+ * JWT roles를 그대로 사용 (prefix 유지).
+ * 빈 배열이면 ['glucoseview:patient'] fallback.
+ */
+function extractRoles(apiUser: any): string[] {
+  const raw: string[] =
+    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+      ? apiUser.roles
+      : apiUser.role
+        ? [apiUser.role]
+        : [];
+  return raw.length > 0 ? raw : ['glucoseview:patient'];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -89,10 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+          const roles = extractRoles(apiUser);
 
           // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-          if (!roles.includes('patient')) {
+          if (!roles.includes('glucoseview:patient')) {
             clearAllTokens();
             setIsLoading(false);
             return;
@@ -125,10 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await authClient.login({ email, password });
       const apiUser = result.user as any;
       if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
+        const roles = extractRoles(apiUser);
 
         // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-        if (!roles.includes('patient')) {
+        if (!roles.includes('glucoseview:patient')) {
           clearAllTokens();
           return { success: false, message: 'GlucoseView는 당뇨인 전용 서비스입니다. 약사는 GlycoPharm을 이용해주세요.' };
         }
@@ -187,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isApproved = user?.approvalStatus === 'approved';
-  const isAdmin = !!(user?.roles.includes('admin') && isApproved);
+  const isAdmin = !!(user?.roles.some(r => r === 'glucoseview:admin' || r === 'platform:super_admin') && isApproved);
   const isPending = user?.approvalStatus === 'pending';
   const isRejected = user?.approvalStatus === 'rejected';
 

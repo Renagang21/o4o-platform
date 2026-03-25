@@ -12,8 +12,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
 export default function MyPage() {
@@ -34,7 +33,7 @@ export default function MyPage() {
     );
   }
 
-  const dashboardPath = getPrimaryDashboardRoute(user.roles);
+  const dashboardPath = getKCosmeticsDashboardRoute(user.roles);
   const roleLabel = ROLE_LABELS[user.roles[0]];
 
   const handleSave = () => {

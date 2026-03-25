@@ -14,8 +14,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useAuth, ROUTE_OVERRIDES, useLoginModal } from '../contexts';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, getNetureDashboardRoute, useLoginModal } from '../contexts';
 
 const REMEMBER_EMAIL_KEY = 'neture_remember_email';
 
@@ -72,9 +71,9 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
 
     const dashboardPath =
       (roles && roles.length > 0)
-        ? getPrimaryDashboardRoute(roles, ROUTE_OVERRIDES)
+        ? getNetureDashboardRoute(roles)
         : role
-          ? getPrimaryDashboardRoute([role], ROUTE_OVERRIDES)
+          ? getNetureDashboardRoute([role])
           : '/';
 
     // 역할 우선순위 기반 리다이렉트 (admin > operator > ...)

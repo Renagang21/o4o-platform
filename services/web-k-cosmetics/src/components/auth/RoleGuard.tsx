@@ -81,7 +81,8 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardP
 
   if (!user) return <Navigate to="/" replace />;
 
-  const isAdmin = (user.roles as string[]).some(r => r === 'admin' || r === 'super_admin');
+  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role checks
+  const isAdmin = user.roles.some(r => r === 'k-cosmetics:admin' || r === 'platform:super_admin');
   const hasOperatorMembership = user.memberships?.some(
     m => m.serviceKey === SERVICE_KEY && m.status === 'active'
   );

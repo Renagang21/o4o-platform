@@ -12,11 +12,30 @@ import ServiceSwitcher from './ServiceSwitcher';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 
 const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
 const ROLE_LABELS: Record<string, string> = {
-  pharmacist: '약사',
-  admin: '관리자',
-  operator: '운영자',
-  patient: '당뇨인',
+  'platform:super_admin': '최고 관리자',
+  'glucoseview:admin': '관리자',
+  'glucoseview:operator': '운영자',
+  'glucoseview:pharmacist': '약사',
+  'glucoseview:patient': '당뇨인',
+};
+
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
+const GV_ROLE_PRIORITY = [
+  'platform:super_admin',
+  'glucoseview:admin',
+  'glucoseview:operator',
+  'glucoseview:pharmacist',
+  'glucoseview:patient',
+] as const;
+
+const GV_DASHBOARD_MAP: Record<string, string> = {
+  'platform:super_admin': '/admin',
+  'glucoseview:admin': '/admin',
+  'glucoseview:operator': '/operator',
+  'glucoseview:pharmacist': '/',
+  'glucoseview:patient': '/patient',
 };
 
 const navItems = [
@@ -116,7 +135,7 @@ export default function Layout() {
               )}
 
               {/* Operator Link - 관리자 또는 운영자 표시 */}
-              {(isAdmin || user?.roles?.includes('operator')) && (
+              {(isAdmin || user?.roles?.includes('glucoseview:operator')) && (
                 <NavLink
                   to="/operator"
                   className={({ isActive }) =>
@@ -166,8 +185,8 @@ export default function Layout() {
                         {/* 메뉴 항목 */}
                         <div className="py-1">
                           {/* 대표 대시보드 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
-                          {user?.roles?.[0] && user.roles[0] !== 'patient' && (() => {
-                            const dp = getPrimaryDashboardRoute(user.roles);
+                          {user?.roles?.[0] && user.roles[0] !== 'glucoseview:patient' && (() => {
+                            const dp = getPrimaryDashboardRoute(user.roles, [...GV_ROLE_PRIORITY], GV_DASHBOARD_MAP);
                             const rl = ROLE_LABELS[user.roles[0]] || user.roles[0];
                             return (
                               <NavLink

@@ -2,10 +2,12 @@
  * Scope Assignment Utilities
  *
  * WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
+ * WO-O4O-RBAC-SCOPE-CONSISTENCY-FIX-V1: prefixed role 지원
  *
  * 사용자 역할 기반 스코프 할당 로직
  * - 역할에서 스코프 자동 도출
  * - 서비스별 스코프 레벨 매핑
+ * - prefixed role (예: 'platform:admin', 'neture:operator') 및 unprefixed role 모두 지원
  */
 
 import { SERVICE_SCOPES, getScopesByLevel, type ScopeLevel } from '../config/service-scopes.js';
@@ -31,35 +33,52 @@ export interface ScopeAssignmentContext {
 }
 
 // ============================================================================
+// Role Matching Helper
+// ============================================================================
+
+/**
+ * WO-O4O-RBAC-SCOPE-CONSISTENCY-FIX-V1
+ *
+ * prefixed role과 unprefixed role 모두 매칭.
+ * 예: hasRole(roles, 'admin') → 'admin', 'platform:admin', 'neture:admin' 모두 매칭
+ */
+function hasRole(allRoles: Set<string>, target: string): boolean {
+  if (allRoles.has(target)) return true;
+  return Array.from(allRoles).some(r => r.endsWith(`:${target}`));
+}
+
+// ============================================================================
 // Role to Scope Level Mapping
 // ============================================================================
 
 /**
  * 역할에서 스코프 레벨 도출
+ * prefixed/unprefixed 모두 지원
  */
 function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
   const allRoles = new Set([role, ...(roles || [])]);
 
   // Admin 계열
-  if (allRoles.has('super_admin') || allRoles.has('admin')) {
+  if (hasRole(allRoles, 'super_admin') || hasRole(allRoles, 'admin')) {
     return 'admin';
   }
 
   // Operator 계열
-  if (allRoles.has('operator')) {
+  if (hasRole(allRoles, 'operator')) {
     return 'operator';
   }
 
   // Member 계열 (인증된 일반 사용자)
   if (
-    allRoles.has('user') ||
-    allRoles.has('customer') ||
-    allRoles.has('member') ||
-    allRoles.has('pharmacist') ||
-    allRoles.has('seller') ||
-    allRoles.has('vendor') ||
-    allRoles.has('supplier') ||
-    allRoles.has('partner')
+    hasRole(allRoles, 'user') ||
+    hasRole(allRoles, 'customer') ||
+    hasRole(allRoles, 'member') ||
+    hasRole(allRoles, 'pharmacist') ||
+    hasRole(allRoles, 'seller') ||
+    hasRole(allRoles, 'vendor') ||
+    hasRole(allRoles, 'supplier') ||
+    hasRole(allRoles, 'partner') ||
+    hasRole(allRoles, 'patient')
   ) {
     return 'member';
   }
@@ -95,12 +114,8 @@ function detectServiceFromRole(role: string, roles?: string[]): string[] {
   const services: string[] = [];
   const allRoles = new Set([role, ...(roles || [])]);
 
-  // 역할에 따른 서비스 힌트
-  // (실제로는 사용자의 조직/소속에 따라 결정되어야 함)
-  // 여기서는 기본적인 매핑만 제공
-
   // super_admin/admin은 모든 서비스 접근 가능
-  if (allRoles.has('super_admin') || allRoles.has('admin')) {
+  if (hasRole(allRoles, 'super_admin') || hasRole(allRoles, 'admin')) {
     return Object.keys(SERVICE_SCOPES);
   }
 

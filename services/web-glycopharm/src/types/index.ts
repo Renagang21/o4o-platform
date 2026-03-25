@@ -57,8 +57,8 @@ export {
   type StorePaginatedResponse,
 } from './store';
 
-// User Roles
-export type UserRole = 'admin' | 'pharmacy' | 'supplier' | 'operator' | 'consumer';
+// User Roles — WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed JWT roles (e.g. 'glycopharm:admin')
+export type UserRole = string;
 
 // User status
 export type UserStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
@@ -82,8 +82,9 @@ export interface User {
 }
 
 // Pharmacy specific user data
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: role field uses prefixed format
 export interface PharmacyUser extends User {
-  role: 'pharmacy';
+  role: 'glycopharm:pharmacy';
   pharmacy: {
     id: string;
     name: string;
@@ -97,7 +98,7 @@ export interface PharmacyUser extends User {
 
 // Supplier specific user data
 export interface SupplierUser extends User {
-  role: 'supplier';
+  role: 'glycopharm:supplier';
   company: {
     id: string;
     name: string;
@@ -108,7 +109,7 @@ export interface SupplierUser extends User {
 
 // Consumer specific user data
 export interface ConsumerUser extends User {
-  role: 'consumer';
+  role: 'glycopharm:consumer';
   healthProfile?: {
     diabetesType?: 'type1' | 'type2' | 'gestational' | 'prediabetes';
     diagnosisYear?: number;

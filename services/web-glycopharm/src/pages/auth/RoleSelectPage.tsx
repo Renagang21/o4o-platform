@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_ROLES, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
 import {
   Building2,
   Shield,
@@ -9,24 +9,24 @@ import {
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
-// 이 서비스에서 사용 가능한 역할 (공급자/파트너는 Neture에서 관리)
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role options
 const roleOptions: Array<{ role: UserRole; label: string; description: string; icon: typeof Building2; color: string }> = [
   {
-    role: 'pharmacy',
+    role: GLYCOPHARM_ROLES.PHARMACY,
     label: '약국',
     description: '약국 운영, 상품 판매, 고객 관리',
     icon: Building2,
     color: 'primary',
   },
   {
-    role: 'operator',
+    role: GLYCOPHARM_ROLES.OPERATOR,
     label: '운영자',
     description: '플랫폼 운영, 회원 관리, 시스템 설정',
     icon: Shield,
     color: 'red',
   },
   {
-    role: 'consumer',
+    role: GLYCOPHARM_ROLES.CONSUMER,
     label: '소비자',
     description: '약국 매장에서 제품 구매',
     icon: UserCircle,
@@ -40,17 +40,7 @@ export default function RoleSelectPage() {
 
   const handleRoleSelect = (role: UserRole) => {
     selectRole(role);
-
-    // Navigate to role-specific dashboard
-    const dashboardPaths: Record<UserRole, string> = {
-      admin: '/admin',
-      pharmacy: '/care',
-      supplier: '/supplier',
-      operator: '/operator',
-      consumer: '/',
-    };
-
-    navigate(dashboardPaths[role]);
+    navigate(GLYCOPHARM_DASHBOARD_MAP[role] ?? '/');
   };
 
   return (

@@ -2,12 +2,12 @@
  * RoleGuard — GlycoPharm 공통 역할 기반 접근 제어
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
- * 기존 ProtectedRoute 로직을 그대로 유지하며 통일된 인터페이스 제공.
- * WO-O4O-ROLE-MODEL-UNIFICATION-PHASE2-V1: roles[] 배열 기반 전환
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed JWT roles 직접 사용
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { GLYCOPHARM_ROLES } from '../../contexts/AuthContext';
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -42,7 +42,8 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login' }: RoleG
  * OperatorRoute — service_memberships 기반 Operator 접근 제어
  *
  * WO-O4O-OPERATOR-VISIBILITY-UNIFICATION-V1
- * - Platform admin (admin/super_admin) → 항상 허용
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed JWT roles 직접 사용
+ * - Platform admin/super_admin or glycopharm:admin/operator → 항상 허용
  * - 그 외 → 해당 서비스의 active membership 필요
  */
 const SERVICE_KEY = 'glycopharm';
@@ -65,8 +66,11 @@ export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardP
 
   if (!user) return <Navigate to="/" replace />;
 
-  // ROLE_MAP이 super_admin → 'admin'으로 정규화하므로 admin만 확인
-  const isAdmin = user.roles.some(r => r === 'admin');
+  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role checks
+  const isAdmin = user.roles.some(r =>
+    r === GLYCOPHARM_ROLES.ADMIN ||
+    r === GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN
+  );
   const hasOperatorMembership = user.memberships?.some(
     m => m.serviceKey === SERVICE_KEY && m.status === 'active'
   );

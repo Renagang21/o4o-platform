@@ -25,7 +25,7 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
@@ -133,7 +133,12 @@ export default function ForumFeedPage() {
   }
 
   const canWrite = forum.status === 'open' && user && user.roles.some(r => forum.allowedRoles.includes(r));
-  const isOperator = user?.roles.includes('operator');
+  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role checks
+  const isOperator = user?.roles.some(r =>
+    r === GLYCOPHARM_ROLES.OPERATOR ||
+    r === GLYCOPHARM_ROLES.ADMIN ||
+    r === GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN
+  );
 
   // 공지 상단, 일반 글 최신순
   const pinnedPosts = posts.filter((p) => p.isPinned);

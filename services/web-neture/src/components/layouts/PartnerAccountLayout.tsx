@@ -43,7 +43,7 @@ export default function PartnerAccountLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some((r: string) => ['partner', 'admin'].includes(r));
+  const hasAccess = user.roles.some((r: string) => ['neture:partner', 'neture:admin', 'platform:super_admin'].includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">

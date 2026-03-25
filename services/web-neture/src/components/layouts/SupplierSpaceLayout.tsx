@@ -115,7 +115,7 @@ export default function SupplierSpaceLayout() {
     return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />;
   }
 
-  const hasAccess = user.roles.some(r => ['supplier', 'admin'].includes(r));
+  const hasAccess = user.roles.some(r => ['neture:supplier', 'neture:admin', 'platform:super_admin'].includes(r));
   if (!hasAccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8">

@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -339,7 +339,7 @@ function StoreLayoutWrapper() {
  * WO-O4O-DASHBOARD-ROUTING-NORMALIZE-V1: /admin + /operator 분리
  */
 function AdminAreaLayout() {
-  return <DashboardLayout role="admin" />;
+  return <DashboardLayout role={GLYCOPHARM_ROLES.ADMIN} />;
 }
 
 function OperatorAreaLayout() {
@@ -413,7 +413,7 @@ function AppRoutes() {
 
         {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
         <Route path="store" element={
-          <SoftGuard feature="store" allowedRoles={['pharmacy']}>
+          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]}>
             <StoreEntryPage />
           </SoftGuard>
         } />
@@ -421,7 +421,7 @@ function AppRoutes() {
 
       {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
       <Route path="care" element={<MainLayout />}>
-        <Route element={<SoftGuardOutlet feature="care" allowedRoles={['pharmacy']} />}>
+        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]} />}>
           <Route index element={<CareDashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
           {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}
@@ -447,7 +447,7 @@ function AppRoutes() {
         path="service"
         element={
           <ServiceUserProtectedRoute>
-            <DashboardLayout role="consumer" />
+            <DashboardLayout role={GLYCOPHARM_ROLES.CONSUMER} />
           </ServiceUserProtectedRoute>
         }
       >
@@ -476,7 +476,7 @@ function AppRoutes() {
       <Route
         path="admin"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}>
             <AdminAreaLayout />
           </ProtectedRoute>
         }
@@ -582,7 +582,7 @@ function AppRoutes() {
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={['pharmacy']}>
+          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }

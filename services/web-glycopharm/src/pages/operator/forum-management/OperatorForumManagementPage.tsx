@@ -20,17 +20,18 @@ import {
   X,
 } from 'lucide-react';
 import type { Forum, ForumApplication, ForumStatus, ForumApplicationStatus, UserRole } from '@/types';
+import { GLYCOPHARM_ROLES, ROLE_LABELS } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 
-// Mock 포럼 신청 데이터
+// Mock 포럼 신청 데이터 (WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed roles)
 const mockApplications: ForumApplication[] = [
   {
     id: 'app1',
     title: '인슐린 펌프 사용자 모임',
     description: '인슐린 펌프 사용 경험을 공유하는 포럼',
     purpose: '인슐린 펌프 사용자들이 경험과 노하우를 공유하고, 새로운 사용자들에게 도움을 주기 위함',
-    targetRoles: ['pharmacy'],
-    allowedWriteRoles: ['pharmacy', 'operator'],
+    targetRoles: [GLYCOPHARM_ROLES.PHARMACY],
+    allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.OPERATOR],
     applicantId: 'u5',
     applicantName: '최약사',
     status: 'pending',
@@ -41,8 +42,8 @@ const mockApplications: ForumApplication[] = [
     title: '당뇨 식단 정보 공유',
     description: '당뇨인를 위한 식단 정보 공유 포럼',
     purpose: '당뇨인 맞춤 식단 정보와 레시피를 공유하는 공간',
-    targetRoles: ['pharmacy', 'supplier'],
-    allowedWriteRoles: ['pharmacy', 'supplier', 'operator'],
+    targetRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.SUPPLIER],
+    allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.SUPPLIER, GLYCOPHARM_ROLES.OPERATOR],
     note: '영양사 협회와 연계 예정',
     applicantId: 'u6',
     applicantName: '정약사',
@@ -51,14 +52,14 @@ const mockApplications: ForumApplication[] = [
   },
 ];
 
-// Mock 포럼 목록
+// Mock 포럼 목록 (WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed roles)
 const mockForums: Forum[] = [
   {
     id: 'forum1',
     title: 'CGM 사용 경험 공유',
     description: 'CGM 기기 사용 경험과 노하우를 공유하는 포럼입니다.',
     status: 'open',
-    allowedRoles: ['pharmacy', 'operator'],
+    allowedRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.OPERATOR],
     creatorId: 'u1',
     creatorName: '관리자',
     postCount: 45,
@@ -71,7 +72,7 @@ const mockForums: Forum[] = [
     title: '혈당관리 상담 사례',
     description: '약국에서의 혈당관리 상담 사례를 공유합니다.',
     status: 'open',
-    allowedRoles: ['pharmacy', 'operator'],
+    allowedRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.OPERATOR],
     creatorId: 'u2',
     creatorName: '김약사',
     postCount: 32,
@@ -84,7 +85,7 @@ const mockForums: Forum[] = [
     title: '공지사항',
     description: 'GlycoPharm 플랫폼 공지사항입니다.',
     status: 'readonly',
-    allowedRoles: ['operator'],
+    allowedRoles: [GLYCOPHARM_ROLES.OPERATOR],
     creatorId: 'u1',
     creatorName: '관리자',
     postCount: 12,
@@ -97,7 +98,7 @@ const mockForums: Forum[] = [
     title: '2023년 당뇨 케어 캠페인',
     description: '2023년 당뇨 케어 캠페인 관련 아카이브입니다.',
     status: 'closed',
-    allowedRoles: ['pharmacy', 'operator'],
+    allowedRoles: [GLYCOPHARM_ROLES.PHARMACY, GLYCOPHARM_ROLES.OPERATOR],
     creatorId: 'u1',
     creatorName: '관리자',
     postCount: 67,
@@ -172,13 +173,9 @@ export default function OperatorForumManagementPage() {
     }
   };
 
+  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
   const getRoleLabel = (role: UserRole) => {
-    switch (role) {
-      case 'pharmacy': return '약국';
-      case 'supplier': return '공급자';
-      case 'operator': return '운영자';
-      default: return role;
-    }
+    return ROLE_LABELS[role] ?? role;
   };
 
   const handleApprove = (appId: string) => {

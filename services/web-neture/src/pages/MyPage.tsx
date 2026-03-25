@@ -14,8 +14,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { User, Mail, Shield, Edit3, Check, X, LogOut, LayoutDashboard } from 'lucide-react';
-import { useAuth, ROLE_LABELS, ROUTE_OVERRIDES } from '../contexts';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, ROLE_LABELS, getNetureDashboardRoute } from '../contexts';
 import { useLoginModal } from '../contexts/LoginModalContext';
 
 /**
@@ -61,8 +60,8 @@ export default function MyPage() {
   }
 
   const activeRole = user.roles[0];
-  const dashboardPath = getPrimaryDashboardRoute(user.roles, ROUTE_OVERRIDES);
-  const roleLabel = ROLE_LABELS[activeRole];
+  const dashboardPath = getNetureDashboardRoute(user.roles);
+  const roleLabel = ROLE_LABELS[activeRole] || '사용자';
 
   const handleSave = () => {
     // TODO: Implement save API

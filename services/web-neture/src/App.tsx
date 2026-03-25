@@ -32,7 +32,7 @@ import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
 import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
-import { RoleGuard, OperatorRoute, AdminRoute } from './components/auth/RoleGuard';
+import { RoleGuard, OperatorRoute, AdminRoute, SupplierRoute } from './components/auth/RoleGuard';
 
 // ============================================================================
 // Neture 메인 페이지 (항상 로드)
@@ -545,8 +545,13 @@ function App() {
             {/* ================================================================
                 Supplier Space (/supplier/*)
                 WO-O4O-NETURE-UI-REFACTORING-V1
+                WO-O4O-AUTH-RBAC-STABILIZATION-V1: SupplierRoute guard 추가
             ================================================================ */}
-            <Route element={<SupplierSpaceLayout />}>
+            <Route element={
+              <SupplierRoute>
+                <SupplierSpaceLayout />
+              </SupplierRoute>
+            }>
               <Route path="/supplier/dashboard" element={<SupplierDashboardPage />} />
               <Route path="/supplier/products" element={<SupplierProductsPage />} />
               <Route path="/supplier/products/library" element={<SupplierProductLibraryPage />} />
@@ -577,8 +582,13 @@ function App() {
             {/* ================================================================
                 Supplier Account (/account/supplier/*)
                 WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1
+                WO-O4O-AUTH-RBAC-STABILIZATION-V1: SupplierRoute guard 추가
             ================================================================ */}
-            <Route element={<SupplierAccountLayout />}>
+            <Route element={
+              <SupplierRoute>
+                <SupplierAccountLayout />
+              </SupplierRoute>
+            }>
               <Route path="/account/supplier" element={<SupplierAccountDashboardPage />} />
               <Route path="/account/supplier/products" element={<SupplierProductsListPage />} />
               <Route path="/account/supplier/orders" element={<SupplierOrdersListPage />} />
@@ -687,7 +697,7 @@ function App() {
                 Admin Vault (/admin-vault)
             ================================================================ */}
             <Route element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['neture:admin', 'platform:super_admin']}>
                 <AdminVaultLayout />
               </ProtectedRoute>
             }>
@@ -828,12 +838,8 @@ function App() {
               <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
-              <Route path="/operator/roles" element={<RoleManagementPage />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
-              <Route path="/operator/categories" element={<CategoryManagementPage />} />
-              <Route path="/operator/brands" element={<BrandManagementPage />} />
-              <Route path="/operator/product-cleanup" element={<ProductDataCleanupPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/curation" element={<ProductCurationPage />} />
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />

@@ -3,17 +3,22 @@
  *
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  */
 
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility
 export { getAccessToken };
 
-export type UserRole = 'admin' | 'supplier' | 'seller' | 'partner' | 'operator';
+/**
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
+ * e.g., 'k-cosmetics:admin', 'k-cosmetics:operator', 'platform:super_admin'
+ */
+export type UserRole = string;
 
 export interface User {
   id: string;
@@ -37,26 +42,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ROLE_LABELS: Record<UserRole, string> = {
-  admin: '관리자',
-  supplier: '공급자',
-  seller: '판매자',
-  partner: '파트너',
-  operator: '운영자',
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
+const ROLE_LABELS: Record<string, string> = {
+  'platform:super_admin': '최고 관리자',
+  'k-cosmetics:admin': '관리자',
+  'k-cosmetics:operator': '운영자',
+  'k-cosmetics:supplier': '공급자',
+  'k-cosmetics:seller': '판매자',
+  'k-cosmetics:partner': '파트너',
+  user: '사용자',
 };
 
-
-// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
-const ROLE_MAP: Record<string, UserRole> = {
-  admin: 'admin',
-  super_admin: 'admin',
-  operator: 'operator',
-  supplier: 'supplier',
-  seller: 'seller',
-  partner: 'partner',
-  customer: 'seller',
-  user: 'seller',
-};
+/**
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: JWT roles를 그대로 사용 (prefix 유지).
+ * 빈 배열이면 ['user'] fallback.
+ */
+function extractRoles(apiUser: any): string[] {
+  const raw: string[] =
+    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+      ? apiUser.roles
+      : apiUser.role
+        ? [apiUser.role]
+        : [];
+  return raw.length > 0 ? raw : ['user'];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -73,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = response.data;
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
+        const roles = extractRoles(apiUser);
         const base = normalizeUser(apiUser);
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
@@ -95,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await authClient.login({ email, password });
       const apiUser = result.user as any;
       if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'seller' as UserRole);
+        const roles = extractRoles(apiUser);
         const base = normalizeUser(apiUser);
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
@@ -157,3 +166,29 @@ export function useAuth() {
 }
 
 export { ROLE_LABELS };
+
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
+const KCOSMETICS_ROLE_PRIORITY = [
+  'platform:super_admin',
+  'k-cosmetics:admin',
+  'k-cosmetics:operator',
+  'k-cosmetics:supplier',
+  'k-cosmetics:partner',
+  'k-cosmetics:seller',
+] as const;
+
+const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
+  'platform:super_admin': '/admin',
+  'k-cosmetics:admin': '/admin',
+  'k-cosmetics:operator': '/operator',
+  'k-cosmetics:supplier': '/',
+  'k-cosmetics:partner': '/partner',
+  'k-cosmetics:seller': '/',
+};
+
+/**
+ * K-Cosmetics 서비스용 대시보드 경로 결정
+ */
+export function getKCosmeticsDashboardRoute(roles: string[]): string {
+  return getPrimaryDashboardRoute(roles, KCOSMETICS_ROLE_PRIORITY, KCOSMETICS_DASHBOARD_MAP);
+}

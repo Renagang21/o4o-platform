@@ -5,8 +5,7 @@
 
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { AuthProvider, useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { LoginModalProvider } from '@/contexts/LoginModalContext';
 import LoginModal from '@/components/common/LoginModal';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
@@ -152,7 +151,7 @@ function RoleBasedHome() {
 
   useEffect(() => {
     if (user?.roles[0]) {
-      const target = getPrimaryDashboardRoute(user.roles);
+      const target = getKCosmeticsDashboardRoute(user.roles);
       if (target && target !== '/') {
         navigate(target, { replace: true });
       }
@@ -263,7 +262,7 @@ function AppRoutes() {
       <Route
         path="partner"
         element={
-          <ProtectedRoute allowedRoles={['partner']}>
+          <ProtectedRoute allowedRoles={['k-cosmetics:partner']}>
             <PartnerLayout />
           </ProtectedRoute>
         }
@@ -283,7 +282,7 @@ function AppRoutes() {
       <Route
         path="admin"
         element={
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={['k-cosmetics:admin', 'platform:super_admin']}>
             <DashboardLayout role="admin" />
           </ProtectedRoute>
         }
@@ -348,7 +347,7 @@ function AppRoutes() {
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={['operator']}>
+          <ProtectedRoute allowedRoles={['k-cosmetics:operator', 'k-cosmetics:admin', 'platform:super_admin']}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }
