@@ -51,8 +51,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isPending: boolean;
   isRejected: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }>;
-  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string; roles?: UserRole[] }>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
 }
@@ -119,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string; roles?: UserRole[] }> => {
     try {
       // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
       // which stores tokens to localStorage (api.post() alone does not)
@@ -168,45 +167,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       // Axios는 non-2xx 시 throw — error.response.data로 서버 에러 접근
       const data = error.response?.data;
-      if (data?.code === 'PASSWORD_MISMATCH' && data?.passwordSyncAvailable) {
-        return { success: false, message: data.error, passwordSyncAvailable: true, syncToken: data.syncToken };
-      }
       if (data) {
         return { success: false, message: resolveAuthError(data, error.response?.status) };
       }
       return { success: false, message: '로그인에 실패했습니다.' };
-    }
-  };
-
-  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; message?: string }> => {
-    try {
-      // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
-      const result = await authClient.passwordSync({ email, syncToken, newPassword });
-      const apiUser = result.user as any;
-      if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'pharmacist' as UserRole);
-
-        // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-        if (!roles.includes('patient')) {
-          clearAllTokens();
-          return { success: false, message: 'GlucoseView는 당뇨인 전용 서비스입니다.' };
-        }
-
-        const base = normalizeUser(apiUser);
-        const userData: User = {
-          ...base,
-          roles,
-          memberships: (apiUser as any).memberships || [],
-          approvalStatus: apiUser.status === 'active' ? 'approved' : 'pending',
-          displayName: base.name,
-        };
-        setUser(userData);
-        return { success: true };
-      }
-      return { success: false, message: '응답이 올바르지 않습니다.' };
-    } catch (error: any) {
-      const msg = error.response?.data?.error;
-      return { success: false, message: msg || '비밀번호 변경에 실패했습니다.' };
     }
   };
 
@@ -237,7 +201,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isPending,
       isRejected,
       login,
-      passwordSync,
       logout,
       updateUser,
     }}>

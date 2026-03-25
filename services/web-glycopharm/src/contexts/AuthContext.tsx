@@ -66,7 +66,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<User>;
-  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<User>;
   logout: () => void;
   selectRole: (role: UserRole) => void;
   switchRole: (role: UserRole) => void;
@@ -184,42 +183,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       // Axios는 non-2xx 시 throw — error.response.data로 서버 에러 접근
       const data = error.response?.data;
-      if (data?.code === 'PASSWORD_MISMATCH' && data?.passwordSyncAvailable) {
-        const err = new Error(data.error || '비밀번호가 일치하지 않습니다.');
-        (err as any).passwordSyncAvailable = true;
-        (err as any).syncToken = data.syncToken;
-        throw err;
-      }
       if (data) {
         throw new Error(resolveAuthError(data, error.response?.status));
       }
       throw new Error('로그인에 실패했습니다.');
-    }
-  };
-
-  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<User> => {
-    try {
-      // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
-      const result = await authClient.passwordSync({ email, syncToken, newPassword });
-      const apiUser = result.user as any;
-      if (apiUser) {
-        const mappedRoles = mapApiRoles(apiUser, ROLE_MAP, 'consumer' as UserRole);
-        const base = normalizeUser(apiUser);
-        const typedUser: User = {
-          ...apiUser,
-          ...base,
-          roles: mappedRoles,
-          memberships: (apiUser as any).memberships || [],
-          status: (apiUser.status as string) || 'approved',
-        } as User;
-        setUser(typedUser);
-        setAvailableRoles(mappedRoles);
-        return typedUser;
-      }
-      throw new Error('응답이 올바르지 않습니다.');
-    } catch (error: any) {
-      const msg = error.response?.data?.error;
-      throw new Error(msg || error.message || '비밀번호 변경에 실패했습니다.');
     }
   };
 
@@ -296,7 +263,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
-        passwordSync,
         logout,
         selectRole,
         switchRole,

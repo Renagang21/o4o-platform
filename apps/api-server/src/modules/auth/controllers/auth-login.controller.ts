@@ -5,13 +5,11 @@
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
 import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
 import { AppDataSource } from '../../../database/connection.js';
 import type { LoginRequestDto } from '../dto/index.js';
 import logger from '../../../utils/logger.js';
-import { RedisService } from '../../../services/redis.service.js';
 import { monitoringMetrics } from '../../../common/monitoring/metrics.service.js';
 import {
   isCrossOriginRequest,
@@ -135,26 +133,7 @@ export class AuthLoginController extends BaseController {
 
       // Handle specific auth errors with specific error codes
       if (error.code === 'INVALID_CREDENTIALS') {
-        // WO-O4O-AUTH-PASSWORD-SYNC-V1: Issue syncToken for password reset flow
-        try {
-          const syncToken = uuidv4();
-          const redis = RedisService.getInstance();
-          await redis.set(
-            `password-sync:${syncToken}`,
-            JSON.stringify({ email, createdAt: Date.now() }),
-            300, // 5 minutes TTL
-          );
-          return res.status(401).json({
-            success: false,
-            error: '비밀번호가 일치하지 않습니다.',
-            code: 'PASSWORD_MISMATCH',
-            passwordSyncAvailable: true,
-            syncToken,
-          });
-        } catch (syncErr) {
-          logger.warn('[AuthLoginController.login] Failed to generate syncToken', syncErr);
-          return BaseController.unauthorized(res, error.message, 'PASSWORD_MISMATCH');
-        }
+        return BaseController.unauthorized(res, '비밀번호가 일치하지 않습니다.', 'INVALID_CREDENTIALS');
       }
       if (error.code === 'INVALID_USER') {
         return BaseController.unauthorized(res, error.message, error.code);

@@ -27,8 +27,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }>;
-  passwordSync: (email: string, syncToken: string, newPassword: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
@@ -92,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
   }, []);
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[]; passwordSyncAvailable?: boolean; syncToken?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
     try {
       setIsLoading(true);
 
@@ -114,10 +113,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const responseData = error?.response?.data;
       const status = error?.response?.status;
 
-      if (responseData?.code === 'PASSWORD_MISMATCH' && responseData?.passwordSyncAvailable) {
-        return { success: false, error: responseData.error, passwordSyncAvailable: true, syncToken: responseData.syncToken };
-      }
-
       if (responseData) {
         return { success: false, error: resolveAuthError(responseData, status) };
       }
@@ -129,25 +124,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { success: false, error: '로그인에 실패했습니다.' };
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const passwordSync = async (email: string, syncToken: string, newPassword: string): Promise<{ success: boolean; error?: string; role?: UserRole; roles?: UserRole[] }> => {
-    try {
-      // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.passwordSync() handles token storage
-      const result = await authClient.passwordSync({ email, syncToken, newPassword });
-      const apiUser = result.user as any;
-      if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
-        const base = normalizeUser(apiUser);
-        const memberships = (apiUser as any).memberships || [];
-        setUser({ ...base, roles, memberships });
-        return { success: true, role: roles[0], roles };
-      }
-      return { success: false, error: '응답이 올바르지 않습니다.' };
-    } catch (error: any) {
-      const msg = error?.response?.data?.error || '비밀번호 변경에 실패했습니다.';
-      return { success: false, error: msg };
     }
   };
 
@@ -173,7 +149,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         isLoading,
         login,
-        passwordSync,
         logout,
         switchRole,
         hasMultipleRoles,
