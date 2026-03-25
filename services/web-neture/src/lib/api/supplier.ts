@@ -118,6 +118,9 @@ export interface SupplierProduct {
   // WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1
   consumerShortDescription?: string | null;
   consumerDetailDescription?: string | null;
+  // WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1
+  completenessScore?: number;
+  completenessStatus?: 'DRAFT' | 'INCOMPLETE' | 'READY' | 'APPROVED';
 }
 
 export interface ServiceSummary {
@@ -449,6 +452,7 @@ export const supplierApi = {
     distributionType?: string; isActive?: string;
     sort?: string; order?: string;
     hasImage?: string; hasDescription?: string; barcodeSource?: string;
+    completenessStatus?: string;
   }): Promise<{ data: SupplierProduct[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     try {
       const sp = new URLSearchParams();
@@ -462,6 +466,7 @@ export const supplierApi = {
       if (params?.hasImage) sp.set('hasImage', params.hasImage);
       if (params?.hasDescription) sp.set('hasDescription', params.hasDescription);
       if (params?.barcodeSource) sp.set('barcodeSource', params.barcodeSource);
+      if (params?.completenessStatus) sp.set('completenessStatus', params.completenessStatus);
       const qs = sp.toString() ? `?${sp}` : '';
       const response = await api.get(`/neture/supplier/products${qs}`);
       const result = response.data;

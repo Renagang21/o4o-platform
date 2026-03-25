@@ -619,6 +619,15 @@ export class NetureOfferService {
 
   // ==================== Paginated Supplier Products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
 
+  // WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1: 5-item × 20pts inline score
+  private static readonly COMPLETENESS_EXPR = `(
+    CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
+    + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
+    + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
+    + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
+    + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
+  )`;
+
   async getSupplierProductsPaginated(
     supplierId: string,
     options: {
@@ -632,6 +641,7 @@ export class NetureOfferService {
       hasImage?: string;
       hasDescription?: string;
       barcodeSource?: string;
+      completenessStatus?: string;
     } = {},
   ) {
     const page = Math.max(1, Number(options.page) || 1);
@@ -644,6 +654,7 @@ export class NetureOfferService {
       createdAt: 'spo.created_at',
       priceGeneral: 'spo.price_general',
       name: 'pm.marketing_name',
+      completeness: NetureOfferService.COMPLETENESS_EXPR,
     };
     const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
 
@@ -682,6 +693,13 @@ export class NetureOfferService {
       params.push(options.barcodeSource);
       idx++;
     }
+    if (options.completenessStatus === 'DRAFT') {
+      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} = 0`);
+    } else if (options.completenessStatus === 'INCOMPLETE') {
+      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} > 0 AND ${NetureOfferService.COMPLETENESS_EXPR} < 60`);
+    } else if (options.completenessStatus === 'READY') {
+      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 60`);
+    }
 
     const where = conditions.join(' AND ');
 
@@ -718,7 +736,8 @@ export class NetureOfferService {
            pi_img.image_url AS "primaryImageUrl",
            COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
            COALESCE(active.cnt, 0)::int AS "activeServiceCount",
-           svc_appr.approvals AS "serviceApprovals"
+           svc_appr.approvals AS "serviceApprovals",
+           ${NetureOfferService.COMPLETENESS_EXPR} AS "completenessScore"
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories pc ON pc.id = pm.category_id
@@ -747,13 +766,18 @@ export class NetureOfferService {
 
     const total = countResult[0]?.total || 0;
 
-    // Derive purpose
+    // Derive purpose + completenessStatus
     const data = rows.map((r: any) => ({
       ...r,
       purpose:
         r.isActive && r.activeServiceCount > 0 ? 'ACTIVE_SALES'
         : r.isActive ? 'APPLICATION'
         : 'CATALOG',
+      completenessStatus:
+        r.approvalStatus === 'approved' ? 'APPROVED'
+        : (r.completenessScore || 0) >= 60 ? 'READY'
+        : (r.completenessScore || 0) > 0 ? 'INCOMPLETE'
+        : 'DRAFT',
     }));
 
     return {

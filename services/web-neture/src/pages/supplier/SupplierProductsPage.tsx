@@ -408,6 +408,38 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     },
   },
   {
+    key: 'completenessScore' as any,
+    header: '완성도',
+    width: '90px',
+    align: 'center' as const,
+    render: (v: number | undefined, row: SupplierProduct) => {
+      const score = v || 0;
+      const color = score >= 80 ? 'text-green-600' : score >= 40 ? 'text-amber-600' : 'text-red-500';
+      const bgColor = score >= 80 ? 'bg-green-500' : score >= 40 ? 'bg-amber-500' : 'bg-red-500';
+      const missing: string[] = [];
+      if (!row.priceGeneral || row.priceGeneral <= 0) missing.push('가격');
+      if (!row.primaryImageUrl) missing.push('이미지');
+      if (!row.consumerShortDescription) missing.push('간단 소개');
+      if (!row.consumerDetailDescription) missing.push('상세 설명');
+      if (!row.distributionType) missing.push('유통 타입');
+      return (
+        <div className="group relative">
+          <div className="flex items-center gap-1.5">
+            <div className="w-10 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className={`h-full ${bgColor} rounded-full`} style={{ width: `${score}%` }} />
+            </div>
+            <span className={`text-xs font-medium ${color}`}>{score}%</span>
+          </div>
+          {missing.length > 0 && (
+            <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-slate-800 text-white text-[10px] rounded whitespace-nowrap z-10">
+              부족: {missing.join(', ')}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
     key: 'tags',
     header: '태그',
     width: '150px',
@@ -449,6 +481,7 @@ export default function SupplierProductsPage() {
   const [filterHasImage, setFilterHasImage] = useState('');
   const [filterHasDescription, setFilterHasDescription] = useState('');
   const [filterBarcodeSource, setFilterBarcodeSource] = useState('');
+  const [filterCompleteness, setFilterCompleteness] = useState('');
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
@@ -644,12 +677,13 @@ export default function SupplierProductsPage() {
       hasImage: filterHasImage || undefined,
       hasDescription: filterHasDescription || undefined,
       barcodeSource: filterBarcodeSource || undefined,
+      completenessStatus: filterCompleteness || undefined,
     });
     setProducts(result.data);
     setPagination(result.pagination);
     setSelectedIds(new Set());
     setLoading(false);
-  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource]);
+  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
 
   useEffect(() => {
     fetchProducts(1);
@@ -728,6 +762,9 @@ export default function SupplierProductsPage() {
         <FilterChip label="이미지 없음" active={filterHasImage === 'false'} onClick={() => toggleFilter(setFilterHasImage, 'false', filterHasImage)} />
         <FilterChip label="설명 없음" active={filterHasDescription === 'false'} onClick={() => toggleFilter(setFilterHasDescription, 'false', filterHasDescription)} />
         <FilterChip label="INTERNAL 상품" active={filterBarcodeSource === 'INTERNAL'} onClick={() => toggleFilter(setFilterBarcodeSource, 'INTERNAL', filterBarcodeSource)} />
+        <span className="w-px h-4 bg-slate-300" />
+        <FilterChip label="미완성" active={filterCompleteness === 'INCOMPLETE'} onClick={() => toggleFilter(setFilterCompleteness, 'INCOMPLETE', filterCompleteness)} />
+        <FilterChip label="완성" active={filterCompleteness === 'READY'} onClick={() => toggleFilter(setFilterCompleteness, 'READY', filterCompleteness)} />
       </div>
 
       {/* Bulk Action Bar */}

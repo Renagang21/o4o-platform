@@ -54,10 +54,10 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { page, limit, keyword, distributionType, isActive, sort, order,
-              hasImage, hasDescription, barcodeSource } = req.query;
+              hasImage, hasDescription, barcodeSource, completenessStatus } = req.query;
 
       // 쿼리 파라미터가 있으면 paginated, 없으면 기존 호환
-      if (page || limit || keyword || distributionType || isActive || sort || hasImage || hasDescription || barcodeSource) {
+      if (page || limit || keyword || distributionType || isActive || sort || hasImage || hasDescription || barcodeSource || completenessStatus) {
         const result = await netureService.getSupplierProductsPaginated(supplierId, {
           page: page as string | undefined ? Number(page) : undefined,
           limit: limit as string | undefined ? Number(limit) : undefined,
@@ -69,6 +69,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
           hasImage: hasImage as string | undefined,
           hasDescription: hasDescription as string | undefined,
           barcodeSource: barcodeSource as string | undefined,
+          completenessStatus: completenessStatus as string | undefined,
         });
         res.json({ success: true, ...result });
       } else {
