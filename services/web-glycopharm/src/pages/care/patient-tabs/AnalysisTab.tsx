@@ -55,6 +55,8 @@ const MEAL_COLORS: Record<string, { color: string; label: string }> = {
   fasting: { color: '#7c3aed', label: '공복' },
   before_meal: { color: '#2563eb', label: '식전' },
   after_meal: { color: '#f97316', label: '식후' },
+  after_meal_1h: { color: '#f97316', label: '식후1h' },
+  after_meal_2h: { color: '#ea580c', label: '식후2h' },
   bedtime: { color: '#6366f1', label: '취침전' },
   random: { color: '#64748b', label: '수시' },
 };
@@ -494,8 +496,9 @@ export default function AnalysisTab() {
       ? Math.round(fastingValues.reduce((a, b) => a + b, 0) / fastingValues.length)
       : null;
 
+    const postMealTimings = new Set(['after_meal', 'after_meal_1h', 'after_meal_2h']);
     const postMealReadings = readings.filter(
-      (r) => (r.metadata as Record<string, string>)?.mealTiming === 'after_meal',
+      (r) => postMealTimings.has((r.metadata as Record<string, string>)?.mealTiming),
     );
     const postMealValues = postMealReadings
       .map((r) => (r.valueNumeric != null ? Number(r.valueNumeric) : NaN))
