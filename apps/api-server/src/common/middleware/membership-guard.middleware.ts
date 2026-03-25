@@ -65,18 +65,8 @@ export function createMembershipScopeGuard(
         return scopeHandler(req, res, next);
       }
 
-      // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1
-      // Legacy unprefixed role compatibility for platform bypass services.
-      // Users with unprefixed 'admin'/'super_admin'/'operator' are legacy platform admins.
-      // When platformBypass is enabled, augment their roles with platform:super_admin
-      // so the scope guard can match them. KPA (platformBypass=false) is unaffected.
-      const LEGACY_PLATFORM_ROLES = ['admin', 'super_admin', 'operator'];
-      if (config.platformBypass && user.roles?.some((r: string) => LEGACY_PLATFORM_ROLES.includes(r))) {
-        if (!user.roles.includes('platform:super_admin')) {
-          user.roles = [...user.roles, 'platform:super_admin'];
-        }
-        return scopeHandler(req, res, next);
-      }
+      // WO-O4O-AUTH-RBAC-STABILIZATION-V1: Legacy unprefixed role bypass removed.
+      // All roles must now be prefixed (platform:*, neture:*, etc.).
 
       // WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1
       // Service-scoped role bypass — users with {service}:* roles (e.g., kpa:admin)

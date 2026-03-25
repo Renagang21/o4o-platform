@@ -3,14 +3,19 @@
  * httpOnly Cookie 기반 인증 (web-neture 패턴)
  *
  * WO-O4O-ACCOUNT-CENTER-UI-V1
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  */
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
-export type UserRole = 'admin' | 'supplier' | 'partner' | 'seller' | 'operator' | 'user';
+/**
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
+ * e.g., 'platform:super_admin', 'neture:admin', 'kpa-society:operator'
+ */
+export type UserRole = string;
 
 export interface User {
   id: string;
@@ -30,16 +35,19 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ROLE_MAP: Record<string, UserRole> = {
-  admin: 'admin',
-  super_admin: 'admin',
-  operator: 'operator',
-  supplier: 'supplier',
-  partner: 'partner',
-  seller: 'seller',
-  customer: 'user',
-  user: 'user',
-};
+/**
+ * JWT roles를 그대로 사용 (prefix 유지).
+ * 빈 배열이면 ['user'] fallback.
+ */
+function extractRoles(apiUser: any): string[] {
+  const raw: string[] =
+    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+      ? apiUser.roles
+      : apiUser.role
+        ? [apiUser.role]
+        : [];
+  return raw.length > 0 ? raw : ['user'];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -56,9 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const data = await response.json();
           const { user: apiUser } = parseAuthResponse(data);
           if (apiUser) {
-            const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
+            const roles = extractRoles(apiUser);
             const base = normalizeUser(apiUser);
-            const memberships = (apiUser as Record<string, unknown>).memberships as User['memberships'] || [];
+            const memberships = (apiUser as any).memberships || [];
             setUser({ ...base, roles, memberships });
           }
         }
@@ -90,9 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const { user: apiUser } = parseAuthResponse(data);
       if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
+        const roles = extractRoles(apiUser);
         const base = normalizeUser(apiUser);
-        const memberships = (apiUser as Record<string, unknown>).memberships as User['memberships'] || [];
+        const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
         return { success: true };
       }

@@ -89,7 +89,7 @@ const registrationSteps = [
 export default function PartnerLandingPage() {
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
-  const isPartner = isAuthenticated && user?.roles.some((r) => ['partner', 'admin'].includes(r));
+  const isPartner = isAuthenticated && user?.roles.some((r) => ['neture:partner', 'neture:admin', 'platform:super_admin'].includes(r));
 
   return (
     <div>

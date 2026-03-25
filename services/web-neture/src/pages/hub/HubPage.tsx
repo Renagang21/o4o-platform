@@ -39,7 +39,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
   {
     id: 'seller',
     title: '공급자 운영',
-    roles: ['supplier', 'partner', 'admin'],
+    roles: ['neture:supplier', 'neture:partner', 'neture:admin', 'platform:super_admin'],
     cards: [
       {
         id: 'products',
@@ -87,7 +87,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
     id: 'admin',
     title: '관리자 운영',
     badge: 'Admin',
-    roles: ['admin'],
+    roles: ['neture:admin', 'platform:super_admin'],
     cards: [
       {
         id: 'supplier-approval',
@@ -432,7 +432,7 @@ export default function HubPage() {
 
   const fetchSignals = useCallback(async () => {
     try {
-      const isAdmin = user?.roles.includes('admin');
+      const isAdmin = user?.roles.some(r => r === 'neture:admin' || r === 'platform:super_admin');
 
       // Fetch base signals + dashboard summary + AI insight in parallel
       // Promise.allSettled: individual failures don't crash the entire hub
@@ -567,7 +567,7 @@ export default function HubPage() {
   const userRoles = user.roles;
 
   // user 역할은 허브 접근 불가
-  if (!['admin', 'supplier', 'partner'].includes(role)) {
+  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'neture:partner'].includes(role)) {
     return (
       <div style={styles.guardContainer}>
         <div style={styles.guardBox}>

@@ -18,16 +18,17 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumStatus, ForumApplicationFormData, UserRole } from '@/types';
 
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role options
 const roleOptions: { value: UserRole; label: string }[] = [
-  { value: 'pharmacy', label: '약국' },
-  { value: 'supplier', label: '공급자' },
-  { value: 'operator', label: '운영자' },
+  { value: GLYCOPHARM_ROLES.PHARMACY, label: '약국' },
+  { value: GLYCOPHARM_ROLES.SUPPLIER, label: '공급자' },
+  { value: GLYCOPHARM_ROLES.OPERATOR, label: '운영자' },
 ];
 
 export default function ForumListPage() {
@@ -39,8 +40,8 @@ export default function ForumListPage() {
     title: '',
     description: '',
     purpose: '',
-    targetRoles: ['pharmacy'],
-    allowedWriteRoles: ['pharmacy'],
+    targetRoles: [GLYCOPHARM_ROLES.PHARMACY],
+    allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY],
     note: '',
   });
 
@@ -147,8 +148,8 @@ export default function ForumListPage() {
         title: '',
         description: '',
         purpose: '',
-        targetRoles: ['pharmacy'],
-        allowedWriteRoles: ['pharmacy'],
+        targetRoles: [GLYCOPHARM_ROLES.PHARMACY],
+        allowedWriteRoles: [GLYCOPHARM_ROLES.PHARMACY],
         note: '',
       });
     } catch {

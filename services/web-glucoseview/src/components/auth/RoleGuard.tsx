@@ -2,8 +2,7 @@
  * RoleGuard — GlucoseView 공통 역할 기반 접근 제어
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
- * 기존 RoleProtectedRoute 로직을 그대로 유지하며 통일된 인터페이스 제공.
- * role 필드: user.role
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed roles (e.g., 'glucoseview:admin')
  * fallback 기본값: '/' (GlucoseView 홈)
  */
 
@@ -66,8 +65,8 @@ export function OperatorRoute({ children, fallback = '/' }: Omit<RoleGuardProps,
 
   if (!user) return <Navigate to="/" replace />;
 
-  // ROLE_MAP이 super_admin → 'admin'으로 정규화하므로 admin만 확인
-  const isAdmin = user.roles.some(r => r === 'admin');
+  // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role check
+  const isAdmin = user.roles.some(r => r === 'glucoseview:admin' || r === 'platform:super_admin');
   const hasOperatorMembership = user.memberships?.some(
     m => m.serviceKey === SERVICE_KEY && m.status === 'active'
   );

@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams, NavLink } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
 import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react';
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
       } else if (loginType === 'operator') {
         navigate('/operator');
       } else {
-        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? []));
+        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? [], GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');

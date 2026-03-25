@@ -3,17 +3,22 @@
  *
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, mapApiRoles, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, getPrimaryDashboardRoute } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
 
-export type UserRole = 'admin' | 'supplier' | 'partner' | 'seller' | 'operator' | 'user';
+/**
+ * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
+ * e.g., 'neture:admin', 'neture:operator', 'platform:super_admin'
+ */
+export type UserRole = string;
 
 export interface User {
   id: string;
@@ -35,36 +40,49 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ROLE_LABELS: Record<UserRole, string> = {
-  admin: '관리자',
-  supplier: '공급자',
-  partner: '파트너',
-  seller: '셀러',
-  operator: '운영자',
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
+const ROLE_LABELS: Record<string, string> = {
+  'platform:super_admin': '최고 관리자',
+  'neture:admin': '관리자',
+  'neture:operator': '운영자',
+  'neture:supplier': '공급자',
+  'neture:partner': '파트너',
+  'neture:seller': '셀러',
   user: '사용자',
 };
 
-// WO-O4O-ROLE-ROUTE-ISOLATION-V1: 역할별 대표 진입 경로
-// admin → /admin, operator → /operator (분리)
-const ROUTE_OVERRIDES: Record<string, string> = {
-  admin: '/admin',
-  operator: '/operator',
-  supplier: '/supplier/dashboard',
-  partner: '/partner/dashboard',
-  seller: '/seller/overview',
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
+const NETURE_ROLE_PRIORITY = [
+  'platform:super_admin',
+  'neture:admin',
+  'neture:operator',
+  'neture:supplier',
+  'neture:partner',
+  'neture:seller',
+] as const;
+
+const NETURE_DASHBOARD_MAP: Record<string, string> = {
+  'platform:super_admin': '/admin',
+  'neture:admin': '/admin',
+  'neture:operator': '/operator',
+  'neture:supplier': '/supplier/dashboard',
+  'neture:partner': '/partner/dashboard',
+  'neture:seller': '/seller/overview',
 };
 
-// WO-O4O-AUTH-CHAIN-UNIFICATION-V1: 서비스별 역할 매핑 테이블
-const ROLE_MAP: Record<string, UserRole> = {
-  admin: 'admin',
-  super_admin: 'admin',
-  operator: 'operator',
-  supplier: 'supplier',
-  partner: 'partner',
-  seller: 'seller',
-  customer: 'user',
-  user: 'user',
-};
+/**
+ * JWT roles를 그대로 사용 (prefix 유지).
+ * 빈 배열이면 ['user'] fallback.
+ */
+function extractRoles(apiUser: any): string[] {
+  const raw: string[] =
+    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
+      ? apiUser.roles
+      : apiUser.role
+        ? [apiUser.role]
+        : [];
+  return raw.length > 0 ? raw : ['user'];
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -77,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
+          const roles = extractRoles(apiUser);
           const base = normalizeUser(apiUser);
           const memberships = (apiUser as any).memberships || [];
           setUser({ ...base, roles, memberships });
@@ -95,16 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      // WO-NETURE-OPERATOR-AUTH-SCOPE-COMPAT-FIX-V1: use authClient.login()
-      // which stores tokens to localStorage (api.post() alone does not)
       const result = await authClient.login({ email, password });
       const apiUser = result.user as any;
       if (apiUser) {
-        const roles = mapApiRoles(apiUser, ROLE_MAP, 'user' as UserRole);
+        const roles = extractRoles(apiUser);
         const base = normalizeUser(apiUser);
         const memberships = (apiUser as any).memberships || [];
         setUser({ ...base, roles, memberships });
-        // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles 반환
         return { success: true, role: roles[0], roles };
       }
 
@@ -128,7 +143,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
     await authClient.logout();
     setUser(null);
   };
@@ -167,4 +181,12 @@ export function useAuth() {
   return context;
 }
 
-export { ROLE_LABELS, ROUTE_OVERRIDES };
+export { ROLE_LABELS, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP };
+
+/**
+ * Neture 서비스용 대시보드 경로 결정
+ * getPrimaryDashboardRoute(roles, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP)
+ */
+export function getNetureDashboardRoute(roles: string[]): string {
+  return getPrimaryDashboardRoute(roles, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP);
+}

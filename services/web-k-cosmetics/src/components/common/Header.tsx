@@ -7,8 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
-import { useAuth, ROLE_LABELS } from '@/contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { useLoginModal } from '@/contexts/LoginModalContext';
 import ServiceSwitcher from '../ServiceSwitcher';
 
@@ -51,7 +50,7 @@ export default function Header() {
     setMobileMenuOpen(false);
   };
 
-  const dashboardPath = user?.roles[0] ? getPrimaryDashboardRoute(user.roles) : '/';
+  const dashboardPath = user?.roles[0] ? getKCosmeticsDashboardRoute(user.roles) : '/';
   const roleLabel = user?.roles[0] ? ROLE_LABELS[user.roles[0]] : '';
 
   return (

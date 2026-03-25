@@ -103,7 +103,7 @@ const RoleProtectedRoute = RoleGuard;
 function HomeRedirect() {
   const { isAuthenticated, user } = useAuth();
 
-  if (isAuthenticated && user?.roles.includes('patient')) {
+  if (isAuthenticated && user?.roles.includes('glucoseview:patient')) {
     return <Navigate to="/patient" replace />;
   }
 
@@ -149,7 +149,7 @@ function AppRoutes() {
 
       {/* 관리자 페이지 — WO-SECURITY-GLUCOSEVIEW-GUARD-FIX-V1: admin 역할 보호 */}
       <Route path="/admin" element={
-        <RoleProtectedRoute allowedRoles={['admin']}>
+        <RoleProtectedRoute allowedRoles={['glucoseview:admin', 'platform:super_admin']}>
           <AdminPage />
         </RoleProtectedRoute>
       } />
@@ -208,7 +208,7 @@ function AppRoutes() {
 
       {/* 당뇨인 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
       <Route path="/patient" element={
-        <RoleProtectedRoute allowedRoles={['patient']}>
+        <RoleProtectedRoute allowedRoles={['glucoseview:patient']}>
           <PatientLayout />
         </RoleProtectedRoute>
       }>

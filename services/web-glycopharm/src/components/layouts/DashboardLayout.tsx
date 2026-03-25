@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import type { UserRole } from '@/types';
 import {
   LayoutDashboard,
@@ -45,8 +45,9 @@ type SidebarItem = { label: string; path: string; exact?: boolean };
 type SidebarGroup = { label: string; icon: typeof LayoutDashboard; items: SidebarItem[]; };
 type RoleConfig = { title: string; icon: typeof Building2; color: string; menuItems?: MenuItem[]; menuGroups?: SidebarGroup[] };
 
+// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role keys
 const roleConfig: Record<string, RoleConfig> = {
-  admin: {
+  [GLYCOPHARM_ROLES.ADMIN]: {
     title: '관리자',
     icon: Shield,
     color: 'red',
@@ -66,7 +67,7 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
     ],
   },
-  pharmacy: {
+  [GLYCOPHARM_ROLES.PHARMACY]: {
     title: '약국 관리',
     icon: Building2,
     color: 'primary',
@@ -91,7 +92,7 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/store/settings', label: '설정', icon: Settings },
     ],
   },
-  supplier: {
+  [GLYCOPHARM_ROLES.SUPPLIER]: {
     title: '공급자 관리',
     icon: Truck,
     color: 'blue',
@@ -100,6 +101,14 @@ const roleConfig: Record<string, RoleConfig> = {
       { path: '/supplier/products', label: '상품 관리', icon: Package },
       { path: '/supplier/orders', label: '주문 현황', icon: ShoppingCart },
       { path: '/supplier/settings', label: '설정', icon: Settings },
+    ],
+  },
+  [GLYCOPHARM_ROLES.CONSUMER]: {
+    title: '소비자',
+    icon: Building2,
+    color: 'green',
+    menuItems: [
+      { path: '/', label: '홈', icon: LayoutDashboard },
     ],
   },
   // operator config removed — WO-O4O-OPERATOR-UI-STANDARDIZATION-V1: uses shared OperatorShell
@@ -344,7 +353,7 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
                   <NavLink
                     key={item.path}
                     to={item.path}
-                    end={item.path === '/admin' || item.path === `/${role}`}
+                    end={item.path === '/admin' || item.path === '/store' || item.path === '/supplier' || item.path === '/'}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive
                         ? `bg-${config.color}-50 text-${config.color}-700`

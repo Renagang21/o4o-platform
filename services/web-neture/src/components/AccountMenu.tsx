@@ -13,8 +13,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, LayoutDashboard, Settings, Shield, ExternalLink } from 'lucide-react';
 
 const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
-import { useAuth, ROUTE_OVERRIDES, ROLE_LABELS, useLoginModal } from '../contexts';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, ROLE_LABELS, getNetureDashboardRoute, useLoginModal } from '../contexts';
 import type { User as UserType } from '../contexts';
 
 /**
@@ -33,7 +32,7 @@ function isSuperOperator(user: UserType | null): boolean {
   if ((user as any).isSuperOperator) return true;
 
   // 역할 기반 판단
-  const operatorRoles = ['platform:operator', 'super_operator', 'platform:admin'];
+  const operatorRoles = ['platform:super_admin', 'neture:admin', 'platform:operator'];
   if (user.roles?.some(r => operatorRoles.includes(r))) return true;
 
   return false;
@@ -100,7 +99,7 @@ export default function AccountMenu() {
   }
 
   // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles로 대시보드 경로 결정
-  const dashboardPath = getPrimaryDashboardRoute(user.roles, ROUTE_OVERRIDES);
+  const dashboardPath = getNetureDashboardRoute(user.roles);
   const activeRole = user.roles[0];
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
   const isOperator = isSuperOperator(user);

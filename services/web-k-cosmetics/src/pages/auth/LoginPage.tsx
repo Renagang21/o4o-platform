@@ -5,8 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -30,7 +29,7 @@ export default function LoginPage() {
         throw new Error(result.error || '로그인에 실패했습니다.');
       }
       // WO-K-COSMETICS-ROLE-BASED-LANDING-V1: 역할 기반 리다이렉트
-      navigate(returnUrl || (result.role ? getPrimaryDashboardRoute([result.role]) : '/'));
+      navigate(returnUrl || (result.role ? getKCosmeticsDashboardRoute([result.role]) : '/'));
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
     } finally {
