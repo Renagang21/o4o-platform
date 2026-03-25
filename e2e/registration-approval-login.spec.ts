@@ -100,7 +100,7 @@ const services: ServiceConfig[] = [
     loginPath: '/login',
     operatorEmail: 'admin-neture@o4o.com',
     operatorPassword: 'O4oTestPass',
-    approvalPath: '/workspace/operator/registrations',
+    approvalPath: '/operator/registrations',
     fillRegister: async (page: Page) => {
       // Step 1: Role selection (supplier)
       const supplierBtn = page.locator('button:has-text("공급자"), button:has-text("supplier"), div:has-text("공급자")').first();
@@ -129,7 +129,7 @@ const services: ServiceConfig[] = [
       }
     },
     navigateToApproval: async (page: Page) => {
-      await page.goto('https://www.neture.co.kr/workspace/operator/registrations', { waitUntil: 'networkidle', timeout: 30000 });
+      await page.goto('https://www.neture.co.kr/operator/registrations', { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(3000);
     },
     approveUser: async (page: Page, email: string) => {

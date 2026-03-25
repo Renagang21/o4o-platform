@@ -351,7 +351,7 @@ function ServiceSummaryCard({ service }: { service: ServiceQualitySummary }) {
           </div>
           <div className="mt-3 text-right">
             <Link
-              to={`/workspace/operator/ai-admin/asset-quality/${service.serviceId}`}
+              to={`/operator/ai-admin/asset-quality/${service.serviceId}`}
               className="text-sm text-primary-600 hover:text-primary-700 font-medium"
             >
               상세 보기 →
@@ -531,43 +531,43 @@ export default function AssetQualityPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-6">
             <Link
-              to="/workspace/operator/ai-admin"
+              to="/operator/ai-admin"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               대시보드
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/engines"
+              to="/operator/ai-admin/engines"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               엔진 설정
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/policy"
+              to="/operator/ai-admin/policy"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               사용 기준 설정
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/asset-quality"
+              to="/operator/ai-admin/asset-quality"
               className="py-4 px-1 border-b-2 border-primary-600 text-primary-600 font-medium text-sm"
             >
               품질 관리
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/cost"
+              to="/operator/ai-admin/cost"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               비용 현황
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/context-assets"
+              to="/operator/ai-admin/context-assets"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               Context Asset
             </Link>
             <Link
-              to="/workspace/operator/ai-admin/composition-rules"
+              to="/operator/ai-admin/composition-rules"
               className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm"
             >
               응답 규칙

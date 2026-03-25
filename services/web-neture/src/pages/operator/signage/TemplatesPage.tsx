@@ -144,7 +144,7 @@ export default function TemplatesPage() {
         {filteredTemplates.map((item) => (
           <div
             key={item.id}
-            onClick={() => navigate(`/workspace/operator/signage/templates/${item.id}`)}
+            onClick={() => navigate(`/operator/signage/templates/${item.id}`)}
             className="bg-white rounded-xl border border-slate-200 p-5 hover:border-primary-200 hover:shadow-sm cursor-pointer transition-all group"
           >
             {/* Thumbnail or Placeholder */}

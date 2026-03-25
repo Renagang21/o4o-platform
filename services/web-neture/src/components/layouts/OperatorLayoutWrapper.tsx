@@ -24,7 +24,7 @@ export default function OperatorLayoutWrapper() {
       serviceName="Neture"
       menuItems={menuItems}
       capabilities={ENABLED_CAPABILITIES}
-      dashboardLink="/workspace/operator"
+      dashboardLink="/operator"
       user={user ? { name: user.name || '', email: user.email } : null}
       onLogout={() => { logout(); navigate('/'); }}
       headerActions={<AccountMenu />}

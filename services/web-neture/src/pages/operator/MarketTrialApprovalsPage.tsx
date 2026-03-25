@@ -96,7 +96,7 @@ export default function MarketTrialApprovalsPage() {
             return (
               <div
                 key={trial.id}
-                onClick={() => navigate(`/workspace/operator/market-trial/${trial.id}`)}
+                onClick={() => navigate(`/operator/market-trial/${trial.id}`)}
                 className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm cursor-pointer transition"
               >
                 <div className="flex items-start justify-between">

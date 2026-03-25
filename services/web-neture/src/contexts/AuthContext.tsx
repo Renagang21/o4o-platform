@@ -45,11 +45,11 @@ const ROLE_LABELS: Record<UserRole, string> = {
   user: '사용자',
 };
 
-// WO-O4O-OPERATOR-UI-UNIFICATION-V1: 역할별 대표 진입 경로
-// admin + operator → 통합 /workspace/operator
+// WO-O4O-NETURE-ROUTE-UNIFICATION-BIG-SWITCH-V1: 역할별 대표 진입 경로
+// admin + operator → 통합 /operator
 const ROUTE_OVERRIDES: Record<string, string> = {
-  admin: '/workspace/operator',
-  operator: '/workspace/operator',
+  admin: '/operator',
+  operator: '/operator',
   supplier: '/supplier/dashboard',
   partner: '/partner/dashboard',
   seller: '/seller/overview',

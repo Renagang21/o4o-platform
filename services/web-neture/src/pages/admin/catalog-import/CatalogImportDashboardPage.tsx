@@ -13,13 +13,13 @@ export default function CatalogImportDashboardPage() {
     {
       title: 'CSV Import',
       description: '범용 CSV 파일로 상품 일괄 등록',
-      path: '/workspace/operator/catalog-import/csv',
+      path: '/operator/catalog-import/csv',
       icon: '📄',
     },
     {
       title: 'Import History',
       description: '전체 Import 작업 이력 조회',
-      path: '/workspace/operator/catalog-import/history',
+      path: '/operator/catalog-import/history',
       icon: '📋',
     },
   ];

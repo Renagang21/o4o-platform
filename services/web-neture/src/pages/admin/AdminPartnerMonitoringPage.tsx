@@ -131,7 +131,7 @@ export default function AdminPartnerMonitoringPage() {
                   <td style={{ ...tdStyle, textAlign: 'right', color: '#059669' }}>{fmt(p.paid)}원</td>
                   <td style={{ ...tdStyle, textAlign: 'center' }}>
                     <button
-                      onClick={() => navigate(`/workspace/operator/partners/${p.partner_id}`)}
+                      onClick={() => navigate(`/operator/partners/${p.partner_id}`)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
                     >
                       <Eye size={16} color="#2563eb" />

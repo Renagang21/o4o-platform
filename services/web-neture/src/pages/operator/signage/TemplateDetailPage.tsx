@@ -112,7 +112,7 @@ export default function TemplateDetailPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
-          onClick={() => navigate('/workspace/operator/signage/templates')}
+          onClick={() => navigate('/operator/signage/templates')}
           className="flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -137,7 +137,7 @@ export default function TemplateDetailPage() {
       {/* Back + Header */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => navigate('/workspace/operator/signage/templates')}
+          onClick={() => navigate('/operator/signage/templates')}
           className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
