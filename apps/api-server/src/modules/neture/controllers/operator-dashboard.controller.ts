@@ -214,10 +214,10 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       // Block 3: Action Queue (5개)
       const actionQueue: ActionItem[] = [
         { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
-        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/supply' },
-        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/supply' },
+        { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/admin-suppliers' },
+        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/product-approvals' },
         { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
-        { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/community' },
+        { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/contact-messages' },
       ];
 
       // Block 4: Activity Log (multi-source: orders, suppliers, products, partners, contacts)
