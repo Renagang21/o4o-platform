@@ -42,7 +42,7 @@ export class PrefixUnprefixedRoles1771200000019 implements MigrationInterface {
       );
     }
 
-    console.log('[Migration] PrefixUnprefixedRoles completed. Rows affected:', result?.[1] ?? 'unknown');
+    console.warn('[Migration] PrefixUnprefixedRoles completed. Rows affected:', result?.[1] ?? 'unknown');
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
