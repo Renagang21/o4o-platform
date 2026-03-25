@@ -4,6 +4,8 @@
  * WO-NETURE-SUPPLIER-EXCEL-LIST-V1
  * WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1 — 다건 가격 편집, 체크박스 선택, 벌크 모달
  * WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1 — 이미지/설명 필터, 업로드 모달, 설명 편집 모달
+ * WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1 — 완성도 점수, 진행바, 필터
+ * WO-NETURE-SUPPLIER-WORKFLOW-SHORTCUTS-V1 — 부족 항목 클릭 → 편집 UI 바로 열기
  *
  * EditableDataTable 기반. 다건 인라인 편집 + batch 저장.
  * 검색/정렬/페이지네이션/필터 지원.
@@ -487,6 +489,11 @@ export default function SupplierProductsPage() {
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
   const [descEditProduct, setDescEditProduct] = useState<SupplierProduct | null>(null);
 
+  // Continuous workflow state
+  const [autoNext, setAutoNext] = useState(true);
+  const [highlightRowId, setHighlightRowId] = useState<string | null>(null);
+  const lastEditedRef = useRef<{ id: string; type: 'image' | 'description' | 'save' } | null>(null);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
@@ -644,6 +651,59 @@ export default function SupplierProductsPage() {
           ),
         };
       }
+      // Enhance completenessScore with clickable workflow shortcuts
+      if ((col as any).key === 'completenessScore') {
+        return {
+          ...col,
+          width: '110px',
+          render: (v: number | undefined, row: SupplierProduct) => {
+            const score = v || 0;
+            const color = score >= 80 ? 'text-green-600' : score >= 40 ? 'text-amber-600' : 'text-red-500';
+            const bgColor = score >= 80 ? 'bg-green-500' : score >= 40 ? 'bg-amber-500' : 'bg-red-500';
+            type MissingItem = { label: string; action: () => void };
+            const missing: MissingItem[] = [];
+            if (!row.primaryImageUrl) missing.push({ label: '이미지', action: () => setImageUploadMasterId(row.masterId) });
+            if (!row.priceGeneral || row.priceGeneral <= 0) missing.push({ label: '가격', action: () => showToast('공급가 셀을 클릭하여 편집하세요') });
+            if (!row.consumerShortDescription) missing.push({ label: '간단 소개', action: () => setDescEditProduct(row) });
+            if (!row.consumerDetailDescription) missing.push({ label: '상세 설명', action: () => setDescEditProduct(row) });
+            if (!row.distributionType) missing.push({ label: '유통 타입', action: () => showToast('유통 셀을 클릭하여 편집하세요') });
+            const next = missing[0];
+            const isHighlighted = highlightRowId === row.id;
+            return (
+              <div className={`group/comp relative ${isHighlighted ? 'animate-pulse' : ''}`}>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-10 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full ${bgColor} rounded-full`} style={{ width: `${score}%` }} />
+                  </div>
+                  <span className={`text-xs font-medium ${color}`}>{score}%</span>
+                  {isHighlighted && <span className="text-blue-500 text-xs">▶</span>}
+                </div>
+                {next && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); next.action(); }}
+                    className="mt-0.5 text-[10px] text-blue-600 hover:text-blue-800 hover:underline truncate block"
+                  >
+                    → {next.label}
+                  </button>
+                )}
+                {missing.length > 1 && (
+                  <div className="hidden group-hover/comp:flex flex-col absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-slate-800 rounded shadow-lg z-10 py-1 min-w-[100px]">
+                    {missing.map((item, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.stopPropagation(); item.action(); }}
+                        className="px-3 py-1 text-[11px] text-white hover:bg-slate-700 text-left whitespace-nowrap"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          },
+        };
+      }
       return col;
     });
 
@@ -656,7 +716,7 @@ export default function SupplierProductsPage() {
     if (refPriceIdx >= 0) cols.splice(refPriceIdx + 1, 0, descCol);
 
     return [selectCol, ...cols];
-  }, [products, selectedIds]);
+  }, [products, selectedIds, highlightRowId]);
 
   const handleGenerateAiTags = async (masterId: string) => {
     setGeneratingTagFor(masterId);
@@ -689,6 +749,52 @@ export default function SupplierProductsPage() {
     fetchProducts(1);
   }, [fetchProducts]);
 
+  // Auto-next: after action completes, move to next incomplete product
+  useEffect(() => {
+    const pending = lastEditedRef.current;
+    if (!pending || !autoNext || loading) return;
+    lastEditedRef.current = null;
+
+    const currentIdx = products.findIndex(p => p.id === pending.id);
+    if (currentIdx < 0) return;
+
+    let next: SupplierProduct | null = null;
+    for (let i = currentIdx + 1; i < products.length; i++) {
+      const p = products[i];
+      if ((p.completenessScore || 0) < 100 && p.completenessStatus !== 'APPROVED') {
+        next = p;
+        break;
+      }
+    }
+
+    if (!next) {
+      setToast('이 페이지의 미완성 상품을 모두 처리했습니다!');
+      setTimeout(() => setToast(null), 3000);
+      return;
+    }
+
+    setToast(`다음: ${next.name || next.masterName}`);
+    setTimeout(() => setToast(null), 3000);
+    setHighlightRowId(next.id);
+    setTimeout(() => setHighlightRowId(null), 2000);
+
+    // Scroll to target row
+    const targetIdx = products.findIndex(p => p.id === next!.id);
+    setTimeout(() => {
+      const rows = document.querySelectorAll('tbody tr');
+      if (targetIdx >= 0 && rows[targetIdx]) {
+        rows[targetIdx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+
+    // Auto-open editor for same action type
+    if (pending.type === 'image' && !next.primaryImageUrl) {
+      setTimeout(() => setImageUploadMasterId(next!.masterId), 400);
+    } else if (pending.type === 'description' && (!next.consumerShortDescription || !next.consumerDetailDescription)) {
+      setTimeout(() => setDescEditProduct(next!), 400);
+    }
+  }, [products, autoNext, loading]);
+
   const handleSearch = useCallback((value: string) => {
     fetchProducts(1, value);
   }, [fetchProducts]);
@@ -703,6 +809,9 @@ export default function SupplierProductsPage() {
       consumerReferencePrice: r.consumerReferencePrice != null ? Number(r.consumerReferencePrice) : null,
     }));
     await supplierApi.batchUpdateProducts(updates);
+    if (autoNext && changedRows.length === 1) {
+      lastEditedRef.current = { id: changedRows[0].id, type: 'save' };
+    }
     await fetchProducts(pagination.page);
     setSaving(false);
   };
@@ -765,6 +874,15 @@ export default function SupplierProductsPage() {
         <span className="w-px h-4 bg-slate-300" />
         <FilterChip label="미완성" active={filterCompleteness === 'INCOMPLETE'} onClick={() => toggleFilter(setFilterCompleteness, 'INCOMPLETE', filterCompleteness)} />
         <FilterChip label="완성" active={filterCompleteness === 'READY'} onClick={() => toggleFilter(setFilterCompleteness, 'READY', filterCompleteness)} />
+        <span className="w-px h-4 bg-slate-300" />
+        <button
+          onClick={() => setAutoNext(prev => !prev)}
+          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            autoNext ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          연속 작업 {autoNext ? 'ON' : 'OFF'}
+        </button>
       </div>
 
       {/* Bulk Action Bar */}
@@ -845,14 +963,23 @@ export default function SupplierProductsPage() {
         <ImageUploadModal
           masterId={imageUploadMasterId}
           onClose={() => setImageUploadMasterId(null)}
-          onUploaded={() => { setImageUploadMasterId(null); fetchProducts(pagination.page); }}
+          onUploaded={() => {
+            const p = products.find(pr => pr.masterId === imageUploadMasterId);
+            if (p) lastEditedRef.current = { id: p.id, type: 'image' };
+            setImageUploadMasterId(null);
+            fetchProducts(pagination.page);
+          }}
         />
       )}
       {descEditProduct && (
         <DescriptionEditModal
           product={descEditProduct}
           onClose={() => setDescEditProduct(null)}
-          onSaved={() => { setDescEditProduct(null); fetchProducts(pagination.page); }}
+          onSaved={() => {
+            lastEditedRef.current = { id: descEditProduct!.id, type: 'description' };
+            setDescEditProduct(null);
+            fetchProducts(pagination.page);
+          }}
         />
       )}
     </div>
