@@ -53,10 +53,11 @@ export function createSupplierProductController(dataSource: DataSource): Router 
   router.get('/products', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { page, limit, keyword, distributionType, isActive, sort, order } = req.query;
+      const { page, limit, keyword, distributionType, isActive, sort, order,
+              hasImage, hasDescription, barcodeSource } = req.query;
 
       // 쿼리 파라미터가 있으면 paginated, 없으면 기존 호환
-      if (page || limit || keyword || distributionType || isActive || sort) {
+      if (page || limit || keyword || distributionType || isActive || sort || hasImage || hasDescription || barcodeSource) {
         const result = await netureService.getSupplierProductsPaginated(supplierId, {
           page: page as string | undefined ? Number(page) : undefined,
           limit: limit as string | undefined ? Number(limit) : undefined,
@@ -65,6 +66,9 @@ export function createSupplierProductController(dataSource: DataSource): Router 
           isActive: isActive as string | undefined,
           sort: sort as string | undefined,
           order: order as string | undefined,
+          hasImage: hasImage as string | undefined,
+          hasDescription: hasDescription as string | undefined,
+          barcodeSource: barcodeSource as string | undefined,
         });
         res.json({ success: true, ...result });
       } else {
@@ -74,6 +78,35 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier products:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier products' });
+    }
+  });
+
+  // PATCH /supplier/products/bulk-price (WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1)
+  // 주의: /products/:id 보다 먼저 등록해야 'bulk-price'가 :id로 매칭되지 않음
+  router.patch('/products/bulk-price', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { offerIds, operation, value } = req.body;
+
+      if (!Array.isArray(offerIds) || offerIds.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_OFFER_IDS', message: 'offerIds array is required' });
+      }
+      if (offerIds.length > 100) {
+        return res.status(400).json({ success: false, error: 'TOO_MANY_OFFERS', message: 'Max 100 offers per request' });
+      }
+      const validOps = ['INCREASE', 'DECREASE', 'PERCENT_INCREASE', 'PERCENT_DECREASE', 'SET'];
+      if (!validOps.includes(operation)) {
+        return res.status(400).json({ success: false, error: 'INVALID_OPERATION', message: `operation must be one of: ${validOps.join(', ')}` });
+      }
+      if (typeof value !== 'number' || value < 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_VALUE', message: 'value must be a non-negative number' });
+      }
+
+      const result = await netureService.bulkUpdatePrice(supplierId, offerIds, operation, value);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error bulk updating prices:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to bulk update prices' });
     }
   });
 

@@ -251,6 +251,10 @@ export class NetureService {
     return this.offerService.batchUpdateSupplierOffers(supplierId, updates);
   }
 
+  async bulkUpdatePrice(...args: Parameters<typeof this.offerService.bulkUpdatePrice>) {
+    return this.offerService.bulkUpdatePrice(...args);
+  }
+
   async createSupplierOffer(
     supplierId: string,
     data: {

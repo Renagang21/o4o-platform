@@ -115,6 +115,9 @@ export interface SupplierProduct {
   serviceKeys?: string[];
   // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
   serviceApprovals?: Array<{ serviceKey: string; status: string }>;
+  // WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1
+  consumerShortDescription?: string | null;
+  consumerDetailDescription?: string | null;
 }
 
 export interface ServiceSummary {
@@ -445,6 +448,7 @@ export const supplierApi = {
     page?: number; limit?: number; keyword?: string;
     distributionType?: string; isActive?: string;
     sort?: string; order?: string;
+    hasImage?: string; hasDescription?: string; barcodeSource?: string;
   }): Promise<{ data: SupplierProduct[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     try {
       const sp = new URLSearchParams();
@@ -455,6 +459,9 @@ export const supplierApi = {
       if (params?.isActive) sp.set('isActive', params.isActive);
       if (params?.sort) sp.set('sort', params.sort);
       if (params?.order) sp.set('order', params.order);
+      if (params?.hasImage) sp.set('hasImage', params.hasImage);
+      if (params?.hasDescription) sp.set('hasDescription', params.hasDescription);
+      if (params?.barcodeSource) sp.set('barcodeSource', params.barcodeSource);
       const qs = sp.toString() ? `?${sp}` : '';
       const response = await api.get(`/neture/supplier/products${qs}`);
       const result = response.data;
@@ -483,6 +490,21 @@ export const supplierApi = {
     } catch (error) {
       console.warn('[Supplier API] Failed to batch update products:', error);
       return { updated: [], failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
+    }
+  },
+
+  // WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1: Bulk price update
+  async bulkUpdatePrice(params: {
+    offerIds: string[];
+    operation: 'INCREASE' | 'DECREASE' | 'PERCENT_INCREASE' | 'PERCENT_DECREASE' | 'SET';
+    value: number;
+  }): Promise<{ updated: number; failed: Array<{ id: string; error: string }> }> {
+    try {
+      const response = await api.patch('/neture/supplier/products/bulk-price', params);
+      return response.data.data || { updated: 0, failed: [] };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to bulk update prices:', error);
+      return { updated: 0, failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
     }
   },
 

@@ -629,6 +629,9 @@ export class NetureOfferService {
       isActive?: string;
       sort?: string;
       order?: string;
+      hasImage?: string;
+      hasDescription?: string;
+      barcodeSource?: string;
     } = {},
   ) {
     const page = Math.max(1, Number(options.page) || 1);
@@ -664,6 +667,21 @@ export class NetureOfferService {
       params.push(options.isActive === 'true');
       idx++;
     }
+    if (options.hasImage === 'true') {
+      conditions.push(`EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id)`);
+    } else if (options.hasImage === 'false') {
+      conditions.push(`NOT EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id)`);
+    }
+    if (options.hasDescription === 'true') {
+      conditions.push(`spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != ''`);
+    } else if (options.hasDescription === 'false') {
+      conditions.push(`(spo.consumer_short_description IS NULL OR spo.consumer_short_description = '')`);
+    }
+    if (options.barcodeSource) {
+      conditions.push(`pm.barcode_source = $${idx}`);
+      params.push(options.barcodeSource);
+      idx++;
+    }
 
     const where = conditions.join(' AND ');
 
@@ -686,6 +704,7 @@ export class NetureOfferService {
            spo.price_platinum AS "pricePlatinum",
            spo.consumer_reference_price AS "consumerReferencePrice",
            spo.consumer_short_description AS "consumerShortDescription",
+           spo.consumer_detail_description AS "consumerDetailDescription",
            spo.service_keys AS "serviceKeys",
            spo.created_at AS "createdAt",
            spo.updated_at AS "updatedAt",
@@ -773,6 +792,64 @@ export class NetureOfferService {
         }
       } catch (err) {
         failed.push({ id: item.offerId, error: (err as Error).message });
+      }
+    }
+
+    return { updated, failed };
+  }
+
+  // ==================== Bulk Price Update (WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1) ====================
+
+  async bulkUpdatePrice(
+    supplierId: string,
+    offerIds: string[],
+    operation: 'INCREASE' | 'DECREASE' | 'PERCENT_INCREASE' | 'PERCENT_DECREASE' | 'SET',
+    value: number,
+  ): Promise<{ updated: number; failed: Array<{ id: string; error: string }> }> {
+    const offers = await this.offerRepo.find({
+      where: { id: In(offerIds), supplierId },
+    });
+
+    const foundIds = new Set(offers.map((o) => o.id));
+    const failed: Array<{ id: string; error: string }> = [];
+
+    for (const id of offerIds) {
+      if (!foundIds.has(id)) {
+        failed.push({ id, error: 'NOT_FOUND_OR_NOT_OWNED' });
+      }
+    }
+
+    let updated = 0;
+    for (const offer of offers) {
+      const oldPrice = Number(offer.priceGeneral) || 0;
+      let newPrice: number;
+
+      switch (operation) {
+        case 'INCREASE':
+          newPrice = oldPrice + value;
+          break;
+        case 'DECREASE':
+          newPrice = oldPrice - value;
+          break;
+        case 'PERCENT_INCREASE':
+          newPrice = oldPrice * (1 + value / 100);
+          break;
+        case 'PERCENT_DECREASE':
+          newPrice = oldPrice * (1 - value / 100);
+          break;
+        case 'SET':
+          newPrice = value;
+          break;
+      }
+
+      newPrice = Math.max(0, Math.round(newPrice));
+      offer.priceGeneral = newPrice;
+
+      try {
+        await this.offerRepo.save(offer);
+        updated++;
+      } catch (err) {
+        failed.push({ id: offer.id, error: (err as Error).message });
       }
     }
 
