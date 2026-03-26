@@ -478,6 +478,38 @@ export class MembershipConsoleController {
            WHERE id = $2`,
           [dbStatus, userId]
         );
+
+        // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: suspend memberships + deactivate roles for service scope
+        if (dbStatus === 'suspended') {
+          const membershipFilter = scope.isPlatformAdmin
+            ? `WHERE user_id = $1 AND status = 'active'`
+            : `WHERE user_id = $1 AND status = 'active' AND service_key = ANY($2)`;
+          const membershipParams = scope.isPlatformAdmin ? [userId] : [userId, scope.serviceKeys];
+
+          const activeMemberships = await AppDataSource.query(
+            `SELECT id, role, service_key FROM service_memberships ${membershipFilter}`,
+            membershipParams
+          );
+
+          if (activeMemberships.length > 0) {
+            const membershipIds = activeMemberships.map((m: any) => m.id);
+            await AppDataSource.query(
+              `UPDATE service_memberships SET status = 'suspended', updated_at = NOW()
+               WHERE id = ANY($1)`,
+              [membershipIds]
+            );
+
+            for (const m of activeMemberships) {
+              if (m.role) {
+                await AppDataSource.query(
+                  `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+                   WHERE user_id = $1 AND role = $2 AND is_active = true`,
+                  [userId, m.role]
+                );
+              }
+            }
+          }
+        }
       }
 
       res.json({ success: true, message: `User status updated to ${status}` });
@@ -491,6 +523,65 @@ export class MembershipConsoleController {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to update user status',
         code: (error as any)?.code,
+      });
+    }
+  };
+
+  /**
+   * POST /api/v1/operator/members/:userId/reactivate
+   * 서비스 멤버십 재활성화 (membership + user + role_assignments atomic)
+   * WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
+   */
+  reactivateMember = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const scope: ServiceScope = (req as any).serviceScope;
+      const { userId } = req.params;
+      const reactivatedBy = (req as any).user?.id || null;
+
+      if (!scope.isPlatformAdmin) {
+        const hasAccess = await this.checkServiceBoundary(userId, scope.serviceKeys);
+        if (!hasAccess) {
+          res.status(404).json({ success: false, error: 'User not found' });
+          return;
+        }
+      }
+
+      const result = await approvalService.reactivateMembership({
+        userId,
+        reactivatedBy,
+        isPlatformAdmin: scope.isPlatformAdmin,
+        serviceKeys: scope.serviceKeys,
+      });
+
+      if (!result) {
+        res.status(404).json({ success: false, error: 'No suspended memberships found' });
+        return;
+      }
+
+      // Audit logging
+      const serviceKey = scope.serviceKeys[0] || 'platform';
+      this.getActionLogService()?.logSuccess(
+        serviceKey,
+        reactivatedBy || 'unknown',
+        `${serviceKey}.operator.member_reactivate`,
+        {
+          meta: {
+            targetId: userId,
+            reactivatedMemberships: result.reactivatedMemberships,
+            roles: result.reactivatedRoles,
+          },
+        },
+      ).catch(() => {});
+
+      res.json({ success: true, message: 'User reactivated', data: result });
+    } catch (error) {
+      logger.error('[MembershipConsole] reactivateMember error', {
+        userId: req.params.userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to reactivate member',
       });
     }
   };

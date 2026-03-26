@@ -53,6 +53,18 @@ export const cosmeticsActionConfig: ServiceActionConfig = {
       actionApi: '/cosmetics/operator/actions/execute/draft-products',
       actionMethod: 'POST',
     },
+    {
+      id: 'suspended-members',
+      type: 'member',
+      title: '정지 회원 복구 대기',
+      description: '정지 상태의 회원이 있습니다.',
+      query: `SELECT COUNT(*)::int AS cnt, MIN(sm.updated_at) AS oldest
+              FROM service_memberships sm
+              WHERE sm.status = 'suspended' AND sm.service_key = 'k-cosmetics'`,
+      actionUrl: '/operator/users?status=suspended',
+      actionLabel: '회원 관리',
+      actionType: 'NAVIGATE',
+    },
   ],
   executeHandlers: {
     // WO-O4O-ACTION-EXECUTION-LAYER-V1: 임시저장 상품 일괄 발행 (DRAFT → VISIBLE)

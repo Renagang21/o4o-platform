@@ -327,6 +327,21 @@ export default function UserDetailPage({
     }
   };
 
+  // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: 서비스 멤버십 + 역할 복구
+  const handleReactivate = async () => {
+    if (!id || !user) return;
+    if (!confirm('이 사용자의 멤버십과 역할을 복구하시겠습니까?')) return;
+    setActionLoading('reactivate');
+    try {
+      await apiAdapter.post(`/operator/members/${id}/reactivate`);
+      fetchDetail();
+    } catch (err: any) {
+      alert(err.message || '복구에 실패했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleDelete = async () => {
     if (!user || !id) return;
     if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
@@ -498,7 +513,16 @@ export default function UserDetailPage({
                 <XCircle className="w-4 h-4" />정지
               </button>
             )}
-            {(user.status === 'suspended' || user.status === 'rejected') && (
+            {user.status === 'suspended' && (
+              <button
+                onClick={handleReactivate}
+                disabled={actionLoading === 'reactivate'}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              >
+                <CheckCircle className="w-4 h-4" />복구
+              </button>
+            )}
+            {user.status === 'rejected' && (
               <button
                 onClick={() => handleStatusChange('approved')}
                 disabled={actionLoading === 'status'}

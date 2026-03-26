@@ -106,6 +106,18 @@ export const kpaActionConfig: ServiceActionConfig = {
       actionLabel: '승인 관리',
       actionType: 'NAVIGATE',
     },
+    {
+      id: 'suspended-members',
+      type: 'member',
+      title: '정지 회원 복구 대기',
+      description: '정지 상태의 회원이 있습니다.',
+      query: `SELECT COUNT(*)::int AS cnt, MIN(sm.updated_at) AS oldest
+              FROM service_memberships sm
+              WHERE sm.status = 'suspended' AND sm.service_key = 'kpa-society'`,
+      actionUrl: '/operator/users?status=suspended',
+      actionLabel: '회원 관리',
+      actionType: 'NAVIGATE',
+    },
   ],
   executeHandlers: {
     // WO-O4O-ACTION-EXECUTION-LAYER-V1: 대기 콘텐츠 일괄 승인 (pending → published)
