@@ -16,15 +16,15 @@
 | Database | `o4o_platform` |
 
 **DB 접근 정책:**
-- ✅ Cloud Run 내부 / Admin API / Google Cloud Console
+- ✅ Cloud Run 내부 / Admin API / Google Cloud Console / `gcloud sql` CLI
 - ❌ 로컬 psql / 로컬 scripts — **절대 금지** (방화벽 차단)
 
-**마이그레이션:** main 배포 → CI/CD 자동 실행 (권장) | 긴급 시 Admin API 또는 Cloud Console SQL Editor
+**마이그레이션:** main 배포 → CI/CD 자동 실행 (권장) | 긴급 시 Admin API 또는 Cloud Console SQL Editor 또는 `gcloud sql connect`
 
 > 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
 **로컬 도구:**
-- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회(`gcloud run services logs read`), 리비전 확인 등 디버깅에 활용 가능
+- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회(`gcloud run services logs read`), 리비전 확인, Cloud SQL 접근(`gcloud sql connect`) 등 디버깅/운영에 활용 가능
 - ✅ `gh` CLI 설치됨 — GitHub PR/이슈 관리
 
 ---
