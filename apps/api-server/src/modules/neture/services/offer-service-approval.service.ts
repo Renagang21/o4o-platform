@@ -70,7 +70,7 @@ export class OfferServiceApprovalService {
            osa.reason, osa.created_at AS "createdAt",
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS "productName",
            pm.barcode,
-           ns.name AS "supplierName",
+           COALESCE(supplier_org.name, ns.name) AS "supplierName",
            pm.regulatory_type AS "regulatoryType",
            pm.mfds_permit_number AS "mfdsPermitNumber",
            pm.is_mfds_verified AS "isMfdsVerified",
@@ -87,6 +87,7 @@ export class OfferServiceApprovalService {
          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
          ${where}
          ORDER BY osa.created_at DESC
          LIMIT $${idx} OFFSET $${idx + 1}`,

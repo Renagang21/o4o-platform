@@ -162,7 +162,7 @@ export class PartnerService {
         spo.slug AS product_slug,
         ns.slug AS store_slug,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
-        ns.name AS supplier_name,
+        COALESCE(supplier_org.name, ns.name) AS supplier_name,
         spc.commission_per_unit,
         spc.start_date AS commission_start_date,
         spo.consumer_reference_price,
@@ -171,6 +171,7 @@ export class PartnerService {
       FROM supplier_partner_commissions spc
       JOIN supplier_product_offers spo ON spo.id = spc.supplier_product_id
       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
       LEFT JOIN product_masters pm ON pm.id = spo.master_id
       WHERE spc.start_date <= CURRENT_DATE
         AND (spc.end_date IS NULL OR spc.end_date >= CURRENT_DATE)
@@ -230,13 +231,14 @@ export class PartnerService {
         pr.id, pr.referral_token, pr.product_id, pr.store_id, pr.created_at,
         spo.slug AS product_slug,
         ns.slug AS store_slug,
-        ns.name AS store_name,
+        COALESCE(supplier_org.name, ns.name) AS store_name,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
         spo.price_general,
         spc.commission_per_unit
       FROM partner_referrals pr
       JOIN supplier_product_offers spo ON spo.id = pr.product_id
       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
       LEFT JOIN product_masters pm ON pm.id = spo.master_id
       LEFT JOIN supplier_partner_commissions spc ON spc.supplier_product_id = pr.product_id
         AND spc.start_date <= CURRENT_DATE
@@ -295,11 +297,12 @@ export class PartnerService {
 
     const items = await this.dataSource.query(
       `SELECT psi.commission_amount, pc.order_number, pc.order_amount,
-              pc.commission_rate, pc.supplier_id, ns.name AS supplier_name,
+              pc.commission_rate, pc.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
               pc.created_at AS commission_date
        FROM partner_settlement_items psi
        JOIN partner_commissions pc ON pc.id = psi.commission_id
        LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
        WHERE psi.settlement_id = $1
        ORDER BY pc.created_at`,
       [settlementId],
@@ -584,11 +587,12 @@ export class PartnerService {
     // 포함된 커미션 목록
     const items = await this.dataSource.query(
       `SELECT psi.*, pc.order_number, pc.order_amount, pc.commission_rate,
-              pc.supplier_id, ns.name AS supplier_name,
+              pc.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
               pc.status AS commission_status
        FROM partner_settlement_items psi
        JOIN partner_commissions pc ON pc.id = psi.commission_id
        LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
        WHERE psi.settlement_id = $1
        ORDER BY pc.created_at`,
       [settlementId],

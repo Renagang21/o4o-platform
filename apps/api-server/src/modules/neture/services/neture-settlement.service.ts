@@ -269,13 +269,14 @@ export class NetureSettlementService {
 
     const [settlements, countResult] = await Promise.all([
       this.dataSource.query(
-        `SELECT s.id, s.supplier_id, ns.name AS supplier_name,
+        `SELECT s.id, s.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
                 s.period_start, s.period_end,
                 s.total_sales, s.platform_fee, s.supplier_amount,
                 s.platform_fee_rate, s.order_count, s.status,
                 s.approved_at, s.paid_at, s.notes, s.created_at, s.updated_at
          FROM neture_settlements s
          LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
+         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
          ${statusClause}
          ORDER BY s.created_at DESC
          LIMIT ${limit} OFFSET ${offset}`,
@@ -331,9 +332,10 @@ export class NetureSettlementService {
    */
   async getAdminSettlementDetail(settlementId: string) {
     const rows = await this.dataSource.query(
-      `SELECT s.*, ns.name AS supplier_name
+      `SELECT s.*, COALESCE(supplier_org.name, ns.name) AS supplier_name
        FROM neture_settlements s
        LEFT JOIN neture_suppliers ns ON ns.id = s.supplier_id
+       LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
        WHERE s.id = $1 LIMIT 1`,
       [settlementId],
     );

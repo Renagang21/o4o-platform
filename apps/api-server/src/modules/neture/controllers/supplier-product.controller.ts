@@ -175,7 +175,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       }
       const rows = await dataSource.query(
         `SELECT pa.id, pa.approval_status AS status,
-                spo.supplier_id AS "supplierId", ns.name AS "supplierName",
+                spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
                 pm.marketing_name AS "productName", pa.offer_id AS "offerId",
@@ -186,6 +186,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
          WHERE pa.approval_type = 'private'
            AND spo.supplier_id = $1${statusFilter}${serviceFilter}
          ORDER BY pa.created_at DESC`,
@@ -205,7 +206,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { id } = req.params;
       const rows = await dataSource.query(
         `SELECT pa.id, pa.approval_status AS status,
-                spo.supplier_id AS "supplierId", ns.name AS "supplierName",
+                spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
                 pm.marketing_name AS "productName", pa.offer_id AS "offerId",
@@ -218,6 +219,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
          JOIN supplier_product_offers spo ON spo.id = pa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
          WHERE pa.id = $1 AND pa.approval_type = 'private'
            AND spo.supplier_id = $2`,
         [id, supplierId],
