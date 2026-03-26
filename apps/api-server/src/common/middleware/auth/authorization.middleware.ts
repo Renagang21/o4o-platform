@@ -45,10 +45,8 @@ export const requireAdmin = async (
   const user = req.user as User;
 
   try {
-    // WO-O4O-AUTH-RBAC-CLEANUP-V1: admin/super_admin only — operator removed
+    // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: prefixed roles only
     const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
-      'admin',
-      'super_admin',
       'platform:admin',
       'platform:super_admin',
     ]);

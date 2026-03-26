@@ -46,6 +46,19 @@ export interface DeleteMemberParams {
 }
 
 // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
+export interface SuspendParams {
+  userId: string;
+  suspendedBy: string | null;
+  isPlatformAdmin: boolean;
+  serviceKeys: string[];
+}
+
+export interface SuspendResult {
+  suspendedMemberships: number;
+  deactivatedRoles: string[];
+  userId: string;
+}
+
 export interface ReactivateParams {
   userId: string;
   reactivatedBy: string | null;
@@ -227,6 +240,108 @@ export class MembershipApprovalService {
         stack: error instanceof Error ? error.stack : undefined,
       });
       throw error;
+    }
+  }
+
+  /**
+   * Suspend active memberships for a user (atomic: membership + role_assignment).
+   * WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2
+   * Service-level only — does NOT change users.status (no global impact).
+   * Returns result with counts, or null if no active memberships found in scope.
+   */
+  async suspendMembership(params: SuspendParams): Promise<SuspendResult | null> {
+    const { userId, suspendedBy, isPlatformAdmin, serviceKeys } = params;
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // STEP0: SELECT active memberships FOR UPDATE
+      logger.info('[SUSPEND][STEP0] SELECT active memberships FOR UPDATE', {
+        userId, suspendedBy, isPlatformAdmin,
+      });
+
+      const selectResult = isPlatformAdmin
+        ? await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status = 'active'
+             FOR UPDATE`,
+            [userId]
+          )
+        : await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status = 'active' AND service_key = ANY($2)
+             FOR UPDATE`,
+            [userId, serviceKeys]
+          );
+
+      if (!selectResult || selectResult.length === 0) {
+        logger.warn('[SUSPEND][STEP0] no active memberships found', {
+          userId, isPlatformAdmin, serviceKeys,
+        });
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+
+      const membershipIds = selectResult.map((m: any) => m.id);
+      const roles = selectResult.map((m: any) => m.role).filter(Boolean);
+
+      logger.info('[SUSPEND][STEP0] memberships locked', {
+        userId, count: selectResult.length, roles,
+      });
+
+      // STEP1: Suspend memberships
+      logger.info('[SUSPEND][STEP1] membership UPDATE', { membershipIds });
+
+      await queryRunner.query(
+        `UPDATE service_memberships
+         SET status = 'suspended', updated_at = NOW()
+         WHERE id = ANY($1)`,
+        [membershipIds]
+      );
+
+      // STEP2: Deactivate role_assignments for each membership role
+      const deactivatedRoles: string[] = [];
+      for (const membership of selectResult) {
+        if (membership.role) {
+          logger.info('[SUSPEND][STEP2] role DEACTIVATE', { userId, role: membership.role });
+
+          await queryRunner.query(
+            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = true`,
+            [userId, membership.role]
+          );
+          deactivatedRoles.push(membership.role);
+        }
+      }
+
+      // NOTE: users.status is NOT changed — service-level suspension only
+      await queryRunner.commitTransaction();
+
+      logger.info('[SUSPEND][SUCCESS]', {
+        userId, suspendedMemberships: selectResult.length, deactivatedRoles, suspendedBy,
+      });
+
+      return {
+        suspendedMemberships: selectResult.length,
+        deactivatedRoles,
+        userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error('[SUSPEND][FAILED]', {
+        userId, suspendedBy,
+        errorMessage: err.message,
+        errorCode: (error as any)?.code,
+        errorDetail: (error as any)?.detail,
+        stack: err.stack,
+      });
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 

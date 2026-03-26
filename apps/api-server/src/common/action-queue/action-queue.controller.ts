@@ -25,7 +25,7 @@ type AuthenticatedRequest = Request & { user?: { id: string } };
 export function createActionQueueRouter(
   dataSource: DataSource,
   config: ServiceActionConfig,
-  executeGuard?: RequestHandler,
+  executeGuard: RequestHandler,
 ): Router {
   const router = Router();
 
@@ -105,11 +105,7 @@ export function createActionQueueRouter(
     }
   };
 
-  if (executeGuard) {
-    router.post('/actions/execute/:actionId', executeGuard, executeHandler);
-  } else {
-    router.post('/actions/execute/:actionId', executeHandler);
-  }
+  router.post('/actions/execute/:actionId', executeGuard, executeHandler);
 
   // ── POST /actions/dismiss/:actionId ──
   router.post('/actions/dismiss/:actionId', async (req: Request, res: Response): Promise<void> => {

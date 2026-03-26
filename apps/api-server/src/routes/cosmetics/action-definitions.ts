@@ -8,6 +8,7 @@
 
 import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig } from '../../common/action-queue/action-queue.types.js';
+import logger from '../../utils/logger.js';
 
 export const cosmeticsActionConfig: ServiceActionConfig = {
   serviceKey: 'k-cosmetics',
@@ -68,7 +69,8 @@ export const cosmeticsActionConfig: ServiceActionConfig = {
   ],
   executeHandlers: {
     // WO-O4O-ACTION-EXECUTION-LAYER-V1: 임시저장 상품 일괄 발행 (DRAFT → VISIBLE)
-    'draft-products': async (dataSource: DataSource, _userId: string) => {
+    'draft-products': async (dataSource: DataSource, userId: string) => {
+      logger.info(`[ActionExecute] cosmetics/draft-products by ${userId}`);
       const result = await dataSource.query(
         `UPDATE cosmetics.cosmetics_products
          SET status = 'VISIBLE', updated_at = NOW()

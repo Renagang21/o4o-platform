@@ -4,6 +4,7 @@ import { FieldGroup, CustomField, CustomFieldValue } from '../../entities/Custom
 import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 import logger from '../../utils/logger.js';
+import { isAnyAdmin } from '../../utils/role.utils.js';
 
 export class FieldGroupsController {
   private fieldGroupRepo = AppDataSource.getRepository(FieldGroup);
@@ -89,7 +90,7 @@ export class FieldGroupsController {
       const { title, description, location, rules, options, placement, fields = [] } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -148,7 +149,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -216,7 +217,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -265,7 +266,7 @@ export class FieldGroupsController {
       const { title } = req.body;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -332,7 +333,7 @@ export class FieldGroupsController {
       const { id } = req.params;
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }
@@ -370,7 +371,7 @@ export class FieldGroupsController {
       const { fieldGroups } = req.body; // Array of { id, order }
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.includes('admin')) {
+      if (!user || !isAnyAdmin(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Admin access required' }

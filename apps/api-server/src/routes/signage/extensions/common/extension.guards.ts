@@ -86,7 +86,7 @@ function hasRole(user: any, role: string): boolean {
  * Core Signage Operator 여부 확인
  */
 function isCoreSignageOperator(user: any): boolean {
-  return hasRole(user, 'signage:operator') || hasRole(user, 'admin');
+  return hasRole(user, 'signage:operator') || hasRole(user, 'platform:admin') || hasRole(user, 'platform:super_admin');
 }
 
 /**
