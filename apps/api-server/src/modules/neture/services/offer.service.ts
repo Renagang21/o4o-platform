@@ -340,11 +340,7 @@ export class NetureOfferService {
         const pendingRequestCount = pendingMap.get(o.id) || 0;
         const productName = o.master?.marketingName || o.master?.regulatoryName || '';
 
-        // Derive purpose from state
-        const purpose: 'ACTIVE_SALES' | 'APPLICATION' | 'CATALOG' =
-          o.isActive && activeServiceCount > 0 ? 'ACTIVE_SALES'
-          : o.isActive ? 'APPLICATION'
-          : 'CATALOG';
+        const purpose = NetureOfferService.derivePurpose(o.isActive, activeServiceCount);
 
         return {
           id: o.id,
@@ -707,6 +703,27 @@ export class NetureOfferService {
     + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
   )`;
 
+  /** Phase 3B: offer 상태로부터 purpose 파생 */
+  private static derivePurpose(
+    isActive: boolean,
+    activeServiceCount: number,
+  ): 'ACTIVE_SALES' | 'APPLICATION' | 'CATALOG' {
+    if (isActive && activeServiceCount > 0) return 'ACTIVE_SALES';
+    if (isActive) return 'APPLICATION';
+    return 'CATALOG';
+  }
+
+  /** Phase 3B: approvalStatus + completenessScore로부터 completenessStatus 파생 */
+  private static deriveCompletenessStatus(
+    approvalStatus: string,
+    completenessScore: number,
+  ): 'APPROVED' | 'READY' | 'INCOMPLETE' | 'DRAFT' {
+    if (approvalStatus === 'approved') return 'APPROVED';
+    if (completenessScore >= 60) return 'READY';
+    if (completenessScore > 0) return 'INCOMPLETE';
+    return 'DRAFT';
+  }
+
   /** Phase 3A: WHERE 조건 + 페이징/정렬 파라미터 빌드 */
   private buildPaginatedWhereClause(
     supplierId: string,
@@ -790,15 +807,8 @@ export class NetureOfferService {
   private mapPaginatedRow(r: any) {
     return {
       ...r,
-      purpose:
-        r.isActive && r.activeServiceCount > 0 ? 'ACTIVE_SALES'
-        : r.isActive ? 'APPLICATION'
-        : 'CATALOG',
-      completenessStatus:
-        r.approvalStatus === 'approved' ? 'APPROVED'
-        : (r.completenessScore || 0) >= 60 ? 'READY'
-        : (r.completenessScore || 0) > 0 ? 'INCOMPLETE'
-        : 'DRAFT',
+      purpose: NetureOfferService.derivePurpose(r.isActive, r.activeServiceCount),
+      completenessStatus: NetureOfferService.deriveCompletenessStatus(r.approvalStatus, r.completenessScore || 0),
     };
   }
 
