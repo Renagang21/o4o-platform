@@ -121,6 +121,12 @@ export interface SupplierProduct {
   // WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1
   completenessScore?: number;
   completenessStatus?: 'DRAFT' | 'INCOMPLETE' | 'READY' | 'APPROVED';
+  // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1
+  stockQuantity?: number;
+  regulatoryType?: string;
+  regulatoryName?: string;
+  mfdsPermitNumber?: string | null;
+  manufacturerName?: string | null;
 }
 
 export interface ServiceSummary {
@@ -487,6 +493,7 @@ export const supplierApi = {
     distributionType?: string;
     priceGeneral?: number;
     consumerReferencePrice?: number | null;
+    stockQuantity?: number;
   }>): Promise<{ updated: string[]; failed: Array<{ id: string; error: string }> }> {
     try {
       const response = await api.patch('/neture/supplier/products/batch', { updates });
@@ -555,6 +562,8 @@ export const supplierApi = {
       consumerDetailDescription?: string | null;
       businessShortDescription?: string | null;
       businessDetailDescription?: string | null;
+      stockQuantity?: number;
+      marketingName?: string;
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {

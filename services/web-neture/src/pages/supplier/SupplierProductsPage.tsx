@@ -6,6 +6,7 @@
  * WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1 — 이미지/설명 필터, 업로드 모달, 설명 편집 모달
  * WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1 — 완성도 점수, 진행바, 필터
  * WO-NETURE-SUPPLIER-WORKFLOW-SHORTCUTS-V1 — 부족 항목 클릭 → 편집 UI 바로 열기
+ * WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1 — 재고/규제/이미지타입/상품명 편집
  *
  * EditableDataTable 기반. 다건 인라인 편집 + batch 저장.
  * 검색/정렬/페이지네이션/필터 지원.
@@ -35,6 +36,24 @@ const APPROVAL_CONFIG: Record<string, { label: string; bg: string; text: string 
   pending: { label: '대기', bg: 'bg-amber-50', text: 'text-amber-700' },
   rejected: { label: '거부', bg: 'bg-red-50', text: 'text-red-700' },
 };
+
+// ─── Regulatory type labels (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
+
+const REGULATORY_TYPE_LABELS: Record<string, string> = {
+  DRUG: '의약품',
+  HEALTH_FUNCTIONAL: '건강기능식품',
+  QUASI_DRUG: '의약외품',
+  COSMETIC: '화장품',
+  GENERAL: '일반',
+};
+
+// ─── Image type options (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
+
+const IMAGE_TYPE_OPTIONS: { value: 'thumbnail' | 'detail' | 'content'; label: string; desc: string }[] = [
+  { value: 'thumbnail', label: '대표 이미지', desc: '목록/카드에 표시' },
+  { value: 'detail', label: '상세 이미지', desc: '상품 상세 페이지' },
+  { value: 'content', label: '콘텐츠 이미지', desc: '설명/성분 등 보조' },
+];
 
 // ─── Filter Chip ───
 
@@ -116,7 +135,7 @@ function BulkPriceModal({
   );
 }
 
-// ─── Image Upload Modal ───
+// ─── Image Upload Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: 3타입 지원) ───
 
 function ImageUploadModal({
   masterId,
@@ -129,6 +148,7 @@ function ImageUploadModal({
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [imageType, setImageType] = useState<'thumbnail' | 'detail' | 'content'>('thumbnail');
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -143,7 +163,7 @@ function ImageUploadModal({
     if (!file) return;
     setUploading(true);
     try {
-      await productApi.uploadProductImage(masterId, file, 'thumbnail');
+      await productApi.uploadProductImage(masterId, file, imageType);
       onUploaded();
     } catch {
       alert('이미지 업로드 실패');
@@ -160,6 +180,24 @@ function ImageUploadModal({
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
         </div>
 
+        {/* Image type selector */}
+        <div className="flex gap-1.5 mb-4">
+          {IMAGE_TYPE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setImageType(opt.value)}
+              className={`flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                imageType === opt.value
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+              title={opt.desc}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
         {preview ? (
           <div className="mb-4 flex justify-center">
             <img src={preview} alt="미리보기" className="max-h-48 rounded-lg object-contain" />
@@ -171,6 +209,7 @@ function ImageUploadModal({
           >
             <ImagePlus size={32} className="mx-auto text-slate-400 mb-2" />
             <p className="text-sm text-slate-500">클릭하여 이미지 선택</p>
+            <p className="text-[10px] text-slate-400 mt-1">{IMAGE_TYPE_OPTIONS.find(o => o.value === imageType)?.desc}</p>
           </div>
         )}
 
@@ -191,7 +230,7 @@ function ImageUploadModal({
   );
 }
 
-// ─── Description Edit Modal ───
+// ─── Description Edit Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: marketingName 추가) ───
 
 function stripHtml(html: string | null | undefined): string {
   if (!html) return '';
@@ -207,6 +246,7 @@ function DescriptionEditModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const [marketingName, setMarketingName] = useState(product.name || product.masterName || '');
   const [shortDesc, setShortDesc] = useState(stripHtml(product.consumerShortDescription));
   const [detailDesc, setDetailDesc] = useState(stripHtml(product.consumerDetailDescription));
   const [saving, setSaving] = useState(false);
@@ -215,12 +255,13 @@ function DescriptionEditModal({
     setSaving(true);
     try {
       await supplierApi.updateProduct(product.id, {
+        marketingName: marketingName || undefined,
         consumerShortDescription: shortDesc ? `<p>${shortDesc}</p>` : '',
         consumerDetailDescription: detailDesc ? `<p>${detailDesc}</p>` : '',
       });
       onSaved();
     } catch {
-      alert('설명 저장 실패');
+      alert('저장 실패');
     } finally {
       setSaving(false);
     }
@@ -230,13 +271,21 @@ function DescriptionEditModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl p-6 w-[480px]">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">상품 설명 편집</h3>
+          <h3 className="text-lg font-bold text-slate-900">상품 정보 편집</h3>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
         </div>
 
-        <p className="text-sm text-slate-500 mb-4">{product.name || product.masterName}</p>
-
         <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">상품명</label>
+            <input
+              type="text"
+              value={marketingName}
+              onChange={(e) => setMarketingName(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="상품명 (마케팅명)"
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">간단 소개</label>
             <textarea
@@ -268,6 +317,56 @@ function DescriptionEditModal({
           >
             {saving ? '저장 중...' : '저장'}
           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Regulatory Info Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
+
+function RegulatoryInfoModal({
+  product,
+  onClose,
+}: {
+  product: SupplierProduct;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-[420px]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-900">규제 정보</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
+        </div>
+
+        <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg mb-4">
+          규제 정보는 상품 등록 시 설정되며 수정할 수 없습니다.
+        </p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-0.5">규제 유형</label>
+            <p className="text-sm text-slate-900">
+              {product.regulatoryType ? (REGULATORY_TYPE_LABELS[product.regulatoryType] || product.regulatoryType) : '-'}
+            </p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-0.5">포장명 (규제명)</label>
+            <p className="text-sm text-slate-900">{product.regulatoryName || '-'}</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-0.5">MFDS 허가번호</label>
+            <p className="text-sm text-slate-900 font-mono">{product.mfdsPermitNumber || '-'}</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-500 mb-0.5">제조사</label>
+            <p className="text-sm text-slate-900">{product.manufacturerName || '-'}</p>
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-6">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">닫기</button>
         </div>
       </div>
     </div>
@@ -328,6 +427,25 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
         className="w-full px-2 py-1 text-sm text-right border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+        autoFocus
+      />
+    ),
+  },
+  // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: 재고 인라인 편집
+  {
+    key: 'stockQuantity' as any,
+    header: '재고',
+    width: '80px',
+    align: 'right' as const,
+    editable: true,
+    render: (v: any) => v != null ? Number(v).toLocaleString() : '0',
+    editRender: (value: any, _row: any, onChange: any) => (
+      <input
+        type="number"
+        value={value ?? 0}
+        onChange={(e: any) => onChange(e.target.value ? Number(e.target.value) : 0)}
+        className="w-full px-2 py-1 text-sm text-right border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+        min="0"
         autoFocus
       />
     ),
@@ -488,6 +606,7 @@ export default function SupplierProductsPage() {
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
   const [descEditProduct, setDescEditProduct] = useState<SupplierProduct | null>(null);
+  const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
 
   // Continuous workflow state
   const [autoNext, setAutoNext] = useState(true);
@@ -543,7 +662,7 @@ export default function SupplierProductsPage() {
     await fetchProducts(pagination.page);
   };
 
-  // Column with checkbox, image, description, quick price
+  // Column with checkbox, image, description, quick price, regulatory
   const enhancedColumns = useMemo(() => {
     const selectCol: ListColumnDef<SupplierProduct> = {
       key: '_select' as any,
@@ -601,6 +720,27 @@ export default function SupplierProductsPage() {
             미작성
           </button>
         ),
+    };
+
+    // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: 규제 정보 읽기 전용 컬럼
+    const regulatoryCol: ListColumnDef<SupplierProduct> = {
+      key: 'regulatoryType' as any,
+      header: '규제',
+      width: '60px',
+      align: 'center' as const,
+      render: (v: any, row: SupplierProduct) => {
+        if (!v) return <span className="text-xs text-slate-300">-</span>;
+        const label = REGULATORY_TYPE_LABELS[v] || v;
+        return (
+          <button
+            onClick={(e) => { e.stopPropagation(); setRegulatoryProduct(row); }}
+            className="text-[10px] px-1.5 py-0.5 rounded bg-violet-50 text-violet-700 hover:bg-violet-100 truncate"
+            title="규제 정보 보기"
+          >
+            {label}
+          </button>
+        );
+      },
     };
 
     // Insert name column with group indicator
@@ -676,14 +816,14 @@ export default function SupplierProductsPage() {
                     <div className={`h-full ${bgColor} rounded-full`} style={{ width: `${score}%` }} />
                   </div>
                   <span className={`text-xs font-medium ${color}`}>{score}%</span>
-                  {isHighlighted && <span className="text-blue-500 text-xs">▶</span>}
+                  {isHighlighted && <span className="text-blue-500 text-xs">&#9654;</span>}
                 </div>
                 {next && (
                   <button
                     onClick={(e) => { e.stopPropagation(); next.action(); }}
                     className="mt-0.5 text-[10px] text-blue-600 hover:text-blue-800 hover:underline truncate block"
                   >
-                    → {next.label}
+                    &rarr; {next.label}
                   </button>
                 )}
                 {missing.length > 1 && (
@@ -714,6 +854,10 @@ export default function SupplierProductsPage() {
     // Insert descCol after consumerReferencePrice
     const refPriceIdx = cols.findIndex((c) => c.key === 'consumerReferencePrice');
     if (refPriceIdx >= 0) cols.splice(refPriceIdx + 1, 0, descCol);
+
+    // Insert regulatoryCol after barcode
+    const barcodeIdx = cols.findIndex((c) => c.key === 'barcode');
+    if (barcodeIdx >= 0) cols.splice(barcodeIdx + 1, 0, regulatoryCol);
 
     return [selectCol, ...cols];
   }, [products, selectedIds, highlightRowId]);
@@ -807,6 +951,7 @@ export default function SupplierProductsPage() {
       distributionType: r.distributionType,
       priceGeneral: r.priceGeneral != null ? Number(r.priceGeneral) : undefined,
       consumerReferencePrice: r.consumerReferencePrice != null ? Number(r.consumerReferencePrice) : null,
+      stockQuantity: (r as any).stockQuantity != null ? Number((r as any).stockQuantity) : undefined,
     }));
     await supplierApi.batchUpdateProducts(updates);
     if (autoNext && changedRows.length === 1) {
@@ -980,6 +1125,12 @@ export default function SupplierProductsPage() {
             setDescEditProduct(null);
             fetchProducts(pagination.page);
           }}
+        />
+      )}
+      {regulatoryProduct && (
+        <RegulatoryInfoModal
+          product={regulatoryProduct}
+          onClose={() => setRegulatoryProduct(null)}
         />
       )}
     </div>

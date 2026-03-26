@@ -406,6 +406,7 @@ export class NetureOfferService {
         specification?: string | null;
         originCountry?: string | null;
         tags?: string[];
+        stockQty?: number | string | null;
       };
       distributionType?: OfferDistributionType;
       serviceKeys?: string[];
@@ -524,6 +525,9 @@ export class NetureOfferService {
       const slugBase = masterResult.data.barcode || masterResult.data.id;
       const slug = `${slugBase}-${supplierId.slice(0, 8)}-${Date.now()}`;
 
+      // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: stockQty 매핑
+      const resolvedStockQty = manualData.stockQty != null ? Number(manualData.stockQty) : 0;
+
       const offer = this.offerRepo.create({
         supplierId,
         masterId: masterResult.data.id,
@@ -537,6 +541,7 @@ export class NetureOfferService {
         priceGold: null,
         pricePlatinum: null,
         consumerReferencePrice: data.consumerReferencePrice ?? null,
+        stockQuantity: resolvedStockQty,
         consumerShortDescription: data.consumerShortDescription ?? null,
         consumerDetailDescription: data.consumerDetailDescription ?? null,
         businessShortDescription: null,
@@ -589,8 +594,10 @@ export class NetureOfferService {
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
+      stockQuantity?: number;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
+      marketingName?: string;
     }
   ) {
     try {
@@ -620,12 +627,20 @@ export class NetureOfferService {
       if (updates.consumerReferencePrice !== undefined) {
         offer.consumerReferencePrice = updates.consumerReferencePrice;
       }
+      if (updates.stockQuantity !== undefined) {
+        offer.stockQuantity = updates.stockQuantity;
+      }
 
       if (updates.consumerShortDescription !== undefined) {
         offer.consumerShortDescription = updates.consumerShortDescription;
       }
       if (updates.consumerDetailDescription !== undefined) {
         offer.consumerDetailDescription = updates.consumerDetailDescription;
+      }
+
+      // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: marketingName → master
+      if (updates.marketingName !== undefined) {
+        await this.catalogService.updateProductMaster(offer.masterId, { marketingName: updates.marketingName });
       }
 
       // Validation: PRIVATE requires at least one seller ID
@@ -774,12 +789,17 @@ export class NetureOfferService {
            spo.consumer_short_description AS "consumerShortDescription",
            spo.consumer_detail_description AS "consumerDetailDescription",
            spo.service_keys AS "serviceKeys",
+           spo.stock_quantity AS "stockQuantity",
            spo.created_at AS "createdAt",
            spo.updated_at AS "updatedAt",
            pm.tags,
            pm.marketing_name AS "masterName",
            pm.barcode,
            pm.specification,
+           pm.regulatory_type AS "regulatoryType",
+           pm.regulatory_name AS "regulatoryName",
+           pm.mfds_permit_number AS "mfdsPermitNumber",
+           pm.manufacturer_name AS "manufacturerName",
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
            pc.name AS "categoryName",
            pm.brand_name AS "brandName",
@@ -846,6 +866,7 @@ export class NetureOfferService {
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
+      stockQuantity?: number;
     }>,
   ) {
     const updated: string[] = [];
@@ -858,6 +879,7 @@ export class NetureOfferService {
           distributionType: item.distributionType,
           priceGeneral: item.priceGeneral,
           consumerReferencePrice: item.consumerReferencePrice,
+          stockQuantity: item.stockQuantity,
         });
         if (result.success) {
           updated.push(item.offerId);

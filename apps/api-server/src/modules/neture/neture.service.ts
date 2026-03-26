@@ -294,8 +294,10 @@ export class NetureService {
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
+      stockQuantity?: number;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
+      marketingName?: string;
     }
   ) {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);

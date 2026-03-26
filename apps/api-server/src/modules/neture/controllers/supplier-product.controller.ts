@@ -137,12 +137,12 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const supplierId = (req as SupplierRequest).supplierId;
       const { id } = req.params;
       const { isActive, distributionType, allowedSellerIds,
-              priceGeneral, consumerReferencePrice,
-              consumerShortDescription, consumerDetailDescription } = req.body;
+              priceGeneral, consumerReferencePrice, stockQuantity,
+              consumerShortDescription, consumerDetailDescription, marketingName } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
         isActive, distributionType, allowedSellerIds,
-        priceGeneral, consumerReferencePrice,
-        consumerShortDescription, consumerDetailDescription,
+        priceGeneral, consumerReferencePrice, stockQuantity,
+        consumerShortDescription, consumerDetailDescription, marketingName,
       });
       if (!result.success) {
         const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
