@@ -55,7 +55,7 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isCurrentUserAdmin = currentUser?.roles?.includes('admin') ?? false;
+  const isCurrentUserAdmin = currentUser?.roles?.some(r => r === 'k-cosmetics:admin' || r === 'platform:super_admin') ?? false;
 
   return (
     <CommonUserDetailPage

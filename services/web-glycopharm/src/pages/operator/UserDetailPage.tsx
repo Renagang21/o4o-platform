@@ -55,7 +55,8 @@ export default function UserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isCurrentUserAdmin = currentUser?.roles?.includes('admin') ?? false;
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role check
+  const isCurrentUserAdmin = currentUser?.roles?.some(r => r === 'glycopharm:admin' || r === 'platform:super_admin') ?? false;
 
   return (
     <CommonUserDetailPage

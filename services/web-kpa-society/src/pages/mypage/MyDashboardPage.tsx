@@ -66,8 +66,8 @@ export function MyDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 임원 여부 확인 (officer 또는 admin)
-  const isOfficer = user?.roles.some(r => ['officer', 'admin'].includes(r)) ?? false;
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role check
+  const isOfficer = user?.roles.some(r => r === 'kpa:admin' || r === 'platform:super_admin') ?? false;
 
   // 임원용 회계 데이터 (단식부기) - Mock
   const [accountingEntries] = useState<AccountingEntry[]>([

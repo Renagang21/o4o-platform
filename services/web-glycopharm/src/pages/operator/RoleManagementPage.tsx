@@ -10,7 +10,8 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function RoleManagementPageWrapper() {
   const { user } = useAuth();
-  const isAdmin = user?.roles?.some((r: string) => ['admin', 'super_admin'].includes(r)) ?? false;
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role check
+  const isAdmin = user?.roles?.some((r: string) => r === 'glycopharm:admin' || r === 'platform:super_admin') ?? false;
 
   return <RoleManagementPage apiClient={api} isAdmin={isAdmin} toast={toast} />;
 }
