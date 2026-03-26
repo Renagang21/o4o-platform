@@ -20,6 +20,7 @@ import {
   Pill,
   Footprints,
   AlertTriangle,
+  Clock,
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading } from '@/api/patient';
@@ -79,6 +80,7 @@ export default function GlucoseInputPage() {
   const [glucoseValue, setGlucoseValue] = useState('');
   const [mealTiming, setMealTiming] = useState('fasting');
   const [measuredAt, setMeasuredAt] = useState(getDefaultMeasuredAt);
+  const [timeEditOpen, setTimeEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
@@ -286,17 +288,53 @@ export default function GlucoseInputPage() {
               </div>
             </div>
 
-            {/* 측정 시간 — 축소 표시 */}
+            {/* 측정 시간 — collapsible time picker (WO-O4O-CARE-EVENT-TIME-ENHANCEMENT-V1) */}
             <div>
               <label className="block text-sm font-medium text-slate-500 mb-2">
                 측정 시간
               </label>
-              <input
-                type="datetime-local"
-                value={measuredAt}
-                onChange={(e) => setMeasuredAt(e.target.value)}
-                className="w-full px-3 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
-              />
+              {timeEditOpen ? (
+                <div className="space-y-2">
+                  <input
+                    type="datetime-local"
+                    value={measuredAt}
+                    onChange={(e) => setMeasuredAt(e.target.value)}
+                    className="w-full px-3 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  />
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setMeasuredAt(getDefaultMeasuredAt()); setTimeEditOpen(false); }}
+                      className="text-xs text-slate-500 hover:text-teal-600 transition-colors"
+                    >
+                      지금으로
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTimeEditOpen(false)}
+                      className="text-xs text-teal-600 font-medium hover:underline"
+                    >
+                      확인
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setTimeEditOpen(true)}
+                  className="w-full flex items-center gap-2.5 px-3 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-left"
+                >
+                  <Clock className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                  <span className="text-sm text-slate-700">
+                    {(() => {
+                      const d = new Date(measuredAt);
+                      if (isNaN(d.getTime())) return measuredAt;
+                      return d.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+                    })()}
+                  </span>
+                  <span className="text-xs text-teal-500 ml-auto flex-shrink-0">수정</span>
+                </button>
+              )}
             </div>
           </div>
         </section>
