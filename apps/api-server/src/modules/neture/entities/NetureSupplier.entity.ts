@@ -136,6 +136,10 @@ export class NetureSupplier {
   @Column({ name: 'rejected_reason', type: 'text', nullable: true })
   rejectedReason: string | null;
 
+  /** WO-O4O-NETURE-ORG-DATA-MODEL-V1: Bridge to organizations table */
+  @Column({ name: 'organization_id', type: 'uuid', nullable: true })
+  organizationId: string | null;
+
   @OneToMany('SupplierProductOffer', 'supplier')
   offers: SupplierProductOffer[];
 }

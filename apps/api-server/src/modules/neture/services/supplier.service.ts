@@ -93,6 +93,10 @@ export class NetureSupplierService {
       });
       const saved = await this.supplierRepo.save(supplier);
       logger.info(`[NetureSupplierService] Supplier registered: ${saved.id} (PENDING) by user ${userId}`);
+
+      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: create org (isActive=false for PENDING)
+      await this.syncSupplierOrganization(saved, { isActive: false });
+
       return {
         success: true,
         data: { id: saved.id, name: saved.name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt },
@@ -131,6 +135,10 @@ export class NetureSupplierService {
         });
         logger.info(`[NetureSupplierService] Role neture:supplier assigned to user ${supplier.userId}`);
       }
+
+      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: ensure org exists + activate
+      await this.syncSupplierOrganization(supplier, { isActive: true });
+      await this.setOrgActive(supplier, true);
 
       logger.info(`[NetureSupplierService] Supplier approved: ${supplierId} by ${approvedByUserId}`);
       return {
@@ -268,6 +276,9 @@ export class NetureSupplierService {
         await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
       }
 
+      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: deactivate org
+      await this.setOrgActive(supplier, false);
+
       logger.info(`[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${revokedCount} approvals, deactivated listings)`);
       return {
         success: true,
@@ -288,6 +299,10 @@ export class NetureSupplierService {
 
       const suppliers = await this.supplierRepo.find({ where, order: { createdAt: 'DESC' } });
 
+      // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: batch org read for name
+      const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
+      const orgMap = await this.getOrgDataBatch(orgIds);
+
       const userIds = suppliers.map((s) => s.userId).filter(Boolean);
       const userStatusMap = new Map<string, { status: string; email: string }>();
       if (userIds.length > 0) {
@@ -303,9 +318,10 @@ export class NetureSupplierService {
       }
 
       return suppliers.map((s) => {
+        const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
         return {
-          id: s.id, name: s.name, slug: s.slug, status: s.status,
+          id: s.id, name: org?.name ?? s.name, slug: s.slug, status: s.status,
           contactEmail: s.contactEmail || '',
           userId: s.userId,
           identityStatus: userInfo?.status || null,
@@ -338,11 +354,16 @@ export class NetureSupplierService {
       query.orderBy('supplier.createdAt', 'DESC');
       const suppliers = await query.getMany();
 
+      // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: batch org read for name
+      const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
+      const orgMap = await this.getOrgDataBatch(orgIds);
+
       const results = await Promise.all(
         suppliers.map(async (supplier) => {
+          const org = supplier.organizationId ? orgMap.get(supplier.organizationId) : null;
           const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
           return {
-            id: supplier.id, slug: supplier.slug, name: supplier.name,
+            id: supplier.id, slug: supplier.slug, name: org?.name ?? supplier.name,
             logo: supplier.logoUrl, category: supplier.category,
             shortDescription: supplier.shortDescription,
             productCount: supplier.offers?.length || 0,
@@ -381,6 +402,9 @@ export class NetureSupplierService {
       });
       if (!supplier) return null;
 
+      // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: org-primary read for name
+      const org = await this.getOrgData(supplier.organizationId);
+
       const isOwner = !!viewerId && supplier.userId === viewerId;
       const isPartner = !!viewerId && !isOwner
         ? await this.hasApprovedPartnership(supplier.id, viewerId)
@@ -390,7 +414,7 @@ export class NetureSupplierService {
       const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
 
       return {
-        id: supplier.id, slug: supplier.slug, name: supplier.name,
+        id: supplier.id, slug: supplier.slug, name: org?.name ?? supplier.name,
         logo: supplier.logoUrl, category: supplier.category,
         shortDescription: supplier.shortDescription,
         description: supplier.description,
@@ -419,6 +443,9 @@ export class NetureSupplierService {
     try {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return null;
+
+      // WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1: org-primary read for canonical fields
+      const org = await this.getOrgData(supplier.organizationId);
 
       // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1: pre-fill from users.businessInfo
       let prefilled: Record<string, string | null> = {};
@@ -450,18 +477,18 @@ export class NetureSupplierService {
 
       return {
         id: supplier.id,
-        name: supplier.name,
+        name: org?.name ?? supplier.name,
         slug: supplier.slug,
-        // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
-        businessNumber: supplier.businessNumber || prefilled.businessNumber || null,
+        // Business profile — org-primary with supplier + prefill fallback
+        businessNumber: org?.business_number ?? supplier.businessNumber ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,
-        businessAddress: supplier.businessAddress || prefilled.businessAddress || null,
+        businessAddress: org?.address ?? supplier.businessAddress ?? prefilled.businessAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || prefilled.businessType || null,
         taxEmail: supplier.taxEmail || prefilled.taxEmail || null,
         _prefilled: Object.keys(prefilled).length > 0,
-        // Contact (existing)
+        // Contact (existing — supplier remains SSOT for contact visibility)
         contactEmail: supplier.contactEmail || null,
         contactPhone: supplier.contactPhone || null,
         contactWebsite: supplier.contactWebsite || null,
@@ -522,6 +549,15 @@ export class NetureSupplierService {
       if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
 
       await this.supplierRepo.save(supplier);
+
+      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: sync business data to organizations
+      const orgSyncNeeded =
+        data.businessNumber !== undefined ||
+        data.businessAddress !== undefined ||
+        data.contactPhone !== undefined;
+      if (orgSyncNeeded) {
+        await this.syncOrgBusinessData(supplier);
+      }
 
       return {
         id: supplier.id,
@@ -701,6 +737,192 @@ export class NetureSupplierService {
       website: canView(supplier.contactWebsiteVisibility) ? (supplier.contactWebsite || null) : null,
       kakao: canView(supplier.contactKakaoVisibility) ? (supplier.contactKakao || null) : null,
     };
+  }
+
+  // ==================== Organization Sync (WO-O4O-NETURE-ORG-DATA-MODEL-V1 Phase 2-B) ====================
+
+  /**
+   * Ensure an organizations record exists for this supplier.
+   * Creates org + organization_members + enrollment as side-effects.
+   * Idempotent: skips if already linked.
+   */
+  private async syncSupplierOrganization(
+    supplier: NetureSupplier,
+    options?: { isActive?: boolean },
+  ): Promise<void> {
+    const isActive = options?.isActive ?? (supplier.status === SupplierStatus.ACTIVE);
+
+    try {
+      // 1. Create or get organizations record
+      if (!supplier.organizationId) {
+        const orgCode = `neture-${supplier.slug}`;
+
+        // Check if org already exists (e.g., created by migration backfill)
+        const existing = await AppDataSource.query(
+          `SELECT id FROM organizations WHERE code = $1 LIMIT 1`,
+          [orgCode],
+        );
+
+        let orgId: string;
+        if (existing.length > 0) {
+          orgId = existing[0].id;
+        } else {
+          const inserted = await AppDataSource.query(
+            `INSERT INTO organizations (
+              id, name, code, type, level, path,
+              business_number, address, phone,
+              created_by_user_id, "isActive",
+              metadata, "createdAt", "updatedAt"
+            ) VALUES (
+              gen_random_uuid(), $1, $2, 'supplier', 0, '/' || $2,
+              $3, $4, $5, $6, $7,
+              $8, NOW(), NOW()
+            )
+            ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
+            RETURNING id`,
+            [
+              supplier.name,
+              orgCode,
+              supplier.businessNumber || null,
+              supplier.businessAddress || null,
+              supplier.contactPhone || null,
+              supplier.userId || null,
+              isActive,
+              JSON.stringify({ serviceKey: 'neture', netureSupplierSlug: supplier.slug }),
+            ],
+          );
+          orgId = inserted[0].id;
+        }
+
+        // Link supplier → organization
+        await AppDataSource.query(
+          `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
+          [orgId, supplier.id],
+        );
+        supplier.organizationId = orgId;
+        logger.info(`[NetureSupplierService] Org linked: supplier=${supplier.id} → org=${orgId}`);
+      }
+
+      const orgId = supplier.organizationId;
+
+      // 2. Ensure organization_members (owner)
+      if (supplier.userId) {
+        await AppDataSource.query(
+          `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, $2, 'owner', true, NOW(), NOW(), NOW())
+           ON CONFLICT (organization_id, user_id) DO NOTHING`,
+          [orgId, supplier.userId],
+        );
+      }
+
+      // 3. Ensure organization_service_enrollments (only when active)
+      if (isActive) {
+        await AppDataSource.query(
+          `INSERT INTO organization_service_enrollments (id, organization_id, service_code, status, enrolled_at, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, 'neture', 'active', NOW(), NOW(), NOW())
+           ON CONFLICT (organization_id, service_code) DO NOTHING`,
+          [orgId],
+        );
+      }
+    } catch (error) {
+      // Non-fatal: log and continue (org sync is a side-effect, must not break core flow)
+      logger.warn(`[NetureSupplierService] Org sync failed for supplier ${supplier.id}:`, error);
+    }
+  }
+
+  /**
+   * Update organizations record when supplier business data changes.
+   * Only syncs fields that are org-canonical: name, business_number, address, phone.
+   */
+  private async syncOrgBusinessData(supplier: NetureSupplier): Promise<void> {
+    if (!supplier.organizationId) return;
+
+    try {
+      await AppDataSource.query(
+        `UPDATE organizations
+         SET name = $1, business_number = $2, address = $3, phone = $4, "updatedAt" = NOW()
+         WHERE id = $5`,
+        [
+          supplier.name,
+          supplier.businessNumber || null,
+          supplier.businessAddress || null,
+          supplier.contactPhone || null,
+          supplier.organizationId,
+        ],
+      );
+    } catch (error) {
+      logger.warn(`[NetureSupplierService] Org business data sync failed for org ${supplier.organizationId}:`, error);
+    }
+  }
+
+  /**
+   * Set organizations.isActive based on supplier status change.
+   */
+  private async setOrgActive(supplier: NetureSupplier, isActive: boolean): Promise<void> {
+    if (!supplier.organizationId) return;
+
+    try {
+      await AppDataSource.query(
+        `UPDATE organizations SET "isActive" = $1, "updatedAt" = NOW() WHERE id = $2`,
+        [isActive, supplier.organizationId],
+      );
+    } catch (error) {
+      logger.warn(`[NetureSupplierService] Org active sync failed for org ${supplier.organizationId}:`, error);
+    }
+  }
+
+  // ==================== Organization Read Helpers (WO-O4O-NETURE-ORG-READ-PATH-SWITCH-V1) ====================
+
+  /**
+   * Fetch canonical business fields from organizations table.
+   * Returns null if organizationId is null or query fails (supplier fallback).
+   */
+  private async getOrgData(organizationId: string | null): Promise<{
+    name: string;
+    business_number: string | null;
+    address: string | null;
+    phone: string | null;
+  } | null> {
+    if (!organizationId) return null;
+
+    try {
+      const rows = await AppDataSource.query(
+        `SELECT name, business_number, address, phone FROM organizations WHERE id = $1 LIMIT 1`,
+        [organizationId],
+      );
+      return rows[0] || null;
+    } catch (error) {
+      logger.warn(`[NetureSupplierService] Org data read failed for ${organizationId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Batch fetch org data for a list of organization IDs.
+   * Returns Map<orgId, orgData> for efficient list rendering.
+   */
+  private async getOrgDataBatch(organizationIds: string[]): Promise<Map<string, {
+    name: string;
+    business_number: string | null;
+    address: string | null;
+    phone: string | null;
+  }>> {
+    const map = new Map<string, { name: string; business_number: string | null; address: string | null; phone: string | null }>();
+    if (organizationIds.length === 0) return map;
+
+    try {
+      const rows: Array<{ id: string; name: string; business_number: string | null; address: string | null; phone: string | null }> =
+        await AppDataSource.query(
+          `SELECT id, name, business_number, address, phone FROM organizations WHERE id = ANY($1)`,
+          [organizationIds],
+        );
+      for (const row of rows) {
+        map.set(row.id, { name: row.name, business_number: row.business_number, address: row.address, phone: row.phone });
+      }
+    } catch (error) {
+      logger.warn('[NetureSupplierService] Org batch read failed:', error);
+    }
+    return map;
   }
 
   private computeContactHints(
