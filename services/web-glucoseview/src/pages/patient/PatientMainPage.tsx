@@ -13,6 +13,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useUnreadCount } from '@/hooks/useUnreadCount';
 import {
   Activity,
   Plus,
@@ -43,6 +44,7 @@ const QUICK_MENU = [
 export default function PatientMainPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const unreadCount = useUnreadCount();
 
   const handleLogout = () => {
     logout();
@@ -323,6 +325,11 @@ export default function PatientMainPage() {
                 <div className="flex items-center gap-2">
                   <MessageCircle className="w-4 h-4 text-violet-500" />
                   <h2 className="text-sm font-semibold text-slate-500">약사 코칭</h2>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </div>
                 {latestCoaching && (
                   <button

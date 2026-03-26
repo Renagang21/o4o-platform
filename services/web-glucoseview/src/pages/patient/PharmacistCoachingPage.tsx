@@ -176,14 +176,23 @@ export default function PharmacistCoachingPage() {
                   )}
                 </div>
 
-                {/* Appointment shortcut */}
-                <button
-                  onClick={() => navigate('/patient/appointments')}
-                  className="w-full mt-3 py-2.5 text-sm font-medium text-orange-600 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  상담 예약하기
-                </button>
+                {/* Action buttons */}
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => navigate(`/patient/messages?coaching=${latest.id}`)}
+                    className="flex-1 py-2.5 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    질문하기
+                  </button>
+                  <button
+                    onClick={() => navigate('/patient/appointments')}
+                    className="flex-1 py-2.5 text-sm font-medium text-orange-600 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    상담 예약
+                  </button>
+                </div>
               </section>
             )}
 

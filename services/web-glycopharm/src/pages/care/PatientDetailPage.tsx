@@ -36,6 +36,7 @@ import PatientAiSummary from './PatientAiSummary';
 import CareAiChatEntry from './CareAiChatEntry';
 import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
 import { RISK_DISPLAY } from '@/constants/care-display';
+import { usePharmacyUnread } from '@/hooks/usePharmacyUnread';
 
 // ── Shared types for tab context ──
 
@@ -65,12 +66,15 @@ const detailTabs = [
   { path: '', label: '데이터', end: true },
   { path: 'analysis', label: '분석', end: false },
   { path: 'coaching', label: '코칭', end: false },
+  { path: 'messages', label: '메시지', end: false },
   { path: 'history', label: '기록', end: false },
 ];
 
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { byPatient } = usePharmacyUnread();
+  const messageUnread = id ? (byPatient.get(id) ?? 0) : 0;
 
   const [patient, setPatient] = useState<PharmacyCustomer | null>(null);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
@@ -268,22 +272,30 @@ export default function PatientDetailPage() {
         {/* Tab Navigation */}
         <nav className="bg-white rounded-t-2xl border border-b-0 border-slate-200">
           <div className="flex overflow-x-auto">
-            {detailTabs.map((tab) => (
-              <NavLink
-                key={tab.path}
-                to={tab.path === '' ? `/care/patients/${id}` : `/care/patients/${id}/${tab.path}`}
-                end={tab.end}
-                className={({ isActive }) =>
-                  `px-6 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    isActive
-                      ? 'border-primary-600 text-primary-700'
-                      : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-                  }`
-                }
-              >
-                {tab.label}
-              </NavLink>
-            ))}
+            {detailTabs.map((tab) => {
+              const tabUnread = tab.path === 'messages' ? messageUnread : 0;
+              return (
+                <NavLink
+                  key={tab.path}
+                  to={tab.path === '' ? `/care/patients/${id}` : `/care/patients/${id}/${tab.path}`}
+                  end={tab.end}
+                  className={({ isActive }) =>
+                    `px-6 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                      isActive
+                        ? 'border-primary-600 text-primary-700'
+                        : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    }`
+                  }
+                >
+                  {tab.label}
+                  {tabUnread > 0 && (
+                    <span className="min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                      {tabUnread > 9 ? '9+' : tabUnread}
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
           </div>
         </nav>
 

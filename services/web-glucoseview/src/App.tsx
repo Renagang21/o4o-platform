@@ -52,6 +52,7 @@ import PharmacistCoachingPage from './pages/patient/PharmacistCoachingPage';
 import SelectPharmacyPage from './pages/patient/SelectPharmacyPage';
 import PatientAppointmentsPage from './pages/patient/AppointmentsPage';
 import CareGuidelinePage from './pages/patient/CareGuidelinePage';
+import MessagesPage from './pages/patient/MessagesPage';
 
 import { RoleGuard, OperatorRoute } from './components/auth/RoleGuard';
 import PwaInstallPrompt from './components/common/PwaInstallPrompt';
@@ -220,6 +221,7 @@ function AppRoutes() {
         <Route path="select-pharmacy" element={<SelectPharmacyPage />} />
         <Route path="appointments" element={<PatientAppointmentsPage />} />
         <Route path="care-guideline" element={<CareGuidelinePage />} />
+        <Route path="messages" element={<MessagesPage />} />
       </Route>
 
       {/* 메인 레이아웃 (WO-O4O-GLUCOSEVIEW-BOOTSTRAP-FIX-V1) */}

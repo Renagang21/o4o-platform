@@ -224,6 +224,7 @@ const DataTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ defa
 const PatientAnalysisTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.AnalysisTab })));
 const PatientCoachingTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.CoachingTab })));
 const HistoryTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.HistoryTab })));
+const PatientMessagesTab = lazy(() => import('@/pages/care/patient-tabs').then(m => ({ default: m.MessagesTab })));
 
 
 // Loading fallback
@@ -429,6 +430,7 @@ function AppRoutes() {
             <Route index element={<DataTab />} />
             <Route path="analysis" element={<PatientAnalysisTab />} />
             <Route path="coaching" element={<PatientCoachingTab />} />
+            <Route path="messages" element={<PatientMessagesTab />} />
             <Route path="history" element={<HistoryTab />} />
           </Route>
           <Route path="analysis" element={<AnalysisPage />} />

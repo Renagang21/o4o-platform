@@ -8,3 +8,4 @@ export { default as SummaryTab } from './SummaryTab';
 export { default as AnalysisTab } from './AnalysisTab';
 export { default as CoachingTab } from './CoachingTab';
 export { default as HistoryTab } from './HistoryTab';
+export { default as MessagesTab } from './MessagesTab';

@@ -786,6 +786,37 @@ class PharmacyApiClient {
     });
   }
 
+  // Messages (WO-O4O-CARE-QNA-SYSTEM-V1)
+  async getPatientMessages(patientId: string): Promise<CareMessageDto[]> {
+    return this.request(`/care/messages/${patientId}`);
+  }
+
+  async sendMessageToPatient(
+    patientId: string,
+    content: string,
+    coachingId?: string,
+  ): Promise<CareMessageDto> {
+    return this.request('/care/messages/pharmacist', {
+      method: 'POST',
+      body: JSON.stringify({ patientId, content, ...(coachingId ? { coachingId } : {}) }),
+    });
+  }
+
+  async markPatientMessagesRead(patientId: string): Promise<void> {
+    return this.request(`/care/messages/${patientId}/read`, {
+      method: 'PATCH',
+    });
+  }
+
+  // Notification (WO-O4O-CARE-NOTIFICATION-V1)
+  async getPharmacyUnreadCount(): Promise<{ count: number }> {
+    return this.request('/care/messages/pharmacist/unread-count');
+  }
+
+  async getPharmacyUnreadByPatient(): Promise<Array<{ patientId: string; count: number }>> {
+    return this.request('/care/messages/pharmacist/unread-by-patient');
+  }
+
   async postHealthReading(data: {
     patientId: string;
     metricType?: string;
@@ -966,6 +997,21 @@ export interface CoachingSession {
   summary: string;
   actionPlan: string;
   createdAt: string;
+}
+
+// WO-O4O-CARE-QNA-SYSTEM-V1
+export interface CareMessageDto {
+  id: string;
+  patientId: string;
+  pharmacyId: string;
+  senderType: 'patient' | 'pharmacist';
+  senderId: string;
+  messageType: 'text' | 'coaching_ref';
+  content: string;
+  coachingId: string | null;
+  status: 'sent' | 'read';
+  createdAt: string;
+  readAt: string | null;
 }
 
 export interface HealthReadingDto {

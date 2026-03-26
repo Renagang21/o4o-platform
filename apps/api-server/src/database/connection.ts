@@ -207,6 +207,9 @@ import { CareAppointment } from '../modules/care/entities/care-appointment.entit
 // PATIENT HEALTH PROFILE (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
 import { PatientHealthProfile } from '../modules/care/entities/patient-health-profile.entity.js';
 
+// CARE MESSAGE (WO-O4O-CARE-QNA-SYSTEM-V1)
+import { CareMessage } from '../modules/care/entities/care-message.entity.js';
+
 // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
 import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';
@@ -736,6 +739,10 @@ export const AppDataSource = new DataSource({
     // PATIENT HEALTH PROFILE (WO-GLYCOPHARM-PATIENT-PROFILE-V1)
     // ============================================================================
     PatientHealthProfile,
+    // ============================================================================
+    // CARE MESSAGE (WO-O4O-CARE-QNA-SYSTEM-V1)
+    // ============================================================================
+    CareMessage,
     // ============================================================================
     // ASSET SNAPSHOT ENTITY (WO-KPA-A-ASSET-COPY-ENGINE-PILOT-V1)
     // ============================================================================

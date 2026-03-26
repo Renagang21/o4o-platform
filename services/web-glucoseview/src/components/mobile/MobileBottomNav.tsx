@@ -8,6 +8,7 @@
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Home, ClipboardEdit, BarChart3, MessageCircle, User } from 'lucide-react';
+import { useUnreadCount } from '@/hooks/useUnreadCount';
 
 const NAV_ITEMS = [
   { path: '/patient', label: '홈', icon: Home, exact: true },
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
 export default function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const unreadCount = useUnreadCount();
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => {
     if (item.exact) {
@@ -34,6 +36,7 @@ export default function MobileBottomNav() {
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isActive(item);
+          const showBadge = item.label === '코칭' && unreadCount > 0;
           return (
             <button
               key={item.path}
@@ -42,7 +45,14 @@ export default function MobileBottomNav() {
                 active ? 'text-teal-600' : 'text-slate-400'
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <span className="relative">
+                <Icon className="w-5 h-5" />
+                {showBadge && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>
           );

@@ -162,6 +162,21 @@ export interface AppointmentDto {
   createdAt: string;
 }
 
+// Message types (WO-O4O-CARE-QNA-SYSTEM-V1)
+export interface MessageDto {
+  id: string;
+  patientId: string;
+  pharmacyId: string;
+  senderType: 'patient' | 'pharmacist';
+  senderId: string;
+  messageType: 'text' | 'coaching_ref';
+  content: string;
+  coachingId: string | null;
+  status: 'sent' | 'read';
+  createdAt: string;
+  readAt: string | null;
+}
+
 // AI Insight
 export interface AiInsight {
   summary: string | null;
@@ -221,4 +236,20 @@ export const patientApi = {
   // AI Insight
   getAiInsight: () =>
     request<AiInsight>('GET', '/api/v1/care/patient/ai-insight'),
+
+  // Messages (WO-O4O-CARE-QNA-SYSTEM-V1)
+  getMyMessages: () =>
+    request<MessageDto[]>('GET', '/api/v1/care/messages/my'),
+
+  sendMessage: (content: string, coachingId?: string) =>
+    request<MessageDto>('POST', '/api/v1/care/messages', {
+      content,
+      ...(coachingId ? { coachingId } : {}),
+    }),
+
+  markMessagesRead: () =>
+    request<void>('PATCH', '/api/v1/care/messages/read'),
+
+  getUnreadCount: () =>
+    request<{ count: number }>('GET', '/api/v1/care/messages/unread-count'),
 };

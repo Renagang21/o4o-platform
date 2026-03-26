@@ -573,6 +573,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Care Appointment routes:', appointmentError);
     }
 
+    // 28h. Register Care Message routes (WO-O4O-CARE-QNA-SYSTEM-V1)
+    try {
+      const { createCareMessageRouter } = await import('../modules/care/controllers/care-message.controller.js');
+      app.use('/api/v1/care', createCareMessageRouter(dataSource));
+      logger.info('✅ Care Message routes registered at /api/v1/care/messages');
+    } catch (messageError) {
+      logger.error('Failed to register Care Message routes:', messageError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('../modules/store-ai/controllers/store-ai.controller.js');
