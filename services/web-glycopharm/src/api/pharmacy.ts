@@ -157,6 +157,7 @@ export interface PharmacyOrderItem {
 // 약국 고객
 export interface PharmacyCustomer {
   id: string;
+  userId?: string; // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1
   name: string;
   phone: string;
   email?: string;
@@ -611,7 +612,7 @@ class PharmacyApiClient {
     gender?: 'male' | 'female';
     birthYear?: number;
     notes?: string;
-  }): Promise<StoreApiResponse<{ id: string; name: string; phone: string; email: string; gender: string | null; birth_year: number | null; created_at: string }>> {
+  }): Promise<StoreApiResponse<{ id: string; user_id?: string; name: string; phone: string; email: string; gender: string | null; birth_year: number | null; created_at: string }>> {
     return this.request('/glycopharm/pharmacy/customers', {
       method: 'POST',
       body: JSON.stringify(data),

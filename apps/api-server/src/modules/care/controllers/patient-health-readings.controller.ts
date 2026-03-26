@@ -47,11 +47,12 @@ export function createPatientHealthReadingsRouter(dataSource: DataSource): Route
       }
 
       // Resolve linked pharmacy from glucoseview_customers (source of truth)
+      // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1: lookup by user_id instead of email
       let linkedPharmacyId: string | null = null;
       try {
         const linked = await dataSource.query(
-          `SELECT organization_id FROM glucoseview_customers WHERE email = $1 LIMIT 1`,
-          [user.email],
+          `SELECT organization_id FROM glucoseview_customers WHERE user_id = $1 LIMIT 1`,
+          [user.id],
         );
         if (linked.length > 0) {
           linkedPharmacyId = linked[0].organization_id;

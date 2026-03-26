@@ -82,7 +82,7 @@ export class CareCoachingSessionService {
        FROM care_coaching_sessions s
        LEFT JOIN users u ON u.id = s.patient_id
        LEFT JOIN glucoseview_customers gc
-         ON gc.email = u.email AND gc.organization_id = s.pharmacy_id
+         ON gc.user_id = s.patient_id AND gc.organization_id = s.pharmacy_id
        WHERE s.pharmacy_id = $1
        ORDER BY s.created_at DESC
        LIMIT $2`,

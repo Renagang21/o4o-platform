@@ -61,7 +61,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
       // Patient ownership guard: verify patient belongs to this pharmacy
       if (pharmacyId) {
         const ownerCheck = await dataSource.query(
-          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE (user_id = $1 OR id = $1) LIMIT 1`,
           [patientId],
         );
         if (ownerCheck.length === 0) {
