@@ -302,26 +302,35 @@ export function createMemberController(
         const saved = await memberRepo.save(member);
 
         // ============================================================
-        // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1: Sync User + role_assignments
+        // WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1 + WO-KPA-A-ROLE-CLEANUP-V1
         // users.status/isActive via raw SQL (ESM rule compliance)
-        // role via roleAssignmentService (RBAC SSOT)
+        // kpa:pharmacist / kpa:student role 할당 제거 — profile 기반 전환
         // ============================================================
         try {
-          const kpaRole = member.membership_type === 'student' ? 'kpa:student' : 'kpa:pharmacist';
-
           if (oldStatus === 'pending' && newStatus === 'active') {
-            // APPROVAL: Activate user + assign KPA role
+            // APPROVAL: Activate user
             await dataSource.query(
               `UPDATE users
                SET status = 'active', "isActive" = true, "approvedAt" = NOW(), "approvedBy" = $2
                WHERE id = $1`,
               [member.user_id, req.user!.id]
             );
-            await roleAssignmentService.assignRole({
-              userId: member.user_id,
-              role: kpaRole,
-              assignedBy: req.user!.id,
-            });
+            // WO-KPA-A-ROLE-CLEANUP-V1: Create profile instead of role assignment
+            if (member.membership_type === 'student') {
+              await dataSource.query(
+                `INSERT INTO kpa_student_profiles (user_id, university_name, student_year)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, member.university_name, member.student_year]
+              );
+            } else {
+              await dataSource.query(
+                `INSERT INTO kpa_pharmacist_profiles (user_id, license_number, activity_type)
+                 VALUES ($1, $2, $3)
+                 ON CONFLICT (user_id) DO NOTHING`,
+                [member.user_id, member.license_number, member.activity_type]
+              );
+            }
           } else if (newStatus === 'suspended') {
             // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
             const approvalService = new MembershipApprovalService();
@@ -332,8 +341,7 @@ export function createMemberController(
               serviceKeys: ['kpa-society'],
             });
           } else if (newStatus === 'withdrawn') {
-            // WITHDRAWAL: Remove KPA role
-            await roleAssignmentService.removeRole(member.user_id, kpaRole);
+            // WITHDRAWAL: no role to remove (profile retained for audit)
           } else if (oldStatus === 'suspended' && newStatus === 'active') {
             // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
             const approvalService = new MembershipApprovalService();
@@ -345,7 +353,7 @@ export function createMemberController(
             });
           }
         } catch (syncError) {
-          console.error('[WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1] User/role sync failed:', syncError);
+          console.error('[WO-KPA-A-APPROVAL-RBAC-ALIGNMENT-V1] User/profile sync failed:', syncError);
         }
 
         // 서비스 레코드 동기화 (kpa-a)
@@ -488,10 +496,12 @@ export function createMemberController(
         member.role = newRole;
         const saved = await memberRepo.save(member);
 
-        // WO-KPA-ROLE-POLICY-ENFORCEMENT-V1: Sync role_assignments (RBAC SSOT)
+        // WO-KPA-ROLE-POLICY-ENFORCEMENT-V1 + WO-KPA-A-ROLE-CLEANUP-V1
+        // member role은 profile 기반 (role_assignments 없음)
+        // operator/admin만 RBAC role 할당
         try {
-          const ROLE_MAP: Record<string, string> = {
-            member: 'kpa:pharmacist',
+          const ROLE_MAP: Record<string, string | null> = {
+            member: null, // WO-KPA-A-ROLE-CLEANUP-V1: profile 기반, RBAC role 없음
             operator: 'kpa:operator',
             admin: 'kpa:admin',
           };

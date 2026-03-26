@@ -299,18 +299,18 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
   'kpa:pharmacist': {
     role: 'kpa:pharmacist',
     label: 'Pharmacist',
-    description: 'General pharmacist/member',
+    description: 'General pharmacist/member — WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환. 신규 할당 중단.',
     service: 'kpa',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
   'kpa:student': {
     role: 'kpa:student',
     label: 'Student',
-    description: 'Student member',
+    description: 'Student member — WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환. 신규 할당 중단.',
     service: 'kpa',
     category: 'service',
-    deprecated: false
+    deprecated: true
   },
 
   // Neture roles

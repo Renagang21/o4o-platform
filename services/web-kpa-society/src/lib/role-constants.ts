@@ -17,7 +17,9 @@ export const ROLES = {
   KPA_OPERATOR: 'kpa:operator',
 
   // KPA-a 커뮤니티
+  /** @deprecated WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환 완료. 자격 판단은 profile 사용. */
   KPA_PHARMACIST: 'kpa:pharmacist',
+  /** @deprecated WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환 완료. 자격 판단은 membershipType 사용. */
   KPA_STUDENT: 'kpa:student',
 
   // KPA-b 레거시/데모 (격리, 제거 예정)
@@ -45,10 +47,13 @@ export const INTRANET_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
 ];
 
-/** 직능 선택 면제 역할 = 플랫폼 + 학생 (분회 역할은 membershipRole로 체크) */
+/**
+ * 직능 선택 면제 역할 = 플랫폼 역할만.
+ * WO-KPA-A-ROLE-CLEANUP-V1: KPA_STUDENT 제거 — membershipType 기반 판정으로 전환.
+ * isActivityTypeExempt()에서 membershipType === 'student' 으로 판정.
+ */
 export const FUNCTION_GATE_EXEMPT_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
-  ROLES.KPA_STUDENT,
 ];
 
 /** Super Operator 감지용 (Header) */

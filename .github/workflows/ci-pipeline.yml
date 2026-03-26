@@ -103,7 +103,7 @@ jobs:
         MISSING_DIST=0
 
         # All packages built by build:packages (must stay in sync)
-        for pkg in types capabilities appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight yaksa-scheduler ai-prompts; do
+        for pkg in types auth-utils capabilities appearance-system auth-client utils ui auth-context shortcodes block-renderer content-editor slide-app organization-core forum-core pharmacy-ai-insight yaksa-scheduler ai-prompts; do
           if [ ! -d "packages/$pkg/dist" ]; then
             echo "❌ packages/$pkg/dist not found!"
             MISSING_DIST=1
