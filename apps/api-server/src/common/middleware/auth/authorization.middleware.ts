@@ -45,12 +45,10 @@ export const requireAdmin = async (
   const user = req.user as User;
 
   try {
-    // Phase3-E: Pure RA-based admin check. role_assignments is the single source of truth.
-    // Support both unprefixed and domain-prefixed role names
+    // WO-O4O-AUTH-RBAC-CLEANUP-V1: admin/super_admin only — operator removed
     const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
       'admin',
       'super_admin',
-      'operator',
       'platform:admin',
       'platform:super_admin',
     ]);
