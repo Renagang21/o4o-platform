@@ -6,6 +6,7 @@
  * 기존 operator-dashboard.controller.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
+import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig } from '../../common/action-queue/action-queue.types.js';
 
 export const cosmeticsActionConfig: ServiceActionConfig = {
@@ -47,9 +48,23 @@ export const cosmeticsActionConfig: ServiceActionConfig = {
               FROM cosmetics.cosmetics_products
               WHERE status = 'DRAFT'`,
       actionUrl: '/operator/products?status=DRAFT',
-      actionLabel: '상품 관리',
-      actionType: 'NAVIGATE',
+      actionLabel: '일괄 발행',
+      actionType: 'EXECUTE',
+      actionApi: '/cosmetics/operator/actions/execute/draft-products',
+      actionMethod: 'POST',
     },
   ],
-  executeHandlers: {},
+  executeHandlers: {
+    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 임시저장 상품 일괄 발행 (DRAFT → VISIBLE)
+    'draft-products': async (dataSource: DataSource, _userId: string) => {
+      const result = await dataSource.query(
+        `UPDATE cosmetics.cosmetics_products
+         SET status = 'VISIBLE', updated_at = NOW()
+         WHERE status = 'DRAFT'
+         RETURNING id`,
+      );
+      const count = Array.isArray(result) ? result.length : 0;
+      return { processed: count, succeeded: count, failed: 0 };
+    },
+  },
 };

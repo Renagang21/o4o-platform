@@ -23,6 +23,8 @@ export async function buildActionQueue(
   definitions: ActionDefinition[],
   aiActions: AiRuleAction[],
   dismissedIds?: Set<string>,
+  /** WO-O4O-ACTION-EXECUTION-LAYER-V1: handler가 등록된 action id 집합 */
+  executeHandlerIds?: Set<string>,
 ): Promise<ActionQueueResponse> {
   // ── 1. 병렬 count 쿼리 실행 ──
   const results = await Promise.all(
@@ -60,6 +62,7 @@ export async function buildActionQueue(
       };
       if (r.def.actionApi) item.actionApi = r.def.actionApi;
       if (r.def.actionMethod) item.actionMethod = r.def.actionMethod;
+      if (executeHandlerIds?.has(r.def.id)) item.canExecute = true;
       return item;
     });
 

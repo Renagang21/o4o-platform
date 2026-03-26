@@ -50,8 +50,12 @@ export interface ActionQueueItem extends ActionItem {
   oldestAt?: string | null;
   confidence?: number;
   actionType?: 'EXECUTE' | 'NAVIGATE';
+  actionUrl?: string;
+  actionLabel?: string;
   actionApi?: string;
   actionMethod?: string;
+  /** handler 등록 여부 — EXECUTE 버튼 활성화 판단 (WO-O4O-ACTION-EXECUTION-LAYER-V1) */
+  canExecute?: boolean;
 }
 
 // ─── Block 4: Activity Log ───

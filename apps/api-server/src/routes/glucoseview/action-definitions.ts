@@ -6,6 +6,7 @@
  * 기존 operator-dashboard.service.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
+import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
 
 export const glucoseviewActionConfig: ServiceActionConfig = {
@@ -45,12 +46,25 @@ export const glucoseviewActionConfig: ServiceActionConfig = {
               WHERE is_resolved = false
                 AND service_code = 'glucoseview'`,
       actionUrl: '/operator/care/alerts',
-      actionLabel: '알림 확인',
-      actionType: 'NAVIGATE',
+      actionLabel: '일괄 확인',
+      actionType: 'EXECUTE',
+      actionApi: '/glucoseview/operator/actions/execute/care-alerts',
+      actionMethod: 'POST',
       alwaysHigh: true,
     },
   ],
-  executeHandlers: {},
+  executeHandlers: {
+    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 케어 알림 일괄 확인
+    'care-alerts': async (dataSource: DataSource, _userId: string) => {
+      const result = await dataSource.query(
+        `UPDATE care_alerts SET is_resolved = true, updated_at = NOW()
+         WHERE is_resolved = false AND service_code = 'glucoseview'
+         RETURNING id`,
+      );
+      const count = Array.isArray(result) ? result.length : 0;
+      return { processed: count, succeeded: count, failed: 0 };
+    },
+  },
   aiRuleGenerator: (counts) => {
     const actions: AiRuleAction[] = [];
     if ((counts['care-alerts'] || 0) > 5) {

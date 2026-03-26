@@ -6,6 +6,7 @@
  * 기존 operator-summary.controller.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
+import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
 
 export const kpaActionConfig: ServiceActionConfig = {
@@ -21,8 +22,10 @@ export const kpaActionConfig: ServiceActionConfig = {
               WHERE "serviceKey" IN ('kpa-society', 'kpa')
                 AND status = 'pending'`,
       actionUrl: '/operator/content?status=pending',
-      actionLabel: '콘텐츠 관리',
-      actionType: 'NAVIGATE',
+      actionLabel: '일괄 승인',
+      actionType: 'EXECUTE',
+      actionApi: '/kpa/operator/actions/execute/content-pending',
+      actionMethod: 'POST',
       alwaysHigh: true,
     },
     {
@@ -104,7 +107,20 @@ export const kpaActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
     },
   ],
-  executeHandlers: {},
+  executeHandlers: {
+    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 대기 콘텐츠 일괄 승인 (pending → published)
+    'content-pending': async (dataSource: DataSource, _userId: string) => {
+      const result = await dataSource.query(
+        `UPDATE cms_contents
+         SET status = 'published', updated_at = NOW()
+         WHERE "serviceKey" IN ('kpa-society', 'kpa')
+           AND status = 'pending'
+         RETURNING id`,
+      );
+      const count = Array.isArray(result) ? result.length : 0;
+      return { processed: count, succeeded: count, failed: 0 };
+    },
+  },
   aiRuleGenerator: (counts) => {
     const actions: AiRuleAction[] = [];
     if ((counts['content-draft'] || 0) > 10) {

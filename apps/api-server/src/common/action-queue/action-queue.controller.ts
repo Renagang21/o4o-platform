@@ -50,9 +50,10 @@ export function createActionQueueRouter(
         config.serviceKey, counts, config.aiRuleGenerator,
       );
 
-      // 4. 통합 빌드
+      // 4. 통합 빌드 (WO-O4O-ACTION-EXECUTION-LAYER-V1: executeHandlerIds 전달)
+      const executeHandlerIds = new Set(Object.keys(config.executeHandlers));
       const result = await buildActionQueue(
-        dataSource, config.definitions, aiActions, dismissedIds,
+        dataSource, config.definitions, aiActions, dismissedIds, executeHandlerIds,
       );
 
       res.json({ success: true, data: result });
@@ -79,8 +80,19 @@ export function createActionQueueRouter(
         return;
       }
 
-      const result = await handler(userId);
+      const result = await handler(dataSource, userId);
       logger.info(`[${config.serviceKey} ActionExecute] ${actionId}: ${JSON.stringify(result)}`);
+
+      // WO-O4O-ACTION-EXECUTION-LAYER-V1: 실행 성공 시 자동 dismiss
+      try {
+        await dataSource.query(
+          `INSERT INTO operator_action_dismissals (user_id, service_key, action_id)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (user_id, service_key, action_id) DO NOTHING`,
+          [userId, config.serviceKey, actionId],
+        );
+      } catch { /* dismiss 실패는 무시 */ }
+
       res.json({ success: true, data: result });
     } catch (error: any) {
       logger.error(`[${config.serviceKey} ActionExecute] Error:`, error);
