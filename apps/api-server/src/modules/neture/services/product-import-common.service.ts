@@ -50,28 +50,31 @@ export class ProductImportCommonService {
       msrp?: number | null;
       stockQty?: number | null;
       description?: string | null;
+      detailDescription?: string | null;
     },
   ): Promise<void> {
     const slug = `${barcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
     const msrp = extra?.msrp ?? null;
     const stockQty = extra?.stockQty ?? 0;
     const descriptionHtml = extra?.description ? `<p>${extra.description}</p>` : null;
+    const detailHtml = extra?.detailDescription ? `<p>${extra.detailDescription}</p>` : null;
 
     await manager.query(
       `INSERT INTO supplier_product_offers
         (id, master_id, supplier_id, distribution_type, approval_status, is_active,
          price_general, consumer_reference_price, stock_quantity,
-         consumer_short_description, slug, created_at, updated_at)
+         consumer_short_description, consumer_detail_description, slug, created_at, updated_at)
        VALUES
-        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, $7, $8, $9, NOW(), NOW())
+        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, $7, $8, $9, $10, NOW(), NOW())
        ON CONFLICT (master_id, supplier_id) DO UPDATE SET
          price_general = EXCLUDED.price_general,
          consumer_reference_price = COALESCE(EXCLUDED.consumer_reference_price, supplier_product_offers.consumer_reference_price),
          stock_quantity = COALESCE(EXCLUDED.stock_quantity, supplier_product_offers.stock_quantity),
          consumer_short_description = COALESCE(EXCLUDED.consumer_short_description, supplier_product_offers.consumer_short_description),
+         consumer_detail_description = COALESCE(EXCLUDED.consumer_detail_description, supplier_product_offers.consumer_detail_description),
          distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
          updated_at = NOW()`,
-      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, slug],
+      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug],
     );
 
     logger.info(`[ImportCommon] Upserted offer: master=${masterId}, supplier=${supplierId}`);

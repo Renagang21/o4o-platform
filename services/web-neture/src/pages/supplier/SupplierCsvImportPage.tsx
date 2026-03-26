@@ -159,8 +159,9 @@ export default function SupplierCsvImportPage() {
           아래 XLSX 양식을 다운로드하여 상품 정보를 입력한 후 업로드하세요.
         </p>
         <div className="mb-3 text-xs text-gray-400 space-y-1">
-          <p><strong>필수 컬럼:</strong> barcode, marketing_name, supply_price</p>
-          <p><strong>선택 컬럼:</strong> distribution_type, msrp, stock_qty, brand, manufacturer_name, image_url, consumer_short_description</p>
+          <p><strong>필수:</strong> supply_price</p>
+          <p><strong>권장:</strong> packaging_name, marketing_name</p>
+          <p><strong>선택:</strong> barcode, manufacturer_name, brand, origin_country, consumer_price, stock_qty, short_description, detail_description, image_url</p>
         </div>
         <button
           onClick={downloadTemplate}

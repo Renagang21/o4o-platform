@@ -15,6 +15,10 @@
  * WO-NETURE-CSV-TEMPLATE-V1
  *   - supply_price 필수화
  *   - consumer_short_description 컬럼 추가 (Plain text only)
+ * WO-NETURE-XLSX-TEMPLATE-FINAL-V2
+ *   - barcode 선택화 (미입력 시 자동 생성)
+ *   - category_name / distribution_type 필수 해제
+ *   - consumer_price / packaging_name / short_description / detail_description 매핑 추가
  */
 
 import { DataSource, Repository } from 'typeorm';
@@ -41,21 +45,22 @@ import logger from '../../../utils/logger.js';
 const ALLOWED_CSV_COLUMNS = [
   'barcode',
   'supply_price',
-  'msrp',
+  'msrp', // legacy compat
+  'consumer_price', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2
   'stock_qty',
-  'distribution_type',
-  'description',
-  // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1
+  'distribution_type', // legacy compat (무시, 기본 PUBLIC)
+  'description', // legacy compat
   'image_url',
-  'regulatory_name',
+  'regulatory_name', // legacy compat
+  'packaging_name', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (→ regulatory_name 매핑)
   'manufacturer_name',
   'brand',
-  // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
+  'origin_country', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (rawJson 보존)
   'marketing_name',
-  // WO-NETURE-CSV-TEMPLATE-V1
-  'consumer_short_description',
-  // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1
-  'category_name',
+  'consumer_short_description', // legacy compat
+  'short_description', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2 (→ consumer_short_description 매핑)
+  'detail_description', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2
+  'category_name', // legacy compat (선택)
 ];
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
@@ -153,11 +158,19 @@ export class CsvImportService {
       const rowNumber = i + 1;
       const barcode = (raw.barcode || '').trim();
 
+      // WO-NETURE-XLSX-TEMPLATE-FINAL-V2: barcode 선택, 미입력 시 자동 생성
+      let effectiveBarcode = barcode;
+      let isAutoBarcode = false;
+      if (!barcode) {
+        effectiveBarcode = `INT${Date.now()}${String(rowNumber).padStart(4, '0')}`;
+        isAutoBarcode = true;
+      }
+
       const row = this.rowRepo.create({
         batchId: savedBatch.id,
         rowNumber,
         rawJson: raw,
-        parsedBarcode: barcode || null,
+        parsedBarcode: effectiveBarcode,
         parsedSupplyPrice: null,
         parsedDistributionType: null,
         validationStatus: CsvRowValidationStatus.PENDING,
@@ -166,33 +179,27 @@ export class CsvImportService {
         actionType: null,
       });
 
-      // 3a. barcode 존재?
-      if (!barcode) {
-        this.rejectRow(row, 'INVALID_BARCODE');
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
+      // 3a. GTIN 유효? (자동 생성 바코드는 스킵)
+      if (!isAutoBarcode) {
+        const gtinError = validateGtin(effectiveBarcode);
+        if (gtinError) {
+          this.rejectRow(row, `INVALID_GTIN: ${gtinError}`);
+          rejectedCount++;
+          rowEntities.push(row);
+          continue;
+        }
       }
 
-      // 3b. GTIN 유효?
-      const gtinError = validateGtin(barcode);
-      if (gtinError) {
-        this.rejectRow(row, `INVALID_GTIN: ${gtinError}`);
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
-      }
-
-      // 3c. batch 내 barcode 중복?
-      if (seenBarcodes.has(barcode)) {
+      // 3b. batch 내 barcode 중복?
+      if (seenBarcodes.has(effectiveBarcode)) {
         this.rejectRow(row, 'DUPLICATE_IN_BATCH');
         rejectedCount++;
         rowEntities.push(row);
         continue;
       }
-      seenBarcodes.add(barcode);
+      seenBarcodes.add(effectiveBarcode);
 
-      // 3d. supply_price 검증 (WO-NETURE-CSV-TEMPLATE-V1: 필수)
+      // 3c. supply_price 검증 (필수)
       const rawPrice = (raw.supply_price || '').trim();
       if (!rawPrice) {
         this.rejectRow(row, 'MISSING_SUPPLY_PRICE');
@@ -209,75 +216,61 @@ export class CsvImportService {
       }
       row.parsedSupplyPrice = price;
 
-      // 3e. distribution_type 검증
+      // 3d. distribution_type — 값이 있으면 파싱, 없으면 PUBLIC 기본값 (검증 안함)
       const rawDist = (raw.distribution_type || '').trim().toUpperCase();
-      if (rawDist && !VALID_DISTRIBUTION_TYPES.includes(rawDist)) {
-        this.rejectRow(row, `INVALID_DISTRIBUTION_TYPE: ${rawDist}`);
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
-      }
-      if (rawDist) {
-        row.parsedDistributionType = rawDist;
-      }
+      row.parsedDistributionType = rawDist && VALID_DISTRIBUTION_TYPES.includes(rawDist) ? rawDist : 'PUBLIC';
 
-      // 3f. PUBLIC requires consumer_short_description
-      const distType = rawDist || 'PRIVATE';
-      if (distType === 'PUBLIC' && !((raw.consumer_short_description || '') as string).trim()) {
-        this.rejectRow(row, 'PUBLIC_REQUIRES_DESCRIPTION');
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
-      }
-
-      // 3g. category_name 필수 (WO-NETURE-XLSX-CATEGORY-STRICT-VALIDATION-V1)
+      // 3e. category_name — 선택 (있으면 DB 매칭 시도, 없어도 통과)
       const categoryName = (raw.category_name || '').trim();
-      if (!categoryName) {
-        this.rejectRow(row, 'MISSING_CATEGORY');
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
+      if (categoryName) {
+        const catMatchRows: Array<{ id: string }> = await this.dataSource.query(
+          `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
+          [categoryName],
+        );
+        if (catMatchRows.length === 0) {
+          logger.warn(`[CsvImport] Category not found: "${categoryName}" (row ${rowNumber}), ignoring`);
+        }
       }
 
-      // 3h. category DB 매칭 확인 (case-insensitive)
-      const catMatchRows: Array<{ id: string }> = await this.dataSource.query(
-        `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
-        [categoryName],
-      );
-      if (catMatchRows.length === 0) {
-        this.rejectRow(row, `CATEGORY_NOT_FOUND: "${categoryName}"`);
-        rejectedCount++;
-        rowEntities.push(row);
-        continue;
-      }
-
-      // 3i. 내부 Master 조회
-      const existingMaster = await this.masterRepo.findOne({
-        where: { barcode },
-        select: ['id'],
-      });
-
-      if (existingMaster) {
-        // Master 존재 → link
-        row.masterId = existingMaster.id;
-        row.actionType = CsvRowActionType.LINK_EXISTING;
-        row.validationStatus = CsvRowValidationStatus.VALID;
-        validCount++;
-      } else {
-        // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
-        // Master 미존재 → marketing_name 또는 regulatory_name이 있으면 CREATE_MASTER
-        // MFDS는 Apply 단계에서 advisory-only로 호출 (validation에서 gate 아님)
+      // 3f. 내부 Master 조회 (자동 생성 바코드는 항상 CREATE_MASTER)
+      if (isAutoBarcode) {
+        // packaging_name / marketing_name 중 하나는 있어야 Master 생성 가능
+        const packagingName = (raw.packaging_name || '').trim();
         const marketingName = (raw.marketing_name || '').trim();
         const regulatoryName = (raw.regulatory_name || '').trim();
-        const hasProductName = !!(marketingName || regulatoryName);
-
-        if (hasProductName) {
+        if (packagingName || marketingName || regulatoryName) {
           row.actionType = CsvRowActionType.CREATE_MASTER;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
         } else {
           this.rejectRow(row, 'MISSING_MARKETING_NAME');
           rejectedCount++;
+        }
+      } else {
+        const existingMaster = await this.masterRepo.findOne({
+          where: { barcode: effectiveBarcode },
+          select: ['id'],
+        });
+
+        if (existingMaster) {
+          row.masterId = existingMaster.id;
+          row.actionType = CsvRowActionType.LINK_EXISTING;
+          row.validationStatus = CsvRowValidationStatus.VALID;
+          validCount++;
+        } else {
+          const packagingName = (raw.packaging_name || '').trim();
+          const marketingName = (raw.marketing_name || '').trim();
+          const regulatoryName = (raw.regulatory_name || '').trim();
+          const hasProductName = !!(packagingName || marketingName || regulatoryName);
+
+          if (hasProductName) {
+            row.actionType = CsvRowActionType.CREATE_MASTER;
+            row.validationStatus = CsvRowValidationStatus.VALID;
+            validCount++;
+          } else {
+            this.rejectRow(row, 'MISSING_MARKETING_NAME');
+            rejectedCount++;
+          }
         }
       }
 
@@ -402,9 +395,10 @@ export class CsvImportService {
             const mfdsResult = await verifyProductByBarcode(barcode);
             const mfds = mfdsResult.verified && mfdsResult.product ? mfdsResult.product : null;
 
-            // CSV 데이터 추출
+            // CSV 데이터 추출 — packaging_name → regulatoryName 매핑
             const csvMarketingName = (raw.marketing_name || '').trim();
-            const csvRegulatoryName = (raw.regulatory_name || '').trim();
+            const csvPackagingName = (raw.packaging_name || '').trim();
+            const csvRegulatoryName = (raw.regulatory_name || csvPackagingName).trim();
             const csvManufacturerName = (raw.manufacturer_name || '').trim();
 
             master = masterRepo.create({
@@ -450,7 +444,7 @@ export class CsvImportService {
           }
         }
 
-        // WO-NETURE-XLSX-CATEGORY-STRICT-VALIDATION-V1: Category 필수 매칭
+        // Category 매칭 (선택 — 있으면 매칭, 없으면 스킵)
         const categoryName = (raw.category_name || '').trim();
         if (categoryName && masterId) {
           const catRows: Array<{ id: string }> = await manager.query(
@@ -458,7 +452,6 @@ export class CsvImportService {
             [categoryName],
           );
           if (catRows.length > 0) {
-            // CREATE_MASTER: 항상 설정 / LINK_EXISTING: NULL일 때만 설정
             const condition = row.actionType === CsvRowActionType.CREATE_MASTER
               ? ''
               : ' AND category_id IS NULL';
@@ -467,26 +460,25 @@ export class CsvImportService {
               [catRows[0].id, masterId],
             );
           } else {
-            // Validation에서 이미 검증됨 — 동시성 등 예외 상황 방어
-            throw new Error(`Category not found during apply: "${categoryName}" (row ${row.rowNumber})`);
+            logger.warn(`[CsvImport] Category not found during apply: "${categoryName}" (row ${row.rowNumber}), skipping`);
           }
-        } else if (!categoryName) {
-          // Validation에서 이미 필수 검증됨 — 이중 안전장치
-          throw new Error(`categoryId 없음 상태로 생성 시도 (row ${row.rowNumber})`);
         }
 
         // Offer upsert via common service (3.5 + ENABLEMENT-V1)
         const distributionType = row.parsedDistributionType || 'PRIVATE';
         const supplyPrice = row.parsedSupplyPrice ?? 0;
 
-        const rawMsrp = (raw.msrp || '').trim();
+        // WO-NETURE-XLSX-TEMPLATE-FINAL-V2: consumer_price 우선, msrp 하위호환
+        const rawConsumerPrice = (raw.consumer_price || raw.msrp || '').trim();
         const rawStockQty = (raw.stock_qty || '').trim();
-        // WO-NETURE-CSV-TEMPLATE-V1: consumer_short_description 우선, description 하위호환
-        const rawDescription = (raw.consumer_short_description || raw.description || '').trim();
+        // short_description 우선, consumer_short_description / description 하위호환
+        const rawDescription = (raw.short_description || raw.consumer_short_description || raw.description || '').trim();
+        const rawDetailDesc = (raw.detail_description || '').trim();
         const extra = {
-          msrp: rawMsrp ? parseInt(rawMsrp, 10) || null : null,
+          msrp: rawConsumerPrice ? parseInt(rawConsumerPrice, 10) || null : null,
           stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
           description: rawDescription || null,
+          detailDescription: rawDetailDesc || null,
         };
 
         await this.importCommon.upsertSupplierOffer(
