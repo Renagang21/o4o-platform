@@ -9,7 +9,7 @@
  *   GET  /api/v1/care/health-readings/:patientId → 기록 조회
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Plus,
   Loader2,
@@ -21,6 +21,7 @@ import {
   Footprints,
   AlertTriangle,
   Utensils,
+  Clock,
 } from 'lucide-react';
 import { pharmacyApi, type HealthReadingDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
@@ -33,13 +34,6 @@ const METRIC_OPTIONS = [
   { value: 'blood_pressure_diastolic', label: '이완기 혈압', unit: 'mmHg' },
   { value: 'weight', label: '체중', unit: 'kg' },
 ] as const;
-
-const METRIC_LABELS: Record<string, string> = {
-  glucose: '혈당',
-  blood_pressure_systolic: '수축기 혈압',
-  blood_pressure_diastolic: '이완기 혈압',
-  weight: '체중',
-};
 
 const MEAL_TIMING_OPTIONS = [
   { value: 'fasting', label: '공복' },
@@ -144,6 +138,145 @@ const MEAL_TIMING_LABELS: Record<string, string> = {
   random: '기타',
 };
 
+// ── Record display helpers (WO-O4O-CARE-RECENT-RECORDS-UI-REFACTOR-V1) ──
+
+type RecordEntryType = 'glucose' | 'blood_pressure' | 'weight' | 'meal' | 'medication' | 'exercise' | 'symptom';
+
+interface DisplayEntry {
+  id: string;
+  timestamp: Date;
+  entryType: RecordEntryType;
+  label: string;
+}
+
+const ENTRY_TYPE_CONFIG: Record<RecordEntryType, { tag: string; bg: string; text: string }> = {
+  glucose: { tag: '혈당', bg: 'bg-blue-50', text: 'text-blue-600' },
+  blood_pressure: { tag: '혈압', bg: 'bg-pink-50', text: 'text-pink-600' },
+  weight: { tag: '체중', bg: 'bg-indigo-50', text: 'text-indigo-600' },
+  meal: { tag: '식사', bg: 'bg-orange-50', text: 'text-orange-600' },
+  medication: { tag: '투약', bg: 'bg-violet-50', text: 'text-violet-600' },
+  exercise: { tag: '운동', bg: 'bg-emerald-50', text: 'text-emerald-600' },
+  symptom: { tag: '증상', bg: 'bg-amber-50', text: 'text-amber-700' },
+};
+
+const RECORD_FILTER_OPTIONS = [
+  { value: 'all', label: '전체' },
+  { value: 'glucose', label: '혈당' },
+  { value: 'meal', label: '식사' },
+  { value: 'medication', label: '투약' },
+  { value: 'exercise', label: '운동' },
+  { value: 'symptom', label: '증상' },
+  { value: 'blood_pressure', label: '혈압' },
+  { value: 'weight', label: '체중' },
+];
+
+const MEAL_AMOUNT_LABELS: Record<string, string> = {
+  light: '소식', normal: '보통', heavy: '과식',
+};
+
+const SEVERITY_LABELS: Record<string, string> = {
+  mild: '경미', moderate: '보통', severe: '심함',
+};
+
+const TYPE_GROUP_ORDER: RecordEntryType[] = ['glucose', 'meal', 'medication', 'exercise', 'symptom', 'blood_pressure', 'weight'];
+
+function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
+  const entries: DisplayEntry[] = [];
+  const ts = new Date(r.measuredAt);
+  const meta = r.metadata as Record<string, unknown> | undefined;
+
+  // Base metric
+  if (r.metricType === 'glucose') {
+    const timing = (meta?.mealTiming as string) || '';
+    const timingLabel = MEAL_TIMING_LABELS[timing] || '';
+    const situation = meta?.situation as string;
+    const sitLabel = situation === 'suspected_hypoglycemia' ? ' · 저혈당 의심' : situation === 'suspected_hyperglycemia' ? ' · 고혈당 의심' : '';
+    entries.push({
+      id: `${r.id}-glucose`, timestamp: ts, entryType: 'glucose',
+      label: `${Number(r.valueNumeric).toFixed(0)} mg/dL${timingLabel ? ` (${timingLabel})` : ''}${sitLabel}`,
+    });
+  } else if (r.metricType.startsWith('blood_pressure')) {
+    const st = meta?.state as string;
+    const stLabel = st === 'after_activity' ? ' (활동 후)' : st === 'after_medication' ? ' (투약 후)' : '';
+    entries.push({
+      id: `${r.id}-bp`, timestamp: ts, entryType: 'blood_pressure',
+      label: `${r.metricType === 'blood_pressure_systolic' ? '수축기' : '이완기'} ${Number(r.valueNumeric).toFixed(0)} mmHg${stLabel}`,
+    });
+  } else if (r.metricType === 'weight') {
+    const tod = meta?.timeOfDay as string;
+    const todLabel = tod === 'morning' ? ' (아침)' : tod === 'evening' ? ' (저녁)' : '';
+    entries.push({
+      id: `${r.id}-weight`, timestamp: ts, entryType: 'weight',
+      label: `${Number(r.valueNumeric).toFixed(1)} kg${todLabel}`,
+    });
+  }
+
+  // Metadata entries
+  if (meta?.meal) {
+    const meal = meta.meal as { type?: string; style?: string; amount?: string };
+    const typeLabel = MEAL_TYPE_OPTIONS.find(o => o.value === meal.type)?.label || meal.type || '';
+    const amtLabel = meal.amount ? MEAL_AMOUNT_LABELS[meal.amount] || '' : '';
+    entries.push({
+      id: `${r.id}-meal`, timestamp: ts, entryType: 'meal',
+      label: `${typeLabel}${amtLabel ? ` / ${amtLabel}` : ''}`,
+    });
+  }
+
+  if (meta?.medication) {
+    const med = meta.medication as { name?: string; dose?: string; taken?: boolean };
+    const parts = [med.name || ''];
+    if (med.dose) parts.push(med.dose);
+    if (med.taken === false) parts.push('(미복용)');
+    entries.push({
+      id: `${r.id}-med`, timestamp: ts, entryType: 'medication',
+      label: parts.join(' '),
+    });
+  }
+
+  if (meta?.exercise) {
+    const ex = meta.exercise as { type?: string; duration?: number; timing?: string };
+    const exLabel = EXERCISE_TYPES.find(o => o.value === ex.type)?.label || ex.type || '';
+    const tmLabel = ex.timing === 'after_meal' ? ' (식후)' : ex.timing === 'fasting' ? ' (공복)' : '';
+    entries.push({
+      id: `${r.id}-ex`, timestamp: ts, entryType: 'exercise',
+      label: `${exLabel}${ex.duration ? ` ${ex.duration}분` : ''}${tmLabel}`,
+    });
+  }
+
+  // Symptoms (backward compat: string[] or { items, severity, duration })
+  const sympRaw = meta?.symptoms;
+  let symItems: string[] | undefined;
+  let symSev: string | undefined;
+  let symDur: number | undefined;
+  if (Array.isArray(sympRaw)) {
+    symItems = sympRaw;
+  } else if (sympRaw && typeof sympRaw === 'object') {
+    const so = sympRaw as { items?: string[]; severity?: string; duration?: number };
+    symItems = so.items; symSev = so.severity; symDur = so.duration;
+  }
+  if (symItems && symItems.length > 0) {
+    entries.push({
+      id: `${r.id}-sym`, timestamp: ts, entryType: 'symptom',
+      label: `${symItems.join(', ')}${symSev ? ` [${SEVERITY_LABELS[symSev] || symSev}]` : ''}${symDur ? ` ${symDur}분` : ''}`,
+    });
+  }
+
+  return entries;
+}
+
+function getDateLabel(date: Date): string {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isSameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  const base = `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()} (${weekdays[date.getDay()]})`;
+  if (isSameDay(date, today)) return `오늘 · ${base}`;
+  if (isSameDay(date, yesterday)) return `어제 · ${base}`;
+  return base;
+}
+
 // ── Toggle-button helper ──
 
 function ToggleButton({ selected, onClick, children }: {
@@ -206,6 +339,19 @@ export default function DataTab() {
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [timeEditOpen, setTimeEditOpen] = useState(false);
+
+  const resetMeasuredAtToNow = useCallback(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    setMeasuredAt(now.toISOString().slice(0, 16));
+  }, []);
+
+  const formatMeasuredTime = useCallback(() => {
+    const d = new Date(measuredAt);
+    if (isNaN(d.getTime())) return measuredAt;
+    return d.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+  }, [measuredAt]);
 
   // ── Metric-specific Context ──
   const [mealTiming, setMealTiming] = useState('fasting');
@@ -263,6 +409,40 @@ export default function DataTab() {
   useEffect(() => {
     loadReadings();
   }, [loadReadings]);
+
+  // ── Recent records view state (WO-O4O-CARE-RECENT-RECORDS-UI-REFACTOR-V1) ──
+  const [viewMode, setViewMode] = useState<'by_date' | 'by_type'>('by_date');
+  const [recordFilter, setRecordFilter] = useState('all');
+
+  const displayEntries = useMemo(() => {
+    const all: DisplayEntry[] = [];
+    for (const r of readings) all.push(...buildDisplayEntries(r));
+    return recordFilter === 'all' ? all : all.filter(e => e.entryType === recordFilter);
+  }, [readings, recordFilter]);
+
+  const dateGroups = useMemo(() => {
+    const grouped = new Map<string, { date: Date; entries: DisplayEntry[] }>();
+    for (const entry of displayEntries) {
+      const y = entry.timestamp.getFullYear();
+      const m = String(entry.timestamp.getMonth() + 1).padStart(2, '0');
+      const d = String(entry.timestamp.getDate()).padStart(2, '0');
+      const key = `${y}-${m}-${d}`;
+      if (!grouped.has(key)) grouped.set(key, { date: new Date(y, entry.timestamp.getMonth(), entry.timestamp.getDate()), entries: [] });
+      grouped.get(key)!.entries.push(entry);
+    }
+    for (const [, g] of grouped) g.entries.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    return [...grouped.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([, g]) => g);
+  }, [displayEntries]);
+
+  const typeGroups = useMemo(() => {
+    const grouped = new Map<RecordEntryType, DisplayEntry[]>();
+    for (const entry of displayEntries) {
+      if (!grouped.has(entry.entryType)) grouped.set(entry.entryType, []);
+      grouped.get(entry.entryType)!.push(entry);
+    }
+    for (const [, entries] of grouped) entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return TYPE_GROUP_ORDER.filter(t => grouped.has(t)).map(t => ({ type: t, entries: grouped.get(t)! }));
+  }, [displayEntries]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -348,6 +528,7 @@ export default function DataTab() {
 
       // ── Reset ──
       setValue('');
+      setTimeEditOpen(false);
       setMealTiming('fasting');
       setGlucoseSituation('normal');
       setBpState('resting');
@@ -419,16 +600,46 @@ export default function DataTab() {
               />
             </div>
 
-            {/* Measured At */}
+            {/* Measured At — collapsible time picker (WO-O4O-CARE-EVENT-TIME-ENHANCEMENT-V1) */}
             <div>
               <label className="block text-xs text-slate-500 mb-1">측정 일시</label>
-              <input
-                type="datetime-local"
-                value={measuredAt}
-                onChange={(e) => setMeasuredAt(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-              />
+              {timeEditOpen ? (
+                <div className="space-y-1.5">
+                  <input
+                    type="datetime-local"
+                    value={measuredAt}
+                    onChange={(e) => setMeasuredAt(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    required
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { resetMeasuredAtToNow(); setTimeEditOpen(false); }}
+                      className="text-xs text-slate-500 hover:text-primary-600 transition-colors"
+                    >
+                      지금으로
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTimeEditOpen(false)}
+                      className="text-xs text-primary-600 font-medium hover:underline"
+                    >
+                      확인
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setTimeEditOpen(true)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white hover:bg-slate-50 transition-colors text-left"
+                >
+                  <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                  <span className="text-slate-700">{formatMeasuredTime()}</span>
+                  <span className="text-xs text-primary-500 ml-auto flex-shrink-0">수정</span>
+                </button>
+              )}
             </div>
 
             {/* Submit */}
@@ -863,157 +1074,109 @@ export default function DataTab() {
         </form>
       </div>
 
-      {/* Recent Readings */}
+      {/* Recent Readings — WO-O4O-CARE-RECENT-RECORDS-UI-REFACTOR-V1 */}
       <div>
-        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-4">최근 기록</h3>
+        {/* Header + Tabs + Filter */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">최근 기록</h3>
+            <div className="flex gap-0.5 bg-slate-100 rounded-lg p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('by_date')}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  viewMode === 'by_date' ? 'bg-white text-slate-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                일자별
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('by_type')}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  viewMode === 'by_type' ? 'bg-white text-slate-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                항목별
+              </button>
+            </div>
+          </div>
+          <select
+            value={recordFilter}
+            onChange={(e) => setRecordFilter(e.target.value)}
+            className="px-2 py-1 text-xs border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            {RECORD_FILTER_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
 
+        {/* Content */}
         {loadingReadings ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
           </div>
-        ) : readings.length === 0 ? (
+        ) : displayEntries.length === 0 ? (
           <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 flex flex-col items-center justify-center min-h-[160px]">
             <ClipboardPlus className="w-10 h-10 text-slate-300 mb-2" />
-            <p className="text-sm text-slate-500">아직 기록이 없습니다.</p>
+            <p className="text-sm text-slate-500">
+              {recordFilter !== 'all' ? '해당 항목의 기록이 없습니다.' : '최근 기록이 없습니다.'}
+            </p>
             <p className="text-xs text-slate-400 mt-1">위 양식으로 첫 데이터를 입력해 보세요.</p>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">날짜</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">항목</th>
-                  <th className="text-right py-3 px-4 text-xs font-medium text-slate-500 uppercase">값</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">단위</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">부가 정보</th>
-                  <th className="text-left py-3 px-4 text-xs font-medium text-slate-500 uppercase">입력 방식</th>
-                </tr>
-              </thead>
-              <tbody>
-                {readings.map((r) => {
-                  const meta = r.metadata as Record<string, unknown> | undefined;
-                  const mealTimingVal = (meta?.mealTiming as string) || '';
-                  const situation = meta?.situation as string | undefined;
-                  const bpStateVal = meta?.state as string | undefined;
-                  const timeOfDay = meta?.timeOfDay as string | undefined;
-                  const meal = meta?.meal as { type?: string; style?: string; amount?: string } | undefined;
-                  const medication = meta?.medication as { name?: string; dose?: string; taken?: boolean; timing?: string; note?: string } | undefined;
-                  const exercise = meta?.exercise as { type?: string; duration?: number; timing?: string } | undefined;
-
-                  // Backward compat: symptoms can be string[] (legacy) or {items, severity, duration} (new)
-                  const symptomsRaw = meta?.symptoms;
-                  let symptomItems: string[] | undefined;
-                  let symptomSeverity: string | undefined;
-                  let symptomDuration: number | undefined;
-                  if (Array.isArray(symptomsRaw)) {
-                    symptomItems = symptomsRaw as string[];
-                  } else if (symptomsRaw && typeof symptomsRaw === 'object') {
-                    const so = symptomsRaw as { items?: string[]; severity?: string; duration?: number };
-                    symptomItems = so.items;
-                    symptomSeverity = so.severity;
-                    symptomDuration = so.duration;
-                  }
-
-                  const hasMeta = mealTimingVal || situation || bpStateVal || timeOfDay || meal ||
-                    medication?.name || exercise?.type || (symptomItems && symptomItems.length > 0);
-
-                  const SITUATION_LABELS: Record<string, string> = {
-                    suspected_hypoglycemia: '저혈당 의심',
-                    suspected_hyperglycemia: '고혈당 의심',
-                  };
-                  const BP_STATE_LABELS: Record<string, string> = {
-                    after_activity: '활동 후',
-                    after_medication: '투약 후',
-                  };
-                  const TIME_OF_DAY_LABELS: Record<string, string> = {
-                    morning: '아침',
-                    evening: '저녁',
-                  };
-                  const MEAL_AMOUNT_LABELS: Record<string, string> = {
-                    light: '소식',
-                    normal: '보통',
-                    heavy: '과식',
-                  };
-                  const SEVERITY_LABELS: Record<string, string> = {
-                    mild: '경미',
-                    moderate: '보통',
-                    severe: '심함',
-                  };
-
-                  return (
-                    <tr key={r.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                      <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
-                        {new Date(r.measuredAt).toLocaleString()}
-                      </td>
-                      <td className="py-3 px-4 text-slate-700 font-medium whitespace-nowrap">
-                        {METRIC_LABELS[r.metricType] || r.metricType}
-                      </td>
-                      <td className="py-3 px-4 text-right text-slate-800 font-bold tabular-nums">
-                        {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(1) : '-'}
-                      </td>
-                      <td className="py-3 px-4 text-slate-500">{r.unit}</td>
-                      <td className="py-3 px-4">
-                        <div className="flex flex-wrap gap-1">
-                          {mealTimingVal && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-slate-100 text-slate-600">
-                              {MEAL_TIMING_LABELS[mealTimingVal] || mealTimingVal}
-                            </span>
-                          )}
-                          {situation && SITUATION_LABELS[situation] && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-red-50 text-red-600">
-                              {SITUATION_LABELS[situation]}
-                            </span>
-                          )}
-                          {bpStateVal && BP_STATE_LABELS[bpStateVal] && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-pink-50 text-pink-600">
-                              {BP_STATE_LABELS[bpStateVal]}
-                            </span>
-                          )}
-                          {timeOfDay && TIME_OF_DAY_LABELS[timeOfDay] && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-indigo-50 text-indigo-600">
-                              {TIME_OF_DAY_LABELS[timeOfDay]}
-                            </span>
-                          )}
-                          {meal?.type && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-orange-50 text-orange-600">
-                              식사 {MEAL_TYPE_OPTIONS.find(o => o.value === meal.type)?.label || meal.type}
-                              {meal.amount ? ` ${MEAL_AMOUNT_LABELS[meal.amount] || meal.amount}` : ''}
-                            </span>
-                          )}
-                          {medication?.name && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-600">
-                              {medication.taken === false ? '미복용' : '투약'} {medication.name}{medication.dose ? ` ${medication.dose}` : ''}
-                            </span>
-                          )}
-                          {exercise?.type && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-50 text-green-600">
-                              운동 {exercise.type}{exercise.duration ? ` ${exercise.duration}분` : ''}
-                              {exercise.timing === 'after_meal' ? ' (식후)' : exercise.timing === 'fasting' ? ' (공복)' : ''}
-                            </span>
-                          )}
-                          {symptomItems && symptomItems.length > 0 && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700">
-                              증상 {symptomItems.join(', ')}
-                              {symptomSeverity ? ` [${SEVERITY_LABELS[symptomSeverity] || symptomSeverity}]` : ''}
-                              {symptomDuration ? ` ${symptomDuration}분` : ''}
-                            </span>
-                          )}
-                          {!hasMeta && (
-                            <span className="text-xs text-slate-300">-</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-600">
-                          {r.sourceType === 'manual' ? '수동 입력' : r.sourceType}
+        ) : viewMode === 'by_date' ? (
+          /* ── Date view ── */
+          <div className="space-y-3">
+            {dateGroups.map((group) => (
+              <div key={group.date.toISOString()} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100">
+                  <span className="text-xs font-semibold text-slate-600">{getDateLabel(group.date)}</span>
+                </div>
+                <div className="divide-y divide-slate-50">
+                  {group.entries.map((entry) => {
+                    const cfg = ENTRY_TYPE_CONFIG[entry.entryType];
+                    return (
+                      <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <span className="text-xs text-slate-400 w-11 flex-shrink-0 tabular-nums">
+                          {entry.timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })}
                         </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded ${cfg.bg} ${cfg.text} flex-shrink-0`}>
+                          {cfg.tag}
+                        </span>
+                        <span className="text-sm text-slate-700 truncate">{entry.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* ── Type view ── */
+          <div className="space-y-3">
+            {typeGroups.map(({ type, entries }) => {
+              const cfg = ENTRY_TYPE_CONFIG[type];
+              return (
+                <div key={type} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                  <div className={`px-4 py-2.5 border-b border-slate-100 flex items-center gap-2 ${cfg.bg}`}>
+                    <span className={`text-xs font-semibold ${cfg.text}`}>{cfg.tag}</span>
+                    <span className="text-[10px] text-slate-400">{entries.length}건</span>
+                  </div>
+                  <div className="divide-y divide-slate-50">
+                    {entries.map((entry) => (
+                      <div key={entry.id} className="flex items-center gap-3 px-4 py-2.5">
+                        <span className="text-xs text-slate-400 w-24 flex-shrink-0 tabular-nums">
+                          {entry.timestamp.toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}{' '}
+                          {entry.timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                        </span>
+                        <span className="text-sm text-slate-700 truncate">{entry.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
