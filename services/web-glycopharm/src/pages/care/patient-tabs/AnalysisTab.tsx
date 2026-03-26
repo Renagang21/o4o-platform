@@ -7,7 +7,8 @@
  *   GET /api/v1/care/kpi/:patientId → 트렌드 비교
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Activity,
   TrendingUp,
@@ -21,8 +22,11 @@ import {
   ShieldAlert,
   Sparkles,
   AlertCircle,
+  User,
+  MessageSquare,
+  CheckCircle2,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto } from '@/api/pharmacy';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
 import { RISK_DISPLAY } from '@/constants/care-display';
 
@@ -436,6 +440,7 @@ function WeightChart({ readings }: { readings: HealthReadingDto[] }) {
 
 export default function AnalysisTab() {
   const { patient } = usePatientDetail();
+  const navigate = useNavigate();
   const [analysis, setAnalysis] = useState<CareInsightDto | null>(null);
   const [kpi, setKpi] = useState<KpiComparisonDto | null>(null);
   const [llmInsight, setLlmInsight] = useState<CareLlmInsightDto | null>(null);
@@ -474,6 +479,25 @@ export default function AnalysisTab() {
       setEventAnalysis(ev);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
+
+  // ── Action handler (WO-O4O-CARE-ACTION-ENGINE-V2) ──
+  const handleCareAction = useCallback((action: CareGeneratedActionDto) => {
+    if (!patient?.id) return;
+    switch (action.type) {
+      case 'open_patient':
+        navigate(`/care/patients/${patient.id}`);
+        break;
+      case 'create_coaching':
+        navigate(`/care/patients/${patient.id}/coaching`, { state: { openForm: true } });
+        break;
+      case 'run_analysis':
+        pharmacyApi.getCgmEventAnalysis(patient.id, 30).then(setEventAnalysis).catch(() => {});
+        break;
+      case 'resolve_alert':
+        navigate(`/care/patients/${patient.id}`);
+        break;
+    }
+  }, [patient?.id, navigate]);
 
   // ── Glucose stats for mini cards ──
   const glucoseStats = useMemo(() => {
@@ -821,7 +845,7 @@ export default function AnalysisTab() {
       </div>
 
       {/* ── CGM-Event Analysis (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1) ── */}
-      <CgmEventAnalysisSection data={eventAnalysis} />
+      <CgmEventAnalysisSection data={eventAnalysis} onActionExecute={handleCareAction} />
     </div>
   );
 }
@@ -860,7 +884,10 @@ const EVENT_BORDER: Record<string, string> = {
   symptom: 'border-l-amber-400',
 };
 
-function CgmEventAnalysisSection({ data }: { data: CgmEventAnalysisDto | null }) {
+function CgmEventAnalysisSection({ data, onActionExecute }: {
+  data: CgmEventAnalysisDto | null;
+  onActionExecute: (action: CareGeneratedActionDto) => void;
+}) {
   if (!data) return null;
 
   const hasEvents = data.events.length > 0;
@@ -894,6 +921,16 @@ function CgmEventAnalysisSection({ data }: { data: CgmEventAnalysisDto | null })
                   </span>
                 );
               })}
+            </div>
+          )}
+
+          {/* Actions — WO-O4O-CARE-ACTION-ENGINE-V2 */}
+          {data.actions && data.actions.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">권장 조치</p>
+              {data.actions.map((action, i) => (
+                <CareActionButton key={i} action={action} onExecute={onActionExecute} />
+              ))}
             </div>
           )}
 
@@ -1001,5 +1038,44 @@ function EventCard({ event: ev }: { event: CgmEventAnalysisDto['events'][number]
         )}
       </div>
     </div>
+  );
+}
+
+// ── Care Action Button (WO-O4O-CARE-ACTION-ENGINE-V2) ──
+
+const CARE_ACTION_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  open_patient: User,
+  create_coaching: MessageSquare,
+  run_analysis: BarChart3,
+  resolve_alert: CheckCircle2,
+};
+
+const PRIORITY_STYLES: Record<string, { border: string; bg: string; text: string }> = {
+  HIGH: { border: 'border-red-200', bg: 'bg-red-50', text: 'text-red-700' },
+  MEDIUM: { border: 'border-amber-200', bg: 'bg-amber-50', text: 'text-amber-700' },
+  LOW: { border: 'border-slate-200', bg: 'bg-slate-50', text: 'text-slate-600' },
+};
+
+function CareActionButton({
+  action,
+  onExecute,
+}: {
+  action: CareGeneratedActionDto;
+  onExecute: (action: CareGeneratedActionDto) => void;
+}) {
+  const Icon = CARE_ACTION_ICONS[action.type] || BarChart3;
+  const style = PRIORITY_STYLES[action.priority] || PRIORITY_STYLES.LOW;
+
+  return (
+    <button
+      onClick={() => onExecute(action)}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left text-sm transition-colors hover:opacity-80 ${style.border} ${style.bg} ${style.text}`}
+    >
+      <Icon className="w-4 h-4 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <span className="font-medium">{action.label}</span>
+        <p className="text-xs opacity-70 mt-0.5">{action.reason}</p>
+      </div>
+    </button>
   );
 }

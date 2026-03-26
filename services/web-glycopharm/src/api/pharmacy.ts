@@ -1145,6 +1145,17 @@ export interface DetectedPatternDto {
   label: string;
 }
 
+// ── Action Engine V2 (WO-O4O-CARE-ACTION-ENGINE-V2) ──
+
+export type CareActionPriority = 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface CareGeneratedActionDto {
+  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+  priority: CareActionPriority;
+  reason: string;
+  label: string;
+}
+
 export interface CgmEventAnalysisDto {
   patientId: string;
   periodFrom: string;
@@ -1161,6 +1172,7 @@ export interface CgmEventAnalysisDto {
     postMealAvg: number | null;
     delta: number | null;
   } | null;
+  actions?: CareGeneratedActionDto[];
 }
 
 // Export singleton instance

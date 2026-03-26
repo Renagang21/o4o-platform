@@ -56,7 +56,12 @@ export function createCgmEventAnalysisRouter(dataSource: DataSource): Router {
         }
 
         const result = await provider.analyzePatientEvents(patientId, days);
-        res.json({ success: true, data: result });
+
+        // V2: Rule-based action mapping (WO-O4O-CARE-ACTION-ENGINE-V2)
+        const { mapAnalysisToActions } = await import('../domain/analysis/cgm-action.mapper.js');
+        const actions = mapAnalysisToActions(result);
+
+        res.json({ success: true, data: { ...result, actions } });
       } catch (error) {
         console.error('[CgmEventAnalysis] error:', error);
         res.status(500).json({
