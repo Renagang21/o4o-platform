@@ -117,8 +117,10 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         //   - supplier_product_offers has no 'name' column → JOIN product_masters
         //   - neture_contact_messages uses "createdAt" (camelCase), not created_at
         dataSource.query(`
-          (SELECT 'supplier' AS source, name AS ref, status AS detail, created_at
-           FROM neture_suppliers ORDER BY created_at DESC LIMIT 2)
+          (SELECT 'supplier' AS source, o.name AS ref, ns.status AS detail, ns.created_at
+           FROM neture_suppliers ns
+           LEFT JOIN organizations o ON o.id = ns.organization_id
+           ORDER BY ns.created_at DESC LIMIT 2)
           UNION ALL
           (SELECT 'product' AS source, pm.name AS ref, spo.approval_status AS detail, spo.created_at
            FROM supplier_product_offers spo
