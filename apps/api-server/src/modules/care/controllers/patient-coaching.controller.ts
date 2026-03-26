@@ -41,6 +41,7 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
           cs.summary,
           cs.action_plan AS "actionPlan",
           cs.created_at AS "createdAt",
+          cs.patient_read_at AS "patientReadAt",
           COALESCE(
             NULLIF(TRIM(CONCAT(u."firstName", ' ', u."lastName")), ''),
             u.name,
@@ -53,6 +54,14 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
         LIMIT 50`,
         [user.id],
       );
+
+      // Auto-mark as read (fire-and-forget)
+      dataSource.query(
+        `UPDATE care_coaching_sessions
+         SET patient_read_at = NOW()
+         WHERE patient_id = $1 AND patient_read_at IS NULL`,
+        [user.id],
+      ).catch(() => {});
 
       res.json({ success: true, data: sessions });
     } catch (error) {

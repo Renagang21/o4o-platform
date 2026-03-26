@@ -131,6 +131,7 @@ export interface PatientCoachingRecord {
   actionPlan: string;
   createdAt: string;
   pharmacistName: string;
+  patientReadAt?: string | null;
 }
 
 // Pharmacy Link types

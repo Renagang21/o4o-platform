@@ -106,4 +106,28 @@ export class CareCoachingSessionService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  /** 환자가 코칭 세션을 읽음 처리 (bulk) */
+  async markAsReadByPatient(patientId: string): Promise<number> {
+    const result = await this.dataSource.query(
+      `UPDATE care_coaching_sessions
+       SET patient_read_at = NOW()
+       WHERE patient_id = $1
+         AND patient_read_at IS NULL`,
+      [patientId],
+    );
+    return result[1] ?? 0;
+  }
+
+  /** 환자의 안읽은 코칭 세션 수 */
+  async getUnreadCoachingCount(patientId: string): Promise<number> {
+    const rows = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS count
+       FROM care_coaching_sessions
+       WHERE patient_id = $1
+         AND patient_read_at IS NULL`,
+      [patientId],
+    );
+    return rows[0]?.count ?? 0;
+  }
 }

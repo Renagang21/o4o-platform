@@ -130,28 +130,44 @@ export default function MessagesPage() {
             <p className="text-sm">약사에게 궁금한 점을 질문해 보세요</p>
           </div>
         ) : (
-          messages.map((msg) => {
+          messages.map((msg, idx) => {
             const isMine = msg.senderType === 'patient';
             const isCoachingRef = msg.messageType === 'coaching_ref';
+            const isUnread = !isMine && msg.status === 'sent';
+            // Show "new messages" divider before the first unread message from pharmacist
+            const showNewDivider = isUnread && !messages.slice(0, idx).some(
+              (m) => m.senderType === 'pharmacist' && m.status === 'sent',
+            );
             return (
-              <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    isMine
-                      ? 'bg-teal-600 text-white rounded-br-md'
-                      : isCoachingRef
-                        ? 'bg-violet-50 border border-violet-200 text-slate-800 rounded-bl-md'
-                        : 'bg-slate-100 text-slate-800 rounded-bl-md'
-                  }`}
-                >
-                  {isCoachingRef && !isMine && (
-                    <p className="text-[10px] font-medium text-violet-500 mb-1">코칭 관련</p>
-                  )}
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                  <p className={`text-[10px] mt-1 ${isMine ? 'text-teal-200' : 'text-slate-400'}`}>
-                    {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
-                    {!isMine && msg.status === 'read' && ' · 읽음'}
-                  </p>
+              <div key={msg.id}>
+                {showNewDivider && (
+                  <div className="flex items-center gap-2 my-2">
+                    <div className="flex-1 h-px bg-teal-300" />
+                    <span className="text-[10px] font-semibold text-teal-500 uppercase">새 메시지</span>
+                    <div className="flex-1 h-px bg-teal-300" />
+                  </div>
+                )}
+                <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      isMine
+                        ? 'bg-teal-600 text-white rounded-br-md'
+                        : isUnread
+                          ? 'bg-blue-50 border border-blue-200 text-slate-800 rounded-bl-md'
+                          : isCoachingRef
+                            ? 'bg-violet-50 border border-violet-200 text-slate-800 rounded-bl-md'
+                            : 'bg-slate-100 text-slate-800 rounded-bl-md'
+                    }`}
+                  >
+                    {isCoachingRef && !isMine && (
+                      <p className="text-[10px] font-medium text-violet-500 mb-1">코칭 관련</p>
+                    )}
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    <p className={`text-[10px] mt-1 ${isMine ? 'text-teal-200' : 'text-slate-400'}`}>
+                      {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                      {!isMine && msg.status === 'read' && ' · 읽음'}
+                    </p>
+                  </div>
                 </div>
               </div>
             );

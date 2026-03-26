@@ -135,9 +135,14 @@ export default function PharmacistCoachingPage() {
             {/* Latest Coaching — Highlighted */}
             {latest && (
               <section className="mb-6">
-                <h2 className="text-xs font-semibold text-violet-500 uppercase tracking-wide mb-3">
-                  최신 코칭
-                </h2>
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-xs font-semibold text-violet-500 uppercase tracking-wide">
+                    최신 코칭
+                  </h2>
+                  {!latest.patientReadAt && (
+                    <span className="px-1.5 py-0.5 rounded bg-red-500 text-white text-[10px] font-bold leading-none">NEW</span>
+                  )}
+                </div>
                 <div className="bg-violet-50 rounded-2xl border border-violet-200 p-5">
                   {/* Pharmacist + date */}
                   <div className="flex items-center gap-2 mb-3">
@@ -215,9 +220,14 @@ export default function PharmacistCoachingPage() {
                           className="w-full p-4 flex items-center justify-between text-left"
                         >
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800 truncate">
-                              {record.summary}
-                            </p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-sm font-medium text-slate-800 truncate">
+                                {record.summary}
+                              </p>
+                              {!record.patientReadAt && (
+                                <span className="px-1.5 py-0.5 rounded bg-red-500 text-white text-[10px] font-bold leading-none flex-shrink-0">NEW</span>
+                              )}
+                            </div>
                             <p className="text-xs text-slate-400 mt-0.5">
                               {record.pharmacistName || '약사'} ·{' '}
                               {new Date(record.createdAt).toLocaleDateString('ko-KR')}

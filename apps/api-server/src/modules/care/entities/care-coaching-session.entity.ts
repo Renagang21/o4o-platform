@@ -33,4 +33,7 @@ export class CareCoachingSession {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  @Column({ name: 'patient_read_at', type: 'timestamptz', nullable: true })
+  patientReadAt?: Date | null;
 }

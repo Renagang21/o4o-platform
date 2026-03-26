@@ -27,6 +27,7 @@ import {
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
 import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
+import { usePharmacyUnread } from '@/hooks/usePharmacyUnread';
 
 type RiskLevel = 'all' | 'high' | 'moderate' | 'low';
 
@@ -50,6 +51,7 @@ interface SnapshotData {
 
 export default function PatientsPage() {
   const navigate = useNavigate();
+  const { byPatient: unreadByPatient } = usePharmacyUnread();
   const [patients, setPatients] = useState<PharmacyCustomer[]>([]);
   const [summary, setSummary] = useState<CareDashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -360,10 +362,19 @@ export default function PatientsPage() {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
+                          <div className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-medium">
                               {getPatientInitial(patient.name)}
                             </span>
+                            {(() => {
+                              const pid = patient.userId || patient.id;
+                              const cnt = unreadByPatient.get(pid) ?? 0;
+                              return cnt > 0 ? (
+                                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none">
+                                  {cnt > 9 ? '9+' : cnt}
+                                </span>
+                              ) : null;
+                            })()}
                           </div>
                           <span className="font-medium text-slate-900">{getPatientDisplayName(patient.name)}</span>
                         </div>
