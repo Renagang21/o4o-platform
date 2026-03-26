@@ -19,6 +19,13 @@ export interface ServiceApprovalItem {
   productName: string;
   barcode: string;
   supplierName: string;
+  // WO-NETURE-OPERATOR-REVIEW-UX-V1: 규제/완성도 필드
+  regulatoryType: string | null;
+  mfdsPermitNumber: string | null;
+  isMfdsVerified: boolean;
+  offerApprovalStatus: string;
+  distributionType: string | null;
+  completenessScore: number;
 }
 
 export interface ServiceApprovalStats {

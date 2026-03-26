@@ -70,7 +70,19 @@ export class OfferServiceApprovalService {
            osa.reason, osa.created_at AS "createdAt",
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS "productName",
            pm.barcode,
-           ns.name AS "supplierName"
+           ns.name AS "supplierName",
+           pm.regulatory_type AS "regulatoryType",
+           pm.mfds_permit_number AS "mfdsPermitNumber",
+           pm.is_mfds_verified AS "isMfdsVerified",
+           spo.approval_status AS "offerApprovalStatus",
+           spo.distribution_type AS "distributionType",
+           (
+             CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
+             + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
+             + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
+             + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
+             + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
+           ) AS "completenessScore"
          FROM offer_service_approvals osa
          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id

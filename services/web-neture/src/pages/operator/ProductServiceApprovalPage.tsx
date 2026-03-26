@@ -40,6 +40,30 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; text: string }> 
   rejected: { label: '거절됨', bg: 'bg-red-50', text: 'text-red-700' },
 };
 
+// WO-NETURE-OPERATOR-REVIEW-UX-V1: 규제 상태 뱃지
+function getRegulatoryBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
+  const rt = item.regulatoryType;
+  if (!rt || rt === 'GENERAL') return { label: '일반', bg: 'bg-slate-50', text: 'text-slate-500' };
+  if (!item.mfdsPermitNumber) return { label: '⚠ 허가없음', bg: 'bg-red-50', text: 'text-red-700' };
+  if (item.isMfdsVerified) return { label: '검증됨', bg: 'bg-green-50', text: 'text-green-700' };
+  return { label: '미검증', bg: 'bg-amber-50', text: 'text-amber-700' };
+}
+
+// WO-NETURE-OPERATOR-REVIEW-UX-V1: 완성도 상태 (deriveCompletenessStatus 로직 재현)
+function getCompletenessBadge(item: ServiceApprovalItem): { label: string; bg: string; text: string } {
+  if (item.offerApprovalStatus === 'approved') return { label: 'APPROVED', bg: 'bg-green-50', text: 'text-green-700' };
+  const score = item.completenessScore || 0;
+  if (score >= 60) return { label: 'READY', bg: 'bg-blue-50', text: 'text-blue-700' };
+  if (score > 0) return { label: 'INCOMPLETE', bg: 'bg-amber-50', text: 'text-amber-700' };
+  return { label: 'DRAFT', bg: 'bg-slate-50', text: 'text-slate-500' };
+}
+
+/** 규제 상품인데 허가번호 없음 → 승인 위험 */
+function hasPermitRisk(item: ServiceApprovalItem): boolean {
+  const rt = item.regulatoryType;
+  return !!rt && rt !== 'GENERAL' && !item.mfdsPermitNumber;
+}
+
 export default function ProductServiceApprovalPage() {
   const { user } = useAuth();
   const isAdmin = user?.roles?.some(
@@ -160,9 +184,11 @@ export default function ProductServiceApprovalPage() {
             <tr>
               <th className="text-left px-4 py-3 font-medium text-slate-600">상품명</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">바코드</th>
+              <th className="text-center px-4 py-3 font-medium text-slate-600">규제</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">공급사</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">서비스</th>
               <th className="text-center px-4 py-3 font-medium text-slate-600">상태</th>
+              <th className="text-center px-4 py-3 font-medium text-slate-600">완성도</th>
               <th className="text-left px-4 py-3 font-medium text-slate-600">등록일</th>
               <th className="text-center px-4 py-3 font-medium text-slate-600">액션</th>
             </tr>
@@ -170,11 +196,11 @@ export default function ProductServiceApprovalPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="text-center py-12 text-slate-400">로딩 중...</td>
+                <td colSpan={9} className="text-center py-12 text-slate-400">로딩 중...</td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-12 text-slate-400">데이터가 없습니다</td>
+                <td colSpan={9} className="text-center py-12 text-slate-400">데이터가 없습니다</td>
               </tr>
             ) : (
               items.map((item) => {
@@ -183,6 +209,19 @@ export default function ProductServiceApprovalPage() {
                   <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium">{item.productName || '-'}</td>
                     <td className="px-4 py-3 font-mono text-xs">{item.barcode || '-'}</td>
+                    <td className="px-4 py-3 text-center">
+                      {(() => {
+                        const rb = getRegulatoryBadge(item);
+                        return (
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${rb.bg} ${rb.text}`}
+                            title={item.regulatoryType || '일반'}
+                          >
+                            {rb.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-4 py-3">{item.supplierName || '-'}</td>
                     <td className="px-4 py-3">
                       <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
@@ -194,16 +233,29 @@ export default function ProductServiceApprovalPage() {
                         {badge.label}
                       </span>
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      {(() => {
+                        const cb = getCompletenessBadge(item);
+                        return (
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${cb.bg} ${cb.text}`}>
+                            {cb.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
                       {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {item.approvalStatus === 'pending' ? (
                         <div className="flex items-center justify-center gap-2">
+                          {hasPermitRisk(item) && (
+                            <span className="text-red-500 text-sm" title="규제 상품 — 허가번호 없음">⚠</span>
+                          )}
                           <button
                             onClick={() => handleApprove(item.id)}
                             disabled={!isAdmin || actionLoading === item.id}
-                            title={!isAdmin ? '관리자만 승인할 수 있습니다' : undefined}
+                            title={!isAdmin ? '관리자만 승인할 수 있습니다' : hasPermitRisk(item) ? '규제 상품 — 허가번호 없음' : undefined}
                             className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             승인
