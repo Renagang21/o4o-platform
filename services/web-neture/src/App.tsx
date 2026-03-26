@@ -503,8 +503,6 @@ function App() {
             <Route path="/forgot-password" element={<AccountRecoveryPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/register/pending" element={<RegisterPendingPage />} />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="/my" element={<Navigate to="/mypage" replace />} />
             <Route path="/qr/:slug" element={<QrLandingPage />} />
 
             {/* ================================================================
@@ -513,6 +511,8 @@ function App() {
             ================================================================ */}
             <Route element={<NetureLayout />}>
               <Route path="/" element={<NetureHomePage />} />
+              <Route path="/mypage" element={<MyPage />} />
+              <Route path="/my" element={<Navigate to="/mypage" replace />} />
               <Route path="/supplier" element={<SupplierLandingPage />} />
               <Route path="/partner" element={<PartnerLandingPage />} />
               <Route path="/about" element={<AboutPage />} />
