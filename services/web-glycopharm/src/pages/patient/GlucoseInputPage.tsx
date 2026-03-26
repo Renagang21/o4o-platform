@@ -33,13 +33,7 @@ const MEAL_TIMING_OPTIONS = [
   { value: 'random', label: '기타' },
 ];
 
-const MEAL_TIMING_LABELS: Record<string, string> = {
-  fasting: '공복',
-  before_meal: '식전',
-  after_meal: '식후',
-  bedtime: '취침 전',
-  random: '기타',
-};
+import { MEAL_TIMING_LABELS } from '@/constants/meal-timing';
 
 const EXERCISE_TYPES = [
   { value: 'walking', label: '걷기' },

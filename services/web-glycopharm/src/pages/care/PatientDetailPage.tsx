@@ -20,9 +20,6 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, NavLink, Outlet, useNavigate, useOutletContext } from 'react-router-dom';
 import {
   ArrowLeft,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle,
   Calendar,
   Loader2,
   MessageSquare,
@@ -38,6 +35,7 @@ import CareSubNav from './CareSubNav';
 import PatientAiSummary from './PatientAiSummary';
 import CareAiChatEntry from './CareAiChatEntry';
 import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
+import { RISK_DISPLAY } from '@/constants/care-display';
 
 // ── Shared types for tab context ──
 
@@ -60,12 +58,6 @@ export function usePatientDetail() {
 }
 
 // ── Constants ──
-
-const RISK_DISPLAY = {
-  high: { label: '고위험', cls: 'bg-red-100 text-red-700', Icon: AlertTriangle },
-  moderate: { label: '주의', cls: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
-  low: { label: '양호', cls: 'bg-green-100 text-green-700', Icon: CheckCircle },
-} as const;
 
 type RiskKey = keyof typeof RISK_DISPLAY;
 

@@ -30,14 +30,9 @@ import {
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading, PatientCoachingRecord, MyLinkStatus, AiInsight } from '@/api/patient';
+import { extractMetadata } from '@/utils/extract-metadata';
 
-const MEAL_TIMING_LABELS: Record<string, string> = {
-  fasting: '공복',
-  before_meal: '식전',
-  after_meal: '식후',
-  bedtime: '취침 전',
-  random: '기타',
-};
+import { MEAL_TIMING_LABELS } from '@/constants/meal-timing';
 
 const QUICK_MENU = [
   { label: '약국 연결', path: '/patient/select-pharmacy', icon: Building2, color: 'text-teal-600', bg: 'bg-teal-50' },
@@ -232,11 +227,8 @@ export default function PatientMainPage() {
               {readings.length > 0 ? (
                 <div className="space-y-2">
                   {readings.slice(0, 5).map((r) => {
-                    const meta = r.metadata as Record<string, unknown>;
-                    const medication = meta?.medication as { name?: string; dose?: string } | undefined;
-                    const exercise = meta?.exercise as { type?: string; duration?: number } | undefined;
-                    const symptoms = Array.isArray(meta?.symptoms) ? (meta.symptoms as string[]) : undefined;
-                    const hasExtra = !!(medication?.name || exercise?.type || (symptoms && symptoms.length > 0));
+                    const meta = extractMetadata(r.metadata);
+                    const hasExtra = !!(meta.medication?.name || meta.exercise?.type || (meta.symptoms && meta.symptoms.items.length > 0));
                     return (
                       <div
                         key={r.id}
@@ -252,23 +244,23 @@ export default function PatientMainPage() {
                             })}
                           </p>
                           <p className="text-xs text-slate-300">
-                            {MEAL_TIMING_LABELS[(meta?.mealTiming as string)] || ''}
+                            {MEAL_TIMING_LABELS[meta.mealTiming || ''] || ''}
                           </p>
                           {hasExtra && (
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {medication?.name && (
+                              {meta.medication?.name && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-600">
-                                  투약 {medication.name}
+                                  투약 {meta.medication.name}
                                 </span>
                               )}
-                              {exercise?.type && (
+                              {meta.exercise?.type && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-50 text-green-600">
-                                  운동 {exercise.type}
+                                  운동 {meta.exercise.type}
                                 </span>
                               )}
-                              {symptoms && symptoms.length > 0 && (
+                              {meta.symptoms && meta.symptoms.items.length > 0 && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700">
-                                  증상 {symptoms.length}건
+                                  증상 {meta.symptoms.items.length}건
                                 </span>
                               )}
                             </div>

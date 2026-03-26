@@ -14,24 +14,17 @@ import {
   TrendingDown,
   Minus,
   BarChart3,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle,
   Loader2,
   Lightbulb,
   Heart,
   Weight,
   ShieldAlert,
   Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
-
-const RISK_DISPLAY = {
-  high: { label: '고위험', cls: 'bg-red-100 text-red-700', Icon: AlertTriangle },
-  moderate: { label: '주의', cls: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
-  low: { label: '양호', cls: 'bg-green-100 text-green-700', Icon: CheckCircle },
-} as const;
+import { RISK_DISPLAY } from '@/constants/care-display';
 
 const TREND_DISPLAY = {
   improving: { label: '개선 중', cls: 'text-green-600', Icon: TrendingUp },

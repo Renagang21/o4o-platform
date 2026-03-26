@@ -12,9 +12,6 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   BarChart3,
   MessageSquare,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle,
   Clock,
   Loader2,
   Heart,
@@ -22,19 +19,12 @@ import {
 } from 'lucide-react';
 import { pharmacyApi, type TimelineEventDto } from '@/api/pharmacy';
 import { usePatientDetail } from '../PatientDetailPage';
+import { RISK_DISPLAY } from '@/constants/care-display';
 
 // ── Types ──
 
 type EventType = TimelineEventDto['type'];
 type FilterType = 'all' | EventType;
-
-// ── Constants ──
-
-const RISK_DISPLAY = {
-  high: { label: '고위험', cls: 'text-red-700 bg-red-100', Icon: AlertTriangle },
-  moderate: { label: '주의', cls: 'text-amber-700 bg-amber-100', Icon: AlertCircle },
-  low: { label: '양호', cls: 'text-green-700 bg-green-100', Icon: CheckCircle },
-} as const;
 
 const EVENT_STYLE: Record<EventType, { dot: string; Icon: typeof BarChart3; label: string }> = {
   health_reading: { dot: 'bg-purple-500', Icon: Heart, label: '건강데이터' },

@@ -6,21 +6,13 @@
  */
 
 import {
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle,
   Calendar,
   Phone,
   Stethoscope,
   ShoppingCart,
 } from 'lucide-react';
 import { usePatientDetail } from '../PatientDetailPage';
-
-const RISK_DISPLAY = {
-  high: { label: '고위험', cls: 'bg-red-100 text-red-700 border-red-200', Icon: AlertTriangle },
-  moderate: { label: '주의', cls: 'bg-amber-100 text-amber-700 border-amber-200', Icon: AlertCircle },
-  low: { label: '양호', cls: 'bg-green-100 text-green-700 border-green-200', Icon: CheckCircle },
-} as const;
+import { RISK_DISPLAY } from '@/constants/care-display';
 
 type RiskKey = keyof typeof RISK_DISPLAY;
 
