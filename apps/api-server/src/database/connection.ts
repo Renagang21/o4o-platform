@@ -302,6 +302,7 @@ import {
   KpaPharmacyRequest, // WO-KPA-A-PHARMACY-REQUEST-STRUCTURE-REALIGN-V1
   OrganizationServiceEnrollment, // WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1
   KpaPharmacistProfile, // WO-ROLE-NORMALIZATION-PHASE3-B-V1
+  KpaStudentProfile, // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
   ServiceProduct, // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
 } from '../routes/kpa/entities/index.js';
 
@@ -808,6 +809,8 @@ export const AppDataSource = new DataSource({
     OrganizationServiceEnrollment,
     // WO-ROLE-NORMALIZATION-PHASE3-B-V1
     KpaPharmacistProfile,
+    // WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
+    KpaStudentProfile,
     // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
     ServiceProduct,
     // ============================================================================

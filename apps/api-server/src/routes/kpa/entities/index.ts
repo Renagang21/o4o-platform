@@ -31,6 +31,8 @@ export { OrganizationStore } from '../../../modules/store-core/entities/organiza
 export { OrganizationServiceEnrollment } from './organization-service-enrollment.entity.js';
 // WO-ROLE-NORMALIZATION-PHASE3-B-V1
 export { KpaPharmacistProfile } from './kpa-pharmacist-profile.entity.js';
+// WO-KPA-A-RBAC-PROFILE-NORMALIZATION-V1
+export { KpaStudentProfile } from './kpa-student-profile.entity.js';
 // WO-KPA-B-LMS-GUARD-BYPASS-AUDIT-AND-IMPLEMENTATION-V1
 /** @deprecated WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: Use KpaApprovalRequest (entity_type='instructor_qualification'). Kept for legacy data reads. */
 export { KpaInstructorQualification } from './kpa-instructor-qualification.entity.js';

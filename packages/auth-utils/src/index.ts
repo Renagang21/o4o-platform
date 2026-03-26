@@ -7,3 +7,11 @@ export { ROLE_DASHBOARD_MAP } from './roleDashboardMap.js';
 export { getPrimaryDashboardRoute } from './getPrimaryDashboardRoute.js';
 export { hasRole, hasAnyRole } from './hasRole.js';
 export { extractRoles } from './extractRoles.js';
+export type { ProfileConfig } from './profile-utils.js';
+export {
+  PROFILE_MAP,
+  getProfileTableName,
+  hasProfileMapping,
+  getProfilesByService,
+  getProfileMappedRoles,
+} from './profile-utils.js';
