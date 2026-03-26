@@ -7,12 +7,15 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, normalizeUser, resolveAuthError, getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
 export { getAccessToken };
+
+// WO-O4O-AUTH-FLOW-SIMPLIFICATION-V1: dashboard config → config/dashboard.ts로 분리, 하위 호환 re-export
+export { ROLE_LABELS, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP, getNetureDashboardRoute } from '../config/dashboard';
 
 /**
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
@@ -39,50 +42,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
-const ROLE_LABELS: Record<string, string> = {
-  'platform:super_admin': '최고 관리자',
-  'neture:admin': '관리자',
-  'neture:operator': '운영자',
-  'neture:supplier': '공급자',
-  'neture:partner': '파트너',
-  'neture:seller': '셀러',
-  user: '사용자',
-};
-
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
-const NETURE_ROLE_PRIORITY = [
-  'platform:super_admin',
-  'neture:admin',
-  'neture:operator',
-  'neture:supplier',
-  'neture:partner',
-  'neture:seller',
-] as const;
-
-const NETURE_DASHBOARD_MAP: Record<string, string> = {
-  'platform:super_admin': '/admin',
-  'neture:admin': '/admin',
-  'neture:operator': '/operator',
-  'neture:supplier': '/supplier/dashboard',
-  'neture:partner': '/partner/dashboard',
-  'neture:seller': '/seller/overview',
-};
-
-/**
- * JWT roles를 그대로 사용 (prefix 유지).
- * 빈 배열이면 ['user'] fallback.
- */
-function extractRoles(apiUser: any): string[] {
-  const raw: string[] =
-    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
-      ? apiUser.roles
-      : apiUser.role
-        ? [apiUser.role]
-        : [];
-  return raw.length > 0 ? raw : ['user'];
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -181,12 +140,3 @@ export function useAuth() {
   return context;
 }
 
-export { ROLE_LABELS, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP };
-
-/**
- * Neture 서비스용 대시보드 경로 결정
- * getPrimaryDashboardRoute(roles, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP)
- */
-export function getNetureDashboardRoute(roles: string[]): string {
-  return getPrimaryDashboardRoute(roles, NETURE_ROLE_PRIORITY, NETURE_DASHBOARD_MAP);
-}

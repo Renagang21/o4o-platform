@@ -9,8 +9,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams, NavLink } from 'react-router-dom';
-import { useAuth, GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP } from '@/contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { getGlycopharmDashboardRoute } from '@/config/dashboard';
 import { Activity, Mail, Lock, Eye, EyeOff, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const REMEMBER_EMAIL_KEY = 'glycopharm_remember_email';
@@ -67,7 +67,7 @@ export default function LoginPage() {
       } else if (loginType === 'operator') {
         navigate('/operator');
       } else {
-        navigate(getPrimaryDashboardRoute(loggedInUser.roles ?? [], GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP));
+        navigate(getGlycopharmDashboardRoute(loggedInUser.roles ?? []));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');

@@ -7,3 +7,4 @@ export { ROLE_PRIORITY } from './rolePriority.js';
 export { ROLE_DASHBOARD_MAP } from './roleDashboardMap.js';
 export { getPrimaryDashboardRoute } from './getPrimaryDashboardRoute.js';
 export { hasRole, hasAnyRole } from './hasRole.js';
+export { extractRoles } from './extractRoles.js';

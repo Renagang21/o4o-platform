@@ -7,12 +7,15 @@
  */
 
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { parseAuthResponse, normalizeUser, resolveAuthError, getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility
 export { getAccessToken };
+
+// WO-O4O-AUTH-FLOW-SIMPLIFICATION-V1: dashboard config → config/dashboard.ts로 분리, 하위 호환 re-export
+export { ROLE_LABELS, KCOSMETICS_ROLE_PRIORITY, KCOSMETICS_DASHBOARD_MAP, getKCosmeticsDashboardRoute } from '../config/dashboard';
 
 /**
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role format
@@ -41,31 +44,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
-const ROLE_LABELS: Record<string, string> = {
-  'platform:super_admin': '최고 관리자',
-  'k-cosmetics:admin': '관리자',
-  'k-cosmetics:operator': '운영자',
-  'k-cosmetics:supplier': '공급자',
-  'k-cosmetics:seller': '판매자',
-  'k-cosmetics:partner': '파트너',
-  user: '사용자',
-};
-
-/**
- * WO-O4O-AUTH-RBAC-UNIFICATION-V2: JWT roles를 그대로 사용 (prefix 유지).
- * 빈 배열이면 ['user'] fallback.
- */
-function extractRoles(apiUser: any): string[] {
-  const raw: string[] =
-    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
-      ? apiUser.roles
-      : apiUser.role
-        ? [apiUser.role]
-        : [];
-  return raw.length > 0 ? raw : ['user'];
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -163,32 +141,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
-
-export { ROLE_LABELS };
-
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
-const KCOSMETICS_ROLE_PRIORITY = [
-  'platform:super_admin',
-  'k-cosmetics:admin',
-  'k-cosmetics:operator',
-  'k-cosmetics:supplier',
-  'k-cosmetics:partner',
-  'k-cosmetics:seller',
-] as const;
-
-const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
-  'platform:super_admin': '/admin',
-  'k-cosmetics:admin': '/admin',
-  'k-cosmetics:operator': '/operator',
-  'k-cosmetics:supplier': '/',
-  'k-cosmetics:partner': '/partner',
-  'k-cosmetics:seller': '/',
-};
-
-/**
- * K-Cosmetics 서비스용 대시보드 경로 결정
- */
-export function getKCosmeticsDashboardRoute(roles: string[]): string {
-  return getPrimaryDashboardRoute(roles, KCOSMETICS_ROLE_PRIORITY, KCOSMETICS_DASHBOARD_MAP);
 }
