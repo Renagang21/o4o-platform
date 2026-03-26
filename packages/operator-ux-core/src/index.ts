@@ -10,6 +10,7 @@ export type {
   KpiItem,
   AiSummaryItem,
   ActionItem,
+  ActionQueueItem,
   ActivityItem,
   QuickActionItem,
   OperatorDashboardConfig,

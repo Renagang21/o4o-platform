@@ -21,6 +21,9 @@ import { GlucoseViewPharmacist } from './entities/index.js';
 // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1: Centralized scope middleware
 import { requireGlucoseViewScope } from '../../middleware/glucoseview-scope.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
+// WO-O4O-OPERATOR-ACTION-LAYER-V1
+import { createActionQueueRouter } from '../../common/action-queue/index.js';
+import { glucoseviewActionConfig } from './action-definitions.js';
 
 /**
  * GlucoseView Admin middleware factory
@@ -126,6 +129,8 @@ export function createGlucoseViewRoutes(dataSource: DataSource): Router {
   // Operator Dashboard (WO-O4O-OPERATOR-DASHBOARD-DATA-NORMALIZATION-V1)
   const operatorDashboardController = createOperatorDashboardController(dataSource, actionLogService);
   router.use('/operator', operatorDashboardController);
+  // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glucoseviewActionConfig));
 
   // Mount routes
   router.use('/', glucoseviewController);

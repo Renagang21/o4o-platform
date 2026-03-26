@@ -34,6 +34,9 @@ import { createStoreAssetControlController } from '../o4o-store/controllers/stor
 import { createPublishedAssetsController } from '../o4o-store/controllers/published-assets.controller.js';
 // WO-KCOSMETICS-COMMUNITY-HUB-IMPLEMENTATION-V1
 import { createCosmeticsCommunityHubController } from './controllers/cosmetics-community-hub.controller.js';
+// WO-O4O-OPERATOR-ACTION-LAYER-V1
+import { createActionQueueRouter } from '../../common/action-queue/index.js';
+import { cosmeticsActionConfig } from './action-definitions.js';
 
 /**
  * Create cosmetics routes
@@ -72,6 +75,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   router.use('/', cosmeticsController);
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 3): /operator/dashboard
   router.use('/operator', createCosmeticsOperatorDashboardController(dataSource));
+  // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, cosmeticsActionConfig));
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
   router.use('/payments', paymentController); // Payment EventHub 연결
   router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리
