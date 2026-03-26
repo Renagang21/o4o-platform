@@ -128,7 +128,7 @@ export function ActionQueueBlock({ items, onExecute, onDismiss, executing }: Act
                   {item.actionType === 'EXECUTE' && onExecute ? (
                     <button
                       onClick={() => onExecute(item)}
-                      disabled={isExecuting}
+                      disabled={isExecuting || item.canExecute === false}
                       className="text-xs font-medium px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {isExecuting ? '처리 중...' : item.actionLabel}

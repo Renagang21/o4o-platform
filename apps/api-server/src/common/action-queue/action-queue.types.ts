@@ -6,6 +6,8 @@
  * Neture 검증 패턴 일반화. 모든 서비스가 동일한 타입으로 Action Queue를 구성한다.
  */
 
+import type { DataSource } from 'typeorm';
+
 export type ActionPriority = 'high' | 'medium' | 'low';
 export type ActionSource = 'SYSTEM' | 'AI';
 export type ActionExecutionType = 'EXECUTE' | 'NAVIGATE';
@@ -26,6 +28,8 @@ export interface ActionQueueItem {
   actionType: ActionExecutionType;
   actionApi?: string;
   actionMethod?: string;
+  /** handler가 등록되어 있으면 true — frontend에서 EXECUTE 버튼 활성화 판단 */
+  canExecute?: boolean;
 }
 
 /** Action Queue 응답 요약 */
@@ -80,8 +84,8 @@ export interface AiRuleAction {
   actionMethod?: string;
 }
 
-/** 일괄 실행 핸들러 */
-export type ExecuteHandler = (userId: string) => Promise<{
+/** 일괄 실행 핸들러 — WO-O4O-ACTION-EXECUTION-LAYER-V1: dataSource 파라미터 추가 */
+export type ExecuteHandler = (dataSource: DataSource, userId: string) => Promise<{
   processed: number;
   succeeded: number;
   failed: number;
