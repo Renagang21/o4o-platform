@@ -30,6 +30,7 @@ const AVAILABLE_SERVICES = [
 
 interface FormData {
   barcode: string;
+  packagingName: string;
   marketingName: string;
   categoryId: string;
   brandName: string;
@@ -38,6 +39,7 @@ interface FormData {
   serviceKeys: string[];
   priceGeneral: string;
   consumerReferencePrice: string;
+  stockQty: string;
   regulatoryType: string;
   regulatoryName: string;
   mfdsPermitNumber: string;
@@ -67,6 +69,7 @@ export default function SupplierProductCreatePage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [form, setForm] = useState<FormData>({
     barcode: '',
+    packagingName: '',
     marketingName: '',
     categoryId: '',
     brandName: '',
@@ -75,6 +78,7 @@ export default function SupplierProductCreatePage() {
     serviceKeys: [],
     priceGeneral: '',
     consumerReferencePrice: '',
+    stockQty: '',
     regulatoryType: '건강기능식품',
     regulatoryName: '',
     mfdsPermitNumber: '',
@@ -204,6 +208,7 @@ export default function SupplierProductCreatePage() {
     setSubmitError('');
 
     const manualData: Record<string, any> = {};
+    if (form.packagingName) manualData.regulatoryName = form.packagingName;
     if (isRegulated) {
       manualData.regulatoryType = form.regulatoryType;
       manualData.regulatoryName = form.regulatoryName;
@@ -212,6 +217,7 @@ export default function SupplierProductCreatePage() {
     if (form.manufacturerName) manualData.manufacturerName = form.manufacturerName;
     if (form.specification) manualData.specification = form.specification;
     if (form.originCountry) manualData.originCountry = form.originCountry;
+    if (form.stockQty) manualData.stockQty = Number(form.stockQty);
 
     const result = await supplierApi.createProduct({
       barcode: form.barcode.trim() || undefined,
@@ -330,6 +336,23 @@ export default function SupplierProductCreatePage() {
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-5">
             <h3 className="text-lg font-semibold text-slate-800">기본 정보</h3>
 
+            {/* Packaging Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                포장 상품명 <span className="text-xs text-slate-400">(선택)</span>
+              </label>
+              <input
+                type="text"
+                name="packagingName"
+                value={form.packagingName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="포장에 인쇄된 공식 상품명"
+                autoFocus
+              />
+              <p className="mt-1 text-xs text-slate-400">포장에 인쇄된 공식 상품명 (상품 식별 기준, 입력 권장)</p>
+            </div>
+
             {/* Marketing Name */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
@@ -341,8 +364,7 @@ export default function SupplierProductCreatePage() {
                 value={form.marketingName}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                placeholder="소비자에게 노출되는 상품명"
-                autoFocus
+                placeholder="소비자에게 노출되는 상품명 (검색/노출용)"
               />
             </div>
 
@@ -515,7 +537,7 @@ export default function SupplierProductCreatePage() {
 
           {/* Consumer Reference Price */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">소비자 참고가 (원)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">소비자 가격 (원)</label>
             <input
               type="number"
               name="consumerReferencePrice"
@@ -525,6 +547,23 @@ export default function SupplierProductCreatePage() {
               placeholder="선택"
               min="0"
             />
+          </div>
+
+          {/* Stock Quantity */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              재고 수량 <span className="text-xs text-slate-400">(선택)</span>
+            </label>
+            <input
+              type="number"
+              name="stockQty"
+              value={form.stockQty}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="0"
+              min="0"
+            />
+            <p className="mt-1 text-xs text-slate-400">미입력 시 0으로 처리됩니다</p>
           </div>
 
           {/* Distribution type */}
