@@ -45,6 +45,20 @@ export interface DeleteMemberParams {
   serviceKeys: string[];
 }
 
+// WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
+export interface ReactivateParams {
+  userId: string;
+  reactivatedBy: string | null;
+  isPlatformAdmin: boolean;
+  serviceKeys: string[];
+}
+
+export interface ReactivateResult {
+  reactivatedMemberships: number;
+  reactivatedRoles: string[];
+  userId: string;
+}
+
 export class MembershipApprovalService {
 
   /**
@@ -213,6 +227,116 @@ export class MembershipApprovalService {
         stack: error instanceof Error ? error.stack : undefined,
       });
       throw error;
+    }
+  }
+
+  /**
+   * Reactivate suspended memberships for a user (atomic: membership + user + role_assignment).
+   * WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
+   * Returns result with counts, or null if no suspended memberships found.
+   */
+  async reactivateMembership(params: ReactivateParams): Promise<ReactivateResult | null> {
+    const { userId, reactivatedBy, isPlatformAdmin, serviceKeys } = params;
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // STEP0: SELECT suspended memberships FOR UPDATE
+      logger.info('[REACTIVATE][STEP0] SELECT suspended memberships FOR UPDATE', {
+        userId, reactivatedBy, isPlatformAdmin,
+      });
+
+      const selectResult = isPlatformAdmin
+        ? await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status = 'suspended'
+             FOR UPDATE`,
+            [userId]
+          )
+        : await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE user_id = $1 AND status = 'suspended' AND service_key = ANY($2)
+             FOR UPDATE`,
+            [userId, serviceKeys]
+          );
+
+      if (!selectResult || selectResult.length === 0) {
+        logger.warn('[REACTIVATE][STEP0] no suspended memberships found', {
+          userId, isPlatformAdmin, serviceKeys,
+        });
+        await queryRunner.rollbackTransaction();
+        return null;
+      }
+
+      const membershipIds = selectResult.map((m: any) => m.id);
+      const roles = selectResult.map((m: any) => m.role).filter(Boolean);
+
+      logger.info('[REACTIVATE][STEP0] memberships locked', {
+        userId, count: selectResult.length, roles,
+      });
+
+      // STEP1: Activate memberships
+      logger.info('[REACTIVATE][STEP1] membership UPDATE', { membershipIds });
+
+      await queryRunner.query(
+        `UPDATE service_memberships
+         SET status = 'active', approved_by = $1, approved_at = NOW(), updated_at = NOW()
+         WHERE id = ANY($2)`,
+        [reactivatedBy, membershipIds]
+      );
+
+      // STEP2: Activate user account (idempotent — only if currently suspended)
+      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId });
+
+      await queryRunner.query(
+        `UPDATE users SET status = 'active', "isActive" = true, "updatedAt" = NOW()
+         WHERE id = $1 AND status = 'suspended'`,
+        [userId]
+      );
+
+      // STEP3: Reactivate role_assignments for each membership role
+      const reactivatedRoles: string[] = [];
+      for (const membership of selectResult) {
+        const memberRole = membership.role || 'member';
+        logger.info('[REACTIVATE][STEP3] role UPSERT', { userId, role: memberRole });
+
+        await queryRunner.query(
+          `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
+           VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
+           ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+           DO UPDATE SET updated_at = NOW(), is_active = true`,
+          [userId, memberRole, reactivatedBy]
+        );
+        reactivatedRoles.push(memberRole);
+      }
+
+      await queryRunner.commitTransaction();
+
+      logger.info('[REACTIVATE][SUCCESS]', {
+        userId, reactivatedMemberships: selectResult.length, reactivatedRoles, reactivatedBy,
+      });
+
+      return {
+        reactivatedMemberships: selectResult.length,
+        reactivatedRoles,
+        userId,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error('[REACTIVATE][FAILED]', {
+        userId, reactivatedBy,
+        errorMessage: err.message,
+        errorCode: (error as any)?.code,
+        errorDetail: (error as any)?.detail,
+        stack: err.stack,
+      });
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 

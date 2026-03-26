@@ -40,6 +40,7 @@ router.get('/:userId', controller.getMemberDetail);
 // Member update (password change) / status change / delete
 router.put('/:userId', controller.updateMember);
 router.patch('/:userId/status', controller.updateMemberStatus);
+router.post('/:userId/reactivate', controller.reactivateMember);
 router.delete('/:userId', controller.deleteMember);
 
 // Role assignment/removal
