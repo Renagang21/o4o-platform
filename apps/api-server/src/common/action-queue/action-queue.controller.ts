@@ -9,7 +9,7 @@
  *   POST /actions/dismiss/:id  — dismiss (사용자별)
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig } from './action-queue.types.js';
 import { buildActionQueue } from './action-queue.factory.js';
@@ -19,9 +19,13 @@ import logger from '../../utils/logger.js';
 
 type AuthenticatedRequest = Request & { user?: { id: string } };
 
+/**
+ * @param executeGuard — WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint에만 적용할 scope guard middleware
+ */
 export function createActionQueueRouter(
   dataSource: DataSource,
   config: ServiceActionConfig,
+  executeGuard?: RequestHandler,
 ): Router {
   const router = Router();
 
@@ -64,7 +68,8 @@ export function createActionQueueRouter(
   });
 
   // ── POST /actions/execute/:actionId ──
-  router.post('/actions/execute/:actionId', async (req: Request, res: Response): Promise<void> => {
+  // WO-O4O-ACTION-SCOPE-GUARD-V1: admin scope guard (1st layer — route level)
+  const executeHandler = async (req: Request, res: Response): Promise<void> => {
     try {
       const { actionId } = req.params;
       const userId = (req as AuthenticatedRequest).user?.id;
@@ -98,7 +103,13 @@ export function createActionQueueRouter(
       logger.error(`[${config.serviceKey} ActionExecute] Error:`, error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: error.message });
     }
-  });
+  };
+
+  if (executeGuard) {
+    router.post('/actions/execute/:actionId', executeGuard, executeHandler);
+  } else {
+    router.post('/actions/execute/:actionId', executeHandler);
+  }
 
   // ── POST /actions/dismiss/:actionId ──
   router.post('/actions/dismiss/:actionId', async (req: Request, res: Response): Promise<void> => {

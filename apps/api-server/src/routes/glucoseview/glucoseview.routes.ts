@@ -130,7 +130,8 @@ export function createGlucoseViewRoutes(dataSource: DataSource): Router {
   const operatorDashboardController = createOperatorDashboardController(dataSource, actionLogService);
   router.use('/operator', operatorDashboardController);
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
-  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glucoseviewActionConfig));
+  // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glucoseviewActionConfig, requireGlucoseViewScope('glucoseview:admin')));
 
   // Mount routes
   router.use('/', glucoseviewController);

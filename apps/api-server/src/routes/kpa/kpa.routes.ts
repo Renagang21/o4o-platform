@@ -206,7 +206,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     forumService,
   }));
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
-  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig));
+  // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));

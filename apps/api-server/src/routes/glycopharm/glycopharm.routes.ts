@@ -336,7 +336,8 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
   router.use('/operator', operatorController);
 
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
-  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glycopharmActionConfig));
+  // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glycopharmActionConfig, requireGlycopharmScope('glycopharm:admin')));
 
   // ============================================================================
   // Store HUB Controllers (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1)

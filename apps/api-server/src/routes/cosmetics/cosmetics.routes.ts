@@ -76,7 +76,8 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 3): /operator/dashboard
   router.use('/operator', createCosmeticsOperatorDashboardController(dataSource));
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
-  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, cosmeticsActionConfig));
+  // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, cosmeticsActionConfig, requireCosmeticsScope('cosmetics:admin')));
   router.use('/orders', orderController); // H2-0: 주문 엔드포인트
   router.use('/payments', paymentController); // Payment EventHub 연결
   router.use('/stores', storeController); // WO-KCOS-STORES-PHASE1-V1: 매장 관리
