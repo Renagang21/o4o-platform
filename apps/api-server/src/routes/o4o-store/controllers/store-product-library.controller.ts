@@ -101,7 +101,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1 (3.4)
     // 확장 필드: descriptions, price tiers, brand, manufacturer
     const offers = await dataSource.query(
-      `SELECT spo.id, spo.supplier_id AS "supplierId", COALESCE(o.name, s.name) AS "supplierName",
+      `SELECT spo.id, spo.supplier_id AS "supplierId", o.name AS "supplierName",
               spo.price_general AS "priceGeneral",
               spo.price_gold AS "priceGold",
               spo.price_platinum AS "pricePlatinum",
@@ -190,7 +190,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
                 spo.price_general AS "offerPrice", spo.distribution_type AS "distributionType",
-                COALESCE(o.name, s.name) AS "supplierName"
+                o.name AS "supplierName"
          FROM organization_product_listings opl
          LEFT JOIN product_masters pm ON opl.master_id = pm.id
          LEFT JOIN supplier_product_offers spo ON opl.offer_id = spo.id

@@ -162,7 +162,7 @@ export class PartnerService {
         spo.slug AS product_slug,
         ns.slug AS store_slug,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
-        COALESCE(supplier_org.name, ns.name) AS supplier_name,
+        supplier_org.name AS supplier_name,
         spc.commission_per_unit,
         spc.start_date AS commission_start_date,
         spo.consumer_reference_price,
@@ -231,7 +231,7 @@ export class PartnerService {
         pr.id, pr.referral_token, pr.product_id, pr.store_id, pr.created_at,
         spo.slug AS product_slug,
         ns.slug AS store_slug,
-        COALESCE(supplier_org.name, ns.name) AS store_name,
+        supplier_org.name AS store_name,
         COALESCE(pm.marketing_name, 'Unknown') AS product_name,
         spo.price_general,
         spc.commission_per_unit
@@ -297,7 +297,7 @@ export class PartnerService {
 
     const items = await this.dataSource.query(
       `SELECT psi.commission_amount, pc.order_number, pc.order_amount,
-              pc.commission_rate, pc.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
+              pc.commission_rate, pc.supplier_id, supplier_org.name AS supplier_name,
               pc.created_at AS commission_date
        FROM partner_settlement_items psi
        JOIN partner_commissions pc ON pc.id = psi.commission_id
@@ -587,7 +587,7 @@ export class PartnerService {
     // 포함된 커미션 목록
     const items = await this.dataSource.query(
       `SELECT psi.*, pc.order_number, pc.order_amount, pc.commission_rate,
-              pc.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
+              pc.supplier_id, supplier_org.name AS supplier_name,
               pc.status AS commission_status
        FROM partner_settlement_items psi
        JOIN partner_commissions pc ON pc.id = psi.commission_id

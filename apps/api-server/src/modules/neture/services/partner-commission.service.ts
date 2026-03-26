@@ -144,7 +144,7 @@ export class PartnerCommissionService {
 
     const [commissions, countResult] = await Promise.all([
       this.dataSource.query(
-        `SELECT pc.id, pc.partner_id, pc.supplier_id, COALESCE(o.name, ns.name) AS supplier_name,
+        `SELECT pc.id, pc.partner_id, pc.supplier_id, o.name AS supplier_name,
                 pc.order_id, pc.order_number, pc.contract_id,
                 pc.commission_rate, pc.order_amount, pc.commission_amount,
                 pc.status, pc.period_start, pc.period_end,
@@ -179,7 +179,7 @@ export class PartnerCommissionService {
    */
   async getPartnerCommissionDetail(commissionId: string, partnerId: string) {
     const rows = await this.dataSource.query(
-      `SELECT pc.*, COALESCE(o.name, ns.name) AS supplier_name
+      `SELECT pc.*, o.name AS supplier_name
        FROM partner_commissions pc
        LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
        LEFT JOIN organizations o ON o.id = ns.organization_id
@@ -295,7 +295,7 @@ export class PartnerCommissionService {
     const [commissions, countResult] = await Promise.all([
       this.dataSource.query(
         `SELECT pc.id, pc.partner_id, np.name AS partner_name,
-                pc.supplier_id, COALESCE(supplier_org.name, ns.name) AS supplier_name,
+                pc.supplier_id, supplier_org.name AS supplier_name,
                 pc.order_id, pc.order_number, pc.contract_id,
                 pc.commission_rate, pc.order_amount, pc.commission_amount,
                 pc.status, pc.period_start, pc.period_end,
@@ -360,7 +360,7 @@ export class PartnerCommissionService {
    */
   async getAdminCommissionDetail(commissionId: string) {
     const rows = await this.dataSource.query(
-      `SELECT pc.*, np.name AS partner_name, COALESCE(supplier_org.name, ns.name) AS supplier_name
+      `SELECT pc.*, np.name AS partner_name, supplier_org.name AS supplier_name
        FROM partner_commissions pc
        LEFT JOIN neture_partners np ON np.id = pc.partner_id
        LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id

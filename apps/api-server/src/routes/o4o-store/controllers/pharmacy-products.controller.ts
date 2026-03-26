@@ -81,7 +81,7 @@ export function createPharmacyProductsController(
          spo.created_at AS "createdAt",
          spo.updated_at AS "updatedAt",
          s.id AS "supplierId",
-         COALESCE(o.name, s.name) AS "supplierName",
+         o.name AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
          s.category AS "supplierCategory",
          -- 내 신청/진열 상태 (v2: product_approvals)

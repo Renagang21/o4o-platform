@@ -21,7 +21,7 @@ export class SellerService {
   async getMyProducts(sellerId: string) {
     const rows = await this.dataSource.query(
       `SELECT pa.id,
-              spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
+              spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
               pa.offer_id AS "offerId", pm.marketing_name AS "productName",
               pm.brand_name AS "productCategory",
               pa.service_key AS "serviceId",
@@ -60,7 +60,7 @@ export class SellerService {
       primary_image_url: string | null;
     }> = await this.dataSource.query(
       `SELECT spo.id, pm.marketing_name AS name, pm.brand_name AS category, '' AS description,
-              spo.supplier_id, COALESCE(supplier_org.name, s.name) AS supplier_name,
+              spo.supplier_id, supplier_org.name AS supplier_name,
               spo.distribution_type,
               spo.price_general, spo.consumer_reference_price,
               spo.approval_status,
@@ -156,7 +156,7 @@ export class SellerService {
               pa.offer_id AS "offerId",
               pm.marketing_name AS "productName",
               pm.brand_name AS "productCategory",
-              COALESCE(supplier_org.name, ns.name) AS "supplierName",
+              supplier_org.name AS "supplierName",
               spo.supplier_id AS "supplierId",
               pa.reason AS "rejectReason",
               pa.requested_by AS "requestedBy",
@@ -192,7 +192,7 @@ export class SellerService {
       primary_image_url: string | null;
     }> = await this.dataSource.query(
       `SELECT spo.id AS offer_id,
-              s.id AS supplier_id, COALESCE(supplier_org.name, s.name) AS supplier_name,
+              s.id AS supplier_id, supplier_org.name AS supplier_name,
               s.contact_phone AS supplier_phone, s.contact_website AS supplier_website,
               pm.brand_name, pm.specification, pm.barcode,
               pi.image_url AS primary_image_url

@@ -116,12 +116,13 @@ export class SupplierOrderService {
     const productIds = items.map((i: any) => i.product_id);
     const enrichments = await this.dataSource.query(
       `SELECT spo.id AS offer_id,
-              s.id AS supplier_id, s.name AS supplier_name,
+              s.id AS supplier_id, supplier_org.name AS supplier_name,
               s.contact_phone AS supplier_phone, s.contact_website AS supplier_website,
               pm.brand_name, pm.specification, pm.barcode,
               pi.image_url AS primary_image_url
        FROM supplier_product_offers spo
        JOIN neture_suppliers s ON s.id = spo.supplier_id
+       LEFT JOIN organizations supplier_org ON supplier_org.id = s.organization_id
        JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
        WHERE spo.id = ANY($1::uuid[])`,

@@ -38,7 +38,7 @@ export class AdminService {
 
     const rows = await this.dataSource.query(
       `SELECT pa.id, pa.approval_status AS status,
-              spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
+              spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
               pa.organization_id AS "sellerId",
               pa.service_key AS "serviceId",
               pm.marketing_name AS "productName", pa.offer_id AS "offerId",
@@ -71,7 +71,7 @@ export class AdminService {
     const rows = await this.dataSource.query(`
       SELECT pa.id, pa.approval_status AS status,
         pm.marketing_name AS "productName",
-        COALESCE(supplier_org.name, ns.name) AS "supplierName",
+        supplier_org.name AS "supplierName",
         o.name AS "sellerOrg",
         pa.service_key AS "serviceId",
         pa.reason AS "rejectReason",

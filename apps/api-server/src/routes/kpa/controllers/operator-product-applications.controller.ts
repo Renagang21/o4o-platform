@@ -68,7 +68,7 @@ export function createOperatorProductApplicationsController(
               pa.decided_at AS reviewed_at,
               pa.created_at, pa.updated_at,
               pa.approval_type,
-              COALESCE(supplier_org.name, ns.name) AS supplier_name
+              supplier_org.name AS supplier_name
        FROM product_approvals pa
        LEFT JOIN supplier_product_offers spo ON spo.id = pa.offer_id
        LEFT JOIN product_masters pm ON pm.id = spo.master_id

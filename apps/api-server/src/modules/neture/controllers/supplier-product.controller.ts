@@ -175,7 +175,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       }
       const rows = await dataSource.query(
         `SELECT pa.id, pa.approval_status AS status,
-                spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
+                spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
                 pm.marketing_name AS "productName", pa.offer_id AS "offerId",
@@ -206,7 +206,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { id } = req.params;
       const rows = await dataSource.query(
         `SELECT pa.id, pa.approval_status AS status,
-                spo.supplier_id AS "supplierId", COALESCE(supplier_org.name, ns.name) AS "supplierName",
+                spo.supplier_id AS "supplierId", supplier_org.name AS "supplierName",
                 pa.organization_id AS "sellerId",
                 pa.service_key AS "serviceId",
                 pm.marketing_name AS "productName", pa.offer_id AS "offerId",

@@ -649,7 +649,16 @@
       "WebFetch(domain:seongjangdotori.com)",
       "WebFetch(domain:multilifer.com)",
       "Bash(__NEW_LINE_0b6517c3af708e82__ echo \"=== Neture Members ===\")",
-      "Bash(git cherry-pick:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(git log:*)",
+      "Bash(xxd:*)",
+      "Bash(psql:*)",
+      "Bash(1 <<'EOSQL'\nSELECT opl.id, opl.organization_id\nFROM organization_product_listings opl\nLEFT JOIN organizations o ON o.id = opl.organization_id\nWHERE o.id IS NULL;\nEOSQL)",
+      "Bash(git ls-files:*)",
+      "Bash(git remote prune:*)",
+      "Bash(1 <<'EOF'\nSELECT COUNT\\(*\\)::int AS mismatch_count FROM neture_suppliers s JOIN organizations o ON o.id = s.organization_id WHERE s.name != o.name OR COALESCE\\(s.business_number, ''\\) != COALESCE\\(o.business_number, ''\\) OR COALESCE\\(s.business_address, ''\\) != COALESCE\\(o.address, ''\\);\nEOF)",
+      "Bash(choco search:*)",
+      "Bash(timeout /t 3:*)"
     ],
     "deny": []
   }

@@ -87,7 +87,7 @@ export class NetureSupplierService {
         return { success: false, error: 'SLUG_ALREADY_EXISTS' };
       }
       const supplier = this.supplierRepo.create({
-        name, slug, userId,
+        slug, userId,
         contactEmail: data.contactEmail || null,
         status: SupplierStatus.PENDING,
       });
@@ -95,11 +95,11 @@ export class NetureSupplierService {
       logger.info(`[NetureSupplierService] Supplier registered: ${saved.id} (PENDING) by user ${userId}`);
 
       // WO-O4O-NETURE-ORG-DATA-MODEL-V1: create org (isActive=false for PENDING)
-      await this.syncSupplierOrganization(saved, { isActive: false });
+      await this.syncSupplierOrganization(saved, { isActive: false, name });
 
       return {
         success: true,
-        data: { id: saved.id, name: saved.name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt },
+        data: { id: saved.id, name, slug: saved.slug, status: saved.status, createdAt: saved.createdAt },
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error registering supplier:', error);
@@ -140,10 +140,12 @@ export class NetureSupplierService {
       await this.syncSupplierOrganization(supplier, { isActive: true });
       await this.setOrgActive(supplier, true);
 
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read name from org
+      const org = await this.getOrgData(supplier.organizationId);
       logger.info(`[NetureSupplierService] Supplier approved: ${supplierId} by ${approvedByUserId}`);
       return {
         success: true,
-        data: { id: supplier.id, name: supplier.name, status: supplier.status, approvedBy: supplier.approvedBy, approvedAt: supplier.approvedAt },
+        data: { id: supplier.id, name: org?.name ?? '', status: supplier.status, approvedBy: supplier.approvedBy, approvedAt: supplier.approvedAt },
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error approving supplier:', error);
@@ -178,10 +180,11 @@ export class NetureSupplierService {
         await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
       }
 
+      const org = await this.getOrgData(supplier.organizationId);
       logger.info(`[NetureSupplierService] Supplier rejected: ${supplierId} by ${rejectedByUserId}`);
       return {
         success: true,
-        data: { id: supplier.id, name: supplier.name, status: supplier.status, rejectedReason: supplier.rejectedReason },
+        data: { id: supplier.id, name: org?.name ?? '', status: supplier.status, rejectedReason: supplier.rejectedReason },
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error rejecting supplier:', error);
@@ -198,6 +201,10 @@ export class NetureSupplierService {
         order: { createdAt: 'ASC' },
       });
 
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: batch org read for name
+      const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
+      const orgMap = await this.getOrgDataBatch(orgIds);
+
       const userIds = suppliers.map((s) => s.userId).filter(Boolean);
       const userStatusMap = new Map<string, { status: string; email: string }>();
       if (userIds.length > 0) {
@@ -213,9 +220,10 @@ export class NetureSupplierService {
       }
 
       return suppliers.map((s) => {
+        const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
         return {
-          id: s.id, name: s.name, slug: s.slug,
+          id: s.id, name: org?.name ?? '', slug: s.slug,
           contactEmail: s.contactEmail || null,
           userId: s.userId,
           identityStatus: userInfo?.status || null,
@@ -279,10 +287,11 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-ORG-DATA-MODEL-V1: deactivate org
       await this.setOrgActive(supplier, false);
 
+      const org = await this.getOrgData(supplier.organizationId);
       logger.info(`[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${revokedCount} approvals, deactivated listings)`);
       return {
         success: true,
-        data: { id: supplier.id, name: supplier.name, status: supplier.status },
+        data: { id: supplier.id, name: org?.name ?? '', status: supplier.status },
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error deactivating supplier:', error);
@@ -321,7 +330,7 @@ export class NetureSupplierService {
         const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
         return {
-          id: s.id, name: org?.name ?? s.name, slug: s.slug, status: s.status,
+          id: s.id, name: org?.name ?? '', slug: s.slug, status: s.status,
           contactEmail: s.contactEmail || '',
           userId: s.userId,
           identityStatus: userInfo?.status || null,
@@ -363,7 +372,7 @@ export class NetureSupplierService {
           const org = supplier.organizationId ? orgMap.get(supplier.organizationId) : null;
           const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
           return {
-            id: supplier.id, slug: supplier.slug, name: org?.name ?? supplier.name,
+            id: supplier.id, slug: supplier.slug, name: org?.name ?? '',
             logo: supplier.logoUrl, category: supplier.category,
             shortDescription: supplier.shortDescription,
             productCount: supplier.offers?.length || 0,
@@ -414,7 +423,7 @@ export class NetureSupplierService {
       const trustSignals = await this.computeTrustSignals(supplier.id, supplier);
 
       return {
-        id: supplier.id, slug: supplier.slug, name: org?.name ?? supplier.name,
+        id: supplier.id, slug: supplier.slug, name: org?.name ?? '',
         logo: supplier.logoUrl, category: supplier.category,
         shortDescription: supplier.shortDescription,
         description: supplier.description,
@@ -451,9 +460,9 @@ export class NetureSupplierService {
       let prefilled: Record<string, string | null> = {};
       const needsPrefill =
         supplier.userId &&
-        !supplier.businessNumber &&
+        !org?.business_number &&
         !supplier.representativeName &&
-        !supplier.businessAddress;
+        !org?.address;
 
       if (needsPrefill) {
         try {
@@ -477,12 +486,12 @@ export class NetureSupplierService {
 
       return {
         id: supplier.id,
-        name: org?.name ?? supplier.name,
+        name: org?.name ?? '',
         slug: supplier.slug,
         // Business profile — org-primary with supplier + prefill fallback
-        businessNumber: org?.business_number ?? supplier.businessNumber ?? prefilled.businessNumber ?? null,
+        businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,
-        businessAddress: org?.address ?? supplier.businessAddress ?? prefilled.businessAddress ?? null,
+        businessAddress: org?.address ?? prefilled.businessAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || prefilled.businessType || null,
@@ -540,36 +549,37 @@ export class NetureSupplierService {
       if (data.contactKakaoVisibility !== undefined) supplier.contactKakaoVisibility = data.contactKakaoVisibility;
 
       // Business profile fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
-      if (data.businessNumber !== undefined) supplier.businessNumber = data.businessNumber || null;
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: businessNumber/businessAddress → org only
       if (data.representativeName !== undefined) supplier.representativeName = data.representativeName || null;
-      if (data.businessAddress !== undefined) supplier.businessAddress = data.businessAddress || null;
       if (data.managerName !== undefined) supplier.managerName = data.managerName || null;
       if (data.managerPhone !== undefined) supplier.managerPhone = data.managerPhone ? data.managerPhone.replace(/\D/g, '') : null;
       if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
       if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
 
-      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 4-A: org-primary write → supplier reverse-sync
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: org-only write (no supplier reverse-sync)
       const orgWriteNeeded =
         data.businessNumber !== undefined ||
         data.businessAddress !== undefined ||
         data.contactPhone !== undefined;
       if (orgWriteNeeded && supplier.organizationId) {
         await this.writeOrgBusinessData(supplier.organizationId, {
-          name: supplier.name,
-          business_number: supplier.businessNumber,
-          address: supplier.businessAddress,
-          phone: supplier.contactPhone ? supplier.contactPhone.replace(/\D/g, '') : null,
+          business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
+          address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
+          phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
         });
       }
 
       await this.supplierRepo.save(supplier);
 
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read org for canonical fields
+      const org = await this.getOrgData(supplier.organizationId);
+
       return {
         id: supplier.id,
-        // Business profile
-        businessNumber: supplier.businessNumber || null,
+        // Business profile — org SSOT
+        businessNumber: org?.business_number ?? null,
         representativeName: supplier.representativeName || null,
-        businessAddress: supplier.businessAddress || null,
+        businessAddress: org?.address ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || null,
@@ -613,10 +623,13 @@ export class NetureSupplierService {
       const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
       if (!supplier) return null;
 
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read name from org
+      const org = await this.getOrgData(supplier.organizationId);
       const missing: string[] = [];
 
-      // 1. name
-      if (!supplier.name || supplier.name.trim().length === 0) {
+      // 1. name (from org SSOT)
+      const orgName = org?.name ?? '';
+      if (!orgName || orgName.trim().length === 0) {
         missing.push('name');
       }
 
@@ -753,9 +766,10 @@ export class NetureSupplierService {
    */
   private async syncSupplierOrganization(
     supplier: NetureSupplier,
-    options?: { isActive?: boolean },
+    options?: { isActive?: boolean; name?: string },
   ): Promise<void> {
     const isActive = options?.isActive ?? (supplier.status === SupplierStatus.ACTIVE);
+    const orgName = options?.name || supplier.slug; // Phase 5-C: name passed explicitly
 
     try {
       // 1. Create or get organizations record
@@ -775,21 +789,19 @@ export class NetureSupplierService {
           const inserted = await AppDataSource.query(
             `INSERT INTO organizations (
               id, name, code, type, level, path,
-              business_number, address, phone,
+              phone,
               created_by_user_id, "isActive",
               metadata, "createdAt", "updatedAt"
             ) VALUES (
               gen_random_uuid(), $1, $2, 'supplier', 0, '/' || $2,
-              $3, $4, $5, $6, $7,
-              $8, NOW(), NOW()
+              $3, $4, $5,
+              $6, NOW(), NOW()
             )
             ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
             RETURNING id`,
             [
-              supplier.name,
+              orgName,
               orgCode,
-              supplier.businessNumber || null,
-              supplier.businessAddress || null,
               supplier.contactPhone || null,
               supplier.userId || null,
               isActive,
@@ -836,20 +848,39 @@ export class NetureSupplierService {
   }
 
   /**
-   * WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 4-A:
-   * Write business data to organizations as primary target.
-   * Org is SSOT for name, business_number, address, phone.
+   * WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B:
+   * Write business data to organizations (SSOT). Partial update — only provided fields.
    */
   private async writeOrgBusinessData(
     organizationId: string,
-    data: { name: string; business_number: string | null; address: string | null; phone: string | null },
+    data: { business_number?: string | null; address?: string | null; phone?: string | null },
   ): Promise<void> {
     try {
+      const setClauses: string[] = [];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (data.business_number !== undefined) {
+        setClauses.push(`business_number = $${idx++}`);
+        params.push(data.business_number);
+      }
+      if (data.address !== undefined) {
+        setClauses.push(`address = $${idx++}`);
+        params.push(data.address);
+      }
+      if (data.phone !== undefined) {
+        setClauses.push(`phone = $${idx++}`);
+        params.push(data.phone);
+      }
+
+      if (setClauses.length === 0) return;
+
+      setClauses.push(`"updatedAt" = NOW()`);
+      params.push(organizationId);
+
       await AppDataSource.query(
-        `UPDATE organizations
-         SET name = $1, business_number = $2, address = $3, phone = $4, "updatedAt" = NOW()
-         WHERE id = $5`,
-        [data.name, data.business_number, data.address, data.phone, organizationId],
+        `UPDATE organizations SET ${setClauses.join(', ')} WHERE id = $${idx}`,
+        params,
       );
     } catch (error) {
       logger.warn(`[NetureSupplierService] Org business write failed for org ${organizationId}:`, error);

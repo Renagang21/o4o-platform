@@ -70,7 +70,7 @@ export class OfferServiceApprovalService {
            osa.reason, osa.created_at AS "createdAt",
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS "productName",
            pm.barcode,
-           COALESCE(supplier_org.name, ns.name) AS "supplierName",
+           supplier_org.name AS "supplierName",
            pm.regulatory_type AS "regulatoryType",
            pm.mfds_permit_number AS "mfdsPermitNumber",
            pm.is_mfds_verified AS "isMfdsVerified",
