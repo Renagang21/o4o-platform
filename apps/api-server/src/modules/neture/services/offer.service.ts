@@ -389,6 +389,116 @@ export class NetureOfferService {
    * WO-NETURE-LAYER2-MASTER-PIPELINE-ENFORCEMENT-V1
    * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
    */
+  // ==================== createSupplierOffer sub-methods (Phase3A) ====================
+
+  /** 입력 검증: 바코드 생성, 유통타입 검증, 보안 체크, 공급자 상태 */
+  private async validateCreateInput(
+    data: { barcode?: string; distributionType?: OfferDistributionType; serviceKeys?: string[]; consumerShortDescription?: string | null },
+    supplierId: string,
+  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { barcode: string } }> {
+    let barcode = data.barcode?.trim() || '';
+    if (!barcode) {
+      const { generateInternalBarcode } = await import('../../../utils/gtin.js');
+      barcode = generateInternalBarcode(supplierId);
+    }
+
+    if (data.distributionType === OfferDistributionType.SERVICE && (!data.serviceKeys || data.serviceKeys.length === 0)) {
+      return { success: false, error: 'SERVICE_REQUIRES_KEYS', message: 'SERVICE 유통 시 서비스를 선택해야 합니다.' };
+    }
+    if (data.distributionType === OfferDistributionType.PUBLIC) {
+      data.serviceKeys = [];
+    }
+    if (data.distributionType === OfferDistributionType.PUBLIC && !data.consumerShortDescription?.trim()) {
+      return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
+    }
+
+    if ('masterId' in (data as any)) {
+      return { success: false, error: 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED' };
+    }
+
+    const supplier = await this.supplierRepo.findOne({ where: { id: supplierId }, select: ['id', 'status'] });
+    if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
+      return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
+    }
+
+    return { success: true, data: { barcode } };
+  }
+
+  /** 카테고리/규제/브랜드 해석 → Master 파이프라인 → 확장 필드 적용 */
+  private async resolveProductMetadata(
+    rawManualData: Record<string, any> | undefined,
+    barcode: string,
+    marketingName: string,
+    categoryId: string | null,
+    brandName: string | undefined,
+  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any> } }> {
+    const resolvedCategoryId: string | null = categoryId || rawManualData?.categoryId || null;
+    let isRegulated = false;
+    if (resolvedCategoryId) {
+      const categoryRepo = AppDataSource.getRepository(ProductCategory);
+      const category = await categoryRepo.findOne({ where: { id: resolvedCategoryId } });
+      if (!category) return { success: false, error: 'INVALID_CATEGORY' };
+      isRegulated = category.isRegulated;
+    }
+
+    const manualData = { ...rawManualData };
+    const resolvedMarketingName = marketingName || manualData.marketingName || '';
+
+    if (isRegulated) {
+      if (!manualData.regulatoryType || !manualData.regulatoryName) {
+        return { success: false, error: 'REGULATED_FIELDS_REQUIRED' };
+      }
+      const resolved = resolveRegulatoryType(manualData.regulatoryType);
+      if (!resolved) {
+        return { success: false, error: 'INVALID_REGULATORY_TYPE', message: `허용 규제 유형: ${REGULATORY_TYPES.join(', ')}` };
+      }
+      manualData.regulatoryType = resolved;
+    } else {
+      const resolved = resolveRegulatoryType(manualData.regulatoryType);
+      manualData.regulatoryType = resolved || 'GENERAL';
+      manualData.regulatoryName = manualData.regulatoryName || resolvedMarketingName || 'UNKNOWN';
+    }
+    if (resolvedMarketingName) manualData.marketingName = resolvedMarketingName;
+
+    let resolvedBrandId: string | null = manualData.brandId || null;
+    if (!resolvedBrandId && brandName?.trim()) {
+      const importCommon = new ProductImportCommonService(AppDataSource);
+      resolvedBrandId = await importCommon.resolveBrandId(AppDataSource.manager, brandName.trim(), manualData.manufacturerName);
+    }
+    if (resolvedCategoryId) manualData.categoryId = resolvedCategoryId;
+    if (resolvedBrandId) manualData.brandId = resolvedBrandId;
+
+    const masterResult = await this.catalogService.resolveOrCreateMaster(barcode, manualData);
+    if (!masterResult.success || !masterResult.data) {
+      return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
+    }
+
+    if (isRegulated && !masterResult.data.isMfdsVerified && !manualData.mfdsPermitNumber) {
+      return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
+    }
+
+    const extFields: Record<string, unknown> = {};
+    if (manualData.categoryId !== undefined) extFields.categoryId = manualData.categoryId;
+    if (manualData.brandId !== undefined) extFields.brandId = manualData.brandId;
+    if (manualData.specification !== undefined) extFields.specification = manualData.specification;
+    if (manualData.originCountry !== undefined) extFields.originCountry = manualData.originCountry;
+    if (manualData.tags !== undefined) extFields.tags = manualData.tags;
+    if (manualData.marketingName !== undefined) extFields.marketingName = manualData.marketingName;
+
+    if (Object.keys(extFields).length > 0) {
+      await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
+    }
+
+    return { success: true, data: { masterId: masterResult.data.id, masterBarcode: masterResult.data.barcode || masterResult.data.id, manualData } };
+  }
+
+  // ==================== createSupplierOffer (orchestrator) ====================
+
+  /**
+   * POST /supplier/products — 공급자 상품 등록
+   *
+   * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
+   */
   async createSupplierOffer(
     supplierId: string,
     data: {
@@ -418,120 +528,25 @@ export class NetureOfferService {
     }
   ) {
     try {
-      // WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1: 바코드 optional
-      let barcode = data.barcode?.trim() || '';
-      if (!barcode) {
-        const { generateInternalBarcode } = await import('../../../utils/gtin.js');
-        barcode = generateInternalBarcode(supplierId);
-      }
+      const validation = await this.validateCreateInput(data, supplierId);
+      if ('error' in validation) return { success: false, error: validation.error, message: validation.message };
+      const { barcode } = validation.data;
 
-      // WO-NETURE-OFFER-DISTRIBUTION-TYPE-V1: SERVICE requires serviceKeys
-      if (data.distributionType === OfferDistributionType.SERVICE && (!data.serviceKeys || data.serviceKeys.length === 0)) {
-        return { success: false, error: 'SERVICE_REQUIRES_KEYS', message: 'SERVICE 유통 시 서비스를 선택해야 합니다.' };
-      }
-      // PUBLIC은 serviceKeys 무시
-      if (data.distributionType === OfferDistributionType.PUBLIC) {
-        data.serviceKeys = [];
-      }
+      const marketingName = data.marketingName || data.manualData?.marketingName || '';
+      const categoryId = data.categoryId || data.manualData?.categoryId || null;
 
-      // PUBLIC requires consumer description
-      if (data.distributionType === OfferDistributionType.PUBLIC && !data.consumerShortDescription?.trim()) {
-        return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
-      }
+      const metadata = await this.resolveProductMetadata(data.manualData, barcode, marketingName, categoryId, data.brandName);
+      if ('error' in metadata) return { success: false, error: metadata.error, message: metadata.message };
 
-      // masterId 직접 주입 차단
-      if ('masterId' in (data as any)) {
-        return { success: false, error: 'MASTER_ID_DIRECT_INJECTION_NOT_ALLOWED' };
-      }
+      const { masterId, masterBarcode, manualData } = metadata.data;
 
-      // Supplier ACTIVE guard
-      const supplier = await this.supplierRepo.findOne({
-        where: { id: supplierId },
-        select: ['id', 'status'],
-      });
-      if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
-        return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
-      }
-
-      // WO-NETURE-PRODUCT-REGISTRATION-UI-ALIGN-TO-IMPORT-V1: Category + Regulatory auto-fill
-      const resolvedCategoryId: string | null = data.categoryId || data.manualData?.categoryId || null;
-      let isRegulated = false;
-      if (resolvedCategoryId) {
-        const categoryRepo = AppDataSource.getRepository(ProductCategory);
-        const category = await categoryRepo.findOne({ where: { id: resolvedCategoryId } });
-        if (!category) {
-          return { success: false, error: 'INVALID_CATEGORY' };
-        }
-        isRegulated = category.isRegulated;
-      }
-
-      const manualData = { ...data.manualData };
-      const marketingName = data.marketingName || manualData.marketingName || '';
-
-      if (isRegulated) {
-        if (!manualData.regulatoryType || !manualData.regulatoryName) {
-          return { success: false, error: 'REGULATED_FIELDS_REQUIRED' };
-        }
-        // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: enum validation
-        const resolved = resolveRegulatoryType(manualData.regulatoryType);
-        if (!resolved) {
-          return { success: false, error: 'INVALID_REGULATORY_TYPE', message: `허용 규제 유형: ${REGULATORY_TYPES.join(', ')}` };
-        }
-        manualData.regulatoryType = resolved;
-      } else {
-        const resolved = resolveRegulatoryType(manualData.regulatoryType);
-        manualData.regulatoryType = resolved || 'GENERAL';
-        manualData.regulatoryName = manualData.regulatoryName || marketingName || 'UNKNOWN';
-      }
-      if (marketingName) manualData.marketingName = marketingName;
-
-      // Brand resolution (reuse Import logic)
-      let resolvedBrandId: string | null = manualData.brandId || null;
-      if (!resolvedBrandId && data.brandName?.trim()) {
-        const importCommon = new ProductImportCommonService(AppDataSource);
-        resolvedBrandId = await importCommon.resolveBrandId(
-          AppDataSource.manager, data.brandName.trim(), manualData.manufacturerName,
-        );
-      }
-      if (resolvedCategoryId) manualData.categoryId = resolvedCategoryId;
-      if (resolvedBrandId) manualData.brandId = resolvedBrandId;
-
-      // Master 파이프라인 강제 경유
-      const masterResult = await this.catalogService.resolveOrCreateMaster(barcode, manualData);
-      if (!masterResult.success || !masterResult.data) {
-        return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
-      }
-
-      // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 + MFDS 미검증 시 permit 필수
-      if (isRegulated && !masterResult.data.isMfdsVerified && !manualData.mfdsPermitNumber) {
-        return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
-      }
-
-      // Extended fields 적용
-      const extFields: Record<string, unknown> = {};
-      if (manualData.categoryId !== undefined) extFields.categoryId = manualData.categoryId;
-      if (manualData.brandId !== undefined) extFields.brandId = manualData.brandId;
-      if (manualData.specification !== undefined) extFields.specification = manualData.specification;
-      if (manualData.originCountry !== undefined) extFields.originCountry = manualData.originCountry;
-      if (manualData.tags !== undefined) extFields.tags = manualData.tags;
-      if (manualData.marketingName !== undefined) extFields.marketingName = manualData.marketingName;
-
-      if (Object.keys(extFields).length > 0) {
-        await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
-      }
-
-      // WO-NETURE-OFFER-DISTRIBUTION-TYPE-V1: 동일 master+supplier 복수 Offer 허용 (UNIQUE 제거됨)
-
-      // P1: slug 자동 생성 (barcode-supplierId-timestamp)
-      const slugBase = masterResult.data.barcode || masterResult.data.id;
-      const slug = `${slugBase}-${supplierId.slice(0, 8)}-${Date.now()}`;
-
-      // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: stockQty 매핑
+      // slug + stockQty + offer entity
+      const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
       const resolvedStockQty = manualData.stockQty != null ? Number(manualData.stockQty) : 0;
 
       const offer = this.offerRepo.create({
         supplierId,
-        masterId: masterResult.data.id,
+        masterId,
         slug,
         distributionType: data.distributionType || OfferDistributionType.PRIVATE,
         isActive: false,
@@ -550,10 +565,8 @@ export class NetureOfferService {
       });
 
       const savedOffer = await this.offerRepo.save(offer);
+      logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
 
-      logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterResult.data.id} (PENDING approval)`);
-
-      // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1: auto-create pending service approvals
       if (data.serviceKeys && data.serviceKeys.length > 0) {
         const approvalService = new OfferServiceApprovalService(AppDataSource);
         await approvalService.createPendingApprovals(savedOffer.id, data.serviceKeys);
@@ -694,7 +707,8 @@ export class NetureOfferService {
     + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
   )`;
 
-  async getSupplierProductsPaginated(
+  /** Phase 3A: WHERE 조건 + 페이징/정렬 파라미터 빌드 */
+  private buildPaginatedWhereClause(
     supplierId: string,
     options: {
       page?: number;
@@ -708,7 +722,7 @@ export class NetureOfferService {
       hasDescription?: string;
       barcodeSource?: string;
       completenessStatus?: string;
-    } = {},
+    },
   ) {
     const page = Math.max(1, Number(options.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(options.limit) || 50));
@@ -769,13 +783,50 @@ export class NetureOfferService {
 
     const where = conditions.join(' AND ');
 
+    return { page, limit, offset, sortField, sortOrder, where, params, idx };
+  }
+
+  /** Phase 3A: 페이지네이션 쿼리 결과 행 → DTO 매핑 (purpose + completenessStatus 파생) */
+  private mapPaginatedRow(r: any) {
+    return {
+      ...r,
+      purpose:
+        r.isActive && r.activeServiceCount > 0 ? 'ACTIVE_SALES'
+        : r.isActive ? 'APPLICATION'
+        : 'CATALOG',
+      completenessStatus:
+        r.approvalStatus === 'approved' ? 'APPROVED'
+        : (r.completenessScore || 0) >= 60 ? 'READY'
+        : (r.completenessScore || 0) > 0 ? 'INCOMPLETE'
+        : 'DRAFT',
+    };
+  }
+
+  async getSupplierProductsPaginated(
+    supplierId: string,
+    options: {
+      page?: number;
+      limit?: number;
+      keyword?: string;
+      distributionType?: string;
+      isActive?: string;
+      sort?: string;
+      order?: string;
+      hasImage?: string;
+      hasDescription?: string;
+      barcodeSource?: string;
+      completenessStatus?: string;
+    } = {},
+  ) {
+    const q = this.buildPaginatedWhereClause(supplierId, options);
+
     const [countResult, rows] = await Promise.all([
       AppDataSource.query(
         `SELECT COUNT(*)::int AS total
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
-         WHERE ${where}`,
-        params,
+         WHERE ${q.where}`,
+        q.params,
       ),
       AppDataSource.query(
         `SELECT
@@ -828,32 +879,19 @@ export class NetureOfferService {
            SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
            FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
          ) svc_appr ON true
-         WHERE ${where}
-         ORDER BY pm.id, ${sortField} ${sortOrder}
-         LIMIT $${idx} OFFSET $${idx + 1}`,
-        [...params, limit, offset],
+         WHERE ${q.where}
+         ORDER BY pm.id, ${q.sortField} ${q.sortOrder}
+         LIMIT $${q.idx} OFFSET $${q.idx + 1}`,
+        [...q.params, q.limit, q.offset],
       ),
     ]);
 
     const total = countResult[0]?.total || 0;
-
-    // Derive purpose + completenessStatus
-    const data = rows.map((r: any) => ({
-      ...r,
-      purpose:
-        r.isActive && r.activeServiceCount > 0 ? 'ACTIVE_SALES'
-        : r.isActive ? 'APPLICATION'
-        : 'CATALOG',
-      completenessStatus:
-        r.approvalStatus === 'approved' ? 'APPROVED'
-        : (r.completenessScore || 0) >= 60 ? 'READY'
-        : (r.completenessScore || 0) > 0 ? 'INCOMPLETE'
-        : 'DRAFT',
-    }));
+    const data = rows.map((r: any) => this.mapPaginatedRow(r));
 
     return {
       data,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: { page: q.page, limit: q.limit, total, totalPages: Math.ceil(total / q.limit) },
     };
   }
 
