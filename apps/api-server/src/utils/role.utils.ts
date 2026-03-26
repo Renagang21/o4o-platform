@@ -200,6 +200,30 @@ export function getServiceRoles(userRoles: string[], serviceKey: ServiceKey): st
 }
 
 /**
+ * Check if user has any admin role across all services
+ * WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2
+ *
+ * Matches: platform:admin, platform:super_admin, kpa:admin, neture:admin, etc.
+ * Use for cross-service features (CPT, tenant-isolation, entities).
+ */
+export function isAnyAdmin(userRoles: string[]): boolean {
+  return userRoles.some(r => r === 'platform:super_admin' || r.endsWith(':admin'));
+}
+
+/**
+ * Check if user has admin, manager, or business role across all services
+ * WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2
+ *
+ * Matches: any :admin, :manager, or :business suffixed role, plus platform:super_admin.
+ * Use for CPT form/taxonomy management where managers and business users also have access.
+ */
+export function isAnyManagerOrAbove(userRoles: string[]): boolean {
+  return isAnyAdmin(userRoles) || userRoles.some(r =>
+    r.endsWith(':manager') || r.endsWith(':business')
+  );
+}
+
+/**
  * Migration helper: Log when legacy role format is used
  *
  * ⚠️ MONITORING ONLY - Remove after migration complete

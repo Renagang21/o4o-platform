@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index
 } from 'typeorm';
+import { isAnyAdmin } from '../utils/role.utils.js';
 
 export enum DashboardType {
   OVERVIEW = 'overview',
@@ -459,7 +460,7 @@ export class OperationsDashboard {
   canBeEditedBy(userId: string, userRoles: string[]): boolean {
     // Only creator and admins can edit
     if (this.createdBy === userId) return true;
-    if (userRoles.includes('admin')) return true;
+    if (isAnyAdmin(userRoles)) return true;
     return false;
   }
 

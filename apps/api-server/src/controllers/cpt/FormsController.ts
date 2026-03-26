@@ -6,6 +6,7 @@ import type { AuthRequest } from '../../types/auth.js';
 import { User } from '../../entities/User.js';
 import type { FormField, FormSettings, FormNotification, FormConfirmation } from '../../types/form-builder.js';
 import logger from '../../utils/logger.js';
+import { isAnyAdmin, isAnyManagerOrAbove } from '../../utils/role.utils.js';
 
 export class FormsController {
   private formRepo = AppDataSource.getRepository(Form);
@@ -25,7 +26,7 @@ export class FormsController {
         .orderBy('form.updatedAt', 'DESC');
 
       // Role-based filtering
-      if (!user.roles?.includes('admin')) {
+      if (!isAnyAdmin(user.roles || [])) {
         queryBuilder.andWhere('form.createdBy = :userId', { userId: user.id });
       }
 
@@ -40,7 +41,7 @@ export class FormsController {
         queryBuilder.andWhere('form.status = :status', { status });
       }
 
-      if (createdBy && user.roles?.includes('admin')) {
+      if (createdBy && isAnyAdmin(user.roles || [])) {
         queryBuilder.andWhere('form.createdBy = :createdBy', { createdBy });
       }
 
@@ -106,7 +107,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && form.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && form.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }
@@ -181,7 +182,7 @@ export class FormsController {
 
       const user = (req as AuthRequest).user as User;
 
-      if (!user || !user.roles?.some(r => ['admin', 'manager', 'business'].includes(r))) {
+      if (!user || !isAnyManagerOrAbove(user.roles || [])) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Insufficient permissions' }
@@ -259,7 +260,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && form.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && form.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }
@@ -332,7 +333,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && form.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && form.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }
@@ -374,7 +375,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && originalForm.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && originalForm.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }
@@ -441,7 +442,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && form.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && form.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }
@@ -483,7 +484,7 @@ export class FormsController {
       }
 
       // Check permissions
-      if (!user.roles?.includes('admin') && form.createdBy !== user.id) {
+      if (!isAnyAdmin(user.roles || []) && form.createdBy !== user.id) {
         return res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: 'Access denied' }

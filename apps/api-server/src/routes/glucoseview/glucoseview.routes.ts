@@ -44,7 +44,7 @@ function createRequireGlucoseViewAdmin(dataSource: DataSource): RequestHandler {
     }
 
     // Allow super_admin to bypass
-    if (user?.roles?.includes('super_admin')) {
+    if (user?.roles?.includes('platform:super_admin')) {
       return next();
     }
 

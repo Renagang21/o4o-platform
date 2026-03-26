@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import type { User } from './User.js';
+import { isAnyAdmin } from '../utils/role.utils.js';
 
 export enum ContentType {
   YOUTUBE = 'youtube',
@@ -83,7 +84,7 @@ export class SignageContent {
 
   // Business logic methods
   canBeApprovedBy(user: User): boolean {
-    return user.roles?.includes('admin') ?? false;
+    return isAnyAdmin(user.roles || []);
   }
 
   isApproved(): boolean {

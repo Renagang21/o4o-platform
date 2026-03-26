@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import type { User } from './User.js';
+import { isAnyAdmin } from '../utils/role.utils.js';
 
 export enum StoreStatus {
   ACTIVE = 'active',
@@ -70,6 +71,6 @@ export class Store {
   }
 
   canBeAccessedBy(user: User): boolean {
-    return (user.roles?.includes('admin') ?? false) || this.managerId === user.id;
+    return isAnyAdmin(user.roles || []) || this.managerId === user.id;
   }
 }

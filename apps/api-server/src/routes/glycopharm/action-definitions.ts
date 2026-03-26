@@ -8,6 +8,7 @@
 
 import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
+import logger from '../../utils/logger.js';
 
 export const glycopharmActionConfig: ServiceActionConfig = {
   serviceKey: 'glycopharm',
@@ -78,7 +79,8 @@ export const glycopharmActionConfig: ServiceActionConfig = {
   ],
   executeHandlers: {
     // WO-O4O-ACTION-EXECUTION-LAYER-V1: 케어 알림 일괄 확인
-    'care-alerts': async (dataSource: DataSource, _userId: string) => {
+    'care-alerts': async (dataSource: DataSource, userId: string) => {
+      logger.info(`[ActionExecute] glycopharm/care-alerts by ${userId}`);
       const result = await dataSource.query(
         `UPDATE care_alerts SET is_resolved = true, updated_at = NOW()
          WHERE is_resolved = false AND service_code = 'glycopharm'

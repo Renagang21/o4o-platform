@@ -7,6 +7,7 @@
 
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import logger from '../utils/logger.js';
+import { isAnyAdmin } from '../utils/role.utils.js';
 import type { ServiceGroup } from './tenant-context.middleware.js';
 
 /**
@@ -137,7 +138,7 @@ function isAdminRequest(req: Request): boolean {
   const isAdmin = req.headers['x-admin-access'] === 'true';
   const user = (req as any).user;
   // Phase3-D: user.roles는 RoleAssignment 데이터로 오버라이드됨
-  const hasAdminRole = user?.roles?.includes('admin') || user?.roles?.includes('super_admin');
+  const hasAdminRole = isAnyAdmin(user?.roles || []);
 
   return isAdmin || hasAdminRole;
 }

@@ -8,6 +8,7 @@
 
 import type { DataSource } from 'typeorm';
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
+import logger from '../../utils/logger.js';
 
 export const kpaActionConfig: ServiceActionConfig = {
   serviceKey: 'kpa-society',
@@ -121,7 +122,8 @@ export const kpaActionConfig: ServiceActionConfig = {
   ],
   executeHandlers: {
     // WO-O4O-ACTION-EXECUTION-LAYER-V1: 대기 콘텐츠 일괄 승인 (pending → published)
-    'content-pending': async (dataSource: DataSource, _userId: string) => {
+    'content-pending': async (dataSource: DataSource, userId: string) => {
+      logger.info(`[ActionExecute] kpa/content-pending by ${userId}`);
       const result = await dataSource.query(
         `UPDATE cms_contents
          SET status = 'published', updated_at = NOW()

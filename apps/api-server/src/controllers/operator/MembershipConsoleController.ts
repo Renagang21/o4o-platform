@@ -469,47 +469,28 @@ export class MembershipConsoleController {
             [updatedBy, userId]
           );
         }
+      } else if (status.toLowerCase() === 'suspended') {
+        // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: service-level suspend via atomic transaction
+        // Does NOT change users.status — only suspends memberships + deactivates roles in scope
+        const result = await approvalService.suspendMembership({
+          userId,
+          suspendedBy: updatedBy,
+          isPlatformAdmin: scope.isPlatformAdmin,
+          serviceKeys: scope.serviceKeys,
+        });
+
+        if (!result) {
+          res.status(404).json({ success: false, error: 'No active memberships found to suspend' });
+          return;
+        }
       } else {
-        // Non-approval status (rejected, suspended, etc.) — user status only
-        // UserStatus enum uses lowercase: 'rejected', 'suspended', etc.
+        // Non-approval, non-suspend status (rejected, etc.) — user status only
         const dbStatus = status.toLowerCase();
         await AppDataSource.query(
           `UPDATE users SET status = $1, "isActive" = false, "updatedAt" = NOW()
            WHERE id = $2`,
           [dbStatus, userId]
         );
-
-        // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: suspend memberships + deactivate roles for service scope
-        if (dbStatus === 'suspended') {
-          const membershipFilter = scope.isPlatformAdmin
-            ? `WHERE user_id = $1 AND status = 'active'`
-            : `WHERE user_id = $1 AND status = 'active' AND service_key = ANY($2)`;
-          const membershipParams = scope.isPlatformAdmin ? [userId] : [userId, scope.serviceKeys];
-
-          const activeMemberships = await AppDataSource.query(
-            `SELECT id, role, service_key FROM service_memberships ${membershipFilter}`,
-            membershipParams
-          );
-
-          if (activeMemberships.length > 0) {
-            const membershipIds = activeMemberships.map((m: any) => m.id);
-            await AppDataSource.query(
-              `UPDATE service_memberships SET status = 'suspended', updated_at = NOW()
-               WHERE id = ANY($1)`,
-              [membershipIds]
-            );
-
-            for (const m of activeMemberships) {
-              if (m.role) {
-                await AppDataSource.query(
-                  `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-                   WHERE user_id = $1 AND role = $2 AND is_active = true`,
-                  [userId, m.role]
-                );
-              }
-            }
-          }
-        }
       }
 
       res.json({ success: true, message: `User status updated to ${status}` });

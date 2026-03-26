@@ -9,6 +9,7 @@ import { DataSource } from 'typeorm';
 import { KpaMember, OrganizationStore, KpaMemberService, KpaAuditLog } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { roleAssignmentService } from '../../../modules/auth/services/role-assignment.service.js';
+import { MembershipApprovalService } from '../../../services/approval/MembershipApprovalService.js';
 
 type AuthMiddleware = RequestHandler;
 type ScopeMiddleware = (scope: string) => RequestHandler;
@@ -322,26 +323,25 @@ export function createMemberController(
               assignedBy: req.user!.id,
             });
           } else if (newStatus === 'suspended') {
-            // SUSPENSION: Suspend user + remove KPA role
-            await dataSource.query(
-              `UPDATE users SET status = 'suspended' WHERE id = $1`,
-              [member.user_id]
-            );
-            await roleAssignmentService.removeRole(member.user_id, kpaRole);
+            // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
+            const approvalService = new MembershipApprovalService();
+            await approvalService.suspendMembership({
+              userId: member.user_id,
+              suspendedBy: req.user!.id,
+              isPlatformAdmin: false,
+              serviceKeys: ['kpa-society'],
+            });
           } else if (newStatus === 'withdrawn') {
             // WITHDRAWAL: Remove KPA role
             await roleAssignmentService.removeRole(member.user_id, kpaRole);
           } else if (oldStatus === 'suspended' && newStatus === 'active') {
-            // REACTIVATION: Restore user + re-assign KPA role
-            await dataSource.query(
-              `UPDATE users SET status = 'active', "isActive" = true
-               WHERE id = $1`,
-              [member.user_id]
-            );
-            await roleAssignmentService.assignRole({
+            // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
+            const approvalService = new MembershipApprovalService();
+            await approvalService.reactivateMembership({
               userId: member.user_id,
-              role: kpaRole,
-              assignedBy: req.user!.id,
+              reactivatedBy: req.user!.id,
+              isPlatformAdmin: false,
+              serviceKeys: ['kpa-society'],
             });
           }
         } catch (syncError) {
