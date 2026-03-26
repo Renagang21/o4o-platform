@@ -24,8 +24,6 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readdirSync, existsSync } from 'fs';
-import { globSync } from 'glob';
 
 // ESM equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -101,8 +99,8 @@ function createMigrationDataSource(): DataSource {
 
     migrationsTableName: 'typeorm_migrations',
 
-    // Verbose logging for debugging (info added for migration discovery)
-    logging: ['query', 'error', 'schema', 'migration', 'info'],
+    // Verbose logging for debugging
+    logging: ['query', 'error', 'schema', 'migration'],
 
     // No synchronize - we use migrations only
     synchronize: false,
@@ -128,47 +126,6 @@ async function runMigrations(): Promise<void> {
     log.info('Step 2: Connecting to database...');
     await dataSource.initialize();
     log.info('Database connection established');
-
-    // Step 2.5: Diagnostic — migration file discovery
-    const migrationGlob = join(__dirname, 'database', 'migrations', '*.js');
-    log.info(`[DIAG] __dirname = ${__dirname}`);
-    log.info(`[DIAG] migration glob pattern = ${migrationGlob}`);
-
-    // Check directory exists
-    const migrationDir = join(__dirname, 'database', 'migrations');
-    const dirExists = existsSync(migrationDir);
-    log.info(`[DIAG] migrations dir exists = ${dirExists}`);
-
-    if (dirExists) {
-      // List files with fs.readdirSync
-      const fsFiles = readdirSync(migrationDir).filter(f => f.endsWith('.js'));
-      log.info(`[DIAG] fs.readdirSync *.js count = ${fsFiles.length}`);
-      if (fsFiles.length > 0) {
-        log.info(`[DIAG] fs first 3 = ${fsFiles.slice(0, 3).join(', ')}`);
-        log.info(`[DIAG] fs last 3 = ${fsFiles.slice(-3).join(', ')}`);
-      }
-    }
-
-    // Check with glob package directly
-    try {
-      const globFiles = globSync(migrationGlob);
-      log.info(`[DIAG] glob.globSync count = ${globFiles.length}`);
-      if (globFiles.length > 0) {
-        log.info(`[DIAG] glob first 3 = ${globFiles.slice(0, 3).join(', ')}`);
-        log.info(`[DIAG] glob last 3 = ${globFiles.slice(-3).join(', ')}`);
-      }
-    } catch (e) {
-      log.error(`[DIAG] glob error: ${e instanceof Error ? e.message : String(e)}`);
-    }
-
-    // Check TypeORM loaded migrations
-    const loadedMigrations = dataSource.migrations;
-    log.info(`[DIAG] TypeORM connection.migrations count = ${loadedMigrations.length}`);
-    if (loadedMigrations.length > 0) {
-      const names = loadedMigrations.map(m => (m as any).name || m.constructor.name);
-      log.info(`[DIAG] TypeORM first 3 = ${names.slice(0, 3).join(', ')}`);
-      log.info(`[DIAG] TypeORM last 3 = ${names.slice(-3).join(', ')}`);
-    }
 
     // Step 3: Check pending migrations
     log.info('Step 3: Checking pending migrations...');
