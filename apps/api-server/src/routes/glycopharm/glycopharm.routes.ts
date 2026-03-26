@@ -53,6 +53,9 @@ import { hasAnyServiceRole, logLegacyRoleUsage } from '../../utils/role.utils.js
 import { GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
+// WO-O4O-OPERATOR-ACTION-LAYER-V1
+import { createActionQueueRouter } from '../../common/action-queue/index.js';
+import { glycopharmActionConfig } from './action-definitions.js';
 import { createPharmacyContextMiddleware } from '../../modules/care/care-pharmacy-context.middleware.js';
 
 // Domain controllers - Forum
@@ -331,6 +334,9 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
     actionLogService
   );
   router.use('/operator', operatorController);
+
+  // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, glycopharmActionConfig));
 
   // ============================================================================
   // Store HUB Controllers (WO-O4O-GLYCOPHARM-STORE-HUB-ADOPTION-V1)

@@ -40,6 +40,20 @@ export interface ActionItem {
   link: string;
 }
 
+/** Enhanced Action Queue Item (WO-O4O-OPERATOR-ACTION-LAYER-V1) — 기존 ActionItem 하위호환 */
+export interface ActionQueueItem extends ActionItem {
+  source?: 'SYSTEM' | 'AI';
+  type?: string;
+  title?: string;
+  description?: string;
+  priority?: 'high' | 'medium' | 'low';
+  oldestAt?: string | null;
+  confidence?: number;
+  actionType?: 'EXECUTE' | 'NAVIGATE';
+  actionApi?: string;
+  actionMethod?: string;
+}
+
 // ─── Block 4: Activity Log ───
 
 export interface ActivityItem {

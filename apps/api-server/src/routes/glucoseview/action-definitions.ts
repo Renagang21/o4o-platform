@@ -1,0 +1,71 @@
+/**
+ * GlucoseView — Action Queue Definitions
+ *
+ * WO-O4O-OPERATOR-ACTION-LAYER-V1
+ *
+ * 기존 operator-dashboard.service.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
+ */
+
+import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
+
+export const glucoseviewActionConfig: ServiceActionConfig = {
+  serviceKey: 'glucoseview',
+  definitions: [
+    {
+      id: 'pending-applications',
+      type: 'approval',
+      title: '신청 승인 대기',
+      description: '입점 신청이 대기 중입니다.',
+      query: `SELECT COUNT(*)::int AS cnt, MIN(submitted_at) AS oldest
+              FROM glucoseview_applications WHERE status = 'submitted'`,
+      actionUrl: '/operator/applications',
+      actionLabel: '신청 관리',
+      actionType: 'NAVIGATE',
+      alwaysHigh: true,
+    },
+    {
+      id: 'pending-pharmacists',
+      type: 'pharmacist',
+      title: '약사 승인 대기',
+      description: '약사 승인 요청이 대기 중입니다.',
+      query: `SELECT COUNT(*)::int AS cnt
+              FROM glucoseview_pharmacists WHERE approval_status = 'pending'`,
+      actionUrl: '/operator/users',
+      actionLabel: '약사 관리',
+      actionType: 'NAVIGATE',
+      alwaysHigh: true,
+    },
+    {
+      id: 'care-alerts',
+      type: 'care',
+      title: '케어 알림 미확인',
+      description: '확인되지 않은 환자 케어 알림이 있습니다.',
+      query: `SELECT COUNT(*)::int AS cnt
+              FROM care_alerts
+              WHERE is_resolved = false
+                AND service_code = 'glucoseview'`,
+      actionUrl: '/operator/care/alerts',
+      actionLabel: '알림 확인',
+      actionType: 'NAVIGATE',
+      alwaysHigh: true,
+    },
+  ],
+  executeHandlers: {},
+  aiRuleGenerator: (counts) => {
+    const actions: AiRuleAction[] = [];
+    if ((counts['care-alerts'] || 0) > 5) {
+      actions.push({
+        id: 'ai-care-overload',
+        type: 'care',
+        title: '케어 알림 과다 — 즉시 확인 필요',
+        description: `미확인 케어 알림 ${counts['care-alerts']}건이 적체되고 있습니다`,
+        priority: 'high',
+        confidence: 0.9,
+        actionUrl: '/operator/care/alerts',
+        actionLabel: '알림 확인',
+        actionType: 'NAVIGATE',
+      });
+    }
+    return actions;
+  },
+};

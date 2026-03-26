@@ -30,6 +30,20 @@ export interface ActionItem {
   link: string;
 }
 
+/** Enhanced Action Queue Item (WO-O4O-OPERATOR-ACTION-LAYER-V1) */
+export interface ActionQueueItem extends ActionItem {
+  source?: 'SYSTEM' | 'AI';
+  type?: string;
+  title?: string;
+  description?: string;
+  priority?: 'high' | 'medium' | 'low';
+  oldestAt?: string | null;
+  confidence?: number;
+  actionType?: 'EXECUTE' | 'NAVIGATE';
+  actionApi?: string;
+  actionMethod?: string;
+}
+
 export interface ActivityItem {
   id: string;
   message: string;

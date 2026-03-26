@@ -110,6 +110,9 @@ import { asyncHandler } from '../../middleware/error-handler.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 import { ActionLogService } from '@o4o/action-log-core';
+// WO-O4O-OPERATOR-ACTION-LAYER-V1
+import { createActionQueueRouter } from '../../common/action-queue/index.js';
+import { kpaActionConfig } from './action-definitions.js';
 
 // Domain controllers - Forum
 import { ForumController } from '../../controllers/forum/ForumController.js';
@@ -202,6 +205,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     signageService,
     forumService,
   }));
+  // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
+  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig));
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
