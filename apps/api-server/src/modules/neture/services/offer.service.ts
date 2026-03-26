@@ -13,6 +13,7 @@ import { ProductCategory } from '../entities/index.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
+import { OfferErrorCode } from '../constants/offer-error-code.js';
 
 /**
  * WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 허용 규제 유형 (코드 레벨 enum, DB VARCHAR 유지)
@@ -122,7 +123,7 @@ export class NetureOfferService {
         [offer.masterId],
       );
       if (masterForApproval.length > 0 && masterForApproval[0].is_regulated && !masterForApproval[0].mfds_permit_number) {
-        return { success: false, error: 'PERMIT_REQUIRED_FOR_APPROVAL' };
+        return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_APPROVAL };
       }
 
       // 트랜잭션: Offer 승인 + PUBLIC 자동 확산 (원자적)
@@ -503,7 +504,7 @@ export class NetureOfferService {
 
       // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 + MFDS 미검증 시 permit 필수
       if (isRegulated && !masterResult.data.isMfdsVerified && !manualData.mfdsPermitNumber) {
-        return { success: false, error: 'PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED', message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
+        return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
       }
 
       // Extended fields 적용

@@ -15,6 +15,7 @@ import { CsvImportService } from '../services/csv-import.service.js';
 import { generateProductTemplate } from '../services/xlsx-template.service.js';
 import { uploadSingleMiddleware } from '../../../middleware/upload.middleware.js';
 import logger from '../../../utils/logger.js';
+import { OfferErrorCode } from '../constants/offer-error-code.js';
 
 export function createSupplierProductController(dataSource: DataSource): Router {
   const router = Router();
@@ -90,17 +91,17 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { offerIds, operation, value } = req.body;
 
       if (!Array.isArray(offerIds) || offerIds.length === 0) {
-        return res.status(400).json({ success: false, error: 'INVALID_OFFER_IDS', message: 'offerIds array is required' });
+        return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_OFFER_IDS, message: 'offerIds array is required' });
       }
       if (offerIds.length > 100) {
-        return res.status(400).json({ success: false, error: 'TOO_MANY_OFFERS', message: 'Max 100 offers per request' });
+        return res.status(400).json({ success: false, error: OfferErrorCode.VALIDATION_ERROR, message: 'Max 100 offers per request' });
       }
       const validOps = ['INCREASE', 'DECREASE', 'PERCENT_INCREASE', 'PERCENT_DECREASE', 'SET'];
       if (!validOps.includes(operation)) {
-        return res.status(400).json({ success: false, error: 'INVALID_OPERATION', message: `operation must be one of: ${validOps.join(', ')}` });
+        return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_OPERATION, message: `operation must be one of: ${validOps.join(', ')}` });
       }
       if (typeof value !== 'number' || value < 0) {
-        return res.status(400).json({ success: false, error: 'INVALID_VALUE', message: 'value must be a non-negative number' });
+        return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_VALUE, message: 'value must be a non-negative number' });
       }
 
       const result = await netureService.bulkUpdatePrice(supplierId, offerIds, operation, value);
@@ -108,7 +109,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       res.json({ success: allSucceeded, data: result });
     } catch (error) {
       logger.error('[Neture API] Error bulk updating prices:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to bulk update prices' });
+      res.status(500).json({ success: false, error: OfferErrorCode.INTERNAL_ERROR, message: 'Failed to bulk update prices' });
     }
   });
 
