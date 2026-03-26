@@ -137,6 +137,23 @@ const PATIENT_QUESTIONS = [
 
 // ── Component ──
 
+/** sessionStorage key — patientId별 분리 */
+function getStorageKey(patientId?: string) {
+  return patientId ? `care_ai_chat_${patientId}` : 'care_ai_chat_population';
+}
+
+/** sessionStorage에서 메시지 복원 (loading/streaming 상태 제거) */
+function restoreMessages(patientId?: string): ChatMessage[] {
+  try {
+    const raw = sessionStorage.getItem(getStorageKey(patientId));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ChatMessage[];
+    return parsed
+      .filter(m => !m.loading && !m.streaming)
+      .map(m => ({ ...m, timestamp: new Date(m.timestamp) }));
+  } catch { return []; }
+}
+
 export default function CareAiChatPanel({
   isOpen,
   onClose,
@@ -145,7 +162,7 @@ export default function CareAiChatPanel({
   initialQuestion,
 }: CareAiChatPanelProps) {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => restoreMessages(patientId));
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -157,6 +174,14 @@ export default function CareAiChatPanel({
   const streamBuffer = useStreamBuffer();
 
   const suggestedQuestions = patientId ? PATIENT_QUESTIONS : POPULATION_QUESTIONS;
+
+  // Persist messages to sessionStorage (skip transient states)
+  useEffect(() => {
+    const toSave = messages.filter(m => !m.loading && !m.streaming);
+    if (toSave.length > 0) {
+      sessionStorage.setItem(getStorageKey(patientId), JSON.stringify(toSave));
+    }
+  }, [messages, patientId]);
 
   // Smart auto-scroll: only scroll if user is near bottom
   const scrollToBottomIfNeeded = useCallback(() => {
@@ -235,8 +260,10 @@ export default function CareAiChatPanel({
       const abortCtrl = new AbortController();
       abortControllerRef.current = abortCtrl;
 
-      // 스트리밍 fetch 헬퍼 — 404/502/503 시 1회 재시도
-      const doStreamFetch = async (retried = false): Promise<Response> => {
+      // 스트리밍 fetch 헬퍼 — 404/502/503 시 최대 3회 재시도 (지수 백오프)
+      const RETRY_DELAYS = [500, 1000, 2000];
+
+      const doStreamFetch = async (attempt = 0): Promise<Response> => {
         const token = localStorage.getItem('o4o_accessToken') ||
           localStorage.getItem('accessToken') ||
           localStorage.getItem('token') ||
@@ -252,10 +279,10 @@ export default function CareAiChatPanel({
           signal: abortCtrl.signal,
         });
 
-        // 404/502/503: 서버 일시 오류 → 500ms 후 1회 재시도
-        if ((res.status === 404 || res.status === 502 || res.status === 503) && !retried) {
-          await new Promise(r => setTimeout(r, 500));
-          return doStreamFetch(true);
+        // 404/502/503: 서버 일시 오류 → 지수 백오프 재시도
+        if ((res.status === 404 || res.status === 502 || res.status === 503) && attempt < RETRY_DELAYS.length) {
+          await new Promise(r => setTimeout(r, RETRY_DELAYS[attempt]));
+          return doStreamFetch(attempt + 1);
         }
 
         return res;

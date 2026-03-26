@@ -141,17 +141,11 @@ try {
 // ============================================================================
 const startServer = async () => {
   logger.info('Starting server...');
-
-  // CLOUD RUN CRITICAL: START LISTENING IMMEDIATELY
   const host = process.env.HOST || '0.0.0.0';
-  await new Promise<void>((resolve) => {
-    httpServer.listen(port as number, host as string, () => {
-      logger.info(`🚀 API Server listening on ${host}:${port} (Cloud Run ready)`);
-      resolve();
-    });
-  });
+  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
 
-  // Validate payment configuration (Phase PG-1)
+  // ── Phase 1: Non-DB initialization ──
+
   try {
     const { validatePaymentConfig } = await import('./config/payment.config.js');
     validatePaymentConfig();
@@ -159,7 +153,6 @@ const startServer = async () => {
     logger.warn('Payment config validation skipped:', paymentConfigError);
   }
 
-  // Initialize CPT Registry (Phase 5)
   try {
     const { initializeCPT } = await import('./init/cpt.init.js');
     await initializeCPT();
@@ -167,8 +160,7 @@ const startServer = async () => {
     logger.error('CPT Registry initialization failed:', cptError);
   }
 
-  // GRACEFUL_STARTUP Policy (Phase 2.5)
-  const gracefulStartup = process.env.GRACEFUL_STARTUP !== 'false';
+  // ── Phase 2: Database + Service initialization ──
 
   try {
     await startupService.initialize();
@@ -181,7 +173,6 @@ const startServer = async () => {
     logger.warn('🔄 GRACEFUL_STARTUP=true: Continuing with degraded functionality');
   }
 
-  // Initialize dynamic Passport strategies (AFTER database is initialized)
   try {
     await initializePassport();
     logger.info('✅ Dynamic Passport strategies initialized');
@@ -189,10 +180,22 @@ const startServer = async () => {
     logger.error('Failed to initialize Passport strategies:', passportError);
   }
 
-  // Register domain routes (modules + all domain APIs)
+  // ── Phase 3: Domain routes — BEFORE listen (eliminates 404 window) ──
+  // WO-O4O-CARE-AI-CHAT-STABILITY-FIX-V1
+
   await registerDomainRoutes(app, AppDataSource);
 
-  // Initialize Redis for session sync (if enabled)
+  // ── Phase 4: Start listening — ALL routes ready ──
+
+  await new Promise<void>((resolve) => {
+    httpServer.listen(port as number, host as string, () => {
+      logger.info(`🚀 API Server listening on ${host}:${port} (all routes registered)`);
+      resolve();
+    });
+  });
+
+  // ── Phase 5: Post-listen (non-critical services) ──
+
   let webSocketSessionSync: WebSocketSessionSync | null = null;
 
   if (redisEnabled) {
@@ -231,7 +234,7 @@ const startServer = async () => {
     logger.info('Redis disabled, skipping Redis initialization');
   }
 
-  logger.info('✅ Background initialization complete');
+  logger.info('✅ Server fully initialized — all routes active');
 };
 
 startServer().catch((error) => {
