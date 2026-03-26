@@ -218,10 +218,10 @@ export class NetureOfferService {
          SET approval_status = 'revoked',
              decided_by = $2::uuid,
              decided_at = NOW(),
-             reason = 'Offer rejected by admin',
+             reason = $3,
              updated_at = NOW()
          WHERE offer_id = $1 AND approval_status = 'approved'`,
-        [offerId, adminUserId],
+        [offerId, adminUserId, reason || 'Offer rejected by admin'],
       );
 
       await AppDataSource.query(
@@ -656,8 +656,8 @@ export class NetureOfferService {
           && savedOffer.approvalStatus === OfferApprovalStatus.APPROVED
           && savedOffer.isActive) {
         autoExpandPublicProduct(AppDataSource, savedOffer.id, savedOffer.masterId)
-          .then((count) => logger.info(`[NetureOfferService] Auto-expanded ${count} listings for offer ${savedOffer.id} (PUBLIC transition)`))
-          .catch((err) => logger.error(`[NetureOfferService] Auto-expand failed for offer ${savedOffer.id}:`, err));
+          .then((count) => logger.info(`[NetureOfferService] Auto-expanded ${count} listings for offer ${savedOffer.id} master ${savedOffer.masterId} (PUBLIC transition)`))
+          .catch((err) => logger.warn(`[NetureOfferService] Auto-expand failed for offer ${savedOffer.id} master ${savedOffer.masterId}:`, err));
       }
 
       logger.info(`[NetureOfferService] Updated offer ${offerId} by supplier ${supplierId}`);

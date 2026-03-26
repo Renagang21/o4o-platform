@@ -104,7 +104,8 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       }
 
       const result = await netureService.bulkUpdatePrice(supplierId, offerIds, operation, value);
-      res.json({ success: true, data: result });
+      const allSucceeded = !result.failed || result.failed.length === 0;
+      res.json({ success: allSucceeded, data: result });
     } catch (error) {
       logger.error('[Neture API] Error bulk updating prices:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to bulk update prices' });
