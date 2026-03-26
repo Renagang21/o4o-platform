@@ -77,11 +77,13 @@ export class NetureOfferService {
         order: { createdAt: 'ASC' },
       });
 
+      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
+
       return offers.map((o) => ({
         id: o.id,
         masterId: o.masterId,
         masterName: o.master?.marketingName || '',
-        supplierName: o.supplier?.name || '',
+        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
         distributionType: o.distributionType,
         createdAt: o.createdAt,
@@ -263,11 +265,13 @@ export class NetureOfferService {
         order: { createdAt: 'DESC' },
       });
 
+      const orgNameMap = await this.getOrgNameMap(offers.map((o) => o.supplier).filter(Boolean));
+
       return offers.map((o) => ({
         id: o.id,
         masterId: o.masterId,
         masterName: o.master?.marketingName || '',
-        supplierName: o.supplier?.name || '',
+        supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
         distributionType: o.distributionType,
         isActive: o.isActive,
@@ -1041,6 +1045,7 @@ export class NetureOfferService {
       }
 
       // 머지하여 반환
+      const orgNameMap = await this.getOrgNameMap(activeOffers.map((o) => o.supplier).filter(Boolean));
       return activeOffers.map((o) => {
         const key = `${o.supplierId}:${o.id}`;
         const request = requestMap.get(key);
@@ -1050,7 +1055,7 @@ export class NetureOfferService {
           masterName: o.master?.marketingName || '',
           distributionType: o.distributionType,
           supplierId: o.supplierId,
-          supplierName: o.supplier?.name || '',
+          supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
           supplyStatus: request?.status || 'available',
           requestId: request?.requestId || null,
           rejectReason: request?.rejectReason || null,
@@ -1060,5 +1065,20 @@ export class NetureOfferService {
       logger.error('[NetureOfferService] Error fetching operator supply products:', error);
       throw error;
     }
+  }
+
+  // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-C: batch org name lookup
+  private async getOrgNameMap(suppliers: NetureSupplier[]): Promise<Map<string, string>> {
+    const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
+    const map = new Map<string, string>();
+    if (orgIds.length === 0) return map;
+    try {
+      const rows: Array<{ id: string; name: string }> = await AppDataSource.query(
+        `SELECT id, name FROM organizations WHERE id = ANY($1)`,
+        [orgIds],
+      );
+      for (const r of rows) map.set(r.id, r.name);
+    } catch { /* non-fatal */ }
+    return map;
   }
 }
