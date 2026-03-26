@@ -115,7 +115,7 @@ export class CareRiskService {
           FROM care_kpi_snapshots
           GROUP BY patient_id
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        LEFT JOIN glucoseview_customers c ON c.id = s.patient_id
+        LEFT JOIN glucoseview_customers c ON c.user_id = s.patient_id
         ORDER BY s.created_at DESC
       `
       : `
@@ -135,7 +135,7 @@ export class CareRiskService {
           WHERE pharmacy_id = $1
           GROUP BY patient_id
         ) latest ON s.patient_id = latest.patient_id AND s.created_at = latest.max_at
-        LEFT JOIN glucoseview_customers c ON c.id = s.patient_id
+        LEFT JOIN glucoseview_customers c ON c.user_id = s.patient_id
         WHERE s.pharmacy_id = $1
         ORDER BY s.created_at DESC
       `;

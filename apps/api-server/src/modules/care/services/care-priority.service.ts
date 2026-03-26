@@ -146,7 +146,7 @@ export class CarePriorityService {
           lr.last_reading_at,
           COALESCE(oa.alert_count, 0)::int AS alert_count
         FROM latest_snapshot s
-        LEFT JOIN glucoseview_customers c ON c.id = s.patient_id
+        LEFT JOIN glucoseview_customers c ON c.user_id = s.patient_id
         LEFT JOIN latest_coaching lc ON lc.patient_id = s.patient_id
         LEFT JOIN latest_reading lr ON lr.patient_id = s.patient_id
         LEFT JOIN open_alerts oa ON oa.patient_id = s.patient_id
@@ -191,7 +191,7 @@ export class CarePriorityService {
           lr.last_reading_at,
           COALESCE(oa.alert_count, 0)::int AS alert_count
         FROM latest_snapshot s
-        LEFT JOIN glucoseview_customers c ON c.id = s.patient_id
+        LEFT JOIN glucoseview_customers c ON c.user_id = s.patient_id
         LEFT JOIN latest_coaching lc ON lc.patient_id = s.patient_id
         LEFT JOIN latest_reading lr ON lr.patient_id = s.patient_id
         LEFT JOIN open_alerts oa ON oa.patient_id = s.patient_id
@@ -330,7 +330,7 @@ export class CarePriorityService {
         COALESCE(a.alert_count, 0)::int AS alert_count,
         COALESCE(a.alert_score, 0)::int AS alert_score
       FROM latest_snapshot s
-      LEFT JOIN glucoseview_customers c ON c.id = s.patient_id
+      LEFT JOIN glucoseview_customers c ON c.user_id = s.patient_id
       LEFT JOIN latest_reading lr ON lr.patient_id = s.patient_id
       LEFT JOIN alert_scores a ON a.patient_id = s.patient_id
       `,

@@ -129,7 +129,7 @@ export class CareAlertService {
            a.status,
            a.created_at AS "createdAt"
          FROM care_alerts a
-         LEFT JOIN glucoseview_customers c ON c.id = a.patient_id
+         LEFT JOIN glucoseview_customers c ON c.user_id = a.patient_id
          WHERE ${isGlobal ? '' : 'a.pharmacy_id = $1 AND '}a.status IN ('open', 'acknowledged')
          ORDER BY
            CASE a.severity

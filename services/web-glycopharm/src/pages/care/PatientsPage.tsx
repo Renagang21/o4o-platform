@@ -201,7 +201,7 @@ export default function PatientsPage() {
         setShowRegisterModal(false);
         setRegisterForm({ name: '', phone: '', email: '', gender: '', birthYear: '', notes: '' });
         // 등록 후 환자 상세 페이지로 이동
-        navigate(`/care/patients/${res.data.id}`);
+        navigate(`/care/patients/${res.data.user_id || res.data.id}`);
       } else {
         setRegisterError('당뇨인 등록에 실패했습니다.');
       }
@@ -355,7 +355,7 @@ export default function PatientsPage() {
                   return (
                     <tr
                       key={patient.id}
-                      onClick={() => navigate(`/care/patients/${patient.id}`)}
+                      onClick={() => navigate(`/care/patients/${patient.userId || patient.id}`)}
                       className="hover:bg-slate-50 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4">

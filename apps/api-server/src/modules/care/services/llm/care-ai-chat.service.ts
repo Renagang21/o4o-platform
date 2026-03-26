@@ -289,7 +289,7 @@ export class CareAiChatService {
           SELECT DISTINCT ON (s.patient_id) s.patient_id, s.tir, s.cv, s.risk_level,
             c.name AS patient_name
           FROM care_kpi_snapshots s
-          JOIN glucoseview_customers c ON c.id = s.patient_id
+          JOIN glucoseview_customers c ON c.user_id = s.patient_id
           ${pharmacyFilter ? pharmacyFilter.replace('pharmacy_id', 's.pharmacy_id') : ''}
           ORDER BY s.patient_id, s.created_at DESC
         )
@@ -325,8 +325,8 @@ export class CareAiChatService {
       const q1 = await this.dataSource.query(`
         SELECT c.name, p.diabetes_type, p.treatment_method
         FROM glucoseview_customers c
-        LEFT JOIN patient_health_profiles p ON p.user_id = c.id
-        WHERE c.id = ${pidParam} ${pFilter}
+        LEFT JOIN patient_health_profiles p ON p.user_id = c.user_id
+        WHERE c.user_id = ${pidParam} ${pFilter}
       `, baseParams);
 
       if (q1[0]) {

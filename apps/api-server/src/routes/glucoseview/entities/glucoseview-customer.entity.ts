@@ -38,6 +38,14 @@ export class GlucoseViewCustomer {
   organization_id?: string;
 
   /**
+   * The users.id of the patient (if they have an account).
+   * WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1: Care SSOT
+   */
+  @Column({ type: 'uuid', nullable: true })
+  @Index()
+  user_id?: string;
+
+  /**
    * The pharmacist (user) who registered this customer
    * Retained as "registered by" reference
    */

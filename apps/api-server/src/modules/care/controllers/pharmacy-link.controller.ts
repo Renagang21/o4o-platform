@@ -340,11 +340,12 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
         );
 
         // 2. Create glucoseview_customers record (the canonical link)
+        // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1: set user_id from link request
         await manager.query(
           `INSERT INTO glucoseview_customers
-             (organization_id, pharmacist_id, name, email, visit_count, sync_status, data_sharing_consent, consent_date)
-           VALUES ($1, $2, $3, $4, 0, 'pending', true, NOW())`,
-          [targetPharmacyId, pharmacistId, linkRequest.patientName, linkRequest.patientEmail],
+             (organization_id, pharmacist_id, user_id, name, email, visit_count, sync_status, data_sharing_consent, consent_date)
+           VALUES ($1, $2, $3, $4, $5, 0, 'pending', true, NOW())`,
+          [targetPharmacyId, pharmacistId, linkRequest.patientId, linkRequest.patientName, linkRequest.patientEmail],
         );
       });
 

@@ -234,7 +234,7 @@ export function createPharmacyController(
               params,
             ),
             dataSource.query(
-              `SELECT c.id, c.name, c.phone, c.email, c.birth_year, c.gender,
+              `SELECT c.id, c.user_id, c.name, c.phone, c.email, c.birth_year, c.gender,
                       c.visit_count, c.sync_status, c.last_visit, c.notes,
                       c.created_at, c.updated_at
                FROM glucoseview_customers c
@@ -248,6 +248,7 @@ export function createPharmacyController(
           total = countResult[0]?.count ?? 0;
           items = dataResult.map((row: any) => ({
             id: row.id,
+            userId: row.user_id || row.id,
             name: row.name,
             phone: row.phone || '',
             email: row.email || undefined,
@@ -297,8 +298,8 @@ export function createPharmacyController(
         const pharmacyId = pcReq.pharmacyId;
         const customerId = req.params.id;
 
-        // Build query with boundary check
-        const conditions = ['c.id = $1'];
+        // Build query with boundary check (accept gc.id OR user_id for backward compat)
+        const conditions = ['(c.id = $1 OR c.user_id = $1)'];
         const params: any[] = [customerId];
 
         // Non-admin: enforce organization_id boundary
@@ -310,7 +311,7 @@ export function createPharmacyController(
         const whereClause = conditions.join(' AND ');
 
         const rows = await dataSource.query(
-          `SELECT c.id, c.name, c.phone, c.email, c.birth_year, c.gender,
+          `SELECT c.id, c.user_id, c.name, c.phone, c.email, c.birth_year, c.gender,
                   c.visit_count, c.sync_status, c.last_visit, c.notes,
                   c.created_at, c.updated_at
            FROM glucoseview_customers c
@@ -332,6 +333,7 @@ export function createPharmacyController(
           success: true,
           data: {
             id: row.id,
+            userId: row.user_id || row.id,
             name: row.name,
             phone: row.phone || '',
             email: row.email || undefined,
@@ -433,12 +435,22 @@ export function createPharmacyController(
           }
         }
 
+        // Resolve user_id from email if possible
+        let resolvedUserId: string | null = null;
+        if (trimEmail) {
+          const userMatch = await dataSource.query(
+            `SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+            [trimEmail],
+          );
+          if (userMatch.length > 0) resolvedUserId = userMatch[0].id;
+        }
+
         const result = await dataSource.query(
           `INSERT INTO glucoseview_customers
-             (pharmacist_id, organization_id, name, phone, email, gender, birth_year, notes, last_visit, visit_count, sync_status, data_sharing_consent)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), 1, 'pending', false)
-           RETURNING id, name, phone, email, gender, birth_year, created_at`,
-          [pharmacistId, pharmacyId, name.trim(), cleanPhone, trimEmail, validGender, validBirthYear, notes || null],
+             (pharmacist_id, organization_id, user_id, name, phone, email, gender, birth_year, notes, last_visit, visit_count, sync_status, data_sharing_consent)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), 1, 'pending', false)
+           RETURNING id, user_id, name, phone, email, gender, birth_year, created_at`,
+          [pharmacistId, pharmacyId, resolvedUserId, name.trim(), cleanPhone, trimEmail, validGender, validBirthYear, notes || null],
         );
 
         res.status(201).json({ success: true, data: result[0] });

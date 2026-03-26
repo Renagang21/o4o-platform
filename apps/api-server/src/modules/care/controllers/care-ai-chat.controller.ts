@@ -43,7 +43,7 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
       if (patientId && pharmacyId) {
         // Primary: organization_id match
         const check = await dataSource.query(
-          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+          `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE (user_id = $1 OR id = $1) LIMIT 1`,
           [patientId],
         );
         if (check.length === 0) {
@@ -150,7 +150,7 @@ export function createCareAiChatRouter(dataSource: DataSource): Router {
     // Patient scope guard (동일)
     if (patientId && pharmacyId) {
       const check = await dataSource.query(
-        `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+        `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE (user_id = $1 OR id = $1) LIMIT 1`,
         [patientId],
       );
       if (check.length === 0) {

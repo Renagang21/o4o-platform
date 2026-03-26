@@ -32,21 +32,7 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
         return;
       }
 
-      // Step 1: Find glucoseview_customer by email
-      const customers = await dataSource.query(
-        `SELECT id FROM glucoseview_customers WHERE email = $1 LIMIT 1`,
-        [user.email],
-      );
-
-      if (!customers || customers.length === 0) {
-        // No customer record → no coaching possible yet
-        res.json({ success: true, data: [] });
-        return;
-      }
-
-      const customerId = customers[0].id;
-
-      // Step 2: Query coaching sessions with pharmacist name
+      // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1: query directly by users.id
       const sessions = await dataSource.query(
         `SELECT
           cs.id,
@@ -65,7 +51,7 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
         WHERE cs.patient_id = $1
         ORDER BY cs.created_at DESC
         LIMIT 50`,
-        [customerId],
+        [user.id],
       );
 
       res.json({ success: true, data: sessions });

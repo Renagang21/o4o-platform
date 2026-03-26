@@ -33,7 +33,7 @@ export function createCgmEventAnalysisRouter(dataSource: DataSource): Router {
         // Patient ownership guard (same pattern as care-analysis.controller.ts)
         if (pharmacyId) {
           const ownerCheck = await dataSource.query(
-            `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE id = $1 LIMIT 1`,
+            `SELECT id, organization_id, pharmacist_id FROM glucoseview_customers WHERE (user_id = $1 OR id = $1) LIMIT 1`,
             [patientId],
           );
           if (ownerCheck.length === 0) {
