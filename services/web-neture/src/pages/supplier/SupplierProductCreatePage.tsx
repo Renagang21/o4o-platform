@@ -79,7 +79,7 @@ export default function SupplierProductCreatePage() {
     priceGeneral: '',
     consumerReferencePrice: '',
     stockQty: '',
-    regulatoryType: '건강기능식품',
+    regulatoryType: 'HEALTH_FUNCTIONAL',
     regulatoryName: '',
     mfdsPermitNumber: '',
     specification: '',
@@ -475,11 +475,11 @@ export default function SupplierProductCreatePage() {
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
-                    <option value="건강기능식품">건강기능식품</option>
-                    <option value="의약외품">의약외품</option>
-                    <option value="화장품">화장품</option>
-                    <option value="의료기기">의료기기</option>
-                    <option value="일반">일반</option>
+                    <option value="HEALTH_FUNCTIONAL">건강기능식품</option>
+                    <option value="DRUG">의약품</option>
+                    <option value="QUASI_DRUG">의약외품</option>
+                    <option value="COSMETIC">화장품</option>
+                    <option value="GENERAL">일반</option>
                   </select>
                 </div>
                 <div>

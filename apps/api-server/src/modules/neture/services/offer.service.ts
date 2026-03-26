@@ -15,6 +15,28 @@ import { OfferServiceApprovalService } from './offer-service-approval.service.js
 import type { NetureCatalogService } from './catalog.service.js';
 
 /**
+ * WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 허용 규제 유형 (코드 레벨 enum, DB VARCHAR 유지)
+ */
+const REGULATORY_TYPES = ['DRUG', 'HEALTH_FUNCTIONAL', 'QUASI_DRUG', 'COSMETIC', 'GENERAL'] as const;
+type RegulatoryType = (typeof REGULATORY_TYPES)[number];
+
+/** 한글 입력 → 영문 코드 매핑 (하위호환) */
+const REGULATORY_TYPE_ALIAS: Record<string, RegulatoryType> = {
+  '의약품': 'DRUG',
+  '건강기능식품': 'HEALTH_FUNCTIONAL',
+  '의약외품': 'QUASI_DRUG',
+  '화장품': 'COSMETIC',
+  '일반': 'GENERAL',
+};
+
+function resolveRegulatoryType(raw?: string): RegulatoryType | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if ((REGULATORY_TYPES as readonly string[]).includes(trimmed)) return trimmed as RegulatoryType;
+  return REGULATORY_TYPE_ALIAS[trimmed] || null;
+}
+
+/**
  * NetureOfferService
  *
  * Offer CRUD, approval/rejection, supplier products, operator supply dashboard.
@@ -85,6 +107,22 @@ export class NetureOfferService {
       }
       if (offer.approvalStatus !== OfferApprovalStatus.PENDING) {
         return { success: false, error: 'INVALID_APPROVAL_STATUS' };
+      }
+
+      // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 permit 게이트
+      const masterForApproval: Array<{
+        mfds_permit_number: string | null;
+        category_id: string | null;
+        is_regulated: boolean | null;
+      }> = await AppDataSource.query(
+        `SELECT pm.mfds_permit_number, pm.category_id, pc.is_regulated
+         FROM product_masters pm
+         LEFT JOIN product_categories pc ON pc.id = pm.category_id
+         WHERE pm.id = $1`,
+        [offer.masterId],
+      );
+      if (masterForApproval.length > 0 && masterForApproval[0].is_regulated && !masterForApproval[0].mfds_permit_number) {
+        return { success: false, error: 'PERMIT_REQUIRED_FOR_APPROVAL' };
       }
 
       // 트랜잭션: Offer 승인 + PUBLIC 자동 확산 (원자적)
@@ -432,8 +470,15 @@ export class NetureOfferService {
         if (!manualData.regulatoryType || !manualData.regulatoryName) {
           return { success: false, error: 'REGULATED_FIELDS_REQUIRED' };
         }
+        // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: enum validation
+        const resolved = resolveRegulatoryType(manualData.regulatoryType);
+        if (!resolved) {
+          return { success: false, error: 'INVALID_REGULATORY_TYPE', message: `허용 규제 유형: ${REGULATORY_TYPES.join(', ')}` };
+        }
+        manualData.regulatoryType = resolved;
       } else {
-        manualData.regulatoryType = manualData.regulatoryType || '일반';
+        const resolved = resolveRegulatoryType(manualData.regulatoryType);
+        manualData.regulatoryType = resolved || 'GENERAL';
         manualData.regulatoryName = manualData.regulatoryName || marketingName || 'UNKNOWN';
       }
       if (marketingName) manualData.marketingName = marketingName;
@@ -453,6 +498,11 @@ export class NetureOfferService {
       const masterResult = await this.catalogService.resolveOrCreateMaster(barcode, manualData);
       if (!masterResult.success || !masterResult.data) {
         return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
+      }
+
+      // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 + MFDS 미검증 시 permit 필수
+      if (isRegulated && !masterResult.data.isMfdsVerified && !manualData.mfdsPermitNumber) {
+        return { success: false, error: 'PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED', message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
       }
 
       // Extended fields 적용
