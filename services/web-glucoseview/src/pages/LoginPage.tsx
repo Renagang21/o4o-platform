@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { getGlucoseviewDashboardRoute } from '../config/dashboard';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -20,7 +20,7 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
       if (result.success) {
-        navigate(getPrimaryDashboardRoute(result.roles ?? []));
+        navigate(getGlucoseviewDashboardRoute(result.roles ?? []));
       } else {
         setError(result.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
       }

@@ -9,34 +9,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLoginModal } from '../contexts/LoginModalContext';
 import { AIChatButton } from './ai';
 import ServiceSwitcher from './ServiceSwitcher';
-import { getPrimaryDashboardRoute } from '@o4o/auth-utils';
+import { ROLE_LABELS, getGlucoseviewDashboardRoute } from '../config/dashboard';
 
 const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
-const ROLE_LABELS: Record<string, string> = {
-  'platform:super_admin': '최고 관리자',
-  'glucoseview:admin': '관리자',
-  'glucoseview:operator': '운영자',
-  'glucoseview:pharmacist': '약사',
-  'glucoseview:patient': '당뇨인',
-};
-
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role → dashboard path
-const GV_ROLE_PRIORITY = [
-  'platform:super_admin',
-  'glucoseview:admin',
-  'glucoseview:operator',
-  'glucoseview:pharmacist',
-  'glucoseview:patient',
-] as const;
-
-const GV_DASHBOARD_MAP: Record<string, string> = {
-  'platform:super_admin': '/admin',
-  'glucoseview:admin': '/admin',
-  'glucoseview:operator': '/operator',
-  'glucoseview:pharmacist': '/',
-  'glucoseview:patient': '/patient',
-};
 
 const navItems = [
   { path: '/', label: 'Home', protected: false },
@@ -186,7 +161,7 @@ export default function Layout() {
                         <div className="py-1">
                           {/* 대표 대시보드 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
                           {user?.roles?.[0] && user.roles[0] !== 'glucoseview:patient' && (() => {
-                            const dp = getPrimaryDashboardRoute(user.roles, [...GV_ROLE_PRIORITY], GV_DASHBOARD_MAP);
+                            const dp = getGlucoseviewDashboardRoute(user.roles);
                             const rl = ROLE_LABELS[user.roles[0]] || user.roles[0];
                             return (
                               <NavLink

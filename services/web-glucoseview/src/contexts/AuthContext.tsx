@@ -8,7 +8,7 @@
  */
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
 import { getAccessToken, clearAllTokens } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -61,20 +61,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-/**
- * JWT roles를 그대로 사용 (prefix 유지).
- * 빈 배열이면 ['glucoseview:patient'] fallback.
- */
-function extractRoles(apiUser: any): string[] {
-  const raw: string[] =
-    Array.isArray(apiUser.roles) && apiUser.roles.length > 0
-      ? apiUser.roles
-      : apiUser.role
-        ? [apiUser.role]
-        : [];
-  return raw.length > 0 ? raw : ['glucoseview:patient'];
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const roles = extractRoles(apiUser);
+          const roles = extractRoles(apiUser, ['glucoseview:patient']);
 
           // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
           if (!roles.includes('glucoseview:patient')) {
@@ -129,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await authClient.login({ email, password });
       const apiUser = result.user as any;
       if (apiUser) {
-        const roles = extractRoles(apiUser);
+        const roles = extractRoles(apiUser, ['glucoseview:patient']);
 
         // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
         if (!roles.includes('glucoseview:patient')) {

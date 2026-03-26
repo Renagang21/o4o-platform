@@ -8,7 +8,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
-import { parseAuthResponse, normalizeUser, resolveAuthError } from '@o4o/auth-utils';
+import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
 import { authClient, api } from '../lib/apiClient';
 
@@ -81,20 +81,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// WO-O4O-AUTH-RBAC-UNIFICATION-V2: raw JWT prefixed roles 직접 사용
-// JWT roles are already prefixed (e.g. 'glycopharm:admin', 'platform:super_admin')
-
-/** Extract roles array from API user object — raw JWT roles, no mapping */
-function extractRoles(apiUser: any): string[] {
-  if (Array.isArray(apiUser.roles) && apiUser.roles.length > 0) {
-    return apiUser.roles;
-  }
-  // Fallback: single role field
-  if (apiUser.role) {
-    return [apiUser.role];
-  }
-  return [];
-}
+// WO-O4O-AUTH-FLOW-SIMPLIFICATION-V1: dashboard config → config/dashboard.ts로 분리, 하위 호환 re-export
+export { GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP, getGlycopharmDashboardRoute } from '../config/dashboard';
 
 // GlycoPharm prefixed role constants
 export const GLYCOPHARM_ROLES = {
@@ -124,25 +112,6 @@ export const ROLE_ICONS: Record<string, string> = {
   [GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]: '👑',
 };
 
-// Dashboard routing for prefixed roles
-export const GLYCOPHARM_ROLE_PRIORITY: readonly string[] = [
-  GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN,
-  GLYCOPHARM_ROLES.ADMIN,
-  GLYCOPHARM_ROLES.OPERATOR,
-  GLYCOPHARM_ROLES.SUPPLIER,
-  GLYCOPHARM_ROLES.PHARMACY,
-  GLYCOPHARM_ROLES.CONSUMER,
-];
-
-export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
-  [GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]: '/admin',
-  [GLYCOPHARM_ROLES.ADMIN]: '/admin',
-  [GLYCOPHARM_ROLES.OPERATOR]: '/operator',
-  [GLYCOPHARM_ROLES.SUPPLIER]: '/supplier',
-  [GLYCOPHARM_ROLES.PHARMACY]: '/care',
-  [GLYCOPHARM_ROLES.CONSUMER]: '/',
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   // 토큰이 있으면 세션 확인 필요, 없으면 바로 로딩 완료
@@ -166,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = response.data;
         const { user: apiUser } = parseAuthResponse(data);
         if (apiUser) {
-          const rawRoles = extractRoles(apiUser);
+          const rawRoles = extractRoles(apiUser, []);
           const base = normalizeUser(apiUser);
           const userData: User = {
             ...apiUser,
@@ -196,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const apiUser = result.user as any;
 
       if (apiUser) {
-        const rawRoles = extractRoles(apiUser);
+        const rawRoles = extractRoles(apiUser, []);
         const base = normalizeUser(apiUser);
         const typedUser: User = {
           ...apiUser,
