@@ -81,7 +81,7 @@ export function createPharmacyProductsController(
          spo.created_at AS "createdAt",
          spo.updated_at AS "updatedAt",
          s.id AS "supplierId",
-         s.name AS "supplierName",
+         COALESCE(o.name, s.name) AS "supplierName",
          s.logo_url AS "supplierLogoUrl",
          s.category AS "supplierCategory",
          -- 내 신청/진열 상태 (v2: product_approvals)
@@ -105,6 +105,7 @@ export function createPharmacyProductsController(
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
+       LEFT JOIN organizations o ON o.id = s.organization_id
        WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
          AND spo.is_active = true
          AND s.status = 'ACTIVE'

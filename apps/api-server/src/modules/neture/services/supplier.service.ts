@@ -548,16 +548,21 @@ export class NetureSupplierService {
       if (data.businessType !== undefined) supplier.businessType = data.businessType || null;
       if (data.taxEmail !== undefined) supplier.taxEmail = data.taxEmail || null;
 
-      await this.supplierRepo.save(supplier);
-
-      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: sync business data to organizations
-      const orgSyncNeeded =
+      // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 4-A: org-primary write → supplier reverse-sync
+      const orgWriteNeeded =
         data.businessNumber !== undefined ||
         data.businessAddress !== undefined ||
         data.contactPhone !== undefined;
-      if (orgSyncNeeded) {
-        await this.syncOrgBusinessData(supplier);
+      if (orgWriteNeeded && supplier.organizationId) {
+        await this.writeOrgBusinessData(supplier.organizationId, {
+          name: supplier.name,
+          business_number: supplier.businessNumber,
+          address: supplier.businessAddress,
+          phone: supplier.contactPhone ? supplier.contactPhone.replace(/\D/g, '') : null,
+        });
       }
+
+      await this.supplierRepo.save(supplier);
 
       return {
         id: supplier.id,
@@ -831,27 +836,23 @@ export class NetureSupplierService {
   }
 
   /**
-   * Update organizations record when supplier business data changes.
-   * Only syncs fields that are org-canonical: name, business_number, address, phone.
+   * WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 4-A:
+   * Write business data to organizations as primary target.
+   * Org is SSOT for name, business_number, address, phone.
    */
-  private async syncOrgBusinessData(supplier: NetureSupplier): Promise<void> {
-    if (!supplier.organizationId) return;
-
+  private async writeOrgBusinessData(
+    organizationId: string,
+    data: { name: string; business_number: string | null; address: string | null; phone: string | null },
+  ): Promise<void> {
     try {
       await AppDataSource.query(
         `UPDATE organizations
          SET name = $1, business_number = $2, address = $3, phone = $4, "updatedAt" = NOW()
          WHERE id = $5`,
-        [
-          supplier.name,
-          supplier.businessNumber || null,
-          supplier.businessAddress || null,
-          supplier.contactPhone || null,
-          supplier.organizationId,
-        ],
+        [data.name, data.business_number, data.address, data.phone, organizationId],
       );
     } catch (error) {
-      logger.warn(`[NetureSupplierService] Org business data sync failed for org ${supplier.organizationId}:`, error);
+      logger.warn(`[NetureSupplierService] Org business write failed for org ${organizationId}:`, error);
     }
   }
 

@@ -29,6 +29,7 @@ export class NetureSupplier {
   @Column({ unique: true })
   slug: string;
 
+  /** @deprecated WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1: Use organizations.name via organizationId */
   @Column()
   name: string;
 
@@ -85,12 +86,14 @@ export class NetureSupplier {
 
   // === Business Profile Fields (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1) ===
 
+  /** @deprecated WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1: Use organizations.business_number via organizationId */
   @Column({ name: 'business_number', type: 'varchar', length: 20, nullable: true })
   businessNumber: string | null;
 
   @Column({ name: 'representative_name', type: 'varchar', length: 100, nullable: true })
   representativeName: string | null;
 
+  /** @deprecated WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1: Use organizations.address via organizationId */
   @Column({ name: 'business_address', type: 'text', nullable: true })
   businessAddress: string | null;
 

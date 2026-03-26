@@ -144,7 +144,7 @@ export class PartnerCommissionService {
 
     const [commissions, countResult] = await Promise.all([
       this.dataSource.query(
-        `SELECT pc.id, pc.partner_id, pc.supplier_id, ns.name AS supplier_name,
+        `SELECT pc.id, pc.partner_id, pc.supplier_id, COALESCE(o.name, ns.name) AS supplier_name,
                 pc.order_id, pc.order_number, pc.contract_id,
                 pc.commission_rate, pc.order_amount, pc.commission_amount,
                 pc.status, pc.period_start, pc.period_end,
@@ -152,6 +152,7 @@ export class PartnerCommissionService {
                 pc.created_at, pc.updated_at
          FROM partner_commissions pc
          LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+         LEFT JOIN organizations o ON o.id = ns.organization_id
          WHERE pc.partner_id = $1 ${statusClause}
          ORDER BY pc.created_at DESC
          LIMIT ${limit} OFFSET ${offset}`,
@@ -178,9 +179,10 @@ export class PartnerCommissionService {
    */
   async getPartnerCommissionDetail(commissionId: string, partnerId: string) {
     const rows = await this.dataSource.query(
-      `SELECT pc.*, ns.name AS supplier_name
+      `SELECT pc.*, COALESCE(o.name, ns.name) AS supplier_name
        FROM partner_commissions pc
        LEFT JOIN neture_suppliers ns ON ns.id = pc.supplier_id
+       LEFT JOIN organizations o ON o.id = ns.organization_id
        WHERE pc.id = $1 AND pc.partner_id = $2 LIMIT 1`,
       [commissionId, partnerId],
     );

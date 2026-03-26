@@ -283,7 +283,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
           pm.manufacturer_name,
           pm.brand_name,
           pm.specification,
-          ns.name AS supplier_name,
+          COALESCE(o.name, ns.name) AS supplier_name,
           ns.id AS supplier_id,
           spo.price_general,
           spo.consumer_reference_price,
@@ -294,6 +294,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         FROM supplier_product_offers spo
         LEFT JOIN product_masters pm ON pm.id = spo.master_id
         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+        LEFT JOIN organizations o ON o.id = ns.organization_id
         LEFT JOIN LATERAL (
           SELECT spp.display_name, spp.description, spp.pharmacist_comment
           FROM store_product_profiles spp
@@ -336,7 +337,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
           pm.manufacturer_name,
           pm.brand_name,
           pm.specification,
-          ns.name AS supplier_name,
+          COALESCE(o.name, ns.name) AS supplier_name,
           ns.slug AS store_slug,
           ns.id AS supplier_id,
           spo.price_general,
@@ -348,6 +349,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         FROM supplier_product_offers spo
         LEFT JOIN product_masters pm ON pm.id = spo.master_id
         JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+        LEFT JOIN organizations o ON o.id = ns.organization_id
         LEFT JOIN LATERAL (
           SELECT spp.display_name, spp.description, spp.pharmacist_comment
           FROM store_product_profiles spp
@@ -394,7 +396,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         SELECT
           COALESCE(pm.marketing_name, 'Unknown') AS product_name,
           pm.brand_name,
-          ns.name AS supplier_name,
+          COALESCE(o.name, ns.name) AS supplier_name,
           spo.price_general,
           spo.slug AS product_slug,
           ns.slug AS store_slug,
@@ -404,6 +406,7 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         FROM supplier_product_offers spo
         LEFT JOIN product_masters pm ON pm.id = spo.master_id
         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+        LEFT JOIN organizations o ON o.id = ns.organization_id
         LEFT JOIN LATERAL (
           SELECT spp.pharmacist_comment, spp.display_name
           FROM store_product_profiles spp

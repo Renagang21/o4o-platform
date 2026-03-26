@@ -101,7 +101,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     // WO-O4O-SUPPLIER-PRODUCT-REGISTRATION-REFINEMENT-V1 (3.4)
     // 확장 필드: descriptions, price tiers, brand, manufacturer
     const offers = await dataSource.query(
-      `SELECT spo.id, spo.supplier_id AS "supplierId", s.name AS "supplierName",
+      `SELECT spo.id, spo.supplier_id AS "supplierId", COALESCE(o.name, s.name) AS "supplierName",
               spo.price_general AS "priceGeneral",
               spo.price_gold AS "priceGold",
               spo.price_platinum AS "pricePlatinum",
@@ -112,6 +112,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
               pm.manufacturer_name AS "manufacturerName"
        FROM supplier_product_offers spo
        JOIN neture_suppliers s ON s.id = spo.supplier_id
+       LEFT JOIN organizations o ON o.id = s.organization_id
        LEFT JOIN product_masters pm ON pm.id = spo.master_id
        WHERE spo.master_id = $1
          AND spo.approval_status = 'APPROVED'
@@ -189,11 +190,12 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
                 (SELECT pi.image_url FROM product_images pi
                  WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "primaryImage",
                 spo.price_general AS "offerPrice", spo.distribution_type AS "distributionType",
-                s.name AS "supplierName"
+                COALESCE(o.name, s.name) AS "supplierName"
          FROM organization_product_listings opl
          LEFT JOIN product_masters pm ON opl.master_id = pm.id
          LEFT JOIN supplier_product_offers spo ON opl.offer_id = spo.id
          LEFT JOIN neture_suppliers s ON s.id = spo.supplier_id
+         LEFT JOIN organizations o ON o.id = s.organization_id
          WHERE opl.organization_id = $1
          ORDER BY opl.created_at DESC
          LIMIT $2 OFFSET $3`,
