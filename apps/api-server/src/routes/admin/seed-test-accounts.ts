@@ -37,7 +37,7 @@ const TEST_ACCOUNTS: TestAccount[] = [
     email: 'pharmacist_test@glycopharm.co.kr',
     name: '테스트 약국',
     membershipRole: 'pharmacy',
-    assignedRole: 'pharmacy',
+    assignedRole: 'glycopharm:pharmacy',
   },
 ];
 
@@ -82,7 +82,7 @@ router.post('/', async (_req: Request, res: Response): Promise<void> => {
       logs.push(`[SEED]   role: ${account.assignedRole}`);
 
       // 4. For pharmacy role: ensure organization + enrollment + membership
-      if (account.assignedRole === 'pharmacy') {
+      if (account.assignedRole === 'glycopharm:pharmacy') {
         // 4a. Find or create organization for this pharmacist
         const existingOrg = await AppDataSource.query(
           `SELECT id FROM organizations WHERE created_by_user_id = $1 LIMIT 1`,
