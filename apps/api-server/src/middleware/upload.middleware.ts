@@ -77,8 +77,22 @@ const ALLOWED_EXTENSIONS = [
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'
 ];
 
+// WO-O4O-NETURE-UPLOAD-VALIDATION-REFORM-V1
+// 데이터 파일(.xlsx/.csv)은 MIME에 의존하지 않고 확장자로 허용, 실제 검증은 파싱으로.
+const DATA_FILE_EXTENSIONS = ['.xlsx', '.xls', '.csv'];
+
 // Custom file filter
 const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  // 데이터 파일: MIME 무관하게 확장자만으로 허용 (실제 검증은 파싱 단계에서)
+  if (DATA_FILE_EXTENSIONS.includes(ext)) {
+    if (file.mimetype !== 'text/csv' && !file.mimetype.includes('sheet') && !file.mimetype.includes('excel')) {
+      logger.info(`[Upload] Accepted data file by extension: ${file.originalname} (MIME: ${file.mimetype})`);
+    }
+    return cb(null, true);
+  }
+
   // More flexible MIME type checking using pattern matching
   const allowedPatterns = [
     /^image\//,           // All image types
@@ -99,7 +113,6 @@ const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
 
   // If MIME type is application/octet-stream, check file extension
   if (file.mimetype === 'application/octet-stream') {
-    const ext = file.originalname.substring(file.originalname.lastIndexOf('.')).toLowerCase();
     const isAllowedByExtension = ALLOWED_EXTENSIONS.includes(ext);
 
     if (isAllowedByExtension) {
