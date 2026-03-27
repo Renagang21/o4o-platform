@@ -153,14 +153,14 @@ export function EditableDataTable<T extends Record<string, any>>({
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="min-w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   style={col.width ? { width: col.width } : undefined}
-                  className={`px-4 py-3 text-xs font-medium text-slate-500 uppercase ${alignClass(col.align)}`}
+                  className={`px-4 py-3 text-xs font-medium text-slate-500 uppercase whitespace-nowrap ${alignClass(col.align)}`}
                 >
                   {col.header}
                 </th>
@@ -243,7 +243,7 @@ export function EditableDataTable<T extends Record<string, any>>({
                               ? () => handleCellClick(rKey, col)
                               : undefined
                           }
-                          className={`px-4 py-3 text-sm text-slate-700 ${alignClass(col.align)} ${col.editable ? 'cursor-pointer hover:bg-blue-50' : ''}`}
+                          className={`px-4 py-3 text-sm text-slate-700 whitespace-nowrap ${alignClass(col.align)} ${col.editable ? 'cursor-pointer hover:bg-blue-50' : ''}`}
                         >
                           {content}
                         </td>
