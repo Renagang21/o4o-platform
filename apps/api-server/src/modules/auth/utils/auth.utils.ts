@@ -1,28 +1,7 @@
-import bcrypt from 'bcryptjs';
 import { UserRole } from '../entities/User.js';
 
-/**
- * Hash a plain text password
- * @param password - Plain text password
- * @returns Hashed password
- */
-export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10');
-  return await bcrypt.hash(password, saltRounds);
-}
-
-/**
- * Compare plain text password with hashed password
- * @param password - Plain text password
- * @param hashedPassword - Hashed password from database
- * @returns True if passwords match
- */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(password, hashedPassword);
-}
+// WO-O4O-DEAD-CODE-CLEANUP-V1: 중복 제거 — 표준 구현 re-export
+export { hashPassword, comparePassword } from '../../../utils/auth.utils.js';
 
 /**
  * Get default permissions for a given role

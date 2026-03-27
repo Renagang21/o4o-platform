@@ -45,24 +45,3 @@ export const PROFILE_MAP: Record<string, ProfileConfig> = {
   },
 } as const;
 
-// ─── Utility Functions ───────────────────────────────────────────────────
-
-/** role에 대응하는 profile 테이블 이름 반환. 없으면 null. */
-export function getProfileTableName(role: string): string | null {
-  return PROFILE_MAP[role]?.table ?? null;
-}
-
-/** role에 profile 매핑이 존재하는지 확인. */
-export function hasProfileMapping(role: string): boolean {
-  return role in PROFILE_MAP;
-}
-
-/** 서비스별 profile config 목록 필터. */
-export function getProfilesByService(service: string): ProfileConfig[] {
-  return Object.values(PROFILE_MAP).filter(c => c.service === service);
-}
-
-/** 전체 profile-mapped role 목록. */
-export function getProfileMappedRoles(): string[] {
-  return Object.keys(PROFILE_MAP);
-}

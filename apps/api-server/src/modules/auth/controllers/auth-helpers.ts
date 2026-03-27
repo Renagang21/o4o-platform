@@ -6,8 +6,6 @@
  */
 import { Request } from 'express';
 import { AppDataSource } from '../../../database/connection.js';
-import { PROFILE_MAP } from '@o4o/auth-utils';
-
 /**
  * Check if request is cross-origin.
  * Cross-origin requests need tokens in response body since cookies won't work.
@@ -183,60 +181,3 @@ export async function deriveKpaMembershipContext(userId: string): Promise<KpaMem
   };
 }
 
-// ─── WO-O4O-PROFILE-ABSTRACTION-V1: Unified Profile Layer ───────────────
-
-/**
- * role에 대응하는 profile 존재 여부 확인.
- * PROFILE_MAP에 등록된 role만 지원.
- */
-export async function hasProfile(userId: string, role: string): Promise<boolean> {
-  const config = PROFILE_MAP[role];
-  if (!config) return false;
-
-  try {
-    const [row] = await AppDataSource.query(
-      `SELECT 1 FROM ${config.table} WHERE user_id = $1 LIMIT 1`,
-      [userId]
-    );
-    return !!row;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * role에 대응하는 profile 레코드 조회 (전체 컬럼).
- * PROFILE_MAP에 등록된 role만 지원.
- */
-export async function getProfile(userId: string, role: string): Promise<Record<string, unknown> | null> {
-  const config = PROFILE_MAP[role];
-  if (!config) return null;
-
-  try {
-    const [row] = await AppDataSource.query(
-      `SELECT * FROM ${config.table} WHERE user_id = $1 LIMIT 1`,
-      [userId]
-    );
-    return row || null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * 통합 프로필 자격 조회.
- * role 기반으로 적절한 derive 함수를 디스패치.
- */
-export async function deriveProfileQualification(
-  userId: string,
-  role: string,
-): Promise<Record<string, unknown> | null> {
-  switch (role) {
-    case 'kpa:pharmacist':
-      return derivePharmacistQualification(userId);
-    case 'kpa:student':
-      return deriveStudentQualification(userId);
-    default:
-      return getProfile(userId, role);
-  }
-}

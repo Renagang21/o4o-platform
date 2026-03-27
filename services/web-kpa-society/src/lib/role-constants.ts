@@ -16,12 +16,6 @@ export const ROLES = {
   KPA_ADMIN: 'kpa:admin',
   KPA_OPERATOR: 'kpa:operator',
 
-  // KPA-a 커뮤니티
-  /** @deprecated WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환 완료. 자격 판단은 profile 사용. */
-  KPA_PHARMACIST: 'kpa:pharmacist',
-  /** @deprecated WO-KPA-A-ROLE-CLEANUP-V1: profile 기반 전환 완료. 자격 판단은 membershipType 사용. */
-  KPA_STUDENT: 'kpa:student',
-
   // KPA-b 레거시/데모 (격리, 제거 예정)
   KPA_DISTRICT_ADMIN: 'kpa:district_admin',
   KPA_BRANCH_ADMIN: 'kpa:branch_admin',
