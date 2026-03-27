@@ -617,6 +617,12 @@ export * from './ag-components';
 
 // Shared Components (BaseTable etc.)
 export * from './components/table/BaseTable';
+export { useTableSort } from './components/table/useTableSort';
+export type { SortOrder, SortState, UseTableSortOptions, UseTableSortReturn } from './components/table/useTableSort';
+export { useTableFilter } from './components/table/useTableFilter';
+export type { FilterValue, FilterFn, UseTableFilterOptions, UseTableFilterReturn } from './components/table/useTableFilter';
+export { useVirtualScroll } from './components/table/useVirtualScroll';
+export type { UseVirtualScrollOptions, UseVirtualScrollReturn } from './components/table/useVirtualScroll';
 
 // Layout Components
 export * from './layout';
