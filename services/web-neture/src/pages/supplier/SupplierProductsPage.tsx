@@ -14,7 +14,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Sparkles, ImagePlus, X } from 'lucide-react';
+import { Search, Plus, Sparkles, ImagePlus, X, Eye } from 'lucide-react';
 import {
   EditableDataTable,
   SearchBar,
@@ -22,6 +22,7 @@ import {
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
+import ProductDetailDrawer from './ProductDetailDrawer';
 
 // ─── Badge configs ───
 
@@ -545,6 +546,9 @@ export default function SupplierProductsPage() {
   const [descEditProduct, setDescEditProduct] = useState<SupplierProduct | null>(null);
   const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
 
+  // Drawer state (WO-O4O-NETURE-SUPPLIER-DRAWER-V1)
+  const [drawerProduct, setDrawerProduct] = useState<SupplierProduct | null>(null);
+
   // Continuous workflow state
   const [autoNext, setAutoNext] = useState(true);
   const [highlightRowId, setHighlightRowId] = useState<string | null>(null);
@@ -754,7 +758,24 @@ export default function SupplierProductsPage() {
     const barcodeIdx = cols.findIndex((c) => c.key === 'barcode');
     if (barcodeIdx >= 0) cols.splice(barcodeIdx + 1, 0, regulatoryCol);
 
-    return [selectCol, ...cols];
+    // WO-O4O-NETURE-SUPPLIER-DRAWER-V1: 상세 보기 버튼 컬럼
+    const detailCol: ListColumnDef<SupplierProduct> = {
+      key: '_detail' as any,
+      header: '',
+      width: '40px',
+      align: 'center',
+      render: (_v: any, row: SupplierProduct) => (
+        <button
+          onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
+          className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+          title="상세 보기"
+        >
+          <Eye size={15} />
+        </button>
+      ),
+    };
+
+    return [selectCol, ...cols, detailCol];
   }, [products, selectedIds, highlightRowId]);
 
   const handleGenerateAiTags = async (masterId: string) => {
@@ -781,6 +802,7 @@ export default function SupplierProductsPage() {
     setProducts(result.data);
     setPagination(result.pagination);
     setSelectedIds(new Set());
+    setDrawerProduct(null);
     setLoading(false);
   }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
 
@@ -1047,6 +1069,14 @@ export default function SupplierProductsPage() {
           onClose={() => setRegulatoryProduct(null)}
         />
       )}
+
+      {/* Product Detail Drawer (WO-O4O-NETURE-SUPPLIER-DRAWER-V1 / EDITABLE-V1) */}
+      <ProductDetailDrawer
+        product={drawerProduct}
+        open={!!drawerProduct}
+        onClose={() => setDrawerProduct(null)}
+        onSaved={() => fetchProducts(pagination.page)}
+      />
     </div>
   );
 }

@@ -387,6 +387,10 @@ const ProductCurationPage = lazy(() =>
 const OperatorActionQueuePage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorActionQueuePage }))
 );
+// WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
+const OperatorProductApprovalPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.OperatorProductApprovalPage }))
+);
 
 // WO-NETURE-CATEGORY-MANAGEMENT-V1
 const CategoryManagementPage = lazy(() =>
@@ -841,6 +845,7 @@ function App() {
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
+              <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
               <Route path="/operator/curation" element={<ProductCurationPage />} />
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
             </Route>

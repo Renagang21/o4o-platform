@@ -37,3 +37,5 @@ export { default as ProductServiceApprovalPage } from './ProductServiceApprovalP
 export { default as ProductCurationPage } from './ProductCurationPage';
 // WO-O4O-OPERATOR-ACTION-QUEUE-V1
 export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
+// WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
+export { default as OperatorProductApprovalPage } from './OperatorProductApprovalPage';

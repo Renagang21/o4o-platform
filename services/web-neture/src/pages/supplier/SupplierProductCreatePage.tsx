@@ -17,16 +17,9 @@ import {
   type AdminMaster,
   type CategoryTreeItem,
 } from '../../lib/api';
+import { ProductForm, type ProductFormData } from '../../components/product';
 
 const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
-
-const AVAILABLE_SERVICES = [
-  { key: 'neture', name: 'Neture' },
-  { key: 'glycopharm', name: 'GlycoPharm' },
-  { key: 'glucoseview', name: 'GlucoseView' },
-  { key: 'kpa-society', name: 'KPA Society' },
-  { key: 'k-cosmetics', name: 'K-Cosmetics' },
-];
 
 interface FormData {
   barcode: string;
@@ -156,12 +149,15 @@ export default function SupplierProductCreatePage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const toggleServiceKey = (key: string) => {
+  // WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1: ProductForm onChange → parent form sync
+  const handleProductFormChange = (data: ProductFormData) => {
     setForm((prev) => ({
       ...prev,
-      serviceKeys: prev.serviceKeys.includes(key)
-        ? prev.serviceKeys.filter((k) => k !== key)
-        : [...prev.serviceKeys, key],
+      priceGeneral: data.priceGeneral != null ? String(data.priceGeneral) : '',
+      consumerReferencePrice: data.consumerReferencePrice != null ? String(data.consumerReferencePrice) : '',
+      stockQty: data.stockQuantity ? String(data.stockQuantity) : '',
+      distributionType: data.distributionType || prev.distributionType,
+      serviceKeys: data.serviceKeys || prev.serviceKeys,
     }));
   };
 
@@ -513,118 +509,21 @@ export default function SupplierProductCreatePage() {
         </>
       )}
 
-      {/* ==================== Step 2: 가격 / 유통 / 서비스 ==================== */}
+      {/* ==================== Step 2: 가격 / 유통 / 서비스 (WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1) ==================== */}
       {currentStep === 2 && (
-        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-5">
-          <h3 className="text-lg font-semibold text-slate-800">가격 / 유통 / 서비스</h3>
-
-          {/* Supply Price */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              공급가 (원) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              name="priceGeneral"
-              value={form.priceGeneral}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="0"
-              min="0"
-              autoFocus
-            />
-          </div>
-
-          {/* Consumer Reference Price */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">소비자 가격 (원)</label>
-            <input
-              type="number"
-              name="consumerReferencePrice"
-              value={form.consumerReferencePrice}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="선택"
-              min="0"
-            />
-          </div>
-
-          {/* Stock Quantity */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              재고 수량 <span className="text-xs text-slate-400">(선택)</span>
-            </label>
-            <input
-              type="number"
-              name="stockQty"
-              value={form.stockQty}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="0"
-              min="0"
-            />
-            <p className="mt-1 text-xs text-slate-400">미입력 시 0으로 처리됩니다</p>
-          </div>
-
-          {/* Distribution type */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">유통 정책</label>
-            <div className="space-y-2">
-              {[
-                { value: 'PRIVATE', label: '비공개', desc: '지정된 판매자에게만 노출 (기본)' },
-                { value: 'SERVICE', label: '서비스', desc: '서비스 참여 승인 후 노출' },
-                { value: 'PUBLIC', label: '공개', desc: '모든 판매자에게 자동 노출' },
-              ].map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.distributionType === opt.value
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="distributionType"
-                    value={opt.value}
-                    checked={form.distributionType === opt.value}
-                    onChange={handleChange}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="font-medium text-slate-800">{opt.label}</p>
-                    <p className="text-sm text-slate-500">{opt.desc}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Service Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">서비스 선택</label>
-            <p className="text-xs text-slate-400 mb-3">이 상품을 노출할 서비스를 선택하세요</p>
-            <div className="grid grid-cols-2 gap-2">
-              {AVAILABLE_SERVICES.map((svc) => (
-                <label
-                  key={svc.key}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    form.serviceKeys.includes(svc.key)
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={form.serviceKeys.includes(svc.key)}
-                    onChange={() => toggleServiceKey(svc.key)}
-                    className="w-4 h-4 text-emerald-600 rounded"
-                  />
-                  <span className="text-sm font-medium text-slate-700">{svc.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-slate-800 mb-5">가격 / 유통 / 서비스</h3>
+          <ProductForm
+            mode="create"
+            initialData={{
+              priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
+              consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
+              stockQuantity: Number(form.stockQty) || 0,
+              distributionType: form.distributionType,
+              serviceKeys: form.serviceKeys,
+            }}
+            onChange={handleProductFormChange}
+          />
         </div>
       )}
 
