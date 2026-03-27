@@ -2,6 +2,7 @@
  * DataTable — O4O Platform Standard Data Table
  *
  * WO-O4O-DATATABLE-BASE-ALIGN-V1 — BaseTable 기반 재구성
+ * WO-O4O-TABLE-COLUMN-TYPE-UNIFICATION-V1 — O4OColumn 통합
  *
  * BaseTable 렌더링 엔진 위의 thin wrapper.
  * 정렬, 페이지네이션, 행 선택, 확장 행 기능 제공.
@@ -10,7 +11,8 @@
 
 import React, { ReactNode, useState } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { BaseTable, type BaseColumn } from '../components/table/BaseTable';
+import { BaseTable } from '../components/table/BaseTable';
+import type { O4OColumn } from '../components/table/types';
 
 export interface Column<T> {
   key: string;
@@ -152,13 +154,13 @@ export function DataTable<T extends Record<string, any>>({
     }
   }
 
-  // ─── Column Mapping: Column<T> → BaseColumn<T> ───
+  // ─── Column Mapping: Column<T> → O4OColumn<T> ───
 
-  const baseColumns: BaseColumn<T>[] = [];
+  const o4oColumns: O4OColumn<T>[] = [];
 
   // Selection column (prepend)
   if (rowSelection) {
-    baseColumns.push({
+    o4oColumns.push({
       key: '__selection',
       header: (
         <input
@@ -170,7 +172,7 @@ export function DataTable<T extends Record<string, any>>({
       ),
       headerClassName: 'w-4',
       className: 'w-4',
-      render: (row, index) => {
+      render: (_value, row, index) => {
         const key = getRowKey(row, index);
         return (
           <input
@@ -187,7 +189,7 @@ export function DataTable<T extends Record<string, any>>({
 
   // Data columns
   for (const col of columns) {
-    baseColumns.push({
+    o4oColumns.push({
       key: col.key,
       header: (
         <div className="flex items-center gap-1">
@@ -197,12 +199,10 @@ export function DataTable<T extends Record<string, any>>({
       ),
       width: col.width,
       align: col.align,
+      accessor: col.dataIndex ? (row) => getValue(row, col.dataIndex) : undefined,
+      render: col.render,
       onHeaderClick: col.sortable ? () => handleSort(col.key) : undefined,
       headerClassName: col.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : undefined,
-      render: (row, index) => {
-        const value = getValue(row, col.dataIndex);
-        return col.render ? col.render(value, row, index) : value;
-      },
     });
   }
 
@@ -230,14 +230,14 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={`w-full ${className}`}>
       <BaseTable
-        columns={baseColumns}
+        columns={o4oColumns}
         data={sortedData}
         rowKey={(row, index) => getRowKey(row, index)}
         headerClassName="bg-gray-50"
         bodyClassName="bg-white divide-y divide-gray-200"
         thClassName="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
         tdClassName="px-6 py-4 text-sm text-gray-900"
-        rowClassName={(row, index) => {
+        rowClassName={(row) => {
           const rowProps = onRow?.(row) || {};
           const hasClick = !!(rowProps.onClick || onRowClick);
           return `hover:bg-gray-50 ${hasClick ? 'cursor-pointer' : ''} ${rowProps.className || ''}`;
@@ -252,7 +252,7 @@ export function DataTable<T extends Record<string, any>>({
           if (!expanded) return null;
           return (
             <tr className="bg-gray-50">
-              <td colSpan={baseColumns.length} className="px-6 py-4">
+              <td colSpan={o4oColumns.length} className="px-6 py-4">
                 {expandable.expandedRowRender(row)}
               </td>
             </tr>

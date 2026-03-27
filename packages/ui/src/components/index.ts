@@ -3,4 +3,4 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Button } from './Button';
 export type { ButtonProps } from './Button';
 export { BaseTable } from './table/BaseTable';
-export type { BaseColumn, BaseTableProps } from './table/BaseTable';
+export type { O4OColumn, BaseColumn, BaseTableProps } from './table/BaseTable';

@@ -2,8 +2,7 @@
  * BaseTable — O4O Platform Table Rendering Engine
  *
  * WO-O4O-TABLE-BASE-COMPONENT-V1
- * WO-O4O-EDITABLE-TABLE-REFACTOR-V1 — customization hooks 추가
- * WO-O4O-DATATABLE-BASE-ALIGN-V1 — renderAfterRow, header hooks 추가
+ * WO-O4O-TABLE-COLUMN-TYPE-UNIFICATION-V1 — O4OColumn + accessor 지원
  *
  * 모든 테이블의 공통 렌더링/레이아웃 엔진.
  * DataTable, EditableTable 등은 이 컴포넌트의 thin wrapper.
@@ -15,45 +14,10 @@
  */
 
 import { Fragment } from 'react';
-import type { ReactNode } from 'react';
+import type { BaseTableProps } from './types';
 
-// ─── Types ──────────────────────────────────────
-
-export interface BaseColumn<T> {
-  key: string;
-  header: ReactNode;
-  width?: number | string;
-  align?: 'left' | 'center' | 'right';
-  className?: string;
-  /** 행별 동적 td 클래스. 반환값이 있으면 tdClassName/className 대신 사용. */
-  cellClassName?: (row: T, rowIndex: number) => string;
-  /** 셀 클릭 핸들러 (editable cell 등에 사용) */
-  onCellClick?: (row: T, rowIndex: number) => void;
-  /** th 클릭 핸들러 (정렬 등에 사용) */
-  onHeaderClick?: () => void;
-  /** th에 추가할 클래스 (정렬 가능 표시 등) */
-  headerClassName?: string;
-  render?: (row: T, rowIndex: number) => ReactNode;
-}
-
-export interface BaseTableProps<T> {
-  columns: BaseColumn<T>[];
-  data: T[];
-  rowKey?: (row: T, index: number) => string;
-  className?: string;
-  headerClassName?: string;
-  bodyClassName?: string;
-  /** th 기본 클래스 오버라이드. whitespace-nowrap + align은 항상 적용. */
-  thClassName?: string;
-  /** td 기본 클래스 오버라이드. whitespace-nowrap + align은 항상 적용. */
-  tdClassName?: string;
-  /** 행 클래스. 제공하면 기본 hover 대신 사용. */
-  rowClassName?: (row: T, index: number) => string;
-  onRowClick?: (row: T, index: number) => void;
-  /** 각 행 뒤에 추가 콘텐츠 렌더링 (확장 행 등). null 반환 시 무시. */
-  renderAfterRow?: (row: T, index: number) => ReactNode;
-  emptyMessage?: ReactNode;
-}
+// Re-export types for convenience
+export type { O4OColumn, BaseColumn, BaseTableProps } from './types';
 
 // ─── Helpers ────────────────────────────────────
 
@@ -130,9 +94,12 @@ export function BaseTable<T extends Record<string, any>>({
                     className={rowCls}
                   >
                     {columns.map((col) => {
-                      const content = col.render
-                        ? col.render(row, rowIndex)
+                      const value = col.accessor
+                        ? col.accessor(row, rowIndex)
                         : row[col.key];
+                      const content = col.render
+                        ? col.render(value, row, rowIndex)
+                        : value;
 
                       const dynamicCls = col.cellClassName?.(row, rowIndex);
                       const cellCls = dynamicCls ?? `${tdBase} ${col.className ?? ''}`;

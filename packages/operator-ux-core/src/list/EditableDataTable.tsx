@@ -3,6 +3,7 @@
  *
  * WO-O4O-LIST-BASE-MODULE-V1
  * WO-O4O-EDITABLE-TABLE-REFACTOR-V1 — BaseTable 기반 재구성
+ * WO-O4O-TABLE-COLUMN-TYPE-UNIFICATION-V1 — O4OColumn 통합
  *
  * BaseTable 렌더링 엔진 위의 thin wrapper.
  * 셀 클릭 → input 전환, dirty tracking, batch save.
@@ -11,7 +12,8 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type React from 'react';
-import { BaseTable, type BaseColumn } from '@o4o/ui';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
 import type { EditableDataTableProps, ListColumnDef } from './types';
 
 interface EditingCell {
@@ -107,13 +109,18 @@ export function EditableDataTable<T extends Record<string, any>>({
     setEditingCell(null);
   };
 
-  // ─── Column Mapping: ListColumnDef → BaseColumn ───
+  // ─── Column Mapping: ListColumnDef → O4OColumn ───
 
-  const baseColumns: BaseColumn<T>[] = columns.map((col) => ({
+  const o4oColumns: O4OColumn<T>[] = columns.map((col) => ({
     key: col.key,
     header: col.header,
     width: col.width,
     align: col.align,
+
+    accessor: (row: T, index: number) => {
+      const rKey = getRowKeyValue(row, rowKey, index);
+      return getDisplayValue(row, rKey, col.key);
+    },
 
     onCellClick: col.editable
       ? (row: T, index: number) => {
@@ -133,15 +140,14 @@ export function EditableDataTable<T extends Record<string, any>>({
       return `px-4 py-3 text-sm text-slate-700 ${col.editable ? 'cursor-pointer hover:bg-blue-50' : ''}`;
     },
 
-    render: (row: T, index: number) => {
+    render: (value: any, row: T, index: number) => {
       const rKey = getRowKeyValue(row, rowKey, index);
       const isEditing =
         editingCell?.rowKey === rKey && editingCell?.columnKey === col.key;
-      const displayValue = getDisplayValue(row, rKey, col.key);
 
       // Editing mode — custom edit renderer
       if (isEditing && col.editable && col.editRender) {
-        return col.editRender(displayValue, row, (val) =>
+        return col.editRender(value, row, (val) =>
           handleCellChange(rKey, col.key, val),
         );
       }
@@ -152,7 +158,7 @@ export function EditableDataTable<T extends Record<string, any>>({
           <input
             ref={inputRef}
             type="text"
-            value={displayValue ?? ''}
+            value={value ?? ''}
             onChange={(e) =>
               handleCellChange(rKey, col.key, e.target.value)
             }
@@ -165,8 +171,8 @@ export function EditableDataTable<T extends Record<string, any>>({
 
       // Display mode
       return col.render
-        ? col.render(displayValue, { ...row, ...dirtyRows.get(rKey) } as T, index)
-        : displayValue;
+        ? col.render(value, { ...row, ...dirtyRows.get(rKey) } as T, index)
+        : value;
     },
   }));
 
@@ -215,7 +221,7 @@ export function EditableDataTable<T extends Record<string, any>>({
       )}
 
       <BaseTable
-        columns={baseColumns}
+        columns={o4oColumns}
         data={data}
         rowKey={(row, index) => getRowKeyValue(row, rowKey, index)}
         headerClassName="bg-slate-50 border-b border-slate-200"
