@@ -49,6 +49,7 @@ function friendlyError(msg: string): string {
   if (msg.includes('PARSE_ERROR')) return `파일 파싱 실패: ${msg.replace('PARSE_ERROR: ', '')}`;
   if (msg.includes('CSV_EMPTY')) return '파일에 데이터가 없습니다. 헤더 행 아래에 데이터를 입력해주세요.';
   if (msg.includes('XLSX_NO_SHEET')) return 'XLSX 파일에서 시트를 찾을 수 없습니다.';
+  if (msg.includes('Failed to process') || msg.includes('INTERNAL_ERROR')) return '파일 처리 중 오류가 발생했습니다. 파일을 확인 후 다시 시도해주세요.';
   if (msg.includes('Unexpected file type') || msg.includes('LIMIT_UNEXPECTED_FILE')) return '지원하지 않는 파일 형식입니다. CSV 또는 XLSX 파일만 업로드 가능합니다.';
   if (msg.includes('SUPPLIER_NOT_ACTIVE')) return '공급자 계정이 활성 상태가 아닙니다. 관리자에게 문의해주세요.';
   if (msg.includes('NO_SUPPLIER')) return '공급자 계정을 찾을 수 없습니다.';

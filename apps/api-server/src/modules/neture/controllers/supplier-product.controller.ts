@@ -265,8 +265,9 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       logger.info(`[Neture CSV] Upload success — file: ${file.originalname}, batchId: ${result.data?.batchId}, valid: ${result.data?.validRows}/${result.data?.totalRows}`);
       res.status(200).json(result);
     } catch (error) {
-      logger.error('[Neture API] Error uploading CSV:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to process CSV upload' } });
+      const errMsg = error instanceof Error ? error.message : 'Unknown error';
+      logger.error(`[Neture API] Error uploading file: ${(req as any).file?.originalname} — ${errMsg}`, error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: `파일 처리 실패: ${errMsg}` } });
     }
   });
 
