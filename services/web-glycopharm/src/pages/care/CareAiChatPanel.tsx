@@ -28,6 +28,7 @@ import {
 import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api/pharmacy';
 import { API_BASE_URL } from '@/lib/apiClient';
 import { useStreamBuffer } from '@/hooks/useStreamBuffer';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ── HTTP 상태 기반 사용자 메시지 ──
 
@@ -139,15 +140,18 @@ const PATIENT_QUESTIONS = [
 
 // ── Component ──
 
-/** sessionStorage key — patientId별 분리 */
-function getStorageKey(patientId?: string) {
-  return patientId ? `care_ai_chat_${patientId}` : 'care_ai_chat_population';
+/** sessionStorage key — userId + patientId 기준 격리 */
+function getStorageKey(userId?: string, patientId?: string) {
+  const userPrefix = userId || 'anon';
+  return patientId
+    ? `care_ai_chat_${userPrefix}_${patientId}`
+    : `care_ai_chat_${userPrefix}_population`;
 }
 
 /** sessionStorage에서 메시지 복원 (loading/streaming 상태 제거) */
-function restoreMessages(patientId?: string): ChatMessage[] {
+function restoreMessages(userId?: string, patientId?: string): ChatMessage[] {
   try {
-    const raw = sessionStorage.getItem(getStorageKey(patientId));
+    const raw = sessionStorage.getItem(getStorageKey(userId, patientId));
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ChatMessage[];
     return parsed
@@ -164,7 +168,9 @@ export default function CareAiChatPanel({
   initialQuestion,
 }: CareAiChatPanelProps) {
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>(() => restoreMessages(patientId));
+  const { user } = useAuth();
+  const userId = user?.id;
+  const [messages, setMessages] = useState<ChatMessage[]>(() => restoreMessages(userId, patientId));
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -183,17 +189,17 @@ export default function CareAiChatPanel({
     if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
     setMessages([]);
     setSending(false);
-    sessionStorage.removeItem(getStorageKey(patientId));
+    sessionStorage.removeItem(getStorageKey(userId, patientId));
     setTimeout(() => inputRef.current?.focus(), 100);
-  }, [patientId]);
+  }, [userId, patientId]);
 
   // Persist messages to sessionStorage (skip transient states)
   useEffect(() => {
     const toSave = messages.filter(m => !m.loading && !m.streaming);
     if (toSave.length > 0) {
-      sessionStorage.setItem(getStorageKey(patientId), JSON.stringify(toSave));
+      sessionStorage.setItem(getStorageKey(userId, patientId), JSON.stringify(toSave));
     }
-  }, [messages, patientId]);
+  }, [messages, userId, patientId]);
 
   // Smart auto-scroll: only scroll if user is near bottom
   const scrollToBottomIfNeeded = useCallback(() => {
