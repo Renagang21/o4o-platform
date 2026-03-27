@@ -78,6 +78,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'AI 운영', path: '/operator/ai-operations' },
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
+    { label: '공급자 품질', path: '/operator/supplier-quality' },
     { label: 'AI 관리', path: '/operator/ai-admin', adminOnly: true },
     { label: 'AI 카드 규칙', path: '/operator/ai-card-rules', adminOnly: true },
     { label: 'AI 비즈팩', path: '/operator/ai-business-pack', adminOnly: true },
@@ -156,6 +157,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'AI 운영', path: '/operator/ai-operations' },
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
+    { label: '공급자 품질', path: '/operator/supplier-quality' },
   ],
   system: [
     { label: '알림 설정', path: '/operator/settings/notifications' },

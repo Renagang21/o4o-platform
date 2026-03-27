@@ -39,3 +39,5 @@ export { default as ProductCurationPage } from './ProductCurationPage';
 export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
 // WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1
 export { default as OperatorProductApprovalPage } from './OperatorProductApprovalPage';
+// WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
+export { default as SupplierQualityPage } from './SupplierQualityPage';

@@ -365,6 +365,10 @@ const RoleManagementPage = lazy(() =>
 const OperatorAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
 );
+// WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
+const SupplierQualityPage = lazy(() =>
+  import('./pages/operator').then((m) => ({ default: m.SupplierQualityPage }))
+);
 // WO-O4O-MARKET-TRIAL-PHASE1-V1
 const MarketTrialApprovalsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.MarketTrialApprovalsPage }))
@@ -770,6 +774,7 @@ function App() {
               <Route path="/admin/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
+              <Route path="/admin/supplier-quality" element={<SupplierQualityPage />} />
               <Route path="/admin/roles" element={<RoleManagementPage />} />
               <Route path="/admin/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/admin/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
@@ -842,6 +847,7 @@ function App() {
               <Route path="/operator/signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
               <Route path="/operator/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
+              <Route path="/operator/supplier-quality" element={<SupplierQualityPage />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
