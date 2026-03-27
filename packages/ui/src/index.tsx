@@ -615,6 +615,9 @@ Progress.displayName = 'Progress';
 // AG Components
 export * from './ag-components';
 
+// Shared Components (BaseTable etc.)
+export * from './components/table/BaseTable';
+
 // Layout Components
 export * from './layout';
 
