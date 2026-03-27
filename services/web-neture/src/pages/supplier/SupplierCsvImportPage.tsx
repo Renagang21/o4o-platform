@@ -182,6 +182,37 @@ export default function SupplierCsvImportPage() {
     }
   };
 
+  // ─── 이력 삭제 (WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1) ──────────────────
+  const handleDeleteBatch = async (batch: CsvBatch, e: React.MouseEvent) => {
+    e.stopPropagation(); // row 클릭 (상세 열기) 방지
+
+    // 진행 중 상태 차단
+    if (batch.status === 'VALIDATING') {
+      alert('검증 진행 중인 배치는 삭제할 수 없습니다.');
+      return;
+    }
+
+    // APPLIED/PARTIAL 경고
+    const isApplied = batch.status === 'APPLIED' || batch.status === 'PARTIAL';
+    const msg = isApplied
+      ? '이 업로드로 생성된 상품은 삭제되지 않습니다.\n업로드 기록만 삭제됩니다.\n\n삭제하시겠습니까?'
+      : '이 업로드 이력을 삭제하시겠습니까?';
+
+    if (!confirm(msg)) return;
+
+    const result = await csvImportApi.deleteBatch(batch.id);
+    if (!result.success) {
+      alert(friendlyError(result.error || '삭제 실패'));
+      return;
+    }
+
+    // 모달이 열려 있으면 닫기
+    if (selectedBatch?.id === batch.id) {
+      handleCloseDetail();
+    }
+    await loadBatches();
+  };
+
   // ─── 실패 데이터 다운로드 (client-side CSV) ────────────────────────────────
   // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1: row_number 포함 + 다운로드 완료 상태
   const handleDownloadFailed = () => {
@@ -300,7 +331,8 @@ export default function SupplierCsvImportPage() {
                   <th className="pb-2 pr-4">유효</th>
                   <th className="pb-2 pr-4">거부</th>
                   <th className="pb-2 pr-4">적용</th>
-                  <th className="pb-2">생성일</th>
+                  <th className="pb-2 pr-4">생성일</th>
+                  <th className="pb-2"></th>
                 </tr>
               </thead>
               <tbody>
@@ -318,8 +350,18 @@ export default function SupplierCsvImportPage() {
                     <td className="py-2 pr-4 text-green-600">{b.validRows}</td>
                     <td className="py-2 pr-4 text-red-600">{b.rejectedRows}</td>
                     <td className="py-2 pr-4 text-blue-600">{b.appliedRows}</td>
-                    <td className="py-2 text-gray-400 text-xs">
+                    <td className="py-2 pr-4 text-gray-400 text-xs">
                       {new Date(b.createdAt).toLocaleString('ko-KR')}
+                    </td>
+                    <td className="py-2 text-right">
+                      {b.status !== 'VALIDATING' && (
+                        <button
+                          onClick={(e) => handleDeleteBatch(b, e)}
+                          className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                        >
+                          삭제
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

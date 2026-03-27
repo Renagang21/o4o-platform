@@ -133,4 +133,14 @@ export const csvImportApi = {
       return { success: false, error: extractErrorMessage(error) };
     }
   },
+
+  // WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1
+  async deleteBatch(batchId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const response = await api.delete(`/neture/supplier/csv-import/batches/${batchId}`);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: extractErrorMessage(error) };
+    }
+  },
 };

@@ -10,6 +10,7 @@ import { NeturePartnerStatus } from '../../../routes/neture/entities/neture-part
 import logger from '../../../utils/logger.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
+import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 
 /**
  * NetureSupplierService
@@ -763,83 +764,48 @@ export class NetureSupplierService {
    * Ensure an organizations record exists for this supplier.
    * Creates org + organization_members + enrollment as side-effects.
    * Idempotent: skips if already linked.
+   *
+   * WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1: organizationOpsService 전환
    */
   private async syncSupplierOrganization(
     supplier: NetureSupplier,
     options?: { isActive?: boolean; name?: string },
   ): Promise<void> {
     const isActive = options?.isActive ?? (supplier.status === SupplierStatus.ACTIVE);
-    const orgName = options?.name || supplier.slug; // Phase 5-C: name passed explicitly
+    const orgName = options?.name || supplier.slug;
 
     try {
-      // 1. Create or get organizations record
+      // 1. Ensure org exists
       if (!supplier.organizationId) {
         const orgCode = `neture-${supplier.slug}`;
+        const result = await organizationOpsService.ensureOrganization({
+          name: orgName,
+          code: orgCode,
+          type: 'supplier',
+          metadata: { serviceKey: 'neture', netureSupplierSlug: supplier.slug },
+          createdByUserId: supplier.userId || undefined,
+          isActive,
+        });
 
-        // Check if org already exists (e.g., created by migration backfill)
-        const existing = await AppDataSource.query(
-          `SELECT id FROM organizations WHERE code = $1 LIMIT 1`,
-          [orgCode],
-        );
-
-        let orgId: string;
-        if (existing.length > 0) {
-          orgId = existing[0].id;
-        } else {
-          const inserted = await AppDataSource.query(
-            `INSERT INTO organizations (
-              id, name, code, type, level, path,
-              phone,
-              created_by_user_id, "isActive",
-              metadata, "createdAt", "updatedAt"
-            ) VALUES (
-              gen_random_uuid(), $1, $2, 'supplier', 0, '/' || $2,
-              $3, $4, $5,
-              $6, NOW(), NOW()
-            )
-            ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
-            RETURNING id`,
-            [
-              orgName,
-              orgCode,
-              supplier.contactPhone || null,
-              supplier.userId || null,
-              isActive,
-              JSON.stringify({ serviceKey: 'neture', netureSupplierSlug: supplier.slug }),
-            ],
-          );
-          orgId = inserted[0].id;
-        }
-
-        // Link supplier → organization
+        // Link supplier → organization (domain-specific)
         await AppDataSource.query(
           `UPDATE neture_suppliers SET organization_id = $1 WHERE id = $2 AND organization_id IS NULL`,
-          [orgId, supplier.id],
+          [result.id, supplier.id],
         );
-        supplier.organizationId = orgId;
-        logger.info(`[NetureSupplierService] Org linked: supplier=${supplier.id} → org=${orgId}`);
+        supplier.organizationId = result.id;
+        logger.info(`[NetureSupplierService] Org linked: supplier=${supplier.id} → org=${result.id}`);
       }
 
       const orgId = supplier.organizationId;
 
-      // 2. Ensure organization_members (owner)
+      // 2. Ensure owner member
       if (supplier.userId) {
-        await AppDataSource.query(
-          `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-           VALUES (gen_random_uuid(), $1, $2, 'owner', true, NOW(), NOW(), NOW())
-           ON CONFLICT (organization_id, user_id) DO NOTHING`,
-          [orgId, supplier.userId],
-        );
+        await organizationOpsService.setOwner(orgId, supplier.userId);
       }
 
-      // 3. Ensure organization_service_enrollments (only when active)
+      // 3. Ensure service enrollment (only when active)
       if (isActive) {
-        await AppDataSource.query(
-          `INSERT INTO organization_service_enrollments (id, organization_id, service_code, status, enrolled_at, created_at, updated_at)
-           VALUES (gen_random_uuid(), $1, 'neture', 'active', NOW(), NOW(), NOW())
-           ON CONFLICT (organization_id, service_code) DO NOTHING`,
-          [orgId],
-        );
+        await organizationOpsService.enrollService({ organizationId: orgId, serviceCode: 'neture' });
       }
     } catch (error) {
       // Non-fatal: log and continue (org sync is a side-effect, must not break core flow)
