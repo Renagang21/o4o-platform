@@ -2,13 +2,16 @@
  * EditableDataTable — Inline Editable Table (엑셀형 기반)
  *
  * WO-O4O-LIST-BASE-MODULE-V1
+ * WO-O4O-EDITABLE-TABLE-REFACTOR-V1 — BaseTable 기반 재구성
  *
- * DataTable 확장: 셀 클릭 → input 전환, dirty tracking, batch save.
+ * BaseTable 렌더링 엔진 위의 thin wrapper.
+ * 셀 클릭 → input 전환, dirty tracking, batch save.
  * editable=true 컬럼만 편집 가능. 변경된 행은 하이라이트.
  */
 
 import { useState, useCallback, useRef } from 'react';
 import type React from 'react';
+import { BaseTable, type BaseColumn } from '@o4o/ui';
 import type { EditableDataTableProps, ListColumnDef } from './types';
 
 interface EditingCell {
@@ -28,12 +31,6 @@ function getRowKeyValue<T extends Record<string, any>>(
 function getCellValue<T>(row: T, key: string): any {
   return (row as any)[key];
 }
-
-const alignClass = (align?: 'left' | 'center' | 'right') => {
-  if (align === 'center') return 'text-center';
-  if (align === 'right') return 'text-right';
-  return 'text-left';
-};
 
 export function EditableDataTable<T extends Record<string, any>>({
   columns,
@@ -91,7 +88,6 @@ export function EditableDataTable<T extends Record<string, any>>({
 
   const handleSave = async () => {
     if (!onSave || !hasDirtyRows) return;
-    // Merge dirty values into original rows
     const changedRows: T[] = [];
     for (const [rKey, changes] of dirtyRows.entries()) {
       const originalRow = data.find(
@@ -111,7 +107,71 @@ export function EditableDataTable<T extends Record<string, any>>({
     setEditingCell(null);
   };
 
-  // Loading skeleton
+  // ─── Column Mapping: ListColumnDef → BaseColumn ───
+
+  const baseColumns: BaseColumn<T>[] = columns.map((col) => ({
+    key: col.key,
+    header: col.header,
+    width: col.width,
+    align: col.align,
+
+    onCellClick: col.editable
+      ? (row: T, index: number) => {
+          const rKey = getRowKeyValue(row, rowKey, index);
+          handleCellClick(rKey, col);
+        }
+      : undefined,
+
+    cellClassName: (row: T, index: number) => {
+      const rKey = getRowKeyValue(row, rowKey, index);
+      const isEditing =
+        editingCell?.rowKey === rKey && editingCell?.columnKey === col.key;
+
+      if (isEditing && col.editable) {
+        return 'px-4 py-2';
+      }
+      return `px-4 py-3 text-sm text-slate-700 ${col.editable ? 'cursor-pointer hover:bg-blue-50' : ''}`;
+    },
+
+    render: (row: T, index: number) => {
+      const rKey = getRowKeyValue(row, rowKey, index);
+      const isEditing =
+        editingCell?.rowKey === rKey && editingCell?.columnKey === col.key;
+      const displayValue = getDisplayValue(row, rKey, col.key);
+
+      // Editing mode — custom edit renderer
+      if (isEditing && col.editable && col.editRender) {
+        return col.editRender(displayValue, row, (val) =>
+          handleCellChange(rKey, col.key, val),
+        );
+      }
+
+      // Editing mode — default text input
+      if (isEditing && col.editable) {
+        return (
+          <input
+            ref={inputRef}
+            type="text"
+            value={displayValue ?? ''}
+            onChange={(e) =>
+              handleCellChange(rKey, col.key, e.target.value)
+            }
+            onKeyDown={handleKeyDown}
+            onBlur={() => setEditingCell(null)}
+            className="w-full px-2 py-1 text-sm border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        );
+      }
+
+      // Display mode
+      return col.render
+        ? col.render(displayValue, { ...row, ...dirtyRows.get(rKey) } as T, index)
+        : displayValue;
+    },
+  }));
+
+  // ─── Loading skeleton ───
+
   if (loading) {
     return (
       <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
@@ -124,6 +184,8 @@ export function EditableDataTable<T extends Record<string, any>>({
       </div>
     );
   }
+
+  // ─── Render ───
 
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
@@ -152,110 +214,19 @@ export function EditableDataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  style={col.width ? { width: col.width } : undefined}
-                  className={`px-4 py-3 text-xs font-medium text-slate-500 uppercase whitespace-nowrap ${alignClass(col.align)}`}
-                >
-                  {col.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-12 text-center text-sm text-slate-400"
-                >
-                  {emptyMessage}
-                </td>
-              </tr>
-            ) : (
-              data.map((row, index) => {
-                const rKey = getRowKeyValue(row, rowKey, index);
-                const isDirty = dirtyRows.has(rKey);
-
-                return (
-                  <tr
-                    key={rKey}
-                    className={isDirty ? 'bg-amber-50' : 'hover:bg-slate-50'}
-                  >
-                    {columns.map((col) => {
-                      const isEditing =
-                        editingCell?.rowKey === rKey &&
-                        editingCell?.columnKey === col.key;
-                      const displayValue = getDisplayValue(row, rKey, col.key);
-
-                      // Editing mode
-                      if (isEditing && col.editable) {
-                        // Custom edit renderer
-                        if (col.editRender) {
-                          return (
-                            <td
-                              key={col.key}
-                              className={`px-4 py-2 ${alignClass(col.align)}`}
-                            >
-                              {col.editRender(displayValue, row, (val) =>
-                                handleCellChange(rKey, col.key, val),
-                              )}
-                            </td>
-                          );
-                        }
-
-                        // Default text input
-                        return (
-                          <td
-                            key={col.key}
-                            className={`px-4 py-2 ${alignClass(col.align)}`}
-                          >
-                            <input
-                              ref={inputRef}
-                              type="text"
-                              value={displayValue ?? ''}
-                              onChange={(e) =>
-                                handleCellChange(rKey, col.key, e.target.value)
-                              }
-                              onKeyDown={handleKeyDown}
-                              onBlur={() => setEditingCell(null)}
-                              className="w-full px-2 py-1 text-sm border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                          </td>
-                        );
-                      }
-
-                      // Display mode
-                      const content = col.render
-                        ? col.render(displayValue, { ...row, ...dirtyRows.get(rKey) } as T, index)
-                        : displayValue;
-
-                      return (
-                        <td
-                          key={col.key}
-                          onClick={
-                            col.editable
-                              ? () => handleCellClick(rKey, col)
-                              : undefined
-                          }
-                          className={`px-4 py-3 text-sm text-slate-700 whitespace-nowrap ${alignClass(col.align)} ${col.editable ? 'cursor-pointer hover:bg-blue-50' : ''}`}
-                        >
-                          {content}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <BaseTable
+        columns={baseColumns}
+        data={data}
+        rowKey={(row, index) => getRowKeyValue(row, rowKey, index)}
+        headerClassName="bg-slate-50 border-b border-slate-200"
+        bodyClassName="divide-y divide-slate-100"
+        thClassName="px-4 py-3 text-xs font-medium text-slate-500 uppercase"
+        rowClassName={(row, index) => {
+          const rKey = getRowKeyValue(row, rowKey, index);
+          return dirtyRows.has(rKey) ? 'bg-amber-50' : 'hover:bg-slate-50';
+        }}
+        emptyMessage={emptyMessage}
+      />
     </div>
   );
 }

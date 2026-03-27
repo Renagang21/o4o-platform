@@ -2,6 +2,7 @@
  * BaseTable — O4O Platform Table Rendering Engine
  *
  * WO-O4O-TABLE-BASE-COMPONENT-V1
+ * WO-O4O-EDITABLE-TABLE-REFACTOR-V1 — customization hooks 추가
  *
  * 모든 테이블의 공통 렌더링/레이아웃 엔진.
  * DataTable, EditableTable 등은 이 컴포넌트의 thin wrapper.
@@ -22,6 +23,10 @@ export interface BaseColumn<T> {
   width?: number | string;
   align?: 'left' | 'center' | 'right';
   className?: string;
+  /** 행별 동적 td 클래스. 반환값이 있으면 tdClassName/className 대신 사용. */
+  cellClassName?: (row: T, rowIndex: number) => string;
+  /** 셀 클릭 핸들러 (editable cell 등에 사용) */
+  onCellClick?: (row: T, rowIndex: number) => void;
   render?: (row: T, rowIndex: number) => ReactNode;
 }
 
@@ -32,6 +37,11 @@ export interface BaseTableProps<T> {
   className?: string;
   headerClassName?: string;
   bodyClassName?: string;
+  /** th 기본 클래스 오버라이드. whitespace-nowrap + align은 항상 적용. */
+  thClassName?: string;
+  /** td 기본 클래스 오버라이드. whitespace-nowrap + align은 항상 적용. */
+  tdClassName?: string;
+  /** 행 클래스. 제공하면 기본 hover 대신 사용. */
   rowClassName?: (row: T, index: number) => string;
   onRowClick?: (row: T, index: number) => void;
   emptyMessage?: ReactNode;
@@ -45,6 +55,11 @@ const alignClass = (align?: 'left' | 'center' | 'right') => {
   return 'text-left';
 };
 
+// ─── Defaults ───────────────────────────────────
+
+const DEFAULT_TH = 'px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider';
+const DEFAULT_TD = 'px-4 py-3 text-sm text-gray-900';
+
 // ─── Component ──────────────────────────────────
 
 export function BaseTable<T extends Record<string, any>>({
@@ -54,10 +69,15 @@ export function BaseTable<T extends Record<string, any>>({
   className = '',
   headerClassName = 'bg-gray-50',
   bodyClassName = 'bg-white divide-y divide-gray-200',
+  thClassName,
+  tdClassName,
   rowClassName,
   onRowClick,
   emptyMessage = '데이터가 없습니다',
 }: BaseTableProps<T>) {
+  const thBase = thClassName ?? DEFAULT_TH;
+  const tdBase = tdClassName ?? DEFAULT_TD;
+
   return (
     <div className="overflow-x-auto">
       <table className={`min-w-full ${className}`}>
@@ -67,7 +87,7 @@ export function BaseTable<T extends Record<string, any>>({
               <th
                 key={col.key}
                 style={col.width != null ? { width: col.width } : undefined}
-                className={`whitespace-nowrap px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${alignClass(col.align)}`}
+                className={`whitespace-nowrap ${thBase} ${alignClass(col.align)}`}
               >
                 {col.header}
               </th>
@@ -88,23 +108,27 @@ export function BaseTable<T extends Record<string, any>>({
           ) : (
             data.map((row, rowIndex) => {
               const key = rowKey ? rowKey(row, rowIndex) : `row-${rowIndex}`;
-              const rowCls = rowClassName?.(row, rowIndex) ?? '';
+              const rowCls = rowClassName?.(row, rowIndex) ?? 'hover:bg-gray-50';
 
               return (
                 <tr
                   key={key}
                   onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
-                  className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''} ${rowCls}`}
+                  className={`${onRowClick ? 'cursor-pointer' : ''} ${rowCls}`}
                 >
                   {columns.map((col) => {
                     const content = col.render
                       ? col.render(row, rowIndex)
                       : row[col.key];
 
+                    const dynamicCls = col.cellClassName?.(row, rowIndex);
+                    const cellCls = dynamicCls ?? `${tdBase} ${col.className ?? ''}`;
+
                     return (
                       <td
                         key={col.key}
-                        className={`whitespace-nowrap px-4 py-3 text-sm text-gray-900 ${alignClass(col.align)} ${col.className ?? ''}`}
+                        onClick={col.onCellClick ? () => col.onCellClick!(row, rowIndex) : undefined}
+                        className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)}`}
                       >
                         {content}
                       </td>
