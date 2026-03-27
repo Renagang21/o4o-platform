@@ -38,6 +38,7 @@ import { validateGtin } from '../../../utils/gtin.js';
 import { verifyProductByBarcode } from './mfds.service.js';
 import { parseXlsxToRecords } from './xlsx-parser.service.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
+import { ImageStorageService } from './image-storage.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
 
@@ -72,6 +73,7 @@ export class CsvImportService {
   private offerRepo: Repository<SupplierProductOffer>;
   private supplierRepo: Repository<NetureSupplier>;
   private importCommon: ProductImportCommonService;
+  private imageStorage: ImageStorageService;
 
   constructor(private dataSource: DataSource) {
     this.batchRepo = dataSource.getRepository(SupplierCsvImportBatch);
@@ -80,6 +82,7 @@ export class CsvImportService {
     this.offerRepo = dataSource.getRepository(SupplierProductOffer);
     this.supplierRepo = dataSource.getRepository(NetureSupplier);
     this.importCommon = new ProductImportCommonService(dataSource);
+    this.imageStorage = new ImageStorageService();
   }
 
   // ==================== Upload + Validate ====================
@@ -815,6 +818,188 @@ export class CsvImportService {
     logger.info(`[CSV Import] DELETE_IMPORT batchId=${batchId} supplierId=${supplierId} status=${batch.status} totalRows=${totalRows}`);
 
     return { success: true, data: { deletedId: batchId, totalRows } };
+  }
+
+  // ==================== 완전삭제 (WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1) ====================
+
+  /**
+   * 완전삭제 가능 여부 사전 검사
+   * - listing 존재 여부 체크 → 있으면 차단
+   */
+  async checkFullDelete(
+    batchId: string,
+    supplierId: string,
+  ): Promise<{ success: boolean; error?: string; data?: { canFullDelete: boolean; reasons: string[]; offerCount: number; masterCount: number } }> {
+    const batch = await this.batchRepo.findOne({ where: { id: batchId, supplierId } });
+    if (!batch) return { success: false, error: 'BATCH_NOT_FOUND' };
+    if (batch.status === CsvImportBatchStatus.VALIDATING) {
+      return { success: true, data: { canFullDelete: false, reasons: ['검증 진행 중인 배치입니다'], offerCount: 0, masterCount: 0 } };
+    }
+
+    // rows에서 offer/master IDs 수집
+    const rows = await this.rowRepo.find({
+      where: { batchId },
+      select: ['id', 'offerId', 'masterId'],
+    });
+    const offerIds = [...new Set(rows.map(r => r.offerId).filter((id): id is string => !!id))];
+    const masterIds = [...new Set(rows.map(r => r.masterId).filter((id): id is string => !!id))];
+
+    // offer가 없으면 (apply 안 된 batch) → 기존 deleteBatch로 충분
+    if (offerIds.length === 0) {
+      return { success: true, data: { canFullDelete: true, reasons: [], offerCount: 0, masterCount: 0 } };
+    }
+
+    const reasons: string[] = [];
+
+    // 1. listing 존재 체크
+    const [listingCheck] = await this.dataSource.query(
+      `SELECT COUNT(*)::int AS cnt FROM organization_product_listings WHERE offer_id = ANY($1)`,
+      [offerIds],
+    );
+    if (listingCheck.cnt > 0) {
+      reasons.push(`매장에 등록된 상품이 ${listingCheck.cnt}건 있습니다`);
+    }
+
+    // orphan master 수 계산 (이 batch의 offer만 가진 master)
+    let orphanMasterCount = 0;
+    if (masterIds.length > 0) {
+      const [orphanCheck] = await this.dataSource.query(
+        `SELECT COUNT(DISTINCT pm.id)::int AS cnt
+         FROM product_masters pm
+         WHERE pm.id = ANY($1)
+           AND NOT EXISTS (
+             SELECT 1 FROM supplier_product_offers spo
+             WHERE spo.master_id = pm.id AND spo.id != ALL($2)
+           )`,
+        [masterIds, offerIds],
+      );
+      orphanMasterCount = orphanCheck.cnt;
+    }
+
+    return {
+      success: true,
+      data: {
+        canFullDelete: reasons.length === 0,
+        reasons,
+        offerCount: offerIds.length,
+        masterCount: orphanMasterCount,
+      },
+    };
+  }
+
+  /**
+   * 완전삭제 — batch + rows + offers + (조건부) masters + images + GCS
+   * 조건 미충족 시 차단.
+   */
+  async fullDeleteBatch(
+    batchId: string,
+    supplierId: string,
+    userId: string,
+  ): Promise<{ success: boolean; error?: string; data?: { deletedOffers: number; deletedMasters: number; deletedImages: number } }> {
+    // 사전 검사
+    const check = await this.checkFullDelete(batchId, supplierId);
+    if (!check.success) return { success: false, error: check.error };
+    if (!check.data!.canFullDelete) {
+      return { success: false, error: 'FULL_DELETE_BLOCKED', };
+    }
+
+    // rows에서 offer/master IDs 수집
+    const rows = await this.rowRepo.find({
+      where: { batchId },
+      select: ['id', 'offerId', 'masterId'],
+    });
+    const offerIds = [...new Set(rows.map(r => r.offerId).filter((id): id is string => !!id))];
+    const masterIds = [...new Set(rows.map(r => r.masterId).filter((id): id is string => !!id))];
+
+    // orphan master 판별 (이 batch의 offer만 가진 master)
+    let orphanMasterIds: string[] = [];
+    if (masterIds.length > 0) {
+      const orphans: { id: string }[] = await this.dataSource.query(
+        `SELECT pm.id
+         FROM product_masters pm
+         WHERE pm.id = ANY($1)
+           AND NOT EXISTS (
+             SELECT 1 FROM supplier_product_offers spo
+             WHERE spo.master_id = pm.id AND spo.id != ALL($2)
+           )`,
+        [masterIds, offerIds],
+      );
+      orphanMasterIds = orphans.map(r => r.id);
+    }
+
+    // GCS 경로 수집 (트랜잭션 전 — 삭제 후 DB에서 조회 불가)
+    let gcsPaths: string[] = [];
+    if (orphanMasterIds.length > 0) {
+      const images: { gcs_path: string }[] = await this.dataSource.query(
+        `SELECT gcs_path FROM product_images WHERE master_id = ANY($1) AND gcs_path IS NOT NULL`,
+        [orphanMasterIds],
+      );
+      gcsPaths = images.map(r => r.gcs_path);
+    }
+
+    // 트랜잭션: offers → masters → batch 순서 (FK 안전)
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+
+    try {
+      let deletedOffers = 0;
+      let deletedMasters = 0;
+
+      // 1. offers 삭제 (CASCADE: curations, approvals, listings, service_products, product_approvals)
+      if (offerIds.length > 0) {
+        const offerResult = await qr.query(
+          `DELETE FROM supplier_product_offers WHERE id = ANY($1)`,
+          [offerIds],
+        );
+        deletedOffers = offerResult[1] ?? offerIds.length;
+      }
+
+      // 2. orphan masters 삭제 (CASCADE: product_images)
+      if (orphanMasterIds.length > 0) {
+        const masterResult = await qr.query(
+          `DELETE FROM product_masters WHERE id = ANY($1)`,
+          [orphanMasterIds],
+        );
+        deletedMasters = masterResult[1] ?? orphanMasterIds.length;
+      }
+
+      // 3. batch 삭제 (CASCADE: rows)
+      await qr.query(
+        `DELETE FROM supplier_csv_import_batches WHERE id = $1`,
+        [batchId],
+      );
+
+      await qr.commitTransaction();
+
+      // GCS 파일 삭제 (fire-and-forget, 트랜잭션 외부)
+      if (gcsPaths.length > 0) {
+        Promise.allSettled(
+          gcsPaths.map(p => this.imageStorage.deleteImage(p))
+        ).then(results => {
+          const failed = results.filter(r => r.status === 'rejected').length;
+          if (failed > 0) {
+            logger.warn(`[CSV Import] FULL_DELETE GCS cleanup: ${failed}/${gcsPaths.length} failed`);
+          }
+        });
+      }
+
+      logger.info(
+        `[CSV Import] FULL_DELETE batchId=${batchId} supplierId=${supplierId} user=${userId} ` +
+        `offers=${deletedOffers} masters=${deletedMasters} images=${gcsPaths.length}`
+      );
+
+      return {
+        success: true,
+        data: { deletedOffers, deletedMasters, deletedImages: gcsPaths.length },
+      };
+    } catch (error) {
+      await qr.rollbackTransaction();
+      logger.error(`[CSV Import] FULL_DELETE failed batchId=${batchId}:`, error);
+      throw error;
+    } finally {
+      await qr.release();
+    }
   }
 
   // ==================== Internal helpers ====================

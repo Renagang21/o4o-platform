@@ -245,6 +245,51 @@ export default function SupplierCsvImportPage() {
     await loadBatches();
   };
 
+  // ─── 완전삭제 (WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1) ──────────────
+  const [fullDeleting, setFullDeleting] = useState(false);
+  const handleFullDelete = async (batch: CsvBatch, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFullDeleting(true);
+    try {
+      // 1. 사전 검사
+      const check = await csvImportApi.checkFullDelete(batch.id);
+      if (!check.success) {
+        alert(friendlyError(check.error || '검사 실패'));
+        return;
+      }
+
+      const { canFullDelete, reasons, offerCount, masterCount } = check.data!;
+
+      // 2. 차단
+      if (!canFullDelete) {
+        alert('완전삭제할 수 없습니다:\n\n' + reasons.join('\n'));
+        return;
+      }
+
+      // 3. 확인
+      const msg = offerCount === 0
+        ? '이 업로드 이력을 완전삭제하시겠습니까?\n(생성된 상품이 없습니다)'
+        : `이 업로드와 관련된 모든 상품이 삭제됩니다.\n(offer ${offerCount}건${masterCount > 0 ? `, master ${masterCount}건` : ''})\n\n되돌릴 수 없습니다.`;
+
+      if (!confirm(msg)) return;
+
+      // 4. 실행
+      const result = await csvImportApi.fullDeleteBatch(batch.id);
+      if (!result.success) {
+        alert(friendlyError(result.error || '완전삭제 실패'));
+        return;
+      }
+
+      const d = result.data!;
+      alert(`완전삭제 완료: offer ${d.deletedOffers}건, master ${d.deletedMasters}건, 이미지 ${d.deletedImages}건 삭제됨`);
+
+      if (selectedBatch?.id === batch.id) handleCloseDetail();
+      await loadBatches();
+    } finally {
+      setFullDeleting(false);
+    }
+  };
+
   // ─── 실패 데이터 다운로드 (client-side CSV) ────────────────────────────────
   // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1: row_number 포함 + 다운로드 완료 상태
   const handleDownloadFailed = () => {
@@ -385,13 +430,22 @@ export default function SupplierCsvImportPage() {
                     <td className="py-2 pr-4 text-gray-400 text-xs">
                       {new Date(b.createdAt).toLocaleString('ko-KR')}
                     </td>
-                    <td className="py-2 text-right">
+                    <td className="py-2 text-right space-x-1">
                       {b.status !== 'VALIDATING' && (
                         <button
                           onClick={(e) => handleDeleteBatch(b, e)}
                           className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
                         >
                           삭제
+                        </button>
+                      )}
+                      {(b.status === 'APPLIED' || b.status === 'PARTIAL') && (
+                        <button
+                          onClick={(e) => handleFullDelete(b, e)}
+                          disabled={fullDeleting}
+                          className="px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
+                        >
+                          {fullDeleting ? '처리중...' : '완전삭제'}
                         </button>
                       )}
                     </td>

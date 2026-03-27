@@ -58,6 +58,20 @@ export interface CsvRetryResult {
   errors?: Array<{ rowNumber: number; barcode: string | null; error: string }>;
 }
 
+// WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
+export interface FullDeleteCheck {
+  canFullDelete: boolean;
+  reasons: string[];
+  offerCount: number;
+  masterCount: number;
+}
+
+export interface FullDeleteResult {
+  deletedOffers: number;
+  deletedMasters: number;
+  deletedImages: number;
+}
+
 // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1
 // 에러 추출: 백엔드 nested { error: { message, code } } + multer flat { error: "string" } 모두 처리
 function extractErrorMessage(error: any): string {
@@ -161,6 +175,25 @@ export const csvImportApi = {
   async deleteBatch(batchId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.delete(`/neture/supplier/csv-import/batches/${batchId}`);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: extractErrorMessage(error) };
+    }
+  },
+
+  // WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
+  async checkFullDelete(batchId: string): Promise<{ success: boolean; error?: string; data?: FullDeleteCheck }> {
+    try {
+      const response = await api.get(`/neture/supplier/csv-import/batches/${batchId}/delete-check`);
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: extractErrorMessage(error) };
+    }
+  },
+
+  async fullDeleteBatch(batchId: string): Promise<{ success: boolean; error?: string; data?: FullDeleteResult }> {
+    try {
+      const response = await api.delete(`/neture/supplier/csv-import/batches/${batchId}/full-delete`);
       return response.data;
     } catch (error: any) {
       return { success: false, error: extractErrorMessage(error) };
