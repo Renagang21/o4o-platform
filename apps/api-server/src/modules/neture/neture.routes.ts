@@ -42,6 +42,7 @@ import { createOperatorServiceApprovalController } from './controllers/operator-
 import { createOperatorCurationController } from './controllers/operator-curation.controller.js';
 import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
+import { createOperatorSupplierQualityController } from './controllers/operator-supplier-quality.controller.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -93,6 +94,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorCurationController(dataSource));
   // WO-O4O-OPERATOR-ACTION-QUEUE-V1
   router.use('/operator', createOperatorActionQueueController(dataSource));
+  // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
+  router.use('/operator', createOperatorSupplierQualityController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));
