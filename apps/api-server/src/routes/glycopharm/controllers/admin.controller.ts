@@ -19,6 +19,7 @@ import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
 import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 interface AuthRequest extends Request {
   user?: {
@@ -389,14 +390,14 @@ export function createAdminController(
             }
           }
 
-          // WO-ROLE-NORMALIZATION-PHASE3-A-V1: relation-based ownership via organization_members
+          // WO-ROLE-NORMALIZATION-PHASE3-A-V1 → WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1
           if (createdOrg) {
-            await dataSource.query(
-              `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-               VALUES (uuid_generate_v4(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
-               ON CONFLICT (organization_id, user_id) DO NOTHING`,
-              [createdOrg.id, application.userId]
-            );
+            await organizationOpsService.addMember({
+              organizationId: createdOrg.id,
+              userId: application.userId,
+              role: 'owner',
+              isPrimary: false,
+            });
             logger.info(
               `[Glycopharm Admin] organization_members owner record created for user ${application.userId} → org ${createdOrg.id}`
             );

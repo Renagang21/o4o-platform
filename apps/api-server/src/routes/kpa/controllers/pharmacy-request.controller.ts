@@ -20,6 +20,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import type { ActionLogService } from '@o4o/action-log-core';
 import { KpaPharmacyRequest } from '../entities/kpa-pharmacy-request.entity.js';
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 export function createPharmacyRequestRoutes(
   dataSource: DataSource,
@@ -190,12 +191,12 @@ export function createPharmacyRequestRoutes(
         [request.user_id]
       );
       if (kpaMember?.organization_id) {
-        await dataSource.query(
-          `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-           VALUES (uuid_generate_v4(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
-           ON CONFLICT (organization_id, user_id) DO NOTHING`,
-          [kpaMember.organization_id, request.user_id]
-        );
+        await organizationOpsService.addMember({
+          organizationId: kpaMember.organization_id,
+          userId: request.user_id,
+          role: 'owner',
+          isPrimary: false,
+        });
       }
 
       actionLogService?.logSuccess('kpa-society', user.id, 'kpa.operator.pharmacy_approve', {

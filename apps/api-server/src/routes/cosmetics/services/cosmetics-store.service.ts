@@ -15,6 +15,7 @@ import {
   CosmeticsStoreMemberRole,
 } from '../entities/index.js';
 import { CosmeticsProduct } from '../entities/index.js';
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 export class CosmeticsStoreService {
   private repository: CosmeticsStoreRepository;
@@ -188,11 +189,13 @@ export class CosmeticsStoreService {
         });
         await queryRunner.manager.save('CosmeticsStoreMember', member);
 
-        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1: Create organization_members record
-        await queryRunner.query(`
-          INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-          VALUES (gen_random_uuid(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
-        `, [orgId, application.applicantUserId]);
+        // WO-O4O-COSMETICS-STORE-HUB-ADOPTION-V1 → WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1
+        await organizationOpsService.addMember({
+          organizationId: orgId,
+          userId: application.applicantUserId,
+          role: 'owner',
+          isPrimary: false,
+        }, queryRunner);
 
         await queryRunner.commitTransaction();
 

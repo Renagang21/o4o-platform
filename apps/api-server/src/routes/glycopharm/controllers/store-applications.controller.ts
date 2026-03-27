@@ -18,6 +18,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
+import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { emailService } from '../../../services/email.service.js';
 import { OperatorNotificationController } from '../../../controllers/OperatorNotificationController.js';
@@ -641,11 +642,10 @@ export function createStoreApplicationsController(
             ext.enabled_services = application.serviceTypes;
             await queryRunner.manager.save(GlycopharmPharmacyExtension, ext);
 
-            // Create service enrollment
-            await queryRunner.manager.query(
-              `INSERT INTO organization_service_enrollments (organization_id, service_code, status, enrolled_at)
-               VALUES ($1, 'glycopharm', 'active', NOW())`,
-              [createdOrg.id],
+            // WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1: service enrollment via central service
+            await organizationOpsService.enrollService(
+              { organizationId: createdOrg.id, serviceCode: 'glycopharm' },
+              queryRunner,
             );
 
             // Register slug
@@ -686,14 +686,14 @@ export function createStoreApplicationsController(
           }
         }
 
-        // organization_members ownership
+        // WO-O4O-ORGANIZATION-SERVICE-CENTRALIZATION-V1: membership via central service
         if (createdOrg) {
-          await dataSource.query(
-            `INSERT INTO organization_members (id, organization_id, user_id, role, is_primary, joined_at, created_at, updated_at)
-             VALUES (uuid_generate_v4(), $1, $2, 'owner', false, NOW(), NOW(), NOW())
-             ON CONFLICT (organization_id, user_id) DO NOTHING`,
-            [createdOrg.id, application.userId],
-          );
+          await organizationOpsService.addMember({
+            organizationId: createdOrg.id,
+            userId: application.userId,
+            role: 'owner',
+            isPrimary: false,
+          });
 
           // Auto-list public products
           autoListPublicProductsForOrg(dataSource, createdOrg.id, 'glycopharm')
