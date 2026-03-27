@@ -356,5 +356,40 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // GET /supplier/csv-import/batches/:id/delete-check — WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
+  router.get('/csv-import/batches/:id/delete-check', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { id } = req.params;
+      const result = await csvImportService.checkFullDelete(id, supplierId);
+      if (!result.success) {
+        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error checking full delete:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to check full delete' } });
+    }
+  });
+
+  // DELETE /supplier/csv-import/batches/:id/full-delete — WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
+  router.delete('/csv-import/batches/:id/full-delete', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const userId = req.user!.id;
+      const { id } = req.params;
+      const result = await csvImportService.fullDeleteBatch(id, supplierId, userId);
+      if (!result.success) {
+        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : result.error === 'FULL_DELETE_BLOCKED' ? 409 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error full deleting CSV batch:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to full delete CSV batch' } });
+    }
+  });
+
   return router;
 }
