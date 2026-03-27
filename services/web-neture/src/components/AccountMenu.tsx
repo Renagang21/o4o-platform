@@ -80,9 +80,9 @@ export default function AccountMenu() {
   const activeRole = user.roles[0];
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
 
-  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role 기반 admin/operator 판별
-  const hasAdminOrOperatorRole = user.roles?.some((r: string) =>
-    r.endsWith(':admin') || r.endsWith(':operator') || r === 'platform:super_admin'
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role 기반 대시보드 대상 판별
+  const hasDashboardRole = user.roles?.some((r: string) =>
+    r.endsWith(':admin') || r.endsWith(':operator') || r.endsWith(':supplier') || r.endsWith(':partner') || r.endsWith(':seller') || r === 'platform:super_admin'
   ) ?? false;
 
   // WO-O4O-NAME-NORMALIZATION-V1: displayName > lastName+firstName > name > email prefix > '사용자'
@@ -124,8 +124,8 @@ export default function AccountMenu() {
 
           {/* 메뉴 항목 — WO-O4O-AUTH-RBAC-CLEANUP-V1: 단일 메뉴 구조 */}
           <div className="py-1">
-            {/* 대시보드 - admin/operator 역할인 경우 최상단 표시 */}
-            {hasAdminOrOperatorRole && (
+            {/* 대시보드 - 대시보드 대상 역할인 경우 최상단 표시 */}
+            {hasDashboardRole && (
               <Link
                 to={dashboardPath}
                 onClick={() => setIsOpen(false)}
