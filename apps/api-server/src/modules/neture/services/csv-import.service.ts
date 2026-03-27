@@ -178,11 +178,29 @@ export class CsvImportService {
       const barcode = (raw.barcode || '').trim();
 
       // WO-NETURE-XLSX-TEMPLATE-FINAL-V2: barcode 선택, 미입력 시 자동 생성
+      // WO-O4O-NETURE-UPLOAD-VALIDATION-REFORM-V1: varchar(14) 제한 준수
       let effectiveBarcode = barcode;
       let isAutoBarcode = false;
       if (!barcode) {
-        effectiveBarcode = `INT${Date.now()}${String(rowNumber).padStart(4, '0')}`;
+        // 14자 이내: INT + 6자리 타임스탬프(base36) + 4자리 행번호
+        const ts = Date.now().toString(36).slice(-6).toUpperCase();
+        effectiveBarcode = `INT${ts}${String(rowNumber).padStart(4, '0')}`;
         isAutoBarcode = true;
+      }
+
+      // 바코드 길이 체크 (varchar(14) — parsedBarcode 저장 전 방어)
+      if (effectiveBarcode.length > 14) {
+        const row = this.rowRepo.create({
+          batchId: savedBatch.id, rowNumber, rawJson: raw,
+          parsedBarcode: effectiveBarcode.substring(0, 14),
+          parsedSupplyPrice: null, parsedDistributionType: null,
+          validationStatus: CsvRowValidationStatus.REJECTED,
+          validationError: `BARCODE_TOO_LONG: ${effectiveBarcode.length}자 (최대 14자)`,
+          masterId: null, actionType: CsvRowActionType.REJECT,
+        });
+        rejectedCount++;
+        rowEntities.push(row);
+        continue;
       }
 
       const row = this.rowRepo.create({
