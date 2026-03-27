@@ -612,27 +612,31 @@ export default function CareAiChatPanel({
             </div>
           )}
 
-          {messages.map((msg, idx) => (
-            <div key={msg.id}>
-              {/* Q&A 세션 구분선: user 메시지 앞이며 첫 메시지가 아닌 경우 */}
-              {msg.role === 'user' && idx > 0 && (
-                <div className="flex items-center gap-2 py-2 mb-2">
-                  <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-[10px] text-slate-400 flex-shrink-0">새 질문</span>
-                  <div className="flex-1 h-px bg-slate-200" />
-                </div>
-              )}
-              <MessageBubble
-                message={msg}
-                onRetry={() => retryMessage(msg.id)}
-                onPatientClick={(pid) => {
-                  navigate(`/care/patients/${pid}`);
-                  onClose();
-                }}
-                onActionExecute={handleActionExecute}
-              />
+          {/* 이전 코칭 접기: user 메시지 인덱스로 Q&A 쌍 분리 */}
+          <PreviousCoachingSection
+            messages={messages}
+            onRetry={retryMessage}
+            onPatientClick={(pid) => { navigate(`/care/patients/${pid}`); onClose(); }}
+            onActionExecute={handleActionExecute}
+          />
+
+          {/* 메시지 있을 때 추천 질문 (하단) */}
+          {messages.length > 0 && !sending && (
+            <div className="pt-2">
+              <p className="text-[10px] text-slate-400 mb-1.5">추천 질문</p>
+              <div className="flex flex-wrap gap-1.5">
+                {suggestedQuestions.slice(0, 3).map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => sendMessage(q)}
+                    className="px-2.5 py-1.5 text-[11px] text-slate-500 bg-white border border-slate-200 rounded-full hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-colors"
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
             </div>
-          ))}
+          )}
 
           <div ref={messagesEndRef} />
         </div>
@@ -648,7 +652,7 @@ export default function CareAiChatPanel({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="질문을 입력하세요..."
+              placeholder="혈당 관리에 대해 궁금한 점을 물어보세요..."
               disabled={sending}
               rows={1}
               className="flex-1 resize-none px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 max-h-24"
@@ -685,6 +689,94 @@ export default function CareAiChatPanel({
         }
       `}</style>
     </div>
+  );
+}
+
+// ── Previous Coaching Section (이전 코칭 접기 + 최신 강조) ──
+
+function PreviousCoachingSection({
+  messages,
+  onRetry,
+  onPatientClick,
+  onActionExecute,
+}: {
+  messages: ChatMessage[];
+  onRetry: (aiMsgId: string) => void;
+  onPatientClick: (patientId: string) => void;
+  onActionExecute: (action: AiChatActionDto) => void;
+}) {
+  const [showPrevious, setShowPrevious] = useState(false);
+
+  // Q&A 쌍을 user 메시지 기준으로 분리
+  const qaPairs: { startIdx: number; endIdx: number }[] = [];
+  for (let i = 0; i < messages.length; i++) {
+    if (messages[i].role === 'user') {
+      const nextUserIdx = messages.findIndex((m, j) => j > i && m.role === 'user');
+      qaPairs.push({ startIdx: i, endIdx: nextUserIdx === -1 ? messages.length : nextUserIdx });
+    }
+  }
+
+  const previousPairs = qaPairs.slice(0, -1);
+  const currentPair = qaPairs.length > 0 ? qaPairs[qaPairs.length - 1] : null;
+
+  return (
+    <>
+      {/* 이전 코칭 접기/펼치기 */}
+      {previousPairs.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowPrevious(!showPrevious)}
+            className="w-full flex items-center justify-center gap-1.5 py-2 text-[11px] text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <span>{showPrevious ? '이전 코칭 숨기기' : `이전 코칭 ${previousPairs.length}건 보기`}</span>
+            <span className={`transition-transform ${showPrevious ? 'rotate-180' : ''}`}>▾</span>
+          </button>
+
+          {showPrevious && (
+            <div className="space-y-3 opacity-60">
+              {previousPairs.map((pair, pairIdx) => (
+                <div key={pairIdx} className="space-y-3">
+                  {pairIdx > 0 && (
+                    <div className="flex items-center gap-2 py-1">
+                      <div className="flex-1 h-px bg-slate-200" />
+                    </div>
+                  )}
+                  {messages.slice(pair.startIdx, pair.endIdx).map((msg) => (
+                    <MessageBubble
+                      key={msg.id}
+                      message={msg}
+                      onRetry={() => onRetry(msg.id)}
+                      onPatientClick={onPatientClick}
+                      onActionExecute={onActionExecute}
+                    />
+                  ))}
+                </div>
+              ))}
+              <div className="flex items-center gap-2 py-1">
+                <div className="flex-1 h-px bg-slate-300" />
+                <span className="text-[10px] text-slate-400 flex-shrink-0">최신 코칭</span>
+                <div className="flex-1 h-px bg-slate-300" />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 최신 Q&A (항상 표시, 강조) */}
+      {currentPair && (
+        <div className="space-y-3">
+          {messages.slice(currentPair.startIdx, currentPair.endIdx).map((msg) => (
+            <MessageBubble
+              key={msg.id}
+              message={msg}
+              onRetry={() => onRetry(msg.id)}
+              onPatientClick={onPatientClick}
+              onActionExecute={onActionExecute}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -765,39 +857,51 @@ function MessageBubble({
   const resp = message.response;
   if (!resp) return null;
 
+  // Action 버튼 최대 3개 노출
+  const visibleActions = resp.actions?.slice(0, 3) || [];
+
   return (
     <div className="flex justify-start">
-      <div className="max-w-[90%] bg-slate-50 border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 space-y-3">
-        {/* Summary */}
-        <p className="text-sm text-slate-800 leading-relaxed">{safeStr(resp.summary)}</p>
+      <div className="max-w-[90%] bg-slate-50 border border-slate-200 rounded-2xl rounded-bl-md px-4 py-3 space-y-2.5">
+        {/* 요약 섹션 */}
+        <div>
+          <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-1">요약</p>
+          <p className="text-sm text-slate-800 leading-relaxed">{safeStr(resp.summary)}</p>
+        </div>
 
-        {/* Details */}
+        {/* 핵심 포인트 */}
         {resp.details?.length > 0 && (
-          <div className="space-y-1">
-            {resp.details.map((d, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
-                <span>{safeStr(d)}</span>
-              </div>
-            ))}
+          <div className="bg-white rounded-lg px-3 py-2 border border-slate-100">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">핵심 포인트</p>
+            <div className="space-y-1">
+              {resp.details.map((d, i) => (
+                <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
+                  <span>{safeStr(d)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Recommendations */}
+        {/* 권장사항 */}
         {resp.recommendations?.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {resp.recommendations.map((r, i) => (
-              <span
-                key={i}
-                className="inline-flex items-center px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md"
-              >
-                {safeStr(r)}
-              </span>
-            ))}
+          <div>
+            <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1.5">권장사항</p>
+            <div className="flex flex-wrap gap-1.5">
+              {resp.recommendations.map((r, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md"
+                >
+                  {safeStr(r)}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Related Patients */}
+        {/* 관련 환자 */}
         {resp.relatedPatients?.length > 0 && (
           <div className="pt-1 border-t border-slate-200 space-y-1">
             {resp.relatedPatients.map((p) => (
@@ -815,10 +919,11 @@ function MessageBubble({
           </div>
         )}
 
-        {/* Actions */}
-        {resp.actions?.length > 0 && (
+        {/* 권장 행동 (최대 3개) */}
+        {visibleActions.length > 0 && (
           <div className="pt-2 border-t border-slate-200 space-y-1.5">
-            {resp.actions.map((action, i) => (
+            <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">다음 단계</p>
+            {visibleActions.map((action, i) => (
               <ActionButton key={i} action={action} onExecute={onActionExecute} />
             ))}
           </div>
