@@ -40,6 +40,7 @@ import { AppDataSource } from './database/connection.js';
 import { setupMiddlewares, getAllowedOrigins } from './bootstrap/setup-middlewares.js';
 import { registerCoreRoutes, registerDomainRoutes } from './bootstrap/register-routes.js';
 import { setupGracefulShutdown } from './bootstrap/setup-shutdown.js';
+import { globalErrorHandler } from './common/middleware/global-error.middleware.js';
 
 // ============================================================================
 // APP & SERVER CREATION
@@ -184,6 +185,10 @@ const startServer = async () => {
   // WO-O4O-CARE-AI-CHAT-STABILITY-FIX-V1
 
   await registerDomainRoutes(app, AppDataSource);
+
+  // ── Global error handler — AFTER all routes, BEFORE listen ──
+  // WO-O4O-GLOBAL-ERROR-HANDLER-ENABLEMENT-V1
+  app.use(globalErrorHandler);
 
   // ── Phase 4: Start listening — ALL routes ready ──
 
