@@ -2,9 +2,10 @@
  * CareAiChatPanel — AI Care Copilot 슬라이드 아웃 패널
  * WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
  * WO-O4O-AI-STREAMING-SSE-IMPLEMENTATION-V1
+ * WO-O4O-CARE-AI-CHAT-SESSION-RESET-V1
  *
  * 우측 슬라이드 아웃 (420px). Population/Patient 모드.
- * 메시지 히스토리는 세션 내 유지 (client-side only).
+ * 각 질문은 완전히 독립된 요청 (이전 메시지 context 사용 안 함).
  * Streaming: SSE 기반 토큰 단위 실시간 응답 + 동기 API fallback.
  */
 
@@ -17,6 +18,7 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  RotateCcw,
   User,
   ArrowRight,
   MessageSquare,
@@ -174,6 +176,16 @@ export default function CareAiChatPanel({
   const streamBuffer = useStreamBuffer();
 
   const suggestedQuestions = patientId ? PATIENT_QUESTIONS : POPULATION_QUESTIONS;
+
+  // Reset chat session — clear messages + sessionStorage
+  const resetChatSession = useCallback(() => {
+    abortControllerRef.current?.abort();
+    if (renderTickRef.current) { clearInterval(renderTickRef.current); renderTickRef.current = null; }
+    setMessages([]);
+    setSending(false);
+    sessionStorage.removeItem(getStorageKey(patientId));
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, [patientId]);
 
   // Persist messages to sessionStorage (skip transient states)
   useEffect(() => {
@@ -545,12 +557,25 @@ export default function CareAiChatPanel({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
-          >
-            <X className="w-4 h-4 text-slate-500" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            {messages.length > 0 && (
+              <button
+                onClick={resetChatSession}
+                disabled={sending}
+                title="새 코칭 시작"
+                className="h-8 px-2.5 rounded-lg text-[11px] font-medium text-blue-600 hover:bg-blue-50 flex items-center gap-1.5 transition-colors disabled:opacity-40"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                새 코칭
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
+            >
+              <X className="w-4 h-4 text-slate-500" />
+            </button>
+          </div>
         </div>
 
         {/* Messages Area */}
@@ -581,17 +606,26 @@ export default function CareAiChatPanel({
             </div>
           )}
 
-          {messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              message={msg}
-              onRetry={() => retryMessage(msg.id)}
-              onPatientClick={(pid) => {
-                navigate(`/care/patients/${pid}`);
-                onClose();
-              }}
-              onActionExecute={handleActionExecute}
-            />
+          {messages.map((msg, idx) => (
+            <div key={msg.id}>
+              {/* Q&A 세션 구분선: user 메시지 앞이며 첫 메시지가 아닌 경우 */}
+              {msg.role === 'user' && idx > 0 && (
+                <div className="flex items-center gap-2 py-2 mb-2">
+                  <div className="flex-1 h-px bg-slate-200" />
+                  <span className="text-[10px] text-slate-400 flex-shrink-0">새 질문</span>
+                  <div className="flex-1 h-px bg-slate-200" />
+                </div>
+              )}
+              <MessageBubble
+                message={msg}
+                onRetry={() => retryMessage(msg.id)}
+                onPatientClick={(pid) => {
+                  navigate(`/care/patients/${pid}`);
+                  onClose();
+                }}
+                onActionExecute={handleActionExecute}
+              />
+            </div>
           ))}
 
           <div ref={messagesEndRef} />
@@ -622,7 +656,7 @@ export default function CareAiChatPanel({
             </button>
           </div>
           <p className="text-[10px] text-slate-400 mt-1.5 px-1">
-            AI 분석은 참고용이며, 의료적 판단을 대체하지 않습니다
+            각 질문은 독립 분석됩니다 · AI 분석은 참고용이며, 의료적 판단을 대체하지 않습니다
           </p>
         </form>
       </div>
