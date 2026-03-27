@@ -812,7 +812,7 @@ export class CsvImportService {
     // CASCADE로 rows 자동 삭제
     await this.batchRepo.remove(batch);
 
-    console.log(`[CSV Import] DELETE_IMPORT batchId=${batchId} supplierId=${supplierId} status=${batch.status} totalRows=${totalRows}`);
+    logger.info(`[CSV Import] DELETE_IMPORT batchId=${batchId} supplierId=${supplierId} status=${batch.status} totalRows=${totalRows}`);
 
     return { success: true, data: { deletedId: batchId, totalRows } };
   }
