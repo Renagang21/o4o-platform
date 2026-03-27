@@ -2,7 +2,7 @@
  * SupplierProductsPage — 엑셀형 공급자 제품 관리
  *
  * WO-NETURE-SUPPLIER-EXCEL-LIST-V1
- * WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1 — 다건 가격 편집, 체크박스 선택, 벌크 모달
+ * WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1 — 벌크 가격 제거, 인라인 편집, 일괄 삭제
  * WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1 — 이미지/설명 필터, 업로드 모달, 설명 편집 모달
  * WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1 — 완성도 점수, 진행바, 필터
  * WO-NETURE-SUPPLIER-WORKFLOW-SHORTCUTS-V1 — 부족 항목 클릭 → 편집 UI 바로 열기
@@ -69,69 +69,6 @@ function FilterChip({ label, active, onClick }: { label: string; active: boolean
     >
       {label}
     </button>
-  );
-}
-
-// ─── Bulk Price Modal ───
-
-function BulkPriceModal({
-  count,
-  onClose,
-  onApply,
-  applying,
-}: {
-  count: number;
-  onClose: () => void;
-  onApply: (op: string, value: number) => void;
-  applying: boolean;
-}) {
-  const [operation, setOperation] = useState('INCREASE');
-  const [value, setValue] = useState<number>(0);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[400px]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">일괄 가격 변경</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
-        </div>
-        <p className="text-sm text-slate-500 mb-4">{count}개 상품 선택됨</p>
-
-        <div className="space-y-3">
-          <select
-            value={operation}
-            onChange={(e) => setOperation(e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
-          >
-            <option value="INCREASE">금액 인상</option>
-            <option value="DECREASE">금액 인하</option>
-            <option value="PERCENT_INCREASE">% 인상</option>
-            <option value="PERCENT_DECREASE">% 인하</option>
-            <option value="SET">금액 지정</option>
-          </select>
-
-          <input
-            type="number"
-            min={0}
-            value={value}
-            onChange={(e) => setValue(Number(e.target.value))}
-            placeholder={operation.includes('PERCENT') ? '퍼센트 (%)' : '금액 (원)'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
-          />
-        </div>
-
-        <div className="flex justify-end gap-2 mt-6">
-          <button onClick={onClose} disabled={applying} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
-          <button
-            onClick={() => onApply(operation, value)}
-            disabled={applying || value <= 0}
-            className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
-          >
-            {applying ? '적용 중...' : '적용'}
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -593,8 +530,8 @@ export default function SupplierProductsPage() {
 
   // Bulk edit state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showBulkModal, setShowBulkModal] = useState(false);
-  const [bulkApplying, setBulkApplying] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // Filter state
@@ -634,30 +571,13 @@ export default function SupplierProductsPage() {
     }
   };
 
-  // Quick price adjustment
-  const handleQuickPrice = async (offerId: string, delta: number) => {
-    const result = await supplierApi.bulkUpdatePrice({
-      offerIds: [offerId],
-      operation: delta > 0 ? 'INCREASE' : 'DECREASE',
-      value: Math.abs(delta),
-    });
-    if (result.updated > 0) {
-      showToast(`가격 ${delta > 0 ? '+' : ''}${delta.toLocaleString()}원 적용`);
-      await fetchProducts(pagination.page);
-    }
-  };
-
-  // Bulk price apply
-  const handleBulkApply = async (operation: string, value: number) => {
-    setBulkApplying(true);
-    const result = await supplierApi.bulkUpdatePrice({
-      offerIds: Array.from(selectedIds),
-      operation: operation as any,
-      value,
-    });
-    setBulkApplying(false);
-    setShowBulkModal(false);
-    showToast(`${result.updated}건 가격 변경 완료${result.failed.length > 0 ? ` (${result.failed.length}건 실패)` : ''}`);
+  // Bulk delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1)
+  const handleBulkDelete = async () => {
+    setBulkDeleting(true);
+    const result = await supplierApi.bulkDelete(Array.from(selectedIds));
+    setBulkDeleting(false);
+    setShowDeleteConfirm(false);
+    showToast(`${result.deleted}건 삭제 완료${result.failed.length > 0 ? ` (${result.failed.length}건 실패)` : ''}`);
     setSelectedIds(new Set());
     await fetchProducts(pagination.page);
   };
@@ -764,31 +684,6 @@ export default function SupplierProductsPage() {
               </div>
             );
           },
-        };
-      }
-      // Enhance priceGeneral with quick +/- buttons
-      if (col.key === 'priceGeneral') {
-        return {
-          ...col,
-          render: (v: any, row: SupplierProduct) => (
-            <div className="flex items-center justify-end gap-1">
-              <button
-                onClick={(e) => { e.stopPropagation(); handleQuickPrice(row.id, -500); }}
-                className="text-xs text-red-500 hover:bg-red-50 px-1 rounded"
-                title="-500원"
-              >
-                -5
-              </button>
-              <span>{v != null ? `${Number(v).toLocaleString()}` : '-'}</span>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleQuickPrice(row.id, 500); }}
-                className="text-xs text-blue-500 hover:bg-blue-50 px-1 rounded"
-                title="+500원"
-              >
-                +5
-              </button>
-            </div>
-          ),
         };
       }
       // Enhance completenessScore with clickable workflow shortcuts
@@ -1035,10 +930,10 @@ export default function SupplierProductsPage() {
         <div className="flex items-center gap-3 mb-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
           <span className="text-sm text-blue-700 font-medium">{selectedIds.size}개 선택</span>
           <button
-            onClick={() => setShowBulkModal(true)}
-            className="px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
           >
-            일괄 가격 변경
+            일괄 삭제
           </button>
           <button
             onClick={() => setSelectedIds(new Set())}
@@ -1096,13 +991,32 @@ export default function SupplierProductsPage() {
       )}
 
       {/* Modals */}
-      {showBulkModal && (
-        <BulkPriceModal
-          count={selectedIds.size}
-          onClose={() => setShowBulkModal(false)}
-          onApply={handleBulkApply}
-          applying={bulkApplying}
-        />
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[400px]">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제 확인</h3>
+            <p className="text-sm text-slate-600 mb-1">
+              선택한 <strong>{selectedIds.size}개</strong> 상품을 삭제합니다.
+            </p>
+            <p className="text-xs text-red-600 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={bulkDeleting}
+                className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+                className="px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50"
+              >
+                {bulkDeleting ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       {imageUploadMasterId && (
         <ImageUploadModal

@@ -947,14 +947,12 @@ export class NetureOfferService {
     return { updated, failed };
   }
 
-  // ==================== Bulk Price Update (WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1) ====================
+  // ==================== Bulk Delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1) ====================
 
-  async bulkUpdatePrice(
+  async bulkDeleteOffers(
     supplierId: string,
     offerIds: string[],
-    operation: 'INCREASE' | 'DECREASE' | 'PERCENT_INCREASE' | 'PERCENT_DECREASE' | 'SET',
-    value: number,
-  ): Promise<{ updated: number; failed: Array<{ id: string; error: string }> }> {
+  ): Promise<{ deleted: number; failed: Array<{ id: string; error: string }> }> {
     const offers = await this.offerRepo.find({
       where: { id: In(offerIds), supplierId },
     });
@@ -968,41 +966,18 @@ export class NetureOfferService {
       }
     }
 
-    let updated = 0;
+    let deleted = 0;
     for (const offer of offers) {
-      const oldPrice = Number(offer.priceGeneral) || 0;
-      let newPrice: number;
-
-      switch (operation) {
-        case 'INCREASE':
-          newPrice = oldPrice + value;
-          break;
-        case 'DECREASE':
-          newPrice = oldPrice - value;
-          break;
-        case 'PERCENT_INCREASE':
-          newPrice = oldPrice * (1 + value / 100);
-          break;
-        case 'PERCENT_DECREASE':
-          newPrice = oldPrice * (1 - value / 100);
-          break;
-        case 'SET':
-          newPrice = value;
-          break;
-      }
-
-      newPrice = Math.max(0, Math.round(newPrice));
-      offer.priceGeneral = newPrice;
-
       try {
-        await this.offerRepo.save(offer);
-        updated++;
+        await this.offerRepo.remove(offer);
+        deleted++;
       } catch (err) {
         failed.push({ id: offer.id, error: (err as Error).message });
       }
     }
 
-    return { updated, failed };
+    logger.info(`[OfferService] bulkDeleteOffers: supplier=${supplierId}, requested=${offerIds.length}, deleted=${deleted}, failed=${failed.length}`);
+    return { deleted, failed };
   }
 
   // ==================== Operator Supply Dashboard ====================

@@ -505,18 +505,14 @@ export const supplierApi = {
     }
   },
 
-  // WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1: Bulk price update
-  async bulkUpdatePrice(params: {
-    offerIds: string[];
-    operation: 'INCREASE' | 'DECREASE' | 'PERCENT_INCREASE' | 'PERCENT_DECREASE' | 'SET';
-    value: number;
-  }): Promise<{ updated: number; failed: Array<{ id: string; error: string }> }> {
+  // WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1: Bulk delete
+  async bulkDelete(offerIds: string[]): Promise<{ deleted: number; failed: Array<{ id: string; error: string }> }> {
     try {
-      const response = await api.patch('/neture/supplier/products/bulk-price', params);
-      return response.data.data || { updated: 0, failed: [] };
+      const response = await api.delete('/neture/supplier/products/bulk', { data: { offerIds } });
+      return response.data.data || { deleted: 0, failed: [] };
     } catch (error) {
-      console.warn('[Supplier API] Failed to bulk update prices:', error);
-      return { updated: 0, failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
+      console.warn('[Supplier API] Failed to bulk delete offers:', error);
+      return { deleted: 0, failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
     }
   },
 

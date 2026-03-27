@@ -83,12 +83,12 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
-  // PATCH /supplier/products/bulk-price (WO-NETURE-SUPPLIER-BULK-EDIT-UX-V1)
-  // 주의: /products/:id 보다 먼저 등록해야 'bulk-price'가 :id로 매칭되지 않음
-  router.patch('/products/bulk-price', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+  // DELETE /supplier/products/bulk (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1)
+  // 주의: /products/:id 보다 먼저 등록해야 'bulk'가 :id로 매칭되지 않음
+  router.delete('/products/bulk', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { offerIds, operation, value } = req.body;
+      const { offerIds } = req.body;
 
       if (!Array.isArray(offerIds) || offerIds.length === 0) {
         return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_OFFER_IDS, message: 'offerIds array is required' });
@@ -96,20 +96,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       if (offerIds.length > 100) {
         return res.status(400).json({ success: false, error: OfferErrorCode.VALIDATION_ERROR, message: 'Max 100 offers per request' });
       }
-      const validOps = ['INCREASE', 'DECREASE', 'PERCENT_INCREASE', 'PERCENT_DECREASE', 'SET'];
-      if (!validOps.includes(operation)) {
-        return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_OPERATION, message: `operation must be one of: ${validOps.join(', ')}` });
-      }
-      if (typeof value !== 'number' || value < 0) {
-        return res.status(400).json({ success: false, error: OfferErrorCode.INVALID_VALUE, message: 'value must be a non-negative number' });
-      }
 
-      const result = await netureService.bulkUpdatePrice(supplierId, offerIds, operation, value);
+      const result = await netureService.bulkDeleteOffers(supplierId, offerIds);
       const allSucceeded = !result.failed || result.failed.length === 0;
       res.json({ success: allSucceeded, data: result });
     } catch (error) {
-      logger.error('[Neture API] Error bulk updating prices:', error);
-      res.status(500).json({ success: false, error: OfferErrorCode.INTERNAL_ERROR, message: 'Failed to bulk update prices' });
+      logger.error('[Neture API] Error bulk deleting offers:', error);
+      res.status(500).json({ success: false, error: OfferErrorCode.INTERNAL_ERROR, message: 'Failed to bulk delete offers' });
     }
   });
 
