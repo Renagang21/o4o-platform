@@ -399,12 +399,18 @@ export default function SupplierCsvImportPage() {
               ) : selectedBatch ? (
                 <>
                   {/* Summary */}
-                  <div className="flex gap-4 mb-4 text-sm">
+                  <div className="flex flex-wrap gap-4 mb-4 text-sm">
                     <span>상태: <StatusBadge status={selectedBatch.status} /></span>
                     <span className="text-gray-500">전체: {selectedBatch.totalRows}</span>
                     <span className="text-green-600">유효: {selectedBatch.validRows}</span>
                     <span className="text-red-600">거부: {selectedBatch.rejectedRows}</span>
                     <span className="text-blue-600">적용: {selectedBatch.appliedRows}</span>
+                    {/* WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1 */}
+                    {selectedBatch.rows?.some((r) => r.offerId) && (
+                      <span className="text-indigo-600">
+                        생성 상품: {selectedBatch.rows.filter((r) => r.offerId).length}건
+                      </span>
+                    )}
                   </div>
 
                   {/* Row table — WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: apply 상태 컬럼 추가 */}
@@ -420,6 +426,7 @@ export default function SupplierCsvImportPage() {
                             <th className="pb-2 pr-3">검증</th>
                             <th className="pb-2 pr-3">액션</th>
                             <th className="pb-2 pr-3">적용</th>
+                            <th className="pb-2 pr-3">상품</th>
                             <th className="pb-2">오류</th>
                           </tr>
                         </thead>
@@ -443,6 +450,23 @@ export default function SupplierCsvImportPage() {
                                   <span className="text-red-600 font-medium text-xs">FAIL</span>
                                 ) : (
                                   <span className="text-gray-300 text-xs">-</span>
+                                )}
+                              </td>
+                              <td className="py-2 pr-3 text-xs">
+                                {row.offerId ? (
+                                  <a
+                                    href={`/supplier/products/${row.offerId}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    보기
+                                  </a>
+                                ) : row.masterId && row.applyStatus === 'applied' ? (
+                                  <span className="text-gray-400" title={`Master: ${row.masterId.slice(0, 8)}`}>연결됨</span>
+                                ) : (
+                                  <span className="text-gray-300">-</span>
                                 )}
                               </td>
                               <td className="py-2 text-xs text-red-500">

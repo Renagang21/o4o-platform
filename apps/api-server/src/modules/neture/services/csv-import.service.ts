@@ -398,6 +398,8 @@ export class CsvImportService {
 
           row.applyStatus = 'applied';
           row.applyError = null;
+          row.masterId = result.masterId; // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1
+          row.offerId = result.offerId;
           appliedOffers++;
           if (result.createdMaster) createdMasters++;
           if (result.imageJob) imageJobs.push(result.imageJob);
@@ -476,6 +478,8 @@ export class CsvImportService {
     supplierId: string,
   ): Promise<{
     createdMaster: boolean;
+    masterId: string;
+    offerId: string;
     imageJob?: { masterId: string; imageUrl: string };
     aiInput?: ProductContentInput;
   }> {
@@ -573,7 +577,7 @@ export class CsvImportService {
       detailDescription: rawDetailDesc || null,
     };
 
-    await this.importCommon.upsertSupplierOffer(
+    const offerId = await this.importCommon.upsertSupplierOffer(
       manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!, extra,
     );
 
@@ -589,7 +593,7 @@ export class CsvImportService {
       manufacturerName: masterManufacturer || 'Unknown',
     };
 
-    return { createdMaster, imageJob, aiInput };
+    return { createdMaster, masterId, offerId, imageJob, aiInput };
   }
 
   // ==================== Batch 조회 ====================

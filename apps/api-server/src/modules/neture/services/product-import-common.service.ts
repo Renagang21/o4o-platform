@@ -52,7 +52,7 @@ export class ProductImportCommonService {
       description?: string | null;
       detailDescription?: string | null;
     },
-  ): Promise<void> {
+  ): Promise<string> {
     const slug = `${barcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
     const msrp = extra?.msrp ?? null;
     const stockQty = extra?.stockQty ?? 0;
@@ -77,7 +77,15 @@ export class ProductImportCommonService {
       [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug],
     );
 
-    logger.info(`[ImportCommon] Upserted offer: master=${masterId}, supplier=${supplierId}`);
+    // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1: offer ID 조회 (RETURNING 대신 안전한 SELECT)
+    const rows: Array<{ id: string }> = await manager.query(
+      `SELECT id FROM supplier_product_offers WHERE master_id = $1 AND supplier_id = $2 LIMIT 1`,
+      [masterId, supplierId],
+    );
+    const offerId = rows[0]?.id || '';
+
+    logger.info(`[ImportCommon] Upserted offer: master=${masterId}, supplier=${supplierId}, offer=${offerId}`);
+    return offerId;
   }
 
   // ── Brand Resolution ─────────────────────────────────────────────────
