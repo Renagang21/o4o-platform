@@ -211,14 +211,15 @@ export const uploadMiddleware = (fieldName: string = 'files', maxFiles: number =
 };
 
 // Single file upload middleware
+// WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: error 응답 포맷 통일 { error: { code, message } }
 export const uploadSingleMiddleware = (fieldName: string = 'file') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const uploadHandler = upload.single(fieldName);
-    
+
     uploadHandler(req as any, res as any, (err) => {
       if (err instanceof multer.MulterError) {
         let errorMessage = 'File upload error';
-        
+
         switch (err.code) {
           case 'LIMIT_FILE_SIZE':
             errorMessage = 'File too large';
@@ -227,43 +228,40 @@ export const uploadSingleMiddleware = (fieldName: string = 'file') => {
             errorMessage = err.message || 'Unexpected file type';
             break;
         }
-        
+
         logger.warn('Single file upload error:', {
           error: err.code,
           message: errorMessage
         });
-        
+
         return res.status(400).json({
           success: false,
-          error: errorMessage,
-          code: err.code
+          error: { code: err.code, message: errorMessage },
         });
       }
-      
+
       if (err) {
         logger.error('Unexpected single file upload error:', err);
         return res.status(500).json({
           success: false,
-          error: 'Upload failed',
-          code: 'UPLOAD_ERROR'
+          error: { code: 'UPLOAD_ERROR', message: 'Upload failed' },
         });
       }
-      
+
       // Additional file size validation
       const file = req.file as Express.Multer.File;
       if (file) {
         const fileType = getFileType(file.mimetype);
         const sizeLimit = FILE_SIZE_LIMITS[fileType] || FILE_SIZE_LIMITS.default;
-        
+
         if (file.size > sizeLimit) {
           return res.status(400).json({
             success: false,
-            error: `File exceeds size limit for ${fileType} files (${Math.round(sizeLimit / 1024 / 1024)}MB)`,
-            code: 'FILE_TOO_LARGE'
+            error: { code: 'FILE_TOO_LARGE', message: `File exceeds size limit for ${fileType} files (${Math.round(sizeLimit / 1024 / 1024)}MB)` },
           });
         }
       }
-      
+
       next();
     });
   };

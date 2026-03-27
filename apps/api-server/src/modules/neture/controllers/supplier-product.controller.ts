@@ -252,13 +252,17 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       if (!file) {
         return res.status(400).json({ success: false, error: { code: 'NO_FILE', message: 'CSV file is required' } });
       }
+      // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: 업로드 파일 정보 로깅
+      logger.info(`[Neture CSV] Upload started — file: ${file.originalname}, size: ${file.size}, mime: ${file.mimetype}, supplier: ${supplierId}`);
       const result = await csvImportService.uploadAndValidate(supplierId, userId, {
         buffer: file.buffer,
         originalname: file.originalname,
       });
       if (!result.success) {
+        logger.warn(`[Neture CSV] Validation failed — file: ${file.originalname}, error: ${result.error}`);
         return res.status(400).json({ success: false, error: { code: result.error, message: result.error } });
       }
+      logger.info(`[Neture CSV] Upload success — file: ${file.originalname}, batchId: ${result.data?.batchId}, valid: ${result.data?.validRows}/${result.data?.totalRows}`);
       res.status(200).json(result);
     } catch (error) {
       logger.error('[Neture API] Error uploading CSV:', error);
