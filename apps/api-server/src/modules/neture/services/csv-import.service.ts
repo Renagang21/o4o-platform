@@ -117,10 +117,22 @@ export class CsvImportService {
     };
     error?: string;
   }> {
-    // 1. 파일 파싱 (CSV / XLSX 자동 감지) — WO-NETURE-XLSX-DIRECT-UPLOAD-V1
+    // WO-O4O-NETURE-UPLOAD-VALIDATION-REFORM-V1: 확장자 기반 검증 + 파싱 기반 실제 검증
+    // STEP 1. 확장자 체크
+    const ext = file.originalname ? file.originalname.substring(file.originalname.lastIndexOf('.')).toLowerCase() : '';
+    if (!['.xlsx', '.xls', '.csv'].includes(ext)) {
+      return { success: false, error: '.xlsx 또는 .csv 파일만 업로드 가능합니다' };
+    }
+
+    // STEP 2. 파일 크기 체크 (25MB)
+    if (file.buffer.length > 25 * 1024 * 1024) {
+      return { success: false, error: '파일 크기가 25MB를 초과합니다' };
+    }
+
+    // STEP 3. 실제 파싱 검증 (핵심 — MIME이 아닌 파일 내용으로 검증)
     let records: Record<string, string>[];
+    const isXlsx = /\.xlsx?$/i.test(file.originalname);
     try {
-      const isXlsx = /\.xlsx?$/i.test(file.originalname);
       if (isXlsx) {
         records = parseXlsxToRecords(file.buffer);
       } else {
@@ -133,9 +145,11 @@ export class CsvImportService {
         }) as Record<string, string>[];
       }
     } catch (err) {
-      // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: 파싱 에러 로깅 강화
       logger.error(`[CsvImport] Parse failed — file: ${file.originalname}, error:`, err);
-      return { success: false, error: `PARSE_ERROR: ${(err as Error).message}` };
+      const friendlyMsg = isXlsx
+        ? '엑셀 파일 형식이 올바르지 않습니다. Excel에서 다시 저장 후 업로드해 주세요.'
+        : 'CSV 파일 형식이 올바르지 않습니다.';
+      return { success: false, error: friendlyMsg };
     }
 
     if (records.length === 0) {
