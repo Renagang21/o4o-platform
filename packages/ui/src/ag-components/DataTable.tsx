@@ -1,5 +1,16 @@
-import React, { FC, ReactNode, useState } from 'react';
+/**
+ * DataTable — O4O Platform Standard Data Table
+ *
+ * WO-O4O-DATATABLE-BASE-ALIGN-V1 — BaseTable 기반 재구성
+ *
+ * BaseTable 렌더링 엔진 위의 thin wrapper.
+ * 정렬, 페이지네이션, 행 선택, 확장 행 기능 제공.
+ * 외부 API (DataTableProps, Column) 100% 유지.
+ */
+
+import React, { ReactNode, useState } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { BaseTable, type BaseColumn } from '../components/table/BaseTable';
 
 export interface Column<T> {
   key: string;
@@ -53,41 +64,26 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   rowSelection,
   expandable,
-  emptyText = '\uB370\uC774\uD130\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4',
+  emptyText = '데이터가 없습니다',
   className = ''
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
   const [internalExpandedKeys, setInternalExpandedKeys] = useState<string[]>([]);
 
+  // ─── Helpers ───
+
   const getRowKey = (record: T, index: number): string => {
-    if (typeof rowKey === 'function') {
-      return rowKey(record);
-    }
+    if (typeof rowKey === 'function') return rowKey(record);
     return String(record[rowKey]) || `row-${index}`;
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (rowSelection) {
-      if (checked) {
-        const allKeys = dataSource.map((record, index) => getRowKey(record, index));
-        rowSelection.onChange(allKeys);
-      } else {
-        rowSelection.onChange([]);
-      }
+  const getValue = (record: T, dataIndex: keyof T | string[] | undefined): any => {
+    if (!dataIndex) return record;
+    if (Array.isArray(dataIndex)) {
+      return dataIndex.reduce((obj, key) => obj?.[key], record as any);
     }
-  };
-
-  const handleSelectRow = (key: string, checked: boolean) => {
-    if (rowSelection) {
-      const selected = new Set(rowSelection.selectedRowKeys);
-      if (checked) {
-        selected.add(key);
-      } else {
-        selected.delete(key);
-      }
-      rowSelection.onChange(Array.from(selected));
-    }
+    return record[dataIndex];
   };
 
   const isExpanded = (record: T, index: number) => {
@@ -98,15 +94,23 @@ export function DataTable<T extends Record<string, any>>({
     return internalExpandedKeys.includes(key);
   };
 
-  const getValue = (record: T, dataIndex: keyof T | string[] | undefined): any => {
-    if (!dataIndex) return record;
+  // ─── Selection ───
 
-    if (Array.isArray(dataIndex)) {
-      return dataIndex.reduce((obj, key) => obj?.[key], record as any);
-    }
-
-    return record[dataIndex];
+  const handleSelectAll = (checked: boolean) => {
+    if (!rowSelection) return;
+    rowSelection.onChange(
+      checked ? dataSource.map((r, i) => getRowKey(r, i)) : [],
+    );
   };
+
+  const handleSelectRow = (key: string, checked: boolean) => {
+    if (!rowSelection) return;
+    const selected = new Set(rowSelection.selectedRowKeys);
+    if (checked) selected.add(key); else selected.delete(key);
+    rowSelection.onChange(Array.from(selected));
+  };
+
+  // ─── Sorting ───
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -122,6 +126,16 @@ export function DataTable<T extends Record<string, any>>({
     }
   };
 
+  const renderSortIcon = (columnKey: string, sortable?: boolean) => {
+    if (!sortable) return null;
+    if (sortKey === columnKey) {
+      return sortOrder === 'asc'
+        ? <ChevronUp className="w-4 h-4" />
+        : <ChevronDown className="w-4 h-4" />;
+    }
+    return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
+  };
+
   const sortedData = [...dataSource];
   if (sortKey && sortOrder) {
     const column = columns.find(col => col.key === sortKey);
@@ -129,41 +143,74 @@ export function DataTable<T extends Record<string, any>>({
       sortedData.sort((a, b) => {
         const aValue = getValue(a, column.dataIndex);
         const bValue = getValue(b, column.dataIndex);
-
         if (aValue === bValue) return 0;
         if (aValue == null) return 1;
         if (bValue == null) return -1;
-
         const comparison = aValue < bValue ? -1 : 1;
         return sortOrder === 'asc' ? comparison : -comparison;
       });
     }
   }
 
-  const renderSortIcon = (columnKey: string, sortable?: boolean) => {
-    if (!sortable) return null;
+  // ─── Column Mapping: Column<T> → BaseColumn<T> ───
 
-    if (sortKey === columnKey) {
-      return sortOrder === 'asc' ? (
-        <ChevronUp className="w-4 h-4" />
-      ) : (
-        <ChevronDown className="w-4 h-4" />
-      );
-    }
+  const baseColumns: BaseColumn<T>[] = [];
 
-    return <ChevronsUpDown className="w-4 h-4 text-gray-400" />;
-  };
+  // Selection column (prepend)
+  if (rowSelection) {
+    baseColumns.push({
+      key: '__selection',
+      header: (
+        <input
+          type="checkbox"
+          checked={dataSource.length > 0 && rowSelection.selectedRowKeys.length === dataSource.length}
+          onChange={(e) => handleSelectAll(e.target.checked)}
+          className="rounded border-gray-300"
+        />
+      ),
+      headerClassName: 'w-4',
+      className: 'w-4',
+      render: (row, index) => {
+        const key = getRowKey(row, index);
+        return (
+          <input
+            type="checkbox"
+            checked={rowSelection.selectedRowKeys.includes(key)}
+            onChange={(e) => handleSelectRow(key, e.target.checked)}
+            onClick={(e) => e.stopPropagation()}
+            className="rounded border-gray-300"
+          />
+        );
+      },
+    });
+  }
 
-  const getAlignClass = (align?: 'left' | 'center' | 'right') => {
-    switch (align) {
-      case 'center':
-        return 'text-center';
-      case 'right':
-        return 'text-right';
-      default:
-        return 'text-left';
-    }
-  };
+  // Data columns
+  for (const col of columns) {
+    baseColumns.push({
+      key: col.key,
+      header: (
+        <div className="flex items-center gap-1">
+          <span>{col.title}</span>
+          {renderSortIcon(col.key, col.sortable)}
+        </div>
+      ),
+      width: col.width,
+      align: col.align,
+      onHeaderClick: col.sortable ? () => handleSort(col.key) : undefined,
+      headerClassName: col.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : undefined,
+      render: (row, index) => {
+        const value = getValue(row, col.dataIndex);
+        return col.render ? col.render(value, row, index) : value;
+      },
+    });
+  }
+
+  // ─── Row handlers ───
+
+  const hasAnyRowClick = !!(onRow || onRowClick);
+
+  // ─── Loading skeleton ───
 
   if (loading) {
     return (
@@ -178,106 +225,41 @@ export function DataTable<T extends Record<string, any>>({
     );
   }
 
+  // ─── Render ───
+
   return (
     <div className={`w-full ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {rowSelection && (
-                <th className="px-6 py-3 w-4">
-                  <input
-                    type="checkbox"
-                    checked={dataSource.length > 0 && rowSelection.selectedRowKeys.length === dataSource.length}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                </th>
-              )}
-              {columns.map(column => (
-                <th
-                  key={column.key}
-                  style={{ width: column.width }}
-                  className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${getAlignClass(column.align)} ${column.sortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''
-                    }`}
-                  onClick={() => column.sortable && handleSort(column.key)}
-                >
-                  <div className="flex items-center gap-1">
-                    <span>{column.title}</span>
-                    {renderSortIcon(column.key, column.sortable)}
-                  </div>
-                </th>
-              ))}
+      <BaseTable
+        columns={baseColumns}
+        data={sortedData}
+        rowKey={(row, index) => getRowKey(row, index)}
+        headerClassName="bg-gray-50"
+        bodyClassName="bg-white divide-y divide-gray-200"
+        thClassName="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+        tdClassName="px-6 py-4 text-sm text-gray-900"
+        rowClassName={(row, index) => {
+          const rowProps = onRow?.(row) || {};
+          const hasClick = !!(rowProps.onClick || onRowClick);
+          return `hover:bg-gray-50 ${hasClick ? 'cursor-pointer' : ''} ${rowProps.className || ''}`;
+        }}
+        onRowClick={hasAnyRowClick ? (row) => {
+          const rowProps = onRow?.(row) || {};
+          const handler = rowProps.onClick || (onRowClick ? () => onRowClick(row) : undefined);
+          handler?.();
+        } : undefined}
+        renderAfterRow={expandable ? (row, index) => {
+          const expanded = isExpanded(row, index);
+          if (!expanded) return null;
+          return (
+            <tr className="bg-gray-50">
+              <td colSpan={baseColumns.length} className="px-6 py-4">
+                {expandable.expandedRowRender(row)}
+              </td>
             </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedData.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length + (rowSelection ? 1 : 0)}
-                  className="px-6 py-12 text-center text-sm text-gray-500"
-                >
-                  {emptyText}
-                </td>
-              </tr>
-            ) : (
-              sortedData.map((record, index) => {
-                const rowProps = onRow?.(record) || {};
-                const key = getRowKey(record, index);
-                const expanded = isExpanded(record, index);
-                // Support both onRow and onRowClick
-                const handleClick = rowProps.onClick || (onRowClick ? () => onRowClick(record) : undefined);
-
-                return (
-                  <React.Fragment key={key}>
-                    <tr
-                      onClick={handleClick}
-                      className={`hover:bg-gray-50 ${handleClick ? 'cursor-pointer' : ''} ${rowProps.className || ''
-                        }`}
-                    >
-                      {rowSelection && (
-                        <td className="px-6 py-4 whitespace-nowrap w-4">
-                          <input
-                            type="checkbox"
-                            checked={rowSelection.selectedRowKeys.includes(key)}
-                            onChange={(e) => handleSelectRow(key, e.target.checked)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="rounded border-gray-300"
-                          />
-                        </td>
-                      )}
-                      {columns.map(column => {
-                        const value = getValue(record, column.dataIndex);
-                        const content = column.render
-                          ? column.render(value, record, index)
-                          : value;
-
-                        return (
-                          <td
-                            key={column.key}
-                            className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${getAlignClass(
-                              column.align
-                            )}`}
-                          >
-                            {content}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                    {expanded && expandable && (
-                      <tr className="bg-gray-50">
-                        <td colSpan={columns.length + (rowSelection ? 1 : 0)} className="px-6 py-4">
-                          {expandable.expandedRowRender(record)}
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+          );
+        } : undefined}
+        emptyMessage={emptyText}
+      />
 
       {/* Pagination */}
       {pagination && pagination.total > 0 && (() => {

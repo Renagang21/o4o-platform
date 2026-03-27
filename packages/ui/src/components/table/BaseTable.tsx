@@ -3,6 +3,7 @@
  *
  * WO-O4O-TABLE-BASE-COMPONENT-V1
  * WO-O4O-EDITABLE-TABLE-REFACTOR-V1 — customization hooks 추가
+ * WO-O4O-DATATABLE-BASE-ALIGN-V1 — renderAfterRow, header hooks 추가
  *
  * 모든 테이블의 공통 렌더링/레이아웃 엔진.
  * DataTable, EditableTable 등은 이 컴포넌트의 thin wrapper.
@@ -13,6 +14,7 @@
  *  - th / td:  whitespace-nowrap
  */
 
+import { Fragment } from 'react';
 import type { ReactNode } from 'react';
 
 // ─── Types ──────────────────────────────────────
@@ -27,6 +29,10 @@ export interface BaseColumn<T> {
   cellClassName?: (row: T, rowIndex: number) => string;
   /** 셀 클릭 핸들러 (editable cell 등에 사용) */
   onCellClick?: (row: T, rowIndex: number) => void;
+  /** th 클릭 핸들러 (정렬 등에 사용) */
+  onHeaderClick?: () => void;
+  /** th에 추가할 클래스 (정렬 가능 표시 등) */
+  headerClassName?: string;
   render?: (row: T, rowIndex: number) => ReactNode;
 }
 
@@ -44,6 +50,8 @@ export interface BaseTableProps<T> {
   /** 행 클래스. 제공하면 기본 hover 대신 사용. */
   rowClassName?: (row: T, index: number) => string;
   onRowClick?: (row: T, index: number) => void;
+  /** 각 행 뒤에 추가 콘텐츠 렌더링 (확장 행 등). null 반환 시 무시. */
+  renderAfterRow?: (row: T, index: number) => ReactNode;
   emptyMessage?: ReactNode;
 }
 
@@ -73,6 +81,7 @@ export function BaseTable<T extends Record<string, any>>({
   tdClassName,
   rowClassName,
   onRowClick,
+  renderAfterRow,
   emptyMessage = '데이터가 없습니다',
 }: BaseTableProps<T>) {
   const thBase = thClassName ?? DEFAULT_TH;
@@ -87,7 +96,8 @@ export function BaseTable<T extends Record<string, any>>({
               <th
                 key={col.key}
                 style={col.width != null ? { width: col.width } : undefined}
-                className={`whitespace-nowrap ${thBase} ${alignClass(col.align)}`}
+                onClick={col.onHeaderClick}
+                className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''}`}
               >
                 {col.header}
               </th>
@@ -108,33 +118,38 @@ export function BaseTable<T extends Record<string, any>>({
           ) : (
             data.map((row, rowIndex) => {
               const key = rowKey ? rowKey(row, rowIndex) : `row-${rowIndex}`;
-              const rowCls = rowClassName?.(row, rowIndex) ?? 'hover:bg-gray-50';
+              const rowCls = rowClassName
+                ? rowClassName(row, rowIndex)
+                : `hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`;
+              const afterRow = renderAfterRow?.(row, rowIndex);
 
               return (
-                <tr
-                  key={key}
-                  onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
-                  className={`${onRowClick ? 'cursor-pointer' : ''} ${rowCls}`}
-                >
-                  {columns.map((col) => {
-                    const content = col.render
-                      ? col.render(row, rowIndex)
-                      : row[col.key];
+                <Fragment key={key}>
+                  <tr
+                    onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
+                    className={rowCls}
+                  >
+                    {columns.map((col) => {
+                      const content = col.render
+                        ? col.render(row, rowIndex)
+                        : row[col.key];
 
-                    const dynamicCls = col.cellClassName?.(row, rowIndex);
-                    const cellCls = dynamicCls ?? `${tdBase} ${col.className ?? ''}`;
+                      const dynamicCls = col.cellClassName?.(row, rowIndex);
+                      const cellCls = dynamicCls ?? `${tdBase} ${col.className ?? ''}`;
 
-                    return (
-                      <td
-                        key={col.key}
-                        onClick={col.onCellClick ? () => col.onCellClick!(row, rowIndex) : undefined}
-                        className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)}`}
-                      >
-                        {content}
-                      </td>
-                    );
-                  })}
-                </tr>
+                      return (
+                        <td
+                          key={col.key}
+                          onClick={col.onCellClick ? () => col.onCellClick!(row, rowIndex) : undefined}
+                          className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)}`}
+                        >
+                          {content}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  {afterRow}
+                </Fragment>
               );
             })
           )}
