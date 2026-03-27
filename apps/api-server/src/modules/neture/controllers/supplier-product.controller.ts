@@ -318,5 +318,22 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // DELETE /supplier/csv-import/batches/:id — WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1
+  router.delete('/csv-import/batches/:id', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { id } = req.params;
+      const result = await csvImportService.deleteBatch(id, supplierId);
+      if (!result.success) {
+        const status = result.error === 'BATCH_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error deleting CSV batch:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to delete CSV batch' } });
+    }
+  });
+
   return router;
 }

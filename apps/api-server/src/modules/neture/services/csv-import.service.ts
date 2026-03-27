@@ -627,6 +627,39 @@ export class CsvImportService {
     });
   }
 
+  // ==================== Batch 삭제 (WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1) ====================
+
+  /**
+   * 업로드 이력 삭제 — batch + rows만 삭제, 상품(offer/master) 유지
+   * Rows are auto-deleted via ON DELETE CASCADE at DB level.
+   */
+  async deleteBatch(
+    batchId: string,
+    supplierId: string,
+  ): Promise<{ success: boolean; error?: string; data?: { deletedId: string; totalRows: number } }> {
+    const batch = await this.batchRepo.findOne({
+      where: { id: batchId, supplierId },
+    });
+
+    if (!batch) {
+      return { success: false, error: 'BATCH_NOT_FOUND' };
+    }
+
+    // 진행 중 상태는 삭제 불가
+    if (batch.status === CsvImportBatchStatus.VALIDATING) {
+      return { success: false, error: 'CANNOT_DELETE_IN_PROGRESS' };
+    }
+
+    const { totalRows } = batch;
+
+    // CASCADE로 rows 자동 삭제
+    await this.batchRepo.remove(batch);
+
+    console.log(`[CSV Import] DELETE_IMPORT batchId=${batchId} supplierId=${supplierId} status=${batch.status} totalRows=${totalRows}`);
+
+    return { success: true, data: { deletedId: batchId, totalRows } };
+  }
+
   // ==================== Internal helpers ====================
 
   private rejectRow(row: SupplierCsvImportRow, error: string): void {
