@@ -2,6 +2,7 @@
  * Global Error Handler Middleware
  *
  * WO-O4O-GLOBAL-ERROR-HANDLER-ENABLEMENT-V1
+ * WO-O4O-ERROR-CODE-STANDARDIZATION-V1 — resolveErrorCode 매핑 추가
  *
  * Express 4-param error middleware — 모든 라우트 이후, listen 이전에 등록.
  * asyncHandler로 감싸지 않은 라우트의 최종 안전망.
@@ -10,6 +11,24 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger.js';
+import { ERROR_CODES } from '../errors/error-codes.js';
+
+/**
+ * HTTP status → error code 자동 매핑.
+ * err.errorCode가 이미 있으면 그대로 사용 (기존 AppError 호환).
+ */
+function resolveErrorCode(err: any): string {
+  if (err?.errorCode) return err.errorCode;
+
+  switch (err?.statusCode || err?.status) {
+    case 400: return ERROR_CODES.BAD_REQUEST;
+    case 401: return ERROR_CODES.UNAUTHORIZED;
+    case 403: return ERROR_CODES.FORBIDDEN;
+    case 404: return ERROR_CODES.NOT_FOUND;
+    case 409: return ERROR_CODES.CONFLICT;
+    default:  return ERROR_CODES.INTERNAL_ERROR;
+  }
+}
 
 export function globalErrorHandler(
   err: any,
@@ -36,7 +55,7 @@ export function globalErrorHandler(
     return res.status(statusCode).json({
       success: false,
       error: {
-        code: err?.errorCode || 'INTERNAL_ERROR',
+        code: resolveErrorCode(err),
         message,
       },
     });
