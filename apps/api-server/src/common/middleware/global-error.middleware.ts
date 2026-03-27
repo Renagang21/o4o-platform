@@ -12,6 +12,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import logger from '../../utils/logger.js';
 import { ERROR_CODES } from '../errors/error-codes.js';
+import { AppError } from '../errors/app-error.js';
 
 /**
  * HTTP status → error code 자동 매핑.
@@ -49,7 +50,10 @@ export function globalErrorHandler(
       stack: err?.stack,
     });
 
-    const statusCode = err?.statusCode || err?.status || 500;
+    const isAppError = err instanceof AppError;
+    const statusCode = isAppError
+      ? err.statusCode
+      : (err?.statusCode || err?.status || 500);
     const message = err?.message || 'Internal Server Error';
 
     return res.status(statusCode).json({
@@ -57,6 +61,7 @@ export function globalErrorHandler(
       error: {
         code: resolveErrorCode(err),
         message,
+        ...(isAppError && err.details ? { details: err.details } : {}),
       },
     });
   } catch (handlerError) {
