@@ -318,6 +318,27 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // POST /supplier/csv-import/batches/:id/retry — WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1
+  router.post('/csv-import/batches/:id/retry', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { id } = req.params;
+      const targetRows = Array.isArray(req.body?.rows) ? req.body.rows : undefined;
+      const result = await csvImportService.retryBatch(id, supplierId, targetRows);
+      if (!result.success) {
+        const status = result.error === 'BATCH_NOT_FOUND' ? 404
+          : result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
+          : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+      res.json(result);
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error('[Neture API] Error retrying CSV batch:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: errMsg } });
+    }
+  });
+
   // DELETE /supplier/csv-import/batches/:id — WO-O4O-NETURE-IMPORT-HISTORY-DELETE-V1
   router.delete('/csv-import/batches/:id', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {

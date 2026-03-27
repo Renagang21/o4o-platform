@@ -71,6 +71,7 @@ export default function SupplierCsvImportPage() {
   const [detailError, setDetailError] = useState<string | null>(null);
 
   const [applying, setApplying] = useState(false);
+  const [retrying, setRetrying] = useState(false); // WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1
   const [applyError, setApplyError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState<string | null>(null);
   const [downloadedCsv, setDownloadedCsv] = useState(false); // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1
@@ -179,6 +180,37 @@ export default function SupplierCsvImportPage() {
       setApplyError((err as Error).message);
     } finally {
       setApplying(false);
+    }
+  };
+
+  // ─── 실패 재처리 (WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1) ─────────────────
+  const handleRetry = async () => {
+    if (!selectedBatch) return;
+    setRetrying(true);
+    setApplyError(null);
+    setApplySuccess(null);
+    try {
+      const result = await csvImportApi.retryBatch(selectedBatch.id);
+      if (!result.success) {
+        setApplyError(friendlyError(result.error || 'Retry failed'));
+        return;
+      }
+      const d = result.data;
+      const applied = d?.appliedOffers ?? 0;
+      const failed = d?.failedRows ?? 0;
+      if (failed === 0) {
+        setApplySuccess(`재처리 완료: ${d?.retriedRows ?? 0}건 중 ${applied}건 성공`);
+      } else if (applied === 0) {
+        setApplyError(`재처리 실패: ${d?.retriedRows ?? 0}건 모두 실패`);
+      } else {
+        setApplySuccess(`재처리 부분 성공: ${applied}건 성공, ${failed}건 여전히 실패`);
+      }
+      await loadBatches();
+      await handleOpenDetail(selectedBatch.id);
+    } catch (err) {
+      setApplyError((err as Error).message);
+    } finally {
+      setRetrying(false);
     }
   };
 
@@ -499,6 +531,18 @@ export default function SupplierCsvImportPage() {
                       className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-green-700"
                     >
                       {applying ? '적용 중...' : `카탈로그에 적용 (${selectedBatch.validRows}건)`}
+                    </button>
+                  )}
+
+                  {/* 실패 재처리 버튼 — WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1 */}
+                  {(selectedBatch.status === 'PARTIAL' || selectedBatch.status === 'FAILED') &&
+                    selectedBatch.rows?.some((r) => r.applyStatus === 'failed') && (
+                    <button
+                      onClick={handleRetry}
+                      disabled={retrying}
+                      className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium disabled:opacity-50 hover:bg-orange-700"
+                    >
+                      {retrying ? '재처리 중...' : `실패 재처리 (${selectedBatch.rows.filter((r) => r.applyStatus === 'failed').length}건)`}
                     </button>
                   )}
 

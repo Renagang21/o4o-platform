@@ -596,6 +596,159 @@ export class CsvImportService {
     return { createdMaster, masterId, offerId, imageJob, aiInput };
   }
 
+  // ==================== 실패 행 재처리 (WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1) ====================
+
+  /**
+   * PARTIAL/FAILED 배치의 실패 행만 재처리
+   * applyRow() 재사용, SAVEPOINT 기반 행 단위
+   */
+  async retryBatch(
+    batchId: string,
+    supplierId: string,
+    targetRows?: number[], // 특정 행만 retry (optional)
+  ): Promise<{
+    success: boolean;
+    data?: {
+      retriedRows: number;
+      appliedOffers: number;
+      createdMasters: number;
+      failedRows: number;
+      errors: Array<{ rowNumber: number; barcode: string | null; error: string }>;
+    };
+    error?: string;
+  }> {
+    // 1. Batch 조회 + 상태 검증
+    const batch = await this.batchRepo.findOne({
+      where: { id: batchId, supplierId },
+    });
+    if (!batch) {
+      return { success: false, error: 'BATCH_NOT_FOUND' };
+    }
+    if (batch.status !== CsvImportBatchStatus.PARTIAL && batch.status !== CsvImportBatchStatus.FAILED) {
+      return { success: false, error: `BATCH_NOT_RETRYABLE: current status is ${batch.status}` };
+    }
+
+    // 2. Supplier ACTIVE guard
+    const supplier = await this.supplierRepo.findOne({
+      where: { id: supplierId },
+      select: ['id', 'status'],
+    });
+    if (!supplier || supplier.status !== SupplierStatus.ACTIVE) {
+      return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
+    }
+
+    // 3. 실패 행 조회 (applyStatus === 'failed' only)
+    let failedRows = await this.rowRepo.find({
+      where: {
+        batchId,
+        applyStatus: 'failed',
+      },
+      order: { rowNumber: 'ASC' },
+    });
+
+    // 선택적 행 필터
+    if (targetRows && targetRows.length > 0) {
+      const targetSet = new Set(targetRows);
+      failedRows = failedRows.filter((r) => targetSet.has(r.rowNumber));
+    }
+
+    if (failedRows.length === 0) {
+      return { success: false, error: 'NO_FAILED_ROWS' };
+    }
+
+    // 4. SAVEPOINT 기반 행 단위 재처리
+    let appliedOffers = 0;
+    let createdMasters = 0;
+    let stillFailed = 0;
+    const aiContentInputs: ProductContentInput[] = [];
+    const imageJobs: Array<{ masterId: string; imageUrl: string }> = [];
+
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+
+    try {
+      for (const row of failedRows) {
+        await qr.query('SAVEPOINT row_sp');
+        try {
+          const result = await this.applyRow(qr.manager, row, supplierId);
+          await qr.query('RELEASE SAVEPOINT row_sp');
+
+          row.applyStatus = 'applied';
+          row.applyError = null;
+          row.masterId = result.masterId;
+          row.offerId = result.offerId;
+          appliedOffers++;
+          if (result.createdMaster) createdMasters++;
+          if (result.imageJob) imageJobs.push(result.imageJob);
+          if (result.aiInput) aiContentInputs.push(result.aiInput);
+        } catch (err) {
+          await qr.query('ROLLBACK TO SAVEPOINT row_sp');
+          row.applyStatus = 'failed';
+          row.applyError = (err as Error).message?.slice(0, 500) || 'Unknown error';
+          stillFailed++;
+          logger.warn(`[CsvImport] Retry row ${row.rowNumber} failed: ${row.applyError}`);
+        }
+      }
+      await qr.commitTransaction();
+    } catch (err) {
+      await qr.rollbackTransaction();
+      throw err;
+    } finally {
+      await qr.release();
+    }
+
+    // 5. Row 상태 벌크 저장
+    await this.rowRepo.save(failedRows);
+
+    // 6. Batch 상태 재계산 (전체 row 기준)
+    const allRows = await this.rowRepo.find({ where: { batchId } });
+    const totalApplied = allRows.filter((r) => r.applyStatus === 'applied').length;
+    const totalFailed = allRows.filter((r) => r.applyStatus === 'failed').length;
+
+    batch.appliedRows = totalApplied;
+    batch.status = totalFailed === 0
+      ? CsvImportBatchStatus.APPLIED
+      : totalApplied === 0
+        ? CsvImportBatchStatus.FAILED
+        : CsvImportBatchStatus.PARTIAL;
+    await this.batchRepo.save(batch);
+
+    logger.info(
+      `[CsvImport] Retry batch ${batchId} — retried: ${failedRows.length}, newApplied: ${appliedOffers}, stillFailed: ${stillFailed}, batchStatus: ${batch.status}`,
+    );
+
+    // Fire-and-forget: Image + AI
+    if (imageJobs.length > 0) {
+      const imageJobsGrouped = imageJobs.map((j) => ({ masterId: j.masterId, imageUrls: [j.imageUrl] }));
+      this.importCommon.processImportImages(imageJobsGrouped).catch((err) => {
+        logger.error('[CsvImport] Retry image pipeline error:', err);
+      });
+    }
+    if (aiContentInputs.length > 0) {
+      this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {
+        logger.error('[CsvImport] Retry AI content error:', err);
+      });
+    }
+
+    return {
+      success: true,
+      data: {
+        retriedRows: failedRows.length,
+        appliedOffers,
+        createdMasters,
+        failedRows: stillFailed,
+        errors: failedRows
+          .filter((r) => r.applyStatus === 'failed')
+          .map((r) => ({
+            rowNumber: r.rowNumber,
+            barcode: r.parsedBarcode,
+            error: r.applyError || 'Unknown error',
+          })),
+      },
+    };
+  }
+
   // ==================== Batch 조회 ====================
 
   /**

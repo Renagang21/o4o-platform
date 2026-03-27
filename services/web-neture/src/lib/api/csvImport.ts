@@ -49,6 +49,15 @@ export interface CsvApplyResult {
   errors?: Array<{ rowNumber: number; barcode: string | null; error: string }>;
 }
 
+// WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1
+export interface CsvRetryResult {
+  retriedRows: number;
+  appliedOffers: number;
+  createdMasters: number;
+  failedRows: number;
+  errors?: Array<{ rowNumber: number; barcode: string | null; error: string }>;
+}
+
 // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1
 // 에러 추출: 백엔드 nested { error: { message, code } } + multer flat { error: "string" } 모두 처리
 function extractErrorMessage(error: any): string {
@@ -128,6 +137,19 @@ export const csvImportApi = {
     try {
       const response = await api.post(`/neture/supplier/csv-import/batches/${batchId}/apply`, undefined, {
         timeout: 180_000, // 3분 — apply는 Master 생성 + 이미지 처리 포함
+      });
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: extractErrorMessage(error) };
+    }
+  },
+
+  // WO-O4O-NETURE-IMPORT-RETRY-FAILED-V1
+  async retryBatch(batchId: string, rows?: number[]): Promise<{ success: boolean; error?: string; data?: CsvRetryResult }> {
+    try {
+      const body = rows && rows.length > 0 ? { rows } : undefined;
+      const response = await api.post(`/neture/supplier/csv-import/batches/${batchId}/retry`, body, {
+        timeout: 180_000,
       });
       return response.data;
     } catch (error: any) {
