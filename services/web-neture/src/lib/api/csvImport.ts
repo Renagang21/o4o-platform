@@ -28,6 +28,7 @@ export interface CsvBatchRow {
   validationError: string | null;
   actionType: string | null;
   masterId: string | null;
+  offerId: string | null; // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1
   rawJson: Record<string, unknown>;
   // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
   applyStatus: string | null;

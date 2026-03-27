@@ -84,6 +84,10 @@ export class SupplierCsvImportRow {
   })
   actionType: CsvRowActionType | null;
 
+  // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1: apply 결과 연결
+  @Column({ name: 'offer_id', type: 'uuid', nullable: true })
+  offerId: string | null;
+
   // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: apply 단계 추적
   @Column({ name: 'apply_status', type: 'varchar', length: 10, nullable: true })
   applyStatus: string | null;
