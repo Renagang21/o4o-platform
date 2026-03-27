@@ -130,6 +130,8 @@ export class CsvImportService {
         }) as Record<string, string>[];
       }
     } catch (err) {
+      // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: 파싱 에러 로깅 강화
+      logger.error(`[CsvImport] Parse failed — file: ${file.originalname}, error:`, err);
       return { success: false, error: `PARSE_ERROR: ${(err as Error).message}` };
     }
 
@@ -326,12 +328,21 @@ export class CsvImportService {
    * - 이미지 다운로드 + GCS 업로드 (3.2)
    * - AI 콘텐츠 생성
    */
+  /**
+   * WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
+   * SAVEPOINT 기반 행 단위 부분 성공 지원
+   */
   async applyBatch(
     batchId: string,
     supplierId: string,
   ): Promise<{
     success: boolean;
-    data?: { appliedOffers: number; createdMasters: number };
+    data?: {
+      appliedOffers: number;
+      createdMasters: number;
+      failedRows: number;
+      errors: Array<{ rowNumber: number; barcode: string | null; error: string }>;
+    };
     error?: string;
   }> {
     // 1. Batch 조회 + 상태 검증
@@ -367,149 +378,64 @@ export class CsvImportService {
       return { success: false, error: 'NO_VALID_ROWS' };
     }
 
-    // 4. Transaction 내 적용
+    // 4. SAVEPOINT 기반 행 단위 적용
     let appliedOffers = 0;
     let createdMasters = 0;
+    let failedCount = 0;
     const aiContentInputs: ProductContentInput[] = [];
     const imageJobs: Array<{ masterId: string; imageUrl: string }> = [];
 
-    await this.dataSource.transaction(async (manager) => {
+    const qr = this.dataSource.createQueryRunner();
+    await qr.connect();
+    await qr.startTransaction();
+
+    try {
       for (const row of validRows) {
-        let masterId = row.masterId;
-        let masterName = '';
-        let masterManufacturer = '';
+        await qr.query('SAVEPOINT row_sp');
+        try {
+          const result = await this.applyRow(qr.manager, row, supplierId);
+          await qr.query('RELEASE SAVEPOINT row_sp');
 
-        // WO-NETURE-CSV-MASTER-CREATION-DECOUPLING-V1
-        // CREATE_MASTER → CSV 데이터 우선, MFDS advisory-only
-        if (row.actionType === CsvRowActionType.CREATE_MASTER) {
-          const barcode = row.parsedBarcode!;
-          const raw = row.rawJson as Record<string, string>;
-
-          const masterRepo = manager.getRepository(ProductMaster);
-
-          // UNIQUE(barcode) 보호 — 동시 batch에서 같은 barcode가 이미 생성됐을 수 있음
-          let master = await masterRepo.findOne({ where: { barcode } });
-
-          if (!master) {
-            // MFDS advisory 호출 — 실패해도 Master 생성 진행
-            const mfdsResult = await verifyProductByBarcode(barcode);
-            const mfds = mfdsResult.verified && mfdsResult.product ? mfdsResult.product : null;
-
-            // CSV 데이터 추출 — packaging_name → regulatoryName 매핑
-            const csvMarketingName = (raw.marketing_name || '').trim();
-            const csvPackagingName = (raw.packaging_name || '').trim();
-            const csvRegulatoryName = (raw.regulatory_name || csvPackagingName).trim();
-            const csvManufacturerName = (raw.manufacturer_name || '').trim();
-
-            master = masterRepo.create({
-              barcode,
-              marketingName: csvMarketingName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
-              regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvMarketingName || 'UNKNOWN',
-              regulatoryType: mfds?.regulatoryType || 'UNKNOWN',
-              manufacturerName: csvManufacturerName || mfds?.manufacturerName || null,
-              mfdsPermitNumber: mfds?.permitNumber || null,
-              mfdsProductId: mfds?.productId || barcode,
-              isMfdsVerified: !!mfds,
-              mfdsSyncedAt: mfds ? new Date() : null,
-            });
-            master = await masterRepo.save(master);
-            createdMasters++;
-            logger.info(`[CsvImport] Created Master for barcode ${barcode} (mfdsVerified=${!!mfds})`);
-          }
-
-          masterId = master.id;
-          masterName = master.marketingName || master.regulatoryName;
-          masterManufacturer = master.manufacturerName;
+          row.applyStatus = 'applied';
+          row.applyError = null;
+          appliedOffers++;
+          if (result.createdMaster) createdMasters++;
+          if (result.imageJob) imageJobs.push(result.imageJob);
+          if (result.aiInput) aiContentInputs.push(result.aiInput);
+        } catch (err) {
+          await qr.query('ROLLBACK TO SAVEPOINT row_sp');
+          row.applyStatus = 'failed';
+          row.applyError = (err as Error).message?.slice(0, 500) || 'Unknown error';
+          failedCount++;
+          logger.warn(`[CsvImport] Row ${row.rowNumber} apply failed: ${row.applyError}`);
         }
-
-        if (!masterId) {
-          logger.warn(`[CsvImport] No masterId for row ${row.rowNumber}, skipping`);
-          continue;
-        }
-
-        // WO-NETURE-FIRSTMALL-BASIC-BULK-IMPORT-ENABLEMENT-V1: Brand 해석 + extra 필드
-        const raw = row.rawJson as Record<string, string>;
-        const brandName = (raw.brand || '').trim();
-        if (brandName && masterId) {
-          try {
-            const brandId = await this.importCommon.resolveBrandId(manager, brandName, masterManufacturer || undefined);
-            if (row.actionType === CsvRowActionType.CREATE_MASTER) {
-              await manager.query(
-                `UPDATE product_masters SET brand_id = $1 WHERE id = $2 AND brand_id IS NULL`,
-                [brandId, masterId],
-              );
-            }
-          } catch (err) {
-            logger.warn(`[CsvImport] Brand resolution failed for row ${row.rowNumber}:`, err);
-          }
-        }
-
-        // Category 매칭 (선택 — 있으면 매칭, 없으면 스킵)
-        const categoryName = (raw.category_name || '').trim();
-        if (categoryName && masterId) {
-          const catRows: Array<{ id: string }> = await manager.query(
-            `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
-            [categoryName],
-          );
-          if (catRows.length > 0) {
-            const condition = row.actionType === CsvRowActionType.CREATE_MASTER
-              ? ''
-              : ' AND category_id IS NULL';
-            await manager.query(
-              `UPDATE product_masters SET category_id = $1 WHERE id = $2${condition}`,
-              [catRows[0].id, masterId],
-            );
-          } else {
-            logger.warn(`[CsvImport] Category not found during apply: "${categoryName}" (row ${row.rowNumber}), skipping`);
-          }
-        }
-
-        // Offer upsert via common service (3.5 + ENABLEMENT-V1)
-        const distributionType = row.parsedDistributionType || 'PRIVATE';
-        const supplyPrice = row.parsedSupplyPrice ?? 0;
-
-        // WO-NETURE-XLSX-TEMPLATE-FINAL-V2: consumer_price 우선, msrp 하위호환
-        const rawConsumerPrice = (raw.consumer_price || raw.msrp || '').trim();
-        const rawStockQty = (raw.stock_qty || '').trim();
-        // short_description 우선, consumer_short_description / description 하위호환
-        const rawDescription = (raw.short_description || raw.consumer_short_description || raw.description || '').trim();
-        const rawDetailDesc = (raw.detail_description || '').trim();
-        const extra = {
-          msrp: rawConsumerPrice ? parseInt(rawConsumerPrice, 10) || null : null,
-          stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
-          description: rawDescription || null,
-          detailDescription: rawDetailDesc || null,
-        };
-
-        await this.importCommon.upsertSupplierOffer(
-          manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!, extra,
-        );
-        appliedOffers++;
-
-        // Collect image job (3.2)
-        const imageUrl = ((row.rawJson as Record<string, string>).image_url || '').trim();
-        if (imageUrl) {
-          imageJobs.push({ masterId, imageUrl });
-        }
-
-        // Collect AI content input
-        aiContentInputs.push({
-          id: masterId,
-          regulatoryName: masterName || row.parsedBarcode || 'Unknown',
-          marketingName: masterName || row.parsedBarcode || 'Unknown',
-          manufacturerName: masterManufacturer || 'Unknown',
-        });
       }
-    });
+      await qr.commitTransaction();
+    } catch (err) {
+      await qr.rollbackTransaction();
+      throw err;
+    } finally {
+      await qr.release();
+    }
 
-    // 5. Batch 상태 업데이트
-    batch.status = CsvImportBatchStatus.APPLIED;
+    // 5. Row apply 상태 벌크 저장 (트랜잭션 외부)
+    await this.rowRepo.save(validRows);
+
+    // 6. Batch 상태 결정
+    batch.appliedRows = appliedOffers;
     batch.appliedAt = new Date();
+    batch.status = failedCount === 0
+      ? CsvImportBatchStatus.APPLIED
+      : appliedOffers === 0
+        ? CsvImportBatchStatus.FAILED
+        : CsvImportBatchStatus.PARTIAL;
     await this.batchRepo.save(batch);
 
-    logger.info(`[CsvImport] Batch ${batchId} applied — offers: ${appliedOffers}, masters: ${createdMasters}`);
+    logger.info(
+      `[CsvImport] Batch ${batchId} — status: ${batch.status}, applied: ${appliedOffers}, failed: ${failedCount}, masters: ${createdMasters}`,
+    );
 
-    // Fire-and-forget: Image pipeline via common service (3.2 + 3.5)
+    // Fire-and-forget: Image pipeline (성공한 행만)
     if (imageJobs.length > 0) {
       const imageJobsGrouped = imageJobs.map((j) => ({ masterId: j.masterId, imageUrls: [j.imageUrl] }));
       this.importCommon.processImportImages(imageJobsGrouped).catch((err) => {
@@ -517,7 +443,7 @@ export class CsvImportService {
       });
     }
 
-    // Fire-and-forget: AI content generation via common service (3.5)
+    // Fire-and-forget: AI content generation (성공한 행만)
     if (aiContentInputs.length > 0) {
       this.importCommon.triggerAiContentGeneration(aiContentInputs).catch((err) => {
         logger.error('[CsvImport] AI content generation error:', err);
@@ -526,8 +452,144 @@ export class CsvImportService {
 
     return {
       success: true,
-      data: { appliedOffers, createdMasters },
+      data: {
+        appliedOffers,
+        createdMasters,
+        failedRows: failedCount,
+        errors: validRows
+          .filter((r) => r.applyStatus === 'failed')
+          .map((r) => ({
+            rowNumber: r.rowNumber,
+            barcode: r.parsedBarcode,
+            error: r.applyError || 'Unknown error',
+          })),
+      },
     };
+  }
+
+  /**
+   * 단일 행 적용 로직 — applyBatch에서 SAVEPOINT 내에서 호출
+   */
+  private async applyRow(
+    manager: import('typeorm').EntityManager,
+    row: SupplierCsvImportRow,
+    supplierId: string,
+  ): Promise<{
+    createdMaster: boolean;
+    imageJob?: { masterId: string; imageUrl: string };
+    aiInput?: ProductContentInput;
+  }> {
+    let masterId = row.masterId;
+    let masterName = '';
+    let masterManufacturer = '';
+    let createdMaster = false;
+
+    // CREATE_MASTER
+    if (row.actionType === CsvRowActionType.CREATE_MASTER) {
+      const barcode = row.parsedBarcode!;
+      const raw = row.rawJson as Record<string, string>;
+      const masterRepo = manager.getRepository(ProductMaster);
+
+      let master = await masterRepo.findOne({ where: { barcode } });
+
+      if (!master) {
+        const mfdsResult = await verifyProductByBarcode(barcode);
+        const mfds = mfdsResult.verified && mfdsResult.product ? mfdsResult.product : null;
+
+        const csvMarketingName = (raw.marketing_name || '').trim();
+        const csvPackagingName = (raw.packaging_name || '').trim();
+        const csvRegulatoryName = (raw.regulatory_name || csvPackagingName).trim();
+        const csvManufacturerName = (raw.manufacturer_name || '').trim();
+
+        master = masterRepo.create({
+          barcode,
+          marketingName: csvMarketingName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
+          regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvMarketingName || 'UNKNOWN',
+          regulatoryType: mfds?.regulatoryType || 'UNKNOWN',
+          manufacturerName: csvManufacturerName || mfds?.manufacturerName || null,
+          mfdsPermitNumber: mfds?.permitNumber || null,
+          mfdsProductId: mfds?.productId || barcode,
+          isMfdsVerified: !!mfds,
+          mfdsSyncedAt: mfds ? new Date() : null,
+        });
+        master = await masterRepo.save(master);
+        createdMaster = true;
+        logger.info(`[CsvImport] Created Master for barcode ${barcode} (mfdsVerified=${!!mfds})`);
+      }
+
+      masterId = master.id;
+      masterName = master.marketingName || master.regulatoryName;
+      masterManufacturer = master.manufacturerName;
+    }
+
+    if (!masterId) {
+      throw new Error('NO_MASTER_ID');
+    }
+
+    // Brand 해석
+    const raw = row.rawJson as Record<string, string>;
+    const brandName = (raw.brand || '').trim();
+    if (brandName) {
+      try {
+        const brandId = await this.importCommon.resolveBrandId(manager, brandName, masterManufacturer || undefined);
+        if (row.actionType === CsvRowActionType.CREATE_MASTER) {
+          await manager.query(
+            `UPDATE product_masters SET brand_id = $1 WHERE id = $2 AND brand_id IS NULL`,
+            [brandId, masterId],
+          );
+        }
+      } catch (err) {
+        logger.warn(`[CsvImport] Brand resolution failed for row ${row.rowNumber}:`, err);
+      }
+    }
+
+    // Category 매칭
+    const categoryName = (raw.category_name || '').trim();
+    if (categoryName) {
+      const catRows: Array<{ id: string }> = await manager.query(
+        `SELECT id FROM product_categories WHERE LOWER(name) = LOWER($1) AND is_active = true ORDER BY depth DESC LIMIT 1`,
+        [categoryName],
+      );
+      if (catRows.length > 0) {
+        const condition = row.actionType === CsvRowActionType.CREATE_MASTER ? '' : ' AND category_id IS NULL';
+        await manager.query(
+          `UPDATE product_masters SET category_id = $1 WHERE id = $2${condition}`,
+          [catRows[0].id, masterId],
+        );
+      }
+    }
+
+    // Offer upsert
+    const distributionType = row.parsedDistributionType || 'PRIVATE';
+    const supplyPrice = row.parsedSupplyPrice ?? 0;
+    const rawConsumerPrice = (raw.consumer_price || raw.msrp || '').trim();
+    const rawStockQty = (raw.stock_qty || '').trim();
+    const rawDescription = (raw.short_description || raw.consumer_short_description || raw.description || '').trim();
+    const rawDetailDesc = (raw.detail_description || '').trim();
+    const extra = {
+      msrp: rawConsumerPrice ? parseInt(rawConsumerPrice, 10) || null : null,
+      stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
+      description: rawDescription || null,
+      detailDescription: rawDetailDesc || null,
+    };
+
+    await this.importCommon.upsertSupplierOffer(
+      manager, masterId, supplierId, distributionType, supplyPrice, row.parsedBarcode!, extra,
+    );
+
+    // Image job
+    const imageUrl = (raw.image_url || '').trim();
+    const imageJob = imageUrl ? { masterId, imageUrl } : undefined;
+
+    // AI content input
+    const aiInput: ProductContentInput = {
+      id: masterId,
+      regulatoryName: masterName || row.parsedBarcode || 'Unknown',
+      marketingName: masterName || row.parsedBarcode || 'Unknown',
+      manufacturerName: masterManufacturer || 'Unknown',
+    };
+
+    return { createdMaster, imageJob, aiInput };
   }
 
   // ==================== Batch 조회 ====================
@@ -561,7 +623,7 @@ export class CsvImportService {
     return this.batchRepo.find({
       where: { supplierId },
       order: { createdAt: 'DESC' },
-      select: ['id', 'fileName', 'totalRows', 'validRows', 'rejectedRows', 'status', 'createdAt', 'appliedAt'],
+      select: ['id', 'fileName', 'totalRows', 'validRows', 'rejectedRows', 'appliedRows', 'status', 'createdAt', 'appliedAt'],
     });
   }
 

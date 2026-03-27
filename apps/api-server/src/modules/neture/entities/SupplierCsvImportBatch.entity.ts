@@ -24,6 +24,7 @@ export enum CsvImportBatchStatus {
   UPLOADED = 'UPLOADED',
   VALIDATING = 'VALIDATING',
   READY = 'READY',
+  PARTIAL = 'PARTIAL',       // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: 부분 성공
   APPLIED = 'APPLIED',
   FAILED = 'FAILED',
 }
@@ -55,6 +56,10 @@ export class SupplierCsvImportBatch {
 
   @Column({ name: 'rejected_rows', type: 'int', default: 0 })
   rejectedRows: number;
+
+  // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
+  @Column({ name: 'applied_rows', type: 'int', default: 0 })
+  appliedRows: number;
 
   @Column({
     type: 'enum',

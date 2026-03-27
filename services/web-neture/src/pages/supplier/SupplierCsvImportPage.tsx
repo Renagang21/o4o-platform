@@ -26,6 +26,7 @@ function StatusBadge({ status }: { status: string }) {
     VALID: 'bg-green-100 text-green-800',
     VALIDATED: 'bg-green-100 text-green-800',
     APPLIED: 'bg-blue-100 text-blue-800',
+    PARTIAL: 'bg-yellow-100 text-yellow-800', // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
     REJECTED: 'bg-red-100 text-red-800',
     PENDING: 'bg-gray-100 text-gray-600',
     LINK_EXISTING: 'bg-indigo-100 text-indigo-800',
@@ -37,6 +38,23 @@ function StatusBadge({ status }: { status: string }) {
       {status}
     </span>
   );
+}
+
+// WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1: 에러 메시지 한국어 매핑
+function friendlyError(msg: string): string {
+  if (!msg) return '업로드 실패';
+  if (msg === 'NETWORK_ERROR') return '네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.';
+  if (msg.includes('File too large') || msg.includes('FILE_TOO_LARGE')) return '파일 크기가 너무 큽니다. 최대 25MB까지 업로드 가능합니다.';
+  if (msg.includes('LIMIT_FILE_SIZE')) return '파일 크기가 서버 제한을 초과했습니다.';
+  if (msg.includes('PARSE_ERROR')) return `파일 파싱 실패: ${msg.replace('PARSE_ERROR: ', '')}`;
+  if (msg.includes('CSV_EMPTY')) return '파일에 데이터가 없습니다. 헤더 행 아래에 데이터를 입력해주세요.';
+  if (msg.includes('XLSX_NO_SHEET')) return 'XLSX 파일에서 시트를 찾을 수 없습니다.';
+  if (msg.includes('Unexpected file type') || msg.includes('LIMIT_UNEXPECTED_FILE')) return '지원하지 않는 파일 형식입니다. CSV 또는 XLSX 파일만 업로드 가능합니다.';
+  if (msg.includes('SUPPLIER_NOT_ACTIVE')) return '공급자 계정이 활성 상태가 아닙니다. 관리자에게 문의해주세요.';
+  if (msg.includes('NO_SUPPLIER')) return '공급자 계정을 찾을 수 없습니다.';
+  if (msg.includes('UNAUTHORIZED')) return '로그인이 필요합니다. 다시 로그인해주세요.';
+  if (msg.includes('시간이 초과')) return msg; // 이미 한국어
+  return msg;
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
@@ -55,6 +73,7 @@ export default function SupplierCsvImportPage() {
   const [applying, setApplying] = useState(false);
   const [applyError, setApplyError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState<string | null>(null);
+  const [downloadedCsv, setDownloadedCsv] = useState(false); // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1
 
   // ─── Load batches ─────────────────────────────────────────────────────────
   const loadBatches = useCallback(async () => {
@@ -69,14 +88,23 @@ export default function SupplierCsvImportPage() {
   }, [loadBatches]);
 
   // ─── Upload handler ───────────────────────────────────────────────────────
+  // WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1
   const handleUpload = async () => {
     if (!file) return;
+
+    // 프론트 사전 검증: 25MB (document 타입 서버 제한과 동일)
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError(`파일 크기가 너무 큽니다 (${(file.size / 1024 / 1024).toFixed(1)}MB). 최대 25MB까지 업로드 가능합니다.`);
+      return;
+    }
+
     setUploading(true);
     setUploadError(null);
     try {
       const result = await csvImportApi.uploadCsv(file);
       if (!result.success) {
-        setUploadError(result.error || 'Upload failed');
+        setUploadError(friendlyError(result.error || 'Upload failed'));
         return;
       }
       setFile(null);
@@ -101,6 +129,7 @@ export default function SupplierCsvImportPage() {
     setDetailError(null);
     setApplyError(null);
     setApplySuccess(null);
+    setDownloadedCsv(false);
     try {
       const result = await csvImportApi.getBatchDetail(batchId);
       if (!result.success) {
@@ -122,7 +151,7 @@ export default function SupplierCsvImportPage() {
     setApplySuccess(null);
   };
 
-  // ─── Apply handler ────────────────────────────────────────────────────────
+  // ─── Apply handler (WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1) ────────────────
   const handleApply = async () => {
     if (!selectedBatch) return;
     setApplying(true);
@@ -131,21 +160,59 @@ export default function SupplierCsvImportPage() {
     try {
       const result = await csvImportApi.applyBatch(selectedBatch.id);
       if (!result.success) {
-        setApplyError(result.error || 'Apply failed');
+        setApplyError(friendlyError(result.error || 'Apply failed'));
         return;
       }
       const d = result.data;
-      setApplySuccess(
-        `적용 완료: Offer ${d?.appliedOffers ?? 0}건, Master 생성 ${d?.createdMasters ?? 0}건, 기존 연결 ${d?.linkedExisting ?? 0}건`,
-      );
+      const applied = d?.appliedOffers ?? 0;
+      const failed = d?.failedRows ?? 0;
+      if (failed === 0) {
+        setApplySuccess(`적용 완료: 성공 ${applied}건, Master 생성 ${d?.createdMasters ?? 0}건`);
+      } else if (applied === 0) {
+        setApplyError(`적용 실패: 전체 ${failed}건 실패`);
+      } else {
+        setApplySuccess(`부분 적용: 성공 ${applied}건, 실패 ${failed}건, Master 생성 ${d?.createdMasters ?? 0}건`);
+      }
       await loadBatches();
-      // Refresh detail
       await handleOpenDetail(selectedBatch.id);
     } catch (err) {
       setApplyError((err as Error).message);
     } finally {
       setApplying(false);
     }
+  };
+
+  // ─── 실패 데이터 다운로드 (client-side CSV) ────────────────────────────────
+  // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1: row_number 포함 + 다운로드 완료 상태
+  const handleDownloadFailed = () => {
+    if (!selectedBatch?.rows) return;
+    const failedRows = selectedBatch.rows.filter((r) => r.applyStatus === 'failed');
+    if (failedRows.length === 0) return;
+
+    // CSV 헤더: row_number + rawJson 키 + apply_error
+    const sampleKeys = Object.keys(failedRows[0].rawJson || {});
+    const headers = ['row_number', ...sampleKeys, 'apply_error'];
+    const csvLines = [headers.join(',')];
+
+    for (const row of failedRows) {
+      const raw = row.rawJson as Record<string, unknown>;
+      const values: string[] = [`"${row.rowNumber}"`];
+      for (const k of sampleKeys) {
+        const v = String(raw[k] ?? '').replace(/"/g, '""');
+        values.push(`"${v}"`);
+      }
+      values.push(`"${(row.applyError || '').replace(/"/g, '""')}"`);
+      csvLines.push(values.join(','));
+    }
+
+    const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `failed_rows_${selectedBatch.id.slice(0, 8)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setDownloadedCsv(true);
   };
 
   return (
@@ -173,7 +240,10 @@ export default function SupplierCsvImportPage() {
 
       {/* ═══ Section 2: Upload ═══ */}
       <section className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">파일 업로드</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">파일 업로드</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          XLSX 또는 CSV 파일을 업로드하세요. 실패 데이터 수정 후 재업로드 시에도 동일하게 사용합니다.
+        </p>
         <div className="flex items-end gap-4">
           <div className="flex-1">
             <label htmlFor="csv-file-input" className="block text-sm font-medium text-gray-700 mb-1">
@@ -295,7 +365,7 @@ export default function SupplierCsvImportPage() {
                     <span className="text-blue-600">적용: {selectedBatch.appliedRows}</span>
                   </div>
 
-                  {/* Row table */}
+                  {/* Row table — WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: apply 상태 컬럼 추가 */}
                   {selectedBatch.rows && selectedBatch.rows.length > 0 && (
                     <div className="overflow-x-auto mb-4">
                       <table className="w-full text-sm">
@@ -305,14 +375,15 @@ export default function SupplierCsvImportPage() {
                             <th className="pb-2 pr-3">바코드</th>
                             <th className="pb-2 pr-3">공급가</th>
                             <th className="pb-2 pr-3">유통</th>
-                            <th className="pb-2 pr-3">상태</th>
+                            <th className="pb-2 pr-3">검증</th>
                             <th className="pb-2 pr-3">액션</th>
+                            <th className="pb-2 pr-3">적용</th>
                             <th className="pb-2">오류</th>
                           </tr>
                         </thead>
                         <tbody>
                           {selectedBatch.rows.map((row) => (
-                            <tr key={row.id} className="border-b border-gray-100">
+                            <tr key={row.id} className={`border-b border-gray-100 ${row.applyStatus === 'failed' ? 'bg-red-50' : ''}`}>
                               <td className="py-2 pr-3 text-gray-400">{row.rowNumber}</td>
                               <td className="py-2 pr-3 font-mono text-xs">{row.parsedBarcode || '-'}</td>
                               <td className="py-2 pr-3">
@@ -323,7 +394,18 @@ export default function SupplierCsvImportPage() {
                               <td className="py-2 pr-3 text-xs text-gray-500">
                                 {row.actionType ? <StatusBadge status={row.actionType} /> : '-'}
                               </td>
-                              <td className="py-2 text-xs text-red-500">{row.validationError || ''}</td>
+                              <td className="py-2 pr-3 text-center">
+                                {row.applyStatus === 'applied' ? (
+                                  <span className="text-green-600 font-medium text-xs">OK</span>
+                                ) : row.applyStatus === 'failed' ? (
+                                  <span className="text-red-600 font-medium text-xs">FAIL</span>
+                                ) : (
+                                  <span className="text-gray-300 text-xs">-</span>
+                                )}
+                              </td>
+                              <td className="py-2 text-xs text-red-500">
+                                {row.applyError || row.validationError || ''}
+                              </td>
                             </tr>
                           ))}
                         </tbody>
@@ -343,6 +425,7 @@ export default function SupplierCsvImportPage() {
                     </div>
                   )}
 
+                  {/* Apply 버튼 */}
                   {(selectedBatch.status === 'VALIDATED' || selectedBatch.status === 'READY') && selectedBatch.validRows > 0 && (
                     <button
                       onClick={handleApply}
@@ -351,6 +434,39 @@ export default function SupplierCsvImportPage() {
                     >
                       {applying ? '적용 중...' : `카탈로그에 적용 (${selectedBatch.validRows}건)`}
                     </button>
+                  )}
+
+                  {/* 실패 데이터 다운로드 + 가이드 — WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1 */}
+                  {selectedBatch.rows?.some((r) => r.applyStatus === 'failed') && (
+                    <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="flex items-center gap-3 mb-3">
+                        <button
+                          onClick={handleDownloadFailed}
+                          className="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600"
+                        >
+                          실패 데이터 다운로드 (CSV) — {selectedBatch.rows.filter((r) => r.applyStatus === 'failed').length}건
+                        </button>
+                      </div>
+
+                      {/* 다운로드 완료 안내 */}
+                      {downloadedCsv && (
+                        <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded text-green-700 text-xs">
+                          CSV 파일이 다운로드되었습니다. 아래 안내에 따라 수정 후 재업로드하세요.
+                        </div>
+                      )}
+
+                      {/* 가이드 텍스트 */}
+                      <p className="text-sm text-amber-800 mb-2 font-medium">재업로드 안내</p>
+                      <p className="text-xs text-amber-700 mb-2">
+                        다운로드된 CSV 파일에는 실패한 행의 원본 데이터와 <code className="bg-amber-100 px-1 rounded">apply_error</code> 컬럼이 포함됩니다.
+                      </p>
+                      <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                        <li>다운로드된 CSV 파일을 엑셀(Excel)이나 Google Sheets에서 엽니다.</li>
+                        <li><code className="bg-amber-100 px-1 rounded">row_number</code>와 <code className="bg-amber-100 px-1 rounded">apply_error</code> 컬럼을 참고하여 데이터를 수정합니다.</li>
+                        <li>수정 후 <code className="bg-amber-100 px-1 rounded">row_number</code>와 <code className="bg-amber-100 px-1 rounded">apply_error</code> 컬럼을 삭제합니다.</li>
+                        <li>XLSX 또는 CSV로 저장한 뒤 위의 &quot;파일 업로드&quot; 영역에서 다시 업로드하세요.</li>
+                      </ol>
+                    </div>
                   )}
                 </>
               ) : null}

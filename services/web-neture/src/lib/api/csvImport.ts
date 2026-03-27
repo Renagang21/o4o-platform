@@ -29,6 +29,9 @@ export interface CsvBatchRow {
   actionType: string | null;
   masterId: string | null;
   rawJson: Record<string, unknown>;
+  // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
+  applyStatus: string | null;
+  applyError: string | null;
 }
 
 export interface CsvBatchDetail extends CsvBatch {
@@ -40,6 +43,36 @@ export interface CsvApplyResult {
   createdMasters: number;
   linkedExisting: number;
   rejected: number;
+  // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
+  failedRows: number;
+  errors?: Array<{ rowNumber: number; barcode: string | null; error: string }>;
+}
+
+// WO-O4O-NETURE-CSV-XLSX-UPLOAD-NETWORK-ERROR-FIX-V1
+// 에러 추출: 백엔드 nested { error: { message, code } } + multer flat { error: "string" } 모두 처리
+function extractErrorMessage(error: any): string {
+  // 1. 서버 응답이 있는 경우
+  const data = error?.response?.data;
+  if (data) {
+    // nested: { error: { message, code } }
+    if (typeof data.error === 'object' && data.error !== null) {
+      return data.error.message || data.error.code || 'UNKNOWN_ERROR';
+    }
+    // flat (multer 등): { error: "string" }
+    if (typeof data.error === 'string') {
+      return data.error;
+    }
+    // fallback: { message: "string" }
+    if (typeof data.message === 'string') {
+      return data.message;
+    }
+  }
+  // 2. 타임아웃
+  if (error?.code === 'ECONNABORTED') {
+    return '업로드 시간이 초과되었습니다. 파일 크기를 확인해주세요.';
+  }
+  // 3. 서버 응답 없음 (진짜 네트워크 오류)
+  return 'NETWORK_ERROR';
 }
 
 export const csvImportApi = {
@@ -62,11 +95,11 @@ export const csvImportApi = {
       formData.append('file', file);
       const response = await api.post('/neture/supplier/csv-import/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 120_000, // 2분 — 대용량 파일 + 행별 검증 시간 확보
       });
       return response.data;
     } catch (error: any) {
-      const msg = error?.response?.data?.error?.message || error?.response?.data?.error?.code || 'NETWORK_ERROR';
-      return { success: false, error: msg };
+      return { success: false, error: extractErrorMessage(error) };
     }
   },
 
@@ -86,18 +119,18 @@ export const csvImportApi = {
       const response = await api.get(`/neture/supplier/csv-import/batches/${batchId}`);
       return response.data;
     } catch (error: any) {
-      const msg = error?.response?.data?.error?.message || 'NETWORK_ERROR';
-      return { success: false, error: msg };
+      return { success: false, error: extractErrorMessage(error) };
     }
   },
 
   async applyBatch(batchId: string): Promise<{ success: boolean; error?: string; data?: CsvApplyResult }> {
     try {
-      const response = await api.post(`/neture/supplier/csv-import/batches/${batchId}/apply`);
+      const response = await api.post(`/neture/supplier/csv-import/batches/${batchId}/apply`, undefined, {
+        timeout: 180_000, // 3분 — apply는 Master 생성 + 이미지 처리 포함
+      });
       return response.data;
     } catch (error: any) {
-      const msg = error?.response?.data?.error?.message || error?.response?.data?.error?.code || 'NETWORK_ERROR';
-      return { success: false, error: msg };
+      return { success: false, error: extractErrorMessage(error) };
     }
   },
 };

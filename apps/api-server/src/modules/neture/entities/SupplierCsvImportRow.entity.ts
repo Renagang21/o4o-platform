@@ -84,6 +84,13 @@ export class SupplierCsvImportRow {
   })
   actionType: CsvRowActionType | null;
 
+  // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: apply 단계 추적
+  @Column({ name: 'apply_status', type: 'varchar', length: 10, nullable: true })
+  applyStatus: string | null;
+
+  @Column({ name: 'apply_error', type: 'text', nullable: true })
+  applyError: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }
