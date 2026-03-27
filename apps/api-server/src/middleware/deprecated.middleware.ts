@@ -1,3 +1,9 @@
+/**
+ * @deprecated WO-O4O-MIDDLEWARE-CONSOLIDATION-V1
+ * 표준: deprecation.middleware.ts
+ * 이 파일은 0 importers — Phase 5 제거 대상.
+ */
+
 import { Request, Response, NextFunction } from 'express';
 
 /**

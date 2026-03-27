@@ -1,3 +1,9 @@
+/**
+ * @deprecated WO-O4O-MIDDLEWARE-CONSOLIDATION-V1
+ * 활성 cache: infrastructure/cache.service.ts, cache/read-cache.ts
+ * 이 파일은 0 importers — Phase 5 제거 대상.
+ */
+
 import { Request, Response, NextFunction } from 'express';
 import { cacheService } from '../services/CacheService.js';
 import logger from '../utils/logger.js';
