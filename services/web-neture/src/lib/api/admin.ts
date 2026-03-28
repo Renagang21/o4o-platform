@@ -33,7 +33,8 @@ export const adminOperatorApi = {
       const qs = includeInactive ? '?includeInactive=true' : '';
       const response = await api.get(`/neture/admin/operators${qs}`);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Operators API not available');
       return [];
     }
@@ -75,7 +76,8 @@ export const adminSupplierApi = {
       const qs = status ? `?status=${status}` : '';
       const response = await api.get(`/neture/admin/suppliers${qs}`);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch suppliers:', error);
       return [];
     }
@@ -85,7 +87,8 @@ export const adminSupplierApi = {
     try {
       const response = await api.get('/neture/admin/suppliers/pending');
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch pending suppliers:', error);
       return [];
     }
@@ -213,7 +216,8 @@ export const adminProductApi = {
       const qs = status ? `?status=${status}` : '';
       const response = await api.get(`/neture/admin/products${qs}`);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch products:', error);
       return [];
     }
@@ -223,7 +227,8 @@ export const adminProductApi = {
     try {
       const response = await api.get('/neture/admin/products/pending');
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch pending products:', error);
       return [];
     }
@@ -271,7 +276,8 @@ export const adminMasterApi = {
     try {
       const response = await api.get('/neture/admin/masters');
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch masters:', error);
       return [];
     }
@@ -322,7 +328,8 @@ export const adminServiceApprovalApi = {
       const qs = status ? `?status=${status}` : '';
       const response = await api.get(`/neture/admin/service-approvals${qs}`);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch service approvals:', error);
       return [];
     }
@@ -605,7 +612,8 @@ export const adminRegistrationApi = {
       const qs = filters?.status ? `?status=${filters.status}` : '';
       const response = await api.get(`/neture/admin/requests${qs}`);
       return response.data.data || [];
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
       console.warn('[Admin API] Failed to fetch registration requests:', error);
       return [];
     }

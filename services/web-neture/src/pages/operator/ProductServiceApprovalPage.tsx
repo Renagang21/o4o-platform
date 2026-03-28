@@ -86,6 +86,7 @@ export default function ProductServiceApprovalPage() {
   const [stats, setStats] = useState<ServiceApprovalStats>({ pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 });
   const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -118,23 +119,29 @@ export default function ProductServiceApprovalPage() {
 
   const fetchData = useCallback(async (page = 1) => {
     setLoading(true);
-    const [listResult, statsResult] = await Promise.all([
-      operatorServiceApprovalApi.list({
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        serviceKey: serviceFilter || undefined,
-        search: searchQuery || undefined,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
-        page,
-        limit: 30,
-      }),
-      operatorServiceApprovalApi.stats(),
-    ]);
-    setItems(listResult.data);
-    setPagination(listResult.pagination);
-    setStats(statsResult);
-    setSelectedIds(new Set());
-    setLoading(false);
+    setPermissionError(null);
+    try {
+      const [listResult, statsResult] = await Promise.all([
+        operatorServiceApprovalApi.list({
+          status: statusFilter !== 'all' ? statusFilter : undefined,
+          serviceKey: serviceFilter || undefined,
+          search: searchQuery || undefined,
+          dateFrom: dateFrom || undefined,
+          dateTo: dateTo || undefined,
+          page,
+          limit: 30,
+        }),
+        operatorServiceApprovalApi.stats(),
+      ]);
+      setItems(listResult.data);
+      setPagination(listResult.pagination);
+      setStats(statsResult);
+      setSelectedIds(new Set());
+    } catch (err: any) {
+      setPermissionError(err?.message || '데이터를 불러올 수 없습니다');
+    } finally {
+      setLoading(false);
+    }
   }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo]);
 
   useEffect(() => {
@@ -365,6 +372,11 @@ export default function ProductServiceApprovalPage() {
       <div className="space-y-2">
         {loading ? (
           <div className="text-center py-16 text-slate-400">로딩 중...</div>
+        ) : permissionError ? (
+          <div className="text-center py-16">
+            <div className="text-red-500 font-medium text-lg mb-2">{permissionError}</div>
+            <p className="text-slate-400 text-sm">이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.</p>
+          </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-slate-400">데이터가 없습니다</div>
         ) : (

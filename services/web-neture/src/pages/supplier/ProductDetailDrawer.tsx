@@ -570,15 +570,20 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 <div className="space-y-1.5">
                   <span className="text-sm text-slate-500">서비스별 승인</span>
                   {product.serviceApprovals.map((sa) => (
-                    <div key={sa.serviceKey} className="flex items-center justify-between pl-3">
-                      <span className="text-xs text-slate-600">{sa.serviceKey}</span>
-                      <Badge className={
-                        sa.status === 'approved' ? 'bg-green-50 text-green-700'
-                          : sa.status === 'pending' ? 'bg-amber-50 text-amber-700'
-                          : 'bg-red-50 text-red-700'
-                      }>
-                        {sa.status === 'approved' ? '승인' : sa.status === 'pending' ? '대기' : sa.status}
-                      </Badge>
+                    <div key={sa.serviceKey}>
+                      <div className="flex items-center justify-between pl-3">
+                        <span className="text-xs text-slate-600">{sa.serviceKey}</span>
+                        <Badge className={
+                          sa.status === 'approved' ? 'bg-green-50 text-green-700'
+                            : sa.status === 'pending' ? 'bg-amber-50 text-amber-700'
+                            : 'bg-red-50 text-red-700'
+                        }>
+                          {sa.status === 'approved' ? '승인' : sa.status === 'pending' ? '대기' : '반려'}
+                        </Badge>
+                      </div>
+                      {sa.reason && (
+                        <p className="text-xs text-red-600 pl-3 mt-0.5">반려 사유: {sa.reason}</p>
+                      )}
                     </div>
                   ))}
                 </div>

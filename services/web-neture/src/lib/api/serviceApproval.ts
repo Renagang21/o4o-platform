@@ -70,7 +70,10 @@ export const operatorServiceApprovalApi = {
         data: result.data || [],
         pagination: result.pagination || { page: 1, limit: 50, total: 0, totalPages: 0 },
       };
-    } catch {
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        throw new Error('접근 권한이 없습니다');
+      }
       return { data: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } };
     }
   },
@@ -79,7 +82,10 @@ export const operatorServiceApprovalApi = {
     try {
       const response = await api.get('/neture/operator/service-approvals/stats');
       return response.data?.data || { pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 };
-    } catch {
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        throw new Error('접근 권한이 없습니다');
+      }
       return { pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 };
     }
   },
