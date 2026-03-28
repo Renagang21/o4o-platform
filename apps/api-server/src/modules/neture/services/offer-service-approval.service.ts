@@ -172,13 +172,13 @@ export class OfferServiceApprovalService {
   /**
    * Operator: 일괄 승인
    */
-  async batchApprove(ids: string[], decidedBy: string): Promise<{ approved: number; failed: number; errors: string[] }> {
+  async batchApprove(ids: string[], decidedBy: string, reason?: string): Promise<{ approved: number; failed: number; errors: string[] }> {
     let approved = 0;
     let failed = 0;
     const errors: string[] = [];
 
     for (const id of ids) {
-      const result = await this.approve(id, decidedBy);
+      const result = await this.approve(id, decidedBy, reason);
       if (result.success) {
         approved++;
       } else {
@@ -322,7 +322,7 @@ export class OfferServiceApprovalService {
    * Operator: 승인
    * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1: 트랜잭션 + sync 추가
    */
-  async approve(approvalId: string, decidedBy: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
+  async approve(approvalId: string, decidedBy: string, reason?: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
     const rows = await this.dataSource.query(
       `SELECT id, offer_id, approval_status FROM offer_service_approvals WHERE id = $1`,
       [approvalId],
@@ -336,15 +336,19 @@ export class OfferServiceApprovalService {
     try {
       await queryRunner.query(
         `UPDATE offer_service_approvals
-         SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), updated_at = NOW()
+         SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), reason = $3, updated_at = NOW()
          WHERE id = $1`,
-        [approvalId, decidedBy],
+        [approvalId, decidedBy, reason || null],
       );
 
       const syncResult = await this.syncOfferFromServiceApprovals(offerId, decidedBy, queryRunner);
       await queryRunner.commitTransaction();
 
       logger.info(`[ServiceApproval] Approved ${approvalId} by ${decidedBy}, sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}`);
+
+      // WO-NETURE-APPROVAL-ACTION-UX-V1: fire-and-forget notification
+      this.notifySupplier(offerId, 'approved', reason).catch(() => {});
+
       return { success: true, syncResult };
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -381,12 +385,49 @@ export class OfferServiceApprovalService {
       await queryRunner.commitTransaction();
 
       logger.info(`[ServiceApproval] Rejected ${approvalId} by ${decidedBy}, sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}`);
+
+      // WO-NETURE-APPROVAL-ACTION-UX-V1: fire-and-forget notification
+      this.notifySupplier(offerId, 'rejected', reason).catch(() => {});
+
       return { success: true, syncResult };
     } catch (err) {
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  /**
+   * WO-NETURE-APPROVAL-ACTION-UX-V1: 공급자에게 승인/거절 알림 (fire-and-forget)
+   */
+  private async notifySupplier(offerId: string, status: 'approved' | 'rejected', reason?: string): Promise<void> {
+    try {
+      // offer → supplier → user
+      const rows = await this.dataSource.query(
+        `SELECT ns.user_id, COALESCE(pm.marketing_name, pm.regulatory_name, '') AS product_name
+         FROM supplier_product_offers spo
+         JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         JOIN product_masters pm ON pm.id = spo.master_id
+         WHERE spo.id = $1`,
+        [offerId],
+      );
+      if (!rows.length || !rows[0].user_id) return;
+
+      const { user_id: userId, product_name: productName } = rows[0];
+      const isApproved = status === 'approved';
+      const title = isApproved ? '상품 승인 완료' : '상품 승인 거절';
+      const message = reason
+        ? `[${productName}] ${isApproved ? '승인' : '거절'}되었습니다. 사유: ${reason}`
+        : `[${productName}] ${isApproved ? '승인' : '거절'}되었습니다.`;
+
+      await this.dataSource.query(
+        `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
+         VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, false, NOW())`,
+        [userId, title, message, JSON.stringify({ offerId, status, productName })],
+      );
+    } catch (err) {
+      logger.warn('[ServiceApproval] Failed to send notification', err);
     }
   }
 }

@@ -77,8 +77,8 @@ function formatPrice(price: number | null): string {
 
 export default function ProductServiceApprovalPage() {
   const { user } = useAuth();
-  const isAdmin = user?.roles?.some(
-    (r: string) => r === 'neture:admin' || r === 'platform:super_admin',
+  const canManage = user?.roles?.some(
+    (r: string) => r === 'neture:admin' || r === 'neture:operator' || r === 'platform:super_admin',
   ) ?? false;
 
   // Data
@@ -106,6 +106,10 @@ export default function ProductServiceApprovalPage() {
   // Reject modal
   const [rejectTarget, setRejectTarget] = useState<string | null>(null); // single ID or 'batch'
   const [rejectReason, setRejectReason] = useState('');
+
+  // Approve modal (WO-NETURE-APPROVAL-ACTION-UX-V1)
+  const [approveTarget, setApproveTarget] = useState<string | null>(null); // single ID or 'batch'
+  const [approveMemo, setApproveMemo] = useState('');
 
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
@@ -170,14 +174,28 @@ export default function ProductServiceApprovalPage() {
 
   // ==================== Actions ====================
 
-  const handleApprove = async (id: string) => {
-    setActionLoading(id);
-    const result = await operatorServiceApprovalApi.approve(id);
-    if (result.success) {
-      await fetchData(pagination.page);
-      if (drawerItem?.id === id) setDrawerItem(null);
+  const handleApprove = (id: string) => {
+    setApproveTarget(id);
+    setApproveMemo('');
+  };
+
+  const handleApproveConfirm = async () => {
+    if (!approveTarget) return;
+
+    if (approveTarget === 'batch') {
+      setBatchLoading(true);
+      await operatorServiceApprovalApi.batchApprove(selectedPendingIds, approveMemo || undefined);
+      setBatchLoading(false);
+    } else {
+      setActionLoading(approveTarget);
+      await operatorServiceApprovalApi.approve(approveTarget, approveMemo || undefined);
+      setActionLoading(null);
+      if (drawerItem?.id === approveTarget) setDrawerItem(null);
     }
-    setActionLoading(null);
+
+    setApproveTarget(null);
+    setApproveMemo('');
+    await fetchData(pagination.page);
   };
 
   const handleRejectConfirm = async () => {
@@ -199,12 +217,10 @@ export default function ProductServiceApprovalPage() {
     await fetchData(pagination.page);
   };
 
-  const handleBatchApprove = async () => {
+  const handleBatchApprove = () => {
     if (selectedPendingIds.length === 0) return;
-    setBatchLoading(true);
-    await operatorServiceApprovalApi.batchApprove(selectedPendingIds);
-    setBatchLoading(false);
-    await fetchData(pagination.page);
+    setApproveTarget('batch');
+    setApproveMemo('');
   };
 
   const handleBatchReject = () => {
@@ -306,14 +322,14 @@ export default function ProductServiceApprovalPage() {
             <>
               <button
                 onClick={handleBatchApprove}
-                disabled={!isAdmin || batchLoading}
+                disabled={!canManage || batchLoading}
                 className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 승인 ({selectedPendingIds.length})
               </button>
               <button
                 onClick={handleBatchReject}
-                disabled={!isAdmin || batchLoading}
+                disabled={!canManage || batchLoading}
                 className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 일괄 거절 ({selectedPendingIds.length})
@@ -434,24 +450,24 @@ export default function ProductServiceApprovalPage() {
                       )}
                       <button
                         onClick={() => handleApprove(item.id)}
-                        disabled={!isAdmin || actionLoading === item.id}
-                        title={!isAdmin ? '관리자만 승인할 수 있습니다' : undefined}
+                        disabled={!canManage || actionLoading === item.id}
+                        title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         승인
                       </button>
                       <button
                         onClick={() => { setRejectTarget(item.id); setRejectReason(''); }}
-                        disabled={!isAdmin || actionLoading === item.id}
-                        title={!isAdmin ? '관리자만 거절할 수 있습니다' : undefined}
+                        disabled={!canManage || actionLoading === item.id}
+                        title={!canManage ? '권한이 없습니다' : undefined}
                         className="px-2.5 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         거절
                       </button>
                     </>
-                  ) : item.approvalStatus === 'rejected' && item.reason ? (
+                  ) : item.reason ? (
                     <span className="text-xs text-slate-500 max-w-[120px] truncate" title={item.reason}>
-                      사유: {item.reason}
+                      {item.approvalStatus === 'rejected' ? '사유' : '메모'}: {item.reason}
                     </span>
                   ) : null}
                 </div>
@@ -534,6 +550,43 @@ export default function ProductServiceApprovalPage() {
                 className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
               >
                 거절 확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approve Modal (WO-NETURE-APPROVAL-ACTION-UX-V1) */}
+      {approveTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">
+              {approveTarget === 'batch' ? `일괄 승인 (${selectedPendingIds.length}건)` : '상품 승인'}
+            </h3>
+            <p className="text-sm text-slate-500 mb-4">
+              {approveTarget === 'batch'
+                ? '선택한 승인대기 상품을 일괄 승인합니다.'
+                : '이 상품의 서비스 승인을 처리합니다.'}
+            </p>
+            <textarea
+              value={approveMemo}
+              onChange={(e) => setApproveMemo(e.target.value)}
+              placeholder="승인 메모를 입력하세요 (선택)"
+              className="w-full border border-slate-300 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setApproveTarget(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleApproveConfirm}
+                disabled={batchLoading || (approveTarget !== 'batch' && actionLoading === approveTarget)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
+              >
+                승인 확인
               </button>
             </div>
           </div>
@@ -653,11 +706,21 @@ export default function ProductServiceApprovalPage() {
                 </div>
               </div>
 
-              {/* Rejection reason */}
-              {drawerItem.approvalStatus === 'rejected' && drawerItem.reason && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <div className="text-xs font-medium text-red-600 mb-1">거절 사유</div>
-                  <div className="text-sm text-red-800">{drawerItem.reason}</div>
+              {/* Decision reason */}
+              {drawerItem.reason && (
+                <div className={`border rounded-lg p-4 mb-6 ${
+                  drawerItem.approvalStatus === 'rejected'
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-green-50 border-green-200'
+                }`}>
+                  <div className={`text-xs font-medium mb-1 ${
+                    drawerItem.approvalStatus === 'rejected' ? 'text-red-600' : 'text-green-600'
+                  }`}>
+                    {drawerItem.approvalStatus === 'rejected' ? '거절 사유' : '승인 메모'}
+                  </div>
+                  <div className={`text-sm ${
+                    drawerItem.approvalStatus === 'rejected' ? 'text-red-800' : 'text-green-800'
+                  }`}>{drawerItem.reason}</div>
                 </div>
               )}
 
@@ -674,14 +737,14 @@ export default function ProductServiceApprovalPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleApprove(drawerItem.id)}
-                    disabled={!isAdmin || actionLoading === drawerItem.id}
+                    disabled={!canManage || actionLoading === drawerItem.id}
                     className="flex-1 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     승인
                   </button>
                   <button
                     onClick={() => { setRejectTarget(drawerItem.id); setRejectReason(''); }}
-                    disabled={!isAdmin || actionLoading === drawerItem.id}
+                    disabled={!canManage || actionLoading === drawerItem.id}
                     className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     거절

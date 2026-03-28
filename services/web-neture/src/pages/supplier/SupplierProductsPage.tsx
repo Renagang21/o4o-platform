@@ -585,13 +585,18 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
   {
     key: 'approvalStatus',
     header: '승인',
-    width: '70px',
+    width: '90px',
     align: 'center',
     render: (_v: string, row: SupplierProduct) => {
       const cfg = deriveSubmissionStatus(row);
+      const approvals = row.serviceApprovals || [];
+      const reasonApproval = approvals.find((a) => a.reason);
       return (
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${cfg.bg} ${cfg.text}`}>
-          {cfg.label}
+        <span
+          className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${cfg.bg} ${cfg.text}`}
+          title={reasonApproval?.reason || undefined}
+        >
+          {cfg.label}{reasonApproval?.reason ? ' *' : ''}
         </span>
       );
     },

@@ -114,7 +114,7 @@ export interface SupplierProduct {
   tags?: string[];
   serviceKeys?: string[];
   // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
-  serviceApprovals?: Array<{ serviceKey: string; status: string }>;
+  serviceApprovals?: Array<{ serviceKey: string; status: string; reason?: string | null }>;
   // WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1
   consumerShortDescription?: string | null;
   consumerDetailDescription?: string | null;
@@ -342,7 +342,9 @@ export interface SupplierProfile {
   // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
   businessNumber: string | null;
   representativeName: string | null;
+  businessZipCode: string | null;
   businessAddress: string | null;
+  businessAddressDetail: string | null;
   managerName: string | null;
   managerPhone: string | null;
   businessType: string | null;
@@ -856,7 +858,9 @@ export const supplierProfileApi = {
     // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
     businessNumber?: string;
     representativeName?: string;
+    businessZipCode?: string;
     businessAddress?: string;
+    businessAddressDetail?: string;
     managerName?: string;
     managerPhone?: string;
     businessType?: string;

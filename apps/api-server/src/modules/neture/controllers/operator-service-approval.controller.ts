@@ -82,7 +82,8 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         return;
       }
       const { id } = req.params;
-      const result = await approvalService.approve(id, userId);
+      const { reason } = req.body || {};
+      const result = await approvalService.approve(id, userId, reason);
       if (!result.success) {
         res.status(400).json({ success: false, error: result.error });
         return;
@@ -131,12 +132,12 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
         return;
       }
-      const { ids } = req.body || {};
+      const { ids, reason } = req.body || {};
       if (!Array.isArray(ids) || ids.length === 0) {
         res.status(400).json({ success: false, error: 'IDS_REQUIRED' });
         return;
       }
-      const result = await approvalService.batchApprove(ids, userId);
+      const result = await approvalService.batchApprove(ids, userId, reason);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('[OperatorServiceApproval] Error batch approving:', error);

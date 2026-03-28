@@ -998,7 +998,7 @@ export class NetureOfferService {
            WHERE offer_id = spo.id AND approval_type = 'private' AND approval_status = 'approved'
          ) active ON true
          LEFT JOIN LATERAL (
-           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
+           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status, 'reason', osa.reason)), '[]'::json) AS approvals
            FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
          ) svc_appr ON true
          WHERE ${q.where}

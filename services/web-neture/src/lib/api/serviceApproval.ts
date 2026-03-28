@@ -84,9 +84,9 @@ export const operatorServiceApprovalApi = {
     }
   },
 
-  async approve(id: string): Promise<{ success: boolean; error?: string }> {
+  async approve(id: string, reason?: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await api.patch(`/neture/operator/service-approvals/${id}/approve`);
+      const response = await api.patch(`/neture/operator/service-approvals/${id}/approve`, { reason });
       return response.data;
     } catch (err: any) {
       return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };
@@ -103,9 +103,9 @@ export const operatorServiceApprovalApi = {
   },
 
   // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
-  async batchApprove(ids: string[]): Promise<{ success: boolean; error?: string; data?: { approved: number; failed: number } }> {
+  async batchApprove(ids: string[], reason?: string): Promise<{ success: boolean; error?: string; data?: { approved: number; failed: number } }> {
     try {
-      const response = await api.post('/neture/operator/service-approvals/batch-approve', { ids });
+      const response = await api.post('/neture/operator/service-approvals/batch-approve', { ids, reason });
       return response.data;
     } catch (err: any) {
       return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };
