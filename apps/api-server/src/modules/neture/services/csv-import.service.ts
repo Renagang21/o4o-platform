@@ -66,6 +66,9 @@ const ALLOWED_CSV_COLUMNS = [
 
 const VALID_DISTRIBUTION_TYPES = ['PUBLIC', 'SERVICE', 'PRIVATE'];
 
+/** VALIDATING 상태가 이 시간 이상이면 stuck으로 간주 (5분) */
+const STUCK_VALIDATING_THRESHOLD_MS = 5 * 60 * 1000;
+
 export class CsvImportService {
   private batchRepo: Repository<SupplierCsvImportBatch>;
   private rowRepo: Repository<SupplierCsvImportRow>;
@@ -156,7 +159,28 @@ export class CsvImportService {
       return { success: false, error: 'CSV_EMPTY' };
     }
 
-    // 2. Batch 생성
+    // 2a. 동일 파일명의 FAILED / stuck-VALIDATING 이전 배치 자동 정리
+    if (file.originalname) {
+      const staleBatches = await this.batchRepo.find({
+        where: [
+          { supplierId, fileName: file.originalname, status: CsvImportBatchStatus.FAILED },
+          { supplierId, fileName: file.originalname, status: CsvImportBatchStatus.VALIDATING },
+        ],
+      });
+      if (staleBatches.length > 0) {
+        const now = Date.now();
+        const toDelete = staleBatches.filter(b =>
+          b.status === CsvImportBatchStatus.FAILED ||
+          (now - new Date(b.createdAt).getTime()) > STUCK_VALIDATING_THRESHOLD_MS,
+        );
+        if (toDelete.length > 0) {
+          await this.batchRepo.remove(toDelete);
+          logger.info(`[CsvImport] Auto-cleanup ${toDelete.length} stale batch(es) for "${file.originalname}"`);
+        }
+      }
+    }
+
+    // 2b. Batch 생성
     const batch = this.batchRepo.create({
       supplierId,
       uploadedBy,
@@ -812,6 +836,17 @@ export class CsvImportService {
   async listBatches(
     supplierId: string,
   ): Promise<SupplierCsvImportBatch[]> {
+    // stuck VALIDATING(>5min) → FAILED 자동 전환
+    const cutoff = new Date(Date.now() - STUCK_VALIDATING_THRESHOLD_MS);
+    await this.batchRepo
+      .createQueryBuilder()
+      .update(SupplierCsvImportBatch)
+      .set({ status: CsvImportBatchStatus.FAILED })
+      .where('"supplier_id" = :supplierId', { supplierId })
+      .andWhere('status = :status', { status: CsvImportBatchStatus.VALIDATING })
+      .andWhere('"created_at" < :cutoff', { cutoff })
+      .execute();
+
     return this.batchRepo.find({
       where: { supplierId },
       order: { createdAt: 'DESC' },
@@ -837,9 +872,12 @@ export class CsvImportService {
       return { success: false, error: 'BATCH_NOT_FOUND' };
     }
 
-    // 진행 중 상태는 삭제 불가
+    // 진행 중 상태: 5분 미만이면 삭제 차단, 5분 이상이면 stuck → 삭제 허용
     if (batch.status === CsvImportBatchStatus.VALIDATING) {
-      return { success: false, error: 'CANNOT_DELETE_IN_PROGRESS' };
+      const ageMs = Date.now() - new Date(batch.createdAt).getTime();
+      if (ageMs < STUCK_VALIDATING_THRESHOLD_MS) {
+        return { success: false, error: 'CANNOT_DELETE_IN_PROGRESS' };
+      }
     }
 
     const { totalRows } = batch;

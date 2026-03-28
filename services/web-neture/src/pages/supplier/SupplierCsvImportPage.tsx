@@ -25,8 +25,11 @@ function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     VALID: 'bg-green-100 text-green-800',
     VALIDATED: 'bg-green-100 text-green-800',
+    READY: 'bg-green-100 text-green-800',
     APPLIED: 'bg-blue-100 text-blue-800',
     PARTIAL: 'bg-yellow-100 text-yellow-800', // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
+    VALIDATING: 'bg-orange-100 text-orange-800',
+    FAILED: 'bg-red-100 text-red-800',
     REJECTED: 'bg-red-100 text-red-800',
     PENDING: 'bg-gray-100 text-gray-600',
     LINK_EXISTING: 'bg-indigo-100 text-indigo-800',
@@ -219,9 +222,18 @@ export default function SupplierCsvImportPage() {
   const handleDeleteBatch = async (batch: CsvBatch, e: React.MouseEvent) => {
     e.stopPropagation(); // row 클릭 (상세 열기) 방지
 
-    // 진행 중 상태 차단
+    // VALIDATING 상태: 서버에서 5분 경과 여부로 삭제 가능 판단
     if (batch.status === 'VALIDATING') {
-      alert('검증 진행 중인 배치는 삭제할 수 없습니다.');
+      if (!confirm('검증이 멈춘 것으로 보이는 배치입니다.\n삭제하시겠습니까?')) return;
+      const result = await csvImportApi.deleteBatch(batch.id);
+      if (!result.success) {
+        alert(result.error === 'CANNOT_DELETE_IN_PROGRESS'
+          ? '검증이 아직 진행 중입니다. 잠시 후 다시 시도해주세요.'
+          : friendlyError(result.error || '삭제 실패'));
+        return;
+      }
+      if (selectedBatch?.id === batch.id) handleCloseDetail();
+      await loadBatches();
       return;
     }
 
@@ -432,14 +444,12 @@ export default function SupplierCsvImportPage() {
                       {new Date(b.createdAt).toLocaleString('ko-KR')}
                     </td>
                     <td className="py-2 text-right space-x-1">
-                      {b.status !== 'VALIDATING' && (
-                        <button
-                          onClick={(e) => handleDeleteBatch(b, e)}
-                          className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
-                        >
-                          삭제
-                        </button>
-                      )}
+                      <button
+                        onClick={(e) => handleDeleteBatch(b, e)}
+                        className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                      >
+                        삭제
+                      </button>
                       {(b.status === 'APPLIED' || b.status === 'PARTIAL') && (
                         <button
                           onClick={(e) => handleFullDelete(b, e)}
