@@ -96,8 +96,10 @@ export class NetureOfferService {
   }
 
   /**
-   * POST /admin/products/:id/approve — 상품 승인 (isActive=true)
-   * WO-NETURE-TIER1-AUTO-EXPANSION-BETA-V1: PUBLIC 상품은 승인 시 모든 활성 조직에 자동 listing
+   * POST /admin/products/:id/approve — 상품 승인
+   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
+   *   Admin 승인 = 모든 service approvals → approved → 파생 sync
+   *   직접 offer.approvalStatus 변경 제거 → service approval SSOT
    */
   async approveProduct(
     offerId: string,
@@ -108,8 +110,12 @@ export class NetureOfferService {
       if (!offer) {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
-      if (offer.approvalStatus !== OfferApprovalStatus.PENDING) {
-        return { success: false, error: 'INVALID_APPROVAL_STATUS' };
+      // 멱등: 이미 승인된 offer → 기존 데이터 반환
+      if (offer.approvalStatus === OfferApprovalStatus.APPROVED) {
+        return {
+          success: true,
+          data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus, autoListedCount: 0 },
+        };
       }
 
       // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 permit 게이트
@@ -128,32 +134,52 @@ export class NetureOfferService {
         return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_APPROVAL };
       }
 
-      // 트랜잭션: Offer 승인 + PUBLIC 자동 확산 (원자적)
+      // WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1:
+      // Admin override = service approvals 보장 + 일괄 approved → 파생 sync
+      const approvalService = new OfferServiceApprovalService(AppDataSource);
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        offer.approvalStatus = OfferApprovalStatus.APPROVED;
-        offer.isActive = true;
-        await queryRunner.manager.save(offer);
-
-        // Tier 1 (PUBLIC) 자동 확산: 모든 활성 조직에 listing 생성
-        let autoListedCount = 0;
-        if (offer.distributionType === OfferDistributionType.PUBLIC) {
-          autoListedCount = await autoExpandPublicProduct(queryRunner, offerId, offer.masterId);
+        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
+        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
+          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
+          [offerId],
+        );
+        if (existingApprovals.length === 0) {
+          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
+          const uniqueKeys = [...new Set(['neture', ...keys])];
+          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+          await queryRunner.query(
+            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+             VALUES ${values}
+             ON CONFLICT (offer_id, service_key) DO NOTHING`,
+            [offerId, ...uniqueKeys],
+          );
         }
+
+        // 2. 모든 service approvals를 approved로 일괄 변경
+        await queryRunner.query(
+          `UPDATE offer_service_approvals
+           SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), updated_at = NOW()
+           WHERE offer_id = $1 AND approval_status != 'approved'`,
+          [offerId, adminUserId],
+        );
+
+        // 3. 파생 sync → offer 상태 + is_active + auto-expand
+        const syncResult = await approvalService.syncOfferFromServiceApprovals(offerId, adminUserId, queryRunner);
 
         await queryRunner.commitTransaction();
 
-        logger.info(`[NetureOfferService] Offer approved: ${offerId} by ${adminUserId} (autoListed: ${autoListedCount})`);
+        logger.info(`[NetureOfferService] Offer approved via service approvals: ${offerId} by ${adminUserId} (sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}, autoListed: ${syncResult.autoListedCount})`);
 
         return {
           success: true,
           data: {
             id: offer.id,
             masterId: offer.masterId,
-            isActive: offer.isActive,
-            approvalStatus: offer.approvalStatus,
-            autoListedCount,
+            isActive: true,
+            approvalStatus: syncResult.derivedStatus,
+            autoListedCount: syncResult.autoListedCount,
           },
         };
       } catch (txError) {
@@ -196,7 +222,10 @@ export class NetureOfferService {
   }
 
   /**
-   * POST /admin/products/:id/reject — 상품 반려 (isActive 유지 false)
+   * POST /admin/products/:id/reject — 상품 반려
+   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
+   *   Admin 반려 = 모든 service approvals → rejected → 파생 sync (cascade 포함)
+   *   직접 offer.approvalStatus 변경 제거 → service approval SSOT
    */
   async rejectProduct(
     offerId: string,
@@ -208,38 +237,45 @@ export class NetureOfferService {
       if (!offer) {
         return { success: false, error: 'PRODUCT_NOT_FOUND' };
       }
-      if (offer.approvalStatus !== OfferApprovalStatus.PENDING) {
-        return { success: false, error: 'INVALID_APPROVAL_STATUS' };
+      // 멱등: 이미 거절된 offer → 기존 데이터 반환
+      if (offer.approvalStatus === OfferApprovalStatus.REJECTED) {
+        return {
+          success: true,
+          data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus },
+        };
       }
 
-      offer.approvalStatus = OfferApprovalStatus.REJECTED;
-      await this.offerRepo.save(offer);
+      // 트랜잭션: service approvals → rejected → 파생 sync + cascade (원자적)
+      const approvalService = new OfferServiceApprovalService(AppDataSource);
+      const queryRunner = AppDataSource.createQueryRunner();
+      await queryRunner.startTransaction();
+      try {
+        // 모든 service approvals를 rejected로 일괄 변경
+        await queryRunner.query(
+          `UPDATE offer_service_approvals
+           SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(),
+               reason = $3, updated_at = NOW()
+           WHERE offer_id = $1 AND approval_status != 'rejected'`,
+          [offerId, adminUserId, reason || 'Offer rejected by admin'],
+        );
 
-      // 캐스케이드: Offer 반려 → APPROVED approval → REVOKED + listing 비활성화
-      await AppDataSource.query(
-        `UPDATE product_approvals
-         SET approval_status = 'revoked',
-             decided_by = $2::uuid,
-             decided_at = NOW(),
-             reason = $3,
-             updated_at = NOW()
-         WHERE offer_id = $1 AND approval_status = 'approved'`,
-        [offerId, adminUserId, reason || 'Offer rejected by admin'],
-      );
+        // 파생 sync → offer 상태 + cascade (product_approvals revoke + listings 비활성화)
+        const syncResult = await approvalService.syncOfferFromServiceApprovals(offerId, adminUserId, queryRunner);
 
-      await AppDataSource.query(
-        `UPDATE organization_product_listings
-         SET is_active = false, updated_at = NOW()
-         WHERE offer_id = $1`,
-        [offerId],
-      );
+        await queryRunner.commitTransaction();
 
-      logger.info(`[NetureOfferService] Offer rejected with cascade: ${offerId} by ${adminUserId}`);
+        logger.info(`[NetureOfferService] Offer rejected via service approvals: ${offerId} by ${adminUserId} (sync: ${syncResult.previousStatus}→${syncResult.derivedStatus})`);
 
-      return {
-        success: true,
-        data: { id: offer.id, masterId: offer.masterId, isActive: offer.isActive, approvalStatus: offer.approvalStatus },
-      };
+        return {
+          success: true,
+          data: { id: offer.id, masterId: offer.masterId, isActive: false, approvalStatus: syncResult.derivedStatus },
+        };
+      } catch (txError) {
+        await queryRunner.rollbackTransaction();
+        throw txError;
+      } finally {
+        await queryRunner.release();
+      }
     } catch (error) {
       logger.error('[NetureOfferService] Error rejecting offer:', error);
       throw error;

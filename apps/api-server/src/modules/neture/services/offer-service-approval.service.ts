@@ -3,10 +3,18 @@
  *
  * 서비스 레벨 상품 승인 관리.
  * offer_service_approvals 테이블 전용 (기존 product_approvals와 독립).
+ *
+ * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1:
+ * offer_service_approvals = SSOT. supplier_product_offers.approval_status는 파생 필드.
+ * syncOfferFromServiceApprovals()가 모든 승인 상태 변경의 단일 경로.
  */
 
-import type { DataSource } from 'typeorm';
+import type { DataSource, QueryRunner } from 'typeorm';
+import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
+
+/** DataSource 또는 QueryRunner 양쪽에서 query() 실행 가능 */
+type QueryExecutor = Pick<DataSource, 'query'> | Pick<QueryRunner, 'query'>;
 
 export class OfferServiceApprovalService {
   constructor(private readonly dataSource: DataSource) {}
@@ -122,45 +130,180 @@ export class OfferServiceApprovalService {
     return stats;
   }
 
+  // ==================== WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1 ====================
+
+  /**
+   * 파생 상태 동기화 — offer_service_approvals 기준으로 offer 상태 결정
+   *
+   * 파생 규칙 (WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1):
+   *   ANY approved → APPROVED (하나라도 승인되면 제품 활성화)
+   *   ALL rejected → REJECTED
+   *   some pending, none approved → PENDING
+   *
+   * 상태 전이 부작용:
+   *   → APPROVED: is_active=true + PUBLIC이면 autoExpandPublicProduct()
+   *   → REJECTED: product_approvals revoke + listings 비활성화
+   */
+  async syncOfferFromServiceApprovals(
+    offerId: string,
+    decidedBy: string,
+    executor: QueryExecutor,
+  ): Promise<{ previousStatus: string; derivedStatus: string; changed: boolean; autoListedCount: number }> {
+    // 1. 현재 service approval 상태 조회
+    const approvals: Array<{ approval_status: string }> = await executor.query(
+      `SELECT approval_status FROM offer_service_approvals WHERE offer_id = $1`,
+      [offerId],
+    );
+
+    if (!approvals.length) {
+      return { previousStatus: 'PENDING', derivedStatus: 'PENDING', changed: false, autoListedCount: 0 };
+    }
+
+    // 2. 파생 규칙 적용 (WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1)
+    //   ANY approved → APPROVED (하나라도 승인되면 제품 활성화)
+    //   ALL rejected → REJECTED
+    //   some pending, none approved → PENDING
+    const anyApproved = approvals.some(a => a.approval_status === 'approved');
+    const hasPending = approvals.some(a => a.approval_status === 'pending');
+
+    let derivedStatus: string;
+    if (anyApproved) derivedStatus = 'APPROVED';
+    else if (hasPending) derivedStatus = 'PENDING';
+    else derivedStatus = 'REJECTED';
+
+    // 3. 현재 offer 상태 조회
+    const [offer]: Array<{ approval_status: string; is_active: boolean; distribution_type: string; master_id: string }> =
+      await executor.query(
+        `SELECT approval_status, is_active, distribution_type, master_id FROM supplier_product_offers WHERE id = $1`,
+        [offerId],
+      );
+    if (!offer) {
+      return { previousStatus: 'PENDING', derivedStatus, changed: false, autoListedCount: 0 };
+    }
+
+    const previousStatus = offer.approval_status;
+    const changed = previousStatus !== derivedStatus;
+    let autoListedCount = 0;
+
+    if (!changed) {
+      return { previousStatus, derivedStatus, changed: false, autoListedCount: 0 };
+    }
+
+    // 4. offer 파생 상태 업데이트
+    if (derivedStatus === 'APPROVED') {
+      // → APPROVED: is_active=true + auto-expand
+      await executor.query(
+        `UPDATE supplier_product_offers SET approval_status = 'APPROVED', is_active = true, updated_at = NOW() WHERE id = $1`,
+        [offerId],
+      );
+
+      if (offer.distribution_type === 'PUBLIC') {
+        autoListedCount = await autoExpandPublicProduct(executor, offerId, offer.master_id);
+      }
+
+      logger.info(`[ServiceApproval] Offer ${offerId} → APPROVED (derived) by ${decidedBy}, autoListed=${autoListedCount}`);
+    } else if (derivedStatus === 'REJECTED') {
+      // → REJECTED: offer 상태 + cascade (product_approvals revoke + listings 비활성화)
+      await executor.query(
+        `UPDATE supplier_product_offers SET approval_status = 'REJECTED', updated_at = NOW() WHERE id = $1`,
+        [offerId],
+      );
+
+      await executor.query(
+        `UPDATE product_approvals
+         SET approval_status = 'revoked', decided_by = $2::uuid, decided_at = NOW(),
+             reason = 'Offer rejected (derived)', updated_at = NOW()
+         WHERE offer_id = $1 AND approval_status = 'approved'`,
+        [offerId, decidedBy],
+      );
+
+      await executor.query(
+        `UPDATE organization_product_listings SET is_active = false, updated_at = NOW() WHERE offer_id = $1`,
+        [offerId],
+      );
+
+      logger.info(`[ServiceApproval] Offer ${offerId} → REJECTED (derived) by ${decidedBy}, cascade applied`);
+    } else {
+      // → PENDING
+      await executor.query(
+        `UPDATE supplier_product_offers SET approval_status = 'PENDING', updated_at = NOW() WHERE id = $1`,
+        [offerId],
+      );
+      logger.info(`[ServiceApproval] Offer ${offerId} → PENDING (derived) by ${decidedBy}`);
+    }
+
+    return { previousStatus, derivedStatus, changed, autoListedCount };
+  }
+
   /**
    * Operator: 승인
+   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1: 트랜잭션 + sync 추가
    */
-  async approve(approvalId: string, decidedBy: string): Promise<{ success: boolean; error?: string }> {
+  async approve(approvalId: string, decidedBy: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
     const rows = await this.dataSource.query(
-      `SELECT id, approval_status FROM offer_service_approvals WHERE id = $1`,
+      `SELECT id, offer_id, approval_status FROM offer_service_approvals WHERE id = $1`,
       [approvalId],
     );
     if (!rows.length) return { success: false, error: 'APPROVAL_NOT_FOUND' };
     if (rows[0].approval_status !== 'pending') return { success: false, error: 'NOT_PENDING' };
 
-    await this.dataSource.query(
-      `UPDATE offer_service_approvals
-       SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), updated_at = NOW()
-       WHERE id = $1`,
-      [approvalId, decidedBy],
-    );
-    logger.info(`[ServiceApproval] Approved ${approvalId} by ${decidedBy}`);
-    return { success: true };
+    const offerId = rows[0].offer_id;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(
+        `UPDATE offer_service_approvals
+         SET approval_status = 'approved', decided_by = $2, decided_at = NOW(), updated_at = NOW()
+         WHERE id = $1`,
+        [approvalId, decidedBy],
+      );
+
+      const syncResult = await this.syncOfferFromServiceApprovals(offerId, decidedBy, queryRunner);
+      await queryRunner.commitTransaction();
+
+      logger.info(`[ServiceApproval] Approved ${approvalId} by ${decidedBy}, sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}`);
+      return { success: true, syncResult };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**
    * Operator: 거절
+   * WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1: 트랜잭션 + sync 추가
    */
-  async reject(approvalId: string, decidedBy: string, reason?: string): Promise<{ success: boolean; error?: string }> {
+  async reject(approvalId: string, decidedBy: string, reason?: string): Promise<{ success: boolean; error?: string; syncResult?: any }> {
     const rows = await this.dataSource.query(
-      `SELECT id, approval_status FROM offer_service_approvals WHERE id = $1`,
+      `SELECT id, offer_id, approval_status FROM offer_service_approvals WHERE id = $1`,
       [approvalId],
     );
     if (!rows.length) return { success: false, error: 'APPROVAL_NOT_FOUND' };
     if (rows[0].approval_status !== 'pending') return { success: false, error: 'NOT_PENDING' };
 
-    await this.dataSource.query(
-      `UPDATE offer_service_approvals
-       SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(), reason = $3, updated_at = NOW()
-       WHERE id = $1`,
-      [approvalId, decidedBy, reason || null],
-    );
-    logger.info(`[ServiceApproval] Rejected ${approvalId} by ${decidedBy}`);
-    return { success: true };
+    const offerId = rows[0].offer_id;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(
+        `UPDATE offer_service_approvals
+         SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(), reason = $3, updated_at = NOW()
+         WHERE id = $1`,
+        [approvalId, decidedBy, reason || null],
+      );
+
+      const syncResult = await this.syncOfferFromServiceApprovals(offerId, decidedBy, queryRunner);
+      await queryRunner.commitTransaction();
+
+      logger.info(`[ServiceApproval] Rejected ${approvalId} by ${decidedBy}, sync: ${syncResult.previousStatus}→${syncResult.derivedStatus}`);
+      return { success: true, syncResult };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

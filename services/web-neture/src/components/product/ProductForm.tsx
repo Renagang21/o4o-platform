@@ -3,8 +3,10 @@
  *
  * WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1
  *
- * mode='edit'   → Drawer에서 사용 (5필드: 상품명, 공급가, 소비자가, 재고, 활성)
+ * mode='edit'   → Drawer에서 사용 (상품명, 공급가, 소비자가, 재고, 활성, 유통정책, 서비스)
  * mode='create'  → 등록 Step 2에서 사용 (공급가, 소비자가, 재고, 유통정책, 서비스)
+ *
+ * WO-NETURE-DISTRIBUTION-SETTINGS-UX-V1 — 유통 설정을 edit 모드에서도 표시
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,7 +19,6 @@ export interface ProductFormData {
   consumerReferencePrice: number | null;
   stockQuantity: number;
   isActive: boolean;
-  // create-only
   distributionType?: string;
   serviceKeys?: string[];
 }
@@ -47,6 +48,9 @@ export function validateProductForm(
   }
   if (data.consumerReferencePrice != null && data.consumerReferencePrice < 0) {
     errors.consumerReferencePrice = '0 이상 입력해주세요';
+  }
+  if (data.distributionType === 'SERVICE' && (!data.serviceKeys || data.serviceKeys.length === 0)) {
+    errors.serviceKeys = '서비스를 1개 이상 선택해주세요';
   }
   return errors;
 }
@@ -168,6 +172,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
   };
 
   const toggleServiceKey = (key: string) => {
+    if (key === 'neture') return; // neture는 항상 포함
     const current = data.serviceKeys || [];
     const next = current.includes(key)
       ? current.filter((k) => k !== key)
@@ -256,70 +261,76 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
         </div>
       )}
 
-      {/* ── Create mode: 유통 정책 ── */}
-      {mode === 'create' && (
-        <div>
-          <FieldLabel>유통 정책</FieldLabel>
-          <div className="space-y-2">
-            {DISTRIBUTION_OPTIONS.map((opt) => (
+      {/* ── 유통 정책 ── */}
+      <div>
+        <FieldLabel>유통 정책</FieldLabel>
+        <div className="space-y-2">
+          {DISTRIBUTION_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                data.distributionType === opt.value
+                  ? 'border-emerald-500 bg-emerald-50'
+                  : 'border-slate-200 hover:bg-slate-50'
+              } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+            >
+              <input
+                type="radio"
+                name="distributionType"
+                value={opt.value}
+                checked={data.distributionType === opt.value}
+                onChange={() => updateField('distributionType', opt.value)}
+                disabled={disabled}
+                className="mt-1"
+              />
+              <div>
+                <p className="font-medium text-slate-800">{opt.label}</p>
+                <p className="text-sm text-slate-500">{opt.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+        {mode === 'edit' && (
+          <p className="mt-2 text-xs text-slate-400">
+            서비스 운영자가 상품을 검토 후 승인하면 해당 서비스에 노출됩니다.
+          </p>
+        )}
+      </div>
+
+      {/* ── 서비스 선택 ── */}
+      <div>
+        <FieldLabel>서비스 선택</FieldLabel>
+        <p className="text-xs text-slate-400 mb-3">이 상품을 노출할 서비스를 선택하세요</p>
+        <div className="grid grid-cols-2 gap-2">
+          {AVAILABLE_SERVICES.map((svc) => {
+            const selected = (data.serviceKeys || []).includes(svc.key);
+            const isNeture = svc.key === 'neture';
+            return (
               <label
-                key={opt.value}
-                className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  data.distributionType === opt.value
+                key={svc.key}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selected
                     ? 'border-emerald-500 bg-emerald-50'
                     : 'border-slate-200 hover:bg-slate-50'
-                } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+                } ${disabled || isNeture ? 'opacity-60 pointer-events-none' : ''}`}
               >
                 <input
-                  type="radio"
-                  name="distributionType"
-                  value={opt.value}
-                  checked={data.distributionType === opt.value}
-                  onChange={() => updateField('distributionType', opt.value)}
-                  disabled={disabled}
-                  className="mt-1"
+                  type="checkbox"
+                  checked={selected}
+                  onChange={() => toggleServiceKey(svc.key)}
+                  disabled={disabled || isNeture}
+                  className="w-4 h-4 text-emerald-600 rounded"
                 />
-                <div>
-                  <p className="font-medium text-slate-800">{opt.label}</p>
-                  <p className="text-sm text-slate-500">{opt.desc}</p>
-                </div>
+                <span className="text-sm font-medium text-slate-700">
+                  {svc.name}
+                  {isNeture && <span className="text-[10px] text-slate-400 ml-1">(필수)</span>}
+                </span>
               </label>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      )}
-
-      {/* ── Create mode: 서비스 선택 ── */}
-      {mode === 'create' && (
-        <div>
-          <FieldLabel>서비스 선택</FieldLabel>
-          <p className="text-xs text-slate-400 mb-3">이 상품을 노출할 서비스를 선택하세요</p>
-          <div className="grid grid-cols-2 gap-2">
-            {AVAILABLE_SERVICES.map((svc) => {
-              const selected = (data.serviceKeys || []).includes(svc.key);
-              return (
-                <label
-                  key={svc.key}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                    selected
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-slate-200 hover:bg-slate-50'
-                  } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => toggleServiceKey(svc.key)}
-                    disabled={disabled}
-                    className="w-4 h-4 text-emerald-600 rounded"
-                  />
-                  <span className="text-sm font-medium text-slate-700">{svc.name}</span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      )}
+        <FieldError error={errors.serviceKeys} />
+      </div>
     </div>
   );
 }

@@ -107,6 +107,8 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
     consumerReferencePrice: p.consumerReferencePrice ?? null,
     stockQuantity: p.stockQuantity ?? 0,
     isActive: p.isActive,
+    distributionType: p.distributionType || 'PUBLIC',
+    serviceKeys: p.serviceKeys?.length ? p.serviceKeys : ['neture'],
   };
 }
 
@@ -196,13 +198,26 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (!product || !formRef.current) return;
     const form = formRef.current;
     setSaving(true);
+
+    // 1. 기본 필드 + distributionType 업데이트
     const result = await supplierApi.updateProduct(product.id, {
       marketingName: form.marketingName || undefined,
       priceGeneral: form.priceGeneral ?? undefined,
       consumerReferencePrice: form.consumerReferencePrice,
       stockQuantity: form.stockQuantity,
       isActive: form.isActive,
+      distributionType: form.distributionType as any,
     });
+
+    // 2. 새로운 serviceKeys가 추가되었으면 승인 요청
+    if (result.success && form.serviceKeys?.length) {
+      const existingKeys = new Set(product.serviceKeys || []);
+      const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
+      if (newKeys.length > 0) {
+        await supplierApi.submitForApproval([product.id], form.serviceKeys);
+      }
+    }
+
     setSaving(false);
     if (result.success) {
       setIsEditing(false);

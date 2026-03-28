@@ -526,8 +526,29 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
       >
         <option value="PUBLIC">전체 공개</option>
         <option value="SERVICE">서비스</option>
+        <option value="PRIVATE">비공개</option>
       </select>
     ),
+  },
+  // WO-NETURE-DISTRIBUTION-SETTINGS-UX-V1: serviceKeys 열
+  {
+    key: 'serviceKeys' as any,
+    header: '서비스',
+    width: '120px',
+    render: (v: string[] | undefined | null) => {
+      const keys = Array.isArray(v) ? v : [];
+      if (keys.length === 0) return <span className="text-xs text-slate-400">-</span>;
+      const display = keys.slice(0, 2);
+      const rest = keys.length - 2;
+      return (
+        <div className="flex flex-wrap gap-1">
+          {display.map((k) => (
+            <span key={k} className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">{k}</span>
+          ))}
+          {rest > 0 && <span className="text-[10px] text-slate-400">+{rest}</span>}
+        </div>
+      );
+    },
   },
   {
     key: 'isActive',
