@@ -485,6 +485,9 @@ export class NetureSupplierService {
         }
       }
 
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1
+      const addrDetail = org?.address_detail;
+
       return {
         id: supplier.id,
         name: org?.name ?? '',
@@ -492,7 +495,9 @@ export class NetureSupplierService {
         // Business profile — org-primary with supplier + prefill fallback
         businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,
+        businessZipCode: addrDetail?.zipCode ?? null,
         businessAddress: org?.address ?? prefilled.businessAddress ?? null,
+        businessAddressDetail: addrDetail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || prefilled.businessType || null,
@@ -529,6 +534,9 @@ export class NetureSupplierService {
       businessNumber?: string;
       representativeName?: string;
       businessAddress?: string;
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1
+      businessZipCode?: string;
+      businessAddressDetail?: string;
       managerName?: string;
       managerPhone?: string;
       businessType?: string;
@@ -561,12 +569,31 @@ export class NetureSupplierService {
       const orgWriteNeeded =
         data.businessNumber !== undefined ||
         data.businessAddress !== undefined ||
+        data.businessZipCode !== undefined ||
+        data.businessAddressDetail !== undefined ||
         data.contactPhone !== undefined;
       if (orgWriteNeeded && supplier.organizationId) {
+        // WO-O4O-POSTAL-CODE-ADDRESS-V1: build address_detail JSONB
+        let addressDetail: Record<string, string | null> | undefined;
+        if (data.businessAddress !== undefined || data.businessZipCode !== undefined || data.businessAddressDetail !== undefined) {
+          // Read existing address_detail to merge
+          const orgRows = await AppDataSource.query(
+            `SELECT address_detail FROM organizations WHERE id = $1`,
+            [supplier.organizationId],
+          );
+          const existing = (orgRows[0]?.address_detail as Record<string, string | null>) || {};
+          addressDetail = {
+            zipCode: data.businessZipCode !== undefined ? (data.businessZipCode || null) : (existing.zipCode || null),
+            baseAddress: data.businessAddress !== undefined ? (data.businessAddress || '') : (existing.baseAddress || ''),
+            detailAddress: data.businessAddressDetail !== undefined ? (data.businessAddressDetail || null) : (existing.detailAddress || null),
+          };
+        }
+
         await this.writeOrgBusinessData(supplier.organizationId, {
           business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
           address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
           phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
+          address_detail: addressDetail,
         });
       }
 
@@ -580,7 +607,9 @@ export class NetureSupplierService {
         // Business profile — org SSOT
         businessNumber: org?.business_number ?? null,
         representativeName: supplier.representativeName || null,
+        businessZipCode: org?.address_detail?.zipCode ?? null,
         businessAddress: org?.address ?? null,
+        businessAddressDetail: org?.address_detail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         businessType: supplier.businessType || null,
@@ -819,7 +848,13 @@ export class NetureSupplierService {
    */
   private async writeOrgBusinessData(
     organizationId: string,
-    data: { business_number?: string | null; address?: string | null; phone?: string | null },
+    data: {
+      business_number?: string | null;
+      address?: string | null;
+      phone?: string | null;
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1
+      address_detail?: Record<string, string | null> | null;
+    },
   ): Promise<void> {
     try {
       const setClauses: string[] = [];
@@ -837,6 +872,11 @@ export class NetureSupplierService {
       if (data.phone !== undefined) {
         setClauses.push(`phone = $${idx++}`);
         params.push(data.phone);
+      }
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1
+      if (data.address_detail !== undefined) {
+        setClauses.push(`address_detail = $${idx++}`);
+        params.push(data.address_detail ? JSON.stringify(data.address_detail) : null);
       }
 
       if (setClauses.length === 0) return;
@@ -880,12 +920,13 @@ export class NetureSupplierService {
     business_number: string | null;
     address: string | null;
     phone: string | null;
+    address_detail: Record<string, string | null> | null;
   } | null> {
     if (!organizationId) return null;
 
     try {
       const rows = await AppDataSource.query(
-        `SELECT name, business_number, address, phone FROM organizations WHERE id = $1 LIMIT 1`,
+        `SELECT name, business_number, address, phone, address_detail FROM organizations WHERE id = $1 LIMIT 1`,
         [organizationId],
       );
       return rows[0] || null;

@@ -15,6 +15,7 @@ import { ArrowLeft, Truck, Store } from 'lucide-react';
 import * as cartService from '../../services/cartService';
 import type { CartItem } from '../../services/cartService';
 import { getReferralCookie } from '../../utils/referral';
+import { AddressSearch } from '@o4o/ui';
 
 // ============================================================================
 // Types
@@ -259,9 +260,15 @@ export function CheckoutPage() {
             <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <input placeholder="수령인" value={shippingAddress.recipientName} onChange={(e) => setShippingAddress({ ...shippingAddress, recipientName: e.target.value })} style={inputStyle} />
               <input placeholder="연락처" value={shippingAddress.phone} onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })} style={inputStyle} />
-              <input placeholder="우편번호" value={shippingAddress.zipCode} onChange={(e) => setShippingAddress({ ...shippingAddress, zipCode: e.target.value })} style={inputStyle} />
-              <input placeholder="주소" value={shippingAddress.address1} onChange={(e) => setShippingAddress({ ...shippingAddress, address1: e.target.value })} style={inputStyle} />
-              <input placeholder="상세주소" value={shippingAddress.address2} onChange={(e) => setShippingAddress({ ...shippingAddress, address2: e.target.value })} style={inputStyle} />
+              {/* WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
+              <AddressSearch
+                zipCode={shippingAddress.zipCode}
+                address={shippingAddress.address1}
+                addressDetail={shippingAddress.address2}
+                onChange={({ zipCode, address, addressDetail }) =>
+                  setShippingAddress(prev => ({ ...prev, zipCode, address1: address, address2: addressDetail }))
+                }
+              />
               <input placeholder="배송 메모 (선택)" value={shippingAddress.memo} onChange={(e) => setShippingAddress({ ...shippingAddress, memo: e.target.value })} style={inputStyle} />
             </div>
           )}

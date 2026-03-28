@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
+import { AddressSearch } from '@o4o/ui';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -26,6 +27,7 @@ export interface BusinessInfoData {
   businessCategory?: string;
   address?: string;
   address2?: string;
+  zipCode?: string;
 }
 
 // ─── API Helper ──────────────────────────────────────────────
@@ -59,6 +61,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
     taxEmail: '',
     businessType: '',
     businessCategory: '',
+    zipCode: '',
     address1: '',
     address2: '',
   });
@@ -81,6 +84,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
           taxEmail: biz.email || '',
           businessType: biz.businessType || '',
           businessCategory: biz.businessCategory || '',
+          zipCode: biz.zipCode || '',
           address1: biz.address || '',
           address2: biz.address2 || '',
         });
@@ -119,6 +123,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         payload.taxEmail = form.taxEmail;
         payload.businessType = form.businessType;
         payload.businessCategory = form.businessCategory;
+        payload.zipCode = form.zipCode;
         payload.address1 = form.address1;
         payload.address2 = form.address2;
       }
@@ -229,18 +234,16 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                         placeholder="의약품" />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">주소</label>
-                    <input type="text" name="address1" value={form.address1} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="서울특별시 강남구 테헤란로 123" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-600 mb-1">상세주소</label>
-                    <input type="text" name="address2" value={form.address2} onChange={handleChange}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      placeholder="1층 건강약국" />
-                  </div>
+                  {/* WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
+                  <AddressSearch
+                    zipCode={form.zipCode}
+                    address={form.address1}
+                    addressDetail={form.address2}
+                    onChange={({ zipCode, address, addressDetail }) =>
+                      setForm(prev => ({ ...prev, zipCode, address1: address, address2: addressDetail }))
+                    }
+                    inputClassName="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
                 </div>
               </div>
             )}

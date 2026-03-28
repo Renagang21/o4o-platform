@@ -119,6 +119,11 @@ export class RegisterRequestDto {
   @IsString()
   businessCategory?: string;
 
+  /** WO-O4O-POSTAL-CODE-ADDRESS-V1: 우편번호 */
+  @IsOptional()
+  @IsString()
+  zipCode?: string;
+
   /** GlycoPharm: 주소 */
   @IsOptional()
   @IsString()

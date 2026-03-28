@@ -117,6 +117,7 @@ export class AuthRegisterController extends BaseController {
           if (data.businessType) newBiz.businessType = data.businessType;
           if (data.taxEmail) newBiz.email = data.taxEmail;
           if (data.businessCategory) newBiz.businessCategory = data.businessCategory;
+          if (data.zipCode) newBiz.zipCode = data.zipCode;
           if (data.address1) newBiz.address = data.address1;
           if (data.address2) newBiz.address2 = data.address2;
           if (Object.keys(newBiz).length > 0) {
@@ -198,6 +199,10 @@ export class AuthRegisterController extends BaseController {
         if (data.businessCategory) {
           businessInfo.businessCategory = data.businessCategory;
         }
+        // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
+        if (data.zipCode) {
+          businessInfo.zipCode = data.zipCode;
+        }
         if (data.address1) {
           businessInfo.address = data.address1;
         }
@@ -207,6 +212,7 @@ export class AuthRegisterController extends BaseController {
         // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 dual write
         if (data.address1) {
           (businessInfo as any).storeAddress = {
+            ...(data.zipCode ? { zipCode: data.zipCode } : {}),
             baseAddress: data.address1,
             ...(data.address2 ? { detailAddress: data.address2 } : {}),
           };

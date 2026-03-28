@@ -189,6 +189,9 @@ export class NetureService {
       businessNumber?: string;
       representativeName?: string;
       businessAddress?: string;
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1
+      businessZipCode?: string;
+      businessAddressDetail?: string;
       managerName?: string;
       managerPhone?: string;
       businessType?: string;

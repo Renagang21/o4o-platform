@@ -182,6 +182,8 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         contactWebsiteVisibility, contactKakaoVisibility,
         // WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
         businessNumber, representativeName, businessAddress,
+        // WO-O4O-POSTAL-CODE-ADDRESS-V1
+        businessZipCode, businessAddressDetail,
         managerName, managerPhone, businessType, taxEmail,
       } = req.body;
       const result = await netureService.updateSupplierProfile(supplierId, {
@@ -189,6 +191,7 @@ export function createSupplierManagementController(dataSource: DataSource): Rout
         contactEmailVisibility, contactPhoneVisibility,
         contactWebsiteVisibility, contactKakaoVisibility,
         businessNumber, representativeName, businessAddress,
+        businessZipCode, businessAddressDetail,
         managerName, managerPhone, businessType, taxEmail,
       });
       if (!result) {

@@ -579,7 +579,7 @@ export class MembershipConsoleController {
       const {
         password, lastName, firstName, nickname, phone,
         businessName, businessNumber, taxEmail, businessType,
-        businessCategory, address1, address2,
+        businessCategory, zipCode, address1, address2,
       } = req.body;
 
       if (!scope.isPlatformAdmin) {
@@ -622,11 +622,14 @@ export class MembershipConsoleController {
       if (taxEmail !== undefined) bizFields.email = taxEmail;
       if (businessType !== undefined) bizFields.businessType = businessType;
       if (businessCategory !== undefined) bizFields.businessCategory = businessCategory;
+      // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
+      if (zipCode !== undefined) bizFields.zipCode = zipCode;
       if (address1 !== undefined) bizFields.address = address1;
       if (address2 !== undefined) bizFields.address2 = address2;
       // WO-O4O-STORE-PROFILE-UNIFICATION-V1: 구조화된 주소 동기화
-      if (address1 !== undefined || address2 !== undefined) {
+      if (address1 !== undefined || address2 !== undefined || zipCode !== undefined) {
         (bizFields as any).storeAddress = {
+          ...(zipCode ? { zipCode } : {}),
           baseAddress: address1 || '',
           ...(address2 ? { detailAddress: address2 } : {}),
         };

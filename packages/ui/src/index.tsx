@@ -616,6 +616,8 @@ Progress.displayName = 'Progress';
 export * from './ag-components';
 
 // Shared Components (BaseTable etc.)
+export { AddressSearch } from './components/AddressSearch';
+export type { AddressSearchProps, AddressSearchValue } from './components/AddressSearch';
 export * from './components/table/BaseTable';
 export { useTableSort } from './components/table/useTableSort';
 export type { SortOrder, SortState, UseTableSortOptions, UseTableSortReturn } from './components/table/useTableSort';

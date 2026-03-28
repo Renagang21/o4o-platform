@@ -25,6 +25,7 @@ import {
   Info,
 } from 'lucide-react';
 import { supplierProfileApi, type SupplierProfile, type ContactVisibility } from '../../lib/api';
+import { AddressSearch } from '@o4o/ui';
 
 const VISIBILITY_OPTIONS: { value: ContactVisibility; label: string; desc: string }[] = [
   { value: 'public', label: '전체 공개', desc: '모든 판매자에게 표시' },
@@ -68,7 +69,9 @@ export default function SupplierProfilePage() {
   const [representativeName, setRepresentativeName] = useState('');
   const [businessNumber, setBusinessNumber] = useState('');
   const [businessType, setBusinessType] = useState('');
+  const [businessZipCode, setBusinessZipCode] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
+  const [businessAddressDetail, setBusinessAddressDetail] = useState('');
   const [taxEmail, setTaxEmail] = useState('');
 
   // Section B: 담당자 정보
@@ -98,7 +101,9 @@ export default function SupplierProfilePage() {
         setRepresentativeName(data.representativeName || '');
         setBusinessNumber(data.businessNumber || '');
         setBusinessType(data.businessType || '');
+        setBusinessZipCode(data.businessZipCode || '');
         setBusinessAddress(data.businessAddress || '');
+        setBusinessAddressDetail(data.businessAddressDetail || '');
         setTaxEmail(data.taxEmail || '');
         // Section B
         setManagerName(data.managerName || '');
@@ -129,7 +134,9 @@ export default function SupplierProfilePage() {
       // Section A
       businessNumber,
       representativeName,
+      businessZipCode,
       businessAddress,
+      businessAddressDetail,
       businessType,
       taxEmail,
       // Section B
@@ -249,18 +256,22 @@ export default function SupplierProfilePage() {
             />
           </div>
 
-          {/* 사업장 주소 */}
+          {/* 사업장 주소 — WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
           <div>
-            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
               <MapPin className="w-3.5 h-3.5 text-gray-400" />
               사업장 주소
             </label>
-            <input
-              type="text"
-              value={businessAddress}
-              onChange={(e) => setBusinessAddress(e.target.value)}
-              placeholder="서울특별시 강남구 테헤란로 123"
-              className={inputClass}
+            <AddressSearch
+              zipCode={businessZipCode}
+              address={businessAddress}
+              addressDetail={businessAddressDetail}
+              onChange={({ zipCode, address, addressDetail }) => {
+                setBusinessZipCode(zipCode);
+                setBusinessAddress(address);
+                setBusinessAddressDetail(addressDetail);
+              }}
+              inputClassName={inputClass}
             />
           </div>
 

@@ -1,3 +1,5 @@
+export { AddressSearch } from './AddressSearch';
+export type { AddressSearchProps, AddressSearchValue } from './AddressSearch';
 export { SocialLoginButtons } from './SocialLoginButtons';
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './Card';
 export { Button } from './Button';

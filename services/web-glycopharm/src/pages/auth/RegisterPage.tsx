@@ -25,6 +25,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { api } from '../../lib/apiClient';
+import { AddressSearch } from '@o4o/ui';
 
 const SERVICE_LABELS: Record<string, string> = {
   neture: 'Neture', glycopharm: 'GlycoPharm', glucoseview: 'GlucoseView',
@@ -54,6 +55,7 @@ export default function RegisterPage() {
     taxEmail: '',
     businessType: '',
     businessCategory: '',
+    zipCode: '',
     address1: '',
     address2: '',
     agreeTerms: false,
@@ -123,6 +125,7 @@ export default function RegisterPage() {
           taxEmail: formData.taxEmail || undefined,
           businessType: formData.businessType || undefined,
           businessCategory: formData.businessCategory || undefined,
+          zipCode: formData.zipCode || undefined,
           address1: formData.address1 || undefined,
           address2: formData.address2 || undefined,
         }),
@@ -528,29 +531,16 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">주소</label>
-                    <input
-                      type="text"
-                      name="address1"
-                      value={formData.address1}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="서울특별시 강남구 테헤란로 123"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">상세주소</label>
-                    <input
-                      type="text"
-                      name="address2"
-                      value={formData.address2}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="1층 건강약국"
-                    />
-                  </div>
+                  {/* WO-O4O-POSTAL-CODE-ADDRESS-V1 */}
+                  <AddressSearch
+                    zipCode={formData.zipCode}
+                    address={formData.address1}
+                    addressDetail={formData.address2}
+                    onChange={({ zipCode, address, addressDetail }) =>
+                      setFormData(prev => ({ ...prev, zipCode, address1: address, address2: addressDetail }))
+                    }
+                    inputClassName="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
             )}
