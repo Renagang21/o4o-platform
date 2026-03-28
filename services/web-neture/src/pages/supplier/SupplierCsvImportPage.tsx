@@ -10,8 +10,8 @@
  * WO-NETURE-CSV-IMPORT-UI-V1
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { csvImportApi, type CsvBatch, type CsvBatchDetail } from '../../lib/api/csvImport';
+import React, { useState, useEffect, useCallback } from 'react';
+import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow } from '../../lib/api/csvImport';
 
 // ─── XLSX Template Download ──────────────────────────────────────────────────
 function downloadTemplate() {
@@ -58,6 +58,12 @@ function friendlyError(msg: string): string {
   if (msg.includes('NO_SUPPLIER')) return '공급자 계정을 찾을 수 없습니다.';
   if (msg.includes('UNAUTHORIZED')) return '로그인이 필요합니다. 다시 로그인해주세요.';
   if (msg.includes('시간이 초과')) return msg; // 이미 한국어
+  // WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
+  if (msg.includes('BATCH_NOT_READY')) return '배치가 READY 상태가 아닙니다.';
+  if (msg.includes('ROW_NOT_EDITABLE')) return '이 행은 수정할 수 없습니다 (VALID 상태만 수정 가능).';
+  if (msg.includes('INVALID_SUPPLY_PRICE')) return '공급가는 0 이상의 숫자여야 합니다.';
+  if (msg.includes('INVALID_DISTRIBUTION_TYPE')) return '유통 타입은 PUBLIC, SERVICE, PRIVATE 중 하나여야 합니다.';
+  if (msg.includes('NO_FIELDS')) return '수정할 필드가 없습니다.';
   return msg;
 }
 
@@ -79,6 +85,12 @@ export default function SupplierCsvImportPage() {
   const [applyError, setApplyError] = useState<string | null>(null);
   const [applySuccess, setApplySuccess] = useState<string | null>(null);
   const [downloadedCsv, setDownloadedCsv] = useState(false); // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1
+
+  // WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<Record<string, string>>({});
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // ─── Load batches ─────────────────────────────────────────────────────────
   const loadBatches = useCallback(async () => {
@@ -336,6 +348,71 @@ export default function SupplierCsvImportPage() {
     setDownloadedCsv(true);
   };
 
+  // ─── Row Quick Edit (WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1) ──────────────────
+  const EDITABLE_FIELDS: Array<{ key: string; label: string; type: 'text' | 'number' | 'select' | 'textarea' }> = [
+    { key: 'marketing_name', label: '마케팅명', type: 'text' },
+    { key: 'brand', label: '브랜드', type: 'text' },
+    { key: 'supply_price', label: '공급가', type: 'number' },
+    { key: 'consumer_price', label: '소비자가', type: 'number' },
+    { key: 'stock_qty', label: '재고', type: 'number' },
+    { key: 'distribution_type', label: '유통 타입', type: 'select' },
+    { key: 'short_description', label: '짧은 설명', type: 'textarea' },
+    { key: 'detail_description', label: '상세 설명', type: 'textarea' },
+    { key: 'category_name', label: '카테고리', type: 'text' },
+    { key: 'manufacturer_name', label: '제조사', type: 'text' },
+    { key: 'image_url', label: '이미지 URL', type: 'text' },
+  ];
+
+  const handleStartEdit = (row: CsvBatchRow) => {
+    const raw = row.rawJson as Record<string, string>;
+    const fields: Record<string, string> = {};
+    for (const f of EDITABLE_FIELDS) {
+      fields[f.key] = String(raw[f.key] ?? '');
+    }
+    setEditingRowId(row.id);
+    setEditFields(fields);
+    setEditError(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRowId(null);
+    setEditFields({});
+    setEditError(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedBatch || !editingRowId) return;
+    setEditSaving(true);
+    setEditError(null);
+    try {
+      const row = selectedBatch.rows.find((r) => r.id === editingRowId);
+      if (!row) return;
+      const raw = row.rawJson as Record<string, string>;
+      const changed: Record<string, string> = {};
+      for (const f of EDITABLE_FIELDS) {
+        if (editFields[f.key] !== String(raw[f.key] ?? '')) {
+          changed[f.key] = editFields[f.key];
+        }
+      }
+      if (Object.keys(changed).length === 0) {
+        handleCancelEdit();
+        return;
+      }
+      const result = await csvImportApi.updateRow(selectedBatch.id, editingRowId, changed);
+      if (!result.success) {
+        setEditError(friendlyError(result.error || '수정 실패'));
+        return;
+      }
+      await handleOpenDetail(selectedBatch.id);
+      setEditingRowId(null);
+      setEditFields({});
+    } catch (err) {
+      setEditError((err as Error).message);
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">상품 일괄 등록</h1>
@@ -524,52 +601,126 @@ export default function SupplierCsvImportPage() {
                             <th className="pb-2 pr-3">액션</th>
                             <th className="pb-2 pr-3">적용</th>
                             <th className="pb-2 pr-3">상품</th>
-                            <th className="pb-2">오류</th>
+                            <th className="pb-2 pr-3">오류</th>
+                            {selectedBatch.status === 'READY' && <th className="pb-2">수정</th>}
                           </tr>
                         </thead>
                         <tbody>
                           {selectedBatch.rows.map((row) => (
-                            <tr key={row.id} className={`border-b border-gray-100 ${row.applyStatus === 'failed' ? 'bg-red-50' : ''}`}>
-                              <td className="py-2 pr-3 text-gray-400">{row.rowNumber}</td>
-                              <td className="py-2 pr-3 font-mono text-xs">{row.parsedBarcode || '-'}</td>
-                              <td className="py-2 pr-3">
-                                {row.parsedSupplyPrice != null ? row.parsedSupplyPrice.toLocaleString() : '-'}
-                              </td>
-                              <td className="py-2 pr-3 text-xs">{row.parsedDistributionType || '-'}</td>
-                              <td className="py-2 pr-3"><StatusBadge status={row.validationStatus} /></td>
-                              <td className="py-2 pr-3 text-xs text-gray-500">
-                                {row.actionType ? <StatusBadge status={row.actionType} /> : '-'}
-                              </td>
-                              <td className="py-2 pr-3 text-center">
-                                {row.applyStatus === 'applied' ? (
-                                  <span className="text-green-600 font-medium text-xs">OK</span>
-                                ) : row.applyStatus === 'failed' ? (
-                                  <span className="text-red-600 font-medium text-xs">FAIL</span>
-                                ) : (
-                                  <span className="text-gray-300 text-xs">-</span>
+                            <React.Fragment key={row.id}>
+                              <tr className={`border-b border-gray-100 ${row.applyStatus === 'failed' ? 'bg-red-50' : ''} ${editingRowId === row.id ? 'bg-blue-50' : ''}`}>
+                                <td className="py-2 pr-3 text-gray-400">{row.rowNumber}</td>
+                                <td className="py-2 pr-3 font-mono text-xs">{row.parsedBarcode || '-'}</td>
+                                <td className="py-2 pr-3">
+                                  {row.parsedSupplyPrice != null ? row.parsedSupplyPrice.toLocaleString() : '-'}
+                                </td>
+                                <td className="py-2 pr-3 text-xs">{row.parsedDistributionType || '-'}</td>
+                                <td className="py-2 pr-3"><StatusBadge status={row.validationStatus} /></td>
+                                <td className="py-2 pr-3 text-xs text-gray-500">
+                                  {row.actionType ? <StatusBadge status={row.actionType} /> : '-'}
+                                </td>
+                                <td className="py-2 pr-3 text-center">
+                                  {row.applyStatus === 'applied' ? (
+                                    <span className="text-green-600 font-medium text-xs">OK</span>
+                                  ) : row.applyStatus === 'failed' ? (
+                                    <span className="text-red-600 font-medium text-xs">FAIL</span>
+                                  ) : (
+                                    <span className="text-gray-300 text-xs">-</span>
+                                  )}
+                                </td>
+                                <td className="py-2 pr-3 text-xs">
+                                  {row.offerId ? (
+                                    <a
+                                      href={`/supplier/products/${row.offerId}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-blue-600 hover:text-blue-800 underline"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      보기
+                                    </a>
+                                  ) : row.masterId && row.applyStatus === 'applied' ? (
+                                    <span className="text-gray-400" title={`Master: ${row.masterId.slice(0, 8)}`}>연결됨</span>
+                                  ) : (
+                                    <span className="text-gray-300">-</span>
+                                  )}
+                                </td>
+                                <td className="py-2 pr-3 text-xs text-red-500">
+                                  {row.applyError || row.validationError || ''}
+                                </td>
+                                {selectedBatch.status === 'READY' && (
+                                  <td className="py-2 text-center">
+                                    {row.validationStatus === 'VALID' && !row.applyStatus && (
+                                      <button
+                                        onClick={() => editingRowId === row.id ? handleCancelEdit() : handleStartEdit(row)}
+                                        className="px-2 py-0.5 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded"
+                                      >
+                                        {editingRowId === row.id ? '닫기' : '수정'}
+                                      </button>
+                                    )}
+                                  </td>
                                 )}
-                              </td>
-                              <td className="py-2 pr-3 text-xs">
-                                {row.offerId ? (
-                                  <a
-                                    href={`/supplier/products/${row.offerId}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 underline"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    보기
-                                  </a>
-                                ) : row.masterId && row.applyStatus === 'applied' ? (
-                                  <span className="text-gray-400" title={`Master: ${row.masterId.slice(0, 8)}`}>연결됨</span>
-                                ) : (
-                                  <span className="text-gray-300">-</span>
-                                )}
-                              </td>
-                              <td className="py-2 text-xs text-red-500">
-                                {row.applyError || row.validationError || ''}
-                              </td>
-                            </tr>
+                              </tr>
+                              {/* WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1: Inline edit panel */}
+                              {editingRowId === row.id && (
+                                <tr className="bg-blue-50 border-b border-blue-200">
+                                  <td colSpan={selectedBatch.status === 'READY' ? 10 : 9} className="p-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+                                      {EDITABLE_FIELDS.map((f) => (
+                                        <div key={f.key}>
+                                          <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
+                                          {f.type === 'select' ? (
+                                            <select
+                                              value={editFields[f.key] || ''}
+                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
+                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                            >
+                                              <option value="PUBLIC">PUBLIC</option>
+                                              <option value="SERVICE">SERVICE</option>
+                                              <option value="PRIVATE">PRIVATE</option>
+                                            </select>
+                                          ) : f.type === 'textarea' ? (
+                                            <textarea
+                                              value={editFields[f.key] || ''}
+                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
+                                              rows={2}
+                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                            />
+                                          ) : (
+                                            <input
+                                              type={f.type === 'number' ? 'number' : 'text'}
+                                              value={editFields[f.key] || ''}
+                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
+                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                            />
+                                          )}
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {editError && (
+                                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs">
+                                        {editError}
+                                      </div>
+                                    )}
+                                    <div className="mt-3 flex gap-2">
+                                      <button
+                                        onClick={handleSaveEdit}
+                                        disabled={editSaving}
+                                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm disabled:opacity-50 hover:bg-blue-700"
+                                      >
+                                        {editSaving ? '저장 중...' : '저장'}
+                                      </button>
+                                      <button
+                                        onClick={handleCancelEdit}
+                                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
+                                      >
+                                        취소
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </React.Fragment>
                           ))}
                         </tbody>
                       </table>

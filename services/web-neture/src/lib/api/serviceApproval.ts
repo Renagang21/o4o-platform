@@ -2,6 +2,7 @@
  * Service Approval API Client
  *
  * WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
+ * WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
  * Operator: 서비스 레벨 상품 승인 관리 API
  */
 
@@ -26,6 +27,10 @@ export interface ServiceApprovalItem {
   offerApprovalStatus: string;
   distributionType: string | null;
   completenessScore: number;
+  // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1: 카드 UI 추가 필드
+  imageUrl: string | null;
+  brandName: string | null;
+  priceGeneral: number | null;
 }
 
 export interface ServiceApprovalStats {
@@ -33,12 +38,16 @@ export interface ServiceApprovalStats {
   approved: number;
   rejected: number;
   total: number;
+  todayPending: number; // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
 }
 
 export const operatorServiceApprovalApi = {
   async list(params?: {
     status?: string;
     serviceKey?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
     page?: number;
     limit?: number;
   }): Promise<{
@@ -49,6 +58,9 @@ export const operatorServiceApprovalApi = {
       const sp = new URLSearchParams();
       if (params?.status) sp.set('status', params.status);
       if (params?.serviceKey) sp.set('serviceKey', params.serviceKey);
+      if (params?.search) sp.set('search', params.search);
+      if (params?.dateFrom) sp.set('dateFrom', params.dateFrom);
+      if (params?.dateTo) sp.set('dateTo', params.dateTo);
       if (params?.page) sp.set('page', String(params.page));
       if (params?.limit) sp.set('limit', String(params.limit));
       const qs = sp.toString() ? `?${sp.toString()}` : '';
@@ -66,9 +78,9 @@ export const operatorServiceApprovalApi = {
   async stats(): Promise<ServiceApprovalStats> {
     try {
       const response = await api.get('/neture/operator/service-approvals/stats');
-      return response.data?.data || { pending: 0, approved: 0, rejected: 0, total: 0 };
+      return response.data?.data || { pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 };
     } catch {
-      return { pending: 0, approved: 0, rejected: 0, total: 0 };
+      return { pending: 0, approved: 0, rejected: 0, total: 0, todayPending: 0 };
     }
   },
 
@@ -84,6 +96,25 @@ export const operatorServiceApprovalApi = {
   async reject(id: string, reason?: string): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await api.patch(`/neture/operator/service-approvals/${id}/reject`, { reason });
+      return response.data;
+    } catch (err: any) {
+      return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
+  async batchApprove(ids: string[]): Promise<{ success: boolean; error?: string; data?: { approved: number; failed: number } }> {
+    try {
+      const response = await api.post('/neture/operator/service-approvals/batch-approve', { ids });
+      return response.data;
+    } catch (err: any) {
+      return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };
+    }
+  },
+
+  async batchReject(ids: string[], reason?: string): Promise<{ success: boolean; error?: string; data?: { rejected: number; failed: number } }> {
+    try {
+      const response = await api.post('/neture/operator/service-approvals/batch-reject', { ids, reason });
       return response.data;
     } catch (err: any) {
       return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };

@@ -58,6 +58,21 @@ export interface CsvRetryResult {
   errors?: Array<{ rowNumber: number; barcode: string | null; error: string }>;
 }
 
+// WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
+export interface CsvRowEditFields {
+  marketing_name?: string;
+  brand?: string;
+  supply_price?: string | number;
+  consumer_price?: string | number;
+  stock_qty?: string | number;
+  distribution_type?: string;
+  short_description?: string;
+  detail_description?: string;
+  category_name?: string;
+  manufacturer_name?: string;
+  image_url?: string;
+}
+
 // WO-O4O-NETURE-IMPORT-HISTORY-FULL-DELETE-V1
 export interface FullDeleteCheck {
   canFullDelete: boolean;
@@ -165,6 +180,23 @@ export const csvImportApi = {
       const response = await api.post(`/neture/supplier/csv-import/batches/${batchId}/retry`, body, {
         timeout: 180_000,
       });
+      return response.data;
+    } catch (error: any) {
+      return { success: false, error: extractErrorMessage(error) };
+    }
+  },
+
+  // WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
+  async updateRow(
+    batchId: string,
+    rowId: string,
+    fields: CsvRowEditFields,
+  ): Promise<{ success: boolean; error?: string; data?: CsvBatchRow }> {
+    try {
+      const response = await api.patch(
+        `/neture/supplier/csv-import/batches/${batchId}/rows/${rowId}`,
+        fields,
+      );
       return response.data;
     } catch (error: any) {
       return { success: false, error: extractErrorMessage(error) };

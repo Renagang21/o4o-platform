@@ -38,15 +38,19 @@ export class OfferServiceApprovalService {
   }
 
   /**
-   * Operator: 승인 목록 (페이지네이션 + 필터)
+   * Operator: 승인 목록 (페이지네이션 + 필터 + 검색 + 기간)
+   * WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
    */
   async listApprovals(options: {
     status?: string;
     serviceKey?: string;
+    search?: string;
+    dateFrom?: string;
+    dateTo?: string;
     page?: number;
     limit?: number;
   }): Promise<{ data: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
-    const { status, serviceKey, page = 1, limit = 50 } = options;
+    const { status, serviceKey, search, dateFrom, dateTo, page = 1, limit = 50 } = options;
     const conditions: string[] = [];
     const params: unknown[] = [];
     let idx = 1;
@@ -61,15 +65,37 @@ export class OfferServiceApprovalService {
       params.push(serviceKey);
       idx++;
     }
+    if (search) {
+      const like = `%${search}%`;
+      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR supplier_org.name ILIKE $${idx})`);
+      params.push(like);
+      idx++;
+    }
+    if (dateFrom) {
+      conditions.push(`osa.created_at >= $${idx}`);
+      params.push(dateFrom);
+      idx++;
+    }
+    if (dateTo) {
+      conditions.push(`osa.created_at < ($${idx}::date + INTERVAL '1 day')`);
+      params.push(dateTo);
+      idx++;
+    }
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const offset = (page - 1) * limit;
 
+    // COUNT needs same JOINs because search references pm/supplier_org
+    const countSql = `SELECT COUNT(*)::int AS total
+      FROM offer_service_approvals osa
+      JOIN supplier_product_offers spo ON spo.id = osa.offer_id
+      JOIN product_masters pm ON pm.id = spo.master_id
+      JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+      LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
+      ${where}`;
+
     const [countResult, rows] = await Promise.all([
-      this.dataSource.query(
-        `SELECT COUNT(*)::int AS total FROM offer_service_approvals osa ${where}`,
-        params,
-      ),
+      this.dataSource.query(countSql, params),
       this.dataSource.query(
         `SELECT
            osa.id, osa.offer_id AS "offerId", osa.service_key AS "serviceKey",
@@ -90,7 +116,10 @@ export class OfferServiceApprovalService {
              + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
              + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
              + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
-           ) AS "completenessScore"
+           ) AS "completenessScore",
+           (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "imageUrl",
+           pm.brand_name AS "brandName",
+           spo.price_general AS "priceGeneral"
          FROM offer_service_approvals osa
          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
@@ -112,22 +141,76 @@ export class OfferServiceApprovalService {
   }
 
   /**
-   * Operator: 상태별 카운트
+   * Operator: 상태별 카운트 + 오늘 신규 pending
+   * WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
    */
-  async getStats(): Promise<{ pending: number; approved: number; rejected: number; total: number }> {
-    const rows = await this.dataSource.query(
-      `SELECT approval_status AS status, COUNT(*)::int AS cnt
-       FROM offer_service_approvals
-       GROUP BY approval_status`,
-    );
+  async getStats(): Promise<{ pending: number; approved: number; rejected: number; total: number; todayPending: number }> {
+    const [rows, todayRow] = await Promise.all([
+      this.dataSource.query(
+        `SELECT approval_status AS status, COUNT(*)::int AS cnt
+         FROM offer_service_approvals
+         GROUP BY approval_status`,
+      ),
+      this.dataSource.query(
+        `SELECT COUNT(*)::int AS cnt
+         FROM offer_service_approvals
+         WHERE approval_status = 'pending' AND created_at >= CURRENT_DATE`,
+      ),
+    ]);
 
-    const stats = { pending: 0, approved: 0, rejected: 0, total: 0 };
+    const stats = { pending: 0, approved: 0, rejected: 0, total: 0, todayPending: todayRow[0]?.cnt || 0 };
     for (const r of rows) {
       const key = r.status as keyof typeof stats;
-      if (key in stats) stats[key] = r.cnt;
+      if (key in stats && key !== 'todayPending') (stats as any)[key] = r.cnt;
       stats.total += r.cnt;
     }
     return stats;
+  }
+
+  // ==================== WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1 ====================
+
+  /**
+   * Operator: 일괄 승인
+   */
+  async batchApprove(ids: string[], decidedBy: string): Promise<{ approved: number; failed: number; errors: string[] }> {
+    let approved = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const id of ids) {
+      const result = await this.approve(id, decidedBy);
+      if (result.success) {
+        approved++;
+      } else {
+        failed++;
+        errors.push(`${id}: ${result.error}`);
+      }
+    }
+
+    logger.info(`[ServiceApproval] batchApprove: ${approved} approved, ${failed} failed by ${decidedBy}`);
+    return { approved, failed, errors };
+  }
+
+  /**
+   * Operator: 일괄 거절
+   */
+  async batchReject(ids: string[], decidedBy: string, reason?: string): Promise<{ rejected: number; failed: number; errors: string[] }> {
+    let rejected = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const id of ids) {
+      const result = await this.reject(id, decidedBy, reason);
+      if (result.success) {
+        rejected++;
+      } else {
+        failed++;
+        errors.push(`${id}: ${result.error}`);
+      }
+    }
+
+    logger.info(`[ServiceApproval] batchReject: ${rejected} rejected, ${failed} failed by ${decidedBy}`);
+    return { rejected, failed, errors };
   }
 
   // ==================== WO-NETURE-APPROVAL-SYSTEM-NORMALIZATION-V1 ====================

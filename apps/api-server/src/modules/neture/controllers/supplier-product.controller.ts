@@ -324,6 +324,23 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // PATCH /supplier/csv-import/batches/:batchId/rows/:rowId — WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
+  router.patch('/csv-import/batches/:batchId/rows/:rowId', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { batchId, rowId } = req.params;
+      const result = await csvImportService.updateRow(batchId, rowId, supplierId, req.body);
+      if (!result.success) {
+        const status = result.error === 'BATCH_NOT_FOUND' || result.error === 'ROW_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error updating CSV import row:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to update row' } });
+    }
+  });
+
   // POST /supplier/csv-import/batches/:id/apply
   router.post('/csv-import/batches/:id/apply', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {

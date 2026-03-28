@@ -830,6 +830,78 @@ export class CsvImportService {
     return { success: true, data: batch };
   }
 
+  // ==================== Row Quick Edit (WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1) ====================
+
+  private static EDITABLE_ROW_FIELDS = [
+    'marketing_name', 'brand', 'supply_price', 'consumer_price',
+    'stock_qty', 'distribution_type', 'short_description',
+    'detail_description', 'category_name', 'manufacturer_name', 'image_url',
+  ] as const;
+
+  async updateRow(
+    batchId: string,
+    rowId: string,
+    supplierId: string,
+    fields: Partial<Record<string, unknown>>,
+  ): Promise<{ success: boolean; data?: SupplierCsvImportRow; error?: string }> {
+    const batch = await this.batchRepo.findOne({ where: { id: batchId, supplierId } });
+    if (!batch) return { success: false, error: 'BATCH_NOT_FOUND' };
+    if (batch.status !== CsvImportBatchStatus.READY) {
+      return { success: false, error: 'BATCH_NOT_READY' };
+    }
+
+    const row = await this.rowRepo.findOne({ where: { id: rowId, batchId } });
+    if (!row) return { success: false, error: 'ROW_NOT_FOUND' };
+    if (row.validationStatus !== CsvRowValidationStatus.VALID) {
+      return { success: false, error: 'ROW_NOT_EDITABLE' };
+    }
+
+    const updates: Record<string, unknown> = {};
+    for (const key of CsvImportService.EDITABLE_ROW_FIELDS) {
+      if (key in fields && fields[key] !== undefined) {
+        updates[key] = fields[key];
+      }
+    }
+    if (Object.keys(updates).length === 0) {
+      return { success: false, error: 'NO_FIELDS' };
+    }
+
+    if ('supply_price' in updates) {
+      const raw = String(updates.supply_price).trim();
+      const price = parseInt(raw, 10);
+      if (!raw || isNaN(price) || price < 0) {
+        return { success: false, error: 'INVALID_SUPPLY_PRICE' };
+      }
+      updates.supply_price = raw;
+    }
+
+    if ('distribution_type' in updates) {
+      const dt = String(updates.distribution_type).trim().toUpperCase();
+      if (dt && !VALID_DISTRIBUTION_TYPES.includes(dt)) {
+        return { success: false, error: 'INVALID_DISTRIBUTION_TYPE' };
+      }
+      updates.distribution_type = dt || 'PUBLIC';
+    }
+
+    const newRawJson = { ...(row.rawJson as Record<string, unknown>), ...updates };
+    row.rawJson = newRawJson;
+
+    const rawPrice = String(newRawJson.supply_price || '').trim();
+    row.parsedSupplyPrice = rawPrice ? parseInt(rawPrice, 10) : null;
+
+    const rawDist = String(newRawJson.distribution_type || '').trim().toUpperCase();
+    row.parsedDistributionType =
+      rawDist && VALID_DISTRIBUTION_TYPES.includes(rawDist) ? rawDist : 'PUBLIC';
+
+    await this.rowRepo.save(row);
+
+    logger.info(
+      `[CsvImport] Row ${row.rowNumber} updated in batch ${batchId} — fields: ${Object.keys(updates).join(', ')}`,
+    );
+
+    return { success: true, data: row };
+  }
+
   /**
    * 공급자별 Batch 목록 (최신순)
    */
