@@ -245,12 +245,30 @@ export class NetureOfferService {
         };
       }
 
-      // 트랜잭션: service approvals → rejected → 파생 sync + cascade (원자적)
+      // WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1:
+      // Admin override reject = service approvals 보장 + 일괄 rejected → 파생 sync + cascade
       const approvalService = new OfferServiceApprovalService(AppDataSource);
       const queryRunner = AppDataSource.createQueryRunner();
       await queryRunner.startTransaction();
       try {
-        // 모든 service approvals를 rejected로 일괄 변경
+        // 1. service approvals 없으면 생성 (bulk import 등으로 누락된 경우)
+        const existingApprovals: Array<{ id: string }> = await queryRunner.query(
+          `SELECT id FROM offer_service_approvals WHERE offer_id = $1`,
+          [offerId],
+        );
+        if (existingApprovals.length === 0) {
+          const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
+          const uniqueKeys = [...new Set(['neture', ...keys])];
+          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+          await queryRunner.query(
+            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+             VALUES ${values}
+             ON CONFLICT (offer_id, service_key) DO NOTHING`,
+            [offerId, ...uniqueKeys],
+          );
+        }
+
+        // 2. 모든 service approvals를 rejected로 일괄 변경
         await queryRunner.query(
           `UPDATE offer_service_approvals
            SET approval_status = 'rejected', decided_by = $2, decided_at = NOW(),
@@ -259,7 +277,7 @@ export class NetureOfferService {
           [offerId, adminUserId, reason || 'Offer rejected by admin'],
         );
 
-        // 파생 sync → offer 상태 + cascade (product_approvals revoke + listings 비활성화)
+        // 3. 파생 sync → offer 상태 + cascade (product_approvals revoke + listings 비활성화)
         const syncResult = await approvalService.syncOfferFromServiceApprovals(offerId, adminUserId, queryRunner);
 
         await queryRunner.commitTransaction();
