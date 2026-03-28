@@ -723,6 +723,53 @@ export function createAdminController(dataSource: DataSource): Router {
     }
   });
 
+  /**
+   * POST /admin/sync-offer-approvals
+   * WO-NETURE-OFFER-SERVICE-APPROVAL-SYNC-V1
+   *
+   * 운영 안정화: 모든 offer의 approval_status를 service approvals 기준으로 재계산.
+   * offer_service_approvals가 없는 offer는 skip.
+   */
+  router.post('/sync-offer-approvals', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+        return;
+      }
+
+      // 모든 offer 중 service approval이 존재하는 건만 대상
+      const offers: Array<{ id: string }> = await dataSource.query(
+        `SELECT DISTINCT spo.id
+         FROM supplier_product_offers spo
+         WHERE EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`,
+      );
+
+      const { OfferServiceApprovalService } = await import('../services/offer-service-approval.service.js');
+      const approvalService = new OfferServiceApprovalService(dataSource);
+
+      let synced = 0;
+      let changed = 0;
+      const errors: string[] = [];
+
+      for (const offer of offers) {
+        try {
+          const result = await approvalService.syncOfferFromServiceApprovals(offer.id, adminUserId, dataSource);
+          synced++;
+          if (result.changed) changed++;
+        } catch (err: any) {
+          errors.push(`${offer.id}: ${err.message}`);
+        }
+      }
+
+      logger.info(`[Admin] Sync offer approvals: ${synced} synced, ${changed} changed, ${errors.length} errors by ${adminUserId}`);
+      res.json({ success: true, data: { total: offers.length, synced, changed, errors: errors.slice(0, 20) } });
+    } catch (error) {
+      logger.error('[Neture API] Error syncing offer approvals:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to sync offer approvals' } });
+    }
+  });
+
   return router;
 }
 
