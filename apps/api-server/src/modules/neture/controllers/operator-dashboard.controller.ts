@@ -78,11 +78,13 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         `).catch(() => []) as Promise<Array<{ status: string; cnt: number }>>,
 
         // 3. Product offer counts
+        // WO-NETURE-PRODUCT-APPROVAL-DATA-SOURCE-UNIFICATION-V1:
+        // pending은 offer_service_approvals 기준으로 통일 (승인 페이지와 동일 소스)
         dataSource.query(`
           SELECT
             COUNT(*)::int AS total,
             COUNT(*) FILTER (WHERE is_active = true AND approval_status = 'APPROVED')::int AS active,
-            COUNT(*) FILTER (WHERE approval_status = 'PENDING')::int AS pending
+            (SELECT COUNT(*)::int FROM offer_service_approvals WHERE approval_status = 'pending') AS pending
           FROM supplier_product_offers
         `).catch(() => [{ total: 0, active: 0, pending: 0 }]) as Promise<Array<{ total: number; active: number; pending: number }>>,
 

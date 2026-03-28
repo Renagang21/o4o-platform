@@ -567,10 +567,13 @@ export class NetureOfferService {
       const savedOffer = await this.offerRepo.save(offer);
       logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
 
-      if (data.serviceKeys && data.serviceKeys.length > 0) {
-        const approvalService = new OfferServiceApprovalService(AppDataSource);
-        await approvalService.createPendingApprovals(savedOffer.id, data.serviceKeys);
-      }
+      // WO-NETURE-PRODUCT-APPROVAL-DATA-SOURCE-UNIFICATION-V1:
+      // 모든 Neture 상품에 최소 'neture' service approval 보장
+      const approvalService = new OfferServiceApprovalService(AppDataSource);
+      const approvalKeys = data.serviceKeys && data.serviceKeys.length > 0
+        ? (data.serviceKeys.includes('neture') ? data.serviceKeys : ['neture', ...data.serviceKeys])
+        : ['neture'];
+      await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
 
       return {
         success: true,
