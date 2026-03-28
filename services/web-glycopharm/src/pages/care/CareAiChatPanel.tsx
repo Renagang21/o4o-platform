@@ -24,6 +24,7 @@ import {
   MessageSquare,
   BarChart3,
   CheckCircle,
+  BookOpen,
 } from 'lucide-react';
 import { pharmacyApi, type AiChatResponseDto, type AiChatActionDto } from '@/api/pharmacy';
 import { API_BASE_URL } from '@/lib/apiClient';
@@ -535,6 +536,14 @@ export default function CareAiChatPanel({
       case 'resolve_alert':
         // handled inline in ActionButton
         break;
+      case 'link_guideline':
+        if (action.contentId) {
+          navigate(`/care/guideline?highlight=${action.contentId}`);
+        } else {
+          navigate('/care/guideline');
+        }
+        onClose();
+        break;
     }
   };
 
@@ -945,6 +954,7 @@ const ACTION_ICONS: Record<string, typeof User> = {
   create_coaching: MessageSquare,
   run_analysis: BarChart3,
   resolve_alert: CheckCircle,
+  link_guideline: BookOpen,
 };
 
 function ActionButton({

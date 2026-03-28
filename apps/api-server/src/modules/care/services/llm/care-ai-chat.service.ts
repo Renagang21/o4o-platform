@@ -21,13 +21,14 @@ import { createHash } from 'crypto';
 const POPULATION_CACHE_TTL = 5 * 60 * 1000;   // 5 minutes
 const PATIENT_CACHE_TTL = 10 * 60 * 1000;      // 10 minutes
 
-export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert' | 'link_guideline';
 
 export interface CareAction {
   type: CareActionType;
   label: string;
   patientId?: string;
   alertId?: string;
+  contentId?: string;
 }
 
 export interface AiChatResponse {
@@ -95,7 +96,7 @@ export class CareAiChatService {
       parsed = { summary: extractFallbackSummary(response.content) };
     }
 
-    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert', 'link_guideline']);
     const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
       .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
 
@@ -181,7 +182,7 @@ export class CareAiChatService {
       parsed = { summary: extractFallbackSummary(accumulated) };
     }
 
-    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert']);
+    const ALLOWED_ACTIONS: Set<string> = new Set(['open_patient', 'create_coaching', 'run_analysis', 'resolve_alert', 'link_guideline']);
     const actions = (Array.isArray(parsed.actions) ? parsed.actions : [])
       .filter((a: any) => ALLOWED_ACTIONS.has(a?.type) && typeof a?.label === 'string');
 

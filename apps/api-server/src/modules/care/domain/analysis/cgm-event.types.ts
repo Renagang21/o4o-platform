@@ -119,7 +119,7 @@ export interface CgmEventAnalysisResult {
 
 // ── Action Engine V2 (WO-O4O-CARE-ACTION-ENGINE-V2) ──
 
-export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+export type CareActionType = 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert' | 'link_guideline';
 export type CareActionPriority = 'HIGH' | 'MEDIUM' | 'LOW';
 
 export interface CareGeneratedAction {

@@ -1136,12 +1136,13 @@ export interface AiPriorityPatientDto extends PriorityPatientDto {
   aiReason: string | null;
 }
 
-// WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1 + WO-GLYCOPHARM-CARE-ACTION-ENGINE-V1
+// WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1 + WO-GLYCOPHARM-CARE-ACTION-ENGINE-V1 + WO-O4O-CARE-ACTION-ENGINE-V2
 export interface AiChatActionDto {
-  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert' | 'link_guideline';
   label: string;
   patientId?: string;
   alertId?: string;
+  contentId?: string;
 }
 
 export interface AiChatResponseDto {
