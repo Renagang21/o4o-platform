@@ -582,6 +582,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Care Message routes:', messageError);
     }
 
+    // 28i. Register Care Guideline routes (WO-O4O-CARE-GUIDELINE-SEARCH-V1)
+    try {
+      const { createCareGuidelineRouter } = await import('../modules/care/controllers/care-guideline.controller.js');
+      app.use('/api/v1/care', createCareGuidelineRouter(dataSource));
+      logger.info('✅ Care Guideline routes registered at /api/v1/care/guidelines');
+    } catch (guidelineError) {
+      logger.error('Failed to register Care Guideline routes:', guidelineError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('../modules/store-ai/controllers/store-ai.controller.js');

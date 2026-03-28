@@ -36,4 +36,7 @@ export class CareCoachingSession {
 
   @Column({ name: 'patient_read_at', type: 'timestamptz', nullable: true })
   patientReadAt?: Date | null;
+
+  @Column({ name: 'guideline_content_id', type: 'uuid', nullable: true })
+  guidelineContentId?: string | null;
 }

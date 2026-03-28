@@ -9,6 +9,7 @@ export interface CreateCoachingSessionDto {
   snapshotId?: string;
   summary: string;
   actionPlan: string;
+  guidelineContentId?: string;
 }
 
 export class CareCoachingSessionService {
@@ -42,6 +43,7 @@ export class CareCoachingSessionService {
       snapshotId,
       summary: dto.summary,
       actionPlan: dto.actionPlan,
+      guidelineContentId: dto.guidelineContentId ?? null,
     });
 
     return this.sessionRepo.save(session);
