@@ -88,10 +88,12 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           WHERE service_key = 'neture'
         `),
         dataSource.query(`
-          SELECT COALESCE(reason, '사유 미입력') AS reason, COUNT(*)::int AS count
+          SELECT reason, COUNT(*)::int AS count
           FROM offer_service_approvals
-          WHERE service_key = 'neture' AND approval_status = 'rejected'
-          GROUP BY COALESCE(reason, '사유 미입력')
+          WHERE service_key = 'neture'
+            AND approval_status = 'rejected'
+            AND reason IS NOT NULL AND reason != ''
+          GROUP BY reason
           ORDER BY count DESC
           LIMIT 5
         `),
