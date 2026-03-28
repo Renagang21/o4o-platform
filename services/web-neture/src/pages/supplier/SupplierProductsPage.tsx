@@ -677,7 +677,11 @@ export default function SupplierProductsPage() {
   const [filterHasDescription, setFilterHasDescription] = useState('');
   const [filterBarcodeSource, setFilterBarcodeSource] = useState('');
   const [filterCompleteness, setFilterCompleteness] = useState('');
-  const [filterSubmission, setFilterSubmission] = useState<'' | 'not_submitted' | 'pending' | 'approved'>('');
+
+  // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: server-side approval tab
+  type ApprovalTab = 'all' | 'pending' | 'approved' | 'rejected';
+  const [activeTab, setActiveTab] = useState<ApprovalTab>('all');
+  const [tabCounts, setTabCounts] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
@@ -722,6 +726,7 @@ export default function SupplierProductsPage() {
     showToast(`${result.deleted}건 삭제 완료${result.failed.length > 0 ? ` (${result.failed.length}건 실패)` : ''}`);
     setSelectedIds(new Set());
     await fetchProducts(pagination.page);
+    fetchTabCounts();
   };
 
   // Column with checkbox, image, description, quick price, regulatory
@@ -936,17 +941,28 @@ export default function SupplierProductsPage() {
       hasDescription: filterHasDescription || undefined,
       barcodeSource: filterBarcodeSource || undefined,
       completenessStatus: filterCompleteness || undefined,
+      serviceApprovalStatus: activeTab === 'all' ? undefined : activeTab,
     });
     setProducts(result.data);
     setPagination(result.pagination);
     setSelectedIds(new Set());
     setDrawerProduct(null);
     setLoading(false);
-  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
+  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness, activeTab]);
+
+  // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: fetch tab counts
+  const fetchTabCounts = useCallback(async () => {
+    const counts = await supplierApi.getApprovalCounts();
+    setTabCounts(counts);
+  }, []);
 
   useEffect(() => {
     fetchProducts(1);
   }, [fetchProducts]);
+
+  useEffect(() => {
+    fetchTabCounts();
+  }, [fetchTabCounts]);
 
   // Auto-next: after action completes, move to next incomplete product
   useEffect(() => {
@@ -994,18 +1010,6 @@ export default function SupplierProductsPage() {
     }
   }, [products, autoNext, loading]);
 
-  // Client-side submission status filter (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1)
-  const filteredProducts = useMemo(() => {
-    if (!filterSubmission) return products;
-    return products.filter((p) => {
-      const status = deriveSubmissionStatus(p);
-      if (filterSubmission === 'not_submitted') return status.label === '미요청';
-      if (filterSubmission === 'pending') return status.label === '심사중';
-      if (filterSubmission === 'approved') return status.label === '승인';
-      return true;
-    });
-  }, [products, filterSubmission]);
-
   const handleSearch = useCallback((value: string) => {
     fetchProducts(1, value);
   }, [fetchProducts]);
@@ -1025,6 +1029,7 @@ export default function SupplierProductsPage() {
       lastEditedRef.current = { id: changedRows[0].id, type: 'save' };
     }
     await fetchProducts(pagination.page);
+    fetchTabCounts();
     setSaving(false);
   };
 
@@ -1078,6 +1083,33 @@ export default function SupplierProductsPage() {
         />
       </div>
 
+      {/* Approval Status Tabs (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1) */}
+      <div className="flex border-b border-slate-200 mb-3">
+        {([
+          { key: 'all' as ApprovalTab, label: '전체', count: tabCounts.total },
+          { key: 'pending' as ApprovalTab, label: '승인전', count: tabCounts.pending },
+          { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts.approved },
+          { key: 'rejected' as ApprovalTab, label: '거절됨', count: tabCounts.rejected },
+        ]).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab.key
+                ? 'border-emerald-600 text-emerald-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            }`}
+          >
+            {tab.label}
+            <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+              activeTab === tab.key ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {tab.count}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Filter Chips */}
       <div className="flex flex-wrap gap-2 mb-3">
         <FilterChip label="이미지 없음" active={filterHasImage === 'false'} onClick={() => toggleFilter(setFilterHasImage, 'false', filterHasImage)} />
@@ -1086,10 +1118,6 @@ export default function SupplierProductsPage() {
         <span className="w-px h-4 bg-slate-300" />
         <FilterChip label="미완성" active={filterCompleteness === 'INCOMPLETE'} onClick={() => toggleFilter(setFilterCompleteness, 'INCOMPLETE', filterCompleteness)} />
         <FilterChip label="완성" active={filterCompleteness === 'READY'} onClick={() => toggleFilter(setFilterCompleteness, 'READY', filterCompleteness)} />
-        <span className="w-px h-4 bg-slate-300" />
-        <FilterChip label="미요청" active={filterSubmission === 'not_submitted'} onClick={() => setFilterSubmission(prev => prev === 'not_submitted' ? '' : 'not_submitted')} />
-        <FilterChip label="심사중" active={filterSubmission === 'pending'} onClick={() => setFilterSubmission(prev => prev === 'pending' ? '' : 'pending')} />
-        <FilterChip label="승인완료" active={filterSubmission === 'approved'} onClick={() => setFilterSubmission(prev => prev === 'approved' ? '' : 'approved')} />
         <span className="w-px h-4 bg-slate-300" />
         <button
           onClick={() => setAutoNext(prev => !prev)}
@@ -1148,7 +1176,7 @@ export default function SupplierProductsPage() {
             ),
           } as any,
         ]}
-        data={filteredProducts}
+        data={products}
         rowKey="id"
         loading={loading}
         emptyMessage="등록된 제품이 없습니다"

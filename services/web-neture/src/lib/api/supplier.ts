@@ -461,6 +461,7 @@ export const supplierApi = {
     sort?: string; order?: string;
     hasImage?: string; hasDescription?: string; barcodeSource?: string;
     completenessStatus?: string;
+    serviceApprovalStatus?: string;
   }): Promise<{ data: SupplierProduct[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     try {
       const sp = new URLSearchParams();
@@ -475,6 +476,7 @@ export const supplierApi = {
       if (params?.hasDescription) sp.set('hasDescription', params.hasDescription);
       if (params?.barcodeSource) sp.set('barcodeSource', params.barcodeSource);
       if (params?.completenessStatus) sp.set('completenessStatus', params.completenessStatus);
+      if (params?.serviceApprovalStatus) sp.set('serviceApprovalStatus', params.serviceApprovalStatus);
       const qs = sp.toString() ? `?${sp}` : '';
       const response = await api.get(`/neture/supplier/products${qs}`);
       const result = response.data;
@@ -485,6 +487,18 @@ export const supplierApi = {
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch paginated products:', error);
       return { data: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } };
+    }
+  },
+
+  // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: Approval tab counts
+  async getApprovalCounts(): Promise<{ total: number; pending: number; approved: number; rejected: number }> {
+    try {
+      const response = await api.get('/neture/supplier/products/approval-counts');
+      const result = response.data;
+      return result.data || { total: 0, pending: 0, approved: 0, rejected: 0 };
+    } catch (error) {
+      console.warn('[Supplier API] Failed to fetch approval counts:', error);
+      return { total: 0, pending: 0, approved: 0, rejected: 0 };
     }
   },
 

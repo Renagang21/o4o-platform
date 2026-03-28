@@ -851,6 +851,7 @@ export class NetureOfferService {
       hasDescription?: string;
       barcodeSource?: string;
       completenessStatus?: string;
+      serviceApprovalStatus?: string;
     },
   ) {
     const page = Math.max(1, Number(options.page) || 1);
@@ -910,6 +911,16 @@ export class NetureOfferService {
       conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 60`);
     }
 
+    // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: service approval status filter
+    if (options.serviceApprovalStatus === 'pending') {
+      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
+    } else if (options.serviceApprovalStatus === 'approved') {
+      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`);
+      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
+    } else if (options.serviceApprovalStatus === 'rejected') {
+      conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')`);
+    }
+
     const where = conditions.join(' AND ');
 
     return { page, limit, offset, sortField, sortOrder, where, params, idx };
@@ -938,6 +949,7 @@ export class NetureOfferService {
       hasDescription?: string;
       barcodeSource?: string;
       completenessStatus?: string;
+      serviceApprovalStatus?: string;
     } = {},
   ) {
     const q = this.buildPaginatedWhereClause(supplierId, options);
@@ -1015,6 +1027,31 @@ export class NetureOfferService {
       data,
       pagination: { page: q.page, limit: q.limit, total, totalPages: Math.ceil(total / q.limit) },
     };
+  }
+
+  // ==================== Approval Tab Counts (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1) ====================
+
+  async getSupplierProductApprovalCounts(supplierId: string) {
+    const rows: Array<{ total: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
+      `SELECT
+         COUNT(*)::int AS total,
+         COUNT(*) FILTER (WHERE EXISTS (
+           SELECT 1 FROM offer_service_approvals osa
+           WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
+         ))::int AS pending,
+         COUNT(*) FILTER (WHERE
+           NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')
+           AND EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
+         )::int AS approved,
+         COUNT(*) FILTER (WHERE EXISTS (
+           SELECT 1 FROM offer_service_approvals osa
+           WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
+         ))::int AS rejected
+       FROM supplier_product_offers spo
+       WHERE spo.supplier_id = $1`,
+      [supplierId],
+    );
+    return rows[0] || { total: 0, pending: 0, approved: 0, rejected: 0 };
   }
 
   // ==================== Batch Update (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================

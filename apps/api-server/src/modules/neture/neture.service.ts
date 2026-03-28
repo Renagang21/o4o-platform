@@ -250,6 +250,11 @@ export class NetureService {
     return this.offerService.getSupplierProductsPaginated(supplierId, options);
   }
 
+  // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: approval tab counts
+  async getSupplierProductApprovalCounts(supplierId: string) {
+    return this.offerService.getSupplierProductApprovalCounts(supplierId);
+  }
+
   async batchUpdateSupplierOffers(supplierId: string, updates: Parameters<typeof this.offerService.batchUpdateSupplierOffers>[1]) {
     return this.offerService.batchUpdateSupplierOffers(supplierId, updates);
   }

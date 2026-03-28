@@ -55,10 +55,10 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { page, limit, keyword, distributionType, isActive, sort, order,
-              hasImage, hasDescription, barcodeSource, completenessStatus } = req.query;
+              hasImage, hasDescription, barcodeSource, completenessStatus, serviceApprovalStatus } = req.query;
 
       // 쿼리 파라미터가 있으면 paginated, 없으면 기존 호환
-      if (page || limit || keyword || distributionType || isActive || sort || hasImage || hasDescription || barcodeSource || completenessStatus) {
+      if (page || limit || keyword || distributionType || isActive || sort || hasImage || hasDescription || barcodeSource || completenessStatus || serviceApprovalStatus) {
         const result = await netureService.getSupplierProductsPaginated(supplierId, {
           page: page as string | undefined ? Number(page) : undefined,
           limit: limit as string | undefined ? Number(limit) : undefined,
@@ -71,6 +71,7 @@ export function createSupplierProductController(dataSource: DataSource): Router 
           hasDescription: hasDescription as string | undefined,
           barcodeSource: barcodeSource as string | undefined,
           completenessStatus: completenessStatus as string | undefined,
+          serviceApprovalStatus: serviceApprovalStatus as string | undefined,
         });
         res.json({ success: true, ...result });
       } else {
@@ -80,6 +81,19 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     } catch (error) {
       logger.error('[Neture API] Error fetching supplier products:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch supplier products' });
+    }
+  });
+
+  // GET /supplier/products/approval-counts (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1)
+  // 주의: /products/:id 보다 먼저 등록
+  router.get('/products/approval-counts', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const counts = await netureService.getSupplierProductApprovalCounts(supplierId);
+      res.json({ success: true, data: counts });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching approval counts:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }
   });
 
