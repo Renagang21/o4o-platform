@@ -52,7 +52,7 @@ export class OfferCurationService {
        FROM offer_curations oc
        JOIN supplier_product_offers spo ON spo.id = oc.offer_id
        JOIN product_masters pm ON pm.id = spo.master_id
-       LEFT JOIN product_brands b ON b.id = pm.brand_id
+       LEFT JOIN brands b ON b.id = pm.brand_id
        LEFT JOIN product_categories pc ON pc.id = oc.category_id
        ${where}
        ORDER BY oc.placement, oc.position ASC`,

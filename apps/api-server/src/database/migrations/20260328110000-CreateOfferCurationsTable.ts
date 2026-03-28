@@ -3,10 +3,11 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * WO-NETURE-PRODUCT-CURATION-V1
  *
- * 큐레이션 테이블: 승인된 Offer 중 operator가 노출 선택
+ * 큐레이션 테이블: 승인된 Offer 중 operator가 노출 선택.
+ * (원본: src/migrations/1771200000018 — 잘못된 디렉토리에 배치되어 프로덕션 미실행)
  */
-export class CreateOfferCurationsTable1771200000018 implements MigrationInterface {
-  name = 'CreateOfferCurationsTable1771200000018';
+export class CreateOfferCurationsTable20260328110000 implements MigrationInterface {
+  name = 'CreateOfferCurationsTable20260328110000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
