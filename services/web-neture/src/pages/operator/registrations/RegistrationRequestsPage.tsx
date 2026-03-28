@@ -1,11 +1,11 @@
 /**
  * RegistrationRequestsPage - 가입 신청 관리
  *
- * 서비스 운영자가 관리:
- * - 가입 신청 목록 조회
- * - 신청 상세 확인
- * - 승인 / 거부 처리
- * - 이메일 알림 발송
+ * WO-NETURE-REGISTRATION-UX-IMPROVEMENT-V1
+ * - 기본 필터: 승인대기 (PENDING)
+ * - 상태 매핑 수정: active → APPROVED
+ * - 운영자 메모 기능
+ * - 거절 시 신청자 알림 안내
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -17,6 +17,8 @@ import {
   CheckCircle,
   ArrowLeft,
   AlertCircle,
+  X,
+  MessageSquare,
 } from 'lucide-react';
 import { DataTable, type Column, OperatorConfirmModal } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
@@ -40,8 +42,22 @@ interface RegistrationRequest {
   processedAt?: string;
   processedBy?: string;
   rejectReason?: string;
+  operatorNotes?: string;
+  supplierStatus?: string;
 }
 
+function mapStatus(raw: string | undefined): 'PENDING' | 'APPROVED' | 'REJECTED' {
+  switch (raw?.toLowerCase()) {
+    case 'active':
+    case 'approved':
+      return 'APPROVED';
+    case 'rejected':
+      return 'REJECTED';
+    case 'pending':
+    default:
+      return 'PENDING';
+  }
+}
 
 const roleLabels: Record<string, string> = {
   ALL: '전체',
@@ -72,13 +88,16 @@ export default function RegistrationRequestsPage() {
   const [requests, setRequests] = useState<RegistrationRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<RequestStatus>('ALL');
+  const [statusFilter, setStatusFilter] = useState<RequestStatus>('PENDING');
   const [roleFilter, setRoleFilter] = useState<UserRole | 'ALL'>('ALL');
   const [selectedRequest, setSelectedRequest] = useState<RegistrationRequest | null>(null);
   const [processing, setProcessing] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesValue, setNotesValue] = useState('');
+  const [savingNotes, setSavingNotes] = useState(false);
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -95,11 +114,13 @@ export default function RegistrationRequestsPage() {
         companyName: r.companyName,
         businessNumber: r.businessNumber,
         licenseNumber: r.licenseNumber,
-        status: (r.status?.toUpperCase() as 'PENDING' | 'APPROVED' | 'REJECTED') || 'PENDING',
+        status: mapStatus(r.status),
         createdAt: r.createdAt || new Date().toISOString(),
         processedAt: r.processedAt,
         processedBy: r.processedBy,
         rejectReason: r.rejectReason,
+        operatorNotes: r.operatorNotes,
+        supplierStatus: r.supplierStatus,
       }));
       setRequests(mapped);
     } catch (error) {
@@ -156,7 +177,7 @@ export default function RegistrationRequestsPage() {
         return;
       }
 
-      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다.` });
+      setMessage({ type: 'success', text: `${request.name}님의 가입 신청이 거부되었습니다. 거부 사유가 신청자에게 전달됩니다.` });
       setSelectedRequest(null);
       setShowRejectModal(false);
       await fetchRequests();
@@ -167,7 +188,26 @@ export default function RegistrationRequestsPage() {
     }
   };
 
-  const filteredRequests = requests.filter(request => {
+  const handleSaveNotes = async () => {
+    if (!selectedRequest) return;
+    try {
+      setSavingNotes(true);
+      await operatorRegistrationApi.updateNotes(selectedRequest.id, notesValue);
+      setEditingNotes(false);
+      // Update local state
+      setRequests((prev) =>
+        prev.map((r) => (r.id === selectedRequest.id ? { ...r, operatorNotes: notesValue } : r)),
+      );
+      setSelectedRequest((prev) => (prev ? { ...prev, operatorNotes: notesValue } : null));
+      setMessage({ type: 'success', text: '메모가 저장되었습니다.' });
+    } catch {
+      setMessage({ type: 'error', text: '메모 저장에 실패했습니다.' });
+    } finally {
+      setSavingNotes(false);
+    }
+  };
+
+  const filteredRequests = requests.filter((request) => {
     const matchesSearch =
       request.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,9 +217,11 @@ export default function RegistrationRequestsPage() {
     return matchesSearch && matchesStatus && matchesRole;
   });
 
-  const pendingCount = requests.filter(r => r.status === 'PENDING').length;
+  const pendingCount = requests.filter((r) => r.status === 'PENDING').length;
+  const approvedCount = requests.filter((r) => r.status === 'APPROVED').length;
+  const rejectedCount = requests.filter((r) => r.status === 'REJECTED').length;
 
-  // DataTable columns (축약 버전: 4개 컬럼 + 액션)
+  // DataTable columns
   const columns: Column<Record<string, any>>[] = [
     { key: 'applicant', title: '신청자', dataIndex: 'applicant', width: '30%' },
     { key: 'company', title: '회사 / 면허', dataIndex: 'company', width: '20%' },
@@ -212,14 +254,20 @@ export default function RegistrationRequestsPage() {
       </div>
     ),
     status: (
-      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status]}`}>
-        {statusLabels[request.status]}
+      <span
+        className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${statusStyles[request.status] || 'bg-gray-100 text-gray-600'}`}
+      >
+        {statusLabels[request.status] || request.status}
       </span>
     ),
     actions: (
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <button
-          onClick={() => setSelectedRequest(request)}
+          onClick={() => {
+            setSelectedRequest(request);
+            setEditingNotes(false);
+            setNotesValue(request.operatorNotes || '');
+          }}
           className="text-xs text-blue-600 hover:text-blue-800 font-medium"
         >
           상세보기
@@ -244,6 +292,9 @@ export default function RegistrationRequestsPage() {
               거부
             </button>
           </>
+        )}
+        {request.operatorNotes && (
+          <MessageSquare className="w-3.5 h-3.5 text-blue-400" />
         )}
       </div>
     ),
@@ -281,6 +332,26 @@ export default function RegistrationRequestsPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 text-center">
+            <div className="text-2xl font-bold text-gray-900">{requests.length}</div>
+            <div className="text-sm text-gray-500">전체</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-amber-200 p-4 text-center">
+            <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
+            <div className="text-sm text-gray-500">승인대기</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-green-200 p-4 text-center">
+            <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
+            <div className="text-sm text-gray-500">승인완료</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-red-200 p-4 text-center">
+            <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
+            <div className="text-sm text-gray-500">거부됨</div>
+          </div>
+        </div>
+
         {/* Fetch Error Alert */}
         {fetchError && (
           <div className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-red-50 text-red-700 border border-red-200">
@@ -300,16 +371,22 @@ export default function RegistrationRequestsPage() {
 
         {/* Message Alert */}
         {message && (
-          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
-          }`}>
-            {message.type === 'success'
-              ? <CheckCircle className="w-5 h-5" />
-              : <AlertCircle className="w-5 h-5" />
-            }
-            <span>{message.text}</span>
+          <div
+            className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+              message.type === 'success'
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}
+          >
+            {message.type === 'success' ? (
+              <CheckCircle className="w-5 h-5" />
+            ) : (
+              <AlertCircle className="w-5 h-5" />
+            )}
+            <span className="flex-1">{message.text}</span>
+            <button onClick={() => setMessage(null)} className="text-current opacity-50 hover:opacity-100">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         )}
 
@@ -337,7 +414,9 @@ export default function RegistrationRequestsPage() {
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 {Object.entries(statusLabels).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -349,20 +428,26 @@ export default function RegistrationRequestsPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               {Object.entries(roleLabels).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
+                <option key={value} value={value}>
+                  {label}
+                </option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Request List - SimpleTable */}
+        {/* Request List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <DataTable
             columns={columns}
             dataSource={tableRows}
             rowKey="id"
             loading={loading}
-            emptyText="조건에 맞는 가입 신청이 없습니다"
+            emptyText={
+              statusFilter === 'PENDING'
+                ? '대기 중인 가입 신청이 없습니다'
+                : '조건에 맞는 가입 신청이 없습니다'
+            }
           />
         </div>
 
@@ -376,7 +461,7 @@ export default function RegistrationRequestsPage() {
                   onClick={() => setSelectedRequest(null)}
                   className="text-gray-400 hover:text-gray-600"
                 >
-                  &times;
+                  <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="p-6 space-y-4">
@@ -395,7 +480,7 @@ export default function RegistrationRequestsPage() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">연락처</div>
-                    <div className="font-medium">{selectedRequest.phone}</div>
+                    <div className="font-medium">{selectedRequest.phone || '-'}</div>
                   </div>
                   {selectedRequest.companyName && (
                     <div>
@@ -423,10 +508,37 @@ export default function RegistrationRequestsPage() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">상태</div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyles[selectedRequest.status]}`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${statusStyles[selectedRequest.status]}`}
+                    >
                       {statusLabels[selectedRequest.status]}
                     </span>
                   </div>
+                  {selectedRequest.role === 'supplier' && (
+                    <div>
+                      <div className="text-sm text-gray-500">공급자 계정</div>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        selectedRequest.supplierStatus === 'ACTIVE'
+                          ? 'bg-green-100 text-green-700'
+                          : selectedRequest.supplierStatus
+                            ? 'bg-amber-100 text-amber-700'
+                            : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {selectedRequest.supplierStatus === 'ACTIVE' ? '활성' :
+                         selectedRequest.supplierStatus === 'PENDING' ? '대기' :
+                         selectedRequest.supplierStatus === 'REJECTED' ? '거절' :
+                         selectedRequest.supplierStatus || '미생성'}
+                      </span>
+                    </div>
+                  )}
+                  {selectedRequest.processedAt && (
+                    <div>
+                      <div className="text-sm text-gray-500">처리일</div>
+                      <div className="font-medium">
+                        {new Date(selectedRequest.processedAt).toLocaleString('ko-KR')}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {selectedRequest.rejectReason && (
@@ -435,42 +547,104 @@ export default function RegistrationRequestsPage() {
                     <div className="text-sm text-red-700">{selectedRequest.rejectReason}</div>
                   </div>
                 )}
+
+                {/* Operator Notes */}
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                      <MessageSquare className="w-4 h-4" />
+                      운영자 메모
+                    </div>
+                    {!editingNotes && (
+                      <button
+                        onClick={() => {
+                          setEditingNotes(true);
+                          setNotesValue(selectedRequest.operatorNotes || '');
+                        }}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                      >
+                        {selectedRequest.operatorNotes ? '수정' : '작성'}
+                      </button>
+                    )}
+                  </div>
+                  {editingNotes ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={notesValue}
+                        onChange={(e) => setNotesValue(e.target.value)}
+                        placeholder="내부 메모를 입력하세요 (신청자에게 표시되지 않습니다)"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => setEditingNotes(false)}
+                          className="px-3 py-1 text-xs text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          취소
+                        </button>
+                        <button
+                          onClick={handleSaveNotes}
+                          disabled={savingNotes}
+                          className="px-3 py-1 text-xs text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                        >
+                          {savingNotes ? '저장 중...' : '저장'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : selectedRequest.operatorNotes ? (
+                    <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+                      {selectedRequest.operatorNotes}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-400">메모 없음</div>
+                  )}
+                </div>
               </div>
 
               {selectedRequest.status === 'PENDING' && (
-                <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end">
-                  <button
-                    onClick={() => {
-                      setShowRejectModal(true);
-                    }}
-                    disabled={processing}
-                    className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
-                  >
-                    거부
-                  </button>
-                  <button
-                    onClick={() => handleApprove(selectedRequest)}
-                    disabled={processing}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                  >
-                    승인
-                  </button>
+                <div className="px-6 py-4 border-t border-gray-100">
+                  {selectedRequest.role === 'supplier' && !selectedRequest.supplierStatus && (
+                    <div className="mb-3 p-2.5 bg-blue-50 rounded-lg text-xs text-blue-700">
+                      승인 시 공급자 계정이 자동 생성��어 즉시 상품 관리가 가능합니다.
+                    </div>
+                  )}
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => {
+                        setShowRejectModal(true);
+                      }}
+                      disabled={processing}
+                      className="px-4 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+                    >
+                      거부
+                    </button>
+                    <button
+                      onClick={() => handleApprove(selectedRequest)}
+                      disabled={processing}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                      승인
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         )}
 
-        {/* Reject Modal (WO-O4O-OPERATOR-ACTION-STANDARDIZATION-V1) */}
+        {/* Reject Modal */}
         {showRejectModal && selectedRequest && (
           <OperatorConfirmModal
             open
             actionType={OperatorActionType.REJECT}
-            onClose={() => { setShowRejectModal(false); }}
+            onClose={() => {
+              setShowRejectModal(false);
+            }}
             onConfirm={(reason) => handleReject(selectedRequest, reason)}
             loading={processing}
             title="가입 신청 거부"
-            message={`${selectedRequest.name}님의 가입 신청을 거부합니다. 거부 사유를 입력해주세요.`}
+            message={`${selectedRequest.name}님의 가입 신청을 거부합니다.\n\n거부 사유를 입력해주세요. 입력한 사유는 신청자에게 전달됩니다.`}
             confirmText="거부 확인"
           />
         )}

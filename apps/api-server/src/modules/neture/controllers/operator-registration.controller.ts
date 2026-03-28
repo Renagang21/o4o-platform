@@ -146,6 +146,39 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
   );
 
   /**
+   * PATCH /operator/registrations/:userId/notes
+   * 운영자 메모 저장
+   */
+  router.patch(
+    '/registrations/:userId/notes',
+    requireAuth,
+    requireOperatorOrAdmin,
+    async (req: AuthenticatedRequest, res: Response) => {
+      try {
+        const { userId } = req.params;
+        const { notes } = req.body;
+        const result = await registrationService.updateNotes(userId, notes);
+        res.json({ success: true, data: result });
+      } catch (error: any) {
+        if (error?.message === 'REGISTRATION_NOT_FOUND') {
+          res.status(404).json({
+            success: false,
+            error: 'REGISTRATION_NOT_FOUND',
+            message: 'Registration not found',
+          });
+          return;
+        }
+        logger.error('[Operator] Error updating notes:', error);
+        res.status(500).json({
+          success: false,
+          error: 'INTERNAL_ERROR',
+          message: 'Failed to update notes',
+        });
+      }
+    },
+  );
+
+  /**
    * GET /operator/registrations/copilot
    * 가입 승인 Copilot — 우선순위별 분류
    * WO-O4O-NETURE-OPERATOR-COPILOT-REGISTRATION-V1

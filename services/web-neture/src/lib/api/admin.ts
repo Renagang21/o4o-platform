@@ -630,6 +630,8 @@ export interface RegistrationRecord {
   processedAt?: string;
   processedBy?: string;
   rejectReason?: string;
+  operatorNotes?: string;
+  supplierStatus?: string;
 }
 
 export const operatorRegistrationApi = {
@@ -655,4 +657,11 @@ export const operatorRegistrationApi = {
     return response.data;
   },
 
+  async updateNotes(userId: string, notes: string): Promise<{ success: boolean }> {
+    const response = await api.patch(
+      `/neture/operator/registrations/${userId}/notes`,
+      { notes },
+    );
+    return response.data;
+  },
 };
