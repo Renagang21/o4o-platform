@@ -10,7 +10,7 @@ export class FixMarketTrialTitle20260328100000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `UPDATE market_trials
-       SET title = 'Trial Test 1', updated_at = NOW()
+       SET title = 'Trial Test 1'
        WHERE title LIKE '%MARKET-TRIAL-PHASE1-POST-DEPLOY-VERIFY%'`,
     );
   }
