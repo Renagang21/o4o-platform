@@ -658,7 +658,8 @@
       "Bash(git remote prune:*)",
       "Bash(1 <<'EOF'\nSELECT COUNT\\(*\\)::int AS mismatch_count FROM neture_suppliers s JOIN organizations o ON o.id = s.organization_id WHERE s.name != o.name OR COALESCE\\(s.business_number, ''\\) != COALESCE\\(o.business_number, ''\\) OR COALESCE\\(s.business_address, ''\\) != COALESCE\\(o.address, ''\\);\nEOF)",
       "Bash(choco search:*)",
-      "Bash(timeout /t 3:*)"
+      "Bash(timeout /t 3:*)",
+      "Bash(\"C:\\\\Users\\\\sohae\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd\" run services logs read o4o-core-api --region=asia-northeast3 --limit=30)"
     ],
     "deny": []
   }

@@ -84,7 +84,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
           SELECT
             COUNT(*)::int AS total,
             COUNT(*) FILTER (WHERE is_active = true AND approval_status = 'APPROVED')::int AS active,
-            (SELECT COUNT(*)::int FROM offer_service_approvals WHERE approval_status = 'pending') AS pending
+            (SELECT COUNT(*)::int FROM offer_service_approvals WHERE approval_status = 'pending' AND service_key = 'neture') AS pending
           FROM supplier_product_offers
         `).catch(() => [{ total: 0, active: 0, pending: 0 }]) as Promise<Array<{ total: number; active: number; pending: number }>>,
 
@@ -219,7 +219,7 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
       const actionQueue: ActionItem[] = [
         { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
         { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/admin-suppliers' },
-        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/product-approvals' },
+        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/product-service-approvals' },
         { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
         { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/contact-messages' },
       ];
