@@ -41,7 +41,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
    */
   router.get('/service-approvals', async (req: Request, res: Response): Promise<void> => {
     try {
-      const { status, serviceKey, search, dateFrom, dateTo, page, limit } = req.query;
+      const { status, serviceKey, search, dateFrom, dateTo, page, limit, minScore, maxScore, hasIssues } = req.query;
       const result = await approvalService.listApprovals({
         status: status as string | undefined,
         serviceKey: serviceKey as string | undefined,
@@ -50,6 +50,9 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         dateTo: dateTo as string | undefined,
         page: page ? parseInt(page as string, 10) : undefined,
         limit: limit ? parseInt(limit as string, 10) : undefined,
+        minScore: minScore ? parseInt(minScore as string, 10) : undefined,
+        maxScore: maxScore ? parseInt(maxScore as string, 10) : undefined,
+        hasIssues: hasIssues as string | undefined,
       });
       res.json({ success: true, ...result });
     } catch (error) {
@@ -86,7 +89,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
             ? `AND osa.created_at >= NOW() - INTERVAL '30 days'`
             : '';
 
-      const [summaryRows, reasonRows, avgTimeRows, supplierRows] = await Promise.all([
+      const [summaryRows, reasonRows, avgTimeRows, supplierRows, staleRows] = await Promise.all([
         dataSource.query(`
           SELECT
             COUNT(*)::int AS total,
@@ -131,10 +134,30 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           ORDER BY "approvalRate" DESC
           LIMIT 10
         `),
+        // WO-NETURE-APPROVAL-ACTIONABLE-INSIGHTS-V1: stale pending count (48h+)
+        dataSource.query(`
+          SELECT COUNT(*)::int AS count
+          FROM offer_service_approvals osa
+          WHERE osa.service_key = 'neture'
+            AND osa.approval_status = 'pending'
+            AND osa.created_at < NOW() - INTERVAL '2 days'
+        `),
       ]);
 
       const s = summaryRows[0] || { total: 0, approved: 0, rejected: 0, pending: 0 };
       const approvalRate = s.total > 0 ? Math.round((s.approved / s.total) * 100) : 0;
+
+      const supplierRatesMapped = supplierRows.map((r: any) => ({
+        supplierId: r.supplierId,
+        supplierName: r.supplierName,
+        approvalRate: parseFloat(r.approvalRate) || 0,
+        total: r.total,
+      }));
+
+      // WO-NETURE-APPROVAL-ACTIONABLE-INSIGHTS-V1
+      const lowQualitySuppliers = supplierRatesMapped
+        .filter((sr: any) => sr.approvalRate < 50 && sr.total >= 5);
+      const stalePendingCount = staleRows[0]?.count || 0;
 
       res.json({
         success: true,
@@ -142,12 +165,11 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           summary: { ...s, approvalRate },
           topRejectionReasons: reasonRows,
           avgProcessingTimeHours: parseFloat(avgTimeRows[0]?.avg_hours) || 0,
-          supplierApprovalRates: supplierRows.map((r: any) => ({
-            supplierId: r.supplierId,
-            supplierName: r.supplierName,
-            approvalRate: parseFloat(r.approvalRate) || 0,
-            total: r.total,
-          })),
+          supplierApprovalRates: supplierRatesMapped,
+          alerts: {
+            lowQualitySuppliers,
+            stalePendingCount,
+          },
         },
       });
     } catch (error) {

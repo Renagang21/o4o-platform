@@ -31,6 +31,10 @@ export interface ServiceApprovalItem {
   imageUrl: string | null;
   brandName: string | null;
   priceGeneral: number | null;
+  // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: 품질 판단 필드
+  hasShortDescription: boolean;
+  hasDetailDescription: boolean;
+  imageCount: number;
 }
 
 export interface ServiceApprovalStats {
@@ -41,12 +45,16 @@ export interface ServiceApprovalStats {
   todayPending: number; // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
 }
 
-// WO-NETURE-APPROVAL-ANALYTICS-LITE-V1 + ENHANCEMENT-V1
+// WO-NETURE-APPROVAL-ANALYTICS-LITE-V1 + ENHANCEMENT-V1 + ACTIONABLE-INSIGHTS-V1
 export interface ApprovalAnalytics {
   summary: { total: number; approved: number; rejected: number; pending: number; approvalRate: number };
   topRejectionReasons: Array<{ reason: string; count: number }>;
   avgProcessingTimeHours: number;
   supplierApprovalRates: Array<{ supplierId: string; supplierName: string; approvalRate: number; total: number }>;
+  alerts?: {
+    lowQualitySuppliers: Array<{ supplierId: string; supplierName: string; approvalRate: number; total: number }>;
+    stalePendingCount: number;
+  };
 }
 
 export const operatorServiceApprovalApi = {
@@ -58,6 +66,9 @@ export const operatorServiceApprovalApi = {
     dateTo?: string;
     page?: number;
     limit?: number;
+    minScore?: number;
+    maxScore?: number;
+    hasIssues?: string;
   }): Promise<{
     data: ServiceApprovalItem[];
     pagination: { page: number; limit: number; total: number; totalPages: number };
@@ -71,6 +82,9 @@ export const operatorServiceApprovalApi = {
       if (params?.dateTo) sp.set('dateTo', params.dateTo);
       if (params?.page) sp.set('page', String(params.page));
       if (params?.limit) sp.set('limit', String(params.limit));
+      if (params?.minScore != null) sp.set('minScore', String(params.minScore));
+      if (params?.maxScore != null) sp.set('maxScore', String(params.maxScore));
+      if (params?.hasIssues) sp.set('hasIssues', params.hasIssues);
       const qs = sp.toString() ? `?${sp.toString()}` : '';
       const response = await api.get(`/neture/operator/service-approvals${qs}`);
       const result = response.data;

@@ -74,6 +74,32 @@ function formatPrice(price: number | null): string {
   return `₩${price.toLocaleString('ko-KR')}`;
 }
 
+// WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: 품질 판단 헬퍼
+
+function getQualityFlags(item: ServiceApprovalItem): string[] {
+  const flags: string[] = [];
+  if (!item.imageUrl) flags.push('이미지 없음');
+  if (!item.priceGeneral || item.priceGeneral <= 0) flags.push('가격 미설정');
+  if (!item.hasShortDescription) flags.push('간단 설명 없음');
+  if (!item.hasDetailDescription) flags.push('상세 설명 없음');
+  if (!item.distributionType) flags.push('유통 타입 미설정');
+  return flags;
+}
+
+function getRecommendation(score: number): { label: string; bg: string; text: string; icon: string } {
+  if (score >= 80) return { label: '승인 추천', bg: 'bg-green-50', text: 'text-green-700', icon: '✓' };
+  if (score >= 60) return { label: '검토 필요', bg: 'bg-amber-50', text: 'text-amber-700', icon: '!' };
+  return { label: '보완 필요', bg: 'bg-red-50', text: 'text-red-700', icon: '✕' };
+}
+
+const REJECT_TEMPLATES = [
+  '상품 이미지가 없습니다. 이미지를 추가한 후 다시 요청해 주세요.',
+  '상품 설명이 부족합니다. 간단 소개와 상세 설명을 작성해 주세요.',
+  '가격 정보가 누락되었습니다. 공급가를 설정해 주세요.',
+  '상품 정보가 불완전합니다. 완성도를 높인 후 재요청 바랍니다.',
+  '규제 정보 확인이 필요합니다. MFDS 허가번호를 입력해 주세요.',
+];
+
 // ==================== Component ====================
 
 export default function ProductServiceApprovalPage() {
@@ -99,6 +125,9 @@ export default function ProductServiceApprovalPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
+  const [scoreRange, setScoreRange] = useState<'' | 'low' | 'mid' | 'high'>('');
+  const [filterHasIssues, setFilterHasIssues] = useState(false);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Selection
@@ -125,6 +154,11 @@ export default function ProductServiceApprovalPage() {
     setLoading(true);
     setPermissionError(null);
     try {
+      const scoreParams: { minScore?: number; maxScore?: number } =
+        scoreRange === 'low' ? { minScore: 0, maxScore: 59 }
+        : scoreRange === 'mid' ? { minScore: 60, maxScore: 79 }
+        : scoreRange === 'high' ? { minScore: 80 }
+        : {};
       const [listResult, statsResult] = await Promise.all([
         operatorServiceApprovalApi.list({
           status: statusFilter !== 'all' ? statusFilter : undefined,
@@ -134,6 +168,8 @@ export default function ProductServiceApprovalPage() {
           dateTo: dateTo || undefined,
           page,
           limit: 30,
+          ...scoreParams,
+          hasIssues: filterHasIssues ? 'true' : undefined,
         }),
         operatorServiceApprovalApi.stats(),
       ]);
@@ -146,7 +182,7 @@ export default function ProductServiceApprovalPage() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo]);
+  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues]);
 
   useEffect(() => {
     fetchData(1);
@@ -309,6 +345,33 @@ export default function ProductServiceApprovalPage() {
           </div>
           {showAnalytics && (
             <>
+              {/* Actionable Alerts (WO-NETURE-APPROVAL-ACTIONABLE-INSIGHTS-V1) */}
+              {analytics.alerts && (analytics.alerts.lowQualitySuppliers.length > 0 || analytics.alerts.stalePendingCount > 0) && (
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {analytics.alerts.stalePendingCount > 0 && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm">
+                      <span className="text-amber-600 font-medium">48h+ 대기 상품 {analytics.alerts.stalePendingCount}건</span>
+                      <button
+                        onClick={() => { setStatusFilter('pending'); setDateTo(new Date(Date.now() - 2 * 86400000).toISOString().slice(0, 10)); }}
+                        className="text-amber-700 underline text-xs hover:text-amber-900"
+                      >
+                        보러가기
+                      </button>
+                    </div>
+                  )}
+                  {analytics.alerts.lowQualitySuppliers.length > 0 && (
+                    <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm">
+                      <span className="text-red-600 font-medium">승인율 낮은 공급자: </span>
+                      {analytics.alerts.lowQualitySuppliers.map((lq, i) => (
+                        <span key={lq.supplierId} className="text-red-700">
+                          {i > 0 && ', '}{lq.supplierName} ({lq.approvalRate}%)
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-3 gap-4 mb-4">
                 {/* Approval Rate */}
                 <div className="bg-white border border-slate-200 rounded-lg p-4">
@@ -428,6 +491,36 @@ export default function ProductServiceApprovalPage() {
             onChange={(e) => setDateTo(e.target.value)}
             className="px-2 py-1.5 border border-slate-300 rounded-lg text-sm"
           />
+        </div>
+
+        {/* WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: Quality Filters */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFilterHasIssues((v) => !v)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              filterHasIssues
+                ? 'bg-red-600 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            문제 있음만
+          </button>
+          {(['', 'low', 'mid', 'high'] as const).map((range) => {
+            const labels: Record<string, string> = { '': '점수 전체', low: '0-59', mid: '60-79', high: '80+' };
+            return (
+              <button
+                key={range}
+                onClick={() => setScoreRange(range)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  scoreRange === range
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {labels[range]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
