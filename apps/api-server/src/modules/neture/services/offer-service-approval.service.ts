@@ -49,6 +49,9 @@ export class OfferServiceApprovalService {
     dateTo?: string;
     page?: number;
     limit?: number;
+    minScore?: number;
+    maxScore?: number;
+    hasIssues?: string;
   }): Promise<{ data: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     const { status, serviceKey, search, dateFrom, dateTo, page = 1, limit = 50 } = options;
     const conditions: string[] = [];
@@ -80,6 +83,28 @@ export class OfferServiceApprovalService {
       conditions.push(`osa.created_at < ($${idx}::date + INTERVAL '1 day')`);
       params.push(dateTo);
       idx++;
+    }
+
+    // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
+    const completenessExpr = `(
+      CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
+      + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
+      + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
+      + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
+      + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
+    )`;
+    if (options.minScore != null && !isNaN(Number(options.minScore))) {
+      conditions.push(`${completenessExpr} >= $${idx}`);
+      params.push(Number(options.minScore));
+      idx++;
+    }
+    if (options.maxScore != null && !isNaN(Number(options.maxScore))) {
+      conditions.push(`${completenessExpr} <= $${idx}`);
+      params.push(Number(options.maxScore));
+      idx++;
+    }
+    if (options.hasIssues === 'true') {
+      conditions.push(`${completenessExpr} < 100`);
     }
 
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -119,7 +144,10 @@ export class OfferServiceApprovalService {
            ) AS "completenessScore",
            (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "imageUrl",
            pm.brand_name AS "brandName",
-           spo.price_general AS "priceGeneral"
+           spo.price_general AS "priceGeneral",
+           (spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '') AS "hasShortDescription",
+           (spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '') AS "hasDetailDescription",
+           (SELECT COUNT(*)::int FROM product_images pi2 WHERE pi2.master_id = pm.id) AS "imageCount"
          FROM offer_service_approvals osa
          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id

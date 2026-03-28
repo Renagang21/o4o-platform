@@ -587,74 +587,81 @@ export default function ProductServiceApprovalPage() {
             const badge = STATUS_BADGE[item.approvalStatus] || { label: item.approvalStatus, bg: 'bg-slate-50', text: 'text-slate-600' };
             const regBadge = getRegulatoryBadge(item);
             const compBadge = getCompletenessBadge(item);
+            const qualityFlags = getQualityFlags(item);
+            const recommendation = getRecommendation(item.completenessScore || 0);
+            const score = item.completenessScore || 0;
 
             return (
               <div
                 key={item.id}
-                className={`flex items-start gap-3 p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${
+                className={`p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${
                   selectedIds.has(item.id) ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200'
                 }`}
               >
-                {/* Checkbox */}
-                <input
-                  type="checkbox"
-                  checked={selectedIds.has(item.id)}
-                  onChange={() => toggleSelect(item.id)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="mt-1 rounded border-slate-300 shrink-0"
-                />
+                <div className="flex items-start gap-3">
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(item.id)}
+                    onChange={() => toggleSelect(item.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-1 rounded border-slate-300 shrink-0"
+                  />
 
-                {/* Image */}
-                <div
-                  className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center"
-                  onClick={() => setDrawerItem(item)}
-                >
-                  {item.imageUrl ? (
-                    <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <svg className="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0" onClick={() => setDrawerItem(item)}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-slate-900 truncate">{item.productName || '(이름 없음)'}</span>
-                    {item.brandName && (
-                      <span className="text-xs text-slate-400 shrink-0">({item.brandName})</span>
+                  {/* Image */}
+                  <div
+                    className="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 shrink-0 flex items-center justify-center"
+                    onClick={() => setDrawerItem(item)}
+                  >
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
-                    <span className="font-mono">{item.barcode || '-'}</span>
-                    <span>·</span>
-                    <span>{item.supplierName || '-'}</span>
-                    <span>·</span>
-                    <span>{formatPrice(item.priceGeneral)}</span>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0" onClick={() => setDrawerItem(item)}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-slate-900 truncate">{item.productName || '(이름 없음)'}</span>
+                      {item.brandName && (
+                        <span className="text-xs text-slate-400 shrink-0">({item.brandName})</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                      <span className="font-mono">{item.barcode || '-'}</span>
+                      <span>·</span>
+                      <span>{item.supplierName || '-'}</span>
+                      <span>·</span>
+                      <span>{formatPrice(item.priceGeneral)}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Badges */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${regBadge.bg} ${regBadge.text}`}>
-                    {regBadge.label}
-                  </span>
-                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${compBadge.bg} ${compBadge.text}`}>
-                    {compBadge.label}
-                  </span>
-                  <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
-                    {item.serviceKey}
-                  </span>
-                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${badge.bg} ${badge.text}`}>
-                    {badge.label}
-                  </span>
-                </div>
+                  {/* Badges + Recommendation */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${recommendation.bg} ${recommendation.text}`}>
+                      {recommendation.icon} {recommendation.label}
+                    </span>
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${regBadge.bg} ${regBadge.text}`}>
+                      {regBadge.label}
+                    </span>
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${compBadge.bg} ${compBadge.text}`}>
+                      {compBadge.label}
+                    </span>
+                    <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
+                      {item.serviceKey}
+                    </span>
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${badge.bg} ${badge.text}`}>
+                      {badge.label}
+                    </span>
+                  </div>
 
-                {/* Date */}
-                <div className="text-xs text-slate-400 shrink-0 w-20 text-right">
-                  {new Date(item.createdAt).toLocaleDateString('ko-KR')}
-                </div>
+                  {/* Date */}
+                  <div className="text-xs text-slate-400 shrink-0 w-20 text-right">
+                    {new Date(item.createdAt).toLocaleDateString('ko-KR')}
+                  </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -686,6 +693,33 @@ export default function ProductServiceApprovalPage() {
                     </span>
                   ) : null}
                 </div>
+                </div>
+
+                {/* Quality flags + Progress bar */}
+                {(qualityFlags.length > 0 || score < 100) && (
+                  <div className="mt-2 ml-[68px] flex items-center gap-3" onClick={() => setDrawerItem(item)}>
+                    {qualityFlags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {qualityFlags.map((flag) => (
+                          <span key={flag} className="text-[11px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                            ⚠ {flag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1.5 ml-auto shrink-0">
+                      <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            score >= 80 ? 'bg-green-500' : score >= 60 ? 'bg-amber-400' : 'bg-red-400'
+                          }`}
+                          style={{ width: `${score}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] text-slate-400">{score}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })
@@ -746,6 +780,17 @@ export default function ProductServiceApprovalPage() {
                 ? '선택한 승인대기 상품을 일괄 거절합니다.'
                 : '이 상품의 서비스 승인을 거절합니다.'}
             </p>
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {REJECT_TEMPLATES.map((tpl, i) => (
+                <button
+                  key={i}
+                  onClick={() => setRejectReason(tpl)}
+                  className="px-2.5 py-1 bg-slate-100 text-slate-600 rounded text-xs hover:bg-slate-200 text-left"
+                >
+                  {tpl.length > 30 ? tpl.slice(0, 30) + '…' : tpl}
+                </button>
+              ))}
+            </div>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
@@ -911,6 +956,8 @@ export default function ProductServiceApprovalPage() {
                   {[
                     { label: '공급가 설정', ok: drawerItem.priceGeneral != null && drawerItem.priceGeneral > 0 },
                     { label: '상품 이미지', ok: !!drawerItem.imageUrl },
+                    { label: '간단 소개', ok: drawerItem.hasShortDescription },
+                    { label: '상세 설명', ok: drawerItem.hasDetailDescription },
                     { label: '유통 타입', ok: !!drawerItem.distributionType },
                   ].map((c) => (
                     <div key={c.label} className="flex items-center gap-2 text-sm">
