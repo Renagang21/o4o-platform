@@ -128,6 +128,8 @@ export default function ProductServiceApprovalPage() {
   // WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: quality filters
   const [scoreRange, setScoreRange] = useState<'' | 'low' | 'mid' | 'high'>('');
   const [filterHasIssues, setFilterHasIssues] = useState(false);
+  // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: priority filter
+  const [priorityFilter, setPriorityFilter] = useState<'' | 'HIGH' | 'MEDIUM' | 'LOW'>('');
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Selection
@@ -170,6 +172,7 @@ export default function ProductServiceApprovalPage() {
           limit: 30,
           ...scoreParams,
           hasIssues: filterHasIssues ? 'true' : undefined,
+          priority: priorityFilter || undefined,
         }),
         operatorServiceApprovalApi.stats(),
       ]);
@@ -182,7 +185,7 @@ export default function ProductServiceApprovalPage() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues]);
+  }, [statusFilter, serviceFilter, searchQuery, dateFrom, dateTo, scoreRange, filterHasIssues, priorityFilter]);
 
   useEffect(() => {
     fetchData(1);
@@ -363,9 +366,13 @@ export default function ProductServiceApprovalPage() {
                     <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm">
                       <span className="text-red-600 font-medium">승인율 낮은 공급자: </span>
                       {analytics.alerts.lowQualitySuppliers.map((lq, i) => (
-                        <span key={lq.supplierId} className="text-red-700">
+                        <button
+                          key={lq.supplierId}
+                          onClick={() => { setSearchInput(lq.supplierName); setSearchQuery(lq.supplierName); }}
+                          className="text-red-700 underline hover:text-red-900"
+                        >
                           {i > 0 && ', '}{lq.supplierName} ({lq.approvalRate}%)
-                        </span>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -493,6 +500,36 @@ export default function ProductServiceApprovalPage() {
           />
         </div>
 
+        {/* WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: Priority Filters */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setPriorityFilter(priorityFilter === 'HIGH' ? '' : 'HIGH')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              priorityFilter === 'HIGH'
+                ? 'bg-red-600 text-white'
+                : 'bg-red-50 text-red-700 hover:bg-red-100'
+            }`}
+          >
+            긴급 처리
+          </button>
+          {(['', 'HIGH', 'MEDIUM', 'LOW'] as const).map((p) => {
+            const labels: Record<string, string> = { '': '우선순위 전체', HIGH: 'HIGH', MEDIUM: 'MEDIUM', LOW: 'LOW' };
+            return (
+              <button
+                key={p}
+                onClick={() => setPriorityFilter(p)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  priorityFilter === p
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {labels[p]}
+              </button>
+            );
+          })}
+        </div>
+
         {/* WO-O4O-NETURE-OPERATOR-APPROVAL-UX-ADVANCED-V1: Quality Filters */}
         <div className="flex items-center gap-2">
           <button
@@ -591,12 +628,19 @@ export default function ProductServiceApprovalPage() {
             const recommendation = getRecommendation(item.completenessScore || 0);
             const score = item.completenessScore || 0;
 
+            // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: priority border
+            const borderClass = selectedIds.has(item.id)
+              ? 'border-blue-400 bg-blue-50/30'
+              : item.priority === 'HIGH'
+                ? 'border-red-400 bg-red-50/20'
+                : item.priority === 'MEDIUM'
+                  ? 'border-amber-400 bg-amber-50/20'
+                  : 'border-slate-200';
+
             return (
               <div
                 key={item.id}
-                className={`p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${
-                  selectedIds.has(item.id) ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200'
-                }`}
+                className={`p-4 bg-white border rounded-lg hover:border-blue-300 transition-colors cursor-pointer ${borderClass}`}
               >
                 <div className="flex items-start gap-3">
                   {/* Checkbox */}
@@ -695,18 +739,26 @@ export default function ProductServiceApprovalPage() {
                 </div>
                 </div>
 
-                {/* Quality flags + Progress bar */}
-                {(qualityFlags.length > 0 || score < 100) && (
+                {/* Priority badges + Quality flags + Progress bar */}
+                {(item.isStale || item.isLowQualitySupplier || qualityFlags.length > 0 || score < 100) && (
                   <div className="mt-2 ml-[68px] flex items-center gap-3" onClick={() => setDrawerItem(item)}>
-                    {qualityFlags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {qualityFlags.map((flag) => (
-                          <span key={flag} className="text-[11px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
-                            ⚠ {flag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex flex-wrap gap-1">
+                      {item.isStale && (
+                        <span className="text-[11px] text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded font-medium" title="48시간 이상 승인 대기">
+                          48h+ 대기
+                        </span>
+                      )}
+                      {item.isLowQualitySupplier && (
+                        <span className="text-[11px] text-red-700 bg-red-100 px-1.5 py-0.5 rounded font-medium" title="이 공급자의 승인율이 낮습니다">
+                          저품질 공급자
+                        </span>
+                      )}
+                      {qualityFlags.map((flag) => (
+                        <span key={flag} className="text-[11px] text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                          ⚠ {flag}
+                        </span>
+                      ))}
+                    </div>
                     <div className="flex items-center gap-1.5 ml-auto shrink-0">
                       <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                         <div

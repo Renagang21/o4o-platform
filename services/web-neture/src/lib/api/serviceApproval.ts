@@ -35,6 +35,10 @@ export interface ServiceApprovalItem {
   hasShortDescription: boolean;
   hasDetailDescription: boolean;
   imageCount: number;
+  // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: 우선순위 필드
+  isStale: boolean;
+  isLowQualitySupplier: boolean;
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
 }
 
 export interface ServiceApprovalStats {
@@ -69,6 +73,7 @@ export const operatorServiceApprovalApi = {
     minScore?: number;
     maxScore?: number;
     hasIssues?: string;
+    priority?: string;
   }): Promise<{
     data: ServiceApprovalItem[];
     pagination: { page: number; limit: number; total: number; totalPages: number };
@@ -85,6 +90,7 @@ export const operatorServiceApprovalApi = {
       if (params?.minScore != null) sp.set('minScore', String(params.minScore));
       if (params?.maxScore != null) sp.set('maxScore', String(params.maxScore));
       if (params?.hasIssues) sp.set('hasIssues', params.hasIssues);
+      if (params?.priority) sp.set('priority', params.priority);
       const qs = sp.toString() ? `?${sp.toString()}` : '';
       const response = await api.get(`/neture/operator/service-approvals${qs}`);
       const result = response.data;

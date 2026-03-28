@@ -41,7 +41,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
    */
   router.get('/service-approvals', async (req: Request, res: Response): Promise<void> => {
     try {
-      const { status, serviceKey, search, dateFrom, dateTo, page, limit, minScore, maxScore, hasIssues } = req.query;
+      const { status, serviceKey, search, dateFrom, dateTo, page, limit, minScore, maxScore, hasIssues, priority } = req.query;
       const result = await approvalService.listApprovals({
         status: status as string | undefined,
         serviceKey: serviceKey as string | undefined,
@@ -53,6 +53,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         minScore: minScore ? parseInt(minScore as string, 10) : undefined,
         maxScore: maxScore ? parseInt(maxScore as string, 10) : undefined,
         hasIssues: hasIssues as string | undefined,
+        priority: priority as string | undefined,
       });
       res.json({ success: true, ...result });
     } catch (error) {

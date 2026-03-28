@@ -52,6 +52,7 @@ export class OfferServiceApprovalService {
     minScore?: number;
     maxScore?: number;
     hasIssues?: string;
+    priority?: string; // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1
   }): Promise<{ data: any[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
     const { status, serviceKey, search, dateFrom, dateTo, page = 1, limit = 50 } = options;
     const conditions: string[] = [];
@@ -107,16 +108,44 @@ export class OfferServiceApprovalService {
       conditions.push(`${completenessExpr} < 100`);
     }
 
+    // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: priority filter
+    const staleExpr = `(osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending')`;
+    const lowQualityExpr = `(COALESCE(supplier_stats.approval_rate, 100) < 50 AND COALESCE(supplier_stats.total_count, 0) >= 5)`;
+    if (options.priority === 'HIGH') {
+      conditions.push(`${staleExpr} AND ${lowQualityExpr}`);
+    } else if (options.priority === 'MEDIUM') {
+      conditions.push(`${staleExpr}`);
+      conditions.push(`NOT ${lowQualityExpr}`);
+    } else if (options.priority === 'LOW') {
+      conditions.push(`NOT ${staleExpr}`);
+    }
+
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const offset = (page - 1) * limit;
 
-    // COUNT needs same JOINs because search references pm/supplier_org
+    // WO-O4O-NETURE-APPROVAL-UI-INSIGHT-INTEGRATION-V1: supplier stats subquery for priority
+    const supplierStatsJoin = `LEFT JOIN (
+      SELECT
+        spo2.supplier_id,
+        COUNT(*)::int AS total_count,
+        ROUND(
+          COUNT(*) FILTER (WHERE osa2.approval_status = 'approved')::numeric
+          / NULLIF(COUNT(*), 0) * 100, 1
+        ) AS approval_rate
+      FROM offer_service_approvals osa2
+      JOIN supplier_product_offers spo2 ON spo2.id = osa2.offer_id
+      WHERE osa2.service_key = 'neture'
+      GROUP BY spo2.supplier_id
+    ) supplier_stats ON supplier_stats.supplier_id = spo.supplier_id`;
+
+    // COUNT needs same JOINs because search references pm/supplier_org + supplier_stats for priority filter
     const countSql = `SELECT COUNT(*)::int AS total
       FROM offer_service_approvals osa
       JOIN supplier_product_offers spo ON spo.id = osa.offer_id
       JOIN product_masters pm ON pm.id = spo.master_id
       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
       LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
+      ${supplierStatsJoin}
       ${where}`;
 
     const [countResult, rows] = await Promise.all([
@@ -147,14 +176,34 @@ export class OfferServiceApprovalService {
            spo.price_general AS "priceGeneral",
            (spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '') AS "hasShortDescription",
            (spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '') AS "hasDetailDescription",
-           (SELECT COUNT(*)::int FROM product_images pi2 WHERE pi2.master_id = pm.id) AS "imageCount"
+           (SELECT COUNT(*)::int FROM product_images pi2 WHERE pi2.master_id = pm.id) AS "imageCount",
+           (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending') AS "isStale",
+           (COALESCE(supplier_stats.approval_rate, 100) < 50 AND COALESCE(supplier_stats.total_count, 0) >= 5) AS "isLowQualitySupplier",
+           CASE
+             WHEN (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending')
+               AND (COALESCE(supplier_stats.approval_rate, 100) < 50 AND COALESCE(supplier_stats.total_count, 0) >= 5)
+               THEN 'HIGH'
+             WHEN (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending')
+               THEN 'MEDIUM'
+             ELSE 'LOW'
+           END AS "priority"
          FROM offer_service_approvals osa
          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
          JOIN product_masters pm ON pm.id = spo.master_id
          JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
+         ${supplierStatsJoin}
          ${where}
-         ORDER BY osa.created_at DESC
+         ORDER BY
+           CASE
+             WHEN (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending')
+               AND (COALESCE(supplier_stats.approval_rate, 100) < 50 AND COALESCE(supplier_stats.total_count, 0) >= 5)
+               THEN 1
+             WHEN (osa.created_at < NOW() - INTERVAL '2 days' AND osa.approval_status = 'pending')
+               THEN 2
+             ELSE 3
+           END ASC,
+           osa.created_at ASC
          LIMIT $${idx} OFFSET $${idx + 1}`,
         [...params, limit, offset],
       ),
