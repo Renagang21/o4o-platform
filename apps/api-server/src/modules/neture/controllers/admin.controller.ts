@@ -724,8 +724,76 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   /**
+   * GET /admin/approval-integrity-check
+   * WO-NETURE-APPROVAL-OPERATION-STABILIZATION-LITE-V1
+   *
+   * 읽기 전용 정합성 검사: offer ↔ service approval 불일치 탐지.
+   */
+  router.get('/approval-integrity-check', requireAuth, requireNetureScope('neture:admin'), async (_req: Request, res: Response) => {
+    try {
+      // 1. offer vs derived status mismatch
+      const mismatches = await dataSource.query(
+        `SELECT spo.id AS "offerId",
+                spo.approval_status AS "offerStatus",
+                CASE
+                  WHEN bool_or(osa.approval_status = 'approved') THEN 'APPROVED'
+                  WHEN bool_or(osa.approval_status = 'pending') THEN 'PENDING'
+                  ELSE 'REJECTED'
+                END AS "derivedStatus"
+         FROM supplier_product_offers spo
+         JOIN offer_service_approvals osa ON osa.offer_id = spo.id
+         GROUP BY spo.id, spo.approval_status
+         HAVING spo.approval_status != CASE
+           WHEN bool_or(osa.approval_status = 'approved') THEN 'APPROVED'
+           WHEN bool_or(osa.approval_status = 'pending') THEN 'PENDING'
+           ELSE 'REJECTED'
+         END`,
+      );
+
+      // 2. orphan approvals (no matching offer)
+      const orphans = await dataSource.query(
+        `SELECT osa.id, osa.offer_id AS "offerId", osa.service_key AS "serviceKey"
+         FROM offer_service_approvals osa
+         LEFT JOIN supplier_product_offers spo ON spo.id = osa.offer_id
+         WHERE spo.id IS NULL`,
+      );
+
+      // 3. invalid status values
+      const invalidStatus = await dataSource.query(
+        `SELECT id, offer_id AS "offerId", approval_status AS "status"
+         FROM offer_service_approvals
+         WHERE approval_status NOT IN ('pending', 'approved', 'rejected')`,
+      );
+
+      // 4. missing service_key
+      const missingServiceKey = await dataSource.query(
+        `SELECT id, offer_id AS "offerId"
+         FROM offer_service_approvals
+         WHERE service_key IS NULL OR service_key = ''`,
+      );
+
+      const issues = mismatches.length + orphans.length + invalidStatus.length + missingServiceKey.length;
+
+      res.json({
+        success: true,
+        data: {
+          issues,
+          mismatches: { count: mismatches.length, items: mismatches.slice(0, 50) },
+          orphans: { count: orphans.length, items: orphans.slice(0, 50) },
+          invalidStatus: { count: invalidStatus.length, items: invalidStatus.slice(0, 50) },
+          missingServiceKey: { count: missingServiceKey.length, items: missingServiceKey.slice(0, 50) },
+        },
+      });
+    } catch (error) {
+      logger.error('[Neture API] Error checking approval integrity:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to check integrity' } });
+    }
+  });
+
+  /**
    * POST /admin/sync-offer-approvals
    * WO-NETURE-OFFER-SERVICE-APPROVAL-SYNC-V1
+   * WO-NETURE-APPROVAL-OPERATION-STABILIZATION-LITE-V1: 상세 리포트 추가
    *
    * 운영 안정화: 모든 offer의 approval_status를 service approvals 기준으로 재계산.
    * offer_service_approvals가 없는 offer는 skip.
@@ -750,20 +818,34 @@ export function createAdminController(dataSource: DataSource): Router {
 
       let synced = 0;
       let changed = 0;
+      const details: Array<{ offerId: string; before: string; after: string }> = [];
       const errors: string[] = [];
 
       for (const offer of offers) {
         try {
           const result = await approvalService.syncOfferFromServiceApprovals(offer.id, adminUserId, dataSource);
           synced++;
-          if (result.changed) changed++;
+          if (result.changed) {
+            changed++;
+            details.push({ offerId: offer.id, before: result.previousStatus, after: result.derivedStatus });
+          }
         } catch (err: any) {
           errors.push(`${offer.id}: ${err.message}`);
         }
       }
 
       logger.info(`[Admin] Sync offer approvals: ${synced} synced, ${changed} changed, ${errors.length} errors by ${adminUserId}`);
-      res.json({ success: true, data: { total: offers.length, synced, changed, errors: errors.slice(0, 20) } });
+      res.json({
+        success: true,
+        data: {
+          totalOffers: offers.length,
+          synced,
+          updated: changed,
+          unchanged: synced - changed,
+          details: details.slice(0, 100),
+          errors: errors.slice(0, 20),
+        },
+      });
     } catch (error) {
       logger.error('[Neture API] Error syncing offer approvals:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to sync offer approvals' } });
