@@ -90,6 +90,7 @@ export default function ProductServiceApprovalPage() {
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<ApprovalAnalytics | null>(null);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<'all' | '7d' | '30d'>('all');
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -151,15 +152,15 @@ export default function ProductServiceApprovalPage() {
     fetchData(1);
   }, [fetchData]);
 
-  // Fetch analytics once on mount
+  // Fetch analytics (re-fetch on period change)
   useEffect(() => {
-    operatorServiceApprovalApi.analytics().then((data) => {
+    operatorServiceApprovalApi.analytics(analyticsPeriod).then((data) => {
       if (data) {
         setAnalytics(data);
         setShowAnalytics(true);
       }
     });
-  }, []);
+  }, [analyticsPeriod]);
 
   // Search debounce
   const handleSearchChange = (value: string) => {
@@ -277,57 +278,98 @@ export default function ProductServiceApprovalPage() {
         ))}
       </div>
 
-      {/* Analytics Card (WO-NETURE-APPROVAL-ANALYTICS-LITE-V1) */}
+      {/* Analytics Card (WO-NETURE-APPROVAL-ANALYTICS-ENHANCEMENT-V1) */}
       {analytics && (
         <div className="mb-6">
-          <button
-            onClick={() => setShowAnalytics((v) => !v)}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-3 flex items-center gap-1"
-          >
-            <span>{showAnalytics ? '▼' : '▶'}</span>
-            승인 분석
-          </button>
+          <div className="flex items-center gap-3 mb-3">
+            <button
+              onClick={() => setShowAnalytics((v) => !v)}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+            >
+              <span>{showAnalytics ? '▼' : '▶'}</span>
+              승인 분석
+            </button>
+            {showAnalytics && (
+              <div className="flex gap-1">
+                {([['all', '전체'], ['7d', '7일'], ['30d', '30일']] as const).map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setAnalyticsPeriod(key)}
+                    className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+                      analyticsPeriod === key
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {showAnalytics && (
-            <div className="grid grid-cols-3 gap-4">
-              {/* Approval Rate */}
-              <div className="bg-white border border-slate-200 rounded-lg p-4">
-                <div className="text-xs text-slate-400 mb-1">승인율</div>
-                <div className="text-3xl font-bold text-blue-700">{analytics.summary.approvalRate}%</div>
-                <div className="flex gap-3 mt-2 text-xs text-slate-500">
-                  <span>승인 {analytics.summary.approved}</span>
-                  <span>거절 {analytics.summary.rejected}</span>
-                  <span>대기 {analytics.summary.pending}</span>
+            <>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                {/* Approval Rate */}
+                <div className="bg-white border border-slate-200 rounded-lg p-4">
+                  <div className="text-xs text-slate-400 mb-1">승인율</div>
+                  <div className="text-3xl font-bold text-blue-700">{analytics.summary.approvalRate}%</div>
+                  <div className="flex gap-3 mt-2 text-xs text-slate-500">
+                    <span>승인 {analytics.summary.approved}</span>
+                    <span>거절 {analytics.summary.rejected}</span>
+                    <span>대기 {analytics.summary.pending}</span>
+                  </div>
+                </div>
+
+                {/* Avg Processing Time */}
+                <div className="bg-white border border-slate-200 rounded-lg p-4">
+                  <div className="text-xs text-slate-400 mb-1">평균 처리 시간</div>
+                  <div className="text-3xl font-bold text-slate-800">
+                    {analytics.avgProcessingTimeHours > 0
+                      ? `${analytics.avgProcessingTimeHours}h`
+                      : '-'}
+                  </div>
+                  <div className="text-xs text-slate-400 mt-2">승인/거절 결정까지 소요</div>
+                </div>
+
+                {/* Top Rejection Reasons */}
+                <div className="bg-white border border-slate-200 rounded-lg p-4">
+                  <div className="text-xs text-slate-400 mb-2">반려 사유 TOP</div>
+                  {analytics.topRejectionReasons.length > 0 ? (
+                    <ul className="space-y-1">
+                      {analytics.topRejectionReasons.map((r, i) => (
+                        <li key={i} className="flex items-center justify-between text-sm">
+                          <span className="text-slate-600 truncate mr-2">{r.reason}</span>
+                          <span className="text-slate-400 text-xs shrink-0">{r.count}건</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="text-sm text-slate-400">반려 내역 없음</div>
+                  )}
                 </div>
               </div>
 
-              {/* Avg Processing Time */}
-              <div className="bg-white border border-slate-200 rounded-lg p-4">
-                <div className="text-xs text-slate-400 mb-1">평균 처리 시간</div>
-                <div className="text-3xl font-bold text-slate-800">
-                  {analytics.avgProcessingTimeHours > 0
-                    ? `${analytics.avgProcessingTimeHours}h`
-                    : '-'}
-                </div>
-                <div className="text-xs text-slate-400 mt-2">승인/거절 결정까지 소요</div>
-              </div>
-
-              {/* Top Rejection Reasons */}
-              <div className="bg-white border border-slate-200 rounded-lg p-4">
-                <div className="text-xs text-slate-400 mb-2">반려 사유 TOP</div>
-                {analytics.topRejectionReasons.length > 0 ? (
-                  <ul className="space-y-1">
-                    {analytics.topRejectionReasons.map((r, i) => (
-                      <li key={i} className="flex items-center justify-between text-sm">
-                        <span className="text-slate-600 truncate mr-2">{r.reason}</span>
-                        <span className="text-slate-400 text-xs shrink-0">{r.count}건</span>
-                      </li>
+              {/* Supplier Approval Rates */}
+              {analytics.supplierApprovalRates.length > 0 && (
+                <div className="bg-white border border-slate-200 rounded-lg p-4">
+                  <div className="text-xs text-slate-400 mb-2">공급자별 승인율</div>
+                  <div className="space-y-1.5">
+                    {analytics.supplierApprovalRates.map((s) => (
+                      <div key={s.supplierId} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-700 truncate mr-3">{s.supplierName}</span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className={`font-medium ${s.approvalRate >= 80 ? 'text-green-600' : s.approvalRate >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
+                            {s.approvalRate}%
+                          </span>
+                          <span className="text-slate-400 text-xs">({s.total}건)</span>
+                        </div>
+                      </div>
                     ))}
-                  </ul>
-                ) : (
-                  <div className="text-sm text-slate-400">반려 내역 없음</div>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

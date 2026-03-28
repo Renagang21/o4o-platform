@@ -73,34 +73,63 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
 
   /**
    * GET /approval-analytics
-   * WO-NETURE-APPROVAL-ANALYTICS-LITE-V1: 승인율 + 반려 사유 TOP + 처리 시간
+   * WO-NETURE-APPROVAL-ANALYTICS-LITE-V1 + ENHANCEMENT-V1
+   * Query: ?period=all|7d|30d (default: all)
    */
-  router.get('/approval-analytics', async (_req: Request, res: Response): Promise<void> => {
+  router.get('/approval-analytics', async (req: Request, res: Response): Promise<void> => {
     try {
-      const [summaryRows, reasonRows, avgTimeRows] = await Promise.all([
+      const period = (req.query.period as string) || 'all';
+      const periodClause =
+        period === '7d'
+          ? `AND osa.created_at >= NOW() - INTERVAL '7 days'`
+          : period === '30d'
+            ? `AND osa.created_at >= NOW() - INTERVAL '30 days'`
+            : '';
+
+      const [summaryRows, reasonRows, avgTimeRows, supplierRows] = await Promise.all([
         dataSource.query(`
           SELECT
             COUNT(*)::int AS total,
-            COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS approved,
-            COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS rejected,
-            COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS pending
-          FROM offer_service_approvals
-          WHERE service_key = 'neture'
+            COUNT(*) FILTER (WHERE osa.approval_status = 'approved')::int AS approved,
+            COUNT(*) FILTER (WHERE osa.approval_status = 'rejected')::int AS rejected,
+            COUNT(*) FILTER (WHERE osa.approval_status = 'pending')::int AS pending
+          FROM offer_service_approvals osa
+          WHERE osa.service_key = 'neture' ${periodClause}
         `),
         dataSource.query(`
-          SELECT reason, COUNT(*)::int AS count
-          FROM offer_service_approvals
-          WHERE service_key = 'neture'
-            AND approval_status = 'rejected'
-            AND reason IS NOT NULL AND reason != ''
-          GROUP BY reason
+          SELECT osa.reason, COUNT(*)::int AS count
+          FROM offer_service_approvals osa
+          WHERE osa.service_key = 'neture'
+            AND osa.approval_status = 'rejected'
+            AND osa.reason IS NOT NULL AND osa.reason != ''
+            ${periodClause}
+          GROUP BY osa.reason
           ORDER BY count DESC
           LIMIT 5
         `),
         dataSource.query(`
-          SELECT ROUND(AVG(EXTRACT(EPOCH FROM (decided_at - created_at)) / 3600)::numeric, 1) AS avg_hours
-          FROM offer_service_approvals
-          WHERE service_key = 'neture' AND decided_at IS NOT NULL
+          SELECT ROUND(AVG(EXTRACT(EPOCH FROM (osa.decided_at - osa.created_at)) / 3600)::numeric, 1) AS avg_hours
+          FROM offer_service_approvals osa
+          WHERE osa.service_key = 'neture' AND osa.decided_at IS NOT NULL ${periodClause}
+        `),
+        dataSource.query(`
+          SELECT
+            spo.supplier_id AS "supplierId",
+            COALESCE(ns.company_name, 'Unknown') AS "supplierName",
+            COUNT(*)::int AS total,
+            COUNT(*) FILTER (WHERE osa.approval_status = 'approved')::int AS approved,
+            ROUND(
+              COUNT(*) FILTER (WHERE osa.approval_status = 'approved')::numeric
+              / NULLIF(COUNT(*), 0) * 100, 1
+            ) AS "approvalRate"
+          FROM offer_service_approvals osa
+          JOIN supplier_product_offers spo ON spo.id = osa.offer_id
+          LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          WHERE osa.service_key = 'neture' ${periodClause}
+          GROUP BY spo.supplier_id, ns.company_name
+          HAVING COUNT(*) >= 3
+          ORDER BY "approvalRate" DESC
+          LIMIT 10
         `),
       ]);
 
@@ -113,6 +142,12 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           summary: { ...s, approvalRate },
           topRejectionReasons: reasonRows,
           avgProcessingTimeHours: parseFloat(avgTimeRows[0]?.avg_hours) || 0,
+          supplierApprovalRates: supplierRows.map((r: any) => ({
+            supplierId: r.supplierId,
+            supplierName: r.supplierName,
+            approvalRate: parseFloat(r.approvalRate) || 0,
+            total: r.total,
+          })),
         },
       });
     } catch (error) {

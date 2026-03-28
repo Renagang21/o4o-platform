@@ -41,11 +41,12 @@ export interface ServiceApprovalStats {
   todayPending: number; // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
 }
 
-// WO-NETURE-APPROVAL-ANALYTICS-LITE-V1
+// WO-NETURE-APPROVAL-ANALYTICS-LITE-V1 + ENHANCEMENT-V1
 export interface ApprovalAnalytics {
   summary: { total: number; approved: number; rejected: number; pending: number; approvalRate: number };
   topRejectionReasons: Array<{ reason: string; count: number }>;
   avgProcessingTimeHours: number;
+  supplierApprovalRates: Array<{ supplierId: string; supplierName: string; approvalRate: number; total: number }>;
 }
 
 export const operatorServiceApprovalApi = {
@@ -134,10 +135,11 @@ export const operatorServiceApprovalApi = {
     }
   },
 
-  // WO-NETURE-APPROVAL-ANALYTICS-LITE-V1
-  async analytics(): Promise<ApprovalAnalytics | null> {
+  // WO-NETURE-APPROVAL-ANALYTICS-LITE-V1 + ENHANCEMENT-V1
+  async analytics(period?: string): Promise<ApprovalAnalytics | null> {
     try {
-      const response = await api.get('/neture/operator/approval-analytics');
+      const qs = period && period !== 'all' ? `?period=${period}` : '';
+      const response = await api.get(`/neture/operator/approval-analytics${qs}`);
       return response.data?.data || null;
     } catch {
       return null;
