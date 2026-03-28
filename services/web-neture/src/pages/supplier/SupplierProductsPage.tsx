@@ -14,7 +14,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Sparkles, ImagePlus, X, Eye } from 'lucide-react';
+import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send } from 'lucide-react';
 import {
   EditableDataTable,
   SearchBar,
@@ -30,12 +30,6 @@ const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; bg: string
   CATALOG: { label: '정보 제공', bg: 'bg-slate-100', text: 'text-slate-600' },
   APPLICATION: { label: '신청 가능', bg: 'bg-blue-50', text: 'text-blue-700' },
   ACTIVE_SALES: { label: '판매 중', bg: 'bg-green-50', text: 'text-green-700' },
-};
-
-const APPROVAL_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  approved: { label: '승인', bg: 'bg-green-50', text: 'text-green-700' },
-  pending: { label: '대기', bg: 'bg-amber-50', text: 'text-amber-700' },
-  rejected: { label: '거부', bg: 'bg-red-50', text: 'text-red-700' },
 };
 
 // ─── Regulatory type labels (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
@@ -311,6 +305,122 @@ function RegulatoryInfoModal({
   );
 }
 
+// ─── Service Key Select Modal (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
+
+const AVAILABLE_SERVICES = [
+  { key: 'neture', name: 'Neture' },
+  { key: 'glycopharm', name: 'GlycoPharm' },
+  { key: 'glucoseview', name: 'GlucoseView' },
+  { key: 'kpa-society', name: 'KPA Society' },
+  { key: 'k-cosmetics', name: 'K-Cosmetics' },
+];
+
+function ServiceKeySelectModal({
+  selectedCount,
+  onClose,
+  onSubmit,
+}: {
+  selectedCount: number;
+  onClose: () => void;
+  onSubmit: (serviceKeys: string[]) => void;
+}) {
+  const [chosen, setChosen] = useState<Set<string>>(new Set(['neture']));
+  const [submitting, setSubmitting] = useState(false);
+
+  const toggle = (key: string) => {
+    setChosen((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (chosen.size === 0) return;
+    setSubmitting(true);
+    await onSubmit(Array.from(chosen));
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-[420px]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-900">승인 요청</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
+        </div>
+
+        <p className="text-sm text-slate-600 mb-4">
+          선택한 <strong>{selectedCount}개</strong> 상품을 아래 서비스에 승인 요청합니다.
+        </p>
+
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {AVAILABLE_SERVICES.map((svc) => {
+            const selected = chosen.has(svc.key);
+            return (
+              <label
+                key={svc.key}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                  selected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected}
+                  onChange={() => toggle(svc.key)}
+                  className="w-4 h-4 text-emerald-600 rounded"
+                />
+                <span className="text-sm font-medium">{svc.name}</span>
+              </label>
+            );
+          })}
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} disabled={submitting} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">
+            취소
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={chosen.size === 0 || submitting}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
+          >
+            <Send size={14} />
+            {submitting ? '요청 중...' : '승인 요청'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Approval status helper (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
+
+function deriveSubmissionStatus(product: SupplierProduct): { label: string; bg: string; text: string } {
+  const approvals = product.serviceApprovals || [];
+
+  // offer-level APPROVED (legacy) 우선
+  if (product.approvalStatus === 'APPROVED') {
+    return { label: '승인', bg: 'bg-green-50', text: 'text-green-700' };
+  }
+
+  if (approvals.length === 0) {
+    return { label: '미요청', bg: 'bg-slate-100', text: 'text-slate-500' };
+  }
+
+  const hasRejected = approvals.some((a) => a.status === 'rejected');
+  if (hasRejected) {
+    return { label: '거절', bg: 'bg-red-50', text: 'text-red-700' };
+  }
+
+  const allApproved = approvals.every((a) => a.status === 'approved');
+  if (allApproved) {
+    return { label: '승인', bg: 'bg-green-50', text: 'text-green-700' };
+  }
+
+  return { label: '심사중', bg: 'bg-amber-50', text: 'text-amber-700' };
+}
+
 // ─── Column definitions ───
 
 const baseColumns: ListColumnDef<SupplierProduct>[] = [
@@ -454,10 +564,10 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
   {
     key: 'approvalStatus',
     header: '승인',
-    width: '60px',
+    width: '70px',
     align: 'center',
-    render: (v: string) => {
-      const cfg = APPROVAL_CONFIG[v] || { label: v || '-', bg: 'bg-slate-50', text: 'text-slate-600' };
+    render: (_v: string, row: SupplierProduct) => {
+      const cfg = deriveSubmissionStatus(row);
       return (
         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${cfg.bg} ${cfg.text}`}>
           {cfg.label}
@@ -533,6 +643,7 @@ export default function SupplierProductsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   // Filter state
@@ -540,6 +651,7 @@ export default function SupplierProductsPage() {
   const [filterHasDescription, setFilterHasDescription] = useState('');
   const [filterBarcodeSource, setFilterBarcodeSource] = useState('');
   const [filterCompleteness, setFilterCompleteness] = useState('');
+  const [filterSubmission, setFilterSubmission] = useState<'' | 'not_submitted' | 'pending' | 'approved'>('');
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
@@ -856,6 +968,18 @@ export default function SupplierProductsPage() {
     }
   }, [products, autoNext, loading]);
 
+  // Client-side submission status filter (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1)
+  const filteredProducts = useMemo(() => {
+    if (!filterSubmission) return products;
+    return products.filter((p) => {
+      const status = deriveSubmissionStatus(p);
+      if (filterSubmission === 'not_submitted') return status.label === '미요청';
+      if (filterSubmission === 'pending') return status.label === '심사중';
+      if (filterSubmission === 'approved') return status.label === '승인';
+      return true;
+    });
+  }, [products, filterSubmission]);
+
   const handleSearch = useCallback((value: string) => {
     fetchProducts(1, value);
   }, [fetchProducts]);
@@ -937,6 +1061,10 @@ export default function SupplierProductsPage() {
         <FilterChip label="미완성" active={filterCompleteness === 'INCOMPLETE'} onClick={() => toggleFilter(setFilterCompleteness, 'INCOMPLETE', filterCompleteness)} />
         <FilterChip label="완성" active={filterCompleteness === 'READY'} onClick={() => toggleFilter(setFilterCompleteness, 'READY', filterCompleteness)} />
         <span className="w-px h-4 bg-slate-300" />
+        <FilterChip label="미요청" active={filterSubmission === 'not_submitted'} onClick={() => setFilterSubmission(prev => prev === 'not_submitted' ? '' : 'not_submitted')} />
+        <FilterChip label="심사중" active={filterSubmission === 'pending'} onClick={() => setFilterSubmission(prev => prev === 'pending' ? '' : 'pending')} />
+        <FilterChip label="승인완료" active={filterSubmission === 'approved'} onClick={() => setFilterSubmission(prev => prev === 'approved' ? '' : 'approved')} />
+        <span className="w-px h-4 bg-slate-300" />
         <button
           onClick={() => setAutoNext(prev => !prev)}
           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
@@ -951,6 +1079,13 @@ export default function SupplierProductsPage() {
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 mb-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
           <span className="text-sm text-blue-700 font-medium">{selectedIds.size}개 선택</span>
+          <button
+            onClick={() => setShowApprovalModal(true)}
+            className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded"
+          >
+            <Send size={13} />
+            승인 요청
+          </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
@@ -987,7 +1122,7 @@ export default function SupplierProductsPage() {
             ),
           } as any,
         ]}
-        data={products}
+        data={filteredProducts}
         rowKey="id"
         loading={loading}
         emptyMessage="등록된 제품이 없습니다"
@@ -1067,6 +1202,23 @@ export default function SupplierProductsPage() {
         <RegulatoryInfoModal
           product={regulatoryProduct}
           onClose={() => setRegulatoryProduct(null)}
+        />
+      )}
+      {showApprovalModal && (
+        <ServiceKeySelectModal
+          selectedCount={selectedIds.size}
+          onClose={() => setShowApprovalModal(false)}
+          onSubmit={async (serviceKeys) => {
+            const result = await supplierApi.submitForApproval(Array.from(selectedIds), serviceKeys);
+            setShowApprovalModal(false);
+            if (result.success && result.data) {
+              showToast(`${result.data.submitted}건 승인 요청 완료${result.data.errors.length > 0 ? ` (${result.data.errors.length}건 실패)` : ''}`);
+            } else {
+              showToast('승인 요청 실패');
+            }
+            setSelectedIds(new Set());
+            await fetchProducts(pagination.page);
+          }}
         />
       )}
 

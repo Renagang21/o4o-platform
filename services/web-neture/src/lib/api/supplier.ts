@@ -516,6 +516,20 @@ export const supplierApi = {
     }
   },
 
+  /** WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1: 승인 요청 */
+  async submitForApproval(
+    offerIds: string[],
+    serviceKeys: string[],
+  ): Promise<{ success: boolean; data?: { submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }; error?: string }> {
+    try {
+      const response = await api.post('/neture/supplier/products/submit-approval', { offerIds, serviceKeys });
+      return response.data;
+    } catch (error) {
+      console.warn('[Supplier API] Failed to submit for approval:', error);
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
   async createProduct(data: {
     barcode?: string;
     marketingName?: string;

@@ -246,6 +246,57 @@ export class NetureOfferService {
     }
   }
 
+  // ==================== Supplier: Submit for Approval (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ====================
+
+  /**
+   * POST /supplier/products/submit-approval
+   * 선택된 offer들에 대해 서비스별 승인 레코드를 생성하고 serviceKeys를 업데이트한다.
+   */
+  async submitForApproval(
+    supplierId: string,
+    offerIds: string[],
+    serviceKeys: string[],
+  ): Promise<{ submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }> {
+    const approvalService = new OfferServiceApprovalService(AppDataSource);
+    const result = { submitted: 0, skipped: 0, errors: [] as Array<{ id: string; error: string }> };
+
+    // 소유권 일괄 확인
+    const ownedRows: Array<{ id: string }> = await AppDataSource.query(
+      `SELECT id FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2`,
+      [offerIds, supplierId],
+    );
+    const ownedSet = new Set(ownedRows.map((r) => r.id));
+
+    for (const offerId of offerIds) {
+      if (!ownedSet.has(offerId)) {
+        result.errors.push({ id: offerId, error: 'NOT_OWNED' });
+        continue;
+      }
+
+      try {
+        await approvalService.createPendingApprovals(offerId, serviceKeys);
+
+        // service_keys 병합 업데이트
+        await AppDataSource.query(
+          `UPDATE supplier_product_offers
+           SET service_keys = (
+             SELECT ARRAY(SELECT DISTINCT unnest(service_keys || $2::text[]))
+           ), updated_at = NOW()
+           WHERE id = $1`,
+          [offerId, serviceKeys],
+        );
+
+        result.submitted++;
+      } catch (error) {
+        logger.error(`[NetureOfferService] submitForApproval failed for ${offerId}:`, error);
+        result.errors.push({ id: offerId, error: 'INTERNAL_ERROR' });
+      }
+    }
+
+    logger.info(`[NetureOfferService] submitForApproval: submitted=${result.submitted}, skipped=${result.skipped}, errors=${result.errors.length}`);
+    return result;
+  }
+
   /**
    * GET /admin/products — 전체 상품 목록 (필터)
    */

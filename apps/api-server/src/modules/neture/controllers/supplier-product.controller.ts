@@ -83,6 +83,31 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // POST /supplier/products/submit-approval (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1)
+  // 주의: /products/:id 보다 먼저 등록해야 'submit-approval'이 :id로 매칭되지 않음
+  router.post('/products/submit-approval', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { offerIds, serviceKeys } = req.body;
+
+      if (!Array.isArray(offerIds) || offerIds.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_OFFER_IDS', message: 'offerIds array is required' });
+      }
+      if (offerIds.length > 100) {
+        return res.status(400).json({ success: false, error: 'TOO_MANY_OFFERS', message: 'Max 100 offers per request' });
+      }
+      if (!Array.isArray(serviceKeys) || serviceKeys.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS', message: 'serviceKeys array is required' });
+      }
+
+      const result = await netureService.submitForApproval(supplierId, offerIds, serviceKeys);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error submitting for approval:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to submit for approval' });
+    }
+  });
+
   // DELETE /supplier/products/bulk (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1)
   // 주의: /products/:id 보다 먼저 등록해야 'bulk'가 :id로 매칭되지 않음
   router.delete('/products/bulk', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {

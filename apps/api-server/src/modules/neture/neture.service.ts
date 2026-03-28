@@ -255,6 +255,11 @@ export class NetureService {
     return this.offerService.bulkDeleteOffers(...args);
   }
 
+  /** WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1 */
+  async submitForApproval(supplierId: string, offerIds: string[], serviceKeys: string[]) {
+    return this.offerService.submitForApproval(supplierId, offerIds, serviceKeys);
+  }
+
   async createSupplierOffer(
     supplierId: string,
     data: {
