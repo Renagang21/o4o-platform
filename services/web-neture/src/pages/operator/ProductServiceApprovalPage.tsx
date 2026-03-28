@@ -118,8 +118,12 @@ export default function ProductServiceApprovalPage() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [analyticsPeriod, setAnalyticsPeriod] = useState<'all' | '7d' | '30d'>('all');
 
-  // Filters
-  const [statusFilter, setStatusFilter] = useState('all');
+  // Filters — URL param으로 초기 상태 결정 (Dashboard 링크 연동)
+  const [statusFilter, setStatusFilter] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get('status');
+    return s && ['pending', 'approved', 'rejected'].includes(s) ? s : 'all';
+  });
   const [serviceFilter, setServiceFilter] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
