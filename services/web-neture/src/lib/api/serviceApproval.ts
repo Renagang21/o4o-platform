@@ -41,6 +41,13 @@ export interface ServiceApprovalStats {
   todayPending: number; // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1
 }
 
+// WO-NETURE-APPROVAL-ANALYTICS-LITE-V1
+export interface ApprovalAnalytics {
+  summary: { total: number; approved: number; rejected: number; pending: number; approvalRate: number };
+  topRejectionReasons: Array<{ reason: string; count: number }>;
+  avgProcessingTimeHours: number;
+}
+
 export const operatorServiceApprovalApi = {
   async list(params?: {
     status?: string;
@@ -124,6 +131,16 @@ export const operatorServiceApprovalApi = {
       return response.data;
     } catch (err: any) {
       return { success: false, error: err?.response?.data?.error || 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-NETURE-APPROVAL-ANALYTICS-LITE-V1
+  async analytics(): Promise<ApprovalAnalytics | null> {
+    try {
+      const response = await api.get('/neture/operator/approval-analytics');
+      return response.data?.data || null;
+    } catch {
+      return null;
     }
   },
 };

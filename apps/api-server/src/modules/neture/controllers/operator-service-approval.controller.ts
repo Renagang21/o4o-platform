@@ -6,8 +6,9 @@
  *
  * 서비스 레벨 상품 승인 관리 — Neture Operator 전용.
  *
- * GET  /service-approvals       — 페이지네이션 목록 (검색 + 기간 필터)
- * GET  /service-approvals/stats — 상태별 카운트 + todayPending
+ * GET  /service-approvals            — 페이지네이션 목록 (검색 + 기간 필터)
+ * GET  /service-approvals/stats      — 상태별 카운트 + todayPending
+ * GET  /approval-analytics           — 승인율 + 반려 사유 TOP + 평균 처리 시간
  * PATCH /service-approvals/:id/approve
  * PATCH /service-approvals/:id/reject  — body: { reason? }
  * POST /service-approvals/batch-approve — body: { ids }
@@ -66,6 +67,54 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
       res.json({ success: true, data: stats });
     } catch (error) {
       logger.error('[OperatorServiceApproval] Error fetching stats:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * GET /approval-analytics
+   * WO-NETURE-APPROVAL-ANALYTICS-LITE-V1: 승인율 + 반려 사유 TOP + 처리 시간
+   */
+  router.get('/approval-analytics', async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const [summaryRows, reasonRows, avgTimeRows] = await Promise.all([
+        dataSource.query(`
+          SELECT
+            COUNT(*)::int AS total,
+            COUNT(*) FILTER (WHERE approval_status = 'approved')::int AS approved,
+            COUNT(*) FILTER (WHERE approval_status = 'rejected')::int AS rejected,
+            COUNT(*) FILTER (WHERE approval_status = 'pending')::int AS pending
+          FROM offer_service_approvals
+          WHERE service_key = 'neture'
+        `),
+        dataSource.query(`
+          SELECT COALESCE(reason, '사유 미입력') AS reason, COUNT(*)::int AS count
+          FROM offer_service_approvals
+          WHERE service_key = 'neture' AND approval_status = 'rejected'
+          GROUP BY COALESCE(reason, '사유 미입력')
+          ORDER BY count DESC
+          LIMIT 5
+        `),
+        dataSource.query(`
+          SELECT ROUND(AVG(EXTRACT(EPOCH FROM (decided_at - created_at)) / 3600)::numeric, 1) AS avg_hours
+          FROM offer_service_approvals
+          WHERE service_key = 'neture' AND decided_at IS NOT NULL
+        `),
+      ]);
+
+      const s = summaryRows[0] || { total: 0, approved: 0, rejected: 0, pending: 0 };
+      const approvalRate = s.total > 0 ? Math.round((s.approved / s.total) * 100) : 0;
+
+      res.json({
+        success: true,
+        data: {
+          summary: { ...s, approvalRate },
+          topRejectionReasons: reasonRows,
+          avgProcessingTimeHours: parseFloat(avgTimeRows[0]?.avg_hours) || 0,
+        },
+      });
+    } catch (error) {
+      logger.error('[OperatorServiceApproval] Error fetching analytics:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }
   });

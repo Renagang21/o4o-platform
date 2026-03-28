@@ -18,6 +18,7 @@ import {
   operatorServiceApprovalApi,
   type ServiceApprovalItem,
   type ServiceApprovalStats,
+  type ApprovalAnalytics,
 } from '../../lib/api/serviceApproval';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -87,6 +88,8 @@ export default function ProductServiceApprovalPage() {
   const [pagination, setPagination] = useState({ page: 1, limit: 30, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [analytics, setAnalytics] = useState<ApprovalAnalytics | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('all');
@@ -147,6 +150,16 @@ export default function ProductServiceApprovalPage() {
   useEffect(() => {
     fetchData(1);
   }, [fetchData]);
+
+  // Fetch analytics once on mount
+  useEffect(() => {
+    operatorServiceApprovalApi.analytics().then((data) => {
+      if (data) {
+        setAnalytics(data);
+        setShowAnalytics(true);
+      }
+    });
+  }, []);
 
   // Search debounce
   const handleSearchChange = (value: string) => {
@@ -263,6 +276,61 @@ export default function ProductServiceApprovalPage() {
           </div>
         ))}
       </div>
+
+      {/* Analytics Card (WO-NETURE-APPROVAL-ANALYTICS-LITE-V1) */}
+      {analytics && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowAnalytics((v) => !v)}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium mb-3 flex items-center gap-1"
+          >
+            <span>{showAnalytics ? '▼' : '▶'}</span>
+            승인 분석
+          </button>
+          {showAnalytics && (
+            <div className="grid grid-cols-3 gap-4">
+              {/* Approval Rate */}
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <div className="text-xs text-slate-400 mb-1">승인율</div>
+                <div className="text-3xl font-bold text-blue-700">{analytics.summary.approvalRate}%</div>
+                <div className="flex gap-3 mt-2 text-xs text-slate-500">
+                  <span>승인 {analytics.summary.approved}</span>
+                  <span>거절 {analytics.summary.rejected}</span>
+                  <span>대기 {analytics.summary.pending}</span>
+                </div>
+              </div>
+
+              {/* Avg Processing Time */}
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <div className="text-xs text-slate-400 mb-1">평균 처리 시간</div>
+                <div className="text-3xl font-bold text-slate-800">
+                  {analytics.avgProcessingTimeHours > 0
+                    ? `${analytics.avgProcessingTimeHours}h`
+                    : '-'}
+                </div>
+                <div className="text-xs text-slate-400 mt-2">승인/거절 결정까지 소요</div>
+              </div>
+
+              {/* Top Rejection Reasons */}
+              <div className="bg-white border border-slate-200 rounded-lg p-4">
+                <div className="text-xs text-slate-400 mb-2">반려 사유 TOP</div>
+                {analytics.topRejectionReasons.length > 0 ? (
+                  <ul className="space-y-1">
+                    {analytics.topRejectionReasons.map((r, i) => (
+                      <li key={i} className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600 truncate mr-2">{r.reason}</span>
+                        <span className="text-slate-400 text-xs shrink-0">{r.count}건</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-sm text-slate-400">반려 내역 없음</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
