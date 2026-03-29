@@ -1,67 +1,59 @@
-# KPA-a 사이버 공간 템플릿 갤러리
+# Plan: WO-O4O-NETURE-CSV-APPLY-VISIBILITY-FIX-V1
 
-## 개요
+## 현재 상태 분석
 
-약국이 사이버 공간(온라인 매장)에서 사용할 디자인 템플릿을 미리보기하고 선택하는 갤러리 페이지를 만든다.
+- Apply 버튼은 이미 **배치 상세 모달 내부에만** 존재 (line 743-751)
+- READY 상태가 VALID/VALIDATED와 동일한 **초록색** — 완료된 것처럼 보임
+- 배치 리스트 테이블에서는 Apply 없이 상세 모달을 열어야만 적용 가능
+- 업로드 후 안내 문구 없음 → 사용자가 "업로드 = 등록"으로 오해
 
-## 채널 4종 × 디자인 4종 = 16개 템플릿
+## 변경 대상: 1개 파일
 
-### 채널 타입
-| 채널 | 설명 | 화면 특성 |
-|------|------|-----------|
-| 블로그 | 약국 건강정보 블로그 | 콘텐츠 중심, 카드형 기사 목록 |
-| 태블릿 | 매장 내 태블릿 디스플레이 | 터치 최적화, 큰 버튼, 스와이프 |
-| 전자상거래 | B2C 온라인 쇼핑몰 | 상품 그리드, 카트, 프로모션 |
-| 키오스크 | 무인 안내/주문 키오스크 | 세로형, 단계별 플로우, 큰 터치 영역 |
+### `services/web-neture/src/pages/supplier/SupplierCsvImportPage.tsx`
 
-### 디자인 스타일
-| 스타일 | 키워드 | 컬러 톤 |
-|--------|--------|---------|
-| 현대적 (Modern) | 깔끔한 선, 볼드 타이포, 그라디언트 | #0F172A → #3B82F6 |
-| 감성적 (Emotional) | 따뜻한 색, 둥근 모서리, 부드러운 그림자 | #F59E0B → #EC4899 |
-| 건조한 (Dry) | 초미니멀, 흑백, 날카로운 모서리, 데이터 중심 | #000000 → #6B7280 |
-| 전문적 (Professional) | 의료/약국 전문, 신뢰감, 구조적 | #059669 → #0D9488 |
+### A. 배치 리스트에 Apply 버튼 노출
 
-## 파일 구조
+배치 테이블 행의 우측 버튼 영역(line 523-538)에 READY 상태일 때 `[적용하기]` 버튼 추가.
+- 새로운 `handleQuickApply(batchId, e)` 함수 추가
+- applyBatch API 호출 → 성공 시 alert로 결과 표시 + loadBatches() 새로고침
 
+### B. 상태 표시 개선
+
+**B-1.** StatusBadge에서 READY 색상 변경: 초록 → **주황색(amber)** (상품 생성 전 상태를 시각적으로 구분)
 ```
-services/web-kpa-society/src/pages/pharmacy/
-├── CyberTemplateGalleryPage.tsx    ← 메인 갤러리 페이지 (NEW)
-├── templates/                      ← 템플릿 미리보기 컴포넌트 (NEW)
-│   ├── index.ts
-│   ├── BlogTemplates.tsx           ← 블로그 4종 미리보기
-│   ├── TabletTemplates.tsx         ← 태블릿 4종 미리보기
-│   ├── EcommerceTemplates.tsx      ← 전자상거래 4종 미리보기
-│   └── KioskTemplates.tsx          ← 키오스크 4종 미리보기
+READY: 'bg-amber-100 text-amber-800'  // 기존: 'bg-green-100 text-green-800'
 ```
 
-## 페이지 구조
+**B-2.** StatusBadge에서 READY 텍스트를 `생성 대기`로 표시하도록 label 매핑 추가
 
-### CyberTemplateGalleryPage.tsx
-- 경로: `/pharmacy/store/cyber-templates`
-- 상단: 채널 타입 탭 (블로그 | 태블릿 | 전자상거래 | 키오스크)
-- 본문: 선택된 채널의 4가지 디자인 미리보기 카드 그리드 (2×2)
-- 각 카드: 축소된 미리보기 + 스타일명 + 설명 + "미리보기" 버튼
-- 미리보기 모달: 클릭 시 확대된 미리보기 표시
-- 하단: "이 템플릿 적용" 버튼 (현재는 선택만, 실제 적용은 향후)
+### C. 업로드 영역 하단 안내 메시지
 
-### 각 템플릿 미리보기 컴포넌트
-- 순수 CSS/React로 만든 mock 디자인
-- 실제 데이터 없이 더미 콘텐츠로 디자인만 표현
-- 각 스타일별 고유 색상/레이아웃/타이포그래피
+Section 2 (Upload) 하단에 상시 안내 추가:
+```
+업로드 후 '적용하기'를 눌러야 상품이 생성됩니다.
+```
 
-## 라우팅 변경
+### D. 배치 리스트에서 직접 Apply 시 피드백
 
-1. `StoreManagementLayout.tsx`: 사이드바에 "사이버 공간" 메뉴 추가
-2. `App.tsx`: `/pharmacy/store/cyber-templates` 라우트 추가
-3. `pharmacy/index.ts`: export 추가
+리스트에서 Apply 클릭 시:
+- 성공: `"상품 N건이 생성되었습니다"` alert
+- 부분 성공: `"N건 성공, M건 실패"` alert
+- 실패: `"상품 생성에 실패했습니다"` alert
 
-## 구현 순서
+### E. 빈 상품 리스트 안내
 
-1. 블로그 템플릿 4종 (BlogTemplates.tsx)
-2. 태블릿 템플릿 4종 (TabletTemplates.tsx)
-3. 전자상거래 템플릿 4종 (EcommerceTemplates.tsx)
-4. 키오스크 템플릿 4종 (KioskTemplates.tsx)
-5. 갤러리 메인 페이지 (CyberTemplateGalleryPage.tsx)
-6. 라우팅/사이드바 연결
-7. 커밋 & 푸시
+변경하지 않음 — CSV import 페이지 자체에서 충분히 가이드.
+
+### F. 자동 이동
+
+배치 리스트에서 Apply 성공 후 자동 이동 않음 (배치 상태가 APPLIED로 바뀌어 시각적 확인 충분).
+
+## 요약
+
+| 항목 | 변경 내용 |
+|------|----------|
+| Apply 버튼 | 배치 리스트 테이블 행에 READY 상태 시 노출 |
+| READY 색상 | 초록 → 주황(amber) |
+| READY 텍스트 | `READY` → `생성 대기` |
+| 안내 문구 | 업로드 영역 하단에 상시 표시 |
+| 피드백 | Apply 결과를 alert로 표시 |
