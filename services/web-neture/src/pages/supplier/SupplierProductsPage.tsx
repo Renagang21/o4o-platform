@@ -909,6 +909,7 @@ export default function SupplierProductsPage() {
       align: 'center',
       render: (_v: any, row: SupplierProduct) => (
         <button
+          type="button"
           onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
           className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
           title="상세 보기"
@@ -918,7 +919,7 @@ export default function SupplierProductsPage() {
       ),
     };
 
-    return [selectCol, ...cols, detailCol];
+    return [selectCol, detailCol, ...cols];
   }, [products, selectedIds, highlightRowId]);
 
   const handleGenerateAiTags = async (masterId: string) => {
@@ -1166,6 +1167,7 @@ export default function SupplierProductsPage() {
             align: 'center',
             render: (_v: string, row: SupplierProduct) => (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); handleGenerateAiTags(row.masterId); }}
                 disabled={generatingTagFor === row.masterId}
                 className="p-1 rounded hover:bg-blue-50 text-blue-600 disabled:opacity-50 disabled:animate-pulse"
