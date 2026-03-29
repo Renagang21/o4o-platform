@@ -59,6 +59,25 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
     }
   });
 
+  // POST /:productId/ai-tags/suggest — AI 태그 추천 (non-destructive, WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1)
+  router.post('/:productId/ai-tags/suggest', authenticate, async (req, res) => {
+    try {
+      const { productId } = req.params;
+
+      const product = await loadProductTagInput(dataSource, productId);
+      if (!product) {
+        res.status(404).json({ success: false, error: 'Product not found' });
+        return;
+      }
+
+      const suggestions = await taggingService.suggestTags(product);
+      res.json({ success: true, data: { suggestions } });
+    } catch (error) {
+      console.error('[ProductAiTag] suggest error:', error);
+      res.status(500).json({ success: false, error: 'Failed to suggest tags' });
+    }
+  });
+
   // POST /:productId/ai-tags/manual — 수동 태그 추가
   router.post('/:productId/ai-tags/manual', authenticate, async (req, res) => {
     try {
@@ -78,6 +97,35 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
     }
   });
 
+  // POST /:productId/ai-tags/manual/batch — V2: 수동 태그 일괄 추가
+  router.post('/:productId/ai-tags/manual/batch', authenticate, async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const { tags } = req.body;
+
+      if (!Array.isArray(tags) || tags.length === 0) {
+        res.status(400).json({ success: false, error: 'Tags array is required' });
+        return;
+      }
+
+      const trimmed = tags
+        .filter((t: unknown) => typeof t === 'string' && (t as string).trim().length > 0)
+        .map((t: string) => t.trim())
+        .slice(0, 20);
+
+      if (trimmed.length === 0) {
+        res.status(400).json({ success: false, error: 'No valid tags provided' });
+        return;
+      }
+
+      const saved = await taggingService.addManualTagsBatch(productId, trimmed);
+      res.json({ success: true, data: { added: saved.length, tags: saved } });
+    } catch (error) {
+      console.error('[ProductAiTag] batch manual tag error:', error);
+      res.status(500).json({ success: false, error: 'Failed to add batch tags' });
+    }
+  });
+
   // DELETE /:productId/ai-tags/:tagId — 태그 삭제
   router.delete('/:productId/ai-tags/:tagId', authenticate, async (req, res) => {
     try {
@@ -94,7 +142,8 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
 }
 
 /**
- * ProductMaster + Category + Brand 정보를 태그 생성용으로 조회.
+ * ProductMaster + Category + Brand + B2C description + existing tags 정보를 태그 생성용으로 조회.
+ * WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: B2C 소비자 설명 추가
  */
 async function loadProductTagInput(
   dataSource: DataSource,
@@ -108,12 +157,18 @@ async function loadProductTagInput(
          pm.marketing_name AS "marketingName",
          pm.specification,
          pm.manufacturer_name AS "manufacturerName",
+         pm.regulatory_type AS "regulatoryType",
+         pm.tags AS "existingTags",
          pc.name AS "categoryName",
-         b.name AS "brandName"
+         b.name AS "brandName",
+         spo.consumer_detail_description AS "consumerDetailDescription",
+         spo.consumer_short_description AS "consumerShortDescription"
        FROM product_masters pm
        LEFT JOIN product_categories pc ON pc.id = pm.category_id
        LEFT JOIN brands b ON b.id = pm.brand_id
-       WHERE pm.id = $1`,
+       LEFT JOIN supplier_product_offers spo ON spo.master_id = pm.id
+       WHERE pm.id = $1
+       LIMIT 1`,
       [productId],
     );
 
@@ -128,6 +183,14 @@ async function loadProductTagInput(
       categoryName: r.categoryName,
       brandName: r.brandName,
       manufacturerName: r.manufacturerName,
+      regulatoryType: r.regulatoryType || null,
+      consumerDetailDescription: r.consumerDetailDescription
+        ? r.consumerDetailDescription.replace(/<[^>]*>/g, '').trim()
+        : null,
+      consumerShortDescription: r.consumerShortDescription
+        ? r.consumerShortDescription.replace(/<[^>]*>/g, '').trim()
+        : null,
+      existingTags: Array.isArray(r.existingTags) ? r.existingTags : [],
     };
   } catch {
     return null;

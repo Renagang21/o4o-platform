@@ -311,6 +311,12 @@ export class NetureService {
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
       marketingName?: string;
+      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
+      categoryId?: string | null;
+      brandId?: string | null;
+      specification?: string | null;
+      originCountry?: string | null;
+      tags?: string[];
     }
   ) {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);

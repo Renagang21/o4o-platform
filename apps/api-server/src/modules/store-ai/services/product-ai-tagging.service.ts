@@ -29,6 +29,14 @@ export interface ProductTagInput {
   categoryName?: string | null;
   brandName?: string | null;
   manufacturerName: string;
+  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: B2C 소비자 상세 설명 */
+  consumerDetailDescription?: string | null;
+  /** V2: 규제 유형 (DRUG, HEALTH_FUNCTIONAL, etc.) */
+  regulatoryType?: string | null;
+  /** V2: B2C 소비자 간단 소개 */
+  consumerShortDescription?: string | null;
+  /** 기존 태그 목록 (중복 방지용) */
+  existingTags?: string[];
 }
 
 export class ProductAiTaggingService {
@@ -89,6 +97,42 @@ export class ProductAiTaggingService {
   }
 
   /**
+   * WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1
+   * Non-destructive: LLM에서 태그 추천만 받고, DB에 저장하지 않음.
+   * 기존 태그와 중복되지 않는 새 태그만 반환.
+   */
+  async suggestTags(product: ProductTagInput): Promise<Array<{ tag: string; confidence: number }>> {
+    try {
+      const userPrompt = this.buildUserPrompt(product);
+
+      const result = await execute({
+        systemPrompt: PRODUCT_TAGGING_SYSTEM,
+        userPrompt,
+        config: this.configResolver,
+        meta: { service: 'store', callerName: 'ProductAiTaggingService.suggestTags' },
+      });
+      const parsed = JSON.parse(result.content) as LlmTagResponse;
+
+      if (!parsed.tags || !Array.isArray(parsed.tags) || parsed.tags.length === 0) {
+        return [];
+      }
+
+      // Filter out existing tags
+      const existingSet = new Set((product.existingTags || []).map((t) => t.toLowerCase()));
+      return parsed.tags
+        .slice(0, 8)
+        .filter((t) => !existingSet.has(t.tag.toLowerCase()))
+        .map((t) => ({
+          tag: t.tag,
+          confidence: Math.min(1, Math.max(0, t.confidence)),
+        }));
+    } catch (error) {
+      console.error('[ProductAiTag] suggestTags error:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get all tags for a product, split by source.
    */
   async getTagsByProduct(productId: string): Promise<{ aiTags: ProductAiTag[]; manualTags: ProductAiTag[] }> {
@@ -104,17 +148,59 @@ export class ProductAiTaggingService {
   }
 
   /**
-   * Add a manual tag.
+   * Add a manual tag. V2: case-insensitive dedup.
    */
   async addManualTag(productId: string, tag: string): Promise<ProductAiTag> {
+    const trimmed = tag.trim();
+
+    // V2: dedup — prevent duplicate tags (case-insensitive)
+    const existing = await this.tagRepo
+      .createQueryBuilder('t')
+      .where('t.productId = :productId', { productId })
+      .andWhere('LOWER(t.tag) = LOWER(:tag)', { tag: trimmed })
+      .getOne();
+    if (existing) return existing;
+
     const newTag = this.tagRepo.create({
       productId,
-      tag,
+      tag: trimmed,
       confidence: 1.0,
       source: 'manual',
       model: null,
     });
     const saved = await this.tagRepo.save(newTag);
+    await this.syncMasterTags(productId);
+    return saved;
+  }
+
+  /**
+   * V2: Batch add multiple manual tags (for AI suggestion multi-select).
+   * Deduplicates against existing tags, single syncMasterTags call.
+   */
+  async addManualTagsBatch(productId: string, tags: string[]): Promise<ProductAiTag[]> {
+    if (!tags.length) return [];
+
+    const existing = await this.tagRepo.find({ where: { productId } });
+    const existingSet = new Set(existing.map((t) => t.tag.toLowerCase()));
+
+    const newTags: ProductAiTag[] = [];
+    for (const tag of tags) {
+      const trimmed = tag.trim();
+      if (!trimmed || existingSet.has(trimmed.toLowerCase())) continue;
+      newTags.push(
+        this.tagRepo.create({
+          productId,
+          tag: trimmed,
+          confidence: 1.0,
+          source: 'manual',
+          model: null,
+        }),
+      );
+      existingSet.add(trimmed.toLowerCase());
+    }
+
+    if (newTags.length === 0) return [];
+    const saved = await this.tagRepo.save(newTags);
     await this.syncMasterTags(productId);
     return saved;
   }
@@ -150,6 +236,21 @@ export class ProductAiTaggingService {
 
   private buildUserPrompt(product: ProductTagInput): string {
     const parts: string[] = [];
+
+    // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: B2C 설명 최우선
+    if (product.consumerDetailDescription) {
+      parts.push(`[소비자 상세 설명]`);
+      parts.push(product.consumerDetailDescription);
+      parts.push('');
+    }
+
+    // V2: B2C 간단 소개 (보조)
+    if (product.consumerShortDescription) {
+      parts.push(`[소비자 간단 소개]`);
+      parts.push(product.consumerShortDescription);
+      parts.push('');
+    }
+
     parts.push(`[상품 정보]`);
     parts.push(`- 식약처명: ${product.regulatoryName}`);
     parts.push(`- 마케팅명: ${product.marketingName}`);
@@ -157,6 +258,17 @@ export class ProductAiTaggingService {
     if (product.categoryName) parts.push(`- 카테고리: ${product.categoryName}`);
     if (product.brandName) parts.push(`- 브랜드: ${product.brandName}`);
     parts.push(`- 제조사: ${product.manufacturerName}`);
+    // V2: 규제 유형 (건강기능식품, 의약품, 의약외품 등)
+    if (product.regulatoryType && product.regulatoryType !== 'GENERAL') {
+      parts.push(`- 규제 유형: ${product.regulatoryType}`);
+    }
+
+    if (product.existingTags?.length) {
+      parts.push('');
+      parts.push(`[기존 태그 (중복 제외)]`);
+      parts.push(product.existingTags.join(', '));
+    }
+
     return parts.join('\n');
   }
 }

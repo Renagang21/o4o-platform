@@ -171,4 +171,65 @@ export const productApi = {
       return { success: false, message: 'AI 태그 생성 실패' };
     }
   },
+
+  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI 태그 추천 (non-destructive) */
+  async suggestAiTags(masterId: string): Promise<Array<{ tag: string; confidence: number }>> {
+    try {
+      const response = await api.post(`/products/${masterId}/ai-tags/suggest`);
+      return response.data?.data?.suggestions || [];
+    } catch (error) {
+      console.warn('[Product API] Failed to suggest AI tags:', error);
+      return [];
+    }
+  },
+
+  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: 태그 조회 (AI + manual) */
+  async getAiTags(masterId: string): Promise<{
+    aiTags: Array<{ id: string; tag: string; confidence: number; source: string }>;
+    manualTags: Array<{ id: string; tag: string; confidence: number; source: string }>;
+  }> {
+    try {
+      const response = await api.get(`/products/${masterId}/ai-tags`);
+      return response.data?.data || { aiTags: [], manualTags: [] };
+    } catch (error) {
+      console.warn('[Product API] Failed to fetch AI tags:', error);
+      return { aiTags: [], manualTags: [] };
+    }
+  },
+
+  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: 수동 태그 추가 */
+  async addManualTag(masterId: string, tag: string): Promise<{ success: boolean }> {
+    try {
+      const response = await api.post(`/products/${masterId}/ai-tags/manual`, { tag });
+      return response.data;
+    } catch (error) {
+      console.warn('[Product API] Failed to add manual tag:', error);
+      return { success: false };
+    }
+  },
+
+  /** V2: 수동 태그 일괄 추가 (AI 추천 다건 수락용) */
+  async addManualTagsBatch(
+    masterId: string,
+    tags: string[],
+  ): Promise<{ success: boolean; data?: { added: number } }> {
+    try {
+      const response = await api.post(`/products/${masterId}/ai-tags/manual/batch`, { tags });
+      return response.data;
+    } catch (error) {
+      console.warn('[Product API] Failed to add batch manual tags:', error);
+      return { success: false };
+    }
+  },
+
+  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: 태그 삭제 */
+  async deleteAiTag(masterId: string, tagId: string): Promise<{ success: boolean }> {
+    try {
+      const response = await api.delete(`/products/${masterId}/ai-tags/${tagId}`);
+      return response.data;
+    } catch (error) {
+      console.warn('[Product API] Failed to delete tag:', error);
+      return { success: false };
+    }
+  },
 };

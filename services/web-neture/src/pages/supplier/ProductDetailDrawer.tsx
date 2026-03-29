@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Pencil, Trash2, ImagePlus, Loader2 } from 'lucide-react';
+import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
 
@@ -152,12 +152,21 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [editBrand, setEditBrand] = useState<string | null>(null);
   const [editSpec, setEditSpec] = useState('');
   const [editOrigin, setEditOrigin] = useState('');
-  const [editTags, setEditTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
   const [editBizShort, setEditBizShort] = useState('');
   const [editBizDetail, setEditBizDetail] = useState('');
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
   const [brands, setBrands] = useState<BrandItem[]>([]);
+
+  // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag management state
+  const [aiTags, setAiTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
+  const [manualTags, setManualTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
+  const [suggestedTags, setSuggestedTags] = useState<Array<{ tag: string; confidence: number }>>([]);
+  const [aiTagLoading, setAiTagLoading] = useState(false);
+  const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
+  const [manualTagInput, setManualTagInput] = useState('');
+  const [addingTag, setAddingTag] = useState(false);
+  // V2: multi-select AI suggestions in edit mode
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
 
   // Load images when drawer opens
   useEffect(() => {
@@ -173,6 +182,25 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     }
   }, [product?.masterId, open]);
 
+  // Load AI tags when drawer opens
+  useEffect(() => {
+    if (product?.masterId && open) {
+      setAiTagLoading(true);
+      productApi.getAiTags(product.masterId).then((data) => {
+        setAiTags(data.aiTags);
+        setManualTags(data.manualTags);
+        setAiTagLoading(false);
+      });
+    }
+    if (!open) {
+      setAiTags([]);
+      setManualTags([]);
+      setSuggestedTags([]);
+      setManualTagInput('');
+      setSelectedSuggestions(new Set());
+    }
+  }, [product?.masterId, open]);
+
   // Reset state when product changes
   useEffect(() => {
     if (product) {
@@ -180,6 +208,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       setShowDirtyConfirm(false);
       formRef.current = null;
       isDirtyRef.current = false;
+      setSuggestedTags([]);
+      setManualTagInput('');
+      setSelectedSuggestions(new Set());
     }
   }, [product]);
 
@@ -239,7 +270,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       brandId: editBrand,
       specification: editSpec || null,
       originCountry: editOrigin || null,
-      tags: editTags,
+      // tags: V2에서 product_ai_tags API로 통합, handleSave에서 제거
     });
 
     // 2. B2B 설명 업데이트 (전용 엔드포인트)
@@ -268,6 +299,80 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     setSaving(false);
     if (result.success) {
       setIsEditing(false);
+      onSaved?.();
+    }
+  };
+
+  // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag handlers
+  const handleAiSuggest = async () => {
+    if (!product?.masterId) return;
+    setAiSuggestLoading(true);
+    setSuggestedTags([]);
+    const suggestions = await productApi.suggestAiTags(product.masterId);
+    setSuggestedTags(suggestions);
+    setAiSuggestLoading(false);
+  };
+
+  const handleAcceptSuggestion = async (tag: string) => {
+    if (!product?.masterId) return;
+    setAddingTag(true);
+    const result = await productApi.addManualTag(product.masterId, tag);
+    if (result.success) {
+      setSuggestedTags((prev) => prev.filter((s) => s.tag !== tag));
+      const data = await productApi.getAiTags(product.masterId);
+      setAiTags(data.aiTags);
+      setManualTags(data.manualTags);
+      onSaved?.();
+    }
+    setAddingTag(false);
+  };
+
+  // V2: multi-select AI suggestion handlers
+  const handleAcceptSelectedSuggestions = async () => {
+    if (!product?.masterId || selectedSuggestions.size === 0) return;
+    setAddingTag(true);
+    const tagsToAdd = Array.from(selectedSuggestions);
+    const result = await productApi.addManualTagsBatch(product.masterId, tagsToAdd);
+    if (result.success) {
+      setSuggestedTags((prev) => prev.filter((s) => !selectedSuggestions.has(s.tag)));
+      setSelectedSuggestions(new Set());
+      const data = await productApi.getAiTags(product.masterId);
+      setAiTags(data.aiTags);
+      setManualTags(data.manualTags);
+      onSaved?.();
+    }
+    setAddingTag(false);
+  };
+
+  const toggleSuggestion = (tag: string) => {
+    setSelectedSuggestions((prev) => {
+      const next = new Set(prev);
+      next.has(tag) ? next.delete(tag) : next.add(tag);
+      return next;
+    });
+  };
+
+  const handleAddManualTag = async () => {
+    const tag = manualTagInput.trim();
+    if (!tag || !product?.masterId) return;
+    setAddingTag(true);
+    const result = await productApi.addManualTag(product.masterId, tag);
+    if (result.success) {
+      setManualTagInput('');
+      const data = await productApi.getAiTags(product.masterId);
+      setAiTags(data.aiTags);
+      setManualTags(data.manualTags);
+      onSaved?.();
+    }
+    setAddingTag(false);
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    if (!product?.masterId) return;
+    const result = await productApi.deleteAiTag(product.masterId, tagId);
+    if (result.success) {
+      setAiTags((prev) => prev.filter((t) => t.id !== tagId));
+      setManualTags((prev) => prev.filter((t) => t.id !== tagId));
       onSaved?.();
     }
   };
@@ -368,8 +473,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   setEditBrand(product.brandId || null);
                   setEditSpec(product.specification || '');
                   setEditOrigin(product.originCountry || '');
-                  setEditTags(product.tags || []);
-                  setTagInput('');
                   setEditBizShort(stripHtml(product.businessShortDescription) || '');
                   setEditBizDetail(stripHtml(product.businessDetailDescription) || '');
                   productApi.getCategories().then(setCategories);
@@ -473,40 +576,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 />
               </div>
 
-              {/* 태그 */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">태그</label>
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {editTags.map((tag, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-xs">
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => setEditTags((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="text-slate-400 hover:text-slate-600"
-                      >×</button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
-                      e.preventDefault();
-                      const newTag = tagInput.trim().replace(/,$/, '');
-                      if (newTag && !editTags.includes(newTag)) {
-                        setEditTags((prev) => [...prev, newTag]);
-                      }
-                      setTagInput('');
-                    }
-                  }}
-                  disabled={saving}
-                  placeholder="태그 입력 후 Enter"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
-                />
-              </div>
+              {/* 태그: V2에서 "태그 관리" 섹션으로 통합 (product_ai_tags API 기반) */}
 
               {/* B2B 설명 */}
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pt-2">B2B 설명</h4>
@@ -786,11 +856,12 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           ) : null}
 
           {/* ── 설명 ── */}
-          {(product.consumerShortDescription || product.consumerDetailDescription) && (
+          {(product.consumerShortDescription || product.consumerDetailDescription ||
+            product.businessShortDescription || product.businessDetailDescription) && (
             <Section title="설명">
               {product.consumerShortDescription && (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <span className="text-xs text-slate-400 block mb-1">소비자 간단 소개</span>
                   <p className="text-sm text-slate-700 line-clamp-3">
                     {stripHtml(product.consumerShortDescription)}
                   </p>
@@ -798,10 +869,36 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               )}
               {product.consumerDetailDescription && (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <span className="text-xs text-slate-400 block mb-1">소비자 상세 설명</span>
                   <p className="text-sm text-slate-700 line-clamp-5">
                     {stripHtml(product.consumerDetailDescription)}
                   </p>
+                </div>
+              )}
+              {product.businessShortDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">B2B 간단 소개</span>
+                  <p className="text-sm text-slate-700 line-clamp-3">
+                    {stripHtml(product.businessShortDescription)}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">B2B 간단 소개</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+              {product.businessDetailDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">B2B 상세 설명</span>
+                  <p className="text-sm text-slate-700 line-clamp-5">
+                    {stripHtml(product.businessDetailDescription)}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">B2B 상세 설명</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
                 </div>
               )}
             </Section>
@@ -813,22 +910,153 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               <InfoRow label="재고 수량">
                 {product.stockQuantity != null ? Number(product.stockQuantity).toLocaleString() : '0'}
               </InfoRow>
-              {product.tags && product.tags.length > 0 && (
-                <InfoRow label="태그">
-                  <div className="flex flex-wrap gap-1 justify-end">
-                    {product.tags.slice(0, 5).map((tag, i) => (
-                      <Badge key={i} className="bg-slate-100 text-slate-600">{tag}</Badge>
-                    ))}
-                    {product.tags.length > 5 && (
-                      <span className="text-xs text-slate-400">+{product.tags.length - 5}</span>
-                    )}
-                  </div>
-                </InfoRow>
-              )}
               <InfoRow label="등록일">{formatDate(product.createdAt)}</InfoRow>
               <InfoRow label="수정일">{formatDate(product.updatedAt)}</InfoRow>
             </Section>
           )}
+
+          {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시) ── */}
+          <Section title="태그 관리">
+            {aiTagLoading ? (
+              <div className="flex items-center justify-center py-3">
+                <Loader2 size={16} className="animate-spin text-slate-400" />
+              </div>
+            ) : (
+              <>
+                {/* 기존 AI 태그 */}
+                {aiTags.length > 0 && (
+                  <div className="mb-3">
+                    <span className="text-xs text-slate-400 block mb-1.5">AI 생성 태그</span>
+                    <div className="flex flex-wrap gap-1">
+                      {aiTags.map((t) => (
+                        <span key={t.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
+                          {t.tag}
+                          <span className="text-blue-400 text-[10px]">{Math.round(t.confidence * 100)}%</span>
+                          <button
+                            onClick={() => handleDeleteTag(t.id)}
+                            className="text-blue-300 hover:text-red-500 ml-0.5"
+                            title="삭제"
+                          >&times;</button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 수동 태그 */}
+                {manualTags.length > 0 && (
+                  <div className="mb-3">
+                    <span className="text-xs text-slate-400 block mb-1.5">수동 태그</span>
+                    <div className="flex flex-wrap gap-1">
+                      {manualTags.map((t) => (
+                        <span key={t.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 rounded text-xs">
+                          {t.tag}
+                          <button
+                            onClick={() => handleDeleteTag(t.id)}
+                            className="text-green-300 hover:text-red-500 ml-0.5"
+                            title="삭제"
+                          >&times;</button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {aiTags.length === 0 && manualTags.length === 0 && (
+                  <p className="text-sm text-slate-400 mb-3">등록된 태그가 없습니다</p>
+                )}
+
+                {/* AI 추천 결과 — V2: 편집 모드에서는 multi-select */}
+                {suggestedTags.length > 0 && (
+                  <div className="mb-3 p-3 bg-amber-50/60 border border-amber-200 rounded-lg">
+                    <span className="text-xs font-medium text-amber-700 block mb-1.5">
+                      AI 추천 태그 {isEditing ? '(선택 후 일괄 추가)' : '(클릭하여 추가)'}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {suggestedTags.map((s, i) => (
+                        isEditing ? (
+                          <button
+                            key={i}
+                            onClick={() => toggleSuggestion(s.tag)}
+                            disabled={addingTag}
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 border rounded text-xs transition-colors disabled:opacity-50 ${
+                              selectedSuggestions.has(s.tag)
+                                ? 'bg-amber-200 border-amber-400 text-amber-900 font-medium'
+                                : 'bg-white border-amber-300 text-amber-800 hover:bg-amber-100'
+                            }`}
+                          >
+                            {selectedSuggestions.has(s.tag) && '\u2713 '}{s.tag}
+                            <span className="text-amber-400 text-[10px]">{Math.round(s.confidence * 100)}%</span>
+                          </button>
+                        ) : (
+                          <button
+                            key={i}
+                            onClick={() => handleAcceptSuggestion(s.tag)}
+                            disabled={addingTag}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-amber-300 text-amber-800 rounded text-xs hover:bg-amber-100 transition-colors disabled:opacity-50"
+                          >
+                            <Plus size={10} />
+                            {s.tag}
+                            <span className="text-amber-400 text-[10px]">{Math.round(s.confidence * 100)}%</span>
+                          </button>
+                        )
+                      ))}
+                    </div>
+                    {isEditing && selectedSuggestions.size > 0 && (
+                      <button
+                        onClick={handleAcceptSelectedSuggestions}
+                        disabled={addingTag}
+                        className="mt-2 px-3 py-1 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg disabled:opacity-50"
+                      >
+                        {addingTag ? '추가 중...' : `선택 추가 (${selectedSuggestions.size}개)`}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* 액션 버튼 */}
+                <div className="flex items-center gap-2 mb-3">
+                  <button
+                    onClick={handleAiSuggest}
+                    disabled={aiSuggestLoading || !product?.masterId}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {aiSuggestLoading ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={12} />
+                    )}
+                    {aiSuggestLoading ? 'AI 분석 중...' : 'AI 태그 추천'}
+                  </button>
+                </div>
+
+                {/* 수동 태그 입력 */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={manualTagInput}
+                    onChange={(e) => setManualTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && manualTagInput.trim()) {
+                        e.preventDefault();
+                        handleAddManualTag();
+                      }
+                    }}
+                    placeholder="태그 직접 입력 후 Enter"
+                    disabled={addingTag}
+                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                  />
+                  <button
+                    onClick={handleAddManualTag}
+                    disabled={addingTag || !manualTagInput.trim()}
+                    className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg disabled:opacity-50"
+                  >
+                    추가
+                  </button>
+                </div>
+              </>
+            )}
+          </Section>
         </div>
 
         {/* Footer — 수정 모드 시 취소/저장 */}
