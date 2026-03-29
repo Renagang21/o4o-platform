@@ -25,7 +25,7 @@ function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
     VALID: 'bg-green-100 text-green-800',
     VALIDATED: 'bg-green-100 text-green-800',
-    READY: 'bg-green-100 text-green-800',
+    READY: 'bg-amber-100 text-amber-800',
     APPLIED: 'bg-blue-100 text-blue-800',
     PARTIAL: 'bg-yellow-100 text-yellow-800', // WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1
     VALIDATING: 'bg-orange-100 text-orange-800',
@@ -36,9 +36,12 @@ function StatusBadge({ status }: { status: string }) {
     CREATE_MASTER: 'bg-emerald-100 text-emerald-800',
     REJECT: 'bg-red-100 text-red-700',
   };
+  const labels: Record<string, string> = {
+    READY: '생성 대기',
+  };
   return (
     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-600'}`}>
-      {status}
+      {labels[status] || status}
     </span>
   );
 }
@@ -227,6 +230,35 @@ export default function SupplierCsvImportPage() {
       setApplyError((err as Error).message);
     } finally {
       setRetrying(false);
+    }
+  };
+
+  // ─── Quick Apply from batch list (WO-O4O-NETURE-CSV-APPLY-VISIBILITY-FIX-V1) ──
+  const [quickApplying, setQuickApplying] = useState<string | null>(null);
+  const handleQuickApply = async (batchId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setQuickApplying(batchId);
+    try {
+      const result = await csvImportApi.applyBatch(batchId);
+      if (!result.success) {
+        alert(friendlyError(result.error || '적용 실패'));
+        return;
+      }
+      const d = result.data;
+      const applied = d?.appliedOffers ?? 0;
+      const failed = d?.failedRows ?? 0;
+      if (failed === 0) {
+        alert(`상품 ${applied}건이 생성되었습니다.`);
+      } else if (applied === 0) {
+        alert(`상품 생성에 실패했습니다 (${failed}건 실패)`);
+      } else {
+        alert(`${applied}건 성공, ${failed}건 실패`);
+      }
+      await loadBatches();
+    } catch (err) {
+      alert((err as Error).message);
+    } finally {
+      setQuickApplying(null);
     }
   };
 
@@ -468,6 +500,9 @@ export default function SupplierCsvImportPage() {
             {uploadError}
           </div>
         )}
+        <p className="mt-3 text-xs text-amber-600">
+          업로드 후 '적용하기'를 눌러야 상품이 생성됩니다.
+        </p>
       </section>
 
       {/* ═══ Section 3: Batch List ═══ */}
@@ -521,6 +556,15 @@ export default function SupplierCsvImportPage() {
                       {new Date(b.createdAt).toLocaleString('ko-KR')}
                     </td>
                     <td className="py-2 text-right space-x-1">
+                      {b.status === 'READY' && b.validRows > 0 && (
+                        <button
+                          onClick={(e) => handleQuickApply(b.id, e)}
+                          disabled={quickApplying === b.id}
+                          className="px-2 py-1 text-xs text-white bg-green-600 hover:bg-green-700 rounded disabled:opacity-50"
+                        >
+                          {quickApplying === b.id ? '적용 중...' : '적용하기'}
+                        </button>
+                      )}
                       <button
                         onClick={(e) => handleDeleteBatch(b, e)}
                         className="px-2 py-1 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
