@@ -303,6 +303,9 @@ export class CsvImportService {
           row.actionType = CsvRowActionType.CREATE_MASTER;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
+          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+          const quality = this.assessRowQuality(raw);
+          row.rawJson = { ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
         } else {
           this.rejectRow(row, 'MISSING_MARKETING_NAME');
           rejectedCount++;
@@ -318,6 +321,9 @@ export class CsvImportService {
           row.actionType = CsvRowActionType.LINK_EXISTING;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
+          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+          const quality = this.assessRowQuality(raw);
+          row.rawJson = { ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
         } else {
           const packagingName = (raw.packaging_name || '').trim();
           const marketingName = (raw.marketing_name || '').trim();
@@ -328,6 +334,9 @@ export class CsvImportService {
             row.actionType = CsvRowActionType.CREATE_MASTER;
             row.validationStatus = CsvRowValidationStatus.VALID;
             validCount++;
+            // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+            const quality2 = this.assessRowQuality(raw);
+            row.rawJson = { ...raw, _qualityScore: quality2.score, _qualityWarnings: quality2.warnings };
           } else {
             this.rejectRow(row, 'MISSING_MARKETING_NAME');
             rejectedCount++;
@@ -884,7 +893,10 @@ export class CsvImportService {
     }
 
     const newRawJson = { ...(row.rawJson as Record<string, unknown>), ...updates };
-    row.rawJson = newRawJson;
+
+    // Re-assess quality after edit (WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1)
+    const quality = this.assessRowQuality(newRawJson as Record<string, string>);
+    row.rawJson = { ...newRawJson, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
 
     const rawPrice = String(newRawJson.supply_price || '').trim();
     row.parsedSupplyPrice = rawPrice ? parseInt(rawPrice, 10) : null;
@@ -1150,5 +1162,32 @@ export class CsvImportService {
     row.validationStatus = CsvRowValidationStatus.REJECTED;
     row.validationError = error;
     row.actionType = CsvRowActionType.REJECT;
+  }
+
+  /**
+   * Row 데이터 품질 평가 (WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1)
+   *
+   * 5차원 각 20점 = 최대 100점.
+   * marketing_name은 VALID 행이면 항상 존재하므로 base 20점.
+   */
+  private assessRowQuality(raw: Record<string, string>): { score: number; warnings: string[] } {
+    const warnings: string[] = [];
+    let score = 20; // base: marketing_name (required for VALID rows)
+
+    const checks: Array<{ keys: string[]; warning: string }> = [
+      { keys: ['image_url'], warning: 'MISSING_IMAGE' },
+      { keys: ['category_name'], warning: 'MISSING_CATEGORY' },
+      { keys: ['short_description', 'detail_description', 'consumer_short_description'], warning: 'MISSING_DESCRIPTION' },
+      { keys: ['consumer_price'], warning: 'MISSING_CONSUMER_PRICE' },
+    ];
+
+    for (const { keys, warning } of checks) {
+      if (keys.some((k) => (raw[k] || '').trim())) {
+        score += 20;
+      } else {
+        warnings.push(warning);
+      }
+    }
+    return { score, warnings };
   }
 }

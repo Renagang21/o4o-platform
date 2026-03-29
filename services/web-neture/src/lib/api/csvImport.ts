@@ -232,3 +232,30 @@ export const csvImportApi = {
     }
   },
 };
+
+// ─── WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 ─────────────────────────────────
+
+export const QUALITY_WARNING_LABELS: Record<string, string> = {
+  MISSING_IMAGE: '이미지 없음',
+  MISSING_CATEGORY: '카테고리 없음',
+  MISSING_DESCRIPTION: '설명 없음',
+  MISSING_CONSUMER_PRICE: '소비자가 없음',
+};
+
+export function computeBatchQuality(rows: CsvBatchRow[]) {
+  const validRows = rows.filter((r) => r.validationStatus === 'VALID');
+  const scores = validRows.map((r) => (r.rawJson._qualityScore as number) ?? 100);
+  const completeRows = scores.filter((s) => s === 100).length;
+  const warningRows = scores.filter((s) => s < 100).length;
+  const avgScore = scores.length
+    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+    : 0;
+
+  const warningCounts: Record<string, number> = {};
+  for (const row of validRows) {
+    const warnings = (row.rawJson._qualityWarnings as string[]) || [];
+    for (const w of warnings) warningCounts[w] = (warningCounts[w] || 0) + 1;
+  }
+
+  return { totalValidRows: validRows.length, completeRows, warningRows, avgScore, warningCounts };
+}

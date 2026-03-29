@@ -11,7 +11,8 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow } from '../../lib/api/csvImport';
+import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, computeBatchQuality, QUALITY_WARNING_LABELS } from '../../lib/api/csvImport';
+import EditImportRowDrawer from '../../components/import/EditImportRowDrawer';
 
 // ─── XLSX Template Download ──────────────────────────────────────────────────
 function downloadTemplate() {
@@ -89,11 +90,8 @@ export default function SupplierCsvImportPage() {
   const [applySuccess, setApplySuccess] = useState<string | null>(null);
   const [downloadedCsv, setDownloadedCsv] = useState(false); // WO-O4O-NETURE-IMPORT-FAILED-DOWNLOAD-UX-GUIDE-V1
 
-  // WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1
-  const [editingRowId, setEditingRowId] = useState<string | null>(null);
-  const [editFields, setEditFields] = useState<Record<string, string>>({});
-  const [editSaving, setEditSaving] = useState(false);
-  const [editError, setEditError] = useState<string | null>(null);
+  // WO-NETURE-IMPORT-ROW-EDITOR-V1: Drawer for row editing
+  const [drawerRow, setDrawerRow] = useState<CsvBatchRow | null>(null);
 
   // ─── Load batches ─────────────────────────────────────────────────────────
   const loadBatches = useCallback(async () => {
@@ -174,6 +172,26 @@ export default function SupplierCsvImportPage() {
   // ─── Apply handler (WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1) ────────────────
   const handleApply = async () => {
     if (!selectedBatch) return;
+
+    // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1: Pre-apply quality confirmation
+    if (selectedBatch.rows) {
+      const quality = computeBatchQuality(selectedBatch.rows);
+      if (quality.warningRows > 0) {
+        const details = Object.entries(quality.warningCounts)
+          .map(([k, v]) => `  ${QUALITY_WARNING_LABELS[k] || k}: ${v}건`)
+          .join('\n');
+        const confirmed = confirm(
+          `데이터 품질 경고\n\n` +
+          `전체 ${quality.totalValidRows}건 중 ${quality.warningRows}건에 누락된 정보가 있습니다.\n` +
+          `평균 품질 점수: ${quality.avgScore}점\n\n` +
+          `${details}\n\n` +
+          `누락된 정보는 나중에 개별 상품에서 보완할 수 있습니다.\n` +
+          `이대로 적용하시겠습니까?`,
+        );
+        if (!confirmed) return;
+      }
+    }
+
     setApplying(true);
     setApplyError(null);
     setApplySuccess(null);
@@ -239,6 +257,26 @@ export default function SupplierCsvImportPage() {
     e.stopPropagation();
     setQuickApplying(batchId);
     try {
+      // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1: Pre-apply quality check
+      const detailResult = await csvImportApi.getBatchDetail(batchId);
+      if (detailResult.success && detailResult.data?.rows) {
+        const quality = computeBatchQuality(detailResult.data.rows);
+        if (quality.warningRows > 0) {
+          const details = Object.entries(quality.warningCounts)
+            .map(([k, v]) => `  ${QUALITY_WARNING_LABELS[k] || k}: ${v}건`)
+            .join('\n');
+          const confirmed = confirm(
+            `데이터 품질 경고\n\n` +
+            `${quality.warningRows}/${quality.totalValidRows}건에 누락된 정보가 있습니다.\n\n` +
+            `${details}\n\n이대로 적용하시겠습니까?`,
+          );
+          if (!confirmed) {
+            setQuickApplying(null);
+            return;
+          }
+        }
+      }
+
       const result = await csvImportApi.applyBatch(batchId);
       if (!result.success) {
         alert(friendlyError(result.error || '적용 실패'));
@@ -380,68 +418,11 @@ export default function SupplierCsvImportPage() {
     setDownloadedCsv(true);
   };
 
-  // ─── Row Quick Edit (WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1) ──────────────────
-  const EDITABLE_FIELDS: Array<{ key: string; label: string; type: 'text' | 'number' | 'select' | 'textarea' }> = [
-    { key: 'marketing_name', label: '마케팅명', type: 'text' },
-    { key: 'brand', label: '브랜드', type: 'text' },
-    { key: 'supply_price', label: '공급가', type: 'number' },
-    { key: 'consumer_price', label: '소비자가', type: 'number' },
-    { key: 'stock_qty', label: '재고', type: 'number' },
-    { key: 'distribution_type', label: '유통 타입', type: 'select' },
-    { key: 'short_description', label: '짧은 설명', type: 'textarea' },
-    { key: 'detail_description', label: '상세 설명', type: 'textarea' },
-    { key: 'category_name', label: '카테고리', type: 'text' },
-    { key: 'manufacturer_name', label: '제조사', type: 'text' },
-    { key: 'image_url', label: '이미지 URL', type: 'text' },
-  ];
-
-  const handleStartEdit = (row: CsvBatchRow) => {
-    const raw = row.rawJson as Record<string, string>;
-    const fields: Record<string, string> = {};
-    for (const f of EDITABLE_FIELDS) {
-      fields[f.key] = String(raw[f.key] ?? '');
-    }
-    setEditingRowId(row.id);
-    setEditFields(fields);
-    setEditError(null);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingRowId(null);
-    setEditFields({});
-    setEditError(null);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!selectedBatch || !editingRowId) return;
-    setEditSaving(true);
-    setEditError(null);
-    try {
-      const row = selectedBatch.rows.find((r) => r.id === editingRowId);
-      if (!row) return;
-      const raw = row.rawJson as Record<string, string>;
-      const changed: Record<string, string> = {};
-      for (const f of EDITABLE_FIELDS) {
-        if (editFields[f.key] !== String(raw[f.key] ?? '')) {
-          changed[f.key] = editFields[f.key];
-        }
-      }
-      if (Object.keys(changed).length === 0) {
-        handleCancelEdit();
-        return;
-      }
-      const result = await csvImportApi.updateRow(selectedBatch.id, editingRowId, changed);
-      if (!result.success) {
-        setEditError(friendlyError(result.error || '수정 실패'));
-        return;
-      }
+  // ─── Row Edit Drawer (WO-NETURE-IMPORT-ROW-EDITOR-V1) ──────────────────
+  const handleDrawerSave = async () => {
+    setDrawerRow(null);
+    if (selectedBatch) {
       await handleOpenDetail(selectedBatch.id);
-      setEditingRowId(null);
-      setEditFields({});
-    } catch (err) {
-      setEditError((err as Error).message);
-    } finally {
-      setEditSaving(false);
     }
   };
 
@@ -631,6 +612,30 @@ export default function SupplierCsvImportPage() {
                     )}
                   </div>
 
+                  {/* WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1: Quality summary */}
+                  {selectedBatch.status === 'READY' && selectedBatch.rows && (() => {
+                    const quality = computeBatchQuality(selectedBatch.rows);
+                    if (quality.totalValidRows === 0) return null;
+                    return (
+                      <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs space-y-1">
+                        <div className="flex gap-4">
+                          <span>평균 품질: <strong>{quality.avgScore}점</strong></span>
+                          <span className="text-green-600">완전: {quality.completeRows}건</span>
+                          {quality.warningRows > 0 && (
+                            <span className="text-amber-600">경고: {quality.warningRows}건</span>
+                          )}
+                        </div>
+                        {Object.keys(quality.warningCounts).length > 0 && (
+                          <div className="flex gap-3 text-gray-500">
+                            {Object.entries(quality.warningCounts).map(([code, count]) => (
+                              <span key={code}>{QUALITY_WARNING_LABELS[code] || code}: {count}건</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {/* Row table — WO-O4O-NETURE-CSV-PARTIAL-SUCCESS-V1: apply 상태 컬럼 추가 */}
                   {selectedBatch.rows && selectedBatch.rows.length > 0 && (
                     <div className="overflow-x-auto mb-4">
@@ -643,6 +648,7 @@ export default function SupplierCsvImportPage() {
                             <th className="pb-2 pr-3">유통</th>
                             <th className="pb-2 pr-3">검증</th>
                             <th className="pb-2 pr-3">액션</th>
+                            <th className="pb-2 pr-3">품질</th>
                             <th className="pb-2 pr-3">적용</th>
                             <th className="pb-2 pr-3">상품</th>
                             <th className="pb-2 pr-3">오류</th>
@@ -652,7 +658,7 @@ export default function SupplierCsvImportPage() {
                         <tbody>
                           {selectedBatch.rows.map((row) => (
                             <React.Fragment key={row.id}>
-                              <tr className={`border-b border-gray-100 ${row.applyStatus === 'failed' ? 'bg-red-50' : ''} ${editingRowId === row.id ? 'bg-blue-50' : ''}`}>
+                              <tr className={`border-b border-gray-100 ${row.applyStatus === 'failed' ? 'bg-red-50' : ''}`}>
                                 <td className="py-2 pr-3 text-gray-400">{row.rowNumber}</td>
                                 <td className="py-2 pr-3 font-mono text-xs">{row.parsedBarcode || '-'}</td>
                                 <td className="py-2 pr-3">
@@ -662,6 +668,29 @@ export default function SupplierCsvImportPage() {
                                 <td className="py-2 pr-3"><StatusBadge status={row.validationStatus} /></td>
                                 <td className="py-2 pr-3 text-xs text-gray-500">
                                   {row.actionType ? <StatusBadge status={row.actionType} /> : '-'}
+                                </td>
+                                {/* WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 */}
+                                <td className="py-2 pr-3 text-center">
+                                  {row.validationStatus === 'VALID' && row.rawJson._qualityScore != null ? (
+                                    <span
+                                      className={`text-xs font-medium ${
+                                        (row.rawJson._qualityScore as number) === 100
+                                          ? 'text-green-600'
+                                          : (row.rawJson._qualityScore as number) >= 60
+                                            ? 'text-amber-600'
+                                            : 'text-red-600'
+                                      }`}
+                                      title={
+                                        ((row.rawJson._qualityWarnings as string[]) || [])
+                                          .map((w) => QUALITY_WARNING_LABELS[w] || w)
+                                          .join(', ') || '완전'
+                                      }
+                                    >
+                                      {row.rawJson._qualityScore as number}
+                                    </span>
+                                  ) : (
+                                    <span className="text-gray-300 text-xs">-</span>
+                                  )}
                                 </td>
                                 <td className="py-2 pr-3 text-center">
                                   {row.applyStatus === 'applied' ? (
@@ -696,74 +725,15 @@ export default function SupplierCsvImportPage() {
                                   <td className="py-2 text-center">
                                     {row.validationStatus === 'VALID' && !row.applyStatus && (
                                       <button
-                                        onClick={() => editingRowId === row.id ? handleCancelEdit() : handleStartEdit(row)}
+                                        onClick={() => setDrawerRow(row)}
                                         className="px-2 py-0.5 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded"
                                       >
-                                        {editingRowId === row.id ? '닫기' : '수정'}
+                                        수정
                                       </button>
                                     )}
                                   </td>
                                 )}
                               </tr>
-                              {/* WO-NETURE-IMPORT-ROW-QUICK-EDIT-V1: Inline edit panel */}
-                              {editingRowId === row.id && (
-                                <tr className="bg-blue-50 border-b border-blue-200">
-                                  <td colSpan={selectedBatch.status === 'READY' ? 10 : 9} className="p-4">
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                                      {EDITABLE_FIELDS.map((f) => (
-                                        <div key={f.key}>
-                                          <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
-                                          {f.type === 'select' ? (
-                                            <select
-                                              value={editFields[f.key] || ''}
-                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
-                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                            >
-                                              <option value="PUBLIC">PUBLIC</option>
-                                              <option value="SERVICE">SERVICE</option>
-                                              <option value="PRIVATE">PRIVATE</option>
-                                            </select>
-                                          ) : f.type === 'textarea' ? (
-                                            <textarea
-                                              value={editFields[f.key] || ''}
-                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
-                                              rows={2}
-                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                            />
-                                          ) : (
-                                            <input
-                                              type={f.type === 'number' ? 'number' : 'text'}
-                                              value={editFields[f.key] || ''}
-                                              onChange={(e) => setEditFields({ ...editFields, [f.key]: e.target.value })}
-                                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                                            />
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                    {editError && (
-                                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-xs">
-                                        {editError}
-                                      </div>
-                                    )}
-                                    <div className="mt-3 flex gap-2">
-                                      <button
-                                        onClick={handleSaveEdit}
-                                        disabled={editSaving}
-                                        className="px-3 py-1 bg-blue-600 text-white rounded text-sm disabled:opacity-50 hover:bg-blue-700"
-                                      >
-                                        {editSaving ? '저장 중...' : '저장'}
-                                      </button>
-                                      <button
-                                        onClick={handleCancelEdit}
-                                        className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
-                                      >
-                                        취소
-                                      </button>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
                             </React.Fragment>
                           ))}
                         </tbody>
@@ -843,6 +813,16 @@ export default function SupplierCsvImportPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* WO-NETURE-IMPORT-ROW-EDITOR-V1: Edit Drawer */}
+      {drawerRow && selectedBatch && (
+        <EditImportRowDrawer
+          row={drawerRow}
+          batchId={selectedBatch.id}
+          onSave={handleDrawerSave}
+          onClose={() => setDrawerRow(null)}
+        />
       )}
     </div>
   );
