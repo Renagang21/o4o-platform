@@ -39,7 +39,7 @@ const SERVICE_LINKS: Record<AIServiceId, Record<string, string>> = {
   neture: {
     suppliers: '/operator/supply',
     registrations: '/operator/applications',
-    products: '/operator/supply',
+    products: '/operator/product-service-approvals?status=pending',
     orders: '/operator/orders',
   },
   glycopharm: {
