@@ -119,7 +119,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         dataSource.query(`
           SELECT
             spo.supplier_id AS "supplierId",
-            COALESCE(ns.company_name, 'Unknown') AS "supplierName",
+            COALESCE(supplier_org.name, 'Unknown') AS "supplierName",
             COUNT(*)::int AS total,
             COUNT(*) FILTER (WHERE osa.approval_status = 'approved')::int AS approved,
             ROUND(
@@ -129,8 +129,9 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           FROM offer_service_approvals osa
           JOIN supplier_product_offers spo ON spo.id = osa.offer_id
           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+          LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
           WHERE osa.service_key = 'neture' ${periodClause}
-          GROUP BY spo.supplier_id, ns.company_name
+          GROUP BY spo.supplier_id, supplier_org.name
           HAVING COUNT(*) >= 3
           ORDER BY "approvalRate" DESC
           LIMIT 10
