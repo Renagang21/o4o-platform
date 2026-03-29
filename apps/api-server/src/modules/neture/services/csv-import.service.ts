@@ -312,7 +312,7 @@ export class CsvImportService {
           validCount++;
           // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
           const quality = this.assessRowQuality(raw);
-          const suggestions = this.generateSuggestions(raw, brandCache, manufacturerCache);
+          const suggestions = await this.generateSuggestions(raw, brandCache, manufacturerCache);
           row.rawJson = {
             ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
             ...(Object.keys(suggestions).length > 0 ? { _suggestions: suggestions } : {}),
@@ -334,7 +334,7 @@ export class CsvImportService {
           validCount++;
           // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
           const quality = this.assessRowQuality(raw);
-          const suggestions2 = this.generateSuggestions(raw, brandCache, manufacturerCache);
+          const suggestions2 = await this.generateSuggestions(raw, brandCache, manufacturerCache);
           row.rawJson = {
             ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
             ...(Object.keys(suggestions2).length > 0 ? { _suggestions: suggestions2 } : {}),
@@ -351,7 +351,7 @@ export class CsvImportService {
             validCount++;
             // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
             const quality2 = this.assessRowQuality(raw);
-            const suggestions3 = this.generateSuggestions(raw, brandCache, manufacturerCache);
+            const suggestions3 = await this.generateSuggestions(raw, brandCache, manufacturerCache);
             row.rawJson = {
               ...raw, _qualityScore: quality2.score, _qualityWarnings: quality2.warnings,
               ...(Object.keys(suggestions3).length > 0 ? { _suggestions: suggestions3 } : {}),
@@ -935,7 +935,7 @@ export class CsvImportService {
     const quality = this.assessRowQuality(newRawJson as Record<string, string>);
     const editBrandCache = await this.loadBrandCache();
     const editMfrCache = await this.loadManufacturerCache();
-    const editSuggestions = this.generateSuggestions(newRawJson as Record<string, string>, editBrandCache, editMfrCache);
+    const editSuggestions = await this.generateSuggestions(newRawJson as Record<string, string>, editBrandCache, editMfrCache);
     row.rawJson = {
       ...newRawJson, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
       ...(Object.keys(editSuggestions).length > 0 ? { _suggestions: editSuggestions } : {}),
@@ -1201,16 +1201,7 @@ export class CsvImportService {
 
   // ==================== Internal helpers ====================
 
-  // ── WO-NETURE-IMPORT-AUTO-SUGGESTION-V1 ──────────────────────────────────
-
-  /** 카테고리 키워드 → 추천 카테고리명 매핑 (긴 키워드 우선) */
-  private static CATEGORY_KEYWORDS: Array<{ keywords: string[]; category: string }> = [
-    { keywords: ['비타민', '유산균', '프로바이오틱', '프로바이오', '오메가', '영양제', '홍삼', '루테인', '칼슘', '마그네슘', '아연', '철분', '콜라겐', '글루코사민', '밀크씨슬', '프로폴리스', '코엔자임', '엽산', '식이섬유'], category: '건강기능식품' },
-    { keywords: ['크림', '세럼', '로션', '토너', '클렌저', '에센스', '선크림', '마스크팩', '스킨', '앰플', '미스트', '클렌징'], category: '화장품' },
-    { keywords: ['치약', '구강', '손소독', '생리대', '밴드', '파스', '가글', '물티슈'], category: '의약외품' },
-    { keywords: ['혈압계', '체온계', '혈당', '보청기', '콘택트렌즈', '측정기', '의료용'], category: '의료기기' },
-    { keywords: ['차', '꿀', '즙', '환', '분말', '선식', '시리얼', '견과', '간식', '음료'], category: '식품' },
-  ];
+  // ── WO-NETURE-IMPORT-AUTO-SUGGESTION-V1 + CATEGORY-TREE-EXPANSION-V1 ─────
 
   /** 브랜드 캐시 로드 (이름 길이 역순 — 긴 이름 우선 매칭) */
   private async loadBrandCache(): Promise<string[]> {
@@ -1240,27 +1231,25 @@ export class CsvImportService {
    * 행 데이터 기반 자동 추천 생성
    *
    * 비어있는 필드에 대해서만 추천:
-   * - category_name: 상품명 키워드 매칭
+   * - category_name: CategoryMappingService DB 규칙 매칭
    * - brand: DB 브랜드 목록에서 상품명 포함 여부
    * - manufacturer_name: DB 제조사 목록에서 상품명 포함 여부
    * - short_description: 템플릿 기반 자동 생성
    */
-  private generateSuggestions(
+  private async generateSuggestions(
     raw: Record<string, string>,
     brandCache: string[],
     manufacturerCache: string[],
-  ): Record<string, string> {
+  ): Promise<Record<string, string>> {
     const suggestions: Record<string, string> = {};
     const name = (raw.marketing_name || raw.packaging_name || raw.regulatory_name || '').trim();
     if (!name) return suggestions;
 
-    // 1. Category suggestion (if empty)
+    // 1. Category suggestion via DB rules (WO-NETURE-CATEGORY-TREE-EXPANSION-V1)
     if (!(raw.category_name || '').trim()) {
-      for (const { keywords, category } of CsvImportService.CATEGORY_KEYWORDS) {
-        if (keywords.some((k) => name.includes(k))) {
-          suggestions.category_name = category;
-          break;
-        }
+      const catSuggestion = await this.categoryMappingService.suggestCategory(name);
+      if (catSuggestion.categoryName) {
+        suggestions.category_name = catSuggestion.categoryName;
       }
     }
 

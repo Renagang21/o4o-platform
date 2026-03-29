@@ -233,7 +233,7 @@ export const csvImportApi = {
   },
 };
 
-// ─── WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 ─────────────────────────────────
+// ─── WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1 ─────────────
 
 export const QUALITY_WARNING_LABELS: Record<string, string> = {
   MISSING_IMAGE: '이미지 없음',
@@ -258,4 +258,33 @@ export function computeBatchQuality(rows: CsvBatchRow[]) {
   }
 
   return { totalValidRows: validRows.length, completeRows, warningRows, avgScore, warningCounts };
+}
+
+// ─── WO-NETURE-IMPORT-AUTO-SUGGESTION-V1 ────────────────────────────────────
+
+export const SUGGESTION_FIELD_LABELS: Record<string, string> = {
+  category_name: '카테고리',
+  brand: '브랜드',
+  manufacturer_name: '제조사',
+  short_description: '짧은 설명',
+};
+
+export function getRowSuggestions(row: CsvBatchRow): Record<string, string> {
+  return (row.rawJson._suggestions as Record<string, string>) || {};
+}
+
+export function countBatchSuggestions(rows: CsvBatchRow[]): { rowsWithSuggestions: number; suggestionCounts: Record<string, number> } {
+  const validRows = rows.filter((r) => r.validationStatus === 'VALID');
+  let rowsWithSuggestions = 0;
+  const suggestionCounts: Record<string, number> = {};
+
+  for (const row of validRows) {
+    const suggestions = getRowSuggestions(row);
+    const keys = Object.keys(suggestions);
+    if (keys.length > 0) {
+      rowsWithSuggestions++;
+      for (const k of keys) suggestionCounts[k] = (suggestionCounts[k] || 0) + 1;
+    }
+  }
+  return { rowsWithSuggestions, suggestionCounts };
 }

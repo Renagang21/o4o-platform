@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, computeBatchQuality, QUALITY_WARNING_LABELS } from '../../lib/api/csvImport';
+import { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, computeBatchQuality, QUALITY_WARNING_LABELS, countBatchSuggestions, SUGGESTION_FIELD_LABELS } from '../../lib/api/csvImport';
 import EditImportRowDrawer from '../../components/import/EditImportRowDrawer';
 
 // ─── XLSX Template Download ──────────────────────────────────────────────────
@@ -632,6 +632,25 @@ export default function SupplierCsvImportPage() {
                             ))}
                           </div>
                         )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* WO-NETURE-IMPORT-AUTO-SUGGESTION-V1: Suggestion summary */}
+                  {selectedBatch.status === 'READY' && selectedBatch.rows && (() => {
+                    const suggestionInfo = countBatchSuggestions(selectedBatch.rows);
+                    if (suggestionInfo.rowsWithSuggestions === 0) return null;
+                    return (
+                      <div className="mb-4 p-3 bg-blue-50 rounded-lg text-xs space-y-1">
+                        <div className="flex gap-4">
+                          <span className="text-blue-700 font-medium">자동 추천: {suggestionInfo.rowsWithSuggestions}건</span>
+                          <span className="text-blue-500">수정 Drawer에서 추천을 확인하고 적용할 수 있습니다.</span>
+                        </div>
+                        <div className="flex gap-3 text-blue-500">
+                          {Object.entries(suggestionInfo.suggestionCounts).map(([field, count]) => (
+                            <span key={field}>{SUGGESTION_FIELD_LABELS[field] || field}: {count}건</span>
+                          ))}
+                        </div>
                       </div>
                     );
                   })()}

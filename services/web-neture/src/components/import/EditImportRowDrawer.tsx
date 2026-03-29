@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { csvImportApi, type CsvBatchRow, type CsvRowEditFields, QUALITY_WARNING_LABELS } from '../../lib/api/csvImport';
+import { csvImportApi, type CsvBatchRow, type CsvRowEditFields, QUALITY_WARNING_LABELS, SUGGESTION_FIELD_LABELS, getRowSuggestions } from '../../lib/api/csvImport';
 
 interface EditImportRowDrawerProps {
   row: CsvBatchRow;
@@ -67,6 +67,7 @@ function friendlyEditError(msg: string): string {
 
 export default function EditImportRowDrawer({ row, batchId, onSave, onClose }: EditImportRowDrawerProps) {
   const raw = row.rawJson as Record<string, string>;
+  const suggestions = getRowSuggestions(row); // WO-NETURE-IMPORT-AUTO-SUGGESTION-V1
 
   const [fields, setFields] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -197,6 +198,37 @@ export default function EditImportRowDrawer({ row, batchId, onSave, onClose }: E
             );
           })()}
 
+          {/* WO-NETURE-IMPORT-AUTO-SUGGESTION-V1: Suggestion banner */}
+          {Object.keys(suggestions).length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-blue-700 text-sm font-medium">
+                  자동 추천 ({Object.keys(suggestions).length}개 필드)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = { ...fields };
+                    for (const [key, val] of Object.entries(suggestions)) {
+                      if (!updated[key]) updated[key] = val;
+                    }
+                    setFields(updated);
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200"
+                >
+                  모두 적용
+                </button>
+              </div>
+              <ul className="text-xs text-blue-600 space-y-0.5">
+                {Object.entries(suggestions).map(([key, val]) => (
+                  <li key={key}>
+                    &bull; {SUGGESTION_FIELD_LABELS[key] || key}: {String(val).length > 30 ? String(val).slice(0, 30) + '...' : val}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Field Groups */}
           {FIELD_GROUPS.map((group) => (
             <div key={group.label}>
@@ -215,6 +247,21 @@ export default function EditImportRowDrawer({ row, batchId, onSave, onClose }: E
                           (w: string) => (QUALITY_FIELD_MAP[w] || []).includes(f.key),
                         ) && <span className="text-amber-500 ml-1 text-[10px]">(권장)</span>}
                     </label>
+                    {/* WO-NETURE-IMPORT-AUTO-SUGGESTION-V1: per-field suggestion chip */}
+                    {suggestions[f.key] && !fields[f.key] && (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[11px] text-blue-500 truncate max-w-[200px]">
+                          추천: {suggestions[f.key]}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleChange(f.key, suggestions[f.key])}
+                          className="text-[10px] text-blue-600 hover:text-blue-800 font-medium px-1.5 py-0.5 rounded bg-blue-50 hover:bg-blue-100 border border-blue-200 whitespace-nowrap"
+                        >
+                          적용
+                        </button>
+                      </div>
+                    )}
                     {f.type === 'textarea' ? (
                       <textarea
                         value={fields[f.key] || ''}
