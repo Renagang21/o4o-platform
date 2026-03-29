@@ -41,3 +41,5 @@ export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
 export { default as OperatorProductApprovalPage } from './OperatorProductApprovalPage';
 // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
 export { default as SupplierQualityPage } from './SupplierQualityPage';
+// WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
+export { default as CategoryMappingRulesPage } from './CategoryMappingRulesPage';

@@ -49,6 +49,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '상품 승인', path: '/operator/product-approvals', adminOnly: true },
     { label: '마스터 관리', path: '/operator/masters', adminOnly: true },
     { label: '카탈로그 일괄등록', path: '/operator/catalog-import', adminOnly: true },
+    { label: '카테고리 매핑', path: '/operator/category-mapping-rules', adminOnly: true },
   ],
   stores: [
     { label: '매장 관리', path: '/operator/stores' },
