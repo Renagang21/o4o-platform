@@ -43,6 +43,8 @@ import { createOperatorCurationController } from './controllers/operator-curatio
 import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createOperatorSupplierQualityController } from './controllers/operator-supplier-quality.controller.js';
+import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
+import { CategoryMappingService } from './services/category-mapping.service.js';
 
 // Request type
 type AuthenticatedRequest = Request & {
@@ -96,6 +98,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorActionQueueController(dataSource));
   // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
   router.use('/operator', createOperatorSupplierQualityController(dataSource));
+  // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
+  router.use('/operator', createOperatorCategoryMappingController());
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));
@@ -209,6 +213,26 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
       res.json({ success: true, data: tree });
     } catch (error) {
       logger.error('[Neture API] Error fetching public categories:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * GET /api/v1/neture/categories/suggest?name=비타민C
+   * WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
+   */
+  router.get('/categories/suggest', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const name = (req.query.name as string || '').trim();
+      if (!name) {
+        res.status(400).json({ success: false, error: 'NAME_REQUIRED' });
+        return;
+      }
+      const mappingService = new CategoryMappingService();
+      const suggestion = await mappingService.suggestCategory(name);
+      res.json({ success: true, data: suggestion });
+    } catch (error) {
+      logger.error('[Neture API] Error suggesting category:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }
   });

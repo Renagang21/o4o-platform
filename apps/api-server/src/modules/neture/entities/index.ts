@@ -21,3 +21,4 @@ export { NetureSettlementOrder } from './neture-settlement-order.entity.js';
 export { NetureContactMessage } from './NetureContactMessage.entity.js';
 export { OfferServiceApproval } from './OfferServiceApproval.entity.js';
 export { OfferCuration } from './OfferCuration.entity.js';
+export { CategoryMappingRule } from './CategoryMappingRule.entity.js';

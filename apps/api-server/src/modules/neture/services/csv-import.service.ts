@@ -39,6 +39,7 @@ import { verifyProductByBarcode } from './mfds.service.js';
 import { parseXlsxToRecords } from './xlsx-parser.service.js';
 import { ProductImportCommonService } from './product-import-common.service.js';
 import { ImageStorageService } from './image-storage.service.js';
+import { CategoryMappingService } from './category-mapping.service.js';
 import type { ProductContentInput } from '@o4o/ai-prompts/store';
 import logger from '../../../utils/logger.js';
 
@@ -77,6 +78,7 @@ export class CsvImportService {
   private supplierRepo: Repository<NetureSupplier>;
   private importCommon: ProductImportCommonService;
   private imageStorage: ImageStorageService;
+  private categoryMappingService: CategoryMappingService;
 
   constructor(private dataSource: DataSource) {
     this.batchRepo = dataSource.getRepository(SupplierCsvImportBatch);
@@ -86,6 +88,7 @@ export class CsvImportService {
     this.supplierRepo = dataSource.getRepository(NetureSupplier);
     this.importCommon = new ProductImportCommonService(dataSource);
     this.imageStorage = new ImageStorageService();
+    this.categoryMappingService = new CategoryMappingService();
   }
 
   // ==================== Upload + Validate ====================
@@ -189,6 +192,10 @@ export class CsvImportService {
       status: CsvImportBatchStatus.VALIDATING,
     });
     const savedBatch = await this.batchRepo.save(batch);
+
+    // WO-NETURE-IMPORT-AUTO-SUGGESTION-V1: Load caches for suggestions
+    const brandCache = await this.loadBrandCache();
+    const manufacturerCache = await this.loadManufacturerCache();
 
     // 3. Row별 검증
     const seenBarcodes = new Set<string>();
@@ -303,9 +310,13 @@ export class CsvImportService {
           row.actionType = CsvRowActionType.CREATE_MASTER;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
-          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
           const quality = this.assessRowQuality(raw);
-          row.rawJson = { ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
+          const suggestions = this.generateSuggestions(raw, brandCache, manufacturerCache);
+          row.rawJson = {
+            ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
+            ...(Object.keys(suggestions).length > 0 ? { _suggestions: suggestions } : {}),
+          };
         } else {
           this.rejectRow(row, 'MISSING_MARKETING_NAME');
           rejectedCount++;
@@ -321,9 +332,13 @@ export class CsvImportService {
           row.actionType = CsvRowActionType.LINK_EXISTING;
           row.validationStatus = CsvRowValidationStatus.VALID;
           validCount++;
-          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+          // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
           const quality = this.assessRowQuality(raw);
-          row.rawJson = { ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
+          const suggestions2 = this.generateSuggestions(raw, brandCache, manufacturerCache);
+          row.rawJson = {
+            ...raw, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
+            ...(Object.keys(suggestions2).length > 0 ? { _suggestions: suggestions2 } : {}),
+          };
         } else {
           const packagingName = (raw.packaging_name || '').trim();
           const marketingName = (raw.marketing_name || '').trim();
@@ -334,9 +349,13 @@ export class CsvImportService {
             row.actionType = CsvRowActionType.CREATE_MASTER;
             row.validationStatus = CsvRowValidationStatus.VALID;
             validCount++;
-            // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1
+            // WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1
             const quality2 = this.assessRowQuality(raw);
-            row.rawJson = { ...raw, _qualityScore: quality2.score, _qualityWarnings: quality2.warnings };
+            const suggestions3 = this.generateSuggestions(raw, brandCache, manufacturerCache);
+            row.rawJson = {
+              ...raw, _qualityScore: quality2.score, _qualityWarnings: quality2.warnings,
+              ...(Object.keys(suggestions3).length > 0 ? { _suggestions: suggestions3 } : {}),
+            };
           } else {
             this.rejectRow(row, 'MISSING_MARKETING_NAME');
             rejectedCount++;
@@ -631,6 +650,24 @@ export class CsvImportService {
       }
     }
 
+    // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1: auto-suggest when no category_name in CSV
+    if (!categoryName && masterId) {
+      const productName = (raw.marketing_name || raw.packaging_name || '').trim();
+      if (productName) {
+        try {
+          const suggestion = await this.categoryMappingService.suggestCategory(productName);
+          if (suggestion.categoryId) {
+            await manager.query(
+              `UPDATE product_masters SET category_id = $1 WHERE id = $2 AND category_id IS NULL`,
+              [suggestion.categoryId, masterId],
+            );
+          }
+        } catch (err) {
+          logger.warn(`[CsvImport] Category auto-suggest failed for row ${row.rowNumber}:`, err);
+        }
+      }
+    }
+
     // Offer upsert
     const distributionType = row.parsedDistributionType || 'PRIVATE';
     const supplyPrice = row.parsedSupplyPrice ?? 0;
@@ -894,9 +931,15 @@ export class CsvImportService {
 
     const newRawJson = { ...(row.rawJson as Record<string, unknown>), ...updates };
 
-    // Re-assess quality after edit (WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1)
+    // Re-assess quality + suggestions after edit (WO-NETURE-IMPORT-DATA-QUALITY-GUARD-V1 + AUTO-SUGGESTION-V1)
     const quality = this.assessRowQuality(newRawJson as Record<string, string>);
-    row.rawJson = { ...newRawJson, _qualityScore: quality.score, _qualityWarnings: quality.warnings };
+    const editBrandCache = await this.loadBrandCache();
+    const editMfrCache = await this.loadManufacturerCache();
+    const editSuggestions = this.generateSuggestions(newRawJson as Record<string, string>, editBrandCache, editMfrCache);
+    row.rawJson = {
+      ...newRawJson, _qualityScore: quality.score, _qualityWarnings: quality.warnings,
+      ...(Object.keys(editSuggestions).length > 0 ? { _suggestions: editSuggestions } : {}),
+    };
 
     const rawPrice = String(newRawJson.supply_price || '').trim();
     row.parsedSupplyPrice = rawPrice ? parseInt(rawPrice, 10) : null;
@@ -1157,6 +1200,101 @@ export class CsvImportService {
   }
 
   // ==================== Internal helpers ====================
+
+  // ── WO-NETURE-IMPORT-AUTO-SUGGESTION-V1 ──────────────────────────────────
+
+  /** 카테고리 키워드 → 추천 카테고리명 매핑 (긴 키워드 우선) */
+  private static CATEGORY_KEYWORDS: Array<{ keywords: string[]; category: string }> = [
+    { keywords: ['비타민', '유산균', '프로바이오틱', '프로바이오', '오메가', '영양제', '홍삼', '루테인', '칼슘', '마그네슘', '아연', '철분', '콜라겐', '글루코사민', '밀크씨슬', '프로폴리스', '코엔자임', '엽산', '식이섬유'], category: '건강기능식품' },
+    { keywords: ['크림', '세럼', '로션', '토너', '클렌저', '에센스', '선크림', '마스크팩', '스킨', '앰플', '미스트', '클렌징'], category: '화장품' },
+    { keywords: ['치약', '구강', '손소독', '생리대', '밴드', '파스', '가글', '물티슈'], category: '의약외품' },
+    { keywords: ['혈압계', '체온계', '혈당', '보청기', '콘택트렌즈', '측정기', '의료용'], category: '의료기기' },
+    { keywords: ['차', '꿀', '즙', '환', '분말', '선식', '시리얼', '견과', '간식', '음료'], category: '식품' },
+  ];
+
+  /** 브랜드 캐시 로드 (이름 길이 역순 — 긴 이름 우선 매칭) */
+  private async loadBrandCache(): Promise<string[]> {
+    try {
+      const rows: Array<{ name: string }> = await this.dataSource.query(
+        `SELECT DISTINCT name FROM brands WHERE name IS NOT NULL AND name != '' AND is_active = true ORDER BY LENGTH(name) DESC LIMIT 200`,
+      );
+      return rows.map((r) => r.name);
+    } catch {
+      return [];
+    }
+  }
+
+  /** 제조사 캐시 로드 (이름 길이 역순) */
+  private async loadManufacturerCache(): Promise<string[]> {
+    try {
+      const rows: Array<{ manufacturer_name: string }> = await this.dataSource.query(
+        `SELECT DISTINCT "manufacturerName" AS manufacturer_name FROM product_masters WHERE "manufacturerName" IS NOT NULL AND "manufacturerName" != '' AND "manufacturerName" != 'Unknown' ORDER BY LENGTH("manufacturerName") DESC LIMIT 200`,
+      );
+      return rows.map((r) => r.manufacturer_name);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * 행 데이터 기반 자동 추천 생성
+   *
+   * 비어있는 필드에 대해서만 추천:
+   * - category_name: 상품명 키워드 매칭
+   * - brand: DB 브랜드 목록에서 상품명 포함 여부
+   * - manufacturer_name: DB 제조사 목록에서 상품명 포함 여부
+   * - short_description: 템플릿 기반 자동 생성
+   */
+  private generateSuggestions(
+    raw: Record<string, string>,
+    brandCache: string[],
+    manufacturerCache: string[],
+  ): Record<string, string> {
+    const suggestions: Record<string, string> = {};
+    const name = (raw.marketing_name || raw.packaging_name || raw.regulatory_name || '').trim();
+    if (!name) return suggestions;
+
+    // 1. Category suggestion (if empty)
+    if (!(raw.category_name || '').trim()) {
+      for (const { keywords, category } of CsvImportService.CATEGORY_KEYWORDS) {
+        if (keywords.some((k) => name.includes(k))) {
+          suggestions.category_name = category;
+          break;
+        }
+      }
+    }
+
+    // 2. Brand suggestion (if empty)
+    if (!(raw.brand || '').trim() && brandCache.length > 0) {
+      for (const brand of brandCache) {
+        if (name.includes(brand)) {
+          suggestions.brand = brand;
+          break;
+        }
+      }
+    }
+
+    // 3. Manufacturer suggestion (if empty)
+    if (!(raw.manufacturer_name || '').trim() && manufacturerCache.length > 0) {
+      for (const mfr of manufacturerCache) {
+        if (name.includes(mfr)) {
+          suggestions.manufacturer_name = mfr;
+          break;
+        }
+      }
+    }
+
+    // 4. Description suggestion (if both short and detail empty)
+    const hasDesc = (raw.short_description || raw.detail_description || raw.consumer_short_description || '').trim();
+    if (!hasDesc) {
+      const cat = suggestions.category_name || (raw.category_name || '').trim();
+      suggestions.short_description = cat
+        ? `${name}은(는) ${cat}에 속하는 제품입니다.`
+        : `${name} 제품입니다.`;
+    }
+
+    return suggestions;
+  }
 
   private rejectRow(row: SupplierCsvImportRow, error: string): void {
     row.validationStatus = CsvRowValidationStatus.REJECTED;
