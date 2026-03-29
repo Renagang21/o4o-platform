@@ -113,12 +113,9 @@ function OfferModal({
                           {offer.distributionType === 'PUBLIC' ? '공개' : '비공개'}
                         </span>
                       </div>
-                      {/* Descriptions */}
-                      {offer.consumerShortDescription && (
-                        <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{offer.consumerShortDescription}</p>
-                      )}
-                      {offer.businessShortDescription && !offer.consumerShortDescription && (
-                        <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{offer.businessShortDescription}</p>
+                      {/* Descriptions — WO-NETURE-B2B-CONTENT-MANAGEMENT-V1: backend COALESCE fallback */}
+                      {offer.effectiveShortDescription && (
+                        <p className="text-xs text-slate-500 mt-1.5 line-clamp-2">{offer.effectiveShortDescription}</p>
                       )}
                     </div>
                     <button

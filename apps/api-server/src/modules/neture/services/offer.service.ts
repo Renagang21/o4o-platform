@@ -479,6 +479,11 @@ export class NetureOfferService {
           brandName: o.master?.brand?.name || o.master?.brandName || null,
           categoryName: o.master?.category?.name || null,
           specification: o.master?.specification || null,
+          // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: additional Master fields
+          originCountry: o.master?.originCountry || null,
+          tags: o.master?.tags || [],
+          categoryId: o.master?.categoryId || null,
+          brandId: o.master?.brandId || null,
           primaryImageUrl: imageMap.get(o.masterId) || null,
         };
       });
@@ -720,6 +725,12 @@ export class NetureOfferService {
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
       marketingName?: string;
+      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
+      categoryId?: string | null;
+      brandId?: string | null;
+      specification?: string | null;
+      originCountry?: string | null;
+      tags?: string[];
     }
   ) {
     try {
@@ -760,9 +771,17 @@ export class NetureOfferService {
         offer.consumerDetailDescription = updates.consumerDetailDescription;
       }
 
-      // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: marketingName → master
-      if (updates.marketingName !== undefined) {
-        await this.catalogService.updateProductMaster(offer.masterId, { marketingName: updates.marketingName });
+      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level field updates (consolidated)
+      const masterUpdates: Record<string, unknown> = {};
+      if (updates.marketingName !== undefined) masterUpdates.marketingName = updates.marketingName;
+      if (updates.categoryId !== undefined) masterUpdates.categoryId = updates.categoryId;
+      if (updates.brandId !== undefined) masterUpdates.brandId = updates.brandId;
+      if (updates.specification !== undefined) masterUpdates.specification = updates.specification;
+      if (updates.originCountry !== undefined) masterUpdates.originCountry = updates.originCountry;
+      if (updates.tags !== undefined) masterUpdates.tags = updates.tags;
+
+      if (Object.keys(masterUpdates).length > 0) {
+        await this.catalogService.updateProductMaster(offer.masterId, masterUpdates);
       }
 
       // Validation: PRIVATE requires at least one seller ID
@@ -800,6 +819,50 @@ export class NetureOfferService {
       };
     } catch (error) {
       logger.error('[NetureOfferService] Error updating supplier offer:', error);
+      throw error;
+    }
+  }
+
+  // ==================== B2B Content (WO-NETURE-B2B-CONTENT-MANAGEMENT-V1) ====================
+
+  async updateBusinessContent(
+    offerId: string,
+    supplierId: string,
+    updates: {
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
+    },
+  ) {
+    try {
+      const offer = await this.offerRepo.findOne({
+        where: { id: offerId, supplierId },
+      });
+
+      if (!offer) {
+        return { success: false, error: 'PRODUCT_NOT_FOUND' };
+      }
+
+      if (updates.businessShortDescription !== undefined) {
+        offer.businessShortDescription = updates.businessShortDescription;
+      }
+      if (updates.businessDetailDescription !== undefined) {
+        offer.businessDetailDescription = updates.businessDetailDescription;
+      }
+
+      const saved = await this.offerRepo.save(offer);
+      logger.info(`[NetureOfferService] Updated business content for offer ${offerId} by supplier ${supplierId}`);
+
+      return {
+        success: true,
+        data: {
+          id: saved.id,
+          businessShortDescription: saved.businessShortDescription,
+          businessDetailDescription: saved.businessDetailDescription,
+          updatedAt: saved.updatedAt,
+        },
+      };
+    } catch (error) {
+      logger.error('[NetureOfferService] Error updating business content:', error);
       throw error;
     }
   }
@@ -974,6 +1037,8 @@ export class NetureOfferService {
            spo.consumer_reference_price AS "consumerReferencePrice",
            spo.consumer_short_description AS "consumerShortDescription",
            spo.consumer_detail_description AS "consumerDetailDescription",
+           spo.business_short_description AS "businessShortDescription",
+           spo.business_detail_description AS "businessDetailDescription",
            spo.service_keys AS "serviceKeys",
            spo.stock_quantity AS "stockQuantity",
            spo.created_at AS "createdAt",

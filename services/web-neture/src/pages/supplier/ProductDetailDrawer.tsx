@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Pencil, Trash2, ImagePlus, Loader2 } from 'lucide-react';
-import { supplierApi, type SupplierProduct, productApi, type ProductImage } from '../../lib/api';
+import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
 
 interface ProductDetailDrawerProps {
@@ -100,6 +100,21 @@ function formatDate(dateString: string | null | undefined): string {
   return date.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
+// WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: flatten category tree for <select>
+function flattenCategories(
+  categories: CategoryTreeItem[],
+  depth = 0,
+): { id: string; name: string; depth: number }[] {
+  const result: { id: string; name: string; depth: number }[] = [];
+  for (const cat of categories) {
+    result.push({ id: cat.id, name: cat.name, depth });
+    if (cat.children?.length) {
+      result.push(...flattenCategories(cat.children, depth + 1));
+    }
+  }
+  return result;
+}
+
 function toFormData(p: SupplierProduct): Partial<ProductFormData> {
   return {
     marketingName: p.name || p.masterName || '',
@@ -131,6 +146,18 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   // Track ProductForm data via ref to avoid re-render loops
   const formRef = useRef<ProductFormData | null>(null);
   const isDirtyRef = useRef(false);
+
+  // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master field editing state
+  const [editCategory, setEditCategory] = useState<string | null>(null);
+  const [editBrand, setEditBrand] = useState<string | null>(null);
+  const [editSpec, setEditSpec] = useState('');
+  const [editOrigin, setEditOrigin] = useState('');
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [editBizShort, setEditBizShort] = useState('');
+  const [editBizDetail, setEditBizDetail] = useState('');
+  const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
+  const [brands, setBrands] = useState<BrandItem[]>([]);
 
   // Load images when drawer opens
   useEffect(() => {
@@ -199,7 +226,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     const form = formRef.current;
     setSaving(true);
 
-    // 1. 기본 필드 + distributionType 업데이트
+    // 1. 기본 필드 + distributionType + Master 필드 업데이트
     const result = await supplierApi.updateProduct(product.id, {
       marketingName: form.marketingName || undefined,
       priceGeneral: form.priceGeneral ?? undefined,
@@ -207,9 +234,29 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       stockQuantity: form.stockQuantity,
       isActive: form.isActive,
       distributionType: form.distributionType as any,
+      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
+      categoryId: editCategory,
+      brandId: editBrand,
+      specification: editSpec || null,
+      originCountry: editOrigin || null,
+      tags: editTags,
     });
 
-    // 2. 새로운 serviceKeys가 추가되었으면 승인 요청
+    // 2. B2B 설명 업데이트 (전용 엔드포인트)
+    if (result.success) {
+      const bizShort = editBizShort.trim() ? `<p>${editBizShort.trim()}</p>` : null;
+      const bizDetail = editBizDetail.trim() ? `<p>${editBizDetail.trim()}</p>` : null;
+      const prevBizShort = stripHtml(product.businessShortDescription);
+      const prevBizDetail = stripHtml(product.businessDetailDescription);
+      if (editBizShort.trim() !== prevBizShort || editBizDetail.trim() !== prevBizDetail) {
+        await supplierApi.updateBusinessContent(product.id, {
+          businessShortDescription: bizShort,
+          businessDetailDescription: bizDetail,
+        });
+      }
+    }
+
+    // 3. 새로운 serviceKeys가 추가되었으면 승인 요청
     if (result.success && form.serviceKeys?.length) {
       const existingKeys = new Set(product.serviceKeys || []);
       const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
@@ -315,7 +362,20 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           <div className="flex items-center gap-1 shrink-0">
             {!isEditing && !approvalActions && (
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: initialize Master fields on edit
+                  setEditCategory(product.categoryId || null);
+                  setEditBrand(product.brandId || null);
+                  setEditSpec(product.specification || '');
+                  setEditOrigin(product.originCountry || '');
+                  setEditTags(product.tags || []);
+                  setTagInput('');
+                  setEditBizShort(stripHtml(product.businessShortDescription) || '');
+                  setEditBizDetail(stripHtml(product.businessDetailDescription) || '');
+                  productApi.getCategories().then(setCategories);
+                  productApi.getBrands().then(setBrands);
+                  setIsEditing(true);
+                }}
                 className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"
                 title="수정"
               >
@@ -345,6 +405,135 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 onChange={handleFormChange}
                 disabled={saving}
               />
+            </div>
+          )}
+
+          {/* ── 수정 모드: Master 필드 + B2B 설명 (WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1) ── */}
+          {isEditing && (
+            <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보 수정</h4>
+
+              {/* 카테고리 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">카테고리</label>
+                <select
+                  value={editCategory || ''}
+                  onChange={(e) => setEditCategory(e.target.value || null)}
+                  disabled={saving}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                >
+                  <option value="">선택 안함</option>
+                  {flattenCategories(categories).map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {'  '.repeat(cat.depth)}{cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 브랜드 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">브랜드</label>
+                <select
+                  value={editBrand || ''}
+                  onChange={(e) => setEditBrand(e.target.value || null)}
+                  disabled={saving}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                >
+                  <option value="">선택 안함</option>
+                  {brands.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 사양 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">사양</label>
+                <input
+                  type="text"
+                  value={editSpec}
+                  onChange={(e) => setEditSpec(e.target.value)}
+                  disabled={saving}
+                  placeholder="예: 500mg × 60정"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                />
+              </div>
+
+              {/* 원산지 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">원산지</label>
+                <input
+                  type="text"
+                  value={editOrigin}
+                  onChange={(e) => setEditOrigin(e.target.value)}
+                  disabled={saving}
+                  placeholder="예: 대한민국"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                />
+              </div>
+
+              {/* 태그 */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">태그</label>
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {editTags.map((tag, i) => (
+                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-xs">
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => setEditTags((prev) => prev.filter((_, idx) => idx !== i))}
+                        className="text-slate-400 hover:text-slate-600"
+                      >×</button>
+                    </span>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ',') && tagInput.trim()) {
+                      e.preventDefault();
+                      const newTag = tagInput.trim().replace(/,$/, '');
+                      if (newTag && !editTags.includes(newTag)) {
+                        setEditTags((prev) => [...prev, newTag]);
+                      }
+                      setTagInput('');
+                    }
+                  }}
+                  disabled={saving}
+                  placeholder="태그 입력 후 Enter"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
+                />
+              </div>
+
+              {/* B2B 설명 */}
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pt-2">B2B 설명</h4>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
+                <textarea
+                  value={editBizShort}
+                  onChange={(e) => setEditBizShort(e.target.value)}
+                  disabled={saving}
+                  rows={2}
+                  placeholder="거래처용 간단 소개"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
+                <textarea
+                  value={editBizDetail}
+                  onChange={(e) => setEditBizDetail(e.target.value)}
+                  disabled={saving}
+                  rows={4}
+                  placeholder="거래처용 상세 설명"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 resize-none"
+                />
+              </div>
             </div>
           )}
 
@@ -490,6 +679,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               <InfoRow label="카테고리">{product.categoryName || '-'}</InfoRow>
               {product.specification && (
                 <InfoRow label="사양">{product.specification}</InfoRow>
+              )}
+              {product.originCountry && (
+                <InfoRow label="원산지">{product.originCountry}</InfoRow>
               )}
               <InfoRow label="규제 유형">
                 <Badge className={regBadgeCls}>{regLabel}</Badge>

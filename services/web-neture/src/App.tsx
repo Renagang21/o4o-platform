@@ -174,6 +174,10 @@ const SupplierPartnerCommissionsPage = lazy(() =>
 const SupplierCsvImportPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierCsvImportPage }))
 );
+// WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
+const SupplierB2BContentPage = lazy(() =>
+  import('./pages/supplier/SupplierB2BContentPage').then((m) => ({ default: m.default }))
+);
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.MyForumDashboardPage }))
@@ -574,6 +578,8 @@ function App() {
               <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
               {/* WO-NETURE-CSV-IMPORT-UI-V1 */}
               <Route path="/supplier/csv-import" element={<SupplierCsvImportPage />} />
+              {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
+              <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
               <Route path="/supplier/profile" element={<SupplierProfilePage />} />
               {/* WO-O4O-MARKET-TRIAL-PHASE1-V1 */}
               <Route path="/supplier/market-trial/new" element={<SupplierTrialCreatePage />} />

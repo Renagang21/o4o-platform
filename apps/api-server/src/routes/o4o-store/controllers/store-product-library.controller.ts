@@ -108,6 +108,9 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
               spo.distribution_type AS "distributionType",
               spo.consumer_short_description AS "consumerShortDescription",
               spo.business_short_description AS "businessShortDescription",
+              spo.business_detail_description AS "businessDetailDescription",
+              COALESCE(spo.business_short_description, spo.consumer_short_description) AS "effectiveShortDescription",
+              COALESCE(spo.business_detail_description, spo.consumer_detail_description) AS "effectiveDetailDescription",
               pm.brand_name AS "brandName",
               pm.manufacturer_name AS "manufacturerName"
        FROM supplier_product_offers spo

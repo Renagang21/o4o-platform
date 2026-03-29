@@ -165,6 +165,26 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // PATCH /supplier/products/:id/business-content (WO-NETURE-B2B-CONTENT-MANAGEMENT-V1)
+  router.patch('/products/:id/business-content', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const { id } = req.params;
+      const { businessShortDescription, businessDetailDescription } = req.body;
+      const result = await netureService.updateBusinessContent(id, supplierId, {
+        businessShortDescription, businessDetailDescription,
+      });
+      if (!result.success) {
+        const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;
+        return res.status(statusCode).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error updating business content:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to update business content' });
+    }
+  });
+
   // PATCH /supplier/products/:id
   router.patch('/products/:id', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -172,11 +192,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { id } = req.params;
       const { isActive, distributionType, allowedSellerIds,
               priceGeneral, consumerReferencePrice, stockQuantity,
-              consumerShortDescription, consumerDetailDescription, marketingName } = req.body;
+              consumerShortDescription, consumerDetailDescription, marketingName,
+              categoryId, brandId, specification, originCountry, tags } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
         isActive, distributionType, allowedSellerIds,
         priceGeneral, consumerReferencePrice, stockQuantity,
         consumerShortDescription, consumerDetailDescription, marketingName,
+        categoryId, brandId, specification, originCountry, tags,
       });
       if (!result.success) {
         const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;

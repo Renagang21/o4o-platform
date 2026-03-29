@@ -316,6 +316,18 @@ export class NetureService {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);
   }
 
+  // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
+  async updateBusinessContent(
+    offerId: string,
+    supplierId: string,
+    updates: {
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
+    },
+  ) {
+    return this.offerService.updateBusinessContent(offerId, supplierId, updates);
+  }
+
   // ==================== Product Master ====================
 
   async getProductMasterByBarcode(barcode: string): Promise<ProductMaster | null> {

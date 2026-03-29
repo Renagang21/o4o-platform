@@ -118,6 +118,9 @@ export interface SupplierProduct {
   // WO-NETURE-SUPPLIER-CONTENT-EDIT-UX-V1
   consumerShortDescription?: string | null;
   consumerDetailDescription?: string | null;
+  // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
+  businessShortDescription?: string | null;
+  businessDetailDescription?: string | null;
   // WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1
   completenessScore?: number;
   completenessStatus?: 'DRAFT' | 'INCOMPLETE' | 'READY' | 'APPROVED';
@@ -127,6 +130,10 @@ export interface SupplierProduct {
   regulatoryName?: string;
   mfdsPermitNumber?: string | null;
   manufacturerName?: string | null;
+  // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1
+  originCountry?: string | null;
+  categoryId?: string | null;
+  brandId?: string | null;
 }
 
 export interface ServiceSummary {
@@ -590,10 +597,32 @@ export const supplierApi = {
       businessDetailDescription?: string | null;
       stockQuantity?: number;
       marketingName?: string;
+      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
+      categoryId?: string | null;
+      brandId?: string | null;
+      specification?: string | null;
+      originCountry?: string | null;
+      tags?: string[];
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await api.patch(`/neture/supplier/products/${id}`, updates);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
+  // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
+  async updateBusinessContent(
+    offerId: string,
+    data: {
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
+    },
+  ): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      const response = await api.patch(`/neture/supplier/products/${offerId}/business-content`, data);
       return response.data;
     } catch (error) {
       return { success: false, error: 'NETWORK_ERROR' };

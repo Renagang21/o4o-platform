@@ -276,6 +276,9 @@ export interface StoreOfferItem {
   distributionType: string;
   consumerShortDescription: string | null;
   businessShortDescription: string | null;
+  businessDetailDescription: string | null;
+  effectiveShortDescription: string | null;
+  effectiveDetailDescription: string | null;
   brandName: string | null;
   manufacturerName: string | null;
 }
