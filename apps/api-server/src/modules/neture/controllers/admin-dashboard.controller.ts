@@ -123,7 +123,7 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           key: 'pending-products',
           label: '상품 승인 대기',
           status: (pendingApprovals > 0 ? 'partial' : 'configured') as 'partial' | 'configured',
-          link: '/admin/product-service-approvals',
+          link: '/admin/product-service-approvals?status=pending',
         },
         {
           key: 'pending-suppliers',
