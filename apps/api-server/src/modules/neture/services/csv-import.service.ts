@@ -569,7 +569,7 @@ export class CsvImportService {
           marketingName: csvMarketingName || csvRegulatoryName || mfds?.regulatoryName || 'UNKNOWN_PRODUCT',
           regulatoryName: csvRegulatoryName || mfds?.regulatoryName || csvMarketingName || 'UNKNOWN',
           regulatoryType: mfds?.regulatoryType || 'UNKNOWN',
-          manufacturerName: csvManufacturerName || mfds?.manufacturerName || null,
+          manufacturerName: csvManufacturerName || mfds?.manufacturerName || 'Unknown',
           mfdsPermitNumber: mfds?.permitNumber || null,
           mfdsProductId: mfds?.productId || barcode,
           isMfdsVerified: !!mfds,
