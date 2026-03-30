@@ -4,6 +4,7 @@
  * WO-O4O-NETURE-SUPPLIER-DRAWER-V1
  * WO-O4O-NETURE-SUPPLIER-DRAWER-EDITABLE-V1
  * WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1 — ProductForm 통합
+ * WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1 — B2B 상세 설명 에디터에 템플릿 기능 연결
  *
  * 조회 모드: read-only 섹션
  * 수정 모드: ProductForm mode="edit" 사용
@@ -13,7 +14,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
-import { RichTextEditor } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
+import { useContentTemplates } from '../../hooks/useContentTemplates';
+import { useAuth } from '../../contexts';
 
 interface ProductDetailDrawerProps {
   product: SupplierProduct | null;
@@ -90,10 +93,6 @@ function formatPrice(v: number | null | undefined): string {
   return `${Number(v).toLocaleString()}원`;
 }
 
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return '';
-  return html.replace(/<[^>]*>/g, '').trim();
-}
 
 function formatDate(dateString: string | null | undefined): string {
   if (!dateString) return '-';
@@ -136,6 +135,13 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showDirtyConfirm, setShowDirtyConfirm] = useState(false);
+
+  // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
+  const { user } = useAuth();
+  const tpl = useContentTemplates();
+  const canCreatePublicTemplate = user?.roles?.some(
+    (r: string) => r.includes('admin') || r.includes('operator') || r.includes('super_admin'),
+  ) ?? false;
 
   // Image state
   const [images, setImages] = useState<ProductImage[]>([]);
@@ -635,6 +641,16 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
+                  showTemplateActions
+                  templates={tpl.templates}
+                  templatesLoading={tpl.loading}
+                  templatesSaving={tpl.saving}
+                  onLoadTemplates={tpl.loadTemplates}
+                  onSaveAsTemplate={(name, category, isPublic) =>
+                    tpl.saveTemplate(editBizDetail, name, category, isPublic)
+                  }
+                  onUseTemplate={tpl.recordUse}
+                  canCreatePublicTemplate={canCreatePublicTemplate}
                 />
               </div>
             </div>
@@ -895,25 +911,19 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               {product.consumerShortDescription && (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">소비자 간단 소개</span>
-                  <p className="text-sm text-slate-700 line-clamp-3">
-                    {stripHtml(product.consumerShortDescription)}
-                  </p>
+                  <ContentRenderer html={product.consumerShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
                 </div>
               )}
               {product.consumerDetailDescription && (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">소비자 상세 설명</span>
-                  <p className="text-sm text-slate-700 line-clamp-5">
-                    {stripHtml(product.consumerDetailDescription)}
-                  </p>
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
                 </div>
               )}
               {product.businessShortDescription ? (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">B2B 간단 소개</span>
-                  <p className="text-sm text-slate-700 line-clamp-3">
-                    {stripHtml(product.businessShortDescription)}
-                  </p>
+                  <ContentRenderer html={product.businessShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
                 </div>
               ) : (
                 <div>
@@ -924,9 +934,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               {product.businessDetailDescription ? (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">B2B 상세 설명</span>
-                  <p className="text-sm text-slate-700 line-clamp-5">
-                    {stripHtml(product.businessDetailDescription)}
-                  </p>
+                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
                 </div>
               ) : (
                 <div>

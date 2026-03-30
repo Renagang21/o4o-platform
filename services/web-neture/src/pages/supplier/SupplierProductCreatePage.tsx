@@ -2,6 +2,7 @@
  * SupplierProductCreatePage - 공급자 상품 등록 (3-Step Wizard)
  *
  * WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
+ * WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1: 상세 설명 에디터에 템플릿 기능 연결
  *
  * Step 1: 기본 정보 (상품명, 카테고리, 브랜드, 제조사, 바코드 optional, 규제)
  * Step 2: 가격/유통/서비스 (공급가, 소비자참고가, 유통정책, 서비스선택)
@@ -18,6 +19,8 @@ import {
   type CategoryTreeItem,
 } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
+import { useContentTemplates } from '../../hooks/useContentTemplates';
+import { useAuth } from '../../contexts';
 
 const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
 
@@ -98,6 +101,13 @@ export default function SupplierProductCreatePage() {
   const [detailPreviews, setDetailPreviews] = useState<string[]>([]);
   const [contentFiles, setContentFiles] = useState<File[]>([]);
   const [contentPreviews, setContentPreviews] = useState<string[]>([]);
+
+  // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
+  const { user } = useAuth();
+  const tpl = useContentTemplates();
+  const canCreatePublicTemplate = user?.roles?.some(
+    (r: string) => r.includes('admin') || r.includes('operator') || r.includes('super_admin'),
+  ) ?? false;
 
   // Submit
   const [submitting, setSubmitting] = useState(false);
@@ -629,6 +639,16 @@ export default function SupplierProductCreatePage() {
                 onChange={(c) => setConsumerDetailDesc(c.html)}
                 placeholder="소비자에게 보이는 상세 설명을 입력하세요..."
                 minHeight="200px"
+                showTemplateActions
+                templates={tpl.templates}
+                templatesLoading={tpl.loading}
+                templatesSaving={tpl.saving}
+                onLoadTemplates={tpl.loadTemplates}
+                onSaveAsTemplate={(name, category, isPublic) =>
+                  tpl.saveTemplate(consumerDetailDesc, name, category, isPublic)
+                }
+                onUseTemplate={tpl.recordUse}
+                canCreatePublicTemplate={canCreatePublicTemplate}
               />
             </div>
           </div>
