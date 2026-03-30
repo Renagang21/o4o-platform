@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { cn } from '@/lib/utils';
 import {
   Palette,
@@ -546,7 +547,7 @@ const CoverOverlay: React.FC<CoverOverlayProps> = ({
     return (
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <defs>
-          <g dangerouslySetInnerHTML={{ __html: generateDuotoneFilter(overlay.duotone) }} />
+          <g dangerouslySetInnerHTML={{ __html: sanitizeHtml(generateDuotoneFilter(overlay.duotone)) }} />
         </defs>
       </svg>
     );

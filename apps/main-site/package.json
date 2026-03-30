@@ -14,6 +14,7 @@
     "delete:view": "tsx src/generator/cli.ts delete"
   },
   "dependencies": {
+    "dompurify": "^3.0.6",
     "@o4o/auth-client": "workspace:*",
     "@o4o/ui": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
@@ -23,6 +24,7 @@
     "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@types/react": "^19.1.1",
     "@types/react-dom": "^19.1.1",
     "@vitejs/plugin-react": "^4.3.0",

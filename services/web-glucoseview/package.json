@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "dompurify": "^3.0.6",
     "@o4o/error-handling": "workspace:*",
     "@o4o/ai-components": "workspace:*",
     "@o4o/auth-client": "workspace:*",
@@ -25,6 +26,7 @@
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",

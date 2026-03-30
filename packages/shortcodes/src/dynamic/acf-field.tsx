@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, useState, createElement } from 'react';
+import DOMPurify from 'dompurify';
 import { ACFFieldShortcodeAttributes, ACFFieldValue, DynamicShortcodeContext } from './types.js';
 import { ShortcodeProps } from '../types.js';
 
@@ -171,7 +172,7 @@ const formatACFValue = (value: any, type?: string, format?: string, attributes?:
     case 'wysiwyg':
     case 'textarea':
       if (format === 'html' || type === 'wysiwyg') {
-        return <div dangerouslySetInnerHTML={{ __html: value }} className={attributes?.class || ''} />;
+        return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }} className={attributes?.class || ''} />;
       }
       return value;
 

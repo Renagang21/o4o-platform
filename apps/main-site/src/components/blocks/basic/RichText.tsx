@@ -2,6 +2,7 @@
  * RichText Block Renderer
  */
 
+import DOMPurify from 'dompurify';
 import { BlockRendererProps } from '../BlockRenderer';
 
 export const RichTextBlock = ({ node }: BlockRendererProps) => {
@@ -17,7 +18,7 @@ export const RichTextBlock = ({ node }: BlockRendererProps) => {
   return (
     <div
       className={`prose prose-lg max-w-none ${alignClasses[align as keyof typeof alignClasses] || 'text-left'}`}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
     />
   );
 };

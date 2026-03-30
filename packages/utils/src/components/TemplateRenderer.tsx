@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import type {
   TemplatePreset,
   TemplateLayoutType,
@@ -159,7 +160,7 @@ function SchemaOrgComponent({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData, null, 2) }}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(JSON.stringify(schemaData, null, 2)) }}
     />
   );
 }

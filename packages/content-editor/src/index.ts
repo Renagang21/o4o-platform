@@ -4,6 +4,7 @@
  */
 
 export { RichTextEditor, Toolbar, ContentPreview } from './components';
+export { sanitizeHtml } from './sanitize';
 export type {
   ContentEditorProps,
   EditorContent,

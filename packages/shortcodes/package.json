@@ -39,6 +39,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "dompurify": "^3.0.6",
     "@o4o/auth-client": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/utils": "workspace:*",
@@ -46,6 +47,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "typescript": "5.4.5"

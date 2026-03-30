@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { api } from '../../lib/api/index.js';
+import { sanitizeHtml } from '@o4o/content-editor';
 
 // ── Types ──
 
@@ -180,7 +181,7 @@ export default function StoreBlogPage() {
               prose-headings:text-gray-900 prose-headings:font-bold
               prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
               prose-img:rounded-xl prose-img:shadow-sm"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </article>
 

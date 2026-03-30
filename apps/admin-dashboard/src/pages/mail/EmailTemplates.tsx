@@ -1,4 +1,5 @@
 import { FC, useState, useEffect } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { Plus, Edit, Trash2, Eye, Copy } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -372,7 +373,7 @@ const EmailTemplates: FC = () => {
                 <Label>내용</Label>
                 <div 
                   className="p-4 bg-white border rounded"
-                  dangerouslySetInnerHTML={{ __html: previewTemplate.htmlContent }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(previewTemplate.htmlContent) }}
                 />
               </div>
             </div>

@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import {
   BookOpen,
   Activity,
@@ -317,7 +318,7 @@ export default function CareGuidelinePage() {
                     {selectedDetail.body ? (
                       <div
                         className="prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: selectedDetail.body }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedDetail.body) }}
                       />
                     ) : (
                       <p className="text-sm text-slate-400">본문이 없습니다.</p>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 import type { ChatMessage, PromptDefinition } from './types';
 import { getDefaultPrompts, buildUserPrompt } from './prompts';
 import { api } from '../../services/api';
@@ -252,9 +253,9 @@ export default function AIChatWidget({
               <div
                 className="text-sm whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{
-                  __html: message.content
+                  __html: DOMPurify.sanitize(message.content
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\n/g, '<br />'),
+                    .replace(/\n/g, '<br />')),
                 }}
               />
               <p

@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'dompurify';
 import type {
   ViewPreset,
   ViewField
@@ -23,7 +24,7 @@ function renderFieldValue(value: any, field: ViewField): React.ReactNode {
 
   switch (field.format) {
     case 'html':
-      return <div dangerouslySetInnerHTML={{ __html: value }} />;
+      return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(value) }} />;
 
     case 'image':
       if (typeof value === 'string') {

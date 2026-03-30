@@ -26,6 +26,7 @@
  */
 
 import React, { ReactNode, CSSProperties, useMemo } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { Descendant } from 'slate';
 
 interface SlateBlockWrapperProps {
@@ -80,7 +81,7 @@ const SlateBlockWrapper: React.FC<SlateBlockWrapperProps> = ({
         minHeight: '1.5em',
         ...viewModeStyle,
       }}
-      dangerouslySetInnerHTML={{ __html: viewModeHtml }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(viewModeHtml) }}
     />
   );
 };

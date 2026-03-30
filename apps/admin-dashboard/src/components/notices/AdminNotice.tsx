@@ -1,4 +1,5 @@
 import { FC, ReactNode, useState } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { X } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -63,7 +64,7 @@ export const AdminNotice: FC<AdminNoticeProps> = ({
 
   return (
     <div className={noticeClasses}>
-      <p dangerouslySetInnerHTML={{ __html: message }} />
+      <p dangerouslySetInnerHTML={{ __html: sanitizeHtml(message) }} />
       {children}
       {dismissible && (
         <button

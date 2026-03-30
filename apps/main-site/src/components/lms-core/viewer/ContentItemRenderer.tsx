@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import type { Quiz, Survey } from '@/lib/api/contentBundleApi';
 import { QuizRunner } from './QuizRunner';
 import { SurveyRunner } from './SurveyRunner';
@@ -81,7 +82,7 @@ export function ContentItemRenderer({
         )}
         <div
           className="content-html"
-          dangerouslySetInnerHTML={{ __html: item.content || '' }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item.content || '') }}
         />
       </div>
     );

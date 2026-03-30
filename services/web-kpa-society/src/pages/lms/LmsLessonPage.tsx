@@ -13,6 +13,7 @@ import { LoadingSpinner, EmptyState, Card } from '../../components/common';
 import { lmsApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import type { Course, Lesson, Enrollment } from '../../types';
+import { sanitizeHtml } from '@o4o/content-editor';
 
 export function LmsLessonPage() {
   const { courseId, lessonId } = useParams<{ courseId: string; lessonId: string }>();
@@ -179,7 +180,7 @@ export function LmsLessonPage() {
           <Card padding="large" style={{ marginTop: '24px' }}>
             <div
               style={styles.content}
-              dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(currentLesson.content) }}
             />
           </Card>
         )}

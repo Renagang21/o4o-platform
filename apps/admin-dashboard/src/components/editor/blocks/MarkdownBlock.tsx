@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { marked } from 'marked';
 import Editor from '@monaco-editor/react';
 import EnhancedBlockWrapper from './EnhancedBlockWrapper';
@@ -470,7 +471,7 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
                 <div
                   ref={previewRef}
                   className="prose prose-sm max-w-none p-4 flex-1 overflow-y-auto"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderMarkdown()) }}
                 />
               </div>
             )}
@@ -545,7 +546,7 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
             {/* Markdown Content */}
             <div
               className="prose prose-sm max-w-none p-4 flex-1"
-              dangerouslySetInnerHTML={{ __html: renderMarkdown() }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderMarkdown()) }}
             />
           </div>
         </div>

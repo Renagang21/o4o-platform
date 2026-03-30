@@ -9,6 +9,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Calendar, Download, FileText, Paperclip } from 'lucide-react';
 import { cmsApi, type CmsContent } from '../../lib/api';
 import { blocksToHtml } from '@o4o/forum-core/utils';
+import { sanitizeHtml } from '@o4o/content-editor';
 
 export default function KnowledgeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -139,7 +140,7 @@ export default function KnowledgeDetailPage() {
           {content.bodyBlocks && Array.isArray(content.bodyBlocks) && content.bodyBlocks.length > 0 ? (
             <div
               className="prose prose-gray max-w-none"
-              dangerouslySetInnerHTML={{ __html: blocksToHtml(content.bodyBlocks as any) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(blocksToHtml(content.bodyBlocks as any)) }}
             />
           ) : content.body ? (
             <div className="prose prose-gray max-w-none">

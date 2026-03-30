@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sanitizeHtml } from '@o4o/content-editor';
 
 interface HTMLSettingsProps {
   settings: any;
@@ -92,7 +93,7 @@ export const HTMLSettings: React.FC<HTMLSettingsProps> = ({ settings, onChange }
           <label className="block text-sm font-medium text-gray-700 mb-2">Preview</label>
           <div
             className="border border-gray-300 rounded-md p-3 bg-gray-50 min-h-[100px] max-h-[300px] overflow-auto"
-            dangerouslySetInnerHTML={{ __html: safeMode ? sanitizeHTML(html) : html }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(safeMode ? sanitizeHTML(html) : html) }}
           />
         </div>
       )}

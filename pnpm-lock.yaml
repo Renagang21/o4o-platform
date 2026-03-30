@@ -1283,6 +1283,9 @@ importers:
       axios:
         specifier: ^1.6.0
         version: 1.13.2
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -1293,6 +1296,9 @@ importers:
         specifier: ^7.0.0
         version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/node':
         specifier: ^22.0.0
         version: 22.17.2
@@ -1851,6 +1857,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^2.1.0
         version: 2.27.2
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -1861,6 +1870,9 @@ importers:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
@@ -2794,6 +2806,9 @@ importers:
       '@o4o/utils':
         specifier: workspace:*
         version: link:../utils
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -2801,6 +2816,9 @@ importers:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
@@ -2953,6 +2971,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -2960,6 +2981,9 @@ importers:
         specifier: ^2.5.5
         version: 2.6.0
     devDependencies:
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/node':
         specifier: ^22.10.2
         version: 22.17.2
@@ -3055,6 +3079,9 @@ importers:
 
   services/signage-player-web:
     dependencies:
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -3071,6 +3098,9 @@ importers:
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -3186,6 +3216,9 @@ importers:
       '@o4o/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      dompurify:
+        specifier: ^3.0.6
+        version: 3.3.0
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -3202,6 +3235,9 @@ importers:
       '@eslint/js':
         specifier: ^9.39.1
         version: 9.39.1
+      '@types/dompurify':
+        specifier: ^3.0.5
+        version: 3.2.0
       '@types/node':
         specifier: ^24.10.1
         version: 24.10.1
@@ -15402,6 +15438,7 @@ snapshots:
       '@o4o/auth-client': link:packages/auth-client
       '@o4o/types': link:packages/types
       '@o4o/utils': link:packages/utils
+      dompurify: 3.3.0
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
@@ -15411,6 +15448,7 @@ snapshots:
       '@o4o/types': link:packages/types
       '@tanstack/react-query': 5.90.11(react@19.2.0)
       clsx: 2.1.1
+      dompurify: 3.3.0
       react: 19.2.0
       tailwind-merge: 2.6.0
 

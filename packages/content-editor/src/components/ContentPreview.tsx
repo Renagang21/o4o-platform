@@ -3,6 +3,8 @@
  * 콘텐츠 미리보기
  */
 
+import { sanitizeHtml } from '../sanitize';
+
 interface ContentPreviewProps {
   /** HTML 콘텐츠 */
   html: string;
@@ -43,7 +45,7 @@ export function ContentPreview({ html, title, className = '' }: ContentPreviewPr
           padding: '16px',
           minHeight: '200px',
         }}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
       />
       <style>{previewStyles}</style>
     </div>

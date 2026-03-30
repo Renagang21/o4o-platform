@@ -48,6 +48,7 @@ import {
   type PostType,
 } from '../../services/forumApi';
 import { blocksToHtml } from '@o4o/forum-core/utils';
+import { sanitizeHtml } from '@o4o/content-editor';
 
 /** Convert post content (Block[] or string) to safe HTML */
 function contentToHtml(content: string | object[] | undefined): string {
@@ -465,7 +466,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
       {/* Post Content */}
       <article
         style={styles.postContent}
-        dangerouslySetInnerHTML={{ __html: contentToHtml(post.content) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentToHtml(post.content)) }}
       />
 
       {/* WO-NETURE-EXTERNAL-CONTACT-V1: Author Contact Section */}
