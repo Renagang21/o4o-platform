@@ -253,53 +253,71 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   }, [open, isEditing, cancelEdit, onClose]);
 
   const handleSave = async () => {
-    if (!product || !formRef.current) return;
+    if (!product) return;
+    if (!formRef.current) {
+      console.warn('[ProductDetailDrawer] formRef.current is null — form not ready');
+      return;
+    }
     const form = formRef.current;
     setSaving(true);
 
-    // 1. 기본 필드 + distributionType + Master 필드 업데이트
-    const result = await supplierApi.updateProduct(product.id, {
-      marketingName: form.marketingName || undefined,
-      priceGeneral: form.priceGeneral ?? undefined,
-      consumerReferencePrice: form.consumerReferencePrice,
-      stockQuantity: form.stockQuantity,
-      isActive: form.isActive,
-      distributionType: form.distributionType as any,
-      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
-      categoryId: editCategory,
-      brandId: editBrand,
-      specification: editSpec || null,
-      originCountry: editOrigin || null,
-      // tags: V2에서 product_ai_tags API로 통합, handleSave에서 제거
-    });
+    try {
+      // 1. 기본 필드 + distributionType + Master 필드 업데이트
+      const payload = {
+        marketingName: form.marketingName || undefined,
+        priceGeneral: form.priceGeneral ?? undefined,
+        consumerReferencePrice: form.consumerReferencePrice,
+        stockQuantity: form.stockQuantity,
+        isActive: form.isActive,
+        distributionType: form.distributionType as any,
+        // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
+        categoryId: editCategory,
+        brandId: editBrand,
+        specification: editSpec || null,
+        originCountry: editOrigin || null,
+      };
+      console.log('[ProductDetailDrawer] save payload:', payload);
 
-    // 2. B2B 설명 업데이트 (전용 엔드포인트)
-    if (result.success) {
+      const result = await supplierApi.updateProduct(product.id, payload);
+      console.log('[ProductDetailDrawer] save result:', result);
+
+      if (!result.success) {
+        alert(`저장 실패: ${result.error || '알 수 없는 오류'}`);
+        setSaving(false);
+        return;
+      }
+
+      // 2. B2B 설명 업데이트 (전용 엔드포인트)
       const bizShort = editBizShort.trim() ? `<p>${editBizShort.trim()}</p>` : null;
       const bizDetail = editBizDetail.trim() ? `<p>${editBizDetail.trim()}</p>` : null;
       const prevBizShort = stripHtml(product.businessShortDescription);
       const prevBizDetail = stripHtml(product.businessDetailDescription);
       if (editBizShort.trim() !== prevBizShort || editBizDetail.trim() !== prevBizDetail) {
-        await supplierApi.updateBusinessContent(product.id, {
+        const bizResult = await supplierApi.updateBusinessContent(product.id, {
           businessShortDescription: bizShort,
           businessDetailDescription: bizDetail,
         });
+        if (!bizResult.success) {
+          console.warn('[ProductDetailDrawer] B2B content save failed:', bizResult.error);
+        }
       }
-    }
 
-    // 3. 새로운 serviceKeys가 추가되었으면 승인 요청
-    if (result.success && form.serviceKeys?.length) {
-      const existingKeys = new Set(product.serviceKeys || []);
-      const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
-      if (newKeys.length > 0) {
-        await supplierApi.submitForApproval([product.id], form.serviceKeys);
+      // 3. 새로운 serviceKeys가 추가되었으면 승인 요청
+      if (form.serviceKeys?.length) {
+        const existingKeys = new Set(product.serviceKeys || []);
+        const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
+        if (newKeys.length > 0) {
+          await supplierApi.submitForApproval([product.id], form.serviceKeys);
+        }
       }
-    }
 
-    setSaving(false);
-    if (result.success) {
       setIsEditing(false);
       onSaved?.();
+    } catch (error) {
+      console.error('[ProductDetailDrawer] save error:', error);
+      alert('저장 중 오류가 발생했습니다');
+    } finally {
+      setSaving(false);
     }
   };
 
