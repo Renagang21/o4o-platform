@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { Plus, Edit, Trash2, Eye, Copy } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -371,9 +371,9 @@ const EmailTemplates: FC = () => {
               </div>
               <div>
                 <Label>내용</Label>
-                <div 
+                <ContentRenderer
+                  html={previewTemplate.htmlContent}
                   className="p-4 bg-white border rounded"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(previewTemplate.htmlContent) }}
                 />
               </div>
             </div>

@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { RichTextEditor, sanitizeHtml } from '@o4o/content-editor';
+import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import { supplierApi, type SupplierProduct } from '../../lib/api/supplier';
 
 interface B2BContentDrawerProps {
@@ -106,7 +106,7 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
               <div>
                 <label className="text-xs text-gray-500">짧은 설명</label>
                 {product.consumerShortDescription ? (
-                  <div className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem]" dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.consumerShortDescription) }} />
+                  <ContentRenderer html={product.consumerShortDescription} className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem]" />
                 ) : (
                   <p className="text-sm text-gray-400 italic bg-gray-50 rounded p-2 min-h-[2rem]">없음</p>
                 )}
@@ -114,7 +114,7 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
               <div>
                 <label className="text-xs text-gray-500">상세 설명</label>
                 {product.consumerDetailDescription ? (
-                  <div className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4" dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.consumerDetailDescription) }} />
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4" />
                 ) : (
                   <p className="text-sm text-gray-400 italic bg-gray-50 rounded p-2 min-h-[2rem]">없음</p>
                 )}

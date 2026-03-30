@@ -1,11 +1,12 @@
 /**
- * ForumWritePage — Simplified Forum Post Creation
+ * ForumWritePage — Forum Post Creation with RichTextEditor
  *
  * WO-GLYCOPHARM-COMMUNITY-HUB-IMPLEMENTATION-V1
+ * WO-O4O-GLYCOPHARM-FORUM-EDITOR-MIGRATION-V1
  *
  * Route: /forum/write
- * Uses textarea (no rich editor dependency).
- * Converts plain text to Block[] format for API submission.
+ * Uses @o4o/content-editor RichTextEditor (TipTap-based).
+ * Sends HTML content string to API.
  * Uses apiClient centralized pattern (GlycoPharm standard).
  */
 
@@ -15,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '../../services/api';
 import { toast } from '@o4o/error-handling';
+import { RichTextEditor } from '@o4o/content-editor';
 
 interface ForumCategory {
   id: string;
@@ -32,14 +34,6 @@ const POST_TYPES: { value: PostType; label: string }[] = [
   { value: 'poll', label: '설문' },
   { value: 'announcement', label: '공지' },
 ];
-
-/** Convert plain text to Block[] format */
-function textToBlocks(text: string): Array<{ type: string; content: string }> {
-  return text
-    .split('\n\n')
-    .filter((p) => p.trim())
-    .map((p) => ({ type: 'paragraph', content: p.trim() }));
-}
 
 export default function ForumWritePage() {
   const navigate = useNavigate();
@@ -75,19 +69,19 @@ export default function ForumWritePage() {
       toast.error('카테고리를 선택해주세요.');
       return;
     }
-    if (!content.trim()) {
+    const isEmpty = !content || content === '<p></p>' || content.replace(/<[^>]*>/g, '').trim() === '';
+    if (isEmpty) {
       toast.error('내용을 입력해주세요.');
       return;
     }
 
     try {
       setSubmitting(true);
-      const blocks = textToBlocks(content);
       const res = await apiClient.post('/api/v1/glycopharm/forum/posts', {
         title: title.trim(),
         categoryId,
         type: postType,
-        content: blocks,
+        content,
       });
 
       const data = res as any;
@@ -179,12 +173,12 @@ export default function ForumWritePage() {
           {/* Content */}
           <div style={styles.field}>
             <label style={styles.label}>내용</label>
-            <textarea
+            <RichTextEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="게시글 내용을 작성하세요. 빈 줄 두 개로 문단을 구분합니다."
-              style={styles.textarea}
-              rows={12}
+              onChange={(editorContent) => setContent(editorContent.html)}
+              placeholder="게시글 내용을 작성하세요"
+              minHeight="300px"
+              preset="compact"
             />
           </div>
 
@@ -261,17 +255,6 @@ const styles: Record<string, CSSProperties> = {
     outline: 'none',
     backgroundColor: 'white',
     cursor: 'pointer',
-  },
-  textarea: {
-    padding: '12px 14px',
-    fontSize: 15,
-    border: '1px solid #e2e8f0',
-    borderRadius: 8,
-    outline: 'none',
-    backgroundColor: 'white',
-    resize: 'vertical' as const,
-    fontFamily: 'inherit',
-    lineHeight: 1.6,
   },
   actions: {
     display: 'flex',

@@ -12,7 +12,7 @@ import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
 import { PLATFORM_ROLES, ROLES, hasAnyRole } from '../../lib/role-constants';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 
 export function ForumDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -147,7 +147,7 @@ export function ForumDetailPage() {
           {Array.isArray(post.content) ? (
             <ForumBlockRenderer content={post.content} />
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} />
+            <ContentRenderer html={post.content} />
           )}
         </div>
 

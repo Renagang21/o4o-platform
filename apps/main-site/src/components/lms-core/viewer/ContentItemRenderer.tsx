@@ -8,7 +8,7 @@
  */
 
 import { useState } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import type { Quiz, Survey } from '@/lib/api/contentBundleApi';
 import { QuizRunner } from './QuizRunner';
 import { SurveyRunner } from './SurveyRunner';
@@ -80,10 +80,7 @@ export function ContentItemRenderer({
         {item.title && (
           <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
         )}
-        <div
-          className="content-html"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.content || '') }}
-        />
+        <ContentRenderer html={item.content || ''} className="content-html" />
       </div>
     );
   }

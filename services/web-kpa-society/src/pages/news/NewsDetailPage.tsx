@@ -24,7 +24,7 @@ import {
 import type { ContentType } from '@o4o/types/content';
 import type { Notice } from '../../types';
 import { ContentMetaBar, CopyOptionsModal } from '@o4o/ui';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 
 export function NewsDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -174,7 +174,7 @@ export function NewsDetailPage() {
           <p style={styles.summary}>{notice.summary}</p>
         )}
 
-        <div style={styles.content} dangerouslySetInnerHTML={{ __html: sanitizeHtml(notice.body || notice.content) }} />
+        <ContentRenderer html={notice.body || notice.content} style={styles.content} />
 
         {/* 첨부파일 */}
         {notice.attachments && notice.attachments.length > 0 && (

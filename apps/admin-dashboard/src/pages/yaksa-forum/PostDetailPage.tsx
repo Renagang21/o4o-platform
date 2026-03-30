@@ -13,7 +13,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   AGPageHeader,
   AGSection,
@@ -254,7 +254,7 @@ const PostDetailPage: React.FC = () => {
 
             {/* Content */}
             <div className="prose prose-gray max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} />
+              <ContentRenderer html={post.content} />
             </div>
           </AGCard>
         </AGSection>

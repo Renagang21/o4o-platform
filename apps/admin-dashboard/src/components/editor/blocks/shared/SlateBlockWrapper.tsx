@@ -26,7 +26,7 @@
  */
 
 import React, { ReactNode, CSSProperties, useMemo } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { Descendant } from 'slate';
 
 interface SlateBlockWrapperProps {
@@ -73,7 +73,8 @@ const SlateBlockWrapper: React.FC<SlateBlockWrapperProps> = ({
 
   // View mode: Render HTML content from current state
   return (
-    <div
+    <ContentRenderer
+      html={viewModeHtml}
       className={`view-mode-content ${viewModeClassName}`.trim()}
       style={{
         whiteSpace: 'pre-wrap',
@@ -81,7 +82,6 @@ const SlateBlockWrapper: React.FC<SlateBlockWrapperProps> = ({
         minHeight: '1.5em',
         ...viewModeStyle,
       }}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(viewModeHtml) }}
     />
   );
 };

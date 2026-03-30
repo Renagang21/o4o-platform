@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
@@ -245,10 +245,7 @@ export function GroupbuyDetailPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">상세 정보</h2>
 
               {campaign.content ? (
-                <div
-                  className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(campaign.content) }}
-                />
+                <ContentRenderer html={campaign.content} className="prose prose-sm max-w-none" />
               ) : campaign.description ? (
                 <p className="text-gray-700 whitespace-pre-wrap">{campaign.description}</p>
               ) : (

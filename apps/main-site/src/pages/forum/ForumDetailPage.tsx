@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
@@ -361,10 +361,7 @@ export function ForumDetailPage() {
 
           {/* 본문 */}
           <div className="p-6">
-            <div
-              className="prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
-            />
+            <ContentRenderer html={post.content} className="prose prose-sm max-w-none" />
 
             {/* 태그 */}
             {post.tags && post.tags.length > 0 && (

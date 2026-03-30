@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/apiClient';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 
 interface LegalPageProps {
   slug: string;
@@ -50,7 +50,7 @@ export default function LegalPage({ slug, title }: LegalPageProps) {
     const c = page.content as Record<string, unknown>;
 
     if (typeof c.html === 'string') {
-      return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(c.html) }} />;
+      return <ContentRenderer html={c.html} className="prose max-w-none" />;
     }
 
     if (typeof c.body === 'string') {

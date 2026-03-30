@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { replaceShortcodes, type ShortcodeMatch } from '@/utils/shortcode-parser';
 import type { CustomField, LinkValue, RepeaterRow } from '../types/acf.types';
 
@@ -197,9 +197,9 @@ const renderFieldValue = (
       // Render HTML content
       // WARNING: Ensure content is sanitized on the server to prevent XSS attacks
       return (
-        <div
+        <ContentRenderer
+          html={value}
           className="acf-wysiwyg prose"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }}
         />
       );
 

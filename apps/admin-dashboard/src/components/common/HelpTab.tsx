@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { HelpCircle, X } from 'lucide-react';
 import { useHelpTabs } from '@/hooks/useHelpTabs';
 import { cn } from '@/lib/utils';
@@ -80,7 +80,7 @@ export const HelpTab: FC = () => {
             <div className="contextual-help-sidebar">
               <h3>{sidebar.title}</h3>
               {typeof sidebar.content === 'string' ? (
-                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(sidebar.content) }} />
+                <ContentRenderer html={sidebar.content} />
               ) : (
                 sidebar.content
               )}
@@ -98,7 +98,7 @@ export const HelpTab: FC = () => {
                 )}
               >
                 {typeof tab.content === 'string' ? (
-                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(tab.content) }} />
+                  <ContentRenderer html={tab.content} />
                 ) : (
                   tab.content
                 )}

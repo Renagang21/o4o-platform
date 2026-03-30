@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
@@ -248,10 +248,7 @@ export function CourseDetailPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">과정 소개</h2>
 
               {course.content ? (
-                <div
-                  className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }}
-                />
+                <ContentRenderer html={course.content} className="prose prose-sm max-w-none" />
               ) : course.description ? (
                 <p className="text-gray-700 whitespace-pre-wrap">{course.description}</p>
               ) : (

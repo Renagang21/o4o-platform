@@ -8,7 +8,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   BookOpen,
   Activity,
@@ -316,9 +316,9 @@ export default function CareGuidelinePage() {
                       <p className="text-sm text-slate-500 mb-4">{selectedDetail.summary}</p>
                     )}
                     {selectedDetail.body ? (
-                      <div
+                      <ContentRenderer
+                        html={selectedDetail.body}
                         className="prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(selectedDetail.body) }}
                       />
                     ) : (
                       <p className="text-sm text-slate-400">본문이 없습니다.</p>

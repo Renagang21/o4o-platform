@@ -28,6 +28,7 @@ import {
 import { useAuth, GLYCOPHARM_ROLES } from '@/contexts/AuthContext';
 import { apiClient } from '@/services/api';
 import { toast } from '@o4o/error-handling';
+import { RichTextEditor } from '@o4o/content-editor';
 import { EmptyState, LoadingState, ErrorState } from '@/components/common';
 import type { Forum, ForumExtPost, ForumReply, PostType } from '@/types';
 
@@ -224,7 +225,8 @@ export default function ForumFeedPage() {
   };
 
   const handleCreatePost = async () => {
-    if (!newPost.title || !newPost.content) {
+    const contentEmpty = !newPost.content || newPost.content === '<p></p>' || newPost.content.replace(/<[^>]*>/g, '').trim() === '';
+    if (!newPost.title || contentEmpty) {
       toast.error('제목과 내용을 입력해주세요.');
       return;
     }
@@ -495,12 +497,12 @@ export default function ForumFeedPage() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   내용 <span className="text-red-500">*</span>
                 </label>
-                <textarea
+                <RichTextEditor
                   value={newPost.content}
-                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  onChange={(editorContent) => setNewPost({ ...newPost, content: editorContent.html })}
                   placeholder="내용을 입력하세요"
-                  rows={6}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                  minHeight="200px"
+                  preset="compact"
                 />
               </div>
 

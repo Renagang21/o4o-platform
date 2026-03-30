@@ -7,7 +7,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   YaksaRoleBadge,
   YaksaStatusBadge,
@@ -221,10 +221,7 @@ export function YaksaForumPostSingle({ postSlug }: YaksaForumPostSingleProps) {
 
           {/* Post Content */}
           <div className="p-6">
-            <div
-              className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content || '') }}
-            />
+            <ContentRenderer html={post.content || ''} className="prose max-w-none" />
 
             {/* Attachments */}
             {post.attachments && post.attachments.length > 0 && (

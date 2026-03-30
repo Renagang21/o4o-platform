@@ -48,7 +48,7 @@ import {
   type PostType,
 } from '../../services/forumApi';
 import { blocksToHtml } from '@o4o/forum-core/utils';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 
 /** Convert post content (Block[] or string) to safe HTML */
 function contentToHtml(content: string | object[] | undefined): string {
@@ -464,10 +464,7 @@ export function ForumPostPage({ basePath = '/forum' }: { basePath?: string } = {
       </header>
 
       {/* Post Content */}
-      <article
-        style={styles.postContent}
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(contentToHtml(post.content)) }}
-      />
+      <ContentRenderer html={contentToHtml(post.content)} style={styles.postContent} />
 
       {/* WO-NETURE-EXTERNAL-CONTACT-V1: Author Contact Section */}
       {shouldShowAuthorContact(post) && (

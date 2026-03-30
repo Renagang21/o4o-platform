@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 
 export interface RichTextProps {
   html: string;
@@ -17,10 +17,10 @@ export default function RichText({
   className = '',
 }: RichTextProps) {
   return (
-    <div
+    <ContentRenderer
+      html={html}
       className={`prose prose-slate max-w-none ${className}`}
       style={{ maxWidth }}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
     />
   );
 }

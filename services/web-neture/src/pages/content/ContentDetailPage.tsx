@@ -14,7 +14,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Bell, FileText, Calendar, BookOpen } from 'lucide-react';
 import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
 import { blocksToHtml } from '@o4o/forum-core/utils';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { useAuth } from '../../contexts/AuthContext';
 import { ContentUtilizationGuide } from '../../components/ContentUtilizationGuide';
 import { ContentMetaBar } from '@o4o/ui';
@@ -197,10 +197,7 @@ export default function ContentDetailPage() {
           )}
 
           {content.bodyBlocks && Array.isArray(content.bodyBlocks) && content.bodyBlocks.length > 0 ? (
-            <div
-              className="prose prose-gray max-w-none"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(blocksToHtml(content.bodyBlocks as any)) }}
-            />
+            <ContentRenderer html={blocksToHtml(content.bodyBlocks as any)} className="prose prose-gray max-w-none" />
           ) : content.body ? (
             <div className="prose prose-gray max-w-none">
               {content.body.split('\n').map((paragraph, index) => (

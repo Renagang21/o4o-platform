@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { sanitizeHtml } from '@o4o/content-editor';
+import { ContentRenderer } from '@o4o/content-editor';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
@@ -241,10 +241,7 @@ export function LessonPage() {
           )}
 
           {lesson.content && (
-            <div
-              className="prose prose-invert prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(lesson.content) }}
-            />
+            <ContentRenderer html={lesson.content} className="prose prose-invert prose-sm max-w-none" />
           )}
 
           {lesson.type === 'text' && !lesson.content && (
