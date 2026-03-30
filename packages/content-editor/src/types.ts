@@ -8,6 +8,13 @@ export interface EditorContent {
   json?: Record<string, unknown>;
 }
 
+/**
+ * Toolbar preset — 용도별 버튼 구성
+ * - full: CMS/상품 상세 등 풀 기능 (기본값)
+ * - compact: 포럼/댓글 등 경량 입력
+ */
+export type EditorPreset = 'full' | 'compact';
+
 export interface ContentEditorProps {
   /** 초기 HTML 콘텐츠 */
   value?: string;
@@ -25,6 +32,8 @@ export interface ContentEditorProps {
   minHeight?: string;
   /** 클래스명 */
   className?: string;
+  /** Toolbar preset (기본: 'full') */
+  preset?: EditorPreset;
 }
 
 export interface ToolbarProps {

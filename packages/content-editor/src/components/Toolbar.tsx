@@ -28,13 +28,15 @@ import {
   Minus,
   Highlighter,
 } from 'lucide-react';
+import type { EditorPreset } from '../types';
 
 interface ToolbarProps {
   editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
+  preset?: EditorPreset;
 }
 
-export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, preset = 'full' }: ToolbarProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -148,31 +150,6 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
 
       <Divider />
 
-      {/* Headings */}
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        isActive={editor.isActive('heading', { level: 1 })}
-        title="제목 1"
-      >
-        <Heading1 size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        isActive={editor.isActive('heading', { level: 2 })}
-        title="제목 2"
-      >
-        <Heading2 size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        isActive={editor.isActive('heading', { level: 3 })}
-        title="제목 3"
-      >
-        <Heading3 size={18} />
-      </ToolButton>
-
-      <Divider />
-
       {/* Text Formatting */}
       <ToolButton
         onClick={() => editor.chain().focus().toggleBold().run()}
@@ -195,45 +172,25 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
       >
         <Underline size={18} />
       </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        isActive={editor.isActive('strike')}
-        title="취소선"
-      >
-        <Strikethrough size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleHighlight().run()}
-        isActive={editor.isActive('highlight')}
-        title="형광펜"
-      >
-        <Highlighter size={18} />
-      </ToolButton>
 
-      <Divider />
-
-      {/* Alignment */}
-      <ToolButton
-        onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        isActive={editor.isActive({ textAlign: 'left' })}
-        title="왼쪽 정렬"
-      >
-        <AlignLeft size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        isActive={editor.isActive({ textAlign: 'center' })}
-        title="가운데 정렬"
-      >
-        <AlignCenter size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        isActive={editor.isActive({ textAlign: 'right' })}
-        title="오른쪽 정렬"
-      >
-        <AlignRight size={18} />
-      </ToolButton>
+      {preset === 'full' && (
+        <>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            isActive={editor.isActive('strike')}
+            title="취소선"
+          >
+            <Strikethrough size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleHighlight().run()}
+            isActive={editor.isActive('highlight')}
+            title="형광펜"
+          >
+            <Highlighter size={18} />
+          </ToolButton>
+        </>
+      )}
 
       <Divider />
 
@@ -245,37 +202,92 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
       >
         <List size={18} />
       </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        isActive={editor.isActive('orderedList')}
-        title="번호 매기기"
-      >
-        <ListOrdered size={18} />
-      </ToolButton>
 
-      <Divider />
+      {preset === 'full' && (
+        <>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+            isActive={editor.isActive('orderedList')}
+            title="번호 매기기"
+          >
+            <ListOrdered size={18} />
+          </ToolButton>
 
-      {/* Block elements */}
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive('blockquote')}
-        title="인용구"
-      >
-        <Quote size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        isActive={editor.isActive('codeBlock')}
-        title="코드 블록"
-      >
-        <Code size={18} />
-      </ToolButton>
-      <ToolButton
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        title="구분선"
-      >
-        <Minus size={18} />
-      </ToolButton>
+          <Divider />
+
+          {/* Headings */}
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            isActive={editor.isActive('heading', { level: 1 })}
+            title="제목 1"
+          >
+            <Heading1 size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            isActive={editor.isActive('heading', { level: 2 })}
+            title="제목 2"
+          >
+            <Heading2 size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            isActive={editor.isActive('heading', { level: 3 })}
+            title="제목 3"
+          >
+            <Heading3 size={18} />
+          </ToolButton>
+
+          <Divider />
+
+          {/* Alignment */}
+          <ToolButton
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            isActive={editor.isActive({ textAlign: 'left' })}
+            title="왼쪽 정렬"
+          >
+            <AlignLeft size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            isActive={editor.isActive({ textAlign: 'center' })}
+            title="가운데 정렬"
+          >
+            <AlignCenter size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            isActive={editor.isActive({ textAlign: 'right' })}
+            title="오른쪽 정렬"
+          >
+            <AlignRight size={18} />
+          </ToolButton>
+
+          <Divider />
+
+          {/* Block elements */}
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            isActive={editor.isActive('blockquote')}
+            title="인용구"
+          >
+            <Quote size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            isActive={editor.isActive('codeBlock')}
+            title="코드 블록"
+          >
+            <Code size={18} />
+          </ToolButton>
+          <ToolButton
+            onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            title="구분선"
+          >
+            <Minus size={18} />
+          </ToolButton>
+        </>
+      )}
 
       <Divider />
 
@@ -333,156 +345,160 @@ export function Toolbar({ editor, onImageUpload }: ToolbarProps) {
         )}
       </div>
 
-      {/* Image */}
-      <div style={{ position: 'relative' }}>
-        <ToolButton
-          onClick={() => setShowImageInput(!showImageInput)}
-          title="이미지"
-        >
-          <Image size={18} />
-        </ToolButton>
-        {showImageInput && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            zIndex: 10,
-            background: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            padding: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            minWidth: '280px',
-          }}>
-            <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
-              이미지 URL 입력
-            </div>
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://..."
-                style={{
-                  flex: 1,
-                  padding: '6px 10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddImage()}
-              />
-              <button
-                onClick={handleAddImage}
-                style={{
-                  padding: '6px 12px',
-                  background: '#4f46e5',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                추가
-              </button>
-            </div>
-            {onImageUpload && (
-              <>
-                <div style={{
-                  textAlign: 'center',
-                  fontSize: '12px',
-                  color: '#9ca3af',
-                  margin: '8px 0',
-                }}>
-                  또는
-                </div>
-                <label style={{
-                  display: 'block',
-                  padding: '8px',
-                  border: '1px dashed #d1d5db',
-                  borderRadius: '4px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  color: '#6b7280',
-                }}>
-                  파일 선택하여 업로드
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageFileUpload}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Video (YouTube/Vimeo) */}
-      <div style={{ position: 'relative' }}>
-        <ToolButton
-          onClick={() => setShowVideoInput(!showVideoInput)}
-          title="동영상 (YouTube/Vimeo)"
-        >
-          <Youtube size={18} />
-        </ToolButton>
-        {showVideoInput && (
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            zIndex: 10,
-            background: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            padding: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            minWidth: '300px',
-          }}>
-            <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
-              YouTube 또는 Vimeo URL 입력
-            </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <input
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/watch?v=..."
-                style={{
-                  flex: 1,
-                  padding: '6px 10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddVideo()}
-              />
-              <button
-                onClick={handleAddVideo}
-                style={{
-                  padding: '6px 12px',
-                  background: '#4f46e5',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                삽입
-              </button>
-            </div>
+      {/* Image (full only) */}
+      {preset === 'full' && (
+        <div style={{ position: 'relative' }}>
+          <ToolButton
+            onClick={() => setShowImageInput(!showImageInput)}
+            title="이미지"
+          >
+            <Image size={18} />
+          </ToolButton>
+          {showImageInput && (
             <div style={{
-              marginTop: '8px',
-              fontSize: '11px',
-              color: '#9ca3af'
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              zIndex: 10,
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '12px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              minWidth: '280px',
             }}>
-              지원: YouTube, Vimeo
+              <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
+                이미지 URL 입력
+              </div>
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://..."
+                  style={{
+                    flex: 1,
+                    padding: '6px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddImage()}
+                />
+                <button
+                  onClick={handleAddImage}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#4f46e5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  추가
+                </button>
+              </div>
+              {onImageUpload && (
+                <>
+                  <div style={{
+                    textAlign: 'center',
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    margin: '8px 0',
+                  }}>
+                    또는
+                  </div>
+                  <label style={{
+                    display: 'block',
+                    padding: '8px',
+                    border: '1px dashed #d1d5db',
+                    borderRadius: '4px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    color: '#6b7280',
+                  }}>
+                    파일 선택하여 업로드
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
+      {/* Video — full only */}
+      {preset === 'full' && (
+        <div style={{ position: 'relative' }}>
+          <ToolButton
+            onClick={() => setShowVideoInput(!showVideoInput)}
+            title="동영상 (YouTube/Vimeo)"
+          >
+            <Youtube size={18} />
+          </ToolButton>
+          {showVideoInput && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              zIndex: 10,
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '12px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              minWidth: '300px',
+            }}>
+              <div style={{ marginBottom: '8px', fontSize: '13px', color: '#6b7280' }}>
+                YouTube 또는 Vimeo URL 입력
+              </div>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  style={{
+                    flex: 1,
+                    padding: '6px 10px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddVideo()}
+                />
+                <button
+                  onClick={handleAddVideo}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#4f46e5',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  삽입
+                </button>
+              </div>
+              <div style={{
+                marginTop: '8px',
+                fontSize: '11px',
+                color: '#9ca3af'
+              }}>
+                지원: YouTube, Vimeo
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

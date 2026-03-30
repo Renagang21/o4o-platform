@@ -28,6 +28,7 @@ export function RichTextEditor({
   autoSaveInterval = 0,
   minHeight = '400px',
   className = '',
+  preset = 'full',
 }: ContentEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -127,7 +128,7 @@ export function RichTextEditor({
       }}
       onKeyDown={handleKeyDown}
     >
-      {editable && <Toolbar editor={editor} />}
+      {editable && <Toolbar editor={editor} preset={preset} />}
       <EditorContent
         editor={editor}
         style={{
