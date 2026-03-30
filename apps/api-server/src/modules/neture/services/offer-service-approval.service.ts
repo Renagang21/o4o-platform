@@ -134,7 +134,6 @@ export class OfferServiceApprovalService {
         ) AS approval_rate
       FROM offer_service_approvals osa2
       JOIN supplier_product_offers spo2 ON spo2.id = osa2.offer_id
-      WHERE osa2.service_key = 'neture'
       GROUP BY spo2.supplier_id
     ) supplier_stats ON supplier_stats.supplier_id = spo.supplier_id`;
 

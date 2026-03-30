@@ -58,7 +58,6 @@ export function validateProductForm(
 // ─── Constants ───
 
 const AVAILABLE_SERVICES = [
-  { key: 'neture', name: 'Neture' },
   { key: 'glycopharm', name: 'GlycoPharm' },
   { key: 'glucoseview', name: 'GlucoseView' },
   { key: 'kpa-society', name: 'KPA Society' },
@@ -172,7 +171,6 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
   };
 
   const toggleServiceKey = (key: string) => {
-    if (key === 'neture') return; // neture는 항상 포함
     const current = data.serviceKeys || [];
     const next = current.includes(key)
       ? current.filter((k) => k !== key)
@@ -304,7 +302,6 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
         <div className="grid grid-cols-2 gap-2">
           {AVAILABLE_SERVICES.map((svc) => {
             const selected = (data.serviceKeys || []).includes(svc.key);
-            const isNeture = svc.key === 'neture';
             return (
               <label
                 key={svc.key}
@@ -312,18 +309,17 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
                   selected
                     ? 'border-emerald-500 bg-emerald-50'
                     : 'border-slate-200 hover:bg-slate-50'
-                } ${disabled || isNeture ? 'opacity-60 pointer-events-none' : ''}`}
+                } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
               >
                 <input
                   type="checkbox"
                   checked={selected}
                   onChange={() => toggleServiceKey(svc.key)}
-                  disabled={disabled || isNeture}
+                  disabled={disabled}
                   className="w-4 h-4 text-emerald-600 rounded"
                 />
                 <span className="text-sm font-medium text-slate-700">
                   {svc.name}
-                  {isNeture && <span className="text-[10px] text-slate-400 ml-1">(필수)</span>}
                 </span>
               </label>
             );

@@ -98,13 +98,12 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
             COUNT(*) FILTER (WHERE osa.approval_status = 'rejected')::int AS rejected,
             COUNT(*) FILTER (WHERE osa.approval_status = 'pending')::int AS pending
           FROM offer_service_approvals osa
-          WHERE osa.service_key = 'neture' ${periodClause}
+          WHERE 1=1 ${periodClause}
         `),
         dataSource.query(`
           SELECT osa.reason, COUNT(*)::int AS count
           FROM offer_service_approvals osa
-          WHERE osa.service_key = 'neture'
-            AND osa.approval_status = 'rejected'
+          WHERE osa.approval_status = 'rejected'
             AND osa.reason IS NOT NULL AND osa.reason != ''
             ${periodClause}
           GROUP BY osa.reason
@@ -114,7 +113,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         dataSource.query(`
           SELECT ROUND(AVG(EXTRACT(EPOCH FROM (osa.decided_at - osa.created_at)) / 3600)::numeric, 1) AS avg_hours
           FROM offer_service_approvals osa
-          WHERE osa.service_key = 'neture' AND osa.decided_at IS NOT NULL ${periodClause}
+          WHERE osa.decided_at IS NOT NULL ${periodClause}
         `),
         dataSource.query(`
           SELECT
@@ -130,7 +129,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
           JOIN supplier_product_offers spo ON spo.id = osa.offer_id
           LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
           LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
-          WHERE osa.service_key = 'neture' ${periodClause}
+          WHERE 1=1 ${periodClause}
           GROUP BY spo.supplier_id, supplier_org.name
           HAVING COUNT(*) >= 3
           ORDER BY "approvalRate" DESC
@@ -140,8 +139,7 @@ export function createOperatorServiceApprovalController(dataSource: DataSource):
         dataSource.query(`
           SELECT COUNT(*)::int AS count
           FROM offer_service_approvals osa
-          WHERE osa.service_key = 'neture'
-            AND osa.approval_status = 'pending'
+          WHERE osa.approval_status = 'pending'
             AND osa.created_at < NOW() - INTERVAL '2 days'
         `),
       ]);

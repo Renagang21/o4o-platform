@@ -33,7 +33,6 @@ const STATUS_TABS = [
 
 const SERVICE_OPTIONS = [
   { key: '', label: '전체 서비스' },
-  { key: 'neture', label: 'Neture' },
   { key: 'glycopharm', label: 'GlycoPharm' },
   { key: 'glucoseview', label: 'GlucoseView' },
   { key: 'k-cosmetics', label: 'K-Cosmetics' },

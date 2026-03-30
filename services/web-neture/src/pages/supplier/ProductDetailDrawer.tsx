@@ -123,7 +123,7 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
     stockQuantity: p.stockQuantity ?? 0,
     isActive: p.isActive,
     distributionType: p.distributionType || 'PUBLIC',
-    serviceKeys: p.serviceKeys?.length ? p.serviceKeys : ['neture'],
+    serviceKeys: p.serviceKeys || [],
   };
 }
 

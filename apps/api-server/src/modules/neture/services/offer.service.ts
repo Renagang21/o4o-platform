@@ -147,14 +147,16 @@ export class NetureOfferService {
         );
         if (existingApprovals.length === 0) {
           const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(['neture', ...keys])];
-          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
-          await queryRunner.query(
-            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-             VALUES ${values}
-             ON CONFLICT (offer_id, service_key) DO NOTHING`,
-            [offerId, ...uniqueKeys],
-          );
+          const uniqueKeys = [...new Set(keys)];
+          if (uniqueKeys.length > 0) {
+            const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+            await queryRunner.query(
+              `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+               VALUES ${values}
+               ON CONFLICT (offer_id, service_key) DO NOTHING`,
+              [offerId, ...uniqueKeys],
+            );
+          }
         }
 
         // 2. 모든 service approvals를 approved로 일괄 변경
@@ -258,14 +260,16 @@ export class NetureOfferService {
         );
         if (existingApprovals.length === 0) {
           const keys = offer.serviceKeys?.length ? offer.serviceKeys : [];
-          const uniqueKeys = [...new Set(['neture', ...keys])];
-          const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
-          await queryRunner.query(
-            `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-             VALUES ${values}
-             ON CONFLICT (offer_id, service_key) DO NOTHING`,
-            [offerId, ...uniqueKeys],
-          );
+          const uniqueKeys = [...new Set(keys)];
+          if (uniqueKeys.length > 0) {
+            const values = uniqueKeys.map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`).join(', ');
+            await queryRunner.query(
+              `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
+               VALUES ${values}
+               ON CONFLICT (offer_id, service_key) DO NOTHING`,
+              [offerId, ...uniqueKeys],
+            );
+          }
         }
 
         // 2. 모든 service approvals를 rejected로 일괄 변경
@@ -677,13 +681,15 @@ export class NetureOfferService {
       const savedOffer = await this.offerRepo.save(offer);
       logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
 
-      // WO-NETURE-PRODUCT-APPROVAL-DATA-SOURCE-UNIFICATION-V1:
-      // 모든 Neture 상품에 최소 'neture' service approval 보장
+      // WO-NETURE-REMOVE-NETURE-FROM-SERVICE-SELECTION-AND-APPROVAL-V1:
+      // Neture는 기본 운영 공간이므로 service approval 대상 아님
       const approvalService = new OfferServiceApprovalService(AppDataSource);
       const approvalKeys = data.serviceKeys && data.serviceKeys.length > 0
-        ? (data.serviceKeys.includes('neture') ? data.serviceKeys : ['neture', ...data.serviceKeys])
-        : ['neture'];
-      await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
+        ? data.serviceKeys
+        : [];
+      if (approvalKeys.length > 0) {
+        await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
+      }
 
       return {
         success: true,

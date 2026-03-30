@@ -66,7 +66,7 @@ export class ProductImportCommonService {
          price_general, consumer_reference_price, stock_quantity,
          consumer_short_description, consumer_detail_description, slug, service_keys, created_at, updated_at)
        VALUES
-        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, $7, $8, $9, $10, ARRAY['neture']::text[], NOW(), NOW())
+        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, $7, $8, $9, $10, ARRAY[]::text[], NOW(), NOW())
        ON CONFLICT (master_id, supplier_id) DO UPDATE SET
          price_general = EXCLUDED.price_general,
          consumer_reference_price = COALESCE(EXCLUDED.consumer_reference_price, supplier_product_offers.consumer_reference_price),
@@ -74,11 +74,7 @@ export class ProductImportCommonService {
          consumer_short_description = COALESCE(EXCLUDED.consumer_short_description, supplier_product_offers.consumer_short_description),
          consumer_detail_description = COALESCE(EXCLUDED.consumer_detail_description, supplier_product_offers.consumer_detail_description),
          distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
-         service_keys = CASE
-           WHEN NOT ('neture' = ANY(COALESCE(supplier_product_offers.service_keys, ARRAY[]::text[])))
-           THEN COALESCE(supplier_product_offers.service_keys, ARRAY[]::text[]) || ARRAY['neture']::text[]
-           ELSE supplier_product_offers.service_keys
-         END,
+         service_keys = supplier_product_offers.service_keys,
          updated_at = NOW()`,
       [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug],
     );
