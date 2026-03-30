@@ -26,7 +26,8 @@ import {
   MessageSquare,
   CheckCircle2,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto } from '@/api/pharmacy';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto, type TimeBasedAnalysisDto } from '@/api/pharmacy';
+import { Clock, Utensils, Footprints } from 'lucide-react';
 import { usePatientDetail } from '../PatientDetailPage';
 import { RISK_DISPLAY } from '@/constants/care-display';
 
@@ -449,6 +450,7 @@ export default function AnalysisTab() {
   const [bpDiaReadings, setBpDiaReadings] = useState<HealthReadingDto[]>([]);
   const [weightReadings, setWeightReadings] = useState<HealthReadingDto[]>([]);
   const [eventAnalysis, setEventAnalysis] = useState<CgmEventAnalysisDto | null>(null);
+  const [timeAnalysis, setTimeAnalysis] = useState<TimeBasedAnalysisDto | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -468,7 +470,8 @@ export default function AnalysisTab() {
       pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'blood_pressure_diastolic' }).catch(() => [] as HealthReadingDto[]),
       pharmacyApi.getHealthReadings(patient.id, { from: fromISO, metricType: 'weight' }).catch(() => [] as HealthReadingDto[]),
       pharmacyApi.getCgmEventAnalysis(patient.id, 30).catch(() => null),
-    ]).then(([a, k, llm, glu, bpS, bpD, wt, ev]) => {
+      pharmacyApi.getCareTimeBasedAnalysis(patient.id, 14).then(r => r?.data ?? null).catch(() => null),
+    ]).then(([a, k, llm, glu, bpS, bpD, wt, ev, ta]) => {
       setAnalysis(a);
       setKpi(k);
       setLlmInsight(llm);
@@ -477,6 +480,7 @@ export default function AnalysisTab() {
       setBpDiaReadings(bpD ?? []);
       setWeightReadings(wt ?? []);
       setEventAnalysis(ev);
+      setTimeAnalysis(ta);
     }).finally(() => setLoading(false));
   }, [patient?.id]);
 
@@ -806,6 +810,11 @@ export default function AnalysisTab() {
         )}
       </div>
 
+      {/* 시간 기반 분석 — WO-O4O-CARE-TIME-BASED-ANALYSIS-V1 */}
+      {timeAnalysis && (timeAnalysis.timeBuckets.length > 0 || timeAnalysis.mealTimingStats.length > 0) && (
+        <TimeBasedAnalysisSection data={timeAnalysis} />
+      )}
+
       {/* 혈압 추이 차트 — WO-O4O-GLYCOPHARM-ANALYSIS-TAB-BP-WEIGHT-CHART-EXPANSION-V1 */}
       <div>
         <h4 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
@@ -1077,5 +1086,171 @@ function CareActionButton({
         <p className="text-xs opacity-70 mt-0.5">{action.reason}</p>
       </div>
     </button>
+  );
+}
+
+// ── Time-Based Analysis Section (WO-O4O-CARE-TIME-BASED-ANALYSIS-V1) ──
+
+const BUCKET_LABELS: Record<string, string> = {
+  morning: '아침 (05~10시)',
+  afternoon: '점심 (10~15시)',
+  evening: '저녁 (15~21시)',
+  night: '야간 (21~05시)',
+};
+
+const BUCKET_COLORS: Record<string, string> = {
+  morning: 'bg-amber-50 border-amber-200 text-amber-800',
+  afternoon: 'bg-blue-50 border-blue-200 text-blue-800',
+  evening: 'bg-orange-50 border-orange-200 text-orange-800',
+  night: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+};
+
+const MEAL_TIMING_DISPLAY: Record<string, string> = {
+  fasting: '공복',
+  before_meal: '식전',
+  after_meal: '식후',
+  after_meal_1h: '식후 1h',
+  after_meal_2h: '식후 2h',
+  bedtime: '취침 전',
+  random: '수시',
+};
+
+function TimeBasedAnalysisSection({ data }: { data: TimeBasedAnalysisDto }) {
+  const maxBucketAvg = Math.max(...data.timeBuckets.map(b => b.avg), 1);
+
+  return (
+    <div className="space-y-4">
+      <h4 className="text-sm font-medium text-slate-600 flex items-center gap-2">
+        <Clock className="w-4 h-4 text-slate-500" />
+        시간 기반 분석 (최근 {data.days}일)
+      </h4>
+
+      {/* Time-of-day buckets */}
+      {data.timeBuckets.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {data.timeBuckets.map((b) => (
+            <div key={b.bucket} className={`rounded-xl border p-3 ${BUCKET_COLORS[b.bucket] || 'bg-slate-50 border-slate-200 text-slate-800'}`}>
+              <p className="text-[11px] font-medium opacity-70 mb-1">{BUCKET_LABELS[b.bucket] || b.bucket}</p>
+              <p className="text-xl font-bold">{b.avg} <span className="text-xs font-normal opacity-60">mg/dL</span></p>
+              <div className="mt-1.5 h-1.5 rounded-full bg-black/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-current opacity-40"
+                  style={{ width: `${Math.round((b.avg / maxBucketAvg) * 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-1">
+                <span className="text-[10px] opacity-50">{b.count}회</span>
+                {b.highCount > 0 && <span className="text-[10px] text-red-600 font-medium">고혈당 {b.highCount}</span>}
+                {b.lowCount > 0 && <span className="text-[10px] text-blue-600 font-medium">저혈당 {b.lowCount}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Meal-timing stats + Exercise impact */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Meal timing */}
+        {data.mealTimingStats.length > 0 && (
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+              <Utensils className="w-3.5 h-3.5 text-orange-500" />
+              측정 구분별 혈당
+            </h5>
+            <div className="space-y-2">
+              {data.mealTimingStats.map((m) => (
+                <div key={m.mealTiming} className="flex items-center justify-between text-sm">
+                  <span className="text-slate-600">{MEAL_TIMING_DISPLAY[m.mealTiming] || m.mealTiming}</span>
+                  <span className="font-medium text-slate-800">
+                    {m.avg} <span className="text-xs text-slate-400">mg/dL ({m.count}회)</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* Post-meal rise indicator */}
+            {(() => {
+              const fasting = data.mealTimingStats.find(m => m.mealTiming === 'fasting');
+              const postMeal = data.mealTimingStats.find(m => ['after_meal', 'after_meal_1h', 'after_meal_2h'].includes(m.mealTiming));
+              if (fasting && postMeal) {
+                const rise = postMeal.avg - fasting.avg;
+                return (
+                  <div className={`mt-3 pt-2 border-t border-slate-100 text-xs ${rise > 50 ? 'text-red-600' : rise > 30 ? 'text-amber-600' : 'text-green-600'}`}>
+                    식후 평균 상승: <span className="font-semibold">{rise > 0 ? '+' : ''}{rise} mg/dL</span>
+                    {rise > 50 && ' (관리 필요)'}
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
+        )}
+
+        {/* Exercise + Trends */}
+        <div className="space-y-4">
+          {/* Exercise impact */}
+          {data.exerciseImpact.count > 0 && data.exerciseImpact.avgWithExercise != null && data.exerciseImpact.overallAvg != null && (
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                <Footprints className="w-3.5 h-3.5 text-emerald-500" />
+                운동 영향
+              </h5>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-slate-400">운동 시 평균</p>
+                  <p className="text-lg font-bold text-slate-800">{data.exerciseImpact.avgWithExercise} <span className="text-xs font-normal text-slate-400">mg/dL</span></p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-400">전체 평균</p>
+                  <p className="text-lg font-bold text-slate-800">{data.exerciseImpact.overallAvg} <span className="text-xs font-normal text-slate-400">mg/dL</span></p>
+                </div>
+              </div>
+              {(() => {
+                const diff = data.exerciseImpact.avgWithExercise! - data.exerciseImpact.overallAvg!;
+                return (
+                  <p className={`text-xs mt-2 ${diff < 0 ? 'text-green-600' : 'text-slate-500'}`}>
+                    운동 시 {diff < 0 ? `${Math.abs(diff)} mg/dL 낮은 경향` : diff > 0 ? `${diff} mg/dL 높은 경향` : '차이 없음'}
+                    <span className="text-slate-400 ml-1">({data.exerciseImpact.count}회 기록)</span>
+                  </p>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Trends */}
+          {data.trends.countFull > 0 && (
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                추세 비교
+              </h5>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <p className="text-[10px] text-slate-400">3일</p>
+                  <p className="text-lg font-bold text-slate-800">{data.trends.avg3d ?? '-'}</p>
+                  <p className="text-[10px] text-slate-400">{data.trends.count3d}회</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400">7일</p>
+                  <p className="text-lg font-bold text-slate-800">{data.trends.avg7d ?? '-'}</p>
+                  <p className="text-[10px] text-slate-400">{data.trends.count7d}회</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-slate-400">{data.days}일</p>
+                  <p className="text-lg font-bold text-slate-800">{data.trends.avgFull ?? '-'}</p>
+                  <p className="text-[10px] text-slate-400">{data.trends.countFull}회</p>
+                </div>
+              </div>
+              {data.trends.avg3d != null && data.trends.avg7d != null && (
+                <p className={`text-xs mt-2 text-center ${
+                  data.trends.avg3d < data.trends.avg7d ? 'text-green-600' : data.trends.avg3d > data.trends.avg7d ? 'text-red-600' : 'text-slate-500'
+                }`}>
+                  최근 3일 {data.trends.avg3d < data.trends.avg7d ? '개선 추세' : data.trends.avg3d > data.trends.avg7d ? '상승 추세' : '유지'}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

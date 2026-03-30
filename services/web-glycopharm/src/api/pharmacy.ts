@@ -745,6 +745,10 @@ class PharmacyApiClient {
     return this.request(`/care/kpi/${patientId}`);
   }
 
+  async getCareTimeBasedAnalysis(patientId: string, days = 14): Promise<{ success: boolean; data: TimeBasedAnalysisDto }> {
+    return this.request(`/care/analysis/time-based/${patientId}?days=${days}`);
+  }
+
   async createCoachingSession(data: {
     patientId: string;
     summary: string;
@@ -986,6 +990,39 @@ export interface KpiComparisonDto {
   previousCv: number | null;
   cvChange: number | null;
   riskTrend: 'improving' | 'stable' | 'worsening' | null;
+}
+
+// WO-O4O-CARE-TIME-BASED-ANALYSIS-V1
+export interface TimeBasedAnalysisDto {
+  days: number;
+  timeBuckets: Array<{
+    bucket: 'morning' | 'afternoon' | 'evening' | 'night';
+    count: number;
+    avg: number;
+    min: number;
+    max: number;
+    highCount: number;
+    lowCount: number;
+  }>;
+  mealTimingStats: Array<{
+    mealTiming: string;
+    count: number;
+    avg: number;
+    max: number;
+  }>;
+  exerciseImpact: {
+    count: number;
+    avgWithExercise: number | null;
+    overallAvg: number | null;
+  };
+  trends: {
+    avg3d: number | null;
+    count3d: number;
+    avg7d: number | null;
+    count7d: number;
+    avgFull: number | null;
+    countFull: number;
+  };
 }
 
 export interface CoachingSession {
