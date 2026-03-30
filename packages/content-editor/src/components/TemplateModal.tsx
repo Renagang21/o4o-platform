@@ -14,7 +14,7 @@ import type { ContentTemplate } from '../types';
 interface TemplateModalProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (html: string) => void;
+  onSelect: (html: string, templateId: string) => void;
   templates: ContentTemplate[];
   loading?: boolean;
 }
@@ -41,6 +41,13 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
     if (selectedCategory === 'all') return scopedTemplates;
     return scopedTemplates.filter((t) => t.category === selectedCategory);
   }, [scopedTemplates, selectedCategory]);
+
+  const popularTemplates = useMemo(() => {
+    return templates
+      .filter((t) => (t.usageCount ?? 0) > 0)
+      .sort((a, b) => (b.usageCount ?? 0) - (a.usageCount ?? 0))
+      .slice(0, 5);
+  }, [templates]);
 
   const previewTemplate = previewId ? templates.find((t) => t.id === previewId) : null;
 
@@ -102,6 +109,30 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
           ) : filtered.length === 0 ? (
             <p style={styles.emptyText}>저장된 템플릿이 없습니다.</p>
           ) : (
+            <>
+            {/* Recommendations */}
+            {scope === 'all' && selectedCategory === 'all' && popularTemplates.length > 0 && (
+              <div style={styles.recommendSection}>
+                <div style={styles.recommendLabel}>인기 템플릿</div>
+                <div style={styles.recommendList}>
+                  {popularTemplates.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      style={{
+                        ...styles.recommendChip,
+                        ...(previewId === t.id ? styles.recommendChipActive : {}),
+                      }}
+                      onClick={() => setPreviewId(t.id)}
+                    >
+                      {t.isPublic && <span style={styles.publicBadge}>공용</span>}
+                      {t.name}
+                      <span style={styles.recommendCount}>{t.usageCount}회</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div style={styles.grid}>
               {filtered.map((t) => (
                 <div
@@ -122,9 +153,13 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
                   <div style={styles.cardPreview}>
                     <ContentRenderer html={t.contentHtml} style={{ fontSize: '11px', lineHeight: '1.4' }} />
                   </div>
+                  {(t.usageCount ?? 0) > 0 && (
+                    <div style={styles.cardUsage}>{t.usageCount}회 사용</div>
+                  )}
                 </div>
               ))}
             </div>
+            </>
           )}
         </div>
 
@@ -151,7 +186,7 @@ export function TemplateModal({ open, onClose, onSelect, templates, loading }: T
             disabled={!previewTemplate}
             onClick={() => {
               if (previewTemplate) {
-                onSelect(previewTemplate.contentHtml);
+                onSelect(previewTemplate.contentHtml, previewTemplate.id);
                 onClose();
               }
             }}
@@ -293,6 +328,53 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: 4,
     background: '#f8fafc',
     padding: 6,
+  },
+  cardUsage: {
+    fontSize: 10,
+    color: '#94a3b8',
+    marginTop: 4,
+    textAlign: 'right' as const,
+  },
+  recommendSection: {
+    marginBottom: 12,
+    padding: '10px 12px',
+    background: '#fffbeb',
+    borderRadius: 8,
+    border: '1px solid #fde68a',
+  },
+  recommendLabel: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: '#92400e',
+    marginBottom: 8,
+  },
+  recommendList: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: 6,
+  },
+  recommendChip: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 10px',
+    fontSize: 12,
+    fontWeight: 500,
+    border: '1px solid #fde68a',
+    borderRadius: 16,
+    background: 'white',
+    color: '#78350f',
+    cursor: 'pointer',
+  },
+  recommendChipActive: {
+    borderColor: '#059669',
+    background: '#f0fdf4',
+    color: '#059669',
+  },
+  recommendCount: {
+    fontSize: 10,
+    color: '#b45309',
+    fontWeight: 400,
   },
   previewSection: {
     borderTop: '1px solid #e5e7eb',

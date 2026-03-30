@@ -9,14 +9,28 @@
  * WO-O4O-TEMPLATE-PUBLIC-SHARING-V1:
  * - includePublic query param to merge public templates
  * - isPublic flag on create (operator/admin only)
+ *
+ * WO-O4O-TEMPLATE-USAGE-ANALYTICS-V1:
+ * - POST /:id/use — increment usage_count + update last_used_at
+ * - GET / sort=popular — order by usage_count DESC
+ *
+ * WO-O4O-TEMPLATE-RECOMMENDATION-V1:
+ * - GET /recommend — popular + recent used templates
+ *
+ * WO-O4O-TEMPLATE-BOUNDARY-HARDENING-V1:
+ * - POST: serviceKey validated against service catalog
+ * - GET: includePublic requires serviceKey (no cross-service leakage)
+ * - DELETE: admin override for public template management
  */
 
 import { Router, type Response } from 'express';
 import { DataSource } from 'typeorm';
 import { requireAuth, type AuthRequest } from '../../middleware/auth.middleware.js';
 import { ContentTemplate } from '../../entities/ContentTemplate.js';
+import { O4O_SERVICES } from '../../config/service-catalog.js';
 
 const PUBLIC_TEMPLATE_ROLES = ['admin', 'super_admin', 'operator', 'platform:admin', 'platform:super_admin'];
+const VALID_SERVICE_KEYS = new Set(O4O_SERVICES.map((s) => s.key));
 
 export function createContentTemplateRoutes(dataSource: DataSource): Router {
   const router = Router();
@@ -26,7 +40,7 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
    * GET /
    * List templates (my + optionally public)
    *
-   * Query: ?category=&includePublic=true&serviceKey=&limit=20&offset=0
+   * Query: ?category=&includePublic=true&serviceKey=&sort=recent|popular&limit=20&offset=0
    */
   router.get('/', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -36,7 +50,7 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      const { category, includePublic, serviceKey, limit = '20', offset = '0' } = req.query;
+      const { category, includePublic, serviceKey, sort, limit = '20', offset = '0' } = req.query;
       const take = parseInt(limit as string, 10);
       const skip = parseInt(offset as string, 10);
 
@@ -50,10 +64,8 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
           { userId: user.id, serviceKey },
         );
       } else if (includePublic === 'true') {
-        qb.andWhere(
-          '(t.createdByUserId = :userId OR t.isPublic = true)',
-          { userId: user.id },
-        );
+        // serviceKey required for cross-service safety — without it, only own templates
+        qb.andWhere('t.createdByUserId = :userId', { userId: user.id });
       } else {
         qb.andWhere('t.createdByUserId = :userId', { userId: user.id });
       }
@@ -62,9 +74,13 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
         qb.andWhere('t.category = :category', { category });
       }
 
-      qb.orderBy('t.updatedAt', 'DESC')
-        .take(take)
-        .skip(skip);
+      if (sort === 'popular') {
+        qb.orderBy('t.usageCount', 'DESC').addOrderBy('t.updatedAt', 'DESC');
+      } else {
+        qb.orderBy('t.updatedAt', 'DESC');
+      }
+
+      qb.take(take).skip(skip);
 
       const [templates, total] = await qb.getManyAndCount();
 
@@ -114,6 +130,15 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
         return;
       }
 
+      // Validate serviceKey against service catalog
+      if (serviceKey && typeof serviceKey === 'string' && !VALID_SERVICE_KEYS.has(serviceKey.trim())) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: '유효하지 않은 서비스 키입니다.' },
+        });
+        return;
+      }
+
       // Public template: operator/admin only
       let publicFlag = false;
       if (isPublic === true) {
@@ -145,6 +170,103 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
       res.status(201).json({ success: true, data: saved });
     } catch (error: any) {
       console.error('Failed to create content template:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * GET /recommend
+   * Recommended templates: popular (public) + recent used (my)
+   *
+   * Query: ?category=&serviceKey=&limit=5
+   */
+  router.get('/recommend', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { category, serviceKey, limit = '5' } = req.query;
+      const take = Math.min(parseInt(limit as string, 10) || 5, 20);
+
+      // 1. Popular public templates
+      const popularQb = repo.createQueryBuilder('t')
+        .where('t.isActive = true')
+        .andWhere('t.isPublic = true')
+        .andWhere('t.usageCount > 0');
+
+      if (serviceKey && typeof serviceKey === 'string') {
+        popularQb.andWhere('t.serviceKey = :serviceKey', { serviceKey });
+      }
+      if (category && typeof category === 'string') {
+        popularQb.andWhere('t.category = :category', { category });
+      }
+
+      popularQb.orderBy('t.usageCount', 'DESC').take(take);
+      const popular = await popularQb.getMany();
+
+      // 2. Recently used by this user
+      const recentQb = repo.createQueryBuilder('t')
+        .where('t.isActive = true')
+        .andWhere('t.createdByUserId = :userId', { userId: user.id })
+        .andWhere('t.lastUsedAt IS NOT NULL');
+
+      if (category && typeof category === 'string') {
+        recentQb.andWhere('t.category = :category', { category });
+      }
+
+      recentQb.orderBy('t.lastUsedAt', 'DESC').take(3);
+      const recent = await recentQb.getMany();
+
+      res.json({ success: true, data: { popular, recent } });
+    } catch (error: any) {
+      console.error('Failed to get template recommendations:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: error.message },
+      });
+    }
+  });
+
+  /**
+   * POST /:id/use
+   * Record template usage (increment count + update timestamp)
+   */
+  router.post('/:id/use', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { id } = req.params;
+
+      const result = await repo.createQueryBuilder()
+        .update(ContentTemplate)
+        .set({
+          usageCount: () => '"usage_count" + 1',
+          lastUsedAt: () => 'NOW()',
+        })
+        .where('id = :id AND isActive = true', { id })
+        .execute();
+
+      if (result.affected === 0) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: '템플릿을 찾을 수 없습니다.' },
+        });
+        return;
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Failed to record template usage:', error);
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: error.message },
@@ -206,7 +328,7 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
 
   /**
    * DELETE /:id
-   * Soft-delete a template (owner only)
+   * Soft-delete a template (owner or admin)
    */
   router.delete('/:id', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
@@ -227,7 +349,10 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
         return;
       }
 
-      if (template.createdByUserId !== user.id) {
+      const userRoles: string[] = (user as any).roles || [];
+      const isAdmin = userRoles.some((r: string) => PUBLIC_TEMPLATE_ROLES.includes(r));
+
+      if (template.createdByUserId !== user.id && !isAdmin) {
         res.status(403).json({
           success: false,
           error: { code: 'FORBIDDEN', message: '본인의 템플릿만 삭제할 수 있습니다.' },

@@ -38,6 +38,7 @@ export function RichTextEditor({
   canCreatePublicTemplate = false,
   templatesLoading = false,
   templatesSaving = false,
+  onUseTemplate,
   onImageUpload,
   existingImages,
 }: ContentEditorProps) {
@@ -203,7 +204,7 @@ export function RichTextEditor({
           <TemplateModal
             open={templateModalOpen}
             onClose={() => setTemplateModalOpen(false)}
-            onSelect={(html) => {
+            onSelect={(html, templateId) => {
               if (editor) {
                 const isEmpty = editor.isEmpty || editor.getHTML() === '<p></p>';
                 if (!isEmpty) {
@@ -212,6 +213,7 @@ export function RichTextEditor({
                 }
                 editor.commands.setContent(html);
                 onChange?.({ html: editor.getHTML(), json: editor.getJSON() });
+                onUseTemplate?.(templateId);
               }
             }}
             templates={templates}

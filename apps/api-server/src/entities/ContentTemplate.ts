@@ -48,6 +48,12 @@ export class ContentTemplate {
   @Column({ type: 'boolean', default: false })
   isPublic!: boolean;
 
+  @Column({ type: 'integer', default: 0 })
+  usageCount!: number;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  lastUsedAt!: Date | null;
+
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 

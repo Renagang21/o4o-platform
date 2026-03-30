@@ -48,6 +48,8 @@ export interface ContentEditorProps {
   templatesLoading?: boolean;
   /** 템플릿 저장 중 */
   templatesSaving?: boolean;
+  /** 템플릿 사용 기록 콜백 (fire-and-forget) */
+  onUseTemplate?: (templateId: string) => void;
   /** 이미지 업로드 핸들러 — 파일 → URL 반환 */
   onImageUpload?: (file: File) => Promise<string>;
   /** 기존 이미지 목록 (선택 삽입용) */
@@ -91,4 +93,6 @@ export interface ContentTemplate {
   category: string;
   contentHtml: string;
   isPublic?: boolean;
+  usageCount?: number;
+  lastUsedAt?: string | null;
 }
