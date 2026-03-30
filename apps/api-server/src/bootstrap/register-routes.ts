@@ -784,7 +784,16 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Content Assets routes:', contentAssetsError);
     }
 
-    // 32-c. Register Dashboard Assets routes (WO-APP-DATA-HUB-COPY-PHASE2A-V1)
+    // 32-c. Register Content Templates routes (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
+    try {
+      const { createContentTemplateRoutes } = await import('../routes/content/content-templates.routes.js');
+      app.use('/api/v1/content/templates', createContentTemplateRoutes(dataSource));
+      logger.info('✅ Content Templates routes registered at /api/v1/content/templates');
+    } catch (contentTemplateError) {
+      logger.error('Failed to register Content Templates routes:', contentTemplateError);
+    }
+
+    // 32-d. Register Dashboard Assets routes (WO-APP-DATA-HUB-COPY-PHASE2A-V1)
     try {
       const dashboardAssetsRoutes = createDashboardAssetsRoutes(dataSource);
       app.use('/api/v1/dashboard/assets', dashboardAssetsRoutes);

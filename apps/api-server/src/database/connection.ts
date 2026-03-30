@@ -366,6 +366,11 @@ import {
 import { PlatformStorePolicy, PlatformStorePaymentConfig } from '@o4o/platform-core/store-policy';
 
 // ============================================================================
+// CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
+// ============================================================================
+import { ContentTemplate } from '../entities/ContentTemplate.js';
+
+// ============================================================================
 // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
 // ============================================================================
 import { PlatformInquiry } from '../entities/PlatformInquiry.js';
@@ -833,6 +838,10 @@ export const AppDataSource = new DataSource({
     SiteGuideApiKey,
     SiteGuideUsageSummary,
     SiteGuideExecutionLog,
+    // ============================================================================
+    // CONTENT TEMPLATE ENTITY (WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1)
+    // ============================================================================
+    ContentTemplate,
     // ============================================================================
     // PLATFORM INQUIRY ENTITY (Platform-level Contact Form)
     // ============================================================================
