@@ -31,6 +31,39 @@ export interface AuthClientOptions {
   strategy?: AuthStrategy;
 }
 
+/**
+ * Extract tokens from server response.
+ * Handles both BaseController.ok() wrapped format and flat format.
+ *
+ * Wrapped:  { success, data: { tokens: { accessToken, refreshToken } } }
+ * Flat:     { accessToken, refreshToken }
+ *
+ * WO-NETURE-AUTH-TOKEN-FAMILY-MISMATCH-FIX-V1
+ */
+function extractTokensFromResponse(responseData: any): {
+  accessToken?: string;
+  refreshToken?: string;
+} {
+  // Path 1: BaseController.ok() wrapped — { success, data: { tokens: { ... } } }
+  const wrapped = responseData?.data?.tokens;
+  if (wrapped?.accessToken) {
+    return { accessToken: wrapped.accessToken, refreshToken: wrapped.refreshToken };
+  }
+
+  // Path 2: data-level tokens (no nested tokens key) — { success, data: { accessToken, ... } }
+  const dataLevel = responseData?.data;
+  if (dataLevel?.accessToken) {
+    return { accessToken: dataLevel.accessToken, refreshToken: dataLevel.refreshToken };
+  }
+
+  // Path 3: flat response — { accessToken, refreshToken }
+  if (responseData?.accessToken) {
+    return { accessToken: responseData.accessToken, refreshToken: responseData.refreshToken };
+  }
+
+  return {};
+}
+
 export class AuthClient {
   private baseURL: string;
   public api: AxiosInstance;
@@ -117,10 +150,22 @@ export class AuthClient {
               : {}; // Cookie strategy sends refresh token via cookie
 
             const response = await this.api.post('/auth/refresh', refreshPayload);
-            const { accessToken, refreshToken: newRefreshToken } = response.data as { accessToken?: string; refreshToken?: string };
+
+            // WO-NETURE-AUTH-TOKEN-FAMILY-MISMATCH-FIX-V1:
+            // Use shared helper to correctly unwrap BaseController.ok() response
+            const { accessToken, refreshToken: newRefreshToken } = extractTokensFromResponse(response.data);
+
+            if (!accessToken) {
+              // Refresh endpoint returned 200 but no usable token — treat as failure
+              console.warn('[AuthClient] Refresh succeeded but no accessToken in response');
+              if (this.strategy === 'localStorage') {
+                clearAllTokens();
+              }
+              return Promise.reject(new Error('Refresh response missing accessToken'));
+            }
 
             // Phase 6-7: Only update localStorage for localStorage strategy
-            if (this.strategy === 'localStorage' && accessToken) {
+            if (this.strategy === 'localStorage') {
               setAccessToken(accessToken);
               if (newRefreshToken) {
                 setRefreshToken(newRefreshToken);
@@ -129,11 +174,11 @@ export class AuthClient {
             }
 
             // Notify subscribers
-            this.refreshSubscribers.forEach(callback => callback(accessToken || ''));
+            this.refreshSubscribers.forEach(callback => callback(accessToken));
             this.refreshSubscribers = [];
 
-            // Retry original request
-            if (this.strategy === 'localStorage' && accessToken) {
+            // Retry original request with new access token
+            if (this.strategy === 'localStorage') {
               originalRequest.headers.Authorization = `Bearer ${accessToken}`;
             }
             return this.api.request(originalRequest);
@@ -180,19 +225,13 @@ export class AuthClient {
       : credentials;
 
     const response = await this.api.post('/auth/login', payload);
-    const rawData = response.data as {
-      success: boolean;
-      data?: {
-        user?: any;
-        tokens?: { accessToken?: string; refreshToken?: string; expiresIn?: number };
-        message?: string;
-      };
-    };
+    const rawData = response.data as { success?: boolean; data?: any };
 
-    // Unwrap the nested response format from BaseController.ok
-    const accessToken = rawData.data?.tokens?.accessToken;
-    const refreshToken = rawData.data?.tokens?.refreshToken;
+    // WO-NETURE-AUTH-TOKEN-FAMILY-MISMATCH-FIX-V1:
+    // Use shared helper for consistent token extraction
+    const { accessToken, refreshToken } = extractTokensFromResponse(rawData);
     const user = rawData.data?.user;
+    const expiresIn = rawData.data?.tokens?.expiresIn ?? rawData.data?.expiresIn;
 
     // Phase 6-7: Only store tokens locally for localStorage strategy
     if (this.strategy === 'localStorage' && accessToken) {
@@ -205,12 +244,12 @@ export class AuthClient {
 
     // Return flattened AuthResponse for client consumption
     return {
-      success: rawData.success,
+      success: rawData.success ?? true,
       message: rawData.data?.message,
       accessToken,
       refreshToken,
       user,
-      expiresIn: rawData.data?.tokens?.expiresIn,
+      expiresIn,
     };
   }
 
