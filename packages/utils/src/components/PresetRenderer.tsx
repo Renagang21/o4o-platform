@@ -1,14 +1,9 @@
 import React from 'react';
-import DOMPurify from 'dompurify';
+import { ContentRenderer } from '@o4o/content-editor';
 import type {
   ViewPreset,
   ViewField
 } from '@o4o/types';
-
-// DOMPurify 직접 사용 — @o4o/content-editor는 빌드 순서상 utils 이후이므로 직접 import
-function sanitizeHtml(dirty: string): string {
-  return DOMPurify.sanitize(dirty);
-}
 
 /**
  * Props for PresetRenderer
@@ -29,7 +24,7 @@ function renderFieldValue(value: any, field: ViewField): React.ReactNode {
 
   switch (field.format) {
     case 'html':
-      return <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(value) }} />;
+      return <ContentRenderer html={value} />;
 
     case 'image':
       if (typeof value === 'string') {

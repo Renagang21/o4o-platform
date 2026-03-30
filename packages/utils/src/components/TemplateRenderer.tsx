@@ -1,16 +1,11 @@
 import React from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@o4o/content-editor';
 import type {
   TemplatePreset,
   TemplateLayoutType,
   SlotConfig,
   BlockReference
 } from '@o4o/types';
-
-// DOMPurify 직접 사용 — @o4o/content-editor는 빌드 순서상 utils 이후이므로 직접 import
-function sanitizeHtml(dirty: string): string {
-  return DOMPurify.sanitize(dirty);
-}
 
 /**
  * Props for TemplateRenderer

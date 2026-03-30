@@ -2956,6 +2956,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../auth-client
+      '@o4o/content-editor':
+        specifier: workspace:*
+        version: link:../content-editor
       '@o4o/types':
         specifier: workspace:*
         version: link:../types
@@ -2965,9 +2968,6 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
-      dompurify:
-        specifier: ^3.3.0
-        version: 3.3.0
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -15430,10 +15430,10 @@ snapshots:
   '@o4o/utils@file:packages/utils':
     dependencies:
       '@o4o/auth-client': link:packages/auth-client
+      '@o4o/content-editor': link:packages/content-editor
       '@o4o/types': link:packages/types
       '@tanstack/react-query': 5.90.11(react@19.2.0)
       clsx: 2.1.1
-      dompurify: 3.3.0
       react: 19.2.0
       tailwind-merge: 2.6.0
 
