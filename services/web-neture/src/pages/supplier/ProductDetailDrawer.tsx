@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
+import { RichTextEditor } from '@o4o/content-editor';
 
 interface ProductDetailDrawerProps {
   product: SupplierProduct | null;
@@ -271,8 +272,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         isActive: form.isActive,
         distributionType: form.distributionType as any,
         // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
-        categoryId: editCategory,
-        brandId: editBrand,
+        // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
+        categoryId: editCategory || null,
+        brandId: editBrand || null,
         specification: editSpec || null,
         originCountry: editOrigin || null,
       };
@@ -288,11 +290,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       }
 
       // 2. B2B 설명 업데이트 (전용 엔드포인트)
-      const bizShort = editBizShort.trim() ? `<p>${editBizShort.trim()}</p>` : null;
-      const bizDetail = editBizDetail.trim() ? `<p>${editBizDetail.trim()}</p>` : null;
-      const prevBizShort = stripHtml(product.businessShortDescription);
-      const prevBizDetail = stripHtml(product.businessDetailDescription);
-      if (editBizShort.trim() !== prevBizShort || editBizDetail.trim() !== prevBizDetail) {
+      const bizShort = editBizShort.trim() || null;
+      const bizDetail = editBizDetail.trim() || null;
+      if (editBizShort !== (product.businessShortDescription || '') || editBizDetail !== (product.businessDetailDescription || '')) {
         const bizResult = await supplierApi.updateBusinessContent(product.id, {
           businessShortDescription: bizShort,
           businessDetailDescription: bizDetail,
@@ -491,8 +491,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   setEditBrand(product.brandId || null);
                   setEditSpec(product.specification || '');
                   setEditOrigin(product.originCountry || '');
-                  setEditBizShort(stripHtml(product.businessShortDescription) || '');
-                  setEditBizDetail(stripHtml(product.businessDetailDescription) || '');
+                  setEditBizShort(product.businessShortDescription || '');
+                  setEditBizDetail(product.businessDetailDescription || '');
                   productApi.getCategories().then(setCategories);
                   productApi.getBrands().then(setBrands);
                   setIsEditing(true);
@@ -601,25 +601,23 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
-                <textarea
+                <RichTextEditor
                   value={editBizShort}
-                  onChange={(e) => setEditBizShort(e.target.value)}
-                  disabled={saving}
-                  rows={2}
+                  onChange={(c) => setEditBizShort(c.html)}
+                  editable={!saving}
                   placeholder="거래처용 간단 소개"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 resize-none"
+                  minHeight="80px"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
-                <textarea
+                <RichTextEditor
                   value={editBizDetail}
-                  onChange={(e) => setEditBizDetail(e.target.value)}
-                  disabled={saving}
-                  rows={4}
+                  onChange={(c) => setEditBizDetail(c.html)}
+                  editable={!saving}
                   placeholder="거래처용 상세 설명"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50 resize-none"
+                  minHeight="150px"
                 />
               </div>
             </div>

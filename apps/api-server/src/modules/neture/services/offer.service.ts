@@ -781,7 +781,16 @@ export class NetureOfferService {
       if (updates.tags !== undefined) masterUpdates.tags = updates.tags;
 
       if (Object.keys(masterUpdates).length > 0) {
-        await this.catalogService.updateProductMaster(offer.masterId, masterUpdates);
+        // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null for UUID fields
+        for (const key of ['categoryId', 'brandId'] as const) {
+          if (key in masterUpdates && masterUpdates[key] === '') {
+            masterUpdates[key] = null;
+          }
+        }
+        const masterResult = await this.catalogService.updateProductMaster(offer.masterId, masterUpdates);
+        if (!masterResult.success) {
+          return { success: false, error: masterResult.error || 'MASTER_UPDATE_FAILED' };
+        }
       }
 
       // Validation: PRIVATE requires at least one seller ID

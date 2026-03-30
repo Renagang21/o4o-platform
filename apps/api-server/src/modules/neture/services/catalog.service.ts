@@ -193,11 +193,12 @@ export class NetureCatalogService {
       master.brandName = updates.brandName as string | null;
     }
     // WO-O4O-NETURE-CATEGORY-PRODUCTMASTER-STRUCTURE-V1: 확장 필드
+    // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
     if ('categoryId' in updates) {
-      master.categoryId = updates.categoryId as string | null;
+      master.categoryId = (updates.categoryId as string | null) || null;
     }
     if ('brandId' in updates) {
-      master.brandId = updates.brandId as string | null;
+      master.brandId = (updates.brandId as string | null) || null;
     }
     if ('specification' in updates) {
       master.specification = updates.specification as string | null;

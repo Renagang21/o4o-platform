@@ -5,11 +5,12 @@
  *
  * B2B 콘텐츠 편집 Drawer.
  * - 현재 B2C 콘텐츠 참조 (읽기전용)
- * - B2B 콘텐츠 편집 (textarea)
+ * - B2B 콘텐츠 편집 (RichTextEditor)
  * - "B2C에서 복사" 버튼
  */
 
 import { useState, useEffect } from 'react';
+import { RichTextEditor } from '@o4o/content-editor';
 import { supplierApi, type SupplierProduct } from '../../lib/api/supplier';
 
 interface B2BContentDrawerProps {
@@ -17,11 +18,6 @@ interface B2BContentDrawerProps {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
-}
-
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return '';
-  return html.replace(/<[^>]*>/g, '').trim();
 }
 
 export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2BContentDrawerProps) {
@@ -32,21 +28,20 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
 
   useEffect(() => {
     if (product && open) {
-      setBusinessShort(stripHtml(product.businessShortDescription));
-      setBusinessDetail(stripHtml(product.businessDetailDescription));
+      setBusinessShort(product.businessShortDescription || '');
+      setBusinessDetail(product.businessDetailDescription || '');
       setError(null);
     }
   }, [product, open]);
 
   if (!open || !product) return null;
 
-  const consumerShort = stripHtml(product.consumerShortDescription);
-  const consumerDetail = stripHtml(product.consumerDetailDescription);
+  const hasConsumer = !!(product.consumerShortDescription || product.consumerDetailDescription);
   const hasB2B = !!(product.businessShortDescription || product.businessDetailDescription);
 
   const handleCopyFromConsumer = () => {
-    if (consumerShort && !businessShort) setBusinessShort(consumerShort);
-    if (consumerDetail && !businessDetail) setBusinessDetail(consumerDetail);
+    if (product.consumerShortDescription && !businessShort) setBusinessShort(product.consumerShortDescription);
+    if (product.consumerDetailDescription && !businessDetail) setBusinessDetail(product.consumerDetailDescription);
   };
 
   const handleSave = async () => {
@@ -101,7 +96,7 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
               <button
                 type="button"
                 onClick={handleCopyFromConsumer}
-                disabled={!consumerShort && !consumerDetail}
+                disabled={!hasConsumer}
                 className="text-xs text-blue-600 hover:text-blue-800 font-medium px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 B2C에서 복사
@@ -110,15 +105,19 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
             <div className="space-y-2">
               <div>
                 <label className="text-xs text-gray-500">짧은 설명</label>
-                <p className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem]">
-                  {consumerShort || <span className="text-gray-400 italic">없음</span>}
-                </p>
+                {product.consumerShortDescription ? (
+                  <div className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem]" dangerouslySetInnerHTML={{ __html: product.consumerShortDescription }} />
+                ) : (
+                  <p className="text-sm text-gray-400 italic bg-gray-50 rounded p-2 min-h-[2rem]">없음</p>
+                )}
               </div>
               <div>
                 <label className="text-xs text-gray-500">상세 설명</label>
-                <p className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4">
-                  {consumerDetail || <span className="text-gray-400 italic">없음</span>}
-                </p>
+                {product.consumerDetailDescription ? (
+                  <div className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4" dangerouslySetInnerHTML={{ __html: product.consumerDetailDescription }} />
+                ) : (
+                  <p className="text-sm text-gray-400 italic bg-gray-50 rounded p-2 min-h-[2rem]">없음</p>
+                )}
               </div>
             </div>
           </div>
@@ -129,22 +128,20 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">짧은 설명 (B2B)</label>
-                <textarea
+                <RichTextEditor
                   value={businessShort}
-                  onChange={(e) => setBusinessShort(e.target.value)}
-                  rows={3}
+                  onChange={(c) => setBusinessShort(c.html)}
                   placeholder="도매/파트너용 짧은 상품 설명"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  minHeight="80px"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">상세 설명 (B2B)</label>
-                <textarea
+                <RichTextEditor
                   value={businessDetail}
-                  onChange={(e) => setBusinessDetail(e.target.value)}
-                  rows={5}
+                  onChange={(c) => setBusinessDetail(c.html)}
                   placeholder="도매/파트너용 상세 상품 설명"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  minHeight="150px"
                 />
               </div>
             </div>
