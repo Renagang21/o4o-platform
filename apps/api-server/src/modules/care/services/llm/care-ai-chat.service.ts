@@ -407,7 +407,58 @@ export class CareAiChatService {
       }
     } catch { /* table may not exist */ }
 
-    // Q6: Latest LLM insight
+    // Q6: Time-of-day glucose pattern (WO-O4O-CARE-TIME-BASED-ANALYSIS-V1)
+    try {
+      const q6t = await this.dataSource.query(`
+        SELECT
+          CASE
+            WHEN EXTRACT(HOUR FROM measured_at) >= 5  AND EXTRACT(HOUR FROM measured_at) < 10 THEN 'morning'
+            WHEN EXTRACT(HOUR FROM measured_at) >= 10 AND EXTRACT(HOUR FROM measured_at) < 15 THEN 'afternoon'
+            WHEN EXTRACT(HOUR FROM measured_at) >= 15 AND EXTRACT(HOUR FROM measured_at) < 21 THEN 'evening'
+            ELSE 'night'
+          END AS bucket,
+          COUNT(*)::int AS count,
+          ROUND(AVG(value_numeric::numeric), 0)::int AS avg
+        FROM health_readings
+        WHERE patient_id = ${pidParam} ${sFilter}
+          AND metric_type = 'glucose' AND measured_at >= NOW() - INTERVAL '14 days'
+        GROUP BY bucket
+        ORDER BY CASE bucket WHEN 'morning' THEN 0 WHEN 'afternoon' THEN 1 WHEN 'evening' THEN 2 ELSE 3 END
+      `, baseParams);
+
+      if (q6t.length > 0) {
+        const bucketLabels: Record<string, string> = { morning: '아침(05~10시)', afternoon: '점심(10~15시)', evening: '저녁(15~21시)', night: '야간(21~05시)' };
+        parts.push(`\n[시간대별 혈당 패턴]`);
+        for (const b of q6t) {
+          parts.push(`- ${bucketLabels[b.bucket] || b.bucket}: 평균 ${b.avg} mg/dL (${b.count}회)`);
+        }
+      }
+    } catch { /* ignore */ }
+
+    // Q6b: Post-meal average
+    try {
+      const q6m = await this.dataSource.query(`
+        SELECT
+          metadata->>'mealTiming' AS timing,
+          COUNT(*)::int AS count,
+          ROUND(AVG(value_numeric::numeric), 0)::int AS avg
+        FROM health_readings
+        WHERE patient_id = ${pidParam} ${sFilter}
+          AND metric_type = 'glucose' AND metadata->>'mealTiming' IS NOT NULL
+          AND measured_at >= NOW() - INTERVAL '14 days'
+        GROUP BY metadata->>'mealTiming'
+      `, baseParams);
+
+      if (q6m.length > 0) {
+        const timingLabels: Record<string, string> = { fasting: '공복', before_meal: '식전', after_meal: '식후', after_meal_1h: '식후1h', after_meal_2h: '식후2h', bedtime: '취침전', random: '수시' };
+        parts.push(`\n[측정 구분별 혈당]`);
+        for (const m of q6m) {
+          parts.push(`- ${timingLabels[m.timing] || m.timing}: 평균 ${m.avg} mg/dL (${m.count}회)`);
+        }
+      }
+    } catch { /* ignore */ }
+
+    // Q7: Latest LLM insight
     try {
       const q6 = await this.dataSource.query(`
         SELECT pharmacy_insight FROM care_llm_insights

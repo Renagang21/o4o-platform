@@ -106,6 +106,132 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
     }
   });
 
+  // GET /analysis/time-based/:patientId — time-bucket analysis (WO-O4O-CARE-TIME-BASED-ANALYSIS-V1)
+  router.get('/analysis/time-based/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const { patientId } = req.params;
+      const pharmacyId = pcReq.pharmacyId;
+      const days = Math.min(Number(req.query.days) || 14, 90);
+
+      const pharmacyFilter = pharmacyId ? 'AND pharmacy_id = $2' : '';
+      const params: unknown[] = pharmacyId ? [patientId, pharmacyId] : [patientId];
+
+      // Q1: Time-of-day glucose buckets
+      const timeBuckets = await dataSource.query(`
+        SELECT
+          CASE
+            WHEN EXTRACT(HOUR FROM measured_at) >= 5  AND EXTRACT(HOUR FROM measured_at) < 10 THEN 'morning'
+            WHEN EXTRACT(HOUR FROM measured_at) >= 10 AND EXTRACT(HOUR FROM measured_at) < 15 THEN 'afternoon'
+            WHEN EXTRACT(HOUR FROM measured_at) >= 15 AND EXTRACT(HOUR FROM measured_at) < 21 THEN 'evening'
+            ELSE 'night'
+          END AS bucket,
+          COUNT(*)::int AS count,
+          ROUND(AVG(value_numeric::numeric), 0)::int AS avg,
+          MIN(value_numeric::numeric)::int AS min,
+          MAX(value_numeric::numeric)::int AS max,
+          COUNT(*) FILTER (WHERE value_numeric::numeric > 180)::int AS high_count,
+          COUNT(*) FILTER (WHERE value_numeric::numeric < 70)::int AS low_count
+        FROM health_readings
+        WHERE patient_id = $1 ${pharmacyFilter}
+          AND metric_type = 'glucose'
+          AND measured_at >= NOW() - make_interval(days => ${days})
+        GROUP BY bucket
+        ORDER BY CASE bucket WHEN 'morning' THEN 0 WHEN 'afternoon' THEN 1 WHEN 'evening' THEN 2 ELSE 3 END
+      `, params);
+
+      // Q2: Meal-timing glucose stats (from metadata)
+      const mealTimingStats = await dataSource.query(`
+        SELECT
+          metadata->>'mealTiming' AS meal_timing,
+          COUNT(*)::int AS count,
+          ROUND(AVG(value_numeric::numeric), 0)::int AS avg,
+          MAX(value_numeric::numeric)::int AS max
+        FROM health_readings
+        WHERE patient_id = $1 ${pharmacyFilter}
+          AND metric_type = 'glucose'
+          AND metadata->>'mealTiming' IS NOT NULL
+          AND measured_at >= NOW() - make_interval(days => ${days})
+        GROUP BY metadata->>'mealTiming'
+        ORDER BY count DESC
+      `, params);
+
+      // Q3: Exercise impact — compare glucose before/after exercise (readings with exercise metadata)
+      const exerciseImpact = await dataSource.query(`
+        SELECT
+          COUNT(*)::int AS count,
+          ROUND(AVG(value_numeric::numeric), 0)::int AS avg_with_exercise
+        FROM health_readings
+        WHERE patient_id = $1 ${pharmacyFilter}
+          AND metric_type = 'glucose'
+          AND metadata->'exercise' IS NOT NULL
+          AND metadata->>'exercise' != 'null'
+          AND measured_at >= NOW() - make_interval(days => ${days})
+      `, params);
+
+      // Q4: Trend comparison (3d / 7d / 14d averages)
+      const trends = await dataSource.query(`
+        SELECT
+          ROUND(AVG(value_numeric::numeric) FILTER (WHERE measured_at >= NOW() - INTERVAL '3 days'), 0)::int AS avg_3d,
+          COUNT(*) FILTER (WHERE measured_at >= NOW() - INTERVAL '3 days')::int AS count_3d,
+          ROUND(AVG(value_numeric::numeric) FILTER (WHERE measured_at >= NOW() - INTERVAL '7 days'), 0)::int AS avg_7d,
+          COUNT(*) FILTER (WHERE measured_at >= NOW() - INTERVAL '7 days')::int AS count_7d,
+          ROUND(AVG(value_numeric::numeric) FILTER (WHERE measured_at >= NOW() - make_interval(days => ${days})), 0)::int AS avg_full,
+          COUNT(*) FILTER (WHERE measured_at >= NOW() - make_interval(days => ${days}))::int AS count_full
+        FROM health_readings
+        WHERE patient_id = $1 ${pharmacyFilter}
+          AND metric_type = 'glucose'
+      `, params);
+
+      // Q5: Overall glucose average (for exercise comparison baseline)
+      const overallAvg = await dataSource.query(`
+        SELECT ROUND(AVG(value_numeric::numeric), 0)::int AS avg
+        FROM health_readings
+        WHERE patient_id = $1 ${pharmacyFilter}
+          AND metric_type = 'glucose'
+          AND measured_at >= NOW() - make_interval(days => ${days})
+      `, params);
+
+      res.json({
+        success: true,
+        data: {
+          days,
+          timeBuckets: timeBuckets.map((b: any) => ({
+            bucket: b.bucket,
+            count: b.count,
+            avg: b.avg,
+            min: b.min,
+            max: b.max,
+            highCount: b.high_count,
+            lowCount: b.low_count,
+          })),
+          mealTimingStats: mealTimingStats.map((m: any) => ({
+            mealTiming: m.meal_timing,
+            count: m.count,
+            avg: m.avg,
+            max: m.max,
+          })),
+          exerciseImpact: {
+            count: exerciseImpact[0]?.count ?? 0,
+            avgWithExercise: exerciseImpact[0]?.avg_with_exercise ?? null,
+            overallAvg: overallAvg[0]?.avg ?? null,
+          },
+          trends: {
+            avg3d: trends[0]?.avg_3d ?? null,
+            count3d: trends[0]?.count_3d ?? 0,
+            avg7d: trends[0]?.avg_7d ?? null,
+            count7d: trends[0]?.count_7d ?? 0,
+            avgFull: trends[0]?.avg_full ?? null,
+            countFull: trends[0]?.count_full ?? 0,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('[CareAnalysis] time-based analysis error:', error);
+      res.status(500).json({ success: false, error: { code: 'ANALYSIS_ERROR', message: 'Time-based analysis failed' } });
+    }
+  });
+
   // GET /kpi/:patientId — compare latest 2 snapshots (pharmacy-scoped)
   router.get('/kpi/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
