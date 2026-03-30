@@ -7,7 +7,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@o4o/content-editor';
 import {
   YaksaRoleBadge,
   YaksaStatusBadge,
@@ -223,7 +223,7 @@ export function YaksaForumPostSingle({ postSlug }: YaksaForumPostSingleProps) {
           <div className="p-6">
             <div
               className="prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || '') }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content || '') }}
             />
 
             {/* Attachments */}

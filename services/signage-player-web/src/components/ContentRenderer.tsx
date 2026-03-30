@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import DOMPurify from 'dompurify'
+import { sanitizeHtml } from '@o4o/content-editor'
 import type { ChannelContent } from '@/api/channels'
 
 interface ContentRendererProps {
@@ -158,7 +158,7 @@ function TextContent({ content }: { content: ChannelContent['content'] }) {
   return (
     <div className="content-text" style={styles}>
       {content.body ? (
-        <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content.body) }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.body) }} />
       ) : (
         <p>{text}</p>
       )}

@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { useAuth } from '@/context';
@@ -250,7 +250,7 @@ export function CourseDetailPage() {
               {course.content ? (
                 <div
                   className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(course.content) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(course.content) }}
                 />
               ) : course.description ? (
                 <p className="text-gray-700 whitespace-pre-wrap">{course.description}</p>

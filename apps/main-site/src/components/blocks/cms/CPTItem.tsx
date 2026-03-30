@@ -4,7 +4,7 @@
 
 'use client';
 
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@o4o/content-editor';
 import { BlockRendererProps } from '../BlockRenderer';
 import type { CMSPost } from '@/lib/cms/client';
 
@@ -46,7 +46,7 @@ export const CPTItemBlock = ({ node }: BlockRendererProps) => {
           )}
           {showAuthor && post.author && <span>By {post.author.name}</span>}
         </div>
-        <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }} />
+        <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} />
       </article>
     );
   }

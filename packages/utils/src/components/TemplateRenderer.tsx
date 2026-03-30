@@ -1,5 +1,5 @@
 import React from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@o4o/content-editor';
 import type {
   TemplatePreset,
   TemplateLayoutType,
@@ -160,7 +160,7 @@ function SchemaOrgComponent({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(JSON.stringify(schemaData, null, 2)) }}
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(JSON.stringify(schemaData, null, 2)) }}
     />
   );
 }

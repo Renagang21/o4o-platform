@@ -11,14 +11,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "dompurify": "^3.0.6",
+    "@o4o/content-editor": "workspace:*",
     "lucide-react": "^0.523.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6"
   },
   "devDependencies": {
-    "@types/dompurify": "^3.0.5",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
