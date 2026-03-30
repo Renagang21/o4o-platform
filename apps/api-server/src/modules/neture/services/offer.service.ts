@@ -1056,13 +1056,16 @@ export class NetureOfferService {
            pm.marketing_name AS "masterName",
            pm.barcode,
            pm.specification,
+           pm.origin_country AS "originCountry",
+           pm.category_id AS "categoryId",
+           pm.brand_id AS "brandId",
            pm.regulatory_type AS "regulatoryType",
            pm.regulatory_name AS "regulatoryName",
            pm.mfds_permit_number AS "mfdsPermitNumber",
            pm.manufacturer_name AS "manufacturerName",
            COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
            pc.name AS "categoryName",
-           pm.brand_name AS "brandName",
+           COALESCE(b.name, pm.brand_name) AS "brandName",
            pi_img.image_url AS "primaryImageUrl",
            COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
            COALESCE(active.cnt, 0)::int AS "activeServiceCount",
@@ -1071,6 +1074,7 @@ export class NetureOfferService {
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN product_categories pc ON pc.id = pm.category_id
+         LEFT JOIN brands b ON b.id = pm.brand_id
          LEFT JOIN LATERAL (
            SELECT image_url FROM product_images
            WHERE master_id = pm.id AND is_primary = true LIMIT 1
