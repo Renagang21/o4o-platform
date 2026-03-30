@@ -94,6 +94,8 @@ export default function GlucoseInputPage() {
   // Form state — Symptoms (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
   const [symOpen, setSymOpen] = useState(true);
   const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [symSeverity, setSymSeverity] = useState('mild');
+  const [symDuration, setSymDuration] = useState('');
 
   // Recent readings
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
@@ -175,9 +177,13 @@ export default function GlucoseInputPage() {
         }
       }
 
-      // Symptoms
+      // Symptoms — structured format (aligned with DataTab)
       if (symOpen && symptoms.length > 0) {
-        metadata.symptoms = symptoms;
+        metadata.symptoms = {
+          items: symptoms,
+          severity: symSeverity,
+          ...(symDuration ? { duration: Number(symDuration) } : {}),
+        };
       }
 
       const res = await patientApi.postGlucoseReading({
@@ -502,6 +508,41 @@ export default function GlucoseInputPage() {
                   </button>
                 ))}
               </div>
+              {/* Severity + Duration */}
+              {symptoms.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">심각도</label>
+                    <div className="flex gap-1.5">
+                      {[{ value: 'mild', label: '경미' }, { value: 'moderate', label: '보통' }, { value: 'severe', label: '심함' }].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setSymSeverity(opt.value)}
+                          className={`flex-1 py-2 text-xs font-medium rounded-xl border transition-colors ${
+                            symSeverity === opt.value
+                              ? 'bg-amber-50 border-amber-300 text-amber-700'
+                              : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">지속 시간 (분)</label>
+                    <input
+                      type="number"
+                      value={symDuration}
+                      onChange={(e) => setSymDuration(e.target.value)}
+                      placeholder="예: 15"
+                      min="1"
+                      className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>
@@ -552,7 +593,14 @@ export default function GlucoseInputPage() {
                 const meta = r.metadata as Record<string, unknown>;
                 const hasMed = meta?.medication != null;
                 const hasEx = meta?.exercise != null;
-                const hasSym = Array.isArray(meta?.symptoms) && (meta.symptoms as string[]).length > 0;
+                // Backward compat: symptoms can be string[] or { items: string[] }
+                const rawSym = meta?.symptoms;
+                const symItems: string[] | undefined = Array.isArray(rawSym)
+                  ? rawSym as string[]
+                  : rawSym && typeof rawSym === 'object' && Array.isArray((rawSym as { items?: string[] }).items)
+                    ? (rawSym as { items: string[] }).items
+                    : undefined;
+                const hasSym = !!(symItems && symItems.length > 0);
                 return (
                   <div
                     key={r.id}
@@ -592,7 +640,7 @@ export default function GlucoseInputPage() {
                         {hasSym && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600">
                             <AlertTriangle className="w-3 h-3" />
-                            증상 {(meta.symptoms as string[]).length}개
+                            증상 {symItems!.length}개
                           </span>
                         )}
                       </div>

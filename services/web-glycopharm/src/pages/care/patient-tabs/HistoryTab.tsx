@@ -125,7 +125,7 @@ export default function HistoryTab() {
                           <style.Icon className="w-4 h-4 text-slate-400" />
                           <span className="text-xs font-medium text-slate-400 uppercase">{style.label}</span>
                           <span className="text-xs text-slate-400">
-                            {new Date(event.eventAt).toLocaleDateString()}
+                            {new Date(event.eventAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
                           </span>
                         </div>
                         {/* Content by type */}

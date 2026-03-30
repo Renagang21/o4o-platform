@@ -271,8 +271,15 @@ export default function RecordsPage() {
               const mealTiming = (meta?.mealTiming as string) || '';
               const medication = meta?.medication as { name?: string; dose?: string } | undefined;
               const exercise = meta?.exercise as { type?: string; duration?: number } | undefined;
-              const symptoms = Array.isArray(meta?.symptoms) ? (meta.symptoms as string[]) : undefined;
-              const hasMetadata = !!(mealTiming || medication?.name || exercise?.type || (symptoms && symptoms.length > 0));
+              // Backward compat: symptoms can be string[] (legacy) or { items: string[], severity?, duration? }
+              const rawSym = meta?.symptoms;
+              const symptomItems: string[] | undefined = Array.isArray(rawSym)
+                ? rawSym as string[]
+                : rawSym && typeof rawSym === 'object' && Array.isArray((rawSym as { items?: string[] }).items)
+                  ? (rawSym as { items: string[] }).items
+                  : undefined;
+              const symptomSeverity = rawSym && typeof rawSym === 'object' && !Array.isArray(rawSym) ? (rawSym as { severity?: string }).severity : undefined;
+              const hasMetadata = !!(mealTiming || medication?.name || exercise?.type || (symptomItems && symptomItems.length > 0));
 
               return (
                 <div key={r.id} className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 transition-colors">
@@ -306,9 +313,9 @@ export default function RecordsPage() {
                               운동 {exercise.type}{exercise.duration ? ` ${exercise.duration}분` : ''}
                             </span>
                           )}
-                          {symptoms && symptoms.length > 0 && (
+                          {symptomItems && symptomItems.length > 0 && (
                             <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-50 text-amber-700">
-                              증상 {symptoms.join(', ')}
+                              증상 {symptomItems.join(', ')}{symptomSeverity === 'severe' ? ' [심함]' : symptomSeverity === 'moderate' ? ' [보통]' : ''}
                             </span>
                           )}
                         </div>
