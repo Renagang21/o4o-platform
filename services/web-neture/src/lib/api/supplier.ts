@@ -17,6 +17,24 @@ import type {
   SettlementKpi,
 } from './store.js';
 
+// WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: 실제 에러 메시지 추출
+function extractApiError(error: any): string {
+  const data = error?.response?.data;
+  if (data) {
+    // { success: false, error: "CODE" }
+    if (typeof data.error === 'string') return data.error;
+    // { success: false, error: { code, message } }
+    if (typeof data.error === 'object' && data.error !== null) {
+      return data.error.message || data.error.code || 'UNKNOWN_ERROR';
+    }
+    if (typeof data.message === 'string') return data.message;
+  }
+  if (error?.code === 'ECONNABORTED') return 'REQUEST_TIMEOUT';
+  if (error?.response?.status) return `HTTP_${error.response.status}`;
+  console.error('[Supplier API] Network error:', error?.message || error);
+  return 'NETWORK_ERROR';
+}
+
 // ==================== Supplier Types ====================
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
@@ -210,7 +228,7 @@ export const supplierCommissionApi = {
       const response = await api.post('/neture/supplier/partner-commissions', data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -222,7 +240,7 @@ export const supplierCommissionApi = {
       const response = await api.put(`/neture/supplier/partner-commissions/${id}`, data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -231,7 +249,7 @@ export const supplierCommissionApi = {
       const response = await api.delete(`/neture/supplier/partner-commissions/${id}`);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 };
@@ -410,7 +428,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/requests/${id}/approve`, {});
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -419,7 +437,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/requests/${id}/reject`, { reason });
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -428,7 +446,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/requests/${id}/suspend`, { note });
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -437,7 +455,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/requests/${id}/reactivate`, { note });
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -446,7 +464,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/requests/${id}/revoke`, { note });
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -549,7 +567,7 @@ export const supplierApi = {
       return response.data;
     } catch (error) {
       console.warn('[Supplier API] Failed to submit for approval:', error);
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -575,7 +593,7 @@ export const supplierApi = {
       const response = await api.post('/neture/supplier/products', data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -609,7 +627,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/supplier/products/${id}`, updates);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -625,7 +643,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/supplier/products/${offerId}/business-content`, data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -671,7 +689,7 @@ export const supplierApi = {
       const response = await api.post('/neture/library', data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -689,7 +707,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/library/${id}`, data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -698,7 +716,7 @@ export const supplierApi = {
       const response = await api.delete(`/neture/library/${id}`);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -735,7 +753,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/supplier/orders/${id}/status`, { status });
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -781,7 +799,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/supplier/inventory/${offerId}`, updates);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -794,7 +812,7 @@ export const supplierApi = {
       const response = await api.post(`/neture/supplier/orders/${orderId}/shipment`, data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -817,7 +835,7 @@ export const supplierApi = {
       const response = await api.patch(`/neture/supplier/shipments/${shipmentId}`, data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 
@@ -913,7 +931,7 @@ export const supplierProfileApi = {
       const response = await api.patch('/neture/supplier/profile', data);
       return response.data;
     } catch (error) {
-      return { success: false, error: 'NETWORK_ERROR' };
+      return { success: false, error: extractApiError(error) };
     }
   },
 };
