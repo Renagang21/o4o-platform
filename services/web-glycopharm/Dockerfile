@@ -66,8 +66,8 @@ RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
-RUN pnpm --filter @o4o/utils build
 RUN pnpm --filter @o4o/content-editor build
+RUN pnpm --filter @o4o/utils build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
