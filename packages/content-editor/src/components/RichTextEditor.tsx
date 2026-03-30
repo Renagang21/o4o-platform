@@ -3,7 +3,7 @@
  * TipTap 기반 리치 텍스트 에디터
  */
 
-import { useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -17,6 +17,8 @@ import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 
 import { Toolbar } from './Toolbar';
+import { TemplateModal } from './TemplateModal';
+import { SaveTemplateModal } from './SaveTemplateModal';
 import type { ContentEditorProps } from '../types';
 
 export function RichTextEditor({
@@ -29,7 +31,18 @@ export function RichTextEditor({
   minHeight = '400px',
   className = '',
   preset = 'full',
+  showTemplateActions = false,
+  templates = [],
+  onLoadTemplates,
+  onSaveAsTemplate,
+  canCreatePublicTemplate = false,
+  templatesLoading = false,
+  templatesSaving = false,
+  onImageUpload,
+  existingImages,
 }: ContentEditorProps) {
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -128,7 +141,7 @@ export function RichTextEditor({
       }}
       onKeyDown={handleKeyDown}
     >
-      {editable && <Toolbar editor={editor} preset={preset} />}
+      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} />}
       <EditorContent
         editor={editor}
         style={{
@@ -136,6 +149,86 @@ export function RichTextEditor({
           padding: '16px',
         }}
       />
+      {showTemplateActions && (
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            padding: '8px 12px',
+            borderTop: '1px solid #e5e7eb',
+            background: '#f8fafc',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              onLoadTemplates?.();
+              setTemplateModalOpen(true);
+            }}
+            style={{
+              padding: '4px 12px',
+              fontSize: 12,
+              fontWeight: 500,
+              border: '1px solid #e2e8f0',
+              borderRadius: 4,
+              background: 'white',
+              color: '#475569',
+              cursor: 'pointer',
+            }}
+          >
+            템플릿 불러오기
+          </button>
+          {onSaveAsTemplate && (
+            <button
+              type="button"
+              onClick={() => setSaveModalOpen(true)}
+              style={{
+                padding: '4px 12px',
+                fontSize: 12,
+                fontWeight: 500,
+                border: '1px solid #e2e8f0',
+                borderRadius: 4,
+                background: 'white',
+                color: '#475569',
+                cursor: 'pointer',
+              }}
+            >
+              템플릿으로 저장
+            </button>
+          )}
+        </div>
+      )}
+      {showTemplateActions && (
+        <>
+          <TemplateModal
+            open={templateModalOpen}
+            onClose={() => setTemplateModalOpen(false)}
+            onSelect={(html) => {
+              if (editor) {
+                const isEmpty = editor.isEmpty || editor.getHTML() === '<p></p>';
+                if (!isEmpty) {
+                  const ok = window.confirm('현재 작성 중인 내용이 사라집니다. 템플릿을 적용하시겠습니까?');
+                  if (!ok) return;
+                }
+                editor.commands.setContent(html);
+                onChange?.({ html: editor.getHTML(), json: editor.getJSON() });
+              }
+            }}
+            templates={templates}
+            loading={templatesLoading}
+          />
+          <SaveTemplateModal
+            open={saveModalOpen}
+            onClose={() => setSaveModalOpen(false)}
+            onSave={(name, category, isPublic) => {
+              onSaveAsTemplate?.(name, category, isPublic);
+              setSaveModalOpen(false);
+            }}
+            saving={templatesSaving}
+            canCreatePublic={canCreatePublicTemplate}
+          />
+        </>
+      )}
       <style>{editorStyles}</style>
     </div>
   );

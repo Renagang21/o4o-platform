@@ -30,13 +30,20 @@ import {
 } from 'lucide-react';
 import type { EditorPreset } from '../types';
 
+interface ExistingImage {
+  id: string;
+  url: string;
+  label?: string;
+}
+
 interface ToolbarProps {
   editor: Editor | null;
   onImageUpload?: (file: File) => Promise<string>;
+  existingImages?: ExistingImage[];
   preset?: EditorPreset;
 }
 
-export function Toolbar({ editor, onImageUpload, preset = 'full' }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full' }: ToolbarProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -427,6 +434,55 @@ export function Toolbar({ editor, onImageUpload, preset = 'full' }: ToolbarProps
                       style={{ display: 'none' }}
                     />
                   </label>
+                </>
+              )}
+              {existingImages && existingImages.length > 0 && (
+                <>
+                  <div style={{
+                    textAlign: 'center',
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    margin: '8px 0',
+                  }}>
+                    등록된 이미지에서 선택
+                  </div>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '4px',
+                    maxHeight: '160px',
+                    overflowY: 'auto',
+                  }}>
+                    {existingImages.map((img) => (
+                      <button
+                        key={img.id}
+                        type="button"
+                        onClick={() => {
+                          editor.chain().focus().setImage({ src: img.url }).run();
+                          setShowImageInput(false);
+                        }}
+                        style={{
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '4px',
+                          padding: '2px',
+                          cursor: 'pointer',
+                          background: 'white',
+                        }}
+                        title={img.label || '이미지 삽입'}
+                      >
+                        <img
+                          src={img.url}
+                          alt={img.label || '상품 이미지'}
+                          style={{
+                            width: '100%',
+                            aspectRatio: '1',
+                            objectFit: 'cover',
+                            borderRadius: '2px',
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </>
               )}
             </div>

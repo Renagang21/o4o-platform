@@ -410,6 +410,19 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
+  // Editor inline image upload — RichTextEditor onImageUpload callback
+  const editorImageUpload = useCallback(async (file: File): Promise<string> => {
+    if (!product?.masterId) throw new Error('No product');
+    const res = await productApi.uploadProductImage(product.masterId, file, 'content');
+    if (res.success && res.data) {
+      // Refresh images list so existingImages stays in sync
+      const updated = await productApi.getProductImages(product.masterId);
+      setImages(updated);
+      return res.data.imageUrl;
+    }
+    throw new Error(res.error || 'Upload failed');
+  }, [product?.masterId]);
+
   const handleImageDelete = async (imageId: string) => {
     if (!product?.masterId) return;
     const ok = await productApi.deleteProductImage(imageId, product.masterId);
@@ -607,6 +620,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   editable={!saving}
                   placeholder="거래처용 간단 소개"
                   minHeight="80px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </div>
 
@@ -618,6 +633,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   editable={!saving}
                   placeholder="거래처용 상세 설명"
                   minHeight="150px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </div>
             </div>

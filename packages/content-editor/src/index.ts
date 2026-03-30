@@ -3,7 +3,7 @@
  * Rich text content editor for O4O Platform
  */
 
-export { RichTextEditor, Toolbar, ContentPreview, ContentRenderer } from './components';
+export { RichTextEditor, Toolbar, ContentPreview, ContentRenderer, TemplateModal, SaveTemplateModal } from './components';
 export { sanitizeHtml } from './sanitize';
 export type {
   ContentEditorProps,
@@ -12,4 +12,5 @@ export type {
   ImageUploadConfig,
   VideoEmbedConfig,
   EditorConfig,
+  ContentTemplate,
 } from './types';

@@ -34,6 +34,24 @@ export interface ContentEditorProps {
   className?: string;
   /** Toolbar preset (기본: 'full') */
   preset?: EditorPreset;
+  /** 템플릿 기능 활성화 (기본: false) */
+  showTemplateActions?: boolean;
+  /** 템플릿 목록 */
+  templates?: ContentTemplate[];
+  /** 템플릿 로딩 콜백 (모달 열릴 때 호출) */
+  onLoadTemplates?: () => void;
+  /** 템플릿 저장 콜백 (isPublic은 operator/admin만 true 가능) */
+  onSaveAsTemplate?: (name: string, category: string, isPublic: boolean) => void;
+  /** 공용 템플릿 생성 권한 여부 (operator/admin) */
+  canCreatePublicTemplate?: boolean;
+  /** 템플릿 목록 로딩 중 */
+  templatesLoading?: boolean;
+  /** 템플릿 저장 중 */
+  templatesSaving?: boolean;
+  /** 이미지 업로드 핸들러 — 파일 → URL 반환 */
+  onImageUpload?: (file: File) => Promise<string>;
+  /** 기존 이미지 목록 (선택 삽입용) */
+  existingImages?: { id: string; url: string; label?: string }[];
 }
 
 export interface ToolbarProps {
@@ -60,4 +78,17 @@ export interface VideoEmbedConfig {
 export interface EditorConfig {
   image?: ImageUploadConfig;
   video?: VideoEmbedConfig;
+}
+
+/**
+ * Content Template — 저장된 HTML 콘텐츠 템플릿
+ * WO-O4O-CONTENT-TEMPLATE-SYSTEM-V1
+ */
+export interface ContentTemplate {
+  id: string;
+  name: string;
+  description?: string | null;
+  category: string;
+  contentHtml: string;
+  isPublic?: boolean;
 }
