@@ -164,11 +164,16 @@ export class OfferServiceApprovalService {
            spo.approval_status AS "offerApprovalStatus",
            spo.distribution_type AS "distributionType",
            (
-             CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
-             + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
-             + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
-             + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
-             + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
+             CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 10 ELSE 0 END
+             + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 10 ELSE 0 END
+             + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 10 ELSE 0 END
+             + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 10 ELSE 0 END
+             + CASE WHEN spo.distribution_type IS NOT NULL THEN 10 ELSE 0 END
+             + CASE WHEN pm.category_id IS NOT NULL THEN 10 ELSE 0 END
+             + CASE WHEN pm.brand_id IS NOT NULL THEN 10 ELSE 0 END
+             + CASE WHEN pm.tags IS NOT NULL AND array_length(pm.tags, 1) > 0 THEN 10 ELSE 0 END
+             + CASE WHEN spo.business_short_description IS NOT NULL AND spo.business_short_description != '' THEN 10 ELSE 0 END
+             + CASE WHEN spo.business_detail_description IS NOT NULL AND spo.business_detail_description != '' THEN 10 ELSE 0 END
            ) AS "completenessScore",
            (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = pm.id AND pi.is_primary = true LIMIT 1) AS "imageUrl",
            pm.brand_name AS "brandName",

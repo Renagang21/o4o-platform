@@ -884,13 +884,18 @@ export class NetureOfferService {
 
   // ==================== Paginated Supplier Products (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
 
-  // WO-NETURE-SUPPLIER-PRODUCT-COMPLETENESS-MANAGEMENT-V1: 5-item × 20pts inline score
+  // WO-NETURE-COMPLETENESS-V2: 10-item × 10pts inline score (Offer + Master fields)
   private static readonly COMPLETENESS_EXPR = `(
-    CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 20 ELSE 0 END
-    + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 20 ELSE 0 END
-    + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 20 ELSE 0 END
-    + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 20 ELSE 0 END
-    + CASE WHEN spo.distribution_type IS NOT NULL THEN 20 ELSE 0 END
+    CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 10 ELSE 0 END
+    + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 10 ELSE 0 END
+    + CASE WHEN spo.consumer_short_description IS NOT NULL AND spo.consumer_short_description != '' THEN 10 ELSE 0 END
+    + CASE WHEN spo.consumer_detail_description IS NOT NULL AND spo.consumer_detail_description != '' THEN 10 ELSE 0 END
+    + CASE WHEN spo.distribution_type IS NOT NULL THEN 10 ELSE 0 END
+    + CASE WHEN pm.category_id IS NOT NULL THEN 10 ELSE 0 END
+    + CASE WHEN pm.brand_id IS NOT NULL THEN 10 ELSE 0 END
+    + CASE WHEN pm.tags IS NOT NULL AND array_length(pm.tags, 1) > 0 THEN 10 ELSE 0 END
+    + CASE WHEN spo.business_short_description IS NOT NULL AND spo.business_short_description != '' THEN 10 ELSE 0 END
+    + CASE WHEN spo.business_detail_description IS NOT NULL AND spo.business_detail_description != '' THEN 10 ELSE 0 END
   )`;
 
   /** Phase 3B: offer 상태로부터 purpose 파생 */
@@ -909,7 +914,7 @@ export class NetureOfferService {
     completenessScore: number,
   ): 'APPROVED' | 'READY' | 'INCOMPLETE' | 'DRAFT' {
     if (approvalStatus === 'approved') return 'APPROVED';
-    if (completenessScore >= 60) return 'READY';
+    if (completenessScore >= 70) return 'READY';
     if (completenessScore > 0) return 'INCOMPLETE';
     return 'DRAFT';
   }
@@ -984,9 +989,9 @@ export class NetureOfferService {
     if (options.completenessStatus === 'DRAFT') {
       conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} = 0`);
     } else if (options.completenessStatus === 'INCOMPLETE') {
-      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} > 0 AND ${NetureOfferService.COMPLETENESS_EXPR} < 60`);
+      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} > 0 AND ${NetureOfferService.COMPLETENESS_EXPR} < 70`);
     } else if (options.completenessStatus === 'READY') {
-      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 60`);
+      conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 70`);
     }
 
     // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: service approval status filter
