@@ -109,7 +109,7 @@ export interface SupplierUser extends User {
 
 // Consumer specific user data
 export interface ConsumerUser extends User {
-  role: 'glycopharm:consumer';
+  role: 'customer';
   healthProfile?: {
     diabetesType?: 'type1' | 'type2' | 'gestational' | 'prediabetes';
     diagnosisYear?: number;

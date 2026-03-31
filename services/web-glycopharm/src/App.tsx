@@ -422,7 +422,7 @@ function AppRoutes() {
 
       {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
       <Route path="care" element={<MainLayout />}>
-        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, 'seller']} />}>
+        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]} />}>
           <Route index element={<CareDashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
           {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}

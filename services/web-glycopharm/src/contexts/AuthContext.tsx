@@ -85,13 +85,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // WO-O4O-AUTH-FLOW-SIMPLIFICATION-V1: dashboard config → config/dashboard.ts로 분리, 하위 호환 re-export
 export { GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP, getGlycopharmDashboardRoute } from '../config/dashboard';
 
-// GlycoPharm prefixed role constants
+// GlycoPharm role constants — DB에 실제 저장되는 값과 일치
 export const GLYCOPHARM_ROLES = {
   ADMIN: 'glycopharm:admin',
   OPERATOR: 'glycopharm:operator',
-  PHARMACY: 'glycopharm:pharmacy',
-  SUPPLIER: 'glycopharm:supplier',
-  CONSUMER: 'glycopharm:consumer',
+  PHARMACY: 'seller',
+  SUPPLIER: 'supplier',
+  CONSUMER: 'customer',
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',
 } as const;
 
