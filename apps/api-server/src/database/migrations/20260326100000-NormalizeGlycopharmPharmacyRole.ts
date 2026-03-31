@@ -1,15 +1,14 @@
 import type { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
- * WO-O4O-RBAC-ROLE-PREFIX-NORMALIZATION-V1
+ * ⚠️ SUPERSEDED by 20260331300000-UnifyGlycopharmPharmacyRole
  *
+ * 이 마이그레이션은 pharmacy → glycopharm:pharmacy 변환을 수행했으나,
+ * 20260331300000에서 glycopharm:pharmacy → pharmacy로 되돌림.
+ * 정규 role은 'pharmacy' (비접두어).
+ *
+ * [원래 설명]
  * role_assignments에 접두어 없이 저장된 'pharmacy' → 'glycopharm:pharmacy' 정규화.
- *
- * 배경:
- * - 시드 코드(seed-test-accounts.ts)에서 assignedRole: 'pharmacy' 로 잘못 저장
- * - 프론트엔드 GLYCOPHARM_ROLES.PHARMACY = 'glycopharm:pharmacy' 기대
- * - 백엔드 security-core도 service prefix 기반 설계
- * - SoftGuardOutlet에서 role mismatch → /care 접근 실패
  *
  * 안전장치:
  * - service_memberships JOIN으로 glycopharm 서비스 사용자만 대상

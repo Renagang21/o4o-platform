@@ -62,10 +62,10 @@ export type NetureRole =
 export type GlycoPharmRole =
   | 'glycopharm:admin'    // GlycoPharm admin
   | 'glycopharm:operator' // GlycoPharm operator
-  | 'glycopharm:pharmacy' // Pharmacy user
-  | 'glycopharm:supplier' // GlycoPharm supplier
-  | 'glycopharm:partner'  // GlycoPharm partner
-  | 'glycopharm:consumer'; // Consumer/patient
+  | 'pharmacy'            // 약국 (정규)
+  | 'supplier'            // 공급자
+  | 'partner'             // 파트너
+  | 'customer';           // 당뇨인 (정규)
 
 /**
  * K-Cosmetics service roles
@@ -372,36 +372,36 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'service',
     deprecated: false
   },
-  'glycopharm:pharmacy': {
-    role: 'glycopharm:pharmacy',
-    label: 'Pharmacy',
-    description: 'Pharmacy user',
+  'pharmacy': {
+    role: 'pharmacy',
+    label: '약국',
+    description: 'GlycoPharm 약국 (정규)',
     service: 'glycopharm',
     category: 'service',
     deprecated: false
   },
-  'glycopharm:supplier': {
-    role: 'glycopharm:supplier',
-    label: 'GlycoPharm Supplier',
-    description: 'GlycoPharm supplier',
-    service: 'glycopharm',
-    category: 'commerce',
-    deprecated: false
-  },
-  'glycopharm:partner': {
-    role: 'glycopharm:partner',
-    label: 'GlycoPharm Partner',
-    description: 'GlycoPharm partner',
-    service: 'glycopharm',
-    category: 'commerce',
-    deprecated: false
-  },
-  'glycopharm:consumer': {
-    role: 'glycopharm:consumer',
-    label: 'Consumer',
-    description: 'Consumer/patient',
+  'customer': {
+    role: 'customer',
+    label: '당뇨인',
+    description: 'GlycoPharm/GlucoseView 당뇨인 (정규)',
     service: 'glycopharm',
     category: 'service',
+    deprecated: false
+  },
+  'supplier': {
+    role: 'supplier',
+    label: '공급자',
+    description: 'Neture/GlycoPharm 공급자',
+    service: 'glycopharm',
+    category: 'commerce',
+    deprecated: false
+  },
+  'partner': {
+    role: 'partner',
+    label: '파트너',
+    description: 'Neture/GlycoPharm 파트너',
+    service: 'glycopharm',
+    category: 'commerce',
     deprecated: false
   },
 
