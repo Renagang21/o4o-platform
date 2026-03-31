@@ -85,7 +85,7 @@ const registrationSteps = [
 export default function SupplierLandingPage() {
   const { user, isAuthenticated } = useAuth();
   const { openLoginModal } = useLoginModal();
-  const isSupplier = isAuthenticated && user?.roles.some((r) => ['neture:supplier', 'neture:admin', 'platform:super_admin'].includes(r));
+  const isSupplier = isAuthenticated && user?.roles.some((r) => ['neture:supplier', 'supplier', 'neture:admin', 'platform:super_admin'].includes(r));
 
   return (
     <div>

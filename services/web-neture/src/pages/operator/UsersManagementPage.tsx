@@ -80,10 +80,16 @@ function getUserName(u: UserData): string {
   return u.email?.split('@')[0] || '사용자';
 }
 
+// Neture 컨텍스트 역할 표시 매핑 (RoleBadge용)
+// customer → consumer: RoleBadge의 customer="당뇨인"(GlycoPharm) 대신 consumer="소비자" 사용
+const NETURE_ROLE_DISPLAY: Record<string, string> = {
+  customer: 'consumer',
+};
+
 function getPrimaryRole(u: UserData): string {
   // WO-NETURE-ROLE-NORMALIZATION-V1: service membership role 우선 (service-scoped SSOT)
   const netureMembership = u.memberships?.find(m => m.serviceKey === 'neture');
-  if (netureMembership?.role) return netureMembership.role;
+  if (netureMembership?.role) return NETURE_ROLE_DISPLAY[netureMembership.role] || netureMembership.role;
   // Fallback: role_assignments
   const roles = u.roles || (u.role ? [u.role] : []);
   return roles[0] || 'user';

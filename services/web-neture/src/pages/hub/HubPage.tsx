@@ -39,7 +39,7 @@ const HUB_SECTIONS: HubSectionDefinition[] = [
   {
     id: 'seller',
     title: '공급자 운영',
-    roles: ['neture:supplier', 'neture:partner', 'neture:admin', 'platform:super_admin'],
+    roles: ['neture:supplier', 'supplier', 'neture:partner', 'partner', 'neture:admin', 'platform:super_admin'],
     cards: [
       {
         id: 'products',
@@ -567,7 +567,7 @@ export default function HubPage() {
   const userRoles = user.roles;
 
   // user 역할은 허브 접근 불가
-  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'neture:partner'].includes(role)) {
+  if (!['neture:admin', 'platform:super_admin', 'neture:supplier', 'supplier', 'neture:partner', 'partner'].includes(role)) {
     return (
       <div style={styles.guardContainer}>
         <div style={styles.guardBox}>
