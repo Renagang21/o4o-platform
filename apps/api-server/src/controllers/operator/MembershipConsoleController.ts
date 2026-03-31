@@ -593,7 +593,8 @@ export class MembershipConsoleController {
 
       // 0. Membership role update (service_memberships.role)
       if (membershipRole && typeof membershipRole === 'string') {
-        const serviceKey = scope.serviceKeys[0];
+        // Platform admin은 scope.serviceKeys가 빈 배열 → 프론트에서 전달한 키 사용
+        const serviceKey = req.body.membershipServiceKey || scope.serviceKeys[0];
         if (serviceKey) {
           await AppDataSource.query(
             `UPDATE service_memberships SET role = $1, updated_at = NOW()

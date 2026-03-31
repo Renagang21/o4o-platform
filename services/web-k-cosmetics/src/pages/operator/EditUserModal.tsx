@@ -151,6 +151,7 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
       // 회원 유형 변경
       if (membershipRole !== originalMembershipRole) {
         payload.membershipRole = membershipRole;
+        payload.membershipServiceKey = 'k-cosmetics';
       }
       if (hasBusinessInfo) {
         payload.businessName = form.businessName;
