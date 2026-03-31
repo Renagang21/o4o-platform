@@ -131,10 +131,11 @@ export class NetureSupplierService {
           await this.membershipRepo.save(membership);
           logger.info(`[NetureSupplierService] Membership activated for user ${supplier.userId}`);
         }
+        // WO-NETURE-ROLE-NORMALIZATION-V1: unprefixed role
         await roleAssignmentService.assignRole({
-          userId: supplier.userId, role: 'neture:supplier', assignedBy: approvedByUserId,
+          userId: supplier.userId, role: 'supplier', assignedBy: approvedByUserId,
         });
-        logger.info(`[NetureSupplierService] Role neture:supplier assigned to user ${supplier.userId}`);
+        logger.info(`[NetureSupplierService] Role supplier assigned to user ${supplier.userId}`);
       }
 
       // WO-O4O-NETURE-ORG-DATA-MODEL-V1: ensure org exists + activate
@@ -178,7 +179,7 @@ export class NetureSupplierService {
           membership.status = 'rejected';
           await this.membershipRepo.save(membership);
         }
-        await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
+        await roleAssignmentService.removeRole(supplier.userId, 'supplier');
       }
 
       const org = await this.getOrgData(supplier.organizationId);
@@ -282,7 +283,7 @@ export class NetureSupplierService {
           membership.status = 'suspended';
           await this.membershipRepo.save(membership);
         }
-        await roleAssignmentService.removeRole(supplier.userId, 'neture:supplier');
+        await roleAssignmentService.removeRole(supplier.userId, 'supplier');
       }
 
       // WO-O4O-NETURE-ORG-DATA-MODEL-V1: deactivate org

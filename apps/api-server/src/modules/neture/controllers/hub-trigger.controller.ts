@@ -303,7 +303,7 @@ export function createNetureHubTriggerController(deps: TriggerDeps): ExpressRout
         },
         user: {
           id: authReq.user?.id || '',
-          role: 'neture:supplier',
+          role: 'supplier',
         },
       });
 

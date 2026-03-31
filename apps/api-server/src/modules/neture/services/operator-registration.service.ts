@@ -97,14 +97,18 @@ export class OperatorRegistrationService {
         [approvedBy, userId],
       );
 
-      // 3. role_assignment 생성 — prefixed role (neture:supplier, neture:partner 등)
+      // 3. role_assignment 생성
+      // WO-NETURE-ROLE-NORMALIZATION-V1: admin/operator만 prefixed, 나머지는 unprefixed
       const rawRole = smResult[0]?.role || 'member';
-      const prefixedRole = rawRole.includes(':') ? rawRole : `neture:${rawRole}`;
+      const ADMIN_ROLES = ['admin', 'operator'];
+      const finalRole = ADMIN_ROLES.includes(rawRole)
+        ? (rawRole.includes(':') ? rawRole : `neture:${rawRole}`)
+        : rawRole;
       await queryRunner.query(
         `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
          VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
          ON CONFLICT (user_id, role, is_active) DO UPDATE SET updated_at = NOW()`,
-        [userId, prefixedRole, approvedBy],
+        [userId, finalRole, approvedBy],
       );
 
       // 4. supplier role → neture_suppliers 자동 생성 (ONE-STEP 승인)

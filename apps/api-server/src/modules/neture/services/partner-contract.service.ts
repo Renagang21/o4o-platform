@@ -244,13 +244,13 @@ export class NeturePartnerContractService {
           logger.info(`[NeturePartnerContractService] Membership activated for partner user ${application.partnerId}`);
         }
 
-        // 2. RBAC: assign neture:partner role (idempotent — assignRole handles duplicates)
+        // 2. RBAC: assign partner role (WO-NETURE-ROLE-NORMALIZATION-V1: unprefixed)
         await roleAssignmentService.assignRole({
           userId: application.partnerId,
-          role: 'neture:partner',
+          role: 'partner',
           assignedBy: sellerId,
         });
-        logger.info(`[NeturePartnerContractService] Role neture:partner assigned to user ${application.partnerId}`);
+        logger.info(`[NeturePartnerContractService] Role partner assigned to user ${application.partnerId}`);
       }
 
       return { id: application.id, status: application.status };

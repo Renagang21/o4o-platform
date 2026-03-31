@@ -81,6 +81,10 @@ function getUserName(u: UserData): string {
 }
 
 function getPrimaryRole(u: UserData): string {
+  // WO-NETURE-ROLE-NORMALIZATION-V1: service membership role 우선 (service-scoped SSOT)
+  const netureMembership = u.memberships?.find(m => m.serviceKey === 'neture');
+  if (netureMembership?.role) return netureMembership.role;
+  // Fallback: role_assignments
   const roles = u.roles || (u.role ? [u.role] : []);
   return roles[0] || 'user';
 }

@@ -39,7 +39,7 @@ export function createNetureAssetSnapshotController(
   requireAuth: AuthMiddleware,
 ): Router {
   return createAssetCopyController(dataSource, requireAuth, {
-    allowedRoles: ['neture:admin', 'neture:supplier'],
+    allowedRoles: ['neture:admin', 'supplier', 'neture:supplier'],
     sourceService: 'neture',
     resolver: new NetureAssetResolver(dataSource),
     resolveOrgId: resolveNetureOrgId,

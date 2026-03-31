@@ -46,17 +46,28 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ─── Component ───────────────────────────────────────────────
 
-const KPA_ROLE_OPTIONS = [
-  { value: 'pharmacist', label: '약사' },
-  { value: 'student', label: '약대생' },
+// 운영 권한 부여용 (role_assignments)
+const KPA_ADMIN_ROLE_OPTIONS = [
+  { value: '', label: '일반 회원' },
+  { value: 'kpa:operator', label: '운영자' },
+  { value: 'kpa:admin', label: '관리자' },
 ];
+
+// 회원 유형 라벨 (읽기 전용)
+const MEMBERSHIP_ROLE_LABELS: Record<string, string> = {
+  pharmacy: '약사',
+  pharmacist: '약사',
+  user: '약대생',
+  student: '약대생',
+};
 
 export default function EditUserModal({ userId, onClose, onSuccess }: { userId: string; onClose: () => void; onSuccess: () => void }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [hasBusinessInfo, setHasBusinessInfo] = useState(false);
-  const [currentRole, setCurrentRole] = useState('');
+  const [membershipRole, setMembershipRole] = useState(''); // service_memberships.role (읽기 전용)
+  const [currentRole, setCurrentRole] = useState(''); // role_assignments (운영 권한)
   const [selectedRole, setSelectedRole] = useState('');
 
   const [form, setForm] = useState({
@@ -79,10 +90,16 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
       try {
         const data = await apiFetch<any>(`/api/v1/operator/members/${userId}`);
         const u = data.user;
-        const roles: string[] = u.roles || (u.role ? [u.role] : []);
-        const primaryRole = roles[0] || '';
-        setCurrentRole(primaryRole);
-        setSelectedRole(primaryRole);
+        // 회원 유형 (service_memberships.role — 읽기 전용)
+        const kpaMembership = (data.memberships || []).find((m: any) => m.serviceKey === 'kpa-society');
+        setMembershipRole(kpaMembership?.role || '');
+        // 운영 권한 (role_assignments — 편집 가능)
+        const activeRoles: string[] = (data.roles || [])
+          .filter((r: any) => r.isActive)
+          .map((r: any) => r.role);
+        const adminRole = activeRoles.find((r: string) => r === 'kpa:admin' || r === 'kpa:operator') || '';
+        setCurrentRole(adminRole);
+        setSelectedRole(adminRole);
         const biz: BusinessInfoData = u.businessInfo || {};
         const hasBiz = !!(biz.businessName || u.company);
         setHasBusinessInfo(hasBiz);
@@ -144,19 +161,21 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         body: JSON.stringify(payload),
       });
 
-      // Role 변경 처리
-      if (selectedRole && selectedRole !== currentRole) {
-        // 기존 role 제거
+      // 운영 권한 변경 처리 (role_assignments)
+      if (selectedRole !== currentRole) {
+        // 기존 운영 권한 제거
         if (currentRole) {
           await apiFetch(`/api/v1/operator/members/${userId}/roles/${encodeURIComponent(currentRole)}`, {
             method: 'DELETE',
-          }).catch(() => {}); // 이미 없으면 무시
+          }).catch(() => {});
         }
-        // 새 role 할당
-        await apiFetch(`/api/v1/operator/members/${userId}/roles`, {
-          method: 'POST',
-          body: JSON.stringify({ role: selectedRole }),
-        });
+        // 새 운영 권한 할당 (일반 회원 = 빈 값이면 제거만)
+        if (selectedRole) {
+          await apiFetch(`/api/v1/operator/members/${userId}/roles`, {
+            method: 'POST',
+            body: JSON.stringify({ role: selectedRole }),
+          });
+        }
       }
 
       toast.success('회원정보가 수정되었습니다.');
@@ -220,22 +239,29 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
               </div>
             </div>
 
-            {/* 역할 변경 */}
+            {/* 회원 유형 (읽기 전용) */}
             <div className="pt-3 border-t">
-              <h4 className="text-sm font-semibold text-slate-700 mb-3">역할</h4>
+              <h4 className="text-sm font-semibold text-slate-700 mb-3">회원 유형</h4>
+              <p className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                {MEMBERSHIP_ROLE_LABELS[membershipRole] || membershipRole || '미지정'}
+              </p>
+            </div>
+
+            {/* 운영 권한 */}
+            <div className="pt-3 border-t">
+              <h4 className="text-sm font-semibold text-slate-700 mb-3">운영 권한</h4>
               <select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
-                <option value="">선택</option>
-                {KPA_ROLE_OPTIONS.map(opt => (
+                {KPA_ADMIN_ROLE_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
               {selectedRole !== currentRole && (
                 <p className="text-xs text-amber-600 mt-1">
-                  역할이 변경됩니다: {currentRole || '없음'} → {selectedRole || '없음'}
+                  권한이 변경됩니다: {currentRole ? KPA_ADMIN_ROLE_OPTIONS.find(o => o.value === currentRole)?.label || currentRole : '일반 회원'} → {selectedRole ? KPA_ADMIN_ROLE_OPTIONS.find(o => o.value === selectedRole)?.label || selectedRole : '일반 회원'}
                 </p>
               )}
             </div>

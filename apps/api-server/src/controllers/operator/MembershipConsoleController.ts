@@ -715,7 +715,24 @@ export class MembershipConsoleController {
       }
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
-      const roleEntity = await roleService.getRoleByName(role);
+      // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
+      let roleEntity = await roleService.getRoleByName(role);
+      // Cross-service collision: unprefixed name이 다른 서비스 role과 매칭된 경우 caller prefix로 재검색
+      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
+        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
+          for (const prefix of scope.rolePrefixes) {
+            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
+            if (prefixed) { roleEntity = prefixed; break; }
+          }
+        }
+      }
+      // Fallback: 못 찾은 경우 prefix 붙여서 재시도
+      if (!roleEntity && !role.includes(':')) {
+        for (const prefix of scope.rolePrefixes) {
+          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
+          if (roleEntity) break;
+        }
+      }
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
@@ -733,9 +750,12 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
-        // 1. Service prefix check (rolePrefixes = raw prefixes from JWT roles)
+        // 1. Service scope check — prefixed roles must match prefix, unprefixed roles must match serviceKey
         const allowedPrefixes = scope.rolePrefixes.map((p: string) => `${p}:`);
-        if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
+        const inScope = role.includes(':')
+          ? allowedPrefixes.some((prefix: string) => role.startsWith(prefix))
+          : scope.serviceKeys.includes(roleEntity.serviceKey);
+        if (!inScope) {
           res.status(403).json({ success: false, error: 'Cannot assign roles outside your service scope' });
           return;
         }
@@ -791,7 +811,22 @@ export class MembershipConsoleController {
       }
 
       // DB-based role validation (WO-O4O-ROLE-SYSTEM-DB-DESIGN-V1)
-      const roleEntity = await roleService.getRoleByName(role);
+      // WO-NETURE-ROLE-NORMALIZATION-V1: cross-service collision 해결
+      let roleEntity = await roleService.getRoleByName(role);
+      if (roleEntity && !role.includes(':') && !scope.isPlatformAdmin) {
+        if (!scope.serviceKeys.includes(roleEntity.serviceKey)) {
+          for (const prefix of scope.rolePrefixes) {
+            const prefixed = await roleService.getRoleByName(`${prefix}:${role}`);
+            if (prefixed) { roleEntity = prefixed; break; }
+          }
+        }
+      }
+      if (!roleEntity && !role.includes(':')) {
+        for (const prefix of scope.rolePrefixes) {
+          roleEntity = await roleService.getRoleByName(`${prefix}:${role}`);
+          if (roleEntity) break;
+        }
+      }
       if (!roleEntity) {
         res.status(400).json({ success: false, error: 'Invalid role' });
         return;
@@ -804,9 +839,12 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
         }
-        // 1. Service prefix check (rolePrefixes = raw prefixes from JWT roles)
+        // 1. Service scope check — prefixed roles must match prefix, unprefixed roles must match serviceKey
         const allowedPrefixes = scope.rolePrefixes.map((p: string) => `${p}:`);
-        if (!allowedPrefixes.some((prefix: string) => role.startsWith(prefix))) {
+        const inScope = role.includes(':')
+          ? allowedPrefixes.some((prefix: string) => role.startsWith(prefix))
+          : scope.serviceKeys.includes(roleEntity.serviceKey);
+        if (!inScope) {
           res.status(403).json({ success: false, error: 'Cannot remove roles outside your service scope' });
           return;
         }
