@@ -24,6 +24,9 @@ export const KCOSMETICS_ROLE_PRIORITY = [
   'k-cosmetics:supplier',
   'k-cosmetics:partner',
   'k-cosmetics:seller',
+  'seller',              // legacy: 가입 시 seller로 저장됨
+  'consumer',            // legacy: 가입 시 consumer로 저장됨
+  'customer',            // legacy: 가입 시 customer로 저장됨
 ] as const;
 
 export const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
@@ -33,6 +36,9 @@ export const KCOSMETICS_DASHBOARD_MAP: Record<string, string> = {
   'k-cosmetics:supplier': '/',
   'k-cosmetics:partner': '/partner',
   'k-cosmetics:seller': '/',
+  'seller': '/',             // legacy
+  'consumer': '/',           // legacy
+  'customer': '/',           // legacy
 };
 
 export function getKCosmeticsDashboardRoute(roles: string[]): string {

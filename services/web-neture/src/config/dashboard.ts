@@ -22,8 +22,11 @@ export const NETURE_ROLE_PRIORITY = [
   'neture:admin',
   'neture:operator',
   'neture:supplier',
+  'supplier',            // legacy: 가입 시 supplier로 저장됨
   'neture:partner',
+  'partner',             // legacy: 가입 시 partner로 저장됨
   'neture:seller',
+  'seller',              // legacy: 가입 시 seller로 저장됨
 ] as const;
 
 export const NETURE_DASHBOARD_MAP: Record<string, string> = {
@@ -31,8 +34,11 @@ export const NETURE_DASHBOARD_MAP: Record<string, string> = {
   'neture:admin': '/admin',
   'neture:operator': '/operator',
   'neture:supplier': '/supplier/dashboard',
+  'supplier': '/supplier/dashboard',   // legacy
   'neture:partner': '/partner/dashboard',
+  'partner': '/partner/dashboard',     // legacy
   'neture:seller': '/seller/overview',
+  'seller': '/seller/overview',        // legacy
 };
 
 export function getNetureDashboardRoute(roles: string[]): string {

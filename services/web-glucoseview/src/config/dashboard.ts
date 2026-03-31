@@ -21,6 +21,8 @@ export const GV_ROLE_PRIORITY = [
   'glucoseview:operator',
   'glucoseview:pharmacist',
   'glucoseview:patient',
+  'user',                // legacy: 가입 시 user로 저장됨
+  'customer',            // legacy: 가입 시 customer로 저장됨
 ] as const;
 
 export const GV_DASHBOARD_MAP: Record<string, string> = {
@@ -29,6 +31,8 @@ export const GV_DASHBOARD_MAP: Record<string, string> = {
   'glucoseview:operator': '/operator',
   'glucoseview:pharmacist': '/',
   'glucoseview:patient': '/patient',
+  'user': '/patient',        // legacy
+  'customer': '/patient',    // legacy
 };
 
 export function getGlucoseviewDashboardRoute(roles: string[]): string {

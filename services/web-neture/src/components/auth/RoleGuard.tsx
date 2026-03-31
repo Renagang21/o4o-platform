@@ -27,8 +27,8 @@ export const ADMIN_ROLES = [NETURE_ROLES.ADMIN, NETURE_ROLES.PLATFORM_SUPER_ADMI
 /** Operator 역할 집합 */
 export const OPERATOR_ROLES = [NETURE_ROLES.OPERATOR];
 
-/** Supplier 역할 집합 */
-export const SUPPLIER_ROLES = [NETURE_ROLES.SUPPLIER];
+/** Supplier 역할 집합 (legacy 'supplier' 포함 — 가입 시 unprefixed로 저장됨) */
+export const SUPPLIER_ROLES = [NETURE_ROLES.SUPPLIER, 'supplier', 'partner', 'seller'];
 
 // ─── RouteGuard (통합 컴포넌트) ───
 
