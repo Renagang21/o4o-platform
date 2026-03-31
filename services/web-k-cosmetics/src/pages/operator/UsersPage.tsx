@@ -1,17 +1,17 @@
 /**
  * Operator Users Page — 회원 관리
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
+ * WO-O4O-MEMBER-LIST-STANDARDIZATION-V1
  *
- * /api/v1/operator/members API (Extension Layer)
- * 탭: 회원 목록 | 가입 신청
- * 기능: 승인, 거부, 비밀번호 변경, 삭제, 멤버십 표시, 상세 페이지 이동
+ * MemberListLayout + @o4o/ui DataTable 기반 표준 회원 리스트.
+ * 탭: 전체 | 판매자 | 소비자 | 가입 신청
+ * 기능: 검색, 정렬, 승인/거부, 비밀번호 변경, 편집, 삭제
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
-  Search,
   CheckCircle,
   XCircle,
   Clock,
@@ -19,15 +19,18 @@ import {
   UserCheck,
   UserX,
   KeyRound,
+  Pencil,
   Trash2,
   Loader2,
   AlertCircle,
   X,
-  ChevronRight,
-  Pencil,
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
+import { MemberListLayout, StatusBadge, RoleBadge, ServiceBadge } from '@o4o/operator-ux-core';
+import type { MemberTab } from '@o4o/operator-ux-core';
 import { api } from '../../lib/apiClient';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
@@ -48,6 +51,9 @@ interface UserData {
   firstName?: string;
   lastName?: string;
   name?: string;
+  nickname?: string;
+  phone?: string;
+  company?: string;
   status: string;
   roles?: string[];
   role?: string;
@@ -63,8 +69,6 @@ interface PaginationData {
   totalPages: number;
 }
 
-type Tab = 'all' | 'pending';
-
 // ─── API Helper ──────────────────────────────────────────────
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
@@ -78,36 +82,8 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return response.data;
 }
 
-// ─── Status Config ───────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────
 
-const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
-  active: { label: '활성', color: 'text-green-700', bg: 'bg-green-50' },
-  approved: { label: '승인', color: 'text-green-700', bg: 'bg-green-50' },
-  pending: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
-  rejected: { label: '거부', color: 'text-red-700', bg: 'bg-red-50' },
-  suspended: { label: '정지', color: 'text-red-700', bg: 'bg-red-50' },
-  inactive: { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-100' },
-};
-
-const SERVICE_LABELS: Record<string, string> = {
-  glycopharm: 'GlycoPharm',
-  glucoseview: 'GlucoseView',
-  'k-cosmetics': 'K-Cosmetics',
-  neture: 'Neture',
-  'kpa-society': 'KPA',
-  platform: 'Platform',
-};
-
-function StatusBadge({ status }: { status: string }) {
-  const cfg = STATUS_MAP[status] || { label: status, color: 'text-slate-500', bg: 'bg-slate-100' };
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.color}`}>
-      {cfg.label}
-    </span>
-  );
-}
-
-// WO-O4O-NAME-NORMALIZATION-V1: lastName+firstName > name > email prefix > '사용자'
 function getUserName(u: UserData): string {
   if (u.lastName || u.firstName) {
     const full = `${u.lastName || ''}${u.firstName || ''}`.trim();
@@ -117,11 +93,18 @@ function getUserName(u: UserData): string {
   return u.email?.split('@')[0] || '사용자';
 }
 
-function getRoleLabel(u: UserData): string {
+function getPrimaryRole(u: UserData): string {
   const roles = u.roles || (u.role ? [u.role] : []);
-  if (roles.length === 0) return 'user';
-  return roles.join(', ');
+  return roles[0] || 'user';
 }
+
+// Role tab filtering
+const ROLE_TAB_FILTER: Record<string, string[]> = {
+  all: [],
+  seller: ['seller', 'k-cosmetics:seller'],
+  consumer: ['consumer', 'customer', 'k-cosmetics:consumer'],
+  pending: [],
+};
 
 // ─── Password Modal ──────────────────────────────────────────
 
@@ -145,14 +128,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
       onSuccess();
       onClose();
     } catch (err: any) {
-      const msg = err?.message || '비밀번호 변경에 실패했습니다.';
-      if (msg.includes('ROLE_REQUIRED') || msg.includes('role')) {
-        setError('비밀번호 변경 권한이 없습니다.');
-      } else if (msg.includes('not found') || msg.includes('404')) {
-        setError('사용자를 찾을 수 없습니다.');
-      } else {
-        setError(msg);
-      }
+      setError(err?.message || '비밀번호 변경에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -178,7 +154,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="새 비밀번호 (8자 이상)"
-              className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 pr-10 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
               minLength={8}
             />
@@ -192,7 +168,7 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="flex-1 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">취소</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+            <button type="submit" disabled={loading} className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
               {loading ? '처리 중...' : '변경'}
             </button>
           </div>
@@ -206,19 +182,19 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
 
 export default function UsersPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('all');
+  const [activeTab, setActiveTab] = useState('all');
   const [users, setUsers] = useState<UserData[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
 
   // Stats
-  const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0 });
+  const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, sellerCount: 0, consumerCount: 0 });
 
   const fetchUsers = useCallback(async (page = 1) => {
     setLoading(true);
@@ -227,12 +203,10 @@ export default function UsersPage() {
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('limit', '20');
-      if (tab === 'pending') {
+      if (activeTab === 'pending') {
         params.set('status', 'pending');
-      } else if (statusFilter) {
-        params.set('status', statusFilter);
       }
-      if (search) params.set('search', search);
+      if (searchQuery) params.set('search', searchQuery);
 
       const data = await apiFetch<any>(`/api/v1/operator/members?${params}`);
       setUsers(data.users || []);
@@ -242,18 +216,33 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [tab, statusFilter, search]);
+  }, [activeTab, searchQuery]);
 
   const fetchStats = useCallback(async () => {
     try {
       const data = await apiFetch<any>('/api/v1/operator/members/stats');
       const byStatus = data.statistics?.byStatus || [];
       const getCount = (s: string) => byStatus.find((b: any) => b.status === s)?.count || 0;
+
+      // Role counts from users (client-side for now)
+      const allData = await apiFetch<any>('/api/v1/operator/members?limit=1000');
+      const allUsers: UserData[] = allData.users || [];
+      const sellerRoles = ROLE_TAB_FILTER.seller;
+      const consumerRoles = ROLE_TAB_FILTER.consumer;
+
       setStats({
         total: data.statistics?.total || 0,
         active: getCount('active') + getCount('approved'),
         pending: getCount('pending'),
         rejected: getCount('rejected'),
+        sellerCount: allUsers.filter(u => {
+          const role = getPrimaryRole(u);
+          return sellerRoles.includes(role);
+        }).length,
+        consumerCount: allUsers.filter(u => {
+          const role = getPrimaryRole(u);
+          return consumerRoles.includes(role);
+        }).length,
       });
     } catch {
       // stats failure is non-critical
@@ -295,19 +284,125 @@ export default function UsersPage() {
     }
   };
 
+  // ─── Role tab filtering (client-side) ──────────────
+
+  const filteredUsers = useMemo(() => {
+    if (activeTab === 'all' || activeTab === 'pending') return users;
+    const allowedRoles = ROLE_TAB_FILTER[activeTab];
+    if (!allowedRoles || allowedRoles.length === 0) return users;
+    return users.filter(u => {
+      const role = getPrimaryRole(u);
+      return allowedRoles.includes(role);
+    });
+  }, [users, activeTab]);
+
+  // ─── Tabs ──────────────────────────────────────────
+
+  const tabs: MemberTab[] = [
+    { key: 'all', label: '전체', count: stats.total },
+    { key: 'seller', label: '판매자', count: stats.sellerCount },
+    { key: 'consumer', label: '소비자', count: stats.consumerCount },
+    { key: 'pending', label: '가입 신청', count: stats.pending },
+  ];
+
+  // ─── DataTable Columns ────────────────────────────
+
+  const columns: Column<UserData>[] = [
+    {
+      key: 'name',
+      title: '이름',
+      sortable: true,
+      width: '180px',
+      render: (_v, user) => (
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600 shrink-0">
+            {getUserName(user).charAt(0)}
+          </div>
+          <span className="font-medium text-slate-800 text-sm truncate">{getUserName(user)}</span>
+        </div>
+      ),
+      sorter: (a, b) => getUserName(a).localeCompare(getUserName(b)),
+    },
+    {
+      key: 'email',
+      title: '이메일',
+      dataIndex: 'email',
+      sortable: true,
+      width: '220px',
+    },
+    {
+      key: 'role',
+      title: '역할',
+      width: '120px',
+      render: (_v, user) => <RoleBadge role={getPrimaryRole(user)} />,
+    },
+    {
+      key: 'services',
+      title: '서비스',
+      width: '150px',
+      render: (_v, user) => (
+        <div className="flex flex-wrap gap-1">
+          {user.memberships && user.memberships.length > 0 ? (
+            user.memberships.map((m) => <ServiceBadge key={m.id} serviceKey={m.serviceKey} />)
+          ) : (
+            <span className="text-xs text-slate-400">-</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      title: '가입일',
+      dataIndex: 'createdAt',
+      sortable: true,
+      width: '100px',
+      render: (v) => <span className="text-sm text-slate-600">{new Date(v).toLocaleDateString('ko-KR')}</span>,
+    },
+    {
+      key: 'status',
+      title: '상태',
+      dataIndex: 'status',
+      width: '80px',
+      render: (v) => <StatusBadge status={v} />,
+    },
+    {
+      key: 'actions',
+      title: '관리',
+      width: '180px',
+      align: 'right',
+      render: (_v, user) => (
+        <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+          {actionLoading === user.id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          ) : (
+            <>
+              {user.status === 'pending' && (
+                <>
+                  <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
+                  <button onClick={() => handleStatusChange(user.id, 'rejected')} title="거부" className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
+                </>
+              )}
+              {user.status === 'rejected' && (
+                <button onClick={() => handleStatusChange(user.id, 'approved')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
+              )}
+              {(user.status === 'active' || user.status === 'approved') && (
+                <button onClick={() => handleStatusChange(user.id, 'suspended')} title="정지" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"><XCircle className="w-4 h-4" /></button>
+              )}
+              {user.status === 'suspended' && (
+                <button onClick={() => handleStatusChange(user.id, 'approved')} title="활성화" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><CheckCircle className="w-4 h-4" /></button>
+              )}
+              <button onClick={() => setEditUser(user)} title="정보 수정" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => setPasswordUser(user)} title="비밀번호 변경" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><KeyRound className="w-4 h-4" /></button>
+              <button onClick={() => handleDelete(user)} title="삭제" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+            </>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">회원 관리</h1>
-          <p className="text-sm text-slate-500 mt-1">회원 승인, 상태 변경, 서비스 멤버십 관리</p>
-        </div>
-        <button onClick={() => { fetchUsers(pagination.page); fetchStats(); }} className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50">
-          <RefreshCw className="w-4 h-4" />새로고침
-        </button>
-      </div>
-
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
@@ -330,241 +425,48 @@ export default function UsersPage() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-slate-200 mb-4">
-        <button
-          onClick={() => { setTab('all'); setStatusFilter(''); }}
-          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'all' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-        >
-          <Users className="inline w-4 h-4 mr-1" />회원 목록
-        </button>
-        <button
-          onClick={() => setTab('pending')}
-          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${tab === 'pending' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-        >
-          <Clock className="inline w-4 h-4 mr-1" />가입 신청
-          {stats.pending > 0 && (
-            <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-amber-100 text-amber-700 rounded-full">{stats.pending}</span>
-          )}
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchUsers(1)}
-            placeholder="이름, 이메일로 검색"
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          onClick={() => fetchUsers(1)}
-          className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-        >
-          검색
-        </button>
-        {tab === 'all' && (
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Member List Layout: Search + Tabs + Table */}
+      <MemberListLayout
+        title="회원 관리"
+        description="회원 승인, 상태 변경, 서비스 멤버십 관리"
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(key) => { setActiveTab(key); }}
+        search={search}
+        onSearchChange={setSearch}
+        onSearch={(q) => { setSearchQuery(q); }}
+        headerActions={
+          <button
+            onClick={() => { fetchUsers(pagination.page); fetchStats(); }}
+            className="flex items-center gap-2 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
           >
-            <option value="">전체 상태</option>
-            <option value="active">활성</option>
-            <option value="pending">대기</option>
-            <option value="rejected">거부</option>
-            <option value="suspended">정지</option>
-          </select>
+            <RefreshCw className="w-4 h-4" />새로고침
+          </button>
+        }
+      >
+        {/* Error */}
+        {error && (
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4 shrink-0" />{error}
+          </div>
         )}
-      </div>
 
-      {/* Error */}
-      {error && (
-        <div className="flex items-center gap-2 rounded-lg bg-red-50 p-4 text-sm text-red-700 mb-4">
-          <AlertCircle className="w-4 h-4 shrink-0" />{error}
-        </div>
-      )}
-
-      {/* Loading */}
-      {loading && (
-        <div className="text-center py-16">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-3" />
-          <p className="text-slate-500 text-sm">불러오는 중...</p>
-        </div>
-      )}
-
-      {/* Table */}
-      {!loading && users.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">역할</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">서비스</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">가입일</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-slate-500 uppercase">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-slate-50 cursor-pointer"
-                  onClick={() => navigate(`/operator/users/${user.id}`)}
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-sm font-medium text-slate-600">
-                        {getUserName(user).charAt(0)}
-                      </div>
-                      <span className="font-medium text-slate-800 text-sm">{getUserName(user)}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{user.email}</td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{getRoleLabel(user)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {(user.memberships && user.memberships.length > 0) ? (
-                        user.memberships.map((m) => (
-                          <span
-                            key={m.id}
-                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
-                              m.status === 'active' ? 'bg-blue-50 text-blue-700' :
-                              m.status === 'pending' ? 'bg-amber-50 text-amber-700' :
-                              'bg-slate-100 text-slate-500'
-                            }`}
-                            title={`${SERVICE_LABELS[m.serviceKey] || m.serviceKey}: ${m.status}`}
-                          >
-                            {SERVICE_LABELS[m.serviceKey] || m.serviceKey}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-slate-400">-</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-600">{new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
-                  <td className="px-4 py-3"><StatusBadge status={user.status} /></td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                      {actionLoading === user.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                      ) : (
-                        <>
-                          {(user.status === 'pending') && (
-                            <>
-                              <button
-                                onClick={() => handleStatusChange(user.id, 'approved')}
-                                title="승인"
-                                className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                              >
-                                <UserCheck className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(user.id, 'rejected')}
-                                title="거부"
-                                className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
-                              >
-                                <UserX className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
-                          {user.status === 'rejected' && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'approved')}
-                              title="승인"
-                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                            >
-                              <UserCheck className="w-4 h-4" />
-                            </button>
-                          )}
-                          {(user.status === 'active' || user.status === 'approved') && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'suspended')}
-                              title="정지"
-                              className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          {user.status === 'suspended' && (
-                            <button
-                              onClick={() => handleStatusChange(user.id, 'approved')}
-                              title="활성화"
-                              className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setEditUser(user); }}
-                            title="정보 수정"
-                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setPasswordUser(user)}
-                            title="비밀번호 변경"
-                            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"
-                          >
-                            <KeyRound className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user)}
-                            title="삭제"
-                            className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                          <ChevronRight className="w-4 h-4 text-slate-300 ml-1" />
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Pagination */}
-          {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
-              <button
-                onClick={() => fetchUsers(pagination.page - 1)}
-                disabled={pagination.page <= 1}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-600">{pagination.page} / {pagination.totalPages}</span>
-              <button
-                onClick={() => fetchUsers(pagination.page + 1)}
-                disabled={pagination.page >= pagination.totalPages}
-                className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                다음
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Empty */}
-      {!loading && users.length === 0 && !error && (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-          <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-500">{tab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}</p>
-        </div>
-      )}
+        {/* DataTable */}
+        <DataTable<UserData>
+          columns={columns}
+          dataSource={filteredUsers}
+          rowKey="id"
+          loading={loading}
+          emptyText={activeTab === 'pending' ? '가입 신청이 없습니다.' : '등록된 사용자가 없습니다.'}
+          onRowClick={(user) => navigate(`/operator/users/${user.id}`)}
+          pagination={{
+            current: pagination.page,
+            pageSize: pagination.limit,
+            total: activeTab === 'all' || activeTab === 'pending' ? pagination.total : filteredUsers.length,
+            onChange: (page) => fetchUsers(page),
+          }}
+        />
+      </MemberListLayout>
 
       {/* Password Modal */}
       {passwordUser && (
@@ -575,7 +477,7 @@ export default function UsersPage() {
         />
       )}
 
-      {/* Edit Modal */}
+      {/* Edit User Modal */}
       {editUser && (
         <EditUserModal
           userId={editUser.id}

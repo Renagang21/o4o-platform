@@ -28,3 +28,6 @@ export { QuickActionBlock } from './blocks/QuickActionBlock';
 
 // List Module (WO-O4O-LIST-BASE-MODULE-V1)
 export * from './list/index';
+
+// Member List Module (WO-O4O-MEMBER-LIST-STANDARDIZATION-V1)
+export * from './member-list/index';
