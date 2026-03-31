@@ -2,6 +2,7 @@
  * Time-Based Analysis → Action Mapper (순수 함수)
  *
  * WO-O4O-CARE-ACTION-ENGINE-V2.1
+ * WO-O4O-CARE-ACTION-ENGINE-V2.2 — sourceKey 추가 (중복 억제용)
  *
  * 시간대별 혈당 분석 결과를 규칙 기반으로 약사 행동 제안(Action)에 매핑한다.
  * DB 접근 없음. AI 생성 없음. 최대 3개 Action, 중복 제거, 우선순위 정렬.
@@ -94,6 +95,7 @@ function applyTimeBucketRules(
         priority: 'HIGH',
         label: `${label} 혈당 관리 코칭 권장`,
         reason: `${label} 시간대 평균 혈당이 ${b.avg} mg/dL로 높습니다`,
+        sourceKey: `${b.bucket}_avg_high`,
       });
     }
 
@@ -104,6 +106,7 @@ function applyTimeBucketRules(
         priority: 'MEDIUM',
         label: `${label} 시간대 식단 가이드`,
         reason: `${label} 평균 ${b.avg} mg/dL — 식단 조절로 개선 가능`,
+        sourceKey: `${b.bucket}_avg_moderate`,
       });
     }
 
@@ -114,6 +117,7 @@ function applyTimeBucketRules(
         priority: 'HIGH',
         label: `${label} 고혈당 반복 확인`,
         reason: `${label} 시간대 고혈당(>180) ${b.highCount}회 발생`,
+        sourceKey: `${b.bucket}_high_repeat`,
       });
     }
 
@@ -124,6 +128,7 @@ function applyTimeBucketRules(
         priority: 'HIGH',
         label: `${label} 저혈당 반복 확인`,
         reason: `${label} 시간대 저혈당(<70) ${b.lowCount}회 발생 — 긴급 확인 필요`,
+        sourceKey: `${b.bucket}_low_repeat`,
       });
     }
   }
@@ -150,6 +155,7 @@ function applyMealTimingRules(
         priority: 'HIGH',
         label: '식후 혈당 관리 코칭 권장',
         reason: `식후 평균 상승 +${rise} mg/dL — 식사 조절 코칭 필요`,
+        sourceKey: 'post_meal_spike',
       });
     }
     // 식후 상승 > 30 → 가이드 연결
@@ -159,6 +165,7 @@ function applyMealTimingRules(
         priority: 'MEDIUM',
         label: '식사 관리 가이드',
         reason: `식후 평균 상승 +${rise} mg/dL — 식단 가이드 참고 권장`,
+        sourceKey: 'post_meal_moderate',
       });
     }
   }
@@ -170,6 +177,7 @@ function applyMealTimingRules(
       priority: 'MEDIUM',
       label: '공복 혈당 상세 확인',
       reason: `공복 평균 ${fasting.avg} mg/dL — 약물/생활습관 점검 권장`,
+      sourceKey: 'fasting_high',
     });
   }
 }
@@ -191,6 +199,7 @@ function applyExerciseRules(
       priority: 'MEDIUM',
       label: '운동 효과 점검 가이드',
       reason: `운동 시 혈당 감소 효과가 미미합니다 (차이 ${diff > 0 ? '+' : ''}${diff} mg/dL)`,
+      sourceKey: 'exercise_no_effect',
     });
   }
 
@@ -201,6 +210,7 @@ function applyExerciseRules(
       priority: 'LOW',
       label: '운동 유지 격려 코칭',
       reason: `운동 시 혈당 ${Math.abs(diff)} mg/dL 감소 — 좋은 효과, 유지 권장`,
+      sourceKey: 'exercise_good_effect',
     });
   }
 }
@@ -222,6 +232,7 @@ function applyTrendRules(
       priority: 'HIGH',
       label: '혈당 상승 추세 코칭 필요',
       reason: `최근 3일 평균이 7일 대비 +${shortTermChange} mg/dL 상승 — 즉시 개입 권장`,
+      sourceKey: 'trend_worsening',
     });
   }
 
@@ -232,6 +243,7 @@ function applyTrendRules(
       priority: 'MEDIUM',
       label: '혈당 추세 상세 확인',
       reason: `최근 3일 평균이 7일 대비 +${shortTermChange} mg/dL 상승 추세`,
+      sourceKey: 'trend_warning',
     });
   }
 
@@ -242,6 +254,7 @@ function applyTrendRules(
       priority: 'LOW',
       label: '혈당 개선 격려 코칭',
       reason: `최근 3일 평균이 7일 대비 ${shortTermChange} mg/dL 감소 — 개선 중`,
+      sourceKey: 'trend_improving',
     });
   }
 }

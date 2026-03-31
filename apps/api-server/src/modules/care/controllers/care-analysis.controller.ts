@@ -14,6 +14,7 @@ import { CareLlmInsightService } from '../services/llm/care-llm-insight.service.
 import { CareCoachingDraftService } from '../services/llm/care-coaching-draft.service.js';
 import { CareAlertService } from '../services/care-alert.service.js';
 import { mapTimeAnalysisToActions } from '../domain/analysis/time-action.mapper.js';
+import { CareActionService } from '../services/care-action.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
@@ -50,6 +51,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
   const llmInsightService = new CareLlmInsightService(dataSource);
   const coachingDraftService = new CareCoachingDraftService(dataSource);
   const alertService = new CareAlertService(dataSource);
+  const actionService = new CareActionService(dataSource);
   const requirePharmacyContext = createPharmacyContextMiddleware(dataSource);
 
   // GET /analysis/:patientId — run analysis + auto-record snapshot
@@ -225,8 +227,17 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
         },
       };
 
-      // WO-O4O-CARE-ACTION-ENGINE-V2.1: Rule 기반 Action 생성
-      const actions = mapTimeAnalysisToActions(responseData);
+      // WO-O4O-CARE-ACTION-ENGINE-V2.2: Rule 기반 Action 생성 → 영속화 → 저장 기반 응답
+      const candidates = mapTimeAnalysisToActions(responseData);
+
+      let actions;
+      if (pharmacyId) {
+        // 영속화: 중복 억제 + 신규 저장 + 기존 active 합산
+        actions = await actionService.persistAndMerge(patientId, pharmacyId, candidates);
+      } else {
+        // pharmacy 없으면 fallback: 임시 객체 (비영속)
+        actions = candidates;
+      }
 
       res.json({
         success: true,

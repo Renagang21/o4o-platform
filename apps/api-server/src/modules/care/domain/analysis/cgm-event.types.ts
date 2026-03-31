@@ -127,4 +127,27 @@ export interface CareGeneratedAction {
   priority: CareActionPriority;
   reason: string;
   label: string;
+  /** WO-O4O-CARE-ACTION-ENGINE-V2.2: 규칙 식별 키 (중복 억제용) */
+  sourceKey?: string;
+}
+
+/** WO-O4O-CARE-ACTION-ENGINE-V2.2: 영속화된 Action 응답 */
+export type CareActionStatus = 'suggested' | 'in_progress' | 'completed' | 'dismissed' | 'expired';
+
+export interface CarePersistedAction {
+  id: string;
+  actionType: CareActionType;
+  title: string;
+  description: string;
+  priority: CareActionPriority;
+  status: CareActionStatus;
+  sourceType: string;
+  sourceKey: string;
+  createdAt: string;
+  actedAt: string | null;
+  completedAt: string | null;
+  payload: Record<string, unknown> | null;
+  canStart: boolean;
+  canComplete: boolean;
+  canDismiss: boolean;
 }

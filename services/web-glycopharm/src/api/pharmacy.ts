@@ -749,6 +749,24 @@ class PharmacyApiClient {
     return this.request(`/care/analysis/time-based/${patientId}?days=${days}`);
   }
 
+  // WO-O4O-CARE-ACTION-ENGINE-V2.2: Action lifecycle APIs
+  async getCareActions(patientId: string, status?: string): Promise<{ success: boolean; data: { actions: CarePersistedActionDto[] } }> {
+    const qs = status ? `?status=${status}` : '';
+    return this.request(`/care/actions/${patientId}${qs}`);
+  }
+
+  async startCareAction(actionId: string): Promise<{ success: boolean; data: CarePersistedActionDto }> {
+    return this.request(`/care/actions/${actionId}/start`, { method: 'POST' });
+  }
+
+  async completeCareAction(actionId: string): Promise<{ success: boolean; data: CarePersistedActionDto }> {
+    return this.request(`/care/actions/${actionId}/complete`, { method: 'POST' });
+  }
+
+  async dismissCareAction(actionId: string): Promise<{ success: boolean; data: CarePersistedActionDto }> {
+    return this.request(`/care/actions/${actionId}/dismiss`, { method: 'POST' });
+  }
+
   async createCoachingSession(data: {
     patientId: string;
     summary: string;
@@ -1023,7 +1041,7 @@ export interface TimeBasedAnalysisDto {
     avgFull: number | null;
     countFull: number;
   };
-  actions?: CareGeneratedActionDto[];
+  actions?: CareGeneratedActionDto[] | CarePersistedActionDto[];
 }
 
 export interface CoachingSession {
@@ -1240,6 +1258,28 @@ export interface CareGeneratedActionDto {
   priority: CareActionPriority;
   reason: string;
   label: string;
+  sourceKey?: string;
+}
+
+// WO-O4O-CARE-ACTION-ENGINE-V2.2: 영속화된 Action
+export type CareActionStatus = 'suggested' | 'in_progress' | 'completed' | 'dismissed' | 'expired';
+
+export interface CarePersistedActionDto {
+  id: string;
+  actionType: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert' | 'link_guideline';
+  title: string;
+  description: string;
+  priority: CareActionPriority;
+  status: CareActionStatus;
+  sourceType: string;
+  sourceKey: string;
+  createdAt: string;
+  actedAt: string | null;
+  completedAt: string | null;
+  payload: Record<string, unknown> | null;
+  canStart: boolean;
+  canComplete: boolean;
+  canDismiss: boolean;
 }
 
 export interface CgmEventAnalysisDto {

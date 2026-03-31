@@ -26,8 +26,8 @@ import {
   MessageSquare,
   CheckCircle2,
 } from 'lucide-react';
-import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto, type TimeBasedAnalysisDto } from '@/api/pharmacy';
-import { Clock, Utensils, Footprints, BookOpen } from 'lucide-react';
+import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto, type CarePersistedActionDto, type TimeBasedAnalysisDto } from '@/api/pharmacy';
+import { Clock, Utensils, Footprints, BookOpen, Play, XCircle, Eye, EyeOff } from 'lucide-react';
 import { usePatientDetail } from '../PatientDetailPage';
 import { RISK_DISPLAY } from '@/constants/care-display';
 
@@ -484,10 +484,11 @@ export default function AnalysisTab() {
     }).finally(() => setLoading(false));
   }, [patient?.id]);
 
-  // ── Action handler (WO-O4O-CARE-ACTION-ENGINE-V2) ──
-  const handleCareAction = useCallback((action: CareGeneratedActionDto) => {
+  // ── Action handler (WO-O4O-CARE-ACTION-ENGINE-V2.2) ──
+  const handleCareAction = useCallback((action: CareGeneratedActionDto | CarePersistedActionDto) => {
     if (!patient?.id) return;
-    switch (action.type) {
+    const actionType = 'actionType' in action ? action.actionType : action.type;
+    switch (actionType) {
       case 'open_patient':
         navigate(`/care/patients/${patient.id}`);
         break;
@@ -505,6 +506,35 @@ export default function AnalysisTab() {
         break;
     }
   }, [patient?.id, navigate]);
+
+  // WO-O4O-CARE-ACTION-ENGINE-V2.2: Action lifecycle handlers
+  const refreshTimeAnalysis = useCallback(() => {
+    if (!patient?.id) return;
+    pharmacyApi.getCareTimeBasedAnalysis(patient.id, 14).then(r => {
+      if (r.success) setTimeAnalysis(r.data);
+    }).catch(() => {});
+  }, [patient?.id]);
+
+  const handleActionStart = useCallback(async (actionId: string) => {
+    try {
+      await pharmacyApi.startCareAction(actionId);
+      refreshTimeAnalysis();
+    } catch { /* ignore */ }
+  }, [refreshTimeAnalysis]);
+
+  const handleActionComplete = useCallback(async (actionId: string) => {
+    try {
+      await pharmacyApi.completeCareAction(actionId);
+      refreshTimeAnalysis();
+    } catch { /* ignore */ }
+  }, [refreshTimeAnalysis]);
+
+  const handleActionDismiss = useCallback(async (actionId: string) => {
+    try {
+      await pharmacyApi.dismissCareAction(actionId);
+      refreshTimeAnalysis();
+    } catch { /* ignore */ }
+  }, [refreshTimeAnalysis]);
 
   // ── Glucose stats for mini cards ──
   const glucoseStats = useMemo(() => {
@@ -815,7 +845,13 @@ export default function AnalysisTab() {
 
       {/* 시간 기반 분석 — WO-O4O-CARE-TIME-BASED-ANALYSIS-V1 */}
       {timeAnalysis && (timeAnalysis.timeBuckets.length > 0 || timeAnalysis.mealTimingStats.length > 0) && (
-        <TimeBasedAnalysisSection data={timeAnalysis} onActionExecute={handleCareAction} />
+        <TimeBasedAnalysisSection
+          data={timeAnalysis}
+          onActionExecute={handleCareAction}
+          onActionStart={handleActionStart}
+          onActionComplete={handleActionComplete}
+          onActionDismiss={handleActionDismiss}
+        />
       )}
 
       {/* 혈압 추이 차트 — WO-O4O-GLYCOPHARM-ANALYSIS-TAB-BP-WEIGHT-CHART-EXPANSION-V1 */}
@@ -1069,6 +1105,16 @@ const PRIORITY_STYLES: Record<string, { border: string; bg: string; text: string
   LOW: { border: 'border-slate-200', bg: 'bg-slate-50', text: 'text-slate-600' },
 };
 
+// WO-O4O-CARE-ACTION-ENGINE-V2.2: 영속화된 Action 카드 (상태 배지 + 실행 버튼)
+
+const STATUS_DISPLAY: Record<string, { label: string; cls: string }> = {
+  suggested: { label: '추천', cls: 'bg-blue-100 text-blue-700' },
+  in_progress: { label: '진행 중', cls: 'bg-amber-100 text-amber-700' },
+  completed: { label: '완료', cls: 'bg-green-100 text-green-700' },
+  dismissed: { label: '보류', cls: 'bg-slate-100 text-slate-500' },
+  expired: { label: '만료', cls: 'bg-slate-100 text-slate-400' },
+};
+
 function CareActionButton({
   action,
   onExecute,
@@ -1090,6 +1136,73 @@ function CareActionButton({
         <p className="text-xs opacity-70 mt-0.5">{action.reason}</p>
       </div>
     </button>
+  );
+}
+
+function CarePersistedActionCard({
+  action,
+  onExecute,
+  onStart,
+  onComplete,
+  onDismiss,
+}: {
+  action: CarePersistedActionDto;
+  onExecute: (action: CarePersistedActionDto) => void;
+  onStart: (id: string) => void;
+  onComplete: (id: string) => void;
+  onDismiss: (id: string) => void;
+}) {
+  const Icon = CARE_ACTION_ICONS[action.actionType] || BarChart3;
+  const style = PRIORITY_STYLES[action.priority] || PRIORITY_STYLES.LOW;
+  const statusDisplay = STATUS_DISPLAY[action.status] || STATUS_DISPLAY.suggested;
+  const isFinished = action.status === 'completed' || action.status === 'dismissed' || action.status === 'expired';
+
+  return (
+    <div className={`w-full rounded-xl border text-left text-sm transition-colors ${isFinished ? 'opacity-60' : ''} ${style.border} ${style.bg}`}>
+      <button
+        onClick={() => onExecute(action)}
+        className={`w-full flex items-center gap-3 px-4 py-3 hover:opacity-80 ${style.text}`}
+      >
+        <Icon className="w-4 h-4 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{action.title}</span>
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${statusDisplay.cls}`}>
+              {statusDisplay.label}
+            </span>
+          </div>
+          <p className="text-xs opacity-70 mt-0.5">{action.description}</p>
+        </div>
+      </button>
+      {!isFinished && (
+        <div className="flex items-center gap-1 px-4 pb-3 pt-0">
+          {action.canStart && (
+            <button
+              onClick={() => onStart(action.id)}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition-colors"
+            >
+              <Play className="w-3 h-3" /> 시작
+            </button>
+          )}
+          {action.canComplete && (
+            <button
+              onClick={() => onComplete(action.id)}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-green-600 bg-green-50 hover:bg-green-100 rounded transition-colors"
+            >
+              <CheckCircle2 className="w-3 h-3" /> 완료
+            </button>
+          )}
+          {action.canDismiss && (
+            <button
+              onClick={() => onDismiss(action.id)}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-slate-500 bg-slate-50 hover:bg-slate-100 rounded transition-colors"
+            >
+              <XCircle className="w-3 h-3" /> 보류
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1119,7 +1232,13 @@ const MEAL_TIMING_DISPLAY: Record<string, string> = {
   random: '수시',
 };
 
-function TimeBasedAnalysisSection({ data, onActionExecute }: { data: TimeBasedAnalysisDto; onActionExecute: (action: CareGeneratedActionDto) => void }) {
+function TimeBasedAnalysisSection({ data, onActionExecute, onActionStart, onActionComplete, onActionDismiss }: {
+  data: TimeBasedAnalysisDto;
+  onActionExecute: (action: CareGeneratedActionDto | CarePersistedActionDto) => void;
+  onActionStart?: (id: string) => void;
+  onActionComplete?: (id: string) => void;
+  onActionDismiss?: (id: string) => void;
+}) {
   const maxBucketAvg = Math.max(...data.timeBuckets.map(b => b.avg), 1);
 
   return (
@@ -1256,7 +1375,7 @@ function TimeBasedAnalysisSection({ data, onActionExecute }: { data: TimeBasedAn
         </div>
       </div>
 
-      {/* Action cards — WO-O4O-CARE-ACTION-ENGINE-V2.1 */}
+      {/* Action cards — WO-O4O-CARE-ACTION-ENGINE-V2.2 */}
       {data.actions && data.actions.length > 0 && (
         <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 p-4">
           <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
@@ -1264,9 +1383,22 @@ function TimeBasedAnalysisSection({ data, onActionExecute }: { data: TimeBasedAn
             권장 조치
           </h5>
           <div className="space-y-2">
-            {data.actions.map((action, i) => (
-              <CareActionButton key={i} action={action} onExecute={onActionExecute} />
-            ))}
+            {data.actions
+              .filter((a) => !('status' in a) || (a as CarePersistedActionDto).status !== 'dismissed')
+              .map((action, i) => (
+                'id' in action && 'status' in action ? (
+                  <CarePersistedActionCard
+                    key={(action as CarePersistedActionDto).id}
+                    action={action as CarePersistedActionDto}
+                    onExecute={onActionExecute}
+                    onStart={onActionStart || (() => {})}
+                    onComplete={onActionComplete || (() => {})}
+                    onDismiss={onActionDismiss || (() => {})}
+                  />
+                ) : (
+                  <CareActionButton key={i} action={action as CareGeneratedActionDto} onExecute={onActionExecute} />
+                )
+              ))}
           </div>
         </div>
       )}
