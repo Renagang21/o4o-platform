@@ -82,7 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const roles = extractRoles(apiUser, ['glucoseview:patient']);
 
           // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-          if (!roles.includes('glucoseview:patient')) {
+          // customer/user = GlycoPharm/GlucoseView 가입 시 legacy role
+          const PATIENT_ROLES = ['glucoseview:patient', 'customer', 'user'];
+          if (!roles.some(r => PATIENT_ROLES.includes(r))) {
             clearAllTokens();
             setIsLoading(false);
             return;
@@ -118,7 +120,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const roles = extractRoles(apiUser, ['glucoseview:patient']);
 
         // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-        if (!roles.includes('glucoseview:patient')) {
+        // customer/user = GlycoPharm/GlucoseView 가입 시 legacy role
+        const PATIENT_ROLES = ['glucoseview:patient', 'customer', 'user'];
+        if (!roles.some(r => PATIENT_ROLES.includes(r))) {
           clearAllTokens();
           return { success: false, message: 'GlucoseView는 당뇨인 전용 서비스입니다. 약사는 GlycoPharm을 이용해주세요.' };
         }
