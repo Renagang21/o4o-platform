@@ -969,6 +969,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 done: (product.tags?.length || 0) >= 3,
                 partial: (product.tags?.length || 0) > 0 && (product.tags?.length || 0) < 3,
               },
+              {
+                label: '가격',
+                done: (product.priceGeneral ?? 0) > 0,
+                partial: (product.priceGeneral ?? 0) > 0 && (product.priceGold == null && product.pricePlatinum == null),
+              },
             ];
             const isNeedsCuration = product.completenessStatus === 'DRAFT' || product.completenessStatus === 'INCOMPLETE';
             if (!isNeedsCuration) return null;
@@ -1038,20 +1043,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
-          {/* ── 가격 (read-only) ── */}
-          {!isEditing && (
-            <Section title="가격">
-              <InfoRow label="공급가">{formatPrice(product.priceGeneral)}</InfoRow>
-              <InfoRow label="소비자 참고가">{formatPrice(product.consumerReferencePrice)}</InfoRow>
-              {product.priceGold != null && (
-                <InfoRow label="서비스가">{formatPrice(product.priceGold)}</InfoRow>
-              )}
-              {product.pricePlatinum != null && (
-                <InfoRow label="스팟가">{formatPrice(product.pricePlatinum)}</InfoRow>
-              )}
-            </Section>
-          )}
-
           {/* ── 소비자 공개 설명 (B2C) ── */}
           {!isEditing && (
             <Section title="소비자 공개 설명 (B2C)">
@@ -1114,90 +1105,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           )}
 
-          {/* ── 재고·기타 ── */}
-          {!isEditing && (
-            <Section title="재고 · 기타">
-              <InfoRow label="재고 수량">
-                {product.stockQuantity != null ? Number(product.stockQuantity).toLocaleString() : '0'}
-              </InfoRow>
-              <InfoRow label="등록일">{formatDate(product.createdAt)}</InfoRow>
-              <InfoRow label="수정일">{formatDate(product.updatedAt)}</InfoRow>
-            </Section>
-          )}
-
-          {/* ── 상태 ── */}
-          <Section title="상태">
-            {!isEditing && (
-              <InfoRow label="활성">
-                <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
-                  {product.isActive ? '활성' : '비활성'}
-                </Badge>
-              </InfoRow>
-            )}
-            <InfoRow label="유통 방식">
-              <Badge className={distCfg.cls}>{distCfg.label}</Badge>
-            </InfoRow>
-            <InfoRow label="승인">
-              <Badge className={
-                product.approvalStatus === 'approved' ? 'bg-green-50 text-green-700'
-                  : product.approvalStatus === 'pending' ? 'bg-amber-50 text-amber-700'
-                  : product.approvalStatus === 'rejected' ? 'bg-red-50 text-red-700'
-                  : 'bg-slate-100 text-slate-600'
-              }>
-                {product.approvalStatus === 'approved' ? '승인' : product.approvalStatus === 'pending' ? '대기' : product.approvalStatus === 'rejected' ? '거부' : product.approvalStatus || '-'}
-              </Badge>
-            </InfoRow>
-            <InfoRow label="완성도">
-              <div className="flex items-center gap-2">
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div className={`h-full ${scoreBgColor} rounded-full`} style={{ width: `${score}%` }} />
-                </div>
-                <span className={`text-xs font-medium ${scoreColor}`}>{score}%</span>
-                <Badge className={compCfg.cls}>{compCfg.label}</Badge>
-              </div>
-            </InfoRow>
-          </Section>
-
-          {/* ── 서비스 ── */}
-          {(product.serviceKeys?.length || product.serviceApprovals?.length) ? (
-            <Section title="서비스">
-              {product.serviceKeys && product.serviceKeys.length > 0 && (
-                <InfoRow label="등록 서비스">
-                  <div className="flex flex-wrap gap-1 justify-end">
-                    {product.serviceKeys.map((sk) => (
-                      <Badge key={sk} className="bg-slate-100 text-slate-600">{sk}</Badge>
-                    ))}
-                  </div>
-                </InfoRow>
-              )}
-              {product.serviceApprovals && product.serviceApprovals.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-sm text-slate-500">서비스별 승인</span>
-                  {product.serviceApprovals.map((sa) => (
-                    <div key={sa.serviceKey}>
-                      <div className="flex items-center justify-between pl-3">
-                        <span className="text-xs text-slate-600">{sa.serviceKey}</span>
-                        <Badge className={
-                          sa.status === 'approved' ? 'bg-green-50 text-green-700'
-                            : sa.status === 'pending' ? 'bg-amber-50 text-amber-700'
-                            : 'bg-red-50 text-red-700'
-                        }>
-                          {sa.status === 'approved' ? '승인' : sa.status === 'pending' ? '대기' : '반려'}
-                        </Badge>
-                      </div>
-                      {sa.reason && (
-                        <p className="text-xs text-red-600 pl-3 mt-0.5">반려 사유: {sa.reason}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              <InfoRow label="대기 요청">{product.pendingRequestCount ?? 0}건</InfoRow>
-              <InfoRow label="활성 서비스">{product.activeServiceCount ?? 0}개</InfoRow>
-            </Section>
-          ) : null}
-
-          {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시) ── */}
+          {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시, 후편집 4단계) ── */}
           <Section title="태그 관리">
             {/* WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1: 태그 추천 안내 */}
             {(!product.categoryId || (!product.consumerShortDescription && !product.consumerDetailDescription)) && (
@@ -1362,6 +1270,104 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               </>
             )}
           </Section>
+
+          {/* ── 가격 점검 (후편집 마지막 단계) ── */}
+          {!isEditing && (
+            <Section title="가격 점검">
+              <InfoRow label="공급가">{formatPrice(product.priceGeneral)}</InfoRow>
+              <InfoRow label="소비자 참고가">{formatPrice(product.consumerReferencePrice)}</InfoRow>
+              <InfoRow label="서비스가">
+                {product.priceGold != null ? formatPrice(product.priceGold) : <span className="text-slate-400 italic text-xs">미설정</span>}
+              </InfoRow>
+              <InfoRow label="스팟가">
+                {product.pricePlatinum != null ? formatPrice(product.pricePlatinum) : <span className="text-slate-400 italic text-xs">미설정</span>}
+              </InfoRow>
+              <p className="text-[11px] text-slate-400 mt-2">서비스가·스팟가는 공급자 운영 참고용이며, 주문 단가는 공급가 기준입니다.</p>
+            </Section>
+          )}
+
+          {/* ── 재고·기타 ── */}
+          {!isEditing && (
+            <Section title="재고 · 기타">
+              <InfoRow label="재고 수량">
+                {product.stockQuantity != null ? Number(product.stockQuantity).toLocaleString() : '0'}
+              </InfoRow>
+              <InfoRow label="등록일">{formatDate(product.createdAt)}</InfoRow>
+              <InfoRow label="수정일">{formatDate(product.updatedAt)}</InfoRow>
+            </Section>
+          )}
+
+          {/* ── 상태 ── */}
+          <Section title="상태">
+            {!isEditing && (
+              <InfoRow label="활성">
+                <Badge className={product.isActive ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}>
+                  {product.isActive ? '활성' : '비활성'}
+                </Badge>
+              </InfoRow>
+            )}
+            <InfoRow label="유통 방식">
+              <Badge className={distCfg.cls}>{distCfg.label}</Badge>
+            </InfoRow>
+            <InfoRow label="승인">
+              <Badge className={
+                product.approvalStatus === 'approved' ? 'bg-green-50 text-green-700'
+                  : product.approvalStatus === 'pending' ? 'bg-amber-50 text-amber-700'
+                  : product.approvalStatus === 'rejected' ? 'bg-red-50 text-red-700'
+                  : 'bg-slate-100 text-slate-600'
+              }>
+                {product.approvalStatus === 'approved' ? '승인' : product.approvalStatus === 'pending' ? '대기' : product.approvalStatus === 'rejected' ? '거부' : product.approvalStatus || '-'}
+              </Badge>
+            </InfoRow>
+            <InfoRow label="완성도">
+              <div className="flex items-center gap-2">
+                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                  <div className={`h-full ${scoreBgColor} rounded-full`} style={{ width: `${score}%` }} />
+                </div>
+                <span className={`text-xs font-medium ${scoreColor}`}>{score}%</span>
+                <Badge className={compCfg.cls}>{compCfg.label}</Badge>
+              </div>
+            </InfoRow>
+          </Section>
+
+          {/* ── 서비스 ── */}
+          {(product.serviceKeys?.length || product.serviceApprovals?.length) ? (
+            <Section title="서비스">
+              {product.serviceKeys && product.serviceKeys.length > 0 && (
+                <InfoRow label="등록 서비스">
+                  <div className="flex flex-wrap gap-1 justify-end">
+                    {product.serviceKeys.map((sk) => (
+                      <Badge key={sk} className="bg-slate-100 text-slate-600">{sk}</Badge>
+                    ))}
+                  </div>
+                </InfoRow>
+              )}
+              {product.serviceApprovals && product.serviceApprovals.length > 0 && (
+                <div className="space-y-1.5">
+                  <span className="text-sm text-slate-500">서비스별 승인</span>
+                  {product.serviceApprovals.map((sa) => (
+                    <div key={sa.serviceKey}>
+                      <div className="flex items-center justify-between pl-3">
+                        <span className="text-xs text-slate-600">{sa.serviceKey}</span>
+                        <Badge className={
+                          sa.status === 'approved' ? 'bg-green-50 text-green-700'
+                            : sa.status === 'pending' ? 'bg-amber-50 text-amber-700'
+                            : 'bg-red-50 text-red-700'
+                        }>
+                          {sa.status === 'approved' ? '승인' : sa.status === 'pending' ? '대기' : '반려'}
+                        </Badge>
+                      </div>
+                      {sa.reason && (
+                        <p className="text-xs text-red-600 pl-3 mt-0.5">반려 사유: {sa.reason}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <InfoRow label="대기 요청">{product.pendingRequestCount ?? 0}건</InfoRow>
+              <InfoRow label="활성 서비스">{product.activeServiceCount ?? 0}개</InfoRow>
+            </Section>
+          ) : null}
         </div>
 
         {/* Footer — 수정 모드 시 취소/저장 */}
