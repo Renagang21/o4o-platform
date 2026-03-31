@@ -84,7 +84,7 @@ export interface User {
 // Pharmacy specific user data
 // WO-O4O-AUTH-RBAC-UNIFICATION-V2: role field uses prefixed format
 export interface PharmacyUser extends User {
-  role: 'pharmacy' | 'glycopharm:pharmacy' | 'seller';
+  role: 'pharmacy';
   pharmacy: {
     id: string;
     name: string;

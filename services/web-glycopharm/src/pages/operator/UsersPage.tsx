@@ -102,8 +102,8 @@ function getPrimaryRole(u: UserData): string {
 // Role tab filtering
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
-  pharmacy: ['pharmacy', 'seller', 'glycopharm:pharmacy', 'glycopharm:pharmacist'],
-  customer: ['customer', 'glycopharm:consumer'],
+  pharmacy: ['pharmacy'],
+  customer: ['customer'],
   pending: [],
 };
 

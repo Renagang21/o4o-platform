@@ -12,8 +12,6 @@ export const GLYCOPHARM_ROLE_PRIORITY = [
   'glycopharm:admin',
   'glycopharm:operator',
   'pharmacy',
-  'glycopharm:pharmacy',  // legacy: 마이그레이션 전 데이터 호환
-  'seller',               // legacy: 초기 가입자 호환
   'customer',
 ] as const;
 
@@ -22,8 +20,6 @@ export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
   'glycopharm:admin': '/admin',
   'glycopharm:operator': '/operator',
   'pharmacy': '/care',
-  'glycopharm:pharmacy': '/care',  // legacy
-  'seller': '/care',               // legacy
   'customer': '/patient',
 };
 

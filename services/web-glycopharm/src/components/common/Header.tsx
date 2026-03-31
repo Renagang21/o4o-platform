@@ -45,7 +45,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role checks
-  const isPharmacy = isAuthenticated && user?.roles?.some(r => r === 'pharmacy' || r === 'glycopharm:pharmacy' || r === 'seller');
+  const isPharmacy = isAuthenticated && user?.roles?.some(r => r === 'pharmacy');
   const isAdmin = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:admin' || r === 'platform:super_admin');
   const isOperator = isAuthenticated && user?.roles?.some(r => r === 'glycopharm:operator' || r === 'glycopharm:admin' || r === 'platform:super_admin');
 
