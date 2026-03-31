@@ -580,6 +580,7 @@ export class MembershipConsoleController {
         password, lastName, firstName, nickname, phone,
         businessName, businessNumber, taxEmail, businessType,
         businessCategory, zipCode, address1, address2,
+        membershipRole, // service_memberships.role 변경
       } = req.body;
 
       if (!scope.isPlatformAdmin) {
@@ -587,6 +588,18 @@ export class MembershipConsoleController {
         if (!hasAccess) {
           res.status(404).json({ success: false, error: 'User not found' });
           return;
+        }
+      }
+
+      // 0. Membership role update (service_memberships.role)
+      if (membershipRole && typeof membershipRole === 'string') {
+        const serviceKey = scope.serviceKeys[0];
+        if (serviceKey) {
+          await AppDataSource.query(
+            `UPDATE service_memberships SET role = $1, updated_at = NOW()
+             WHERE user_id = $2 AND service_key = $3`,
+            [membershipRole, userId, serviceKey]
+          );
         }
       }
 

@@ -45,13 +45,12 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ─── Component ───────────────────────────────────────────────
 
-// 서비스 역할 (service_memberships.role — 읽기 전용)
-const GLYCOPHARM_MEMBERSHIP_LABELS: Record<string, string> = {
-  pharmacy: '약국',
-  customer: '당뇨인',
-  supplier: '공급자',
-  seller: '약국',
-};
+// 서비스 역할 (service_memberships.role — 편집 가능)
+const GLYCOPHARM_MEMBERSHIP_OPTIONS = [
+  { value: 'pharmacy', label: '약국' },
+  { value: 'customer', label: '당뇨인' },
+  { value: 'supplier', label: '공급자' },
+];
 
 // 운영 권한 (role_assignments — 편집 가능)
 const GLYCOPHARM_ADMIN_ROLE_OPTIONS = [
@@ -65,7 +64,8 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [hasBusinessInfo, setHasBusinessInfo] = useState(false);
-  const [membershipRole, setMembershipRole] = useState(''); // service_memberships.role (읽기 전용)
+  const [membershipRole, setMembershipRole] = useState(''); // service_memberships.role (편집 가능)
+  const [originalMembershipRole, setOriginalMembershipRole] = useState('');
   const [currentRole, setCurrentRole] = useState(''); // role_assignments 운영 권한
   const [selectedRole, setSelectedRole] = useState('');
 
@@ -89,9 +89,10 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
       try {
         const data = await apiFetch<any>(`/api/v1/operator/members/${userId}`);
         const u = data.user;
-        // 회원 유형 (service_memberships.role — 읽기 전용)
+        // 회원 유형 (service_memberships.role — 편집 가능)
         const gpMembership = (data.memberships || []).find((m: any) => m.serviceKey === 'glycopharm');
         setMembershipRole(gpMembership?.role || '');
+        setOriginalMembershipRole(gpMembership?.role || '');
         // 운영 권한 (role_assignments — 편집 가능)
         const activeRoles: string[] = (data.roles || [])
           .filter((r: any) => r.isActive)
@@ -145,6 +146,10 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         nickname: form.nickname,
         phone: form.phone,
       };
+      // 회원 유형 변경
+      if (membershipRole !== originalMembershipRole) {
+        payload.membershipRole = membershipRole;
+      }
       if (hasBusinessInfo) {
         payload.businessName = form.businessName;
         payload.businessNumber = form.businessNumber;
@@ -238,12 +243,23 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
               </div>
             </div>
 
-            {/* 회원 유형 (읽기 전용) */}
+            {/* 회원 유형 (편집 가능) */}
             <div className="pt-3 border-t">
               <h4 className="text-sm font-semibold text-slate-700 mb-3">회원 유형</h4>
-              <p className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
-                {GLYCOPHARM_MEMBERSHIP_LABELS[membershipRole] || membershipRole || '미지정'}
-              </p>
+              <select
+                value={membershipRole}
+                onChange={(e) => setMembershipRole(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                {GLYCOPHARM_MEMBERSHIP_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {membershipRole !== originalMembershipRole && (
+                <p className="text-xs text-amber-600 mt-1">
+                  회원 유형이 변경됩니다: {GLYCOPHARM_MEMBERSHIP_OPTIONS.find(o => o.value === originalMembershipRole)?.label || originalMembershipRole || '미지정'} → {GLYCOPHARM_MEMBERSHIP_OPTIONS.find(o => o.value === membershipRole)?.label || membershipRole}
+                </p>
+              )}
             </div>
 
             {/* 운영 권한 */}
