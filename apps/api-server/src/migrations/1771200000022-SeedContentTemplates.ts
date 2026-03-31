@@ -21,7 +21,7 @@ export class SeedContentTemplates1771200000022 implements MigrationInterface {
       `SELECT COUNT(*)::int AS cnt FROM content_templates WHERE is_public = true AND service_key = 'neture' AND is_active = true`,
     );
     if (existing[0]?.cnt > 0) {
-      console.log('[SeedContentTemplates] Public neture templates already exist, skipping seed.');
+      // Public neture templates already exist — skip seed
       return;
     }
 
@@ -123,7 +123,7 @@ export class SeedContentTemplates1771200000022 implements MigrationInterface {
       );
     }
 
-    console.log(`[SeedContentTemplates] Inserted ${templates.length} public neture templates.`);
+    // Seed complete
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
