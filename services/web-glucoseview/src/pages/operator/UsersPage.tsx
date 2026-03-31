@@ -95,6 +95,9 @@ function getUserName(u: UserData): string {
 }
 
 function getPrimaryRole(u: UserData): string {
+  // service_memberships.role 우선 (SSOT)
+  const membership = u.memberships?.find(m => m.serviceKey === 'glucoseview');
+  if (membership?.role) return membership.role;
   const roles = u.roles || (u.role ? [u.role] : []);
   return roles[0] || 'user';
 }
