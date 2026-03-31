@@ -93,17 +93,6 @@ export class ProductImportCommonService {
     );
     const offerId = rows[0]?.id || '';
 
-    // WO-NETURE-PRODUCT-APPROVAL-DATA-SOURCE-UNIFICATION-V1:
-    // CSV import에서도 'neture' service approval 보장
-    if (offerId) {
-      await manager.query(
-        `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
-         VALUES ($1, 'neture', 'pending', NOW(), NOW())
-         ON CONFLICT (offer_id, service_key) DO NOTHING`,
-        [offerId],
-      );
-    }
-
     logger.info(`[ImportCommon] Upserted offer: master=${masterId}, supplier=${supplierId}, offer=${offerId}`);
     return offerId;
   }
