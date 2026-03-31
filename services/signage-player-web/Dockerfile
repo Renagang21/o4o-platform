@@ -8,19 +8,25 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy workspace files
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.base.json tsconfig.packages.json ./
+COPY packages/content-editor/package.json ./packages/content-editor/
 COPY services/signage-player-web/package.json ./services/signage-player-web/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile --filter signage-player-web
 
 # Copy source files
+COPY packages/content-editor/ ./packages/content-editor/
 COPY services/signage-player-web ./services/signage-player-web
+
+# Build workspace dependencies
+RUN pnpm --filter @o4o/content-editor build
 
 # Build
 ARG VITE_API_URL=https://api.neture.co.kr
 ENV VITE_API_URL=$VITE_API_URL
 
-# Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
+# Build the service (vite only — tsc는 CI/로컬에서 별도 수정)
 WORKDIR /app/services/signage-player-web
 RUN npx vite build
 
