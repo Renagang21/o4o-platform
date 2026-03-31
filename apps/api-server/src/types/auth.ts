@@ -141,7 +141,7 @@ export interface AccessTokenPayload {
   /** 서비스 스코프 목록 (WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1) */
   scopes?: string[];
   /** 서비스별 멤버십 상태 (WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1) */
-  memberships?: { serviceKey: string; status: string }[];
+  memberships?: { serviceKey: string; status: string; role?: string }[];
   domain?: string;
   sub?: string; // JWT standard claim
   // Phase 2.5: Server isolation claims

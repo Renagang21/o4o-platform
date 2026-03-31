@@ -72,7 +72,7 @@ function getJwtSecrets() {
  * === Phase 1: Service User 인증 기반 (WO-AUTH-SERVICE-IDENTITY-PHASE1) ===
  * Token includes tokenType: 'user' to distinguish from service tokens
  */
-export function generateAccessToken(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string }[]): string {
+export function generateAccessToken(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[]): string {
   const { jwtSecret, jwtIssuer, jwtAudience } = getJwtConfig();
 
   // Phase3-E PR3: roles from RoleAssignment table (explicit parameter)
@@ -234,7 +234,7 @@ export function generateRefreshToken(user: User, tokenFamily?: string): string {
  * @param domain - Domain for the token (default: neture.co.kr)
  * @returns AuthTokens object with both tokens
  */
-export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string }[]): AuthTokens {
+export function generateTokens(user: User, roles: string[], domain: string = 'neture.co.kr', memberships?: { serviceKey: string; status: string; role?: string }[]): AuthTokens {
   const tokenFamily = uuidv4();
 
   const accessToken = generateAccessToken(user, roles, domain, memberships);

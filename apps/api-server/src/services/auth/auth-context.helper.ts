@@ -15,7 +15,7 @@ import type { AuthTokens } from '../../types/auth.js';
 
 export interface UserContext {
   roles: string[];
-  memberships: { serviceKey: string; status: string }[];
+  memberships: { serviceKey: string; status: string; role?: string }[];
 }
 
 /**
@@ -26,9 +26,9 @@ export async function freshenUserContext(userId: string): Promise<UserContext> {
   const [roles, memberships] = await Promise.all([
     roleAssignmentService.getRoleNames(userId),
     AppDataSource.query(
-      `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+      `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
       [userId],
-    ) as Promise<{ serviceKey: string; status: string }[]>,
+    ) as Promise<{ serviceKey: string; status: string; role?: string }[]>,
   ]);
   return { roles, memberships };
 }
@@ -40,7 +40,7 @@ export async function freshenUserContext(userId: string): Promise<UserContext> {
 export async function generateTokensWithContext(
   user: User,
   domain: string = 'neture.co.kr',
-): Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string }[] }> {
+): Promise<{ tokens: AuthTokens; roles: string[]; memberships: { serviceKey: string; status: string; role?: string }[] }> {
   const ctx = await freshenUserContext(user.id);
   const tokens = tokenUtils.generateTokens(user, ctx.roles, domain, ctx.memberships);
   return { tokens, ...ctx };
@@ -53,7 +53,7 @@ export async function generateTokensWithContext(
 export function injectRolesIntoPublicData(
   publicData: Record<string, unknown>,
   roles: string[],
-  memberships?: { serviceKey: string; status: string }[],
+  memberships?: { serviceKey: string; status: string; role?: string }[],
 ): void {
   publicData.roles = roles;
   publicData.role = (roles[0] as any) || 'user';

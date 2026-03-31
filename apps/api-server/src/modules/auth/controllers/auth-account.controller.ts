@@ -82,7 +82,7 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       try {
         ud.memberships = await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+          `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
           [req.user.id]
         );
       } catch { ud.memberships = []; }
@@ -209,7 +209,7 @@ export class AuthAccountController extends BaseController {
       // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Include service memberships
       try {
         ud.memberships = await AppDataSource.query(
-          `SELECT service_key AS "serviceKey", status FROM service_memberships WHERE user_id = $1`,
+          `SELECT service_key AS "serviceKey", status, role FROM service_memberships WHERE user_id = $1`,
           [req.user.id]
         );
       } catch { ud.memberships = []; }

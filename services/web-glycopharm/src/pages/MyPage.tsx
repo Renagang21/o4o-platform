@@ -31,6 +31,8 @@ const roleLabels: Record<string, string> = {
   admin: '관리자',
   operator: '운영자',
   pharmacy: '약사',
+  pharmacist: '약사',
+  customer: '당뇨인',
   supplier: '공급자',
   partner: '파트너',
   consumer: '소비자',
@@ -39,6 +41,7 @@ const roleLabels: Record<string, string> = {
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: '승인 대기', color: 'yellow' },
   approved: { label: '승인됨', color: 'green' },
+  active: { label: '승인됨', color: 'green' },
   rejected: { label: '거부됨', color: 'red' },
   suspended: { label: '정지됨', color: 'gray' },
 };
@@ -207,7 +210,7 @@ export default function MyPage() {
                   {(user.lastName && user.firstName) ? `${user.lastName}${user.firstName}` : user.name}
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm text-slate-500">{roleLabels[user.roles[0]] || user.roles[0]}</span>
+                  <span className="text-sm text-slate-500">{roleLabels[user.memberships?.find(m => m.serviceKey === 'glycopharm')?.role || ''] || roleLabels[user.roles[0]] || user.roles[0]}</span>
                   <span className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${status.color}-100 text-${status.color}-700`}>
                     {status.label}
                   </span>
@@ -329,7 +332,7 @@ export default function MyPage() {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-slate-400">역할</p>
-                  <p className="text-sm font-medium text-slate-800">{roleLabels[user.roles[0]] || user.roles[0]}</p>
+                  <p className="text-sm font-medium text-slate-800">{roleLabels[user.memberships?.find(m => m.serviceKey === 'glycopharm')?.role || ''] || roleLabels[user.roles[0]] || user.roles[0]}</p>
                 </div>
               </div>
 
