@@ -591,6 +591,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Care Guideline routes:', guidelineError);
     }
 
+    // 28j. Register Care Action routes (WO-O4O-CARE-ACTION-ENGINE-V2.2)
+    try {
+      const { createCareActionRouter } = await import('../modules/care/controllers/care-action.controller.js');
+      app.use('/api/v1/care', createCareActionRouter(dataSource));
+      logger.info('✅ Care Action routes registered at /api/v1/care/actions');
+    } catch (actionError) {
+      logger.error('Failed to register Care Action routes:', actionError);
+    }
+
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
     try {
       const { createStoreAiRouter } = await import('../modules/store-ai/controllers/store-ai.controller.js');
@@ -944,6 +953,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.info('✅ User Debug endpoint registered at /__debug__/user');
     } catch (userDebugError) {
       logger.error('Failed to register User Debug routes:', userDebugError);
+    }
+
+    // Pharmacy Debug endpoint (임시 운영 도구)
+    try {
+      const { createPharmacyDebugRouter } = await import('../routes/debug/pharmacy-debug.controller.js');
+      app.use('/__debug__/pharmacy', createPharmacyDebugRouter(dataSource));
+      logger.info('✅ Pharmacy Debug endpoint registered at /__debug__/pharmacy');
+    } catch (pharmacyDebugError) {
+      logger.error('Failed to register Pharmacy Debug routes:', pharmacyDebugError);
     }
 
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
