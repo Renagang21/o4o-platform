@@ -176,6 +176,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [aiTags, setAiTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
   const [manualTags, setManualTags] = useState<Array<{ id: string; tag: string; confidence: number; source: string }>>([]);
   const [suggestedTags, setSuggestedTags] = useState<Array<{ tag: string; confidence: number }>>([]);
+  const [suggestAttempted, setSuggestAttempted] = useState(false);
   const [aiTagLoading, setAiTagLoading] = useState(false);
   const [aiSuggestLoading, setAiSuggestLoading] = useState(false);
   const [manualTagInput, setManualTagInput] = useState('');
@@ -368,6 +369,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (!product?.masterId) return;
     setAiSuggestLoading(true);
     setSuggestedTags([]);
+    setSuggestAttempted(false);
 
     const overrides = isEditing
       ? {
@@ -380,6 +382,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
     const suggestions = await productApi.suggestAiTags(product.masterId, overrides, purpose);
     setSuggestedTags(suggestions);
+    setSuggestAttempted(true);
     setAiSuggestLoading(false);
   };
 
@@ -943,6 +946,60 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             )}
           </Section>
 
+          {/* ── 후편집 체크리스트 (WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1) ── */}
+          {(() => {
+            const curationItems = [
+              { label: '카테고리', done: !!product.categoryId, partial: false },
+              {
+                label: 'B2C 설명',
+                done: !!(product.consumerShortDescription && product.consumerDetailDescription),
+                partial: !!(product.consumerShortDescription) !== !!(product.consumerDetailDescription),
+              },
+              {
+                label: 'B2B 설명',
+                done: !!(product.businessShortDescription && product.businessDetailDescription),
+                partial: !!(product.businessShortDescription) !== !!(product.businessDetailDescription),
+              },
+              {
+                label: '태그',
+                done: (product.tags?.length || 0) >= 3,
+                partial: (product.tags?.length || 0) > 0 && (product.tags?.length || 0) < 3,
+              },
+            ];
+            const isNeedsCuration = product.completenessStatus === 'DRAFT' || product.completenessStatus === 'INCOMPLETE';
+            if (!isNeedsCuration) return null;
+            return (
+              <div className="mb-4 p-3 bg-amber-50/60 border border-amber-200 rounded-xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">후편집 상태</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1.5 bg-amber-200 rounded-full overflow-hidden">
+                      <div className={`h-full ${scoreBgColor} rounded-full`} style={{ width: `${score}%` }} />
+                    </div>
+                    <span className={`text-xs font-medium ${scoreColor}`}>{score}%</span>
+                    <Badge className={compCfg.cls}>{compCfg.label}</Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {curationItems.map((item) => (
+                    <span key={item.label} className="flex items-center gap-1 text-xs">
+                      {item.done && !item.partial ? (
+                        <span className="text-emerald-600 font-bold">&#10003;</span>
+                      ) : item.partial ? (
+                        <span className="text-amber-600 font-bold">&#9651;</span>
+                      ) : (
+                        <span className="text-slate-400 font-bold">&#10007;</span>
+                      )}
+                      <span className={item.done && !item.partial ? 'text-emerald-700' : item.partial ? 'text-amber-700' : 'text-slate-500'}>
+                        {item.label}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ── 기본 정보 (read-only) ── */}
           {!isEditing && (
             <Section title="기본 정보">
@@ -952,7 +1009,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 <InfoRow label="규제명">{product.regulatoryName}</InfoRow>
               )}
               <InfoRow label="브랜드">{product.brandName || '-'}</InfoRow>
-              <InfoRow label="카테고리">{product.categoryName || '-'}</InfoRow>
+              <InfoRow label="카테고리">
+                {product.categoryName || <span className="text-amber-600 font-medium">미지정</span>}
+              </InfoRow>
               {product.specification && (
                 <InfoRow label="사양">{product.specification}</InfoRow>
               )}
@@ -986,6 +1045,79 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               {product.pricePlatinum != null && (
                 <InfoRow label="Platinum 가격">{formatPrice(product.pricePlatinum)}</InfoRow>
               )}
+            </Section>
+          )}
+
+          {/* ── 소비자 공개 설명 (B2C) ── */}
+          {!isEditing && (
+            <Section title="소비자 공개 설명 (B2C)">
+              {!product.consumerShortDescription && !product.consumerDetailDescription && (
+                <p className="text-xs text-amber-600 mb-2">소비자 공개용 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.</p>
+              )}
+              {product.consumerShortDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <ContentRenderer html={product.consumerShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+              {product.consumerDetailDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+            </Section>
+          )}
+
+          {/* ── 판매자 지원 설명 (B2B) ── */}
+          {!isEditing && (
+            <Section title="판매자 지원 설명 (B2B)">
+              {!product.businessShortDescription && !product.businessDetailDescription && (
+                <p className="text-xs text-amber-600 mb-2">판매자 지원 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.</p>
+              )}
+              {product.businessShortDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <ContentRenderer html={product.businessShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+              {product.businessDetailDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+            </Section>
+          )}
+
+          {/* ── 재고·기타 ── */}
+          {!isEditing && (
+            <Section title="재고 · 기타">
+              <InfoRow label="재고 수량">
+                {product.stockQuantity != null ? Number(product.stockQuantity).toLocaleString() : '0'}
+              </InfoRow>
+              <InfoRow label="등록일">{formatDate(product.createdAt)}</InfoRow>
+              <InfoRow label="수정일">{formatDate(product.updatedAt)}</InfoRow>
             </Section>
           )}
 
@@ -1061,75 +1193,14 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           ) : null}
 
-          {/* ── 소비자 공개 설명 (B2C) ── */}
-          {!isEditing && (
-            <Section title="소비자 공개 설명 (B2C)">
-              {product.consumerShortDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <ContentRenderer html={product.consumerShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-              {product.consumerDetailDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* ── 판매자 지원 설명 (B2B) ── */}
-          {!isEditing && (
-            <Section title="판매자 지원 설명 (B2B)">
-              {product.businessShortDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <ContentRenderer html={product.businessShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-              {product.businessDetailDescription ? (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
-                </div>
-              ) : (
-                <div>
-                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <p className="text-sm text-slate-400 italic">미작성</p>
-                </div>
-              )}
-            </Section>
-          )}
-
-          {/* ── 재고·기타 ── */}
-          {!isEditing && (
-            <Section title="재고 · 기타">
-              <InfoRow label="재고 수량">
-                {product.stockQuantity != null ? Number(product.stockQuantity).toLocaleString() : '0'}
-              </InfoRow>
-              <InfoRow label="등록일">{formatDate(product.createdAt)}</InfoRow>
-              <InfoRow label="수정일">{formatDate(product.updatedAt)}</InfoRow>
-            </Section>
-          )}
-
           {/* ── 태그 관리 (V2: 편집/읽기 모드 모두 표시) ── */}
           <Section title="태그 관리">
+            {/* WO-NETURE-BULK-PRODUCT-POST-IMPORT-CURATION-FLOW-V1: 태그 추천 안내 */}
+            {(!product.categoryId || (!product.consumerShortDescription && !product.consumerDetailDescription)) && (
+              <p className="text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 mb-3">
+                카테고리와 설명을 먼저 입력하면 더 정확한 태그가 추천됩니다.
+              </p>
+            )}
             {aiTagLoading ? (
               <div className="flex items-center justify-center py-3">
                 <Loader2 size={16} className="animate-spin text-slate-400" />
@@ -1177,6 +1248,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
                 {aiTags.length === 0 && manualTags.length === 0 && (
                   <p className="text-sm text-slate-400 mb-3">등록된 태그가 없습니다</p>
+                )}
+
+                {/* 추천 결과 0건 안내 */}
+                {suggestAttempted && suggestedTags.length === 0 && (
+                  <p className="text-xs text-slate-500 mb-3">추천할 새 태그가 없습니다. 설명을 보강하거나 수동으로 태그를 입력하세요.</p>
                 )}
 
                 {/* AI 추천 결과 — V2: 편집 모드에서는 multi-select */}
