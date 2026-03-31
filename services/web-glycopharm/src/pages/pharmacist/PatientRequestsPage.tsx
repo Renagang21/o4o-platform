@@ -6,9 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   UserPlus,
   CheckCircle,
   XCircle,
@@ -18,10 +16,9 @@ import {
 } from 'lucide-react';
 import { pharmacyApi } from '@/api/pharmacy';
 import type { PharmacyLinkRequestDto } from '@/api/pharmacy';
+import CareSubNav from '@/pages/care/CareSubNav';
 
 export default function PatientRequestsPage() {
-  const navigate = useNavigate();
-
   const [requests, setRequests] = useState<PharmacyLinkRequestDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -76,17 +73,10 @@ export default function PatientRequestsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6">
+    <div className="min-h-screen bg-slate-50">
+      <CareSubNav />
+      <div className="px-4 py-6">
       <div className="w-full max-w-lg mx-auto">
-        {/* Header */}
-        <button
-          onClick={() => navigate('/pharmacy')}
-          className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          돌아가기
-        </button>
-
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
             <UserPlus className="w-5 h-5 text-violet-600" />
@@ -212,6 +202,7 @@ export default function PatientRequestsPage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

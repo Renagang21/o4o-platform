@@ -425,6 +425,7 @@ function AppRoutes() {
         <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]} />}>
           <Route index element={<CareDashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
+          <Route path="patient-requests" element={<PharmacistPatientRequestsPage />} />
           {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}
           <Route path="patients/:id" element={<PatientDetailPage />}>
             <Route index element={<DataTab />} />
