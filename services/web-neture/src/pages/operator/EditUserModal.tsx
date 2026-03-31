@@ -30,6 +30,14 @@ export interface BusinessInfoData {
   zipCode?: string;
 }
 
+// ─── Role Options ───────────────────────────────────────────
+
+const NETURE_ROLE_OPTIONS = [
+  { value: 'supplier', label: '공급자' },
+  { value: 'partner', label: '파트너' },
+  { value: 'seller', label: '셀러' },
+];
+
 // ─── Component ───────────────────────────────────────────────
 
 export default function EditUserModal({ userId, onClose, onSuccess }: { userId: string; onClose: () => void; onSuccess: () => void }) {
@@ -37,6 +45,8 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [hasBusinessInfo, setHasBusinessInfo] = useState(false);
+  const [currentRole, setCurrentRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
 
   const [form, setForm] = useState({
     lastName: '',
@@ -58,6 +68,10 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
       try {
         const { data } = await api.get(`/operator/members/${userId}`);
         const u = data.user;
+        const roles: string[] = u.roles || (u.role ? [u.role] : []);
+        const primaryRole = roles[0] || '';
+        setCurrentRole(primaryRole);
+        setSelectedRole(primaryRole);
         const biz: BusinessInfoData = u.businessInfo || {};
         const hasBiz = !!(biz.businessName || u.company);
         setHasBusinessInfo(hasBiz);
@@ -115,6 +129,17 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
         payload.address2 = form.address2;
       }
       await api.put(`/operator/members/${userId}`, payload);
+
+      // Role 변경 처리
+      if (selectedRole && selectedRole !== currentRole) {
+        // 기존 role 제거
+        if (currentRole) {
+          await api.delete(`/operator/members/${userId}/roles/${encodeURIComponent(currentRole)}`).catch(() => {}); // 이미 없으면 무시
+        }
+        // 새 role 할당
+        await api.post(`/operator/members/${userId}/roles`, { role: selectedRole });
+      }
+
       toast.success('회원정보가 수정되었습니다.');
       onSuccess();
       onClose();
@@ -174,6 +199,26 @@ export default function EditUserModal({ userId, onClose, onSuccess }: { userId: 
                     placeholder="숫자만 입력" />
                 </div>
               </div>
+            </div>
+
+            {/* 역할 변경 */}
+            <div className="pt-3 border-t">
+              <h4 className="text-sm font-semibold text-slate-700 mb-3">역할</h4>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">선택</option>
+                {NETURE_ROLE_OPTIONS.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {selectedRole !== currentRole && (
+                <p className="text-xs text-amber-600 mt-1">
+                  역할이 변경됩니다: {currentRole || '없음'} → {selectedRole || '없음'}
+                </p>
+              )}
             </div>
 
             {/* 사업자 정보 */}
