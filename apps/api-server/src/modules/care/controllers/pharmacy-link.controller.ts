@@ -239,6 +239,58 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
     }
   });
 
+  /**
+   * POST /pharmacy-link/disconnect
+   * 환자가 현재 약국 연결 해제
+   */
+  router.post('/pharmacy-link/disconnect', authenticate, async (req, res) => {
+    try {
+      const authReq = req as AuthRequest;
+      const user = authReq.user;
+      if (!user) {
+        res.status(401).json({
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        });
+        return;
+      }
+
+      // Find current link
+      const existing = await dataSource.query(
+        `SELECT id, organization_id FROM glucoseview_customers WHERE email = $1 LIMIT 1`,
+        [user.email],
+      );
+
+      if (existing.length === 0) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_LINKED', message: 'No pharmacy link found' },
+        });
+        return;
+      }
+
+      // Delete the customer record (disconnects from pharmacy)
+      await dataSource.query(
+        `DELETE FROM glucoseview_customers WHERE id = $1`,
+        [existing[0].id],
+      );
+
+      console.info('[pharmacy-link] Patient disconnected', {
+        userId: user.id,
+        email: user.email,
+        previousPharmacyId: existing[0].organization_id,
+      });
+
+      res.json({ success: true, data: { disconnected: true } });
+    } catch (error) {
+      console.error('[pharmacy-link] POST disconnect failed:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to disconnect' },
+      });
+    }
+  });
+
   // ─── Pharmacist APIs ───
 
   /**

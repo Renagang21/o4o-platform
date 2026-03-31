@@ -33,6 +33,7 @@ export default function SelectPharmacyPage() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [disconnecting, setDisconnecting] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -72,6 +73,19 @@ export default function SelectPharmacyPage() {
       setError('네트워크 오류가 발생했습니다.');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    if (!confirm('현재 약국 연결을 해제하시겠습니까?\n해제 후 다른 약국을 선택할 수 있습니다.')) return;
+    setDisconnecting(true);
+    try {
+      await patientApi.disconnectPharmacy();
+      setLinkStatus({ linked: false });
+    } catch {
+      setError('연결 해제에 실패했습니다.');
+    } finally {
+      setDisconnecting(false);
     }
   };
 
@@ -137,9 +151,16 @@ export default function SelectPharmacyPage() {
             <p className="text-base font-medium text-emerald-700 mb-4">
               {linkStatus.pharmacyName}
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-400 mb-4">
               혈당 기록을 입력하면 담당 약사가 확인할 수 있습니다.
             </p>
+            <button
+              onClick={handleDisconnect}
+              disabled={disconnecting}
+              className="px-5 py-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-xl hover:bg-white hover:text-red-600 hover:border-red-300 transition-colors disabled:opacity-50"
+            >
+              {disconnecting ? '처리 중...' : '다른 약국으로 변경'}
+            </button>
           </div>
         ) : linkStatus?.pendingRequest ? (
           /* ── Pending Request ── */
