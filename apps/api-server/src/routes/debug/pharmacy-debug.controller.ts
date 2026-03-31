@@ -39,7 +39,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
           o.name AS org_name,
           gp.name AS gp_name,
           o."isActive",
-          o.created_at,
+          o."createdAt",
           COALESCE(pc.cnt, 0)::int AS patient_count
         FROM organizations o
         JOIN organization_service_enrollments e
@@ -52,7 +52,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
           FROM glucoseview_customers
           GROUP BY organization_id
         ) pc ON pc.organization_id = o.id
-        ORDER BY o.created_at
+        ORDER BY o."createdAt"
       `);
 
       const tableRows = rows.map((r: any) => `<tr>
