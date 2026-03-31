@@ -171,7 +171,7 @@ export class OfferServiceApprovalService {
              + CASE WHEN spo.distribution_type IS NOT NULL THEN 10 ELSE 0 END
              + CASE WHEN pm.category_id IS NOT NULL THEN 10 ELSE 0 END
              + CASE WHEN pm.brand_id IS NOT NULL THEN 10 ELSE 0 END
-             + CASE WHEN pm.tags IS NOT NULL AND array_length(pm.tags, 1) > 0 THEN 10 ELSE 0 END
+             + CASE WHEN pm.tags IS NOT NULL AND jsonb_array_length(pm.tags) > 0 THEN 10 ELSE 0 END
              + CASE WHEN spo.business_short_description IS NOT NULL AND spo.business_short_description != '' THEN 10 ELSE 0 END
              + CASE WHEN spo.business_detail_description IS NOT NULL AND spo.business_detail_description != '' THEN 10 ELSE 0 END
            ) AS "completenessScore",
