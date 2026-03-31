@@ -96,7 +96,7 @@ export default function RegisterPage() {
         password: form.password,
         name: form.name,
         phone: normalizedPhone,
-        role: 'user',
+        role: 'customer',
         service: 'glucoseview',
       });
 

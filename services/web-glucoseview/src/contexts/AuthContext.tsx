@@ -82,8 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const roles = extractRoles(apiUser, ['glucoseview:patient']);
 
           // WO-O4O-GLUCOSEVIEW-AUTH-ROLE-GUARD-V1: 당뇨인 전용 서비스
-          // customer/user = GlycoPharm/GlucoseView 가입 시 legacy role
-          const PATIENT_ROLES = ['glucoseview:patient', 'customer', 'user'];
+          // customer = GlycoPharm/GlucoseView 공통 당뇨인 role, user = 기존 가입자 호환
+          const PATIENT_ROLES = ['customer', 'user'];
           if (!roles.some(r => PATIENT_ROLES.includes(r))) {
             clearAllTokens();
             setIsLoading(false);
