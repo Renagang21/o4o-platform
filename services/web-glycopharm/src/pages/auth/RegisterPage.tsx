@@ -117,7 +117,7 @@ export default function RegisterPage() {
         firstName: formData.firstName,
         nickname: formData.nickname,
         phone: formData.phone.replace(/\D/g, ''),
-        role: memberType === 'pharmacy' ? 'seller' : 'customer',
+        role: memberType === 'pharmacy' ? 'pharmacy' : 'customer',
         service: 'glycopharm',
         ...(memberType === 'pharmacy' && {
           businessName: formData.businessName || undefined,

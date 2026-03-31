@@ -89,7 +89,7 @@ export { GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP, getGlycopharmDashbo
 export const GLYCOPHARM_ROLES = {
   ADMIN: 'glycopharm:admin',
   OPERATOR: 'glycopharm:operator',
-  PHARMACY: 'seller',
+  PHARMACY: 'pharmacy',
   SUPPLIER: 'supplier',
   CONSUMER: 'customer',
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',

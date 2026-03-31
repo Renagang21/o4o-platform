@@ -44,7 +44,7 @@ export class AuthRegisterController extends BaseController {
       const smRepository = AppDataSource.getRepository(ServiceMembership);
 
       // Phase 3: membershipType에 따라 role 분기
-      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business', 'partner', 'supplier', 'manager', 'customer'];
+      const VALID_ROLES = ['super_admin', 'admin', 'vendor', 'seller', 'user', 'business', 'partner', 'supplier', 'manager', 'customer', 'pharmacy'];
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
