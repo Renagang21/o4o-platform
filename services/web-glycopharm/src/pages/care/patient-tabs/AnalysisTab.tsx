@@ -27,7 +27,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto, type TimeBasedAnalysisDto } from '@/api/pharmacy';
-import { Clock, Utensils, Footprints } from 'lucide-react';
+import { Clock, Utensils, Footprints, BookOpen } from 'lucide-react';
 import { usePatientDetail } from '../PatientDetailPage';
 import { RISK_DISPLAY } from '@/constants/care-display';
 
@@ -500,6 +500,9 @@ export default function AnalysisTab() {
       case 'resolve_alert':
         navigate(`/care/patients/${patient.id}`);
         break;
+      case 'link_guideline':
+        navigate(`/care/patients/${patient.id}/coaching`, { state: { openForm: true } });
+        break;
     }
   }, [patient?.id, navigate]);
 
@@ -812,7 +815,7 @@ export default function AnalysisTab() {
 
       {/* 시간 기반 분석 — WO-O4O-CARE-TIME-BASED-ANALYSIS-V1 */}
       {timeAnalysis && (timeAnalysis.timeBuckets.length > 0 || timeAnalysis.mealTimingStats.length > 0) && (
-        <TimeBasedAnalysisSection data={timeAnalysis} />
+        <TimeBasedAnalysisSection data={timeAnalysis} onActionExecute={handleCareAction} />
       )}
 
       {/* 혈압 추이 차트 — WO-O4O-GLYCOPHARM-ANALYSIS-TAB-BP-WEIGHT-CHART-EXPANSION-V1 */}
@@ -1057,6 +1060,7 @@ const CARE_ACTION_ICONS: Record<string, React.ComponentType<{ className?: string
   create_coaching: MessageSquare,
   run_analysis: BarChart3,
   resolve_alert: CheckCircle2,
+  link_guideline: BookOpen,
 };
 
 const PRIORITY_STYLES: Record<string, { border: string; bg: string; text: string }> = {
@@ -1115,7 +1119,7 @@ const MEAL_TIMING_DISPLAY: Record<string, string> = {
   random: '수시',
 };
 
-function TimeBasedAnalysisSection({ data }: { data: TimeBasedAnalysisDto }) {
+function TimeBasedAnalysisSection({ data, onActionExecute }: { data: TimeBasedAnalysisDto; onActionExecute: (action: CareGeneratedActionDto) => void }) {
   const maxBucketAvg = Math.max(...data.timeBuckets.map(b => b.avg), 1);
 
   return (
@@ -1251,6 +1255,21 @@ function TimeBasedAnalysisSection({ data }: { data: TimeBasedAnalysisDto }) {
           )}
         </div>
       </div>
+
+      {/* Action cards — WO-O4O-CARE-ACTION-ENGINE-V2.1 */}
+      {data.actions && data.actions.length > 0 && (
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-200 p-4">
+          <h5 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
+            <AlertCircle className="w-3.5 h-3.5 text-blue-500" />
+            권장 조치
+          </h5>
+          <div className="space-y-2">
+            {data.actions.map((action, i) => (
+              <CareActionButton key={i} action={action} onExecute={onActionExecute} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
