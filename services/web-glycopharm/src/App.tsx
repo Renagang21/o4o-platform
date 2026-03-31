@@ -414,7 +414,7 @@ function AppRoutes() {
 
         {/* Store Entry Portal (WO-STORE-MAIN-ENTRY-LAYOUT-V1) */}
         <Route path="store" element={
-          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]}>
+          <SoftGuard feature="store" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, 'glycopharm:pharmacy', 'seller']}>
             <StoreEntryPage />
           </SoftGuard>
         } />
@@ -422,7 +422,7 @@ function AppRoutes() {
 
       {/* Care Routes (WO-GLYCOPHARM-SOFT-GUARD-INTRO-V1: SoftGuard로 전환) */}
       <Route path="care" element={<MainLayout />}>
-        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]} />}>
+        <Route element={<SoftGuardOutlet feature="care" allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, 'glycopharm:pharmacy', 'seller']} />}>
           <Route index element={<CareDashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
           {/* Patient Detail with nested tabs (WO-O4O-PATIENT-DETAIL-CARE-WORKSPACE-V1) */}
@@ -585,7 +585,7 @@ function AppRoutes() {
       <Route
         path="store"
         element={
-          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACY]}>
+          <ProtectedRoute allowedRoles={[GLYCOPHARM_ROLES.PHARMACY, 'glycopharm:pharmacy', 'seller']}>
             <StoreLayoutWrapper />
           </ProtectedRoute>
         }
