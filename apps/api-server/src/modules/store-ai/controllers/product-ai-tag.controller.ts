@@ -60,6 +60,7 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
   });
 
   // POST /:productId/ai-tags/suggest — AI 태그 추천 (non-destructive, WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1)
+  // WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: optional override payload 지원
   router.post('/:productId/ai-tags/suggest', authenticate, async (req, res) => {
     try {
       const { productId } = req.params;
@@ -70,7 +71,25 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const suggestions = await taggingService.suggestTags(product);
+      // WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: override 병합 (편집 중 값 우선)
+      const overrides = req.body?.overrides;
+      if (overrides && typeof overrides === 'object') {
+        const stripHtml = (v: unknown) =>
+          typeof v === 'string' ? v.replace(/<[^>]*>/g, '').trim() || null : null;
+
+        if (overrides.consumerShortDescription !== undefined)
+          product.consumerShortDescription = stripHtml(overrides.consumerShortDescription);
+        if (overrides.consumerDetailDescription !== undefined)
+          product.consumerDetailDescription = stripHtml(overrides.consumerDetailDescription);
+        if (overrides.businessShortDescription !== undefined)
+          product.businessShortDescription = stripHtml(overrides.businessShortDescription);
+        if (overrides.businessDetailDescription !== undefined)
+          product.businessDetailDescription = stripHtml(overrides.businessDetailDescription);
+      }
+
+      // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: purpose 분기
+      const purpose = req.body?.purpose === 'b2b' ? 'b2b' as const : 'b2c' as const;
+      const suggestions = await taggingService.suggestTags(product, purpose);
       res.json({ success: true, data: { suggestions } });
     } catch (error) {
       console.error('[ProductAiTag] suggest error:', error);
@@ -162,7 +181,9 @@ async function loadProductTagInput(
          pc.name AS "categoryName",
          b.name AS "brandName",
          spo.consumer_detail_description AS "consumerDetailDescription",
-         spo.consumer_short_description AS "consumerShortDescription"
+         spo.consumer_short_description AS "consumerShortDescription",
+         spo.business_detail_description AS "businessDetailDescription",
+         spo.business_short_description AS "businessShortDescription"
        FROM product_masters pm
        LEFT JOIN product_categories pc ON pc.id = pm.category_id
        LEFT JOIN brands b ON b.id = pm.brand_id
@@ -189,6 +210,12 @@ async function loadProductTagInput(
         : null,
       consumerShortDescription: r.consumerShortDescription
         ? r.consumerShortDescription.replace(/<[^>]*>/g, '').trim()
+        : null,
+      businessDetailDescription: r.businessDetailDescription
+        ? r.businessDetailDescription.replace(/<[^>]*>/g, '').trim()
+        : null,
+      businessShortDescription: r.businessShortDescription
+        ? r.businessShortDescription.replace(/<[^>]*>/g, '').trim()
         : null,
       existingTags: Array.isArray(r.existingTags) ? r.existingTags : [],
     };

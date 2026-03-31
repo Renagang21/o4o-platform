@@ -172,10 +172,22 @@ export const productApi = {
     }
   },
 
-  /** WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI 태그 추천 (non-destructive) */
-  async suggestAiTags(masterId: string): Promise<Array<{ tag: string; confidence: number }>> {
+  /** WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: AI 태그 추천 (B2C/B2B 전략 분리) */
+  async suggestAiTags(
+    masterId: string,
+    overrides?: {
+      consumerShortDescription?: string | null;
+      consumerDetailDescription?: string | null;
+      businessShortDescription?: string | null;
+      businessDetailDescription?: string | null;
+    },
+    purpose?: 'b2c' | 'b2b',
+  ): Promise<Array<{ tag: string; confidence: number }>> {
     try {
-      const response = await api.post(`/products/${masterId}/ai-tags/suggest`);
+      const body: Record<string, unknown> = {};
+      if (overrides) body.overrides = overrides;
+      if (purpose) body.purpose = purpose;
+      const response = await api.post(`/products/${masterId}/ai-tags/suggest`, Object.keys(body).length > 0 ? body : undefined);
       return response.data?.data?.suggestions || [];
     } catch (error) {
       console.warn('[Product API] Failed to suggest AI tags:', error);

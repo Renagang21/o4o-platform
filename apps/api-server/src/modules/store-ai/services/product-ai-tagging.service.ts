@@ -1,6 +1,6 @@
 import type { DataSource, Repository } from 'typeorm';
 import { execute } from '@o4o/ai-core';
-import { PRODUCT_TAGGING_SYSTEM } from '@o4o/ai-prompts/store';
+import { PRODUCT_TAGGING_SYSTEM, PRODUCT_TAGGING_B2B_SYSTEM } from '@o4o/ai-prompts/store';
 import { ProductAiTag } from '../entities/product-ai-tag.entity.js';
 import { ProductMaster } from '../../neture/entities/ProductMaster.entity.js';
 import { buildConfigResolver } from '../../../utils/ai-config-resolver.js';
@@ -35,6 +35,10 @@ export interface ProductTagInput {
   regulatoryType?: string | null;
   /** V2: B2C 소비자 간단 소개 */
   consumerShortDescription?: string | null;
+  /** WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: B2B 사업자 상세 설명 */
+  businessDetailDescription?: string | null;
+  /** WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: B2B 사업자 간단 소개 */
+  businessShortDescription?: string | null;
   /** 기존 태그 목록 (중복 방지용) */
   existingTags?: string[];
 }
@@ -55,7 +59,7 @@ export class ProductAiTaggingService {
    */
   async generateTags(product: ProductTagInput): Promise<void> {
     try {
-      const userPrompt = this.buildUserPrompt(product);
+      const userPrompt = this.buildB2cUserPrompt(product);
 
       const result = await execute({
         systemPrompt: PRODUCT_TAGGING_SYSTEM,
@@ -97,19 +101,25 @@ export class ProductAiTaggingService {
   }
 
   /**
-   * WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1
+   * WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1
    * Non-destructive: LLM에서 태그 추천만 받고, DB에 저장하지 않음.
-   * 기존 태그와 중복되지 않는 새 태그만 반환.
+   * purpose에 따라 B2C(소비자 검색/노출) 또는 B2B(판매 포인트/운영) 전략으로 추천.
    */
-  async suggestTags(product: ProductTagInput): Promise<Array<{ tag: string; confidence: number }>> {
+  async suggestTags(
+    product: ProductTagInput,
+    purpose: 'b2c' | 'b2b' = 'b2c',
+  ): Promise<Array<{ tag: string; confidence: number }>> {
     try {
-      const userPrompt = this.buildUserPrompt(product);
+      const systemPrompt = purpose === 'b2b' ? PRODUCT_TAGGING_B2B_SYSTEM : PRODUCT_TAGGING_SYSTEM;
+      const userPrompt = purpose === 'b2b'
+        ? this.buildB2bUserPrompt(product)
+        : this.buildB2cUserPrompt(product);
 
       const result = await execute({
-        systemPrompt: PRODUCT_TAGGING_SYSTEM,
+        systemPrompt,
         userPrompt,
         config: this.configResolver,
-        meta: { service: 'store', callerName: 'ProductAiTaggingService.suggestTags' },
+        meta: { service: 'store', callerName: `ProductAiTaggingService.suggestTags.${purpose}` },
       });
       const parsed = JSON.parse(result.content) as LlmTagResponse;
 
@@ -119,13 +129,27 @@ export class ProductAiTaggingService {
 
       // Filter out existing tags
       const existingSet = new Set((product.existingTags || []).map((t) => t.toLowerCase()));
-      return parsed.tags
+      const filtered = parsed.tags
         .slice(0, 8)
         .filter((t) => !existingSet.has(t.tag.toLowerCase()))
         .map((t) => ({
           tag: t.tag,
           confidence: Math.min(1, Math.max(0, t.confidence)),
         }));
+
+      // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: 카테고리 마지막 이름 강제 포함 정책
+      if (product.categoryName) {
+        const parts = product.categoryName.split('>').map((s) => s.trim());
+        const leafCategory = parts[parts.length - 1];
+        if (leafCategory
+          && !existingSet.has(leafCategory.toLowerCase())
+          && !filtered.some((t) => t.tag.toLowerCase() === leafCategory.toLowerCase())
+        ) {
+          filtered.unshift({ tag: leafCategory, confidence: 1.0 });
+        }
+      }
+
+      return filtered.slice(0, 8);
     } catch (error) {
       console.error('[ProductAiTag] suggestTags error:', error);
       return [];
@@ -234,23 +258,9 @@ export class ProductAiTaggingService {
     }
   }
 
-  private buildUserPrompt(product: ProductTagInput): string {
+  // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: 공통 상품 정보 블록
+  private buildProductInfoBlock(product: ProductTagInput): string[] {
     const parts: string[] = [];
-
-    // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: B2C 설명 최우선
-    if (product.consumerDetailDescription) {
-      parts.push(`[소비자 상세 설명]`);
-      parts.push(product.consumerDetailDescription);
-      parts.push('');
-    }
-
-    // V2: B2C 간단 소개 (보조)
-    if (product.consumerShortDescription) {
-      parts.push(`[소비자 간단 소개]`);
-      parts.push(product.consumerShortDescription);
-      parts.push('');
-    }
-
     parts.push(`[상품 정보]`);
     parts.push(`- 식약처명: ${product.regulatoryName}`);
     parts.push(`- 마케팅명: ${product.marketingName}`);
@@ -258,9 +268,69 @@ export class ProductAiTaggingService {
     if (product.categoryName) parts.push(`- 카테고리: ${product.categoryName}`);
     if (product.brandName) parts.push(`- 브랜드: ${product.brandName}`);
     parts.push(`- 제조사: ${product.manufacturerName}`);
-    // V2: 규제 유형 (건강기능식품, 의약품, 의약외품 등)
     if (product.regulatoryType && product.regulatoryType !== 'GENERAL') {
       parts.push(`- 규제 유형: ${product.regulatoryType}`);
+    }
+    return parts;
+  }
+
+  // B2C 전략: 소비자 설명 최우선, B2B 설명 미포함
+  private buildB2cUserPrompt(product: ProductTagInput): string {
+    const parts: string[] = [];
+
+    if (product.consumerDetailDescription) {
+      parts.push(`[소비자 상세 설명]`);
+      parts.push(product.consumerDetailDescription);
+      parts.push('');
+    }
+    if (product.consumerShortDescription) {
+      parts.push(`[소비자 간단 소개]`);
+      parts.push(product.consumerShortDescription);
+      parts.push('');
+    }
+
+    parts.push(...this.buildProductInfoBlock(product));
+
+    if (product.existingTags?.length) {
+      parts.push('');
+      parts.push(`[기존 태그 (중복 제외)]`);
+      parts.push(product.existingTags.join(', '));
+    }
+
+    return parts.join('\n');
+  }
+
+  // B2B 전략: B2B 설명 최우선, B2C 설명 보조 참고
+  private buildB2bUserPrompt(product: ProductTagInput): string {
+    const parts: string[] = [];
+
+    if (product.businessDetailDescription) {
+      parts.push(`[사업자 상세 설명]`);
+      parts.push(product.businessDetailDescription);
+      parts.push('');
+    }
+    if (product.businessShortDescription) {
+      parts.push(`[사업자 간단 소개]`);
+      parts.push(product.businessShortDescription);
+      parts.push('');
+    }
+
+    parts.push(...this.buildProductInfoBlock(product));
+
+    // B2C 설명은 보조 참고로만 포함
+    if (product.consumerDetailDescription || product.consumerShortDescription) {
+      parts.push('');
+      parts.push(`[소비자 설명 참고]`);
+      if (product.consumerShortDescription) {
+        parts.push(product.consumerShortDescription);
+      }
+      if (product.consumerDetailDescription) {
+        // 보조이므로 앞 200자만
+        const trimmed = product.consumerDetailDescription.length > 200
+          ? product.consumerDetailDescription.slice(0, 200) + '...'
+          : product.consumerDetailDescription;
+        parts.push(trimmed);
+      }
     }
 
     if (product.existingTags?.length) {

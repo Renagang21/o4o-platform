@@ -5,13 +5,14 @@
  * WO-O4O-NETURE-SUPPLIER-DRAWER-EDITABLE-V1
  * WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1 — ProductForm 통합
  * WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1 — B2B 상세 설명 에디터에 템플릿 기능 연결
+ * WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1 — 공개/B2C + 판매/B2B 편집 진입점 2개 구조
  *
  * 조회 모드: read-only 섹션
- * 수정 모드: ProductForm mode="edit" 사용
+ * 수정 모드: ProductForm mode="edit" 사용 (editMode: 'b2c' | 'b2b')
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus } from 'lucide-react';
+import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, Briefcase, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
 import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
@@ -132,7 +133,11 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
 const ACCEPTED_IMAGE_TYPES = 'image/jpeg,image/png,image/webp';
 
 export default function ProductDetailDrawer({ product, open, onClose, onSaved, approvalActions }: ProductDetailDrawerProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  // WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1: dual edit mode
+  const [editMode, setEditMode] = useState<'b2c' | 'b2b' | null>(null);
+  const isEditing = editMode !== null;
+  const [showSecondaryEdit, setShowSecondaryEdit] = useState(false);
+  const b2bEditRef = useRef<HTMLDivElement>(null);
   const [saving, setSaving] = useState(false);
   const [showDirtyConfirm, setShowDirtyConfirm] = useState(false);
 
@@ -161,6 +166,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [editOrigin, setEditOrigin] = useState('');
   const [editBizShort, setEditBizShort] = useState('');
   const [editBizDetail, setEditBizDetail] = useState('');
+  // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C description editing state
+  const [editConsumerShort, setEditConsumerShort] = useState('');
+  const [editConsumerDetail, setEditConsumerDetail] = useState('');
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
   const [brands, setBrands] = useState<BrandItem[]>([]);
 
@@ -211,7 +219,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   // Reset state when product changes
   useEffect(() => {
     if (product) {
-      setIsEditing(false);
+      setEditMode(null);
+      setShowSecondaryEdit(false);
       setShowDirtyConfirm(false);
       formRef.current = null;
       isDirtyRef.current = false;
@@ -226,8 +235,29 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     isDirtyRef.current = dirty;
   }, []);
 
+  // WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1: startEdit initializes fields and sets mode
+  const startEdit = useCallback((mode: 'b2c' | 'b2b') => {
+    if (!product) return;
+    setEditCategory(product.categoryId || null);
+    setEditBrand(product.brandId || null);
+    setEditSpec(product.specification || '');
+    setEditOrigin(product.originCountry || '');
+    setEditBizShort(product.businessShortDescription || '');
+    setEditBizDetail(product.businessDetailDescription || '');
+    setEditConsumerShort(product.consumerShortDescription || '');
+    setEditConsumerDetail(product.consumerDetailDescription || '');
+    productApi.getCategories().then(setCategories);
+    productApi.getBrands().then(setBrands);
+    setShowSecondaryEdit(false);
+    setEditMode(mode);
+    if (mode === 'b2b') {
+      setTimeout(() => b2bEditRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+    }
+  }, [product]);
+
   const cancelEdit = useCallback(() => {
-    setIsEditing(false);
+    setEditMode(null);
+    setShowSecondaryEdit(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -235,7 +265,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       setShowDirtyConfirm(true);
       return;
     }
-    setIsEditing(false);
+    setEditMode(null);
     onClose();
   }, [isEditing, onClose]);
 
@@ -283,6 +313,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         brandId: editBrand || null,
         specification: editSpec || null,
         originCountry: editOrigin || null,
+        // WO-NETURE-PRODUCT-DRAWER-B2C-EDIT-RESTORE-V1: B2C 설명 저장 복구
+        consumerShortDescription: editConsumerShort.trim() || null,
+        consumerDetailDescription: editConsumerDetail.trim() || null,
       };
       console.log('[ProductDetailDrawer] save payload:', payload);
 
@@ -317,7 +350,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         }
       }
 
-      setIsEditing(false);
+      setEditMode(null);
+      setShowSecondaryEdit(false);
       onSaved?.();
     } catch (error) {
       console.error('[ProductDetailDrawer] save error:', error);
@@ -328,11 +362,23 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   };
 
   // WO-NETURE-SUPPLIER-TAG-AI-B2C-ALIGNMENT-V1: AI tag handlers
-  const handleAiSuggest = async () => {
+  // WO-NETURE-AI-TAG-EDITING-OVERRIDE-INPUT-V1: 편집 중 값을 override로 전달
+  // WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1: purpose별 AI 태그 추천
+  const handleAiSuggest = async (purpose: 'b2c' | 'b2b') => {
     if (!product?.masterId) return;
     setAiSuggestLoading(true);
     setSuggestedTags([]);
-    const suggestions = await productApi.suggestAiTags(product.masterId);
+
+    const overrides = isEditing
+      ? {
+          consumerShortDescription: editConsumerShort.trim() || null,
+          consumerDetailDescription: editConsumerDetail.trim() || null,
+          businessShortDescription: editBizShort.trim() || null,
+          businessDetailDescription: editBizDetail.trim() || null,
+        }
+      : undefined;
+
+    const suggestions = await productApi.suggestAiTags(product.masterId, overrides, purpose);
     setSuggestedTags(suggestions);
     setAiSuggestLoading(false);
   };
@@ -503,24 +549,26 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {!isEditing && !approvalActions && (
-              <button
-                onClick={() => {
-                  // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: initialize Master fields on edit
-                  setEditCategory(product.categoryId || null);
-                  setEditBrand(product.brandId || null);
-                  setEditSpec(product.specification || '');
-                  setEditOrigin(product.originCountry || '');
-                  setEditBizShort(product.businessShortDescription || '');
-                  setEditBizDetail(product.businessDetailDescription || '');
-                  productApi.getCategories().then(setCategories);
-                  productApi.getBrands().then(setBrands);
-                  setIsEditing(true);
-                }}
-                className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600"
-                title="수정"
-              >
-                <Pencil size={16} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => startEdit('b2c')}
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg"
+                  title="소비자 공개 정보 편집 (공통 + B2C)"
+                  aria-label="공개/B2C 편집"
+                >
+                  <Pencil size={14} />
+                  <span className="hidden sm:inline">공개</span>
+                </button>
+                <button
+                  onClick={() => startEdit('b2b')}
+                  className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-teal-700 hover:bg-teal-50 rounded-lg"
+                  title="판매자 지원 정보 편집 (B2B)"
+                  aria-label="판매/B2B 편집"
+                >
+                  <Briefcase size={14} />
+                  <span className="hidden sm:inline">판매</span>
+                </button>
+              </div>
             )}
             <button
               onClick={handleClose}
@@ -535,8 +583,72 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
 
-          {/* ── 수정 모드: ProductForm ── */}
+          {/* ── 편집 모드 배너 (WO-NETURE-PRODUCT-DRAWER-DUAL-EDIT-ENTRY-V1) ── */}
           {isEditing && (
+            <div className={`mb-4 px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
+              editMode === 'b2c' ? 'bg-blue-50 text-blue-700' : 'bg-teal-50 text-teal-700'
+            }`}>
+              {editMode === 'b2c' ? <Pencil size={14} /> : <Briefcase size={14} />}
+              {editMode === 'b2c' ? '공개/B2C 편집 모드' : '판매/B2B 편집 모드'}
+            </div>
+          )}
+
+          {/* ── B2B 모드: B2B 설명 우선 표시 ── */}
+          {isEditing && editMode === 'b2b' && (
+            <div ref={b2bEditRef} className="mb-5 p-4 bg-teal-50/40 border border-teal-200 rounded-xl space-y-4">
+              <h4 className="text-xs font-semibold text-teal-600 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
+                <RichTextEditor
+                  value={editBizShort}
+                  onChange={(c) => setEditBizShort(c.html)}
+                  editable={!saving}
+                  placeholder="거래처용 간단 소개"
+                  minHeight="80px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">B2B 상세 설명</label>
+                <RichTextEditor
+                  value={editBizDetail}
+                  onChange={(c) => setEditBizDetail(c.html)}
+                  editable={!saving}
+                  placeholder="거래처용 상세 설명"
+                  minHeight="150px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
+                  showTemplateActions
+                  templates={tpl.templates}
+                  templatesLoading={tpl.loading}
+                  templatesSaving={tpl.saving}
+                  onLoadTemplates={tpl.loadTemplates}
+                  onSaveAsTemplate={(name, category, isPublic) =>
+                    tpl.saveTemplate(editBizDetail, name, category, isPublic)
+                  }
+                  onUseTemplate={tpl.recordUse}
+                  canCreatePublicTemplate={canCreatePublicTemplate}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── 보조 섹션 토글 ── */}
+          {isEditing && (
+            <button
+              onClick={() => setShowSecondaryEdit(!showSecondaryEdit)}
+              className="mb-4 flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+            >
+              {showSecondaryEdit ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              {editMode === 'b2c' ? 'B2B 설명도 편집' : '기본 정보 / B2C도 편집'}
+            </button>
+          )}
+
+          {/* ── 수정 모드: ProductForm ── */}
+          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
             <div className="mb-5 p-4 bg-amber-50/40 border border-amber-200 rounded-xl">
               <h4 className="text-xs font-semibold text-amber-600 uppercase tracking-wider mb-3">수정</h4>
               <ProductForm
@@ -548,10 +660,10 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </div>
           )}
 
-          {/* ── 수정 모드: Master 필드 + B2B 설명 (WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1) ── */}
-          {isEditing && (
+          {/* ── 수정 모드: 공통 기본 정보 ── */}
+          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
             <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보 수정</h4>
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보</h4>
 
               {/* 카테고리 */}
               <div>
@@ -612,11 +724,56 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
                 />
               </div>
+            </div>
+          )}
 
-              {/* 태그: V2에서 "태그 관리" 섹션으로 통합 (product_ai_tags API 기반) */}
+          {/* ── 수정 모드: 소비자 공개 설명 (B2C) ── */}
+          {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
+            <div className="mb-5 p-4 bg-emerald-50/40 border border-emerald-200 rounded-xl space-y-4">
+              <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">소비자 공개 설명 (B2C)</h4>
 
-              {/* B2B 설명 */}
-              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider pt-2">B2B 설명</h4>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">소비자 간단 소개</label>
+                <RichTextEditor
+                  value={editConsumerShort}
+                  onChange={(c) => setEditConsumerShort(c.html)}
+                  editable={!saving}
+                  placeholder="소비자에게 보이는 간단 소개"
+                  minHeight="80px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">소비자 상세 설명</label>
+                <RichTextEditor
+                  value={editConsumerDetail}
+                  onChange={(c) => setEditConsumerDetail(c.html)}
+                  editable={!saving}
+                  placeholder="소비자에게 보이는 상세 설명"
+                  minHeight="150px"
+                  onImageUpload={editorImageUpload}
+                  existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
+                  showTemplateActions
+                  templates={tpl.templates}
+                  templatesLoading={tpl.loading}
+                  templatesSaving={tpl.saving}
+                  onLoadTemplates={tpl.loadTemplates}
+                  onSaveAsTemplate={(name, category, isPublic) =>
+                    tpl.saveTemplate(editConsumerDetail, name, category, isPublic)
+                  }
+                  onUseTemplate={tpl.recordUse}
+                  canCreatePublicTemplate={canCreatePublicTemplate}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── 수정 모드: 판매자 지원 설명 (B2B) — B2C 모드의 보조 섹션으로만 표시 (B2B 모드는 위에서 우선 렌더링) ── */}
+          {isEditing && editMode === 'b2c' && showSecondaryEdit && (
+            <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">판매자 지원 설명 (B2B)</h4>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">B2B 간단 소개</label>
@@ -904,41 +1061,56 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           ) : null}
 
-          {/* ── 설명 ── */}
-          {(product.consumerShortDescription || product.consumerDetailDescription ||
-            product.businessShortDescription || product.businessDetailDescription) && (
-            <Section title="설명">
-              {product.consumerShortDescription && (
+          {/* ── 소비자 공개 설명 (B2C) ── */}
+          {!isEditing && (
+            <Section title="소비자 공개 설명 (B2C)">
+              {product.consumerShortDescription ? (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">소비자 간단 소개</span>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
                   <ContentRenderer html={product.consumerShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
                 </div>
-              )}
-              {product.consumerDetailDescription && (
+              ) : (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">소비자 상세 설명</span>
-                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
                 </div>
               )}
+              {product.consumerDetailDescription ? (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                </div>
+              ) : (
+                <div>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
+                  <p className="text-sm text-slate-400 italic">미작성</p>
+                </div>
+              )}
+            </Section>
+          )}
+
+          {/* ── 판매자 지원 설명 (B2B) ── */}
+          {!isEditing && (
+            <Section title="판매자 지원 설명 (B2B)">
               {product.businessShortDescription ? (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">B2B 간단 소개</span>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
                   <ContentRenderer html={product.businessShortDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-3" />
                 </div>
               ) : (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">B2B 간단 소개</span>
+                  <span className="text-xs text-slate-400 block mb-1">간단 소개</span>
                   <p className="text-sm text-slate-400 italic">미작성</p>
                 </div>
               )}
               {product.businessDetailDescription ? (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">B2B 상세 설명</span>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
                   <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
                 </div>
               ) : (
                 <div>
-                  <span className="text-xs text-slate-400 block mb-1">B2B 상세 설명</span>
+                  <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
                   <p className="text-sm text-slate-400 italic">미작성</p>
                 </div>
               )}
@@ -1055,19 +1227,31 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   </div>
                 )}
 
-                {/* 액션 버튼 */}
+                {/* 액션 버튼: B2C/B2B 전략 분리 (WO-NETURE-B2C-B2B-TAG-RECOMMENDATION-STRATEGY-V1) */}
                 <div className="flex items-center gap-2 mb-3">
                   <button
-                    onClick={handleAiSuggest}
+                    onClick={() => handleAiSuggest('b2c')}
                     disabled={aiSuggestLoading || !product?.masterId}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors disabled:opacity-50"
                   >
                     {aiSuggestLoading ? (
                       <Loader2 size={12} className="animate-spin" />
                     ) : (
                       <Sparkles size={12} />
                     )}
-                    {aiSuggestLoading ? 'AI 분석 중...' : 'AI 태그 추천'}
+                    B2C 태그 추천
+                  </button>
+                  <button
+                    onClick={() => handleAiSuggest('b2b')}
+                    disabled={aiSuggestLoading || !product?.masterId}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {aiSuggestLoading ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={12} />
+                    )}
+                    B2B 태그 추천
                   </button>
                 </div>
 
