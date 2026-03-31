@@ -51,7 +51,8 @@ const ROLE_STYLES: Record<string, { label: string; color: string; bg: string }> 
   'kpa:admin':            { label: '관리자',   color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
   'kpa:operator':         { label: '운영자',   color: 'text-violet-700', bg: 'bg-violet-50 border-violet-200' },
   'platform:super_admin': { label: '슈퍼관리자', color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' },
-  'glycopharm:pharmacist':{ label: '약사(test)', color: 'text-teal-700', bg: 'bg-teal-50 border-teal-200' },
+  'glycopharm:pharmacy':  { label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
+  'glycopharm:pharmacist':{ label: '약국',   color: 'text-teal-700',   bg: 'bg-teal-50 border-teal-200' },
 };
 
 export function RoleBadge({ role }: { role: string }) {
