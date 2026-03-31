@@ -41,8 +41,8 @@ interface FormData {
   height: string | null;
   weight: string | null;
   targetHbA1c: string | null;
-  targetGlucoseLow: number;
-  targetGlucoseHigh: number;
+  targetGlucoseLow: number | null;
+  targetGlucoseHigh: number | null;
   birthDate: string | null;
 }
 
@@ -131,8 +131,8 @@ export default function ProfilePage() {
         height: form.height || null,
         weight: form.weight || null,
         targetHbA1c: form.targetHbA1c || null,
-        targetGlucoseLow: form.targetGlucoseLow,
-        targetGlucoseHigh: form.targetGlucoseHigh,
+        targetGlucoseLow: form.targetGlucoseLow ?? 70,
+        targetGlucoseHigh: form.targetGlucoseHigh ?? 180,
         birthDate: form.birthDate || null,
       };
 
@@ -287,16 +287,18 @@ export default function ProfilePage() {
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  value={form.targetGlucoseLow}
-                  onChange={(e) => updateForm('targetGlucoseLow', Number(e.target.value) || 70)}
+                  value={form.targetGlucoseLow ?? ''}
+                  onChange={(e) => updateForm('targetGlucoseLow', e.target.value === '' ? null : Number(e.target.value))}
+                  onFocus={(e) => e.target.select()}
                   className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="70"
                 />
                 <span className="text-slate-400 text-sm">~</span>
                 <input
                   type="number"
-                  value={form.targetGlucoseHigh}
-                  onChange={(e) => updateForm('targetGlucoseHigh', Number(e.target.value) || 180)}
+                  value={form.targetGlucoseHigh ?? ''}
+                  onChange={(e) => updateForm('targetGlucoseHigh', e.target.value === '' ? null : Number(e.target.value))}
+                  onFocus={(e) => e.target.select()}
                   className="flex-1 px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="180"
                 />

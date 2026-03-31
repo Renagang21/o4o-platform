@@ -13,7 +13,9 @@ export const GLYCOPHARM_ROLE_PRIORITY = [
   'glycopharm:operator',
   'glycopharm:supplier',
   'glycopharm:pharmacy',
+  'seller',              // legacy: 약국 가입 시 seller로 저장됨
   'glycopharm:consumer',
+  'customer',            // legacy: 당뇨인 가입 시 customer로 저장됨
 ] as const;
 
 export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
@@ -22,7 +24,9 @@ export const GLYCOPHARM_DASHBOARD_MAP: Record<string, string> = {
   'glycopharm:operator': '/operator',
   'glycopharm:supplier': '/supplier',
   'glycopharm:pharmacy': '/care',
+  'seller': '/care',               // legacy: seller = pharmacy
   'glycopharm:consumer': '/',
+  'customer': '/patient',          // legacy: customer = consumer (patient)
 };
 
 export function getGlycopharmDashboardRoute(roles: string[]): string {
