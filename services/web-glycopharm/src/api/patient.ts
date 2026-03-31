@@ -181,6 +181,9 @@ export const patientApi = {
   disconnectPharmacy: () =>
     request<{ disconnected: boolean }>('POST', '/care/pharmacy-link/disconnect'),
 
+  cancelPharmacyLinkRequest: () =>
+    request<{ cancelled: boolean }>('POST', '/care/pharmacy-link/cancel'),
+
   // Appointments (WO-GLYCOPHARM-APPOINTMENT-SYSTEM-V1)
   getMyAppointments: () =>
     request<AppointmentDto[]>('GET', '/care/appointments/my'),

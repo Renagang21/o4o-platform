@@ -291,6 +291,43 @@ export function createPharmacyLinkRouter(dataSource: DataSource): Router {
     }
   });
 
+  /**
+   * POST /pharmacy-link/cancel
+   * 환자가 대기 중인 연결 요청 취소
+   */
+  router.post('/pharmacy-link/cancel', authenticate, async (req, res) => {
+    try {
+      const authReq = req as AuthRequest;
+      const user = authReq.user;
+      if (!user) {
+        res.status(401).json({
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
+        });
+        return;
+      }
+
+      const result = await dataSource.query(
+        `DELETE FROM care_pharmacy_link_requests
+         WHERE patient_id = $1 AND status = 'pending'`,
+        [user.id],
+      );
+
+      console.info('[pharmacy-link] Patient cancelled pending request', {
+        userId: user.id,
+        deletedCount: result[1] ?? 0,
+      });
+
+      res.json({ success: true, data: { cancelled: true } });
+    } catch (error) {
+      console.error('[pharmacy-link] POST cancel failed:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to cancel request' },
+      });
+    }
+  });
+
   // ─── Pharmacist APIs ───
 
   /**
