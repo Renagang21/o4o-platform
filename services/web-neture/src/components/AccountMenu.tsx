@@ -80,9 +80,10 @@ export default function AccountMenu() {
   const activeRole = user.roles[0];
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
 
-  // WO-O4O-AUTH-RBAC-CLEANUP-V1: prefixed role 기반 대시보드 대상 판별
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: 대시보드 대상 판별 (prefixed + unprefixed)
+  const DASHBOARD_ROLES = ['supplier', 'partner', 'seller'];
   const hasDashboardRole = user.roles?.some((r: string) =>
-    r.endsWith(':admin') || r.endsWith(':operator') || r.endsWith(':supplier') || r.endsWith(':partner') || r.endsWith(':seller') || r === 'platform:super_admin'
+    r.endsWith(':admin') || r.endsWith(':operator') || r.endsWith(':supplier') || r.endsWith(':partner') || r.endsWith(':seller') || r === 'platform:super_admin' || DASHBOARD_ROLES.includes(r)
   ) ?? false;
 
   // WO-O4O-NAME-NORMALIZATION-V1: displayName > lastName+firstName > name > email prefix > '사용자'
