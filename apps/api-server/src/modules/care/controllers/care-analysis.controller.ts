@@ -13,6 +13,7 @@ import { CareKpiSnapshotService } from '../services/kpi/care-kpi-snapshot.servic
 import { CareLlmInsightService } from '../services/llm/care-llm-insight.service.js';
 import { CareCoachingDraftService } from '../services/llm/care-coaching-draft.service.js';
 import { CareAlertService } from '../services/care-alert.service.js';
+import { mapTimeAnalysisToActions } from '../domain/analysis/time-action.mapper.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
@@ -192,39 +193,44 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
           AND measured_at >= NOW() - make_interval(days => ${days})
       `, params);
 
+      const responseData = {
+        days,
+        timeBuckets: timeBuckets.map((b: any) => ({
+          bucket: b.bucket,
+          count: b.count,
+          avg: b.avg,
+          min: b.min,
+          max: b.max,
+          highCount: b.high_count,
+          lowCount: b.low_count,
+        })),
+        mealTimingStats: mealTimingStats.map((m: any) => ({
+          mealTiming: m.meal_timing,
+          count: m.count,
+          avg: m.avg,
+          max: m.max,
+        })),
+        exerciseImpact: {
+          count: exerciseImpact[0]?.count ?? 0,
+          avgWithExercise: exerciseImpact[0]?.avg_with_exercise ?? null,
+          overallAvg: overallAvg[0]?.avg ?? null,
+        },
+        trends: {
+          avg3d: trends[0]?.avg_3d ?? null,
+          count3d: trends[0]?.count_3d ?? 0,
+          avg7d: trends[0]?.avg_7d ?? null,
+          count7d: trends[0]?.count_7d ?? 0,
+          avgFull: trends[0]?.avg_full ?? null,
+          countFull: trends[0]?.count_full ?? 0,
+        },
+      };
+
+      // WO-O4O-CARE-ACTION-ENGINE-V2.1: Rule 기반 Action 생성
+      const actions = mapTimeAnalysisToActions(responseData);
+
       res.json({
         success: true,
-        data: {
-          days,
-          timeBuckets: timeBuckets.map((b: any) => ({
-            bucket: b.bucket,
-            count: b.count,
-            avg: b.avg,
-            min: b.min,
-            max: b.max,
-            highCount: b.high_count,
-            lowCount: b.low_count,
-          })),
-          mealTimingStats: mealTimingStats.map((m: any) => ({
-            mealTiming: m.meal_timing,
-            count: m.count,
-            avg: m.avg,
-            max: m.max,
-          })),
-          exerciseImpact: {
-            count: exerciseImpact[0]?.count ?? 0,
-            avgWithExercise: exerciseImpact[0]?.avg_with_exercise ?? null,
-            overallAvg: overallAvg[0]?.avg ?? null,
-          },
-          trends: {
-            avg3d: trends[0]?.avg_3d ?? null,
-            count3d: trends[0]?.count_3d ?? 0,
-            avg7d: trends[0]?.avg_7d ?? null,
-            count7d: trends[0]?.count_7d ?? 0,
-            avgFull: trends[0]?.avg_full ?? null,
-            countFull: trends[0]?.count_full ?? 0,
-          },
-        },
+        data: { ...responseData, actions },
       });
     } catch (error) {
       console.error('[CareAnalysis] time-based analysis error:', error);

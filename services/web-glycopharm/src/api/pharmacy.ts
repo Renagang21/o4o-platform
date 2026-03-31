@@ -1023,6 +1023,7 @@ export interface TimeBasedAnalysisDto {
     avgFull: number | null;
     countFull: number;
   };
+  actions?: CareGeneratedActionDto[];
 }
 
 export interface CoachingSession {
@@ -1235,7 +1236,7 @@ export interface DetectedPatternDto {
 export type CareActionPriority = 'HIGH' | 'MEDIUM' | 'LOW';
 
 export interface CareGeneratedActionDto {
-  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert';
+  type: 'open_patient' | 'create_coaching' | 'run_analysis' | 'resolve_alert' | 'link_guideline';
   priority: CareActionPriority;
   reason: string;
   label: string;
