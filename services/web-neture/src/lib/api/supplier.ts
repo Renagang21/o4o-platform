@@ -880,6 +880,61 @@ export const supplierApi = {
       return { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
     }
   },
+
+  // ==================== WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 ====================
+
+  /** 스팟 정책 생성 */
+  async createSpotPolicy(data: {
+    offerId: string;
+    policyName: string;
+    spotPrice: number;
+    startAt: string;
+    endAt: string;
+  }): Promise<{ success: boolean; data?: SpotPricePolicy; error?: string }> {
+    try {
+      const response = await api.post('/neture/supplier/spot-policies', data);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  /** 상품별 스팟 정책 목록 */
+  async listSpotPolicies(offerId: string): Promise<SpotPricePolicy[]> {
+    try {
+      const response = await api.get(`/neture/supplier/spot-policies/offer/${offerId}`);
+      return response.data?.data || [];
+    } catch (error) {
+      console.warn('[Supplier API] Failed to list spot policies:', error);
+      return [];
+    }
+  },
+
+  /** 스팟 정책 수정 (DRAFT만) */
+  async updateSpotPolicy(
+    id: string,
+    data: { policyName?: string; spotPrice?: number; startAt?: string; endAt?: string },
+  ): Promise<{ success: boolean; data?: SpotPricePolicy; error?: string }> {
+    try {
+      const response = await api.patch(`/neture/supplier/spot-policies/${id}`, data);
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
+
+  /** 스팟 정책 상태 변경 */
+  async changeSpotPolicyStatus(
+    id: string,
+    status: 'ACTIVE' | 'CANCELLED',
+  ): Promise<{ success: boolean; data?: SpotPricePolicy; error?: string }> {
+    try {
+      const response = await api.patch(`/neture/supplier/spot-policies/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
 };
 
 // ==================== Supplier Profile API ====================
@@ -935,3 +990,17 @@ export const supplierProfileApi = {
     }
   },
 };
+
+/** WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 */
+export interface SpotPricePolicy {
+  id: string;
+  offerId: string;
+  supplierId: string;
+  policyName: string;
+  spotPrice: number;
+  status: 'DRAFT' | 'ACTIVE' | 'CANCELLED';
+  startAt: string;
+  endAt: string;
+  createdAt: string;
+  updatedAt: string;
+}

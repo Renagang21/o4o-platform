@@ -230,16 +230,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
         />
       </div>
 
-      {/* ── 스팟가 ── */}
-      <div>
-        <FieldLabel>스팟가 (원)</FieldLabel>
-        <NumericInput
-          value={data.pricePlatinum}
-          onChange={(v) => updateField('pricePlatinum', v)}
-          disabled={disabled}
-          placeholder="특별 공급가 기록용"
-        />
-      </div>
+      {/* WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟가는 별도 정책 섹션으로 이동 */}
 
       {/* ── 소비자 참고가 ── */}
       <div>

@@ -707,6 +707,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Product Library routes:', productLibraryError);
     }
 
+    // 29d-3. Register Spot Price Policy routes (WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1)
+    try {
+      const { createSpotPricePolicyRouter } = await import('../modules/neture/controllers/spot-price-policy.controller.js');
+      app.use('/api/v1/neture/supplier', createSpotPricePolicyRouter(dataSource));
+      logger.info('✅ Spot Price Policy routes registered at /api/v1/neture/supplier/spot-policies/*');
+    } catch (spotPolicyError) {
+      logger.error('Failed to register Spot Price Policy routes:', spotPolicyError);
+    }
+
     // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('../copilot/copilot-engine.controller.js');

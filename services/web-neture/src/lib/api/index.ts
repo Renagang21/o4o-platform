@@ -81,6 +81,7 @@ export {
   type DistributionItem,
   type TrendingProductItem,
   type SupplierAiInsight,
+  type SpotPricePolicy,
 } from './supplier.js';
 
 // Seller API

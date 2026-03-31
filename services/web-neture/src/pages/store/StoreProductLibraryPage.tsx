@@ -105,9 +105,7 @@ function OfferModal({
                         {offer.priceGold != null && (
                           <span className="text-xs text-amber-600">서비스 ₩{formatPrice(offer.priceGold)}</span>
                         )}
-                        {offer.pricePlatinum != null && (
-                          <span className="text-xs text-purple-600">스팟 ₩{formatPrice(offer.pricePlatinum)}</span>
-                        )}
+                        {/* WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟가는 별도 정책으로 이동 */}
                         <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
                           <Truck size={10} className="inline mr-0.5" />
                           {offer.distributionType === 'PUBLIC' ? '공개' : '비공개'}
