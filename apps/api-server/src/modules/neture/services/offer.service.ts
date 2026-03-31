@@ -636,6 +636,8 @@ export class NetureOfferService {
       distributionType?: OfferDistributionType;
       serviceKeys?: string[];
       priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
@@ -668,8 +670,8 @@ export class NetureOfferService {
         allowedSellerIds: [],
         serviceKeys: data.serviceKeys || [],
         priceGeneral: data.priceGeneral ?? 0,
-        priceGold: null,
-        pricePlatinum: null,
+        priceGold: data.priceGold ?? null,
+        pricePlatinum: data.pricePlatinum ?? null,
         consumerReferencePrice: data.consumerReferencePrice ?? null,
         stockQuantity: resolvedStockQty,
         consumerShortDescription: data.consumerShortDescription ?? null,
@@ -726,6 +728,8 @@ export class NetureOfferService {
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       stockQuantity?: number;
       consumerShortDescription?: string | null;
@@ -762,6 +766,12 @@ export class NetureOfferService {
 
       if (updates.priceGeneral !== undefined) {
         offer.priceGeneral = updates.priceGeneral;
+      }
+      if (updates.priceGold !== undefined) {
+        offer.priceGold = updates.priceGold;
+      }
+      if (updates.pricePlatinum !== undefined) {
+        offer.pricePlatinum = updates.pricePlatinum;
       }
       if (updates.consumerReferencePrice !== undefined) {
         offer.consumerReferencePrice = updates.consumerReferencePrice;

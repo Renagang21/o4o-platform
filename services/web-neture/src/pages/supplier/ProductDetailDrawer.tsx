@@ -120,6 +120,8 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
   return {
     marketingName: p.name || p.masterName || '',
     priceGeneral: p.priceGeneral ?? null,
+    priceGold: p.priceGold ?? null,
+    pricePlatinum: p.pricePlatinum ?? null,
     consumerReferencePrice: p.consumerReferencePrice ?? null,
     stockQuantity: p.stockQuantity ?? 0,
     isActive: p.isActive,
@@ -304,6 +306,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       const payload = {
         marketingName: form.marketingName || undefined,
         priceGeneral: form.priceGeneral ?? undefined,
+        priceGold: form.priceGold,
+        pricePlatinum: form.pricePlatinum,
         consumerReferencePrice: form.consumerReferencePrice,
         stockQuantity: form.stockQuantity,
         isActive: form.isActive,
@@ -1040,10 +1044,10 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               <InfoRow label="공급가">{formatPrice(product.priceGeneral)}</InfoRow>
               <InfoRow label="소비자 참고가">{formatPrice(product.consumerReferencePrice)}</InfoRow>
               {product.priceGold != null && (
-                <InfoRow label="Gold 가격">{formatPrice(product.priceGold)}</InfoRow>
+                <InfoRow label="서비스가">{formatPrice(product.priceGold)}</InfoRow>
               )}
               {product.pricePlatinum != null && (
-                <InfoRow label="Platinum 가격">{formatPrice(product.pricePlatinum)}</InfoRow>
+                <InfoRow label="스팟가">{formatPrice(product.pricePlatinum)}</InfoRow>
               )}
             </Section>
           )}

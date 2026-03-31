@@ -47,6 +47,8 @@ import logger from '../../../utils/logger.js';
 const ALLOWED_CSV_COLUMNS = [
   'barcode',
   'supply_price',
+  'service_price', // WO-NETURE-B2B-PRICE-THREE-TIER-POLICY-ALIGNMENT-V1: 서비스가
+  'spot_price', // WO-NETURE-B2B-PRICE-THREE-TIER-POLICY-ALIGNMENT-V1: 스팟가
   'msrp', // legacy compat
   'consumer_price', // WO-NETURE-XLSX-TEMPLATE-FINAL-V2
   'stock_qty',
@@ -675,11 +677,16 @@ export class CsvImportService {
     const rawStockQty = (raw.stock_qty || '').trim();
     const rawDescription = (raw.short_description || raw.consumer_short_description || raw.description || '').trim();
     const rawDetailDesc = (raw.detail_description || '').trim();
+    // WO-NETURE-B2B-PRICE-THREE-TIER-POLICY-ALIGNMENT-V1: service_price, spot_price
+    const rawServicePrice = (raw.service_price || '').trim();
+    const rawSpotPrice = (raw.spot_price || '').trim();
     const extra = {
       msrp: rawConsumerPrice ? parseInt(rawConsumerPrice, 10) || null : null,
       stockQty: rawStockQty ? parseInt(rawStockQty, 10) || null : null,
       description: rawDescription || null,
       detailDescription: rawDetailDesc || null,
+      servicePrice: rawServicePrice ? parseInt(rawServicePrice, 10) || null : null,
+      spotPrice: rawSpotPrice ? parseInt(rawSpotPrice, 10) || null : null,
     };
 
     const offerId = await this.importCommon.upsertSupplierOffer(

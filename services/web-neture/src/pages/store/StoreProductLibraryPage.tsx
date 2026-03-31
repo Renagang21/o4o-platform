@@ -103,10 +103,10 @@ function OfferModal({
                           ₩{formatPrice(offer.priceGeneral)}
                         </span>
                         {offer.priceGold != null && (
-                          <span className="text-xs text-amber-600">Gold ₩{formatPrice(offer.priceGold)}</span>
+                          <span className="text-xs text-amber-600">서비스 ₩{formatPrice(offer.priceGold)}</span>
                         )}
                         {offer.pricePlatinum != null && (
-                          <span className="text-xs text-purple-600">Platinum ₩{formatPrice(offer.pricePlatinum)}</span>
+                          <span className="text-xs text-purple-600">스팟 ₩{formatPrice(offer.pricePlatinum)}</span>
                         )}
                         <span className="inline-block px-1.5 py-0.5 text-xs bg-slate-100 text-slate-500 rounded">
                           <Truck size={10} className="inline mr-0.5" />

@@ -16,6 +16,8 @@ import { useState, useEffect, useCallback } from 'react';
 export interface ProductFormData {
   marketingName: string;
   priceGeneral: number | null;
+  priceGold: number | null;
+  pricePlatinum: number | null;
   consumerReferencePrice: number | null;
   stockQuantity: number;
   isActive: boolean;
@@ -119,6 +121,8 @@ function FieldError({ error }: { error?: string }) {
 const DEFAULT_DATA: ProductFormData = {
   marketingName: '',
   priceGeneral: null,
+  priceGold: null,
+  pricePlatinum: null,
   consumerReferencePrice: null,
   stockQuantity: 0,
   isActive: true,
@@ -213,6 +217,28 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
           disabled={disabled}
         />
         <FieldError error={errors.priceGeneral} />
+      </div>
+
+      {/* ── 서비스가 ── */}
+      <div>
+        <FieldLabel>서비스가 (원)</FieldLabel>
+        <NumericInput
+          value={data.priceGold}
+          onChange={(v) => updateField('priceGold', v)}
+          disabled={disabled}
+          placeholder="서비스 채널용 공급가"
+        />
+      </div>
+
+      {/* ── 스팟가 ── */}
+      <div>
+        <FieldLabel>스팟가 (원)</FieldLabel>
+        <NumericInput
+          value={data.pricePlatinum}
+          onChange={(v) => updateField('pricePlatinum', v)}
+          disabled={disabled}
+          placeholder="특별 공급가 기록용"
+        />
       </div>
 
       {/* ── 소비자 참고가 ── */}

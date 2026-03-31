@@ -51,6 +51,8 @@ export class ProductImportCommonService {
       stockQty?: number | null;
       description?: string | null;
       detailDescription?: string | null;
+      servicePrice?: number | null;
+      spotPrice?: number | null;
     },
   ): Promise<string> {
     const slug = `${barcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
@@ -58,17 +60,22 @@ export class ProductImportCommonService {
     const stockQty = extra?.stockQty ?? 0;
     const descriptionHtml = extra?.description ? `<p>${extra.description}</p>` : null;
     const detailHtml = extra?.detailDescription ? `<p>${extra.detailDescription}</p>` : null;
+    const servicePrice = extra?.servicePrice ?? null;
+    const spotPrice = extra?.spotPrice ?? null;
 
     // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: service_keys 포함
+    // WO-NETURE-B2B-PRICE-THREE-TIER-POLICY-ALIGNMENT-V1: price_gold(서비스가), price_platinum(스팟가)
     await manager.query(
       `INSERT INTO supplier_product_offers
         (id, master_id, supplier_id, distribution_type, approval_status, is_active,
-         price_general, consumer_reference_price, stock_quantity,
+         price_general, price_gold, price_platinum, consumer_reference_price, stock_quantity,
          consumer_short_description, consumer_detail_description, slug, service_keys, created_at, updated_at)
        VALUES
-        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $6, $7, $8, $9, $10, ARRAY[]::text[], NOW(), NOW())
+        (gen_random_uuid(), $1, $2, $3, $4, false, $5, $11, $12, $6, $7, $8, $9, $10, ARRAY[]::text[], NOW(), NOW())
        ON CONFLICT (master_id, supplier_id) DO UPDATE SET
          price_general = EXCLUDED.price_general,
+         price_gold = COALESCE(EXCLUDED.price_gold, supplier_product_offers.price_gold),
+         price_platinum = COALESCE(EXCLUDED.price_platinum, supplier_product_offers.price_platinum),
          consumer_reference_price = COALESCE(EXCLUDED.consumer_reference_price, supplier_product_offers.consumer_reference_price),
          stock_quantity = COALESCE(EXCLUDED.stock_quantity, supplier_product_offers.stock_quantity),
          consumer_short_description = COALESCE(EXCLUDED.consumer_short_description, supplier_product_offers.consumer_short_description),
@@ -76,7 +83,7 @@ export class ProductImportCommonService {
          distribution_type = EXCLUDED.distribution_type::supplier_product_offers_distribution_type_enum,
          service_keys = supplier_product_offers.service_keys,
          updated_at = NOW()`,
-      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug],
+      [masterId, supplierId, distributionType, OfferApprovalStatus.PENDING, price, msrp, stockQty, descriptionHtml, detailHtml, slug, servicePrice, spotPrice],
     );
 
     // WO-O4O-NETURE-IMPORT-PRODUCT-TRACE-V1: offer ID 조회 (RETURNING 대신 안전한 SELECT)

@@ -74,15 +74,15 @@ export class SupplierProductOffer {
   @Column({ name: 'allowed_seller_ids', type: 'text', array: true, nullable: true })
   allowedSellerIds: string[] | null;
 
-  /** B2B 일반가 */
+  /** 공급가 — 기본 B2B 공급 가격 */
   @Column({ name: 'price_general', type: 'int', default: 0 })
   priceGeneral: number;
 
-  /** B2B 골드 등급가 */
+  /** 서비스가 — 서비스 채널용 특별 공급 가격 (참고용, 주문 미반영) */
   @Column({ name: 'price_gold', type: 'int', nullable: true })
   priceGold: number | null;
 
-  /** B2B 플래티넘 등급가 */
+  /** 스팟가 — 특별 공급가 기록용 (참고용, 주문 미반영) */
   @Column({ name: 'price_platinum', type: 'int', nullable: true })
   pricePlatinum: number | null;
 

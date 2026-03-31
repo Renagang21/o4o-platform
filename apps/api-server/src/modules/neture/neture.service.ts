@@ -290,6 +290,8 @@ export class NetureService {
       distributionType?: OfferDistributionType;
       serviceKeys?: string[];
       priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
@@ -306,6 +308,8 @@ export class NetureService {
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
+      priceGold?: number | null;
+      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       stockQuantity?: number;
       consumerShortDescription?: string | null;

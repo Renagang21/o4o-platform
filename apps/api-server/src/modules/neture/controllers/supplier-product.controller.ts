@@ -29,12 +29,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { barcode, marketingName, categoryId, brandName,
-              distributionType, manualData, priceGeneral, consumerReferencePrice,
+              distributionType, manualData, priceGeneral, priceGold, pricePlatinum,
+              consumerReferencePrice,
               consumerShortDescription, consumerDetailDescription, serviceKeys } = req.body;
       const result = await netureService.createSupplierOffer(supplierId, {
         barcode, marketingName, categoryId, brandName,
         manualData, distributionType, serviceKeys,
-        priceGeneral, consumerReferencePrice,
+        priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
         consumerShortDescription, consumerDetailDescription,
       });
       if (!result.success) {
@@ -191,12 +192,14 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const supplierId = (req as SupplierRequest).supplierId;
       const { id } = req.params;
       const { isActive, distributionType, allowedSellerIds,
-              priceGeneral, consumerReferencePrice, stockQuantity,
+              priceGeneral, priceGold, pricePlatinum,
+              consumerReferencePrice, stockQuantity,
               consumerShortDescription, consumerDetailDescription, marketingName,
               categoryId, brandId, specification, originCountry, tags } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
         isActive, distributionType, allowedSellerIds,
-        priceGeneral, consumerReferencePrice, stockQuantity,
+        priceGeneral, priceGold, pricePlatinum,
+        consumerReferencePrice, stockQuantity,
         consumerShortDescription, consumerDetailDescription, marketingName,
         categoryId, brandId, specification, originCountry, tags,
       });
