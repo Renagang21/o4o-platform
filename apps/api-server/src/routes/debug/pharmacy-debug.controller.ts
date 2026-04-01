@@ -136,5 +136,108 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
     }
   });
 
+  // GET /care-data — 환자별 health_readings + glucoseview_customers 진단
+  router.get('/care-data', async (req, res) => {
+    const email = req.query.email as string;
+    const gcId = req.query.gcId as string;
+    if (!email && !gcId) {
+      res.send(page('Care Data Debug', `
+        <h1>Care 데이터 진단</h1>
+        <form method="GET">
+          <p>환자 이메일: <input name="email" placeholder="patient1@o4o.com" style="width:300px;padding:4px" /></p>
+          <p>또는 glucoseview_customers.id: <input name="gcId" placeholder="c57abb40-..." style="width:300px;padding:4px" /></p>
+          <button type="submit" style="padding:6px 16px;background:#0066cc;color:white;border:none;cursor:pointer">조회</button>
+        </form>
+      `));
+      return;
+    }
+
+    try {
+      // 1. users 조회
+      let userRows: any[] = [];
+      if (email) {
+        userRows = await dataSource.query(`SELECT id, email, name, status FROM users WHERE email = $1`, [email]);
+      }
+
+      // 2. glucoseview_customers 조회
+      let gcRows: any[] = [];
+      if (gcId) {
+        gcRows = await dataSource.query(`SELECT id, user_id, organization_id, name, email FROM glucoseview_customers WHERE id = $1`, [gcId]);
+        if (gcRows.length > 0 && gcRows[0].user_id) {
+          userRows = await dataSource.query(`SELECT id, email, name, status FROM users WHERE id = $1`, [gcRows[0].user_id]);
+        }
+      } else if (userRows.length > 0) {
+        gcRows = await dataSource.query(`SELECT id, user_id, organization_id, name, email FROM glucoseview_customers WHERE user_id = $1 OR email = $2`, [userRows[0].id, email]);
+      }
+
+      const userId = userRows[0]?.id || null;
+      const gcCustomerId = gcRows[0]?.id || null;
+      const orgId = gcRows[0]?.organization_id || null;
+
+      // 3. health_readings 조회
+      let readings: any[] = [];
+      if (userId) {
+        readings = await dataSource.query(
+          `SELECT id, patient_id, pharmacy_id, metric_type, value_numeric, source_type, measured_at, metadata
+           FROM health_readings WHERE patient_id = $1 ORDER BY measured_at DESC LIMIT 20`, [userId]);
+      }
+      // patient_id = glucoseview_customers.id 로 저장된 건도 조회
+      let readingsByGcId: any[] = [];
+      if (gcCustomerId && gcCustomerId !== userId) {
+        readingsByGcId = await dataSource.query(
+          `SELECT id, patient_id, pharmacy_id, metric_type, value_numeric, source_type, measured_at, metadata
+           FROM health_readings WHERE patient_id = $1 ORDER BY measured_at DESC LIMIT 20`, [gcCustomerId]);
+      }
+
+      const body = `
+        <h1>Care 데이터 진단</h1>
+        <h2>1. users</h2>
+        <pre>${esc(JSON.stringify(userRows, null, 2))}</pre>
+        <p><strong>users.id:</strong> ${esc(userId)}</p>
+
+        <h2>2. glucoseview_customers</h2>
+        <pre>${esc(JSON.stringify(gcRows, null, 2))}</pre>
+        <p><strong>gc.id:</strong> ${esc(gcCustomerId)}</p>
+        <p><strong>gc.user_id:</strong> ${esc(gcRows[0]?.user_id)}</p>
+        <p><strong>gc.organization_id:</strong> ${esc(orgId)}</p>
+        <p style="color:${gcRows[0]?.user_id === userId ? 'green' : 'red'}">
+          user_id == users.id: <strong>${gcRows[0]?.user_id === userId ? 'MATCH' : 'MISMATCH'}</strong>
+        </p>
+
+        <h2>3. health_readings (patient_id = users.id: ${esc(userId)})</h2>
+        <p>${readings.length}건</p>
+        <pre>${esc(JSON.stringify(readings.map(r => ({
+          id: r.id,
+          patient_id: r.patient_id,
+          pharmacy_id: r.pharmacy_id,
+          metric: r.metric_type,
+          value: r.value_numeric,
+          source: r.source_type,
+          measured_at: r.measured_at,
+        })), null, 2))}</pre>
+
+        ${readingsByGcId.length > 0 ? `
+        <h2 style="color:red">4. health_readings (patient_id = gc.id: ${esc(gcCustomerId)}) — 잘못된 ID!</h2>
+        <p style="color:red">${readingsByGcId.length}건 — 이 데이터는 patient_id가 glucoseview_customers.id로 저장됨</p>
+        <pre>${esc(JSON.stringify(readingsByGcId.map(r => ({
+          id: r.id,
+          patient_id: r.patient_id,
+          pharmacy_id: r.pharmacy_id,
+          metric: r.metric_type,
+          value: r.value_numeric,
+          source: r.source_type,
+          measured_at: r.measured_at,
+        })), null, 2))}</pre>
+        ` : '<h2>4. gc.id로 저장된 잘못된 데이터: 없음 ✅</h2>'}
+
+        <p><a href="/__debug__/pharmacy/care-data">← 다시 조회</a></p>
+      `;
+
+      res.send(page('Care Data Debug', body));
+    } catch (err) {
+      res.status(500).send(page('Error', `<pre>${esc(err)}</pre>`));
+    }
+  });
+
   return router;
 }
