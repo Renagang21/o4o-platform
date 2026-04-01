@@ -196,3 +196,6 @@ export {
   type StoreListingItem,
   type StoreListingsResponse,
 } from './store.js';
+
+// Media Library (WO-O4O-COMMON-MEDIA-PICKER-UPLOADER-V1)
+export { mediaApi, type MediaAssetItem } from './media.js';
