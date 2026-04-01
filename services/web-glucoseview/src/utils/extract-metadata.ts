@@ -25,6 +25,7 @@ export interface ExerciseMeta {
   duration?: number;
   intensity?: string;
   timing?: string;
+  exercisedAt?: string;
 }
 
 export interface SymptomsMeta {
@@ -42,6 +43,7 @@ export interface ExtractedMetadata {
   medication?: MedicationMeta;
   exercise?: ExerciseMeta;
   symptoms?: SymptomsMeta;
+  symptomAt?: string;
 }
 
 /**
@@ -72,5 +74,6 @@ export function extractMetadata(metadata: unknown): ExtractedMetadata {
     medication: meta.medication as MedicationMeta | undefined,
     exercise: meta.exercise as ExerciseMeta | undefined,
     symptoms,
+    symptomAt: meta.symptomAt as string | undefined,
   };
 }

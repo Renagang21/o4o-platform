@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import PlaceholderChart from '../components/PlaceholderChart';
+import PatientRecordsTable from '../components/care/PatientRecordsTable';
 import { useAuth } from '../contexts/AuthContext';
 import { DataTable, type Column } from '@o4o/ui';
 import { api } from '../services/api';
@@ -533,8 +534,8 @@ export default function PatientsPage() {
                   })()}
                 </div>
 
-                {/* Summary Stats */}
-                <PlaceholderChart type="summary" />
+                {/* Patient Records Table */}
+                <PatientRecordsTable patientId={selectedPatient} />
 
                 {/* Glucose Chart */}
                 <PlaceholderChart type="glucose" />
