@@ -62,7 +62,15 @@ export function createHealthReadingsRouter(dataSource: DataSource): Router {
         }
       }
 
-      const entities = items.map((item) =>
+      // Resolve patient IDs (glucoseview_customers.id → users.id)
+      const resolvedItems = await Promise.all(
+        items.map(async (item) => ({
+          ...item,
+          patientId: await resolvePatientUserId(dataSource, item.patientId),
+        })),
+      );
+
+      const entities = resolvedItems.map((item) =>
         repo.create({
           patientId: item.patientId,
           metricType: item.metricType || 'glucose',
