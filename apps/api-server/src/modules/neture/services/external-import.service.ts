@@ -123,6 +123,12 @@ export class ExternalImportService {
     }
 
     const html = await response.text();
+
+    // 로그인 리다이렉트 감지 (비회원 차단 사이트)
+    if (html.includes('member_only') || html.includes('return_url') || html.includes('login_process')) {
+      throw new Error('이 사이트는 로그인이 필요합니다. "HTML 붙여넣기" 탭을 이용하세요.');
+    }
+
     const dom = new JSDOM(html);
     const doc = dom.window.document;
 
