@@ -937,7 +937,7 @@ export const supplierApi = {
 
   // WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1: 외부 상품 가져오기
   async parseExternalProduct(
-    params: { url?: string; html?: string; masterId: string },
+    params: { url?: string; html?: string; masterId: string; baseUrl?: string },
   ): Promise<{
     success: boolean;
     error?: string;

@@ -38,6 +38,7 @@ export default function ExternalImportModal({
   const [tab, setTab] = useState<Tab>('url');
   const [url, setUrl] = useState('');
   const [html, setHtml] = useState('');
+  const [baseUrl, setBaseUrl] = useState('https://3lifezone.co.kr');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ParseResult | null>(null);
@@ -53,7 +54,7 @@ export default function ExternalImportModal({
 
     const params = tab === 'url'
       ? { url: url.trim(), masterId }
-      : { html: html.trim(), masterId };
+      : { html: html.trim(), masterId, baseUrl: baseUrl.trim() || undefined };
 
     if (tab === 'url' && !params.url) {
       setError('URL을 입력하세요');
@@ -143,7 +144,17 @@ export default function ExternalImportModal({
               />
             </div>
           ) : (
-            <div>
+            <div className="space-y-2">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">원본 사이트 주소 (이미지 경로 해결용)</label>
+                <input
+                  type="text"
+                  value={baseUrl}
+                  onChange={(e) => setBaseUrl(e.target.value)}
+                  placeholder="https://3lifezone.co.kr"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
               <textarea
                 value={html}
                 onChange={(e) => setHtml(e.target.value)}

@@ -20,7 +20,7 @@ export function createExternalImportRouter(dataSource: DataSource): Router {
    */
   router.post('/external-import/parse', authenticate, async (req, res) => {
     try {
-      const { url, html, masterId } = req.body;
+      const { url, html, masterId, baseUrl } = req.body;
 
       if (!masterId || typeof masterId !== 'string') {
         res.status(400).json({ success: false, error: 'masterId is required' });
@@ -36,7 +36,7 @@ export function createExternalImportRouter(dataSource: DataSource): Router {
 
       const result = url
         ? await service.parseFromUrl(url, masterId)
-        : await service.parseFromHtml(html, masterId);
+        : await service.parseFromHtml(html, masterId, baseUrl);
 
       logger.info(`[ExternalImport] Parsed: source=${result.source}, images=${result.imageCount}, user=${(req as any).user?.id}`);
 

@@ -175,15 +175,15 @@ export class ExternalImportService {
     };
   }
 
-  async parseFromHtml(html: string, masterId: string): Promise<ExternalImportResult> {
-    const result = await this.processHtml(html, masterId, 'direct-paste');
+  async parseFromHtml(html: string, masterId: string, baseUrl?: string): Promise<ExternalImportResult> {
+    const result = await this.processHtml(html, masterId, 'direct-paste', baseUrl);
 
     return {
       productName: null,
       shortDescription: null,
       detailDescription: result.html,
       imageCount: result.imageCount,
-      source: 'direct-paste',
+      source: baseUrl ? new URL(baseUrl).hostname : 'direct-paste',
     };
   }
 
@@ -191,6 +191,7 @@ export class ExternalImportService {
     html: string,
     masterId: string,
     source: string,
+    baseUrl?: string,
   ): Promise<{ html: string; imageCount: number }> {
     // 1. Strip decoration
     let cleaned = stripDecoration(html);
@@ -199,14 +200,23 @@ export class ExternalImportService {
     const srcs = extractImageSrcs(cleaned);
     let imageCount = 0;
 
+    // baseUrl에서 origin 추출 (상대 URL 해결용)
+    let baseOrigin = '';
+    if (baseUrl) {
+      try { baseOrigin = new URL(baseUrl).origin; } catch { /* ignore */ }
+    }
+
     for (const src of srcs) {
       // Resolve relative URLs
       let absoluteUrl = src;
       if (src.startsWith('//')) {
         absoluteUrl = `https:${src}`;
       } else if (src.startsWith('/')) {
-        // Can't resolve without base URL — skip
-        continue;
+        if (baseOrigin) {
+          absoluteUrl = `${baseOrigin}${src}`;
+        } else {
+          continue; // base URL 없으면 스킵
+        }
       }
 
       if (!absoluteUrl.startsWith('http')) continue;
