@@ -725,6 +725,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register External Import routes:', externalImportError);
     }
 
+    // 29d-5. Register Media Library routes (WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1)
+    try {
+      const { createMediaLibraryRouter } = await import('../modules/media/controllers/media-library.controller.js');
+      app.use('/api/v1/platform', createMediaLibraryRouter(dataSource));
+      logger.info('✅ Media Library routes registered at /api/v1/platform/media-library/*');
+    } catch (mediaLibError) {
+      logger.error('Failed to register Media Library routes:', mediaLibError);
+    }
+
     // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('../copilot/copilot-engine.controller.js');

@@ -227,6 +227,9 @@ import { ProductAiTag } from '../modules/store-ai/entities/product-ai-tag.entity
 // PRODUCT AI CONTENT (IR-O4O-AI-CONTENT-ENGINE-IMPLEMENTATION-V1)
 import { ProductAiContent } from '../modules/store-ai/entities/product-ai-content.entity.js';
 
+// MEDIA LIBRARY (WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1)
+import { MediaAsset } from '../modules/media/entities/MediaAsset.entity.js';
+
 // PRODUCT OCR TEXT (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
 import { ProductOcrText } from '../modules/store-ai/entities/product-ocr-text.entity.js';
 
@@ -989,6 +992,8 @@ export const AppDataSource = new DataSource({
     ProductAiContent,
     // PRODUCT OCR TEXT (WO-O4O-PRODUCT-AI-CONTENT-PIPELINE-V1)
     ProductOcrText,
+    // MEDIA LIBRARY (WO-O4O-COMMON-MEDIA-LIBRARY-FOUNDATION-V1)
+    MediaAsset,
     // ============================================================================
     // AI POLICY ENTITIES (WO-O4O-AI-COST-LIMIT-QUOTA-V1 + WO-O4O-AI-BILLING-DATA-SYSTEM-V1)
     // ============================================================================
