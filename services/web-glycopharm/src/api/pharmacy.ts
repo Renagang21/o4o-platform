@@ -278,6 +278,12 @@ class PharmacyApiClient {
     }
   }
 
+  /** Unwrap standard { success, data } API envelope returned by Care endpoints */
+  private unwrap<T>(res: unknown): T {
+    const obj = res as Record<string, unknown>;
+    return obj && typeof obj === 'object' && 'data' in obj ? (obj.data as T) : (res as T);
+  }
+
   // ============================================================================
   // Dashboard API
   // ============================================================================
@@ -674,31 +680,37 @@ class PharmacyApiClient {
   // ============================================================================
 
   async getCareDashboardSummary(): Promise<CareDashboardSummary> {
-    return this.request('/care/dashboard');
+    const res = await this.request('/care/dashboard');
+    return this.unwrap(res);
   }
 
   async getRiskPatients(): Promise<RiskPatientsResponse> {
-    return this.request('/care/risk-patients');
+    const res = await this.request('/care/risk-patients');
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-PRIORITY-PATIENT-ENGINE-V1
   async getPriorityPatients(): Promise<{ priorityPatients: PriorityPatientDto[] }> {
-    return this.request('/care/priority-patients');
+    const res = await this.request('/care/priority-patients');
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-POPULATION-DASHBOARD-V1
   async getPopulationDashboard(): Promise<PopulationDashboardDto> {
-    return this.request('/care/population-dashboard');
+    const res = await this.request('/care/population-dashboard');
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-TODAY-PRIORITY-PATIENTS-V1
   async getTodayPriorityPatients(): Promise<TodayPriorityPatientDto[]> {
-    return this.request('/care/today-priority');
+    const res = await this.request('/care/today-priority');
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-ALERT-ENGINE-V1
   async getCareAlerts(): Promise<CareAlertDto[]> {
-    return this.request('/care/alerts');
+    const res = await this.request('/care/alerts');
+    return this.unwrap(res);
   }
 
   async acknowledgeCareAlert(alertId: string): Promise<void> {
@@ -715,34 +727,39 @@ class PharmacyApiClient {
 
   // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 3: Patient Timeline
   async getPatientTimeline(patientId: string, limit = 50): Promise<TimelineEventDto[]> {
-    return this.request(`/care/timeline/${patientId}?limit=${limit}`);
+    const res = await this.request(`/care/timeline/${patientId}?limit=${limit}`);
+    return this.unwrap(res);
   }
 
   // WO-GLYCOPHARM-CARE-CONTROL-TOWER-V1 — Phase 4: AI Priority
   async getAiPriorityPatients(limit = 5): Promise<{ priorityPatients: AiPriorityPatientDto[] }> {
-    return this.request(`/care/ai-priority-patients?limit=${limit}`);
+    const res = await this.request(`/care/ai-priority-patients?limit=${limit}`);
+    return this.unwrap(res);
   }
 
   // WO-GLYCOPHARM-CARE-AI-CHAT-SYSTEM-V1
   async sendCareAiChat(message: string, patientId?: string): Promise<AiChatResponseDto> {
-    const res = await this.request<{ success: boolean; data: AiChatResponseDto }>(
-      '/care/ai-chat',
-      { method: 'POST', body: JSON.stringify({ message, patientId }) },
-    );
-    return (res as { data: AiChatResponseDto }).data ?? (res as unknown as AiChatResponseDto);
+    const res = await this.request('/care/ai-chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, patientId }),
+    });
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-LLM-INSIGHT-V1
   async getCareLlmInsight(patientId: string): Promise<CareLlmInsightDto> {
-    return this.request(`/care/llm-insight/${patientId}`);
+    const res = await this.request(`/care/llm-insight/${patientId}`);
+    return this.unwrap(res);
   }
 
   async getCareAnalysis(patientId: string): Promise<CareInsightDto> {
-    return this.request(`/care/analysis/${patientId}`);
+    const res = await this.request(`/care/analysis/${patientId}`);
+    return this.unwrap(res);
   }
 
   async getCareKpi(patientId: string): Promise<KpiComparisonDto> {
-    return this.request(`/care/kpi/${patientId}`);
+    const res = await this.request(`/care/kpi/${patientId}`);
+    return this.unwrap(res);
   }
 
   async getCareTimeBasedAnalysis(patientId: string, days = 14): Promise<{ success: boolean; data: TimeBasedAnalysisDto }> {
@@ -772,34 +789,39 @@ class PharmacyApiClient {
     summary: string;
     actionPlan: string;
   }): Promise<CoachingSession> {
-    return this.request('/care/coaching', {
+    const res = await this.request('/care/coaching', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return this.unwrap(res);
   }
 
   async getCoachingSessions(patientId: string): Promise<CoachingSession[]> {
-    return this.request(`/care/coaching/${patientId}`);
+    const res = await this.request(`/care/coaching/${patientId}`);
+    return this.unwrap(res);
   }
 
   // WO-O4O-GLYCOPHARM-CARE-COACHING-PAGE-V1
   async getAllCoachingSessions(): Promise<CoachingSessionWithPatient[]> {
-    return this.request('/care/coaching');
+    const res = await this.request('/care/coaching');
+    return this.unwrap(res);
   }
 
   // WO-O4O-CARE-AI-COACHING-DRAFT-V1
   async getCoachingDraft(patientId: string): Promise<CoachingDraftDto | null> {
-    return this.request(`/care/coaching-drafts/${patientId}`);
+    const res = await this.request(`/care/coaching-drafts/${patientId}`);
+    return this.unwrap(res);
   }
 
   async approveCoachingDraft(
     draftId: string,
     data?: { summary?: string; actionPlan?: string },
   ): Promise<CoachingSession> {
-    return this.request(`/care/coaching-drafts/${draftId}/approve`, {
+    const res = await this.request(`/care/coaching-drafts/${draftId}/approve`, {
       method: 'POST',
       body: JSON.stringify(data || {}),
     });
+    return this.unwrap(res);
   }
 
   async discardCoachingDraft(draftId: string): Promise<void> {
@@ -810,7 +832,8 @@ class PharmacyApiClient {
 
   // Messages (WO-O4O-CARE-QNA-SYSTEM-V1)
   async getPatientMessages(patientId: string): Promise<CareMessageDto[]> {
-    return this.request(`/care/messages/${patientId}`);
+    const res = await this.request(`/care/messages/${patientId}`);
+    return this.unwrap(res);
   }
 
   async sendMessageToPatient(
@@ -818,10 +841,11 @@ class PharmacyApiClient {
     content: string,
     coachingId?: string,
   ): Promise<CareMessageDto> {
-    return this.request('/care/messages/pharmacist', {
+    const res = await this.request('/care/messages/pharmacist', {
       method: 'POST',
       body: JSON.stringify({ patientId, content, ...(coachingId ? { coachingId } : {}) }),
     });
+    return this.unwrap(res);
   }
 
   async markPatientMessagesRead(patientId: string): Promise<void> {
@@ -832,11 +856,13 @@ class PharmacyApiClient {
 
   // Notification (WO-O4O-CARE-NOTIFICATION-V1)
   async getPharmacyUnreadCount(): Promise<{ count: number }> {
-    return this.request('/care/messages/pharmacist/unread-count');
+    const res = await this.request('/care/messages/pharmacist/unread-count');
+    return this.unwrap(res);
   }
 
   async getPharmacyUnreadByPatient(): Promise<Array<{ patientId: string; count: number }>> {
-    return this.request('/care/messages/pharmacist/unread-by-patient');
+    const res = await this.request('/care/messages/pharmacist/unread-by-patient');
+    return this.unwrap(res);
   }
 
   async postHealthReading(data: {
@@ -847,10 +873,11 @@ class PharmacyApiClient {
     measuredAt: string;
     metadata?: Record<string, unknown>;
   }): Promise<HealthReadingDto> {
-    return this.request('/care/health-readings', {
+    const res = await this.request('/care/health-readings', {
       method: 'POST',
       body: JSON.stringify(data),
     });
+    return this.unwrap(res);
   }
 
   async getHealthReadings(
@@ -862,7 +889,8 @@ class PharmacyApiClient {
     if (params?.to) query.set('to', params.to);
     if (params?.metricType) query.set('metricType', params.metricType);
     const qs = query.toString();
-    return this.request(`/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
+    const res = await this.request(`/care/health-readings/${patientId}${qs ? `?${qs}` : ''}`);
+    return this.unwrap(res);
   }
 
   // ── CGM Event Analysis (WO-O4O-CARE-CGM-EVENT-INTEGRATION-V1) ──
@@ -872,16 +900,15 @@ class PharmacyApiClient {
     days?: number,
   ): Promise<CgmEventAnalysisDto> {
     const qs = days ? `?days=${days}` : '';
-    const res = await this.request<{ success: boolean; data: CgmEventAnalysisDto }>(
-      `/care/event-analysis/${patientId}${qs}`,
-    );
-    return (res as unknown as { data: CgmEventAnalysisDto }).data;
+    const res = await this.request(`/care/event-analysis/${patientId}${qs}`);
+    return this.unwrap(res);
   }
 
   // ── Pharmacy Link (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
 
   async getPharmacyLinkRequests(): Promise<PharmacyLinkRequestDto[]> {
-    return this.request('/care/pharmacy-link/requests');
+    const res = await this.request('/care/pharmacy-link/requests');
+    return this.unwrap(res);
   }
 
   async approvePharmacyLink(requestId: string): Promise<void> {
@@ -902,7 +929,8 @@ class PharmacyApiClient {
 
   async getPharmacyAppointments(status?: string): Promise<PharmacyAppointmentDto[]> {
     const qs = status ? `?status=${status}` : '';
-    return this.request(`/care/appointments/pharmacy${qs}`);
+    const res = await this.request(`/care/appointments/pharmacy${qs}`);
+    return this.unwrap(res);
   }
 
   async confirmAppointment(id: string): Promise<void> {
