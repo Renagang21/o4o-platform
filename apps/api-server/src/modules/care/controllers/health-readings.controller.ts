@@ -84,20 +84,35 @@ export function createHealthReadingsRouter(dataSource: DataSource): Router {
   });
 
   // GET /health-readings/:patientId — list readings (pharmacy-scoped)
+  // WO-O4O-CARE-PATIENT-SELF-INPUT-PHARMACY-VISIBILITY-FIX-V1
+  // 권한 검증은 연결 관계로, 데이터 조회는 patient 기준으로
   router.get('/health-readings/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
       const { patientId } = req.params;
       const pharmacyId = pcReq.pharmacyId;
 
+      // Step 1: 약국-환자 연결 검증 (admin은 pharmacyId=null → 스킵)
+      if (pharmacyId) {
+        const linked = await dataSource.query(
+          `SELECT id FROM glucoseview_customers
+           WHERE organization_id = $1 AND (user_id = $2 OR id = $2)
+           LIMIT 1`,
+          [pharmacyId, patientId],
+        );
+        if (linked.length === 0) {
+          res.status(403).json({
+            success: false,
+            error: { code: 'PATIENT_NOT_LINKED', message: 'Patient is not linked to this pharmacy' },
+          });
+          return;
+        }
+      }
+
+      // Step 2: 연결 확인됨 → 해당 환자의 모든 데이터 조회 (pharmacy_id 필터 제거)
       const qb = repo
         .createQueryBuilder('r')
         .where('r.patient_id = :patientId', { patientId });
-
-      // pharmacy scope
-      if (pharmacyId) {
-        qb.andWhere('r.pharmacy_id = :pharmacyId', { pharmacyId });
-      }
 
       // optional metric_type filter
       const metricType = req.query.metricType as string | undefined;

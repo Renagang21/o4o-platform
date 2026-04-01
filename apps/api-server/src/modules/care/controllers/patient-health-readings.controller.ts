@@ -57,8 +57,8 @@ export function createPatientHealthReadingsRouter(dataSource: DataSource): Route
         if (linked.length > 0) {
           linkedPharmacyId = linked[0].organization_id;
         }
-      } catch {
-        // Non-blocking: if lookup fails, save with null (patient data is never lost)
+      } catch (lookupErr) {
+        console.warn('[patient-health-readings] pharmacy lookup failed, saving with null:', lookupErr);
       }
 
       const entity = repo.create({
