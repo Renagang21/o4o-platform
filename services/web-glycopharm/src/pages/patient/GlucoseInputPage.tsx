@@ -6,10 +6,9 @@
  * 당뇨인 자가입력: 혈당 값 + 측정 구분 + 측정 시간
  * 추가 기록: 투약, 운동, 증상 (기본 펼침)
  * WO-O4O-PATIENT-INPUT-UX-FIX-V1: 접이식 기본 펼침 + 가시성 강화
- * 하단에 최근 기록 표시.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -23,9 +22,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
-import type { GlucoseReading } from '@/api/patient';
 import type { MedicationItem } from '@/utils/extract-metadata';
-import { normalizeMedications } from '@/utils/extract-metadata';
 
 const MEAL_TIMING_OPTIONS = [
   { value: 'fasting', label: '공복' },
@@ -34,8 +31,6 @@ const MEAL_TIMING_OPTIONS = [
   { value: 'bedtime', label: '취침 전' },
   { value: 'random', label: '기타' },
 ];
-
-import { MEAL_TIMING_LABELS } from '@/constants/meal-timing';
 
 const EXERCISE_TYPES = [
   { value: 'walking', label: '걷기' },
@@ -96,30 +91,6 @@ export default function GlucoseInputPage() {
   const [symOpen, setSymOpen] = useState(true);
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [symAt, setSymAt] = useState('');
-
-  // Recent readings
-  const [readings, setReadings] = useState<GlucoseReading[]>([]);
-  const [loadingReadings, setLoadingReadings] = useState(true);
-
-  const loadReadings = useCallback(async () => {
-    setLoadingReadings(true);
-    try {
-      const res = await patientApi.getGlucoseReadings({ metricType: 'glucose' });
-      if (res.success && res.data) {
-        setReadings(Array.isArray(res.data) ? res.data : []);
-      } else {
-        setReadings([]);
-      }
-    } catch {
-      setReadings([]);
-    } finally {
-      setLoadingReadings(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadReadings();
-  }, [loadReadings]);
 
   const toggleSymptom = (value: string) => {
     setSymptoms((prev) =>
@@ -446,6 +417,16 @@ export default function GlucoseInputPage() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">운동 일시</label>
+                <input
+                  type="datetime-local"
+                  value={exAt}
+                  onChange={(e) => setExAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                />
+                <p className="text-xs text-slate-400 mt-1">비워두면 혈당 측정 시간과 동일하게 기록됩니다.</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">운동 강도</label>
                 <div className="flex gap-2">
                   {INTENSITY_OPTIONS.map((opt) => (
@@ -463,16 +444,6 @@ export default function GlucoseInputPage() {
                     </button>
                   ))}
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">운동 일시</label>
-                <input
-                  type="datetime-local"
-                  value={exAt}
-                  onChange={(e) => setExAt(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
-                />
-                <p className="text-xs text-slate-400 mt-1">비워두면 혈당 측정 시간과 동일하게 기록됩니다.</p>
               </div>
             </div>
           )}
@@ -556,79 +527,7 @@ export default function GlucoseInputPage() {
           )}
         </button>
 
-        {/* Recent Readings */}
-        <section>
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-            최근 기록
-          </h2>
-
-          {loadingReadings ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-400" />
-            </div>
-          ) : readings.length === 0 ? (
-            <div className="bg-slate-50 rounded-xl border border-slate-100 p-8 flex flex-col items-center justify-center">
-              <ClipboardEdit className="w-10 h-10 text-slate-300 mb-2" />
-              <p className="text-sm text-slate-500">아직 기록이 없습니다.</p>
-              <p className="text-xs text-slate-400 mt-1">첫 데이터를 입력해 보세요.</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {readings.map((r) => {
-                const meta = r.metadata as Record<string, unknown>;
-                const meds = normalizeMedications(meta);
-                const hasEx = meta?.exercise != null;
-                const hasSym = Array.isArray(meta?.symptoms) && (meta.symptoms as string[]).length > 0;
-                return (
-                  <div
-                    key={r.id}
-                    className="bg-white rounded-xl border border-slate-200 p-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-600">
-                          {new Date(r.measuredAt).toLocaleString('ko-KR')}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {MEAL_TIMING_LABELS[(meta as Record<string, string>)?.mealTiming] || '기타'}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-slate-800 tabular-nums">
-                          {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(0) : '-'}
-                        </p>
-                        <p className="text-xs text-slate-400">{r.unit}</p>
-                      </div>
-                    </div>
-                    {/* Metadata tags */}
-                    {(meds.length > 0 || hasEx || hasSym) && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100">
-                        {meds.map((m, mi) => (
-                          <span key={mi} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
-                            <Pill className="w-3 h-3" />
-                            {m.name}{m.dose ? ` ${m.dose}` : ''}
-                          </span>
-                        ))}
-                        {hasEx && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600">
-                            <Footprints className="w-3 h-3" />
-                            {(meta.exercise as { duration: number }).duration}분
-                          </span>
-                        )}
-                        {hasSym && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600">
-                            <AlertTriangle className="w-3 h-3" />
-                            증상 {(meta.symptoms as string[]).length}개
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
+        {/* 최근 기록은 별도 메뉴로 분리됨 */}
       </div>
     </div>
   );
