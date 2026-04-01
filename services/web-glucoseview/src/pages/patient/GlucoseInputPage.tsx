@@ -96,6 +96,7 @@ export default function GlucoseInputPage() {
   const [symOpen, setSymOpen] = useState(true);
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [symSeverity, setSymSeverity] = useState('mild');
+  const [symAt, setSymAt] = useState('');
   const [symDuration, setSymDuration] = useState('');
 
   // Recent readings
@@ -186,6 +187,7 @@ export default function GlucoseInputPage() {
           severity: symSeverity,
           ...(symDuration ? { duration: Number(symDuration) } : {}),
         };
+        if (symAt) metadata.symptomAt = symAt;
       }
 
       const res = await patientApi.postGlucoseReading({
@@ -555,6 +557,16 @@ export default function GlucoseInputPage() {
                   </div>
                 </div>
               )}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">증상 발생 일시</label>
+                <input
+                  type="datetime-local"
+                  value={symAt}
+                  onChange={(e) => setSymAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+                />
+                <p className="text-xs text-slate-400 mt-1">비워두면 혈당 측정 시간과 동일하게 기록됩니다.</p>
+              </div>
             </div>
           )}
         </section>

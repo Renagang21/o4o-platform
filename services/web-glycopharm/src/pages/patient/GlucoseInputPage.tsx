@@ -94,6 +94,7 @@ export default function GlucoseInputPage() {
   // Form state — Symptoms (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
   const [symOpen, setSymOpen] = useState(true);
   const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [symAt, setSymAt] = useState('');
 
   // Recent readings
   const [readings, setReadings] = useState<GlucoseReading[]>([]);
@@ -179,6 +180,7 @@ export default function GlucoseInputPage() {
       // Symptoms
       if (symOpen && symptoms.length > 0) {
         metadata.symptoms = symptoms;
+        if (symAt) metadata.symptomAt = symAt;
       }
 
       const res = await patientApi.postGlucoseReading({
@@ -451,7 +453,7 @@ export default function GlucoseInputPage() {
           {symOpen && (
             <div className="mt-1 bg-white rounded-2xl border border-amber-100 p-5">
               <p className="text-xs text-slate-500 mb-3">해당되는 증상을 모두 선택하세요.</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {SYMPTOM_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
@@ -466,6 +468,16 @@ export default function GlucoseInputPage() {
                     {opt.label}
                   </button>
                 ))}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">증상 발생 일시</label>
+                <input
+                  type="datetime-local"
+                  value={symAt}
+                  onChange={(e) => setSymAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+                />
+                <p className="text-xs text-slate-400 mt-1">비워두면 혈당 측정 시간과 동일하게 기록됩니다.</p>
               </div>
             </div>
           )}
