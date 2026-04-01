@@ -98,9 +98,8 @@ function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
     const parts = [med.name || ''];
     if (med.dose) parts.push(med.dose);
     if (med.taken === false) parts.push('(미복용)');
-    const medTs = med.takenAt ? new Date(med.takenAt) : ts;
     entries.push({
-      id: `${r.id}-med-${mi}`, timestamp: medTs, entryType: 'medication',
+      id: `${r.id}-med-${mi}`, timestamp: ts, entryType: 'medication',
       label: parts.join(' '),
     });
   }
@@ -108,9 +107,8 @@ function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
   if (meta.exercise) {
     const exLabel = EXERCISE_TYPES.find(o => o.value === meta.exercise!.type)?.label || meta.exercise.type || '';
     const tmLabel = meta.exercise.timing === 'after_meal' ? ' (식후)' : meta.exercise.timing === 'fasting' ? ' (공복)' : '';
-    const exTs = (meta as any).exercise?.exercisedAt ? new Date((meta as any).exercise.exercisedAt) : ts;
     entries.push({
-      id: `${r.id}-ex`, timestamp: exTs, entryType: 'exercise',
+      id: `${r.id}-ex`, timestamp: ts, entryType: 'exercise',
       label: `${exLabel}${meta.exercise.duration ? ` ${meta.exercise.duration}분` : ''}${tmLabel}`,
     });
   }
@@ -118,9 +116,8 @@ function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
   // Symptoms (backward compat handled by extractMetadata)
   if (meta.symptoms && meta.symptoms.items.length > 0) {
     const { items, severity, duration } = meta.symptoms;
-    const symTs = (r.metadata as Record<string, unknown>)?.symptomAt ? new Date(String((r.metadata as Record<string, unknown>).symptomAt)) : ts;
     entries.push({
-      id: `${r.id}-sym`, timestamp: symTs, entryType: 'symptom',
+      id: `${r.id}-sym`, timestamp: ts, entryType: 'symptom',
       label: `${items.join(', ')}${severity ? ` [${SEVERITY_LABELS[severity] || severity}]` : ''}${duration ? ` ${duration}분` : ''}`,
     });
   }
