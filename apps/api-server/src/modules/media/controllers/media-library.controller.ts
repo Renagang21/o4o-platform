@@ -40,12 +40,14 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
 
       const userId = req.user?.id;
       const serviceKey = req.body?.serviceKey || null;
+      const folder = req.body?.folder || 'general';
 
       const service = new MediaLibraryService(dataSource);
       const asset = await service.upload(
         { buffer: file.buffer, originalname: file.originalname, mimetype: file.mimetype, size: file.size },
         userId,
         serviceKey,
+        folder,
       );
 
       logger.info(`[MediaLibrary] Upload success: ${asset.id} by ${userId}`);
@@ -65,9 +67,10 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
       const assetType = req.query.assetType as string | undefined;
+      const folder = req.query.folder as string | undefined;
 
       const service = new MediaLibraryService(dataSource);
-      const result = await service.list({ page, limit, assetType });
+      const result = await service.list({ page, limit, assetType, folder });
 
       res.json({ success: true, ...result });
     } catch (error: any) {
@@ -95,6 +98,70 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
     } catch (error: any) {
       logger.error('[MediaLibrary] Get error:', error);
       res.status(500).json({ success: false, error: 'Failed to get media asset' });
+    }
+  });
+
+  /**
+   * PATCH /media-library/:id/folder
+   * 폴더 이동 (운영자 전용)
+   */
+  router.patch('/media-library/:id/folder', authenticate, async (req: any, res: Response) => {
+    try {
+      const roles: string[] = req.user?.roles || [];
+      const isOperator = roles.some((r: string) =>
+        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+      );
+      if (!isOperator) {
+        res.status(403).json({ success: false, error: 'Operator access required' });
+        return;
+      }
+
+      const { id } = req.params;
+      const { folder } = req.body;
+      if (!folder || typeof folder !== 'string') {
+        res.status(400).json({ success: false, error: 'folder is required' });
+        return;
+      }
+
+      const service = new MediaLibraryService(dataSource);
+      const asset = await service.moveToFolder(id, folder);
+      res.json({ success: true, data: asset });
+    } catch (error: any) {
+      logger.error('[MediaLibrary] Move folder error:', error);
+      if (error.message === 'Asset not found') {
+        res.status(404).json({ success: false, error: 'Asset not found' });
+        return;
+      }
+      res.status(500).json({ success: false, error: 'Failed to move asset' });
+    }
+  });
+
+  /**
+   * DELETE /media-library/:id
+   * 자산 삭제 (운영자 전용)
+   */
+  router.delete('/media-library/:id', authenticate, async (req: any, res: Response) => {
+    try {
+      const roles: string[] = req.user?.roles || [];
+      const isOperator = roles.some((r: string) =>
+        r.includes('admin') || r.includes('operator') || r.includes('super_admin')
+      );
+      if (!isOperator) {
+        res.status(403).json({ success: false, error: 'Operator access required' });
+        return;
+      }
+
+      const { id } = req.params;
+      const service = new MediaLibraryService(dataSource);
+      await service.deleteAsset(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      logger.error('[MediaLibrary] Delete error:', error);
+      if (error.message === 'Asset not found') {
+        res.status(404).json({ success: false, error: 'Asset not found' });
+        return;
+      }
+      res.status(500).json({ success: false, error: 'Failed to delete asset' });
     }
   });
 

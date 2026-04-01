@@ -33,6 +33,7 @@ export class MediaLibraryService {
     file: { buffer: Buffer; originalname: string; mimetype: string; size: number },
     userId: string,
     serviceKey?: string,
+    folder = 'general',
   ): Promise<MediaAsset> {
     const isImage = IMAGE_MIMES.includes(file.mimetype);
     let buffer = file.buffer;
@@ -86,6 +87,7 @@ export class MediaLibraryService {
       assetType: isImage ? 'image' : this.classifyAssetType(file.mimetype),
       width,
       height,
+      folder,
       serviceKey: serviceKey || null,
       uploadedBy: userId,
       isLibraryPublic: true,
@@ -105,6 +107,7 @@ export class MediaLibraryService {
     page?: number;
     limit?: number;
     assetType?: string;
+    folder?: string;
   }): Promise<{ data: MediaAsset[]; total: number; page: number; limit: number }> {
     const page = Math.max(1, options.page || 1);
     const limit = Math.min(100, Math.max(1, options.limit || 20));
@@ -116,6 +119,10 @@ export class MediaLibraryService {
 
     if (options.assetType) {
       qb.andWhere('m.asset_type = :assetType', { assetType: options.assetType });
+    }
+
+    if (options.folder) {
+      qb.andWhere('m.folder = :folder', { folder: options.folder });
     }
 
     const [data, total] = await qb
@@ -131,6 +138,38 @@ export class MediaLibraryService {
    */
   async getById(id: string): Promise<MediaAsset | null> {
     return this.repo.findOne({ where: { id } });
+  }
+
+  /**
+   * 폴더 이동.
+   */
+  async moveToFolder(assetId: string, folder: string): Promise<MediaAsset> {
+    const asset = await this.repo.findOne({ where: { id: assetId } });
+    if (!asset) throw new Error('Asset not found');
+    asset.folder = folder;
+    return this.repo.save(asset);
+  }
+
+  /**
+   * 자산 삭제 (DB + GCS).
+   */
+  async deleteAsset(assetId: string): Promise<void> {
+    const asset = await this.repo.findOne({ where: { id: assetId } });
+    if (!asset) throw new Error('Asset not found');
+
+    // GCS 삭제 (gcsPath가 있는 경우만)
+    if (asset.gcsPath) {
+      try {
+        const bucket = this.storage.bucket(this.bucketName);
+        await bucket.file(asset.gcsPath).delete();
+        logger.info(`[MediaLibrary] GCS deleted: ${asset.gcsPath}`);
+      } catch (err) {
+        logger.warn(`[MediaLibrary] GCS delete failed (continuing): ${asset.gcsPath}`, err);
+      }
+    }
+
+    await this.repo.remove(asset);
+    logger.info(`[MediaLibrary] Deleted asset: ${assetId}`);
   }
 
   private getExtension(mimeType: string, originalName: string): string {

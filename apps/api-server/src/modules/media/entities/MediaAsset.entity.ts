@@ -18,6 +18,7 @@ import {
 @Index('IDX_media_assets_uploaded_by', ['uploadedBy'])
 @Index('IDX_media_assets_asset_type', ['assetType'])
 @Index('IDX_media_assets_service_key', ['serviceKey'])
+@Index('IDX_media_assets_folder', ['folder'])
 export class MediaAsset {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -48,6 +49,9 @@ export class MediaAsset {
 
   @Column({ type: 'int', nullable: true })
   height!: number | null;
+
+  @Column({ type: 'varchar', length: 50, default: 'general' })
+  folder!: string;
 
   @Column({ name: 'service_key', type: 'varchar', length: 100, nullable: true })
   serviceKey!: string | null;
