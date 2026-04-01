@@ -12,13 +12,12 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, Briefcase, ChevronDown, ChevronRight, Globe } from 'lucide-react';
+import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, Briefcase, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
 import { ProductForm, type ProductFormData } from '../../components/product';
 import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
-import ExternalImportModal from '../../components/supplier/ExternalImportModal';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 interface ProductDetailDrawerProps {
@@ -186,8 +185,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [addingTag, setAddingTag] = useState(false);
   // V2: multi-select AI suggestions in edit mode
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
-  // WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1
-  const [showExternalImport, setShowExternalImport] = useState(false);
   // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
 
@@ -789,18 +786,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           {/* ── 수정 모드: 소비자 공개 설명 (B2C) ── */}
           {isEditing && (editMode === 'b2c' || showSecondaryEdit) && (
             <div className="mb-5 p-4 bg-emerald-50/40 border border-emerald-200 rounded-xl space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">소비자 공개 설명 (B2C)</h4>
-                {product?.masterId && (
-                  <button
-                    onClick={() => setShowExternalImport(true)}
-                    className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                  >
-                    <Globe size={11} />
-                    외부에서 가져오기
-                  </button>
-                )}
-              </div>
+              <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">소비자 공개 설명 (B2C)</h4>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">소비자 간단 소개</label>
@@ -1547,22 +1533,6 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           </div>
         )}
       </div>
-      {/* WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1: 외부 가져오기 모달 */}
-      {product?.masterId && (
-        <ExternalImportModal
-          open={showExternalImport}
-          onClose={() => setShowExternalImport(false)}
-          masterId={product.masterId}
-          onApplyProductName={(name) => {
-            if (formRef.current) {
-              formRef.current.marketingName = name;
-            }
-          }}
-          onApplyShortDescription={(html) => setEditConsumerShort(html)}
-          onApplyDetailDescription={(html) => setEditConsumerDetail(html)}
-        />
-      )}
-
       {/* WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 */}
       <MediaPickerModal
         open={!!mediaPickerTarget}
