@@ -636,17 +636,17 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
   {
     key: 'tags',
     header: '태그',
-    width: '150px',
+    width: '120px',
     render: (v: string[] | undefined | null) => {
       const tags = Array.isArray(v) ? v : [];
       if (tags.length === 0) return <span className="text-xs text-slate-400">-</span>;
       return (
-        <div className="flex flex-wrap gap-1">
-          {tags.slice(0, 3).map((tag, i) => (
-            <span key={i} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{tag}</span>
+        <div className="flex items-center gap-1 overflow-hidden whitespace-nowrap">
+          {tags.slice(0, 2).map((tag, i) => (
+            <span key={i} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded truncate max-w-[50px]">{tag}</span>
           ))}
-          {tags.length > 3 && (
-            <span className="text-xs text-slate-400">+{tags.length - 3}</span>
+          {tags.length > 2 && (
+            <span className="text-xs text-slate-400 shrink-0">+{tags.length - 2}</span>
           )}
         </div>
       );
