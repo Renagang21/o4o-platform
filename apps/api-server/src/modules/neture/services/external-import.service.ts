@@ -3,9 +3,10 @@
  *
  * 외부 쇼핑몰 상품 페이지에서 상품명/간략설명/상세설명을 추출하고,
  * 이미지를 O4O GCS에 업로드한 후 URL을 교체하여 반환한다.
+ *
+ * jsdom 대신 regex 기반 파싱 사용 (Cloud Run punycode 호환성 문제 회피)
  */
 
-import { JSDOM } from 'jsdom';
 import sharp from 'sharp';
 import logger from '../../../utils/logger.js';
 import { ImageStorageService } from './image-storage.service.js';
@@ -16,10 +17,11 @@ import type { DataSource } from 'typeorm';
 interface SiteParserConfig {
   domain: string;
   name: string;
-  selectors: {
-    productName: string;
-    shortDescription: string;
-    detailDescription: string;
+  // regex 기반 추출 패턴
+  patterns: {
+    productName: RegExp;
+    shortDescription: RegExp;
+    detailDescription: RegExp;
   };
 }
 
@@ -27,10 +29,13 @@ const SITE_PARSERS: SiteParserConfig[] = [
   {
     domain: '3lifezone.co.kr',
     name: '쓰리라이프존',
-    selectors: {
-      productName: '#frmView .item_detail_tit h3, .goods_name h3, input[name="goods_name"]',
-      shortDescription: '#frmView .item_detail_list .txt, .item_info_cont .txt, .simple_desc',
-      detailDescription: '#detail .detail_cont, #prdDetail, .goods_description',
+    patterns: {
+      // 퍼스트몰 관리자 페이지: input[name="goods_name"] value
+      productName: /name=["']goods_name["'][^>]*value=["']([^"']+)["']/i,
+      // 간략설명 textarea
+      shortDescription: /name=["']short_description["'][^>]*>([^<]*)</i,
+      // 상세설명: 에디터 영역 (tx_canvas_wysiwyg 이후 콘텐츠 또는 goods_description)
+      detailDescription: /class=["'][^"']*detail_cont[^"']*["'][^>]*>([\s\S]*?)<\/div>/i,
     },
   },
 ];
@@ -44,48 +49,54 @@ function findParser(url: string): SiteParserConfig | null {
   }
 }
 
-// ── 텍스트 장식 제거 ──
+// ── 텍스트 장식 제거 (regex 기반) ──
 
-const DECORATION_PROPERTIES = [
-  'font-size', 'font-family', 'color', 'background-color', 'background',
-  'line-height', 'letter-spacing', 'font-weight', 'font-style',
-  'text-decoration', 'text-shadow', 'word-spacing',
-];
+const DECORATION_PROPS_RE = /\b(?:font-size|font-family|color|background-color|background|line-height|letter-spacing|font-weight|font-style|text-decoration|text-shadow|word-spacing)\s*:[^;]+;?/gi;
 
 function stripDecoration(html: string): string {
-  const dom = new JSDOM(`<div id="__root">${html}</div>`);
-  const doc = dom.window.document;
-  const root = doc.getElementById('__root')!;
+  let result = html;
 
-  // Remove <font> tags — unwrap to children
-  root.querySelectorAll('font').forEach((font) => {
-    const parent = font.parentNode;
-    if (parent) {
-      while (font.firstChild) {
-        parent.insertBefore(font.firstChild, font);
-      }
-      parent.removeChild(font);
-    }
+  // 1. <font ...> 태그 → 내용만 유지
+  result = result.replace(/<font[^>]*>([\s\S]*?)<\/font>/gi, '$1');
+
+  // 2. style 속성에서 장식 속성 제거
+  result = result.replace(/style\s*=\s*"([^"]*)"/gi, (match, styleContent: string) => {
+    const cleaned = styleContent.replace(DECORATION_PROPS_RE, '').trim();
+    return cleaned ? `style="${cleaned}"` : '';
+  });
+  result = result.replace(/style\s*=\s*'([^']*)'/gi, (match, styleContent: string) => {
+    const cleaned = styleContent.replace(DECORATION_PROPS_RE, '').trim();
+    return cleaned ? `style='${cleaned}'` : '';
   });
 
-  // Strip decoration styles from all elements
-  root.querySelectorAll('[style]').forEach((el) => {
-    const htmlEl = el as HTMLElement;
-    for (const prop of DECORATION_PROPERTIES) {
-      htmlEl.style.removeProperty(prop);
-    }
-    // Remove style attribute entirely if empty
-    if (!htmlEl.getAttribute('style')?.trim()) {
-      htmlEl.removeAttribute('style');
-    }
-  });
+  // 3. class 속성 제거 (외부 사이트 전용 클래스)
+  result = result.replace(/\s+class\s*=\s*["'][^"']*["']/gi, '');
 
-  // Remove class attributes (site-specific classes)
-  root.querySelectorAll('[class]').forEach((el) => {
-    el.removeAttribute('class');
-  });
+  // 4. 빈 style 속성 정리
+  result = result.replace(/\s+style\s*=\s*["']\s*["']/gi, '');
 
-  return root.innerHTML;
+  // 5. 빈 span 태그 정리 (<span>내용</span> → 내용)
+  result = result.replace(/<span\s*>([\s\S]*?)<\/span>/gi, '$1');
+
+  return result;
+}
+
+// ── 이미지 src 추출 및 교체 ──
+
+function extractImageSrcs(html: string): string[] {
+  const srcs: string[] = [];
+  const imgRegex = /<img[^>]+src\s*=\s*["']([^"']+)["'][^>]*>/gi;
+  let match;
+  while ((match = imgRegex.exec(html)) !== null) {
+    srcs.push(match[1]);
+  }
+  return srcs;
+}
+
+function replaceImageSrc(html: string, oldSrc: string, newSrc: string): string {
+  // Escape special regex chars in the src
+  const escaped = oldSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return html.replace(new RegExp(`(src\\s*=\\s*["'])${escaped}(["'])`, 'g'), `$1${newSrc}$2`);
 }
 
 // ── 메인 서비스 ──
@@ -129,34 +140,20 @@ export class ExternalImportService {
       throw new Error('이 사이트는 로그인이 필요합니다. "HTML 붙여넣기" 탭을 이용하세요.');
     }
 
-    const dom = new JSDOM(html);
-    const doc = dom.window.document;
-
-    // Extract fields using selectors
+    // Extract fields using regex patterns
     let productName: string | null = null;
     let shortDescription: string | null = null;
     let detailHtml: string | null = null;
 
     if (parser) {
-      // Product name
-      const nameEl = doc.querySelector(parser.selectors.productName);
-      if (nameEl) {
-        productName = (nameEl as HTMLInputElement).value?.trim()
-          || nameEl.textContent?.trim()
-          || null;
-      }
+      const nameMatch = html.match(parser.patterns.productName);
+      if (nameMatch) productName = nameMatch[1].trim();
 
-      // Short description
-      const shortEl = doc.querySelector(parser.selectors.shortDescription);
-      if (shortEl) {
-        shortDescription = shortEl.textContent?.trim() || null;
-      }
+      const shortMatch = html.match(parser.patterns.shortDescription);
+      if (shortMatch) shortDescription = shortMatch[1].trim();
 
-      // Detail description
-      const detailEl = doc.querySelector(parser.selectors.detailDescription);
-      if (detailEl) {
-        detailHtml = detailEl.innerHTML;
-      }
+      const detailMatch = html.match(parser.patterns.detailDescription);
+      if (detailMatch) detailHtml = detailMatch[1];
     }
 
     // Process detail description
@@ -198,18 +195,11 @@ export class ExternalImportService {
     // 1. Strip decoration
     let cleaned = stripDecoration(html);
 
-    // 2. Extract and replace images
-    const dom = new JSDOM(`<div id="__root">${cleaned}</div>`);
-    const doc = dom.window.document;
-    const root = doc.getElementById('__root')!;
-    const imgElements = root.querySelectorAll('img');
-
+    // 2. Extract image srcs and process them
+    const srcs = extractImageSrcs(cleaned);
     let imageCount = 0;
 
-    for (const img of Array.from(imgElements) as HTMLImageElement[]) {
-      const src = img.getAttribute('src');
-      if (!src) continue;
-
+    for (const src of srcs) {
       // Resolve relative URLs
       let absoluteUrl = src;
       if (src.startsWith('//')) {
@@ -223,7 +213,7 @@ export class ExternalImportService {
 
       try {
         const newUrl = await this.downloadAndUploadImage(absoluteUrl, masterId);
-        img.setAttribute('src', newUrl);
+        cleaned = replaceImageSrc(cleaned, src, newUrl);
         imageCount++;
       } catch (err) {
         logger.warn(`[ExternalImport] Image download failed: ${absoluteUrl}`, err);
@@ -231,7 +221,7 @@ export class ExternalImportService {
       }
     }
 
-    return { html: root.innerHTML, imageCount };
+    return { html: cleaned, imageCount };
   }
 
   private async downloadAndUploadImage(imageUrl: string, masterId: string): Promise<string> {
