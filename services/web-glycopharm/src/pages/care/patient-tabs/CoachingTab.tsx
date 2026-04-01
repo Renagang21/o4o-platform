@@ -17,6 +17,8 @@ import {
   Send,
   Sparkles,
   Trash2,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { pharmacyApi, type CoachingSession, type CoachingDraftDto } from '@/api/pharmacy';
@@ -42,6 +44,10 @@ export default function CoachingTab() {
   const [draftSending, setDraftSending] = useState(false);
   const [draftDiscarding, setDraftDiscarding] = useState(false);
 
+  // UX feedback (WO-O4O-CARE-COACHING-SEND-UX-REFINEMENT-V1)
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+
   const loadData = useCallback(async () => {
     if (!patient?.id) return;
     setLoading(true);
@@ -66,6 +72,27 @@ export default function CoachingTab() {
     }
   }, [patient?.id]);
 
+  // Soft reload: refresh data without showing full-screen spinner
+  const softReload = useCallback(async () => {
+    if (!patient?.id) return;
+    try {
+      const [sessionsData, draftData] = await Promise.all([
+        pharmacyApi.getCoachingSessions(patient.id),
+        pharmacyApi.getCoachingDraft(patient.id).catch(() => null),
+      ]);
+      setSessions(Array.isArray(sessionsData) ? sessionsData : []);
+      if (draftData && draftData.status === 'draft') {
+        setDraft(draftData);
+        setDraftMessage(draftData.draftMessage);
+      } else {
+        setDraft(null);
+        setDraftMessage('');
+      }
+    } catch {
+      // soft reload failure is non-critical
+    }
+  }, [patient?.id]);
+
   useEffect(() => {
     loadData();
   }, [loadData]);
@@ -85,6 +112,7 @@ export default function CoachingTab() {
     if (!patient?.id || !summary || !actionPlan || saving) return;
 
     setSaving(true);
+    setError('');
     try {
       await pharmacyApi.createCoachingSession({
         patientId: patient.id,
@@ -94,10 +122,12 @@ export default function CoachingTab() {
       setSummary('');
       setActionPlan('');
       setShowForm(false);
-      await loadData();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+      await softReload();
       reload();
     } catch {
-      // error silenced
+      setError('코칭 저장에 실패했습니다.');
     } finally {
       setSaving(false);
     }
@@ -107,14 +137,17 @@ export default function CoachingTab() {
   const handleDraftApprove = async () => {
     if (!draft || draftSending) return;
     setDraftSending(true);
+    setError('');
     try {
       await pharmacyApi.approveCoachingDraft(draft.id, {
         actionPlan: draftMessage,
       });
-      await loadData();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+      await softReload();
       reload();
     } catch {
-      // error silenced
+      setError('코칭 전송에 실패했습니다.');
     } finally {
       setDraftSending(false);
     }
@@ -123,11 +156,12 @@ export default function CoachingTab() {
   const handleDraftDiscard = async () => {
     if (!draft || draftDiscarding) return;
     setDraftDiscarding(true);
+    setError('');
     try {
       await pharmacyApi.discardCoachingDraft(draft.id);
-      await loadData();
+      await softReload();
     } catch {
-      // error silenced
+      setError('초안 폐기에 실패했습니다.');
     } finally {
       setDraftDiscarding(false);
     }
@@ -183,6 +217,20 @@ export default function CoachingTab() {
           </div>
         </div>
       </div>
+
+      {/* UX Feedback Banners — WO-O4O-CARE-COACHING-SEND-UX-REFINEMENT-V1 */}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {error}
+        </div>
+      )}
+      {saved && (
+        <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-600 text-sm flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 flex-shrink-0" />
+          코칭이 전송되었습니다.
+        </div>
+      )}
 
       {/* AI Coaching Draft — WO-O4O-CARE-AI-COACHING-DRAFT-V1 */}
       {draft && (
