@@ -716,6 +716,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Spot Price Policy routes:', spotPolicyError);
     }
 
+    // 29d-4. Register External Import routes (WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1)
+    try {
+      const { createExternalImportRouter } = await import('../modules/neture/controllers/external-import.controller.js');
+      app.use('/api/v1/neture/supplier', createExternalImportRouter(dataSource));
+      logger.info('✅ External Import routes registered at /api/v1/neture/supplier/external-import/*');
+    } catch (externalImportError) {
+      logger.error('Failed to register External Import routes:', externalImportError);
+    }
+
     // 29e. Register Copilot Engine routes (WO-O4O-COPILOT-ENGINE-INTEGRATION-V1)
     try {
       const { createCopilotEngineController } = await import('../copilot/copilot-engine.controller.js');

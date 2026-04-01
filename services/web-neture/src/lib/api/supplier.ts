@@ -934,6 +934,28 @@ export const supplierApi = {
       return { success: false, error: extractApiError(error) };
     }
   },
+
+  // WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1: 외부 상품 가져오기
+  async parseExternalProduct(
+    params: { url?: string; html?: string; masterId: string },
+  ): Promise<{
+    success: boolean;
+    error?: string;
+    data?: {
+      productName: string | null;
+      shortDescription: string | null;
+      detailDescription: string | null;
+      imageCount: number;
+      source: string;
+    };
+  }> {
+    try {
+      const response = await api.post('/neture/supplier/external-import/parse', params, { timeout: 60000 });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: extractApiError(error) };
+    }
+  },
 };
 
 // ==================== Supplier Profile API ====================
