@@ -4,6 +4,7 @@ import { HealthReading } from '../entities/health-reading.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 /**
  * Health Readings Controller
@@ -92,7 +93,10 @@ export function createHealthReadingsRouter(dataSource: DataSource): Router {
       const { patientId } = req.params;
       const pharmacyId = pcReq.pharmacyId;
 
-      // Step 1: 약국-환자 연결 검증 (admin은 pharmacyId=null → 스킵)
+      // Step 1: patientId → user_id 변환 (glucoseview_customers.id가 올 수 있음)
+      const resolvedUserId = await resolvePatientUserId(dataSource, patientId);
+
+      // Step 2: 약국-환자 연결 검증 (admin은 pharmacyId=null → 스킵)
       if (pharmacyId) {
         const linked = await dataSource.query(
           `SELECT id FROM glucoseview_customers
@@ -109,10 +113,10 @@ export function createHealthReadingsRouter(dataSource: DataSource): Router {
         }
       }
 
-      // Step 2: 연결 확인됨 → 해당 환자의 모든 데이터 조회 (pharmacy_id 필터 제거)
+      // Step 3: 연결 확인됨 → 해당 환자의 모든 데이터 조회
       const qb = repo
         .createQueryBuilder('r')
-        .where('r.patient_id = :patientId', { patientId });
+        .where('r.patient_id = :patientId', { patientId: resolvedUserId });
 
       // optional metric_type filter
       const metricType = req.query.metricType as string | undefined;

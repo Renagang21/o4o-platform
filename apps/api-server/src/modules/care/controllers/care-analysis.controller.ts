@@ -18,6 +18,7 @@ import { CareActionService } from '../services/care-action.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 export function createCareAnalysisRouter(dataSource: DataSource): Router {
   // CGM provider: database (real data with mock fallback) or mock-only
@@ -58,7 +59,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
   router.get('/analysis/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       // Patient ownership guard: verify patient belongs to this pharmacy
@@ -113,7 +114,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
   router.get('/analysis/time-based/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
       const days = Math.min(Number(req.query.days) || 14, 90);
 
@@ -253,7 +254,7 @@ export function createCareAnalysisRouter(dataSource: DataSource): Router {
   router.get('/kpi/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       const kpi = await kpiService.getKpiComparison(patientId, pharmacyId);
