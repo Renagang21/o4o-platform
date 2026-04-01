@@ -45,6 +45,7 @@ import StoreOverviewPage from './pages/store/StoreOverviewPage';
 // Patient Pages (WO-GLUCOSEVIEW-PATIENT-MODULE-EXTRACT-V1)
 import PatientMainPage from './pages/patient/PatientMainPage';
 import PatientLandingPage from './pages/patient/PatientLandingPage';
+import { getGlucoseviewDashboardRoute } from './config/dashboard';
 import PatientProfilePage from './pages/patient/ProfilePage';
 import GlucoseInputPage from './pages/patient/GlucoseInputPage';
 import DataAnalysisPage from './pages/patient/DataAnalysisPage';
@@ -104,8 +105,11 @@ const RoleProtectedRoute = RoleGuard;
 function HomeRedirect() {
   const { isAuthenticated, user } = useAuth();
 
-  if (isAuthenticated && user?.roles.includes('glucoseview:patient')) {
-    return <Navigate to="/patient" replace />;
+  if (isAuthenticated && user) {
+    const dashRoute = getGlucoseviewDashboardRoute(user.roles);
+    if (dashRoute !== '/') {
+      return <Navigate to={dashRoute} replace />;
+    }
   }
 
   return <PatientLandingPage />;
@@ -126,17 +130,20 @@ function StoreLayoutWrapper() {
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  // Only redirect from login/register if user has a valid glucoseview dashboard destination
+  const dashRoute = isAuthenticated && user ? getGlucoseviewDashboardRoute(user.roles) : '/';
+  const hasValidSession = isAuthenticated && dashRoute !== '/';
 
   return (
     <Routes>
       {/* 공개 페이지 */}
       <Route path="/handoff" element={<HandoffPage />} />
       <Route path="/login" element={
-        isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />
+        hasValidSession ? <Navigate to={dashRoute} replace /> : <LoginPage />
       } />
       <Route path="/register" element={
-        isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />
+        hasValidSession ? <Navigate to={dashRoute} replace /> : <RegisterPage />
       } />
       <Route path="/forgot-password" element={<AccountRecoveryPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
