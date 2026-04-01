@@ -268,13 +268,19 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
  * WO-GLYCOPHARM-CARE-UI-ADJUST-V1 + WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
  * Patient Auth Guard — 비로그인 → /login?type=patient 리다이렉트
  */
+const PATIENT_ROLES = ['customer', 'glycopharm:consumer'];
+
 function PatientAuthGuardOutlet() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) return <PageLoading />;
   if (!isAuthenticated) {
     return <Navigate to="/login?type=patient" state={{ from: location.pathname }} replace />;
+  }
+  // 당뇨인 role 체크 — 약국/운영자는 /patient 접근 불가
+  if (user && !user.roles.some(r => PATIENT_ROLES.includes(r))) {
+    return <Navigate to="/" replace />;
   }
   return <Outlet />;
 }
