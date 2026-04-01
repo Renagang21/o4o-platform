@@ -95,7 +95,13 @@ export default function PatientDetailPage() {
         pharmacyApi.getCoachingSessions(id).catch(() => []),
       ]);
       if (customerRes?.success && customerRes.data) {
-        setPatient(customerRes.data);
+        // patient.id를 users.id로 정규화 (glucoseview_customers.id 대신)
+        // 모든 하위 탭에서 patient.id로 API 호출 시 users.id 기준 사용
+        const p = customerRes.data;
+        if (p.userId) {
+          p.id = p.userId;
+        }
+        setPatient(p);
       }
       if (summaryRes) {
         setSummary(summaryRes);

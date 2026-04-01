@@ -539,7 +539,7 @@ export default function CareDashboardPage() {
                   return (
                     <tr
                       key={patient.id}
-                      onClick={() => navigate(`/care/patients/${patient.id}`)}
+                      onClick={() => navigate(`/care/patients/${patient.userId || patient.id}`)}
                       className="hover:bg-slate-50 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4">
