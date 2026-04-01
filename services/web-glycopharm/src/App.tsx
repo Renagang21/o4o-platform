@@ -57,6 +57,7 @@ const PharmacistAppointmentsPage = lazy(() => import('@/pages/pharmacist/Appoint
 // WO-GLYCOPHARM-PATIENT-MAIN-SCREEN-V1: Patient sub-pages
 const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
 const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
+const PatientRecordsListPage = lazy(() => import('@/pages/patient/RecordsListPage'));
 const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisPage'));
 const PatientPharmacistCoachingPage = lazy(() => import('@/pages/patient/PharmacistCoachingPage'));
 const PatientCareGuidelinePage = lazy(() => import('@/pages/patient/CareGuidelinePage'));
@@ -363,6 +364,7 @@ function AppRoutes() {
         <Route path="patient" element={<PatientMainPage />} />
         <Route path="patient/profile" element={<PatientProfilePage />} />
         <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
+        <Route path="patient/records" element={<PatientRecordsListPage />} />
         <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
         <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
         <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />

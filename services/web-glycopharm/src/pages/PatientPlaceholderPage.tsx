@@ -10,12 +10,9 @@
  * - 당뇨 케어 가이드라인
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, Calendar, ChevronRight, Pill, Footprints, AlertTriangle } from 'lucide-react';
-import { patientApi } from '@/api/patient';
-import type { GlucoseReading } from '@/api/patient';
+import { Activity, LogOut, Settings, ClipboardEdit, BarChart3, MessageCircle, BookOpen, Building2, Calendar, ChevronRight, List } from 'lucide-react';
 
 const MENU_ITEMS = [
   {
@@ -43,12 +40,20 @@ const MENU_ITEMS = [
     bg: 'bg-slate-100',
   },
   {
-    label: '데이터 입력 및 조회',
+    label: '데이터 입력',
     description: '혈당·투약·운동·증상 데이터 기록',
     path: '/patient/glucose-input',
     icon: ClipboardEdit,
     color: 'text-blue-600',
     bg: 'bg-blue-50',
+  },
+  {
+    label: '등록한 데이터 조회',
+    description: '입력한 혈당·투약·운동 기록 목록',
+    path: '/patient/records',
+    icon: List,
+    color: 'text-cyan-600',
+    bg: 'bg-cyan-50',
   },
   {
     label: '데이터 분석 확인',
@@ -76,34 +81,9 @@ const MENU_ITEMS = [
   },
 ] as const;
 
-const MEAL_TIMING_LABELS: Record<string, string> = {
-  fasting: '공복', before_meal: '식전', after_meal: '식후',
-  after_meal_1h: '식후 1h', after_meal_2h: '식후 2h', bedtime: '취침 전', random: '수시',
-};
-
 export default function PatientMainPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
-  // Recent readings
-  const [readings, setReadings] = useState<GlucoseReading[]>([]);
-  const [loadingReadings, setLoadingReadings] = useState(true);
-
-  const loadReadings = useCallback(async () => {
-    setLoadingReadings(true);
-    try {
-      const res = await patientApi.getGlucoseReadings({ metricType: 'glucose' });
-      if (res.success && res.data) {
-        setReadings((Array.isArray(res.data) ? res.data : []).slice(0, 5));
-      }
-    } catch {
-      // silent
-    } finally {
-      setLoadingReadings(false);
-    }
-  }, []);
-
-  useEffect(() => { loadReadings(); }, [loadReadings]);
 
   const handleLogout = () => {
     logout();
@@ -149,65 +129,6 @@ export default function PatientMainPage() {
             );
           })}
         </div>
-
-        {/* Recent Readings */}
-        {!loadingReadings && readings.length > 0 && (
-          <div className="mt-6">
-            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-              최근 기록
-            </h2>
-            <div className="space-y-2">
-              {readings.map((r) => {
-                const meta = r.metadata as Record<string, unknown>;
-                const hasMed = meta?.medication != null;
-                const hasEx = meta?.exercise != null;
-                const hasSym = Array.isArray(meta?.symptoms) && (meta.symptoms as string[]).length > 0;
-                return (
-                  <div key={r.id} className="bg-white rounded-xl border border-slate-200 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-slate-600">
-                          {new Date(r.measuredAt).toLocaleString('ko-KR')}
-                        </p>
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {MEAL_TIMING_LABELS[(meta as Record<string, string>)?.mealTiming] || '기타'}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-slate-800 tabular-nums">
-                          {r.valueNumeric != null ? Number(r.valueNumeric).toFixed(0) : '-'}
-                        </p>
-                        <p className="text-xs text-slate-400">{r.unit}</p>
-                      </div>
-                    </div>
-                    {(hasMed || hasEx || hasSym) && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100">
-                        {hasMed && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
-                            <Pill className="w-3 h-3" />
-                            {(meta.medication as { name: string }).name}
-                          </span>
-                        )}
-                        {hasEx && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600">
-                            <Footprints className="w-3 h-3" />
-                            {(meta.exercise as { duration: number }).duration}분
-                          </span>
-                        )}
-                        {hasSym && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-600">
-                            <AlertTriangle className="w-3 h-3" />
-                            증상 {(meta.symptoms as string[]).length}개
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* Logout */}
         <div className="mt-8 text-center">
