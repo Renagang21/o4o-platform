@@ -170,7 +170,7 @@ export default function GlucoseInputPage() {
 
       if (res.success) {
         setSaved(true);
-        setTimeout(() => navigate(-1), 1200);
+        setTimeout(() => navigate('/patient'), 1200);
       } else {
         setError(res.error?.message || '저장에 실패했습니다.');
       }
