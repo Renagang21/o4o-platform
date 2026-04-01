@@ -6,8 +6,8 @@
 
 import { Router } from 'express';
 import type { DataSource } from 'typeorm';
-import { authenticate } from '../../../middleware/auth.js';
-import type { AuthenticatedRequest } from '../../../types/express.js';
+import { authenticate } from '../../../middleware/auth.middleware.js';
+import type { Request } from 'express';
 import { ExternalImportService } from '../services/external-import.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -38,7 +38,7 @@ export function createExternalImportRouter(dataSource: DataSource): Router {
         ? await service.parseFromUrl(url, masterId)
         : await service.parseFromHtml(html, masterId);
 
-      logger.info(`[ExternalImport] Parsed: source=${result.source}, images=${result.imageCount}, user=${(req as AuthenticatedRequest).user?.id}`);
+      logger.info(`[ExternalImport] Parsed: source=${result.source}, images=${result.imageCount}, user=${(req as any).user?.id}`);
 
       res.json({ success: true, data: result });
     } catch (error: any) {

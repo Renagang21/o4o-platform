@@ -206,7 +206,7 @@ export class ExternalImportService {
 
     let imageCount = 0;
 
-    for (const img of Array.from(imgElements)) {
+    for (const img of Array.from(imgElements) as HTMLImageElement[]) {
       const src = img.getAttribute('src');
       if (!src) continue;
 
