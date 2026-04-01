@@ -4,6 +4,7 @@ import { CareLlmInsightService } from '../services/llm/care-llm-insight.service.
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 /**
  * Care LLM Insight Controller — WO-O4O-CARE-LLM-INSIGHT-V1
@@ -96,7 +97,7 @@ export function createCareLlmInsightRouter(dataSource: DataSource): Router {
   router.get('/llm-insight/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       const insight = await llmInsightService.getLatestInsight(patientId, pharmacyId);

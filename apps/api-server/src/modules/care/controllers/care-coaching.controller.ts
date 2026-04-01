@@ -5,6 +5,7 @@ import { CareCoachingDraftService } from '../services/llm/care-coaching-draft.se
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 export function createCareCoachingRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -36,12 +37,11 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
   router.post('/coaching', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId, snapshotId, summary, actionPlan } = req.body;
+      const { patientId: rawPatientId, snapshotId, summary, actionPlan } = req.body;
       const pharmacyId = pcReq.pharmacyId;
-      // pharmacistId forced from authenticated user — client input ignored
       const pharmacistId = pcReq.user?.id;
 
-      if (!patientId || !pharmacistId || !summary || !actionPlan) {
+      if (!rawPatientId || !pharmacistId || !summary || !actionPlan) {
         res.status(400).json({ message: 'patientId, summary, actionPlan are required' });
         return;
       }
@@ -51,6 +51,7 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
         return;
       }
 
+      const patientId = await resolvePatientUserId(dataSource, rawPatientId);
       const session = await service.createSession({
         patientId,
         pharmacistId,
@@ -70,7 +71,7 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
   router.get('/coaching/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       const sessions = await service.listByPatient(patientId, pharmacyId);
@@ -86,7 +87,7 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
   router.get('/coaching-drafts/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       if (!pharmacyId) {

@@ -5,6 +5,7 @@ import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middle
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
 import { DefaultCgmEventAnalysisProvider } from '../domain/analysis/cgm-event-analysis.provider.js';
 import { DatabaseCgmEventProvider } from '../infrastructure/provider/database-cgm-event.provider.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 /**
  * CGM-Event Analysis Controller
@@ -26,7 +27,7 @@ export function createCgmEventAnalysisRouter(dataSource: DataSource): Router {
     async (req, res) => {
       try {
         const pcReq = req as PharmacyContextRequest;
-        const { patientId } = req.params;
+        const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
         const pharmacyId = pcReq.pharmacyId;
         const days = req.query.days ? Number(req.query.days) : 14;
 

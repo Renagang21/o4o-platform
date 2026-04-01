@@ -8,6 +8,7 @@ import { CarePriorityService } from '../services/care-priority.service.js';
 import { CarePriorityAiService } from '../services/care-priority-ai.service.js';
 import { CarePopulationService } from '../services/care-population.service.js';
 import { CareAlertService } from '../services/care-alert.service.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 export interface CareDashboardDto {
   totalPatients: number;
@@ -153,7 +154,7 @@ export function createCareDashboardRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const limit = Math.min(Number(req.query.limit) || 50, 200);
 
       const rows: Array<{

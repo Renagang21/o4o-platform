@@ -15,6 +15,7 @@ import { CareActionService } from '../services/care-action.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
+import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
 
 export function createCareActionRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -25,7 +26,7 @@ export function createCareActionRouter(dataSource: DataSource): Router {
   router.get('/actions/:patientId', authenticate, requirePharmacyContext, async (req, res) => {
     try {
       const pcReq = req as PharmacyContextRequest;
-      const { patientId } = req.params;
+      const patientId = await resolvePatientUserId(dataSource, req.params.patientId);
       const pharmacyId = pcReq.pharmacyId;
 
       if (!pharmacyId) {
