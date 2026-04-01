@@ -160,7 +160,7 @@ export default function Layout() {
                         {/* 메뉴 항목 */}
                         <div className="py-1">
                           {/* 대표 대시보드 — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
-                          {user?.roles?.[0] && user.roles[0] !== 'glucoseview:patient' && (() => {
+                          {user?.roles?.[0] && user.roles[0] !== 'customer' && (() => {
                             const dp = getGlucoseviewDashboardRoute(user.roles);
                             const rl = ROLE_LABELS[user.roles[0]] || user.roles[0];
                             return (

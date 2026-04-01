@@ -268,7 +268,7 @@ function ServiceUserProtectedRoute({ children }: { children: React.ReactNode }) 
  * WO-GLYCOPHARM-CARE-UI-ADJUST-V1 + WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
  * Patient Auth Guard — 비로그인 → /login?type=patient 리다이렉트
  */
-const PATIENT_ROLES = ['customer', 'glycopharm:consumer'];
+const PATIENT_ROLES = ['customer'];
 
 function PatientAuthGuardOutlet() {
   const { isAuthenticated, user, isLoading } = useAuth();

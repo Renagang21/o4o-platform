@@ -216,7 +216,7 @@ function AppRoutes() {
 
       {/* 당뇨인 서비스 — PatientLayout 중첩 (WO-GLUCOSEVIEW-PATIENT-MOBILE-UX-V1) */}
       <Route path="/patient" element={
-        <RoleProtectedRoute allowedRoles={['glucoseview:patient']}>
+        <RoleProtectedRoute allowedRoles={['customer']}>
           <PatientLayout />
         </RoleProtectedRoute>
       }>
