@@ -90,6 +90,7 @@ export default function GlucoseInputPage() {
   const [exType, setExType] = useState('walking');
   const [exDuration, setExDuration] = useState('');
   const [exIntensity, setExIntensity] = useState('moderate');
+  const [exAt, setExAt] = useState('');
 
   // Form state — Symptoms (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
   const [symOpen, setSymOpen] = useState(true);
@@ -173,6 +174,7 @@ export default function GlucoseInputPage() {
             type: exType,
             duration: dur,
             intensity: exIntensity,
+            exercisedAt: exAt || measuredAt,
           };
         }
       }
@@ -463,6 +465,16 @@ export default function GlucoseInputPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">운동 일시</label>
+                <input
+                  type="datetime-local"
+                  value={exAt}
+                  onChange={(e) => setExAt(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
+                />
+                <p className="text-xs text-slate-400 mt-1">비워두면 혈당 측정 시간과 동일하게 기록됩니다.</p>
               </div>
             </div>
           )}

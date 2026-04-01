@@ -126,7 +126,8 @@ export interface SupplierProduct {
   approvalStatus: string;
   priceGeneral: number;
   priceGold: number | null;
-  pricePlatinum: number | null;
+  /** @deprecated WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 별도 정책으로 이동 */
+  pricePlatinum?: number | null;
   consumerReferencePrice: number | null;
   // WO-NETURE-PRODUCT-REGISTRATION-REFACTOR-AND-AI-TAGGING-V1
   tags?: string[];
@@ -581,7 +582,6 @@ export const supplierApi = {
     manualData?: Record<string, any>;
     priceGeneral?: number;
     priceGold?: number | null;
-    pricePlatinum?: number | null;
     consumerReferencePrice?: number | null;
     // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
     consumerShortDescription?: string | null;
@@ -606,7 +606,6 @@ export const supplierApi = {
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
       priceGold?: number | null;
-      pricePlatinum?: number | null;
       consumerReferencePrice?: number | null;
       // WO-NETURE-PRODUCT-DESCRIPTION-FIELDS-V1
       consumerShortDescription?: string | null;

@@ -61,7 +61,6 @@ function toDrawerProduct(p: AdminProduct): SupplierProduct {
     approvalStatus: p.approvalStatus?.toLowerCase() || 'pending',
     priceGeneral: 0,
     priceGold: null,
-    pricePlatinum: null,
     consumerReferencePrice: null,
     consumerShortDescription: p.consumerShortDescription,
     consumerDetailDescription: p.consumerDetailDescription,

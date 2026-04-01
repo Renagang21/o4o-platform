@@ -17,7 +17,6 @@ export interface ProductFormData {
   marketingName: string;
   priceGeneral: number | null;
   priceGold: number | null;
-  pricePlatinum: number | null;
   consumerReferencePrice: number | null;
   stockQuantity: number;
   isActive: boolean;
@@ -122,7 +121,6 @@ const DEFAULT_DATA: ProductFormData = {
   marketingName: '',
   priceGeneral: null,
   priceGold: null,
-  pricePlatinum: null,
   consumerReferencePrice: null,
   stockQuantity: 0,
   isActive: true,

@@ -272,7 +272,8 @@ export interface StoreOfferItem {
   supplierName: string;
   priceGeneral: number;
   priceGold: number | null;
-  pricePlatinum: number | null;
+  /** @deprecated WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 별도 정책으로 이동 */
+  pricePlatinum?: number | null;
   distributionType: string;
   consumerShortDescription: string | null;
   businessShortDescription: string | null;
