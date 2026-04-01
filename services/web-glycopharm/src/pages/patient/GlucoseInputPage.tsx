@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading } from '@/api/patient';
+import type { MedicationItem } from '@/utils/extract-metadata';
+import { normalizeMedications } from '@/utils/extract-metadata';
 
 const MEAL_TIMING_OPTIONS = [
   { value: 'fasting', label: '공복' },
@@ -78,11 +80,10 @@ export default function GlucoseInputPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
-  // Form state — Medication (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
+  // Form state — Medication (다중 약품 배열, 기본 펼침)
+  const EMPTY_MED: MedicationItem = { name: '', dose: '', takenAt: '' };
   const [medOpen, setMedOpen] = useState(true);
-  const [medName, setMedName] = useState('');
-  const [medDose, setMedDose] = useState('');
-  const [medTakenAt, setMedTakenAt] = useState('');
+  const [medications, setMedications] = useState<MedicationItem[]>([{ ...EMPTY_MED }]);
 
   // Form state — Exercise (WO-O4O-PATIENT-INPUT-UX-FIX-V1: 기본 펼침)
   const [exOpen, setExOpen] = useState(true);
@@ -155,13 +156,18 @@ export default function GlucoseInputPage() {
         mealTimingLabel: selectedLabel,
       };
 
-      // Medication
-      if (medOpen && medName.trim()) {
-        metadata.medication = {
-          name: medName.trim(),
-          dose: medDose.trim(),
-          takenAt: medTakenAt || measuredAt,
-        };
+      // Medications (다중 약품)
+      if (medOpen) {
+        const filled = medications
+          .filter((m) => m.name?.trim())
+          .map((m) => ({
+            name: m.name!.trim(),
+            dose: (m.dose || '').trim(),
+            takenAt: m.takenAt || measuredAt,
+          }));
+        if (filled.length > 0) {
+          metadata.medications = filled;
+        }
       }
 
       // Exercise
@@ -290,7 +296,7 @@ export default function GlucoseInputPage() {
           </div>
         </section>
 
-        {/* ─── Section 2: Medication (Collapsible) ─── */}
+        {/* ─── Section 2: Medication (Collapsible, 다중 약품) ─── */}
         <section className="mb-4">
           <button
             type="button"
@@ -301,7 +307,12 @@ export default function GlucoseInputPage() {
               <Pill className="w-4 h-4" />
               투약 기록
               <span className="text-xs font-normal text-slate-400">
-                {medOpen && medName.trim() ? `(${medName.trim()})` : '(선택)'}
+                {(() => {
+                  const names = medications.map((m) => m.name?.trim()).filter(Boolean);
+                  return names.length > 0
+                    ? `(${names.slice(0, 2).join(', ')}${names.length > 2 ? ` +${names.length - 2}` : ''})`
+                    : '(선택)';
+                })()}
               </span>
             </span>
             {medOpen ? (
@@ -313,36 +324,74 @@ export default function GlucoseInputPage() {
 
           {medOpen && (
             <div className="mt-1 bg-white rounded-2xl border border-violet-100 p-5 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">약품명</label>
-                <input
-                  type="text"
-                  value={medName}
-                  onChange={(e) => setMedName(e.target.value)}
-                  placeholder="예: 메트포르민"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">용량</label>
-                <input
-                  type="text"
-                  value={medDose}
-                  onChange={(e) => setMedDose(e.target.value)}
-                  placeholder="예: 500mg 1정"
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">복용 시간</label>
-                <input
-                  type="datetime-local"
-                  value={medTakenAt}
-                  onChange={(e) => setMedTakenAt(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
-                />
-                <p className="text-xs text-slate-400 mt-1">비워두면 측정 시간과 동일하게 기록됩니다.</p>
-              </div>
+              {medications.map((med, idx) => (
+                <div key={idx} className="space-y-4">
+                  {medications.length > 1 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-violet-500">
+                        약품 {idx + 1}{med.name?.trim() ? ` — ${med.name.trim()}` : ''}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setMedications(medications.filter((_, i) => i !== idx))}
+                        className="text-xs text-red-400 hover:text-red-600"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">약품명</label>
+                    <input
+                      type="text"
+                      value={med.name || ''}
+                      onChange={(e) => {
+                        const next = [...medications];
+                        next[idx] = { ...next[idx], name: e.target.value };
+                        setMedications(next);
+                      }}
+                      placeholder="예: 메트포르민"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">용량</label>
+                    <input
+                      type="text"
+                      value={med.dose || ''}
+                      onChange={(e) => {
+                        const next = [...medications];
+                        next[idx] = { ...next[idx], dose: e.target.value };
+                        setMedications(next);
+                      }}
+                      placeholder="예: 500mg 1정"
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">복용 시간</label>
+                    <input
+                      type="datetime-local"
+                      value={med.takenAt || ''}
+                      onChange={(e) => {
+                        const next = [...medications];
+                        next[idx] = { ...next[idx], takenAt: e.target.value };
+                        setMedications(next);
+                      }}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-sm"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">비워두면 측정 시간과 동일하게 기록됩니다.</p>
+                  </div>
+                  {idx < medications.length - 1 && <hr className="border-violet-100" />}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setMedications([...medications, { ...EMPTY_MED }])}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 text-sm font-medium text-violet-600 rounded-xl border border-dashed border-violet-200 hover:bg-violet-50 transition-colors"
+              >
+                + 약품 추가
+              </button>
             </div>
           )}
         </section>
@@ -527,7 +576,7 @@ export default function GlucoseInputPage() {
             <div className="space-y-2">
               {readings.map((r) => {
                 const meta = r.metadata as Record<string, unknown>;
-                const hasMed = meta?.medication != null;
+                const meds = normalizeMedications(meta);
                 const hasEx = meta?.exercise != null;
                 const hasSym = Array.isArray(meta?.symptoms) && (meta.symptoms as string[]).length > 0;
                 return (
@@ -552,14 +601,14 @@ export default function GlucoseInputPage() {
                       </div>
                     </div>
                     {/* Metadata tags */}
-                    {(hasMed || hasEx || hasSym) && (
+                    {(meds.length > 0 || hasEx || hasSym) && (
                       <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100">
-                        {hasMed && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
+                        {meds.map((m, mi) => (
+                          <span key={mi} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
                             <Pill className="w-3 h-3" />
-                            {(meta.medication as { name: string }).name}
+                            {m.name}{m.dose ? ` ${m.dose}` : ''}
                           </span>
-                        )}
+                        ))}
                         {hasEx && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600">
                             <Footprints className="w-3 h-3" />

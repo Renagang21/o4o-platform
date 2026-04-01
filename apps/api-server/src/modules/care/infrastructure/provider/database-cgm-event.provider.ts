@@ -40,7 +40,7 @@ export class DatabaseCgmEventProvider implements CgmEventDataProvider {
       .andWhere('r.measured_at >= :from', { from })
       .andWhere('r.measured_at <= :to', { to })
       .andWhere(
-        `(r.metadata->>'meal' IS NOT NULL OR r.metadata->>'exercise' IS NOT NULL OR r.metadata->>'medication' IS NOT NULL OR r.metadata->>'symptoms' IS NOT NULL)`,
+        `(r.metadata->>'meal' IS NOT NULL OR r.metadata->>'exercise' IS NOT NULL OR r.metadata->>'medication' IS NOT NULL OR r.metadata->>'medications' IS NOT NULL OR r.metadata->>'symptoms' IS NOT NULL)`,
       )
       .orderBy('r.measured_at', 'ASC')
       .getMany();
@@ -67,7 +67,19 @@ export class DatabaseCgmEventProvider implements CgmEventDataProvider {
           detail: meta.exercise as Record<string, unknown>,
         });
       }
-      if (meta.medication && typeof meta.medication === 'object') {
+      // Medications: 신규 배열(medications[]) 우선, 레거시 단일(medication) 호환
+      if (Array.isArray(meta.medications)) {
+        for (const med of meta.medications) {
+          if (med && typeof med === 'object') {
+            events.push({
+              eventType: 'medication',
+              eventTime: ts,
+              readingId: id,
+              detail: med as Record<string, unknown>,
+            });
+          }
+        }
+      } else if (meta.medication && typeof meta.medication === 'object') {
         events.push({
           eventType: 'medication',
           eventTime: ts,

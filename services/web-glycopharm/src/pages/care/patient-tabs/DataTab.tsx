@@ -22,7 +22,8 @@ import EventTimeSelector from '../components/EventTimeSelector';
 import GlucoseForm, { MEAL_TIMING_OPTIONS } from '../components/GlucoseForm';
 import VitalForm from '../components/VitalForm';
 import MealForm, { MEAL_TYPE_OPTIONS } from '../components/MealForm';
-import MedicationForm from '../components/MedicationForm';
+import MedicationForm, { EMPTY_MEDICATION } from '../components/MedicationForm';
+import type { MedicationItem } from '@/utils/extract-metadata';
 import ExerciseForm, { EXERCISE_TYPES } from '../components/ExerciseForm';
 import SymptomForm from '../components/SymptomForm';
 import RecentRecordsSection, {
@@ -93,12 +94,12 @@ function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
     });
   }
 
-  if (meta.medication) {
-    const parts = [meta.medication.name || ''];
-    if (meta.medication.dose) parts.push(meta.medication.dose);
-    if (meta.medication.taken === false) parts.push('(미복용)');
+  for (const [mi, med] of meta.medications.entries()) {
+    const parts = [med.name || ''];
+    if (med.dose) parts.push(med.dose);
+    if (med.taken === false) parts.push('(미복용)');
     entries.push({
-      id: `${r.id}-med`, timestamp: ts, entryType: 'medication',
+      id: `${r.id}-med-${mi}`, timestamp: ts, entryType: 'medication',
       label: parts.join(' '),
     });
   }
@@ -170,14 +171,9 @@ export default function DataTab() {
   const [mealStyle, setMealStyle] = useState('korean');
   const [mealAmount, setMealAmount] = useState('normal');
 
-  // ── Medication ──
+  // ── Medication (다중 약품 배열) ──
   const [medOpen, setMedOpen] = useState(false);
-  const [medName, setMedName] = useState('');
-  const [medDose, setMedDose] = useState('');
-  const [medTakenAt, setMedTakenAt] = useState('');
-  const [medTaken, setMedTaken] = useState(true);
-  const [medTiming, setMedTiming] = useState('after_meal');
-  const [medNote, setMedNote] = useState('');
+  const [medications, setMedications] = useState<MedicationItem[]>([{ ...EMPTY_MEDICATION }]);
 
   // ── Exercise ──
   const [exOpen, setExOpen] = useState(false);
@@ -288,16 +284,21 @@ export default function DataTab() {
         };
       }
 
-      // Medication
-      if (medOpen && medName.trim()) {
-        metadata.medication = {
-          name: medName.trim(),
-          dose: medDose.trim(),
-          takenAt: medTakenAt || measuredAt,
-          taken: medTaken,
-          timing: medTiming,
-          ...(medNote.trim() ? { note: medNote.trim() } : {}),
-        };
+      // Medications (다중 약품)
+      if (medOpen) {
+        const filled = medications
+          .filter((m) => m.name?.trim())
+          .map((m) => ({
+            name: m.name!.trim(),
+            dose: (m.dose || '').trim(),
+            takenAt: m.takenAt || measuredAt,
+            taken: m.taken !== false,
+            timing: m.timing || 'after_meal',
+            ...(m.note?.trim() ? { note: m.note.trim() } : {}),
+          }));
+        if (filled.length > 0) {
+          metadata.medications = filled;
+        }
       }
 
       // Exercise
@@ -343,12 +344,7 @@ export default function DataTab() {
       setMealStyle('korean');
       setMealAmount('normal');
       setMedOpen(false);
-      setMedName('');
-      setMedDose('');
-      setMedTakenAt('');
-      setMedTaken(true);
-      setMedTiming('after_meal');
-      setMedNote('');
+      setMedications([{ ...EMPTY_MEDICATION }]);
       setExOpen(false);
       setExType('walking');
       setExDuration('');
@@ -468,18 +464,8 @@ export default function DataTab() {
             <MedicationForm
               medOpen={medOpen}
               setMedOpen={setMedOpen}
-              medName={medName}
-              setMedName={setMedName}
-              medDose={medDose}
-              setMedDose={setMedDose}
-              medTakenAt={medTakenAt}
-              setMedTakenAt={setMedTakenAt}
-              medTaken={medTaken}
-              setMedTaken={setMedTaken}
-              medTiming={medTiming}
-              setMedTiming={setMedTiming}
-              medNote={medNote}
-              setMedNote={setMedNote}
+              medications={medications}
+              setMedications={setMedications}
             />
             <ExerciseForm
               exOpen={exOpen}

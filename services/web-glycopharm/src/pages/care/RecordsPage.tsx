@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import CareSubNav from './CareSubNav';
 import { pharmacyApi, type HealthReadingDto, type PharmacyCustomer } from '@/api/pharmacy';
+import { normalizeMedications } from '@/utils/extract-metadata';
 
 // ── Constants ──
 
@@ -269,7 +270,7 @@ export default function RecordsPage() {
             {readings.map((r) => {
               const meta = r.metadata as Record<string, unknown> | undefined;
               const mealTiming = (meta?.mealTiming as string) || '';
-              const medication = meta?.medication as { name?: string; dose?: string } | undefined;
+              const meds = normalizeMedications(meta);
               const exercise = meta?.exercise as { type?: string; duration?: number } | undefined;
               // Backward compat: symptoms can be string[] (legacy) or { items: string[], severity?, duration? }
               const rawSym = meta?.symptoms;
@@ -279,7 +280,7 @@ export default function RecordsPage() {
                   ? (rawSym as { items: string[] }).items
                   : undefined;
               const symptomSeverity = rawSym && typeof rawSym === 'object' && !Array.isArray(rawSym) ? (rawSym as { severity?: string }).severity : undefined;
-              const hasMetadata = !!(mealTiming || medication?.name || exercise?.type || (symptomItems && symptomItems.length > 0));
+              const hasMetadata = !!(mealTiming || meds.length > 0 || exercise?.type || (symptomItems && symptomItems.length > 0));
 
               return (
                 <div key={r.id} className="bg-white rounded-xl border border-slate-200 p-4 hover:border-slate-300 transition-colors">
@@ -303,11 +304,11 @@ export default function RecordsPage() {
                               {MEAL_LABELS[mealTiming] || mealTiming}
                             </span>
                           )}
-                          {medication?.name && (
-                            <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-blue-50 text-blue-600">
-                              투약 {medication.name}{medication.dose ? ` ${medication.dose}` : ''}
+                          {meds.map((m, mi) => (
+                            <span key={mi} className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-blue-50 text-blue-600">
+                              투약 {m.name}{m.dose ? ` ${m.dose}` : ''}
                             </span>
-                          )}
+                          ))}
                           {exercise?.type && (
                             <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-green-50 text-green-600">
                               운동 {exercise.type}{exercise.duration ? ` ${exercise.duration}분` : ''}
