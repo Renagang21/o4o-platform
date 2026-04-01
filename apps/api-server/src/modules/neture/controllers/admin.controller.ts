@@ -956,6 +956,36 @@ export function createProductImageController(dataSource: DataSource): Router {
   });
 
   /**
+   * POST /products/:masterId/images/from-url
+   * 공용 미디어 라이브러리 URL로 상품 이미지 등록 (WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1)
+   */
+  router.post('/products/:masterId/images/from-url', requireAuth, requireActiveSupplier as unknown as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { masterId } = req.params;
+      const { imageUrl, type = 'detail' } = req.body;
+
+      if (!imageUrl || typeof imageUrl !== 'string') {
+        return res.status(400).json({ success: false, error: 'MISSING_IMAGE_URL' });
+      }
+
+      const imageType = (['thumbnail', 'detail', 'content'].includes(type) ? type : 'detail') as 'thumbnail' | 'detail' | 'content';
+
+      // gcsPath를 빈 문자열로 설정 — 외부 참조이므로 GCS 삭제 대상 아님
+      const image = await netureService.addProductImage(masterId, imageUrl, '', imageType);
+
+      // 교체된 썸네일의 gcsPath가 있으면 GCS 삭제
+      if (image.replacedGcsPath) {
+        imageStorageService.deleteImage(image.replacedGcsPath).catch(() => {});
+      }
+
+      res.status(201).json({ success: true, data: image });
+    } catch (error) {
+      logger.error('[Neture API] Error registering image from URL:', error);
+      res.status(500).json({ success: false, error: 'REGISTER_FAILED' });
+    }
+  });
+
+  /**
    * PATCH /products/images/:imageId/primary
    * 대표 이미지 변경
    */
@@ -990,7 +1020,9 @@ export function createProductImageController(dataSource: DataSource): Router {
       }
 
       const { gcsPath } = await netureService.deleteProductImage(imageId, masterId);
-      await imageStorageService.deleteImage(gcsPath);
+      if (gcsPath) {
+        await imageStorageService.deleteImage(gcsPath);
+      }
 
       res.json({ success: true });
     } catch (error) {

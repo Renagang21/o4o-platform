@@ -112,6 +112,20 @@ export const productApi = {
     }
   },
 
+  /** WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 라이브러리 URL로 상품 이미지 등록 */
+  async registerImageFromUrl(
+    masterId: string,
+    imageUrl: string,
+    type: 'thumbnail' | 'detail' | 'content' = 'detail'
+  ): Promise<{ success: boolean; data?: ProductImage; error?: string }> {
+    try {
+      const response = await api.post(`/neture/products/${masterId}/images/from-url`, { imageUrl, type });
+      return response.data;
+    } catch (error) {
+      return { success: false, error: 'NETWORK_ERROR' };
+    }
+  },
+
   async setPrimaryImage(imageId: string, masterId: string): Promise<boolean> {
     try {
       await api.patch(`/neture/products/images/${imageId}/primary`, { masterId });

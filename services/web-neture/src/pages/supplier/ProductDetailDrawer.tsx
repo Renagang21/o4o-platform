@@ -187,6 +187,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
   // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
+  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 state
   const [spotPolicies, setSpotPolicies] = useState<SpotPricePolicy[]>([]);
@@ -536,6 +538,20 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       setImages((prev) => prev.filter((i) => i.id !== imageId));
       onSaved?.();
     }
+  };
+
+  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 이미지 선택 핸들러
+  const handleMediaPickerSelect = async (asset: { url: string }) => {
+    if (!product?.masterId) return;
+    setShowImagePicker(false);
+    setUploading(true);
+    const res = await productApi.registerImageFromUrl(product.masterId, asset.url, uploadType);
+    if (res.success) {
+      const updated = await productApi.getProductImages(product.masterId);
+      setImages(updated);
+      onSaved?.();
+    }
+    setUploading(false);
   };
 
   const thumbnail = images.find((i) => i.type === 'thumbnail');
@@ -987,6 +1003,14 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                       <ImagePlus size={12} />
                     )}
                     {uploading ? '업로드 중...' : '추가'}
+                  </button>
+                  <button
+                    onClick={() => setShowImagePicker(true)}
+                    disabled={uploading}
+                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded disabled:opacity-50"
+                  >
+                    <ImagePlus size={12} />
+                    라이브러리
                   </button>
                 </div>
                 {uploadType === 'thumbnail' && thumbnail && (
@@ -1533,7 +1557,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           </div>
         )}
       </div>
-      {/* WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 */}
+      {/* WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 (설명 이미지용) */}
       <MediaPickerModal
         open={!!mediaPickerTarget}
         onClose={() => setMediaPickerTarget(null)}
@@ -1541,6 +1565,13 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           mediaPickerTarget?.(asset.url);
           setMediaPickerTarget(null);
         }}
+      />
+      {/* WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 (상품 이미지용) */}
+      <MediaPickerModal
+        open={showImagePicker}
+        onClose={() => setShowImagePicker(false)}
+        onSelect={handleMediaPickerSelect}
+        title="상품 이미지 선택"
       />
     </>
   );

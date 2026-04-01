@@ -21,6 +21,7 @@ import {
 import { ProductForm, type ProductFormData } from '../../components/product';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 const STEPS = ['기본 정보', '가격 / 유통', '이미지 / 설명'];
 
@@ -95,8 +96,10 @@ export default function SupplierProductCreatePage() {
   const [consumerDetailDesc, setConsumerDetailDesc] = useState('');
 
   // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 선택 지원
+  type ThumbnailSource = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string } | null;
+  const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(null);
+  const [showThumbnailPicker, setShowThumbnailPicker] = useState(false);
   const [detailFiles, setDetailFiles] = useState<File[]>([]);
   const [detailPreviews, setDetailPreviews] = useState<string[]>([]);
   const [contentFiles, setContentFiles] = useState<File[]>([]);
@@ -243,8 +246,11 @@ export default function SupplierProductCreatePage() {
     if (result.success) {
       const masterId = result.data?.masterId;
       if (masterId) {
-        if (thumbnailFile) {
-          await productApi.uploadProductImage(masterId, thumbnailFile, 'thumbnail');
+        // 대표 이미지: 파일 업로드 또는 라이브러리 URL 등록
+        if (thumbnailSource?.kind === 'file') {
+          await productApi.uploadProductImage(masterId, thumbnailSource.file, 'thumbnail');
+        } else if (thumbnailSource?.kind === 'library') {
+          await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
         }
         for (const file of detailFiles) {
           await productApi.uploadProductImage(masterId, file, 'detail');
@@ -253,7 +259,7 @@ export default function SupplierProductCreatePage() {
           await productApi.uploadProductImage(masterId, file, 'content');
         }
       }
-      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+      if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
       detailPreviews.forEach((url) => URL.revokeObjectURL(url));
       contentPreviews.forEach((url) => URL.revokeObjectURL(url));
       navigate('/supplier/products');
@@ -263,19 +269,24 @@ export default function SupplierProductCreatePage() {
   };
 
   // Image handlers — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1
+  // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 파일/라이브러리 통합
   const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) return;
-    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    setThumbnailFile(file);
-    setThumbnailPreview(URL.createObjectURL(file));
+    if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
+    setThumbnailSource({ kind: 'file', file, preview: URL.createObjectURL(file) });
     e.target.value = '';
   };
 
+  const handleThumbnailFromLibrary = (asset: { url: string }) => {
+    if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
+    setThumbnailSource({ kind: 'library', url: asset.url });
+    setShowThumbnailPicker(false);
+  };
+
   const removeThumbnail = () => {
-    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
-    setThumbnailFile(null);
-    setThumbnailPreview(null);
+    if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
+    setThumbnailSource(null);
   };
 
   const handleMultiImageSelect = (
@@ -544,23 +555,36 @@ export default function SupplierProductCreatePage() {
           <div className="bg-white rounded-xl border border-slate-100 shadow-sm p-6 space-y-6">
             <h3 className="text-lg font-semibold text-slate-800">상품 이미지</h3>
 
-            {/* 1. 대표 이미지 (썸네일) */}
+            {/* 1. 대표 이미지 (썸네일) — WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1 */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-700">대표 이미지 (썸네일)</span>
                 <span className="text-xs text-slate-400">1000x1000 정사각형 권장, 최대 1장</span>
               </div>
-              {thumbnailPreview ? (
+              {thumbnailSource ? (
                 <div className="relative group w-32 h-32 rounded-lg overflow-hidden border-2 border-emerald-300">
-                  <img src={thumbnailPreview} alt="썸네일 미리보기" className="w-full h-full object-cover" />
+                  <img
+                    src={thumbnailSource.kind === 'file' ? thumbnailSource.preview : thumbnailSource.url}
+                    alt="썸네일 미리보기"
+                    className="w-full h-full object-cover"
+                  />
                   <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">대표</span>
                   <button type="button" onClick={removeThumbnail} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
                 </div>
               ) : (
-                <label className="block w-32 h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors flex items-center justify-center">
-                  <input type="file" accept="image/*" onChange={handleThumbnailSelect} className="hidden" />
-                  <span className="text-slate-400 text-xs text-center">클릭하여<br />추가</span>
-                </label>
+                <div className="flex items-center gap-3">
+                  <label className="block w-32 h-32 border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors flex items-center justify-center">
+                    <input type="file" accept="image/*" onChange={handleThumbnailSelect} className="hidden" />
+                    <span className="text-slate-400 text-xs text-center">클릭하여<br />추가</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowThumbnailPicker(true)}
+                    className="px-3 py-2 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors"
+                  >
+                    라이브러리에서<br />선택
+                  </button>
+                </div>
               )}
             </div>
 
@@ -725,6 +749,13 @@ export default function SupplierProductCreatePage() {
           </button>
         )}
       </div>
+      {/* WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 대표 이미지 라이브러리 선택 */}
+      <MediaPickerModal
+        open={showThumbnailPicker}
+        onClose={() => setShowThumbnailPicker(false)}
+        onSelect={handleThumbnailFromLibrary}
+        title="대표 이미지 선택"
+      />
     </div>
   );
 }
