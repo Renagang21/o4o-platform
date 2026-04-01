@@ -54,6 +54,10 @@ export interface ContentEditorProps {
   onImageUpload?: (file: File) => Promise<string>;
   /** 기존 이미지 목록 (선택 삽입용) */
   existingImages?: { id: string; url: string; label?: string }[];
+  /** WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1:
+   *  공용 미디어 라이브러리 선택 콜백.
+   *  호출 시 insertImage 함수를 받아 부모가 picker를 열고, 선택 완료 시 insertImage(url)로 에디터에 삽입. */
+  onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
 }
 
 export interface ToolbarProps {

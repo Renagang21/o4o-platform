@@ -41,6 +41,7 @@ export function RichTextEditor({
   onUseTemplate,
   onImageUpload,
   existingImages,
+  onMediaLibraryPick,
 }: ContentEditorProps) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
@@ -142,7 +143,7 @@ export function RichTextEditor({
       }}
       onKeyDown={handleKeyDown}
     >
-      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} />}
+      {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} />}
       <EditorContent
         editor={editor}
         style={{

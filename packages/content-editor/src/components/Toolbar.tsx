@@ -41,9 +41,10 @@ interface ToolbarProps {
   onImageUpload?: (file: File) => Promise<string>;
   existingImages?: ExistingImage[];
   preset?: EditorPreset;
+  onMediaLibraryPick?: (insertImage: (url: string) => void) => void;
 }
 
-export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full' }: ToolbarProps) {
+export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full', onMediaLibraryPick }: ToolbarProps) {
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [showVideoInput, setShowVideoInput] = useState(false);
   const [showImageInput, setShowImageInput] = useState(false);
@@ -434,6 +435,41 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
                       style={{ display: 'none' }}
                     />
                   </label>
+                </>
+              )}
+              {onMediaLibraryPick && (
+                <>
+                  <div style={{
+                    textAlign: 'center',
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    margin: '8px 0',
+                  }}>
+                    또는
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onMediaLibraryPick((url: string) => {
+                        editor.chain().focus().setImage({ src: url }).run();
+                        setShowImageInput(false);
+                      });
+                    }}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      padding: '8px',
+                      border: '1px solid #3b82f6',
+                      borderRadius: '4px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      color: '#3b82f6',
+                      background: '#eff6ff',
+                    }}
+                  >
+                    라이브러리에서 선택
+                  </button>
                 </>
               )}
               {existingImages && existingImages.length > 0 && (

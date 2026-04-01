@@ -19,6 +19,7 @@ import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import ExternalImportModal from '../../components/supplier/ExternalImportModal';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 interface ProductDetailDrawerProps {
   product: SupplierProduct | null;
@@ -187,6 +188,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<string>>(new Set());
   // WO-NETURE-EXTERNAL-PRODUCT-IMPORT-ASSISTANT-V1
   const [showExternalImport, setShowExternalImport] = useState(false);
+  // WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
 
   // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 state
   const [spotPolicies, setSpotPolicies] = useState<SpotPricePolicy[]>([]);
@@ -661,6 +664,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </div>
@@ -674,6 +678,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templates={tpl.templates}
@@ -806,6 +811,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="소비자에게 보이는 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </div>
@@ -819,6 +825,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="소비자에게 보이는 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templates={tpl.templates}
@@ -849,6 +856,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 간단 소개"
                   minHeight="80px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                 />
               </div>
@@ -862,6 +870,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                   placeholder="거래처용 상세 설명"
                   minHeight="150px"
                   onImageUpload={editorImageUpload}
+                  onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                   existingImages={images.filter((i) => i.type !== 'thumbnail').map((i) => ({ id: i.id, url: i.imageUrl }))}
                   showTemplateActions
                   templates={tpl.templates}
@@ -1553,6 +1562,16 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           onApplyDetailDescription={(html) => setEditConsumerDetail(html)}
         />
       )}
+
+      {/* WO-NETURE-DESCRIPTION-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 */}
+      <MediaPickerModal
+        open={!!mediaPickerTarget}
+        onClose={() => setMediaPickerTarget(null)}
+        onSelect={(asset) => {
+          mediaPickerTarget?.(asset.url);
+          setMediaPickerTarget(null);
+        }}
+      />
     </>
   );
 }
