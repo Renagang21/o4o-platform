@@ -763,6 +763,14 @@ export class NetureOfferService {
       }
 
       if (updates.distributionType !== undefined) {
+        // WO-NETURE-DISTRIBUTION-SERVICE-INVALID-STATE-BLOCK-V1
+        // SERVICE requires serviceKeys — inline edit cannot supply them, so block SERVICE here
+        if (updates.distributionType === 'SERVICE') {
+          const hasKeys = Array.isArray(offer.serviceKeys) && offer.serviceKeys.length > 0;
+          if (!hasKeys) {
+            return { success: false, error: 'SERVICE 유통 방식을 설정하려면 서비스를 먼저 지정해야 합니다.' };
+          }
+        }
         offer.distributionType = updates.distributionType;
       }
 

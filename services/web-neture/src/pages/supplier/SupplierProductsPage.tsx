@@ -445,7 +445,6 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
         autoFocus
       >
         <option value="PUBLIC">전체 공개</option>
-        <option value="SERVICE">서비스</option>
         <option value="PRIVATE">비공개</option>
       </select>
     ),
