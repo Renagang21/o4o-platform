@@ -14,7 +14,8 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send } from 'lucide-react';
+import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText } from 'lucide-react';
+import { ContentRenderer } from '@o4o/content-editor';
 import {
   EditableDataTable,
   SearchBar,
@@ -701,6 +702,7 @@ export default function SupplierProductsPage() {
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
   const [descEditProduct, setDescEditProduct] = useState<SupplierProduct | null>(null);
   const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
+  const [previewProduct, setPreviewProduct] = useState<SupplierProduct | null>(null);
 
   // Drawer state (WO-O4O-NETURE-SUPPLIER-DRAWER-V1)
   const [drawerProduct, setDrawerProduct] = useState<SupplierProduct | null>(null);
@@ -1175,6 +1177,22 @@ export default function SupplierProductsPage() {
         columns={[
           ...enhancedColumns,
           {
+            key: '_preview' as any,
+            header: '',
+            width: '40px',
+            align: 'center',
+            render: (_v: any, row: SupplierProduct) => (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setPreviewProduct(row); }}
+                className={`p-1 rounded hover:bg-indigo-50 ${row.consumerDetailDescription ? 'text-indigo-500 hover:text-indigo-700' : 'text-slate-300'}`}
+                title="상세설명 미리보기"
+              >
+                <FileText size={14} />
+              </button>
+            ),
+          } as any,
+          {
             key: 'masterId' as any,
             header: 'AI',
             width: '50px',
@@ -1290,6 +1308,53 @@ export default function SupplierProductsPage() {
             await fetchProducts(pagination.page);
           }}
         />
+      )}
+
+      {/* WO-NETURE-SUPPLIER-PRODUCT-DETAIL-DESCRIPTION-PREVIEW-FROM-LIST-V1: 상세설명 미리보기 */}
+      {previewProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setPreviewProduct(null)}>
+          <div
+            className="bg-white rounded-xl shadow-2xl w-[640px] max-h-[85vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-base font-bold text-slate-900 truncate">{previewProduct.name || previewProduct.masterName}</h3>
+                {previewProduct.barcode && (
+                  <p className="text-xs text-slate-400 mt-0.5 font-mono">{previewProduct.barcode}</p>
+                )}
+              </div>
+              <button onClick={() => setPreviewProduct(null)} className="p-1 rounded hover:bg-slate-100 text-slate-400 ml-3 shrink-0">
+                <X size={18} />
+              </button>
+            </div>
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {previewProduct.primaryImageUrl && (
+                <div className="mb-4 flex justify-center">
+                  <img
+                    src={previewProduct.primaryImageUrl}
+                    alt={previewProduct.name || '상품 이미지'}
+                    className="max-h-48 rounded-lg object-contain"
+                  />
+                </div>
+              )}
+              {previewProduct.consumerDetailDescription ? (
+                <ContentRenderer
+                  html={previewProduct.consumerDetailDescription}
+                  className="prose prose-sm max-w-none text-slate-700"
+                />
+              ) : (
+                <div className="text-center py-12">
+                  <FileText size={32} className="mx-auto text-slate-300 mb-3" />
+                  <p className="text-sm text-slate-400">소비자 상세 설명이 아직 작성되지 않았습니다.</p>
+                  <p className="text-xs text-slate-300 mt-1">상품 편집에서 상세 설명을 입력해 주세요.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Product Detail Drawer (WO-O4O-NETURE-SUPPLIER-DRAWER-V1 / EDITABLE-V1) */}
