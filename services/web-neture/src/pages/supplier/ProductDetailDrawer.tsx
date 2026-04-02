@@ -307,6 +307,35 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
   const handleSave = async () => {
     if (!product) return;
+
+    // IR-NETURE-PRODUCT-DETAIL-DRAWER-B2B-SAVE-NO-RESPONSE-V1:
+    // B2B 전용 편집 모드에서는 ProductForm이 미렌더링되어 formRef가 null.
+    // B2B 설명만 별도 저장한다.
+    if (!formRef.current && editMode === 'b2b') {
+      setSaving(true);
+      try {
+        const bizShort = editBizShort.trim() || null;
+        const bizDetail = editBizDetail.trim() || null;
+        const bizResult = await supplierApi.updateBusinessContent(product.id, {
+          businessShortDescription: bizShort,
+          businessDetailDescription: bizDetail,
+        });
+        if (!bizResult.success) {
+          alert(`저장 실패: ${bizResult.error || '알 수 없는 오류'}`);
+        } else {
+          setEditMode(null);
+          setShowSecondaryEdit(false);
+          onSaved?.();
+        }
+      } catch (error) {
+        console.error('[ProductDetailDrawer] B2B save error:', error);
+        alert('저장 중 오류가 발생했습니다');
+      } finally {
+        setSaving(false);
+      }
+      return;
+    }
+
     if (!formRef.current) {
       console.warn('[ProductDetailDrawer] formRef.current is null — form not ready');
       return;
