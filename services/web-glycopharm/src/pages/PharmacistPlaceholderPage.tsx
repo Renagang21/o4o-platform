@@ -44,19 +44,29 @@ export default function PharmacistPlaceholderPage() {
             <Users className="w-5 h-5" />
             당뇨인 관리
           </button>
+
+          {/* WO-O4O-CARE-PHARMACIST-APPOINTMENT-NAV-ACCESSIBILITY-V1: 예약 관리 카드 강화 */}
+          <button
+            onClick={() => navigate('/pharmacy/appointments')}
+            className="w-full p-4 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-orange-800">예약 관리</p>
+                <p className="text-xs text-orange-600/70">상담 요청 확인 · 승인/거절 · 완료 및 결과 기록</p>
+              </div>
+            </div>
+          </button>
+
           <button
             onClick={() => navigate('/pharmacy/patient-requests')}
             className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
           >
             <UserPlus className="w-4 h-4" />
             당뇨인 연결 요청
-          </button>
-          <button
-            onClick={() => navigate('/pharmacy/appointments')}
-            className="w-full py-3 text-sm font-medium text-orange-600 border border-orange-200 rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <Calendar className="w-4 h-4" />
-            예약 관리
           </button>
           <button
             onClick={() => navigate('/care')}

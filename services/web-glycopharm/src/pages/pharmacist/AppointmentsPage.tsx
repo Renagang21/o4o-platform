@@ -176,7 +176,7 @@ export default function PharmacistAppointmentsPage() {
             <p className="text-xs text-slate-400">
               {totalActive > 0
                 ? `${totalActive}건의 활성 예약`
-                : '상담 예약 관리'}
+                : '상담 요청 확인 · 승인/거절 · 완료 및 결과 기록'}
             </p>
           </div>
         </div>
@@ -189,8 +189,14 @@ export default function PharmacistAppointmentsPage() {
           <div className="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center justify-center">
             <Clock className="w-12 h-12 text-slate-300 mb-3" />
             <p className="text-sm text-slate-500 font-medium">예약이 없습니다</p>
-            <p className="text-xs text-slate-400 mt-1">
-              당뇨인가 상담을 예약하면 여기에 표시됩니다.
+            <div className="text-xs text-slate-400 mt-3 text-left space-y-1">
+              <p className="text-center mb-2">이 화면에서 아래 업무를 관리할 수 있습니다.</p>
+              <p>· 환자의 상담 요청 확인 및 승인/거절</p>
+              <p>· 오늘 예정된 상담 방문 완료 처리</p>
+              <p>· 완료된 상담의 결과 입력 및 관리</p>
+            </div>
+            <p className="text-xs text-slate-400 mt-3">
+              환자가 상담을 요청하면 여기에 표시됩니다.
             </p>
           </div>
         ) : (
