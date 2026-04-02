@@ -31,10 +31,10 @@ const STATUS_TABS = [
   { key: 'rejected', label: '거절됨' },
 ] as const;
 
+// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const SERVICE_OPTIONS = [
   { key: '', label: '전체 서비스' },
   { key: 'glycopharm', label: 'GlycoPharm' },
-  { key: 'glucoseview', label: 'GlucoseView' },
   { key: 'k-cosmetics', label: 'K-Cosmetics' },
   { key: 'kpa-society', label: 'KPA Society' },
 ];
@@ -149,6 +149,10 @@ export default function ProductServiceApprovalPage() {
   // Approve modal (WO-NETURE-APPROVAL-ACTION-UX-V1)
   const [approveTarget, setApproveTarget] = useState<string | null>(null); // single ID or 'batch'
   const [approveMemo, setApproveMemo] = useState('');
+
+  // Delete (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1)
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Detail drawer
   const [drawerItem, setDrawerItem] = useState<ServiceApprovalItem | null>(null);
@@ -290,6 +294,19 @@ export default function ProductServiceApprovalPage() {
     if (selectedPendingIds.length === 0) return;
     setRejectTarget('batch');
     setRejectReason('');
+  };
+
+  // WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    const result = await operatorServiceApprovalApi.deletePendingOffer(deleteTarget);
+    setDeleteLoading(false);
+    setDeleteTarget(null);
+    if (result.success) {
+      if (drawerItem?.offerId === deleteTarget) setDrawerItem(null);
+      await fetchData(pagination.page);
+    }
   };
 
   // ==================== Render ====================
@@ -733,6 +750,14 @@ export default function ProductServiceApprovalPage() {
                       >
                         거절
                       </button>
+                      <button
+                        onClick={() => setDeleteTarget(item.offerId)}
+                        disabled={!canManage || actionLoading === item.id}
+                        title="이 상품을 완전히 삭제합니다"
+                        className="px-2 py-1 bg-slate-200 text-slate-600 rounded text-xs font-medium hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        삭제
+                      </button>
                     </>
                   ) : item.reason ? (
                     <span className="text-xs text-slate-500 max-w-[120px] truncate" title={item.reason}>
@@ -902,6 +927,33 @@ export default function ProductServiceApprovalPage() {
                 className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 승인 확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1) */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제</h3>
+            <p className="text-sm text-slate-500 mb-4">
+              이 상품을 완전히 삭제합니다. 삭제된 데이터는 복구할 수 없습니다.
+            </p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-200"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleteLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteLoading ? '삭제 중...' : '삭제 확인'}
               </button>
             </div>
           </div>

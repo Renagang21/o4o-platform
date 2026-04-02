@@ -58,9 +58,9 @@ export function validateProductForm(
 
 // ─── Constants ───
 
+// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const AVAILABLE_SERVICES = [
   { key: 'glycopharm', name: 'GlycoPharm' },
-  { key: 'glucoseview', name: 'GlucoseView' },
   { key: 'kpa-society', name: 'KPA Society' },
   { key: 'k-cosmetics', name: 'K-Cosmetics' },
 ];

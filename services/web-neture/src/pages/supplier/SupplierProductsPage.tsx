@@ -217,9 +217,9 @@ function RegulatoryInfoModal({
 // ─── Service Key Select Modal (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
 
 // Neture는 공급자 작업 공간이므로 승인 요청 대상에서 제외
+// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const AVAILABLE_SERVICES = [
   { key: 'glycopharm', name: 'GlycoPharm' },
-  { key: 'glucoseview', name: 'GlucoseView' },
   { key: 'kpa-society', name: 'KPA Society' },
   { key: 'k-cosmetics', name: 'K-Cosmetics' },
 ];

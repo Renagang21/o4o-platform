@@ -20,7 +20,6 @@ import { DataTable, type Column } from '@o4o/ui';
 const SERVICE_ICONS: Record<string, string> = {
   glycopharm: '🏥',
   'k-cosmetics': '💄',
-  glucoseview: '📊',
 };
 
 const STATUS_CONFIG: Record<SupplierRequestStatus, { label: string; color: string; bgColor: string; icon: typeof Clock }> = {
@@ -32,11 +31,11 @@ const STATUS_CONFIG: Record<SupplierRequestStatus, { label: string; color: strin
   expired: { label: '계약 만료', color: '#64748b', bgColor: '#f1f5f9', icon: Clock },
 };
 
+// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const SERVICES = [
   { id: 'all', name: '전체 서비스', icon: '🌐' },
   { id: 'glycopharm', name: 'GlycoPharm', icon: '🏥' },
   { id: 'k-cosmetics', name: 'K-Cosmetics', icon: '💄' },
-  { id: 'glucoseview', name: 'GlucoseView', icon: '📊' },
 ];
 
 export default function SellerRequestsPage() {

@@ -53,11 +53,11 @@ const STATUS_CONFIG: Record<
   expired: { label: '계약 만료', twBg: 'bg-slate-50', twText: 'text-slate-500', icon: Clock },
 };
 
+// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const SERVICE_OPTIONS = [
   { id: 'all', name: '전체 서비스' },
   { id: 'glycopharm', name: 'GlycoPharm' },
   { id: 'k-cosmetics', name: 'K-Cosmetics' },
-  { id: 'glucoseview', name: 'GlucoseView' },
 ];
 
 export default function SupplyRequestsPage() {
