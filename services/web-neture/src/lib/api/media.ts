@@ -44,6 +44,7 @@ export const mediaApi = {
 
       const response = await api.post('/platform/media-library/upload', formData, {
         timeout: 60000,
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       return response.data;
     } catch (error: any) {
