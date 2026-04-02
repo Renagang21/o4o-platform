@@ -12,6 +12,7 @@
  *   POST /merge-masters       — Master 병합 (source → target)
  *   PATCH /fix-category       — category 일괄 수정
  *   PATCH /fix-brand          — brand 일괄 수정
+ *   DELETE /pending-offers/:offerId — 승인 신청 상태 Offer 완전 삭제 (WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1)
  *
  * Auth: requireAuth + requireNetureScope('neture:operator')
  */
@@ -244,6 +245,84 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
       res.json({ success: true, data: { updated } });
     } catch (error) {
       logger.error('[Product Cleanup] Error fixing brand:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * DELETE /operator/product-cleanup/pending-offers/:offerId
+   * 운영자: 승인 신청 상태 Offer 완전 삭제
+   * WO-NETURE-OPERATOR-PENDING-PRODUCT-HARD-DELETE-V1
+   */
+  router.delete('/pending-offers/:offerId', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { offerId } = req.params;
+
+      // 1. Offer 조회 + PENDING 상태 검증
+      const [offer] = await dataSource.query(
+        `SELECT id, approval_status AS "approvalStatus" FROM supplier_product_offers WHERE id = $1`,
+        [offerId],
+      );
+      if (!offer) {
+        res.status(404).json({ success: false, error: 'OFFER_NOT_FOUND' });
+        return;
+      }
+      if (offer.approvalStatus !== 'PENDING') {
+        res.status(409).json({ success: false, error: 'NOT_PENDING' });
+        return;
+      }
+
+      // 2. 승인된 서비스 승인 레코드 확인
+      const [approvedCheck] = await dataSource.query(
+        `SELECT COUNT(*)::int AS cnt FROM offer_service_approvals WHERE offer_id = $1 AND approval_status = 'approved'`,
+        [offerId],
+      );
+      if (approvedCheck?.cnt > 0) {
+        res.status(409).json({ success: false, error: 'HAS_APPROVED_SERVICE_APPROVALS' });
+        return;
+      }
+
+      // 3. 활성 listing 확인
+      const [listingCheck] = await dataSource.query(
+        `SELECT COUNT(*)::int AS cnt FROM organization_product_listings WHERE offer_id = $1 AND is_active = true`,
+        [offerId],
+      );
+      if (listingCheck?.cnt > 0) {
+        res.status(409).json({ success: false, error: 'HAS_ACTIVE_LISTINGS' });
+        return;
+      }
+
+      // 4. service_products 확인
+      const [spCheck] = await dataSource.query(
+        `SELECT COUNT(*)::int AS cnt FROM service_products WHERE offer_id = $1`,
+        [offerId],
+      );
+      if (spCheck?.cnt > 0) {
+        res.status(409).json({ success: false, error: 'HAS_SERVICE_PRODUCTS' });
+        return;
+      }
+
+      // 5. 트랜잭션: 수동 정리 + Offer 삭제
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        // 5a. spot_price_policies (No FK)
+        await queryRunner.query(`DELETE FROM spot_price_policies WHERE offer_id = $1`, [offerId]);
+        // 5b. Offer 삭제 (CASCADE: offer_service_approvals, product_approvals, listings, curations)
+        await queryRunner.query(`DELETE FROM supplier_product_offers WHERE id = $1`, [offerId]);
+        await queryRunner.commitTransaction();
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+
+      logger.info(`[Product Cleanup] Deleted pending offer ${offerId}`);
+      res.json({ success: true, data: { deleted: true } });
+    } catch (error) {
+      logger.error('[Product Cleanup] Error deleting pending offer:', error);
       res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }
   });
