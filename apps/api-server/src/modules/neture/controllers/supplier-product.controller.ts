@@ -115,7 +115,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
         return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS', message: 'serviceKeys array is required' });
       }
 
-      const result = await netureService.submitForApproval(supplierId, offerIds, serviceKeys);
+      // neture는 공급자 작업 공간이므로 승인 요청 대상에서 제외
+      const filteredKeys = serviceKeys.filter((k: string) => k !== 'neture');
+      if (filteredKeys.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS', message: 'No valid service keys after filtering' });
+      }
+
+      const result = await netureService.submitForApproval(supplierId, offerIds, filteredKeys);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('[Neture API] Error submitting for approval:', error);

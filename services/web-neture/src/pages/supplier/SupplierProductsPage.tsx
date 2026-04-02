@@ -308,8 +308,8 @@ function RegulatoryInfoModal({
 
 // ─── Service Key Select Modal (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
 
+// Neture는 공급자 작업 공간이므로 승인 요청 대상에서 제외
 const AVAILABLE_SERVICES = [
-  { key: 'neture', name: 'Neture' },
   { key: 'glycopharm', name: 'GlycoPharm' },
   { key: 'glucoseview', name: 'GlucoseView' },
   { key: 'kpa-society', name: 'KPA Society' },
@@ -325,7 +325,7 @@ function ServiceKeySelectModal({
   onClose: () => void;
   onSubmit: (serviceKeys: string[]) => void;
 }) {
-  const [chosen, setChosen] = useState<Set<string>>(new Set(['neture']));
+  const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
 
   const toggle = (key: string) => {
