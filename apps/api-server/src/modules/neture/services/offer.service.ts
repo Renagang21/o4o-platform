@@ -315,6 +315,11 @@ export class NetureOfferService {
     offerIds: string[],
     serviceKeys: string[],
   ): Promise<{ submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }> {
+    // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: 서비스 레벨 방어
+    serviceKeys = serviceKeys.filter((k) => k !== 'neture');
+    if (serviceKeys.length === 0) {
+      return { submitted: 0, skipped: offerIds.length, errors: [] };
+    }
     const approvalService = new OfferServiceApprovalService(AppDataSource);
     const result = { submitted: 0, skipped: 0, errors: [] as Array<{ id: string; error: string }> };
 
@@ -668,7 +673,8 @@ export class NetureOfferService {
         isActive: false,
         approvalStatus: OfferApprovalStatus.PENDING,
         allowedSellerIds: [],
-        serviceKeys: data.serviceKeys || [],
+        // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링
+        serviceKeys: (data.serviceKeys || []).filter((k) => k !== 'neture'),
         priceGeneral: data.priceGeneral ?? 0,
         priceGold: data.priceGold ?? null,
         pricePlatinum: data.pricePlatinum ?? null,

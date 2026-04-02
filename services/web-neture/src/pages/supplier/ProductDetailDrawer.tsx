@@ -1480,21 +1480,25 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           </Section>
 
           {/* ── 서비스 ── */}
-          {(product.serviceKeys?.length || product.serviceApprovals?.length) ? (
+          {/* WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링 */}
+          {(() => {
+            const filteredKeys = product.serviceKeys?.filter((sk) => sk !== 'neture') || [];
+            const filteredApprovals = product.serviceApprovals?.filter((sa) => sa.serviceKey !== 'neture') || [];
+            return (filteredKeys.length > 0 || filteredApprovals.length > 0) ? (
             <Section title="서비스">
-              {product.serviceKeys && product.serviceKeys.length > 0 && (
+              {filteredKeys.length > 0 && (
                 <InfoRow label="등록 서비스">
                   <div className="flex flex-wrap gap-1 justify-end">
-                    {product.serviceKeys.map((sk) => (
+                    {filteredKeys.map((sk) => (
                       <Badge key={sk} className="bg-slate-100 text-slate-600">{sk}</Badge>
                     ))}
                   </div>
                 </InfoRow>
               )}
-              {product.serviceApprovals && product.serviceApprovals.length > 0 && (
+              {filteredApprovals.length > 0 && (
                 <div className="space-y-1.5">
                   <span className="text-sm text-slate-500">서비스별 승인</span>
-                  {product.serviceApprovals.map((sa) => (
+                  {filteredApprovals.map((sa) => (
                     <div key={sa.serviceKey}>
                       <div className="flex items-center justify-between pl-3">
                         <span className="text-xs text-slate-600">{sa.serviceKey}</span>
@@ -1516,7 +1520,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               <InfoRow label="대기 요청">{product.pendingRequestCount ?? 0}건</InfoRow>
               <InfoRow label="활성 서비스">{product.activeServiceCount ?? 0}개</InfoRow>
             </Section>
-          ) : null}
+          ) : null;
+          })()}
         </div>
 
         {/* Footer — 수정 모드 시 취소/저장 */}

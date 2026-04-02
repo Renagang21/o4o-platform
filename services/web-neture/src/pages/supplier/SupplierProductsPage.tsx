@@ -306,7 +306,8 @@ function ServiceKeySelectModal({
 // ─── Approval status helper (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
 
 function deriveSubmissionStatus(product: SupplierProduct): { label: string; bg: string; text: string } {
-  const approvals = product.serviceApprovals || [];
+  // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링
+  const approvals = (product.serviceApprovals || []).filter((a) => a.serviceKey !== 'neture');
 
   // offer-level APPROVED (legacy) 우선
   if (product.approvalStatus === 'APPROVED') {
@@ -457,7 +458,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     minWidth: 70,
     resizable: true,
     render: (v: string[] | undefined | null) => {
-      const keys = Array.isArray(v) ? v : [];
+      // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링
+      const keys = (Array.isArray(v) ? v : []).filter((k) => k !== 'neture');
       if (keys.length === 0) return <span className="text-xs text-slate-400">-</span>;
       const display = keys.slice(0, 2);
       const rest = keys.length - 2;
@@ -510,7 +512,7 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     align: 'center',
     render: (_v: string, row: SupplierProduct) => {
       const cfg = deriveSubmissionStatus(row);
-      const approvals = row.serviceApprovals || [];
+      const approvals = (row.serviceApprovals || []).filter((a) => a.serviceKey !== 'neture');
       const reasonApproval = approvals.find((a) => a.reason);
       return (
         <span
