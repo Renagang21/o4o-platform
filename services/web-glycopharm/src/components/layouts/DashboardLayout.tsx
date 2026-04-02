@@ -29,6 +29,8 @@ import {
   BarChart3,
   FileText,
   Briefcase,
+  DollarSign,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -61,6 +63,15 @@ const roleConfig: Record<string, RoleConfig> = {
       ]},
       { label: 'Approvals', icon: Store, items: [
         { label: '약국 네트워크', path: '/admin/pharmacies' },
+      ]},
+      { label: 'Finance', icon: DollarSign, items: [
+        { label: '정산 관리', path: '/admin/settlements' },
+        { label: '청구 리포트', path: '/admin/reports' },
+        { label: '청구 미리보기', path: '/admin/billing-preview' },
+        { label: '인보이스', path: '/admin/invoices' },
+      ]},
+      { label: 'Governance', icon: ShieldCheck, items: [
+        { label: '역할 관리', path: '/admin/roles' },
       ]},
       { label: 'System', icon: Settings, items: [
         { label: '설정', path: '/admin/settings' },

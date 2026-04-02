@@ -496,7 +496,13 @@ function AppRoutes() {
         <Route path="pharmacies" element={<PharmaciesPage />} />
         <Route path="users" element={<UsersPage />} />
         <Route path="users/:id" element={<UserDetailPage />} />
-        <Route path="settings" element={<SettingsPage />} />
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Finance */}
+        <Route path="settlements" element={<SettlementsPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="billing-preview" element={<BillingPreviewPage />} />
+        <Route path="invoices" element={<InvoicesPage />} />
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: Governance */}
+        <Route path="roles" element={<RoleManagementPage />} />
       </Route>
 
       {/* Operator Dashboard — operator + admin 접근 가능 (WO-O4O-DASHBOARD-ROUTING-NORMALIZE-V1) */}

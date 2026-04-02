@@ -16,6 +16,7 @@ import {
   Monitor,
   MessageSquare,
   BarChart3,
+  HeartPulse,
   Settings,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -45,5 +46,6 @@ export const STANDARD_GROUPS: StandardGroup[] = [
   { key: 'signage', label: 'Signage', icon: Monitor, capability: OperatorCapability.SIGNAGE },
   { key: 'forum', label: 'Forum', icon: MessageSquare, capability: OperatorCapability.COMMUNITY },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, capability: OperatorCapability.ANALYTICS },
+  { key: 'care', label: 'Care', icon: HeartPulse, capability: OperatorCapability.CARE },
   { key: 'system', label: 'System', icon: Settings, capability: OperatorCapability.SETTINGS },
 ];

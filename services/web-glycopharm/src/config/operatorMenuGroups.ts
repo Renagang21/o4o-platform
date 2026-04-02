@@ -50,6 +50,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   forum: [
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '포럼 신청', path: '/operator/forum-requests' },
+    { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
@@ -59,15 +60,13 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'AI 정산', path: '/operator/ai-billing' },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
-  system: [
-    { label: '정산 관리', path: '/operator/settlements', adminOnly: true },
-    { label: '청구 리포트', path: '/operator/reports', adminOnly: true },
-    { label: '청구 미리보기', path: '/operator/billing-preview', adminOnly: true },
-    { label: '인보이스', path: '/operator/invoices', adminOnly: true },
+  /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: care 그룹 신설 */
+  care: [
     { label: '케어 현황', path: '/operator/care' },
     { label: '케어 알림', path: '/operator/care/alerts' },
+  ],
+  system: [
     { label: '서비스 설정', path: '/operator/settings' },
-    { label: '역할 관리', path: '/operator/roles', adminOnly: true },
   ],
 };
 
@@ -119,6 +118,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   forum: [
     { label: '포럼 관리', path: '/operator/forum-management' },
     { label: '포럼 신청', path: '/operator/forum-requests' },
+    { label: '포럼 삭제 요청', path: '/operator/forum-delete-requests' },
     { label: '커뮤니티 관리', path: '/operator/community' },
     { label: '포럼 분석', path: '/operator/forum-analytics' },
   ],
@@ -128,9 +128,11 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'AI 정산', path: '/operator/ai-billing' },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
-  system: [
+  care: [
     { label: '케어 현황', path: '/operator/care' },
     { label: '케어 알림', path: '/operator/care/alerts' },
+  ],
+  system: [
     { label: '서비스 설정', path: '/operator/settings' },
   ],
 };

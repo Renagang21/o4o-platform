@@ -16,5 +16,6 @@ export enum OperatorCapability {
   SIGNAGE = 'SIGNAGE',
   STORE_MANAGEMENT = 'STORE_MANAGEMENT',
   ANALYTICS = 'ANALYTICS',
+  CARE = 'CARE',
   SETTINGS = 'SETTINGS',
 }

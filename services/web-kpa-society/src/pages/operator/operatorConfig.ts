@@ -7,6 +7,10 @@
  *
  * WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1:
  *   Admin/Operator 역할별 KPI·ActionQueue·QuickActions 차등.
+ *
+ * WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1:
+ *   KPA-a 운영 업무 중심 5-Block 재정비.
+ *   상품 신청 KPI/AQ 추가, 무관 항목 제거, Quick Actions 축소.
  */
 
 import type {
@@ -29,6 +33,8 @@ export interface KpaExtendedData {
   pharmacyRequestCount: number;
   // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1
   storeStats: { totalStores: number; activeStores: number } | null;
+  // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 대기
+  productApplicationPendingCount: number;
 }
 
 // ─── Config Builder ───
@@ -37,7 +43,7 @@ export function buildKpaOperatorConfig(
   data: KpaExtendedData,
   isAdmin: boolean,
 ): OperatorDashboardConfig {
-  const { summary, pendingMembers, totalMembers, serviceApplicationCount, pharmacyRequestCount, storeStats } = data;
+  const { summary, pendingMembers, totalMembers, serviceApplicationCount, pharmacyRequestCount, storeStats, productApplicationPendingCount } = data;
 
   if (!summary) {
     return { kpis: [], actionQueue: [], activityLog: [], quickActions: [] };
@@ -79,6 +85,13 @@ export function buildKpaOperatorConfig(
       label: '약국 서비스 신청',
       value: pharmacyRequestCount,
       status: pharmacyRequestCount > 0 ? 'warning' : 'neutral',
+    },
+    // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 대기
+    {
+      key: 'product-applications',
+      label: '상품 신청 대기',
+      value: productApplicationPendingCount,
+      status: productApplicationPendingCount > 0 ? 'warning' : 'neutral',
     },
     // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1: Store KPI
     ...(storeStats ? [{
@@ -146,6 +159,15 @@ export function buildKpaOperatorConfig(
       link: '/operator/pharmacy-requests',
     });
   }
+  // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 대기
+  if (productApplicationPendingCount > 0) {
+    aiSummary.push({
+      id: 'ai-product-applications',
+      message: `상품 신청 ${productApplicationPendingCount}건이 승인 대기 중입니다.`,
+      level: productApplicationPendingCount > 3 ? 'warning' : 'info',
+      link: '/operator/product-applications',
+    });
+  }
   // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 인사이트
   if (isAdmin && serviceApplicationCount > 0) {
     aiSummary.push({
@@ -198,21 +220,22 @@ export function buildKpaOperatorConfig(
       link: '/operator/pharmacy-requests',
     });
   }
-  // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Action Queue
-  if (isAdmin) {
-    if (serviceApplicationCount > 0) {
-      actionQueue.push({
-        id: 'aq-service-apps',
-        label: '서비스 신청 검토',
-        count: serviceApplicationCount,
-        link: '/operator/organization-requests',
-      });
-    }
+  // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 Action Queue
+  if (productApplicationPendingCount > 0) {
     actionQueue.push({
-      id: 'aq-policy-check',
-      label: '서비스 정책 점검',
-      count: 0,
-      link: '/operator/operators',
+      id: 'aq-product-applications',
+      label: '상품 신청 검토',
+      count: productApplicationPendingCount,
+      link: '/operator/product-applications',
+    });
+  }
+  // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Action Queue
+  if (isAdmin && serviceApplicationCount > 0) {
+    actionQueue.push({
+      id: 'aq-service-apps',
+      label: '서비스 신청 검토',
+      count: serviceApplicationCount,
+      link: '/operator/organization-requests',
     });
   }
 
@@ -246,25 +269,18 @@ export function buildKpaOperatorConfig(
   );
   validLog.splice(15);
 
-  // Block 5: Quick Actions (핵심 — Hub 기능 흡수)
+  // Block 5: Quick Actions — WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 10개 축소
   const quickActions: QuickActionItem[] = [
-    { id: 'qa-community', label: '커뮤니티 관리', link: '/operator/community', icon: '🏠' },
-    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
-    { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
-    { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
-    { id: 'qa-docs', label: '자료실', link: '/operator/docs', icon: '📁' },
+    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
     { id: 'qa-requests', label: '조직 가입 요청', link: '/operator/organization-requests', icon: '👥' },
     { id: 'qa-pharmacy-requests', label: '약국 서비스 신청', link: '/operator/pharmacy-requests', icon: '💊' },
     { id: 'qa-product-apps', label: '상품 신청 관리', link: '/operator/product-applications', icon: '🛒' },
-    { id: 'qa-members', label: '회원 관리', link: '/operator/members', icon: '🧑‍💼' },
-    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
-    { id: 'qa-store-channels', label: '채널 관리', link: '/operator/store-channels', icon: '📡' },
+    { id: 'qa-content', label: '콘텐츠 관리', link: '/operator/content', icon: '📝' },
+    { id: 'qa-news', label: '공지사항', link: '/operator/news', icon: '📢' },
+    { id: 'qa-forum', label: '포럼 관리', link: '/operator/forum-management', icon: '💬' },
+    { id: 'qa-community', label: '커뮤니티 관리', link: '/operator/community', icon: '🏠' },
     { id: 'qa-signage', label: '사이니지', link: '/operator/signage/content', icon: '🖥️' },
-    { id: 'qa-ai-report', label: 'AI 리포트', link: '/operator/ai-report', icon: '📊' },
-    // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin 추가 Quick Actions
-    ...(isAdmin ? [
-      { id: 'qa-operators', label: '운영자 관리', link: '/operator/operators', icon: '⚙️' },
-    ] : []),
+    { id: 'qa-stores', label: '매장 관리', link: '/operator/stores', icon: '🏪' },
   ];
 
   return { kpis, aiSummary, actionQueue, activityLog: validLog, quickActions };

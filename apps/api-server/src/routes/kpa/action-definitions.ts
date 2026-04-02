@@ -75,38 +75,8 @@ export const kpaActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
       alwaysHigh: true,
     },
-    {
-      id: 'instructor-pending',
-      type: 'instructor',
-      title: '강사 자격 승인',
-      description: '강사 자격 승인 요청이 대기 중입니다.',
-      query: `SELECT (
-                SELECT COUNT(*) FROM kpa_approval_requests
-                WHERE status = 'pending' AND entity_type = 'instructor_qualification'
-              ) + (
-                SELECT COUNT(*) FROM kpa_instructor_qualifications
-                WHERE status = 'pending'
-              ) AS cnt`,
-      actionUrl: '/operator/approvals',
-      actionLabel: '승인 관리',
-      actionType: 'NAVIGATE',
-    },
-    {
-      id: 'course-pending',
-      type: 'course',
-      title: '과정 승인 대기',
-      description: '과정 승인 요청이 대기 중입니다.',
-      query: `SELECT (
-                SELECT COUNT(*) FROM kpa_approval_requests
-                WHERE status = 'submitted' AND entity_type = 'course'
-              ) + (
-                SELECT COUNT(*) FROM kpa_course_requests
-                WHERE status = 'submitted'
-              ) AS cnt`,
-      actionUrl: '/operator/approvals',
-      actionLabel: '승인 관리',
-      actionType: 'NAVIGATE',
-    },
+    // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: instructor-pending, course-pending 제거
+    // KPA-a에 LMS/강사 기능 없음 — 무관 항목 비노출
     {
       id: 'suspended-members',
       type: 'member',

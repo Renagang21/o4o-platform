@@ -35,6 +35,7 @@ export type OperatorGroupKey =
   | 'signage'
   | 'forum'
   | 'analytics'
+  | 'care'
   | 'system';
 
 /**

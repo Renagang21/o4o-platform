@@ -10,4 +10,5 @@ export const ENABLED_CAPABILITIES: OperatorCapability[] = [
   OperatorCapability.CONTENT_MANAGEMENT,
   OperatorCapability.SIGNAGE,
   OperatorCapability.ANALYTICS,
+  OperatorCapability.CARE,
 ];

@@ -20,7 +20,10 @@
  *  [4] Activity Log   — 최근 콘텐츠/포럼/사이니지 활동 (핵심)
  *  [5] Quick Actions  — Hub 기능 흡수 (+Admin: 회원관리, 서비스승인, 정책설정)
  *
- * API 재사용: operatorApi.getSummary() + apiClient (members, groupbuy)
+ * WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1:
+ *   KPA-a 운영 업무 기준 5-Block 정비. 상품 신청 fetch 추가.
+ *
+ * API 재사용: operatorApi.getSummary() + apiClient (members, product-applications)
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -57,6 +60,8 @@ export default function KpaOperatorDashboard() {
         apiClient.get('/pharmacy-requests/pending', { limit: 1 }),
         // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1: Store stats
         fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1`, { headers: storeHeaders }).then(r => r.ok ? r.json() : null),
+        // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 통계
+        apiClient.get('/kpa/operator/product-applications/stats'),
       ];
       // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin용 추가 데이터 fetch
       if (isAdmin) {
@@ -72,8 +77,9 @@ export default function KpaOperatorDashboard() {
       const membersRes = results[1].status === 'fulfilled' ? results[1].value : null;
       const pharmacyReqRes = results[2].status === 'fulfilled' ? results[2].value : null;
       const storeRes = results[3].status === 'fulfilled' ? results[3].value : null;
-      const totalMembersRes = isAdmin && results[4]?.status === 'fulfilled' ? results[4].value : null;
-      const serviceAppsRes = isAdmin && results[5]?.status === 'fulfilled' ? results[5].value : null;
+      const productAppStatsRes = results[4].status === 'fulfilled' ? results[4].value : null;
+      const totalMembersRes = isAdmin && results[5]?.status === 'fulfilled' ? results[5].value : null;
+      const serviceAppsRes = isAdmin && results[6]?.status === 'fulfilled' ? results[6].value : null;
 
       // Log individual failures
       results.forEach((r, i) => {
@@ -90,6 +96,8 @@ export default function KpaOperatorDashboard() {
         pharmacyRequestCount: (pharmacyReqRes as any)?.data?.pagination?.total ?? 0,
         // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1
         storeStats: storeRes?.stats ?? null,
+        // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 대기
+        productApplicationPendingCount: (productAppStatsRes as any)?.data?.pending ?? 0,
       };
 
       setConfig(buildKpaOperatorConfig(extData, isAdmin));

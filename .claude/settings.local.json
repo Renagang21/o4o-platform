@@ -660,7 +660,14 @@
       "Bash(choco search:*)",
       "Bash(timeout /t 3:*)",
       "Bash(\"C:\\\\Users\\\\sohae\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd\" run services logs read o4o-core-api --region=asia-northeast3 --limit=30)",
-      "Bash(# Login returns cookie-based auth, let''s use cookie jar curl -s -X POST \"\"https://api.neture.co.kr/api/v1/auth/login\"\" -H \"\"Content-Type: application/json\"\" -d @/tmp/neture_login.json -c /tmp/neture_cookies.txt -D /tmp/neture_headers.txt 2>&1 cat /tmp/neture_headers.txt)"
+      "Bash(# Login returns cookie-based auth, let''s use cookie jar curl -s -X POST \"\"https://api.neture.co.kr/api/v1/auth/login\"\" -H \"\"Content-Type: application/json\"\" -d @/tmp/neture_login.json -c /tmp/neture_cookies.txt -D /tmp/neture_headers.txt 2>&1 cat /tmp/neture_headers.txt)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlNTI1NTRkNy1mYmJkLTQ2YmMtODI1Ni1iMGJkZWIxMmVjNTciLCJzdWIiOiJlNTI1NTRkNy1mYmJkLTQ2YmMtODI1Ni1iMGJkZWIxMmVjNTciLCJlbWFpbCI6Im9wZXJhdG9yLW5ldHVyZUBvNG8uY29tIiwicm9sZSI6ImN1c3RvbWVyIiwicm9sZXMiOlsiY3VzdG9tZXIiLCJuZXR1cmU6b3BlcmF0b3IiXSwicGVybWlzc2lvbnMiOltdLCJzY29wZXMiOltdLCJtZW1iZXJzaGlwcyI6W3sic2VydmljZUtleSI6InBsYXRmb3JtIiwic3RhdHVzIjoiYWN0aXZlIn0seyJzZXJ2aWNlS2V5IjoiZ2x5Y29waGFybSIsInN0YXR1cyI6ImFjdGl2ZSJ9LHsic2VydmljZUtleSI6Im5ldHVyZSIsInN0YXR1cyI6ImFjdGl2ZSJ9XSwidG9rZW5UeXBlIjoidXNlciIsImlzcyI6Im80by1wbGF0Zm9ybSIsImF1ZCI6Im80by1hcGkiLCJleHAiOjE3NzQ3NDc5NDYsImlhdCI6MTc3NDc0NzA0Nn0.nunsZSBnluoubtlc9SsoGVvtajwU3ptiJs-7LNU2O_0\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NjRiYzU2My1hNGNkLTQyM2ItOTM5NS02YzU2ZTc0YzRhYzAiLCJzdWIiOiI5NjRiYzU2My1hNGNkLTQyM2ItOTM5NS02YzU2ZTc0YzRhYzAiLCJlbWFpbCI6InBoYXJtYWNpc3RfdGVzdEBnbHljb3BoYXJtLmNvLmtyIiwicm9sZSI6ImN1c3RvbWVyIiwicm9sZXMiOlsiY3VzdG9tZXIiLCJwaGFybWFjeSJdLCJwZXJtaXNzaW9ucyI6W10sInNjb3BlcyI6W10sIm1lbWJlcnNoaXBzIjpbeyJzZXJ2aWNlS2V5IjoiZ2x5Y29waGFybSIsInN0YXR1cyI6ImFjdGl2ZSJ9XSwidG9rZW5UeXBlIjoidXNlciIsImlzcyI6Im80by1wbGF0Zm9ybSIsImF1ZCI6Im80by1hcGkiLCJleHAiOjE3NzQ5NjM5MjEsImlhdCI6MTc3NDk2MzAyMX0.2LwoBtFfO-Bb4tX9iroxJ-DV2dkCVI6yP1hc_W93vcQ\")",
+      "Bash(\"C:\\\\Users\\\\sohae\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd\" sql connect o4o-platform-db --database=o4o_platform --user=postgres --project=netureyoutube --quiet 2)",
+      "Bash(1 <<'EOSQL'\nSELECT spo.id, pm.marketing_name, spo.approval_status, spo.distribution_type, spo.service_keys\nFROM supplier_product_offers spo\nJOIN product_masters pm ON pm.id = spo.master_id\nWHERE pm.marketing_name ILIKE '%자일리톨%'\nLIMIT 5;\nEOSQL)",
+      "Bash(chcp:*)",
+      "Bash(\"C:\\\\Users\\\\sohae\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd\" auth print-access-token --project=netureyoutube)",
+      "Bash(\"C:\\\\Users\\\\sohae\\\\AppData\\\\Local\\\\Google\\\\Cloud SDK\\\\google-cloud-sdk\\\\bin\\\\gcloud.cmd\" run services logs read o4o-core-api --region=asia-northeast3 --limit=10 --project=netureyoutube)"
     ],
     "deny": []
   }

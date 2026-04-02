@@ -24,7 +24,10 @@ import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
 import OperatorStoresPage from '../pages/operator/OperatorStoresPage';
 import OperatorStoreDetailPage from '../pages/operator/OperatorStoreDetailPage';
 import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPage';
-import { NewsPage, DocsPage, ForumPage } from '../pages/admin-branch';
+import { NewsPage } from '../pages/admin-branch';
+// WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용 페이지로 교체
+import OperatorForumPage from '../pages/operator/OperatorForumPage';
+import OperatorDocsPage from '../pages/operator/OperatorDocsPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
@@ -89,11 +92,11 @@ export function OperatorRoutes() {
           {/* 공지사항 */}
           <Route path="news" element={<NewsPage />} />
 
-          {/* 자료실 */}
-          <Route path="docs" element={<DocsPage />} />
+          {/* 자료실 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
+          <Route path="docs" element={<OperatorDocsPage />} />
 
-          {/* 게시판 */}
-          <Route path="forum" element={<ForumPage />} />
+          {/* 게시판 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
+          <Route path="forum" element={<OperatorForumPage />} />
 
           {/* WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1: 회원 관리 (KpaMember 기반) */}
           <Route path="members" element={<MemberManagementPage />} />

@@ -60,7 +60,6 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   system: [
     { label: '법률 관리', path: '/operator/legal', adminOnly: true },
     { label: '감사 로그', path: '/operator/audit-logs', adminOnly: true },
-    { label: '회원 관리 (통합)', path: '/operator/users' },
     { label: '역할 관리', path: '/operator/roles', adminOnly: true },
   ],
 };
@@ -120,7 +119,5 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'AI 리포트', path: '/operator/ai-report' },
     { label: '운영 분석', path: '/operator/analytics' },
   ],
-  system: [
-    { label: '회원 관리 (통합)', path: '/operator/users' },
-  ],
+  system: [],
 };
