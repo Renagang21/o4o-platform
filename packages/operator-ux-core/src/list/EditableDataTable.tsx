@@ -115,6 +115,9 @@ export function EditableDataTable<T extends Record<string, any>>({
     key: col.key,
     header: col.header,
     width: col.width,
+    minWidth: col.minWidth,
+    maxWidth: col.maxWidth,
+    resizable: col.resizable,
     align: col.align,
 
     accessor: (row: T, index: number) => {

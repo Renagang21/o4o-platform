@@ -30,6 +30,12 @@ export interface ListColumnDef<T> {
   header: string;
   /** 컬럼 너비 (CSS value, e.g. '120px', '20%') */
   width?: string;
+  /** 최소 너비 */
+  minWidth?: number | string;
+  /** 최대 너비 */
+  maxWidth?: number | string;
+  /** 컬럼 폭 드래그 리사이즈 허용 */
+  resizable?: boolean;
   /** 텍스트 정렬 */
   align?: 'left' | 'center' | 'right';
   /** 정렬 가능 여부 */

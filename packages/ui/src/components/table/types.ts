@@ -24,8 +24,13 @@ export interface O4OColumn<T> {
 
   // ─── Style ───
   width?: number | string;
+  minWidth?: number | string;
+  maxWidth?: number | string;
   align?: 'left' | 'center' | 'right';
   className?: string;
+
+  /** 컬럼 폭 드래그 리사이즈 허용 */
+  resizable?: boolean;
 
   // ─── Editable (선택) ───
   editable?: boolean;

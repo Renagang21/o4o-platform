@@ -428,18 +428,24 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     key: 'barcode',
     header: '바코드',
     width: '120px',
+    minWidth: 80,
+    resizable: true,
     render: (v) => <span className="font-mono text-xs">{v || '-'}</span>,
   },
   {
     key: 'name',
     header: '상품명',
     width: '180px',
+    minWidth: 100,
+    resizable: true,
     render: (v) => <span className="font-medium">{v || '-'}</span>,
   },
   {
     key: 'categoryName',
     header: '카테고리',
     width: '100px',
+    minWidth: 60,
+    resizable: true,
     render: (v) => v || '-',
   },
   // primaryImageUrl column is inserted dynamically below
@@ -447,6 +453,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     key: 'priceGeneral',
     header: '공급가',
     width: '110px',
+    minWidth: 80,
+    resizable: true,
     align: 'right',
     editable: true,
     render: (v) =>
@@ -465,6 +473,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     key: 'consumerReferencePrice',
     header: '소비자가',
     width: '100px',
+    minWidth: 80,
+    resizable: true,
     align: 'right',
     editable: true,
     render: (v) =>
@@ -535,6 +545,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     key: 'serviceKeys' as any,
     header: '서비스',
     width: '120px',
+    minWidth: 70,
+    resizable: true,
     render: (v: string[] | undefined | null) => {
       const keys = Array.isArray(v) ? v : [];
       if (keys.length === 0) return <span className="text-xs text-slate-400">-</span>;
@@ -637,6 +649,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     key: 'tags',
     header: '태그',
     width: '120px',
+    minWidth: 60,
+    resizable: true,
     render: (v: string[] | undefined | null) => {
       const tags = Array.isArray(v) ? v : [];
       if (tags.length === 0) return <span className="text-xs text-slate-400">-</span>;
