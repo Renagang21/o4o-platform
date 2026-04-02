@@ -53,6 +53,19 @@ export class CareAppointment {
   @Column({ name: 'reject_reason', type: 'text', nullable: true })
   rejectReason?: string | null;
 
+  // WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1
+  @Column({ name: 'consultation_summary', type: 'text', nullable: true })
+  consultationSummary?: string | null;
+
+  @Column({ name: 'consultation_recommendation', type: 'text', nullable: true })
+  consultationRecommendation?: string | null;
+
+  @Column({ name: 'consultation_shared_at', type: 'timestamptz', nullable: true })
+  consultationSharedAt?: Date | null;
+
+  @Column({ name: 'consultation_recorded_by', type: 'uuid', nullable: true })
+  consultationRecordedBy?: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

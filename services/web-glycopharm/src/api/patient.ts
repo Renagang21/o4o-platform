@@ -137,6 +137,10 @@ export interface AppointmentDto {
   status: 'requested' | 'confirmed' | 'rejected' | 'completed' | 'cancelled';
   notes: string | null;
   rejectReason: string | null;
+  // WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1
+  consultationSummary: string | null;
+  consultationRecommendation: string | null;
+  consultationSharedAt: string | null;
   createdAt: string;
 }
 

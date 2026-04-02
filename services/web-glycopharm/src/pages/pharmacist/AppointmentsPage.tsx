@@ -49,6 +49,12 @@ export default function PharmacistAppointmentsPage() {
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
+  // WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1: 상담 결과 입력 모달
+  const [resultModalId, setResultModalId] = useState<string | null>(null);
+  const [resultSummary, setResultSummary] = useState('');
+  const [resultRecommendation, setResultRecommendation] = useState('');
+  const [resultSaving, setResultSaving] = useState(false);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -98,17 +104,42 @@ export default function PharmacistAppointmentsPage() {
     }
   };
 
-  const handleComplete = async (id: string) => {
-    setActionLoading(id);
+  // WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1: 방문 완료 → 결과 입력 모달 열기
+  const handleComplete = (id: string) => {
+    const appt = appointments.find((a) => a.id === id);
+    setResultModalId(id);
+    setResultSummary(appt?.consultationSummary || '');
+    setResultRecommendation(appt?.consultationRecommendation || '');
+  };
+
+  const handleSaveResult = async () => {
+    if (!resultModalId) return;
+    setResultSaving(true);
     try {
-      await pharmacyApi.completeAppointment(id);
+      await pharmacyApi.saveConsultationResult(resultModalId, {
+        summary: resultSummary || undefined,
+        recommendation: resultRecommendation || undefined,
+      });
       setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: 'completed' } : a)),
+        prev.map((a) =>
+          a.id === resultModalId
+            ? {
+                ...a,
+                status: 'completed',
+                consultationSummary: resultSummary || null,
+                consultationRecommendation: resultRecommendation || null,
+                consultationSharedAt: new Date().toISOString(),
+              }
+            : a,
+        ),
       );
+      setResultModalId(null);
+      setResultSummary('');
+      setResultRecommendation('');
     } catch {
       // silent
     } finally {
-      setActionLoading(null);
+      setResultSaving(false);
     }
   };
 
@@ -121,7 +152,8 @@ export default function PharmacistAppointmentsPage() {
     (a) => a.status === 'confirmed' && isFuture(a.scheduledAt),
   );
 
-  const totalActive = todayConfirmed.length + pendingRequests.length + upcomingConfirmed.length;
+  const completedRecent = appointments.filter((a) => a.status === 'completed').slice(0, 10);
+  const totalActive = todayConfirmed.length + pendingRequests.length + upcomingConfirmed.length + completedRecent.length;
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-6">
@@ -372,9 +404,101 @@ export default function PharmacistAppointmentsPage() {
                 </div>
               </section>
             )}
+            {/* Section 4: Recent Completed — WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1 */}
+            {completedRecent.length > 0 && (
+              <section>
+                <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                  최근 완료 ({completedRecent.length}건)
+                </h2>
+                <div className="space-y-2">
+                  {completedRecent.map((appt) => (
+                    <div
+                      key={appt.id}
+                      className="bg-slate-50 rounded-2xl border border-slate-200 p-4"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-slate-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-slate-700">{appt.patientName}</p>
+                            <p className="text-xs text-slate-400">
+                              {new Date(appt.scheduledAt).toLocaleDateString('ko-KR')}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleComplete(appt.id)}
+                          className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                        >
+                          {appt.consultationSummary ? '결과 수정' : '결과 입력'}
+                        </button>
+                      </div>
+                      {appt.consultationSummary && (
+                        <div className="mt-2 pt-2 border-t border-slate-200 space-y-1">
+                          <p className="text-xs text-slate-500"><span className="font-medium">상담 결과:</span> {appt.consultationSummary}</p>
+                          {appt.consultationRecommendation && (
+                            <p className="text-xs text-slate-500"><span className="font-medium">권고사항:</span> {appt.consultationRecommendation}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         )}
       </div>
+
+      {/* 상담 결과 입력 모달 — WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1 */}
+      {resultModalId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+            <div className="px-5 py-4 border-b border-slate-200">
+              <h3 className="text-sm font-semibold text-slate-800">상담 결과 입력</h3>
+            </div>
+            <div className="px-5 py-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">상담 주요 결과</label>
+                <textarea
+                  value={resultSummary}
+                  onChange={(e) => setResultSummary(e.target.value)}
+                  placeholder="혈당 패턴, 복약 상담 내용 등"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">권고사항 / 다음 행동</label>
+                <textarea
+                  value={resultRecommendation}
+                  onChange={(e) => setResultRecommendation(e.target.value)}
+                  placeholder="식사량 조절, 운동 권고 등"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                />
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-slate-200 flex gap-2">
+              <button
+                onClick={() => { setResultModalId(null); setResultSummary(''); setResultRecommendation(''); }}
+                className="flex-1 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveResult}
+                disabled={resultSaving || (!resultSummary.trim() && !resultRecommendation.trim())}
+                className="flex-1 py-2 text-sm font-medium text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition-colors disabled:opacity-50"
+              >
+                {resultSaving ? '저장 중...' : '완료 및 결과 저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

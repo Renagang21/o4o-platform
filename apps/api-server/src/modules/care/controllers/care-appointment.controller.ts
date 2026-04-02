@@ -49,7 +49,11 @@ export function createCareAppointmentRouter(dataSource: DataSource): Router {
       const appointments = await dataSource.query(
         `SELECT id, patient_name AS "patientName", pharmacy_name AS "pharmacyName",
                 scheduled_at AS "scheduledAt", status, notes,
-                reject_reason AS "rejectReason", created_at AS "createdAt"
+                reject_reason AS "rejectReason",
+                consultation_summary AS "consultationSummary",
+                consultation_recommendation AS "consultationRecommendation",
+                consultation_shared_at AS "consultationSharedAt",
+                created_at AS "createdAt"
          FROM care_appointments
          WHERE patient_id = $1
          ORDER BY scheduled_at DESC`,
@@ -190,7 +194,12 @@ export function createCareAppointmentRouter(dataSource: DataSource): Router {
       let query = `SELECT id, patient_id AS "patientId", patient_email AS "patientEmail",
                           patient_name AS "patientName", pharmacy_name AS "pharmacyName",
                           scheduled_at AS "scheduledAt", status, notes,
-                          reject_reason AS "rejectReason", created_at AS "createdAt"
+                          reject_reason AS "rejectReason",
+                          consultation_summary AS "consultationSummary",
+                          consultation_recommendation AS "consultationRecommendation",
+                          consultation_shared_at AS "consultationSharedAt",
+                          consultation_recorded_by AS "consultationRecordedBy",
+                          created_at AS "createdAt"
                    FROM care_appointments`;
       const params: unknown[] = [];
       const conditions: string[] = [];
@@ -349,6 +358,67 @@ export function createCareAppointmentRouter(dataSource: DataSource): Router {
       res.status(500).json({
         success: false,
         error: { code: 'INTERNAL_ERROR', message: 'Failed to complete appointment' },
+      });
+    }
+  });
+
+  /**
+   * PATCH /appointments/:id/consultation-result
+   * 약사가 상담 결과 입력/수정 (완료 처리 포함)
+   * WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1
+   */
+  router.patch('/appointments/:id/consultation-result', authenticate, requirePharmacyContext, async (req, res) => {
+    try {
+      const pcReq = req as PharmacyContextRequest;
+      const authReq = req as AuthRequest;
+      const pharmacyId = pcReq.pharmacyId;
+      const userId = authReq.user?.id;
+      const { id } = req.params;
+      const { summary, recommendation } = req.body;
+
+      if (!summary && !recommendation) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_INPUT', message: 'summary or recommendation is required' },
+        });
+        return;
+      }
+
+      // confirmed 또는 completed 상태만 결과 입력 가능
+      const whereClause = pharmacyId
+        ? `WHERE id = $1 AND pharmacy_id = $2 AND status IN ('confirmed', 'completed')`
+        : `WHERE id = $1 AND status IN ('confirmed', 'completed')`;
+      const params = pharmacyId ? [id, pharmacyId] : [id];
+
+      const result = await dataSource.query(
+        `UPDATE care_appointments
+         SET consultation_summary = $${params.length + 1},
+             consultation_recommendation = $${params.length + 2},
+             consultation_shared_at = NOW(),
+             consultation_recorded_by = $${params.length + 3},
+             status = 'completed',
+             updated_at = NOW()
+         ${whereClause}
+         RETURNING id, status, consultation_summary AS "consultationSummary",
+                   consultation_recommendation AS "consultationRecommendation",
+                   consultation_shared_at AS "consultationSharedAt"`,
+        [...params, summary || null, recommendation || null, userId],
+      );
+
+      if (result.length === 0) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Appointment not found or not in valid status' },
+        });
+        return;
+      }
+
+      res.json({ success: true, data: result[0] });
+    } catch (error) {
+      console.error('[appointments] PATCH /consultation-result failed:', error);
+      res.status(500).json({
+        success: false,
+        error: { code: 'INTERNAL_ERROR', message: 'Failed to save consultation result' },
       });
     }
   });

@@ -947,6 +947,17 @@ class PharmacyApiClient {
   async completeAppointment(id: string): Promise<void> {
     return this.request(`/care/appointments/${id}/complete`, { method: 'PATCH' });
   }
+
+  // WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1
+  async saveConsultationResult(
+    id: string,
+    data: { summary?: string; recommendation?: string },
+  ): Promise<void> {
+    return this.request(`/care/appointments/${id}/consultation-result`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
 }
 
 // ── Pharmacy Link Types (WO-GLYCOPHARM-PATIENT-PHARMACY-LINK-FLOW-V1) ──
@@ -974,6 +985,9 @@ export interface PharmacyAppointmentDto {
   status: string;
   notes: string | null;
   rejectReason: string | null;
+  consultationSummary: string | null;
+  consultationRecommendation: string | null;
+  consultationSharedAt: string | null;
   createdAt: string;
 }
 

@@ -283,6 +283,27 @@ export default function PatientAppointmentsPage() {
                         </div>
                       )}
 
+                      {/* WO-O4O-CARE-CONSULTATION-RESULT-SHARING-V1: 상담 결과 표시 */}
+                      {appt.status === 'completed' && appt.consultationSharedAt && (
+                        <div className="bg-emerald-50 rounded-lg px-3 py-2.5 mb-2 space-y-1.5">
+                          {appt.consultationSummary && (
+                            <div>
+                              <p className="text-[10px] text-emerald-600 font-medium mb-0.5">상담 결과</p>
+                              <p className="text-xs text-slate-700">{appt.consultationSummary}</p>
+                            </div>
+                          )}
+                          {appt.consultationRecommendation && (
+                            <div>
+                              <p className="text-[10px] text-emerald-600 font-medium mb-0.5">권고사항</p>
+                              <p className="text-xs text-slate-700">{appt.consultationRecommendation}</p>
+                            </div>
+                          )}
+                          <p className="text-[10px] text-slate-400">
+                            공유일: {new Date(appt.consultationSharedAt).toLocaleDateString('ko-KR')}
+                          </p>
+                        </div>
+                      )}
+
                       {canCancel && (
                         <button
                           onClick={() => handleCancel(appt.id)}
