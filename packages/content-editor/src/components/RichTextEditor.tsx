@@ -138,19 +138,21 @@ export function RichTextEditor({
       style={{
         border: '1px solid #e5e7eb',
         borderRadius: '8px',
-        overflow: 'hidden',
+        position: 'relative',
         background: 'white',
       }}
       onKeyDown={handleKeyDown}
     >
       {editable && <Toolbar editor={editor} preset={preset} onImageUpload={onImageUpload} existingImages={existingImages} onMediaLibraryPick={onMediaLibraryPick} />}
-      <EditorContent
-        editor={editor}
-        style={{
-          minHeight,
-          padding: '16px',
-        }}
-      />
+      <div style={{ overflow: 'hidden', borderRadius: showTemplateActions ? '0' : '0 0 8px 8px' }}>
+        <EditorContent
+          editor={editor}
+          style={{
+            minHeight,
+            padding: '16px',
+          }}
+        />
+      </div>
       {showTemplateActions && (
         <div
           style={{
@@ -159,6 +161,7 @@ export function RichTextEditor({
             padding: '8px 12px',
             borderTop: '1px solid #e5e7eb',
             background: '#f8fafc',
+            borderRadius: '0 0 8px 8px',
           }}
         >
           <button
