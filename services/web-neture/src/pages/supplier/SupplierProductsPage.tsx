@@ -163,99 +163,6 @@ function ImageUploadModal({
   );
 }
 
-// ─── Description Edit Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: marketingName 추가) ───
-
-function stripHtml(html: string | null | undefined): string {
-  if (!html) return '';
-  return html.replace(/<[^>]*>/g, '').trim();
-}
-
-function DescriptionEditModal({
-  product,
-  onClose,
-  onSaved,
-}: {
-  product: SupplierProduct;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const [marketingName, setMarketingName] = useState(product.name || product.masterName || '');
-  const [shortDesc, setShortDesc] = useState(stripHtml(product.consumerShortDescription));
-  const [detailDesc, setDetailDesc] = useState(stripHtml(product.consumerDetailDescription));
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await supplierApi.updateProduct(product.id, {
-        marketingName: marketingName || undefined,
-        consumerShortDescription: shortDesc ? `<p>${shortDesc}</p>` : '',
-        consumerDetailDescription: detailDesc ? `<p>${detailDesc}</p>` : '',
-      });
-      onSaved();
-    } catch {
-      alert('저장 실패');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[480px]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">상품 정보 편집</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">상품명</label>
-            <input
-              type="text"
-              value={marketingName}
-              onChange={(e) => setMarketingName(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="상품명 (마케팅명)"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">간단 소개</label>
-            <textarea
-              value={shortDesc}
-              onChange={(e) => setShortDesc(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="소비자에게 보여줄 간단 소개"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">상세 설명</label>
-            <textarea
-              value={detailDesc}
-              onChange={(e) => setDetailDesc(e.target.value)}
-              rows={5}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder="상세 설명 (성분, 용법 등)"
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-2 mt-6">
-          <button onClick={onClose} disabled={saving} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
-          >
-            {saving ? '저장 중...' : '저장'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Regulatory Info Modal (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
 
 function RegulatoryInfoModal({
@@ -700,7 +607,6 @@ export default function SupplierProductsPage() {
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
-  const [descEditProduct, setDescEditProduct] = useState<SupplierProduct | null>(null);
   const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
   const [previewProduct, setPreviewProduct] = useState<SupplierProduct | null>(null);
 
@@ -790,14 +696,14 @@ export default function SupplierProductsPage() {
       render: (v: any, row: SupplierProduct) =>
         v ? (
           <button
-            onClick={(e) => { e.stopPropagation(); setDescEditProduct(row); }}
+            onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
             className="text-xs text-green-600 hover:underline"
           >
-            수정
+            있음
           </button>
         ) : (
           <button
-            onClick={(e) => { e.stopPropagation(); setDescEditProduct(row); }}
+            onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
             className="text-xs text-red-500 hover:underline font-medium"
           >
             미작성
@@ -862,8 +768,8 @@ export default function SupplierProductsPage() {
             const missing: MissingItem[] = [];
             if (!row.primaryImageUrl) missing.push({ label: '이미지', action: () => setImageUploadMasterId(row.masterId) });
             if (!row.priceGeneral || row.priceGeneral <= 0) missing.push({ label: '가격', action: () => showToast('공급가 셀을 클릭하여 편집하세요') });
-            if (!row.consumerShortDescription) missing.push({ label: '간단 소개', action: () => setDescEditProduct(row) });
-            if (!row.consumerDetailDescription) missing.push({ label: '상세 설명', action: () => setDescEditProduct(row) });
+            if (!row.consumerShortDescription) missing.push({ label: '간단 소개', action: () => setDrawerProduct(row) });
+            if (!row.consumerDetailDescription) missing.push({ label: '상세 설명', action: () => setDrawerProduct(row) });
             if (!row.distributionType) missing.push({ label: '유통 타입', action: () => showToast('유통 셀을 클릭하여 편집하세요') });
             const next = missing[0];
             const isHighlighted = highlightRowId === row.id;
@@ -1023,7 +929,7 @@ export default function SupplierProductsPage() {
     if (pending.type === 'image' && !next.primaryImageUrl) {
       setTimeout(() => setImageUploadMasterId(next!.masterId), 400);
     } else if (pending.type === 'description' && (!next.consumerShortDescription || !next.consumerDetailDescription)) {
-      setTimeout(() => setDescEditProduct(next!), 400);
+      setTimeout(() => setDrawerProduct(next!), 400);
     }
   }, [products, autoNext, loading]);
 
@@ -1271,17 +1177,6 @@ export default function SupplierProductsPage() {
             const p = products.find(pr => pr.masterId === imageUploadMasterId);
             if (p) lastEditedRef.current = { id: p.id, type: 'image' };
             setImageUploadMasterId(null);
-            fetchProducts(pagination.page);
-          }}
-        />
-      )}
-      {descEditProduct && (
-        <DescriptionEditModal
-          product={descEditProduct}
-          onClose={() => setDescEditProduct(null)}
-          onSaved={() => {
-            lastEditedRef.current = { id: descEditProduct!.id, type: 'description' };
-            setDescEditProduct(null);
             fetchProducts(pagination.page);
           }}
         />
