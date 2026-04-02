@@ -76,7 +76,7 @@ export default function SupplierProductCreatePage() {
     priceGeneral: '',
     consumerReferencePrice: '',
     stockQty: '',
-    regulatoryType: 'HEALTH_FUNCTIONAL',
+    regulatoryType: 'GENERAL',
     regulatoryName: '',
     mfdsPermitNumber: '',
     specification: '',
@@ -218,8 +218,9 @@ export default function SupplierProductCreatePage() {
 
     const manualData: Record<string, any> = {};
     if (form.packagingName) manualData.regulatoryName = form.packagingName;
+    // regulatoryType은 항상 저장
+    manualData.regulatoryType = form.regulatoryType || 'GENERAL';
     if (isRegulated) {
-      manualData.regulatoryType = form.regulatoryType;
       manualData.regulatoryName = form.regulatoryName;
       manualData.mfdsPermitNumber = form.mfdsPermitNumber || null;
     }
@@ -406,6 +407,23 @@ export default function SupplierProductCreatePage() {
               {isRegulated && (
                 <p className="mt-1 text-sm text-amber-600">규제 카테고리 — 아래 규제 정보 입력이 필요합니다</p>
               )}
+            </div>
+
+            {/* Regulatory Type — 항상 표시 */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">규제 구분</label>
+              <select
+                name="regulatoryType"
+                value={form.regulatoryType}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              >
+                <option value="HEALTH_FUNCTIONAL">건강기능식품</option>
+                <option value="MEDICAL_DEVICE">의료기기</option>
+                <option value="QUASI_DRUG">의약외품</option>
+                <option value="COSMETIC">화장품</option>
+                <option value="GENERAL">기타</option>
+              </select>
             </div>
 
             {/* Brand & Manufacturer */}

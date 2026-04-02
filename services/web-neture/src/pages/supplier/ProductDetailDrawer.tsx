@@ -62,16 +62,18 @@ function Badge({ children, className }: { children: React.ReactNode; className: 
 }
 
 const REGULATORY_TYPE_LABELS: Record<string, string> = {
-  DRUG: '의약품',
   HEALTH_FUNCTIONAL: '건강기능식품',
+  MEDICAL_DEVICE: '의료기기',
+  DRUG: '의약품',
   QUASI_DRUG: '의약외품',
   COSMETIC: '화장품',
-  GENERAL: '일반',
+  GENERAL: '기타',
 };
 
 const REGULATORY_TYPE_BADGE: Record<string, string> = {
-  DRUG: 'bg-red-50 text-red-700',
   HEALTH_FUNCTIONAL: 'bg-amber-50 text-amber-700',
+  MEDICAL_DEVICE: 'bg-blue-50 text-blue-700',
+  DRUG: 'bg-red-50 text-red-700',
   QUASI_DRUG: 'bg-yellow-50 text-yellow-700',
   COSMETIC: 'bg-violet-50 text-violet-700',
   GENERAL: 'bg-slate-100 text-slate-600',

@@ -36,11 +36,12 @@ const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; bg: string
 // ─── Regulatory type labels (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
 
 const REGULATORY_TYPE_LABELS: Record<string, string> = {
-  DRUG: '의약품',
   HEALTH_FUNCTIONAL: '건강기능식품',
+  MEDICAL_DEVICE: '의료기기',
+  DRUG: '의약품',
   QUASI_DRUG: '의약외품',
   COSMETIC: '화장품',
-  GENERAL: '일반',
+  GENERAL: '기타',
 };
 
 // ─── Image type options (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
