@@ -842,7 +842,25 @@ export default function SupplierProductsPage() {
       ),
     };
 
-    return [selectCol, detailCol, ...cols];
+    // WO-NETURE-SUPPLIER-PRODUCT-DESCRIPTION-PREVIEW-FROM-LIST-V2: 미리보기 컬럼
+    const previewCol: ListColumnDef<SupplierProduct> = {
+      key: '_preview' as any,
+      header: '',
+      width: '36px',
+      align: 'center',
+      render: (_v: any, row: SupplierProduct) => (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setPreviewProduct(row); }}
+          className="p-1 rounded hover:bg-blue-50 text-slate-400 hover:text-blue-600"
+          title="설명 미리보기"
+        >
+          <FileText size={14} />
+        </button>
+      ),
+    };
+
+    return [selectCol, detailCol, previewCol, ...cols];
   }, [products, selectedIds, highlightRowId]);
 
   const handleGenerateAiTags = async (masterId: string) => {
@@ -1188,6 +1206,12 @@ export default function SupplierProductsPage() {
           onClose={() => setRegulatoryProduct(null)}
         />
       )}
+      {previewProduct && (
+        <DescriptionPreviewModal
+          product={previewProduct}
+          onClose={() => setPreviewProduct(null)}
+        />
+      )}
       {showApprovalModal && (
         <ServiceKeySelectModal
           selectedCount={selectedIds.size}
@@ -1240,6 +1264,7 @@ export default function SupplierProductsPage() {
                 <ContentRenderer
                   html={previewProduct.consumerDetailDescription}
                   className="prose prose-sm max-w-none text-slate-700"
+                  variant="product-detail"
                 />
               ) : (
                 <div className="text-center py-12">
