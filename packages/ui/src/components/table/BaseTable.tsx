@@ -133,13 +133,14 @@ export function BaseTable<T extends Record<string, any>>({
   // ─── Render ───
 
   const useFixedLayout = hasResizable && colWidths.length === columns.length;
+  const totalWidth = useFixedLayout ? colWidths.reduce((s, w) => s + w, 0) : undefined;
 
   return (
     <div className="overflow-x-auto">
       <table
         ref={tableRef}
-        className={`min-w-full ${className}`}
-        style={useFixedLayout ? { tableLayout: 'fixed' } : undefined}
+        className={useFixedLayout ? className : `min-w-full ${className}`}
+        style={useFixedLayout ? { tableLayout: 'fixed', width: totalWidth } : undefined}
       >
         <thead className={headerClassName}>
           <tr>
