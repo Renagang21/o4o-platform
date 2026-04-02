@@ -1206,12 +1206,6 @@ export default function SupplierProductsPage() {
           onClose={() => setRegulatoryProduct(null)}
         />
       )}
-      {previewProduct && (
-        <DescriptionPreviewModal
-          product={previewProduct}
-          onClose={() => setPreviewProduct(null)}
-        />
-      )}
       {showApprovalModal && (
         <ServiceKeySelectModal
           selectedCount={selectedIds.size}

@@ -1142,7 +1142,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               {product.consumerDetailDescription ? (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" variant="product-detail" />
                 </div>
               ) : (
                 <div>
@@ -1173,7 +1173,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
               {product.businessDetailDescription ? (
                 <div>
                   <span className="text-xs text-slate-400 block mb-1">상세 설명</span>
-                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" />
+                  <ContentRenderer html={product.businessDetailDescription} className="text-sm text-slate-700 prose prose-sm max-w-none line-clamp-5" variant="product-detail" />
                 </div>
               ) : (
                 <div>

@@ -114,7 +114,7 @@ export default function B2BContentDrawer({ product, open, onClose, onSaved }: B2
               <div>
                 <label className="text-xs text-gray-500">상세 설명</label>
                 {product.consumerDetailDescription ? (
-                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4" />
+                  <ContentRenderer html={product.consumerDetailDescription} className="text-sm text-gray-600 bg-gray-50 rounded p-2 min-h-[2rem] line-clamp-4" variant="product-detail" />
                 ) : (
                   <p className="text-sm text-gray-400 italic bg-gray-50 rounded p-2 min-h-[2rem]">없음</p>
                 )}
