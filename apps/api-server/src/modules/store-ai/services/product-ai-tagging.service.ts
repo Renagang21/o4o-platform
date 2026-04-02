@@ -77,6 +77,15 @@ export class ProductAiTaggingService {
         return;
       }
 
+      // WO-NETURE-TAG-CATEGORY-INCLUSION-AND-LABEL-CLARITY-FIX-V1: 카테고리 말단 태그 강제 포함
+      if (product.categoryName) {
+        const parts = product.categoryName.split('>').map((s) => s.trim());
+        const leafCategory = parts[parts.length - 1];
+        if (leafCategory && !parsed.tags.some((t) => t.tag.toLowerCase() === leafCategory.toLowerCase())) {
+          parsed.tags.unshift({ tag: leafCategory, confidence: 1.0 });
+        }
+      }
+
       // 기존 AI 태그 삭제
       await this.tagRepo.delete({ productId: product.id, source: 'ai' });
 

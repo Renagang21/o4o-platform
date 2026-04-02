@@ -1199,7 +1199,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                 {/* 기존 AI 태그 */}
                 {aiTags.length > 0 && (
                   <div className="mb-3">
-                    <span className="text-xs text-slate-400 block mb-1.5">AI 생성 태그</span>
+                    <span className="text-xs text-slate-400 block mb-1.5">자동 생성 태그</span>
                     <div className="flex flex-wrap gap-1">
                       {aiTags.map((t) => (
                         <span key={t.id} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">
@@ -1304,7 +1304,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                     ) : (
                       <Sparkles size={12} />
                     )}
-                    B2C 태그 추천
+                    B2C 추가 추천
                   </button>
                   <button
                     onClick={() => handleAiSuggest('b2b')}
@@ -1316,7 +1316,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                     ) : (
                       <Sparkles size={12} />
                     )}
-                    B2B 태그 추천
+                    B2B 추가 추천
                   </button>
                 </div>
 

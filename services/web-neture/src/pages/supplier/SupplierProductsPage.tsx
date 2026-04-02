@@ -1185,7 +1185,7 @@ export default function SupplierProductsPage() {
                 onClick={(e) => { e.stopPropagation(); handleGenerateAiTags(row.masterId); }}
                 disabled={generatingTagFor === row.masterId}
                 className="p-1 rounded hover:bg-blue-50 text-blue-600 disabled:opacity-50 disabled:animate-pulse"
-                title="AI 태그 생성"
+                title="태그 재생성"
               >
                 <Sparkles size={14} />
               </button>
