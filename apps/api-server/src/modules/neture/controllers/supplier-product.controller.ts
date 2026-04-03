@@ -197,13 +197,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { id } = req.params;
-      const { isActive, distributionType, allowedSellerIds,
+      const { isActive, isPublic, distributionType, allowedSellerIds,
               priceGeneral, priceGold, pricePlatinum,
               consumerReferencePrice, stockQuantity,
               consumerShortDescription, consumerDetailDescription, marketingName,
               categoryId, brandId, specification, originCountry, tags } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
-        isActive, distributionType, allowedSellerIds,
+        isActive, isPublic, distributionType, allowedSellerIds,
         priceGeneral, priceGold, pricePlatinum,
         consumerReferencePrice, stockQuantity,
         consumerShortDescription, consumerDetailDescription, marketingName,

@@ -423,29 +423,41 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     header: '유통',
     width: '90px',
     align: 'center',
-    editable: true,
     render: (v) => {
       const config: Record<string, { label: string; cls: string }> = {
         PUBLIC: { label: '전체 공개', cls: 'bg-green-50 text-green-700' },
         SERVICE: { label: '서비스', cls: 'bg-blue-50 text-blue-700' },
         PRIVATE: { label: '비공개', cls: 'bg-amber-50 text-amber-700' },
       };
-      const c = config[v] || config.PUBLIC;
+      const c = config[v] || config.PRIVATE;
       return (
         <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.cls}`}>
           {c.label}
         </span>
       );
     },
-    editRender: (value, _row, onChange) => (
+  },
+  // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 인라인 편집
+  {
+    key: 'isPublic' as any,
+    header: '공개',
+    width: '70px',
+    align: 'center',
+    editable: true,
+    render: (v: boolean) => (
+      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${v ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+        {v ? '공개' : '비공개'}
+      </span>
+    ),
+    editRender: (value: boolean, _row: any, onChange: (v: boolean) => void) => (
       <select
-        value={value || 'PUBLIC'}
-        onChange={(e) => onChange(e.target.value)}
+        value={value ? 'true' : 'false'}
+        onChange={(e) => onChange(e.target.value === 'true')}
         className="w-full px-2 py-1 text-sm border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         autoFocus
       >
-        <option value="PUBLIC">전체 공개</option>
-        <option value="PRIVATE">비공개</option>
+        <option value="true">공개</option>
+        <option value="false">비공개</option>
       </select>
     ),
   },
@@ -962,7 +974,8 @@ export default function SupplierProductsPage() {
     const updates = changedRows.map((r) => ({
       offerId: r.id,
       isActive: r.isActive,
-      distributionType: r.distributionType,
+      // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 직접 전달
+      isPublic: (r as any).isPublic,
       priceGeneral: r.priceGeneral != null ? Number(r.priceGeneral) : undefined,
       consumerReferencePrice: r.consumerReferencePrice != null ? Number(r.consumerReferencePrice) : null,
       stockQuantity: (r as any).stockQuantity != null ? Number((r as any).stockQuantity) : undefined,

@@ -305,6 +305,7 @@ export class NetureService {
     supplierId: string,
     updates: {
       isActive?: boolean;
+      isPublic?: boolean;
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;

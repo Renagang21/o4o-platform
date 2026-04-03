@@ -16,6 +16,16 @@ import type { NetureCatalogService } from './catalog.service.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
 
 /**
+ * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
+ * isPublic + serviceKeys → distributionType 파생 (하위호환)
+ */
+function deriveDistributionType(isPublic: boolean, serviceKeys: string[]): OfferDistributionType {
+  if (isPublic) return OfferDistributionType.PUBLIC;
+  if (serviceKeys.length > 0) return OfferDistributionType.SERVICE;
+  return OfferDistributionType.PRIVATE;
+}
+
+/**
  * WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 허용 규제 유형 (코드 레벨 enum, DB VARCHAR 유지)
  */
 const REGULATORY_TYPES = ['DRUG', 'HEALTH_FUNCTIONAL', 'QUASI_DRUG', 'COSMETIC', 'GENERAL'] as const;
@@ -85,6 +95,7 @@ export class NetureOfferService {
         masterName: o.master?.marketingName || '',
         supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
+        isPublic: o.isPublic,
         distributionType: o.distributionType,
         createdAt: o.createdAt,
         approvalStatus: o.approvalStatus,
@@ -339,12 +350,18 @@ export class NetureOfferService {
       try {
         await approvalService.createPendingApprovals(offerId, serviceKeys);
 
-        // service_keys 병합 업데이트
+        // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1:
+        // service_keys 병합 + distributionType 파생 업데이트
         await AppDataSource.query(
           `UPDATE supplier_product_offers
            SET service_keys = (
              SELECT ARRAY(SELECT DISTINCT unnest(service_keys || $2::text[]))
-           ), updated_at = NOW()
+           ),
+           distribution_type = CASE
+             WHEN is_public THEN 'PUBLIC'
+             ELSE 'SERVICE'
+           END,
+           updated_at = NOW()
            WHERE id = $1`,
           [offerId, serviceKeys],
         );
@@ -387,6 +404,7 @@ export class NetureOfferService {
         masterName: o.master?.marketingName || '',
         supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
         supplierId: o.supplierId,
+        isPublic: o.isPublic,
         distributionType: o.distributionType,
         isActive: o.isActive,
         approvalStatus: o.approvalStatus,
@@ -512,7 +530,7 @@ export class NetureOfferService {
 
   /** 입력 검증: 바코드 생성, 유통타입 검증, 보안 체크, 공급자 상태 */
   private async validateCreateInput(
-    data: { barcode?: string; distributionType?: OfferDistributionType; serviceKeys?: string[]; consumerShortDescription?: string | null },
+    data: { barcode?: string; isPublic?: boolean; distributionType?: OfferDistributionType; serviceKeys?: string[]; consumerShortDescription?: string | null },
     supplierId: string,
   ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { barcode: string } }> {
     let barcode = data.barcode?.trim() || '';
@@ -521,13 +539,10 @@ export class NetureOfferService {
       barcode = generateInternalBarcode(supplierId);
     }
 
-    if (data.distributionType === OfferDistributionType.SERVICE && (!data.serviceKeys || data.serviceKeys.length === 0)) {
-      return { success: false, error: 'SERVICE_REQUIRES_KEYS', message: 'SERVICE 유통 시 서비스를 선택해야 합니다.' };
-    }
-    if (data.distributionType === OfferDistributionType.PUBLIC) {
-      data.serviceKeys = [];
-    }
-    if (data.distributionType === OfferDistributionType.PUBLIC && !data.consumerShortDescription?.trim()) {
+    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리 검증
+    // isPublic과 serviceKeys는 독립적 — 동시 설정 가능
+    const isPublic = data.isPublic ?? (data.distributionType === OfferDistributionType.PUBLIC);
+    if (isPublic && !data.consumerShortDescription?.trim()) {
       return { success: false, error: 'PUBLIC_REQUIRES_DESCRIPTION' };
     }
 
@@ -638,6 +653,7 @@ export class NetureOfferService {
         tags?: string[];
         stockQty?: number | string | null;
       };
+      isPublic?: boolean;
       distributionType?: OfferDistributionType;
       serviceKeys?: string[];
       priceGeneral?: number;
@@ -665,16 +681,20 @@ export class NetureOfferService {
       const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
       const resolvedStockQty = manualData.stockQty != null ? Number(manualData.stockQty) : 0;
 
+      // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
+      const filteredServiceKeys = (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
+      const resolvedIsPublic = data.isPublic ?? (data.distributionType === OfferDistributionType.PUBLIC);
+
       const offer = this.offerRepo.create({
         supplierId,
         masterId,
         slug,
-        distributionType: data.distributionType || OfferDistributionType.PRIVATE,
+        isPublic: resolvedIsPublic,
+        distributionType: deriveDistributionType(resolvedIsPublic, filteredServiceKeys),
         isActive: false,
         approvalStatus: OfferApprovalStatus.PENDING,
         allowedSellerIds: [],
-        // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1 + WO-NETURE-EXCLUDE-GLUCOSEVIEW-V1: neture/glucoseview 필터링
-        serviceKeys: (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview'),
+        serviceKeys: filteredServiceKeys,
         priceGeneral: data.priceGeneral ?? 0,
         priceGold: data.priceGold ?? null,
         pricePlatinum: data.pricePlatinum ?? null,
@@ -705,6 +725,7 @@ export class NetureOfferService {
           id: savedOffer.id,
           masterId: savedOffer.masterId,
           isActive: savedOffer.isActive,
+          isPublic: savedOffer.isPublic,
           approvalStatus: savedOffer.approvalStatus,
           distributionType: savedOffer.distributionType,
           allowedSellerIds: savedOffer.allowedSellerIds,
@@ -731,6 +752,7 @@ export class NetureOfferService {
     supplierId: string,
     updates: {
       isActive?: boolean;
+      isPublic?: boolean;
       distributionType?: OfferDistributionType;
       allowedSellerIds?: string[] | null;
       priceGeneral?: number;
@@ -762,17 +784,18 @@ export class NetureOfferService {
         offer.isActive = updates.isActive;
       }
 
-      if (updates.distributionType !== undefined) {
-        // WO-NETURE-DISTRIBUTION-SERVICE-INVALID-STATE-BLOCK-V1
-        // SERVICE requires serviceKeys — inline edit cannot supply them, so block SERVICE here
-        if (updates.distributionType === 'SERVICE') {
-          const hasKeys = Array.isArray(offer.serviceKeys) && offer.serviceKeys.length > 0;
-          if (!hasKeys) {
-            return { success: false, error: 'SERVICE 유통 방식을 설정하려면 서비스를 먼저 지정해야 합니다.' };
-          }
-        }
-        offer.distributionType = updates.distributionType;
+      // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
+      if (updates.isPublic !== undefined) {
+        offer.isPublic = updates.isPublic;
       }
+
+      if (updates.distributionType !== undefined && updates.isPublic === undefined) {
+        // 레거시 호환: distributionType만 전달된 경우 isPublic 동기화
+        offer.isPublic = updates.distributionType === OfferDistributionType.PUBLIC;
+      }
+
+      // distributionType 파생 (isPublic + serviceKeys 기반)
+      offer.distributionType = deriveDistributionType(offer.isPublic, offer.serviceKeys || []);
 
       if (updates.allowedSellerIds !== undefined) {
         offer.allowedSellerIds = updates.allowedSellerIds;
@@ -847,6 +870,7 @@ export class NetureOfferService {
         data: {
           id: savedOffer.id,
           isActive: savedOffer.isActive,
+          isPublic: savedOffer.isPublic,
           distributionType: savedOffer.distributionType,
           allowedSellerIds: savedOffer.allowedSellerIds,
           priceGeneral: savedOffer.priceGeneral,
@@ -1072,6 +1096,7 @@ export class NetureOfferService {
       AppDataSource.query(
         `SELECT
            spo.id, spo.master_id AS "masterId", spo.is_active AS "isActive",
+           spo.is_public AS "isPublic",
            spo.distribution_type AS "distributionType",
            spo.allowed_seller_ids AS "allowedSellerIds",
            spo.approval_status AS "approvalStatus",
@@ -1174,6 +1199,7 @@ export class NetureOfferService {
     updates: Array<{
       offerId: string;
       isActive?: boolean;
+      isPublic?: boolean;
       distributionType?: OfferDistributionType;
       priceGeneral?: number;
       consumerReferencePrice?: number | null;
@@ -1187,6 +1213,7 @@ export class NetureOfferService {
       try {
         const result = await this.updateSupplierOffer(item.offerId, supplierId, {
           isActive: item.isActive,
+          isPublic: item.isPublic,
           distributionType: item.distributionType,
           priceGeneral: item.priceGeneral,
           consumerReferencePrice: item.consumerReferencePrice,

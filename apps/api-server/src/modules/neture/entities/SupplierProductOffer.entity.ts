@@ -51,6 +51,19 @@ export class SupplierProductOffer {
   @JoinColumn({ name: 'supplier_id' })
   supplier?: NetureSupplier;
 
+  /**
+   * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
+   * 기본 공개 여부 — distributionType과 독립적으로 관리
+   * true = 전체 공개, false = 비공개 (서비스 공급은 serviceKeys로 별도 관리)
+   */
+  @Column({ name: 'is_public', type: 'boolean', default: false })
+  isPublic: boolean;
+
+  /**
+   * 파생 필드 — isPublic + serviceKeys 조합으로 자동 결정
+   * isPublic=true → PUBLIC, serviceKeys.length > 0 → SERVICE, else → PRIVATE
+   * 하위호환용으로 유지 (기존 쿼리/필터 호환)
+   */
   @Column({
     name: 'distribution_type',
     type: 'enum',

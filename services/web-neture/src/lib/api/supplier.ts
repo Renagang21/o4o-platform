@@ -110,6 +110,7 @@ export interface SupplierProduct {
   purpose: SupplierProductPurpose;
   isActive: boolean;
   acceptsApplications: boolean;
+  isPublic: boolean;
   distributionType: DistributionType;
   allowedSellerIds: string[] | null;
   pendingRequestCount: number;
@@ -532,6 +533,7 @@ export const supplierApi = {
   async batchUpdateProducts(updates: Array<{
     offerId: string;
     isActive?: boolean;
+    isPublic?: boolean;
     distributionType?: string;
     priceGeneral?: number;
     consumerReferencePrice?: number | null;
@@ -601,6 +603,7 @@ export const supplierApi = {
     id: string,
     updates: {
       isActive?: boolean;
+      isPublic?: boolean;
       acceptsApplications?: boolean;
       distributionType?: DistributionType;
       allowedSellerIds?: string[] | null;

@@ -127,8 +127,10 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
     consumerReferencePrice: p.consumerReferencePrice ?? null,
     stockQuantity: p.stockQuantity ?? 0,
     isActive: p.isActive,
-    distributionType: p.distributionType || 'PUBLIC',
+    // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
+    isPublic: (p as any).isPublic ?? (p.distributionType === 'PUBLIC'),
     serviceKeys: p.serviceKeys || [],
+    distributionType: p.distributionType || 'PRIVATE',
   };
 }
 
@@ -344,7 +346,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     setSaving(true);
 
     try {
-      // 1. 기본 필드 + distributionType + Master 필드 업데이트
+      // 1. 기본 필드 + isPublic + Master 필드 업데이트
       const payload = {
         marketingName: form.marketingName || undefined,
         priceGeneral: form.priceGeneral ?? undefined,
@@ -352,7 +354,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         consumerReferencePrice: form.consumerReferencePrice,
         stockQuantity: form.stockQuantity,
         isActive: form.isActive,
-        distributionType: form.distributionType as any,
+        // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 직접 전달
+        isPublic: form.isPublic,
         // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
         // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
         categoryId: editCategory || null,
