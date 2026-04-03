@@ -61,7 +61,7 @@ export default function KpaOperatorDashboard() {
         // WO-O4O-STORE-HUB-OPERATOR-INTEGRATION-V1: Store stats
         fetch(`${PLATFORM_API_BASE}/api/v1/operator/stores?limit=1`, { headers: storeHeaders }).then(r => r.ok ? r.json() : null),
         // WO-KPA-A-OPERATOR-DASHBOARD-REFINE-V1: 상품 신청 통계
-        apiClient.get('/kpa/operator/product-applications/stats'),
+        apiClient.get('/operator/product-applications/stats'),
       ];
       // WO-O4O-KPA-A-ADMIN-ROLE-SPLIT-V1: Admin용 추가 데이터 fetch
       if (isAdmin) {
