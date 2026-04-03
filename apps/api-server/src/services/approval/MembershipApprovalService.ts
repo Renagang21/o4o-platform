@@ -503,7 +503,7 @@ export class MembershipApprovalService {
           [userId]
         );
         await queryRunner.query(
-          `UPDATE service_memberships SET status = 'inactive', "updatedAt" = NOW() WHERE user_id = $1`,
+          `UPDATE service_memberships SET status = 'inactive', updated_at = NOW() WHERE user_id = $1`,
           [userId]
         );
 
