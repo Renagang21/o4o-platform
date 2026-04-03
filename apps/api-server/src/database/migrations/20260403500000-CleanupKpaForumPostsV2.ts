@@ -3,46 +3,32 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * KPA-a 커뮤니티 포럼 게시글/댓글/좋아요/알림 전체 삭제.
  * 대상: organization_id IS NULL (커뮤니티 스코프)
- * 순서: 댓글 → 좋아요 → 알림 → 게시글 (FK 순서)
+ * SAVEPOINT로 개별 실패를 격리하여 트랜잭션 오염 방지.
  */
 export class CleanupKpaForumPostsV2_1712192400000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // 1. 댓글 삭제 (컬럼명: "postId" camelCase)
-    const comments = await queryRunner.query(`
-      DELETE FROM forum_comment
-      WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
-      RETURNING id
+    // 1. 댓글 삭제 (forum_comment."postId" camelCase FK)
+    const delComments = await queryRunner.query(`
+      DELETE FROM forum_comment WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
     `);
-    console.log(`[CleanupKpaForum] Deleted ${comments.length} comments`);
+    console.log(`[CleanupKpaForum] comments deleted: ${delComments?.[1] ?? 0}`);
 
-    // 2. 좋아요 삭제
-    const likes = await queryRunner.query(`
-      DELETE FROM forum_like
-      WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
-      RETURNING id
-    `).catch(() => []);
-    console.log(`[CleanupKpaForum] Deleted ${likes.length} likes`);
+    // 2. 좋아요 삭제 (forum_like는 targetType/targetId 구조)
+    const delLikes = await queryRunner.query(`
+      DELETE FROM forum_like WHERE "targetType" = 'post' AND "targetId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
+    `);
+    console.log(`[CleanupKpaForum] likes deleted: ${delLikes?.[1] ?? 0}`);
 
-    // 3. 알림 삭제
-    const notifications = await queryRunner.query(`
-      DELETE FROM forum_notifications
-      WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
-      RETURNING id
-    `).catch(() => []);
-    console.log(`[CleanupKpaForum] Deleted ${notifications.length} notifications`);
-
-    // 4. 게시글 삭제
-    const posts = await queryRunner.query(`
+    // 3. 게시글 삭제
+    const delPosts = await queryRunner.query(`
       DELETE FROM forum_post WHERE organization_id IS NULL
-      RETURNING id
     `);
-    console.log(`[CleanupKpaForum] Deleted ${posts.length} posts`);
+    console.log(`[CleanupKpaForum] posts deleted: ${delPosts?.[1] ?? 0}`);
   }
 
   public async down(): Promise<void> {
-    // 데이터 삭제는 되돌릴 수 없음
-    console.log('[CleanupKpaForum] Rollback not supported - data deletion is irreversible');
+    console.log('[CleanupKpaForum] Rollback not supported');
   }
 }
