@@ -219,8 +219,10 @@ export function createOperatorSummaryController(
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_playlists WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),
       // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: 미존재 테이블 safe fallback
       dataSource.query(`SELECT COUNT(*)::int AS count FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society'`),
-      Promise.resolve([{ count: '0' }]), // kpa_instructor_qualifications 미존재
-      Promise.resolve([{ count: '0' }]), // kpa_course_requests 미존재
+      // Instructor qualification pending (kpa_approval_requests — catch fallback)
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_approval_requests WHERE entity_type = 'instructor_qualification' AND status = 'pending'`).catch(() => [{ count: '0' }]),
+      // Course request pending (kpa_approval_requests — catch fallback)
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_approval_requests WHERE entity_type = 'course' AND status = 'pending'`).catch(() => [{ count: '0' }]),
       dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_organization_join_requests WHERE status = 'pending'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM kpa_store_asset_controls WHERE is_forced = true AND forced_end_at IS NOT NULL AND forced_end_at > NOW() AND forced_end_at <= NOW() + INTERVAL '7 days'`).catch(() => [{ count: 0 }]),
     ]);
