@@ -106,6 +106,7 @@ import { KpaMember } from './entities/kpa-member.entity.js';
 import { OrganizationStore } from '../../modules/store-core/entities/organization-store.entity.js';
 import { requireAuth as coreRequireAuth, authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
 import { asyncHandler } from '../../middleware/error-handler.js';
+import { uploadSingleMiddleware } from '../../middleware/upload.middleware.js';
 // WO-KPA-A-GUARD-STANDARDIZATION-FINAL-V1: legacy role utils removed
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
@@ -803,6 +804,129 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     }
     await repo.increment({ id: doc.id }, 'download_count', 1);
     res.json({ success: true, data: { downloadUrl: doc.file_url } });
+  }));
+
+  // WO-KPA-A-OPERATOR-RESOURCES-CMS-V1: operator CMS 엔드포인트 (등록/수정/삭제/업로드)
+
+  // POST /resources — 자료 등록
+  resourcesRouter.post('/', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id;
+    const { title, description, category, fileUrl, fileName, fileSize, isPublic } = req.body;
+
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      res.status(400).json({ success: false, error: '제목은 필수입니다' });
+      return;
+    }
+
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const repo = dataSource.getRepository(KpaBranchDoc);
+    const doc = repo.create({
+      organization_id: '00000000-0000-0000-0000-000000000000', // KPA-a platform-level
+      title: title.trim(),
+      description: description?.trim() || null,
+      category: category || 'general',
+      file_url: fileUrl || null,
+      file_name: fileName || null,
+      file_size: fileSize || 0,
+      is_public: isPublic ?? true,
+      uploaded_by: userId,
+    });
+    const saved = await repo.save(doc);
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: saved.id,
+        title: saved.title,
+        description: saved.description,
+        category: saved.category,
+        fileUrl: saved.file_url,
+        fileName: saved.file_name,
+        fileSize: saved.file_size,
+        downloadCount: saved.download_count,
+        author: saved.uploaded_by,
+        createdAt: saved.created_at,
+        updatedAt: saved.updated_at,
+      },
+    });
+  }));
+
+  // PATCH /resources/:id — 자료 수정
+  resourcesRouter.patch('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const repo = dataSource.getRepository(KpaBranchDoc);
+    const doc = await repo.findOne({ where: { id: req.params.id, is_deleted: false } });
+    if (!doc) {
+      res.status(404).json({ success: false, error: 'Resource not found' });
+      return;
+    }
+
+    const { title, description, category, fileUrl, fileName, fileSize, isPublic } = req.body;
+    if (title !== undefined) doc.title = title.trim();
+    if (description !== undefined) doc.description = description?.trim() || null;
+    if (category !== undefined) doc.category = category;
+    if (fileUrl !== undefined) doc.file_url = fileUrl || null;
+    if (fileName !== undefined) doc.file_name = fileName || null;
+    if (fileSize !== undefined) doc.file_size = fileSize || 0;
+    if (isPublic !== undefined) doc.is_public = isPublic;
+
+    const saved = await repo.save(doc);
+    res.json({
+      success: true,
+      data: {
+        id: saved.id,
+        title: saved.title,
+        description: saved.description,
+        category: saved.category,
+        fileUrl: saved.file_url,
+        fileName: saved.file_name,
+        fileSize: saved.file_size,
+        downloadCount: saved.download_count,
+        author: saved.uploaded_by,
+        createdAt: saved.created_at,
+        updatedAt: saved.updated_at,
+      },
+    });
+  }));
+
+  // DELETE /resources/:id — 자료 삭제 (soft delete)
+  resourcesRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const repo = dataSource.getRepository(KpaBranchDoc);
+    const doc = await repo.findOne({ where: { id: req.params.id, is_deleted: false } });
+    if (!doc) {
+      res.status(404).json({ success: false, error: 'Resource not found' });
+      return;
+    }
+    doc.is_deleted = true;
+    await repo.save(doc);
+    res.json({ success: true, message: '자료가 삭제되었습니다' });
+  }));
+
+  // POST /resources/upload — 파일 업로드 (메타데이터 반환)
+  resourcesRouter.post('/upload', authenticate, requireKpaScope('kpa:operator') as any, uploadSingleMiddleware('file'), asyncHandler(async (req: Request, res: Response) => {
+    const file = (req as any).file as Express.Multer.File | undefined;
+    if (!file) {
+      res.status(400).json({ success: false, error: '파일이 필요합니다' });
+      return;
+    }
+
+    try {
+      const { MediaLibraryService } = await import('../../modules/media/services/media-library.service.js');
+      const mediaService = new MediaLibraryService(dataSource);
+      const userId = (req as any).user?.id || '';
+      const asset = await mediaService.upload(file, userId, 'kpa-society', 'kpa-resources');
+      res.json({
+        success: true,
+        data: {
+          fileUrl: asset.url,
+          fileName: file.originalname,
+          fileSize: file.size,
+        },
+      });
+    } catch {
+      res.status(500).json({ success: false, error: '파일 업로드에 실패했습니다' });
+    }
   }));
 
   router.use('/resources', resourcesRouter);
