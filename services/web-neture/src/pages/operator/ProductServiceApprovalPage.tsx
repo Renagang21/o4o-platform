@@ -20,6 +20,7 @@ import {
   type ServiceApprovalStats,
   type ApprovalAnalytics,
 } from '../../lib/api/serviceApproval';
+import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import { useAuth } from '../../contexts/AuthContext';
 
 // ==================== Constants ====================
@@ -759,6 +760,21 @@ export default function ProductServiceApprovalPage() {
                         삭제
                       </button>
                     </>
+                  ) : item.approvalStatus === 'approved' ? (
+                    <button
+                      onClick={async () => {
+                        if (!confirm(`"${item.productName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
+                        setActionLoading(item.id);
+                        const res = await productCleanupApi.softDelete(item.offerId);
+                        setActionLoading(null);
+                        if (res.success) fetchData();
+                      }}
+                      disabled={!canManage || actionLoading === item.id}
+                      className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
+                      title="삭제 (휴지통으로 이동)"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
                   ) : item.reason ? (
                     <span className="text-xs text-slate-500 max-w-[120px] truncate" title={item.reason}>
                       {item.approvalStatus === 'rejected' ? '사유' : '메모'}: {item.reason}
