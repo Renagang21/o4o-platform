@@ -63,8 +63,8 @@ export class SeedKpaOperatorTestData1712203200001
       const existing = await queryRunner.query(`SELECT id FROM users WHERE email = $1`, [p.email]);
       if (existing.length > 0) { userIds[p.email] = existing[0].id; continue; }
       const [row] = await queryRunner.query(
-        `INSERT INTO users (email, password, name, role, roles, status, "isActive", "isEmailVerified", service_key, permissions, "createdAt", "updatedAt")
-         VALUES ($1, $2, $3, 'user', ARRAY['kpa:pharmacist']::text[], 'active', true, true, 'kpa-society', '[]', NOW(), NOW())
+        `INSERT INTO users (email, password, name, status, "isActive", "isEmailVerified", service_key, permissions, "createdAt", "updatedAt")
+         VALUES ($1, $2, $3, 'active', true, true, 'kpa-society', '[]', NOW(), NOW())
          RETURNING id`,
         [p.email, hashedPassword, p.name],
       );
@@ -75,8 +75,8 @@ export class SeedKpaOperatorTestData1712203200001
       const existing = await queryRunner.query(`SELECT id FROM users WHERE email = $1`, [s.email]);
       if (existing.length > 0) { userIds[s.email] = existing[0].id; continue; }
       const [row] = await queryRunner.query(
-        `INSERT INTO users (email, password, name, role, roles, status, "isActive", "isEmailVerified", service_key, permissions, "createdAt", "updatedAt")
-         VALUES ($1, $2, $3, 'user', ARRAY['kpa:student']::text[], 'active', true, true, 'kpa-society', '[]', NOW(), NOW())
+        `INSERT INTO users (email, password, name, status, "isActive", "isEmailVerified", service_key, permissions, "createdAt", "updatedAt")
+         VALUES ($1, $2, $3, 'active', true, true, 'kpa-society', '[]', NOW(), NOW())
          RETURNING id`,
         [s.email, hashedPassword, s.name],
       );
