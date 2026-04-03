@@ -17,7 +17,7 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { OperatorAiReportPage, ForumManagementPage, ForumDeleteRequestsPage, LegalManagementPage, ForumAnalyticsDashboard, ContentManagementPage, AuditLogPage, MemberManagementPage, PharmacyRequestManagementPage, ProductApplicationManagementPage, CommunityManagementPage } from '../pages/operator';
-import UsersPage from '../pages/operator/UsersPage';
+// WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: UsersPage → /operator/members redirect
 import UserDetailPage from '../pages/operator/UserDetailPage';
 import RoleManagementPage from '../pages/operator/RoleManagementPage';
 import KpaOperatorDashboard from '../pages/operator/KpaOperatorDashboard';
@@ -117,8 +117,8 @@ export function OperatorRoutes() {
           {/* 채널 관리 (WO-O4O-STORE-CHANNEL-LIFECYCLE-V1) */}
           <Route path="store-channels" element={<OperatorStoreChannelsPage />} />
 
-          {/* 회원 관리 — MembershipConsole 표준 (WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1) */}
-          <Route path="users" element={<UsersPage />} />
+          {/* WO-KPA-A-OPERATOR-DASHBOARD-FIRST-STABILIZATION-V1: /operator/members를 canonical route로 통일 */}
+          <Route path="users" element={<Navigate to="/operator/members" replace />} />
           <Route path="users/:id" element={<UserDetailPage />} />
 
           {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
@@ -128,7 +128,7 @@ export function OperatorRoutes() {
           <Route path="roles" element={<RoleGuard allowedRoles={[ROLES.KPA_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
 
           {/* 레거시 리다이렉트 */}
-          <Route path="operators" element={<Navigate to="/operator/users" replace />} />
+          <Route path="operators" element={<Navigate to="/operator/members" replace />} />
         </Route>
 
         {/* 404 → operator index */}
