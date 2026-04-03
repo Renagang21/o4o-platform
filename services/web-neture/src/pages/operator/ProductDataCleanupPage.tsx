@@ -6,21 +6,23 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, GitMerge, CheckCircle, AlertTriangle, Tag, Bookmark } from 'lucide-react';
+import { Loader2, GitMerge, CheckCircle, AlertTriangle, Tag, Bookmark, Trash2, RotateCcw, XCircle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import {
   productCleanupApi,
   type DuplicateMaster,
   type MissingFieldItem,
+  type RecycleBinItem,
 } from '../../lib/api/operatorProductCleanup';
 import { productApi, type CategoryTreeItem, type BrandItem } from '../../lib/api/product';
 
-type Tab = 'duplicates' | 'missing-category' | 'missing-brand';
+type Tab = 'duplicates' | 'missing-category' | 'missing-brand' | 'recycle-bin';
 
 const TABS: { key: Tab; label: string; icon: typeof GitMerge }[] = [
   { key: 'duplicates', label: '중복 Master', icon: GitMerge },
   { key: 'missing-category', label: '카테고리 없음', icon: Tag },
   { key: 'missing-brand', label: '브랜드 없음', icon: Bookmark },
+  { key: 'recycle-bin', label: '휴지통', icon: Trash2 },
 ];
 
 /** Flatten category tree for dropdown */
@@ -41,6 +43,8 @@ export default function ProductDataCleanupPage() {
   const [duplicates, setDuplicates] = useState<DuplicateMaster[]>([]);
   const [missingCategory, setMissingCategory] = useState<MissingFieldItem[]>([]);
   const [missingBrand, setMissingBrand] = useState<MissingFieldItem[]>([]);
+  const [recycleBin, setRecycleBin] = useState<RecycleBinItem[]>([]);
+  const [recycleBinTotal, setRecycleBinTotal] = useState(0);
 
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
@@ -63,13 +67,17 @@ export default function ProductDataCleanupPage() {
       ]);
       setMissingCategory(items);
       if (!categories.length) setCategories(cats);
-    } else {
+    } else if (t === 'missing-brand') {
       const [items, brs] = await Promise.all([
         productCleanupApi.getMissingBrand(),
         brands.length ? Promise.resolve(brands) : productApi.getBrands(),
       ]);
       setMissingBrand(items);
       if (!brands.length) setBrands(brs);
+    } else if (t === 'recycle-bin') {
+      const res = await productCleanupApi.getRecycleBin(1, 100);
+      setRecycleBin(res.data || []);
+      setRecycleBinTotal(res.pagination?.total || 0);
     }
     setLoading(false);
   }, [categories.length, brands.length]);
@@ -393,6 +401,77 @@ export default function ProductDataCleanupPage() {
             )
           )}
         </>
+      )}
+
+      {/* ── Recycle Bin Tab ── */}
+      {tab === 'recycle-bin' && (
+        loading ? (
+          <div className="flex justify-center py-12"><Loader2 className="animate-spin text-slate-400" size={24} /></div>
+        ) : recycleBin.length === 0 ? (
+          <div className="text-center py-12">
+            <Trash2 size={32} className="mx-auto text-slate-200 mb-2" />
+            <p className="text-sm text-slate-400">휴지통이 비어 있습니다</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+              <p className="text-sm text-slate-600">총 <strong>{recycleBinTotal}</strong>건</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">상품명</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">바코드</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">공급자</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">삭제일</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">삭제자</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">사유</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500">액션</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {recycleBin.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 text-sm text-slate-800">{item.marketing_name || '-'}</td>
+                      <td className="px-4 py-3 text-sm font-mono text-slate-600">{item.barcode}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600">{item.supplier_name || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500">{item.deleted_at ? new Date(item.deleted_at).toLocaleDateString('ko-KR') : '-'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500">{item.deleted_by_name || '-'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500">{item.delete_reason || '-'}</td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`"${item.marketing_name}"을 복구하시겠습니까?`)) return;
+                              const res = await productCleanupApi.restore(item.id);
+                              if (res.success) { toast.success('복구 완료'); loadData('recycle-bin'); }
+                              else toast.error(res.error || '복구 실패');
+                            }}
+                            className="p-1.5 rounded hover:bg-blue-50 text-blue-600" title="복구"
+                          >
+                            <RotateCcw size={14} />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!confirm(`"${item.marketing_name}"을 완전 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+                              const res = await productCleanupApi.hardDelete(item.id);
+                              if (res.success) { toast.success('완전 삭제 완료'); loadData('recycle-bin'); }
+                              else toast.error(res.blockReasons ? `삭제 불가: ${res.blockReasons.join(', ')}` : (res.error || '삭제 실패'));
+                            }}
+                            className="p-1.5 rounded hover:bg-red-50 text-red-600" title="완전 삭제"
+                          >
+                            <XCircle size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
       )}
     </div>
   );

@@ -72,4 +72,59 @@ export const productCleanupApi = {
       return { success: false, error: error?.response?.data?.error || 'FIX_FAILED' };
     }
   },
+
+  // ── Soft Delete & Recycle Bin (WO-NETURE-APPROVED-PRODUCT-SOFT-DELETE-AND-RECYCLE-BIN-FLOW-V1) ──
+
+  async softDelete(offerId: string, reason?: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await api.post(`${BASE}/soft-delete/${offerId}`, { reason });
+      return res.data;
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error || 'SOFT_DELETE_FAILED' };
+    }
+  },
+
+  async getRecycleBin(page = 1, limit = 50): Promise<{ success: boolean; data?: RecycleBinItem[]; pagination?: { page: number; limit: number; total: number; totalPages: number } }> {
+    try {
+      const res = await api.get(`${BASE}/recycle-bin`, { params: { page, limit } });
+      return res.data;
+    } catch (error: any) {
+      return { success: false };
+    }
+  },
+
+  async restore(offerId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await api.post(`${BASE}/restore/${offerId}`);
+      return res.data;
+    } catch (error: any) {
+      return { success: false, error: error?.response?.data?.error || 'RESTORE_FAILED' };
+    }
+  },
+
+  async hardDelete(offerId: string): Promise<{ success: boolean; error?: string; blockReasons?: string[] }> {
+    try {
+      const res = await api.delete(`${BASE}/hard-delete/${offerId}`);
+      return res.data;
+    } catch (error: any) {
+      const data = error?.response?.data;
+      return { success: false, error: data?.error || 'HARD_DELETE_FAILED', blockReasons: data?.blockReasons };
+    }
+  },
 };
+
+export interface RecycleBinItem {
+  id: string;
+  master_id: string;
+  supplier_id: string;
+  approval_status: string;
+  price_general: number;
+  deleted_at: string;
+  deleted_by: string | null;
+  delete_reason: string | null;
+  marketing_name: string;
+  barcode: string;
+  regulatory_type: string | null;
+  supplier_name: string | null;
+  deleted_by_name: string | null;
+}

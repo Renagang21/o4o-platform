@@ -8,7 +8,9 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
 import { adminProductApi, type AdminProduct, type DistributionType } from '../../lib/api';
+import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import type { SupplierProduct } from '../../lib/api';
 import ProductDetailDrawer from '../supplier/ProductDetailDrawer';
 
@@ -272,6 +274,22 @@ export default function OperatorProductApprovalPage() {
                             반려
                           </button>
                         </div>
+                      )}
+                      {p.approvalStatus === 'APPROVED' && (
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`"${p.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`)) return;
+                            setActionLoading(p.id);
+                            const res = await productCleanupApi.softDelete(p.id);
+                            setActionLoading(null);
+                            if (res.success) loadProducts();
+                          }}
+                          disabled={actionLoading === p.id}
+                          className="p-1.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 disabled:opacity-50"
+                          title="삭제 (휴지통으로 이동)"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       )}
                     </td>
                   </tr>

@@ -13,6 +13,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -141,4 +142,15 @@ export class SupplierProductOffer {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  // ==================== Soft Delete (WO-NETURE-APPROVED-PRODUCT-SOFT-DELETE-AND-RECYCLE-BIN-FLOW-V1) ====================
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
+
+  @Column({ name: 'deleted_by', type: 'uuid', nullable: true })
+  deletedBy: string | null;
+
+  @Column({ name: 'delete_reason', type: 'text', nullable: true })
+  deleteReason: string | null;
 }

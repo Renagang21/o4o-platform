@@ -327,5 +327,183 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
     }
   });
 
+  // ==================== Soft Delete & Recycle Bin (WO-NETURE-APPROVED-PRODUCT-SOFT-DELETE-AND-RECYCLE-BIN-FLOW-V1) ====================
+
+  /**
+   * POST /operator/product-cleanup/soft-delete/:offerId
+   * 승인된 상품을 soft 삭제 (운영 목록에서 제거)
+   */
+  router.post('/soft-delete/:offerId', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { offerId } = req.params;
+      const userId = (req as any).user?.id;
+      const { reason } = req.body || {};
+
+      const offer = await dataSource.query(
+        `SELECT id, approval_status, deleted_at FROM supplier_product_offers WHERE id = $1`,
+        [offerId],
+      );
+      if (!offer.length) {
+        res.status(404).json({ success: false, error: 'OFFER_NOT_FOUND' });
+        return;
+      }
+      if (offer[0].deleted_at) {
+        res.status(400).json({ success: false, error: 'ALREADY_DELETED' });
+        return;
+      }
+
+      await dataSource.query(
+        `UPDATE supplier_product_offers SET deleted_at = NOW(), deleted_by = $1, delete_reason = $2, is_active = false WHERE id = $3`,
+        [userId, reason || null, offerId],
+      );
+
+      logger.info(`[Product Cleanup] Soft-deleted offer ${offerId} by ${userId}`);
+      res.json({ success: true, data: { softDeleted: true } });
+    } catch (error) {
+      logger.error('[Product Cleanup] Error soft-deleting offer:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * GET /operator/product-cleanup/recycle-bin
+   * Soft 삭제된 상품 목록 조회
+   */
+  router.get('/recycle-bin', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const page = Math.max(1, Number(req.query.page) || 1);
+      const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
+      const offset = (page - 1) * limit;
+
+      const [rows, countResult] = await Promise.all([
+        dataSource.query(`
+          SELECT o.id, o.master_id, o.supplier_id, o.approval_status,
+                 o.price_general, o.deleted_at, o.deleted_by, o.delete_reason,
+                 m.marketing_name, m.barcode, m.regulatory_type,
+                 s.company_name AS supplier_name,
+                 u.name AS deleted_by_name
+          FROM supplier_product_offers o
+          JOIN product_masters m ON m.id = o.master_id
+          LEFT JOIN neture_suppliers s ON s.id = o.supplier_id
+          LEFT JOIN users u ON u.id = o.deleted_by
+          WHERE o.deleted_at IS NOT NULL
+          ORDER BY o.deleted_at DESC
+          LIMIT $1 OFFSET $2
+        `, [limit, offset]),
+        dataSource.query(`
+          SELECT COUNT(*)::int AS total FROM supplier_product_offers WHERE deleted_at IS NOT NULL
+        `),
+      ]);
+
+      const total = countResult[0]?.total || 0;
+      res.json({
+        success: true,
+        data: rows,
+        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      });
+    } catch (error) {
+      logger.error('[Product Cleanup] Error fetching recycle bin:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * POST /operator/product-cleanup/restore/:offerId
+   * Soft 삭제 복구
+   */
+  router.post('/restore/:offerId', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { offerId } = req.params;
+      const offer = await dataSource.query(
+        `SELECT id, deleted_at FROM supplier_product_offers WHERE id = $1`,
+        [offerId],
+      );
+      if (!offer.length) {
+        res.status(404).json({ success: false, error: 'OFFER_NOT_FOUND' });
+        return;
+      }
+      if (!offer[0].deleted_at) {
+        res.status(400).json({ success: false, error: 'NOT_DELETED' });
+        return;
+      }
+
+      await dataSource.query(
+        `UPDATE supplier_product_offers SET deleted_at = NULL, deleted_by = NULL, delete_reason = NULL WHERE id = $1`,
+        [offerId],
+      );
+
+      logger.info(`[Product Cleanup] Restored offer ${offerId}`);
+      res.json({ success: true, data: { restored: true } });
+    } catch (error) {
+      logger.error('[Product Cleanup] Error restoring offer:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
+  /**
+   * DELETE /operator/product-cleanup/hard-delete/:offerId
+   * Soft 삭제 리스트에서만 가능한 완전 삭제
+   */
+  router.delete('/hard-delete/:offerId', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { offerId } = req.params;
+
+      // soft 삭제된 상품만 완전 삭제 가능
+      const offer = await dataSource.query(
+        `SELECT id, deleted_at FROM supplier_product_offers WHERE id = $1`,
+        [offerId],
+      );
+      if (!offer.length) {
+        res.status(404).json({ success: false, error: 'OFFER_NOT_FOUND' });
+        return;
+      }
+      if (!offer[0].deleted_at) {
+        res.status(400).json({ success: false, error: 'NOT_SOFT_DELETED', message: 'Hard delete is only allowed for soft-deleted offers' });
+        return;
+      }
+
+      // 연결 데이터 확인
+      const [listings, serviceProducts] = await Promise.all([
+        dataSource.query(`SELECT COUNT(*)::int AS cnt FROM organization_product_listings WHERE offer_id = $1 AND is_active = true`, [offerId]),
+        dataSource.query(`SELECT COUNT(*)::int AS cnt FROM service_products WHERE offer_id = $1`, [offerId]),
+      ]);
+
+      const blockReasons: string[] = [];
+      if (listings[0]?.cnt > 0) blockReasons.push(`활성 매장 리스팅 ${listings[0].cnt}건`);
+      if (serviceProducts[0]?.cnt > 0) blockReasons.push(`서비스 상품 ${serviceProducts[0].cnt}건`);
+
+      if (blockReasons.length > 0) {
+        res.status(409).json({
+          success: false,
+          error: 'HARD_DELETE_BLOCKED',
+          message: `연결 데이터 존재: ${blockReasons.join(', ')}`,
+          blockReasons,
+        });
+        return;
+      }
+
+      // 트랜잭션으로 완전 삭제
+      const queryRunner = dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      try {
+        await queryRunner.query(`DELETE FROM spot_price_policies WHERE offer_id = $1`, [offerId]);
+        await queryRunner.query(`DELETE FROM supplier_product_offers WHERE id = $1`, [offerId]);
+        await queryRunner.commitTransaction();
+      } catch (err) {
+        await queryRunner.rollbackTransaction();
+        throw err;
+      } finally {
+        await queryRunner.release();
+      }
+
+      logger.info(`[Product Cleanup] Hard-deleted offer ${offerId} from recycle bin`);
+      res.json({ success: true, data: { hardDeleted: true } });
+    } catch (error) {
+      logger.error('[Product Cleanup] Error hard-deleting offer:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+    }
+  });
+
   return router;
 }

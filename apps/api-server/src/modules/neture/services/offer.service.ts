@@ -975,8 +975,8 @@ export class NetureOfferService {
     };
     const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
 
-    // Build WHERE conditions
-    const conditions: string[] = ['spo.supplier_id = $1'];
+    // Build WHERE conditions (soft 삭제 제외)
+    const conditions: string[] = ['spo.supplier_id = $1', 'spo.deleted_at IS NULL'];
     const params: any[] = [supplierId];
     let idx = 2;
 
