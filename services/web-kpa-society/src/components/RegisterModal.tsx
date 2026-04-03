@@ -241,7 +241,7 @@ export default function RegisterModal() {
     lowercase: /[a-z]/.test(formData.password),
     uppercase: /[A-Z]/.test(formData.password),
     number: /\d/.test(formData.password),
-    special: /[@$!%*?&]/.test(formData.password),
+    special: /[^A-Za-z0-9\s]/.test(formData.password),
   };
   const isPasswordStrong = Object.values(passwordChecks).every(Boolean);
 
@@ -365,12 +365,6 @@ export default function RegisterModal() {
                 </div>
               </div>
 
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-                  <p className="text-sm text-red-600">{error}</p>
-                </div>
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* 기본 정보 */}
                 <div className="space-y-4">
@@ -433,7 +427,7 @@ export default function RegisterModal() {
                             {passwordChecks.number ? '\u2713' : '\u2717'} 숫자
                           </span><br />
                           <span style={{ color: passwordChecks.special ? '#16a34a' : '#dc2626' }}>
-                            {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자(@$!%*?&)
+                            {passwordChecks.special ? '\u2713' : '\u2717'} 특수문자 (예: !@#$%^&*)
                           </span>
                         </div>
                       )}
@@ -657,6 +651,13 @@ export default function RegisterModal() {
                     </span>
                   </label>
                 </div>
+
+                {/* 에러 메시지 (버튼 위) */}
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
 
                 {/* 제출 버튼 */}
                 <button
