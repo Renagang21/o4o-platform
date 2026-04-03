@@ -11,11 +11,13 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthModal } from '../contexts/AuthModalContext';
 
-type Step = 'form' | 'success';
+type MemberType = 'pharmacist' | 'student';
+type Step = 'select' | 'form' | 'success';
 
 export default function RegisterModal() {
   const { activeModal, closeModal, openLoginModal } = useAuthModal();
-  const [step, setStep] = useState<Step>('form');
+  const [step, setStep] = useState<Step>('select');
+  const [memberType, setMemberType] = useState<MemberType>('pharmacist');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +32,8 @@ export default function RegisterModal() {
     licenseNumber: '',
     branchId: '',
     groupId: '',
+    universityName: '',
+    studentYear: '',
     agreeTerms: false,
     agreePrivacy: false,
   });
@@ -57,7 +61,8 @@ export default function RegisterModal() {
   // 모달 열릴 때 초기화
   useEffect(() => {
     if (isOpen) {
-      setStep('form');
+      setStep('select');
+      setMemberType('pharmacist');
       setFormData({
         email: '',
         password: '',
@@ -69,6 +74,8 @@ export default function RegisterModal() {
         licenseNumber: '',
         branchId: '',
         groupId: '',
+        universityName: '',
+        studentYear: '',
         agreeTerms: false,
         agreePrivacy: false,
       });
@@ -151,11 +158,19 @@ export default function RegisterModal() {
           firstName: formData.firstName,
           nickname: formData.nickname,
           phone: formData.phone,
-          role: 'pharmacist',
+          role: memberType,
           service: 'kpa-society',
-          membershipType: 'pharmacist',
-          licenseNumber: formData.licenseNumber,
-          organizationId: formData.groupId || undefined,
+          membershipType: memberType,
+          // 약사 전용 필드
+          ...(memberType === 'pharmacist' ? {
+            licenseNumber: formData.licenseNumber,
+            organizationId: formData.groupId || undefined,
+          } : {}),
+          // 학생 전용 필드
+          ...(memberType === 'student' ? {
+            universityName: formData.universityName,
+            studentYear: formData.studentYear ? Number(formData.studentYear) : undefined,
+          } : {}),
           tos: formData.agreeTerms,
           privacyAccepted: formData.agreePrivacy,
         }),
@@ -206,7 +221,11 @@ export default function RegisterModal() {
 
     if (!commonValid) return false;
 
-    return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
+    if (memberType === 'pharmacist') {
+      return !!formData.licenseNumber && licenseStatus !== 'duplicate' && !!formData.groupId;
+    }
+    // 학생: 대학명 필수
+    return !!formData.universityName;
   };
 
   const handleSwitchToLogin = (e: React.MouseEvent) => {
@@ -217,8 +236,9 @@ export default function RegisterModal() {
   if (!isOpen) return null;
 
   const getHeaderTitle = () => {
+    if (step === 'select') return '회원가입';
     if (step === 'success') return '신청 완료';
-    return '약사 회원가입';
+    return memberType === 'pharmacist' ? '약사 회원가입' : '약대생 회원가입';
   };
 
   return (
@@ -250,17 +270,57 @@ export default function RegisterModal() {
 
         {/* 스크롤 가능한 콘텐츠 */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* 역할 선택 */}
+          {step === 'select' && (
+            <div className="space-y-6">
+              <p className="text-sm text-gray-600 text-center">가입 유형을 선택해 주세요</p>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => { setMemberType('pharmacist'); setStep('form'); }}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all"
+                >
+                  <span className="text-4xl">💊</span>
+                  <span className="text-lg font-bold text-gray-900">약사</span>
+                  <span className="text-xs text-gray-500 text-center">면허 보유 약사<br />승인제 가입</span>
+                </button>
+                <button
+                  onClick={() => { setMemberType('student'); setStep('form'); }}
+                  className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all"
+                >
+                  <span className="text-4xl">🎓</span>
+                  <span className="text-lg font-bold text-gray-900">약대생</span>
+                  <span className="text-xs text-gray-500 text-center">약학대학 재학생<br />승인제 가입</span>
+                </button>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500">
+                  이미 계정이 있으신가요?{' '}
+                  <a href="#" onClick={handleSwitchToLogin} className="text-blue-600 hover:underline font-medium">로그인</a>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* 가입 폼 */}
           {step === 'form' && (
             <>
-              {/* 승인제 안내 */}
-              <div className="mb-6">
+              {/* 뒤로 + 승인제 안내 */}
+              <div className="mb-6 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => setStep('select')}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  ← 가입 유형 다시 선택
+                </button>
                 <div className="flex gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-blue-900">승인제 가입 안내</p>
                     <p className="text-xs text-blue-700 mt-1">
-                      약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.
+                      {memberType === 'pharmacist'
+                        ? '약사면허 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'
+                        : '재학 확인 후 운영자 승인이 완료되면 서비스 이용이 가능합니다.'}
                     </p>
                   </div>
                 </div>
@@ -430,85 +490,95 @@ export default function RegisterModal() {
                   </div>
                 </div>
 
-                {/* 약사 정보 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                    약사 정보
-                  </h4>
+                {/* 약사 전용: 면허 + 소속 */}
+                {memberType === 'pharmacist' && (
+                  <>
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">약사 정보</h4>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          약사면허번호 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="licenseNumber"
+                          value={formData.licenseNumber}
+                          onChange={handleInputChange}
+                          onBlur={() => checkLicenseDuplicate(formData.licenseNumber)}
+                          placeholder="00000"
+                          required
+                          className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            licenseStatus === 'duplicate' ? 'border-red-400' :
+                            licenseStatus === 'available' ? 'border-green-400' : 'border-gray-200'
+                          }`}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
+                        {licenseStatus === 'checking' && <p className="text-xs text-gray-500 mt-1">면허번호 확인 중...</p>}
+                        {licenseStatus === 'duplicate' && <p className="text-xs text-red-500 mt-1">이미 등록된 면허번호입니다.</p>}
+                        {licenseStatus === 'available' && <p className="text-xs text-green-600 mt-1">사용 가능한 면허번호입니다.</p>}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">소속 분회 <span className="text-red-500">*</span></h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">지부 (시/도)</label>
+                          <select name="branchId" value={formData.branchId} onChange={handleInputChange}
+                            className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                            <option value="">지부 선택</option>
+                            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">분회 (시/군/구)</label>
+                          <select name="groupId" value={formData.groupId} onChange={handleInputChange} disabled={!formData.branchId}
+                            className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            <option value="">{formData.branchId ? '분회 선택' : '지부를 먼저 선택'}</option>
+                            {groups.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
+                {/* 학생 전용: 대학 + 학년 */}
+                {memberType === 'student' && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">학생 정보</h4>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        약사면허번호 <span className="text-red-500">*</span>
+                        대학교명 <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        name="licenseNumber"
-                        value={formData.licenseNumber}
+                        name="universityName"
+                        value={formData.universityName}
                         onChange={handleInputChange}
-                        onBlur={() => checkLicenseDuplicate(formData.licenseNumber)}
-                        placeholder="00000"
+                        placeholder="예: 서울대학교 약학대학"
                         required
-                        className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                          licenseStatus === 'duplicate' ? 'border-red-400' :
-                          licenseStatus === 'available' ? 'border-green-400' : 'border-gray-200'
-                        }`}
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
-                      <p className="text-xs text-gray-500 mt-1">약사면허증에 기재된 면허번호</p>
-                      {licenseStatus === 'checking' && (
-                        <p className="text-xs text-gray-500 mt-1">면허번호 확인 중...</p>
-                      )}
-                      {licenseStatus === 'duplicate' && (
-                        <p className="text-xs text-red-500 mt-1">이미 등록된 면허번호입니다. 기존 계정으로 로그인해 주세요.</p>
-                      )}
-                      {licenseStatus === 'available' && (
-                        <p className="text-xs text-green-600 mt-1">사용 가능한 면허번호입니다.</p>
-                      )}
-                    </div>
-                </div>
-
-                {/* 소속 분회 */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">
-                    소속 분회 <span className="text-red-500">*</span>
-                  </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        지부 (시/도)
-                      </label>
-                      <select
-                        name="branchId"
-                        value={formData.branchId}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-                      >
-                        <option value="">지부 선택</option>
-                        {branches.map(b => (
-                          <option key={b.id} value={b.id}>{b.name}</option>
-                        ))}
-                      </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        분회 (시/군/구)
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">학년</label>
                       <select
-                        name="groupId"
-                        value={formData.groupId}
+                        name="studentYear"
+                        value={formData.studentYear}
                         onChange={handleInputChange}
-                        disabled={!formData.branchId}
-                        className={`w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white ${!formData.branchId ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       >
-                        <option value="">
-                          {formData.branchId ? '분회 선택' : '지부를 먼저 선택'}
-                        </option>
-                        {groups.map(g => (
-                          <option key={g.id} value={g.id}>{g.name}</option>
-                        ))}
+                        <option value="">선택 (선택사항)</option>
+                        <option value="1">1학년</option>
+                        <option value="2">2학년</option>
+                        <option value="3">3학년</option>
+                        <option value="4">4학년</option>
+                        <option value="5">5학년</option>
+                        <option value="6">6학년</option>
                       </select>
                     </div>
                   </div>
-                </div>
+                )}
 
                 {/* 약관 동의 */}
                 <div className="space-y-3 pt-4 border-t border-gray-100">
