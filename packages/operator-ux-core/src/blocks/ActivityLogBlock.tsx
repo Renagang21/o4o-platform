@@ -6,6 +6,7 @@
  * 데이터 소스: action-log-core 연동 예정.
  */
 
+import { Link } from 'react-router-dom';
 import type { ActivityItem } from '../types';
 
 function formatTime(timestamp: string): string {
@@ -44,7 +45,13 @@ export function ActivityLogBlock({ items }: { items: ActivityItem[] }) {
           <li key={item.id} className="flex items-start gap-3">
             <div className="mt-1.5 w-2 h-2 rounded-full bg-slate-300 shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-slate-700 truncate">{item.message}</p>
+              {item.link ? (
+                <Link to={item.link} className="text-sm text-slate-700 truncate block hover:text-blue-600 hover:underline">
+                  {item.message}
+                </Link>
+              ) : (
+                <p className="text-sm text-slate-700 truncate">{item.message}</p>
+              )}
               <p className="text-xs text-slate-400">{formatTime(item.timestamp)}</p>
             </div>
           </li>

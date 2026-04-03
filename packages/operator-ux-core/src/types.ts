@@ -65,6 +65,8 @@ export interface ActivityItem {
   message: string;
   /** ISO 8601 timestamp */
   timestamp: string;
+  /** 클릭 시 상세 페이지 이동 (없으면 텍스트만 표시) */
+  link?: string;
 }
 
 // ─── Block 5: Quick Actions ───

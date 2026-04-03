@@ -47,6 +47,14 @@ interface ForumPostItem {
   categoryName: string | null;
 }
 
+// WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: 운영 이벤트 타입
+export interface RecentActivityEvent {
+  type: 'member_join' | 'pharmacy_request' | 'application' | 'org_join';
+  label: string;
+  timestamp: string;
+  status: string;
+}
+
 export interface OperatorSummary {
   content: {
     totalPublished: number;
@@ -69,6 +77,8 @@ export interface OperatorSummary {
   store?: {
     forcedExpirySoon: number;
   };
+  // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2
+  recentActivity?: RecentActivityEvent[];
 }
 
 interface OperatorSummaryResponse {
