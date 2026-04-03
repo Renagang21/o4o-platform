@@ -3,9 +3,11 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1
  * spot_price_policies 테이블 생성 — 상품별 기간 한정 스팟 가격 정책
+ *
+ * 원본: src/migrations/1771200000023 — 잘못된 디렉토리에 배치되어 프로덕션 미실행.
  */
-export class CreateSpotPricePolicies1771200000023 implements MigrationInterface {
-  name = 'CreateSpotPricePolicies1771200000023';
+export class CreateSpotPricePolicies20260403100001 implements MigrationInterface {
+  name = 'CreateSpotPricePolicies20260403100001';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
