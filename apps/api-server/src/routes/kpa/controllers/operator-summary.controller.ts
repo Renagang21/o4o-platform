@@ -116,37 +116,26 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) as count FROM signage_playlists
         WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL
       `),
-      // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: 통합 승인 카운트 (4 entity_type + legacy dual-query)
+      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 참조 제거 — 실존 테이블만 사용
+      // Forum category request pending
       dataSource.query(`
-        SELECT
-          (SELECT COUNT(*) FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society')
-          +
-          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'forum_category')
-          AS count
+        SELECT COUNT(*) AS count FROM forum_category_requests
+        WHERE status = 'pending' AND service_code = 'kpa-society'
       `),
-      // Instructor qualification pending (unified + legacy)
+      // Instructor qualification pending
       dataSource.query(`
-        SELECT
-          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'instructor_qualification')
-          +
-          (SELECT COUNT(*) FROM kpa_instructor_qualifications WHERE status = 'pending')
-          AS count
+        SELECT COUNT(*) AS count FROM kpa_instructor_qualifications
+        WHERE status = 'pending'
       `),
-      // Course request pending (unified + legacy)
+      // Course request pending
       dataSource.query(`
-        SELECT
-          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'submitted' AND entity_type = 'course')
-          +
-          (SELECT COUNT(*) FROM kpa_course_requests WHERE status = 'submitted')
-          AS count
+        SELECT COUNT(*) AS count FROM kpa_course_requests
+        WHERE status = 'submitted'
       `),
-      // Membership pending (unified + legacy)
+      // Membership pending (organization join requests)
       dataSource.query(`
-        SELECT
-          (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'membership')
-          +
-          (SELECT COUNT(*) FROM kpa_organization_join_requests WHERE status = 'pending')
-          AS count
+        SELECT COUNT(*) AS count FROM kpa_organization_join_requests
+        WHERE status = 'pending'
       `),
       // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 (7일 이내)
       dataSource.query(`
@@ -228,10 +217,11 @@ export function createOperatorSummaryController(
       dataSource.query(`SELECT COUNT(*)::int as count FROM cms_contents WHERE "serviceKey" IN ('kpa-society', 'kpa') AND status = 'pending'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_media WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM signage_playlists WHERE "serviceKey" = 'kpa-society' AND status = 'pending' AND "deletedAt" IS NULL`),
-      dataSource.query(`SELECT (SELECT COUNT(*) FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society') + (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'forum_category') AS count`),
-      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'instructor_qualification') + (SELECT COUNT(*) FROM kpa_instructor_qualifications WHERE status = 'pending') AS count`),
-      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'submitted' AND entity_type = 'course') + (SELECT COUNT(*) FROM kpa_course_requests WHERE status = 'submitted') AS count`),
-      dataSource.query(`SELECT (SELECT COUNT(*) FROM kpa_approval_requests WHERE status = 'pending' AND entity_type = 'membership') + (SELECT COUNT(*) FROM kpa_organization_join_requests WHERE status = 'pending') AS count`),
+      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 참조 제거
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM forum_category_requests WHERE status = 'pending' AND service_code = 'kpa-society'`),
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_instructor_qualifications WHERE status = 'pending'`),
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_course_requests WHERE status = 'submitted'`),
+      dataSource.query(`SELECT COUNT(*)::int AS count FROM kpa_organization_join_requests WHERE status = 'pending'`),
       dataSource.query(`SELECT COUNT(*)::int as count FROM kpa_store_asset_controls WHERE is_forced = true AND forced_end_at IS NOT NULL AND forced_end_at > NOW() AND forced_end_at <= NOW() + INTERVAL '7 days'`),
     ]);
 
@@ -368,17 +358,8 @@ export function createOperatorSummaryController(
         .orderBy('r.created_at', 'ASC')
         .take(limit)
         .getManyAndCount(),
-      dataSource.query(
-        `SELECT ar.id, ar.requester_id AS user_id, ar.organization_id,
-                ar.payload->>'requested_role' AS requested_role,
-                ar.payload->>'request_type' AS request_type,
-                ar.status, ar.created_at
-         FROM kpa_approval_requests ar
-         WHERE ar.entity_type = 'membership' AND ar.status = 'pending'
-         ORDER BY ar.created_at ASC
-         LIMIT $1`,
-        [limit],
-      ),
+      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 참조 제거 — 빈 배열 반환
+      Promise.resolve([]),
     ]);
 
     const [pendingLegacyItems, pendingLegacyTotal] = pendingJoinResult;
