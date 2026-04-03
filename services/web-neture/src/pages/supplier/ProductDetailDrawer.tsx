@@ -1554,6 +1554,26 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             </Section>
           ) : null;
           })()}
+
+          {/* ── KPA 2차 심사 상태 (WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1) ── */}
+          {product.kpaReviewStatus && (
+            <Section title="KPA 2차 심사">
+              <InfoRow label="심사 상태">
+                <Badge className={
+                  product.kpaReviewStatus === 'approved' ? 'bg-green-50 text-green-700'
+                    : product.kpaReviewStatus === 'pending' ? 'bg-amber-50 text-amber-700'
+                    : 'bg-red-50 text-red-700'
+                }>
+                  {product.kpaReviewStatus === 'approved' ? '승인' : product.kpaReviewStatus === 'pending' ? '심사 대기' : '반려'}
+                </Badge>
+              </InfoRow>
+              {product.kpaReviewReason && (
+                <InfoRow label="반려 사유">
+                  <span className="text-xs text-red-600">{product.kpaReviewReason}</span>
+                </InfoRow>
+              )}
+            </Section>
+          )}
         </div>
 
         {/* Footer — 수정 모드 시 취소/저장 */}

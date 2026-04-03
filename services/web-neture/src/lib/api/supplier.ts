@@ -154,6 +154,9 @@ export interface SupplierProduct {
   originCountry?: string | null;
   categoryId?: string | null;
   brandId?: string | null;
+  // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
+  kpaReviewStatus?: string | null;
+  kpaReviewReason?: string | null;
 }
 
 export interface ServiceSummary {

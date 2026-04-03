@@ -371,6 +371,19 @@ export class OfferServiceApprovalService {
         autoListedCount = await autoExpandServiceProduct(executor, offerId, offer.master_id, approvedKeys);
       }
 
+      // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
+      // kpa-society가 승인된 경우 → product_approvals PENDING row 생성 (KPA 2차 심사 큐)
+      const kpaApproved = approvals.some(a => a.service_key === 'kpa-society' && a.approval_status === 'approved');
+      if (kpaApproved) {
+        await executor.query(
+          `INSERT INTO product_approvals (offer_id, organization_id, service_key, approval_type, approval_status, requested_by, metadata)
+           VALUES ($1, 'a0000000-0a00-4000-a000-000000000001', 'kpa-society', 'service', 'pending', $2, '{"source":"neture_bridge"}'::jsonb)
+           ON CONFLICT (offer_id, organization_id, approval_type) DO NOTHING`,
+          [offerId, decidedBy],
+        );
+        logger.info(`[ServiceApproval] Offer ${offerId} → KPA 2차 심사 큐 생성 (bridge)`);
+      }
+
       logger.info(`[ServiceApproval] Offer ${offerId} → APPROVED (derived) by ${decidedBy}, autoListed=${autoListedCount}`);
     } else if (derivedStatus === 'REJECTED') {
       // → REJECTED: offer 상태 + cascade (product_approvals revoke + listings 비활성화)

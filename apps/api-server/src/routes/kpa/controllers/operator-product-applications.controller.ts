@@ -122,12 +122,44 @@ export function createOperatorProductApplicationsController(
     res.json({ success: true, data: stats });
   }));
 
-  // ─── PATCH /:id/approve — SERVICE 승인 처리 (v2 service) ──────────────
+  // ─── PATCH /:id/approve — SERVICE 승인 처리 (KPA 2차 심사) ──────────────
+  // WO-KPA-SOCIETY-SECOND-REVIEW-BRIDGE-FOUNDATION-V1
+  // approvalV2Service.approveServiceProduct()는 listing을 is_active=false로 만들고 단일 org만 처리.
+  // KPA 2차 심사 승인은 이미 존재하는 kpa-society listings 전체를 활성화해야 하므로 직접 트랜잭션 사용.
   router.patch('/:id/approve', asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const approvedBy = (req as any).user?.id || 'unknown';
 
-    const result = await approvalV2Service.approveServiceProduct(id, approvedBy);
+    const result = await dataSource.transaction(async (manager) => {
+      // 1. product_approvals PENDING 확인
+      const [approval] = await manager.query(
+        `SELECT id, offer_id, approval_status FROM product_approvals WHERE id = $1`,
+        [id],
+      );
+      if (!approval || approval.approval_status !== 'pending') {
+        return { success: false, error: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' };
+      }
+
+      // 2. product_approvals 상태 업데이트
+      await manager.query(
+        `UPDATE product_approvals SET approval_status = 'approved', decided_by = $2::uuid, decided_at = NOW(), updated_at = NOW()
+         WHERE id = $1 AND approval_status = 'pending'`,
+        [id, approvedBy],
+      );
+
+      // 3. 해당 offer의 kpa-society listings 전체 활성화
+      const listingResult = await manager.query(
+        `UPDATE organization_product_listings SET is_active = true, updated_at = NOW()
+         WHERE offer_id = $1 AND service_key = 'kpa-society'`,
+        [approval.offer_id],
+      );
+
+      return {
+        success: true,
+        data: { approvalId: id, offerId: approval.offer_id, activatedListings: listingResult[1] || 0 },
+      };
+    });
+
     if (!result.success) {
       const status = result.error === 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' ? 404 : 400;
       return res.status(status).json({
@@ -136,7 +168,7 @@ export function createOperatorProductApplicationsController(
       });
     }
 
-    logger.info(`[OperatorProductApplications] SERVICE approval approved: ${id} by ${approvedBy}`);
+    logger.info(`[OperatorProductApplications] KPA 2차 심사 승인: ${id} by ${approvedBy}, activated=${(result.data as any)?.activatedListings}`);
     actionLogService?.logSuccess('kpa-society', approvedBy, 'kpa.operator.product_approve', {
       meta: { targetId: id, statusBefore: 'pending', statusAfter: 'approved' },
     }).catch(() => {});

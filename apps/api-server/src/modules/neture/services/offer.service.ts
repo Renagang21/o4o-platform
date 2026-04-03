@@ -1130,6 +1130,8 @@ export class NetureOfferService {
            COALESCE(pending.cnt, 0)::int AS "pendingRequestCount",
            COALESCE(active.cnt, 0)::int AS "activeServiceCount",
            svc_appr.approvals AS "serviceApprovals",
+           kpa_review.status AS "kpaReviewStatus",
+           kpa_review.reason AS "kpaReviewReason",
            ${NetureOfferService.COMPLETENESS_EXPR} AS "completenessScore"
          FROM supplier_product_offers spo
          JOIN product_masters pm ON pm.id = spo.master_id
@@ -1151,6 +1153,12 @@ export class NetureOfferService {
            SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status, 'reason', osa.reason)), '[]'::json) AS approvals
            FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
          ) svc_appr ON true
+         LEFT JOIN LATERAL (
+           SELECT pa.approval_status AS status, pa.reason
+           FROM product_approvals pa
+           WHERE pa.offer_id = spo.id AND pa.service_key = 'kpa-society' AND pa.approval_type = 'service'
+           LIMIT 1
+         ) kpa_review ON true
          WHERE ${q.where}
          ORDER BY pm.id, ${q.sortField} ${q.sortOrder}
          LIMIT $${q.idx} OFFSET $${q.idx + 1}`,
