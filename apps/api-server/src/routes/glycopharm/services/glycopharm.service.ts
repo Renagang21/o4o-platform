@@ -29,7 +29,7 @@ import {
   PaginationMeta,
   GlycopharmPharmacyStatus,
 } from '../dto/index.js';
-import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
+import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 
 export class GlycopharmService {
   private repository: GlycopharmRepository;
@@ -156,6 +156,9 @@ export class GlycopharmService {
       // WO-O4O-PRODUCT-AUTO-LISTING-STABILIZATION-V1: Tier 1 자동 확산
       autoListPublicProductsForOrg(this.dataSource, org.id, 'glycopharm')
         .catch((err) => console.error('[GlycopharmService] Auto-listing failed:', err));
+      // WO-NETURE-SERVICE-OFFER-AUTO-LIST-ON-NEW-ORG-ENROLLMENT-V1: SERVICE 상품 자동 진열
+      autoListServiceProductsForOrg(this.dataSource, org.id, 'glycopharm')
+        .catch((err) => console.error('[GlycopharmService] SERVICE auto-listing failed:', err));
 
       return this.toPharmacyResponse(org, ext, 0, slug);
     } catch (error) {

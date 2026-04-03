@@ -258,14 +258,13 @@ export default function LoginModal() {
           {/* 테스트 계정 자동입력 */}
           <div className="mt-4 flex flex-wrap gap-2 justify-center">
             {[
-              { label: '학생', email: 'student01@o4o.com' },
-              { label: '약국 개설자', email: 'phamacy1@o4o.com' },
-              { label: '근무약사', email: 'working-pharmacist1@o4o.com' },
+              { label: '관리자', email: 'kpa-a-admin@o4o.com' },
+              { label: '운영자', email: 'kpa-a-operator@o4o.com' },
             ].map((acct) => (
               <button
                 key={acct.email}
                 type="button"
-                onClick={() => { setEmail(acct.email); setPassword('O4oTestPass@1'); setError(null); }}
+                onClick={() => { setEmail(acct.email); setPassword('O4oTestPass'); setError(null); }}
                 className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
               >
                 {acct.label}

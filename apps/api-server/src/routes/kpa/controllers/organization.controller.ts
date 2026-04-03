@@ -8,7 +8,7 @@ import { body, param, validationResult } from 'express-validator';
 import { DataSource } from 'typeorm';
 import { OrganizationStore, OrganizationChannel } from '../entities/index.js';
 import type { AuthRequest } from '../../../types/auth.js';
-import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
+import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 
 type AuthMiddleware = RequestHandler;
@@ -188,6 +188,10 @@ export function createOrganizationController(
         autoListPublicProductsForOrg(dataSource, saved.id, 'kpa')
           .then((count) => { if (count > 0) console.warn(`[OrgCreate] Auto-listed ${count} PUBLIC products for org ${saved.id}`); })
           .catch((err) => console.warn('[OrgCreate] Auto-listing failed:', err));
+        // WO-NETURE-SERVICE-OFFER-AUTO-LIST-ON-NEW-ORG-ENROLLMENT-V1: SERVICE 상품 자동 진열
+        autoListServiceProductsForOrg(dataSource, saved.id, 'kpa-society')
+          .then((count) => { if (count > 0) console.warn(`[OrgCreate] Auto-listed ${count} SERVICE products for org ${saved.id}`); })
+          .catch((err) => console.warn('[OrgCreate] SERVICE auto-listing failed:', err));
 
         res.status(201).json({ data: saved });
       } catch (error: any) {

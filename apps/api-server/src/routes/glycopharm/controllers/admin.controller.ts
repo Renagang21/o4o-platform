@@ -18,7 +18,7 @@ import { User } from '../../../modules/auth/entities/User.js';
 import type { ActionLogService } from '@o4o/action-log-core';
 import logger from '../../../utils/logger.js';
 import { hasAnyServiceRole } from '../../../utils/role.utils.js';
-import { autoListPublicProductsForOrg } from '../../../utils/auto-listing.utils.js';
+import { autoListPublicProductsForOrg, autoListServiceProductsForOrg } from '../../../utils/auto-listing.utils.js';
 import { organizationOpsService } from '../../../modules/organization/services/organization-ops.service.js';
 
 interface AuthRequest extends Request {
@@ -406,6 +406,10 @@ export function createAdminController(
             autoListPublicProductsForOrg(dataSource, createdOrg.id, 'glycopharm')
               .then((count) => logger.info(`[Glycopharm Admin] Auto-listed ${count} PUBLIC products for org ${createdOrg.id}`))
               .catch((err) => logger.error('[Glycopharm Admin] Auto-listing failed:', err));
+            // WO-NETURE-SERVICE-OFFER-AUTO-LIST-ON-NEW-ORG-ENROLLMENT-V1: SERVICE 상품 자동 진열
+            autoListServiceProductsForOrg(dataSource, createdOrg.id, 'glycopharm')
+              .then((count) => logger.info(`[Glycopharm Admin] Auto-listed ${count} SERVICE products for org ${createdOrg.id}`))
+              .catch((err) => logger.error('[Glycopharm Admin] SERVICE auto-listing failed:', err));
           }
         }
 

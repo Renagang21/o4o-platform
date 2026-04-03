@@ -751,10 +751,13 @@ export function createMemberController(
           }));
         } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
 
-        // 순서: 프로필 → member_services(CASCADE) → member
+        // 순서: 프로필 → memberships/roles → member_services(CASCADE) → member → user
         await dataSource.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await dataSource.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await dataSource.query(`DELETE FROM service_memberships WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await dataSource.query(`DELETE FROM role_assignments WHERE user_id = $1`, [member.user_id]).catch(() => {});
         await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제
+        await dataSource.query(`DELETE FROM users WHERE id = $1`, [member.user_id]).catch(() => {});
 
         res.json({ success: true, data: { mode: 'hard', deleted: true } });
       } catch (error: any) {
