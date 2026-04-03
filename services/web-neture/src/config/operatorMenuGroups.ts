@@ -37,7 +37,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '가입 승인', path: '/operator/applications' },
     { label: 'Market Trial', path: '/operator/market-trial' },
     { label: '서비스 승인', path: '/operator/service-approvals', adminOnly: true },
-    { label: '공급사 승인', path: '/operator/admin-suppliers', adminOnly: true },
+    { label: '공급사 승인', path: '/operator/admin-suppliers' },
   ],
   products: [
     { label: '공급 현황', path: '/operator/supply' },

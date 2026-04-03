@@ -129,13 +129,14 @@ export class OperatorRegistrationService {
           const bizName = bizInfo?.businessName || userRow?.name || '';
           const representativeName = userRow?.name || null;
 
-          // neture_suppliers 생성 (status = 'ACTIVE')
+          // WO-NETURE-SUPPLIER-APPROVAL-TWO-STEP-ACTIVATION-V1:
+          // 가입 승인 시 PENDING으로 생성 → 운영자가 별도 공급 승인 후 ACTIVE
           const [insertedSupplier] = await queryRunner.query(
             `INSERT INTO neture_suppliers (user_id, slug, contact_email, contact_phone, representative_name, status, approved_by, approved_at, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, 'ACTIVE', $6, NOW(), NOW(), NOW())
-             ON CONFLICT (user_id) DO UPDATE SET status = 'ACTIVE', approved_by = $6, approved_at = NOW(), updated_at = NOW()
+             VALUES ($1, $2, $3, $4, $5, 'PENDING', NULL, NULL, NOW(), NOW())
+             ON CONFLICT (user_id) DO NOTHING
              RETURNING id`,
-            [userId, slug, contactEmail, contactPhone, representativeName, approvedBy],
+            [userId, slug, contactEmail, contactPhone, representativeName],
           );
 
           // organization 연동 (businessName이 있는 경우)
@@ -156,12 +157,12 @@ export class OperatorRegistrationService {
             }
           }
 
-          logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (ACTIVE) on approval`);
+          logger.info(`[Registration] Auto-created neture_suppliers for user ${userId} (PENDING) — awaiting supplier approval`);
         } else {
-          // 이미 존재하면 ACTIVE로 업데이트
+          // 이미 존재하면 상태 유지 (별도 공급 승인 흐름에서 처리)
           await queryRunner.query(
-            `UPDATE neture_suppliers SET status = 'ACTIVE', approved_by = $1, approved_at = NOW(), updated_at = NOW()
-             WHERE user_id = $2 AND status != 'ACTIVE'`,
+            `UPDATE neture_suppliers SET updated_at = NOW()
+             WHERE user_id = $2 AND status = 'PENDING'`,
             [approvedBy, userId],
           );
         }
