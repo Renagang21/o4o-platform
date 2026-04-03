@@ -56,6 +56,36 @@ export class CleanupAllKpaTestAccounts1712203200000
       [userIds],
     ).catch(() => {});
 
+    // 4.5. FK 참조 테이블 정리 (forum_post, forum_comment, applications 등)
+    await queryRunner.query(
+      `DELETE FROM forum_comment WHERE author_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM forum_post WHERE author_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM kpa_applications WHERE user_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM kpa_pharmacy_requests WHERE user_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM kpa_organization_join_requests WHERE user_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM kpa_operator_audit_logs WHERE actor_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+    await queryRunner.query(
+      `DELETE FROM kpa_approval_requests WHERE requester_id = ANY($1)`,
+      [userIds],
+    ).catch(() => {});
+
     // 5. users 삭제
     const result = await queryRunner.query(
       `DELETE FROM users WHERE id = ANY($1)`,
