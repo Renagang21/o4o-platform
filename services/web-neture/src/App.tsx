@@ -347,6 +347,9 @@ const ForumAnalyticsPage = lazy(() =>
 const SupplyDashboardPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
 );
+// WO-NETURE-OPERATOR-PRODUCT-SUPPLY-OVERVIEW-V1
+const AllProductsOverviewPage = lazy(() => import('./pages/operator/AllProductsOverviewPage'));
+const RecruitingProductsOverviewPage = lazy(() => import('./pages/operator/RecruitingProductsOverviewPage'));
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
 const UsersManagementPage = lazy(() =>
@@ -773,6 +776,8 @@ function App() {
               <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
               <Route path="/admin/supply" element={<SupplyDashboardPage />} />
+              <Route path="/admin/all-products" element={<AllProductsOverviewPage />} />
+              <Route path="/admin/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
               <Route path="/admin/ai/asset-quality" element={<AssetQualityPage />} />
@@ -847,6 +852,8 @@ function App() {
               <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
               <Route path="/operator/supply" element={<SupplyDashboardPage />} />
+              <Route path="/operator/all-products" element={<AllProductsOverviewPage />} />
+              <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/operator/ai-operations" element={<AiOperationsPage />} />
               <Route path="/operator/ai/asset-quality" element={<AssetQualityPage />} />

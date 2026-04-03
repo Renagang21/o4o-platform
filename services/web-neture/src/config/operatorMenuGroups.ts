@@ -41,6 +41,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   products: [
     { label: '공급 현황', path: '/operator/supply' },
+    { label: '전체 공급', path: '/operator/all-products' },
+    { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
     { label: '카테고리 관리', path: '/operator/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/operator/brands', adminOnly: true },
     { label: '상품 데이터 정리', path: '/operator/product-cleanup', adminOnly: true },
@@ -140,6 +142,8 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   products: [
     { label: '공급 현황', path: '/operator/supply' },
+    { label: '전체 공급', path: '/operator/all-products' },
+    { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
     { label: '큐레이션', path: '/operator/curation' },
   ],
