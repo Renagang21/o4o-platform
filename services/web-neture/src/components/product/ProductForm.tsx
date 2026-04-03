@@ -292,7 +292,13 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
                 name="distributionType"
                 value={opt.value}
                 checked={data.distributionType === opt.value}
-                onChange={() => updateField('distributionType', opt.value)}
+                onChange={() => {
+                  updateField('distributionType', opt.value);
+                  // SERVICE 이외 선택 시 serviceKeys 초기화
+                  if (opt.value !== 'SERVICE') {
+                    updateField('serviceKeys', []);
+                  }
+                }}
                 disabled={disabled}
                 className="mt-1"
               />
@@ -303,45 +309,47 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
             </label>
           ))}
         </div>
-        {mode === 'edit' && (
+        {mode === 'edit' && data.distributionType === 'SERVICE' && (
           <p className="mt-2 text-xs text-slate-400">
             서비스 운영자가 상품을 검토 후 승인하면 해당 서비스에 노출됩니다.
           </p>
         )}
       </div>
 
-      {/* ── 서비스 선택 ── */}
-      <div>
-        <FieldLabel>서비스 선택</FieldLabel>
-        <p className="text-xs text-slate-400 mb-3">이 상품을 노출할 서비스를 선택하세요</p>
-        <div className="grid grid-cols-2 gap-2">
-          {AVAILABLE_SERVICES.map((svc) => {
-            const selected = (data.serviceKeys || []).includes(svc.key);
-            return (
-              <label
-                key={svc.key}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  selected
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-slate-200 hover:bg-slate-50'
-                } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={selected}
-                  onChange={() => toggleServiceKey(svc.key)}
-                  disabled={disabled}
-                  className="w-4 h-4 text-emerald-600 rounded"
-                />
-                <span className="text-sm font-medium text-slate-700">
-                  {svc.name}
-                </span>
-              </label>
-            );
-          })}
+      {/* ── 서비스 선택 (SERVICE 정책일 때만 표시) ── */}
+      {data.distributionType === 'SERVICE' && (
+        <div>
+          <FieldLabel required>서비스 선택</FieldLabel>
+          <p className="text-xs text-slate-400 mb-3">이 상품을 노출할 서비스를 선택하세요</p>
+          <div className="grid grid-cols-2 gap-2">
+            {AVAILABLE_SERVICES.map((svc) => {
+              const selected = (data.serviceKeys || []).includes(svc.key);
+              return (
+                <label
+                  key={svc.key}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    selected
+                      ? 'border-emerald-500 bg-emerald-50'
+                      : 'border-slate-200 hover:bg-slate-50'
+                  } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => toggleServiceKey(svc.key)}
+                    disabled={disabled}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    {svc.name}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+          <FieldError error={errors.serviceKeys} />
         </div>
-        <FieldError error={errors.serviceKeys} />
-      </div>
+      )}
     </div>
   );
 }
