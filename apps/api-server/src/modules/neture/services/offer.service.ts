@@ -1305,6 +1305,28 @@ export class NetureOfferService {
       }
 
       // 머지하여 반환
+      // 이미지 조회 (masterId → primaryImageUrl)
+      const masterIds = [...new Set(activeOffers.map((o) => o.masterId).filter(Boolean))];
+      const imageMap = new Map<string, string>();
+      if (masterIds.length > 0) {
+        const images: Array<{ master_id: string; image_url: string }> = await AppDataSource.query(
+          `SELECT master_id, image_url FROM product_images WHERE master_id = ANY($1) AND is_primary = true`,
+          [masterIds],
+        );
+        for (const img of images) imageMap.set(img.master_id, img.image_url);
+      }
+
+      // 카테고리 조회
+      const categoryIds = [...new Set(activeOffers.map((o) => o.master?.categoryId).filter(Boolean))];
+      const categoryMap = new Map<string, string>();
+      if (categoryIds.length > 0) {
+        const cats: Array<{ id: string; name: string }> = await AppDataSource.query(
+          `SELECT id, name FROM product_categories WHERE id = ANY($1)`,
+          [categoryIds],
+        );
+        for (const c of cats) categoryMap.set(c.id, c.name);
+      }
+
       const orgNameMap = await this.getOrgNameMap(activeOffers.map((o) => o.supplier).filter(Boolean));
       return activeOffers.map((o) => {
         const key = `${o.supplierId}:${o.id}`;
@@ -1312,13 +1334,20 @@ export class NetureOfferService {
         return {
           id: o.id,
           masterId: o.masterId,
-          masterName: o.master?.marketingName || '',
+          name: o.master?.marketingName || o.master?.regulatoryName || '',
           distributionType: o.distributionType,
           supplierId: o.supplierId,
           supplierName: (o.supplier?.organizationId ? orgNameMap.get(o.supplier.organizationId) : '') || '',
           supplyStatus: request?.status || 'available',
           requestId: request?.requestId || null,
           rejectReason: request?.rejectReason || null,
+          priceGeneral: o.priceGeneral ?? null,
+          consumerReferencePrice: o.consumerReferencePrice ?? null,
+          approvalStatus: o.approvalStatus || null,
+          barcode: o.master?.barcode || null,
+          specification: o.master?.specification || null,
+          category: o.master?.categoryId ? categoryMap.get(o.master.categoryId) || null : null,
+          primaryImageUrl: imageMap.get(o.masterId) || null,
         };
       });
     } catch (error) {
