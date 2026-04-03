@@ -19,6 +19,11 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  Pencil,
+  Trash2,
+  X,
+  AlertTriangle,
+  ShieldAlert,
 } from 'lucide-react';
 import { DataTable } from '@o4o/ui';
 import type { Column } from '@o4o/ui';
@@ -134,6 +139,220 @@ const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
   applications: '',
 };
 
+// ─── Edit Member Modal (WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1) ───
+
+function EditMemberModal({
+  member,
+  onClose,
+  onSaved,
+}: {
+  member: KpaMember;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState({
+    name: member.user?.name || '',
+    membership_type: member.membership_type,
+    license_number: member.license_number || '',
+    pharmacy_name: member.pharmacy_name || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await apiFetch(`/api/v1/kpa/members/${member.id}/info`, {
+        method: 'PATCH',
+        body: JSON.stringify(form),
+      });
+      toast.success('회원 정보가 수정되었습니다.');
+      onSaved();
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || '수정 실패');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-slate-900">회원 정보 수정</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5 text-slate-400" /></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">이름</label>
+            <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">유형</label>
+            <select value={form.membership_type} onChange={e => setForm(f => ({ ...f, membership_type: e.target.value as any }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="pharmacist">약사</option>
+              <option value="student">약대생</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">면허번호</label>
+            <input type="text" value={form.license_number} onChange={e => setForm(f => ({ ...f, license_number: e.target.value }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">약국명</label>
+            <input type="text" value={form.pharmacy_name} onChange={e => setForm(f => ({ ...f, pharmacy_name: e.target.value }))}
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div className="text-xs text-slate-400">이메일: {member.user?.email || '-'} (읽기 전용)</div>
+        </div>
+        <div className="flex justify-end gap-2 mt-6">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
+          <button onClick={handleSave} disabled={saving}
+            className="px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50">
+            {saving ? '저장 중...' : '저장'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Delete Risk Modal (WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1) ───
+
+interface DeleteRiskData {
+  member: { id: string; userId: string; name: string; email: string; status: string; membershipType: string; role: string };
+  risks: { memberServices: number; forumPosts: number; forumComments: number; approvalRequests: number; auditLogs: number };
+  totalImpact: number;
+  canHardDelete: boolean;
+  message: string;
+}
+
+function DeleteRiskModal({
+  memberId,
+  onClose,
+  onDeleted,
+}: {
+  memberId: string;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DeleteRiskData | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    apiFetch<{ data: DeleteRiskData }>(`/api/v1/kpa/members/${memberId}/delete-risk`)
+      .then(r => setData(r.data))
+      .catch(e => toast.error(e.message))
+      .finally(() => setLoading(false));
+  }, [memberId]);
+
+  const handleSoftDelete = async () => {
+    if (!confirm('이 회원을 탈퇴(비활성) 처리하시겠습니까?')) return;
+    setDeleting(true);
+    try {
+      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=soft`, { method: 'DELETE' });
+      toast.success('탈퇴 처리 완료');
+      onDeleted();
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || '처리 실패');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleHardDelete = async () => {
+    if (!confirm('⚠️ 이 회원 데이터를 완전히 삭제합니다. 이 작업은 되돌릴 수 없습니다.\n정말 삭제하시겠습니까?')) return;
+    setDeleting(true);
+    try {
+      await apiFetch(`/api/v1/kpa/members/${memberId}?mode=hard`, { method: 'DELETE' });
+      toast.success('완전 삭제 완료');
+      onDeleted();
+      onClose();
+    } catch (e: any) {
+      toast.error(e.message || '삭제 실패');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-red-500" />
+            <h3 className="text-lg font-bold text-slate-900">회원 삭제 확인</h3>
+          </div>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5 text-slate-400" /></button>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
+        ) : data ? (
+          <div className="space-y-4">
+            {/* 회원 정보 */}
+            <div className="bg-slate-50 rounded-lg p-4 space-y-1">
+              <p className="text-sm font-medium text-slate-800">{data.member.name}</p>
+              <p className="text-xs text-slate-500">{data.member.email}</p>
+              <div className="flex gap-2 mt-1">
+                <span className="text-xs px-2 py-0.5 bg-slate-200 rounded">{data.member.membershipType === 'pharmacist' ? '약사' : '약대생'}</span>
+                <span className="text-xs px-2 py-0.5 bg-slate-200 rounded">{data.member.status}</span>
+              </div>
+            </div>
+
+            {/* 영향 데이터 */}
+            <div>
+              <p className="text-sm font-medium text-slate-700 mb-2">삭제 시 영향받는 데이터</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: '서비스 연결', value: data.risks.memberServices },
+                  { label: '포럼 게시글', value: data.risks.forumPosts },
+                  { label: '포럼 댓글', value: data.risks.forumComments },
+                  { label: '승인 요청', value: data.risks.approvalRequests },
+                  { label: '감사 로그', value: data.risks.auditLogs },
+                ].map(item => (
+                  <div key={item.label} className={`flex justify-between px-3 py-2 rounded text-sm ${item.value > 0 ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-500'}`}>
+                    <span>{item.label}</span>
+                    <span className="font-medium">{item.value}건</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 경고 */}
+            {!data.canHardDelete && (
+              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-red-700">포럼 게시글/댓글 또는 감사 로그가 있어 완전삭제가 제한됩니다. 탈퇴(비활성) 처리를 권장합니다.</p>
+              </div>
+            )}
+
+            {/* 액션 */}
+            <div className="flex flex-col gap-2 pt-2">
+              <button onClick={handleSoftDelete} disabled={deleting}
+                className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50">
+                {deleting ? '처리 중...' : '탈퇴 처리 (비활성화)'}
+              </button>
+              <button onClick={handleHardDelete} disabled={deleting || !data.canHardDelete}
+                className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
+                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : deleting ? '삭제 중...' : '완전삭제 (되돌릴 수 없음)'}
+              </button>
+              <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-center text-sm text-red-500 py-4">리스크 정보를 불러오지 못했습니다.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
@@ -155,6 +374,8 @@ export default function MemberManagementPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [editTarget, setEditTarget] = useState<KpaMember | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Stats fetch (application stats only — member counts are fetched in fetchMembers)
   useEffect(() => {
@@ -301,7 +522,7 @@ export default function MemberManagementPage() {
     {
       key: 'actions',
       title: '액션',
-      width: '100px',
+      width: '160px',
       align: 'right',
       render: (_v, m) => (
         <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
@@ -322,6 +543,9 @@ export default function MemberManagementPage() {
                 <button onClick={() => handleStatusChange(m.id, 'active')} className="text-xs text-green-600 hover:underline">복원</button>
               )}
               {m.status === 'withdrawn' && <span className="text-xs text-slate-400">-</span>}
+              <div className="w-px h-4 bg-slate-200 mx-0.5" />
+              <button onClick={() => setEditTarget(m)} title="수정" className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><Pencil className="w-3.5 h-3.5" /></button>
+              <button onClick={() => setDeleteTargetId(m.id)} title="삭제" className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
             </>
           )}
         </div>
@@ -417,6 +641,24 @@ export default function MemberManagementPage() {
           </>
         )}
       </MemberListLayout>
+
+      {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 수정 모달 */}
+      {editTarget && (
+        <EditMemberModal
+          member={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSaved={() => fetchMembers(memberPage)}
+        />
+      )}
+
+      {/* WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1: 삭제 리스크 모달 */}
+      {deleteTargetId && (
+        <DeleteRiskModal
+          memberId={deleteTargetId}
+          onClose={() => setDeleteTargetId(null)}
+          onDeleted={() => fetchMembers(memberPage)}
+        />
+      )}
     </div>
   );
 }

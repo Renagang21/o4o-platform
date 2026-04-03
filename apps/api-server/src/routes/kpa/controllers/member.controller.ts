@@ -545,5 +545,224 @@ export function createMemberController(
     }
   );
 
+  // ============================================================================
+  // WO-KPA-A-MEMBER-EDIT-AND-DELETE-FLOW-V1
+  // ============================================================================
+
+  /**
+   * PATCH /kpa/members/:id/info — 운영자용 회원정보 수정
+   */
+  router.patch(
+    '/:id/info',
+    requireAuth,
+    requireScope('kpa:operator'),
+    param('id').isUUID(),
+    handleValidationErrors,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const member = await memberRepo.findOne({ where: { id: req.params.id } });
+        if (!member) {
+          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+          return;
+        }
+
+        const { name, membership_type, license_number, pharmacy_name, pharmacy_address, activity_type } = req.body;
+        const changes: Record<string, any> = {};
+
+        // kpa_members 필드 업데이트
+        if (membership_type && ['pharmacist', 'student'].includes(membership_type)) {
+          changes.membership_type = membership_type;
+          member.membership_type = membership_type;
+        }
+        if (license_number !== undefined) { changes.license_number = license_number; member.license_number = license_number; }
+        if (pharmacy_name !== undefined) { changes.pharmacy_name = pharmacy_name; member.pharmacy_name = pharmacy_name; }
+        if (pharmacy_address !== undefined) { changes.pharmacy_address = pharmacy_address; member.pharmacy_address = pharmacy_address; }
+        if (activity_type !== undefined) { changes.activity_type = activity_type; member.activity_type = activity_type; }
+
+        await memberRepo.save(member);
+
+        // users.name 업데이트 (별도)
+        if (name && typeof name === 'string' && name.trim()) {
+          changes.name = name.trim();
+          await dataSource.query(`UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`, [name.trim(), member.user_id]);
+        }
+
+        // Audit log
+        try {
+          await auditRepo.save(auditRepo.create({
+            operator_id: (req as any).user?.id,
+            operator_role: 'kpa:operator',
+            action_type: 'MEMBER_INFO_UPDATED' as any,
+            target_type: 'member',
+            target_id: member.id,
+            metadata: changes,
+          }));
+        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
+        res.json({ success: true, data: member });
+      } catch (error: any) {
+        console.error('Failed to update member info:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  /**
+   * GET /kpa/members/:id/delete-risk — 삭제 리스크 확인
+   */
+  router.get(
+    '/:id/delete-risk',
+    requireAuth,
+    requireScope('kpa:operator'),
+    param('id').isUUID(),
+    handleValidationErrors,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const member = await memberRepo.findOne({ where: { id: req.params.id } });
+        if (!member) {
+          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+          return;
+        }
+
+        // 사용자 정보
+        const [userRows] = await Promise.all([
+          dataSource.query(`SELECT name, email FROM users WHERE id = $1`, [member.user_id]),
+        ]);
+
+        // 영향 데이터 집계
+        const [
+          serviceCount,
+          forumPostCount,
+          forumCommentCount,
+          approvalRequestCount,
+          auditLogCount,
+        ] = await Promise.all([
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM kpa_member_services WHERE member_id = $1`, [member.id]),
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM kpa_approval_requests WHERE requester_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM kpa_operator_audit_logs WHERE target_id = $1`, [member.id]).catch(() => [{ cnt: 0 }]),
+        ]);
+
+        const risks = {
+          memberServices: serviceCount[0]?.cnt || 0,
+          forumPosts: forumPostCount[0]?.cnt || 0,
+          forumComments: forumCommentCount[0]?.cnt || 0,
+          approvalRequests: approvalRequestCount[0]?.cnt || 0,
+          auditLogs: auditLogCount[0]?.cnt || 0,
+        };
+
+        const totalImpact = Object.values(risks).reduce((s, v) => s + v, 0);
+        const canHardDelete = risks.forumPosts === 0 && risks.forumComments === 0 && risks.auditLogs === 0;
+
+        res.json({
+          success: true,
+          data: {
+            member: {
+              id: member.id,
+              userId: member.user_id,
+              name: userRows[0]?.name || '-',
+              email: userRows[0]?.email || '-',
+              status: member.status,
+              membershipType: member.membership_type,
+              role: member.role,
+            },
+            risks,
+            totalImpact,
+            canHardDelete,
+            message: canHardDelete
+              ? '이 회원은 안전하게 삭제할 수 있습니다.'
+              : '연결된 데이터가 있어 완전삭제 시 주의가 필요합니다.',
+          },
+        });
+      } catch (error: any) {
+        console.error('Failed to check delete risk:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
+  /**
+   * DELETE /kpa/members/:id — 회원 삭제 (soft: withdrawn 상태 전환 / hard: 데이터 삭제)
+   * ?mode=soft (기본) | ?mode=hard
+   */
+  router.delete(
+    '/:id',
+    requireAuth,
+    requireScope('kpa:admin'),
+    param('id').isUUID(),
+    handleValidationErrors,
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        const member = await memberRepo.findOne({ where: { id: req.params.id } });
+        if (!member) {
+          res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Member not found' } });
+          return;
+        }
+
+        const mode = req.query.mode === 'hard' ? 'hard' : 'soft';
+
+        if (mode === 'soft') {
+          // Soft delete: status → withdrawn
+          member.status = 'withdrawn' as any;
+          member.identity_status = 'withdrawn' as any;
+          await memberRepo.save(member);
+
+          try {
+            await auditRepo.save(auditRepo.create({
+              operator_id: (req as any).user?.id,
+              operator_role: 'kpa:admin',
+              action_type: 'MEMBER_STATUS_CHANGED' as any,
+              target_type: 'member',
+              target_id: member.id,
+              metadata: { previousStatus: member.status, newStatus: 'withdrawn', mode: 'soft' },
+            }));
+          } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
+          res.json({ success: true, data: { mode: 'soft', status: 'withdrawn' } });
+          return;
+        }
+
+        // Hard delete
+        // 리스크 확인
+        const [forumPosts, forumComments] = await Promise.all([
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
+          dataSource.query(`SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE author_id = $1`, [member.user_id]).catch(() => [{ cnt: 0 }]),
+        ]);
+
+        if ((forumPosts[0]?.cnt || 0) > 0 || (forumComments[0]?.cnt || 0) > 0) {
+          res.status(409).json({
+            success: false,
+            error: 'HARD_DELETE_BLOCKED',
+            message: `포럼 게시글 ${forumPosts[0]?.cnt}건, 댓글 ${forumComments[0]?.cnt}건이 있어 완전삭제가 불가합니다.`,
+          });
+          return;
+        }
+
+        // Audit log 먼저 기록 (삭제 전)
+        try {
+          await auditRepo.save(auditRepo.create({
+            operator_id: (req as any).user?.id,
+            operator_role: 'kpa:admin',
+            action_type: 'MEMBER_STATUS_CHANGED' as any,
+            target_type: 'member',
+            target_id: member.id,
+            metadata: { action: 'hard_delete', userId: member.user_id },
+          }));
+        } catch (e) { console.error('[KPA AuditLog] Failed:', e); }
+
+        // 순서: 프로필 → member_services(CASCADE) → member
+        await dataSource.query(`DELETE FROM kpa_pharmacist_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await dataSource.query(`DELETE FROM kpa_student_profiles WHERE user_id = $1`, [member.user_id]).catch(() => {});
+        await memberRepo.remove(member); // CASCADE: kpa_member_services 자동 삭제
+
+        res.json({ success: true, data: { mode: 'hard', deleted: true } });
+      } catch (error: any) {
+        console.error('Failed to delete member:', error);
+        res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+      }
+    }
+  );
+
   return router;
 }
