@@ -5,7 +5,7 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * 대상: organization_id IS NULL (커뮤니티 스코프)
  * 순서: 댓글 → 좋아요 → 알림 → 게시글 (FK 순서)
  */
-export class CleanupKpaForumPosts1712188800000
+export class CleanupKpaForumPostsV2_1712192400000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
