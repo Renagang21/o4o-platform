@@ -14,6 +14,46 @@ import { useAuthModal } from '../contexts/AuthModalContext';
 type MemberType = 'pharmacist' | 'student';
 type Step = 'select' | 'form' | 'success';
 
+/** 국내 약학대학 목록 (2025 기준, 가나다순) */
+const PHARMACY_UNIVERSITIES = [
+  '가천대학교 약학대학',
+  '가톨릭대학교 약학대학',
+  '강원대학교 약학대학',
+  '경북대학교 약학대학',
+  '경상국립대학교 약학대학',
+  '경성대학교 약학대학',
+  '경희대학교 약학대학',
+  '계명대학교 약학대학',
+  '고려대학교 약학대학(세종)',
+  '단국대학교 약학대학',
+  '대구가톨릭대학교 약학대학',
+  '덕성여자대학교 약학대학',
+  '동국대학교 약학대학',
+  '동덕여자대학교 약학대학',
+  '목포대학교 약학대학',
+  '부산대학교 약학대학',
+  '삼육대학교 약학대학',
+  '서울대학교 약학대학',
+  '성균관대학교 약학대학',
+  '숙명여자대학교 약학대학',
+  '순천대학교 약학대학',
+  '아주대학교 약학대학',
+  '영남대학교 약학대학',
+  '우석대학교 약학대학',
+  '원광대학교 약학대학',
+  '이화여자대학교 약학대학',
+  '인제대학교 약학대학',
+  '전남대학교 약학대학',
+  '전북대학교 약학대학',
+  '제주대학교 약학대학',
+  '조선대학교 약학대학',
+  '중앙대학교 약학대학',
+  '차의과학대학교 약학대학',
+  '충남대학교 약학대학',
+  '충북대학교 약학대학',
+  '한양대학교 약학대학(ERICA)',
+];
+
 export default function RegisterModal() {
   const { activeModal, closeModal, openLoginModal } = useAuthModal();
   const [step, setStep] = useState<Step>('select');
@@ -169,7 +209,6 @@ export default function RegisterModal() {
           // 학생 전용 필드
           ...(memberType === 'student' ? {
             universityName: formData.universityName,
-            studentYear: formData.studentYear ? Number(formData.studentYear) : undefined,
           } : {}),
           tos: formData.agreeTerms,
           privacyAccepted: formData.agreePrivacy,
@@ -542,39 +581,25 @@ export default function RegisterModal() {
                   </>
                 )}
 
-                {/* 학생 전용: 대학 + 학년 */}
+                {/* 학생 전용: 약학대학 선택 */}
                 {memberType === 'student' && (
                   <div className="space-y-4">
                     <h4 className="text-sm font-semibold text-gray-700 pb-2 border-b border-gray-100">학생 정보</h4>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        대학교명 <span className="text-red-500">*</span>
+                        약학대학 <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
+                      <select
                         name="universityName"
                         value={formData.universityName}
                         onChange={handleInputChange}
-                        placeholder="예: 서울대학교 약학대학"
                         required
-                        className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">학년</label>
-                      <select
-                        name="studentYear"
-                        value={formData.studentYear}
-                        onChange={handleInputChange}
                         className="w-full px-4 py-3 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                       >
-                        <option value="">선택 (선택사항)</option>
-                        <option value="1">1학년</option>
-                        <option value="2">2학년</option>
-                        <option value="3">3학년</option>
-                        <option value="4">4학년</option>
-                        <option value="5">5학년</option>
-                        <option value="6">6학년</option>
+                        <option value="">약학대학을 선택해 주세요</option>
+                        {PHARMACY_UNIVERSITIES.map(u => (
+                          <option key={u} value={u}>{u}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -665,15 +690,23 @@ export default function RegisterModal() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">가입 신청이 완료되었습니다</h3>
               <p className="text-gray-600 mb-6">
-                약사면허 확인 후 운영자 승인이 완료되면<br />이메일로 안내해 드립니다.
+                {memberType === 'pharmacist'
+                  ? '약사면허 확인 후 운영자 승인이 완료되면'
+                  : '재학 정보 확인 후 운영자 승인이 완료되면'}
+                <br />서비스 이용이 가능합니다.
               </p>
               <div className="bg-blue-50 rounded-lg p-4 text-left mb-6">
                 <p className="text-sm text-blue-800">
                   <strong>신청 이메일:</strong> {formData.email}
                 </p>
                 <p className="text-sm text-blue-800 mt-1">
-                  <strong>회원 유형:</strong> 약사
+                  <strong>회원 유형:</strong> {memberType === 'pharmacist' ? '약사' : '약대생'}
                 </p>
+                {memberType === 'student' && formData.universityName && (
+                  <p className="text-sm text-blue-800 mt-1">
+                    <strong>소속 대학:</strong> {formData.universityName}
+                  </p>
+                )}
                 <p className="text-sm text-blue-800 mt-1">
                   승인까지 1-2 영업일이 소요될 수 있습니다.
                 </p>
