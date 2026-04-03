@@ -10,7 +10,7 @@
  */
 
 import type { DataSource, QueryRunner } from 'typeorm';
-import { autoExpandPublicProduct } from '../../../utils/auto-listing.utils.js';
+import { autoExpandPublicProduct, autoExpandServiceProduct } from '../../../utils/auto-listing.utils.js';
 import logger from '../../../utils/logger.js';
 
 /** DataSource 또는 QueryRunner 양쪽에서 query() 실행 가능 */
@@ -314,8 +314,8 @@ export class OfferServiceApprovalService {
     executor: QueryExecutor,
   ): Promise<{ previousStatus: string; derivedStatus: string; changed: boolean; autoListedCount: number }> {
     // 1. 현재 service approval 상태 조회
-    const approvals: Array<{ approval_status: string }> = await executor.query(
-      `SELECT approval_status FROM offer_service_approvals WHERE offer_id = $1`,
+    const approvals: Array<{ approval_status: string; service_key: string }> = await executor.query(
+      `SELECT approval_status, service_key FROM offer_service_approvals WHERE offer_id = $1`,
       [offerId],
     );
 
@@ -363,6 +363,12 @@ export class OfferServiceApprovalService {
 
       if (offer.distribution_type === 'PUBLIC') {
         autoListedCount = await autoExpandPublicProduct(executor, offerId, offer.master_id);
+      } else if (offer.distribution_type === 'SERVICE') {
+        // WO-NETURE-SERVICE-DISTRIBUTION-AUTO-EXPAND-V1
+        const approvedKeys = approvals
+          .filter(a => a.approval_status === 'approved')
+          .map(a => a.service_key);
+        autoListedCount = await autoExpandServiceProduct(executor, offerId, offer.master_id, approvedKeys);
       }
 
       logger.info(`[ServiceApproval] Offer ${offerId} → APPROVED (derived) by ${decidedBy}, autoListed=${autoListedCount}`);
