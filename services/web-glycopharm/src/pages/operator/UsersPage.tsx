@@ -182,6 +182,122 @@ function PasswordModal({ user, onClose, onSuccess }: { user: UserData; onClose: 
   );
 }
 
+// ─── Delete Risk Modal — WO-O4O-OPERATOR-MEMBER-DELETE-RISK-AND-SAFE-DELETE-V1 ──
+
+interface DeleteRiskData {
+  user: { id: string; email: string; name: string; status: string };
+  risks: { serviceMemberships: number; forumPosts: number; forumComments: number; auditLogs: number };
+  totalImpact: number;
+  canHardDelete: boolean;
+}
+
+function DeleteRiskModal({ userId, userName, userEmail, onClose, onDeleted }: {
+  userId: string; userName: string; userEmail: string; onClose: () => void; onDeleted: () => void;
+}) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DeleteRiskData | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    apiFetch<{ data: DeleteRiskData }>(`/api/v1/operator/members/${userId}/delete-risk`)
+      .then((r) => setData(r.data))
+      .catch((e) => toast.error(e.message || '리스크 조회 실패'))
+      .finally(() => setLoading(false));
+  }, [userId]);
+
+  const handleSoftDelete = async () => {
+    if (!confirm('이 회원을 탈퇴(비활성) 처리하시겠습니까?')) return;
+    setDeleting(true);
+    try {
+      await apiFetch(`/api/v1/operator/members/${userId}?mode=soft`, { method: 'DELETE' });
+      toast.success('탈퇴 처리 완료');
+      onDeleted();
+    } catch (e: any) {
+      toast.error(e.message || '처리 실패');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleHardDelete = async () => {
+    if (!confirm('⚠️ 이 회원 데이터를 완전히 삭제합니다. 되돌릴 수 없습니다.\n정말 삭제하시겠습니까?')) return;
+    setDeleting(true);
+    try {
+      await apiFetch(`/api/v1/operator/members/${userId}?mode=hard`, { method: 'DELETE' });
+      toast.success('완전 삭제 완료');
+      onDeleted();
+    } catch (e: any) {
+      toast.error(e.message || '삭제 실패');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-red-500" />
+            <h3 className="text-lg font-bold text-slate-900">회원 삭제 확인</h3>
+          </div>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X className="w-5 h-5 text-slate-400" /></button>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
+        ) : data ? (
+          <div className="space-y-4">
+            <div className="bg-slate-50 rounded-lg p-4 space-y-1">
+              <p className="text-sm font-medium text-slate-800">{userName}</p>
+              <p className="text-xs text-slate-500">{userEmail}</p>
+              <span className="inline-block text-xs px-2 py-0.5 bg-slate-200 rounded mt-1">{data.user.status}</span>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-slate-700 mb-2">삭제 시 영향받는 데이터</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: '서비스 연결', value: data.risks.serviceMemberships },
+                  { label: '포럼 게시글', value: data.risks.forumPosts },
+                  { label: '포럼 댓글', value: data.risks.forumComments },
+                  { label: '감사 로그', value: data.risks.auditLogs },
+                ].map((item) => (
+                  <div key={item.label} className={`flex justify-between px-3 py-2 rounded text-sm ${item.value > 0 ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-500'}`}>
+                    <span>{item.label}</span>
+                    <span className="font-medium">{item.value}건</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {!data.canHardDelete && (
+              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                <p className="text-xs text-red-700">포럼 게시글/댓글 또는 감사 로그가 있어 완전삭제가 제한됩니다. 탈퇴(비활성) 처리를 권장합니다.</p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 pt-2">
+              <button onClick={handleSoftDelete} disabled={deleting}
+                className="w-full px-4 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg disabled:opacity-50">
+                {deleting ? '처리 중...' : '탈퇴 처리 (비활성화)'}
+              </button>
+              <button onClick={handleHardDelete} disabled={deleting || !data.canHardDelete}
+                className="w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed">
+                {!data.canHardDelete ? '완전삭제 불가 (연결 데이터 존재)' : deleting ? '삭제 중...' : '완전삭제 (되돌릴 수 없음)'}
+              </button>
+              <button onClick={onClose} className="w-full px-4 py-2 text-sm text-slate-500 hover:bg-slate-50 rounded-lg">취소</button>
+            </div>
+          </div>
+        ) : (
+          <p className="text-center text-sm text-red-500 py-4">리스크 정보를 불러오지 못했습니다.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ──────────────────────────────────────────
 
 export default function UsersPage() {
@@ -196,6 +312,7 @@ export default function UsersPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [passwordUser, setPasswordUser] = useState<UserData | null>(null);
   const [editUser, setEditUser] = useState<UserData | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UserData | null>(null);
 
   // Stats
   const [stats, setStats] = useState({ total: 0, active: 0, pending: 0, rejected: 0, pharmacyCount: 0, customerCount: 0 });
@@ -274,18 +391,8 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (user: UserData) => {
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
-    setActionLoading(user.id);
-    try {
-      await apiFetch(`/api/v1/operator/members/${user.id}`, { method: 'DELETE' });
-      fetchUsers(pagination.page);
-      fetchStats();
-    } catch (err: any) {
-      toast.error(err.message || '오류가 발생했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
+  const handleDelete = (user: UserData) => {
+    setDeleteTarget(user);
   };
 
   // ─── Role tab filtering (client-side) ──────────────
@@ -487,6 +594,17 @@ export default function UsersPage() {
           userId={editUser.id}
           onClose={() => setEditUser(null)}
           onSuccess={() => { fetchUsers(pagination.page); }}
+        />
+      )}
+
+      {/* Delete Risk Modal — WO-O4O-OPERATOR-MEMBER-DELETE-RISK-AND-SAFE-DELETE-V1 */}
+      {deleteTarget && (
+        <DeleteRiskModal
+          userId={deleteTarget.id}
+          userName={getUserName(deleteTarget)}
+          userEmail={deleteTarget.email}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={() => { fetchUsers(pagination.page); fetchStats(); setDeleteTarget(null); }}
         />
       )}
     </div>

@@ -678,6 +678,63 @@ export class MembershipConsoleController {
   };
 
   /**
+   * GET /api/v1/operator/members/:userId/delete-risk
+   * 삭제 전 영향 분석 — WO-O4O-OPERATOR-MEMBER-DELETE-RISK-AND-SAFE-DELETE-V1
+   */
+  getDeleteRisk = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId } = req.params;
+      const ds = AppDataSource;
+
+      const userRows = await ds.query(
+        `SELECT id, email, first_name AS "firstName", last_name AS "lastName", name, status
+         FROM users WHERE id = $1`,
+        [userId],
+      );
+
+      if (userRows.length === 0) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      const u = userRows[0];
+      const displayName = u.name || `${u.lastName || ''}${u.firstName || ''}`.trim() || u.email;
+
+      const [memberships, forumPosts, forumComments, auditLogs] = await Promise.all([
+        ds.query(`SELECT COUNT(*)::int AS cnt FROM service_memberships WHERE user_id = $1`, [userId]),
+        ds.query(`SELECT COUNT(*)::int AS cnt FROM forum_post WHERE author_id = $1`, [userId]).catch(() => [{ cnt: 0 }]),
+        ds.query(`SELECT COUNT(*)::int AS cnt FROM forum_comment WHERE author_id = $1`, [userId]).catch(() => [{ cnt: 0 }]),
+        ds.query(`SELECT COUNT(*)::int AS cnt FROM action_logs WHERE user_id = $1`, [userId]).catch(() => [{ cnt: 0 }]),
+      ]);
+
+      const risks = {
+        serviceMemberships: memberships[0]?.cnt || 0,
+        forumPosts: forumPosts[0]?.cnt || 0,
+        forumComments: forumComments[0]?.cnt || 0,
+        auditLogs: auditLogs[0]?.cnt || 0,
+      };
+      const totalImpact = Object.values(risks).reduce((a, b) => a + b, 0);
+      const canHardDelete = risks.forumPosts === 0 && risks.forumComments === 0 && risks.auditLogs === 0;
+
+      res.json({
+        success: true,
+        data: {
+          user: { id: userId, email: u.email, name: displayName, status: u.status },
+          risks,
+          totalImpact,
+          canHardDelete,
+        },
+      });
+    } catch (error) {
+      logger.error('[MembershipConsole] getDeleteRisk error', {
+        userId: req.params.userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      res.status(500).json({ success: false, error: 'Failed to assess delete risk' });
+    }
+  };
+
+  /**
    * DELETE /api/v1/operator/members/:userId
    * 사용자 삭제 (service_memberships + user)
    */
