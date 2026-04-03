@@ -10,7 +10,7 @@ const STATUS_STYLES: Record<string, { label: string; color: string; bg: string }
   active:    { label: '활성', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
   approved:  { label: '승인', color: 'text-green-700', bg: 'bg-green-50 border-green-200' },
   pending:   { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
-  rejected:  { label: '거부', color: 'text-red-700',   bg: 'bg-red-50 border-red-200' },
+  rejected:  { label: '반려', color: 'text-red-700',   bg: 'bg-red-50 border-red-200' },
   suspended: { label: '정지', color: 'text-red-700',   bg: 'bg-red-50 border-red-200' },
   inactive:  { label: '비활성', color: 'text-slate-500', bg: 'bg-slate-50 border-slate-200' },
 };

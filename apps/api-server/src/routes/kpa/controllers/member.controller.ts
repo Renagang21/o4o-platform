@@ -270,7 +270,8 @@ export function createMemberController(
     requireScope('kpa:operator'),
     [
       param('id').isUUID(),
-      body('status').isIn(['pending', 'active', 'suspended', 'withdrawn']),
+      // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가
+      body('status').isIn(['pending', 'active', 'suspended', 'rejected', 'withdrawn']),
       handleValidationErrors,
     ],
     async (req: AuthRequest, res: Response): Promise<void> => {
@@ -285,8 +286,8 @@ export function createMemberController(
         const newStatus = req.body.status;
         member.status = newStatus;
 
-        // identity_status 동기화
-        if (newStatus === 'suspended') {
+        // identity_status 동기화 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가)
+        if (newStatus === 'suspended' || newStatus === 'rejected') {
           member.identity_status = 'suspended';
         } else if (newStatus === 'withdrawn') {
           member.identity_status = 'withdrawn';
@@ -331,8 +332,8 @@ export function createMemberController(
                 [member.user_id, member.license_number, member.activity_type]
               );
             }
-          } else if (newStatus === 'suspended') {
-            // WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2: delegate to MembershipApprovalService
+          } else if (newStatus === 'suspended' || newStatus === 'rejected') {
+            // WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected도 suspended와 동일하게 membership 중지
             const approvalService = new MembershipApprovalService();
             await approvalService.suspendMembership({
               userId: member.user_id,
@@ -367,6 +368,8 @@ export function createMemberController(
             svcRecord.approved_at = new Date();
           } else if (newStatus === 'suspended') {
             svcRecord.status = 'suspended';
+          } else if (newStatus === 'rejected') {
+            svcRecord.status = 'rejected';
           } else if (newStatus === 'pending') {
             svcRecord.status = 'pending';
           }

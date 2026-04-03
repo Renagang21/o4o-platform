@@ -16,7 +16,8 @@ import type { OrganizationStore } from '../../../modules/store-core/entities/org
 import type { User } from '../../../modules/auth/entities/User.js';
 
 export type KpaMemberRole = 'member' | 'operator' | 'admin';
-export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'withdrawn';
+/** WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가 (반려 ≠ 정지) */
+export type KpaMemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 export type KpaIdentityStatus = 'active' | 'suspended' | 'withdrawn';
 export type KpaMemberType = 'pharmacist' | 'student';
 

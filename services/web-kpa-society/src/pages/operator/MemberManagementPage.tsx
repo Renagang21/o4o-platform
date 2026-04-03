@@ -30,7 +30,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // ─── Types ───────────────────────────────────────────────────
 
-type MemberStatus = 'pending' | 'active' | 'suspended' | 'withdrawn';
+/** WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1: rejected 추가 */
+type MemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
 type MemberRole = 'member' | 'operator' | 'admin';
 type ApplicationStatus = 'submitted' | 'approved' | 'rejected' | 'cancelled';
 
@@ -111,13 +112,26 @@ function formatDate(dateStr: string | null): string {
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
 
-// ─── Role Tab Filter ─────────────────────────────────────────
+// ─── Tab Filter Config ─────────────────────────────────────────
 
+/** membership_type 기반 클라이언트 필터 */
 const ROLE_TAB_FILTER: Record<string, string[]> = {
   all: [],
   pharmacist: ['pharmacist'],
   student: ['student'],
   applications: [],
+};
+
+/** status 기반 서버사이드 필터 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1) */
+const STATUS_TAB_FILTER: Record<string, MemberStatus | ''> = {
+  all: '',
+  pharmacist: '',
+  student: '',
+  'status-pending': 'pending',
+  'status-active': 'active',
+  'status-rejected': 'rejected',
+  'status-suspended': 'suspended',
+  applications: '',
 };
 
 // ─── Component ───────────────────────────────────────────────
@@ -127,6 +141,9 @@ export default function MemberManagementPage() {
   const [stats, setStats] = useState<ApplicationStats | null>(null);
   const [memberTotal, setMemberTotal] = useState(0);
   const [pendingMemberCount, setPendingMemberCount] = useState(0);
+  const [activeMemberCount, setActiveMemberCount] = useState(0);
+  const [rejectedMemberCount, setRejectedMemberCount] = useState(0);
+  const [suspendedMemberCount, setSuspendedMemberCount] = useState(0);
   const [pharmacistCount, setPharmacistCount] = useState(0);
   const [studentCount, setStudentCount] = useState(0);
 
@@ -139,40 +156,44 @@ export default function MemberManagementPage() {
   const [search, setSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Stats fetch
+  // Stats fetch (application stats only — member counts are fetched in fetchMembers)
   useEffect(() => {
     apiFetch<{ data: ApplicationStats }>('/api/v1/kpa/applications/admin/stats')
       .then(r => setStats(r.data))
       .catch(() => {});
-    apiFetch<{ total: number }>('/api/v1/kpa/members?status=pending&limit=1')
-      .then(r => setPendingMemberCount(r.total ?? 0))
-      .catch(() => {});
   }, []);
 
-  // Fetch members
+  // Fetch members — status 파라미터 지원 (WO-KPA-A-COMMUNITY-BLOCKER-CLEANUP-V1)
   const fetchMembers = useCallback(async (page = 1) => {
     setMemberLoading(true);
     setMemberError(null);
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' });
       if (searchQuery) params.set('search', searchQuery);
+      // 상태 기반 탭이면 서버사이드 필터
+      const statusFilter = STATUS_TAB_FILTER[activeTab] || '';
+      if (statusFilter) params.set('status', statusFilter);
       const res = await apiFetch<{ data: KpaMember[]; total: number; totalPages: number }>(
         `/api/v1/kpa/members?${params}`,
       );
       setMembers(res.data);
       setMemberTotal(res.total);
 
-      // Count by membership_type
+      // Count by membership_type + status (한 번만 조회)
       const allRes = await apiFetch<{ data: KpaMember[]; total: number }>('/api/v1/kpa/members?limit=1000');
       const all = allRes.data || [];
       setPharmacistCount(all.filter(m => m.membership_type === 'pharmacist').length);
       setStudentCount(all.filter(m => m.membership_type === 'student').length);
+      setPendingMemberCount(all.filter(m => m.status === 'pending').length);
+      setActiveMemberCount(all.filter(m => m.status === 'active').length);
+      setRejectedMemberCount(all.filter(m => m.status === 'rejected').length);
+      setSuspendedMemberCount(all.filter(m => m.status === 'suspended').length);
     } catch (e: any) {
       setMemberError(e.message);
     } finally {
       setMemberLoading(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, activeTab]);
 
   useEffect(() => {
     if (activeTab !== 'applications') {
@@ -181,8 +202,9 @@ export default function MemberManagementPage() {
   }, [fetchMembers, activeTab]);
 
   async function handleStatusChange(memberId: string, newStatus: MemberStatus) {
-    const labels: Record<string, string> = { active: '승인', suspended: '정지', pending: '대기' };
-    if (!confirm(`회원 상태를 "${labels[newStatus] || newStatus}"(으)로 변경하시겠습니까?`)) return;
+    const labels: Record<string, string> = { active: '승인', rejected: '반려', suspended: '정지', pending: '대기' };
+    const displayLabel = labels[newStatus] || newStatus;
+    if (!confirm(`회원 상태를 "${displayLabel}"(으)로 변경하시겠습니까?`)) return;
     setActionLoading(memberId);
     try {
       await apiFetch(`/api/v1/kpa/members/${memberId}/status`, {
@@ -197,19 +219,23 @@ export default function MemberManagementPage() {
     }
   }
 
-  // Client-side tab filtering
+  // Client-side tab filtering (status tabs는 서버사이드이므로 여기선 membership_type만)
   const filteredMembers = useMemo(() => {
-    if (activeTab === 'all' || activeTab === 'applications') return members;
+    if (activeTab === 'all' || activeTab === 'applications' || activeTab.startsWith('status-')) return members;
     const allowed = ROLE_TAB_FILTER[activeTab];
     if (!allowed || allowed.length === 0) return members;
     return members.filter(m => allowed.includes(m.membership_type));
   }, [members, activeTab]);
 
-  // Tabs
+  // Tabs — 유형 + 상태 기반 (WO-KPA-A-MEMBER-STATUS-SEMANTICS-SEPARATION-V1)
   const tabs: MemberTab[] = [
     { key: 'all', label: '전체', count: memberTotal },
     { key: 'pharmacist', label: '약사', count: pharmacistCount },
     { key: 'student', label: '약대생', count: studentCount },
+    { key: 'status-pending', label: '승인대기', count: pendingMemberCount },
+    { key: 'status-active', label: '승인완료', count: activeMemberCount },
+    { key: 'status-rejected', label: '반려', count: rejectedMemberCount },
+    { key: 'status-suspended', label: '정지', count: suspendedMemberCount },
     { key: 'applications', label: '가입 신청', count: stats?.submitted ?? 0 },
   ];
 
@@ -286,7 +312,7 @@ export default function MemberManagementPage() {
               {m.status === 'pending' && (
                 <>
                   <button onClick={() => handleStatusChange(m.id, 'active')} title="승인" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg"><UserCheck className="w-4 h-4" /></button>
-                  <button onClick={() => handleStatusChange(m.id, 'suspended')} title="정지" className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
+                  <button onClick={() => handleStatusChange(m.id, 'rejected')} title="반려" className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><UserX className="w-4 h-4" /></button>
                 </>
               )}
               {m.status === 'active' && (
