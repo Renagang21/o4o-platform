@@ -44,6 +44,7 @@ import { createOperatorActionQueueController } from './controllers/operator-acti
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
 import { createOperatorSupplierQualityController } from './controllers/operator-supplier-quality.controller.js';
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
+import { createOperatorRecruitingController } from './controllers/operator-recruiting.controller.js';
 import { CategoryMappingService } from './services/category-mapping.service.js';
 
 // Request type
@@ -100,6 +101,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   router.use('/operator', createOperatorSupplierQualityController(dataSource));
   // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
   router.use('/operator', createOperatorCategoryMappingController());
+  // WO-NETURE-RECRUITING-PRODUCTS-OPERATOR-MUTATION-API-V1
+  router.use('/operator', createOperatorRecruitingController(dataSource));
 
   // Partner domain (full paths included in controller: /partner/*, /admin/partners/*, /admin/partner-settlements/*)
   router.use('/', createPartnerController(dataSource));

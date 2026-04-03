@@ -9,7 +9,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Package, Search, RefreshCw, Users, ChevronLeft, ChevronRight, X, Star } from 'lucide-react';
+import { Package, Search, RefreshCw, Users, ChevronLeft, ChevronRight, X, Star, ToggleLeft, ToggleRight } from 'lucide-react';
+import { api } from '../../lib/api';
 
 const PAGE_SIZE = 20;
 
@@ -63,6 +64,31 @@ export default function RecruitingProductsOverviewPage() {
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
   useEffect(() => { setPage(1); }, [search, categoryFilter]);
+
+  // Mutations
+  const [mutating, setMutating] = useState<string | null>(null);
+
+  const toggleFeatured = async (p: RecruitingProduct) => {
+    setMutating(p.id);
+    try {
+      await api.patch(`/neture/operator/recruiting-products/${p.id}/featured`, { is_featured: !p.is_featured });
+      setProducts(prev => prev.map(item => item.id === p.id ? { ...item, is_featured: !item.is_featured } : item));
+      if (detailProduct?.id === p.id) setDetailProduct(prev => prev ? { ...prev, is_featured: !prev.is_featured } : null);
+    } catch { /* silent */ }
+    setMutating(null);
+  };
+
+  const toggleRecruiting = async (p: RecruitingProduct) => {
+    const next = !p.is_partner_recruiting;
+    if (!next && !confirm(`"${p.name}"의 모집을 중단하시겠습니까?`)) return;
+    setMutating(p.id);
+    try {
+      await api.patch(`/neture/operator/recruiting-products/${p.id}/recruiting`, { is_partner_recruiting: next });
+      setProducts(prev => prev.map(item => item.id === p.id ? { ...item, is_partner_recruiting: next } : item));
+      if (detailProduct?.id === p.id) setDetailProduct(prev => prev ? { ...prev, is_partner_recruiting: next } : null);
+    } catch { /* silent */ }
+    setMutating(null);
+  };
 
   const categories = useMemo(() => {
     const set = new Set(products.map(p => p.category));
@@ -196,15 +222,28 @@ export default function RecruitingProductsOverviewPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-center text-slate-600">{p.stock_quantity}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                    p.is_partner_recruiting ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {p.is_partner_recruiting ? '모집중' : p.status}
-                  </span>
+                <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => toggleRecruiting(p)}
+                    disabled={mutating === p.id}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                      p.is_partner_recruiting ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                    } disabled:opacity-50`}
+                    title={p.is_partner_recruiting ? '모집 중단' : '모집 시작'}
+                  >
+                    {p.is_partner_recruiting ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
+                    {p.is_partner_recruiting ? '모집중' : '중단'}
+                  </button>
                 </td>
-                <td className="px-4 py-3 text-center">
-                  {p.is_featured ? <Star className="w-4 h-4 text-amber-500 mx-auto fill-amber-500" /> : <span className="text-slate-300">-</span>}
+                <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={() => toggleFeatured(p)}
+                    disabled={mutating === p.id}
+                    className="p-1 rounded hover:bg-amber-50 disabled:opacity-50 transition-colors"
+                    title={p.is_featured ? '추천 해제' : '추천 설정'}
+                  >
+                    <Star className={`w-4 h-4 ${p.is_featured ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+                  </button>
                 </td>
                 <td className="px-4 py-3 text-slate-500 text-xs">
                   {new Date(p.created_at).toLocaleDateString('ko-KR')}
@@ -250,12 +289,33 @@ export default function RecruitingProductsOverviewPage() {
                 </div>
                 <p className="text-sm text-slate-500 mt-1">SKU: {detailProduct.sku}</p>
               </div>
-              {detailProduct.is_partner_recruiting && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-emerald-800">판매자 모집중</p>
-                  <p className="text-xs text-emerald-600 mt-0.5">이 상품은 현재 판매 파트너를 모집하고 있습니다</p>
-                </div>
-              )}
+              {/* Operator Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => toggleRecruiting(detailProduct)}
+                  disabled={mutating === detailProduct.id}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                    detailProduct.is_partner_recruiting
+                      ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {detailProduct.is_partner_recruiting ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
+                  {detailProduct.is_partner_recruiting ? '모집중' : '모집 중단'}
+                </button>
+                <button
+                  onClick={() => toggleFeatured(detailProduct)}
+                  disabled={mutating === detailProduct.id}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                    detailProduct.is_featured
+                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  <Star className={`w-4 h-4 ${detailProduct.is_featured ? 'fill-amber-500' : ''}`} />
+                  {detailProduct.is_featured ? '추천' : '미추천'}
+                </button>
+              </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-slate-500">약국/공급자</p>
