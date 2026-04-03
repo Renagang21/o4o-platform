@@ -2,14 +2,17 @@
  * AllProductsOverviewPage — 운영자 전체 공급 상품 Overview
  *
  * WO-NETURE-OPERATOR-PRODUCT-SUPPLY-OVERVIEW-V1
+ * WO-NETURE-OPERATOR-PRODUCT-OVERVIEW-USABILITY-ENHANCEMENT-V1
  *
  * 전체 공급 가능 상품 풀을 운영자 관점에서 조회.
- * 기존 operatorSupplyApi.getSupplyProducts() 재사용.
+ * 클라이언트사이드 페이징 + 상세 패널 drill-down.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Package, Search, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Package, Search, RefreshCw, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { operatorSupplyApi, type OperatorSupplyProduct } from '../../lib/api';
+
+const PAGE_SIZE = 20;
 
 const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
   available: { label: '공급 가능', cls: 'bg-slate-100 text-slate-600' },
@@ -29,6 +32,8 @@ export default function AllProductsOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [detailProduct, setDetailProduct] = useState<OperatorSupplyProduct | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -44,22 +49,28 @@ export default function AllProductsOverviewPage() {
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-  const filtered = products.filter((p) => {
+  // Reset page when filter changes
+  useEffect(() => { setPage(1); }, [search, statusFilter]);
+
+  const filtered = useMemo(() => products.filter((p) => {
     if (search) {
       const q = search.toLowerCase();
       if (!p.name?.toLowerCase().includes(q) && !p.supplierName?.toLowerCase().includes(q)) return false;
     }
     if (statusFilter && p.supplyStatus !== statusFilter) return false;
     return true;
-  });
+  }), [products, search, statusFilter]);
 
-  const statusCounts = {
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const statusCounts = useMemo(() => ({
     all: products.length,
     available: products.filter(p => p.supplyStatus === 'available').length,
     pending: products.filter(p => p.supplyStatus === 'pending').length,
     approved: products.filter(p => p.supplyStatus === 'approved').length,
     rejected: products.filter(p => p.supplyStatus === 'rejected').length,
-  };
+  }), [products]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -97,7 +108,7 @@ export default function AllProductsOverviewPage() {
         ))}
       </div>
 
-      {/* Search */}
+      {/* Search + Count */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -130,14 +141,14 @@ export default function AllProductsOverviewPage() {
           <tbody>
             {loading ? (
               <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
-            ) : filtered.length === 0 ? (
+            ) : paged.length === 0 ? (
               <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">
                 {search || statusFilter ? '조건에 맞는 상품이 없습니다.' : '공급 가능한 상품이 없습니다.'}
               </td></tr>
-            ) : filtered.map((p) => {
+            ) : paged.map((p) => {
               const sc = STATUS_CONFIG[p.supplyStatus] || STATUS_CONFIG.available;
               return (
-                <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50">
+                <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailProduct(p)}>
                   <td className="px-4 py-3">
                     {p.primaryImageUrl ? (
                       <img src={p.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
@@ -182,7 +193,105 @@ export default function AllProductsOverviewPage() {
             })}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+            <span className="text-xs text-slate-500">
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-sm text-slate-600 px-2">{page} / {totalPages}</span>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Detail Panel (right slide) */}
+      {detailProduct && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setDetailProduct(null)} />
+          <div className="relative w-full max-w-md bg-white shadow-xl overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-900">상품 상세</h2>
+              <button onClick={() => setDetailProduct(null)} className="p-1 rounded hover:bg-slate-100"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="px-6 py-4 space-y-4">
+              {/* Image */}
+              {detailProduct.primaryImageUrl ? (
+                <img src={detailProduct.primaryImageUrl} alt="" className="w-full h-48 rounded-lg object-cover bg-slate-100" />
+              ) : (
+                <div className="w-full h-48 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Package className="w-12 h-12 text-slate-300" />
+                </div>
+              )}
+              {/* Info */}
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">{detailProduct.name}</h3>
+                <p className="text-sm text-slate-500 mt-1">{detailProduct.barcode || detailProduct.id}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">공급자</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{detailProduct.supplierName}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">유통 타입</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{DIST_LABELS[detailProduct.distributionType || ''] || '-'}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">공급가</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{detailProduct.priceGeneral ? `₩${detailProduct.priceGeneral.toLocaleString()}` : '-'}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">소비자가</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{detailProduct.consumerReferencePrice ? `₩${detailProduct.consumerReferencePrice.toLocaleString()}` : '-'}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">승인 상태</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{detailProduct.approvalStatus || '-'}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">공급 상태</p>
+                  <p className="font-medium text-slate-800 mt-0.5">{STATUS_CONFIG[detailProduct.supplyStatus]?.label || detailProduct.supplyStatus}</p>
+                </div>
+              </div>
+              {detailProduct.specification && (
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">규격</p>
+                  <p className="text-sm text-slate-800 mt-0.5">{detailProduct.specification}</p>
+                </div>
+              )}
+              {detailProduct.category && (
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-slate-500">카테고리</p>
+                  <p className="text-sm text-slate-800 mt-0.5">{detailProduct.category}</p>
+                </div>
+              )}
+              {detailProduct.rejectReason && (
+                <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+                  <p className="text-xs text-red-600">거절 사유</p>
+                  <p className="text-sm text-red-800 mt-0.5">{detailProduct.rejectReason}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
