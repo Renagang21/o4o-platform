@@ -122,10 +122,16 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) AS count FROM forum_category_requests
         WHERE status = 'pending' AND service_code = 'kpa-society'
       `),
-      // Instructor qualification pending — 테이블 미존재, 향후 LMS 구현 시 활성화
-      Promise.resolve([{ count: '0' }]),
-      // Course request pending — 테이블 미존재, 향후 LMS 구현 시 활성화
-      Promise.resolve([{ count: '0' }]),
+      // Instructor qualification pending (kpa_approval_requests 테이블 복구됨)
+      dataSource.query(`
+        SELECT COUNT(*) AS count FROM kpa_approval_requests
+        WHERE entity_type = 'instructor_qualification' AND status = 'pending'
+      `).catch(() => [{ count: '0' }]),
+      // Course request pending (kpa_approval_requests 테이블 복구됨)
+      dataSource.query(`
+        SELECT COUNT(*) AS count FROM kpa_approval_requests
+        WHERE entity_type = 'course' AND status = 'pending'
+      `).catch(() => [{ count: '0' }]),
       // Membership pending (organization join requests)
       dataSource.query(`
         SELECT COUNT(*) AS count FROM kpa_organization_join_requests
@@ -352,8 +358,14 @@ export function createOperatorSummaryController(
         .orderBy('r.created_at', 'ASC')
         .take(limit)
         .getManyAndCount(),
-      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 참조 제거 — 빈 배열 반환
-      Promise.resolve([]),
+      // WO-KPA-A-OPERATOR-DASHBOARD-RECOVERY-V1: kpa_approval_requests 테이블 복구 — 실제 쿼리
+      dataSource.query(`
+        SELECT id, entity_type, organization_id, status, requester_id, requester_name, requester_email, created_at
+        FROM kpa_approval_requests
+        WHERE entity_type = 'membership' AND status = 'pending'
+        ORDER BY created_at ASC
+        LIMIT $1
+      `, [limit]).catch(() => []),
     ]);
 
     const [pendingLegacyItems, pendingLegacyTotal] = pendingJoinResult;
