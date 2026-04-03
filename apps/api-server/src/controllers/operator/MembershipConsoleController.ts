@@ -687,11 +687,14 @@ export class MembershipConsoleController {
       const { userId } = req.params;
       const deletedBy = (req as any).user?.id || null;
 
+      // WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
+      const mode = req.query.mode === 'hard' ? 'hard' as const : 'soft' as const;
       const deleted = await approvalService.deleteMember({
         userId,
         deletedBy,
         isPlatformAdmin: scope.isPlatformAdmin,
         serviceKeys: scope.serviceKeys,
+        mode,
       });
 
       if (!deleted) {

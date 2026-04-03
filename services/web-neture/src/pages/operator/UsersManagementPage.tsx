@@ -288,15 +288,35 @@ export default function UsersManagementPage() {
     }
   };
 
-  const handleDelete = async (user: UserData) => {
-    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  // WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
+  const handleSoftDelete = async (user: UserData) => {
+    if (!confirm(`${getUserName(user)} (${user.email}) 사용자를 비활성화하시겠습니까?\n로그인이 차단되고 목록에서 제외됩니다.`)) return;
     setActionLoading(user.id);
     try {
-      await api.delete(`/operator/members/${user.id}`);
+      await api.delete(`/operator/members/${user.id}?mode=soft`);
+      toast.success('사용자가 비활성화되었습니다.');
       fetchUsers(pagination.page);
       fetchStats();
     } catch (err: any) {
-      toast.error(err.message || '오류가 발생했습니다.');
+      toast.error(err.message || '비활성화에 실패했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<UserData | null>(null);
+
+  const handleHardDelete = async () => {
+    if (!hardDeleteTarget) return;
+    setActionLoading(hardDeleteTarget.id);
+    try {
+      await api.delete(`/operator/members/${hardDeleteTarget.id}?mode=hard`);
+      toast.success('사용자가 완전히 삭제되었습니다.');
+      setHardDeleteTarget(null);
+      fetchUsers(pagination.page);
+      fetchStats();
+    } catch (err: any) {
+      toast.error(err.message || '완전삭제에 실패했습니다. 연관 데이터가 남아 있을 수 있습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -412,7 +432,8 @@ export default function UsersManagementPage() {
               )}
               <button onClick={() => setEditUser(user)} title="정보 수정" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => setPasswordUser(user)} title="비밀번호 변경" className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg"><KeyRound className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(user)} title="삭제" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => handleSoftDelete(user)} title="비활성화 (soft delete)" className="p-1.5 text-amber-500 hover:bg-amber-50 rounded-lg"><XCircle className="w-4 h-4" /></button>
+              <button onClick={() => setHardDeleteTarget(user)} title="완전삭제 (hard delete)" className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
             </>
           )}
         </div>
@@ -503,6 +524,58 @@ export default function UsersManagementPage() {
           onClose={() => setEditUser(null)}
           onSuccess={() => { fetchUsers(pagination.page); }}
         />
+      )}
+
+      {/* Hard Delete Risk Modal */}
+      {hardDeleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-bold text-red-600 mb-2">완전삭제 확인</h3>
+            <div className="space-y-3 mb-4">
+              <div className="bg-slate-50 rounded-lg p-3">
+                <p className="text-sm text-slate-500">대상 사용자</p>
+                <p className="font-medium text-slate-900">{getUserName(hardDeleteTarget)} ({hardDeleteTarget.email})</p>
+                <p className="text-xs text-slate-400 mt-0.5">상태: {hardDeleteTarget.status}</p>
+              </div>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-sm font-medium text-red-800 mb-1">경고: 이 작업은 되돌릴 수 없습니다</p>
+                <ul className="text-xs text-red-700 space-y-1 list-disc list-inside">
+                  <li>사용자 계정이 영구 삭제됩니다</li>
+                  <li>서비스 멤버십 / 역할 배정이 삭제됩니다</li>
+                  <li>연관 데이터(게시글, 승인 이력 등)는 orphan 될 수 있습니다</li>
+                  <li>연관 데이터가 많으면 삭제가 실패할 수 있습니다</li>
+                </ul>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800">
+                  비활성화(soft delete)를 먼저 권장합니다.
+                  비활성화는 안전하게 로그인 차단 + 목록 제외 처리됩니다.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setHardDeleteTarget(null)}
+                className="flex-1 px-4 py-2 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={() => { setHardDeleteTarget(null); handleSoftDelete(hardDeleteTarget); }}
+                className="flex-1 px-4 py-2 text-sm bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+              >
+                비활성화
+              </button>
+              <button
+                onClick={handleHardDelete}
+                disabled={actionLoading === hardDeleteTarget.id}
+                className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {actionLoading === hardDeleteTarget.id ? '삭제 중...' : '완전삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

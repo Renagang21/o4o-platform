@@ -43,6 +43,8 @@ export interface DeleteMemberParams {
   deletedBy: string | null;
   isPlatformAdmin: boolean;
   serviceKeys: string[];
+  /** WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: 'soft' (기본) = 비활성화, 'hard' = 데이터 삭제 */
+  mode?: 'soft' | 'hard';
 }
 
 // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1
@@ -456,11 +458,16 @@ export class MembershipApprovalService {
   }
 
   /**
-   * Delete a member (atomic: memberships + roles + user).
-   * Returns true if deleted, false if user not found in scope.
+   * Delete a member.
+   * WO-NETURE-MEMBER-DELETE-SAFE-FLOW-V1: soft/hard 2단계 분리
+   *
+   * soft (기본): users.status='deleted', isActive=false, memberships 비활성
+   * hard: service_memberships + role_assignments 삭제, users hard delete (FK 위험)
+   *
+   * Returns true if processed, false if user not found in scope.
    */
   async deleteMember(params: DeleteMemberParams): Promise<boolean> {
-    const { userId, deletedBy, isPlatformAdmin, serviceKeys } = params;
+    const { userId, deletedBy, isPlatformAdmin, serviceKeys, mode = 'soft' } = params;
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -478,13 +485,31 @@ export class MembershipApprovalService {
         }
       }
 
-      await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
-      await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
-      await queryRunner.query(`DELETE FROM users WHERE id = $1`, [userId]);
+      if (mode === 'hard') {
+        // Hard delete: FK 참조 데이터도 함께 정리 후 users 삭제
+        await queryRunner.query(`DELETE FROM service_memberships WHERE user_id = $1`, [userId]);
+        await queryRunner.query(`DELETE FROM role_assignments WHERE user_id = $1`, [userId]);
+        // organization_members 정리 (FK 참조)
+        await queryRunner.query(`DELETE FROM organization_members WHERE user_id = $1`, [userId]);
+        // users 삭제 시도 — 남아있는 FK가 있으면 여전히 실패 가능
+        await queryRunner.query(`DELETE FROM users WHERE id = $1`, [userId]);
 
-      await queryRunner.commitTransaction();
+        await queryRunner.commitTransaction();
+        logger.info('[ApprovalService] HARD_DELETE_SUCCESS', { userId, deletedBy });
+      } else {
+        // Soft delete: 비활성화만 수행 (users 삭제 없음)
+        await queryRunner.query(
+          `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+          [userId]
+        );
+        await queryRunner.query(
+          `UPDATE service_memberships SET status = 'inactive', "updatedAt" = NOW() WHERE user_id = $1`,
+          [userId]
+        );
 
-      logger.info('[ApprovalService] DELETE_SUCCESS', { userId, deletedBy });
+        await queryRunner.commitTransaction();
+        logger.info('[ApprovalService] SOFT_DELETE_SUCCESS', { userId, deletedBy });
+      }
 
       return true;
     } catch (error) {
@@ -492,6 +517,7 @@ export class MembershipApprovalService {
       logger.error('[ApprovalService] DELETE_FAILED', {
         userId,
         deletedBy,
+        mode,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
