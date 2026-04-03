@@ -706,28 +706,104 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // ============================================================================
   // Resources Routes - /api/v1/kpa/resources/*
-  // Placeholder: Returns mock data until file management integration
+  // WO-KPA-A-RESOURCES-API-IMPLEMENTATION-V1: KpaBranchDoc 기반 실데이터 조회
   // ============================================================================
   const resourcesRouter = Router();
 
-  resourcesRouter.get('/', optionalAuth, (req: Request, res: Response) => {
+  // 카테고리 매핑: 프론트(forms/guidelines/policies) → DB(form/guide/regulation)
+  const CATEGORY_MAP: Record<string, string> = {
+    forms: 'form',
+    guidelines: 'guide',
+    policies: 'regulation',
+  };
+
+  resourcesRouter.get('/', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
+    const category = req.query.category as string | undefined;
+    const search = req.query.search as string | undefined;
+
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const qb = dataSource.getRepository(KpaBranchDoc)
+      .createQueryBuilder('d')
+      .where('d.is_public = true')
+      .andWhere('d.is_deleted = false')
+      .orderBy('d.created_at', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    if (category && category !== 'all') {
+      const dbCategory = CATEGORY_MAP[category] || category;
+      qb.andWhere('d.category = :category', { category: dbCategory });
+    }
+
+    if (search && search.trim()) {
+      qb.andWhere('(d.title ILIKE :search OR d.description ILIKE :search OR d.file_name ILIKE :search)', {
+        search: `%${search.trim()}%`,
+      });
+    }
+
+    const [items, total] = await qb.getManyAndCount();
+
     res.json({
       success: true,
-      data: [],
-      pagination: { page, limit, total: 0, totalPages: 0 },
-      message: 'Resources API - Integration pending'
+      data: items.map((d: any) => ({
+        id: d.id,
+        title: d.title,
+        description: d.description,
+        category: d.category,
+        fileUrl: d.file_url,
+        fileName: d.file_name,
+        fileSize: d.file_size,
+        downloadCount: d.download_count,
+        author: d.uploaded_by,
+        createdAt: d.created_at,
+        updatedAt: d.updated_at,
+      })),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
-  });
+  }));
 
-  resourcesRouter.get('/:id', optionalAuth, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'Resource not found' } });
-  });
+  resourcesRouter.get('/:id', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const doc = await dataSource.getRepository(KpaBranchDoc).findOne({
+      where: { id: req.params.id, is_public: true, is_deleted: false },
+    });
+    if (!doc) {
+      res.status(404).json({ success: false, error: { message: 'Resource not found' } });
+      return;
+    }
+    res.json({
+      success: true,
+      data: {
+        id: doc.id,
+        title: doc.title,
+        description: doc.description,
+        category: doc.category,
+        fileUrl: doc.file_url,
+        fileName: doc.file_name,
+        fileSize: doc.file_size,
+        downloadCount: doc.download_count,
+        author: doc.uploaded_by,
+        createdAt: doc.created_at,
+        updatedAt: doc.updated_at,
+      },
+    });
+  }));
 
-  resourcesRouter.post('/:id/download', authenticate, (req: Request, res: Response) => {
-    res.status(404).json({ success: false, error: { message: 'Resource not found' } });
-  });
+  resourcesRouter.post('/:id/download', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const { KpaBranchDoc } = await import('./entities/kpa-branch-doc.entity.js');
+    const repo = dataSource.getRepository(KpaBranchDoc);
+    const doc = await repo.findOne({
+      where: { id: req.params.id, is_public: true, is_deleted: false },
+    });
+    if (!doc || !doc.file_url) {
+      res.status(404).json({ success: false, error: { message: 'Resource not found' } });
+      return;
+    }
+    await repo.increment({ id: doc.id }, 'download_count', 1);
+    res.json({ success: true, data: { downloadUrl: doc.file_url } });
+  }));
 
   router.use('/resources', resourcesRouter);
 
