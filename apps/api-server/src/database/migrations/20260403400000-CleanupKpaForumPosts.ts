@@ -9,10 +9,10 @@ export class CleanupKpaForumPosts1712188800000
   implements MigrationInterface
 {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    // 1. 댓글 삭제
+    // 1. 댓글 삭제 (컬럼명: "postId" camelCase)
     const comments = await queryRunner.query(`
       DELETE FROM forum_comment
-      WHERE post_id IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
+      WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
       RETURNING id
     `);
     console.log(`[CleanupKpaForum] Deleted ${comments.length} comments`);
@@ -20,7 +20,7 @@ export class CleanupKpaForumPosts1712188800000
     // 2. 좋아요 삭제
     const likes = await queryRunner.query(`
       DELETE FROM forum_like
-      WHERE post_id IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
+      WHERE "postId" IN (SELECT id FROM forum_post WHERE organization_id IS NULL)
       RETURNING id
     `).catch(() => []);
     console.log(`[CleanupKpaForum] Deleted ${likes.length} likes`);
