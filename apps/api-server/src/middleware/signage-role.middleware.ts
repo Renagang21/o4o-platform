@@ -94,9 +94,12 @@ export function hasSignageOperatorPermission(user: any, serviceKey: string): boo
 
   // Service-level operator/admin roles also grant signage access
   // e.g. glycopharm:operator, glycopharm:admin → signage:glycopharm access
+  // KPA services: kpa-society serviceKey maps to kpa: role prefix
   const userRoles: string[] = user.roles || [];
+  const rolePrefix = serviceKey.startsWith('kpa-') ? 'kpa' : serviceKey;
   if (userRoles.some((r: string) =>
-    r === `${serviceKey}:operator` || r === `${serviceKey}:admin`
+    r === `${serviceKey}:operator` || r === `${serviceKey}:admin` ||
+    r === `${rolePrefix}:operator` || r === `${rolePrefix}:admin`
   )) {
     return true;
   }
