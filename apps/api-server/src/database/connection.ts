@@ -104,11 +104,9 @@ import {
 
 // Forum Notification entity (Phase 13)
 import { ForumNotification } from '../entities/ForumNotification.js';
-// Digital Signage entities
+// Digital Signage entities (legacy — Device/Slide only; Playlist/Schedule/PlaylistItem from SignageCoreEntities)
 import { SignageDevice } from '../entities/SignageDevice.js';
 import { SignageSlide } from '../entities/SignageSlide.js';
-import { SignagePlaylist, SignagePlaylistItem } from '../entities/SignagePlaylist.js';
-import { SignageSchedule } from '../entities/SignageSchedule.js';
 // Deployment entities
 import { DeploymentInstance } from '../modules/deployment/deployment.entity.js';
 // Site entities
@@ -652,12 +650,9 @@ export const AppDataSource = new DataSource({
     ForumCategoryMember,
     // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
-    // Digital Signage entities
+    // Digital Signage entities (legacy Device/Slide only; rest from SignageCoreEntities)
     SignageDevice,
     SignageSlide,
-    SignagePlaylist,
-    SignagePlaylistItem,
-    SignageSchedule,
     // Deployment entities
     DeploymentInstance,
     // Site entities
