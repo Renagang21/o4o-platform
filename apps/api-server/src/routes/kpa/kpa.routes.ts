@@ -148,7 +148,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society' (backward compat includes legacy 'kpa')
   const contentService = new ContentQueryService(dataSource, {
     serviceKeys: ['kpa-society', 'kpa'],
-    defaultTypes: ['notice', 'news', 'hero', 'promo'],
+    defaultTypes: ['notice', 'news'],
   });
 
   // APP-SIGNAGE Phase 1: shared signage query service
@@ -434,7 +434,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // GET /home/notices - 공지사항 (APP-CONTENT Phase 2: ContentQueryService)
   homeRouter.get('/notices', optionalAuth, asyncHandler(async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 5;
-    const data = await contentService.listForHome(['notice', 'hero'], limit);
+    const data = await contentService.listForHome(['notice'], limit);
     res.json({ success: true, data });
   }));
 
@@ -444,7 +444,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     const featuredLimit = parseInt(req.query.featuredLimit as string) || 3;
 
     const posts = await forumService.listRecentPosts(postLimit);
-    const featured = await contentService.listFeatured(['featured', 'promo'], featuredLimit);
+    const featured = await contentService.listFeatured(['notice', 'news'], featuredLimit);
 
     res.json({
       success: true,

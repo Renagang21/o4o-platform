@@ -61,9 +61,8 @@ export function NewsListPage() {
     return undefined;
   };
 
-  // 공지사항(notice) = notice + hero (메인 페이지 /home/notices와 동일 기준)
+  // WO-KPA-SOCIETY-CONTENT-POLICY-IMPLEMENTATION-AB-V1: hero 의존 제거, notice만 조회
   const getApiType = (uiType: ContentType | undefined): string | undefined => {
-    if (uiType === 'notice') return 'notice,hero';
     return uiType;
   };
 

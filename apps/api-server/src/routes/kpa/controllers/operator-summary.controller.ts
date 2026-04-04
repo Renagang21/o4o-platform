@@ -78,7 +78,7 @@ export function createOperatorSummaryController(
       recentApplicationRows,
       recentOrgJoinRows,
     ] = await Promise.all([
-      contentService.listForHome(['notice', 'news', 'hero', 'promo'], 5),
+      contentService.listForHome(['notice', 'news'], 5),
       signageService.listForHome(3, 3),
       forumService.listRecentPosts(5),
       // Total COUNT queries (Hub/BranchOperator 통계용)

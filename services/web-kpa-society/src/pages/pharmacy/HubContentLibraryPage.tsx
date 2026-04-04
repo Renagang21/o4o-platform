@@ -22,25 +22,18 @@ import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 // 타입 필터 정의
 // ============================================
 
-type ContentTypeFilter = 'all' | 'hero' | 'notice' | 'news' | 'featured' | 'promo' | 'event';
+// WO-KPA-SOCIETY-CONTENT-POLICY-IMPLEMENTATION-AB-V1: KPA 실운영 타입(notice, news)만 유지
+type ContentTypeFilter = 'all' | 'notice' | 'news';
 
 const TYPE_TABS: { key: ContentTypeFilter; label: string }[] = [
   { key: 'all', label: '전체' },
-  { key: 'hero', label: '히어로' },
-  { key: 'notice', label: '공지' },
+  { key: 'notice', label: '공지사항' },
   { key: 'news', label: '뉴스' },
-  { key: 'featured', label: '추천' },
-  { key: 'promo', label: '프로모션' },
-  { key: 'event', label: '이벤트' },
 ];
 
 const TYPE_BADGE_COLORS: Record<string, { bg: string; text: string }> = {
-  hero: { bg: '#dbeafe', text: '#1e40af' },
   notice: { bg: '#fef3c7', text: '#92400e' },
   news: { bg: '#d1fae5', text: '#065f46' },
-  featured: { bg: '#ede9fe', text: '#5b21b6' },
-  promo: { bg: '#fce7f3', text: '#9d174d' },
-  event: { bg: '#ffedd5', text: '#9a3412' },
 };
 
 const PAGE_LIMIT = 20;
