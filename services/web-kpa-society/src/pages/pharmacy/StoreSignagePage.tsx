@@ -41,7 +41,20 @@ import {
   Trash2,
   GripVertical,
   Play,
+  Calendar,
+  Pencil,
 } from 'lucide-react';
+import { useAuth } from '../../contexts';
+import {
+  fetchSchedules,
+  createSchedule,
+  updateSchedule,
+  deleteSchedule,
+  fetchSignagePlaylists,
+  type SignageScheduleItem,
+  type SignagePlaylistOption,
+  type CreateSchedulePayload,
+} from '../../api/signageSchedule';
 import {
   storeAssetControlApi,
   type StoreAssetItem,
@@ -167,13 +180,36 @@ function applySort(items: StoreAssetItem[], sortKey: SortKey): StoreAssetItem[] 
   return sorted;
 }
 
-type ActiveTab = 'playlist' | 'assets';
+type ActiveTab = 'playlist' | 'schedules' | 'assets';
+
+const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
 
 /* ─── Main Component ─────────────────────────── */
 
 export function StoreSignagePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const organizationId = user?.kpaMembership?.organizationId || '';
   const [activeTab, setActiveTab] = useState<ActiveTab>('playlist');
+
+  // ── Schedule state ──
+  const [schedules, setSchedules] = useState<SignageScheduleItem[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [signagePlaylists, setSignagePlaylists] = useState<SignagePlaylistOption[]>([]);
+  const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<SignageScheduleItem | null>(null);
+
+  // Schedule form state
+  const [schName, setSchName] = useState('');
+  const [schPlaylistId, setSchPlaylistId] = useState('');
+  const [schDays, setSchDays] = useState<number[]>([1, 2, 3, 4, 5]); // Mon-Fri default
+  const [schStartTime, setSchStartTime] = useState('09:00');
+  const [schEndTime, setSchEndTime] = useState('18:00');
+  const [schValidFrom, setSchValidFrom] = useState('');
+  const [schValidUntil, setSchValidUntil] = useState('');
+  const [schPriority, setSchPriority] = useState(0);
+  const [schIsActive, setSchIsActive] = useState(true);
+  const [schSaving, setSchSaving] = useState(false);
 
   // ── Legacy asset state ──
   const [items, setItems] = useState<StoreAssetItem[]>([]);
@@ -242,7 +278,38 @@ export function StoreSignagePage() {
     }
   }, []);
 
+  // ── Schedule loaders ──
+  const loadSchedules = useCallback(async () => {
+    if (!organizationId) return;
+    setScheduleLoading(true);
+    try {
+      const res = await fetchSchedules(organizationId);
+      setSchedules(Array.isArray(res.items) ? res.items : Array.isArray(res) ? res as unknown as SignageScheduleItem[] : []);
+    } catch {
+      setSchedules([]);
+    } finally {
+      setScheduleLoading(false);
+    }
+  }, [organizationId]);
+
+  const loadSignagePlaylists = useCallback(async () => {
+    if (!organizationId) return;
+    try {
+      const data = await fetchSignagePlaylists(organizationId);
+      setSignagePlaylists(data);
+    } catch {
+      setSignagePlaylists([]);
+    }
+  }, [organizationId]);
+
   useEffect(() => { fetchItems(); loadPlaylists(); }, [fetchItems, loadPlaylists]);
+
+  useEffect(() => {
+    if (activeTab === 'schedules') {
+      loadSchedules();
+      loadSignagePlaylists();
+    }
+  }, [activeTab, loadSchedules, loadSignagePlaylists]);
 
   useEffect(() => {
     if (selectedPlaylistId) loadPlaylistItems(selectedPlaylistId);
@@ -370,6 +437,87 @@ export function StoreSignagePage() {
     }
   };
 
+  // ── Schedule handlers ──
+  const resetScheduleForm = () => {
+    setSchName('');
+    setSchPlaylistId('');
+    setSchDays([1, 2, 3, 4, 5]);
+    setSchStartTime('09:00');
+    setSchEndTime('18:00');
+    setSchValidFrom('');
+    setSchValidUntil('');
+    setSchPriority(0);
+    setSchIsActive(true);
+    setEditingSchedule(null);
+    setShowScheduleForm(false);
+  };
+
+  const openEditSchedule = (sch: SignageScheduleItem) => {
+    setEditingSchedule(sch);
+    setSchName(sch.name);
+    setSchPlaylistId(sch.playlistId);
+    setSchDays([...sch.daysOfWeek]);
+    setSchStartTime(sch.startTime.slice(0, 5)); // HH:MM:SS → HH:MM
+    setSchEndTime(sch.endTime.slice(0, 5));
+    setSchValidFrom(sch.validFrom ?? '');
+    setSchValidUntil(sch.validUntil ?? '');
+    setSchPriority(sch.priority);
+    setSchIsActive(sch.isActive);
+    setShowScheduleForm(true);
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!schName.trim() || !schPlaylistId || schDays.length === 0 || !organizationId) return;
+    setSchSaving(true);
+    try {
+      if (editingSchedule) {
+        await updateSchedule(organizationId, editingSchedule.id, {
+          name: schName.trim(),
+          playlistId: schPlaylistId,
+          daysOfWeek: schDays,
+          startTime: schStartTime,
+          endTime: schEndTime,
+          validFrom: schValidFrom || null,
+          validUntil: schValidUntil || null,
+          priority: schPriority,
+          isActive: schIsActive,
+        });
+      } else {
+        const payload: CreateSchedulePayload = {
+          name: schName.trim(),
+          playlistId: schPlaylistId,
+          daysOfWeek: schDays,
+          startTime: schStartTime,
+          endTime: schEndTime,
+          priority: schPriority,
+          isActive: schIsActive,
+        };
+        if (schValidFrom) payload.validFrom = schValidFrom;
+        if (schValidUntil) payload.validUntil = schValidUntil;
+        await createSchedule(organizationId, payload);
+      }
+      resetScheduleForm();
+      loadSchedules();
+    } catch {
+      /* user can retry */
+    } finally {
+      setSchSaving(false);
+    }
+  };
+
+  const handleDeleteSchedule = async (sch: SignageScheduleItem) => {
+    if (!confirm(`"${sch.name}" 스케줄을 삭제하시겠습니까?`)) return;
+    if (!organizationId) return;
+    try {
+      await deleteSchedule(organizationId, sch.id);
+      loadSchedules();
+    } catch { /* user can retry */ }
+  };
+
+  const toggleSchDay = (day: number) => {
+    setSchDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort());
+  };
+
   const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
 
   return (
@@ -392,7 +540,10 @@ export function StoreSignagePage() {
             약국 HUB에서 가져오기
           </button>
           <button
-            onClick={() => { fetchItems(); loadPlaylists(); }}
+            onClick={() => {
+              fetchItems(); loadPlaylists();
+              if (activeTab === 'schedules') { loadSchedules(); loadSignagePlaylists(); }
+            }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50"
           >
             <RefreshCw className="w-4 h-4" />
@@ -413,6 +564,17 @@ export function StoreSignagePage() {
         >
           <ListVideo className="w-4 h-4" />
           플레이리스트
+        </button>
+        <button
+          onClick={() => setActiveTab('schedules')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'schedules'
+              ? 'border-blue-600 text-blue-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          스케줄
         </button>
         <button
           onClick={() => setActiveTab('assets')}
@@ -622,6 +784,249 @@ export function StoreSignagePage() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Schedule Tab ═════════════════════════════ */}
+      {activeTab === 'schedules' && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-slate-800">스케줄 관리</h2>
+            <button
+              onClick={() => { resetScheduleForm(); setShowScheduleForm(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
+            >
+              <Plus className="w-4 h-4" />
+              새 스케줄
+            </button>
+          </div>
+
+          {/* ── Create / Edit Form ── */}
+          {showScheduleForm && (
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+              <div className="text-sm font-medium text-slate-700">
+                {editingSchedule ? '스케줄 수정' : '새 스케줄'}
+              </div>
+
+              {/* Row 1: Name */}
+              <input
+                type="text"
+                value={schName}
+                onChange={e => setSchName(e.target.value)}
+                placeholder="스케줄명 *"
+                className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoFocus
+              />
+
+              {/* Row 2: Playlist + Priority */}
+              <div className="flex gap-3">
+                <select
+                  value={schPlaylistId}
+                  onChange={e => setSchPlaylistId(e.target.value)}
+                  className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">플레이리스트 선택 *</option>
+                  {signagePlaylists.map(pl => (
+                    <option key={pl.id} value={pl.id}>{pl.name}</option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-1.5">
+                  <label className="text-xs text-slate-500 whitespace-nowrap">우선순위</label>
+                  <input
+                    type="number"
+                    value={schPriority}
+                    onChange={e => setSchPriority(Number(e.target.value))}
+                    min={0}
+                    className="w-16 px-2 py-1.5 text-sm border border-slate-300 rounded-md text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Days of week */}
+              <div>
+                <label className="text-xs text-slate-500 mb-1 block">요일 선택 *</label>
+                <div className="flex gap-1.5">
+                  {DAY_LABELS.map((label, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => toggleSchDay(idx)}
+                      className={`w-8 h-8 rounded-full text-xs font-medium transition-colors ${
+                        schDays.includes(idx)
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 4: Start / End time */}
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-slate-500 mb-1 block">시작 시간</label>
+                  <input
+                    type="time"
+                    value={schStartTime}
+                    onChange={e => setSchStartTime(e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-slate-500 mb-1 block">종료 시간</label>
+                  <input
+                    type="time"
+                    value={schEndTime}
+                    onChange={e => setSchEndTime(e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Row 5: Valid from / until */}
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-slate-500 mb-1 block">유효 시작일</label>
+                  <input
+                    type="date"
+                    value={schValidFrom}
+                    onChange={e => setSchValidFrom(e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs text-slate-500 mb-1 block">유효 종료일</label>
+                  <input
+                    type="date"
+                    value={schValidUntil}
+                    onChange={e => setSchValidUntil(e.target.value)}
+                    className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Row 6: Active toggle + actions */}
+              <div className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={schIsActive}
+                    onChange={e => setSchIsActive(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-slate-700">활성화</span>
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSaveSchedule}
+                    disabled={schSaving || !schName.trim() || !schPlaylistId || schDays.length === 0}
+                    className="flex items-center gap-1.5 px-4 py-1.5 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {schSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    {editingSchedule ? '수정' : '저장'}
+                  </button>
+                  <button
+                    onClick={resetScheduleForm}
+                    className="px-4 py-1.5 text-sm text-slate-600 border border-slate-300 rounded-md hover:bg-slate-50"
+                  >
+                    취소
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Schedule List ── */}
+          {scheduleLoading ? (
+            <div className="flex items-center justify-center py-12 text-slate-400">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" /> 스케줄 로딩 중...
+            </div>
+          ) : schedules.length === 0 ? (
+            <div className="text-center py-12 text-slate-400">
+              <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+              <p className="text-sm">스케줄이 없습니다.</p>
+              <p className="text-xs mt-1">플레이리스트의 재생 일정을 설정하세요.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
+                    <th className="px-4 py-3 font-medium">이름</th>
+                    <th className="px-4 py-3 font-medium">플레이리스트</th>
+                    <th className="px-4 py-3 font-medium">요일</th>
+                    <th className="px-4 py-3 font-medium">시간</th>
+                    <th className="px-4 py-3 font-medium w-28">기간</th>
+                    <th className="px-4 py-3 font-medium w-16 text-center">우선</th>
+                    <th className="px-4 py-3 font-medium w-16 text-center">상태</th>
+                    <th className="px-4 py-3 font-medium w-20 text-center">액션</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {schedules.map(sch => (
+                    <tr key={sch.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-900">{sch.name}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs">
+                        {sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || sch.playlistId.slice(0, 8)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-0.5">
+                          {DAY_LABELS.map((label, idx) => (
+                            <span
+                              key={idx}
+                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-medium ${
+                                sch.daysOfWeek.includes(idx)
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : 'bg-slate-50 text-slate-300'
+                              }`}
+                            >
+                              {label}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600">
+                        {sch.startTime.slice(0, 5)}–{sch.endTime.slice(0, 5)}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-500">
+                        {sch.validFrom || sch.validUntil
+                          ? `${sch.validFrom ?? '∞'} ~ ${sch.validUntil ?? '∞'}`
+                          : '상시'}
+                      </td>
+                      <td className="px-4 py-3 text-center text-xs text-slate-500">{sch.priority}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[11px] font-medium ${
+                          sch.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          {sch.isActive ? '활성' : '비활성'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => openEditSchedule(sch)}
+                            className="p-1 text-slate-400 hover:text-blue-600 rounded"
+                            title="수정"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSchedule(sch)}
+                            className="p-1 text-slate-400 hover:text-red-500 rounded"
+                            title="삭제"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
