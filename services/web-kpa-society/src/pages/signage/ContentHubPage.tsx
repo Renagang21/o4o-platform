@@ -299,7 +299,7 @@ export default function ContentHubPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <div>
           <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-2" />
           <div className="h-4 w-80 bg-slate-200 rounded animate-pulse" />
@@ -318,7 +318,7 @@ export default function ContentHubPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">안내 영상 · 자료</h1>

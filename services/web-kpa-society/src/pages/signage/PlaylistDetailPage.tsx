@@ -161,7 +161,7 @@ export default function PlaylistDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <div className="h-6 w-32 bg-slate-200 rounded animate-pulse" />
         <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
           <div className="h-8 w-2/3 bg-slate-200 rounded animate-pulse" />
@@ -174,7 +174,7 @@ export default function PlaylistDetailPage() {
 
   if (error || !playlist) {
     return (
-      <div className="space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Link to="/signage" className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
           <ArrowLeft className="h-4 w-4" /> 콘텐츠 허브로 돌아가기
         </Link>
@@ -189,7 +189,7 @@ export default function PlaylistDetailPage() {
   const creatorName = (playlist as any).creatorName as string | undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       {/* Back link */}
       <Link to="/signage" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
         <ArrowLeft className="h-4 w-4" /> 콘텐츠 허브
