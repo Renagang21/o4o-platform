@@ -171,6 +171,9 @@ export function createPharmacyProductsController(
     if (!supplyProductId) {
       throw new ApiError(400, 'supplyProductId is required', 'MISSING_PARAM');
     }
+    if (!organizationId) {
+      throw new ApiError(400, 'Store not set up. Please complete store setup first.', 'STORE_NOT_CONFIGURED');
+    }
 
     const { ProductApprovalV2Service } = await import(
       '../../../modules/product-policy-v2/product-approval-v2.service.js'
