@@ -15,6 +15,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { hasPlatformRole, logLegacyRoleUsage } from '../utils/role.utils.js';
+import { AppDataSource } from '../database/connection.js';
 
 // Extend Express Request interface
 declare module 'express' {
@@ -237,7 +238,7 @@ export const requireSignageOperator = (
  * - Schedule management
  * - Device management
  */
-export const requireSignageStore = (
+export const requireSignageStore = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -267,13 +268,30 @@ export const requireSignageStore = (
     });
   }
 
+  // Check in-memory first (admin, explicit permission, etc.)
   if (!hasSignageStorePermission(req.user, organizationId)) {
-    return res.status(403).json({
-      success: false,
-      error: 'Forbidden',
-      code: 'SIGNAGE_STORE_REQUIRED',
-      message: 'You do not have access to this store',
-    });
+    // Fallback: check kpa_members table for organization membership
+    try {
+      const rows = await AppDataSource.query(
+        `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'approved' LIMIT 1`,
+        [(req.user as any).id || (req.user as any).userId, organizationId],
+      );
+      if (!rows || rows.length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: 'Forbidden',
+          code: 'SIGNAGE_STORE_REQUIRED',
+          message: 'You do not have access to this store',
+        });
+      }
+    } catch {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden',
+        code: 'SIGNAGE_STORE_REQUIRED',
+        message: 'You do not have access to this store',
+      });
+    }
   }
 
   // Set context
