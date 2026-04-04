@@ -376,7 +376,7 @@ export const allowSignageStoreRead = (
  * Use for shared routes that both Operator and Store can access
  * but with different data scopes.
  */
-export const requireSignageOperatorOrStore = (
+export const requireSignageOperatorOrStore = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -406,15 +406,27 @@ export const requireSignageOperatorOrStore = (
     return next();
   }
 
-  // Check store permission
-  if (organizationId && hasSignageStorePermission(req.user, organizationId)) {
-    req.signageContext = {
-      role: 'store',
-      serviceKey,
-      organizationId,
-      permissions: [`signage:store:${organizationId}`],
-    };
-    return next();
+  // Check store permission (in-memory first, then DB fallback)
+  if (organizationId) {
+    let hasAccess = hasSignageStorePermission(req.user, organizationId);
+    if (!hasAccess) {
+      try {
+        const rows = await AppDataSource.query(
+          `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
+          [(req.user as any).id || (req.user as any).userId, organizationId],
+        );
+        hasAccess = rows && rows.length > 0;
+      } catch { /* fall through */ }
+    }
+    if (hasAccess) {
+      req.signageContext = {
+        role: 'store',
+        serviceKey,
+        organizationId,
+        permissions: [`signage:store:${organizationId}`],
+      };
+      return next();
+    }
   }
 
   return res.status(403).json({
