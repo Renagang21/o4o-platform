@@ -273,7 +273,7 @@ export const requireSignageStore = async (
     // Fallback: check kpa_members table for organization membership
     try {
       const rows = await AppDataSource.query(
-        `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'approved' LIMIT 1`,
+        `SELECT 1 FROM kpa_members WHERE user_id = $1 AND organization_id = $2 AND status = 'active' LIMIT 1`,
         [(req.user as any).id || (req.user as any).userId, organizationId],
       );
       if (!rows || rows.length === 0) {
