@@ -135,6 +135,9 @@ export class ForumModerationController extends ForumControllerBase {
         skip,
         take: limit,
       });
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      pendingPosts.forEach(p => this.sanitizeUser((p as any).author));
+      pendingComments.forEach(c => this.sanitizeUser((c as any).author));
 
       res.json({
         success: true,

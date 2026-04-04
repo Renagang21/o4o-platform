@@ -143,6 +143,36 @@ export class ForumControllerBase {
     return { allowed: false, forumType: 'closed' };
   }
 
+  // ---------------------------------------------------------------------------
+  // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+  // ---------------------------------------------------------------------------
+
+  /** Fields to ALWAYS strip from user objects in forum API responses */
+  private static readonly SENSITIVE_USER_FIELDS = [
+    'password',
+    'refreshTokenFamily',
+    'resetPasswordToken',
+    'resetPasswordExpires',
+    'loginAttempts',
+    'lockedUntil',
+    'lastLoginIp',
+    'businessInfo',
+    'provider',
+    'provider_id',
+    'approvedAt',
+    'approvedBy',
+  ];
+
+  /** Strip sensitive fields from a user object (in-place mutation, safe for serialization) */
+  protected sanitizeUser(user: any): void {
+    if (!user) return;
+    for (const field of ForumControllerBase.SENSITIVE_USER_FIELDS) {
+      if (field in user) {
+        delete user[field];
+      }
+    }
+  }
+
   protected generateSlug(text: string): string {
     const timestamp = Date.now().toString(36);
     const baseSlug = text

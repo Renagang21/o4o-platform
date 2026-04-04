@@ -60,6 +60,8 @@ export class ForumCommentController extends ForumControllerBase {
         skip,
         take: limit,
       });
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      comments.forEach(c => this.sanitizeUser((c as any).author));
 
       res.json({
         success: true,
@@ -153,6 +155,8 @@ export class ForumCommentController extends ForumControllerBase {
         where: { id: savedComment.id },
         relations: ['author'],
       });
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      this.sanitizeUser((commentWithAuthor as any)?.author);
 
       res.status(201).json({
         success: true,
@@ -212,6 +216,8 @@ export class ForumCommentController extends ForumControllerBase {
         where: { id: saved.id },
         relations: ['author'],
       });
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      this.sanitizeUser((updated as any)?.author);
 
       res.status(200).json({ success: true, data: updated });
     } catch (error: any) {

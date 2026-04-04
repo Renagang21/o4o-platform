@@ -36,6 +36,8 @@ export class ForumCategoryController extends ForumControllerBase {
         .addOrderBy('cat.name', 'ASC');
 
       const categories = await qb.getMany();
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      categories.forEach(c => this.sanitizeUser((c as any).creator));
 
       res.json({
         success: true,
@@ -93,6 +95,9 @@ export class ForumCategoryController extends ForumControllerBase {
         });
         return;
       }
+
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      this.sanitizeUser((category as any).creator);
 
       res.json({
         success: true,

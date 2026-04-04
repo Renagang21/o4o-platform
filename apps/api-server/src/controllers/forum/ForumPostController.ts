@@ -102,6 +102,8 @@ export class ForumPostController extends ForumControllerBase {
       queryBuilder.skip(skip).take(limit);
 
       const [posts, totalCount] = await queryBuilder.getManyAndCount();
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      posts.forEach(p => this.sanitizeUser((p as any).author));
 
       res.json({
         success: true,
@@ -179,6 +181,8 @@ export class ForumPostController extends ForumControllerBase {
         .update(post.id, { viewCount: () => '"viewCount" + 1' })
         .catch((err) => logger.warn('Failed to increment view count:', err));
       post.viewCount = (post.viewCount || 0) + 1;
+      // WO-KPA-A-FORUM-CREATOR-SENSITIVE-FIELDS-EXPOSURE-HOTFIX-V1
+      this.sanitizeUser((post as any).author);
 
       res.json({
         success: true,
