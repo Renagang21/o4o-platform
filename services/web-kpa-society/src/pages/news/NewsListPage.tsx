@@ -52,10 +52,11 @@ export function NewsListPage() {
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
-    if (path.includes('/news/notice')) return 'notice';
-    if (path.includes('/news/hero')) return 'hero';
-    if (path.includes('/news/promo')) return 'promo';
-    if (path.endsWith('/news/news')) return 'news';
+    // /content/* (primary) and /news/* (legacy) 모두 지원
+    if (path.includes('/content/notice') || path.includes('/news/notice')) return 'notice';
+    if (path.includes('/content/hero') || path.includes('/news/hero')) return 'hero';
+    if (path.includes('/content/promo') || path.includes('/news/promo')) return 'promo';
+    if (path.endsWith('/content/news') || path.endsWith('/news/news')) return 'news';
     return undefined;
   };
 
@@ -123,7 +124,7 @@ export function NewsListPage() {
         title={pageTitle}
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '콘텐츠', href: '/news' },
+          { label: '콘텐츠', href: '/content' },
           ...(currentType ? [{ label: CONTENT_TYPE_LABELS[currentType] }] : []),
         ]}
       />
@@ -132,7 +133,7 @@ export function NewsListPage() {
       {!currentType && (
         <div style={styles.tabs}>
           {filterTypes.map(t => (
-            <Link key={t} to={`/news/${t}`} style={styles.tab}>{CONTENT_TYPE_LABELS[t]}</Link>
+            <Link key={t} to={`/content/${t}`} style={styles.tab}>{CONTENT_TYPE_LABELS[t]}</Link>
           ))}
         </div>
       )}
@@ -156,7 +157,7 @@ export function NewsListPage() {
         <>
           <div style={styles.list}>
             {notices.map(notice => (
-              <Link key={notice.id} to={`/news/${notice.id}`} style={styles.itemLink}>
+              <Link key={notice.id} to={`/content/${notice.id}`} style={styles.itemLink}>
                 <Card hover padding="medium">
                   {/* 상단: 배지 + 사용 중 표시 */}
                   <div style={styles.cardTop}>

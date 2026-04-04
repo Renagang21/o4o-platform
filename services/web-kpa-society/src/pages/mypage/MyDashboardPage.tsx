@@ -4,11 +4,15 @@
  * WO-KPA-MYPAGE-OFFICER-V1
  * - 임원인 경우 임원 대시보드 바로가기 추가
  * - 임원인 경우 회계 요약 섹션 추가
+ *
+ * WO-KPA-A-MYPAGE-HUB-NAVIGATION-AND-CTA-ENHANCEMENT-V1
+ * - MyPageNavigation 탭 네비게이션 추가
+ * - 내 포럼 바로가기 추가, 작성 글 카드 링크 연결
  */
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { AiSummaryButton } from '../../components/ai';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
@@ -145,6 +149,7 @@ export function MyDashboardPage() {
         title="마이페이지"
         breadcrumb={[{ label: '홈', href: servicePrefix || '/' }, { label: '마이페이지' }]}
       />
+      <MyPageNavigation />
 
       {/* 사용자 프로필 요약 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>
@@ -262,13 +267,15 @@ export function MyDashboardPage() {
             </div>
           </Card>
         </Link>
-        <Card padding="medium">
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryIcon}>💬</span>
-            <span style={styles.summaryValue}>{summary?.forumPosts || 0}</span>
-            <span style={styles.summaryLabel}>작성 글</span>
-          </div>
-        </Card>
+        <Link to={`${servicePrefix}/mypage/my-forums`} style={styles.summaryLink}>
+          <Card padding="medium">
+            <div style={styles.summaryItem}>
+              <span style={styles.summaryIcon}>💬</span>
+              <span style={styles.summaryValue}>{summary?.forumPosts || 0}</span>
+              <span style={styles.summaryLabel}>작성 글</span>
+            </div>
+          </Card>
+        </Link>
         <Link to={`${servicePrefix}/groupbuy/history`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
@@ -314,13 +321,17 @@ export function MyDashboardPage() {
           <span style={styles.quickLinkIcon}>👤</span>
           <span>프로필</span>
         </Link>
-        <Link to={`${servicePrefix}/mypage/settings`} style={styles.quickLink}>
-          <span style={styles.quickLinkIcon}>⚙️</span>
-          <span>설정</span>
+        <Link to={`${servicePrefix}/mypage/my-forums`} style={styles.quickLink}>
+          <span style={styles.quickLinkIcon}>💬</span>
+          <span>내 포럼</span>
         </Link>
         <Link to={`${servicePrefix}/mypage/certificates`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>🎓</span>
-          <span>수료증</span>
+          <span>이수현황</span>
+        </Link>
+        <Link to={`${servicePrefix}/mypage/settings`} style={styles.quickLink}>
+          <span style={styles.quickLinkIcon}>⚙️</span>
+          <span>설정</span>
         </Link>
       </div>
     </div>

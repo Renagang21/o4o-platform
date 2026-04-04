@@ -28,15 +28,19 @@ export function useAccessibleDashboards(): DashboardItem[] {
 
   const items: DashboardItem[] = [];
 
-  // 모든 인증된 사용자: 내 대시보드
-  items.push({ label: '내 대시보드', icon: '🏠', path: '/dashboard' });
+  // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: /dashboard → /mypage
+  items.push({ label: '마이페이지', icon: '🏠', path: '/mypage' });
 
-  // 약국 context가 있는 사용자: 약국경영
-  // admin/operator는 Hub가 메인이므로 제외
+  // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
+  // pharmacy_owner → 약국 HUB 진입, isStoreOwner → 내 약국 추가 진입
   const isAdminOrOperator = hasAnyRole(user.roles, DASHBOARD_ADMIN_ROLES);
   const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
-  if (hasPharmacyContext && !isAdminOrOperator) {
-    items.push({ label: '약국경영', icon: '💊', path: '/pharmacy' });
+  const isPharmacyRelated = user.isStoreOwner || (user as any).activityType === 'pharmacy_owner';
+  if (hasPharmacyContext && !isAdminOrOperator && isPharmacyRelated) {
+    items.push({ label: '약국 HUB', icon: '🏪', path: '/hub' });
+    if (user.isStoreOwner) {
+      items.push({ label: '내 약국', icon: '💊', path: '/store' });
+    }
   }
 
   return items;
@@ -54,7 +58,7 @@ export function DashboardSwitcher({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div>
-      <div style={styles.sectionHeader}>대시보드 이동</div>
+      <div style={styles.sectionHeader}>바로가기</div>
       {dashboards.map((item) => {
         const isActive = location.pathname === item.path
           || (item.path !== '/' && location.pathname.startsWith(item.path));

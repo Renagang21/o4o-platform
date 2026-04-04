@@ -129,7 +129,7 @@ export function PolicyPage() {
           <ol style={styles.orderedList}>
             <li>회사는 회원에게 다음과 같은 서비스를 제공합니다.
               <ul style={styles.unorderedList}>
-                <li>커뮤니티 및 게시판 서비스</li>
+                <li>커뮤니티 및 포럼 서비스</li>
                 <li>교육 및 학습 관리 서비스</li>
                 <li>이벤트 및 설문 참여 서비스</li>
                 <li>자료실 및 콘텐츠 제공 서비스</li>

@@ -30,13 +30,13 @@ export const CAPABILITY_REGISTRY: readonly CapabilityMeta[] = [
   { key: StoreCapability.B2C_COMMERCE,  label: '온라인 스토어',     category: 'commerce',  channelType: 'B2C',    defaultEnabled: true,  sortOrder: 1 },
   { key: StoreCapability.TABLET,        label: '태블릿 주문',       category: 'device',    channelType: 'TABLET', defaultEnabled: false, sortOrder: 2 },
   { key: StoreCapability.KIOSK,         label: '키오스크',          category: 'device',    channelType: 'KIOSK',  defaultEnabled: false, sortOrder: 3 },
-  { key: StoreCapability.SIGNAGE,       label: '사이니지',          category: 'device',    channelType: 'SIGNAGE',defaultEnabled: false, sortOrder: 4 },
+  { key: StoreCapability.SIGNAGE,       label: '사이니지',          category: 'device',    channelType: 'SIGNAGE',defaultEnabled: true,  sortOrder: 4 },
   { key: StoreCapability.QR_MARKETING,  label: 'QR 마케팅',        category: 'marketing', channelType: null,     defaultEnabled: true,  sortOrder: 5 },
   { key: StoreCapability.POP_PRINT,     label: 'POP 출력',         category: 'marketing', channelType: null,     defaultEnabled: true,  sortOrder: 6 },
-  { key: StoreCapability.BLOG,          label: '블로그',            category: 'content',   channelType: null,     defaultEnabled: false, sortOrder: 7 },
-  { key: StoreCapability.LIBRARY,       label: '자료실',            category: 'content',   channelType: null,     defaultEnabled: false, sortOrder: 8 },
+  { key: StoreCapability.BLOG,          label: '블로그',            category: 'content',   channelType: null,     defaultEnabled: true,  sortOrder: 7 },
+  { key: StoreCapability.LIBRARY,       label: '자료실',            category: 'content',   channelType: null,     defaultEnabled: true,  sortOrder: 8 },
   { key: StoreCapability.AI_CONTENT,    label: 'AI 콘텐츠',        category: 'content',   channelType: null,     defaultEnabled: false, sortOrder: 9 },
-  { key: StoreCapability.LOCAL_PRODUCTS,label: '지역 특산물',       category: 'commerce',  channelType: null,     defaultEnabled: false, sortOrder: 10 },
+  { key: StoreCapability.LOCAL_PRODUCTS,label: '지역 특산물',       category: 'commerce',  channelType: null,     defaultEnabled: true,  sortOrder: 10 },
 ] as const;
 
 // ─── Derived Lookups ─────────────────────────────────────────

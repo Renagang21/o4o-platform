@@ -15,6 +15,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ForumHubSection } from '../../components/forum/ForumHubSection';
 import { ForumActivitySection } from '../../components/forum/ForumActivitySection';
 import { ForumCategorySection } from '../../components/forum/ForumCategorySection';
@@ -47,6 +48,10 @@ export function ForumHomePage() {
           <p style={styles.heroDesc}>
             약사 커뮤니티에서 정보를 교환하고 토론에 참여하세요
           </p>
+          <div style={styles.heroActions}>
+            <Link to="/forum/write" style={styles.heroWriteBtn}>글쓰기</Link>
+            <Link to="/mypage/my-forums/request" style={styles.heroRequestBtn}>새 포럼 개설 신청</Link>
+          </div>
         </div>
       </div>
 
@@ -88,6 +93,34 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.bodyM,
     color: colors.neutral500,
     margin: `${spacing.sm} 0 0`,
+  },
+  heroActions: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: spacing.md,
+  },
+  heroWriteBtn: {
+    display: 'inline-block',
+    padding: '10px 20px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    textDecoration: 'none',
+    transition: 'background-color 0.2s',
+  },
+  heroRequestBtn: {
+    display: 'inline-block',
+    padding: '10px 20px',
+    backgroundColor: 'transparent',
+    color: colors.primary,
+    border: `1px solid ${colors.primary}`,
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    textDecoration: 'none',
+    transition: 'background-color 0.2s',
   },
   content: {
     maxWidth: '960px',

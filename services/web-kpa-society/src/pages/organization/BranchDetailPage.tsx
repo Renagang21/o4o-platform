@@ -132,7 +132,7 @@ export function BranchDetailPage() {
           <span style={styles.quickLinkIcon}>💬</span>
           <span>분회 포럼</span>
         </Link>
-        <Link to={`/news?organization=${branch.id}`} style={styles.quickLink}>
+        <Link to={`/content?organization=${branch.id}`} style={styles.quickLink}>
           <span style={styles.quickLinkIcon}>📢</span>
           <span>분회 공지</span>
         </Link>

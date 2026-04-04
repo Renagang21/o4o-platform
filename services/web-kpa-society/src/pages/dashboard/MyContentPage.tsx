@@ -392,7 +392,7 @@ export function MyContentPage() {
           {suggestionShown && (
             <div style={styles.suggestionRow}>
               <Link
-                to="/news"
+                to="/content"
                 style={styles.suggestionLink}
                 onClick={() => {
                   setSuggestionShown(false);
@@ -468,7 +468,7 @@ export function MyContentPage() {
           />
           {assets.length === 0 && (
             <div style={{ textAlign: 'center', marginTop: '-16px', paddingBottom: '24px' }}>
-              <Link to="/news" style={styles.hubLink}>
+              <Link to="/content" style={styles.hubLink}>
                 콘텐츠 허브로 이동 →
               </Link>
             </div>

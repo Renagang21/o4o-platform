@@ -117,7 +117,7 @@ export function NewsDetailPage() {
           icon="⚠️"
           title="게시글을 찾을 수 없습니다"
           description={error || '삭제되었거나 존재하지 않는 게시글입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/news') }}
+          action={{ label: '목록으로', onClick: () => navigate('/content') }}
         />
       </div>
     );
@@ -132,9 +132,9 @@ export function NewsDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '콘텐츠', href: '/news' },
+          { label: '콘텐츠', href: '/content' },
           ...(notice.type && CONTENT_TYPE_LABELS[notice.type as ContentType]
-            ? [{ label: CONTENT_TYPE_LABELS[notice.type as ContentType], href: `/news/${notice.type}` }]
+            ? [{ label: CONTENT_TYPE_LABELS[notice.type as ContentType], href: `/content/${notice.type}` }]
             : []),
         ]}
       />
@@ -239,13 +239,13 @@ export function NewsDetailPage() {
       {/* 다음 행동 안내 */}
       <div style={styles.nextAction}>
         <p style={styles.nextActionText}>관련 소식을 계속 확인하세요</p>
-        <Link to={notice.type ? `/news/${notice.type}` : '/news'} style={styles.nextActionLink}>
+        <Link to={notice.type ? `/content/${notice.type}` : '/content'} style={styles.nextActionLink}>
           콘텐츠 더 보기 →
         </Link>
       </div>
 
       <div style={styles.footer}>
-        <Link to={notice.type ? `/news/${notice.type}` : '/news'} style={styles.backButton}>
+        <Link to={notice.type ? `/content/${notice.type}` : '/content'} style={styles.backButton}>
           전체 콘텐츠 보기 →
         </Link>
       </div>

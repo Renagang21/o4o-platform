@@ -75,7 +75,8 @@ export function ActivitySetupPage() {
     user.activityType ||
     isActivityTypeExempt(user.roles, user.membershipRole, user.membershipType)
   ) {
-    return <Navigate to="/dashboard" replace />;
+    // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
+    return <Navigate to="/mypage" replace />;
   }
 
   // Build businessInfo payload from form state
@@ -111,7 +112,7 @@ export function ActivitySetupPage() {
     setError('');
     try {
       await setActivityType(selected, buildBusinessInfo());
-      navigate('/dashboard', { replace: true });
+      navigate('/mypage', { replace: true });
     } catch {
       setError('저장에 실패했습니다. 다시 시도해주세요.');
     } finally {

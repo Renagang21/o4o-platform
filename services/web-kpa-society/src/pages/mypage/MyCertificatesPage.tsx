@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -95,14 +95,15 @@ export function MyCertificatesPage() {
   return (
     <div style={styles.container}>
       <PageHeader
-        title="수료증 관리"
+        title="이수현황"
         description="수료한 교육 과정의 수료증을 확인하세요"
         breadcrumb={[
           { label: '홈', href: servicePrefix || '/' },
           { label: '마이페이지', href: `${servicePrefix}/mypage` },
-          { label: '수료증' },
+          { label: '이수현황' },
         ]}
       />
+      <MyPageNavigation />
 
       {certificates.length === 0 ? (
         <EmptyState

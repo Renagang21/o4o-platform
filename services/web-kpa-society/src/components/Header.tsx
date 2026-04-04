@@ -21,7 +21,7 @@ import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
 import { DashboardSwitcher, useAccessibleDashboards } from './common/DashboardSwitcher';
-import { PLATFORM_ROLES, SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
+import { SUPER_OPERATOR_ROLES, hasAnyRole } from '../lib/role-constants';
 import ServiceSwitcher from './ServiceSwitcher';
 
 /**
@@ -85,12 +85,10 @@ const menuItems: MenuItem[] = [
   { label: '커뮤니티', href: '/community' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '콘텐츠', href: '/news' },
+  { label: '콘텐츠', href: '/content' },
   { label: '약국 HUB', href: '/hub' },
-  { label: '내 매장관리', href: '/store' },
+  { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
-  { label: '매뉴얼', href: '/manual' },
-  { label: '테스트 센터', href: '/test' },
 ];
 
 export function Header({ serviceName }: { serviceName: string }) {
@@ -104,19 +102,32 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // ── 메뉴 필터링 (WO-O4O-KPA-HEADER-VARIANT-REALIGNMENT-V1 정리) ──
-  // /operator  → kpa:admin 또는 kpa:operator (PLATFORM_ROLES)
-  // /store     → 약국 개설자 (isStoreOwner)
-  // /hub       → 약국 개설자 (isStoreOwner)
-  // 나머지     → 전체 공개
-  const isOperatorOrAdmin = user ? hasAnyRole(user.roles, PLATFORM_ROLES) : false;
-  const isPharmacyOwner = user?.isStoreOwner === true;
-  const displayMenuItems = menuItems.filter(item => {
-    if (item.href === '/operator') return isOperatorOrAdmin;
-    if (item.href === '/store') return isPharmacyOwner;
-    if (item.href === '/hub') return isPharmacyOwner;
-    return true;
-  });
+  // ── 메뉴 필터링 (WO-KPA-ADMIN-DEFAULT-DASHBOARD-ROUTING-FIX-V1) ──
+  // kpa:admin  → "관리자 콘솔" /admin
+  // kpa:operator → "운영 대시보드" /operator
+  // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
+  // /store → 승인된 약국 (isStoreOwner)
+  // /hub → pharmacy_owner 이상 (미승인도 HUB 탐색 가능)
+  // 나머지 → 전체 공개
+  const isAdmin = user ? user.roles.includes('kpa:admin') : false;
+  const isOperator = user ? user.roles.includes('kpa:operator') : false;
+  const isStoreOwner = user?.isStoreOwner === true;
+  const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
+  const displayMenuItems = menuItems
+    .map(item => {
+      // admin이면 "운영 대시보드" → "관리자 콘솔" + /admin
+      if (item.href === '/operator' && isAdmin) {
+        return { ...item, label: '관리자 콘솔', href: '/admin' };
+      }
+      return item;
+    })
+    .filter(item => {
+      if (item.href === '/operator') return isOperator;
+      if (item.href === '/admin') return isAdmin;
+      if (item.href === '/store') return isStoreOwner;
+      if (item.href === '/hub') return isPharmacyRelated;
+      return true;
+    });
 
   const handleLogout = async () => {
     await logout();
@@ -220,9 +231,10 @@ export function Header({ serviceName }: { serviceName: string }) {
                       ) : (
                         /* 일반 사용자: 전체 메뉴
                          * DashboardSwitcher: 2개 이상 대시보드 접근 가능 시 표시 (KPA 전용)
-                         * - "내 대시보드" (/dashboard): 모든 인증 사용자
+                         * - "마이페이지" (/mypage): 모든 인증 사용자
                          * - "약국경영" (/pharmacy): pharmacy context + non-admin/operator
-                         * 1개만 접근 가능하면 단순 대시보드 링크 표시
+                         * 1개만 접근 가능하면 단순 마이페이지 링크 표시
+                         * WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
                          */
                         <>
                           {accessibleDashboards.length >= 2 ? (
@@ -232,12 +244,12 @@ export function Header({ serviceName }: { serviceName: string }) {
                             </>
                           ) : (
                             <Link
-                              to="/dashboard"
+                              to="/mypage"
                               style={styles.userDropdownItem}
                               onClick={() => setShowUserDropdown(false)}
                             >
                               <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
-                              대시보드
+                              마이페이지
                             </Link>
                           )}
                           <Link

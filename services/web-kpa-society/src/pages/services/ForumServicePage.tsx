@@ -34,7 +34,7 @@ export function ForumServicePage() {
       <div style={styles.section}>
         <h2 style={styles.sectionTitle}>무엇을 할 수 있나요?</h2>
         <ul style={styles.list}>
-          <li>주제별 게시판에서 정보 교류</li>
+          <li>주제별 포럼에서 정보 교류</li>
           <li>업무 관련 질문 및 답변</li>
           <li>동료 약사와의 네트워킹</li>
           <li>최신 약업 정보 공유</li>

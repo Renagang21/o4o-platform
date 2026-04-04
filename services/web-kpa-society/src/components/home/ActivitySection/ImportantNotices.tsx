@@ -42,7 +42,7 @@ export function ImportantNotices({ prefetchedFeatured, loading: parentLoading }:
     <div>
       <div style={styles.header}>
         <h3 style={styles.title}>추천 콘텐츠</h3>
-        <Link to="/news" style={styles.moreLink}>추천 콘텐츠 보기 →</Link>
+        <Link to="/content" style={styles.moreLink}>추천 콘텐츠 보기 →</Link>
       </div>
       {isLoading ? (
         <p style={styles.empty}>불러오는 중...</p>

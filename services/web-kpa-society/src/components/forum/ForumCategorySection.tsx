@@ -80,7 +80,7 @@ export function ForumCategorySection({
   return (
     <section style={styles.container}>
       <div style={styles.header}>
-        <h2 style={styles.sectionTitle}>게시판</h2>
+        <h2 style={styles.sectionTitle}>최신 글</h2>
         <Link to={allLink} style={styles.moreLink}>전체 글 보기 →</Link>
       </div>
 

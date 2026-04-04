@@ -70,9 +70,9 @@ function renderError(
           ) : (
             <button
               style={styles.backButton}
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/mypage')}
             >
-              대시보드로 돌아가기
+              마이페이지로 돌아가기
             </button>
           )}
         </div>

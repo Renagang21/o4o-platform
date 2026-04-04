@@ -96,7 +96,13 @@ export const GLUCOSEVIEW_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard', 'settings'],
 };
 
-/** KPA-Society Store Config (WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1) */
+/**
+ * KPA-Society Store Config
+ * WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1
+ * WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
+ *   - 약국 정보 섹션 추가 (대시보드 아래)
+ *   - 주문 가능 상품 제거 (canonical: /hub/b2b)
+ */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
   serviceName: '약국 경영지원',
@@ -105,6 +111,9 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   menuSections: [
     { label: '', items: [
       { key: 'dashboard', label: '대시보드', subPath: '/dashboard' },
+    ]},
+    { label: '', items: [
+      { key: 'pharmacy-info', label: '약국 정보', subPath: '/info' },
     ]},
     { label: '운영', items: [
       { key: 'library', label: '자료실', subPath: '/operation/library' },
@@ -118,7 +127,6 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '상품/판매', items: [
-      { key: 'orderable-products', label: '주문 가능 상품', subPath: '/commerce/orderable' },
       { key: 'products', label: '상품 관리(B2B)', subPath: '/commerce/products' },
       { key: 'b2c', label: 'B2C 상품 판매', subPath: '/commerce/products/b2c' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },

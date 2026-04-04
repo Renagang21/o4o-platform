@@ -44,7 +44,7 @@ export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Pro
         <div style={styles.column}>
           <div style={styles.columnHeader}>
             <h2 style={styles.columnTitle}>공지사항</h2>
-            <Link to="/news/notice" style={styles.moreLink}>전체 보기 →</Link>
+            <Link to="/content" style={styles.moreLink}>전체 보기 →</Link>
           </div>
           <div style={styles.card}>
             <ItemList
@@ -57,15 +57,24 @@ export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Pro
           </div>
         </div>
 
-        {/* 약사공론 뉴스 (연결 예정) */}
+        {/* 약사공론 뉴스 (외부 뉴스) */}
         <div style={styles.column}>
           <div style={styles.columnHeader}>
             <h2 style={styles.columnTitle}>약사공론 뉴스</h2>
           </div>
           <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div style={styles.emptyWrap}>
-              <p style={{ ...styles.empty, fontSize: '0.938rem', fontWeight: 500 }}>약사공론 뉴스 연결 예정</p>
-              <p style={styles.emptyHint}>약사공론 뉴스가 연결되면 여기에 표시됩니다.</p>
+              <p style={{ ...styles.empty, fontSize: '1.5rem', marginBottom: '8px' }}>📰</p>
+              <p style={{ ...styles.empty, fontSize: '0.938rem', fontWeight: 500 }}>외부 뉴스 연동 준비 중</p>
+              <p style={styles.emptyHint}>약사공론 뉴스가 연동되면 여기에 최신 기사가 표시됩니다.</p>
+              <a
+                href="https://www.kpanews.co.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.externalLink}
+              >
+                약사공론 바로가기 →
+              </a>
             </div>
           </div>
         </div>
@@ -98,7 +107,7 @@ function ItemList({ items, loading, showPinned, emptyText, emptyHint }: {
     <ul style={styles.list}>
       {items.map((item) => (
         <li key={item.id} style={styles.listItem}>
-          <Link to={`/news/${item.id}`} style={styles.postLink}>
+          <Link to={`/content/${item.id}`} style={styles.postLink}>
             {showPinned && item.isPinned && (
               <span style={styles.pinnedBadge}>고정</span>
             )}
@@ -214,5 +223,13 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral400,
     fontSize: '0.8rem',
     margin: `${spacing.xs} 0 0`,
+  },
+  externalLink: {
+    display: 'inline-block',
+    marginTop: spacing.sm,
+    fontSize: '0.813rem',
+    color: colors.primary,
+    textDecoration: 'none',
+    fontWeight: 500,
   },
 };

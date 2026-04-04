@@ -88,7 +88,6 @@ import { IntranetRoutes } from './routes/IntranetRoutes';
 import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 
 // Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1)
-import { ManualHomePage, ManualPlaceholderPage, ManualServicePage } from './pages/manual';
 
 
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
@@ -97,8 +96,7 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 // Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
 import CommunityHubPage from './pages/community/CommunityHubPage';
 
-// Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
-import ContentLibraryPage from './pages/library/ContentLibraryPage';
+// Content Library → /content redirect (WO-KPA-SOCIETY-CONTENT-VS-LIBRARY-ROLE-REALIGNMENT-V1)
 
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
@@ -110,7 +108,9 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage, StoreOrderableProductsPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+// WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: PharmacyInfoPage + HubGuard
+import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
@@ -126,7 +126,8 @@ import { ActivitySetupPage } from './pages/ActivitySetupPage';
 import { PendingApprovalPage } from './pages/PendingApprovalPage';
 
 // User Dashboard (WO-KPA-SOCIETY-PHASE4-DASHBOARD-IMPLEMENTATION-V1)
-import { UserDashboardPage, MyContentPage } from './pages/dashboard';
+// WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: UserDashboardPage 제거 (/dashboard → /mypage 리다이렉트)
+import { MyContentPage } from './pages/dashboard';
 
 // WO-KPA-A-ROLE-BASED-REDIRECT-V1
 import { getDefaultRouteByRole } from './lib/auth-utils';
@@ -135,6 +136,8 @@ import { getDefaultRouteByRole } from './lib/auth-utils';
 import { PharmacyGuard } from './components/auth/PharmacyGuard';
 import { PharmacistOnlyGuard } from './components/auth/PharmacistOnlyGuard';
 import { PharmacyOwnerOnlyGuard } from './components/auth/PharmacyOwnerOnlyGuard';
+// WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HUB용 완화 가드
+import { HubGuard } from './components/auth/HubGuard';
 
 // Tablet Kiosk (WO-STORE-TABLET-REQUEST-CHANNEL-V1)
 import { TabletStorePage } from './pages/tablet/TabletStorePage';
@@ -213,7 +216,8 @@ function RegisterRedirect() {
   const { openRegisterModal } = useAuthModal();
 
   useEffect(() => {
-    navigate('/dashboard', { replace: true });
+    // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1
+    navigate('/mypage', { replace: true });
     openRegisterModal();
   }, [navigate, openRegisterModal]);
 
@@ -224,6 +228,12 @@ function RegisterRedirect() {
  * /select-function URL 접근 시 대시보드로 리다이렉트 + 모달 표시
  * (페이지 → 모달 전환 후 하위호환용)
  */
+/** Legacy /news/:id → /content/:id redirect */
+function NewsIdRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/content/${id}`} replace />;
+}
+
 /**
  * WO-KPA-A-DEFAULT-ROUTE-FIX-V2
  * / 접근 시 로그인된 관리자/운영자는 적절한 경로로 자동 리다이렉트
@@ -241,7 +251,8 @@ function RoleBasedHome() {
 
     if (user?.roles) {
       const target = getDefaultRouteByRole(user.roles, user.membershipRole);
-      if (target !== '/dashboard' && target !== '/login') {
+      // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: /mypage가 기본값
+      if (target !== '/mypage' && target !== '/login') {
         navigate(target, { replace: true });
       }
     }
@@ -250,23 +261,10 @@ function RoleBasedHome() {
   return <Layout serviceName={SERVICE_NAME}><CommunityHomePage /></Layout>;
 }
 
-/**
- * WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1: membership 기반 라우팅
- * /dashboard 접근 시 관리자/운영자는 적절한 경로로 자동 리다이렉트
- * 일반 사용자만 UserDashboardPage 렌더링
- */
-function DashboardRoute() {
-  const { user } = useAuth();
-
-  if (user?.roles) {
-    const target = getDefaultRouteByRole(user.roles, user.membershipRole);
-    if (target !== '/dashboard' && target !== '/login') {
-      return <Navigate to={target} replace />;
-    }
-  }
-
-  return <Layout serviceName={SERVICE_NAME}><UserDashboardPage /></Layout>;
-}
+// WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1:
+// DashboardRoute 제거 — /dashboard는 /mypage로 리다이렉트 처리
+// 기존 DashboardRoute (WO-KPA-C-ROLE-SYNC-NORMALIZATION-V1) 역할은
+// /mypage 자체 + getDefaultRouteByRole 변경으로 대체됨
 
 // FunctionGateRedirect removed — WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1
 // /select-function → /setup-activity 리다이렉트로 대체
@@ -280,7 +278,7 @@ const KPA_STORE_NAV_ITEMS = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '콘텐츠', href: '/news' },
+  { label: '콘텐츠', href: '/content' },
   { label: '약국 HUB', href: '/hub' },
 ];
 
@@ -335,7 +333,7 @@ function App() {
            *
            * SCOPE: 커뮤니티 중심 서비스
            * - / : 커뮤니티 홈 (공개)
-           * - /dashboard : 사용자 대시보드 (로그인 필수)
+           * - /dashboard : /mypage 리다이렉트 (WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1)
            * - /forum/* : 커뮤니티 포럼 (/demo/forum과 별도)
            * - /services/* : 서비스 소개 페이지
            * - /join/* : 서비스 참여 페이지
@@ -349,7 +347,8 @@ function App() {
            * WO-KPA-SOCIETY-PHASE4-ADJUSTMENT-V1
            * ========================================================= */}
           <Route path="/" element={<AuthGate><RoleBasedHome /></AuthGate>} />
-          <Route path="/dashboard" element={<AuthGate><DashboardRoute /></AuthGate>} />
+          {/* WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: 기존 북마크 호환 리다이렉트 */}
+          <Route path="/dashboard" element={<Navigate to="/mypage" replace />} />
 
           {/* WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1: 상태 기반 페이지 */}
           <Route path="/setup-activity" element={<ActivitySetupPage />} />
@@ -357,8 +356,8 @@ function App() {
 
           {/* Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
           <Route path="/community" element={<Layout serviceName={SERVICE_NAME}><CommunityHubPage /></Layout>} />
-          {/* WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1 */}
-          <Route path="/library/content" element={<Layout serviceName={SERVICE_NAME}><ContentLibraryPage /></Layout>} />
+          {/* /library/content → /content 흡수 (WO-KPA-SOCIETY-CONTENT-VS-LIBRARY-ROLE-REALIGNMENT-V1) */}
+          <Route path="/library/content" element={<Navigate to="/content" replace />} />
 
           {/* ========================================
            * 커뮤니티 포럼 (메인 서비스)
@@ -373,13 +372,6 @@ function App() {
           <Route path="/forum/write" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
           <Route path="/forum/edit/:id" element={<Layout serviceName={SERVICE_NAME}><ForumWritePage /></Layout>} />
 
-          {/* Manual Pages (WO-KPA-A-MANUAL-MAIN-PAGE-V1) */}
-          <Route path="/manual" element={<Layout serviceName={SERVICE_NAME}><ManualHomePage /></Layout>} />
-          <Route path="/manual/service" element={<Layout serviceName={SERVICE_NAME}><ManualServicePage /></Layout>} />
-          <Route path="/manual/general" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="일반 사용자 매뉴얼" description="커뮤니티, 포럼, 강의, 콘텐츠 등 기본 기능 사용법." /></Layout>} />
-          <Route path="/manual/pharmacy" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="약국 개설자 매뉴얼" description="매장 개설, 상품 등록, 채널 관리, 주문 처리 등." /></Layout>} />
-          <Route path="/manual/admin" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Admin) 매뉴얼" description="플랫폼 관리, 승인 처리, 사용자 관리 등 관리자 업무." /></Layout>} />
-          <Route path="/manual/operator" element={<Layout serviceName={SERVICE_NAME}><ManualPlaceholderPage title="운영자(Operator) 매뉴얼" description="콘텐츠 운영, 서비스 관리, 데이터 모니터링 등." /></Layout>} />
 
           {/* =========================================================
            * Service C - 분회 서비스 (Branch Services)
@@ -531,12 +523,12 @@ function App() {
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          {/* Hub = 약국 공용공간 (WO-O4O-HUB-MARKET-RESTRUCTURE-V1) */}
-          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><PharmacyHubMarketPage /></PharmacyGuard></Layout>} />
+          {/* Hub = 약국 공용공간 (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HubGuard 적용) */}
+          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubMarketPage /></HubGuard></Layout>} />
           {/* WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리 */}
-          <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubContentLibraryPage /></PharmacyGuard></Layout>} />
-          <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubB2BCatalogPage /></PharmacyGuard></Layout>} />
-          <Route path="/hub/signage" element={<Layout serviceName={SERVICE_NAME}><PharmacyGuard><HubSignageLibraryPage /></PharmacyGuard></Layout>} />
+          <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubContentLibraryPage /></HubGuard></Layout>} />
+          <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubB2BCatalogPage /></HubGuard></Layout>} />
+          <Route path="/hub/signage" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubSignageLibraryPage /></HubGuard></Layout>} />
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
@@ -553,10 +545,15 @@ function App() {
           {/* My Content (내 콘텐츠 관리) - WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1 */}
           <Route path="/my-content" element={<Layout serviceName={SERVICE_NAME}><MyContentPage /></Layout>} />
 
-          {/* News (공지사항) — 뉴스 게시판은 약사공론 연결 예정으로 제거 */}
-          <Route path="/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
-          <Route path="/news/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
+          {/* Content (콘텐츠) — 내부 CMS 콘텐츠 */}
+          <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/content/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
+
+          {/* Legacy redirect: /news → /content */}
+          <Route path="/news" element={<Navigate to="/content" replace />} />
+          <Route path="/news/notice" element={<Navigate to="/content/notice" replace />} />
+          <Route path="/news/:id" element={<NewsIdRedirect />} />
 
           {/* Course Hub & Intro (Public-facing) - WO-CONTENT-COURSE-HUB/INTRO */}
           <Route path="/courses" element={<Layout serviceName={SERVICE_NAME}><CourseHubPage /></Layout>} />
@@ -633,6 +630,9 @@ function App() {
             <Route index element={<StoreMarketingDashboardPage />} />
             <Route path="dashboard" element={<StoreMarketingDashboardPage />} />
 
+            {/* Pharmacy Info (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1) */}
+            <Route path="info" element={<PharmacyInfoPage />} />
+
             {/* Operation */}
             <Route path="operation/library" element={<StoreLibraryPage />} />
             <Route path="operation/library/new" element={<StoreLibraryNewPage />} />
@@ -644,8 +644,8 @@ function App() {
             <Route path="marketing/pop" element={<StorePopPage />} />
             <Route path="marketing/signage" element={<StoreSignagePage />} />
 
-            {/* Commerce */}
-            <Route path="commerce/orderable" element={<StoreOrderableProductsPage />} />
+            {/* Commerce — WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: orderable → /hub/b2b canonical */}
+            <Route path="commerce/orderable" element={<Navigate to="/hub/b2b" replace />} />
             <Route path="commerce/products" element={<PharmacyB2BPage />} />
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
             <Route path="commerce/products/suppliers" element={<SupplierListPage />} />

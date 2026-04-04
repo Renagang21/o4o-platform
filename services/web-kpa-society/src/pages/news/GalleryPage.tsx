@@ -79,7 +79,7 @@ export function GalleryPage() {
         description="약사회 활동 사진을 확인하세요"
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '공지/소식', href: '/news' },
+          { label: '콘텐츠', href: '/content' },
           { label: '갤러리' },
         ]}
       />

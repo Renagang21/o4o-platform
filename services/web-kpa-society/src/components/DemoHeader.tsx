@@ -58,10 +58,10 @@ const demoMenuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   {
     label: '공지/업무',
-    href: '/news',
+    href: '/content',
     children: [
-      { label: '공지사항', href: '/news' },
-      { label: '소식', href: '/news/branch-news' },
+      { label: '공지사항', href: '/content' },
+      { label: '소식', href: '/content' },
       { label: '자료실', href: '/docs' },
     ],
   },

@@ -290,7 +290,7 @@ export function WorkPage() {
             )}
           </div>
           <div style={styles.cardFooter}>
-            <Link to="/news" style={styles.cardLink}>
+            <Link to="/content" style={styles.cardLink}>
               공지사항 →
             </Link>
           </div>

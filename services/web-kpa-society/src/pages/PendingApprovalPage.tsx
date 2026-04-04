@@ -9,7 +9,7 @@
  * - pending: 가입 승인 대기 안내
  * - suspended: 계정 정지 안내
  * - withdrawn: 탈퇴 계정 안내
- * 이미 active인 사용자가 직접 URL 접근 시 /dashboard로 리다이렉트.
+ * 이미 active인 사용자가 직접 URL 접근 시 /mypage로 리다이렉트.
  */
 
 import { Navigate } from 'react-router-dom';
@@ -71,10 +71,10 @@ export function PendingApprovalPage() {
   // 비로그인 → 홈
   if (!user) return <Navigate to="/" replace />;
 
-  // active → dashboard
+  // active → mypage (WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1)
   const kpaStatus = user.kpaMembership?.status;
   if (kpaStatus === 'active' || user.membershipStatus === 'active' || user.membershipStatus === 'approved') {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/mypage" replace />;
   }
 
   const variant = getStatusVariant(kpaStatus, user.membershipStatus);

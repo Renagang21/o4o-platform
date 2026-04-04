@@ -33,6 +33,7 @@ import {
   PanelLeft,
   Palette,
   ClipboardList,
+  Building2,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -53,6 +54,7 @@ const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
 /** Section mode 아이콘 매핑 (WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1) */
 const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
+  'pharmacy-info': Building2,
   'orderable-products': ClipboardList,
   library: BookOpen,
   qr: QrCode,

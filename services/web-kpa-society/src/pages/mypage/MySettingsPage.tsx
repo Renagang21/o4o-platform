@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
@@ -146,6 +146,7 @@ export function MySettingsPage() {
           { label: '설정' },
         ]}
       />
+      <MyPageNavigation />
 
       {/* 알림 설정 */}
       <Card padding="large" style={{ marginBottom: '24px' }}>

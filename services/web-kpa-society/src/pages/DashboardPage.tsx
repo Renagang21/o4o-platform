@@ -72,11 +72,11 @@ const mockOfficerData = {
 // Quick Menu items (kkpa.kr 참조 - 6열 그리드)
 // WO-KPA-SOCIETY-BRANCH-DEMO-MAIN-UI-REFERENCE-V1
 const quickMenuItems = [
-  { icon: '📢', label: '공지사항', href: '/news/notice', color: '#1e40af' },
+  { icon: '📢', label: '공지사항', href: '/content/notice', color: '#1e40af' },
   { icon: '📅', label: '분회일정', href: '/calendar', color: '#1e40af' },
   { icon: '📁', label: '자료실', href: '/docs', color: '#1e40af' },
   { icon: '📝', label: '회의록', href: '/docs/minutes', color: '#1e40af' },
-  { icon: '💬', label: '게시판', href: '/forum', color: '#1e40af' },
+  { icon: '💬', label: '포럼', href: '/forum', color: '#1e40af' },
   { icon: '📞', label: '문의', href: '/contact', color: '#1e40af' },
 ];
 
@@ -92,7 +92,7 @@ const mockSchedule = [
 const mockActivity = {
   unreadNotices: 3,
   recentForumPosts: [
-    { id: 1, title: '신규 약사 취업 관련 질문', category: '자유게시판' },
+    { id: 1, title: '신규 약사 취업 관련 질문', category: '자유포럼' },
   ],
 };
 
@@ -150,7 +150,7 @@ export function DashboardPage() {
             실제 지부/분회 서비스는 별도 도메인에서 운영됩니다.
           </p>
           <div style={styles.heroButtons}>
-            <a href="/news/notice" style={styles.heroPrimaryButton}>
+            <a href="/content/notice" style={styles.heroPrimaryButton}>
               공지사항 확인
             </a>
             <a href="/organization" style={styles.heroSecondaryButton}>
@@ -275,11 +275,11 @@ export function DashboardPage() {
         <div style={styles.noticeCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>📢 공지사항</h3>
-            <Link to="/news/notice" style={styles.moreLink}>더보기 →</Link>
+            <Link to="/content/notice" style={styles.moreLink}>더보기 →</Link>
           </div>
           <div style={styles.noticeList}>
             {mockOrgNews.map((news) => (
-              <Link key={news.id} to={`/news/notice/${news.id}`} style={styles.noticeListItem}>
+              <Link key={news.id} to={`/content/${news.id}`} style={styles.noticeListItem}>
                 <span style={styles.noticeItemTitle}>{news.title}</span>
                 <span style={styles.noticeItemDate}>{news.date}</span>
               </Link>
@@ -316,7 +316,7 @@ export function DashboardPage() {
       <section style={styles.section}>
         <h2 style={styles.sectionTitle}>나의 활동</h2>
         <div style={styles.activityRow}>
-          <Link to="/news/notice" style={styles.activityChip}>
+          <Link to="/content/notice" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>📢</span>
             <span style={styles.activityChipLabel}>미확인 공지</span>
             <span style={styles.activityChipBadge}>{mockActivity.unreadNotices}</span>
@@ -332,7 +332,7 @@ export function DashboardPage() {
           </Link>
           <Link to="/forum" style={styles.activityChip}>
             <span style={styles.activityChipIcon}>💬</span>
-            <span style={styles.activityChipLabel}>게시판</span>
+            <span style={styles.activityChipLabel}>포럼</span>
           </Link>
         </div>
       </section>
@@ -341,11 +341,11 @@ export function DashboardPage() {
       <section style={styles.section}>
         <div style={styles.newsSectionHeader}>
           <h2 style={styles.sectionTitle}>전체 약사회 소식</h2>
-          <Link to="/news/kpa-news" style={styles.moreLink}>더보기 →</Link>
+          <Link to="/content/news" style={styles.moreLink}>더보기 →</Link>
         </div>
         <div style={styles.kpaNewsList}>
           {mockKpaNews.map((news) => (
-            <Link key={news.id} to={`/news/kpa-news/${news.id}`} style={styles.kpaNewsItem}>
+            <Link key={news.id} to={`/content/news/${news.id}`} style={styles.kpaNewsItem}>
               {news.isImportant && <span style={styles.importantBadge}>중요</span>}
               <span style={styles.kpaNewsTitle}>{news.title}</span>
               <span style={styles.kpaNewsDate}>{news.date}</span>

@@ -186,7 +186,7 @@ export default function CommunityHubPage() {
         </Section>
 
         {/* 5.5 Content Section (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1) */}
-        <Section title="콘텐츠" linkTo="/library/content" linkLabel="전체보기 →">
+        <Section title="콘텐츠" linkTo="/content" linkLabel="전체보기 →">
           {contentItems.length === 0 ? (
             <p style={styles.empty}>등록된 콘텐츠가 없습니다.</p>
           ) : (

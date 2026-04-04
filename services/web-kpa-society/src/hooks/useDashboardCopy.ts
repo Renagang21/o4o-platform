@@ -122,7 +122,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
         options.onSuccess?.(response.dashboardAssetId);
 
         // Phase 3: 복사 후 대시보드 이동 제안
-        const goToDashboard = confirm('내 대시보드에 복사되었습니다.\n대시보드로 이동하시겠습니까?');
+        const goToDashboard = confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?');
         if (goToDashboard) {
           navigate('/my-content');
         }
@@ -178,7 +178,7 @@ export function useDashboardCopy(options: UseDashboardCopyOptions) {
         options.onSuccess?.(response.dashboardAssetId);
 
         // Phase 3: 복사 후 대시보드 이동 제안
-        const goToDashboard = confirm('내 대시보드에 복사되었습니다.\n대시보드로 이동하시겠습니까?');
+        const goToDashboard = confirm('내 콘텐츠에 복사되었습니다.\n내 콘텐츠로 이동하시겠습니까?');
         if (goToDashboard) {
           navigate('/my-content');
         }
