@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { AppDataSource } from '../../database/connection.js';
 import { ForumCategory } from '@o4o/forum-core/entities';
 import { PostStatus } from '@o4o/forum-core/entities';
 import logger from '../../utils/logger.js';
@@ -153,6 +154,14 @@ export class ForumCategoryController extends ForumControllerBase {
       });
 
       const savedCategory = await this.categoryRepository.save(category);
+
+      // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+      await AppDataSource.query(
+        `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+         VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+         ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+        [savedCategory.id, userId],
+      );
 
       res.status(201).json({
         success: true,

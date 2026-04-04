@@ -76,6 +76,14 @@ export class ForumService {
 
     const savedCategory = await this.categoryRepository.save(category);
 
+    // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+    await AppDataSource.query(
+      `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+       VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+       ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+      [savedCategory.id, creatorId],
+    );
+
     // 캐시 무효화
     await this.invalidateCategoryCache();
 

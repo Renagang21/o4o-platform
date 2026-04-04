@@ -298,6 +298,15 @@ export class ForumCategoryRequestService {
           isOrganizationExclusive: !!row.organizationId,
         });
         createdCategory = await queryRunner.manager.save(ForumCategory, category);
+
+        // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+        await queryRunner.query(
+          `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+           VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+           ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+          [createdCategory.id, row.requesterId],
+        );
+
         row.createdCategoryId = createdCategory.id;
         row.createdCategorySlug = createdCategory.slug;
         logger.info(`[ForumCategoryRequest] Created category: ${createdCategory.name} (${createdCategory.slug})`);

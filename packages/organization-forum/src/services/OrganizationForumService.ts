@@ -48,7 +48,18 @@ export class OrganizationForumService {
     }));
 
     try {
-      await this.categoryRepository.save(categoryData);
+      const savedCategories = await this.categoryRepository.save(categoryData);
+
+      // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+      for (const cat of savedCategories) {
+        await this.dataSource.query(
+          `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+           VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+           ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+          [cat.id, creatorId],
+        );
+      }
+
       console.log(
         `[organization-forum] Created ${categories.length} categories for ${organizationName}`
       );
@@ -84,7 +95,17 @@ export class OrganizationForumService {
       postCount: 0,
     });
 
-    return await this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.save(category);
+
+    // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+    await this.dataSource.query(
+      `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+       VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+       ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+      [saved.id, categoryData.createdBy],
+    );
+
+    return saved;
   }
 
   /**

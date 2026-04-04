@@ -261,6 +261,14 @@ export function createForumRequestController(
               createdCategory = await categoryRepo.save(category);
               request.created_category_slug = slug;
 
+              // WO-KPA-A-FORUM-OWNER-MEMBERSHIP-AUTO-SYNC-V1
+              await dataSource.query(
+                `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+                 VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+                 ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+                [createdCategory.id, request.requester_id],
+              );
+
               logger.info(
                 `[Forum Request] Created forum category: ${createdCategory.name} (${createdCategory.slug}) for request ${request.id}`
               );
