@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card, MyPageNavigation } from '../../components/common';
 import { mypageApi, type ProfileResponse } from '../../api';
@@ -513,6 +513,12 @@ export function MyProfilePage() {
                   <div style={styles.infoRow}>
                     <span style={styles.infoLabel}>약국 전화번호</span>
                     <span style={styles.infoValue}>{pharmacyPhone || '-'}</span>
+                  </div>
+                  <div style={styles.infoRow}>
+                    <span style={styles.infoLabel}>약국 정보 관리</span>
+                    <Link to="/store/info" style={{ color: colors.primary, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+                      약국 정보 수정 →
+                    </Link>
                   </div>
                 </>
               )}

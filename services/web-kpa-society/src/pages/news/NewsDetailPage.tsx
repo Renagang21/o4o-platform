@@ -236,17 +236,11 @@ export function NewsDetailPage() {
         </div>
       </Card>
 
-      {/* 다음 행동 안내 */}
+      {/* 목록으로 돌아가기 */}
       <div style={styles.nextAction}>
         <p style={styles.nextActionText}>관련 소식을 계속 확인하세요</p>
         <Link to={notice.type ? `/content/${notice.type}` : '/content'} style={styles.nextActionLink}>
-          콘텐츠 더 보기 →
-        </Link>
-      </div>
-
-      <div style={styles.footer}>
-        <Link to={notice.type ? `/content/${notice.type}` : '/content'} style={styles.backButton}>
-          전체 콘텐츠 보기 →
+          목록으로 돌아가기 →
         </Link>
       </div>
 
@@ -456,17 +450,5 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.primary,
     textDecoration: 'none',
     fontWeight: 500,
-  },
-  footer: {
-    marginTop: '24px',
-    textAlign: 'center',
-  },
-  backButton: {
-    padding: '12px 32px',
-    backgroundColor: colors.neutral100,
-    color: colors.neutral700,
-    textDecoration: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
   },
 };

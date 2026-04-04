@@ -96,8 +96,6 @@ import { CommunityHomePage } from './pages/CommunityHomePage';
 // Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
 import CommunityHubPage from './pages/community/CommunityHubPage';
 
-// Content Library → /content redirect (WO-KPA-SOCIETY-CONTENT-VS-LIBRARY-ROLE-REALIGNMENT-V1)
-
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
 

@@ -72,6 +72,7 @@ import { createPharmacyRequestRoutes } from './controllers/pharmacy-request.cont
 import { createStewardController } from './controllers/steward.controller.js';
 import { createStoreHubController } from '../o4o-store/controllers/store-hub.controller.js';
 import { createPharmacyStoreConfigController } from '../o4o-store/controllers/pharmacy-store-config.controller.js';
+import { createPharmacyInfoController } from '../o4o-store/controllers/pharmacy-info.controller.js';
 import { createPharmacyProductsController } from '../o4o-store/controllers/pharmacy-products.controller.js';
 import { createOperatorProductApplicationsController } from './controllers/operator-product-applications.controller.js';
 import { createAssetSnapshotController } from '../o4o-store/controllers/asset-snapshot.controller.js';
@@ -245,6 +246,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Pharmacy Store Config routes (WO-PHARMACY-HUB-REALIGN-PHASEH2-V1)
   router.use('/pharmacy/store', createPharmacyStoreConfigController(dataSource, coreRequireAuth as any));
+
+  // Pharmacy Info routes (WO-KPA-PHARMACY-INFO-EDIT-FLOW-V1)
+  router.use('/pharmacy', createPharmacyInfoController(dataSource, coreRequireAuth as any));
 
   // Pharmacy Products routes (WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1)
   router.use('/pharmacy/products', createPharmacyProductsController(dataSource, coreRequireAuth as any));

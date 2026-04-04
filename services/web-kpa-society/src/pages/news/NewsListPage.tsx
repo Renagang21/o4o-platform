@@ -1,9 +1,10 @@
 /**
- * NewsListPage - 콘텐츠 목록 페이지
+ * NewsListPage - KPA Society CMS 콘텐츠 허브
  *
- * APP-CONTENT Phase 2: @o4o/types/content 공유 상수 사용
- * Phase 3A: 추천/조회수/페이지네이션 실동작
- * WO-APP-DATA-HUB-TO-DASHBOARD-PHASE3-V1: "이미 사용 중" 표시
+ * WO-KPA-SOCIETY-CONTENT-HUB-REBUILD-V1:
+ * - 타입 필터: 공지사항(notice) + 뉴스(news) 2탭
+ * - 허브 소개 영역 + 활성 탭 표시
+ * - 빈 상태 구분 (데이터 없음 vs 오류)
  *
  * UX 원칙:
  * - 리스트: 추천/조회는 숫자 표시만 (액션 없음)
@@ -27,8 +28,11 @@ import type { ContentType, ContentSortType } from '@o4o/types/content';
 import type { Notice } from '../../types';
 import { ContentSortButtons, ContentPagination, ContentMetaBar } from '@o4o/ui';
 
-// Page-level filter types (subset of all content types shown in list)
-const filterTypes: ContentType[] = ['notice', 'hero', 'promo', 'news'];
+// KPA Society 콘텐츠 허브 — 공지사항 + 뉴스 2탭
+const filterTypes: { type: ContentType; label: string }[] = [
+  { type: 'notice', label: '공지사항' },
+  { type: 'news', label: '뉴스' },
+];
 const sortTypes: ContentSortType[] = ['latest', 'featured', 'views'];
 
 export function NewsListPage() {
@@ -52,10 +56,7 @@ export function NewsListPage() {
 
   const getTypeFromPath = (): ContentType | undefined => {
     const path = location.pathname;
-    // /content/* (primary) and /news/* (legacy) 모두 지원
     if (path.includes('/content/notice') || path.includes('/news/notice')) return 'notice';
-    if (path.includes('/content/hero') || path.includes('/news/hero')) return 'hero';
-    if (path.includes('/content/promo') || path.includes('/news/promo')) return 'promo';
     if (path.endsWith('/content/news') || path.endsWith('/news/news')) return 'news';
     return undefined;
   };
@@ -129,14 +130,37 @@ export function NewsListPage() {
         ]}
       />
 
-      {/* 타입 필터 */}
+      {/* 허브 소개 */}
       {!currentType && (
-        <div style={styles.tabs}>
-          {filterTypes.map(t => (
-            <Link key={t} to={`/content/${t}`} style={styles.tab}>{CONTENT_TYPE_LABELS[t]}</Link>
-          ))}
-        </div>
+        <p style={styles.hubDescription}>
+          대한약사회에서 제공하는 공지사항과 뉴스를 확인하세요.
+        </p>
       )}
+
+      {/* 타입 필터 탭 */}
+      <div style={styles.tabs}>
+        <Link
+          to="/content"
+          style={{
+            ...styles.tab,
+            ...(currentType === undefined ? styles.tabActive : {}),
+          }}
+        >
+          전체
+        </Link>
+        {filterTypes.map(({ type, label }) => (
+          <Link
+            key={type}
+            to={`/content/${type}`}
+            style={{
+              ...styles.tab,
+              ...(currentType === type ? styles.tabActive : {}),
+            }}
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
 
       {/* 정렬 토글 */}
       <div style={{ marginBottom: '24px' }}>
@@ -150,8 +174,10 @@ export function NewsListPage() {
       {notices.length === 0 ? (
         <EmptyState
           icon="📢"
-          title="등록된 콘텐츠가 없습니다"
-          description="새로운 콘텐츠가 등록되면 여기에 표시됩니다."
+          title={currentType ? `${CONTENT_TYPE_LABELS[currentType]} 콘텐츠가 없습니다` : '등록된 콘텐츠가 없습니다'}
+          description={currentType
+            ? `아직 ${CONTENT_TYPE_LABELS[currentType]} 유형의 콘텐츠가 등록되지 않았습니다.`
+            : '새로운 콘텐츠가 등록되면 여기에 표시됩니다.'}
         />
       ) : (
         <>
@@ -220,11 +246,17 @@ const styles: Record<string, React.CSSProperties> = {
     margin: '0 auto',
     padding: '0 20px 40px',
   },
+  hubDescription: {
+    ...typography.bodyM,
+    color: colors.neutral500,
+    margin: '0 0 20px',
+    lineHeight: 1.5,
+  },
   tabs: {
     display: 'flex',
     gap: '8px',
     marginBottom: '16px',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap' as const,
   },
   tab: {
     padding: '10px 20px',
@@ -233,6 +265,13 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     borderRadius: '6px',
     fontSize: '14px',
+    fontWeight: 400,
+    transition: 'all 0.15s ease',
+  },
+  tabActive: {
+    backgroundColor: colors.primary,
+    color: colors.white,
+    fontWeight: 500,
   },
   list: {
     display: 'flex',
