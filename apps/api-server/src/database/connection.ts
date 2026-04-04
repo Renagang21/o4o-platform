@@ -99,6 +99,7 @@ import {
   ForumComment,
   ForumTag,
   ForumCategoryRequest,
+  ForumCategoryMember,
 } from '@o4o/forum-core/entities';
 
 // Forum Notification entity (Phase 13)
@@ -648,6 +649,7 @@ export const AppDataSource = new DataSource({
     ForumComment,
     ForumTag,
     ForumCategoryRequest,
+    ForumCategoryMember,
     // Forum Notification entity (Phase 13) - local entity
     ForumNotification,
     // Digital Signage entities

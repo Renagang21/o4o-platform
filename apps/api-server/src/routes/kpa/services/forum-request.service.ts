@@ -249,6 +249,15 @@ export class ForumRequestService {
         [payload.name, payload.description, slug, payload.iconEmoji || null, user.id, branchId],
       );
 
+      // 2b. Owner를 forum_category_members에 등록
+      // WO-KPA-A-FORUM-MEMBERSHIP-TABLE-AND-JOIN-API-V1
+      await queryRunner.query(
+        `INSERT INTO forum_category_members (forum_category_id, user_id, role, joined_at, created_at, updated_at)
+         VALUES ($1, $2, 'owner', NOW(), NOW(), NOW())
+         ON CONFLICT (forum_category_id, user_id) DO NOTHING`,
+        [category.id, user.id],
+      );
+
       // 3. 결과 기록
       await queryRunner.query(
         `UPDATE kpa_approval_requests SET result_entity_id = $1, result_metadata = $2, updated_at = NOW() WHERE id = $3`,
