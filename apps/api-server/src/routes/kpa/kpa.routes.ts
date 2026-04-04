@@ -98,6 +98,7 @@ import { createBranchMemberController } from './controllers/branch-member.contro
 import { createInstructorController } from './controllers/instructor.controller.js';
 import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
+import { createForumMembershipController } from './controllers/forum-membership.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
@@ -399,6 +400,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   forumRouter.get('/moderation', authenticate, requireKpaScope('kpa:operator'), forumController.getModerationQueue.bind(forumController));
   forumRouter.post('/moderation/:type/:id', authenticate, requireKpaScope('kpa:operator'), forumController.moderateContent.bind(forumController));
 
+  // WO-KPA-A-FORUM-MEMBERSHIP-TABLE-AND-JOIN-API-V1: 폐쇄형 포럼 멤버십 API
+  forumRouter.use('/', createForumMembershipController(dataSource, authenticate as any));
+
   router.use('/forum', forumRouter);
 
   // ============================================================================
@@ -601,7 +605,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // POST /news — 새 콘텐츠 생성
   newsRouter.post('/', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
-    const { title, content, type, status: reqStatus, summary } = req.body;
+    const { title, content, type, status: reqStatus, summary, isOperatorPicked } = req.body;
     if (!title || !type) {
       res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title and type are required' } });
       return;
@@ -622,6 +626,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       status: validStatus,
       publishedAt: validStatus === 'published' ? new Date() : null,
       createdBy: userId,
+      isOperatorPicked: isOperatorPicked === true,
     });
 
     const saved = await contentRepo.save(entity);
@@ -640,11 +645,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       return;
     }
 
-    const { title, content, type, status: reqStatus, summary } = req.body;
+    const { title, content, type, status: reqStatus, summary, isOperatorPicked } = req.body;
     if (title !== undefined) existing.title = title;
     if (summary !== undefined) existing.summary = summary;
     if (content !== undefined) existing.body = content;
     if (type !== undefined && ALLOWED_TYPES.includes(type)) existing.type = type;
+    if (isOperatorPicked !== undefined) existing.isOperatorPicked = isOperatorPicked === true;
     if (reqStatus !== undefined && ['draft', 'published', 'archived'].includes(reqStatus)) {
       if (reqStatus === 'published' && existing.status !== 'published') {
         existing.publishedAt = new Date();

@@ -26,6 +26,7 @@ import {
   RefreshCw,
   X,
   Copy,
+  Star,
 } from 'lucide-react';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
@@ -45,6 +46,7 @@ interface CmsContent {
   summary: string | null;
   body: string | null;
   status: ContentStatus;
+  isOperatorPicked?: boolean;
   publishedAt: string | null;
   createdBy: string | null;
   createdAt: string;
@@ -359,7 +361,15 @@ function ContentList({
                 return (
                   <tr key={item.id} className="hover:bg-slate-50">
                     <td className="px-4 py-3">
-                      <div className="font-medium text-slate-900 truncate max-w-md">{item.title}</div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-slate-900 truncate max-w-md">{item.title}</span>
+                        {item.isOperatorPicked && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 flex-shrink-0">
+                            <Star className="w-3 h-3" />
+                            추천
+                          </span>
+                        )}
+                      </div>
                       {item.summary && (
                         <div className="text-xs text-slate-400 truncate max-w-md mt-0.5">{item.summary}</div>
                       )}
@@ -461,6 +471,7 @@ function ContentEditor({
   const [status, setStatus] = useState<'draft' | 'published'>(
     editTarget?.status === 'published' ? 'published' : 'draft',
   );
+  const [isOperatorPicked, setIsOperatorPicked] = useState(editTarget?.isOperatorPicked ?? false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -476,12 +487,12 @@ function ContentEditor({
       if (isEdit) {
         await apiFetch(`/api/v1/kpa/news/${editTarget.id}`, {
           method: 'PUT',
-          body: JSON.stringify({ title, summary, content: body, status }),
+          body: JSON.stringify({ title, summary, content: body, status, isOperatorPicked }),
         });
       } else {
         await apiFetch('/api/v1/kpa/news', {
           method: 'POST',
-          body: JSON.stringify({ title, summary, content: body, type, status }),
+          body: JSON.stringify({ title, summary, content: body, type, status, isOperatorPicked }),
         });
       }
       onSaved();
@@ -557,6 +568,22 @@ function ContentEditor({
               <option value="draft">임시저장</option>
               <option value="published">즉시 게시</option>
             </select>
+          </div>
+
+          {/* 추천 콘텐츠 토글 */}
+          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={isOperatorPicked}
+                onChange={e => setIsOperatorPicked(e.target.checked)}
+                className="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+              />
+              <span className="text-sm font-medium text-amber-900">홈 추천 콘텐츠로 표시</span>
+            </label>
+            <p className="text-xs text-amber-700 mt-0.5 ml-6">
+              체크하면 홈의 추천 콘텐츠 영역에 우선 노출됩니다. 게시 상태에서만 사용자에게 보입니다.
+            </p>
           </div>
 
           {/* Actions */}
