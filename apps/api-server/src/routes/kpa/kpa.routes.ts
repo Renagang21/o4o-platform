@@ -580,6 +580,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   newsRouter.get('/admin/list', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
     const type = req.query.type as string;
     const status = req.query.status as string;
+    const search = req.query.search as string | undefined;
+    const picked = req.query.picked as string | undefined;
     const page = parseInt(req.query.page as string) || 1;
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
 
@@ -593,6 +595,12 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     }
     if (status && ['draft', 'published', 'archived'].includes(status)) {
       qb.andWhere('c.status = :status', { status });
+    }
+    if (search && search.trim()) {
+      qb.andWhere('c.title ILIKE :search', { search: `%${search.trim()}%` });
+    }
+    if (picked === 'true') {
+      qb.andWhere('c.isOperatorPicked = true');
     }
 
     qb.orderBy('c.createdAt', 'DESC')

@@ -27,9 +27,11 @@ import {
   X,
   Copy,
   Star,
+  Search,
 } from 'lucide-react';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
+import { RichTextEditor } from '@o4o/content-editor';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -78,9 +80,9 @@ const statusConfig: Record<ContentStatus, { label: string; color: string; bg: st
   archived: { label: '보관', color: 'text-red-700', bg: 'bg-red-50' },
 };
 
-const typeConfig: Record<ContentType, { label: string }> = {
-  notice: { label: '공지' },
-  news: { label: '뉴스' },
+const typeConfig: Record<ContentType, { label: string; desc: string }> = {
+  notice: { label: '공지', desc: '운영 안내, 필독 사항, 공식 알림 — 홈 공지 영역에 표시' },
+  news: { label: '뉴스', desc: '소식, 동향, 일반 안내 — 콘텐츠 허브에 표시' },
 };
 
 function formatDate(dateStr: string | null): string {
@@ -141,7 +143,7 @@ export default function ContentManagementPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 mb-6">
+      <div className="border-b border-slate-200 mb-2">
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab('notice')}
@@ -152,7 +154,7 @@ export default function ContentManagementPage() {
             }`}
           >
             <Megaphone className="w-4 h-4 inline-block mr-1.5 -mt-0.5" />
-            공지
+            공지사항
           </button>
           <button
             onClick={() => setActiveTab('news')}
@@ -167,6 +169,7 @@ export default function ContentManagementPage() {
           </button>
         </div>
       </div>
+      <p className="text-xs text-slate-400 mb-4">{typeConfig[activeTab].desc}</p>
 
       {/* Content List */}
       <ContentList
@@ -214,6 +217,9 @@ function ContentList({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [pickedOnly, setPickedOnly] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const limit = 20;
 
@@ -223,6 +229,8 @@ function ContentList({
     try {
       const params = new URLSearchParams({ type, page: String(page), limit: String(limit) });
       if (statusFilter) params.set('status', statusFilter);
+      if (searchQuery) params.set('search', searchQuery);
+      if (pickedOnly) params.set('picked', 'true');
       const res = await apiFetch<{ data: CmsContent[]; total: number; totalPages: number }>(
         `/api/v1/kpa/news/admin/list?${params}`,
       );
@@ -233,10 +241,10 @@ function ContentList({
     } finally {
       setLoading(false);
     }
-  }, [type, page, statusFilter, refreshKey]);
+  }, [type, page, statusFilter, searchQuery, pickedOnly, refreshKey]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
-  useEffect(() => { setPage(1); }, [type]);
+  useEffect(() => { setPage(1); setSearchQuery(''); setSearchInput(''); }, [type]);
 
   async function handleStatusToggle(item: CmsContent) {
     const newStatus: ContentStatus = item.status === 'published' ? 'draft' : 'published';
@@ -320,7 +328,18 @@ function ContentList({
   return (
     <div>
       {/* Filter */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') { setSearchQuery(searchInput); setPage(1); } }}
+            placeholder="제목으로 검색"
+            className="text-sm border border-slate-300 rounded-md pl-8 pr-3 py-1.5 bg-white w-52 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
         <select
           value={statusFilter}
           onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
@@ -331,9 +350,27 @@ function ContentList({
           <option value="published">게시</option>
           <option value="archived">보관</option>
         </select>
-        <button onClick={fetchItems} className="text-sm text-slate-500 hover:text-slate-700">
+        <label className="flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={pickedOnly}
+            onChange={e => { setPickedOnly(e.target.checked); setPage(1); }}
+            className="w-3.5 h-3.5 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+          />
+          <Star className="w-3.5 h-3.5 text-amber-500" />
+          추천만
+        </label>
+        <button onClick={fetchItems} className="text-sm text-slate-500 hover:text-slate-700" title="새로고침">
           <RefreshCw className="w-4 h-4" />
         </button>
+        {searchQuery && (
+          <button
+            onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(1); }}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            검색 초기화
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -549,12 +586,12 @@ function ContentEditor({
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">내용</label>
-            <textarea
+            <RichTextEditor
               value={body}
-              onChange={e => setBody(e.target.value)}
+              onChange={({ html }) => setBody(html)}
+              preset="full"
+              minHeight="300px"
               placeholder="콘텐츠 내용을 입력하세요"
-              rows={10}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
             />
           </div>
 
@@ -584,6 +621,20 @@ function ContentEditor({
             <p className="text-xs text-amber-700 mt-0.5 ml-6">
               체크하면 홈의 추천 콘텐츠 영역에 우선 노출됩니다. 게시 상태에서만 사용자에게 보입니다.
             </p>
+          </div>
+
+          {/* 노출 위치 안내 */}
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-500 space-y-1">
+            <p className="font-medium text-slate-600">노출 위치 안내</p>
+            {status === 'published' ? (
+              <>
+                <p>- 콘텐츠 허브 ({typeConfig[type].label} 탭)에 노출됩니다.</p>
+                {type === 'notice' && <p>- 홈 공지 영역에 표시될 수 있습니다.</p>}
+                {isOperatorPicked && <p>- 홈 추천 콘텐츠 영역에 우선 노출됩니다.</p>}
+              </>
+            ) : (
+              <p>- 임시저장 상태에서는 사용자에게 노출되지 않습니다.</p>
+            )}
           </div>
 
           {/* Actions */}
