@@ -64,7 +64,7 @@ export function PharmacyTemplatePage() {
     const fetchSlug = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${GLYCOPHARM_API}/cockpit/status`, {
+        const res = await fetch(`${GLYCOPHARM_API}/pharmacy/cockpit/status`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const json = await res.json();

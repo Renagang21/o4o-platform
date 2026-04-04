@@ -55,7 +55,7 @@ export function LayoutBuilderPage() {
     const fetchSlug = async () => {
       try {
         const token = getAccessToken();
-        const res = await fetch(`${GLYCOPHARM_API}/cockpit/status`, {
+        const res = await fetch(`${GLYCOPHARM_API}/pharmacy/cockpit/status`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const json = await res.json();

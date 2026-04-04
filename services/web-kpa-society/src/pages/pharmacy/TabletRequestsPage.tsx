@@ -55,7 +55,7 @@ export function TabletRequestsPage() {
           ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/glycopharm`
           : '/api/v1/glycopharm';
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE}/cockpit/status`, {
+        const res = await fetch(`${API_BASE}/pharmacy/cockpit/status`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const json = await res.json();
