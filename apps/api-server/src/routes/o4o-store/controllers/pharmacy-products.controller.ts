@@ -60,15 +60,21 @@ export function createPharmacyProductsController(
   router.get('/catalog', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const category = req.query.category as string | undefined;
+    const distributionType = req.query.distributionType as string | undefined;
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const offset = parseInt(req.query.offset as string) || 0;
 
     let categoryFilter = '';
+    let distributionFilter = '';
     const params: any[] = [organizationId, limit, offset];
 
     if (category) {
-      categoryFilter = `AND pm.brand_name = $4`;
       params.push(category);
+      categoryFilter = `AND pm.brand_name = $${params.length}`;
+    }
+    if (distributionType && ['PUBLIC', 'SERVICE'].includes(distributionType)) {
+      params.push(distributionType);
+      distributionFilter = `AND spo.distribution_type = $${params.length}`;
     }
 
     const rows = await dataSource.query(
@@ -110,6 +116,7 @@ export function createPharmacyProductsController(
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${categoryFilter}
+         ${distributionFilter}
        ORDER BY spo.updated_at DESC
        LIMIT $2 OFFSET $3`,
       params,
@@ -118,9 +125,14 @@ export function createPharmacyProductsController(
     // Total count (for pagination)
     const countParams: any[] = [];
     let countCategoryFilter = '';
+    let countDistributionFilter = '';
     if (category) {
-      countCategoryFilter = `AND pm.brand_name = $1`;
       countParams.push(category);
+      countCategoryFilter = `AND pm.brand_name = $${countParams.length}`;
+    }
+    if (distributionType && ['PUBLIC', 'SERVICE'].includes(distributionType)) {
+      countParams.push(distributionType);
+      countDistributionFilter = `AND spo.distribution_type = $${countParams.length}`;
     }
 
     const countResult = await dataSource.query(
@@ -131,7 +143,8 @@ export function createPharmacyProductsController(
        WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
-         ${countCategoryFilter}`,
+         ${countCategoryFilter}
+         ${countDistributionFilter}`,
       countParams,
     );
 
@@ -146,16 +159,35 @@ export function createPharmacyProductsController(
     });
   }));
 
-  // ─── POST /apply — 410 DEPRECATED ────────────────────────────────
-  // WO-PRODUCT-POLICY-V2-APPLICATION-REMOVAL-V1: v1 application 생성 완전 차단
-  router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (_req: Request, res: Response) => {
-    res.status(410).json({
-      success: false,
-      error: {
-        code: 'ENDPOINT_DEPRECATED',
-        message: 'Product applications are handled by v2 approval system. Use POST /api/v1/product-policy-v2/public-listing, /service-approval, or /private-approval',
-      },
-    });
+  // ─── POST /apply — v2 createServiceApproval 내부 위임 ────────────
+  // WO-KPA-HUB-AND-STORE-ORDERABLE-PRODUCT-LIST-FLOW-V1:
+  // 기존 410 반환을 v2 service-approval 내부 호출로 교체
+  router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    const organizationId = (req as any).organizationId;
+    const { supplyProductId } = req.body;
+    const serviceKey = resolveServiceKeyFromBody(req.body);
+
+    if (!supplyProductId) {
+      throw new ApiError(400, 'supplyProductId is required', 'MISSING_PARAM');
+    }
+
+    const { ProductApprovalV2Service } = await import(
+      '../../../modules/product-policy-v2/product-approval-v2.service.js'
+    );
+    const service = new ProductApprovalV2Service(dataSource);
+    const result = await service.createServiceApproval(
+      supplyProductId,
+      organizationId,
+      serviceKey,
+      user.id,
+    );
+
+    if (!result.success) {
+      throw new ApiError(400, result.error || 'Application failed', 'APPLICATION_FAILED');
+    }
+
+    res.json({ success: true, data: result.data });
   }));
 
   // ─── GET /applications — 내 신청 목록 (v2: product_approvals) ───────

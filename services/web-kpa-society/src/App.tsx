@@ -110,7 +110,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage, StoreOrderableProductsPage } from './pages/pharmacy';
 
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
@@ -645,6 +645,7 @@ function App() {
             <Route path="marketing/signage" element={<StoreSignagePage />} />
 
             {/* Commerce */}
+            <Route path="commerce/orderable" element={<StoreOrderableProductsPage />} />
             <Route path="commerce/products" element={<PharmacyB2BPage />} />
             <Route path="commerce/products/b2c" element={<PharmacySellPage />} />
             <Route path="commerce/products/suppliers" element={<SupplierListPage />} />

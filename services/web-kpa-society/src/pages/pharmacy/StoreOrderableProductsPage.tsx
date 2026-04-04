@@ -1,29 +1,26 @@
 /**
- * HubB2BCatalogPage - 플랫폼 B2B 상품 카탈로그
+ * StoreOrderableProductsPage - Store 주문 가능 상품리스트
  *
- * WO-O4O-HUB-B2B-CATALOG-V1
- * WO-O4O-HUB-B2B-STATE-VISIBILITY-V1: 상태 배지 + 버튼 정비 + 요약 영역
+ * WO-KPA-HUB-AND-STORE-ORDERABLE-PRODUCT-LIST-FLOW-V1
  *
- * Hub 공용공간에서 플랫폼 공급자 상품을 탐색하고
- * "판매 신청" 버튼으로 내 매장 상품 신청을 진행하는 페이지.
+ * Store 대시보드 내부에서 플랫폼 공급 상품을 탐색하고
+ * "내 대시보드에 등록" 버튼으로 상품 등록 신청을 진행하는 페이지.
  *
- * 사용 API:
- *   - getCatalog() : 플랫폼 B2B 상품 카탈로그 (neture_supplier_products PUBLIC)
- *   - applyBySupplyProductId() : 카탈로그 기반 상품 판매 신청
+ * HubB2BCatalogPage와 동일한 API / 탭 구조를 사용하되,
+ * StoreDashboardLayout 내부이므로 breadcrumb / HubSubNav 없음.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   getCatalog,
   applyBySupplyProductId,
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
-import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 
 // ============================================
-// 카테고리 필터
+// 유통 방식 탭 (HubB2BCatalogPage와 동일)
 // ============================================
 
 const DISTRIBUTION_TABS: { key: string; label: string }[] = [
@@ -36,7 +33,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
 const PAGE_LIMIT = 20;
 
 // ============================================
-// 상태 정의 (WO-O4O-HUB-B2B-STATE-VISIBILITY-V1)
+// 상태 정의
 // ============================================
 
 type ProductState = 'listed' | 'approved' | 'pending' | 'available';
@@ -59,7 +56,7 @@ function getProductState(item: CatalogProduct): ProductState {
 // 컴포넌트
 // ============================================
 
-export function HubB2BCatalogPage() {
+export function StoreOrderableProductsPage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +85,7 @@ export function HubB2BCatalogPage() {
       setProducts(res.data);
       setTotal(res.pagination.total);
     } catch (e: any) {
-      setError(e.message || '상품 카탈로그를 불러오지 못했습니다.');
+      setError(e.message || '상품리스트를 불러오지 못했습니다.');
     } finally {
       setLoading(false);
     }
@@ -106,19 +103,18 @@ export function HubB2BCatalogPage() {
   };
 
   const handleApply = async (product: CatalogProduct) => {
-    if (applyingId) return; // 중복 클릭 방지
+    if (applyingId) return;
     setApplyingId(product.id);
     setToast(null);
     try {
       await applyBySupplyProductId(product.id);
       setToast({ type: 'success', message: `"${product.name}" 등록 신청이 완료되었습니다.` });
-      // 로컬 상태 즉시 반영 (재조회 없이)
       setProducts(prev => prev.map(p =>
         p.id === product.id ? { ...p, isApplied: true } : p,
       ));
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
-      if (code === 'DUPLICATE_APPLICATION') {
+      if (code === 'DUPLICATE_APPLICATION' || code === 'ALREADY_EXISTS') {
         setToast({ type: 'error', message: '이미 등록 신청된 상품입니다.' });
       } else {
         setToast({ type: 'error', message: e.message || '등록 신청에 실패했습니다.' });
@@ -129,7 +125,7 @@ export function HubB2BCatalogPage() {
     }
   };
 
-  // 상태 요약 (WO-O4O-HUB-B2B-STATE-VISIBILITY-V1 §4)
+  // 상태 요약
   const summary = useMemo(() => {
     let listed = 0;
     let approved = 0;
@@ -182,17 +178,9 @@ export function HubB2BCatalogPage() {
 
   return (
     <div style={styles.container}>
-      {/* Breadcrumb */}
-      <div style={styles.breadcrumb}>
-        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
-      </div>
-
-      {/* HUB Sub-Navigation */}
-      <HubSubNav />
-
       {/* Hero */}
       <header style={styles.hero}>
-        <h1 style={styles.heroTitle}>상품리스트</h1>
+        <h1 style={styles.heroTitle}>주문 가능 상품리스트</h1>
         <p style={styles.heroDesc}>
           공급자가 제공하는 상품을 탐색하고 내 대시보드에 등록할 수 있습니다.
         </p>
@@ -356,7 +344,7 @@ export function HubB2BCatalogPage() {
                     {state === 'listed' ? (
                       <button disabled style={styles.buttonDisabled}>판매 중</button>
                     ) : state === 'approved' ? (
-                      <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
+                      <button onClick={() => navigate('/store/commerce/products')} style={styles.buttonNavigate}>상품 관리</button>
                     ) : state === 'pending' ? (
                       <button disabled style={styles.buttonDisabled}>승인 대기</button>
                     ) : (
@@ -408,16 +396,6 @@ export function HubB2BCatalogPage() {
           )}
         </>
       )}
-
-      {/* Guide */}
-      <div style={styles.notice}>
-        <span style={styles.noticeIcon}>💡</span>
-        <span>
-          등록 신청 후 승인이 완료되면{' '}
-          <Link to="/store/commerce/orderable" style={{ color: colors.primary }}>내 매장관리 &gt; 주문 가능 상품</Link>
-          에서 상품을 관리할 수 있습니다.
-        </span>
-      </div>
     </div>
   );
 }
@@ -431,12 +409,6 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: '1100px',
     margin: '0 auto',
     padding: '24px',
-  },
-  breadcrumb: { marginBottom: '16px' },
-  breadcrumbLink: {
-    fontSize: '0.875rem',
-    color: colors.primary,
-    textDecoration: 'none',
   },
   hero: {
     marginBottom: '24px',
@@ -716,22 +688,5 @@ const styles: Record<string, React.CSSProperties> = {
     border: `1px solid ${colors.primary}`,
     borderRadius: '6px',
     cursor: 'pointer',
-  },
-  notice: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    gap: '12px',
-    padding: '18px 22px',
-    backgroundColor: colors.primary + '08',
-    borderRadius: borderRadius.lg,
-    border: `1px solid ${colors.primary}20`,
-    fontSize: '0.875rem',
-    color: colors.neutral600,
-    lineHeight: 1.5,
-    marginTop: '24px',
-  },
-  noticeIcon: {
-    fontSize: '18px',
-    flexShrink: 0,
   },
 };

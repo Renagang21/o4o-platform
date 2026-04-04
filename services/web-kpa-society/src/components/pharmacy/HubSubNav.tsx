@@ -22,7 +22,7 @@ interface HubNavItem {
 const HUB_NAV_ITEMS: HubNavItem[] = [
   { label: 'HUB 마켓', path: '/hub', matchExact: true },
   { label: '콘텐츠', path: '/hub/content' },
-  { label: 'B2B 카탈로그', path: '/hub/b2b' },
+  { label: '상품리스트', path: '/hub/b2b' },
   { label: '사이니지', path: '/hub/signage' },
   { label: '공동구매', path: '/groupbuy' },
 ];

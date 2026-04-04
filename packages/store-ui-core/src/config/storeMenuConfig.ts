@@ -118,6 +118,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '상품/판매', items: [
+      { key: 'orderable-products', label: '주문 가능 상품', subPath: '/commerce/orderable' },
       { key: 'products', label: '상품 관리(B2B)', subPath: '/commerce/products' },
       { key: 'b2c', label: 'B2C 상품 판매', subPath: '/commerce/products/b2c' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
