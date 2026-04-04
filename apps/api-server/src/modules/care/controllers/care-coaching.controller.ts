@@ -5,7 +5,7 @@ import { CareCoachingDraftService } from '../services/llm/care-coaching-draft.se
 import { authenticate } from '../../../middleware/auth.middleware.js';
 import { createPharmacyContextMiddleware } from '../care-pharmacy-context.middleware.js';
 import type { PharmacyContextRequest } from '../care-pharmacy-context.middleware.js';
-import { resolvePatientUserId } from '../utils/resolve-patient-id.js';
+import { resolvePatientUserId, resolvePatientUserIdStrict } from '../utils/resolve-patient-id.js';
 
 export function createCareCoachingRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -51,7 +51,19 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const patientId = await resolvePatientUserId(dataSource, rawPatientId);
+      // WO-O4O-GLYCOPHARM-COACHING-PATIENT-ID-NORMALIZATION-FIX-V1
+      // fail-fast: 반드시 users.id로 정규화 가능해야 저장 진행
+      const resolved = await resolvePatientUserIdStrict(dataSource, rawPatientId);
+      if (!resolved) {
+        console.warn(`[care-coaching] Cannot resolve patientId "${rawPatientId}" to users.id — gc.user_id may be NULL`);
+        res.status(400).json({
+          message: 'Patient account is not linked. Cannot save coaching until patient identity is verified.',
+          code: 'PATIENT_NOT_LINKED',
+        });
+        return;
+      }
+
+      const patientId = resolved.userId;
       const session = await service.createSession({
         patientId,
         pharmacistId,
@@ -122,9 +134,17 @@ export function createCareCoachingRouter(dataSource: DataSource): Router {
         return;
       }
 
-      // Create coaching session from approved draft
+      // WO-O4O-GLYCOPHARM-COACHING-PATIENT-ID-NORMALIZATION-FIX-V1
+      // draft.patientId도 users.id인지 재검증
+      const draftResolved = await resolvePatientUserIdStrict(dataSource, draft.patientId);
+      if (!draftResolved) {
+        console.warn(`[care-coaching] Draft patientId "${draft.patientId}" cannot resolve to users.id`);
+        res.status(400).json({ message: 'Patient account is not linked.', code: 'PATIENT_NOT_LINKED' });
+        return;
+      }
+
       const session = await service.createSession({
-        patientId: draft.patientId,
+        patientId: draftResolved.userId,
         pharmacistId,
         pharmacyId,
         snapshotId: draft.snapshotId,

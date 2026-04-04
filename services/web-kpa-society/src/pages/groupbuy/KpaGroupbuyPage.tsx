@@ -12,6 +12,7 @@ import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../
 import { groupbuyApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
+import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
 import type { GroupbuyProduct, GroupbuyStats } from '../../types';
 
@@ -86,10 +87,13 @@ export function KpaGroupbuyPage() {
 
   return (
     <div style={styles.container}>
+      {/* HUB Sub-Navigation */}
+      <HubSubNav />
+
       <PageHeader
         title="공동구매"
         description="약사회 회원 전용 공동구매 상품"
-        breadcrumb={[{ label: '홈', href: '/' }, { label: '공동구매' }]}
+        breadcrumb={[{ label: '약국 HUB', href: '/hub' }, { label: '공동구매' }]}
       />
 
       {/* 운영자 통계 카드 (WO-KPA-GROUPBUY-STATS-V1) */}

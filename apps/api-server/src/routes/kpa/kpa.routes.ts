@@ -98,6 +98,7 @@ import { createInstructorController } from './controllers/instructor.controller.
 import { createCourseRequestController } from './controllers/course-request.controller.js';
 import { createForumRequestController } from './controllers/forum-request.controller.js';
 import { createCommunityHubController } from './controllers/community-hub.controller.js';
+import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
 import { CmsContent } from '@o4o-apps/cms-core';
@@ -228,6 +229,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Steward routes (WO-KPA-STEWARDSHIP-AND-ORGANIZATION-UI-IMPLEMENTATION-V1)
   router.use('/stewards', createStewardController(dataSource, coreRequireAuth as any, requireKpaScope));
+
+  // Legal Documents routes (WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V3)
+  router.use('/', createLegalDocumentsController(dataSource, coreRequireAuth as any, requireKpaScope));
 
   // ============================================================================
   // AUTHENTICATED USER ROUTES — requireAuth only (no admin/operator scope)

@@ -41,6 +41,10 @@ export async function isStoreOwner(
  * Middleware: organization_members 기반 store 접근 필수
  * req.organizationId + req.authContext 주입
  * WO-O4O-AUTH-CONTEXT-UNIFICATION-V1: authContext 추가
+ *
+ * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
+ *   Fallback — activity_type='pharmacy_owner'면 매장 미개설도 접근 허용.
+ *   organizationId=null → 하위 핸들러가 빈 결과 반환.
  */
 export function createRequireStoreOwner(dataSource: DataSource) {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -54,6 +58,7 @@ export function createRequireStoreOwner(dataSource: DataSource) {
       return;
     }
 
+    // Primary: organization_members 기반
     const { isOwner, organizationId, memberRole } = await isStoreOwner(dataSource, user.id);
     if (isOwner && organizationId) {
       req.organizationId = organizationId;
@@ -66,6 +71,26 @@ export function createRequireStoreOwner(dataSource: DataSource) {
       next();
       return;
     }
+
+    // Fallback: activity_type='pharmacy_owner' (매장 미개설 약국 개설약사)
+    // WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1
+    try {
+      const [profile] = await dataSource.query(
+        `SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id = $1 AND activity_type = 'pharmacy_owner' LIMIT 1`,
+        [user.id]
+      );
+      if (profile) {
+        req.organizationId = null as any;
+        req.authContext = {
+          userId: user.id as string,
+          organizationId: null as any,
+          memberRole: '',
+          roles: (user.roles as string[]) || [],
+        };
+        next();
+        return;
+      }
+    } catch { /* table may not exist */ }
 
     res.status(403).json({
       success: false,

@@ -575,7 +575,11 @@ export function createStoreHubController(
     requirePharmacyOwner,
     async (req: Request, res: Response): Promise<void> => {
       try {
-        const organizationId = req.organizationId!;
+        const organizationId = req.organizationId;
+        if (!organizationId) {
+          res.json({ success: true, data: [] });
+          return;
+        }
         const capSvc = new StoreCapabilityService(dataSource);
         const caps = await capSvc.getCapabilities(organizationId);
 

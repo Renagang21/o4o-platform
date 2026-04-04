@@ -27,6 +27,7 @@ import {
 } from '@o4o/hub-exploration-core';
 import { useOrganization } from '../../contexts';
 import { RecommendedServicesSection } from './sections/RecommendedServicesSection';
+import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 import { getCatalog, applyBySupplyProductId } from '../../api/pharmacyProducts';
 import type { CatalogProduct } from '../../api/pharmacyProducts';
 import { cmsApi } from '../../api/cms';
@@ -393,7 +394,7 @@ export function PharmacyHubMarketPage() {
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: '본부/공급사가 제공하는 CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/hub/content') },
     { id: 'signage', icon: '🖥️', title: '플랫폼 사이니지', description: '디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.', onClick: () => navigate('/hub/signage') },
     { id: 'products', icon: '🛒', title: 'B2B 상품 리스트', description: '공급사 상품을 서비스별로 탐색하고 신청·주문합니다.', onClick: () => navigate('/hub/b2b') },
-    { id: 'campaign', icon: '📋', title: '캠페인 · 설문', description: '약사회 캠페인에 참여하고 설문에 응답합니다.', badge: '준비중' },
+    { id: 'groupbuy', icon: '🛍️', title: '공동구매', description: '약국 개설자 전용 공동구매 상품을 탐색하고 참여합니다.', onClick: () => navigate('/groupbuy') },
   ], [navigate]);
 
   // ── Services Section (afterSections slot) ──
@@ -408,6 +409,7 @@ export function PharmacyHubMarketPage() {
   return (
     <HubExplorationLayout
       theme={{ maxWidth: '1100px' }}
+      beforeSections={<HubSubNav />}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
       b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: 'B2B', ctaLabel: 'B2B 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}

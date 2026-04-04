@@ -27,7 +27,7 @@ export class ForumQueryService {
   async listRecentPosts(limit = 5) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at, c.name as "categoryName"
+        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
         FROM forum_post p
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
@@ -39,7 +39,7 @@ export class ForumQueryService {
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at, c.name as "categoryName"
+      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
       FROM forum_post p
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id
@@ -443,7 +443,7 @@ export class ForumQueryService {
   async listPinnedPosts(limit = 3) {
     if (this.config.scope === 'community') {
       return this.dataSource.query(`
-        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at, c.name as "categoryName"
+        SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
         FROM forum_post p
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
@@ -455,7 +455,7 @@ export class ForumQueryService {
 
     // organization scope
     return this.dataSource.query(`
-      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at, c.name as "categoryName"
+      SELECT p.id, p.title, COALESCE(u.nickname, u.name) as "authorName", p.created_at as "createdAt", c.name as "categoryName"
       FROM forum_post p
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id

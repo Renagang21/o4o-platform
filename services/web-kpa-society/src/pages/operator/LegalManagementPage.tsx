@@ -1,122 +1,163 @@
 /**
  * LegalManagementPage - 약관 관리 페이지
  *
- * 운영자가 이용약관과 개인정보처리방침을 편집할 수 있는 페이지
- * WO-KPA-LEGAL-PAGES-V1
+ * WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V3: Phase 3
+ * Backend API 연동 — localStorage 의존 제거
  *
- * TODO: API 연동하여 DB에서 콘텐츠 관리
- * 현재는 로컬 스토리지에 임시 저장
+ * 기능:
+ * - 문서 유형별 탭 (이용약관 / 개인정보처리방침)
+ * - 목록 조회, 편집, 저장, 게시 상태 변경
  */
 
-import { useState, useEffect } from 'react';
-import { Save, FileText, Shield, Eye, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Save, FileText, Shield, AlertCircle, CheckCircle, Globe, FileEdit } from 'lucide-react';
+import { getAccessToken } from '../../contexts/AuthContext';
 
-type TabType = 'policy' | 'privacy';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-const STORAGE_KEY_POLICY = 'kpa_legal_policy';
-const STORAGE_KEY_PRIVACY = 'kpa_legal_privacy';
+type DocType = 'terms' | 'privacy';
 
-// 기본 템플릿 내용
-const DEFAULT_POLICY = `# 이용약관
+interface LegalDocument {
+  id: string;
+  document_type: string;
+  title: string;
+  content: string;
+  status: 'draft' | 'published';
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
-## 제1조 (목적)
-이 약관은 KPA Society(이하 "서비스")의 이용조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
+const DOC_TYPE_LABELS: Record<DocType, string> = {
+  terms: '이용약관',
+  privacy: '개인정보처리방침',
+};
 
-## 제2조 (용어의 정의)
-1. "서비스"란 회사가 제공하는 KPA Society 온라인 서비스를 말합니다.
-2. "회원"이란 서비스에 접속하여 이 약관에 동의하고 회원가입을 완료한 자를 말합니다.
-
-## 제3조 (약관의 효력 및 변경)
-1. 이 약관은 서비스 화면에 게시함으로써 효력을 발생합니다.
-2. 회사는 필요시 관련 법령을 위반하지 않는 범위에서 약관을 변경할 수 있습니다.
-
-(이하 내용을 작성해 주세요)
-`;
-
-const DEFAULT_PRIVACY = `# 개인정보처리방침
-
-## 제1조 (수집하는 개인정보 항목)
-회사는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다.
-
-### 필수 항목
-- 이메일 주소
-- 비밀번호
-- 성명
-- 연락처 (휴대폰 번호)
-- 약사면허번호
-
-### 선택 항목
-- 소속 분회
-- 약국명
-
-## 제2조 (개인정보의 수집 및 이용 목적)
-1. 회원 관리: 본인확인, 개인식별, 가입의사 확인
-2. 서비스 제공: 교육 콘텐츠 제공, 커뮤니티 서비스 제공
-
-(이하 내용을 작성해 주세요)
-`;
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getAccessToken();
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.error?.message || `API error ${res.status}`);
+  }
+  return res.json();
+}
 
 export function LegalManagementPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('policy');
-  const [policyContent, setPolicyContent] = useState('');
-  const [privacyContent, setPrivacyContent] = useState('');
+  const [activeTab, setActiveTab] = useState<DocType>('terms');
+  const [documents, setDocuments] = useState<Record<DocType, LegalDocument | null>>({
+    terms: null,
+    privacy: null,
+  });
+  const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // 로컬 스토리지에서 불러오기
-  useEffect(() => {
-    const savedPolicy = localStorage.getItem(STORAGE_KEY_POLICY);
-    const savedPrivacy = localStorage.getItem(STORAGE_KEY_PRIVACY);
-    setPolicyContent(savedPolicy || DEFAULT_POLICY);
-    setPrivacyContent(savedPrivacy || DEFAULT_PRIVACY);
+  const fetchDocuments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch<{ success: boolean; data: LegalDocument[] }>(
+        '/api/v1/kpa/operator/legal/documents',
+      );
+      const docs = res.data || [];
+      const termsDoc = docs.find((d) => d.document_type === 'terms') || null;
+      const privacyDoc = docs.find((d) => d.document_type === 'privacy') || null;
+      setDocuments({ terms: termsDoc, privacy: privacyDoc });
+    } catch (e: any) {
+      setMessage({ type: 'error', text: `문서 목록 로드 실패: ${e.message}` });
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
+
+  // Sync editor content when tab changes or documents load
+  useEffect(() => {
+    const doc = documents[activeTab];
+    setEditContent(doc?.content || '');
+    setEditTitle(doc?.title || DOC_TYPE_LABELS[activeTab]);
+  }, [activeTab, documents]);
+
+  const currentDoc = documents[activeTab];
 
   const handleSave = async () => {
     setSaving(true);
-    setSaveMessage(null);
+    setMessage(null);
 
     try {
-      // TODO: API 호출로 DB에 저장
-      // const response = await fetch('/api/v1/operator/legal', {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     type: activeTab,
-      //     content: activeTab === 'policy' ? policyContent : privacyContent,
-      //   }),
-      // });
-
-      // 현재는 로컬 스토리지에 저장
-      if (activeTab === 'policy') {
-        localStorage.setItem(STORAGE_KEY_POLICY, policyContent);
+      if (currentDoc) {
+        // Update existing
+        await apiFetch(`/api/v1/kpa/operator/legal/documents/${currentDoc.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({ title: editTitle, content: editContent }),
+        });
       } else {
-        localStorage.setItem(STORAGE_KEY_PRIVACY, privacyContent);
+        // Create new
+        await apiFetch('/api/v1/kpa/operator/legal/documents', {
+          method: 'POST',
+          body: JSON.stringify({
+            document_type: activeTab,
+            title: editTitle,
+            content: editContent,
+          }),
+        });
       }
 
-      // 저장 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setSaveMessage({
-        type: 'success',
-        text: `${activeTab === 'policy' ? '이용약관' : '개인정보처리방침'}이 저장되었습니다.`,
-      });
-    } catch (error) {
-      setSaveMessage({
-        type: 'error',
-        text: '저장에 실패했습니다. 다시 시도해 주세요.',
-      });
+      setMessage({ type: 'success', text: `${DOC_TYPE_LABELS[activeTab]}이 저장되었습니다.` });
+      await fetchDocuments();
+    } catch (e: any) {
+      setMessage({ type: 'error', text: `저장 실패: ${e.message}` });
     } finally {
       setSaving(false);
     }
   };
 
-  const handlePreview = () => {
-    const path = activeTab === 'policy' ? '/policy' : '/privacy';
-    window.open(path, '_blank');
+  const handlePublishToggle = async () => {
+    if (!currentDoc) return;
+    setPublishing(true);
+    setMessage(null);
+
+    const action = currentDoc.status === 'published' ? 'unpublish' : 'publish';
+    const actionLabel = action === 'publish' ? '게시' : '게시 해제';
+
+    try {
+      await apiFetch(`/api/v1/kpa/operator/legal/documents/${currentDoc.id}/publish`, {
+        method: 'PATCH',
+        body: JSON.stringify({ action }),
+      });
+      setMessage({ type: 'success', text: `${DOC_TYPE_LABELS[activeTab]} ${actionLabel} 완료.` });
+      await fetchDocuments();
+    } catch (e: any) {
+      setMessage({ type: 'error', text: `${actionLabel} 실패: ${e.message}` });
+    } finally {
+      setPublishing(false);
+    }
   };
 
-  const currentContent = activeTab === 'policy' ? policyContent : privacyContent;
-  const setCurrentContent = activeTab === 'policy' ? setPolicyContent : setPrivacyContent;
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-slate-200 rounded w-48" />
+          <div className="h-4 bg-slate-200 rounded w-96" />
+          <div className="h-96 bg-slate-200 rounded" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
@@ -137,7 +178,7 @@ export function LegalManagementPage() {
             <p className="font-medium mb-1">약관 작성 안내</p>
             <ul className="list-disc list-inside space-y-1 text-blue-700">
               <li>Markdown 형식으로 작성할 수 있습니다. (# 제목, ## 소제목, - 목록 등)</li>
-              <li>변경된 약관은 저장 후 즉시 반영됩니다.</li>
+              <li>저장 후 &apos;게시&apos; 버튼을 눌러야 회원에게 적용됩니다.</li>
               <li>중요한 변경사항은 회원에게 별도로 안내해 주세요.</li>
             </ul>
           </div>
@@ -147,9 +188,9 @@ export function LegalManagementPage() {
       {/* 탭 */}
       <div className="flex gap-2 mb-6">
         <button
-          onClick={() => setActiveTab('policy')}
+          onClick={() => setActiveTab('terms')}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors ${
-            activeTab === 'policy'
+            activeTab === 'terms'
               ? 'bg-blue-600 text-white'
               : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
           }`}
@@ -170,38 +211,78 @@ export function LegalManagementPage() {
         </button>
       </div>
 
+      {/* 게시 상태 표시 */}
+      {currentDoc && (
+        <div className={`flex items-center gap-2 px-4 py-2.5 rounded-lg mb-4 ${
+          currentDoc.status === 'published'
+            ? 'bg-green-50 border border-green-200'
+            : 'bg-amber-50 border border-amber-200'
+        }`}>
+          {currentDoc.status === 'published' ? (
+            <>
+              <Globe className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-green-800 font-medium">게시 중</span>
+              {currentDoc.published_at && (
+                <span className="text-xs text-green-600 ml-2">
+                  게시일: {new Date(currentDoc.published_at).toLocaleDateString('ko-KR')}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <FileEdit className="w-4 h-4 text-amber-600" />
+              <span className="text-sm text-amber-800 font-medium">임시저장 (미게시)</span>
+            </>
+          )}
+        </div>
+      )}
+
       {/* 저장 메시지 */}
-      {saveMessage && (
+      {message && (
         <div
           className={`flex items-center gap-2 p-3 rounded-lg mb-4 ${
-            saveMessage.type === 'success'
+            message.type === 'success'
               ? 'bg-green-50 border border-green-200 text-green-800'
               : 'bg-red-50 border border-red-200 text-red-800'
           }`}
         >
-          {saveMessage.type === 'success' ? (
+          {message.type === 'success' ? (
             <CheckCircle className="w-4 h-4" />
           ) : (
             <AlertCircle className="w-4 h-4" />
           )}
-          <span className="text-sm">{saveMessage.text}</span>
+          <span className="text-sm">{message.text}</span>
         </div>
       )}
 
       {/* 에디터 */}
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50 border-b border-slate-200">
-          <span className="text-sm font-medium text-slate-700">
-            {activeTab === 'policy' ? '이용약관' : '개인정보처리방침'} 편집
-          </span>
+          <input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            className="text-sm font-medium text-slate-700 bg-transparent border-none focus:outline-none focus:ring-0 w-64"
+            placeholder="문서 제목"
+          />
           <div className="flex items-center gap-2">
-            <button
-              onClick={handlePreview}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors"
-            >
-              <Eye className="w-4 h-4" />
-              미리보기
-            </button>
+            {currentDoc && (
+              <button
+                onClick={handlePublishToggle}
+                disabled={publishing}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                  currentDoc.status === 'published'
+                    ? 'text-amber-700 hover:bg-amber-100 border border-amber-300'
+                    : 'text-green-700 hover:bg-green-100 border border-green-300'
+                }`}
+              >
+                <Globe className="w-4 h-4" />
+                {publishing
+                  ? '처리 중...'
+                  : currentDoc.status === 'published'
+                    ? '게시 해제'
+                    : '게시'}
+              </button>
+            )}
             <button
               onClick={handleSave}
               disabled={saving}
@@ -213,18 +294,18 @@ export function LegalManagementPage() {
           </div>
         </div>
         <textarea
-          value={currentContent}
-          onChange={(e) => setCurrentContent(e.target.value)}
+          value={editContent}
+          onChange={(e) => setEditContent(e.target.value)}
           className="w-full h-[500px] p-4 font-mono text-sm text-slate-800 resize-none focus:outline-none"
-          placeholder={`${activeTab === 'policy' ? '이용약관' : '개인정보처리방침'} 내용을 입력하세요...`}
+          placeholder={`${DOC_TYPE_LABELS[activeTab]} 내용을 입력하세요...`}
         />
       </div>
 
       {/* 하단 안내 */}
       <div className="mt-6 text-sm text-slate-500">
         <p>
-          * 현재 버전에서는 임시로 브라우저에 저장됩니다.
-          서버 연동 후에는 모든 사용자에게 동일한 내용이 표시됩니다.
+          * 저장된 문서는 &apos;게시&apos; 버튼을 눌러야 회원에게 적용됩니다.
+          같은 유형의 문서는 하나만 게시 상태를 유지할 수 있습니다.
         </p>
       </div>
     </div>

@@ -193,8 +193,9 @@ export function buildKpaOperatorConfig(
       link: '/operator/organization-requests',
     });
   }
-  // Sort by severity (critical → warning → info) so slice(0,3) picks highest priority
+  // Sort by severity (critical → warning → info), then limit to top 3 — builder decides final output
   aiSummary.sort((a, b) => levelOrder[a.level] - levelOrder[b.level]);
+  aiSummary.splice(3);
 
   // Block 3: Action Queue — Action Required Only
   const actionQueue: ActionItem[] = [];

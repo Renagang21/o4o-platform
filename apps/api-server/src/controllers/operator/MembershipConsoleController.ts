@@ -73,27 +73,32 @@ export class MembershipConsoleController {
         paramIdx++;
       }
 
+      // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
+      // Status + service scope → combined service_memberships subquery.
+      // Uses sm.status (SSOT for service-level membership state) instead of u.status.
+      const smConditions: string[] = [];
+
       if (status && status !== 'all') {
-        conditions.push(`u.status = $${paramIdx}`);
+        smConditions.push(`sm_f.status = $${paramIdx}`);
         params.push(status);
         paramIdx++;
       }
 
       // WO-O4O-SERVICE-DATA-ISOLATION-FIX-V1: Service scope filter
-      // Platform admin: optional serviceKey filter from query param
-      // Service operator: mandatory filter from scope (overrides query param)
       if (!scope.isPlatformAdmin) {
-        conditions.push(
-          `EXISTS (SELECT 1 FROM service_memberships sm2 WHERE sm2.user_id = u.id AND sm2.service_key = ANY($${paramIdx}))`
-        );
+        smConditions.push(`sm_f.service_key = ANY($${paramIdx})`);
         params.push(scope.serviceKeys);
         paramIdx++;
       } else if (serviceKey && serviceKey !== 'all') {
-        conditions.push(
-          `EXISTS (SELECT 1 FROM service_memberships sm2 WHERE sm2.user_id = u.id AND sm2.service_key = $${paramIdx})`
-        );
+        smConditions.push(`sm_f.service_key = $${paramIdx}`);
         params.push(serviceKey);
         paramIdx++;
+      }
+
+      if (smConditions.length > 0) {
+        conditions.push(
+          `EXISTS (SELECT 1 FROM service_memberships sm_f WHERE sm_f.user_id = u.id AND ${smConditions.join(' AND ')})`
+        );
       }
 
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -185,22 +190,34 @@ export class MembershipConsoleController {
       }
 
       // Compose response
-      const enrichedUsers = users.map((u: any) => ({
-        id: u.id,
-        email: u.email,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        name: u.name,
-        nickname: u.nickname || null,
-        company: u.company,
-        phone: u.phone,
-        status: u.status,
-        isActive: u.isActive,
-        roles: roleMap[u.id] || [],
-        memberships: membershipMap[u.id] || [],
-        createdAt: u.createdAt,
-        updatedAt: u.updatedAt,
-      }));
+      const enrichedUsers = users.map((u: any) => {
+        const memberships = membershipMap[u.id] || [];
+        // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
+        // When filtering by membership status, reflect the matched membership status
+        // so frontend action buttons (approve/reject) render correctly
+        let effectiveStatus = u.status;
+        if (status && status !== 'all' && memberships.length > 0) {
+          const matched = memberships.find((m: any) => m.status === status);
+          if (matched) effectiveStatus = matched.status;
+        }
+
+        return {
+          id: u.id,
+          email: u.email,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          name: u.name,
+          nickname: u.nickname || null,
+          company: u.company,
+          phone: u.phone,
+          status: effectiveStatus,
+          isActive: u.isActive,
+          roles: roleMap[u.id] || [],
+          memberships,
+          createdAt: u.createdAt,
+          updatedAt: u.updatedAt,
+        };
+      });
 
       res.json({
         success: true,
@@ -484,8 +501,32 @@ export class MembershipConsoleController {
           return;
         }
       } else {
-        // Non-approval, non-suspend status (rejected, etc.) — user status only
         const dbStatus = status.toLowerCase();
+
+        // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
+        // For rejection, also update service_memberships.status (SSOT)
+        // to keep consistent with the membership-based listing filter
+        if (dbStatus === 'rejected') {
+          const pendingMemberships = scope.isPlatformAdmin
+            ? await AppDataSource.query(
+                `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
+                [userId]
+              )
+            : await AppDataSource.query(
+                `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
+                [userId, scope.serviceKeys]
+              );
+
+          for (const m of pendingMemberships) {
+            await approvalService.rejectMembership({
+              membershipId: m.id,
+              reason: req.body.reason || null,
+              isPlatformAdmin: scope.isPlatformAdmin,
+              serviceKeys: scope.serviceKeys,
+            });
+          }
+        }
+
         await AppDataSource.query(
           `UPDATE users SET status = $1, "isActive" = false, "updatedAt" = NOW()
            WHERE id = $2`,
@@ -975,12 +1016,13 @@ export class MembershipConsoleController {
         : `WHERE sm.service_key = ANY($1)`;
       const params = scope.isPlatformAdmin ? [] : [scope.serviceKeys];
 
+      // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
+      // Use sm.status (SSOT for service-level membership state) instead of u.status
       const rows = await AppDataSource.query(
-        `SELECT u.status, COUNT(*)::int AS count
-         FROM users u
-         INNER JOIN service_memberships sm ON sm.user_id = u.id
+        `SELECT sm.status, COUNT(*)::int AS count
+         FROM service_memberships sm
          ${serviceFilter}
-         GROUP BY u.status`,
+         GROUP BY sm.status`,
         params
       );
 

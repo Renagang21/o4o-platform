@@ -20,6 +20,7 @@ import {
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
+import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 
 // ============================================
 // 카테고리 필터
@@ -185,6 +186,9 @@ export function HubB2BCatalogPage() {
       <div style={styles.breadcrumb}>
         <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
       </div>
+
+      {/* HUB Sub-Navigation */}
+      <HubSubNav />
 
       {/* Hero */}
       <header style={styles.hero}>

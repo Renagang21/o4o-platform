@@ -213,8 +213,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
   checkAuth: () => Promise<void>;
-  /** WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 설정 (API PATCH + 상태 업데이트) */
-  setActivityType: (activityType: string) => Promise<void>;
+  /** WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1: activityType + optional businessInfo */
+  setActivityType: (activityType: string, businessInfo?: Record<string, any>) => Promise<void>;
   // Phase 2-b: Service User (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   serviceUser: ServiceUser | null;
   isServiceUserAuthenticated: boolean;
@@ -391,18 +391,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * WO-ROLE-NORMALIZATION-PHASE3-C-V1: activityType 설정
+   * WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
+   * activityType + optional businessInfo 저장
    * - API PATCH로 서버 저장 → 서버가 isStoreOwner 재계산
    * - checkAuth()로 서버 응답 기반 상태 동기화
+   * - error re-throw: ActivitySetupPage에서 에러 UI 표시 가능
    */
-  const setActivityType = async (activityType: string) => {
+  const setActivityType = async (activityType: string, businessInfo?: Record<string, any>) => {
     if (user) {
-      try {
-        await authClient.api.patch('/auth/me/profile', { activityType });
-      } catch (err) {
-        console.error('Failed to save activityType:', err);
-      }
-      // 서버가 derive한 최신 상태를 가져옴 (isStoreOwner 재계산 포함)
+      const payload: Record<string, any> = { activityType };
+      if (businessInfo) payload.businessInfo = businessInfo;
+      await authClient.api.patch('/auth/me/profile', payload);
       await checkAuth();
     }
   };

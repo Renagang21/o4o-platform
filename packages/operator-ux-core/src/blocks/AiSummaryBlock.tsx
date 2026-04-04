@@ -35,7 +35,7 @@ export function AiSummaryBlock({ items }: { items: AiSummaryItem[] }) {
     <section className={`${style.bg} border ${style.border} rounded-2xl p-4`}>
       <h2 className={`text-sm font-semibold ${style.text} mb-2`}>AI Summary</h2>
       <ul className="space-y-1">
-        {items.slice(0, 3).map((item) => (
+        {items.map((item) => (
           <li key={item.id} className={`text-sm ${levelStyles[item.level].text}`}>
             {item.link ? (
               <Link to={item.link} className="underline underline-offset-2">

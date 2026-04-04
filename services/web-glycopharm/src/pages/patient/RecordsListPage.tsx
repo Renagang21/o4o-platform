@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { patientApi } from '@/api/patient';
 import type { GlucoseReading } from '@/api/patient';
+import { normalizeMedications } from '@/utils/extract-metadata';
 
 const MEAL_TIMING_LABELS: Record<string, string> = {
   fasting: '공복',
@@ -91,7 +92,8 @@ export default function RecordsListPage() {
           <div className="space-y-2">
             {readings.map((r) => {
               const meta = r.metadata as Record<string, unknown>;
-              const hasMed = meta?.medication != null;
+              const meds = normalizeMedications(meta);
+              const hasMed = meds.length > 0;
               const hasEx = meta?.exercise != null;
               const rawSym = meta?.symptoms;
               const symItems = Array.isArray(rawSym)
@@ -122,12 +124,12 @@ export default function RecordsListPage() {
 
                   {(hasMed || hasEx || hasSym) && (
                     <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-slate-100">
-                      {hasMed && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
+                      {meds.map((med, mi) => (
+                        <span key={mi} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-50 text-violet-600">
                           <Pill className="w-3 h-3" />
-                          {(meta.medication as { name: string }).name}
+                          {med.name}{med.dose ? ` ${med.dose}` : ''}
                         </span>
-                      )}
+                      ))}
                       {hasEx && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-600">
                           <Footprints className="w-3 h-3" />

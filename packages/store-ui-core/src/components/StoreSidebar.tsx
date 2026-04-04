@@ -25,6 +25,13 @@ import {
   QrCode,
   Megaphone,
   BarChart3,
+  Newspaper,
+  Tag,
+  Truck,
+  Tablet,
+  MonitorSmartphone,
+  PanelLeft,
+  Palette,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -42,7 +49,7 @@ const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
   settings: Settings,
 };
 
-/** Section mode 아이콘 매핑 */
+/** Section mode 아이콘 매핑 (WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1) */
 const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   library: BookOpen,
@@ -53,6 +60,17 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'local-products': ShoppingBag,
   orders: ShoppingCart,
   'analytics-marketing': BarChart3,
+  content: FileText,
+  blog: Newspaper,
+  b2c: Tag,
+  suppliers: Truck,
+  channels: LayoutGrid,
+  'tablet-channels': Tablet,
+  'tablet-displays': MonitorSmartphone,
+  'store-settings': Settings,
+  'layout-builder': PanelLeft,
+  template: Palette,
+  billing: Receipt,
 };
 
 export interface StoreSidebarProps {

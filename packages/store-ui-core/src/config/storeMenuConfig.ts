@@ -96,7 +96,7 @@ export const GLUCOSEVIEW_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard', 'settings'],
 };
 
-/** KPA-Society Store Config (WO-O4O-STORE-HUB-STRUCTURE-REFACTOR-V1) */
+/** KPA-Society Store Config (WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1) */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
   serviceName: '약국 경영지원',
@@ -106,21 +106,36 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '', items: [
       { key: 'dashboard', label: '대시보드', subPath: '/dashboard' },
     ]},
-    { label: 'Operation', items: [
+    { label: '운영', items: [
       { key: 'library', label: '자료실', subPath: '/operation/library' },
+      { key: 'content', label: '콘텐츠 관리', subPath: '/content' },
+      { key: 'blog', label: '블로그', subPath: '/content/blog' },
     ]},
-    { label: 'Marketing', items: [
+    { label: '마케팅', items: [
       { key: 'qr', label: 'QR 관리', subPath: '/marketing/qr' },
       { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
-      { key: 'signage', label: '사이니지', subPath: '/marketing/signage' },
+      { key: 'signage', label: '매장 사이니지', subPath: '/marketing/signage' },
+      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
-    { label: 'Commerce', items: [
-      { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
+    { label: '상품/판매', items: [
+      { key: 'products', label: '상품 관리(B2B)', subPath: '/commerce/products' },
+      { key: 'b2c', label: 'B2C 상품 판매', subPath: '/commerce/products/b2c' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
+      { key: 'suppliers', label: '공급자', subPath: '/commerce/products/suppliers' },
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
     ]},
-    { label: 'Analytics', items: [
-      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
+    { label: '채널/디바이스', items: [
+      { key: 'channels', label: '채널 관리', subPath: '/channels' },
+      { key: 'tablet-channels', label: '태블릿 채널', subPath: '/channels/tablet' },
+      { key: 'tablet-displays', label: '태블릿 디스플레이', subPath: '/commerce/tablet-displays' },
+    ]},
+    { label: '설정', items: [
+      { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
+      { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
+      { key: 'template', label: '템플릿 관리', subPath: '/settings/template' },
+    ]},
+    { label: '정산', items: [
+      { key: 'billing', label: '정산/인보이스', subPath: '/billing' },
     ]},
   ],
 };

@@ -113,7 +113,7 @@ export class AuthAccountController extends BaseController {
 
     // WO-KPA-A-ACTIVITY-TYPE-SSOT-ALIGNMENT-V1:
     // activityType 직접 수용 (프론트 계약) + pharmacistFunction 하위 호환
-    const { pharmacistFunction, activityType: rawActivityType } = req.body;
+    const { pharmacistFunction, activityType: rawActivityType, businessInfo } = req.body;
 
     const validActivityTypes = [
       'pharmacy_owner', 'pharmacy_employee', 'hospital', 'manufacturer',
@@ -150,6 +150,38 @@ export class AuthAccountController extends BaseController {
         `UPDATE kpa_members SET activity_type = $2 WHERE user_id = $1`,
         [userId, resolvedActivityType]
       );
+
+      // 3. WO-KPA-A-PHARMACIST-ACTIVITY-TYPE-BUSINESS-INFO-FLOW-V1:
+      //    businessInfo → users.businessInfo JSONB (merge with existing)
+      if (businessInfo && typeof businessInfo === 'object') {
+        const allowedFields = ['businessName', 'phone', 'storeAddress', 'address', 'address2', 'zipCode'];
+        const sanitized: Record<string, any> = {};
+        for (const key of allowedFields) {
+          if (businessInfo[key] !== undefined) sanitized[key] = businessInfo[key];
+        }
+        if (Object.keys(sanitized).length > 0) {
+          const [existingUser] = await AppDataSource.query(
+            `SELECT "businessInfo" FROM users WHERE id = $1`, [userId]
+          );
+          const merged = { ...(existingUser?.businessInfo || {}), ...sanitized };
+          await AppDataSource.query(
+            `UPDATE users SET "businessInfo" = $1 WHERE id = $2`,
+            [JSON.stringify(merged), userId]
+          );
+        }
+      }
+
+      // 4. pharmacy_owner → kpa_members.pharmacy_name/pharmacy_address mirror
+      if (resolvedActivityType === 'pharmacy_owner' && businessInfo) {
+        const pName = businessInfo.businessName || null;
+        const pAddr = businessInfo.storeAddress
+          ? [businessInfo.storeAddress.zipCode, businessInfo.storeAddress.baseAddress, businessInfo.storeAddress.detailAddress].filter(Boolean).join(' ')
+          : (businessInfo.address || null);
+        await AppDataSource.query(
+          `UPDATE kpa_members SET pharmacy_name = COALESCE($2, pharmacy_name), pharmacy_address = COALESCE($3, pharmacy_address) WHERE user_id = $1`,
+          [userId, pName, pAddr]
+        );
+      }
 
       const qualification = await derivePharmacistQualification(userId);
       return BaseController.ok(res, {

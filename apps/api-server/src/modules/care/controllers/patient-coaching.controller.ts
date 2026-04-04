@@ -33,11 +33,13 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
       }
 
       // WO-O4O-CARE-IDENTITY-UNIFICATION-USERS-ID-V1: query directly by users.id
+      // WO-O4O-GLYCOPHARM-COACHING-PATIENT-ID-NORMALIZATION-FIX-V1: pharmacy info 추가
       const sessions = await dataSource.query(
         `SELECT
           cs.id,
           cs.patient_id AS "patientId",
           cs.pharmacist_id AS "pharmacistId",
+          cs.pharmacy_id AS "pharmacyId",
           cs.summary,
           cs.action_plan AS "actionPlan",
           cs.created_at AS "createdAt",
@@ -46,9 +48,11 @@ export function createPatientCoachingRouter(dataSource: DataSource): Router {
             NULLIF(TRIM(CONCAT(u."firstName", ' ', u."lastName")), ''),
             u.name,
             u.email
-          ) AS "pharmacistName"
+          ) AS "pharmacistName",
+          org.name AS "pharmacyName"
         FROM care_coaching_sessions cs
         LEFT JOIN users u ON u.id = cs.pharmacist_id
+        LEFT JOIN organizations org ON org.id = cs.pharmacy_id
         WHERE cs.patient_id = $1
         ORDER BY cs.created_at DESC
         LIMIT 50`,
