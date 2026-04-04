@@ -91,6 +91,9 @@ export class MypageService {
         address: kpaMember?.pharmacy_address || null,
       } : null,
 
+      // Business info (사업장/근무지 정보) — users.businessInfo JSONB
+      businessInfo: fullUser?.businessInfo || null,
+
       // Organization/Officer info (조직/임원 정보)
       organizations: organizationMemberships.map((m: any) => ({
         id: m.organization?.id,
@@ -107,7 +110,7 @@ export class MypageService {
    */
   async updateProfile(
     userId: string,
-    data: { name?: string; lastName?: string; firstName?: string; phone?: string },
+    data: { name?: string; lastName?: string; firstName?: string; phone?: string; university?: string; workplace?: string },
     currentUser: any,
   ): Promise<any> {
     const userRepository = this.dataSource.getRepository('User');
@@ -118,6 +121,8 @@ export class MypageService {
     if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.firstName !== undefined) updateData.firstName = data.firstName;
     if (data.phone !== undefined) updateData.phone = data.phone ? data.phone.replace(/\D/g, '') : data.phone;
+    if (data.university !== undefined) updateData.university = data.university;
+    if (data.workplace !== undefined) updateData.workplace = data.workplace;
 
     // If lastName and firstName provided, auto-generate name
     if (data.lastName !== undefined || data.firstName !== undefined) {

@@ -120,15 +120,7 @@ export default function Header() {
                     >
                       마이페이지
                     </Link>
-                    {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
-                    <a
-                      href="https://account.neture.co.kr"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ ...styles.dropdownItem, color: '#9ca3af' }}
-                    >
-                      Account Center ↗
-                    </a>
+                    {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
                     <button
                       onClick={handleLogout}
                       style={styles.dropdownLogout}

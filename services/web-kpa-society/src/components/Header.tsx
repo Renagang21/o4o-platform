@@ -16,7 +16,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut, ExternalLink } from 'lucide-react';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -259,17 +259,7 @@ export function Header({ serviceName }: { serviceName: string }) {
                         </>
                       )}
 
-                      {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
-                      <div style={styles.userDropdownDivider} />
-                      <a
-                        href="https://account.neture.co.kr"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ ...styles.userDropdownItem, color: colors.gray500 || '#6b7280' }}
-                      >
-                        <ExternalLink style={{ width: 16, height: 16, color: colors.gray400 || '#9ca3af' }} />
-                        Account Center
-                      </a>
+                      {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-KPA-SOCIETY-HIDE-BROKEN-ACCOUNT-CENTER-LINK-V1) */}
                       <div style={styles.userDropdownDivider} />
                       <button
                         style={styles.userDropdownLogout}

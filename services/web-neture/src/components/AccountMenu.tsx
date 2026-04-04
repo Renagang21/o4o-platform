@@ -10,9 +10,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, LayoutDashboard, Settings, ExternalLink } from 'lucide-react';
+import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
 
-const ACCOUNT_CENTER_URL = 'https://account.neture.co.kr';
 import { useAuth, ROLE_LABELS, getNetureDashboardRoute, useLoginModal } from '../contexts';
 
 export default function AccountMenu() {
@@ -147,17 +146,8 @@ export default function AccountMenu() {
               마이페이지
             </Link>
 
-            {/* Account Center — WO-O4O-GLOBAL-HEADER-PROFILE-IA-REALIGNMENT-V1 */}
+            {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
             <div className="border-t border-gray-100 my-1" />
-            <a
-              href={ACCOUNT_CENTER_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
-            >
-              <ExternalLink className="w-4 h-4 text-gray-400" />
-              Account Center
-            </a>
 
             {/* 로그아웃 */}
             <button

@@ -75,6 +75,19 @@ export interface ProfileResponse {
     address: string | null;
   } | null;
 
+  // 사업장/근무지 정보 (users.businessInfo JSONB)
+  businessInfo: {
+    businessName?: string;
+    phone?: string;
+    storeAddress?: {
+      zipCode?: string;
+      baseAddress?: string;
+      detailAddress?: string;
+    };
+    address?: string;
+    zipCode?: string;
+  } | null;
+
   // 조직/임원 정보
   organizations: Array<{
     id: string;

@@ -76,9 +76,12 @@ export async function derivePharmacistQualification(userId: string): Promise<{
   if (isStoreOwner) {
     pharmacistRole = 'pharmacy_owner';
   } else if (profile?.activity_type) {
-    pharmacistRole = profile.activity_type === 'pharmacy_owner'
-      ? 'pharmacy_owner'
-      : 'general';
+    if (profile.activity_type === 'pharmacy_owner') {
+      pharmacistRole = 'pharmacy_owner';
+      isStoreOwner = true;
+    } else {
+      pharmacistRole = 'general';
+    }
   }
 
   // 4. pharmacistFunction = activityType 직통 (SSOT 정합성)
