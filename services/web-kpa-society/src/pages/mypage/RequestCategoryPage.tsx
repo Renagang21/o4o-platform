@@ -16,10 +16,13 @@ import {
 } from 'lucide-react';
 import { forumRequestApi } from '../../api/forum';
 
+type ForumType = 'open' | 'closed';
+
 interface CategoryRequestForm {
   name: string;
   description: string;
   reason?: string;
+  forumType: ForumType;
 }
 
 export default function RequestCategoryPage() {
@@ -27,7 +30,7 @@ export default function RequestCategoryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<CategoryRequestForm>({ name: '', description: '', reason: '' });
+  const [formData, setFormData] = useState<CategoryRequestForm>({ name: '', description: '', reason: '', forumType: 'open' });
   const [errors, setErrors] = useState<Partial<CategoryRequestForm>>({});
 
   const validateForm = (): boolean => {
@@ -51,6 +54,7 @@ export default function RequestCategoryPage() {
         name: formData.name.trim(),
         description: formData.description.trim(),
         reason: formData.reason?.trim() || undefined,
+        forumType: formData.forumType,
       });
       if (!response.success) {
         setSubmitError(response.error || '신청에 실패했습니다.');
@@ -116,6 +120,29 @@ export default function RequestCategoryPage() {
             <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-2">신청 사유 <span className="text-slate-400">(선택)</span></label>
             <textarea id="reason" value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="이 포럼이 필요한 이유를 설명해주세요 (선택사항)" rows={3}
               className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">포럼 유형 <span className="text-red-500">*</span></label>
+            <div className="grid grid-cols-2 gap-3">
+              <label
+                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${formData.forumType === 'open' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+              >
+                <input type="radio" name="forumType" value="open" checked={formData.forumType === 'open'} onChange={() => setFormData({ ...formData, forumType: 'open' })} className="mt-1" />
+                <div>
+                  <div className="font-medium text-slate-800">공개 포럼</div>
+                  <p className="text-xs text-slate-500 mt-1">모든 회원이 자유롭게 참여할 수 있는 포럼</p>
+                </div>
+              </label>
+              <label
+                className={`flex items-start gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${formData.forumType === 'closed' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-slate-300'}`}
+              >
+                <input type="radio" name="forumType" value="closed" checked={formData.forumType === 'closed'} onChange={() => setFormData({ ...formData, forumType: 'closed' })} className="mt-1" />
+                <div>
+                  <div className="font-medium text-slate-800">비공개 포럼</div>
+                  <p className="text-xs text-slate-500 mt-1">승인된 회원만 참여할 수 있는 포럼</p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
         <div className="bg-blue-50 rounded-xl p-4 flex gap-3">

@@ -62,7 +62,7 @@ import { PolicyPage, PrivacyPage } from './pages/legal';
 import { OrganizationAboutPage, BranchesPage, BranchDetailPage, OfficersPage, ContactPage } from './pages/organization';
 
 // MyPage pages
-import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage } from './pages/mypage';
+import { MyDashboardPage, MyProfilePage, MySettingsPage, MyCertificatesPage, PersonalStatusReportPage, AnnualReportFormPage, MyForumDashboardPage, RequestCategoryPage as KpaRequestCategoryPage, MyRequestsPage, ForumMemberManagementPage } from './pages/mypage';
 
 // Branch Routes (분회 서브디렉토리)
 import { BranchRoutes } from './routes/BranchRoutes';
@@ -595,6 +595,10 @@ function App() {
           {/* WO-O4O-FORUM-MY-FORUM-EXPANSION-V1 */}
           <Route path="/mypage/my-forums" element={<Layout serviceName={SERVICE_NAME}><MyForumDashboardPage /></Layout>} />
           <Route path="/mypage/my-forums/request" element={<Layout serviceName={SERVICE_NAME}><KpaRequestCategoryPage /></Layout>} />
+          {/* WO-KPA-A-FORUM-OWNER-MEMBER-MANAGEMENT-UI-V1: 포럼 회원 관리 */}
+          <Route path="/mypage/my-forums/:forumId/members" element={<Layout serviceName={SERVICE_NAME}><ForumMemberManagementPage /></Layout>} />
+          {/* WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1 */}
+          <Route path="/mypage/my-requests" element={<Layout serviceName={SERVICE_NAME}><MyRequestsPage /></Layout>} />
 
           {/* Participation (참여) */}
           <Route path="/participation" element={<Layout serviceName={SERVICE_NAME}><ParticipationListPage /></Layout>} />

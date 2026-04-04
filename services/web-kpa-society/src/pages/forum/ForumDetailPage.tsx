@@ -43,8 +43,14 @@ export function ForumDetailPage() {
 
       setPost(postRes.data);
       setComments(commentsRes.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '게시글을 불러오는데 실패했습니다.');
+    } catch (err: any) {
+      const status = err?.response?.status || err?.status;
+      const code = err?.response?.data?.code;
+      if (status === 403 && code === 'CLOSED_FORUM_ACCESS_DENIED') {
+        setError('비공개 포럼입니다. 가입 신청 후 승인을 받으면 열람할 수 있습니다.');
+      } else {
+        setError(err instanceof Error ? err.message : '게시글을 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }
@@ -101,11 +107,12 @@ export function ForumDetailPage() {
   }
 
   if (error || !post) {
+    const isClosed = error?.includes('비공개 포럼');
     return (
       <div style={styles.container}>
         <EmptyState
-          icon="⚠️"
-          title="게시글을 찾을 수 없습니다"
+          icon={isClosed ? '🔒' : '⚠️'}
+          title={isClosed ? '비공개 포럼' : '게시글을 찾을 수 없습니다'}
           description={error || '삭제되었거나 존재하지 않는 게시글입니다.'}
           action={{ label: '목록으로', onClick: () => navigate('/forum') }}
         />

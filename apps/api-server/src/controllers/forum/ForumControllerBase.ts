@@ -92,6 +92,57 @@ export class ForumControllerBase {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1: closed forum access helpers
+  // ---------------------------------------------------------------------------
+
+  /** Extract user info from request (optionalAuth may leave user undefined) */
+  protected getUserFromReq(req: Request): { userId?: string; roles: string[] } {
+    const user = (req as any).user;
+    return { userId: user?.id, roles: user?.roles || [] };
+  }
+
+  /**
+   * Check if the caller may access a closed forum.
+   * - forumType != 'closed' → always allowed
+   * - closed → member / owner / admin / operator only
+   */
+  protected async checkClosedForumAccess(
+    categoryId: string,
+    userId: string | undefined,
+    userRoles: string[],
+  ): Promise<{ allowed: boolean; forumType?: string }> {
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+      select: ['id', 'forumType', 'createdBy'],
+    });
+    if (!category) return { allowed: true }; // 404 handled by caller
+    if (!category.forumType || category.forumType !== 'closed') {
+      return { allowed: true, forumType: category.forumType };
+    }
+
+    // Admin / operator bypass
+    const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
+    if (userRoles.some((r) => BYPASS_ROLES.includes(r))) {
+      return { allowed: true, forumType: 'closed' };
+    }
+
+    if (!userId) return { allowed: false, forumType: 'closed' };
+
+    // Membership check (owner or member)
+    const [member] = await AppDataSource.query(
+      `SELECT role FROM forum_category_members
+       WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
+      [categoryId, userId],
+    );
+    if (member) return { allowed: true, forumType: 'closed' };
+
+    // Fallback: createdBy (before membership backfill)
+    if (category.createdBy === userId) return { allowed: true, forumType: 'closed' };
+
+    return { allowed: false, forumType: 'closed' };
+  }
+
   protected generateSlug(text: string): string {
     const timestamp = Date.now().toString(36);
     const baseSlug = text

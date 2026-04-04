@@ -234,6 +234,9 @@ export function ForumHubSection({ prefetchedForums, loading: parentLoading }: Pr
                       <span style={styles.emoji}>{forum.iconEmoji}</span>
                     )}
                     <span style={styles.cardName}>{forum.name}</span>
+                    {forum.forumType === 'closed' && (
+                      <span style={{ fontSize: '0.75rem', flexShrink: 0, marginLeft: '4px' }} title="비공개 포럼">🔒</span>
+                    )}
                   </div>
                   <span style={styles.postCountBadge}>{forum.postCount}개 글</span>
                 </div>

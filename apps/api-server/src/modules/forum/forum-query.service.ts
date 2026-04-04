@@ -32,6 +32,7 @@ export class ForumQueryService {
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p.organization_id IS NULL
+          AND (c.forum_type IS NULL OR c.forum_type != 'closed')
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -44,6 +45,7 @@ export class ForumQueryService {
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p.organization_id = $1
+        AND (c.forum_type IS NULL OR c.forum_type != 'closed')
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);
@@ -88,6 +90,7 @@ export class ForumQueryService {
         SELECT
           c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
           c."postCount", c."sortOrder", c."isPinned",
+          c.forum_type AS "forumType",
           COUNT(DISTINCT p.author_id)::int as "memberCount",
           MAX(p.created_at) as "lastActivityAt",
           (SELECT p2.title FROM forum_post p2
@@ -115,6 +118,7 @@ export class ForumQueryService {
       SELECT
         c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
         c."postCount", c."sortOrder", c."isPinned",
+        c.forum_type AS "forumType",
         COUNT(DISTINCT p.author_id)::int as "memberCount",
         MAX(p.created_at) as "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
@@ -157,6 +161,7 @@ export class ForumQueryService {
         SELECT
           c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
           c."postCount", c."sortOrder", c."isPinned",
+          c.forum_type AS "forumType",
           COUNT(DISTINCT p.author_id)::int AS "memberCount",
           MAX(p.created_at) AS "lastActivityAt",
           (SELECT p2.title FROM forum_post p2
@@ -195,6 +200,7 @@ export class ForumQueryService {
       SELECT
         c.id, c.name, c.slug, c.description, c.color, c."iconEmoji",
         c."postCount", c."sortOrder", c."isPinned",
+        c.forum_type AS "forumType",
         COUNT(DISTINCT p.author_id)::int AS "memberCount",
         MAX(p.created_at) AS "lastActivityAt",
         (SELECT p2.title FROM forum_post p2
@@ -262,6 +268,7 @@ export class ForumQueryService {
         ) lp
         LEFT JOIN users u ON lp.author_id = u.id
         WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" IS NULL
+          AND (c.forum_type IS NULL OR c.forum_type != 'closed')
         ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                  c."sortOrder" ASC, c.name ASC
       `, [limit]);
@@ -299,6 +306,7 @@ export class ForumQueryService {
       ) lp
       LEFT JOIN users u ON lp.author_id = u.id
       WHERE c."isActive" = true AND c."accessLevel" = 'all' AND c."organizationId" = $2
+        AND (c.forum_type IS NULL OR c.forum_type != 'closed')
       ORDER BY c."isPinned" DESC, c."pinnedOrder" ASC NULLS LAST,
                c."sortOrder" ASC, c.name ASC
     `, [limit, this.config.organizationId]);
@@ -448,6 +456,7 @@ export class ForumQueryService {
         LEFT JOIN forum_category c ON p."categoryId" = c.id
         LEFT JOIN users u ON p.author_id = u.id
         WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id IS NULL
+          AND (c.forum_type IS NULL OR c.forum_type != 'closed')
         ORDER BY p.created_at DESC
         LIMIT $1
       `, [limit]);
@@ -460,6 +469,7 @@ export class ForumQueryService {
       LEFT JOIN forum_category c ON p."categoryId" = c.id
       LEFT JOIN users u ON p.author_id = u.id
       WHERE p.status = 'publish' AND p."isPinned" = true AND p.organization_id = $1
+        AND (c.forum_type IS NULL OR c.forum_type != 'closed')
       ORDER BY p.created_at DESC
       LIMIT $2
     `, [this.config.organizationId, limit]);

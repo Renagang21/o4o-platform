@@ -38,9 +38,37 @@ export class ForumPostController extends ForumControllerBase {
         queryBuilder.where('post.status = :status', { status: PostStatus.PUBLISHED });
       }
 
-      // Category filter
+      // Category filter + WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      const { userId: uid, roles } = this.getUserFromReq(req);
       if (categoryId) {
         queryBuilder.andWhere('post.categoryId = :categoryId', { categoryId });
+        const access = await this.checkClosedForumAccess(categoryId, uid, roles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'This is a closed forum. Membership is required to view posts.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+          });
+          return;
+        }
+      } else {
+        // Exclude closed forum posts for non-members
+        const BYPASS = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
+        if (!roles.some((r) => BYPASS.includes(r))) {
+          if (uid) {
+            queryBuilder.andWhere(`(
+              category.forumType IS NULL OR category.forumType != 'closed'
+              OR category.createdBy = :closedUid
+              OR EXISTS (SELECT 1 FROM forum_category_members fcm
+                         WHERE fcm.forum_category_id = post."categoryId"
+                         AND fcm.user_id = :closedUid)
+            )`, { closedUid: uid });
+          } else {
+            queryBuilder.andWhere(
+              `(category.forumType IS NULL OR category.forumType != 'closed')`,
+            );
+          }
+        }
       }
 
       // Forum context filter (service-bound visibility)
@@ -132,6 +160,20 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
+      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      if (post.categoryId) {
+        const { userId: uid, roles } = this.getUserFromReq(req);
+        const access = await this.checkClosedForumAccess(post.categoryId, uid, roles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'This post belongs to a closed forum. Membership is required.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+          });
+          return;
+        }
+      }
+
       // Increment view count (fire-and-forget, non-blocking)
       this.postRepository
         .update(post.id, { viewCount: () => '"viewCount" + 1' })
@@ -187,6 +229,20 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       const resolvedCategoryId = category?.id || null;
+
+      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      if (category?.forumType === 'closed') {
+        const { userId: cuid, roles: croles } = this.getUserFromReq(req);
+        const access = await this.checkClosedForumAccess(category.id, cuid, croles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'Membership is required to post in this closed forum.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+          });
+          return;
+        }
+      }
 
       // Normalize content to Block[] format
       const normalizedContent = normalizeContent(content);

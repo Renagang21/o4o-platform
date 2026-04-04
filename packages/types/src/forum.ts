@@ -47,7 +47,7 @@ export type ForumCategoryAccessLevel = 'all' | 'member' | 'business' | 'admin';
  *
  * accessLevel(권한 정책)과 분리해서 사용한다.
  */
-export type ForumType = 'open' | 'managed';
+export type ForumType = 'open' | 'managed' | 'closed';
 
 /**
  * 포럼 개설신청 상태
@@ -131,6 +131,7 @@ export interface ForumCategoryResponse {
   pinnedOrder?: number | null;
   requireApproval: boolean;
   accessLevel: string; // ForumCategoryAccessLevel value
+  forumType?: string; // 'open' | 'managed' | 'closed'
   postCount: number;
   createdBy?: string | null;
   organizationId?: string | null;
@@ -257,6 +258,7 @@ export const FORUM_ACCESS_LEVEL_LABELS: Record<ForumCategoryAccessLevel, string>
 export const FORUM_TYPE_LABELS: Record<ForumType, string> = {
   open: '공개형',
   managed: '회원관리형',
+  closed: '비공개형',
 };
 
 /** 포럼 개설신청 상태별 한글 라벨 */

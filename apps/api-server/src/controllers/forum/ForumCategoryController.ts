@@ -82,6 +82,18 @@ export class ForumCategoryController extends ForumControllerBase {
         return;
       }
 
+      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      const { userId, roles } = this.getUserFromReq(req);
+      const access = await this.checkClosedForumAccess(category.id, userId, roles);
+      if (!access.allowed) {
+        res.status(403).json({
+          success: false,
+          error: 'This is a closed forum. Membership is required.',
+          code: 'CLOSED_FORUM_ACCESS_DENIED',
+        });
+        return;
+      }
+
       res.json({
         success: true,
         data: category,

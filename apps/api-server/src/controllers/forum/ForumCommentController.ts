@@ -36,6 +36,20 @@ export class ForumCommentController extends ForumControllerBase {
         return;
       }
 
+      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      if (parentPost.categoryId) {
+        const { userId: uid, roles } = this.getUserFromReq(req);
+        const access = await this.checkClosedForumAccess(parentPost.categoryId, uid, roles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'This post belongs to a closed forum. Membership is required.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+          });
+          return;
+        }
+      }
+
       const [comments, totalCount] = await this.commentRepository.findAndCount({
         where: {
           postId,
@@ -102,6 +116,20 @@ export class ForumCommentController extends ForumControllerBase {
           error: 'Post not found',
         });
         return;
+      }
+
+      // WO-KPA-A-CLOSED-FORUM-ACCESS-CONTROL-V1
+      if (post.categoryId) {
+        const { userId: cuid, roles: croles } = this.getUserFromReq(req);
+        const access = await this.checkClosedForumAccess(post.categoryId, cuid, croles);
+        if (!access.allowed) {
+          res.status(403).json({
+            success: false,
+            error: 'Membership is required to comment in this closed forum.',
+            code: 'CLOSED_FORUM_ACCESS_DENIED',
+          });
+          return;
+        }
       }
 
       const comment = this.commentRepository.create({

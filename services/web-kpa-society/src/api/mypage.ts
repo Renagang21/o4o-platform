@@ -98,6 +98,26 @@ export interface ProfileResponse {
   }>;
 }
 
+/**
+ * 통합 승인 요청 항목 — WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
+ */
+export interface UnifiedRequestItem {
+  id: string;
+  entityType: string;
+  status: string;
+  displayTitle: string;
+  displayDescription: string;
+  reviewComment: string | null;
+  revisionNote: string | null;
+  reviewedAt: string | null;
+  resultEntityId: string | null;
+  resultMetadata: Record<string, any> | null;
+  submittedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  payload: Record<string, any>;
+}
+
 export const mypageApi = {
   // 프로필
   getProfile: () =>
@@ -144,4 +164,8 @@ export const mypageApi = {
   // 내 공동구매
   getMyGroupbuys: (params?: { status?: string; page?: number; limit?: number }) =>
     apiClient.get<PaginatedResponse<GroupbuyParticipation>>('/mypage/groupbuys', params),
+
+  // 통합 승인 요청 — WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
+  getMyApprovalRequests: (params?: { entityType?: string; status?: string }) =>
+    apiClient.get<ApiResponse<UnifiedRequestItem[]>>('/mypage/my-requests', params as any),
 };

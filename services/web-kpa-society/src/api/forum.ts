@@ -91,6 +91,58 @@ export const forumApi = {
 };
 
 // ============================================================================
+// Forum Membership API — WO-KPA-A-FORUM-OWNER-MEMBER-MANAGEMENT-UI-V1
+// Owner-facing membership management for closed forums
+// ============================================================================
+
+export interface ForumJoinRequest {
+  id: string;
+  requester_id: string;
+  requester_name: string;
+  requester_email: string | null;
+  status: string;
+  created_at: string;
+  user_display_name: string | null;
+}
+
+export interface ForumMember {
+  id: string;
+  user_id: string;
+  role: 'owner' | 'member';
+  joined_at: string;
+  user_name: string | null;
+  user_email: string | null;
+}
+
+export const forumMembershipApi = {
+  getJoinRequests: (categoryId: string) =>
+    apiClient.get<ApiResponse<ForumJoinRequest[]>>(
+      `${getForumBasePath()}/categories/${categoryId}/join-requests`,
+    ),
+
+  approveJoin: (categoryId: string, requestId: string) =>
+    apiClient.post<ApiResponse<{ requestId: string; status: string; userId: string }>>(
+      `${getForumBasePath()}/categories/${categoryId}/members/${requestId}/approve`,
+    ),
+
+  rejectJoin: (categoryId: string, requestId: string, reviewComment?: string) =>
+    apiClient.post<ApiResponse<{ requestId: string; status: string }>>(
+      `${getForumBasePath()}/categories/${categoryId}/members/${requestId}/reject`,
+      { reviewComment },
+    ),
+
+  getMembers: (categoryId: string) =>
+    apiClient.get<ApiResponse<ForumMember[]>>(
+      `${getForumBasePath()}/categories/${categoryId}/members`,
+    ),
+
+  removeMember: (categoryId: string, userId: string) =>
+    apiClient.delete<ApiResponse<{ removed: boolean; userId: string }>>(
+      `${getForumBasePath()}/categories/${categoryId}/members/${userId}`,
+    ),
+};
+
+// ============================================================================
 // Category Request API — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 // Uses authClient.api (base: /api/v1) for common forum endpoints
 // ============================================================================
@@ -108,7 +160,7 @@ export const forumRequestApi = {
     }
   },
 
-  create: async (data: { name: string; description: string; reason?: string }): Promise<{ success: boolean; data?: any; error?: string }> => {
+  create: async (data: { name: string; description: string; reason?: string; forumType?: string }): Promise<{ success: boolean; data?: any; error?: string }> => {
     try {
       const response = await authClient.api.post('/forum/category-requests', {
         ...data,

@@ -49,6 +49,7 @@ export interface ForumCategory {
   slug: string;
   description?: string;
   postCount: number;
+  forumType?: string;
 }
 
 export interface ForumPost extends Partial<ForumPostResponse> {
@@ -95,6 +96,7 @@ export interface ForumHubItem {
   memberCount: number;
   lastActivityAt: string | null;
   lastPostTitle: string | null;
+  forumType?: string;
 }
 
 // 포럼 활동 섹션 (WO-KPA-FORUM-HUB-V2-PHASE3)

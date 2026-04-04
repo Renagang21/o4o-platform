@@ -2,7 +2,9 @@
  * MyForumDashboardPage - 내 포럼 관리 대시보드 (KPA Society)
  *
  * WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
- * GlycoPharm MyForumDashboardPage 패턴 복제 — KPA Society 마이페이지
+ * WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1: 신청 내역 → 통합 신청함으로 이전
+ *
+ * 포럼 운영 관리 전용. 신청 내역은 MyRequestsPage에서 확인.
  */
 
 import { useState, useEffect } from 'react';
@@ -12,44 +14,20 @@ import {
   MessageSquare,
   MessageSquarePlus,
   ExternalLink,
-  Clock,
-  CheckCircle,
-  XCircle,
-  RotateCcw,
-  ChevronRight,
   Loader2,
   AlertCircle,
-  Inbox,
   Layers,
   Pencil,
   X,
   Save,
   Trash2,
+  Users,
 } from 'lucide-react';
-import { forumApi, forumRequestApi } from '../../api/forum';
+import { forumApi } from '../../api/forum';
 
 // ============================================================================
 // Types
 // ============================================================================
-
-type RequestStatus = 'pending' | 'revision_requested' | 'approved' | 'rejected';
-
-interface ForumRequest {
-  id: string;
-  name: string;
-  description: string;
-  reason?: string;
-  status: RequestStatus;
-  requesterId: string;
-  requesterName: string;
-  reviewerName?: string;
-  reviewComment?: string;
-  reviewedAt?: string;
-  createdCategoryId?: string;
-  createdCategorySlug?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface MyForumCategory {
   id: string;
@@ -73,21 +51,6 @@ interface MyForumCategory {
 }
 
 // ============================================================================
-// Constants
-// ============================================================================
-
-const STATUS_CONFIG: Record<RequestStatus, { label: string; color: string; bg: string; icon: typeof Clock }> = {
-  pending: { label: '검토 중', color: 'text-yellow-700', bg: 'bg-yellow-50', icon: Clock },
-  revision_requested: { label: '보완 요청', color: 'text-orange-700', bg: 'bg-orange-50', icon: RotateCcw },
-  approved: { label: '승인됨', color: 'text-green-700', bg: 'bg-green-50', icon: CheckCircle },
-  rejected: { label: '거절됨', color: 'text-red-700', bg: 'bg-red-50', icon: XCircle },
-};
-
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-// ============================================================================
 // Component
 // ============================================================================
 
@@ -99,12 +62,8 @@ interface EditFormData {
 }
 
 export default function MyForumDashboardPage() {
-  const [requests, setRequests] = useState<ForumRequest[]>([]);
   const [myCategories, setMyCategories] = useState<MyForumCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const [editingCategory, setEditingCategory] = useState<MyForumCategory | null>(null);
   const [editForm, setEditForm] = useState<EditFormData>({ name: '', description: '', iconEmoji: '', iconUrl: '' });
@@ -117,26 +76,8 @@ export default function MyForumDashboardPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadRequests();
     loadMyCategories();
   }, []);
-
-  const loadRequests = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await forumRequestApi.getMyRequests();
-      if (!response.success) {
-        setError('포럼 신청 내역을 불러오지 못했습니다.');
-      } else {
-        setRequests((response.data || []) as ForumRequest[]);
-      }
-    } catch {
-      setError('포럼 신청 내역을 불러오지 못했습니다.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const loadMyCategories = async () => {
     setCategoriesLoading(true);
@@ -196,8 +137,6 @@ export default function MyForumDashboardPage() {
   };
 
   const getDeleteStatus = (cat: MyForumCategory) => cat.metadata?.deleteRequestStatus;
-  const pendingCount = requests.filter(r => r.status === 'pending' || r.status === 'revision_requested').length;
-  const approvedCount = requests.filter(r => r.status === 'approved').length;
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
@@ -207,7 +146,7 @@ export default function MyForumDashboardPage() {
           <MessageSquare className="w-6 h-6 text-blue-600" />
           내 포럼
         </h1>
-        <p className="text-slate-500 mt-1">내가 신청하거나 운영하는 포럼을 관리합니다</p>
+        <p className="text-slate-500 mt-1">내가 운영하는 포럼을 관리합니다</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
@@ -231,95 +170,12 @@ export default function MyForumDashboardPage() {
         </Link>
       </div>
 
-      {!isLoading && !error && requests.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-slate-800">{requests.length}</div>
-            <div className="text-xs text-slate-500">전체 신청</div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
-            <div className="text-xs text-slate-500">진행 중</div>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center">
-            <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
-            <div className="text-xs text-slate-500">승인됨</div>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-slate-800 mb-3">내 포럼 신청 내역</h2>
-        {isLoading && (
-          <div className="flex items-center justify-center py-12 bg-white rounded-xl border border-slate-200">
-            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" /><span className="ml-2 text-slate-500">불러오는 중...</span>
-          </div>
-        )}
-        {error && (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-            <AlertCircle className="w-10 h-10 text-red-400 mx-auto" />
-            <p className="mt-3 text-red-600">{error}</p>
-            <button onClick={loadRequests} className="mt-3 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">다시 시도</button>
-          </div>
-        )}
-        {!isLoading && !error && requests.length === 0 && (
-          <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
-            <Inbox className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="mt-3 text-lg font-medium text-slate-700">아직 신청한 포럼이 없습니다</h3>
-            <p className="mt-1 text-sm text-slate-500">원하는 주제의 포럼을 신청해보세요</p>
-            <Link to="/mypage/my-forums/request" className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-              <MessageSquarePlus className="w-4 h-4" />새 포럼 신청
-            </Link>
-          </div>
-        )}
-        {!isLoading && !error && requests.length > 0 && (
-          <div className="space-y-3">
-            {requests.map((request) => {
-              const status = STATUS_CONFIG[request.status];
-              const StatusIcon = status.icon;
-              const isExpanded = expandedId === request.id;
-              return (
-                <div key={request.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                  <button onClick={() => setExpandedId(isExpanded ? null : request.id)} className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-9 h-9 rounded-lg ${status.bg} flex items-center justify-center shrink-0`}><StatusIcon className={`w-4 h-4 ${status.color}`} /></div>
-                      <div className="text-left min-w-0">
-                        <h3 className="font-semibold text-slate-800 truncate">{request.name}</h3>
-                        <p className="text-xs text-slate-500">{formatDate(request.createdAt)}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${status.bg} ${status.color}`}>{status.label}</span>
-                      <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
-                    </div>
-                  </button>
-                  {isExpanded && (
-                    <div className="px-5 pb-5 border-t border-slate-100">
-                      <div className="pt-4 space-y-3">
-                        <div><div className="text-xs font-medium text-slate-500 mb-1">포럼 설명</div><p className="text-sm text-slate-700">{request.description}</p></div>
-                        {request.reason && <div><div className="text-xs font-medium text-slate-500 mb-1">신청 사유</div><p className="text-sm text-slate-700">{request.reason}</p></div>}
-                        {request.reviewComment && (
-                          <div className={`p-3 rounded-lg ${request.status === 'approved' ? 'bg-green-50' : request.status === 'revision_requested' ? 'bg-orange-50' : 'bg-red-50'}`}>
-                            <div className={`text-xs font-medium mb-1 ${request.status === 'approved' ? 'text-green-700' : request.status === 'revision_requested' ? 'text-orange-700' : 'text-red-700'}`}>
-                              {request.status === 'revision_requested' ? '보완 요청 사항' : '관리자 의견'}
-                            </div>
-                            <p className={`text-sm ${request.status === 'approved' ? 'text-green-600' : request.status === 'revision_requested' ? 'text-orange-600' : 'text-red-600'}`}>{request.reviewComment}</p>
-                            {request.reviewedAt && <p className="text-xs text-slate-500 mt-1">{formatDate(request.reviewedAt)} 검토</p>}
-                          </div>
-                        )}
-                        {request.status === 'approved' && request.createdCategorySlug && (
-                          <Link to={`/forum?category=${request.createdCategorySlug}`} className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm">
-                            <CheckCircle className="w-4 h-4" />생성된 포럼 보기
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+      {/* 신청 내역 안내 → 통합 신청함 */}
+      <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+        <div className="text-sm text-slate-600">포럼 신청 내역은 <strong>내 신청</strong> 탭에서 확인하세요</div>
+        <Link to="/mypage/my-requests?entityType=forum_category" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+          내 신청 바로가기 →
+        </Link>
       </div>
 
       <div>
@@ -348,6 +204,7 @@ export default function MyForumDashboardPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-slate-800 truncate">{cat.name}</h3>
                       {!cat.isActive && <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-500">비활성</span>}
+                      {cat.forumType === 'closed' && <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-700">비공개</span>}
                     </div>
                     {cat.description && <p className="text-xs text-slate-500 truncate">{cat.description}</p>}
                   </div>
@@ -356,6 +213,9 @@ export default function MyForumDashboardPage() {
                   {getDeleteStatus(cat) === 'pending' && <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-red-50 text-red-600">삭제 요청 중</span>}
                   {getDeleteStatus(cat) === 'rejected' && <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-slate-100 text-slate-500" title={cat.metadata?.deleteReviewComment || ''}>삭제 반려</span>}
                   <div className="text-right mr-1"><div className="text-sm font-medium text-slate-700">{cat.postCount}</div><div className="text-xs text-slate-400">게시글</div></div>
+                  {cat.forumType === 'closed' && (
+                    <Link to={`/mypage/my-forums/${cat.id}/members`} className="p-2 rounded-lg text-slate-400 hover:text-green-600 hover:bg-green-50 transition-colors" title="회원 관리"><Users className="w-4 h-4" /></Link>
+                  )}
                   <button onClick={() => openEdit(cat)} className="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="포럼 정보 수정"><Pencil className="w-4 h-4" /></button>
                   {getDeleteStatus(cat) !== 'pending' && (
                     <button onClick={() => { setDeletingCategory(cat); setDeleteReason(''); setDeleteError(null); }} className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="삭제 요청"><Trash2 className="w-4 h-4" /></button>

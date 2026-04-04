@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: '홈', path: '/mypage' },
   { label: '프로필', path: '/mypage/profile' },
   { label: '내 포럼', path: '/mypage/my-forums' },
+  { label: '내 신청', path: '/mypage/my-requests' },
   { label: '이수현황', path: '/mypage/certificates' },
   { label: '설정', path: '/mypage/settings' },
 ];

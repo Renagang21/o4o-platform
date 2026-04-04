@@ -196,4 +196,57 @@ export class MypageService {
       pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
     };
   }
+
+  /**
+   * GET /my-requests — 통합 승인 요청 조회
+   * WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
+   */
+  async listMyRequests(
+    userId: string,
+    filters?: { entityType?: string; status?: string },
+  ): Promise<any[]> {
+    let sql = `SELECT id, entity_type, organization_id, payload, status,
+               requester_name, review_comment, revision_note, reviewed_at,
+               result_entity_id, result_metadata,
+               submitted_at, created_at, updated_at
+               FROM kpa_approval_requests WHERE requester_id = $1`;
+    const params: any[] = [userId];
+    let idx = 2;
+
+    if (filters?.entityType) {
+      sql += ` AND entity_type = $${idx++}`;
+      params.push(filters.entityType);
+    }
+    if (filters?.status) {
+      sql += ` AND status = $${idx++}`;
+      params.push(filters.status);
+    }
+
+    sql += ` ORDER BY created_at DESC LIMIT 50`;
+
+    try {
+      const rows = await this.dataSource.query(sql, params);
+      return rows.map((r: any) => {
+        const payload = typeof r.payload === 'string' ? JSON.parse(r.payload) : (r.payload || {});
+        return {
+          id: r.id,
+          entityType: r.entity_type,
+          status: r.status,
+          displayTitle: payload.name || payload.proposed_title || payload.specialization || '요청',
+          displayDescription: payload.description || payload.proposed_description || '',
+          reviewComment: r.review_comment,
+          revisionNote: r.revision_note,
+          reviewedAt: r.reviewed_at,
+          resultEntityId: r.result_entity_id,
+          resultMetadata: typeof r.result_metadata === 'string' ? JSON.parse(r.result_metadata) : r.result_metadata,
+          submittedAt: r.submitted_at,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          payload,
+        };
+      });
+    } catch {
+      return [];
+    }
+  }
 }

@@ -13,6 +13,7 @@
  * - GET /enrollments      (authenticate) — Delegates to EnrollmentController
  * - GET /certificates     (authenticate) — Delegates to CertificateController
  * - GET /groupbuys        (authenticate) — Groupbuys (placeholder)
+ * - GET /my-requests      (authenticate) — Unified approval requests (WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1)
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -127,6 +128,26 @@ export function createMypageController(
       pagination: result.pagination,
     });
   });
+
+  /**
+   * GET /my-requests — Unified approval requests
+   * WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
+   */
+  router.get('/my-requests', authenticate, asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    if (!user?.id) {
+      res.status(401).json({ success: false, error: 'Unauthorized' });
+      return;
+    }
+
+    const { entityType, status } = req.query as { entityType?: string; status?: string };
+    const data = await service.listMyRequests(user.id, { entityType, status });
+
+    res.json({
+      success: true,
+      data,
+    });
+  }));
 
   return router;
 }

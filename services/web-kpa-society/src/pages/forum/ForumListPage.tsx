@@ -144,7 +144,7 @@ export function ForumListPage() {
                 key={cat.id}
                 style={{ ...s.catBtn, ...(currentCategory === cat.id ? s.catBtnActive : {}) }}
                 onClick={() => updateParam('category', cat.id)}
-              >{cat.name}</button>
+              >{cat.name}{cat.forumType === 'closed' && ' 🔒'}</button>
             ))}
           </div>
           <Link to="/forum/write" style={s.writeButton}>글쓰기</Link>

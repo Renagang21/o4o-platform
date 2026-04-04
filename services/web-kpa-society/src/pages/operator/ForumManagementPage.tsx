@@ -28,6 +28,7 @@ interface RequestData {
   name: string;
   description: string;
   reason?: string;
+  forumType?: string;
   status: CategoryRequestStatus;
   serviceCode: string;
   requesterId: string;
@@ -197,7 +198,14 @@ export default function ForumManagementPage() {
               return (
                 <tr key={request.id} className="hover:bg-slate-50">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-slate-800">{request.name}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-slate-800">{request.name}</span>
+                      {request.forumType === 'closed' ? (
+                        <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">비공개</span>
+                      ) : (
+                        <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-600">공개</span>
+                      )}
+                    </div>
                     <div className="text-sm text-slate-500 line-clamp-1">{request.description}</div>
                   </td>
                   <td className="px-6 py-4">
@@ -254,6 +262,16 @@ export default function ForumManagementPage() {
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 이름</h4>
                 <p className="text-slate-800 font-medium">{selectedRequest.name}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 유형</h4>
+                <p className="text-slate-800">
+                  {selectedRequest.forumType === 'closed' ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-slate-100 text-slate-700">비공개 포럼</span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium rounded-lg bg-blue-50 text-blue-700">공개 포럼</span>
+                  )}
+                </p>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-slate-500 mb-1">포럼 설명</h4>
