@@ -159,9 +159,9 @@ export function createPharmacyProductsController(
     });
   }));
 
-  // ─── POST /apply — v2 createServiceApproval 내부 위임 ────────────
-  // WO-KPA-HUB-AND-STORE-ORDERABLE-PRODUCT-LIST-FLOW-V1:
-  // 기존 410 반환을 v2 service-approval 내부 호출로 교체
+  // ─── POST /apply — v2 distribution type 분기 ────────────────────
+  // WO-KPA-HUB-STORE-ORDERABLE-PRODUCT-APPLY-FIX-V1:
+  // SERVICE → createServiceApproval, PUBLIC → createPublicListing
   router.post('/apply', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const user = (req as any).user;
     const organizationId = (req as any).organizationId;
@@ -176,12 +176,24 @@ export function createPharmacyProductsController(
       '../../../modules/product-policy-v2/product-approval-v2.service.js'
     );
     const service = new ProductApprovalV2Service(dataSource);
-    const result = await service.createServiceApproval(
-      supplyProductId,
-      organizationId,
-      serviceKey,
-      user.id,
+
+    // Offer distribution type 조회
+    const [offer] = await dataSource.query(
+      `SELECT distribution_type FROM supplier_product_offers WHERE id = $1::uuid AND is_active = true`,
+      [supplyProductId]
     );
+    if (!offer) {
+      throw new ApiError(404, 'Product not found or inactive', 'PRODUCT_NOT_FOUND');
+    }
+
+    let result;
+    if (offer.distribution_type === 'SERVICE') {
+      result = await service.createServiceApproval(supplyProductId, organizationId, serviceKey, user.id);
+    } else if (offer.distribution_type === 'PUBLIC') {
+      result = await service.createPublicListing(supplyProductId, organizationId, serviceKey);
+    } else {
+      throw new ApiError(400, `Unsupported distribution type: ${offer.distribution_type}`, 'UNSUPPORTED_TYPE');
+    }
 
     if (!result.success) {
       throw new ApiError(400, result.error || 'Application failed', 'APPLICATION_FAILED');

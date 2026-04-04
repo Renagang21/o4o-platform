@@ -123,7 +123,7 @@ function catalogToB2BItem(
 
   switch (state) {
     case 'available':
-      actionLabel = '내 대시보드��� 등록';
+      actionLabel = '내 대시보드에 등록';
       actionStyle = 'primary';
       onAction = onApply ? () => onApply(p) : () => navigate('/hub/b2b');
       break;
@@ -411,7 +411,7 @@ export function PharmacyHubMarketPage() {
       theme={{ maxWidth: '1100px' }}
       beforeSections={<HubSubNav />}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: '���품리스트', ctaLabel: '상품리스트 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: '상품리스트', ctaLabel: '상품리스트 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
       productDevelopment={{ items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' }}
       platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content'), authorTabs: [...HUB_PRODUCER_TABS], activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}
