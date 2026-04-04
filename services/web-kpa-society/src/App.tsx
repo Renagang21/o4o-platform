@@ -546,6 +546,7 @@ function App() {
           {/* Content (콘텐츠) — 내부 CMS 콘텐츠 */}
           <Route path="/content" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/content/notice" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
+          <Route path="/content/news" element={<Layout serviceName={SERVICE_NAME}><NewsListPage /></Layout>} />
           <Route path="/content/:id" element={<Layout serviceName={SERVICE_NAME}><NewsDetailPage /></Layout>} />
 
           {/* Legacy redirect: /news → /content */}
