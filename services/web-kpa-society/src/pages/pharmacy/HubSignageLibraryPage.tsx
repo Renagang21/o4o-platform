@@ -36,7 +36,6 @@ import { SIGNAGE_MEDIA_TYPE_LABELS } from '@o4o/types/signage';
 import { HUB_PRODUCER_TABS, type HubProducer } from '@o4o/hub-exploration-core';
 import { HUB_PRODUCER_LABELS } from '@o4o/types/hub-content';
 import { colors, borderRadius } from '../../styles/theme';
-import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 
 // ============================================
 // 필터 정의
@@ -194,14 +193,6 @@ export function HubSignageLibraryPage() {
 
   return (
     <div style={styles.container}>
-      {/* Breadcrumb */}
-      <div style={styles.breadcrumb}>
-        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
-      </div>
-
-      {/* HUB Sub-Navigation */}
-      <HubSubNav />
-
       {/* Hero */}
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>플랫폼 사이니지</h1>

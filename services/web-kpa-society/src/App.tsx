@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { Layout, DemoLayout } from './components';
 import { AuthProvider, OrganizationProvider } from './contexts';
 import { O4OErrorBoundary, O4OToastProvider } from '@o4o/error-handling';
-import { ServiceProvider, useService } from './contexts/ServiceContext';
+import { ServiceProvider } from './contexts/ServiceContext';
 import { useAuth } from './contexts/AuthContext';
-import { getDisplayOrganizationName } from './lib/org-display';
+import { getPharmacyInfo } from './api/pharmacyInfo';
 import { LoginModalProvider, useAuthModal } from './contexts/LoginModalContext';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
@@ -105,7 +105,9 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, PharmacyHubMarketPage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+// WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 약국 HUB 사이드바 레이아웃
+import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
 // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: PharmacyInfoPage + HubGuard
 import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 
@@ -281,11 +283,20 @@ const KPA_STORE_NAV_ITEMS = [
 
 function KpaStoreLayoutWrapper() {
   const { user, logout } = useAuth();
-  const { currentService } = useService();
   const navigate = useNavigate();
   const enabledCaps = useStoreCapabilities();
 
-  const orgName = getDisplayOrganizationName(currentService, user) || undefined;
+  // WO-KPA-SOCIETY-STORE-LAYOUT-ORGNAME-TO-PHARMACY-NAME-FIX-V1:
+  // 분회명(membershipOrgName) 대신 실제 약국명을 표시
+  const [pharmacyName, setPharmacyName] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    let cancelled = false;
+    getPharmacyInfo().then((info) => {
+      if (!cancelled && info?.name) setPharmacyName(info.name);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
 
   return (
@@ -297,7 +308,7 @@ function KpaStoreLayoutWrapper() {
       navItems={KPA_STORE_NAV_ITEMS}
       serviceLabel="약사 네트워크"
       serviceBadge="KPA"
-      orgName={orgName}
+      orgName={pharmacyName}
     />
   );
 }
@@ -520,12 +531,14 @@ function App() {
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
-          {/* Hub = 약국 공용공간 (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1: HubGuard 적용) */}
-          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubMarketPage /></HubGuard></Layout>} />
-          {/* WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리 */}
-          <Route path="/hub/content" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubContentLibraryPage /></HubGuard></Layout>} />
-          <Route path="/hub/b2b" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubB2BCatalogPage /></HubGuard></Layout>} />
-          <Route path="/hub/signage" element={<Layout serviceName={SERVICE_NAME}><HubGuard><HubSignageLibraryPage /></HubGuard></Layout>} />
+          {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}
+          <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
+            <Route index element={<Navigate to="/hub/b2b" replace />} />
+            <Route path="b2b" element={<HubB2BCatalogPage />} />
+            <Route path="signage" element={<HubSignageLibraryPage />} />
+            <Route path="groupbuy" element={<PharmacyOwnerOnlyGuard><KpaGroupbuyPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="content" element={<HubContentLibraryPage />} />
+          </Route>
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
           <Route path="/operator/*" element={<OperatorRoutes />} />
           <Route path="/intranet/*" element={<Navigate to="/demo/intranet" replace />} />
@@ -604,9 +617,8 @@ function App() {
           <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
-          {/* Groupbuy (공동구매) — WO-KPA-GROUPBUY-PAGE-V1: 상품 카탈로그 */}
-          {/* WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약국 개설자만 접근 */}
-          <Route path="/groupbuy" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><KpaGroupbuyPage /></PharmacyOwnerOnlyGuard></Layout>} />
+          {/* Groupbuy (공동구매) — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: /hub/groupbuy로 통합 */}
+          <Route path="/groupbuy" element={<Navigate to="/hub/groupbuy" replace />} />
           <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><GroupbuyDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
 
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}

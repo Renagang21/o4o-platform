@@ -20,7 +20,6 @@ import {
   type CatalogProduct,
 } from '../../api/pharmacyProducts';
 import { colors, shadows, borderRadius } from '../../styles/theme';
-import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 
 // ============================================
 // 카테고리 필터
@@ -30,7 +29,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'recommended', label: '운영자 추천' },
-  { key: 'PUBLIC', label: '판매처 모집' },
+  { key: 'PUBLIC', label: '거점판매 모집' },
 ];
 
 const PAGE_LIMIT = 20;
@@ -182,14 +181,6 @@ export function HubB2BCatalogPage() {
 
   return (
     <div style={styles.container}>
-      {/* Breadcrumb */}
-      <div style={styles.breadcrumb}>
-        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
-      </div>
-
-      {/* HUB Sub-Navigation */}
-      <HubSubNav />
-
       {/* Hero */}
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>상품리스트</h1>

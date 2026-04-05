@@ -16,7 +16,6 @@ import { Link } from 'react-router-dom';
 import { cmsApi, type CmsContent } from '../../api/cms';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { colors, shadows, borderRadius } from '../../styles/theme';
-import { HubSubNav } from '../../components/pharmacy/HubSubNav';
 
 // ============================================
 // 타입 필터 정의
@@ -105,14 +104,6 @@ export function HubContentLibraryPage() {
 
   return (
     <div style={styles.container}>
-      {/* Breadcrumb */}
-      <div style={styles.breadcrumb}>
-        <Link to="/hub" style={styles.breadcrumbLink}>&larr; 약국 HUB</Link>
-      </div>
-
-      {/* HUB Sub Navigation */}
-      <HubSubNav />
-
       {/* Hero */}
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>플랫폼 콘텐츠</h1>
