@@ -2,6 +2,7 @@
  * EducationSection — Home 허브 교육/강의 요약 블록
  *
  * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 반응형 CSS + empty state 개선
  * lmsApi.getCourses() 독립 호출
  */
 
@@ -9,6 +10,19 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { lmsApi } from '../../api/lms';
 import { colors, spacing, typography } from '../../styles/theme';
+
+const responsiveStyles = `
+  .edu-course-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 768px) {
+    .edu-course-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+`;
 
 interface CourseItem {
   id: string;
@@ -22,6 +36,16 @@ interface CourseItem {
 export function EducationSection() {
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const styleId = 'edu-section-responsive-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = responsiveStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   useEffect(() => {
     lmsApi.getCourses({ limit: 3 })
@@ -42,7 +66,7 @@ export function EducationSection() {
         <Link to="/lms" style={styles.sectionLink}>전체 보기 →</Link>
       </div>
       {courses.length > 0 ? (
-        <div style={styles.courseGrid}>
+        <div className="edu-course-grid">
           {courses.map((course) => (
             <Link key={course.id} to={`/lms/course/${course.id}`} style={styles.courseCard}>
               {course.thumbnailUrl ? (
@@ -70,7 +94,12 @@ export function EducationSection() {
           ))}
         </div>
       ) : (
-        <p style={styles.empty}>등록된 강의가 없습니다.</p>
+        <div style={styles.emptyWrap}>
+          <p style={styles.emptyIcon}>📚</p>
+          <p style={styles.empty}>등록된 강의가 없습니다.</p>
+          <p style={styles.emptyHint}>새로운 강의가 등록되면 여기에 표시됩니다.</p>
+          <Link to="/lms" style={styles.emptyAction}>강의 페이지 바로가기 →</Link>
+        </div>
       )}
     </section>
   );
@@ -94,11 +123,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.primary,
     textDecoration: 'none',
     fontWeight: 500,
-  },
-  courseGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '12px',
   },
   courseCard: {
     display: 'block',
@@ -149,10 +173,32 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral400,
     margin: 0,
   },
+  emptyWrap: {
+    textAlign: 'center',
+    padding: spacing.xl,
+  },
+  emptyIcon: {
+    fontSize: '1.5rem',
+    margin: '0 0 8px',
+    textAlign: 'center',
+  },
   empty: {
-    color: colors.neutral400,
+    color: colors.neutral500,
     fontSize: '14px',
     textAlign: 'center',
-    padding: '24px 0',
+    margin: 0,
+  },
+  emptyHint: {
+    textAlign: 'center',
+    color: colors.neutral400,
+    fontSize: '0.8rem',
+    margin: `${spacing.xs} 0 0`,
+  },
+  emptyAction: {
+    display: 'inline-block',
+    marginTop: spacing.sm,
+    fontSize: '0.813rem',
+    color: colors.primary,
+    textDecoration: 'none',
   },
 };

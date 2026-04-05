@@ -1,14 +1,30 @@
 /**
  * UtilitySection - 메인 하단 실무/보조 영역
  *
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 깨진 링크 수정, 반응형 CSS 추가
+ *
  * 구조:
  * - LoggedInUserPanel (로그인 후만 노출): 내 활동 요약, 알림
  * - HelpAndPolicyLinks: 도움말, 정책, 약관
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
+
+const responsiveStyles = `
+  .user-panel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: ${spacing.sm};
+  }
+  @media (min-width: 768px) {
+    .user-panel-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+`;
 
 /**
  * LoggedInUserPanel - 로그인한 사용자 전용 패널
@@ -16,12 +32,22 @@ import { colors, spacing, borderRadius, shadows, typography } from '../../styles
 function LoggedInUserPanel() {
   const { user } = useAuth();
 
+  useEffect(() => {
+    const styleId = 'utility-section-responsive-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = responsiveStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <div style={styles.userPanel}>
       <div style={styles.userPanelHeader}>
         <span style={styles.userGreeting}>{user?.name}님, 환영합니다</span>
       </div>
-      <div style={styles.userPanelGrid}>
+      <div className="user-panel-grid">
         <Link to="/mypage" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📊</span>
           <span>내 활동 요약</span>
@@ -30,11 +56,11 @@ function LoggedInUserPanel() {
           <span style={styles.userPanelIcon}>🔔</span>
           <span>알림 설정</span>
         </Link>
-        <Link to="/mypage/certificates" style={styles.userPanelLink}>
+        <Link to="/lms" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📜</span>
           <span>이수 현황</span>
         </Link>
-        <Link to="/participation" style={styles.userPanelLink}>
+        <Link to="/forum" style={styles.userPanelLink}>
           <span style={styles.userPanelIcon}>📝</span>
           <span>참여 중 서비스</span>
         </Link>
@@ -90,11 +116,6 @@ const styles: Record<string, React.CSSProperties> = {
   userGreeting: {
     ...typography.headingS,
     color: colors.neutral900,
-  },
-  userPanelGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: spacing.sm,
   },
   userPanelLink: {
     display: 'flex',

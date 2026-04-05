@@ -3,17 +3,17 @@
  *
  * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브
  * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: 통합 허브 재구성
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 블록 우선순위·반응형·링크 정리
  *
  * /community 허브 기능을 흡수하여 단일 Home으로 통합.
  *
- * 섹션 구조 (9블록):
+ * 섹션 구조 (8블록):
  * ├─ HeroBannerSection       — 동적 광고 캐러셀 (community_ads hero)
  * ├─ NoticeSection            — 공지사항 (cms_contents type=notice)
- * ├─ ForumCategorySection     — 포럼 카테고리 카드 그리드
+ * ├─ ActivitySection           — 최근 활동 (포럼 글 + 추천 콘텐츠)
  * ├─ EducationSection         — 교육/강의 요약 (lmsApi 독립 호출)
  * ├─ SignageSection            — 디지털 사이니지 프리뷰
- * ├─ ActivitySection           — 최근 활동 (포럼 글 + 추천 콘텐츠)
- * ├─ CommunityServiceSection   — 공용 서비스 카드 그리드
+ * ├─ CommunityServiceSection   — 서비스 바로가기 카드 그리드
  * ├─ AdSection                — 페이지 광고 (community_ads page)
  * ├─ SponsorBar               — 스폰서 로고 (community_sponsors)
  * └─ UtilitySection            — 유틸리티 (로그인 패널 + 링크)
@@ -22,7 +22,6 @@
 import { useState, useEffect } from 'react';
 import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { NoticeSection } from '../components/home/NoticeSection';
-import { ForumCategorySection } from '../components/home/ForumCategorySection';
 import { EducationSection } from '../components/home/EducationSection';
 import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
 import { SignageSection } from '../components/home/SignageSection';
@@ -51,11 +50,15 @@ export function CommunityHomePage() {
       <HeroBannerSection ads={data?.heroAds ?? []} />
 
       <div style={styles.content}>
-        {/* 2. 공지/뉴스 */}
+        {/* 2. 공지사항 */}
         <NoticeSection prefetchedNotices={data?.notices} loading={loading} />
 
-        {/* 3. 포럼 카테고리 */}
-        <ForumCategorySection categories={data?.forumCategories ?? []} loading={loading} />
+        {/* 3. 최근 활동 (포럼 글 + 추천 콘텐츠) */}
+        <ActivitySection
+          prefetchedPosts={data?.community.posts}
+          prefetchedFeatured={data?.community.featured}
+          loading={loading}
+        />
 
         {/* 4. 교육/강의 (독립 API 호출) */}
         <EducationSection />
@@ -67,20 +70,13 @@ export function CommunityHomePage() {
           loading={loading}
         />
 
-        {/* 6. 최근 활동 (포럼 글 + 추천 콘텐츠) */}
-        <ActivitySection
-          prefetchedPosts={data?.community.posts}
-          prefetchedFeatured={data?.community.featured}
-          loading={loading}
-        />
-
-        {/* 7. 서비스 카드 그리드 */}
+        {/* 6. 서비스 바로가기 */}
         <CommunityServiceSection />
 
-        {/* 8. 페이지 광고 */}
+        {/* 7. 페이지 광고 */}
         <AdSection ads={data?.pageAds ?? []} />
 
-        {/* 9. 스폰서 */}
+        {/* 8. 스폰서 */}
         <SponsorBar sponsors={data?.sponsors ?? []} />
 
         {/* 유틸리티 */}

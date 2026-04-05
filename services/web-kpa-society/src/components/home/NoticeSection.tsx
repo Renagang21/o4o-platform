@@ -1,11 +1,9 @@
 /**
- * NoticeSection - 공지사항 + 약사공론 뉴스 예고 2컬럼 섹션
+ * NoticeSection - 공지사항 단일 컬럼 섹션
  *
  * WO-KPA-HOME-PHASE1-V1: 메인 페이지 공지 요약
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 약사공론 placeholder 제거, 단일 컬럼 전환
  * Performance: prefetchedNotices가 있으면 자체 API 호출 건너뜀
- *
- * 레이아웃:
- * [공지사항 컬럼] | [약사공론 뉴스 연결 예정]
  */
 
 import { useState, useEffect } from 'react';
@@ -28,7 +26,7 @@ export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Pro
       setNotices(prefetchedNotices);
       setLoading(false);
     } else {
-      homeApi.getNotices(3)
+      homeApi.getNotices(5)
         .then((res) => { if (res.data) setNotices(res.data); })
         .catch(() => {})
         .finally(() => setLoading(false));
@@ -39,45 +37,18 @@ export function NoticeSection({ prefetchedNotices, loading: parentLoading }: Pro
 
   return (
     <section style={styles.container}>
-      <div style={styles.grid}>
-        {/* 공지사항 컬럼 */}
-        <div style={styles.column}>
-          <div style={styles.columnHeader}>
-            <h2 style={styles.columnTitle}>공지사항</h2>
-            <Link to="/content" style={styles.moreLink}>전체 보기 →</Link>
-          </div>
-          <div style={styles.card}>
-            <ItemList
-              items={notices}
-              loading={isNoticeLoading}
-              showPinned
-              emptyText="아직 등록된 공지가 없습니다."
-              emptyHint="새 소식이 등록되면 여기에 표시됩니다."
-            />
-          </div>
-        </div>
-
-        {/* 약사공론 뉴스 (외부 뉴스) */}
-        <div style={styles.column}>
-          <div style={styles.columnHeader}>
-            <h2 style={styles.columnTitle}>약사공론 뉴스</h2>
-          </div>
-          <div style={{ ...styles.card, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={styles.emptyWrap}>
-              <p style={{ ...styles.empty, fontSize: '1.5rem', marginBottom: '8px' }}>📰</p>
-              <p style={{ ...styles.empty, fontSize: '0.938rem', fontWeight: 500 }}>외부 뉴스 연동 준비 중</p>
-              <p style={styles.emptyHint}>약사공론 뉴스가 연동되면 여기에 최신 기사가 표시됩니다.</p>
-              <a
-                href="https://www.kpanews.co.kr"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.externalLink}
-              >
-                약사공론 바로가기 →
-              </a>
-            </div>
-          </div>
-        </div>
+      <div style={styles.columnHeader}>
+        <h2 style={styles.columnTitle}>공지사항</h2>
+        <Link to="/content" style={styles.moreLink}>전체 보기 →</Link>
+      </div>
+      <div style={styles.card}>
+        <ItemList
+          items={notices}
+          loading={isNoticeLoading}
+          showPinned
+          emptyText="아직 등록된 공지가 없습니다."
+          emptyHint="새 소식이 등록되면 여기에 표시됩니다."
+        />
       </div>
     </section>
   );
@@ -129,14 +100,6 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: `${spacing.xl} 0`,
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: spacing.lg,
-  },
-  column: {
-    minWidth: 0,
-  },
   columnHeader: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -159,7 +122,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     boxShadow: shadows.sm,
-    minHeight: '180px',
   },
   list: {
     listStyle: 'none',
@@ -223,13 +185,5 @@ const styles: Record<string, React.CSSProperties> = {
     color: colors.neutral400,
     fontSize: '0.8rem',
     margin: `${spacing.xs} 0 0`,
-  },
-  externalLink: {
-    display: 'inline-block',
-    marginTop: spacing.sm,
-    fontSize: '0.813rem',
-    color: colors.primary,
-    textDecoration: 'none',
-    fontWeight: 500,
   },
 };

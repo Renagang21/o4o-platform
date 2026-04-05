@@ -3,11 +3,11 @@
  *
  * WO-KPA-HOME-PHASE1-V1: Home page summary endpoints
  * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: 통합 허브 확장
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: forumCategories 제거, notices limit 조정
  */
 
 import { apiClient } from './client';
 import { communityApi, type CommunityAd, type CommunitySponsor } from './community';
-import { forumApi } from './forum';
 import type { SignageHomeMedia, SignageHomePlaylist } from '@o4o/types/signage';
 import type { ForumHomePost } from '@o4o/types/forum';
 import type { ForumHubItem, ForumActivityCategory } from '../types';
@@ -89,7 +89,6 @@ export interface HomePageData {
   heroAds: CommunityAd[];
   pageAds: CommunityAd[];
   sponsors: CommunitySponsor[];
-  forumCategories: HomeForumCategory[];
 }
 
 export const homeApi = {
@@ -115,19 +114,18 @@ export const homeApi = {
   /**
    * 통합 Home 전체 데이터를 병렬로 가져오기
    * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1
-   * 기존 4개 + community ads/sponsors + forum categories = 8개 병렬 호출
+   * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: forumCategories 제거 → 7개 병렬 호출
    */
   async prefetchAll(): Promise<HomePageData> {
-    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes, catRes] =
+    const [noticesRes, communityRes, signageRes, forumHubRes, heroRes, pageAdRes, sponsorRes] =
       await Promise.allSettled([
-        apiClient.get<NoticesResponse>('/home/notices', { limit: 3 }),
+        apiClient.get<NoticesResponse>('/home/notices', { limit: 5 }),
         apiClient.get<CommunityResponse>('/home/community', { postLimit: 3, featuredLimit: 3 }),
         apiClient.get<SignageResponse>('/home/signage', { mediaLimit: 4, playlistLimit: 2 }),
         apiClient.get<ForumHubResponse>('/home/forum-hub'),
         communityApi.getHeroAds(),
         communityApi.getPageAds(),
         communityApi.getSponsors(),
-        forumApi.getCategories(),
       ]);
 
     return {
@@ -147,9 +145,6 @@ export const homeApi = {
         : [],
       sponsors: sponsorRes.status === 'fulfilled'
         ? (sponsorRes.value as any)?.data?.sponsors ?? (sponsorRes.value as any)?.sponsors ?? []
-        : [],
-      forumCategories: catRes.status === 'fulfilled'
-        ? (catRes.value as any)?.data ?? []
         : [],
     };
   },

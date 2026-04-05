@@ -1,14 +1,13 @@
 /**
- * CommunityServiceSection - 공용 서비스 진입 영역
+ * CommunityServiceSection - 서비스 바로가기 영역
  *
  * WO-KPA-SOCIETY-COMMUNITY-CARD-TONE-DOWN-V1
- * - 상태 배지 제거 (활발한 토론, 학습 진행 등)
- * - 아이콘 무채색 통일 (slate-500 / #64748b)
- * - 차분하고 열린 약사 커뮤니티 톤
+ * WO-KPA-A-HOME-HUB-ENHANCEMENT-V1: 깨진 링크 수정, 반응형 CSS 추가
  *
- * 2x2 ServiceCard 그리드: 포럼, 교육, 이벤트, 자료실
+ * 2x2 ServiceCard 그리드: 포럼, 교육, 콘텐츠, 사이니지
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { colors, spacing, borderRadius, typography } from '../../styles/theme';
 
@@ -18,6 +17,19 @@ interface ServiceCardData {
   href: string;
   icon: React.ReactNode;
 }
+
+const responsiveStyles = `
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: ${spacing.md};
+  }
+  @media (min-width: 768px) {
+    .service-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+`;
 
 // Neutral monochrome icons (inline SVG for consistent styling)
 const ForumIcon = () => (
@@ -33,7 +45,7 @@ const EducationIcon = () => (
   </svg>
 );
 
-const EventIcon = () => (
+const ContentIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
     <line x1="16" y1="2" x2="16" y2="6" />
@@ -42,9 +54,11 @@ const EventIcon = () => (
   </svg>
 );
 
-const ResourceIcon = () => (
+const SignageIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
   </svg>
 );
 
@@ -62,16 +76,16 @@ const services: ServiceCardData[] = [
     icon: <EducationIcon />,
   },
   {
-    title: '이벤트',
-    description: '퀴즈·설문에 참여하고 최신 이슈를 확인하세요',
-    href: '/events',
-    icon: <EventIcon />,
+    title: '콘텐츠 허브',
+    description: '공지·뉴스·이벤트를 한눈에 확인하세요',
+    href: '/content',
+    icon: <ContentIcon />,
   },
   {
-    title: '자료실',
-    description: '문서·영상 자료를 검색하고 공유하세요',
-    href: '/docs',
-    icon: <ResourceIcon />,
+    title: '디지털 사이니지',
+    description: '약국 디지털 미디어를 관리하세요',
+    href: '/signage',
+    icon: <SignageIcon />,
   },
 ];
 
@@ -88,10 +102,20 @@ function ServiceCard({ card }: { card: ServiceCardData }) {
 }
 
 export function CommunityServiceSection() {
+  useEffect(() => {
+    const styleId = 'service-section-responsive-styles';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = responsiveStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <section style={styles.container}>
-      <h2 style={styles.sectionTitle}>커뮤니티 & 서비스</h2>
-      <div style={styles.grid}>
+      <h2 style={styles.sectionTitle}>서비스 바로가기</h2>
+      <div className="service-grid">
         {services.map((card) => (
           <ServiceCard key={card.href} card={card} />
         ))}
@@ -108,11 +132,6 @@ const styles: Record<string, React.CSSProperties> = {
     ...typography.headingM,
     color: colors.neutral900,
     marginBottom: spacing.lg,
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: spacing.md,
   },
   card: {
     display: 'flex',
