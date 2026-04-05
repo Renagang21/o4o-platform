@@ -18,8 +18,10 @@ import {
   Trash2,
   Link2,
   BarChart3,
+  FileDown,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
+import { getAccessToken } from '../../contexts/AuthContext';
 import {
   getProductMarketing,
   unlinkProductMarketingAsset,
@@ -30,11 +32,31 @@ import type {
   ProductLibraryAsset,
 } from '../../api/productMarketing';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
 export function ProductMarketingPage() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handlePopDownload = async (layout: 'A4' | 'A5' = 'A4') => {
+    if (!productId) return;
+    const token = getAccessToken();
+    const url = `${API_BASE}/api/v1/products/${productId}/pop/${layout}`;
+    try {
+      const resp = await fetch(url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!resp.ok) throw new Error('POP 생성 실패');
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    } catch {
+      // silent
+    }
+  };
 
   const fetchData = useCallback(async () => {
     if (!productId) return;
@@ -103,6 +125,14 @@ export function ProductMarketingPage() {
           <p style={styles.subtitle}>이 상품에 연결된 QR 코드, 자료실 항목 등을 확인합니다</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={() => navigate('/store/marketing/qr')} style={styles.actionBtn}>
+            <QrCode size={14} />
+            QR 만들기
+          </button>
+          <button onClick={() => handlePopDownload('A4')} style={styles.actionBtn}>
+            <FileDown size={14} />
+            POP 출력
+          </button>
           <button onClick={() => navigate(-1)} style={styles.backBtn}>
             <ArrowLeft size={14} />
             돌아가기
@@ -273,6 +303,19 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '13px',
     color: colors.neutral500,
     marginTop: '4px',
+  },
+  actionBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    border: `1px solid ${colors.neutral200}`,
+    borderRadius: '8px',
+    backgroundColor: '#fff',
+    fontSize: '13px',
+    color: colors.neutral600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   backBtn: {
     display: 'flex',

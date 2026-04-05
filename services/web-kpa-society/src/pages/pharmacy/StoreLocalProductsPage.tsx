@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus, Search, X, Loader2, ShoppingBag, AlertTriangle,
-  Edit2, Trash2, ChevronLeft, ChevronRight, Tablet,
+  Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3,
 } from 'lucide-react';
 import {
   fetchLocalProducts,
@@ -336,6 +336,13 @@ export default function StoreLocalProductsPage() {
                         title="수정"
                       >
                         <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => navigate(`/store/commerce/products/${product.id}/marketing`)}
+                        className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
+                        title="마케팅 자산"
+                      >
+                        <BarChart3 className="w-4 h-4" />
                       </button>
                       {product.is_active && (
                         <button

@@ -25,6 +25,8 @@ import {
   getQrAnalytics,
 } from '../../api/storeQr';
 import type { StoreQrCode, QrAnalyticsData } from '../../api/storeQr';
+import { getListings } from '../../api/pharmacyProducts';
+import { fetchLocalProducts } from '../../api/localProducts';
 
 const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'product', label: '제품' },
@@ -68,6 +70,10 @@ export function StoreQRPage() {
   const [printing, setPrinting] = useState(false);
   const [downloadMenuId, setDownloadMenuId] = useState<string | null>(null);
 
+  // Product dropdown state
+  const [productOptions, setProductOptions] = useState<{ id: string; name: string }[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+
   const fetchItems = useCallback(async () => {
     try {
       const res = await getStoreQrCodes({ limit: 100 });
@@ -84,6 +90,29 @@ export function StoreQRPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  // Load product options when landingType is 'product'
+  useEffect(() => {
+    if (formLandingType !== 'product' || !creating) return;
+    setLoadingProducts(true);
+    Promise.all([
+      getListings().catch(() => ({ success: false as const, data: [] as any[] })),
+      fetchLocalProducts({ limit: 100 }).catch(() => ({ items: [] as any[], total: 0, page: 1, limit: 100 })),
+    ]).then(([listingsRes, localRes]) => {
+      const combined: { id: string; name: string }[] = [];
+      if (listingsRes.success && Array.isArray(listingsRes.data)) {
+        for (const l of listingsRes.data) {
+          if (l.is_active) combined.push({ id: l.id, name: l.product_name });
+        }
+      }
+      const localItems = 'items' in localRes ? localRes.items : [];
+      for (const p of localItems) {
+        if (p.is_active) combined.push({ id: p.id, name: p.name });
+      }
+      setProductOptions(combined);
+      setLoadingProducts(false);
+    });
+  }, [formLandingType, creating]);
 
   const handleLibrarySelect = (item: LibrarySelectorResult) => {
     setSelectedLibrary(item);
@@ -304,15 +333,29 @@ export function StoreQRPage() {
 
           <div style={styles.formRow}>
             <label style={styles.formLabel}>
-              랜딩 대상 ID {formLandingType === 'link' ? '(URL)' : '(선택)'}
+              {formLandingType === 'product' ? '연결 상품 (선택)' : formLandingType === 'link' ? '랜딩 대상 (URL)' : '랜딩 대상 ID (선택)'}
             </label>
-            <input
-              type="text"
-              value={formLandingTargetId}
-              onChange={(e) => setFormLandingTargetId(e.target.value)}
-              style={styles.input}
-              placeholder={formLandingType === 'link' ? 'https://example.com' : '대상 ID (비워두면 자료 페이지로 이동)'}
-            />
+            {formLandingType === 'product' ? (
+              <select
+                value={formLandingTargetId}
+                onChange={(e) => setFormLandingTargetId(e.target.value)}
+                style={styles.select}
+                disabled={loadingProducts}
+              >
+                <option value="">{loadingProducts ? '상품 목록 로딩 중...' : '상품 선택 (선택사항)'}</option>
+                {productOptions.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={formLandingTargetId}
+                onChange={(e) => setFormLandingTargetId(e.target.value)}
+                style={styles.input}
+                placeholder={formLandingType === 'link' ? 'https://example.com' : '대상 ID (비워두면 자료 페이지로 이동)'}
+              />
+            )}
           </div>
 
           {formError && <p style={styles.formError}>{formError}</p>}
