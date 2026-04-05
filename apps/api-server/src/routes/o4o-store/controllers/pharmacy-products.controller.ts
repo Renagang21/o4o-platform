@@ -75,7 +75,7 @@ export function createPharmacyProductsController(
       params.push(category);
       categoryFilter = `AND pm.brand_name = $${params.length}`;
     }
-    if (distributionType && ['PUBLIC', 'SERVICE'].includes(distributionType)) {
+    if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
       params.push(distributionType);
       distributionFilter = `AND spo.distribution_type = $${params.length}`;
     }
@@ -125,7 +125,7 @@ export function createPharmacyProductsController(
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
        LEFT JOIN organizations o ON o.id = s.organization_id
-       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
+       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${categoryFilter}
@@ -145,7 +145,7 @@ export function createPharmacyProductsController(
       countParams.push(category);
       countCategoryFilter = `AND pm.brand_name = $${countParams.length}`;
     }
-    if (distributionType && ['PUBLIC', 'SERVICE'].includes(distributionType)) {
+    if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
       countParams.push(distributionType);
       countDistributionFilter = `AND spo.distribution_type = $${countParams.length}`;
     }
@@ -164,7 +164,7 @@ export function createPharmacyProductsController(
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
-       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
+       WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE', 'PRIVATE')
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}
@@ -219,6 +219,8 @@ export function createPharmacyProductsController(
       result = await service.createServiceApproval(supplyProductId, organizationId, serviceKey, user.id);
     } else if (offer.distribution_type === 'PUBLIC') {
       result = await service.createPublicListing(supplyProductId, organizationId, serviceKey);
+    } else if (offer.distribution_type === 'PRIVATE') {
+      result = await service.createPrivateApproval(supplyProductId, organizationId, serviceKey, user.id);
     } else {
       throw new ApiError(400, `Unsupported distribution type: ${offer.distribution_type}`, 'UNSUPPORTED_TYPE');
     }

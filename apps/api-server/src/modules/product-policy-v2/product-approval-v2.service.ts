@@ -200,8 +200,11 @@ export class ProductApprovalV2Service {
     offerId: string,
     sellerOrgId: string,
     serviceKey: string,
+    requestedBy?: string,
   ): Promise<{ success: boolean; data?: ProductApproval; error?: string }> {
     const offerRepo = this.dataSource.getRepository(SupplierProductOffer);
+    const approvalRepo = this.dataSource.getRepository(ProductApproval);
+
     const offer = await offerRepo.findOne({ where: { id: offerId } });
     if (!offer) {
       return { success: false, error: 'PRODUCT_NOT_FOUND' };
@@ -213,45 +216,61 @@ export class ProductApprovalV2Service {
       return { success: false, error: 'PRODUCT_INACTIVE' };
     }
 
-    // allowedSellerIds에 포함 검증
-    if (
-      !offer.allowedSellerIds ||
-      !offer.allowedSellerIds.includes(sellerOrgId)
-    ) {
-      return { success: false, error: 'SELLER_NOT_IN_ALLOWED_LIST' };
+    // Supplier ACTIVE 검증
+    const supplierCheck = await this.dataSource.query(
+      `SELECT ns.status
+       FROM supplier_product_offers spo
+       JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+       WHERE spo.id = $1::uuid`,
+      [offerId],
+    );
+    if (supplierCheck.length === 0 || supplierCheck[0].status !== 'ACTIVE') {
+      return { success: false, error: 'SUPPLIER_NOT_ACTIVE' };
     }
 
-    return this.dataSource.transaction(async (manager) => {
-      const txApprovalRepo = manager.getRepository(ProductApproval);
+    // 중복 검사 + 재신청 처리
+    const existing = await approvalRepo.findOne({
+      where: {
+        offer_id: offerId,
+        organization_id: sellerOrgId,
+        approval_type: ProductApprovalType.PRIVATE,
+      },
+    });
+    if (existing) {
+      if (existing.approval_status === ProductApprovalStatus.PENDING) {
+        return { success: false, error: 'APPROVAL_ALREADY_PENDING' };
+      }
+      if (existing.approval_status === ProductApprovalStatus.APPROVED) {
+        return { success: false, error: 'APPROVAL_ALREADY_APPROVED' };
+      }
+      // REJECTED / REVOKED → 재신청
+      existing.approval_status = ProductApprovalStatus.PENDING;
+      if (requestedBy) existing.requested_by = requestedBy;
+      existing.decided_by = null;
+      existing.decided_at = null;
+      existing.reason = null;
+      const saved = await approvalRepo.save(existing);
+      return { success: true, data: saved };
+    }
 
-      const existing = await txApprovalRepo.findOne({
-        where: {
-          offer_id: offerId,
-          organization_id: sellerOrgId,
-          approval_type: ProductApprovalType.PRIVATE,
-        },
+    // 신규 승인 요청 생성
+    try {
+      const approval = approvalRepo.create({
+        offer_id: offerId,
+        organization_id: sellerOrgId,
+        service_key: serviceKey,
+        approval_type: ProductApprovalType.PRIVATE,
+        approval_status: ProductApprovalStatus.PENDING,
+        requested_by: requestedBy || null,
       });
-      if (existing) {
+      const saved = await approvalRepo.save(approval);
+      return { success: true, data: saved };
+    } catch (err: any) {
+      if (err.code === '23505' || err.driverError?.code === '23505') {
         return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
       }
-
-      try {
-        const approval = txApprovalRepo.create({
-          offer_id: offerId,
-          organization_id: sellerOrgId,
-          service_key: serviceKey,
-          approval_type: ProductApprovalType.PRIVATE,
-          approval_status: ProductApprovalStatus.PENDING,
-        });
-        const saved = await txApprovalRepo.save(approval);
-        return { success: true, data: saved };
-      } catch (err: any) {
-        if (err.code === '23505' || err.driverError?.code === '23505') {
-          return { success: false, error: 'APPROVAL_ALREADY_EXISTS' };
-        }
-        throw err;
-      }
-    });
+      throw err;
+    }
   }
 
   // ========================================================================
@@ -333,7 +352,40 @@ export class ProductApprovalV2Service {
   }
 
   // ========================================================================
-  // 5. rejectServiceApproval — SERVICE 승인 거절
+  // 5. rejectPrivateApproval — PRIVATE 승인 거절
+  // ========================================================================
+
+  async rejectPrivateApproval(
+    approvalId: string,
+    rejectedBy: string,
+    reason?: string,
+  ): Promise<{ success: boolean; data?: ProductApproval; error?: string }> {
+    const approvalRepo = this.dataSource.getRepository(ProductApproval);
+
+    const approval = await approvalRepo.findOne({
+      where: {
+        id: approvalId,
+        approval_status: ProductApprovalStatus.PENDING,
+        approval_type: ProductApprovalType.PRIVATE,
+      },
+    });
+    if (!approval) {
+      return { success: false, error: 'APPROVAL_NOT_FOUND_OR_NOT_PENDING' };
+    }
+
+    approval.approval_status = ProductApprovalStatus.REJECTED;
+    approval.decided_by = rejectedBy;
+    approval.decided_at = new Date();
+    if (reason) {
+      approval.reason = reason;
+    }
+    const saved = await approvalRepo.save(approval);
+
+    return { success: true, data: saved };
+  }
+
+  // ========================================================================
+  // 7. rejectServiceApproval — SERVICE 승인 거절
   // ========================================================================
 
   async rejectServiceApproval(
@@ -366,7 +418,7 @@ export class ProductApprovalV2Service {
   }
 
   // ========================================================================
-  // 6. revokeServiceApproval — SERVICE 승인 철회 (APPROVED → REVOKED)
+  // 8. revokeServiceApproval — SERVICE 승인 철회 (APPROVED → REVOKED)
   // ========================================================================
 
   async revokeServiceApproval(
@@ -408,7 +460,7 @@ export class ProductApprovalV2Service {
   }
 
   // ========================================================================
-  // 7. createPublicListing — PUBLIC 분배 Offer 즉시 Listing 생성 (승인 불필요)
+  // 9. createPublicListing — PUBLIC 분배 Offer 즉시 Listing 생성 (승인 불필요)
   // ========================================================================
 
   async createPublicListing(

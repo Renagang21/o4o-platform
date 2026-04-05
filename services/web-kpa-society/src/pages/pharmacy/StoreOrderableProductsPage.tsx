@@ -27,7 +27,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'recommended', label: '운영자 추천' },
-  { key: 'PUBLIC', label: '거점판매 모집' },
+  { key: 'PRIVATE', label: '판매자 모집' },
 ];
 
 const PAGE_LIMIT = 20;
@@ -107,16 +107,16 @@ export function StoreOrderableProductsPage() {
     setToast(null);
     try {
       await applyBySupplyProductId(product.id);
-      setToast({ type: 'success', message: `"${product.name}" 등록 신청이 완료되었습니다.` });
+      setToast({ type: 'success', message: `"${product.name}" 취급 신청이 완료되었습니다.` });
       setProducts(prev => prev.map(p =>
         p.id === product.id ? { ...p, isApplied: true } : p,
       ));
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
       if (code === 'DUPLICATE_APPLICATION' || code === 'ALREADY_EXISTS') {
-        setToast({ type: 'error', message: '이미 등록 신청된 상품입니다.' });
+        setToast({ type: 'error', message: '이미 취급 신청된 상품입니다.' });
       } else {
-        setToast({ type: 'error', message: e.message || '등록 신청에 실패했습니다.' });
+        setToast({ type: 'error', message: e.message || '취급 신청에 실패했습니다.' });
       }
     } finally {
       setApplyingId(null);
@@ -181,7 +181,7 @@ export function StoreOrderableProductsPage() {
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>주문 가능 상품리스트</h1>
         <p style={styles.heroDesc}>
-          공급자가 제공하는 상품을 탐색하고 내 대시보드에 등록할 수 있습니다.
+          공급자가 제공하는 상품을 탐색하고 취급 신청할 수 있습니다.
         </p>
       </header>
 
@@ -354,7 +354,7 @@ export function StoreOrderableProductsPage() {
                           cursor: isApplying ? 'not-allowed' : 'pointer',
                         }}
                       >
-                        {isApplying ? '등록 중...' : '내 대시보드에 등록'}
+                        {isApplying ? '신청 중...' : '취급 신청'}
                       </button>
                     )}
                   </div>

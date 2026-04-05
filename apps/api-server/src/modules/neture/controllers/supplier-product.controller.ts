@@ -297,6 +297,75 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
+  // POST /supplier/requests/:id/approve — PRIVATE 승인 처리 (WO-KPA-SELLER-RECRUITMENT-FLOW-V1)
+  router.post('/requests/:id/approve', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const userId = req.user?.id;
+      const { id } = req.params;
+
+      // 해당 요청이 이 공급자의 상품에 대한 것인지 검증
+      const [row] = await dataSource.query(
+        `SELECT pa.id FROM product_approvals pa
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE pa.id = $1 AND pa.approval_type = 'private' AND spo.supplier_id = $2`,
+        [id, supplierId],
+      );
+      if (!row) {
+        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Request not found' });
+      }
+
+      const { ProductApprovalV2Service } = await import(
+        '../../product-policy-v2/product-approval-v2.service.js'
+      );
+      const service = new ProductApprovalV2Service(dataSource);
+      const result = await service.approvePrivateProduct(id, userId || 'supplier');
+
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error approving supplier request:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to approve request' });
+    }
+  });
+
+  // POST /supplier/requests/:id/reject — PRIVATE 거절 처리 (WO-KPA-SELLER-RECRUITMENT-FLOW-V1)
+  router.post('/requests/:id/reject', requireAuth, requireLinkedSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const supplierId = (req as SupplierRequest).supplierId;
+      const userId = req.user?.id;
+      const { id } = req.params;
+      const { reason } = req.body;
+
+      // 해당 요청이 이 공급자의 상품에 대한 것인지 검증
+      const [row] = await dataSource.query(
+        `SELECT pa.id FROM product_approvals pa
+         JOIN supplier_product_offers spo ON spo.id = pa.offer_id
+         WHERE pa.id = $1 AND pa.approval_type = 'private' AND spo.supplier_id = $2`,
+        [id, supplierId],
+      );
+      if (!row) {
+        return res.status(404).json({ success: false, error: 'NOT_FOUND', message: 'Request not found' });
+      }
+
+      const { ProductApprovalV2Service } = await import(
+        '../../product-policy-v2/product-approval-v2.service.js'
+      );
+      const service = new ProductApprovalV2Service(dataSource);
+      const result = await service.rejectPrivateApproval(id, userId || 'supplier', reason);
+
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      logger.error('[Neture API] Error rejecting supplier request:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to reject request' });
+    }
+  });
+
   // GET /supplier/products/template — XLSX 템플릿 다운로드 (WO-NETURE-BULK-IMPORT-TEMPLATE-UPGRADE-V1)
   router.get('/products/template', requireAuth, async (_req: AuthenticatedRequest, res: Response) => {
     try {

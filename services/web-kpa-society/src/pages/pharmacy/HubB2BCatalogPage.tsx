@@ -29,7 +29,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'recommended', label: '운영자 추천' },
-  { key: 'PUBLIC', label: '거점판매 모집' },
+  { key: 'PRIVATE', label: '판매자 모집' },
 ];
 
 const PAGE_LIMIT = 20;
@@ -109,7 +109,7 @@ export function HubB2BCatalogPage() {
     setToast(null);
     try {
       await applyBySupplyProductId(product.id);
-      setToast({ type: 'success', message: `"${product.name}" 등록 신청이 완료되었습니다.` });
+      setToast({ type: 'success', message: `"${product.name}" 취급 신청이 완료되었습니다.` });
       // 로컬 상태 즉시 반영 (재조회 없이)
       setProducts(prev => prev.map(p =>
         p.id === product.id ? { ...p, isApplied: true } : p,
@@ -117,9 +117,9 @@ export function HubB2BCatalogPage() {
     } catch (e: any) {
       const code = e?.response?.data?.error?.code || e?.code;
       if (code === 'DUPLICATE_APPLICATION') {
-        setToast({ type: 'error', message: '이미 등록 신청된 상품입니다.' });
+        setToast({ type: 'error', message: '이미 취급 신청된 상품입니다.' });
       } else {
-        setToast({ type: 'error', message: e.message || '등록 신청에 실패했습니다.' });
+        setToast({ type: 'error', message: e.message || '취급 신청에 실패했습니다.' });
       }
     } finally {
       setApplyingId(null);
@@ -184,7 +184,7 @@ export function HubB2BCatalogPage() {
       <header style={styles.hero}>
         <h1 style={styles.heroTitle}>상품리스트</h1>
         <p style={styles.heroDesc}>
-          공급자가 제공하는 상품을 탐색하고 내 대시보드에 등록할 수 있습니다.
+          공급자가 제공하는 상품을 탐색하고 취급 신청할 수 있습니다.
         </p>
       </header>
 
@@ -357,7 +357,7 @@ export function HubB2BCatalogPage() {
                           cursor: isApplying ? 'not-allowed' : 'pointer',
                         }}
                       >
-                        {isApplying ? '등록 중...' : '내 대시보드에 등록'}
+                        {isApplying ? '신청 중...' : '취급 신청'}
                       </button>
                     )}
                   </div>
@@ -401,7 +401,7 @@ export function HubB2BCatalogPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          등록 신청 후 승인이 완료되면{' '}
+          취급 신청 후 공급자 승인이 완료되면{' '}
           <Link to="/store/commerce/orderable" style={{ color: colors.primary }}>내 매장관리 &gt; 주문 가능 상품</Link>
           에서 상품을 관리할 수 있습니다.
         </span>
