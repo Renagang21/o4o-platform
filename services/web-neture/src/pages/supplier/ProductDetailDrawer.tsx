@@ -1624,6 +1624,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
           mediaPickerTarget?.(asset.url);
           setMediaPickerTarget(null);
         }}
+        defaultFolder="description"
       />
       {/* WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 공용 미디어 선택기 (상품 이미지용) */}
       <MediaPickerModal
@@ -1631,6 +1632,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         onClose={() => setShowImagePicker(false)}
         onSelect={handleMediaPickerSelect}
         title="상품 이미지 선택"
+        defaultFolder="description"
       />
     </>
   );

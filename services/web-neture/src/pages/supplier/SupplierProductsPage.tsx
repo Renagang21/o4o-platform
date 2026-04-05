@@ -24,6 +24,7 @@ import {
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 // ─── Badge configs ───
 
@@ -84,6 +85,7 @@ function ImageUploadModal({
   const [preview, setPreview] = useState<string | null>(null);
   const [imageType, setImageType] = useState<'thumbnail' | 'detail' | 'content'>('thumbnail');
   const [uploading, setUploading] = useState(false);
+  const [showLibrary, setShowLibrary] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,6 +103,20 @@ function ImageUploadModal({
       onUploaded();
     } catch {
       alert('이미지 업로드 실패');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // WO-NETURE-SUPPLIER-IMAGE-UPLOAD-MODAL-MEDIA-PICKER-ALIGNMENT-V1: 라이브러리 선택
+  const handleLibrarySelect = async (asset: { url: string }) => {
+    setShowLibrary(false);
+    setUploading(true);
+    try {
+      await productApi.registerImageFromUrl(masterId, asset.url, imageType);
+      onUploaded();
+    } catch {
+      alert('이미지 등록 실패');
     } finally {
       setUploading(false);
     }
@@ -149,6 +165,15 @@ function ImageUploadModal({
 
         <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
 
+        {/* WO-NETURE-SUPPLIER-IMAGE-UPLOAD-MODAL-MEDIA-PICKER-ALIGNMENT-V1: 라이브러리 선택 버튼 */}
+        <button
+          onClick={() => setShowLibrary(true)}
+          disabled={uploading}
+          className="w-full mb-4 px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 disabled:opacity-50"
+        >
+          라이브러리에서 선택
+        </button>
+
         <div className="flex justify-end gap-2">
           <button onClick={onClose} disabled={uploading} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">취소</button>
           <button
@@ -160,6 +185,13 @@ function ImageUploadModal({
           </button>
         </div>
       </div>
+      <MediaPickerModal
+        open={showLibrary}
+        onClose={() => setShowLibrary(false)}
+        onSelect={handleLibrarySelect}
+        title="상품 이미지 선택"
+        defaultFolder={imageType === 'thumbnail' ? 'product-thumbnail' : 'description'}
+      />
     </div>
   );
 }

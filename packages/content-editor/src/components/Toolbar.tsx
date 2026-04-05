@@ -3,7 +3,7 @@
  * 편집 도구 모음
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Editor } from '@tiptap/react';
 import {
   Bold,
@@ -51,6 +51,22 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
   const [linkUrl, setLinkUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
+  // WO-NETURE-RICHTEXT-IMAGE-POPUP-STATE-ALIGNMENT-V1: 복수 에디터 팝업 중첩 방지
+  const toolbarId = useRef(Math.random().toString(36).slice(2));
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail !== toolbarId.current) {
+        setShowImageInput(false);
+        setShowLinkInput(false);
+        setShowVideoInput(false);
+      }
+    };
+    window.addEventListener('content-editor-popup-open', handler);
+    return () => window.removeEventListener('content-editor-popup-open', handler);
+  }, []);
 
   if (!editor) return null;
 
@@ -302,7 +318,15 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       {/* Link */}
       <div style={{ position: 'relative' }}>
         <ToolButton
-          onClick={() => setShowLinkInput(!showLinkInput)}
+          onClick={() => {
+            const next = !showLinkInput;
+            if (next) {
+              window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
+              setShowImageInput(false);
+              setShowVideoInput(false);
+            }
+            setShowLinkInput(next);
+          }}
           isActive={editor.isActive('link')}
           title="링크"
         >
@@ -357,7 +381,15 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       {preset === 'full' && (
         <div style={{ position: 'relative' }}>
           <ToolButton
-            onClick={() => setShowImageInput(!showImageInput)}
+            onClick={() => {
+              const next = !showImageInput;
+              if (next) {
+                window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
+                setShowLinkInput(false);
+                setShowVideoInput(false);
+              }
+              setShowImageInput(next);
+            }}
             title="이미지"
           >
             <Image size={18} />
@@ -530,7 +562,15 @@ export function Toolbar({ editor, onImageUpload, existingImages, preset = 'full'
       {preset === 'full' && (
         <div style={{ position: 'relative' }}>
           <ToolButton
-            onClick={() => setShowVideoInput(!showVideoInput)}
+            onClick={() => {
+              const next = !showVideoInput;
+              if (next) {
+                window.dispatchEvent(new CustomEvent('content-editor-popup-open', { detail: toolbarId.current }));
+                setShowLinkInput(false);
+                setShowImageInput(false);
+              }
+              setShowVideoInput(next);
+            }}
             title="동영상 (YouTube/Vimeo)"
           >
             <Youtube size={18} />

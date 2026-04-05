@@ -7,9 +7,12 @@
  * Step 1: 기본 정보 (상품명, 카테고리, 브랜드, 제조사, 바코드 optional, 규제)
  * Step 2: 가격/유통/서비스 (공급가, 소비자참고가, 유통정책, 서비스선택)
  * Step 3: 이미지/설명/등록
+ *
+ * WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1:
+ *   상세/성분 이미지 라이브러리 선택 + 에디터 이미지 기능 연결
  */
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
@@ -18,6 +21,7 @@ import {
   type AdminMaster,
   type CategoryTreeItem,
 } from '../../lib/api';
+import { mediaApi } from '../../lib/api/media';
 import { ProductForm, type ProductFormData } from '../../components/product';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
@@ -97,13 +101,17 @@ export default function SupplierProductCreatePage() {
 
   // Images — WO-NETURE-IMAGE-ASSET-STRUCTURE-V1: 3구역 분리
   // WO-NETURE-PRODUCT-PRIMARY-IMAGE-MEDIA-LIBRARY-INTEGRATION-V1: 라이브러리 선택 지원
+  // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 상세/성분도 라이브러리 지원
   type ThumbnailSource = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string } | null;
+  type ImageItem = { kind: 'file'; file: File; preview: string } | { kind: 'library'; url: string };
   const [thumbnailSource, setThumbnailSource] = useState<ThumbnailSource>(null);
   const [showThumbnailPicker, setShowThumbnailPicker] = useState(false);
-  const [detailFiles, setDetailFiles] = useState<File[]>([]);
-  const [detailPreviews, setDetailPreviews] = useState<string[]>([]);
-  const [contentFiles, setContentFiles] = useState<File[]>([]);
-  const [contentPreviews, setContentPreviews] = useState<string[]>([]);
+  const [detailItems, setDetailItems] = useState<ImageItem[]>([]);
+  const [contentItems, setContentItems] = useState<ImageItem[]>([]);
+  // detail/content 라이브러리 선택 대상
+  const [imagePickerTarget, setImagePickerTarget] = useState<'detail' | 'content' | null>(null);
+  // 에디터 인라인 이미지 라이브러리 선택 콜백
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((url: string) => void) | null>(null);
 
   // Template integration (WO-O4O-TEMPLATE-ADOPTION-NETURE-PRODUCT-V1)
   const { user } = useAuth();
@@ -263,16 +271,25 @@ export default function SupplierProductCreatePage() {
         } else if (thumbnailSource?.kind === 'library') {
           await productApi.registerImageFromUrl(masterId, thumbnailSource.url, 'thumbnail');
         }
-        for (const file of detailFiles) {
-          await productApi.uploadProductImage(masterId, file, 'detail');
+        // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: file/library 분기
+        for (const item of detailItems) {
+          if (item.kind === 'file') {
+            await productApi.uploadProductImage(masterId, item.file, 'detail');
+          } else {
+            await productApi.registerImageFromUrl(masterId, item.url, 'detail');
+          }
         }
-        for (const file of contentFiles) {
-          await productApi.uploadProductImage(masterId, file, 'content');
+        for (const item of contentItems) {
+          if (item.kind === 'file') {
+            await productApi.uploadProductImage(masterId, item.file, 'content');
+          } else {
+            await productApi.registerImageFromUrl(masterId, item.url, 'content');
+          }
         }
       }
       if (thumbnailSource?.kind === 'file') URL.revokeObjectURL(thumbnailSource.preview);
-      detailPreviews.forEach((url) => URL.revokeObjectURL(url));
-      contentPreviews.forEach((url) => URL.revokeObjectURL(url));
+      detailItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
+      contentItems.forEach((item) => { if (item.kind === 'file') URL.revokeObjectURL(item.preview); });
       navigate('/supplier/products');
     } else {
       setSubmitError(result.error || '상품 등록에 실패했습니다.');
@@ -300,30 +317,36 @@ export default function SupplierProductCreatePage() {
     setThumbnailSource(null);
   };
 
+  // WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: ImageItem 기반 핸들러
   const handleMultiImageSelect = (
     e: React.ChangeEvent<HTMLInputElement>,
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-    setPreviews: React.Dispatch<React.SetStateAction<string[]>>
+    setItems: React.Dispatch<React.SetStateAction<ImageItem[]>>,
   ) => {
     const files = e.target.files;
     if (!files) return;
     const newFiles = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (newFiles.length === 0) return;
-    setFiles((prev) => [...prev, ...newFiles]);
-    setPreviews((prev) => [...prev, ...newFiles.map((f) => URL.createObjectURL(f))]);
+    const newItems: ImageItem[] = newFiles.map((f) => ({ kind: 'file' as const, file: f, preview: URL.createObjectURL(f) }));
+    setItems((prev) => [...prev, ...newItems]);
     e.target.value = '';
   };
 
-  const removeMultiImage = (
+  const removeImageItem = (
     idx: number,
-    previews: string[],
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>,
-    setPreviews: React.Dispatch<React.SetStateAction<string[]>>
+    items: ImageItem[],
+    setItems: React.Dispatch<React.SetStateAction<ImageItem[]>>,
   ) => {
-    URL.revokeObjectURL(previews[idx]);
-    setFiles((prev) => prev.filter((_, i) => i !== idx));
-    setPreviews((prev) => prev.filter((_, i) => i !== idx));
+    const item = items[idx];
+    if (item.kind === 'file') URL.revokeObjectURL(item.preview);
+    setItems((prev) => prev.filter((_, i) => i !== idx));
   };
+
+  // 에디터 인라인 이미지: masterId 없으므로 미디어 라이브러리에 업로드
+  const editorImageUpload = useCallback(async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, undefined, 'description');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드 실패');
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -610,54 +633,74 @@ export default function SupplierProductCreatePage() {
               )}
             </div>
 
-            {/* 2. 상세 이미지 */}
+            {/* 2. 상세 이미지 — WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1 */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-700">상세 이미지</span>
                 <span className="text-xs text-slate-400">상품 다각도, 포장 등 (여러 장 가능)</span>
               </div>
-              {detailPreviews.length > 0 && (
+              {detailItems.length > 0 && (
                 <div className="grid grid-cols-4 gap-3">
-                  {detailPreviews.map((src, idx) => (
+                  {detailItems.map((item, idx) => (
                     <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
-                      <img src={src} alt={`상세 ${idx + 1}`} className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => removeMultiImage(idx, detailPreviews, setDetailFiles, setDetailPreviews)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
+                      <img src={item.kind === 'file' ? item.preview : item.url} alt={`상세 ${idx + 1}`} className="w-full h-full object-cover" />
+                      {item.kind === 'library' && <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-[9px] px-1 py-0.5 rounded">LIB</span>}
+                      <button type="button" onClick={() => removeImageItem(idx, detailItems, setDetailItems)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
                     </div>
                   ))}
                 </div>
               )}
-              <label className="block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
-                <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setDetailFiles, setDetailPreviews)} className="hidden" />
-                <div className="text-slate-400 text-sm">
-                  <p className="font-medium">클릭하여 상세 이미지 추가</p>
-                  {detailPreviews.length > 0 && <p className="mt-1 text-xs text-emerald-600">{detailPreviews.length}장 선택됨</p>}
-                </div>
-              </label>
+              <div className="flex gap-2">
+                <label className="flex-1 block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
+                  <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setDetailItems)} className="hidden" />
+                  <div className="text-slate-400 text-sm">
+                    <p className="font-medium">파일에서 추가</p>
+                    {detailItems.length > 0 && <p className="mt-1 text-xs text-emerald-600">{detailItems.length}장 선택됨</p>}
+                  </div>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setImagePickerTarget('detail')}
+                  className="px-4 py-3 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
+                >
+                  라이브러리에서<br />선택
+                </button>
+              </div>
             </div>
 
-            {/* 3. 성분/라벨 이미지 (콘텐츠) */}
+            {/* 3. 성분/라벨 이미지 (콘텐츠) — WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1 */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-slate-700">성분/라벨 이미지</span>
                 <span className="text-xs text-slate-400">성분표, 라벨, 인증마크 등 (AI 텍스트 추출 대상)</span>
               </div>
-              {contentPreviews.length > 0 && (
+              {contentItems.length > 0 && (
                 <div className="grid grid-cols-4 gap-3">
-                  {contentPreviews.map((src, idx) => (
+                  {contentItems.map((item, idx) => (
                     <div key={idx} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
-                      <img src={src} alt={`콘텐츠 ${idx + 1}`} className="w-full h-full object-cover" />
-                      <button type="button" onClick={() => removeMultiImage(idx, contentPreviews, setContentFiles, setContentPreviews)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
+                      <img src={item.kind === 'file' ? item.preview : item.url} alt={`콘텐츠 ${idx + 1}`} className="w-full h-full object-cover" />
+                      {item.kind === 'library' && <span className="absolute bottom-1 left-1 bg-blue-500 text-white text-[9px] px-1 py-0.5 rounded">LIB</span>}
+                      <button type="button" onClick={() => removeImageItem(idx, contentItems, setContentItems)} className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">X</button>
                     </div>
                   ))}
                 </div>
               )}
-              <label className="block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
-                <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setContentFiles, setContentPreviews)} className="hidden" />
-                <div className="text-slate-400 text-sm">
-                  <p className="font-medium">클릭하여 성분/라벨 이미지 추가</p>
-                  {contentPreviews.length > 0 && <p className="mt-1 text-xs text-emerald-600">{contentPreviews.length}장 선택됨</p>}
-                </div>
-              </label>
+              <div className="flex gap-2">
+                <label className="flex-1 block border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/30 transition-colors">
+                  <input type="file" accept="image/*" multiple onChange={(e) => handleMultiImageSelect(e, setContentItems)} className="hidden" />
+                  <div className="text-slate-400 text-sm">
+                    <p className="font-medium">파일에서 추가</p>
+                    {contentItems.length > 0 && <p className="mt-1 text-xs text-emerald-600">{contentItems.length}장 선택됨</p>}
+                  </div>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setImagePickerTarget('content')}
+                  className="px-4 py-3 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
+                >
+                  라이브러리에서<br />선택
+                </button>
+              </div>
             </div>
           </div>
 
@@ -668,6 +711,7 @@ export default function SupplierProductCreatePage() {
               <p className="text-sm text-amber-600">공개(PUBLIC) 유통 시 간이 설명은 필수입니다</p>
             )}
 
+            {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 에디터 이미지 기능 연결 */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">소비자용 간이 설명</label>
               <RichTextEditor
@@ -675,6 +719,8 @@ export default function SupplierProductCreatePage() {
                 onChange={(c) => setConsumerShortDesc(c.html)}
                 placeholder="소비자에게 보이는 간이 설명을 입력하세요..."
                 minHeight="120px"
+                onImageUpload={editorImageUpload}
+                onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
               />
             </div>
 
@@ -685,6 +731,8 @@ export default function SupplierProductCreatePage() {
                 onChange={(c) => setConsumerDetailDesc(c.html)}
                 placeholder="소비자에게 보이는 상세 설명을 입력하세요..."
                 minHeight="200px"
+                onImageUpload={editorImageUpload}
+                onMediaLibraryPick={(insertImage) => setMediaPickerTarget(() => insertImage)}
                 showTemplateActions
                 templates={tpl.templates}
                 templatesLoading={tpl.loading}
@@ -777,6 +825,33 @@ export default function SupplierProductCreatePage() {
         onClose={() => setShowThumbnailPicker(false)}
         onSelect={handleThumbnailFromLibrary}
         title="대표 이미지 선택"
+        defaultFolder="product-thumbnail"
+      />
+      {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 상세/성분 이미지 라이브러리 선택 */}
+      <MediaPickerModal
+        open={imagePickerTarget !== null}
+        onClose={() => setImagePickerTarget(null)}
+        onSelect={(asset) => {
+          if (imagePickerTarget === 'detail') {
+            setDetailItems(prev => [...prev, { kind: 'library', url: asset.url }]);
+          } else if (imagePickerTarget === 'content') {
+            setContentItems(prev => [...prev, { kind: 'library', url: asset.url }]);
+          }
+          setImagePickerTarget(null);
+        }}
+        title={imagePickerTarget === 'detail' ? '상세 이미지 선택' : '성분/라벨 이미지 선택'}
+        defaultFolder="description"
+      />
+      {/* WO-NETURE-SUPPLIER-CREATE-IMAGE-LIBRARY-ALIGNMENT-V1: 에디터 인라인 이미지 라이브러리 선택 */}
+      <MediaPickerModal
+        open={!!mediaPickerTarget}
+        onClose={() => setMediaPickerTarget(null)}
+        onSelect={(asset) => {
+          mediaPickerTarget?.(asset.url);
+          setMediaPickerTarget(null);
+        }}
+        title="설명 이미지 선택"
+        defaultFolder="description"
       />
     </div>
   );
