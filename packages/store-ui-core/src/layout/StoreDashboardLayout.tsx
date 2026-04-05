@@ -32,6 +32,8 @@ interface StoreDashboardLayoutProps {
   serviceBadge?: string;
   /** 소속 조직명 */
   orgName?: string;
+  /** 커스텀 우측 영역 (StoreTopBar에 전달) */
+  topBarRight?: React.ReactNode;
 }
 
 export function StoreDashboardLayout({
@@ -45,6 +47,7 @@ export function StoreDashboardLayout({
   serviceLabel,
   serviceBadge,
   orgName,
+  topBarRight,
 }: StoreDashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -62,6 +65,7 @@ export function StoreDashboardLayout({
         serviceLabel={serviceLabel}
         serviceBadge={serviceBadge}
         orgName={orgName}
+        topBarRight={topBarRight}
       />
 
       {/* ──── Body: sidebar + content ──── */}

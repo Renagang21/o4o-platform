@@ -29,6 +29,8 @@ export interface StoreTopBarProps {
   serviceBadge?: string;
   /** 소속 조직명 (2-line 모드 2번째 줄에 표시) */
   orgName?: string;
+  /** 커스텀 우측 영역 (제공 시 기본 Home+User+Logout 대체, 햄버거는 유지) */
+  topBarRight?: React.ReactNode;
 }
 
 export function StoreTopBar({
@@ -42,6 +44,7 @@ export function StoreTopBar({
   serviceLabel,
   serviceBadge,
   orgName,
+  topBarRight,
 }: StoreTopBarProps) {
   const initial = userInitial || userName?.charAt(0) || '?';
 
@@ -97,33 +100,39 @@ export function StoreTopBar({
 
         {/* Right: Home + User + Mobile Menu */}
         <div className="flex items-center gap-3">
-          <NavLink
-            to={homeLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
-          >
-            <Home className="w-4 h-4" />
-            <span className="hidden md:inline">홈</span>
-          </NavLink>
+          {topBarRight ? (
+            topBarRight
+          ) : (
+            <>
+              <NavLink
+                to={homeLink}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100"
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden md:inline">홈</span>
+              </NavLink>
 
-          {userName && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
-                <span className="text-white text-sm font-medium">{initial}</span>
-              </div>
-              <span className="hidden md:block text-sm font-medium text-slate-700">
-                {userName}
-              </span>
-            </div>
-          )}
+              {userName && (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">{initial}</span>
+                  </div>
+                  <span className="hidden md:block text-sm font-medium text-slate-700">
+                    {userName}
+                  </span>
+                </div>
+              )}
 
-          {onLogout && (
-            <button
-              onClick={onLogout}
-              className="hidden lg:block p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
-              title="로그아웃"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="hidden lg:block p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition-colors"
+                  title="로그아웃"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              )}
+            </>
           )}
 
           {/* Mobile hamburger menu */}

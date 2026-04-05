@@ -114,6 +114,7 @@ import { PharmacyInfoPage } from './pages/pharmacy/PharmacyInfoPage';
 // WO-PHARMACY-MANAGEMENT-CONSOLIDATION-V1 Phase 2: Store Core v1.0 통합
 import { StoreDashboardLayout, KPA_SOCIETY_STORE_CONFIG, resolveStoreMenu } from '@o4o/store-ui-core';
 import { useStoreCapabilities } from './hooks/useStoreCapabilities';
+import { StoreUserDropdown } from './components/store/StoreUserDropdown';
 import { SupplierListPage, SupplierDetailPage } from './pages/pharmacy/b2b';
 
 // Work Pages (WO-KPA-WORK-IMPLEMENT-V1) - 근무약사 전용 업무 화면
@@ -299,16 +300,19 @@ function KpaStoreLayoutWrapper() {
 
   const resolvedConfig = resolveStoreMenu(KPA_SOCIETY_STORE_CONFIG, enabledCaps);
 
+  const handleLogout = () => { logout(); navigate('/'); };
+
   return (
     <StoreDashboardLayout
       config={resolvedConfig}
       userName={user?.name || user?.email || ''}
       homeLink="/"
-      onLogout={() => { logout(); navigate('/'); }}
+      onLogout={handleLogout}
       navItems={KPA_STORE_NAV_ITEMS}
       serviceLabel="약사 네트워크"
       serviceBadge="KPA"
       orgName={pharmacyName}
+      topBarRight={<StoreUserDropdown homeLink="/" onLogout={handleLogout} />}
     />
   );
 }
