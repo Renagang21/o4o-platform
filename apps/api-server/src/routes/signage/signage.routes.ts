@@ -198,7 +198,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // ========== AI Generation Routes (Store feature) ==========
   // POST /api/signage/:serviceKey/ai/generate - Generate content with AI
-  router.post('/ai/generate', requireSignageStore, contentCtrl.generateWithAi);
+  router.post('/ai/generate', requireSignageOperatorOrStore, contentCtrl.generateWithAi);
 
   // ========== Sprint 2-6: Global Content Routes (Read-only for Store) ==========
   // These routes allow Stores to browse HQ/Supplier/Community content

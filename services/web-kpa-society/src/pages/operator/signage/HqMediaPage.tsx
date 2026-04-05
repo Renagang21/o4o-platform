@@ -9,7 +9,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Film, RefreshCw, Plus, ChevronRight } from 'lucide-react';
+import { Film, RefreshCw, Plus, ChevronRight, Sparkles } from 'lucide-react';
+import AiContentGenerationModal from './AiContentGenerationModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -47,6 +48,7 @@ export default function HqMediaPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
 
   // Create form
   const [formName, setFormName] = useState('');
@@ -132,6 +134,9 @@ export default function HqMediaPage() {
           <p className="text-slate-500 text-sm mt-1">운영자 제공 사이니지 미디어 콘텐츠</p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => setShowAiModal(true)} className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+            <Sparkles className="w-4 h-4" /> AI 초안 생성
+          </button>
           <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
             <Plus className="w-4 h-4" /> 새 미디어
           </button>
@@ -243,6 +248,14 @@ export default function HqMediaPage() {
           </table>
         )}
       </div>
+
+      {showAiModal && (
+        <AiContentGenerationModal
+          open={showAiModal}
+          onClose={() => setShowAiModal(false)}
+          onSaved={() => { setShowAiModal(false); fetchMedia(); }}
+        />
+      )}
     </div>
   );
 }
