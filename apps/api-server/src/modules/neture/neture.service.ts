@@ -502,6 +502,11 @@ export class NetureService {
     return this.offerService.getOperatorSupplyProducts(operatorUserId);
   }
 
+  /** WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1 */
+  async getAllRegisteredOffers(options: Parameters<typeof this.offerService.getAllRegisteredOffers>[0]) {
+    return this.offerService.getAllRegisteredOffers(options);
+  }
+
   // ==================== Partner Recruitment & Application ====================
 
   async getPartnerRecruitments(filters?: { status?: RecruitmentStatus }) {

@@ -349,6 +349,8 @@ const SupplyDashboardPage = lazy(() =>
 );
 // WO-NETURE-OPERATOR-PRODUCT-SUPPLY-OVERVIEW-V1
 const AllProductsOverviewPage = lazy(() => import('./pages/operator/AllProductsOverviewPage'));
+// WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
+const AllRegisteredProductsPage = lazy(() => import('./pages/operator/AllRegisteredProductsPage'));
 const RecruitingProductsOverviewPage = lazy(() => import('./pages/operator/RecruitingProductsOverviewPage'));
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
@@ -853,6 +855,7 @@ function App() {
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
               <Route path="/operator/supply" element={<SupplyDashboardPage />} />
               <Route path="/operator/all-products" element={<AllProductsOverviewPage />} />
+              <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
               <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/operator/ai-operations" element={<AiOperationsPage />} />

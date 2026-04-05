@@ -14,7 +14,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText } from 'lucide-react';
+import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   EditableDataTable,
@@ -1059,6 +1059,12 @@ export default function SupplierProductsPage() {
             상품 등록
           </button>
         </div>
+      </div>
+
+      {/* WO-NETURE-OPERATOR-PRODUCT-MENU-LABEL-ALIGNMENT-V1: 운영자 노출 조건 안내 */}
+      <div className="flex items-start gap-2 mb-4 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
+        <Info size={14} className="shrink-0 mt-0.5" />
+        <p>운영자 화면에는 <strong>공개(PUBLIC/SERVICE)</strong> 및 <strong>활성</strong> 상태의 상품만 노출됩니다. 등록 후 운영자에게 보이려면 상품을 활성화하고 유통 타입을 공개로 설정해 주세요.</p>
       </div>
 
       {/* Search */}

@@ -104,7 +104,7 @@ export default function SupplyDashboardPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-800">공급 요청 관리</h1>
-          <p className="text-slate-500 mt-1">공급 가능 제품 조회 및 공급요청</p>
+          <p className="text-slate-500 mt-1">공개·활성 상태 제품 조회 및 공급요청</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -133,7 +133,7 @@ export default function SupplyDashboardPage() {
             대시보드로 돌아가기
           </Link>
           <h1 className="text-2xl font-bold text-slate-800">공급 요청 관리</h1>
-          <p className="text-slate-500 mt-1">공급 가능 제품 조회 및 공급요청</p>
+          <p className="text-slate-500 mt-1">공개·활성 상태 제품 조회 및 공급요청</p>
         </div>
         <button
           onClick={fetchProducts}
@@ -150,7 +150,7 @@ export default function SupplyDashboardPage() {
         <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
           <Package className="w-12 h-12 mx-auto mb-4 text-slate-300" />
           <p className="text-slate-500 text-lg">자료가 없습니다</p>
-          <p className="text-slate-400 text-sm mt-1">공급 가능한 제품이 아직 없습니다.</p>
+          <p className="text-slate-400 text-sm mt-1">현재 공개·활성 상태인 공급 가능 제품이 없습니다.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

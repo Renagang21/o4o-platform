@@ -28,6 +28,71 @@ export interface OperatorSupplyProduct {
   primaryImageUrl: string | null;
 }
 
+/** WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1 */
+export interface AllRegisteredOffer {
+  id: string;
+  masterId: string;
+  name: string;
+  isActive: boolean;
+  distributionType: string;
+  approvalStatus: string;
+  priceGeneral: number | null;
+  consumerReferencePrice: number | null;
+  supplierId: string;
+  supplierName: string;
+  supplierStatus: string;
+  categoryName: string | null;
+  brandName: string | null;
+  barcode: string | null;
+  specification: string | null;
+  primaryImageUrl: string | null;
+  serviceApprovals: Array<{ serviceKey: string; status: string }>;
+  createdAt: string;
+}
+
+export interface AllOffersKpi {
+  total: number;
+  active: number;
+  inactive: number;
+  distPublic: number;
+  distService: number;
+  distPrivate: number;
+  approvalPending: number;
+  approvalApproved: number;
+  approvalRejected: number;
+}
+
+export interface AllOffersResponse {
+  data: AllRegisteredOffer[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+  kpi: AllOffersKpi;
+}
+
+export const operatorAllOffersApi = {
+  async getAll(params?: {
+    page?: number;
+    limit?: number;
+    keyword?: string;
+    distributionType?: string;
+    isActive?: string;
+    approvalStatus?: string;
+    sort?: string;
+    order?: string;
+  }): Promise<AllOffersResponse> {
+    try {
+      const response = await api.get('/neture/operator/all-offers', { params });
+      return response.data;
+    } catch (error) {
+      console.warn('[Operator API] Failed to fetch all offers:', error);
+      return {
+        data: [],
+        pagination: { page: 1, limit: 50, total: 0, totalPages: 0 },
+        kpi: { total: 0, active: 0, inactive: 0, distPublic: 0, distService: 0, distPrivate: 0, approvalPending: 0, approvalApproved: 0, approvalRejected: 0 },
+      };
+    }
+  },
+};
+
 export const operatorSupplyApi = {
   async getSupplyProducts(): Promise<OperatorSupplyProduct[]> {
     try {

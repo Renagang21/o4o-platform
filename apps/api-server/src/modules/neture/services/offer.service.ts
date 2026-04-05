@@ -1364,6 +1364,149 @@ export class NetureOfferService {
     }
   }
 
+  // ==================== Operator All-Offers View ====================
+
+  /**
+   * WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
+   * 전체 등록 상품 조회 (isActive/distributionType 필터 없음)
+   * 운영자가 플랫폼에 등록된 모든 offer를 모니터링하기 위한 용도
+   */
+  async getAllRegisteredOffers(options: {
+    page?: number;
+    limit?: number;
+    keyword?: string;
+    distributionType?: string;
+    isActive?: string;
+    approvalStatus?: string;
+    sort?: string;
+    order?: string;
+  } = {}) {
+    const page = Math.max(1, Number(options.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(options.limit) || 50));
+    const offset = (page - 1) * limit;
+    const sortOrder = options.order?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    const validSortFields: Record<string, string> = {
+      createdAt: 'spo.created_at',
+      priceGeneral: 'spo.price_general',
+      name: 'pm.marketing_name',
+    };
+    const sortField = validSortFields[options.sort || ''] || 'spo.created_at';
+
+    // WHERE 조건 (deleted_at IS NULL 만 기본)
+    const conditions: string[] = ['spo.deleted_at IS NULL'];
+    const params: any[] = [];
+    let idx = 1;
+
+    if (options.keyword?.trim()) {
+      conditions.push(`(pm.marketing_name ILIKE $${idx} OR pm.barcode ILIKE $${idx} OR pm.regulatory_name ILIKE $${idx} OR o.name ILIKE $${idx})`);
+      params.push(`%${options.keyword.trim()}%`);
+      idx++;
+    }
+    if (options.distributionType) {
+      conditions.push(`spo.distribution_type = $${idx}`);
+      params.push(options.distributionType);
+      idx++;
+    }
+    if (options.isActive === 'true' || options.isActive === 'false') {
+      conditions.push(`spo.is_active = $${idx}`);
+      params.push(options.isActive === 'true');
+      idx++;
+    }
+    if (options.approvalStatus) {
+      conditions.push(`spo.approval_status = $${idx}`);
+      params.push(options.approvalStatus);
+      idx++;
+    }
+
+    const where = conditions.join(' AND ');
+
+    const [countResult, rows, kpiResult] = await Promise.all([
+      AppDataSource.query(
+        `SELECT COUNT(*)::int AS total
+         FROM supplier_product_offers spo
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         LEFT JOIN organizations o ON o.id = ns.organization_id
+         WHERE ${where}`,
+        params,
+      ),
+      AppDataSource.query(
+        `SELECT
+           spo.id, spo.master_id AS "masterId",
+           spo.is_active AS "isActive",
+           spo.distribution_type AS "distributionType",
+           spo.approval_status AS "approvalStatus",
+           spo.price_general AS "priceGeneral",
+           spo.consumer_reference_price AS "consumerReferencePrice",
+           spo.supplier_id AS "supplierId",
+           spo.created_at AS "createdAt",
+           COALESCE(pm.marketing_name, pm.regulatory_name, '') AS name,
+           pm.barcode,
+           pm.specification,
+           pm.category_id AS "categoryId",
+           pc.name AS "categoryName",
+           COALESCE(b.name, pm.brand_name) AS "brandName",
+           o.name AS "supplierName",
+           ns.status AS "supplierStatus",
+           pi_img.image_url AS "primaryImageUrl",
+           svc_appr.approvals AS "serviceApprovals"
+         FROM supplier_product_offers spo
+         JOIN product_masters pm ON pm.id = spo.master_id
+         LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
+         LEFT JOIN organizations o ON o.id = ns.organization_id
+         LEFT JOIN product_categories pc ON pc.id = pm.category_id
+         LEFT JOIN brands b ON b.id = pm.brand_id
+         LEFT JOIN LATERAL (
+           SELECT image_url FROM product_images
+           WHERE master_id = pm.id AND is_primary = true LIMIT 1
+         ) pi_img ON true
+         LEFT JOIN LATERAL (
+           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
+           FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
+         ) svc_appr ON true
+         WHERE ${where}
+         ORDER BY ${sortField} ${sortOrder}
+         LIMIT $${idx} OFFSET $${idx + 1}`,
+        [...params, limit, offset],
+      ),
+      // KPI 집계 (필터 무관 전체 대상)
+      AppDataSource.query(
+        `SELECT
+           COUNT(*)::int AS total,
+           COUNT(*) FILTER (WHERE spo.is_active = true)::int AS active,
+           COUNT(*) FILTER (WHERE spo.is_active = false)::int AS inactive,
+           COUNT(*) FILTER (WHERE spo.distribution_type = 'PUBLIC')::int AS "distPublic",
+           COUNT(*) FILTER (WHERE spo.distribution_type = 'SERVICE')::int AS "distService",
+           COUNT(*) FILTER (WHERE spo.distribution_type = 'PRIVATE')::int AS "distPrivate",
+           COUNT(*) FILTER (WHERE spo.approval_status = 'pending')::int AS "approvalPending",
+           COUNT(*) FILTER (WHERE spo.approval_status = 'approved')::int AS "approvalApproved",
+           COUNT(*) FILTER (WHERE spo.approval_status = 'rejected')::int AS "approvalRejected"
+         FROM supplier_product_offers spo
+         WHERE spo.deleted_at IS NULL`,
+      ),
+    ]);
+
+    const total = countResult[0]?.total || 0;
+    const kpi = kpiResult[0] || {};
+
+    return {
+      data: rows,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      kpi: {
+        total: kpi.total || 0,
+        active: kpi.active || 0,
+        inactive: kpi.inactive || 0,
+        distPublic: kpi.distPublic || 0,
+        distService: kpi.distService || 0,
+        distPrivate: kpi.distPrivate || 0,
+        approvalPending: kpi.approvalPending || 0,
+        approvalApproved: kpi.approvalApproved || 0,
+        approvalRejected: kpi.approvalRejected || 0,
+      },
+    };
+  }
+
   // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-C: batch org name lookup
   private async getOrgNameMap(suppliers: NetureSupplier[]): Promise<Map<string, string>> {
     const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];

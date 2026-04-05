@@ -148,7 +148,11 @@ export {
 // Operator API
 export {
   operatorSupplyApi,
+  operatorAllOffersApi,
   type OperatorSupplyProduct,
+  type AllRegisteredOffer,
+  type AllOffersKpi,
+  type AllOffersResponse,
 } from './operator.js';
 
 // Operator Dashboard API (WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1)

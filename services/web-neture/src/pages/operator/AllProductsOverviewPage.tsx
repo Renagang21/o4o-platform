@@ -77,8 +77,8 @@ export default function AllProductsOverviewPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">전체 공급</h1>
-          <p className="text-sm text-slate-500 mt-1">플랫폼 전체 공급 가능 상품 현황</p>
+          <h1 className="text-xl font-bold text-slate-900">공급 가능 상품</h1>
+          <p className="text-sm text-slate-500 mt-1">현재 공개·활성 상태인 공급 가능 상품 현황</p>
         </div>
         <button
           onClick={fetchProducts}
@@ -143,7 +143,7 @@ export default function AllProductsOverviewPage() {
               <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
             ) : paged.length === 0 ? (
               <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">
-                {search || statusFilter ? '조건에 맞는 상품이 없습니다.' : '공급 가능한 상품이 없습니다.'}
+                {search || statusFilter ? '조건에 맞는 상품이 없습니다.' : '현재 공개·활성 상태인 공급 가능 상품이 없습니다.'}
               </td></tr>
             ) : paged.map((p) => {
               const sc = STATUS_CONFIG[p.supplyStatus] || STATUS_CONFIG.available;

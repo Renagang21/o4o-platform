@@ -290,6 +290,34 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     }
   });
 
+  /**
+   * GET /api/v1/neture/operator/all-offers
+   * WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
+   * 전체 등록 상품 조회 (isActive/distributionType 필터 없음)
+   */
+  router.get('/operator/all-offers', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const result = await netureService.getAllRegisteredOffers({
+        page: req.query.page as string | undefined ? Number(req.query.page) : undefined,
+        limit: req.query.limit as string | undefined ? Number(req.query.limit) : undefined,
+        keyword: req.query.keyword as string | undefined,
+        distributionType: req.query.distributionType as string | undefined,
+        isActive: req.query.isActive as string | undefined,
+        approvalStatus: req.query.approvalStatus as string | undefined,
+        sort: req.query.sort as string | undefined,
+        order: req.query.order as string | undefined,
+      });
+      res.json({ success: true, ...result });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching all registered offers:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to fetch all registered offers' });
+    }
+  });
+
   // ==================== Store Product Detail (Public) ====================
 
   /**
