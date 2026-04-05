@@ -364,8 +364,8 @@ export function PharmacyHubMarketPage() {
       {
         id: 'kpi-products',
         tabKey: 'b2b',
-        title: `공개 상품 ${kpi.productCount}개 등록됨`,
-        description: '상품리스트에서 공급사 상품을 탐색하세요',
+        title: `공급 가능 상품 ${kpi.productCount}개`,
+        description: '상품 카탈로그에서 공급사 상품을 탐색하세요',
         badge: '상품',
         onClick: () => navigate('/hub/b2b'),
       },
@@ -393,7 +393,7 @@ export function PharmacyHubMarketPage() {
   const coreServiceBanners: CoreServiceBanner[] = useMemo(() => [
     { id: 'content', icon: '📝', title: '플랫폼 콘텐츠', description: '본부/공급사가 제공하는 CMS 콘텐츠를 탐색하고 내 매장에 복사합니다.', onClick: () => navigate('/hub/content') },
     { id: 'signage', icon: '🖥️', title: '플랫폼 사이니지', description: '디지털 사이니지 미디어와 플레이리스트를 탐색하고 내 매장에 추가합니다.', onClick: () => navigate('/hub/signage') },
-    { id: 'products', icon: '🛒', title: '상품리스트', description: '공급사 상품을 서비스별로 탐색하고 등록·주문합니다.', onClick: () => navigate('/hub/b2b') },
+    { id: 'products', icon: '🛒', title: '상품 카탈로그', description: '현재 공급 가능한 상품을 탐색하고 취급 신청합니다.', onClick: () => navigate('/hub/b2b') },
     { id: 'groupbuy', icon: '🛍️', title: '공동구매', description: '약국 개설자 전용 공동구매 상품을 탐색하고 참여합니다.', onClick: () => navigate('/groupbuy') },
   ], [navigate]);
 
@@ -411,7 +411,7 @@ export function PharmacyHubMarketPage() {
       theme={{ maxWidth: '1100px' }}
       beforeSections={<HubSubNav />}
       hero={{ slides: heroSlides, autoInterval: heroSlides.length > 1 ? 5000 : 0 }}
-      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: '상품리스트', ctaLabel: '상품리스트 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
+      b2bRevenue={b2bItems.length > 0 ? { items: b2bItems, title: '상품 카탈로그', ctaLabel: '상품 카탈로그 전체 보기', onCtaClick: () => navigate('/hub/b2b') } : undefined}
       ads={ads.length > 0 ? { ads } : undefined}
       productDevelopment={{ items: productDevItems, title: '제품개발 참여', ctaLabel: '제품개발 전체 보기' }}
       platformContent={{ items: contentItems, title: '플랫폼 콘텐츠', ctaLabel: '콘텐츠 전체 보기', onCtaClick: () => navigate('/hub/content'), authorTabs: [...HUB_PRODUCER_TABS], activeAuthorTab, onAuthorTabChange: setActiveAuthorTab }}

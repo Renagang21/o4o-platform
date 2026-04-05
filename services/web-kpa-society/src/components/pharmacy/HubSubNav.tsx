@@ -4,7 +4,7 @@
  * WO-KPA-PHARMACY-HUB-MENU-AND-ROUTING-REALIGNMENT-V1
  *
  * 약국 HUB 내부 6개 영역을 가로 탭 형태로 연결:
- *   HUB 마켓 | 콘텐츠 | 상품리스트 | 사이니지 | 공동구매 | 서비스
+ *   HUB 마켓 | 콘텐츠 | 상품 카탈로그 | 사이니지 | 공동구매 | 서비스
  *
  * 현재 경로 기반 active 탭 하이라이트.
  * 가드 처리는 라우트 레벨(App.tsx)에서 수행하므로 여기서는 링크만 제공.
@@ -22,7 +22,7 @@ interface HubNavItem {
 const HUB_NAV_ITEMS: HubNavItem[] = [
   { label: 'HUB 마켓', path: '/hub', matchExact: true },
   { label: '콘텐츠', path: '/hub/content' },
-  { label: '상품리스트', path: '/hub/b2b' },
+  { label: '상품 카탈로그', path: '/hub/b2b' },
   { label: '사이니지', path: '/hub/signage' },
   { label: '공동구매', path: '/groupbuy' },
   { label: '서비스', path: '/services/pharmacy' },

@@ -25,6 +25,13 @@ import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurpose } from '../../lib/api';
 import ProductDetailDrawer from './ProductDetailDrawer';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import {
+  DISTRIBUTION_TYPE_BADGE,
+  APPROVAL_STATUS_BADGE,
+  REGULATORY_TYPE_LABELS,
+  VISIBILITY_STATUS,
+  getVisibilityStatus,
+} from '../../lib/productConstants';
 
 // ─── Badge configs ───
 
@@ -32,17 +39,6 @@ const PURPOSE_CONFIG: Record<SupplierProductPurpose, { label: string; bg: string
   CATALOG: { label: '정보 제공', bg: 'bg-slate-100', text: 'text-slate-600' },
   APPLICATION: { label: '신청 가능', bg: 'bg-blue-50', text: 'text-blue-700' },
   ACTIVE_SALES: { label: '판매 중', bg: 'bg-green-50', text: 'text-green-700' },
-};
-
-// ─── Regulatory type labels (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
-
-const REGULATORY_TYPE_LABELS: Record<string, string> = {
-  HEALTH_FUNCTIONAL: '건강기능식품',
-  MEDICAL_DEVICE: '의료기기',
-  DRUG: '의약품',
-  QUASI_DRUG: '의약외품',
-  COSMETIC: '화장품',
-  GENERAL: '기타',
 };
 
 // ─── Image type options (WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1) ───
@@ -343,24 +339,24 @@ function deriveSubmissionStatus(product: SupplierProduct): { label: string; bg: 
 
   // offer-level APPROVED (legacy) 우선
   if (product.approvalStatus === 'APPROVED') {
-    return { label: '승인', bg: 'bg-green-50', text: 'text-green-700' };
+    return APPROVAL_STATUS_BADGE.approved;
   }
 
   if (approvals.length === 0) {
-    return { label: '미요청', bg: 'bg-slate-100', text: 'text-slate-500' };
+    return APPROVAL_STATUS_BADGE.none;
   }
 
   const hasRejected = approvals.some((a) => a.status === 'rejected');
   if (hasRejected) {
-    return { label: '거절', bg: 'bg-red-50', text: 'text-red-700' };
+    return APPROVAL_STATUS_BADGE.rejected;
   }
 
   const allApproved = approvals.every((a) => a.status === 'approved');
   if (allApproved) {
-    return { label: '승인', bg: 'bg-green-50', text: 'text-green-700' };
+    return APPROVAL_STATUS_BADGE.approved;
   }
 
-  return { label: '심사중', bg: 'bg-amber-50', text: 'text-amber-700' };
+  return APPROVAL_STATUS_BADGE.pending;
 }
 
 // ─── Column definitions ───
@@ -456,14 +452,9 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '90px',
     align: 'center',
     render: (v) => {
-      const config: Record<string, { label: string; cls: string }> = {
-        PUBLIC: { label: '전체 공개', cls: 'bg-green-50 text-green-700' },
-        SERVICE: { label: '서비스', cls: 'bg-blue-50 text-blue-700' },
-        PRIVATE: { label: '비공개', cls: 'bg-amber-50 text-amber-700' },
-      };
-      const c = config[v] || config.PRIVATE;
+      const c = DISTRIBUTION_TYPE_BADGE[v] || DISTRIBUTION_TYPE_BADGE.PRIVATE;
       return (
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.cls}`}>
+        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.bg} ${c.text}`}>
           {c.label}
         </span>
       );
@@ -518,13 +509,20 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
   },
   {
     key: 'isActive',
-    header: '활성',
-    width: '60px',
+    header: '노출',
+    width: '80px',
     align: 'center',
     editable: true,
-    render: (v) => (
-      <span className={`inline-block w-3 h-3 rounded-full ${v ? 'bg-green-500' : 'bg-slate-300'}`} />
-    ),
+    render: (v: boolean, row: SupplierProduct) => {
+      const key = getVisibilityStatus(row);
+      const s = VISIBILITY_STATUS[key];
+      return (
+        <div className="flex items-center justify-center gap-1" title={s.description}>
+          <span className={`inline-block w-2.5 h-2.5 rounded-full shrink-0 ${v ? 'bg-green-500' : 'bg-slate-300'}`} />
+          <span className={`text-[10px] font-medium leading-tight ${s.text}`}>{s.label}</span>
+        </div>
+      );
+    },
     editRender: (value, _row, onChange) => (
       <input
         type="checkbox"
@@ -645,6 +643,7 @@ export default function SupplierProductsPage() {
   const [filterHasDescription, setFilterHasDescription] = useState('');
   const [filterBarcodeSource, setFilterBarcodeSource] = useState('');
   const [filterCompleteness, setFilterCompleteness] = useState('');
+  const [filterVisibility, setFilterVisibility] = useState('');
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: server-side approval tab
   type ApprovalTab = 'all' | 'pending' | 'approved' | 'rejected';
@@ -908,6 +907,15 @@ export default function SupplierProductsPage() {
     return [selectCol, detailCol, previewCol, ...cols];
   }, [products, selectedIds, highlightRowId]);
 
+  // WO-NETURE-SUPPLIER-PRODUCT-VISIBILITY-STATUS-UX-ALIGNMENT-V1: client-side visibility filter
+  const filteredProducts = useMemo(() => {
+    if (!filterVisibility) return products;
+    return products.filter((p) => {
+      const status = getVisibilityStatus(p);
+      return filterVisibility === 'visible' ? status === 'VISIBLE' : status !== 'VISIBLE';
+    });
+  }, [products, filterVisibility]);
+
   const handleGenerateAiTags = async (masterId: string) => {
     setGeneratingTagFor(masterId);
     await productApi.regenerateAiTags(masterId);
@@ -1113,6 +1121,9 @@ export default function SupplierProductsPage() {
         <FilterChip label="미완성" active={filterCompleteness === 'INCOMPLETE'} onClick={() => toggleFilter(setFilterCompleteness, 'INCOMPLETE', filterCompleteness)} />
         <FilterChip label="완성" active={filterCompleteness === 'READY'} onClick={() => toggleFilter(setFilterCompleteness, 'READY', filterCompleteness)} />
         <span className="w-px h-4 bg-slate-300" />
+        <FilterChip label="노출 가능" active={filterVisibility === 'visible'} onClick={() => toggleFilter(setFilterVisibility, 'visible', filterVisibility)} />
+        <FilterChip label="노출 불가" active={filterVisibility === 'hidden'} onClick={() => toggleFilter(setFilterVisibility, 'hidden', filterVisibility)} />
+        <span className="w-px h-4 bg-slate-300" />
         <button
           onClick={() => setAutoNext(prev => !prev)}
           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
@@ -1187,7 +1198,7 @@ export default function SupplierProductsPage() {
             ),
           } as any,
         ]}
-        data={products}
+        data={filteredProducts}
         rowKey="id"
         loading={loading}
         emptyMessage="등록된 제품이 없습니다"

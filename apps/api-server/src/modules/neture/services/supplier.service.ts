@@ -493,6 +493,7 @@ export class NetureSupplierService {
         id: supplier.id,
         name: org?.name ?? '',
         slug: supplier.slug,
+        status: supplier.status,
         // Business profile — org-primary with supplier + prefill fallback
         businessNumber: org?.business_number ?? prefilled.businessNumber ?? null,
         representativeName: supplier.representativeName || null,

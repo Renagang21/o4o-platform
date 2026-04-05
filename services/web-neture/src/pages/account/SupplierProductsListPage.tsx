@@ -13,7 +13,53 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Plus, Search, ToggleLeft, ToggleRight } from 'lucide-react';
-import { supplierApi, type SupplierProduct } from '../../lib/api';
+import { supplierApi, supplierProfileApi, type SupplierProduct } from '../../lib/api';
+
+// ============================================================================
+// HUB Visibility Status
+// ============================================================================
+
+type HubStatus = 'visible' | 'inactive' | 'pending' | 'rejected' | 'supplier_inactive';
+
+interface HubStatusConfig {
+  label: string;
+  bg: string;
+  color: string;
+  hint?: string;
+}
+
+const HUB_STATUS_MAP: Record<HubStatus, HubStatusConfig> = {
+  visible:            { label: 'HUB 노출',      bg: '#dcfce7', color: '#059669' },
+  inactive:           { label: '비활성',          bg: '#f1f5f9', color: '#64748b', hint: '활성화 후 HUB 노출' },
+  pending:            { label: '승인 대기',       bg: '#fefce8', color: '#ca8a04' },
+  rejected:           { label: '승인 거절',       bg: '#fef2f2', color: '#dc2626' },
+  supplier_inactive:  { label: '공급자 미활성',   bg: '#e2e8f0', color: '#475569', hint: '공급자 계정 활성화 필요' },
+};
+
+function getHubStatus(product: SupplierProduct, supplierStatus?: string): HubStatus {
+  if (supplierStatus && supplierStatus !== 'active' && supplierStatus !== 'approved') {
+    return 'supplier_inactive';
+  }
+  if (product.approvalStatus === 'REJECTED') return 'rejected';
+  if (product.approvalStatus === 'PENDING') return 'pending';
+  if (!product.isActive) return 'inactive';
+  return 'visible';
+}
+
+function HubStatusBadge({ product, supplierStatus }: { product: SupplierProduct; supplierStatus?: string }) {
+  const hubStatus = getHubStatus(product, supplierStatus);
+  const config = HUB_STATUS_MAP[hubStatus];
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+      <span style={{ ...styles.badge, backgroundColor: config.bg, color: config.color, fontSize: '10px', padding: '1px 6px' }}>
+        {config.label}
+      </span>
+      {config.hint && (
+        <span style={{ fontSize: '10px', color: '#94a3b8' }}>{config.hint}</span>
+      )}
+    </span>
+  );
+}
 
 // ============================================================================
 // Helpers
@@ -39,12 +85,15 @@ function getStatusInfo(product: SupplierProduct): StatusInfo {
 // Status Badge
 // ============================================================================
 
-function StatusBadge({ product }: { product: SupplierProduct }) {
+function StatusBadge({ product, supplierStatus }: { product: SupplierProduct; supplierStatus?: string }) {
   const info = getStatusInfo(product);
   return (
-    <span style={{ ...styles.badge, backgroundColor: info.bg, color: info.color }}>
-      {info.label}
-    </span>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+      <span style={{ ...styles.badge, backgroundColor: info.bg, color: info.color }}>
+        {info.label}
+      </span>
+      <HubStatusBadge product={product} supplierStatus={supplierStatus} />
+    </div>
   );
 }
 
@@ -210,11 +259,13 @@ function ProductTable({
   onToggleActive,
   onSavePrice,
   togglingId,
+  supplierStatus,
 }: {
   products: SupplierProduct[];
   onToggleActive: (id: string, current: boolean) => void;
   onSavePrice: (id: string, price: number) => Promise<void>;
   togglingId: string | null;
+  supplierStatus?: string;
 }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
@@ -264,7 +315,7 @@ function ProductTable({
                 </td>
                 {/* Status */}
                 <td className="px-4 py-3 text-center">
-                  <StatusBadge product={p} />
+                  <StatusBadge product={p} supplierStatus={supplierStatus} />
                 </td>
                 {/* Actions */}
                 <td className="px-4 py-3 text-center">
@@ -301,11 +352,13 @@ function ProductCards({
   onToggleActive,
   onSavePrice,
   togglingId,
+  supplierStatus,
 }: {
   products: SupplierProduct[];
   onToggleActive: (id: string, current: boolean) => void;
   onSavePrice: (id: string, price: number) => Promise<void>;
   togglingId: string | null;
+  supplierStatus?: string;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -322,7 +375,7 @@ function ProductCards({
                   <div className="font-medium text-slate-800 truncate">
                     {p.masterName || p.name || '-'}
                   </div>
-                  <StatusBadge product={p} />
+                  <StatusBadge product={p} supplierStatus={supplierStatus} />
                 </div>
                 <div className="text-xs text-slate-500 mt-0.5">
                   {[p.brandName, p.categoryName || p.category].filter(Boolean).join(' · ') || '-'}
@@ -388,6 +441,7 @@ export default function SupplierProductsListPage() {
   const [category, setCategory] = useState('');
   const [status, setStatus] = useState('');
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [supplierStatus, setSupplierStatus] = useState<string | undefined>();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -401,6 +455,13 @@ export default function SupplierProductsListPage() {
       setLoading(false);
     };
     fetchProducts();
+  }, []);
+
+  // Fetch supplier profile to get supplier status
+  useEffect(() => {
+    supplierProfileApi.getProfile().then((profile) => {
+      if (profile?.status) setSupplierStatus(profile.status);
+    }).catch(() => {});
   }, []);
 
   const categories = useMemo(() => {
@@ -430,6 +491,10 @@ export default function SupplierProductsListPage() {
       return true;
     });
   }, [products, search, category, status]);
+
+  const hubVisibleCount = useMemo(() => {
+    return filtered.filter((p) => getHubStatus(p, supplierStatus) === 'visible').length;
+  }, [filtered, supplierStatus]);
 
   const handleToggleActive = useCallback(async (id: string, currentValue: boolean) => {
     setTogglingId(id);
@@ -470,6 +535,14 @@ export default function SupplierProductsListPage() {
         onStatusChange={setStatus}
       />
 
+      {/* HUB Info Chip */}
+      {!loading && products.length > 0 && (
+        <div style={styles.infoChip}>
+          <span style={{ flexShrink: 0 }}>ℹ️</span>
+          약국 HUB에는 활성화된 승인 완료 상품만 노출됩니다. 이 화면의 전체 상품 수와 HUB 노출 수는 다를 수 있습니다.
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <div className="text-center py-16 text-sm text-slate-500">로딩 중...</div>
@@ -488,6 +561,7 @@ export default function SupplierProductsListPage() {
               onToggleActive={handleToggleActive}
               onSavePrice={handleSavePrice}
               togglingId={togglingId}
+              supplierStatus={supplierStatus}
             />
           </div>
           {/* Mobile Cards */}
@@ -497,13 +571,14 @@ export default function SupplierProductsListPage() {
               onToggleActive={handleToggleActive}
               onSavePrice={handleSavePrice}
               togglingId={togglingId}
+              supplierStatus={supplierStatus}
             />
           </div>
           {/* Count */}
           <div className="mt-3 text-xs text-slate-400 text-right">
             {filtered.length === products.length
-              ? `총 ${products.length}개 상품`
-              : `${filtered.length} / ${products.length}개 상품`}
+              ? `총 ${products.length}개 상품 · HUB 노출 ${hubVisibleCount}개`
+              : `${filtered.length} / ${products.length}개 상품 · HUB 노출 ${hubVisibleCount}개`}
           </div>
         </>
       )}
@@ -516,6 +591,18 @@ export default function SupplierProductsListPage() {
 // ============================================================================
 
 const styles: Record<string, React.CSSProperties> = {
+  infoChip: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    marginBottom: '16px',
+    fontSize: '12px',
+    color: '#94a3b8',
+    backgroundColor: '#f8fafc',
+    borderRadius: '6px',
+    border: '1px solid #e2e8f0',
+  },
   badge: {
     display: 'inline-block',
     padding: '2px 8px',

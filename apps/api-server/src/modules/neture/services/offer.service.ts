@@ -1378,6 +1378,8 @@ export class NetureOfferService {
     distributionType?: string;
     isActive?: string;
     approvalStatus?: string;
+    category?: string;
+    regulatoryType?: string;
     sort?: string;
     order?: string;
   } = {}) {
@@ -1418,6 +1420,16 @@ export class NetureOfferService {
       params.push(options.approvalStatus);
       idx++;
     }
+    if (options.category?.trim()) {
+      conditions.push(`pc.name ILIKE $${idx}`);
+      params.push(`%${options.category.trim()}%`);
+      idx++;
+    }
+    if (options.regulatoryType) {
+      conditions.push(`pm.regulatory_type = $${idx}`);
+      params.push(options.regulatoryType);
+      idx++;
+    }
 
     const where = conditions.join(' AND ');
 
@@ -1428,6 +1440,7 @@ export class NetureOfferService {
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN neture_suppliers ns ON ns.id = spo.supplier_id
          LEFT JOIN organizations o ON o.id = ns.organization_id
+         LEFT JOIN product_categories pc ON pc.id = pm.category_id
          WHERE ${where}`,
         params,
       ),
@@ -1446,6 +1459,7 @@ export class NetureOfferService {
            pm.specification,
            pm.category_id AS "categoryId",
            pc.name AS "categoryName",
+           pm.regulatory_type AS "regulatoryType",
            COALESCE(b.name, pm.brand_name) AS "brandName",
            o.name AS "supplierName",
            ns.status AS "supplierStatus",

@@ -19,6 +19,13 @@ import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import {
+  DISTRIBUTION_TYPE_BADGE,
+  REGULATORY_TYPE_LABELS,
+  REGULATORY_TYPE_BADGE,
+  VISIBILITY_STATUS,
+  getVisibilityStatus,
+} from '../../lib/productConstants';
 
 interface ProductDetailDrawerProps {
   product: SupplierProduct | null;
@@ -61,29 +68,6 @@ function Badge({ children, className }: { children: React.ReactNode; className: 
   );
 }
 
-const REGULATORY_TYPE_LABELS: Record<string, string> = {
-  HEALTH_FUNCTIONAL: '건강기능식품',
-  MEDICAL_DEVICE: '의료기기',
-  DRUG: '의약품',
-  QUASI_DRUG: '의약외품',
-  COSMETIC: '화장품',
-  GENERAL: '기타',
-};
-
-const REGULATORY_TYPE_BADGE: Record<string, string> = {
-  HEALTH_FUNCTIONAL: 'bg-amber-50 text-amber-700',
-  MEDICAL_DEVICE: 'bg-blue-50 text-blue-700',
-  DRUG: 'bg-red-50 text-red-700',
-  QUASI_DRUG: 'bg-yellow-50 text-yellow-700',
-  COSMETIC: 'bg-violet-50 text-violet-700',
-  GENERAL: 'bg-slate-100 text-slate-600',
-};
-
-const DISTRIBUTION_BADGE: Record<string, { label: string; cls: string }> = {
-  PUBLIC: { label: '전체 공개', cls: 'bg-blue-50 text-blue-700' },
-  PRIVATE: { label: '비공개', cls: 'bg-amber-50 text-amber-700' },
-  SERVICE: { label: '서비스', cls: 'bg-green-50 text-green-700' },
-};
 
 const COMPLETENESS_BADGE: Record<string, { label: string; cls: string }> = {
   APPROVED: { label: '승인됨', cls: 'bg-green-50 text-green-700' },
@@ -596,9 +580,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
 
   const regType = product.regulatoryType || 'GENERAL';
   const regLabel = REGULATORY_TYPE_LABELS[regType] || regType;
-  const regBadgeCls = REGULATORY_TYPE_BADGE[regType] || REGULATORY_TYPE_BADGE.GENERAL;
+  const regBadge = REGULATORY_TYPE_BADGE[regType] || REGULATORY_TYPE_BADGE.GENERAL;
+  const regBadgeCls = `${regBadge.bg} ${regBadge.text}`;
 
-  const distCfg = DISTRIBUTION_BADGE[product.distributionType] || DISTRIBUTION_BADGE.PUBLIC;
+  const distBadge = DISTRIBUTION_TYPE_BADGE[product.distributionType] || DISTRIBUTION_TYPE_BADGE.PUBLIC;
+  const distCfg = { label: distBadge.label, cls: `${distBadge.bg} ${distBadge.text}` };
   const compCfg = COMPLETENESS_BADGE[product.completenessStatus || 'DRAFT'] || COMPLETENESS_BADGE.DRAFT;
 
   const score = product.completenessScore || 0;
@@ -1115,6 +1101,31 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
                       </span>
                     </span>
                   ))}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── 노출 상태 배너 (WO-NETURE-SUPPLIER-PRODUCT-VISIBILITY-STATUS-UX-ALIGNMENT-V1) ── */}
+          {!isEditing && (() => {
+            const visKey = getVisibilityStatus(product);
+            const vis = VISIBILITY_STATUS[visKey];
+            const isVisible = visKey === 'VISIBLE';
+            return (
+              <div className={`mb-4 px-3 py-2.5 rounded-lg flex items-start gap-2 text-sm border ${
+                isVisible ? 'bg-emerald-50 border-emerald-200'
+                  : visKey === 'REJECTED' ? 'bg-red-50 border-red-200'
+                  : 'bg-amber-50 border-amber-200'
+              }`}>
+                <span className={`inline-block w-2.5 h-2.5 rounded-full mt-0.5 shrink-0 ${
+                  isVisible ? 'bg-emerald-500'
+                    : visKey === 'REJECTED' ? 'bg-red-500'
+                    : visKey === 'PENDING' ? 'bg-amber-500'
+                    : 'bg-slate-400'
+                }`} />
+                <div>
+                  <span className={`font-medium ${vis.text}`}>{vis.label}</span>
+                  <p className="text-xs text-slate-600 mt-0.5">{vis.description}</p>
                 </div>
               </div>
             );

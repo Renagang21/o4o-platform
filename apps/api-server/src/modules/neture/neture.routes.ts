@@ -308,6 +308,8 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
         distributionType: req.query.distributionType as string | undefined,
         isActive: req.query.isActive as string | undefined,
         approvalStatus: req.query.approvalStatus as string | undefined,
+        category: req.query.category as string | undefined,
+        regulatoryType: req.query.regulatoryType as string | undefined,
         sort: req.query.sort as string | undefined,
         order: req.query.order as string | undefined,
       });

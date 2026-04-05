@@ -17,18 +17,13 @@ import {
   type AllRegisteredOffer,
   type AllOffersKpi,
 } from '../../lib/api';
-
-const DIST_LABELS: Record<string, string> = {
-  PUBLIC: '전체 공개',
-  SERVICE: '서비스',
-  PRIVATE: '비공개',
-};
-
-const APPROVAL_LABELS: Record<string, { label: string; cls: string }> = {
-  pending: { label: '대기', cls: 'bg-amber-50 text-amber-700' },
-  approved: { label: '승인', cls: 'bg-green-50 text-green-700' },
-  rejected: { label: '반려', cls: 'bg-red-50 text-red-600' },
-};
+import {
+  DISTRIBUTION_TYPE_BADGE,
+  DISTRIBUTION_TYPE_LABELS,
+  APPROVAL_STATUS_BADGE,
+  REGULATORY_TYPE_LABELS,
+  REGULATORY_TYPE_BADGE,
+} from '../../lib/productConstants';
 
 export default function AllRegisteredProductsPage() {
   const [offers, setOffers] = useState<AllRegisteredOffer[]>([]);
@@ -38,6 +33,7 @@ export default function AllRegisteredProductsPage() {
   const [distFilter, setDistFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState('');
   const [approvalFilter, setApprovalFilter] = useState('');
+  const [regulatoryFilter, setRegulatoryFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
@@ -55,6 +51,7 @@ export default function AllRegisteredProductsPage() {
         distributionType: distFilter || undefined,
         isActive: activeFilter || undefined,
         approvalStatus: approvalFilter || undefined,
+        regulatoryType: regulatoryFilter || undefined,
         sort: 'createdAt',
         order: 'DESC',
       });
@@ -67,12 +64,12 @@ export default function AllRegisteredProductsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, distFilter, activeFilter, approvalFilter]);
+  }, [page, search, distFilter, activeFilter, approvalFilter, regulatoryFilter]);
 
   useEffect(() => { fetchOffers(page); }, [fetchOffers, page]);
 
   // Reset page on filter change
-  useEffect(() => { setPage(1); }, [search, distFilter, activeFilter, approvalFilter]);
+  useEffect(() => { setPage(1); }, [search, distFilter, activeFilter, approvalFilter, regulatoryFilter]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -151,10 +148,20 @@ export default function AllRegisteredProductsPage() {
             className="w-full pl-10 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <select
+          value={regulatoryFilter}
+          onChange={(e) => setRegulatoryFilter(e.target.value)}
+          className="text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">규제 유형 전체</option>
+          {Object.entries(REGULATORY_TYPE_LABELS).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
+          ))}
+        </select>
         <span className="text-sm text-slate-500">총 {total}건</span>
-        {(distFilter || activeFilter || approvalFilter) && (
+        {(distFilter || activeFilter || approvalFilter || regulatoryFilter) && (
           <button
-            onClick={() => { setDistFilter(''); setActiveFilter(''); setApprovalFilter(''); }}
+            onClick={() => { setDistFilter(''); setActiveFilter(''); setApprovalFilter(''); setRegulatoryFilter(''); }}
             className="text-xs text-blue-600 hover:underline"
           >
             필터 초기화
@@ -170,6 +177,8 @@ export default function AllRegisteredProductsPage() {
               <th className="px-4 py-3 font-medium w-12"></th>
               <th className="px-4 py-3 font-medium">상품명</th>
               <th className="px-4 py-3 font-medium">공급자</th>
+              <th className="px-4 py-3 font-medium">카테고리</th>
+              <th className="px-4 py-3 font-medium text-center">규제</th>
               <th className="px-4 py-3 font-medium text-center">활성</th>
               <th className="px-4 py-3 font-medium text-center">유통</th>
               <th className="px-4 py-3 font-medium text-right">공급가</th>
@@ -179,15 +188,18 @@ export default function AllRegisteredProductsPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
+              <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
             ) : offers.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">
-                {search || distFilter || activeFilter || approvalFilter
+              <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">
+                {search || distFilter || activeFilter || approvalFilter || regulatoryFilter
                   ? '조건에 맞는 상품이 없습니다.'
                   : '등록된 상품이 없습니다.'}
               </td></tr>
             ) : offers.map((o) => {
-              const appr = APPROVAL_LABELS[o.approvalStatus] || { label: o.approvalStatus || '-', cls: 'bg-slate-100 text-slate-600' };
+              const distBadge = DISTRIBUTION_TYPE_BADGE[o.distributionType] || { label: o.distributionType || '-', bg: 'bg-slate-100', text: 'text-slate-500' };
+              const apprBadge = APPROVAL_STATUS_BADGE[o.approvalStatus] || { label: o.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
+              const regLabel = o.regulatoryType ? REGULATORY_TYPE_LABELS[o.regulatoryType] : null;
+              const regBadge = o.regulatoryType ? REGULATORY_TYPE_BADGE[o.regulatoryType] : null;
               return (
                 <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailOffer(o)}>
                   <td className="px-4 py-3">
@@ -204,6 +216,16 @@ export default function AllRegisteredProductsPage() {
                     <p className="text-xs text-slate-400 mt-0.5">{o.barcode || o.id.slice(0, 8)}</p>
                   </td>
                   <td className="px-4 py-3 text-slate-600">{o.supplierName || '-'}</td>
+                  <td className="px-4 py-3 text-slate-600 text-sm">{o.categoryName || '-'}</td>
+                  <td className="px-4 py-3 text-center">
+                    {regLabel && regBadge ? (
+                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${regBadge.bg} ${regBadge.text}`}>
+                        {regLabel}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400">-</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     {o.isActive ? (
                       <Eye className="w-4 h-4 text-green-600 mx-auto" />
@@ -212,20 +234,16 @@ export default function AllRegisteredProductsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                      o.distributionType === 'PUBLIC' ? 'bg-blue-50 text-blue-700' :
-                      o.distributionType === 'SERVICE' ? 'bg-indigo-50 text-indigo-700' :
-                      'bg-slate-100 text-slate-500'
-                    }`}>
-                      {DIST_LABELS[o.distributionType] || o.distributionType || '-'}
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${distBadge.bg} ${distBadge.text}`}>
+                      {distBadge.label}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right text-slate-700">
                     {o.priceGeneral ? `₩${o.priceGeneral.toLocaleString()}` : '-'}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${appr.cls}`}>
-                      {appr.label}
+                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${apprBadge.bg} ${apprBadge.text}`}>
+                      {apprBadge.label}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -291,11 +309,12 @@ export default function AllRegisteredProductsPage() {
                 <DetailCard label="공급자" value={detailOffer.supplierName || '-'} />
                 <DetailCard label="공급자 상태" value={detailOffer.supplierStatus || '-'} />
                 <DetailCard label="활성 상태" value={detailOffer.isActive ? '활성' : '비활성'} />
-                <DetailCard label="유통 타입" value={DIST_LABELS[detailOffer.distributionType] || detailOffer.distributionType || '-'} />
+                <DetailCard label="유통 타입" value={DISTRIBUTION_TYPE_LABELS[detailOffer.distributionType] || detailOffer.distributionType || '-'} />
                 <DetailCard label="공급가" value={detailOffer.priceGeneral ? `₩${detailOffer.priceGeneral.toLocaleString()}` : '-'} />
                 <DetailCard label="소비자가" value={detailOffer.consumerReferencePrice ? `₩${detailOffer.consumerReferencePrice.toLocaleString()}` : '-'} />
-                <DetailCard label="승인 상태" value={APPROVAL_LABELS[detailOffer.approvalStatus]?.label || detailOffer.approvalStatus || '-'} />
+                <DetailCard label="승인 상태" value={APPROVAL_STATUS_BADGE[detailOffer.approvalStatus]?.label || detailOffer.approvalStatus || '-'} />
                 <DetailCard label="카테고리" value={detailOffer.categoryName || '-'} />
+                <DetailCard label="규제 유형" value={detailOffer.regulatoryType ? (REGULATORY_TYPE_LABELS[detailOffer.regulatoryType] || detailOffer.regulatoryType) : '-'} />
                 {detailOffer.brandName && <DetailCard label="브랜드" value={detailOffer.brandName} />}
                 {detailOffer.specification && <DetailCard label="규격" value={detailOffer.specification} />}
               </div>

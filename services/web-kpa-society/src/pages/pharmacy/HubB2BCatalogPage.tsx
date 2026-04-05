@@ -182,9 +182,9 @@ export function HubB2BCatalogPage() {
     <div style={styles.container}>
       {/* Hero */}
       <header style={styles.hero}>
-        <h1 style={styles.heroTitle}>상품리스트</h1>
+        <h1 style={styles.heroTitle}>상품 카탈로그</h1>
         <p style={styles.heroDesc}>
-          공급자가 제공하는 상품을 탐색하고 취급 신청할 수 있습니다.
+          현재 활성 공급자가 제공 중인 상품을 탐색하고 취급 신청할 수 있습니다.
         </p>
       </header>
 
@@ -244,9 +244,15 @@ export function HubB2BCatalogPage() {
         ))}
       </div>
 
+      {/* Scope Info */}
+      <div style={styles.scopeInfo}>
+        <span style={styles.scopeInfoIcon}>ℹ️</span>
+        <span>이 화면은 현재 공급 가능한 상품만 표시됩니다. 공급자 등록 전체 상품과는 범위가 다를 수 있습니다.</span>
+      </div>
+
       {/* Content */}
       {loading ? (
-        <div style={styles.emptyState}>상품리스트를 불러오는 중...</div>
+        <div style={styles.emptyState}>상품 카탈로그를 불러오는 중...</div>
       ) : error ? (
         <div style={styles.errorState}>
           <p>{error}</p>
@@ -262,7 +268,7 @@ export function HubB2BCatalogPage() {
         </div>
       ) : (
         <>
-          <div style={styles.resultCount}>총 {total}건</div>
+          <div style={styles.resultCount}>공급 가능 상품 {total}건</div>
 
           <div style={styles.tableCard}>
             {/* Table Header */}
@@ -508,6 +514,22 @@ const styles: Record<string, React.CSSProperties> = {
   filterTabActive: {
     backgroundColor: colors.primary,
     color: '#fff',
+  },
+  scopeInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 14px',
+    marginBottom: '16px',
+    fontSize: '0.75rem',
+    color: colors.neutral400,
+    backgroundColor: colors.neutral50,
+    borderRadius: borderRadius.md,
+    border: `1px solid ${colors.neutral200}`,
+  },
+  scopeInfoIcon: {
+    fontSize: '12px',
+    flexShrink: 0,
   },
   resultCount: {
     fontSize: '0.8125rem',

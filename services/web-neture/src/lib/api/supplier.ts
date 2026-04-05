@@ -39,7 +39,7 @@ function extractApiError(error: any): string {
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
 
-export type DistributionType = 'PUBLIC' | 'PRIVATE';
+export type DistributionType = 'PUBLIC' | 'SERVICE' | 'PRIVATE';
 
 export type SupplierRequestStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | 'revoked' | 'expired';
 
@@ -369,6 +369,7 @@ export interface SupplierProfile {
   id: string;
   name: string;
   slug: string;
+  status?: 'pending' | 'active' | 'approved' | 'suspended' | 'rejected';
   // Business profile (WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1)
   businessNumber: string | null;
   representativeName: string | null;

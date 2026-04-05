@@ -46,6 +46,7 @@ export interface AllRegisteredOffer {
   barcode: string | null;
   specification: string | null;
   primaryImageUrl: string | null;
+  regulatoryType: string | null;
   serviceApprovals: Array<{ serviceKey: string; status: string }>;
   createdAt: string;
 }
@@ -76,6 +77,8 @@ export const operatorAllOffersApi = {
     distributionType?: string;
     isActive?: string;
     approvalStatus?: string;
+    category?: string;
+    regulatoryType?: string;
     sort?: string;
     order?: string;
   }): Promise<AllOffersResponse> {
