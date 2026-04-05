@@ -9,7 +9,7 @@
  * Step 3: 이미지/설명/등록
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
@@ -161,6 +161,16 @@ export default function SupplierProductCreatePage() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  // WO-NETURE-SUPPLIER-PRODUCT-PRICE-INPUT-FIX-V1: stable initialData to prevent circular update
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const productFormInitialData = useMemo(() => ({
+    priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
+    consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
+    stockQuantity: Number(form.stockQty) || 0,
+    distributionType: form.distributionType,
+    serviceKeys: form.serviceKeys,
+  }), [currentStep]); // only recompute when step changes (remount)
 
   // WO-O4O-NETURE-PRODUCT-FORM-UNIFICATION-V1: ProductForm onChange → parent form sync
   const handleProductFormChange = (data: ProductFormData) => {
@@ -554,13 +564,7 @@ export default function SupplierProductCreatePage() {
           <h3 className="text-lg font-semibold text-slate-800 mb-5">가격 / 유통 / 서비스</h3>
           <ProductForm
             mode="create"
-            initialData={{
-              priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
-              consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
-              stockQuantity: Number(form.stockQty) || 0,
-              distributionType: form.distributionType,
-              serviceKeys: form.serviceKeys,
-            }}
+            initialData={productFormInitialData}
             onChange={handleProductFormChange}
           />
         </div>

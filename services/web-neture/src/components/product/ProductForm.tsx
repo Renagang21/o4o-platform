@@ -154,6 +154,9 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
   const [touched, setTouched] = useState(false);
 
   // Sync initialData changes (e.g. when product changes in Drawer)
+  // WO-NETURE-SUPPLIER-PRODUCT-PRICE-INPUT-FIX-V1: use serialized key to prevent
+  // circular updates when parent creates new initialData object on every render
+  const initialDataKey = JSON.stringify(initialData);
   useEffect(() => {
     const next = {
       ...DEFAULT_DATA,
@@ -164,7 +167,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
     setData(next);
     setErrors({});
     setTouched(false);
-  }, [initialData]);
+  }, [initialDataKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDirty = useCallback(() => {
     return JSON.stringify(data) !== JSON.stringify(initial);
