@@ -141,8 +141,8 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
       { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
     ]},
-    { label: '정산', items: [
-      { key: 'billing', label: '정산/인보이스', subPath: '/billing' },
+    { label: '구매', items: [
+      { key: 'billing', label: '구매 내역', subPath: '/billing' },
     ]},
   ],
 };

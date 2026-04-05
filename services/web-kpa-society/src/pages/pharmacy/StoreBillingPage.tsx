@@ -1,43 +1,37 @@
 /**
- * StoreBillingPage - 정산/인보이스
- * WO-STORE-BILLING-FOUNDATION-V1
+ * StoreBillingPage - 구매 내역
+ * WO-KPA-A-STORE-BILLING-TO-PURCHASE-HISTORY-V1
  *
- * 공통 UI 프레임:
- * [1] KPI 3블록 (이번 달 매출 / 예상 수수료 / 정산 예정)
- * [2] 최근 정산 내역
+ * 약국 개설자(구매자) 관점의 구매 내역 화면.
+ * 기존 정산/인보이스 개념 제거, 구매 중심으로 전환.
  *
- * KPA-a 수수료율: 3%
- * API 미연결 — mock 데이터 기반
+ * [1] KPI 3블록: 이번 달 구매 금액 / 이번 달 주문 건수 / 거래 공급사 수
+ * [2] 구매 내역 테이블 (실데이터 없으면 빈 상태)
+ *
+ * API 미연결 — 데이터 없음 상태로 정직하게 표시
  */
 
 import { colors, spacing, borderRadius, shadows, typography } from '../../styles/theme';
 
-const COMMISSION_RATE = 0.03; // 3%
-
-/** mock 정산 내역 */
-const MOCK_HISTORY = [
-  { period: '2026-02', status: '정산 예정', amount: 0 },
-  { period: '2026-01', status: '정산 예정', amount: 0 },
-];
-
 export function StoreBillingPage() {
-  // API 미연결 — 모든 값 0
-  const monthlyRevenue = 0;
-  const commission = Math.round(monthlyRevenue * COMMISSION_RATE);
-  const payout = monthlyRevenue - commission;
+  // API 미연결 — 실데이터 없음
+  const purchaseAmount = 0;
+  const orderCount = 0;
+  const supplierCount = 0;
+  const purchaseHistory: never[] = [];
 
   const kpiCards = [
-    { label: '이번 달 매출', value: formatCurrency(monthlyRevenue), color: colors.primary },
-    { label: '예상 수수료 (3%)', value: formatCurrency(commission), color: colors.accentYellow },
-    { label: '정산 예정 금액', value: formatCurrency(payout), color: colors.accentGreen },
+    { label: '이번 달 구매 금액', value: purchaseAmount > 0 ? formatCurrency(purchaseAmount) : '₩0', color: colors.primary },
+    { label: '이번 달 주문 건수', value: `${orderCount}건`, color: colors.accentYellow },
+    { label: '거래 공급사 수', value: `${supplierCount}곳`, color: colors.accentGreen },
   ];
 
   return (
     <div style={S.container}>
       {/* Header */}
       <div>
-        <h1 style={S.title}>정산/인보이스</h1>
-        <p style={S.subtitle}>매출 정산 현황과 내역을 확인합니다</p>
+        <h1 style={S.title}>구매 내역</h1>
+        <p style={S.subtitle}>공급사별 구매 내역과 거래 현황을 확인합니다</p>
       </div>
 
       {/* [1] KPI 3블록 */}
@@ -50,29 +44,19 @@ export function StoreBillingPage() {
         ))}
       </div>
 
-      {/* [2] 최근 정산 내역 */}
+      {/* [2] 구매 내역 */}
       <div style={S.section}>
-        <h2 style={S.sectionTitle}>정산 내역</h2>
+        <h2 style={S.sectionTitle}>구매 내역</h2>
         <div style={S.tableCard}>
           <div style={S.tableHeader}>
-            <span style={{ ...S.th, flex: 1 }}>기간</span>
-            <span style={{ ...S.th, flex: 1 }}>상태</span>
-            <span style={{ ...S.th, flex: 1, textAlign: 'right' as const }}>금액</span>
+            <span style={{ ...S.th, flex: 1 }}>주문일</span>
+            <span style={{ ...S.th, flex: 1 }}>공급사</span>
+            <span style={{ ...S.th, flex: 0.8 }}>주문 건수</span>
+            <span style={{ ...S.th, flex: 1, textAlign: 'right' as const }}>구매 금액</span>
           </div>
-          {MOCK_HISTORY.map((row) => (
-            <div key={row.period} style={S.tableRow}>
-              <span style={{ ...S.td, flex: 1 }}>{row.period}</span>
-              <span style={{ ...S.td, flex: 1 }}>
-                <span style={S.statusBadge}>{row.status}</span>
-              </span>
-              <span style={{ ...S.td, flex: 1, textAlign: 'right' as const, fontWeight: 600 }}>
-                {formatCurrency(row.amount)}
-              </span>
-            </div>
-          ))}
-          {MOCK_HISTORY.length === 0 && (
+          {purchaseHistory.length === 0 && (
             <div style={S.emptyState}>
-              <p style={S.emptyText}>정산 내역이 없습니다</p>
+              <p style={S.emptyText}>아직 구매 내역이 없습니다.</p>
             </div>
           )}
         </div>
@@ -81,7 +65,7 @@ export function StoreBillingPage() {
       {/* 안내 */}
       <div style={S.notice}>
         <p style={S.noticeText}>
-          정산 기능이 연결되면 실제 매출 기반의 정산 내역이 표시됩니다.
+          주문 기능이 연결되면 실제 구매 내역이 표시됩니다.
         </p>
       </div>
     </div>
@@ -168,24 +152,6 @@ const S: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
   } as React.CSSProperties,
-  tableRow: {
-    display: 'flex',
-    padding: `${spacing.md}`,
-    borderBottom: `1px solid ${colors.neutral100}`,
-  },
-  td: {
-    fontSize: '0.875rem',
-    color: colors.neutral700,
-  },
-  statusBadge: {
-    display: 'inline-block',
-    padding: `2px ${spacing.sm}`,
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    color: colors.accentYellow,
-    backgroundColor: '#FEF3C7',
-    borderRadius: borderRadius.sm,
-  },
 
   /* Empty */
   emptyState: {
