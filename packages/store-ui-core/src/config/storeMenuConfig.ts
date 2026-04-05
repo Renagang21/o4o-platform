@@ -130,6 +130,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'b2c', label: 'B2C 상품 판매', subPath: '/commerce/products/b2c' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
       { key: 'suppliers', label: '공급자', subPath: '/commerce/products/suppliers' },
+      { key: 'order-worktable', label: '주문 작업대', subPath: '/commerce/order-worktable' },
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
     ]},
     { label: '채널/디바이스', items: [

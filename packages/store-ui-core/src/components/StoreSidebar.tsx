@@ -68,6 +68,7 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   blog: Newspaper,
   b2c: Tag,
   suppliers: Truck,
+  'order-worktable': ClipboardList,
   channels: LayoutGrid,
   'tablet-channels': Tablet,
   'tablet-displays': MonitorSmartphone,
