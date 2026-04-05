@@ -1,44 +1,38 @@
 /**
- * CommunityHomePage - KPA Society 커뮤니티 홈 페이지
+ * CommunityHomePage - KPA Society 통합 Home 허브
  *
- * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브로 전환
- * Performance fix: 4개 순차 API 호출 → prefetchAll() 병렬 1회 호출
+ * WO-KPA-HOME-PHASE1-V1: 플랫폼 요약 허브
+ * WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: 통합 허브 재구성
  *
- * 섹션 구조:
- * ├─ HeroSection              - 커뮤니티 소개 Hero
- * ├─ NoticeSection             - 공지사항 (cms_contents type=notice)
- * ├─ ActivitySection           - 최근 활동 (포럼 글 + 추천 콘텐츠)
- * ├─ SignageSection            - 디지털 사이니지 프리뷰
- * ├─ CommunityServiceSection   - 공용 서비스 2x2 그리드
- * └─ UtilitySection            - 유틸리티 (로그인 패널 + 링크)
+ * /community 허브 기능을 흡수하여 단일 Home으로 통합.
+ *
+ * 섹션 구조 (9블록):
+ * ├─ HeroBannerSection       — 동적 광고 캐러셀 (community_ads hero)
+ * ├─ NoticeSection            — 공지사항 (cms_contents type=notice)
+ * ├─ ForumCategorySection     — 포럼 카테고리 카드 그리드
+ * ├─ EducationSection         — 교육/강의 요약 (lmsApi 독립 호출)
+ * ├─ SignageSection            — 디지털 사이니지 프리뷰
+ * ├─ ActivitySection           — 최근 활동 (포럼 글 + 추천 콘텐츠)
+ * ├─ CommunityServiceSection   — 공용 서비스 카드 그리드
+ * ├─ AdSection                — 페이지 광고 (community_ads page)
+ * ├─ SponsorBar               — 스폰서 로고 (community_sponsors)
+ * └─ UtilitySection            — 유틸리티 (로그인 패널 + 링크)
  */
 
 import { useState, useEffect } from 'react';
-import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
+import { HeroBannerSection } from '../components/community/HeroBannerSection';
 import { NoticeSection } from '../components/home/NoticeSection';
+import { ForumCategorySection } from '../components/home/ForumCategorySection';
+import { EducationSection } from '../components/home/EducationSection';
+import { ActivitySection } from '../components/home/ActivitySection/ActivitySection';
 import { SignageSection } from '../components/home/SignageSection';
 import { CommunityServiceSection } from '../components/home/CommunityServiceSection';
+import { AdSection } from '../components/community/AdSection';
+import { SponsorBar } from '../components/community/SponsorBar';
 import { UtilitySection } from '../components/home/UtilitySection';
 import { homeApi } from '../api/home';
 import type { HomePageData } from '../api/home';
-import { colors, spacing, typography, borderRadius } from '../styles/theme';
-
-function HeroSection() {
-  return (
-    <div style={heroStyles.wrapper}>
-      <div style={heroStyles.inner}>
-        <span style={heroStyles.badge}>KPA Community</span>
-        <h1 style={heroStyles.title}>약사를 위한 커뮤니티 플랫폼</h1>
-        <p style={heroStyles.subtitle}>
-          포럼에서 동료 약사와 소통하고, 교육·자료를 통해 전문성을 높이세요.
-        </p>
-      </div>
-      {/* 장식 원 */}
-      <div style={heroStyles.circleTopRight} />
-      <div style={heroStyles.circleBottomLeft} />
-    </div>
-  );
-}
+import { colors, spacing } from '../styles/theme';
 
 export function CommunityHomePage() {
   const [data, setData] = useState<HomePageData | null>(null);
@@ -53,84 +47,48 @@ export function CommunityHomePage() {
 
   return (
     <div style={styles.page}>
-      <HeroSection />
+      {/* 1. Hero 배너 (동적 광고 캐러셀) */}
+      <HeroBannerSection ads={data?.heroAds ?? []} />
+
       <div style={styles.content}>
+        {/* 2. 공지/뉴스 */}
         <NoticeSection prefetchedNotices={data?.notices} loading={loading} />
-        <ActivitySection
-          prefetchedPosts={data?.community.posts}
-          prefetchedFeatured={data?.community.featured}
-          loading={loading}
-        />
+
+        {/* 3. 포럼 카테고리 */}
+        <ForumCategorySection categories={data?.forumCategories ?? []} loading={loading} />
+
+        {/* 4. 교육/강의 (독립 API 호출) */}
+        <EducationSection />
+
+        {/* 5. 사이니지 미디어 */}
         <SignageSection
           prefetchedMedia={data?.signage.media}
           prefetchedPlaylists={data?.signage.playlists}
           loading={loading}
         />
+
+        {/* 6. 최근 활동 (포럼 글 + 추천 콘텐츠) */}
+        <ActivitySection
+          prefetchedPosts={data?.community.posts}
+          prefetchedFeatured={data?.community.featured}
+          loading={loading}
+        />
+
+        {/* 7. 서비스 카드 그리드 */}
         <CommunityServiceSection />
+
+        {/* 8. 페이지 광고 */}
+        <AdSection ads={data?.pageAds ?? []} />
+
+        {/* 9. 스폰서 */}
+        <SponsorBar sponsors={data?.sponsors ?? []} />
+
+        {/* 유틸리티 */}
         <UtilitySection />
       </div>
     </div>
   );
 }
-
-const heroStyles: Record<string, React.CSSProperties> = {
-  wrapper: {
-    position: 'relative',
-    overflow: 'hidden',
-    background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryDark} 100%)`,
-    padding: '80px 40px',
-    minHeight: '400px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inner: {
-    position: 'relative',
-    zIndex: 1,
-    maxWidth: '960px',
-    margin: '0 auto',
-    textAlign: 'center',
-  },
-  badge: {
-    display: 'inline-block',
-    padding: '4px 14px',
-    borderRadius: borderRadius.xl,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    color: colors.white,
-    fontSize: typography.bodyM.fontSize,
-    fontWeight: 600,
-    marginBottom: spacing.md,
-  },
-  title: {
-    ...typography.headingXL,
-    color: colors.white,
-    margin: `0 0 ${spacing.sm}`,
-  },
-  subtitle: {
-    fontSize: typography.bodyL.fontSize,
-    color: 'rgba(255,255,255,0.85)',
-    margin: 0,
-    lineHeight: 1.6,
-  },
-  circleTopRight: {
-    position: 'absolute',
-    top: '-40px',
-    right: '-40px',
-    width: '160px',
-    height: '160px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  circleBottomLeft: {
-    position: 'absolute',
-    bottom: '-30px',
-    left: '-30px',
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-};
 
 const styles: Record<string, React.CSSProperties> = {
   page: {

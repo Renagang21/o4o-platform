@@ -70,22 +70,16 @@ interface MenuItem {
 }
 
 /**
- * 메뉴 구조 (WO-KPA-A-STORE-IA-REALIGN-PHASE1-V1)
+ * 메뉴 구조 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
  *
- * - 홈: 커뮤니티 메인
- * - 포럼: 커뮤니티 포럼
- * - 강의: LMS 강좌
- * - 콘텐츠: 공지/뉴스
- * - 내 매장관리: 매장 대시보드 (pharmacy_owner)
- * - 운영 대시보드: admin/operator → /operator (5-Block)
- * - 테스트 센터: 오른쪽 끝 배치
+ * 공개 기본: 홈 / 포럼 / 강의
+ * 조건부: 약국HUB (pharmacy_owner) / 내 약국 (storeOwner) / 운영 대시보드 (operator/admin)
+ * 제거됨: 커뮤니티 (Home 통합), 콘텐츠 (Home 블록 진입)
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
-  { label: '커뮤니티', href: '/community' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '콘텐츠', href: '/content' },
   { label: '약국 HUB', href: '/hub' },
   { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },

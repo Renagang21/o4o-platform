@@ -93,8 +93,7 @@ import RegisterPendingPage from './pages/auth/RegisterPendingPage';
 // Community Home (WO-KPA-COMMUNITY-HOME-V1)
 import { CommunityHomePage } from './pages/CommunityHomePage';
 
-// Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1)
-import CommunityHubPage from './pages/community/CommunityHubPage';
+// Community Hub — /community는 Home으로 리다이렉트 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
 
 // Service Detail Pages (WO-KPA-HOME-SERVICE-SECTION-V1)
 import { BranchServicePage, DivisionServicePage, PharmacyServicePage, ForumServicePage, LmsServicePage } from './pages/services';
@@ -352,8 +351,8 @@ function App() {
           <Route path="/setup-activity" element={<ActivitySetupPage />} />
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
 
-          {/* Community Hub (WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1) */}
-          <Route path="/community" element={<Layout serviceName={SERVICE_NAME}><CommunityHubPage /></Layout>} />
+          {/* WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1: Home 통합 */}
+          <Route path="/community" element={<Navigate to="/" replace />} />
           {/* /library/content → /content 흡수 (WO-KPA-SOCIETY-CONTENT-VS-LIBRARY-ROLE-REALIGNMENT-V1) */}
           <Route path="/library/content" element={<Navigate to="/content" replace />} />
 
