@@ -4,19 +4,14 @@
  * WO-KPA-SOCIETY-MAIN-NAV-REFINE-V1: 서비스 단위 진입 중심 구조
  * WO-KPA-SOCIETY-SERVICE-STRUCTURE-BASELINE-V1: 3개 서비스 구조 기준
  * WO-KPA-SUPER-OPERATOR-BASELINE-REFINE-V1: Super Operator 공통 메뉴 지원
- *
- * 메뉴 구조 (서비스 진입점 중심):
- * - 홈: 커뮤니티 서비스 진입점 (Forum 포함)
- * - 약국경영: 독립 실서비스
- * - 분회 서비스: 실제 분회 운영 서비스
- * - 지부/분회 서비스 데모: 데모 서비스 (/demo) - 제거 예정
+ * WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1: 공개/역할 메뉴 분리 + dropdown 진입점
  *
  * 원칙: 상단 메뉴는 서비스 진입점만 노출 (기능 나열 금지)
  */
 
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, LayoutDashboard, UserCircle, Settings, LogOut } from 'lucide-react';
+import { User, LayoutDashboard, UserCircle, Settings, LogOut, Shield } from 'lucide-react';
 import { useAuth, type User as UserType } from '../contexts';
 import { useAuthModal } from '../contexts/LoginModalContext';
 import { colors } from '../styles/theme';
@@ -70,17 +65,16 @@ interface MenuItem {
 }
 
 /**
- * 메뉴 구조 (WO-KPA-A-PUBLIC-HOME-INTEGRATION-AND-MENU-SIMPLIFICATION-V1)
+ * 메뉴 구조 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1)
  *
  * 공개 기본: 홈 / 포럼 / 강의
- * 조건부: 약국HUB (pharmacy_owner) / 내 약국 (storeOwner) / 운영 대시보드 (operator/admin)
- * 제거됨: 커뮤니티 (Home 통합), 콘텐츠 (Home 블록 진입)
+ * 역할 조건부: 내 약국 (storeOwner) / 운영 대시보드 (operator/admin)
+ * 약국 HUB: 헤더에서 제거 → DashboardSwitcher (user dropdown)에서 접근
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '약국 HUB', href: '/hub' },
   { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
 ];
@@ -96,17 +90,14 @@ export function Header({ serviceName }: { serviceName: string }) {
 
   const accessibleDashboards = useAccessibleDashboards();
 
-  // ── 메뉴 필터링 (WO-KPA-ADMIN-DEFAULT-DASHBOARD-ROUTING-FIX-V1) ──
+  // ── 메뉴 필터링 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1) ──
   // kpa:admin  → "관리자 콘솔" /admin
   // kpa:operator → "운영 대시보드" /operator
-  // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
   // /store → 승인된 약국 (isStoreOwner)
-  // /hub → pharmacy_owner 이상 (미승인도 HUB 탐색 가능)
   // 나머지 → 전체 공개
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
   const isStoreOwner = user?.isStoreOwner === true;
-  const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
   const displayMenuItems = menuItems
     .map(item => {
       // admin이면 "운영 대시보드" → "관리자 콘솔" + /admin
@@ -119,9 +110,13 @@ export function Header({ serviceName }: { serviceName: string }) {
       if (item.href === '/operator') return isOperator;
       if (item.href === '/admin') return isAdmin;
       if (item.href === '/store') return isStoreOwner;
-      if (item.href === '/hub') return isPharmacyRelated;
       return true;
     });
+
+  // 공개 메뉴와 역할 메뉴를 분리 (시각적 구분선 표시용)
+  const PUBLIC_PATHS = ['/', '/forum', '/lms'];
+  const publicMenuItems = displayMenuItems.filter(item => PUBLIC_PATHS.includes(item.href));
+  const roleMenuItems = displayMenuItems.filter(item => !PUBLIC_PATHS.includes(item.href));
 
   const handleLogout = async () => {
     await logout();
@@ -138,10 +133,10 @@ export function Header({ serviceName }: { serviceName: string }) {
             <span style={styles.logoText}>{serviceName || '약사회'}</span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation — 공개/역할 메뉴 분리 */}
           <nav style={styles.nav}>
             <ul style={styles.navList}>
-              {displayMenuItems.map((item) => (
+              {publicMenuItems.map((item) => (
                 <li
                   key={item.label}
                   style={styles.navItem}
@@ -157,20 +152,38 @@ export function Header({ serviceName }: { serviceName: string }) {
                   >
                     {item.label}
                   </Link>
-                  {/* Dropdown */}
                   {item.children && activeMenu === item.label && (
                     <div style={styles.dropdown}>
                       {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          to={child.href}
-                          style={styles.dropdownItem}
-                        >
+                        <Link key={child.href} to={child.href} style={styles.dropdownItem}>
                           {child.label}
                         </Link>
                       ))}
                     </div>
                   )}
+                </li>
+              ))}
+              {roleMenuItems.length > 0 && (
+                <li style={styles.navSeparator} aria-hidden="true">
+                  <span style={styles.navSeparatorLine} />
+                </li>
+              )}
+              {roleMenuItems.map((item) => (
+                <li
+                  key={item.label}
+                  style={styles.navItem}
+                  onMouseEnter={() => setActiveMenu(item.label)}
+                  onMouseLeave={() => setActiveMenu(null)}
+                >
+                  <Link
+                    to={item.href}
+                    style={{
+                      ...styles.navLink,
+                      ...((location.pathname.startsWith(item.href)) ? styles.navLinkActive : {}),
+                    }}
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -221,6 +234,14 @@ export function Header({ serviceName }: { serviceName: string }) {
                             <UserCircle style={{ width: 16, height: 16, color: colors.gray500 }} />
                             프로필
                           </Link>
+                          <Link
+                            to={isAdmin ? '/admin' : '/operator'}
+                            style={styles.userDropdownItem}
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <Shield style={{ width: 16, height: 16, color: '#d97706' }} />
+                            {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                          </Link>
                         </>
                       ) : (
                         /* 일반 사용자: 전체 메뉴
@@ -245,6 +266,20 @@ export function Header({ serviceName }: { serviceName: string }) {
                               <LayoutDashboard style={{ width: 16, height: 16, color: colors.gray500 }} />
                               마이페이지
                             </Link>
+                          )}
+                          {/* 운영/관리 진입점 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1) */}
+                          {(isAdmin || isOperator) && (
+                            <>
+                              <div style={styles.userDropdownDivider} />
+                              <Link
+                                to={isAdmin ? '/admin' : '/operator'}
+                                style={styles.userDropdownItem}
+                                onClick={() => setShowUserDropdown(false)}
+                              >
+                                <Shield style={{ width: 16, height: 16, color: colors.gray500 }} />
+                                {isAdmin ? '관리자 콘솔' : '운영 대시보드'}
+                              </Link>
+                            </>
                           )}
                           <Link
                             to="/mypage/profile"
@@ -320,10 +355,10 @@ export function Header({ serviceName }: { serviceName: string }) {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu — 공개/역할 메뉴 분리 */}
         {mobileMenuOpen && (
           <div style={styles.mobileMenu}>
-            {displayMenuItems.map((item) => (
+            {publicMenuItems.map((item) => (
               <div key={item.label}>
                 <Link
                   to={item.href}
@@ -346,6 +381,18 @@ export function Header({ serviceName }: { serviceName: string }) {
                     ))}
                   </div>
                 )}
+              </div>
+            ))}
+            {roleMenuItems.length > 0 && <div style={styles.mobileSeparator} />}
+            {roleMenuItems.map((item) => (
+              <div key={item.label}>
+                <Link
+                  to={item.href}
+                  style={styles.mobileMenuItem}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
               </div>
             ))}
           </div>
@@ -398,6 +445,17 @@ const styles: Record<string, React.CSSProperties> = {
   },
   navItem: {
     position: 'relative',
+  },
+  navSeparator: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 4px',
+  },
+  navSeparatorLine: {
+    display: 'block',
+    width: '1px',
+    height: '20px',
+    backgroundColor: colors.gray300,
   },
   navLink: {
     display: 'block',
@@ -577,6 +635,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     fontWeight: 500,
     borderBottom: `1px solid ${colors.gray200}`,
+  },
+  mobileSeparator: {
+    height: '1px',
+    backgroundColor: colors.gray300,
+    margin: '8px 0',
   },
   mobileSubMenu: {
     paddingLeft: '16px',
