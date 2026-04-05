@@ -81,6 +81,7 @@ export function HubB2BCatalogPage() {
     try {
       const res = await getCatalog({
         distributionType: (distType === 'all' || distType === 'recommended') ? undefined : distType,
+        recommended: distType === 'recommended' ? true : undefined,
         limit: PAGE_LIMIT,
         offset: pageOffset,
       });
@@ -94,9 +95,7 @@ export function HubB2BCatalogPage() {
   }, []);
 
   useEffect(() => {
-    if (distributionFilter !== 'recommended') {
-      fetchCatalog(distributionFilter, offset);
-    }
+    fetchCatalog(distributionFilter, offset);
   }, [fetchCatalog, distributionFilter, offset]);
 
   const handleDistributionChange = (key: string) => {
@@ -246,9 +245,7 @@ export function HubB2BCatalogPage() {
       </div>
 
       {/* Content */}
-      {distributionFilter === 'recommended' ? (
-        <div style={styles.emptyState}>운영자 추천 상품이 준비 중입니다.</div>
-      ) : loading ? (
+      {loading ? (
         <div style={styles.emptyState}>상품리스트를 불러오는 중...</div>
       ) : error ? (
         <div style={styles.errorState}>

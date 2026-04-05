@@ -27,7 +27,7 @@ const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
   { key: 'recommended', label: '운영자 추천' },
-  { key: 'PUBLIC', label: '판매처 모집' },
+  { key: 'PUBLIC', label: '거점판매 모집' },
 ];
 
 const PAGE_LIMIT = 20;
@@ -79,6 +79,7 @@ export function StoreOrderableProductsPage() {
     try {
       const res = await getCatalog({
         distributionType: (distType === 'all' || distType === 'recommended') ? undefined : distType,
+        recommended: distType === 'recommended' ? true : undefined,
         limit: PAGE_LIMIT,
         offset: pageOffset,
       });
@@ -92,9 +93,7 @@ export function StoreOrderableProductsPage() {
   }, []);
 
   useEffect(() => {
-    if (distributionFilter !== 'recommended') {
-      fetchCatalog(distributionFilter, offset);
-    }
+    fetchCatalog(distributionFilter, offset);
   }, [fetchCatalog, distributionFilter, offset]);
 
   const handleDistributionChange = (key: string) => {
@@ -243,9 +242,7 @@ export function StoreOrderableProductsPage() {
       </div>
 
       {/* Content */}
-      {distributionFilter === 'recommended' ? (
-        <div style={styles.emptyState}>운영자 추천 상품이 준비 중입니다.</div>
-      ) : loading ? (
+      {loading ? (
         <div style={styles.emptyState}>상품리스트를 불러오는 중...</div>
       ) : error ? (
         <div style={styles.errorState}>

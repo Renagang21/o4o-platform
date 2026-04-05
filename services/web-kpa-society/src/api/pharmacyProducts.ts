@@ -88,6 +88,7 @@ export interface CatalogResponse {
 export async function getCatalog(params?: {
   category?: string;
   distributionType?: string;
+  recommended?: boolean;
   limit?: number;
   offset?: number;
 }): Promise<CatalogResponse> {
