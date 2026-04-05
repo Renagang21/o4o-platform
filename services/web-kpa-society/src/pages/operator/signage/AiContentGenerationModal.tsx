@@ -2,14 +2,15 @@
  * AI Content Generation Modal — 3-step wizard
  *
  * WO-KPA-SOCIETY-DIGITAL-SIGNAGE-AI-CONTENT-GENERATION-UI-V1
+ * WO-KPA-SOCIETY-DIGITAL-SIGNAGE-AI-GENERATION-UX-REFINEMENT-V1
  *
  * Step 1: Input (prompt, templateType, style, optional template reference)
- * Step 2: Preview (AI-generated HTML preview + metadata)
- * Step 3: Save (edit name/description → save as HQ media)
+ * Step 2: Preview (AI-generated HTML preview + request summary + metadata)
+ * Step 3: Save (edit name/description + auto-settings summary → save as HQ media)
  */
 
 import { useState, useEffect } from 'react';
-import { Sparkles, Loader2, ArrowLeft, RefreshCw, X, Save, Wand2, Eye } from 'lucide-react';
+import { Sparkles, Loader2, ArrowLeft, ArrowRight, RefreshCw, X, Save, Wand2, Eye, Info } from 'lucide-react';
 import { generateAiContent, saveAsHqMedia } from '../../../api/signageAi';
 import type { AiGenerateRequest, AiGenerateResponse } from '../../../api/signageAi';
 import { fetchTemplates } from '../../../api/signageTemplate';
@@ -41,6 +42,10 @@ const templateTypeLabel: Record<string, string> = {
   banner: '배너', card: '카드', poster: '포스터', slide: '슬라이드',
 };
 
+const styleLabel: Record<string, string> = {
+  modern: '모던', classic: '클래식', minimal: '미니멀', vibrant: '비비드',
+};
+
 export default function AiContentGenerationModal({ open, onClose, onSaved }: Props) {
   const [step, setStep] = useState<Step>(1);
 
@@ -50,6 +55,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
   const [style, setStyle] = useState<NonNullable<AiGenerateRequest['style']>>('modern');
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [templates, setTemplates] = useState<SignageTemplateItem[]>([]);
+  const [inputError, setInputError] = useState('');
 
   // Step 2 — Preview
   const [isGenerating, setIsGenerating] = useState(false);
@@ -61,6 +67,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
   const [mediaDesc, setMediaDesc] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState('');
 
   // Load templates on mount
   useEffect(() => {
@@ -71,9 +78,19 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
 
   if (!open) return null;
 
-  const isPromptValid = prompt.trim().length >= 5;
+  // Derived values
+  const selectedTemplate = selectedTemplateId
+    ? templates.find(t => t.id === selectedTemplateId)
+    : null;
+
+  const requestSummary = `${templateTypeLabel[templateType] || templateType} · ${styleLabel[style] || style} · "${prompt.trim().length > 40 ? prompt.trim().slice(0, 40) + '...' : prompt.trim()}"`;
 
   const handleGenerate = async () => {
+    if (prompt.trim().length < 5) {
+      setInputError('주제를 5자 이상 입력해주세요');
+      return;
+    }
+    setInputError('');
     setIsGenerating(true);
     setGenError(null);
     setStep(2);
@@ -85,13 +102,10 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
     };
 
     // If a template is selected, pass its dimensions
-    if (selectedTemplateId) {
-      const tpl = templates.find(t => t.id === selectedTemplateId);
-      if (tpl?.layoutConfig) {
-        payload.width = tpl.layoutConfig.width;
-        payload.height = tpl.layoutConfig.height;
-        payload.metadata = { selectedTemplateId, templateName: tpl.name };
-      }
+    if (selectedTemplate?.layoutConfig) {
+      payload.width = selectedTemplate.layoutConfig.width;
+      payload.height = selectedTemplate.layoutConfig.height;
+      payload.metadata = { selectedTemplateId, templateName: selectedTemplate.name };
     }
 
     try {
@@ -102,6 +116,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
       const promptSnippet = prompt.trim().length > 30 ? prompt.trim().slice(0, 30) + '...' : prompt.trim();
       setMediaName(`AI 생성: ${typeLabel} - ${promptSnippet}`);
       setMediaDesc('');
+      setNameError('');
     } catch (err: any) {
       setGenError(err?.message || 'AI 콘텐츠 생성에 실패했습니다');
     } finally {
@@ -110,7 +125,12 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
   };
 
   const handleSave = async () => {
-    if (!genResult || !mediaName.trim()) return;
+    if (!mediaName.trim()) {
+      setNameError('미디어 이름을 입력해주세요');
+      return;
+    }
+    if (!genResult) return;
+    setNameError('');
     setIsSaving(true);
     setSaveError(null);
 
@@ -182,12 +202,18 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
                 <label className="block text-sm font-medium text-slate-700 mb-1">주제 / 목적 *</label>
                 <textarea
                   value={prompt}
-                  onChange={e => setPrompt(e.target.value)}
+                  onChange={e => { setPrompt(e.target.value); setInputError(''); }}
                   placeholder="예: 약국 건강검진 캠페인 홍보용 배너, 봄철 건강관리 안내..."
                   rows={3}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none ${
+                    inputError ? 'border-red-400' : 'border-slate-200'
+                  }`}
                 />
-                <p className="text-xs text-slate-400 mt-1">{prompt.trim().length}/5자 이상 입력</p>
+                {inputError ? (
+                  <p className="text-xs text-red-500 mt-1">{inputError}</p>
+                ) : (
+                  <p className="text-xs text-slate-400 mt-1">{prompt.trim().length}/5자 이상 입력</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -232,6 +258,14 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
                     </option>
                   ))}
                 </select>
+                {selectedTemplate ? (
+                  <div className="bg-purple-50 text-purple-700 text-xs rounded-lg p-2 mt-1 flex items-center gap-1.5">
+                    <span>✓</span>
+                    <span>적용: {selectedTemplate.name} — {selectedTemplate.layoutConfig?.width}×{selectedTemplate.layoutConfig?.height} 크기 기준으로 생성</span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 mt-1">기본 크기로 생성됩니다</p>
+                )}
               </div>
             </div>
           )}
@@ -247,29 +281,51 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
               ) : genError ? (
                 <div className="space-y-3">
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">{genError}</div>
-                  <button
-                    onClick={handleGenerate}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
-                  >
-                    <RefreshCw className="w-4 h-4" /> 다시 시도
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setStep(1)}
+                      className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-sm text-slate-600 transition-colors"
+                    >
+                      <ArrowLeft className="w-4 h-4" /> 입력 수정
+                    </button>
+                    <button
+                      onClick={handleGenerate}
+                      className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium transition-colors"
+                    >
+                      <RefreshCw className="w-4 h-4" /> 다시 시도
+                    </button>
+                  </div>
                 </div>
               ) : genResult ? (
                 <>
+                  {/* Request summary */}
+                  <div className="bg-slate-100 rounded-lg px-3 py-2 text-xs text-slate-600 flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-slate-500">요청:</span>
+                    <span>{requestSummary}</span>
+                    {selectedTemplate && (
+                      <span className="bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">
+                        {selectedTemplate.name} ({selectedTemplate.layoutConfig?.width}×{selectedTemplate.layoutConfig?.height})
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Preview */}
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Eye className="w-4 h-4 text-slate-500" />
                       <span className="text-sm font-medium text-slate-700">미리보기</span>
                     </div>
                     <div
-                      className="border border-slate-200 rounded-lg p-4 bg-slate-50 max-h-64 overflow-auto"
+                      className="border border-purple-200 rounded-lg p-4 bg-slate-50 max-h-80 overflow-auto"
                       dangerouslySetInnerHTML={{ __html: genResult.generatedContent }}
                     />
                   </div>
-                  <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 space-y-1">
-                    <p>모델: {genResult.generationLog.modelName}</p>
-                    <p>토큰: {genResult.generationLog.tokensUsed}</p>
-                    <p>생성: {new Date(genResult.generationLog.generatedAt).toLocaleString('ko-KR')}</p>
+
+                  {/* Metadata */}
+                  <div className="bg-slate-50 rounded-lg p-3 text-xs text-slate-500 flex items-center gap-4">
+                    <span>모델: {genResult.generationLog.modelName}</span>
+                    <span>토큰: {genResult.generationLog.tokensUsed}</span>
+                    <span>생성: {new Date(genResult.generationLog.generatedAt).toLocaleString('ko-KR')}</span>
                   </div>
                 </>
               ) : null}
@@ -279,8 +335,17 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
           {/* ── Step 3: Save ── */}
           {step === 3 && (
             <div className="space-y-4">
+              {/* Auto-settings summary */}
               <div className="bg-purple-50 border border-purple-100 rounded-lg p-3 text-sm text-purple-700">
-                생성된 콘텐츠가 HQ 미디어로 저장됩니다
+                <div className="flex items-center gap-1.5 font-medium mb-1.5">
+                  <Info className="w-4 h-4" /> HQ 미디어 자동 설정
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-purple-600">
+                  <span>· 미디어 타입: HTML</span>
+                  <span>· 소스 타입: CMS</span>
+                  <span>· 카테고리: {templateTypeLabel[templateType] || templateType}</span>
+                  <span>· 태그: ai-generated</span>
+                </div>
               </div>
 
               <div>
@@ -288,9 +353,12 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
                 <input
                   type="text"
                   value={mediaName}
-                  onChange={e => setMediaName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  onChange={e => { setMediaName(e.target.value); setNameError(''); }}
+                  className={`w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                    nameError ? 'border-red-400' : 'border-slate-200'
+                  }`}
                 />
+                {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
               </div>
 
               <div>
@@ -322,10 +390,10 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
           )}
         </div>
 
-        {/* Footer buttons */}
+        {/* Footer buttons — simplified: no cancel text button, X is sufficient */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50 rounded-b-xl">
           <div>
-            {step === 2 && !isGenerating && (
+            {step === 2 && !isGenerating && genResult && (
               <button
                 onClick={() => setStep(1)}
                 className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
@@ -344,18 +412,10 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-            >
-              취소
-            </button>
-
             {step === 1 && (
               <button
                 onClick={handleGenerate}
-                disabled={!isPromptValid}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium transition-colors"
               >
                 <Wand2 className="w-4 h-4" /> 초안 생성하기
               </button>
@@ -373,7 +433,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
                   onClick={() => setStep(3)}
                   className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium transition-colors"
                 >
-                  <Sparkles className="w-4 h-4" /> 사용하기
+                  사용하기 <ArrowRight className="w-4 h-4" />
                 </button>
               </>
             )}
@@ -381,7 +441,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
             {step === 3 && (
               <button
                 onClick={handleSave}
-                disabled={isSaving || !mediaName.trim()}
+                disabled={isSaving}
                 className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors"
               >
                 <Save className="w-4 h-4" /> {isSaving ? '저장 중...' : 'HQ 미디어로 저장'}
