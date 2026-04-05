@@ -18,29 +18,37 @@ export class CommunityHubService {
   // ==================== Public Read ====================
 
   async getActiveAds(serviceCode: string, type: 'hero' | 'page') {
-    const rows = await this.ds.query(
-      `SELECT id, type, title, image_url AS "imageUrl", link_url AS "linkUrl", display_order AS "displayOrder"
-       FROM community_ads
-       WHERE service_code = $1
-         AND type = $2
-         AND is_active = true
-         AND (start_date IS NULL OR start_date <= CURRENT_DATE)
-         AND (end_date IS NULL OR end_date >= CURRENT_DATE)
-       ORDER BY display_order ASC, created_at DESC`,
-      [serviceCode, type],
-    );
-    return rows;
+    try {
+      return await this.ds.query(
+        `SELECT id, type, title, image_url AS "imageUrl", link_url AS "linkUrl", display_order AS "displayOrder"
+         FROM community_ads
+         WHERE service_code = $1
+           AND type = $2
+           AND is_active = true
+           AND (start_date IS NULL OR start_date <= CURRENT_DATE)
+           AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+         ORDER BY display_order ASC, created_at DESC`,
+        [serviceCode, type],
+      );
+    } catch (err: any) {
+      console.warn('[CommunityHub] community_ads query failed:', err.message);
+      return [];
+    }
   }
 
   async getActiveSponsors(serviceCode: string) {
-    const rows = await this.ds.query(
-      `SELECT id, name, logo_url AS "logoUrl", link_url AS "linkUrl", display_order AS "displayOrder"
-       FROM community_sponsors
-       WHERE service_code = $1 AND is_active = true
-       ORDER BY display_order ASC, created_at DESC`,
-      [serviceCode],
-    );
-    return rows;
+    try {
+      return await this.ds.query(
+        `SELECT id, name, logo_url AS "logoUrl", link_url AS "linkUrl", display_order AS "displayOrder"
+         FROM community_sponsors
+         WHERE service_code = $1 AND is_active = true
+         ORDER BY display_order ASC, created_at DESC`,
+        [serviceCode],
+      );
+    } catch (err: any) {
+      console.warn('[CommunityHub] community_sponsors query failed:', err.message);
+      return [];
+    }
   }
 
   // ==================== Operator: Ads CRUD ====================
@@ -155,15 +163,20 @@ export class CommunityHubService {
   // ==================== Operator: Sponsors CRUD ====================
 
   async listSponsors(serviceCode: string) {
-    return this.ds.query(
-      `SELECT id, name, logo_url AS "logoUrl", link_url AS "linkUrl",
-              display_order AS "displayOrder", is_active AS "isActive",
-              created_at AS "createdAt", updated_at AS "updatedAt"
-       FROM community_sponsors
-       WHERE service_code = $1
-       ORDER BY display_order ASC, created_at DESC`,
-      [serviceCode],
-    );
+    try {
+      return await this.ds.query(
+        `SELECT id, name, logo_url AS "logoUrl", link_url AS "linkUrl",
+                display_order AS "displayOrder", is_active AS "isActive",
+                created_at AS "createdAt", updated_at AS "updatedAt"
+         FROM community_sponsors
+         WHERE service_code = $1
+         ORDER BY display_order ASC, created_at DESC`,
+        [serviceCode],
+      );
+    } catch (err: any) {
+      console.warn('[CommunityHub] community_sponsors table may not exist:', err.message);
+      return [];
+    }
   }
 
   async createSponsor(data: {
