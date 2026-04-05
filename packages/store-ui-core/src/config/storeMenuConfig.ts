@@ -117,7 +117,6 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '운영', items: [
       { key: 'library', label: '자료실', subPath: '/operation/library' },
-      { key: 'content', label: '콘텐츠 관리', subPath: '/content' },
       { key: 'blog', label: '블로그', subPath: '/content/blog' },
     ]},
     { label: '마케팅', items: [
@@ -141,7 +140,6 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '설정', items: [
       { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
       { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
-      { key: 'template', label: '템플릿 관리', subPath: '/settings/template' },
     ]},
     { label: '정산', items: [
       { key: 'billing', label: '정산/인보이스', subPath: '/billing' },

@@ -2,9 +2,10 @@
  * StoreMarketingDashboardPage — 매장 마케팅 대시보드
  *
  * WO-O4O-STORE-MARKETING-DASHBOARD-V1
+ * WO-KPA-A-STORE-PHASE1-UI-UX-REFINE-V1: QR 편향 완화 (Quick Actions 확장, 제목 개선)
  *
  * Store Hub 마케팅 진입 화면.
- * KPI 요약 + QR 성과 + 최근 활동 + 빠른 이동.
+ * KPI 요약 + 마케팅 성과 + 최근 활동 + 빠른 이동.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -134,7 +135,7 @@ export function StoreMarketingDashboardPage() {
         {/* Top QR Performance */}
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>QR 성과 TOP 5</h2>
+            <h2 style={styles.sectionTitle}>마케팅 성과 TOP 5</h2>
             <Link to="/store/analytics/marketing" style={styles.seeAllLink}>
               전체 보기 <ArrowRight size={12} />
             </Link>
@@ -160,7 +161,7 @@ export function StoreMarketingDashboardPage() {
         {/* Recent Activity */}
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
-            <h2 style={styles.sectionTitle}>최근 스캔 활동</h2>
+            <h2 style={styles.sectionTitle}>최근 활동</h2>
           </div>
           {recentScans.length === 0 ? (
             <p style={styles.emptyText}>최근 스캔 기록이 없습니다</p>
@@ -207,6 +208,11 @@ export function StoreMarketingDashboardPage() {
             <BookOpen size={24} style={{ color: '#059669' }} />
             <p style={styles.quickLabel}>자료실</p>
             <p style={styles.quickDesc}>매장 자료 관리</p>
+          </Link>
+          <Link to="/store/marketing/signage" style={styles.quickCard}>
+            <Monitor size={24} style={{ color: '#2563eb' }} />
+            <p style={styles.quickLabel}>사이니지</p>
+            <p style={styles.quickDesc}>디지털 디스플레이 관리</p>
           </Link>
           <Link to="/store/analytics/marketing" style={styles.quickCard}>
             <BarChart3 size={24} style={{ color: '#7c3aed' }} />
@@ -449,7 +455,7 @@ const styles: Record<string, React.CSSProperties> = {
   // Quick Actions
   quickGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateColumns: 'repeat(5, 1fr)',
     gap: '12px',
   },
   quickCard: {

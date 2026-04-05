@@ -4,6 +4,7 @@
  * WO-KPA-PHARMACY-B2B-FUNCTION-V1: 초기 구조
  * WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1: 도메인 탭 통합
  * WO-O4O-STORE-DOMAIN-TABS-OPERATIONAL-READINESS-V1: 에러/EmptyState 운영 보강
+ * WO-KPA-A-STORE-PHASE1-UI-UX-REFINE-V1: 카드 그리드 → DataTable 표준 전환
  *
  * 매장 중심 멀티도메인 구조:
  * - service_key 기반 도메인 탭 필터
@@ -13,9 +14,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { DataTable } from '@o4o/ui';
+import type { Column } from '@o4o/ui';
 import { getListings } from '../../api/pharmacyProducts';
 import type { ProductListing } from '../../api/pharmacyProducts';
-import { colors, shadows, borderRadius } from '../../styles/theme';
+import { colors, borderRadius } from '../../styles/theme';
 
 // ============================================
 // WO-O4O-STORE-DOMAIN-TAB-UNIFICATION-V1
@@ -107,6 +110,86 @@ export function PharmacyB2BPage() {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('ko-KR');
   };
+
+  // WO-KPA-A-STORE-PHASE1-UI-UX-REFINE-V1: DataTable 컬럼 정의
+  const columns: Column<ProductListing>[] = [
+    {
+      key: 'product_name',
+      title: '상품명',
+      sortable: true,
+      render: (_v, row) => (
+        <span style={{ fontWeight: 500, color: colors.neutral900 }}>{row.product_name}</span>
+      ),
+    },
+    {
+      key: 'service_key',
+      title: '서비스',
+      width: '100px',
+      render: (_v, row) => {
+        const info = SERVICE_KEY_LABELS[row.service_key];
+        if (!info) return row.service_key;
+        return (
+          <span style={{
+            padding: '2px 8px',
+            borderRadius: '4px',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: info.color,
+            backgroundColor: info.bg,
+          }}>
+            {info.text}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'retail_price',
+      title: '소매가',
+      width: '120px',
+      sortable: true,
+      align: 'right',
+      render: (_v, row) => formatPrice(row.retail_price),
+    },
+    {
+      key: 'is_active',
+      title: '상태',
+      width: '80px',
+      sortable: true,
+      render: (_v, row) => (
+        <span style={{
+          padding: '2px 8px',
+          borderRadius: '4px',
+          fontSize: '0.6875rem',
+          fontWeight: 500,
+          color: row.is_active ? '#047857' : '#6B7280',
+          backgroundColor: row.is_active ? '#D1FAE5' : '#F3F4F6',
+        }}>
+          {row.is_active ? '활성' : '비활성'}
+        </span>
+      ),
+    },
+    {
+      key: 'created_at',
+      title: '등록일',
+      width: '110px',
+      sortable: true,
+      render: (_v, row) => (
+        <span style={{ fontSize: '0.8125rem', color: colors.neutral400 }}>
+          {formatDate(row.created_at)}
+        </span>
+      ),
+    },
+    {
+      key: 'external_product_id',
+      title: '외부 ID',
+      width: '120px',
+      render: (_v, row) => (
+        <span style={{ fontSize: '0.75rem', color: colors.neutral400, fontFamily: 'monospace' }}>
+          {row.external_product_id}
+        </span>
+      ),
+    },
+  ];
 
   return (
     <div style={styles.container}>
@@ -206,48 +289,12 @@ export function PharmacyB2BPage() {
           </Link>
         </div>
       ) : (
-        <div style={styles.productGrid}>
-          {listings.map(listing => {
-            const labelInfo = SERVICE_KEY_LABELS[listing.service_key];
-
-            return (
-              <div key={listing.id} style={styles.productCard}>
-                <div style={styles.cardHeader}>
-                  {labelInfo && (
-                    <span style={{
-                      ...styles.serviceKeyBadge,
-                      color: labelInfo.color,
-                      backgroundColor: labelInfo.bg,
-                    }}>
-                      {labelInfo.text}
-                    </span>
-                  )}
-                  <span style={{
-                    ...styles.statusBadge,
-                    ...(listing.is_active ? styles.statusActive : styles.statusInactive),
-                  }}>
-                    {listing.is_active ? '활성' : '비활성'}
-                  </span>
-                </div>
-
-                <h3 style={styles.productName}>{listing.product_name}</h3>
-
-                <div style={styles.productMeta}>
-                  <span style={styles.productPrice}>{formatPrice(listing.retail_price)}</span>
-                </div>
-
-                <div style={styles.cardFooter}>
-                  <span style={styles.productDate}>
-                    {formatDate(listing.created_at)}
-                  </span>
-                  <span style={styles.productId}>
-                    ID: {listing.external_product_id}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <DataTable<ProductListing>
+          columns={columns}
+          dataSource={listings}
+          rowKey="id"
+          emptyText="등록된 상품이 없습니다"
+        />
       )}
 
       {/* 페이지 안내 */}
@@ -436,86 +483,6 @@ const styles: Record<string, React.CSSProperties> = {
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
-  },
-
-  // Product grid
-  productGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '20px',
-  },
-  productCard: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.lg,
-    boxShadow: shadows.sm,
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    border: `1px solid ${colors.neutral200}`,
-  },
-  cardHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  serviceKeyBadge: {
-    padding: '3px 10px',
-    borderRadius: '4px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-  },
-  statusBadge: {
-    padding: '2px 8px',
-    borderRadius: '4px',
-    fontSize: '0.6875rem',
-    fontWeight: 500,
-  },
-  statusActive: {
-    color: '#047857',
-    backgroundColor: '#D1FAE5',
-  },
-  statusInactive: {
-    color: '#6B7280',
-    backgroundColor: '#F3F4F6',
-  },
-  productName: {
-    fontSize: '1rem',
-    fontWeight: 600,
-    color: colors.neutral900,
-    margin: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-  },
-  productMeta: {
-    display: 'flex',
-    alignItems: 'baseline',
-    gap: '8px',
-  },
-  productPrice: {
-    fontSize: '1.125rem',
-    fontWeight: 700,
-    color: colors.neutral900,
-  },
-  cardFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTop: `1px solid ${colors.neutral200}`,
-    paddingTop: '12px',
-    marginTop: 'auto',
-  },
-  productDate: {
-    fontSize: '0.8125rem',
-    color: colors.neutral400,
-  },
-  productId: {
-    fontSize: '0.75rem',
-    color: colors.neutral400,
-    fontFamily: 'monospace',
   },
 
   // Page Notice
