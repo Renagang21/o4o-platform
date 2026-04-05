@@ -68,14 +68,14 @@ interface MenuItem {
  * 메뉴 구조 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1)
  *
  * 공개 기본: 홈 / 포럼 / 강의
- * 역할 조건부: 내 약국 (storeOwner) / 운영 대시보드 (operator/admin)
- * 약국 HUB: 헤더에서 제거 → DashboardSwitcher (user dropdown)에서 접근
+ * 역할 조건부: 약국 HUB (pharmacy_owner) / 운영 대시보드 (operator/admin)
+ * 내 약국: DashboardSwitcher (user dropdown)에서 접근 — 개인 약국 관리용
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
-  { label: '내 약국', href: '/store' },
+  { label: '약국 HUB', href: '/hub' },
   { label: '운영 대시보드', href: '/operator' },
 ];
 
@@ -98,6 +98,7 @@ export function Header({ serviceName }: { serviceName: string }) {
   const isAdmin = user ? user.roles.includes('kpa:admin') : false;
   const isOperator = user ? user.roles.includes('kpa:operator') : false;
   const isStoreOwner = user?.isStoreOwner === true;
+  const isPharmacyRelated = isStoreOwner || (user as any)?.activityType === 'pharmacy_owner';
   const displayMenuItems = menuItems
     .map(item => {
       // admin이면 "운영 대시보드" → "관리자 콘솔" + /admin
@@ -109,7 +110,7 @@ export function Header({ serviceName }: { serviceName: string }) {
     .filter(item => {
       if (item.href === '/operator') return isOperator;
       if (item.href === '/admin') return isAdmin;
-      if (item.href === '/store') return isStoreOwner;
+      if (item.href === '/hub') return isPharmacyRelated;
       return true;
     });
 
