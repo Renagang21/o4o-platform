@@ -10,7 +10,7 @@ export { default as ForumManagementPage } from './ForumManagementPage';
 export { default as ForumDeleteRequestsPage } from './ForumDeleteRequestsPage';
 // WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 export { default as ForumAnalyticsPage } from './ForumAnalyticsPage';
-export { default as SupplyDashboardPage } from './SupplyDashboardPage';
+// WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: SupplyDashboardPage 제거 (미완성 기능)
 
 // WO-NETURE-OPERATOR-DASHBOARD-IMPLEMENTATION-V1
 export { default as UsersManagementPage } from './UsersManagementPage';

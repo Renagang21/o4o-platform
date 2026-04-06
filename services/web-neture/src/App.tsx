@@ -344,9 +344,7 @@ const ForumDeleteRequestsPage = lazy(() =>
 const ForumAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumAnalyticsPage }))
 );
-const SupplyDashboardPage = lazy(() =>
-  import('./pages/operator').then((m) => ({ default: m.SupplyDashboardPage }))
-);
+// WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: SupplyDashboardPage 제거 (미완성 기능)
 // WO-NETURE-OPERATOR-PRODUCT-SUPPLY-OVERVIEW-V1
 const AllProductsOverviewPage = lazy(() => import('./pages/operator/AllProductsOverviewPage'));
 // WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
@@ -777,7 +775,7 @@ function App() {
               <Route path="/admin/community" element={<ForumManagementPage />} />
               <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
-              <Route path="/admin/supply" element={<SupplyDashboardPage />} />
+              {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /admin/supply 제거 */}
               <Route path="/admin/all-products" element={<AllProductsOverviewPage />} />
               <Route path="/admin/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
@@ -853,7 +851,7 @@ function App() {
               <Route path="/operator/community" element={<ForumManagementPage />} />
               <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
-              <Route path="/operator/supply" element={<SupplyDashboardPage />} />
+              {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /operator/supply 제거 */}
               <Route path="/operator/all-products" element={<AllProductsOverviewPage />} />
               <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
               <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />

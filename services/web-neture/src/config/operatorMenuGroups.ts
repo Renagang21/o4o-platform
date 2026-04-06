@@ -40,7 +40,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '공급사 승인', path: '/operator/admin-suppliers' },
   ],
   products: [
-    { label: '공급 현황', path: '/operator/supply' },
+
     { label: '공급 가능 상품', path: '/operator/all-products' },
     { label: '전체 등록 상품', path: '/operator/all-registered-products' },
     { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
@@ -142,7 +142,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: 'Market Trial', path: '/operator/market-trial' },
   ],
   products: [
-    { label: '공급 현황', path: '/operator/supply' },
+
     { label: '공급 가능 상품', path: '/operator/all-products' },
     { label: '전체 등록 상품', path: '/operator/all-registered-products' },
     { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
