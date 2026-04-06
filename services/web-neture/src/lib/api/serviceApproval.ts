@@ -26,6 +26,10 @@ export interface ServiceApprovalItem {
   isMfdsVerified: boolean;
   offerApprovalStatus: string;
   distributionType: string | null;
+  // WO-NETURE-OPERATOR-APPROVAL-LIST-STRUCTURE-ALIGN-V1
+  isPublic?: boolean;
+  serviceKeys?: string[] | null;
+  allowedSellerIds?: string[] | null;
   completenessScore: number;
   // WO-NETURE-OPERATOR-APPROVAL-QUEUE-UX-V1: 카드 UI 추가 필드
   imageUrl: string | null;

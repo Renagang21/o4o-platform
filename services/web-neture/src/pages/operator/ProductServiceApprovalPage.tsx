@@ -21,6 +21,7 @@ import {
   type ApprovalAnalytics,
 } from '../../lib/api/serviceApproval';
 import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
+import { getSupplyPolicyBadges, getServiceDisplay } from '../../lib/productConstants';
 import { useAuth } from '../../contexts/AuthContext';
 
 // ==================== Constants ====================
@@ -715,9 +716,20 @@ export default function ProductServiceApprovalPage() {
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${compBadge.bg} ${compBadge.text}`}>
                       {compBadge.label}
                     </span>
-                    <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
-                      {item.serviceKey}
-                    </span>
+                    {/* WO-NETURE-OPERATOR-APPROVAL-LIST-STRUCTURE-ALIGN-V1: 유통 + 서비스 + 승인 */}
+                    {getSupplyPolicyBadges(item).map((b) => (
+                      <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
+                        {b.label}
+                      </span>
+                    ))}
+                    {(() => {
+                      const svcDisplay = getServiceDisplay(item.serviceKeys) || item.serviceKey;
+                      return (
+                        <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
+                          {svcDisplay}
+                        </span>
+                      );
+                    })()}
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${badge.bg} ${badge.text}`}>
                       {badge.label}
                     </span>
@@ -1034,12 +1046,18 @@ export default function ProductServiceApprovalPage() {
                   <div>
                     <div className="text-xs text-slate-400 mb-1">서비스</div>
                     <span className="inline-block px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium">
-                      {drawerItem.serviceKey}
+                      {getServiceDisplay(drawerItem.serviceKeys) || drawerItem.serviceKey}
                     </span>
                   </div>
                   <div>
-                    <div className="text-xs text-slate-400 mb-1">유통 타입</div>
-                    <div className="text-sm text-slate-700">{drawerItem.distributionType || '-'}</div>
+                    <div className="text-xs text-slate-400 mb-1">유통</div>
+                    <div className="flex flex-wrap gap-1">
+                      {getSupplyPolicyBadges(drawerItem).map((b) => (
+                        <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
+                          {b.label}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

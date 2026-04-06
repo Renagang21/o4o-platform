@@ -163,6 +163,9 @@ export class OfferServiceApprovalService {
            pm.is_mfds_verified AS "isMfdsVerified",
            spo.approval_status AS "offerApprovalStatus",
            spo.distribution_type AS "distributionType",
+           spo.is_public AS "isPublic",
+           spo.service_keys AS "serviceKeys",
+           spo.allowed_seller_ids AS "allowedSellerIds",
            (
              CASE WHEN spo.price_general IS NOT NULL AND spo.price_general > 0 THEN 10 ELSE 0 END
              + CASE WHEN EXISTS (SELECT 1 FROM product_images WHERE master_id = pm.id) THEN 10 ELSE 0 END
