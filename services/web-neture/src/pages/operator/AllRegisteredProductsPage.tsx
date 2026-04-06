@@ -7,7 +7,7 @@
  * 서버사이드 페이징 + KPI 카드 + 상세 패널 drill-down.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
   X, Eye, EyeOff,
@@ -26,6 +26,29 @@ import {
   getServiceDisplay,
 } from '../../lib/productConstants';
 
+// WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Primary tabs
+type PrimaryTab = 'all' | 'approval' | 'supply';
+type SupplySubTab = 'all' | 'service' | 'recruiting';
+type ServiceTab = 'kpa-society' | 'glycopharm' | 'k-cosmetics';
+
+const PRIMARY_TABS: { key: PrimaryTab; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'approval', label: '승인관리' },
+  { key: 'supply', label: '공급현황' },
+];
+
+const SUPPLY_SUB_TABS: { key: SupplySubTab; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'service', label: '서비스' },
+  { key: 'recruiting', label: '판매자모집' },
+];
+
+const SERVICE_TABS: { key: ServiceTab; label: string }[] = [
+  { key: 'kpa-society', label: 'KPA' },
+  { key: 'glycopharm', label: 'GlycoPharm' },
+  { key: 'k-cosmetics', label: 'Cosmetics' },
+];
+
 export default function AllRegisteredProductsPage() {
   const [offers, setOffers] = useState<AllRegisteredOffer[]>([]);
   const [kpi, setKpi] = useState<AllOffersKpi | null>(null);
@@ -40,7 +63,38 @@ export default function AllRegisteredProductsPage() {
   const [total, setTotal] = useState(0);
   const [detailOffer, setDetailOffer] = useState<AllRegisteredOffer | null>(null);
 
+  // Unified tabs state
+  const [primaryTab, setPrimaryTab] = useState<PrimaryTab>('all');
+  const [supplySubTab, setSupplySubTab] = useState<SupplySubTab>('all');
+  const [serviceTab, setServiceTab] = useState<ServiceTab>('kpa-society');
+
   const PAGE_SIZE = 50;
+
+  // Tab change → apply filters
+  const handlePrimaryTabChange = (tab: PrimaryTab) => {
+    setPrimaryTab(tab);
+    setDistFilter('');
+    setActiveFilter('');
+    setApprovalFilter('');
+    if (tab === 'approval') {
+      // 승인관리: approval 상태 기준
+      setApprovalFilter('PENDING');
+    } else if (tab === 'supply') {
+      // 공급현황: 활성 + 공개/서비스
+      setActiveFilter('true');
+      setSupplySubTab('all');
+    }
+  };
+
+  const handleSupplySubTabChange = (sub: SupplySubTab) => {
+    setSupplySubTab(sub);
+    setDistFilter('');
+    if (sub === 'service') {
+      setDistFilter('SERVICE');
+    } else if (sub === 'recruiting') {
+      setDistFilter('PRIVATE');
+    }
+  };
 
   const fetchOffers = useCallback(async (p = page) => {
     setLoading(true);
@@ -72,14 +126,24 @@ export default function AllRegisteredProductsPage() {
   // Reset page on filter change
   useEffect(() => { setPage(1); }, [search, distFilter, activeFilter, approvalFilter, regulatoryFilter]);
 
+  // Client-side service tab filtering
+  const filteredOffers = useMemo(() => {
+    if (primaryTab !== 'supply' || supplySubTab !== 'service') return offers;
+    return offers.filter((o) =>
+      o.serviceApprovals?.some((a) => a.serviceKey === serviceTab)
+    );
+  }, [offers, primaryTab, supplySubTab, serviceTab]);
+
+  const displayOffers = filteredOffers;
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">전체 등록 상품</h1>
+          <h1 className="text-xl font-bold text-slate-900">상품 관리</h1>
           <p className="text-sm text-slate-500 mt-1">
-            플랫폼에 등록된 모든 상품 현황 (활성/비활성, 공개/비공개 포함)
+            플랫폼 상품 현황 · 승인 · 공급 통합 관리
           </p>
         </div>
         <button
@@ -89,6 +153,85 @@ export default function AllRegisteredProductsPage() {
           <RefreshCw className="w-4 h-4" />새로고침
         </button>
       </div>
+
+      {/* Primary Tabs */}
+      <div className="flex gap-1 mb-3 border-b border-slate-200">
+        {PRIMARY_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => handlePrimaryTabChange(t.key)}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              primaryTab === t.key
+                ? 'border-blue-600 text-blue-700'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Secondary Tabs (supply) */}
+      {primaryTab === 'supply' && (
+        <div className="flex gap-1 mb-3">
+          {SUPPLY_SUB_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => handleSupplySubTabChange(t.key)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                supplySubTab === t.key
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Tertiary Tabs (service) */}
+      {primaryTab === 'supply' && supplySubTab === 'service' && (
+        <div className="flex gap-1 mb-3">
+          {SERVICE_TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setServiceTab(t.key)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                serviceTab === t.key
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Approval sub-tabs */}
+      {primaryTab === 'approval' && (
+        <div className="flex gap-1 mb-3">
+          {[
+            { key: '', label: '전체' },
+            { key: 'PENDING', label: '대기' },
+            { key: 'APPROVED', label: '승인' },
+            { key: 'REJECTED', label: '거절' },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setApprovalFilter(t.key)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                approvalFilter === t.key
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* KPI Cards */}
       {kpi && (
@@ -190,13 +333,13 @@ export default function AllRegisteredProductsPage() {
           <tbody>
             {loading ? (
               <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
-            ) : offers.length === 0 ? (
+            ) : displayOffers.length === 0 ? (
               <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">
                 {search || distFilter || activeFilter || approvalFilter || regulatoryFilter
                   ? '조건에 맞는 상품이 없습니다.'
                   : '등록된 상품이 없습니다.'}
               </td></tr>
-            ) : offers.map((o) => {
+            ) : displayOffers.map((o) => {
               // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 공통 유통 정책 badge
               const policyBadges = getSupplyPolicyBadges(o);
               const svcDisplay = getServiceDisplay(o.serviceApprovals?.map(a => a.serviceKey));
