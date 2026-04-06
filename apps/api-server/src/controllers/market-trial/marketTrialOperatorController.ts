@@ -92,12 +92,14 @@ export class MarketTrialOperatorController {
 
   /**
    * PATCH /api/v1/neture/operator/market-trial/:id/approve
-   * 1차 승인: SUBMITTED → APPROVED + ServiceApproval 레코드 생성
+   * WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1:
+   * 네뚜레 운영자 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 제거)
+   * visibleServiceKeys = 운영자가 지정한 오픈 대상 서비스 범위
    */
   static async approve1st(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id;
+      const { visibleServiceKeys } = req.body;
 
       const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
       if (!trial) {
@@ -110,22 +112,16 @@ export class MarketTrialOperatorController {
         });
       }
 
-      // Transition to APPROVED
-      trial.status = TrialStatus.APPROVED;
-      await MarketTrialOperatorController.trialRepo.save(trial);
-
-      // Create ServiceApproval records for each visibleServiceKey
-      const approvals: MarketTrialServiceApproval[] = [];
-      for (const serviceKey of trial.visibleServiceKeys) {
-        const approval = MarketTrialOperatorController.approvalRepo.create({
-          trialId: trial.id,
-          serviceKey,
-          status: ServiceApprovalStatus.PENDING,
-        });
-        approvals.push(await MarketTrialOperatorController.approvalRepo.save(approval));
+      // 오픈 대상 서비스 범위 지정 (운영자가 body로 전달 시)
+      if (Array.isArray(visibleServiceKeys)) {
+        trial.visibleServiceKeys = visibleServiceKeys;
       }
 
-      // Create forum mapping (placeholder)
+      // 단일 승인: SUBMITTED → RECRUITING (서비스별 2차 승인 없이 바로 모집 시작)
+      trial.status = TrialStatus.RECRUITING;
+      await MarketTrialOperatorController.trialRepo.save(trial);
+
+      // Create forum mapping (placeholder for Phase 3 forum integration)
       const existingForum = await MarketTrialOperatorController.forumRepo.findOne({
         where: { marketTrialId: trial.id },
       });
@@ -137,22 +133,13 @@ export class MarketTrialOperatorController {
         await MarketTrialOperatorController.forumRepo.save(forumMapping);
       }
 
-      // If no visibleServiceKeys → auto-transition to RECRUITING (no 2nd approval needed)
-      if (trial.visibleServiceKeys.length === 0) {
-        trial.status = TrialStatus.RECRUITING;
-        await MarketTrialOperatorController.trialRepo.save(trial);
-      }
-
       res.json({
         success: true,
-        data: {
-          ...toOperatorTrialDTO(trial),
-          serviceApprovals: approvals.map(toServiceApprovalDTO),
-        },
-        message: 'Trial approved (1st). Service approvals created.',
+        data: toOperatorTrialDTO(trial),
+        message: 'Trial approved. Now recruiting.',
       });
     } catch (error) {
-      console.error('Operator approve 1st error:', error);
+      console.error('Operator approve error:', error);
       res.status(500).json({ success: false, message: 'Failed to approve trial' });
     }
   }
@@ -193,6 +180,9 @@ export class MarketTrialOperatorController {
 
   // ============================================================================
   // Service Operator 2nd Approval
+  // WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: DEPRECATED
+  // 서비스별 2차 승인 제거됨. 아래 메서드들은 하위 호환용으로 유지하되
+  // 실제 상태 전이 없이 403 반환.
   // ============================================================================
 
   /**
@@ -279,101 +269,14 @@ export class MarketTrialOperatorController {
     }
   }
 
-  /**
-   * PATCH /api/v1/:serviceKey/operator/market-trial/:id/approve
-   * 2차 승인: ServiceApproval pending → approved
-   * 모든 ServiceApproval approved → trial APPROVED → RECRUITING
-   */
+  /** @deprecated WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 */
   static async approve2nd(req: AuthRequest, res: Response) {
-    try {
-      const { serviceKey, id } = req.params;
-      const userId = (req as any).user?.id;
-
-      const approval = await MarketTrialOperatorController.approvalRepo.findOne({
-        where: { trialId: id, serviceKey },
-      });
-      if (!approval) {
-        return res.status(404).json({ success: false, message: 'Service approval not found' });
-      }
-      if (approval.status !== ServiceApprovalStatus.PENDING) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot approve: status is "${approval.status}", expected "pending"`,
-        });
-      }
-
-      approval.status = ServiceApprovalStatus.APPROVED;
-      approval.reviewedBy = userId || null;
-      approval.reviewedAt = new Date();
-      await MarketTrialOperatorController.approvalRepo.save(approval);
-
-      // Check if ALL approvals for this trial are approved → transition to RECRUITING
-      const allApprovals = await MarketTrialOperatorController.approvalRepo.find({
-        where: { trialId: id },
-      });
-      const allApproved = allApprovals.every((a) => a.status === ServiceApprovalStatus.APPROVED);
-
-      let trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id } });
-      if (allApproved && trial && trial.status === TrialStatus.APPROVED) {
-        trial.status = TrialStatus.RECRUITING;
-        await MarketTrialOperatorController.trialRepo.save(trial);
-      }
-
-      res.json({
-        success: true,
-        data: {
-          serviceApproval: toServiceApprovalDTO(approval),
-          trialStatus: trial?.status,
-          allApproved,
-        },
-        message: allApproved
-          ? 'Service approved. All services approved — trial now RECRUITING.'
-          : 'Service approved. Waiting for other service approvals.',
-      });
-    } catch (error) {
-      console.error('Service operator approve error:', error);
-      res.status(500).json({ success: false, message: 'Failed to approve' });
-    }
+    res.status(403).json({ success: false, message: 'Service-level approval is no longer required. Trials are approved by Neture operator only.' });
   }
 
-  /**
-   * PATCH /api/v1/:serviceKey/operator/market-trial/:id/reject
-   * 2차 반려: ServiceApproval pending → rejected
-   */
+  /** @deprecated WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 */
   static async reject2nd(req: AuthRequest, res: Response) {
-    try {
-      const { serviceKey, id } = req.params;
-      const userId = (req as any).user?.id;
-      const { reason } = req.body;
-
-      const approval = await MarketTrialOperatorController.approvalRepo.findOne({
-        where: { trialId: id, serviceKey },
-      });
-      if (!approval) {
-        return res.status(404).json({ success: false, message: 'Service approval not found' });
-      }
-      if (approval.status !== ServiceApprovalStatus.PENDING) {
-        return res.status(400).json({
-          success: false,
-          message: `Cannot reject: status is "${approval.status}", expected "pending"`,
-        });
-      }
-
-      approval.status = ServiceApprovalStatus.REJECTED;
-      approval.reviewedBy = userId || null;
-      approval.reviewedAt = new Date();
-      approval.reason = reason || null;
-      await MarketTrialOperatorController.approvalRepo.save(approval);
-
-      res.json({
-        success: true,
-        data: { serviceApproval: toServiceApprovalDTO(approval) },
-        message: reason ? `Service rejected: ${reason}` : 'Service rejected',
-      });
-    } catch (error) {
-      console.error('Service operator reject error:', error);
-      res.status(500).json({ success: false, message: 'Failed to reject' });
-    }
+    res.status(403).json({ success: false, message: 'Service-level approval is no longer required. Trials are approved by Neture operator only.' });
   }
 }
 

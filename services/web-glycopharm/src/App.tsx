@@ -560,9 +560,7 @@ function AppRoutes() {
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
         <Route path="care" element={<OperatorCareDashboardPage />} />
         <Route path="care/alerts" element={<OperatorCareAlertsPage />} />
-        {/* Market Trial 2차 승인 (WO-O4O-MARKET-TRIAL-PHASE1-V1) */}
-        <Route path="market-trial" element={<MarketTrialServiceApprovalsPage />} />
-        <Route path="market-trial/:id" element={<MarketTrialServiceApprovalDetailPage />} />
+        {/* WO-MARKET-TRIAL-NETURE-SINGLE-APPROVAL-TRANSITION-V1: 서비스별 2차 승인 제거 → 네뚜레 단일 승인 */}
         {/* Guideline Management (WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1) */}
         <Route path="guidelines" element={<GuidelineManagementPage />} />
         {/* Settings */}

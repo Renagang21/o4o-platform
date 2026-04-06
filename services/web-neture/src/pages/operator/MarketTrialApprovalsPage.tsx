@@ -2,7 +2,7 @@
  * Market Trial Approvals Page (Neture Operator)
  *
  * WO-O4O-MARKET-TRIAL-PHASE1-V1
- * 1차 승인 목록 — submitted trials 심사 + 전체 trial 관리
+ * 운영자 승인 목록 — submitted trials 심사 + 전체 trial 관리 (단일 승인 구조)
  */
 
 import { useState, useEffect } from 'react';

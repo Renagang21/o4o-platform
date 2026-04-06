@@ -2,7 +2,7 @@
  * Market Trial Approval Detail Page (Neture Operator)
  *
  * WO-O4O-MARKET-TRIAL-PHASE1-V1
- * 1차 승인 상세 — Trial 정보 확인 + 승인/반려 액션
+ * 운영자 승인 상세 — Trial 정보 확인 + 승인/반려 + 오픈 대상 서비스 지정
  */
 
 import { useState, useEffect } from 'react';
@@ -150,7 +150,7 @@ export default function MarketTrialApprovalDetailPage() {
       {/* Service Approvals (if any) */}
       {trial.serviceApprovals && trial.serviceApprovals.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">서비스별 2차 승인 현황</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">오픈 대상 서비스</h2>
           <div className="space-y-2">
             {trial.serviceApprovals.map((sa) => {
               const cfg = SERVICE_APPROVAL_LABELS[sa.status] || { label: sa.status, color: 'bg-gray-100 text-gray-700' };
