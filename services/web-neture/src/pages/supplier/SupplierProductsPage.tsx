@@ -31,6 +31,8 @@ import {
   REGULATORY_TYPE_LABELS,
   VISIBILITY_STATUS,
   getVisibilityStatus,
+  getSupplyPolicyBadges,
+  getServiceDisplay,
 } from '../../lib/productConstants';
 
 // ─── Badge configs ───
@@ -360,65 +362,37 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
       />
     ),
   },
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-STRUCTURE-REFINE-V1: 통합 유통 정책 컬럼
   {
     key: 'distributionType',
     header: '유통',
-    width: '90px',
-    align: 'center',
-    render: (v) => {
-      const c = DISTRIBUTION_TYPE_BADGE[v] || DISTRIBUTION_TYPE_BADGE.PRIVATE;
+    width: '120px',
+    minWidth: 80,
+    resizable: true,
+    render: (_v: string, row: SupplierProduct) => {
+      const badges = getSupplyPolicyBadges(row);
       return (
-        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${c.bg} ${c.text}`}>
-          {c.label}
-        </span>
+        <div className="flex flex-wrap gap-0.5">
+          {badges.map((b) => (
+            <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
+              {b.label}
+            </span>
+          ))}
+        </div>
       );
     },
   },
-  // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 인라인 편집
-  {
-    key: 'isPublic' as any,
-    header: '공개',
-    width: '70px',
-    align: 'center',
-    editable: true,
-    render: (v: boolean) => (
-      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${v ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
-        {v ? '공개' : '비공개'}
-      </span>
-    ),
-    editRender: (value: boolean, _row: any, onChange: (v: boolean) => void) => (
-      <select
-        value={value ? 'true' : 'false'}
-        onChange={(e) => onChange(e.target.value === 'true')}
-        className="w-full px-2 py-1 text-sm border border-blue-400 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-        autoFocus
-      >
-        <option value="true">공개</option>
-        <option value="false">비공개</option>
-      </select>
-    ),
-  },
-  // WO-NETURE-DISTRIBUTION-SETTINGS-UX-V1: serviceKeys 열
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-STRUCTURE-REFINE-V1: KPA 우선 서비스 표기
   {
     key: 'serviceKeys' as any,
     header: '서비스',
-    width: '120px',
-    minWidth: 70,
+    width: '100px',
+    minWidth: 60,
     resizable: true,
     render: (v: string[] | undefined | null) => {
-      // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1: neture 필터링
-      const keys = (Array.isArray(v) ? v : []).filter((k) => k !== 'neture');
-      if (keys.length === 0) return <span className="text-xs text-slate-400">-</span>;
-      const display = keys.slice(0, 2);
-      const rest = keys.length - 2;
-      return (
-        <div className="flex flex-wrap gap-1">
-          {display.map((k) => (
-            <span key={k} className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">{k}</span>
-          ))}
-          {rest > 0 && <span className="text-[10px] text-slate-400">+{rest}</span>}
-        </div>
-      );
+      const display = getServiceDisplay(v);
+      if (!display) return <span className="text-[10px] text-slate-300">-</span>;
+      return <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">{display}</span>;
     },
   },
   {

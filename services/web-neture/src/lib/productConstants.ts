@@ -92,6 +92,53 @@ export const VISIBILITY_STATUS: Record<VisibilityStatusKey, {
   },
 };
 
+// ─── Supply Policy (WO-NETURE-SUPPLIER-PRODUCT-LIST-STRUCTURE-REFINE-V1) ───
+
+/** 통합 유통 정책 배지 목록 산정 */
+export function getSupplyPolicyBadges(product: {
+  isPublic?: boolean;
+  distributionType?: string;
+  serviceKeys?: string[] | null;
+  allowedSellerIds?: string[] | null;
+}): Array<{ label: string; bg: string; text: string }> {
+  const badges: Array<{ label: string; bg: string; text: string }> = [];
+  const isPublic = product.isPublic ?? product.distributionType === 'PUBLIC';
+  const keys = (product.serviceKeys || []).filter((k) => k !== 'neture');
+  const hasSellers = product.allowedSellerIds && product.allowedSellerIds.length > 0;
+
+  if (isPublic) badges.push({ label: '전체공개', bg: 'bg-emerald-50', text: 'text-emerald-700' });
+  if (keys.length > 0) badges.push({ label: '서비스', bg: 'bg-blue-50', text: 'text-blue-700' });
+  if (hasSellers) badges.push({ label: '판매자모집', bg: 'bg-amber-50', text: 'text-amber-700' });
+  if (badges.length === 0) badges.push({ label: '비공개', bg: 'bg-slate-100', text: 'text-slate-500' });
+
+  return badges;
+}
+
+// KPA 우선 서비스 표기명 매핑
+const SERVICE_DISPLAY: Record<string, string> = {
+  'kpa-society': 'KPA',
+  'glycopharm': 'GlycoPharm',
+  'glucoseview': 'GlucoseView',
+  'k-cosmetics': 'K-Cosmetics',
+};
+
+/** KPA 우선 서비스 표기 */
+export function getServiceDisplay(serviceKeys: string[] | null | undefined): string | null {
+  const keys = (serviceKeys || []).filter((k) => k !== 'neture');
+  if (keys.length === 0) return null;
+
+  // KPA 우선 정렬
+  const sorted = [...keys].sort((a, b) => {
+    if (a === 'kpa-society') return -1;
+    if (b === 'kpa-society') return 1;
+    return 0;
+  });
+
+  const first = SERVICE_DISPLAY[sorted[0]] || sorted[0];
+  const rest = sorted.length - 1;
+  return rest > 0 ? `${first} +${rest}` : first;
+}
+
 /**
  * 운영자 노출 상태 산정.
  * 우선순위: inactive > private > rejected > pending > visible
