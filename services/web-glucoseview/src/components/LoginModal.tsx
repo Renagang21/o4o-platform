@@ -65,7 +65,7 @@ export default function LoginModal() {
         if (result.message === 'pending') {
           navigate('/pending');
         } else if (result.message === 'rejected') {
-          navigate('/rejected');
+          navigate('/pending');
         } else {
           setEmail('');
           setPassword('');

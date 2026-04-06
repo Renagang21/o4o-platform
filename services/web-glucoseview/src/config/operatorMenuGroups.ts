@@ -53,17 +53,3 @@ export function filterMenuByRole(
   }
   return filtered;
 }
-
-// ─── Legacy export (하위호환, deprecated) ───
-/** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
-export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
-  dashboard: [{ label: '대시보드', path: '/operator', exact: true }],
-  users: [{ label: '회원 관리', path: '/operator/users' }],
-  approvals: [{ label: '신청 관리', path: '/operator/applications' }],
-  products: [{ label: '상품 관리', path: '/operator/products' }],
-  stores: [{ label: '매장 관리', path: '/operator/stores' }],
-  analytics: [
-    { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: '운영 분석', path: '/operator/analytics' },
-  ],
-};
