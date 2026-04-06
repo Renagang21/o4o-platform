@@ -520,14 +520,6 @@ export function shouldShowAuthorContact(post: ForumPost): boolean {
 }
 
 /**
- * Get author's contact URL (prioritize open chat, fallback to channel)
- */
-export function getAuthorContactUrl(post: ForumPost): string | null {
-  if (!shouldShowAuthorContact(post)) return null;
-  return post.author?.kakaoOpenChatUrl || post.author?.kakaoChannelUrl || null;
-}
-
-/**
  * Extract text content from Block[] or string
  */
 export function extractTextContent(content: string | object[] | undefined): string {

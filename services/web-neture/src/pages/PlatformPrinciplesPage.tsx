@@ -206,7 +206,7 @@ export function PlatformPrinciplesPage() {
       <section style={styles.relatedSection}>
         <h3 style={styles.relatedTitle}>관련 안내</h3>
         <div style={styles.relatedLinks}>
-          <Link to="/partner-info" style={styles.relatedLink}>
+          <Link to="/workspace/partners/info" style={styles.relatedLink}>
             참여 안내 →
           </Link>
           <Link to="/channel/structure" style={styles.relatedLink}>

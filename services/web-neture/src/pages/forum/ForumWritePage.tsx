@@ -314,7 +314,7 @@ export function ForumWritePage({
             <p style={styles.contactPromptText}>
               연락 정보를 등록하면 글에 연락처를 표시할 수 있습니다.
             </p>
-            <Link to="/profile/contact" style={styles.contactPromptLink}>
+            <Link to="/mypage" style={styles.contactPromptLink}>
               연락 설정하기 →
             </Link>
           </div>

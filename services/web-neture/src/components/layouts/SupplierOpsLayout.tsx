@@ -246,8 +246,8 @@ export default function SupplierOpsLayout() {
                 </Link>
               </p>
             </div>
-            <Link to="/forum/test-feedback" className="text-xs text-green-600 hover:text-green-700 transition-colors">
-              테스트 센터
+            <Link to="/forum" className="text-xs text-green-600 hover:text-green-700 transition-colors">
+              포럼
             </Link>
           </div>
         </div>

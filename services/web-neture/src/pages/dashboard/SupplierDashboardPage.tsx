@@ -20,7 +20,7 @@ export function SupplierDashboardPage() {
           <span style={styles.roleGuideText}>
             이 화면은 공급자의 운영 관리를 위한 공간입니다.
           </span>
-          <Link to="/supplier/overview" style={styles.roleGuideLink}>
+          <Link to="/supplier/products" style={styles.roleGuideLink}>
             콘텐츠 반응 및 인사이트 확인하기 →
           </Link>
         </div>
@@ -66,11 +66,11 @@ export function SupplierDashboardPage() {
             <span style={styles.menuIcon}>📋</span>
             <span style={styles.menuLabel}>주문 관리</span>
           </Link>
-          <Link to="/supplier/shipping" style={styles.menuCard}>
+          <Link to="/supplier/orders" style={styles.menuCard}>
             <span style={styles.menuIcon}>🚚</span>
             <span style={styles.menuLabel}>배송 관리</span>
           </Link>
-          <Link to="/supplier/settlement" style={styles.menuCard}>
+          <Link to="/supplier/orders" style={styles.menuCard}>
             <span style={styles.menuIcon}>💳</span>
             <span style={styles.menuLabel}>정산 내역</span>
           </Link>
