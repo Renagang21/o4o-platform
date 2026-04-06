@@ -108,25 +108,5 @@ export const operatorSupplyApi = {
     }
   },
 
-  async createSupplyRequest(data: {
-    supplierId: string;
-    productId: string;
-    productName: string;
-    serviceId: string;
-    serviceName: string;
-  }): Promise<{ success: boolean; error?: string; existingStatus?: string }> {
-    try {
-      await api.post('/neture/supplier/requests', data);
-      return { success: true };
-    } catch (error: any) {
-      const status = error?.response?.status;
-      const result = error?.response?.data;
-
-      if (status === 409) {
-        return { success: false, error: 'DUPLICATE_REQUEST', existingStatus: result?.existingStatus };
-      }
-
-      return { success: false, error: result?.error || 'UNKNOWN_ERROR' };
-    }
-  },
+  // WO-NETURE-OPERATOR-SUPPLY-MENU-CLEANUP-V1: createSupplyRequest 제거 (백엔드 미구현 기능)
 };

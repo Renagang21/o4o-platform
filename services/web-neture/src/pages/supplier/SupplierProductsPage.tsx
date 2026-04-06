@@ -26,7 +26,6 @@ import { supplierApi, productApi, type SupplierProduct, type SupplierProductPurp
 import ProductDetailDrawer from './ProductDetailDrawer';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import {
-  DISTRIBUTION_TYPE_BADGE,
   APPROVAL_STATUS_BADGE,
   REGULATORY_TYPE_LABELS,
   VISIBILITY_STATUS,

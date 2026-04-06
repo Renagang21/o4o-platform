@@ -1,10 +1,10 @@
 /**
- * SupplyDashboardPage - 운영자 공급요청 관리
+ * SupplyDashboardPage - 운영자 공급 가능 상품 조회
  *
  * WO-O4O-SERVICE-OPERATOR-SUPPLY-DASHBOARD-IMPLEMENTATION-V1
- * 기준선: SUPPLY-REQUEST-BASELINE-V1, SUPPLY-DASHBOARD-UI-DESIGN-V1
- *
- * 공급 가능 제품 목록 조회 + 공급요청 실행
+ * WO-NETURE-OPERATOR-SUPPLY-MENU-CLEANUP-V1:
+ *   공급요청 버튼 제거 — 백엔드 미구현 (404) 상태였던 미완성 기능 정리
+ *   조회 전용 화면으로 전환
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -37,9 +37,6 @@ const STATUS_CONFIG: Record<
 export default function SupplyDashboardPage() {
   const [products, setProducts] = useState<OperatorSupplyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [requestingIds, setRequestingIds] = useState<Set<string>>(new Set());
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [confirmTarget, setConfirmTarget] = useState<OperatorSupplyProduct | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -57,54 +54,12 @@ export default function SupplyDashboardPage() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const showToast = (message: string) => {
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const handleSupplyRequest = async (product: OperatorSupplyProduct) => {
-    setConfirmTarget(null);
-    setRequestingIds((prev) => new Set(prev).add(product.id));
-
-    try {
-      const result = await operatorSupplyApi.createSupplyRequest({
-        supplierId: product.supplierId,
-        productId: product.id,
-        productName: product.name,
-        serviceId: 'neture',
-        serviceName: 'Neture',
-      });
-
-      if (result.success) {
-        // 로컬 상태 업데이트: available → pending
-        setProducts((prev) =>
-          prev.map((p) =>
-            p.id === product.id ? { ...p, supplyStatus: 'pending' as const } : p,
-          ),
-        );
-        showToast('공급요청이 전송되었습니다');
-      } else if (result.error === 'DUPLICATE_REQUEST') {
-        showToast('이미 요청한 제품입니다');
-      } else {
-        showToast('요청에 실패했습니다. 다시 시도해 주세요.');
-      }
-    } catch {
-      showToast('요청에 실패했습니다. 다시 시도해 주세요.');
-    } finally {
-      setRequestingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-800">공급 요청 관리</h1>
-          <p className="text-slate-500 mt-1">공개·활성 상태 제품 조회 및 공급요청</p>
+          <h1 className="text-2xl font-bold text-slate-800">공급 가능 상품</h1>
+          <p className="text-slate-500 mt-1">현재 공개·활성 상태인 공급 가능 상품 현황</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -132,8 +87,8 @@ export default function SupplyDashboardPage() {
             <ArrowLeft className="w-4 h-4" />
             대시보드로 돌아가기
           </Link>
-          <h1 className="text-2xl font-bold text-slate-800">공급 요청 관리</h1>
-          <p className="text-slate-500 mt-1">공개·활성 상태 제품 조회 및 공급요청</p>
+          <h1 className="text-2xl font-bold text-slate-800">공급 가능 상품</h1>
+          <p className="text-slate-500 mt-1">현재 공개·활성 상태인 공급 가능 상품 현황</p>
         </div>
         <button
           onClick={fetchProducts}
@@ -156,8 +111,6 @@ export default function SupplyDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => {
             const status = STATUS_CONFIG[product.supplyStatus] || STATUS_CONFIG.available;
-            const isRequesting = requestingIds.has(product.id);
-            const canRequest = product.supplyStatus === 'available';
 
             return (
               <div
@@ -177,7 +130,7 @@ export default function SupplyDashboardPage() {
                 </div>
 
                 {/* Details */}
-                <div className="space-y-1.5 mb-4">
+                <div className="space-y-1.5">
                   <p className="text-sm text-gray-500">
                     <span className="font-medium text-gray-600">공급자:</span>{' '}
                     {product.supplierName || '-'}
@@ -188,6 +141,12 @@ export default function SupplyDashboardPage() {
                       {product.category}
                     </p>
                   )}
+                  {product.priceGeneral && (
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium text-gray-600">공급가:</span>{' '}
+                      ₩{product.priceGeneral.toLocaleString()}
+                    </p>
+                  )}
                   {product.rejectReason && product.supplyStatus === 'rejected' && (
                     <p className="text-sm text-red-500">
                       <span className="font-medium">거절 사유:</span>{' '}
@@ -195,67 +154,9 @@ export default function SupplyDashboardPage() {
                     </p>
                   )}
                 </div>
-
-                {/* Action Button */}
-                {canRequest ? (
-                  <button
-                    onClick={() => setConfirmTarget(product)}
-                    disabled={isRequesting}
-                    className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
-                      isRequesting
-                        ? 'bg-primary-300 text-white cursor-wait'
-                        : 'bg-primary-600 text-white hover:bg-primary-700 cursor-pointer'
-                    }`}
-                  >
-                    {isRequesting ? '요청 중...' : '공급요청'}
-                  </button>
-                ) : (
-                  <div className="w-full py-2 px-4 rounded-lg text-sm font-medium text-center bg-gray-100 text-gray-400">
-                    {product.supplyStatus === 'pending' && '요청 대기중'}
-                    {product.supplyStatus === 'approved' && '공급 진행중'}
-                    {product.supplyStatus === 'rejected' && '거절됨'}
-                  </div>
-                )}
               </div>
             );
           })}
-        </div>
-      )}
-
-      {/* Confirm Modal */}
-      {confirmTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm mx-4 w-full">
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">공급요청 확인</h3>
-            <p className="text-sm text-gray-600 mb-1">
-              다음 제품의 공급을 요청하시겠습니까?
-            </p>
-            <p className="text-sm font-medium text-slate-800 mb-4">
-              {confirmTarget.name}
-              <span className="text-gray-400 font-normal"> — {confirmTarget.supplierName}</span>
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setConfirmTarget(null)}
-                className="flex-1 py-2 px-4 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
-              >
-                취소
-              </button>
-              <button
-                onClick={() => handleSupplyRequest(confirmTarget)}
-                className="flex-1 py-2 px-4 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
-              >
-                요청
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Toast */}
-      {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium">
-          {toastMessage}
         </div>
       )}
     </div>
