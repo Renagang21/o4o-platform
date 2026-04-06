@@ -1493,9 +1493,9 @@ export class NetureOfferService {
            COUNT(*) FILTER (WHERE spo.distribution_type = 'PUBLIC')::int AS "distPublic",
            COUNT(*) FILTER (WHERE spo.distribution_type = 'SERVICE')::int AS "distService",
            COUNT(*) FILTER (WHERE spo.distribution_type = 'PRIVATE')::int AS "distPrivate",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'pending')::int AS "approvalPending",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'approved')::int AS "approvalApproved",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'rejected')::int AS "approvalRejected"
+           COUNT(*) FILTER (WHERE spo.approval_status = 'PENDING')::int AS "approvalPending",
+           COUNT(*) FILTER (WHERE spo.approval_status = 'APPROVED')::int AS "approvalApproved",
+           COUNT(*) FILTER (WHERE spo.approval_status = 'REJECTED')::int AS "approvalRejected"
          FROM supplier_product_offers spo
          WHERE spo.deleted_at IS NULL`,
       ),
