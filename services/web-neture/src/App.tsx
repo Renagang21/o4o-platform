@@ -776,7 +776,7 @@ function App() {
               <Route path="/admin/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/admin/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /admin/supply 제거 */}
-              <Route path="/admin/all-products" element={<AllProductsOverviewPage />} />
+              <Route path="/admin/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/admin/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/admin/ai-card-report" element={<AiCardReportPage />} />
               <Route path="/admin/ai-operations" element={<AiOperationsPage />} />
@@ -852,7 +852,8 @@ function App() {
               <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
               {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /operator/supply 제거 */}
-              <Route path="/operator/all-products" element={<AllProductsOverviewPage />} />
+              {/* WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 상품 관리로 통합 */}
+              <Route path="/operator/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
               <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
               <Route path="/operator/ai-card-report" element={<AiCardReportPage />} />

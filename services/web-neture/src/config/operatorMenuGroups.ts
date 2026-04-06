@@ -39,16 +39,15 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: '서비스 승인', path: '/operator/service-approvals', adminOnly: true },
     { label: '공급사 승인', path: '/operator/admin-suppliers' },
   ],
+  // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 메뉴 통합
   products: [
-
-    { label: '공급 가능 상품', path: '/operator/all-products' },
-    { label: '전체 등록 상품', path: '/operator/all-registered-products' },
+    { label: '상품 관리', path: '/operator/all-registered-products' },
+    { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
     { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
+    { label: '큐레이션', path: '/operator/curation' },
     { label: '카테고리 관리', path: '/operator/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/operator/brands', adminOnly: true },
     { label: '상품 데이터 정리', path: '/operator/product-cleanup', adminOnly: true },
-    { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
-    { label: '큐레이션', path: '/operator/curation' },
     { label: '상품 승인', path: '/operator/product-approvals', adminOnly: true },
     { label: '마스터 관리', path: '/operator/masters', adminOnly: true },
     { label: '카탈로그 일괄등록', path: '/operator/catalog-import', adminOnly: true },
@@ -141,12 +140,11 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
     { label: '가입 승인', path: '/operator/applications' },
     { label: 'Market Trial', path: '/operator/market-trial' },
   ],
+  // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 메뉴 통합
   products: [
-
-    { label: '공급 가능 상품', path: '/operator/all-products' },
-    { label: '전체 등록 상품', path: '/operator/all-registered-products' },
-    { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
+    { label: '상품 관리', path: '/operator/all-registered-products' },
     { label: '서비스별 상품 승인', path: '/operator/product-service-approvals' },
+    { label: '판매자 모집 제품', path: '/operator/recruiting-products' },
     { label: '큐레이션', path: '/operator/curation' },
   ],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],

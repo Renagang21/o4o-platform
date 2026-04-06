@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
-  X, CheckCircle, XCircle, Clock, Eye, EyeOff,
+  X, Eye, EyeOff,
 } from 'lucide-react';
 import {
   operatorAllOffersApi,
@@ -18,11 +18,12 @@ import {
   type AllOffersKpi,
 } from '../../lib/api';
 import {
-  DISTRIBUTION_TYPE_BADGE,
   DISTRIBUTION_TYPE_LABELS,
   APPROVAL_STATUS_BADGE,
   REGULATORY_TYPE_LABELS,
   REGULATORY_TYPE_BADGE,
+  getSupplyPolicyBadges,
+  getServiceDisplay,
 } from '../../lib/productConstants';
 
 export default function AllRegisteredProductsPage() {
@@ -196,7 +197,9 @@ export default function AllRegisteredProductsPage() {
                   : '등록된 상품이 없습니다.'}
               </td></tr>
             ) : offers.map((o) => {
-              const distBadge = DISTRIBUTION_TYPE_BADGE[o.distributionType] || { label: o.distributionType || '-', bg: 'bg-slate-100', text: 'text-slate-500' };
+              // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 공통 유통 정책 badge
+              const policyBadges = getSupplyPolicyBadges(o);
+              const svcDisplay = getServiceDisplay(o.serviceApprovals?.map(a => a.serviceKey));
               const apprBadge = APPROVAL_STATUS_BADGE[o.approvalStatus] || { label: o.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
               const regLabel = o.regulatoryType ? REGULATORY_TYPE_LABELS[o.regulatoryType] : null;
               const regBadge = o.regulatoryType ? REGULATORY_TYPE_BADGE[o.regulatoryType] : null;
@@ -234,9 +237,13 @@ export default function AllRegisteredProductsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${distBadge.bg} ${distBadge.text}`}>
-                      {distBadge.label}
-                    </span>
+                    <div className="flex flex-wrap gap-0.5 justify-center">
+                      {policyBadges.map((b) => (
+                        <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
+                          {b.label}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-right text-slate-700">
                     {o.priceGeneral ? `₩${o.priceGeneral.toLocaleString()}` : '-'}
@@ -247,7 +254,11 @@ export default function AllRegisteredProductsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <ServiceBadges approvals={o.serviceApprovals} />
+                    {svcDisplay ? (
+                      <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">{svcDisplay}</span>
+                    ) : (
+                      <span className="text-xs text-slate-300">-</span>
+                    )}
                   </td>
                 </tr>
               );
@@ -377,21 +388,4 @@ function DetailCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ServiceBadges({ approvals }: { approvals: Array<{ serviceKey: string; status: string }> }) {
-  if (!approvals || approvals.length === 0) return <span className="text-xs text-slate-400">-</span>;
-  return (
-    <div className="flex items-center justify-center gap-1">
-      {approvals.map((a, i) => (
-        <span key={i} title={`${a.serviceKey}: ${a.status}`}>
-          {a.status === 'approved' ? (
-            <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-          ) : a.status === 'rejected' ? (
-            <XCircle className="w-3.5 h-3.5 text-red-500" />
-          ) : (
-            <Clock className="w-3.5 h-3.5 text-amber-500" />
-          )}
-        </span>
-      ))}
-    </div>
-  );
-}
+// WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: ServiceBadges 제거 → getServiceDisplay() 사용
