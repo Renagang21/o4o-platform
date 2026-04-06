@@ -344,10 +344,7 @@ const ForumDeleteRequestsPage = lazy(() =>
 const ForumAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ForumAnalyticsPage }))
 );
-// WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: SupplyDashboardPage 제거 (미완성 기능)
-// WO-NETURE-OPERATOR-PRODUCT-SUPPLY-OVERVIEW-V1
-const AllProductsOverviewPage = lazy(() => import('./pages/operator/AllProductsOverviewPage'));
-// WO-NETURE-OPERATOR-ALL-OFFERS-VIEW-FOUNDATION-V1
+// WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
 const AllRegisteredProductsPage = lazy(() => import('./pages/operator/AllRegisteredProductsPage'));
 const RecruitingProductsOverviewPage = lazy(() => import('./pages/operator/RecruitingProductsOverviewPage'));
 
