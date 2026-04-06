@@ -1205,6 +1205,10 @@ export default function SupplierProductsPage() {
         emptyMessage="등록된 제품이 없습니다"
         onSave={handleSave}
         saving={saving}
+        tableId="supplier-products"
+        reorderable
+        persistState
+        columnVisibility
       />
 
       {/* Pagination */}

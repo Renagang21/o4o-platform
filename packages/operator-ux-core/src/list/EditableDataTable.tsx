@@ -43,6 +43,10 @@ export function EditableDataTable<T extends Record<string, any>>({
   onSave,
   saving = false,
   className = '',
+  tableId,
+  reorderable,
+  persistState,
+  columnVisibility,
 }: EditableDataTableProps<T>) {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [dirtyRows, setDirtyRows] = useState<Map<string, Partial<T>>>(new Map());
@@ -235,6 +239,10 @@ export function EditableDataTable<T extends Record<string, any>>({
           return dirtyRows.has(rKey) ? 'bg-amber-50' : 'hover:bg-slate-50';
         }}
         emptyMessage={emptyMessage}
+        tableId={tableId}
+        reorderable={reorderable}
+        persistState={persistState}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

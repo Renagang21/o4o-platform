@@ -4,6 +4,7 @@
  * WO-O4O-TABLE-BASE-COMPONENT-V1
  * WO-O4O-TABLE-COLUMN-TYPE-UNIFICATION-V1 — O4OColumn + accessor 지원
  * WO-NETURE-SUPPLIER-PRODUCTS-COLUMN-RESIZE-IMPLEMENTATION-V1 — 컬럼 드래그 리사이즈
+ * WO-O4O-BASETABLE-COLUMN-REORDER-AND-PERSISTENCE-V1 — reorder + persistence + visibility
  *
  * 모든 테이블의 공통 렌더링/레이아웃 엔진.
  * DataTable, EditableTable 등은 이 컴포넌트의 thin wrapper.
@@ -14,8 +15,8 @@
  *  - th / td:  whitespace-nowrap
  */
 
-import { Fragment, useState, useCallback, useRef, useEffect } from 'react';
-import type { BaseTableProps } from './types';
+import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import type { BaseTableProps, O4OColumn } from './types';
 
 // Re-export types for convenience
 export type { O4OColumn, BaseColumn, BaseTableProps } from './types';
@@ -34,6 +35,29 @@ function parsePx(v: string | number | undefined, fallback: number): number {
   if (typeof v === 'number') return v;
   const n = parseFloat(v);
   return Number.isFinite(n) ? n : fallback;
+}
+
+// ─── Persistence ────────────────────────────────
+
+interface TablePersistedState {
+  order?: string[];
+  widths?: Record<string, number>;
+  hidden?: string[];
+}
+
+function loadState(tableId: string): TablePersistedState | null {
+  try {
+    const raw = localStorage.getItem(`o4o_table_${tableId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveState(tableId: string, state: TablePersistedState): void {
+  try {
+    localStorage.setItem(`o4o_table_${tableId}`, JSON.stringify(state));
+  } catch { /* quota exceeded — ignore */ }
 }
 
 // ─── Defaults ───────────────────────────────────
@@ -56,57 +80,177 @@ export function BaseTable<T extends Record<string, any>>({
   onRowClick,
   renderAfterRow,
   emptyMessage = '데이터가 없습니다',
+  tableId,
+  reorderable,
+  persistState: shouldPersist,
+  columnVisibility,
 }: BaseTableProps<T>) {
   const thBase = thClassName ?? DEFAULT_TH;
   const tdBase = tdClassName ?? DEFAULT_TD;
 
-  const hasResizable = columns.some((c) => c.resizable);
+  // ─── Persisted state ───
 
-  // ─── Column width state (resizable 모드) ───
+  const persistedRef = useRef<TablePersistedState | null>(null);
+  if (persistedRef.current === null && tableId && shouldPersist) {
+    persistedRef.current = loadState(tableId) || {};
+  }
+
+  // ─── Column order state ───
+
+  const [columnOrder, setColumnOrder] = useState<string[]>(() => {
+    const persisted = persistedRef.current?.order;
+    if (persisted && persisted.length > 0) return persisted;
+    return columns.map((c) => c.key);
+  });
+
+  // ─── Hidden columns state ───
+
+  const [hiddenKeys, setHiddenKeys] = useState<Set<string>>(() => {
+    const persisted = persistedRef.current?.hidden;
+    return new Set(persisted || []);
+  });
+
+  const [visibilityOpen, setVisibilityOpen] = useState(false);
+
+  // Sync column order when columns change (new columns added, etc.)
+  useEffect(() => {
+    const colKeys = new Set(columns.map((c) => c.key));
+    setColumnOrder((prev) => {
+      const existing = prev.filter((k) => colKeys.has(k));
+      const added = columns.map((c) => c.key).filter((k) => !existing.includes(k));
+      const merged = [...existing, ...added];
+      if (merged.length === prev.length && merged.every((k, i) => k === prev[i])) return prev;
+      return merged;
+    });
+  }, [columns]);
+
+  // Apply order + visibility to get effective columns
+  const effectiveColumns = useMemo(() => {
+    const colMap = new Map(columns.map((c) => [c.key, c]));
+    return columnOrder
+      .filter((key) => colMap.has(key) && !hiddenKeys.has(key))
+      .map((key) => colMap.get(key)!);
+  }, [columns, columnOrder, hiddenKeys]);
+
+  // ─── Persist helper ───
+
+  const persist = useCallback((partial: Partial<TablePersistedState>) => {
+    if (!tableId || !shouldPersist) return;
+    const current = persistedRef.current || {};
+    const next = { ...current, ...partial };
+    persistedRef.current = next;
+    saveState(tableId, next);
+  }, [tableId, shouldPersist]);
+
+  // ─── Drag reorder ───
+
+  const dragColRef = useRef<string | null>(null);
+  const [dragOverKey, setDragOverKey] = useState<string | null>(null);
+
+  const handleDragStart = useCallback((e: React.DragEvent, key: string) => {
+    if (!reorderable) return;
+    dragColRef.current = key;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', key);
+    (e.currentTarget as HTMLElement).style.opacity = '0.5';
+  }, [reorderable]);
+
+  const handleDragEnd = useCallback((e: React.DragEvent) => {
+    (e.currentTarget as HTMLElement).style.opacity = '1';
+    dragColRef.current = null;
+    setDragOverKey(null);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent, key: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverKey(key);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, targetKey: string) => {
+    e.preventDefault();
+    const sourceKey = dragColRef.current;
+    if (!sourceKey || sourceKey === targetKey) {
+      setDragOverKey(null);
+      return;
+    }
+    setColumnOrder((prev) => {
+      const next = [...prev];
+      const fromIdx = next.indexOf(sourceKey);
+      const toIdx = next.indexOf(targetKey);
+      if (fromIdx < 0 || toIdx < 0) return prev;
+      next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, sourceKey);
+      persist({ order: next });
+      return next;
+    });
+    setDragOverKey(null);
+  }, [persist]);
+
+  // ─── Column visibility toggle ───
+
+  const toggleVisibility = useCallback((key: string) => {
+    setHiddenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      persist({ hidden: Array.from(next) });
+      return next;
+    });
+  }, [persist]);
+
+  // ─── Column resize state ───
+
+  const hasResizable = effectiveColumns.some((c) => c.resizable);
 
   const [colWidths, setColWidths] = useState<number[]>([]);
   const tableRef = useRef<HTMLTableElement>(null);
-  const dragRef = useRef<{
+  const dragResizeRef = useRef<{
     colIndex: number;
     startX: number;
     startWidth: number;
+    colKey: string;
   } | null>(null);
 
-  // 최초 마운트 시 실제 렌더링된 th 폭으로 초기화
+  // 최초 마운트 시 실제 렌더링된 th 폭으로 초기화 + 저장된 폭 적용
   useEffect(() => {
     if (!hasResizable || !tableRef.current) return;
     const ths = tableRef.current.querySelectorAll('thead th');
     if (ths.length === 0) return;
-    const widths = Array.from(ths).map((th) => (th as HTMLElement).offsetWidth);
+    const savedWidths = persistedRef.current?.widths;
+    const widths = Array.from(ths).map((th, i) => {
+      const key = effectiveColumns[i]?.key;
+      if (key && savedWidths?.[key]) return savedWidths[key];
+      return (th as HTMLElement).offsetWidth;
+    });
     setColWidths(widths);
-  }, [hasResizable, columns.length]);
+  }, [hasResizable, effectiveColumns.length]);
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent, colIndex: number) => {
       e.preventDefault();
       e.stopPropagation();
 
-      // 현재 실제 폭 스냅샷
       if (tableRef.current) {
         const ths = tableRef.current.querySelectorAll('thead th');
         const freshWidths = Array.from(ths).map((th) => (th as HTMLElement).offsetWidth);
         setColWidths(freshWidths);
-        dragRef.current = {
+        dragResizeRef.current = {
           colIndex,
           startX: e.clientX,
           startWidth: freshWidths[colIndex],
+          colKey: effectiveColumns[colIndex]?.key || '',
         };
       }
 
       const handleMouseMove = (ev: MouseEvent) => {
-        if (!dragRef.current) return;
-        const { colIndex: ci, startX, startWidth } = dragRef.current;
+        if (!dragResizeRef.current) return;
+        const { colIndex: ci, startX, startWidth } = dragResizeRef.current;
         const delta = ev.clientX - startX;
-        const col = columns[ci];
-        const minW = parsePx(col.minWidth, 40);
-        const maxW = parsePx(col.maxWidth, 9999);
+        const col = effectiveColumns[ci];
+        const minW = parsePx(col?.minWidth, 40);
+        const maxW = parsePx(col?.maxWidth, 9999);
         const newWidth = Math.max(minW, Math.min(maxW, startWidth + delta));
-
         setColWidths((prev) => {
           const next = [...prev];
           next[ci] = newWidth;
@@ -115,7 +259,19 @@ export function BaseTable<T extends Record<string, any>>({
       };
 
       const handleMouseUp = () => {
-        dragRef.current = null;
+        // Persist widths on resize end
+        if (dragResizeRef.current && tableId && shouldPersist) {
+          const savedWidths = { ...(persistedRef.current?.widths || {}) };
+          const ths = tableRef.current?.querySelectorAll('thead th');
+          if (ths) {
+            Array.from(ths).forEach((th, i) => {
+              const key = effectiveColumns[i]?.key;
+              if (key) savedWidths[key] = (th as HTMLElement).offsetWidth;
+            });
+          }
+          persist({ widths: savedWidths });
+        }
+        dragResizeRef.current = null;
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
         document.removeEventListener('mousemove', handleMouseMove);
@@ -127,16 +283,50 @@ export function BaseTable<T extends Record<string, any>>({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [columns],
+    [effectiveColumns, tableId, shouldPersist, persist],
   );
 
   // ─── Render ───
 
-  const useFixedLayout = hasResizable && colWidths.length === columns.length;
+  const useFixedLayout = hasResizable && colWidths.length === effectiveColumns.length;
   const totalWidth = useFixedLayout ? colWidths.reduce((s, w) => s + w, 0) : undefined;
 
   return (
     <div className="overflow-x-auto">
+      {/* Column visibility toggle */}
+      {columnVisibility && (
+        <div className="relative mb-2 flex justify-end">
+          <button
+            onClick={() => setVisibilityOpen(!visibilityOpen)}
+            className="text-xs px-3 py-1.5 rounded-md border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+          >
+            컬럼 설정
+          </button>
+          {visibilityOpen && (
+            <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[160px]">
+              <p className="text-xs font-medium text-gray-500 mb-2">표시할 컬럼</p>
+              {columns.map((col) => (
+                <label key={col.key} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1 rounded text-xs text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={!hiddenKeys.has(col.key)}
+                    onChange={() => toggleVisibility(col.key)}
+                    className="w-3.5 h-3.5 accent-blue-600"
+                  />
+                  {typeof col.header === 'string' ? col.header : col.key}
+                </label>
+              ))}
+              <button
+                onClick={() => setVisibilityOpen(false)}
+                className="mt-2 text-xs text-gray-400 hover:text-gray-600 w-full text-center"
+              >
+                닫기
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <table
         ref={tableRef}
         className={useFixedLayout ? className : `min-w-full ${className}`}
@@ -144,7 +334,7 @@ export function BaseTable<T extends Record<string, any>>({
       >
         <thead className={headerClassName}>
           <tr>
-            {columns.map((col, ci) => {
+            {effectiveColumns.map((col, ci) => {
               const widthStyle: React.CSSProperties = {};
               if (useFixedLayout && colWidths[ci] != null) {
                 widthStyle.width = colWidths[ci];
@@ -154,12 +344,19 @@ export function BaseTable<T extends Record<string, any>>({
               if (col.minWidth != null) widthStyle.minWidth = col.minWidth;
               if (col.maxWidth != null) widthStyle.maxWidth = col.maxWidth;
 
+              const isDragOver = dragOverKey === col.key && dragColRef.current !== col.key;
+
               return (
                 <th
                   key={col.key}
                   style={widthStyle}
                   onClick={col.onHeaderClick}
-                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''}`}
+                  draggable={reorderable}
+                  onDragStart={reorderable ? (e) => handleDragStart(e, col.key) : undefined}
+                  onDragEnd={reorderable ? handleDragEnd : undefined}
+                  onDragOver={reorderable ? (e) => handleDragOver(e, col.key) : undefined}
+                  onDrop={reorderable ? (e) => handleDrop(e, col.key) : undefined}
+                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''} ${reorderable ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragOver ? 'bg-blue-50 border-l-2 border-blue-400' : ''}`}
                 >
                   {col.header}
                   {col.resizable && (
@@ -201,7 +398,7 @@ export function BaseTable<T extends Record<string, any>>({
           {data.length === 0 ? (
             <tr>
               <td
-                colSpan={columns.length}
+                colSpan={effectiveColumns.length}
                 className="px-4 py-12 text-center text-sm text-gray-500"
               >
                 {emptyMessage}
@@ -221,7 +418,7 @@ export function BaseTable<T extends Record<string, any>>({
                     onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
                     className={rowCls}
                   >
-                    {columns.map((col, ci) => {
+                    {effectiveColumns.map((col, ci) => {
                       const value = col.accessor
                         ? col.accessor(row, rowIndex)
                         : row[col.key];

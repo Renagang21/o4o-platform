@@ -65,4 +65,14 @@ export interface BaseTableProps<T> {
   onRowClick?: (row: T, index: number) => void;
   renderAfterRow?: (row: T, index: number) => ReactNode;
   emptyMessage?: ReactNode;
+
+  // WO-O4O-BASETABLE-COLUMN-REORDER-AND-PERSISTENCE-V1
+  /** 테이블 고유 ID — 상태 저장에 사용 */
+  tableId?: string;
+  /** 컬럼 드래그 순서 변경 허용 */
+  reorderable?: boolean;
+  /** localStorage에 컬럼 상태 저장 (순서 + 폭) */
+  persistState?: boolean;
+  /** 컬럼 표시/숨김 토글 UI 표시 */
+  columnVisibility?: boolean;
 }
