@@ -5,11 +5,7 @@
  * WO-KPA-HOME-SERVICE-SECTION-V1
  */
 
-export { HeroSection } from './HeroSection';
 export { ServiceCard } from './ServiceCard';
-export { ServiceCardsSection } from './ServiceCardsSection';
-export { AudienceSection } from './AudienceSection';
-export { HowItWorksSection } from './HowItWorksSection';
 export { PlatformHeader } from './PlatformHeader';
 export { PlatformFooter } from './PlatformFooter';
 export { InfoPageLayout } from './InfoPageLayout';

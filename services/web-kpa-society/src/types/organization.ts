@@ -418,44 +418,6 @@ export const OFFICER_ROLE_LABELS: Record<OfficerRole, string> = {
   operator: '운영자',
 };
 
-// 확장된 위원회 타입 라벨
-export const EXTENDED_COMMITTEE_TYPE_LABELS: Record<ExtendedCommitteeType, string> = {
-  standing: '상임위원회',
-  special: '특별위원회',
-  ad_hoc: '임시위원회',
-};
-
-// 유틸리티 함수: 역할에 따른 회계 접근 권한 확인
-export function getAccountingAccess(role: OfficerRole): AccountingAccess {
-  return DEFAULT_ACCOUNTING_ACCESS[role];
-}
-
-// 유틸리티 함수: 위원회별 회계 필터링
-export function filterAccountingByRole(
-  entries: AccountingEntryWithCommittee[],
-  role: OfficerRole,
-  committeeId?: string,
-  subordinateCommitteeIds?: string[]
-): AccountingEntryWithCommittee[] {
-  const access = getAccountingAccess(role);
-
-  switch (access.scope) {
-    case 'all':
-      return entries;
-    case 'subordinate_committees':
-      if (!subordinateCommitteeIds?.length) return [];
-      return entries.filter(e =>
-        !e.committeeId || subordinateCommitteeIds.includes(e.committeeId)
-      );
-    case 'own_committee':
-      if (!committeeId) return [];
-      return entries.filter(e => e.committeeId === committeeId);
-    case 'summary_only':
-    case 'none':
-    default:
-      return [];
-  }
-}
 
 // ============================================
 // WO-CONTEXT-SWITCH-FOUNDATION-V1

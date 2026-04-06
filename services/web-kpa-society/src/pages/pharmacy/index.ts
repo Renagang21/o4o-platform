@@ -8,13 +8,10 @@
 export { PharmacyPage } from './PharmacyPage';
 export { PharmacyB2BPage } from './PharmacyB2BPage';
 export { PharmacyStorePage } from './PharmacyStorePage';
-export { PharmacyServicesPage } from './PharmacyServicesPage';
 
 // WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1: 약국 서비스 신청 게이트
 export { PharmacyApprovalGatePage } from './PharmacyApprovalGatePage';
 
-// WO-O4O-HUB-MARKET-RESTRUCTURE-V1: 약국 공용공간 (Market Layer)
-export { PharmacyHubMarketPage } from './PharmacyHubMarketPage';
 
 // WO-O4O-HUB-CONTENT-LIBRARY-V1: 플랫폼 콘텐츠 라이브러리
 export { HubContentLibraryPage } from './HubContentLibraryPage';
@@ -85,12 +82,8 @@ export { StoreMarketingDashboardPage } from './StoreMarketingDashboardPage';
 // WO-O4O-PRODUCT-MARKETING-GRAPH-V1: 상품 마케팅 그래프
 export { ProductMarketingPage } from './ProductMarketingPage';
 
-// 사이버 공간 템플릿 갤러리
-export { CyberTemplateGalleryPage } from './CyberTemplateGalleryPage';
 
 // WO-O4O-STORE-LOCAL-PRODUCT-UI-V1: 자체 상품 CRUD + 태블릿 진열 관리
 export { default as StoreLocalProductsPage } from './StoreLocalProductsPage';
 export { default as StoreTabletDisplaysPage } from './StoreTabletDisplaysPage';
 
-// WO-KPA-HUB-AND-STORE-ORDERABLE-PRODUCT-LIST-FLOW-V1: Store 주문 가능 상품리스트
-export { StoreOrderableProductsPage } from './StoreOrderableProductsPage';
