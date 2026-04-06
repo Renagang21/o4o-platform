@@ -848,8 +848,8 @@ function App() {
               <Route path="/operator/community" element={<ForumManagementPage />} />
               <Route path="/operator/forum-delete-requests" element={<ForumDeleteRequestsPage />} />
               <Route path="/operator/forum-analytics" element={<ForumAnalyticsPage />} />
-              {/* WO-NETURE-OPERATOR-SUPPLY-MENU-REMOVE-V1: /operator/supply 제거 */}
-              {/* WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 상품 관리로 통합 */}
+              {/* WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: 제거된 메뉴 redirect */}
+              <Route path="/operator/supply" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-products" element={<Navigate to="/operator/all-registered-products" replace />} />
               <Route path="/operator/all-registered-products" element={<AllRegisteredProductsPage />} />
               <Route path="/operator/recruiting-products" element={<RecruitingProductsOverviewPage />} />
