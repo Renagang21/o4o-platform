@@ -299,9 +299,9 @@ function DistrictCommunityCard({ basePath }: CardProps) {
           <span style={s.shortcutIcon}>📁</span>
           <span style={s.shortcutLabel}>자료실</span>
         </Link>
-        <Link to={`${basePath}/groupbuy`} style={s.shortcutCard}>
+        <Link to={`${basePath}/event-offers`} style={s.shortcutCard}>
           <span style={s.shortcutIcon}>🛒</span>
-          <span style={s.shortcutLabel}>공동구매</span>
+          <span style={s.shortcutLabel}>이벤트</span>
         </Link>
       </div>
     </section>
@@ -540,9 +540,9 @@ function BranchCommunityCard({ basePath }: CardProps) {
           <span style={s.shortcutIcon}>📁</span>
           <span style={s.shortcutLabel}>자료실</span>
         </Link>
-        <Link to={`${basePath}/groupbuy`} style={s.shortcutCard}>
+        <Link to={`${basePath}/event-offers`} style={s.shortcutCard}>
           <span style={s.shortcutIcon}>🛒</span>
-          <span style={s.shortcutLabel}>공동구매</span>
+          <span style={s.shortcutLabel}>이벤트</span>
         </Link>
       </div>
     </section>

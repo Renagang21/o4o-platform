@@ -49,7 +49,8 @@ interface DashboardSummary {
   completedCourses: number;
   certificates: number;
   forumPosts: number;
-  groupbuyParticipations: number;
+  groupbuyParticipations?: number;
+  eventOfferParticipations?: number;
 }
 
 /**
@@ -276,12 +277,12 @@ export function MyDashboardPage() {
             </div>
           </Card>
         </Link>
-        <Link to={`${servicePrefix}/groupbuy/history`} style={styles.summaryLink}>
+        <Link to={`${servicePrefix}/event-offers/history`} style={styles.summaryLink}>
           <Card padding="medium">
             <div style={styles.summaryItem}>
               <span style={styles.summaryIcon}>🛒</span>
-              <span style={styles.summaryValue}>{summary?.groupbuyParticipations || 0}</span>
-              <span style={styles.summaryLabel}>공동구매</span>
+              <span style={styles.summaryValue}>{summary?.eventOfferParticipations || summary?.groupbuyParticipations || 0}</span>
+              <span style={styles.summaryLabel}>이벤트</span>
             </div>
           </Card>
         </Link>

@@ -150,7 +150,7 @@ export function KpaEventOfferPage() {
         <>
           <div style={styles.grid}>
             {products.map(product => (
-              <Link key={product.id} to={`/groupbuy/${product.id}`} style={styles.itemLink}>
+              <Link key={product.id} to={`/event-offers/${product.id}`} style={styles.itemLink}>
                 <Card hover padding="none">
                   <div style={styles.thumbnail}>
                     <div style={styles.thumbnailPlaceholder}>🛍️</div>

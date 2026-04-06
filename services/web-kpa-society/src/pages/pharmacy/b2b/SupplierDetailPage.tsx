@@ -187,7 +187,7 @@ export function SupplierDetailPage() {
                   </span>
                   {isOwner ? (
                     <Link
-                      to={`/groupbuy/${gb.id}`}
+                      to={`/event-offers/${gb.id}`}
                       style={styles.joinButton}
                     >
                       참여하기
@@ -214,10 +214,10 @@ export function SupplierDetailPage() {
               </Link>
               {supplier.tradeTypes.includes('groupbuy') && (
                 <Link
-                  to={`/groupbuy?supplier=${supplierId}`}
+                  to={`/event-offers?supplier=${supplierId}`}
                   style={styles.actionButton}
                 >
-                  🛒 공동구매 보기
+                  🛒 이벤트 보기
                 </Link>
               )}
             </div>

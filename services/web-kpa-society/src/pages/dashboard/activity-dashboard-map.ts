@@ -12,7 +12,7 @@ export type DashboardCardKey =
   | 'member-status'
   | 'community-shortcuts'
   | 'store-management'
-  | 'groupbuy'
+  | 'event-offer'
   | 'education'
   | 'academic'
   | 'partner'
@@ -33,7 +33,7 @@ export const DASHBOARD_LAYOUT_BY_ACTIVITY: Record<string, DashboardCardKey[]> = 
   pharmacy_owner: [
     'member-status',
     'store-management',
-    'groupbuy',
+    'event-offer',
     'community-shortcuts',
     'education',
     'notifications',

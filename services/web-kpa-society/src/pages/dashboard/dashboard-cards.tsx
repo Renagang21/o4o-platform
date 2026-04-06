@@ -89,21 +89,21 @@ function StoreManagementCard(_props: CardProps) {
   );
 }
 
-// ─── 4. 공동구매 카드 ──────────────────────────────────
-function GroupbuyCard(_props: CardProps) {
+// ─── 4. 이벤트 카드 ──────────────────────────────────
+function EventOfferCard(_props: CardProps) {
   return (
     <section>
-      <h3 style={cardStyles.sectionTitle}>공동구매</h3>
+      <h3 style={cardStyles.sectionTitle}>이벤트</h3>
       <div style={cardStyles.card}>
         <div style={cardStyles.featureHeader}>
           <span style={cardStyles.featureIcon}>🛒</span>
           <div>
-            <h4 style={cardStyles.featureTitle}>약사회 공동구매</h4>
-            <p style={cardStyles.featureDesc}>약사회 회원 전용 공동구매 상품을 확인하세요.</p>
+            <h4 style={cardStyles.featureTitle}>약사회 이벤트</h4>
+            <p style={cardStyles.featureDesc}>약사회 회원 전용 이벤트 상품을 확인하세요.</p>
           </div>
         </div>
-        <Link to="/groupbuy" style={cardStyles.actionButtonSecondary}>
-          공동구매 보기 →
+        <Link to="/hub/event-offers" style={cardStyles.actionButtonSecondary}>
+          이벤트 보기 →
         </Link>
       </div>
     </section>
@@ -205,7 +205,7 @@ export const CARD_REGISTRY: Record<DashboardCardKey, React.FC<CardProps>> = {
   'member-status': MemberStatusCard,
   'community-shortcuts': CommunityShortcutsCard,
   'store-management': StoreManagementCard,
-  'groupbuy': GroupbuyCard,
+  'event-offer': EventOfferCard,
   'education': EducationCard,
   'academic': AcademicCard,
   'partner': PartnerCard,

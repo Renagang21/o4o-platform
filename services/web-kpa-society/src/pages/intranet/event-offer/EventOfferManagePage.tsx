@@ -723,4 +723,4 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-export default GroupbuyManagePage;
+export default EventOfferManagePage;

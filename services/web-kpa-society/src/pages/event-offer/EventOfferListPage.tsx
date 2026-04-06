@@ -137,7 +137,7 @@ export function EventOfferListPage() {
               const discount = calculateDiscount(item.originalPrice, item.groupPrice);
 
               return (
-                <Link key={item.id} to={`/groupbuy/${item.id}`} style={styles.itemLink}>
+                <Link key={item.id} to={`/event-offers/${item.id}`} style={styles.itemLink}>
                   <Card hover padding="none">
                     <div style={styles.thumbnail}>
                       {item.thumbnail ? (

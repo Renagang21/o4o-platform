@@ -1,5 +1,5 @@
 /**
- * GroupbuyDetailPage - 공동구매 상품 상세 페이지
+ * GroupbuyDetailPage - 이벤트 상품 상세 페이지
  *
  * WO-KPA-GROUPBUY-PAGE-V1: 캠페인 모델 → 상품 상세로 전환
  * OrganizationProductListing 기반
@@ -61,7 +61,7 @@ export function EventOfferDetailPage() {
           icon="⚠️"
           title="상품을 찾을 수 없습니다"
           description={error || '삭제되었거나 존재하지 않는 상품입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/groupbuy') }}
+          action={{ label: '목록으로', onClick: () => navigate('/event-offers') }}
         />
       </div>
     );
@@ -73,7 +73,7 @@ export function EventOfferDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '공동구매', href: '/groupbuy' },
+          { label: '이벤트', href: '/event-offers' },
           { label: product.product_name },
         ]}
       />
@@ -95,7 +95,7 @@ export function EventOfferDetailPage() {
               </div>
               <div style={styles.infoRow}>
                 <span style={styles.infoLabel}>서비스</span>
-                <span style={styles.serviceBadge}>공동구매</span>
+                <span style={styles.serviceBadge}>이벤트</span>
               </div>
               <div style={styles.infoRow}>
                 <span style={styles.infoLabel}>등록일</span>
@@ -118,7 +118,7 @@ export function EventOfferDetailPage() {
         {/* 사이드바 */}
         <div style={styles.sidebar}>
           <Card padding="large">
-            <span style={styles.badge}>공동구매</span>
+            <span style={styles.badge}>이벤트</span>
             <h1 style={styles.title}>{product.product_name}</h1>
 
             <div style={styles.priceSection}>

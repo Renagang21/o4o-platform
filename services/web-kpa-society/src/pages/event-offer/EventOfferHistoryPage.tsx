@@ -1,5 +1,5 @@
 /**
- * GroupbuyHistoryPage - 공동구매 참여 내역 페이지
+ * GroupbuyHistoryPage - 이벤트 참여 내역 페이지
  */
 
 import { useState, useEffect } from 'react';
@@ -87,10 +87,10 @@ export function EventOfferHistoryPage() {
     <div style={styles.container}>
       <PageHeader
         title="참여 내역"
-        description="공동구매 참여 내역을 확인하세요"
+        description="이벤트 참여 내역을 확인하세요"
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '공동구매', href: '/groupbuy' },
+          { label: '이벤트', href: '/event-offers' },
           { label: '참여 내역' },
         ]}
       />
@@ -99,8 +99,8 @@ export function EventOfferHistoryPage() {
         <EmptyState
           icon="🛒"
           title="참여 내역이 없습니다"
-          description="공동구매에 참여해보세요!"
-          action={{ label: '공동구매 보기', onClick: () => window.location.href = '/groupbuy' }}
+          description="이벤트에 참여해보세요!"
+          action={{ label: '이벤트 보기', onClick: () => window.location.href = '/event-offers' }}
         />
       ) : (
         <>
@@ -111,7 +111,7 @@ export function EventOfferHistoryPage() {
                 <Card key={p.id} padding="medium">
                   <div style={styles.item}>
                     <div style={styles.itemMain}>
-                      <Link to={`/groupbuy/${p.groupbuyId}`} style={styles.itemTitle}>
+                      <Link to={`/event-offers/${p.groupbuyId}`} style={styles.itemTitle}>
                         {p.groupbuy.title}
                       </Link>
                       <div style={styles.itemMeta}>
