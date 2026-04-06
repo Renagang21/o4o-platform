@@ -645,10 +645,10 @@ export default function SupplierProductsPage() {
   const [filterCompleteness, setFilterCompleteness] = useState('');
   const [filterVisibility, setFilterVisibility] = useState('');
 
-  // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: server-side approval tab
-  type ApprovalTab = 'all' | 'pending' | 'approved' | 'rejected';
+  // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: 승인요청 전 탭 추가
+  type ApprovalTab = 'all' | 'unrequested' | 'pending' | 'approved' | 'rejected';
   const [activeTab, setActiveTab] = useState<ApprovalTab>('all');
-  const [tabCounts, setTabCounts] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+  const [tabCounts, setTabCounts] = useState({ total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 });
 
   // Modal state
   const [imageUploadMasterId, setImageUploadMasterId] = useState<string | null>(null);
@@ -1085,13 +1085,14 @@ export default function SupplierProductsPage() {
         />
       </div>
 
-      {/* Approval Status Tabs (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1) */}
+      {/* Approval Status Tabs (WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1) */}
       <div className="flex border-b border-slate-200 mb-3">
         {([
           { key: 'all' as ApprovalTab, label: '전체', count: tabCounts.total },
-          { key: 'pending' as ApprovalTab, label: '승인전', count: tabCounts.pending },
+          { key: 'unrequested' as ApprovalTab, label: '승인요청 전', count: tabCounts.unrequested },
+          { key: 'pending' as ApprovalTab, label: '승인대기', count: tabCounts.pending },
           { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts.approved },
-          { key: 'rejected' as ApprovalTab, label: '거절됨', count: tabCounts.rejected },
+          { key: 'rejected' as ApprovalTab, label: '거절', count: tabCounts.rejected },
         ]).map((tab) => (
           <button
             key={tab.key}

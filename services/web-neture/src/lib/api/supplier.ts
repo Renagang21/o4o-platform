@@ -522,14 +522,14 @@ export const supplierApi = {
   },
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: Approval tab counts
-  async getApprovalCounts(): Promise<{ total: number; pending: number; approved: number; rejected: number }> {
+  async getApprovalCounts(): Promise<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> {
     try {
       const response = await api.get('/neture/supplier/products/approval-counts');
       const result = response.data;
-      return result.data || { total: 0, pending: 0, approved: 0, rejected: 0 };
+      return result.data || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
     } catch (error) {
       console.warn('[Supplier API] Failed to fetch approval counts:', error);
-      return { total: 0, pending: 0, approved: 0, rejected: 0 };
+      return { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
     }
   },
 

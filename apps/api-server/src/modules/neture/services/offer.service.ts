@@ -1042,8 +1042,10 @@ export class NetureOfferService {
       conditions.push(`${NetureOfferService.COMPLETENESS_EXPR} >= 70`);
     }
 
-    // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: service approval status filter
-    if (options.serviceApprovalStatus === 'pending') {
+    // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1: service approval status filter
+    if (options.serviceApprovalStatus === 'unrequested') {
+      conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)`);
+    } else if (options.serviceApprovalStatus === 'pending') {
       conditions.push(`EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`);
     } else if (options.serviceApprovalStatus === 'approved') {
       conditions.push(`NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`);
@@ -1177,10 +1179,15 @@ export class NetureOfferService {
 
   // ==================== Approval Tab Counts (WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1) ====================
 
+  // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1:
+  // total = unrequested + pending + approved + rejected
   async getSupplierProductApprovalCounts(supplierId: string) {
-    const rows: Array<{ total: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
+    const rows: Array<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
       `SELECT
          COUNT(*)::int AS total,
+         COUNT(*) FILTER (WHERE NOT EXISTS (
+           SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
+         ))::int AS unrequested,
          COUNT(*) FILTER (WHERE EXISTS (
            SELECT 1 FROM offer_service_approvals osa
            WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
@@ -1197,7 +1204,7 @@ export class NetureOfferService {
        WHERE spo.supplier_id = $1`,
       [supplierId],
     );
-    return rows[0] || { total: 0, pending: 0, approved: 0, rejected: 0 };
+    return rows[0] || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
   }
 
   // ==================== Batch Update (WO-NETURE-SUPPLIER-EXCEL-LIST-V1) ====================
