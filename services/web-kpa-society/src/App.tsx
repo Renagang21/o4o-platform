@@ -40,8 +40,8 @@ import {
   ParticipationResultPage,
 } from './pages/participation';
 
-// Groupbuy pages
-import { GroupbuyListPage, GroupbuyDetailPage, GroupbuyHistoryPage, KpaGroupbuyPage } from './pages/groupbuy';
+// Event Offer pages
+import { EventOfferListPage, EventOfferDetailPage, EventOfferHistoryPage, KpaEventOfferPage } from './pages/event-offer';
 
 // News pages
 import { NewsListPage, NewsDetailPage, GalleryPage } from './pages/news';
@@ -541,7 +541,7 @@ function App() {
             <Route index element={<Navigate to="/hub/b2b" replace />} />
             <Route path="b2b" element={<HubB2BCatalogPage />} />
             <Route path="signage" element={<HubSignageLibraryPage />} />
-            <Route path="groupbuy" element={<PharmacyOwnerOnlyGuard><KpaGroupbuyPage /></PharmacyOwnerOnlyGuard>} />
+            <Route path="event-offers" element={<PharmacyOwnerOnlyGuard><KpaEventOfferPage /></PharmacyOwnerOnlyGuard>} />
             <Route path="content" element={<HubContentLibraryPage />} />
           </Route>
           {/* Operator Routes — WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: KpaOperatorLayout (standalone sidebar) */}
@@ -622,9 +622,10 @@ function App() {
           <Route path="/participation/:id/respond" element={<Layout serviceName={SERVICE_NAME}><ParticipationRespondPage /></Layout>} />
           <Route path="/participation/:id/results" element={<Layout serviceName={SERVICE_NAME}><ParticipationResultPage /></Layout>} />
 
-          {/* Groupbuy (공동구매) — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: /hub/groupbuy로 통합 */}
-          <Route path="/groupbuy" element={<Navigate to="/hub/groupbuy" replace />} />
-          <Route path="/groupbuy/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><GroupbuyDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
+          {/* Event Offers (이벤트) */}
+          <Route path="/groupbuy" element={<Navigate to="/hub/event-offers" replace />} />
+          <Route path="/event-offers" element={<Navigate to="/hub/event-offers" replace />} />
+          <Route path="/event-offers/:id" element={<Layout serviceName={SERVICE_NAME}><PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard></Layout>} />
 
           {/* Function Gate → /setup-activity 리다이렉트 (WO-KPA-A-AUTH-UX-STATE-UNIFICATION-V1) */}
           <Route path="/select-function" element={<Navigate to="/setup-activity" replace />} />
@@ -792,10 +793,10 @@ function DemoLayoutRoutes() {
         <Route path="/participation/:id/respond" element={<ParticipationRespondPage />} />
         <Route path="/participation/:id/results" element={<ParticipationResultPage />} />
 
-        {/* Groupbuy (공동구매) — WO-O4O-KPA-B-C-ACCESS-POLICY-IMPLEMENTATION-V1: 약국 개설자만 접근 */}
-        <Route path="/groupbuy" element={<PharmacyOwnerOnlyGuard><GroupbuyListPage /></PharmacyOwnerOnlyGuard>} />
-        <Route path="/groupbuy/history" element={<PharmacyOwnerOnlyGuard><GroupbuyHistoryPage /></PharmacyOwnerOnlyGuard>} />
-        <Route path="/groupbuy/:id" element={<PharmacyOwnerOnlyGuard><GroupbuyDetailPage /></PharmacyOwnerOnlyGuard>} />
+        {/* Event Offers (이벤트) */}
+        <Route path="/event-offers" element={<PharmacyOwnerOnlyGuard><EventOfferListPage /></PharmacyOwnerOnlyGuard>} />
+        <Route path="/event-offers/history" element={<PharmacyOwnerOnlyGuard><EventOfferHistoryPage /></PharmacyOwnerOnlyGuard>} />
+        <Route path="/event-offers/:id" element={<PharmacyOwnerOnlyGuard><EventOfferDetailPage /></PharmacyOwnerOnlyGuard>} />
 
         {/* Pharmacy Management - 실경로로 리다이렉트 (WO-KPA-PHARMACY-LOCATION-V1) */}
         <Route path="/pharmacy" element={<Navigate to="/pharmacy" replace />} />

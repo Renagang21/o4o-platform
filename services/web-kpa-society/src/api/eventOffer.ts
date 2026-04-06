@@ -12,7 +12,7 @@ import type {
   ApiResponse,
 } from '../types';
 
-export const groupbuyApi = {
+export const eventOfferApi = {
   // 공동구매 상품 목록 (product listing 기반, WO-KPA-GROUPBUY-PAGE-V1)
   getGroupbuyProducts: (params?: {
     page?: number;

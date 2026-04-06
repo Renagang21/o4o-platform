@@ -121,10 +121,10 @@ export function ExternalServiceSection() {
         />
         <ServiceBanner
           icon="🛒"
-          title="공동구매 서비스"
-          description="약국 운영에 필요한 물품을 합리적인 가격에 공동구매합니다."
-          linkUrl="/groupbuy"
-          linkText="공동구매 이용하기"
+          title="이벤트 상품"
+          description="약국 운영에 필요한 물품을 합리적인 가격에 이벤트로 제공합니다."
+          linkUrl="/hub/event-offers"
+          linkText="이벤트 보기"
           variant="secondary"
           showDisclaimer={false}
           isInternal={true}

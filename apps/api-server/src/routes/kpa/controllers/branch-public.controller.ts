@@ -381,29 +381,5 @@ export function createBranchPublicController(dataSource: DataSource): Router {
     },
   );
 
-  // ──────────────────────────────────────────────────────
-  // GET /branches/:branchId/groupbuys — groupbuys (stub)
-  // ──────────────────────────────────────────────────────
-  router.get(
-    '/:branchId/groupbuys',
-    async (_req: Request, res: Response): Promise<void> => {
-      res.json({ success: true, data: { items: [], total: 0, page: 1, totalPages: 0 } });
-    },
-  );
-
-  router.get(
-    '/:branchId/groupbuys/history',
-    async (_req: Request, res: Response): Promise<void> => {
-      res.json({ success: true, data: { items: [], total: 0, page: 1, totalPages: 0 } });
-    },
-  );
-
-  router.get(
-    '/:branchId/groupbuys/:id',
-    async (_req: Request, res: Response): Promise<void> => {
-      res.status(404).json({ success: false, error: 'Groupbuy not found', code: 'NOT_FOUND' });
-    },
-  );
-
   return router;
 }

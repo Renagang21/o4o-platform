@@ -16,7 +16,6 @@ import { AdminLayout, BranchAdminAuthGuard } from '../components/branch-admin';
 import {
   DashboardPage,
   OfficersPage,
-  BranchCampaignStatusPage,
   SettingsPage,
 } from '../pages/branch-admin';
 
@@ -30,9 +29,6 @@ export function BranchAdminRoutes() {
 
         {/* 임원 관리 */}
         <Route path="officers" element={<OfficersPage />} />
-
-        {/* 공동구매 현황 (WO-KPA-CAMPAIGN-UI-RENAMING-V1) */}
-        <Route path="groupbuy-status" element={<BranchCampaignStatusPage />} />
 
         {/* 분회 설정 */}
         <Route path="settings" element={<SettingsPage />} />

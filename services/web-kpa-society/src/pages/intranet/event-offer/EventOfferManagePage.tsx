@@ -19,11 +19,11 @@
 import { useState, useEffect } from 'react';
 import { colors } from '../../../styles/theme';
 import {
-  groupbuyAdminApi,
+  eventOfferAdminApi,
   type GroupbuyProduct,
   type GroupbuyStats,
   type GroupbuyApiError,
-} from '../../../api/groupbuyAdmin';
+} from '../../../api/eventOfferAdmin';
 
 /** 고정 메시지 (WO-KPA-GROUPBUY-OPERATION-STABILIZATION-V1) */
 const MESSAGES = {
@@ -36,7 +36,7 @@ const MESSAGES = {
   NOTICE: '주문·결제·배송은 공급자 시스템에서 처리되며, 본 화면에서는 상품 노출과 집계 통계만 관리합니다.',
 } as const;
 
-export function GroupbuyManagePage() {
+export function EventOfferManagePage() {
   const [products, setProducts] = useState<GroupbuyProduct[]>([]);
   const [stats, setStats] = useState<GroupbuyStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export function GroupbuyManagePage() {
 
     try {
       // 상품 목록 조회
-      const productsRes = await groupbuyAdminApi.getProducts();
+      const productsRes = await eventOfferAdminApi.getProducts();
       if (productsRes?.data) {
         setProducts(productsRes.data);
       }
@@ -96,7 +96,7 @@ export function GroupbuyManagePage() {
     // 통계는 별도 로딩 (권한 오류가 없을 때만)
     if (!permissionDenied) {
       try {
-        const statsRes = await groupbuyAdminApi.getStats();
+        const statsRes = await eventOfferAdminApi.getStats();
         if (statsRes?.data) {
           setStats(statsRes.data);
         }
@@ -120,7 +120,7 @@ export function GroupbuyManagePage() {
     setStatsError(null);
 
     try {
-      const statsRes = await groupbuyAdminApi.getStats();
+      const statsRes = await eventOfferAdminApi.getStats();
       if (statsRes?.data) {
         setStats(statsRes.data);
       }
@@ -154,7 +154,7 @@ export function GroupbuyManagePage() {
 
   const handleToggleVisibility = async (product: GroupbuyProduct) => {
     try {
-      await groupbuyAdminApi.toggleVisibility(product.id, !product.isVisible);
+      await eventOfferAdminApi.toggleVisibility(product.id, !product.isVisible);
       setProducts(prev =>
         prev.map(p =>
           p.id === product.id ? { ...p, isVisible: !p.isVisible } : p
@@ -169,7 +169,7 @@ export function GroupbuyManagePage() {
     if (index === 0) return;
     const product = products[index];
     try {
-      await groupbuyAdminApi.updateOrder(product.id, index - 1);
+      await eventOfferAdminApi.updateOrder(product.id, index - 1);
       const newProducts = [...products];
       [newProducts[index - 1], newProducts[index]] = [newProducts[index], newProducts[index - 1]];
       setProducts(newProducts);
@@ -182,7 +182,7 @@ export function GroupbuyManagePage() {
     if (index === products.length - 1) return;
     const product = products[index];
     try {
-      await groupbuyAdminApi.updateOrder(product.id, index + 1);
+      await eventOfferAdminApi.updateOrder(product.id, index + 1);
       const newProducts = [...products];
       [newProducts[index], newProducts[index + 1]] = [newProducts[index + 1], newProducts[index]];
       setProducts(newProducts);
@@ -196,7 +196,7 @@ export function GroupbuyManagePage() {
       return;
     }
     try {
-      await groupbuyAdminApi.removeProduct(product.id);
+      await eventOfferAdminApi.removeProduct(product.id);
       setProducts(prev => prev.filter(p => p.id !== product.id));
     } catch (err) {
       console.error('Failed to remove product:', err);

@@ -71,7 +71,7 @@ export interface StatsMetaInfo {
   responseTime?: number;
 }
 
-export const groupbuyAdminApi = {
+export const eventOfferAdminApi = {
   /**
    * 공동구매 상품 목록 조회
    */

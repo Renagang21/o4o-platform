@@ -118,18 +118,6 @@ export function createMypageController(
   router.get('/certificates', authenticate, asyncHandler(CertificateController.getMyCertificates));
 
   /**
-   * GET /groupbuys — User groupbuys (placeholder)
-   */
-  router.get('/groupbuys', authenticate, (req: Request, res: Response) => {
-    const result = service.getGroupbuys();
-    res.json({
-      success: true,
-      data: result.data,
-      pagination: result.pagination,
-    });
-  });
-
-  /**
    * GET /my-requests — Unified approval requests
    * WO-KPA-A-MYPAGE-UNIFIED-REQUEST-INBOX-V1
    */

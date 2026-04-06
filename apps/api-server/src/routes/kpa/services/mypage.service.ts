@@ -183,17 +183,6 @@ export class MypageService {
       completedCourses: 0,
       certificates: 0,
       forumPosts: 0,
-      groupbuyParticipations: 0,
-    };
-  }
-
-  /**
-   * GET /groupbuys — User groupbuys (placeholder)
-   */
-  getGroupbuys(): { data: any[]; pagination: any } {
-    return {
-      data: [],
-      pagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
     };
   }
 

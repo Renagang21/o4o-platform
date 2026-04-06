@@ -5,8 +5,8 @@
 export { apiClient } from './client';
 export { forumApi } from './forum';
 export { lmsApi } from './lms';
-export { groupbuyApi } from './groupbuy';
-export { groupbuyAdminApi } from './groupbuyAdmin';
+export { eventOfferApi } from './eventOffer';
+export { eventOfferAdminApi } from './eventOfferAdmin';
 export { newsApi } from './news';
 export { resourcesApi } from './resources';
 export { organizationApi } from './organization';

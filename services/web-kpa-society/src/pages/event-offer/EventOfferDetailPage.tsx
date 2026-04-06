@@ -9,12 +9,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
-import { groupbuyApi } from '../../api';
+import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { GroupbuyProduct } from '../../types';
 
-export function GroupbuyDetailPage() {
+export function EventOfferDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -32,7 +32,7 @@ export function GroupbuyDetailPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await groupbuyApi.getGroupbuyProduct(id!);
+      const res = await eventOfferApi.getGroupbuyProduct(id!);
       setProduct(res.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '상품을 불러오는데 실패했습니다.');

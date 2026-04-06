@@ -14,7 +14,6 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import {
   LayoutDashboard,
   UserCog,
-  ShoppingBag,
   Settings,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -28,7 +27,6 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { icon: LayoutDashboard, label: '대시보드', path: '' },
   { icon: UserCog, label: '임원 관리', path: '/officers' },
-  { icon: ShoppingBag, label: '공동구매 현황', path: '/groupbuy-status' },
   { icon: Settings, label: '분회 설정', path: '/settings' },
 ];
 

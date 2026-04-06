@@ -24,7 +24,7 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
   { label: '콘텐츠', path: '/hub/content' },
   { label: '상품 카탈로그', path: '/hub/b2b' },
   { label: '사이니지', path: '/hub/signage' },
-  { label: '공동구매', path: '/groupbuy' },
+  { label: '이벤트', path: '/hub/event-offers' },
   { label: '서비스', path: '/services/pharmacy' },
 ];
 

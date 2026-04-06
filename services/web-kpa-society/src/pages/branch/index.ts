@@ -4,8 +4,6 @@ export { BranchNewsDetailPage } from './BranchNewsDetailPage';
 export { BranchForumListPage } from './BranchForumListPage';
 export { BranchForumDetailPage } from './BranchForumDetailPage';
 export { BranchForumWritePage } from './BranchForumWritePage';
-export { BranchCampaignListPage } from './BranchCampaignListPage';
-export { BranchCampaignDetailPage } from './BranchCampaignDetailPage';
 export { BranchAboutPage } from './BranchAboutPage';
 export { BranchOfficersPage } from './BranchOfficersPage';
 export { BranchContactPage } from './BranchContactPage';

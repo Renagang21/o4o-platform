@@ -79,7 +79,7 @@ const demoMenuItems: MenuItem[] = [
     href: '/lms',
     children: [
       { label: '교육 (LMS)', href: '/lms' },
-      { label: '공동구매', href: '/groupbuy' },
+      { label: '이벤트 상품', href: '/event-offers' },
       { label: '참여 (설문)', href: '/participation' },
       { label: '이벤트', href: '/events' },
     ],

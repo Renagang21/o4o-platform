@@ -25,8 +25,8 @@ import {
   FeedbackDetailPage,
 } from '../pages/feedback';
 
-// WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 관리
-import { GroupbuyManagePage } from '../pages/intranet/groupbuy';
+// 이벤트 관리
+import { EventOfferManagePage } from '../pages/intranet/event-offer';
 
 // WO-SIGNAGE-CONTENT-HUB-V1-A: 사이니지 콘텐츠 허브
 import ContentHubPage from '../pages/signage/ContentHubPage';
@@ -71,8 +71,8 @@ export function IntranetRoutes() {
           <Route path="feedback/new" element={<FeedbackNewPage />} />
           <Route path="feedback/:id" element={<FeedbackDetailPage />} />
 
-          {/* WO-KPA-GROUPBUY-OPERATOR-UI-V1: 공동구매 관리 */}
-          <Route path="groupbuy" element={<GroupbuyManagePage />} />
+          {/* 이벤트 관리 */}
+          <Route path="event-offers" element={<EventOfferManagePage />} />
 
           {/* 404 */}
           <Route path="*" element={<Navigate to="" replace />} />

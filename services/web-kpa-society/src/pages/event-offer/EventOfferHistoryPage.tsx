@@ -5,12 +5,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { groupbuyApi } from '../../api';
+import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { GroupbuyParticipation } from '../../types';
 
-export function GroupbuyHistoryPage() {
+export function EventOfferHistoryPage() {
   const { user } = useAuth();
   const [participations, setParticipations] = useState<GroupbuyParticipation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export function GroupbuyHistoryPage() {
       setLoading(true);
       setError(null);
 
-      const res = await groupbuyApi.getMyParticipations({
+      const res = await eventOfferApi.getMyParticipations({
         page: currentPage,
         limit: 10,
       });

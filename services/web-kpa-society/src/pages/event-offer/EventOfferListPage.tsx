@@ -5,11 +5,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { groupbuyApi } from '../../api';
+import { eventOfferApi } from '../../api';
 import { colors, typography } from '../../styles/theme';
 import type { Groupbuy } from '../../types';
 
-export function GroupbuyListPage() {
+export function EventOfferListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [groupbuys, setGroupbuys] = useState<Groupbuy[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export function GroupbuyListPage() {
     try {
       setLoading(true);
 
-      const res = await groupbuyApi.getGroupbuys({
+      const res = await eventOfferApi.getGroupbuys({
         status: currentStatus,
         page: currentPage,
         limit: 10,

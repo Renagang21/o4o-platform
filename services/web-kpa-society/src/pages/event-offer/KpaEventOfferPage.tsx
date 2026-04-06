@@ -9,13 +9,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PageHeader, LoadingSpinner, EmptyState, Pagination, Card } from '../../components/common';
-import { groupbuyApi } from '../../api';
+import { eventOfferApi } from '../../api';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import { PLATFORM_ROLES, hasAnyRole } from '../../lib/role-constants';
 import type { GroupbuyProduct, GroupbuyStats } from '../../types';
 
-export function KpaGroupbuyPage() {
+export function KpaEventOfferPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<GroupbuyProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ export function KpaGroupbuyPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await groupbuyApi.getGroupbuyProducts({
+      const res = await eventOfferApi.getGroupbuyProducts({
         page: currentPage,
         limit: 12,
       });
@@ -52,7 +52,7 @@ export function KpaGroupbuyPage() {
     // 운영자인 경우 통계 로드
     if (isOperator) {
       try {
-        const statsRes = await groupbuyApi.getGroupbuyStats();
+        const statsRes = await eventOfferApi.getGroupbuyStats();
         setStats(statsRes.data);
       } catch {
         // 통계 실패 시 무시
