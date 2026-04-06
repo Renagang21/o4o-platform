@@ -120,18 +120,18 @@ export default function AllRegisteredProductsPage() {
           />
           <KpiCard
             label="승인 대기" value={kpi.approvalPending} cls="text-amber-700"
-            active={approvalFilter === 'pending'}
-            onClick={() => setApprovalFilter(approvalFilter === 'pending' ? '' : 'pending')}
+            active={approvalFilter === 'PENDING'}
+            onClick={() => setApprovalFilter(approvalFilter === 'PENDING' ? '' : 'PENDING')}
           />
           <KpiCard
             label="승인됨" value={kpi.approvalApproved} cls="text-green-700"
-            active={approvalFilter === 'approved'}
-            onClick={() => setApprovalFilter(approvalFilter === 'approved' ? '' : 'approved')}
+            active={approvalFilter === 'APPROVED'}
+            onClick={() => setApprovalFilter(approvalFilter === 'APPROVED' ? '' : 'APPROVED')}
           />
           <KpiCard
             label="반려됨" value={kpi.approvalRejected} cls="text-red-600"
-            active={approvalFilter === 'rejected'}
-            onClick={() => setApprovalFilter(approvalFilter === 'rejected' ? '' : 'rejected')}
+            active={approvalFilter === 'REJECTED'}
+            onClick={() => setApprovalFilter(approvalFilter === 'REJECTED' ? '' : 'REJECTED')}
           />
         </div>
       )}
