@@ -379,7 +379,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         const existingKeys = new Set(product.serviceKeys || []);
         const newKeys = form.serviceKeys.filter(k => !existingKeys.has(k));
         if (newKeys.length > 0) {
-          await supplierApi.submitForApproval([product.id], form.serviceKeys);
+          await supplierApi.submitForApproval([product.id]);
         }
       }
 

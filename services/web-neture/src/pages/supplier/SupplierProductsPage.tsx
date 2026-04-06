@@ -242,94 +242,8 @@ function RegulatoryInfoModal({
   );
 }
 
-// ─── Service Key Select Modal (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
-
-// Neture는 공급자 작업 공간이므로 승인 요청 대상에서 제외
-// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
-const AVAILABLE_SERVICES = [
-  { key: 'glycopharm', name: 'GlycoPharm' },
-  { key: 'kpa-society', name: 'KPA Society' },
-  { key: 'k-cosmetics', name: 'K-Cosmetics' },
-];
-
-function ServiceKeySelectModal({
-  selectedCount,
-  onClose,
-  onSubmit,
-}: {
-  selectedCount: number;
-  onClose: () => void;
-  onSubmit: (serviceKeys: string[]) => void;
-}) {
-  const [chosen, setChosen] = useState<Set<string>>(new Set());
-  const [submitting, setSubmitting] = useState(false);
-
-  const toggle = (key: string) => {
-    setChosen((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key); else next.add(key);
-      return next;
-    });
-  };
-
-  const handleSubmit = async () => {
-    if (chosen.size === 0) return;
-    setSubmitting(true);
-    await onSubmit(Array.from(chosen));
-    setSubmitting(false);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[420px]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-900">승인 요청</h3>
-          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
-        </div>
-
-        <p className="text-sm text-slate-600 mb-4">
-          선택한 <strong>{selectedCount}개</strong> 상품을 아래 서비스에 승인 요청합니다.
-        </p>
-
-        <div className="grid grid-cols-2 gap-2 mb-6">
-          {AVAILABLE_SERVICES.map((svc) => {
-            const selected = chosen.has(svc.key);
-            return (
-              <label
-                key={svc.key}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                  selected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={selected}
-                  onChange={() => toggle(svc.key)}
-                  className="w-4 h-4 text-emerald-600 rounded"
-                />
-                <span className="text-sm font-medium">{svc.name}</span>
-              </label>
-            );
-          })}
-        </div>
-
-        <div className="flex justify-end gap-2">
-          <button onClick={onClose} disabled={submitting} className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">
-            취소
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={chosen.size === 0 || submitting}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg disabled:opacity-50"
-          >
-            <Send size={14} />
-            {submitting ? '요청 중...' : '승인 요청'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
+// ServiceKeySelectModal 제거 — 승인 요청 시 상품에 저장된 공급 정책 사용
 
 // ─── Approval status helper (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1) ───
 
@@ -635,7 +549,7 @@ export default function SupplierProductsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  // showApprovalModal 제거됨 — WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1
   const [toast, setToast] = useState<string | null>(null);
 
   // Filter state
@@ -1143,7 +1057,19 @@ export default function SupplierProductsPage() {
         <div className="flex items-center gap-3 mb-3 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
           <span className="text-sm text-blue-700 font-medium">{selectedIds.size}개 선택</span>
           <button
-            onClick={() => setShowApprovalModal(true)}
+            onClick={async () => {
+              if (!confirm(`선택한 ${selectedIds.size}개 상품의 저장된 공급 정책을 기준으로 승인 요청을 보냅니다.\n진행하시겠습니까?`)) return;
+              const result = await supplierApi.submitForApproval(Array.from(selectedIds));
+              if (result.success && result.data) {
+                const d = result.data;
+                showToast(`승인 요청 완료: ${d.submitted}건 요청${d.errors.length > 0 ? `, ${d.errors.length}건 실패` : ''}`);
+                fetchProducts();
+                fetchTabCounts();
+                setSelectedIds(new Set());
+              } else {
+                showToast(result.error || '승인 요청에 실패했습니다.');
+              }
+            }}
             className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded"
           >
             <Send size={13} />
@@ -1280,23 +1206,7 @@ export default function SupplierProductsPage() {
           onClose={() => setRegulatoryProduct(null)}
         />
       )}
-      {showApprovalModal && (
-        <ServiceKeySelectModal
-          selectedCount={selectedIds.size}
-          onClose={() => setShowApprovalModal(false)}
-          onSubmit={async (serviceKeys) => {
-            const result = await supplierApi.submitForApproval(Array.from(selectedIds), serviceKeys);
-            setShowApprovalModal(false);
-            if (result.success && result.data) {
-              showToast(`${result.data.submitted}건 승인 요청 완료${result.data.errors.length > 0 ? ` (${result.data.errors.length}건 실패)` : ''}`);
-            } else {
-              showToast('승인 요청 실패');
-            }
-            setSelectedIds(new Set());
-            await fetchProducts(pagination.page);
-          }}
-        />
-      )}
+      {/* ServiceKeySelectModal 제거됨 — WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1 */}
 
       {/* WO-NETURE-SUPPLIER-PRODUCT-DETAIL-DESCRIPTION-PREVIEW-FROM-LIST-V1: 상세설명 미리보기 */}
       {previewProduct && (

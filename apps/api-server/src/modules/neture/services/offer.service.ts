@@ -321,50 +321,37 @@ export class NetureOfferService {
    * POST /supplier/products/submit-approval
    * 선택된 offer들에 대해 서비스별 승인 레코드를 생성하고 serviceKeys를 업데이트한다.
    */
+  // WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
+  // 승인 요청 시 offer에 저장된 serviceKeys를 사용 (프론트에서 별도 선택 없음)
   async submitForApproval(
     supplierId: string,
     offerIds: string[],
-    serviceKeys: string[],
   ): Promise<{ submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }> {
-    // WO-NETURE-LEGACY-NETURE-SERVICE-SELECTION-DATA-CLEANUP-V1 + WO-NETURE-EXCLUDE-GLUCOSEVIEW-V1: 서비스 레벨 방어
-    serviceKeys = serviceKeys.filter((k) => k !== 'neture' && k !== 'glucoseview');
-    if (serviceKeys.length === 0) {
-      return { submitted: 0, skipped: offerIds.length, errors: [] };
-    }
     const approvalService = new OfferServiceApprovalService(AppDataSource);
     const result = { submitted: 0, skipped: 0, errors: [] as Array<{ id: string; error: string }> };
 
-    // 소유권 일괄 확인
-    const ownedRows: Array<{ id: string }> = await AppDataSource.query(
-      `SELECT id FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2`,
+    // 소유권 + 저장된 정책 일괄 조회
+    const ownedRows: Array<{ id: string; service_keys: string[] }> = await AppDataSource.query(
+      `SELECT id, service_keys FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2`,
       [offerIds, supplierId],
     );
-    const ownedSet = new Set(ownedRows.map((r) => r.id));
+    const ownedMap = new Map(ownedRows.map((r) => [r.id, r.service_keys || []]));
 
     for (const offerId of offerIds) {
-      if (!ownedSet.has(offerId)) {
+      if (!ownedMap.has(offerId)) {
         result.errors.push({ id: offerId, error: 'NOT_OWNED' });
         continue;
       }
 
       try {
-        await approvalService.createPendingApprovals(offerId, serviceKeys);
-
-        // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1:
-        // service_keys 병합 + distributionType 파생 업데이트
-        await AppDataSource.query(
-          `UPDATE supplier_product_offers
-           SET service_keys = (
-             SELECT ARRAY(SELECT DISTINCT unnest(service_keys || $2::text[]))
-           ),
-           distribution_type = CASE
-             WHEN is_public THEN 'PUBLIC'
-             ELSE 'SERVICE'
-           END,
-           updated_at = NOW()
-           WHERE id = $1`,
-          [offerId, serviceKeys],
+        // offer에 저장된 serviceKeys 사용 (neture/glucoseview 제외)
+        const offerServiceKeys = ownedMap.get(offerId)!.filter(
+          (k) => k !== 'neture' && k !== 'glucoseview',
         );
+
+        if (offerServiceKeys.length > 0) {
+          await approvalService.createPendingApprovals(offerId, offerServiceKeys);
+        }
 
         result.submitted++;
       } catch (error) {

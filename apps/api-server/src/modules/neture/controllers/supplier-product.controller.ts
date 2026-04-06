@@ -98,12 +98,13 @@ export function createSupplierProductController(dataSource: DataSource): Router 
     }
   });
 
-  // POST /supplier/products/submit-approval (WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1)
-  // 주의: /products/:id 보다 먼저 등록해야 'submit-approval'이 :id로 매칭되지 않음
+  // POST /supplier/products/submit-approval
+  // WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
+  // serviceKeys를 request body에서 받지 않고, offer에 저장된 정책 사용
   router.post('/products/submit-approval', requireAuth, requireActiveSupplier as RequestHandler, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
-      const { offerIds, serviceKeys } = req.body;
+      const { offerIds } = req.body;
 
       if (!Array.isArray(offerIds) || offerIds.length === 0) {
         return res.status(400).json({ success: false, error: 'INVALID_OFFER_IDS', message: 'offerIds array is required' });
@@ -111,17 +112,8 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       if (offerIds.length > 100) {
         return res.status(400).json({ success: false, error: 'TOO_MANY_OFFERS', message: 'Max 100 offers per request' });
       }
-      if (!Array.isArray(serviceKeys) || serviceKeys.length === 0) {
-        return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS', message: 'serviceKeys array is required' });
-      }
 
-      // neture는 공급자 작업 공간이므로 승인 요청 대상에서 제외
-      const filteredKeys = serviceKeys.filter((k: string) => k !== 'neture');
-      if (filteredKeys.length === 0) {
-        return res.status(400).json({ success: false, error: 'INVALID_SERVICE_KEYS', message: 'No valid service keys after filtering' });
-      }
-
-      const result = await netureService.submitForApproval(supplierId, offerIds, filteredKeys);
+      const result = await netureService.submitForApproval(supplierId, offerIds);
       res.json({ success: true, data: result });
     } catch (error) {
       logger.error('[Neture API] Error submitting for approval:', error);

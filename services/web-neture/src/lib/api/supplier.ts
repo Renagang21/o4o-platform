@@ -564,13 +564,12 @@ export const supplierApi = {
     }
   },
 
-  /** WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1: 승인 요청 */
+  /** WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1: 저장된 정책 기준 승인 요청 */
   async submitForApproval(
     offerIds: string[],
-    serviceKeys: string[],
   ): Promise<{ success: boolean; data?: { submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }; error?: string }> {
     try {
-      const response = await api.post('/neture/supplier/products/submit-approval', { offerIds, serviceKeys });
+      const response = await api.post('/neture/supplier/products/submit-approval', { offerIds });
       return response.data;
     } catch (error) {
       console.warn('[Supplier API] Failed to submit for approval:', error);

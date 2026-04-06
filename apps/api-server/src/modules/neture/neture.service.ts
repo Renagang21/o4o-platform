@@ -264,8 +264,8 @@ export class NetureService {
   }
 
   /** WO-NETURE-PRODUCT-LIFECYCLE-COMPLETION-V1 */
-  async submitForApproval(supplierId: string, offerIds: string[], serviceKeys: string[]) {
-    return this.offerService.submitForApproval(supplierId, offerIds, serviceKeys);
+  async submitForApproval(supplierId: string, offerIds: string[]) {
+    return this.offerService.submitForApproval(supplierId, offerIds);
   }
 
   async createSupplierOffer(
