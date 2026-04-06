@@ -47,6 +47,9 @@ export function EditableDataTable<T extends Record<string, any>>({
   reorderable,
   persistState,
   columnVisibility,
+  selectable,
+  selectedKeys,
+  onSelectionChange,
 }: EditableDataTableProps<T>) {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [dirtyRows, setDirtyRows] = useState<Map<string, Partial<T>>>(new Map());
@@ -122,6 +125,8 @@ export function EditableDataTable<T extends Record<string, any>>({
     minWidth: col.minWidth,
     maxWidth: col.maxWidth,
     resizable: col.resizable,
+    system: col.system,
+    sticky: col.sticky,
     align: col.align,
 
     accessor: (row: T, index: number) => {
@@ -243,6 +248,9 @@ export function EditableDataTable<T extends Record<string, any>>({
         reorderable={reorderable}
         persistState={persistState}
         columnVisibility={columnVisibility}
+        selectable={selectable}
+        selectedKeys={selectedKeys}
+        onSelectionChange={onSelectionChange}
       />
     </div>
   );

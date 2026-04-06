@@ -84,6 +84,9 @@ export function BaseTable<T extends Record<string, any>>({
   reorderable,
   persistState: shouldPersist,
   columnVisibility,
+  selectable,
+  selectedKeys,
+  onSelectionChange,
 }: BaseTableProps<T>) {
   const thBase = thClassName ?? DEFAULT_TH;
   const tdBase = tdClassName ?? DEFAULT_TD;
@@ -125,12 +128,61 @@ export function BaseTable<T extends Record<string, any>>({
   }, [columns]);
 
   // Apply order + visibility to get effective columns
+  // System columns (sticky/selection) are always first, never reordered or hidden
   const effectiveColumns = useMemo(() => {
     const colMap = new Map(columns.map((c) => [c.key, c]));
-    return columnOrder
-      .filter((key) => colMap.has(key) && !hiddenKeys.has(key))
+    const systemCols = columns.filter((c) => c.system);
+    const regularCols = columnOrder
+      .filter((key) => colMap.has(key) && !hiddenKeys.has(key) && !colMap.get(key)!.system)
       .map((key) => colMap.get(key)!);
+    return [...systemCols, ...regularCols];
   }, [columns, columnOrder, hiddenKeys]);
+
+  // ─── Selection (select-all / indeterminate) ───
+
+  const getRowKey = useCallback((row: T, index: number) => {
+    return rowKey ? rowKey(row, index) : `row-${index}`;
+  }, [rowKey]);
+
+  const selectAllState = useMemo<'none' | 'some' | 'all'>(() => {
+    if (!selectable || !selectedKeys || data.length === 0) return 'none';
+    const visibleKeys = data.map((row, i) => getRowKey(row, i));
+    const selectedCount = visibleKeys.filter((k) => selectedKeys.has(k)).length;
+    if (selectedCount === 0) return 'none';
+    if (selectedCount === visibleKeys.length) return 'all';
+    return 'some';
+  }, [selectable, selectedKeys, data, getRowKey]);
+
+  const handleSelectAll = useCallback(() => {
+    if (!onSelectionChange) return;
+    const visibleKeys = data.map((row, i) => getRowKey(row, i));
+    if (selectAllState === 'all') {
+      // Deselect all visible
+      const next = new Set(selectedKeys);
+      visibleKeys.forEach((k) => next.delete(k));
+      onSelectionChange(next);
+    } else {
+      // Select all visible
+      const next = new Set(selectedKeys);
+      visibleKeys.forEach((k) => next.add(k));
+      onSelectionChange(next);
+    }
+  }, [data, getRowKey, selectAllState, selectedKeys, onSelectionChange]);
+
+  const handleToggleRow = useCallback((key: string) => {
+    if (!onSelectionChange) return;
+    const next = new Set(selectedKeys);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    onSelectionChange(next);
+  }, [selectedKeys, onSelectionChange]);
+
+  const selectAllRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (selectAllRef.current) {
+      selectAllRef.current.indeterminate = selectAllState === 'some';
+    }
+  }, [selectAllState]);
 
   // ─── Persist helper ───
 
@@ -305,7 +357,7 @@ export function BaseTable<T extends Record<string, any>>({
           {visibilityOpen && (
             <div className="absolute right-0 top-8 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[160px]">
               <p className="text-xs font-medium text-gray-500 mb-2">표시할 컬럼</p>
-              {columns.map((col) => (
+              {columns.filter((col) => !col.system).map((col) => (
                 <label key={col.key} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1 rounded text-xs text-gray-700">
                   <input
                     type="checkbox"
@@ -345,20 +397,41 @@ export function BaseTable<T extends Record<string, any>>({
               if (col.maxWidth != null) widthStyle.maxWidth = col.maxWidth;
 
               const isDragOver = dragOverKey === col.key && dragColRef.current !== col.key;
+              const isSystem = col.system;
+              const isSticky = col.sticky;
+              const canDrag = reorderable && !isSystem;
+
+              // Sticky styles
+              const stickyStyle: React.CSSProperties = isSticky
+                ? { position: 'sticky', left: 0, zIndex: 20, backgroundColor: 'inherit' }
+                : {};
+
+              // Selection column: render select-all checkbox
+              const headerContent = (selectable && col.key === '_select')
+                ? (
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    checked={selectAllState === 'all'}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 accent-blue-600 cursor-pointer"
+                  />
+                )
+                : col.header;
 
               return (
                 <th
                   key={col.key}
-                  style={widthStyle}
+                  style={{ ...widthStyle, ...stickyStyle }}
                   onClick={col.onHeaderClick}
-                  draggable={reorderable}
-                  onDragStart={reorderable ? (e) => handleDragStart(e, col.key) : undefined}
-                  onDragEnd={reorderable ? handleDragEnd : undefined}
-                  onDragOver={reorderable ? (e) => handleDragOver(e, col.key) : undefined}
-                  onDrop={reorderable ? (e) => handleDrop(e, col.key) : undefined}
-                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''} ${reorderable ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragOver ? 'bg-blue-50 border-l-2 border-blue-400' : ''}`}
+                  draggable={canDrag}
+                  onDragStart={canDrag ? (e) => handleDragStart(e, col.key) : undefined}
+                  onDragEnd={canDrag ? handleDragEnd : undefined}
+                  onDragOver={canDrag ? (e) => handleDragOver(e, col.key) : undefined}
+                  onDrop={canDrag ? (e) => handleDrop(e, col.key) : undefined}
+                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''} ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragOver ? 'bg-blue-50 border-l-2 border-blue-400' : ''} ${isSticky ? 'border-r border-gray-200' : ''}`}
                 >
-                  {col.header}
+                  {headerContent}
                   {col.resizable && (
                     <div
                       onMouseDown={(e) => handleMouseDown(e, ci)}
@@ -433,13 +506,20 @@ export function BaseTable<T extends Record<string, any>>({
                       if (useFixedLayout && colWidths[ci] != null) {
                         tdStyle.width = colWidths[ci];
                       }
+                      // Sticky body cell
+                      if (col.sticky) {
+                        tdStyle.position = 'sticky';
+                        tdStyle.left = 0;
+                        tdStyle.zIndex = 10;
+                        tdStyle.backgroundColor = 'inherit';
+                      }
 
                       return (
                         <td
                           key={col.key}
-                          style={tdStyle.width ? tdStyle : undefined}
+                          style={tdStyle.width || col.sticky ? tdStyle : undefined}
                           onClick={col.onCellClick ? () => col.onCellClick!(row, rowIndex) : undefined}
-                          className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)} overflow-hidden text-ellipsis`}
+                          className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)} overflow-hidden text-ellipsis ${col.sticky ? 'border-r border-gray-200' : ''}`}
                         >
                           {content}
                         </td>

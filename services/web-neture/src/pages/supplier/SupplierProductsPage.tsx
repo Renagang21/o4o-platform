@@ -698,11 +698,14 @@ export default function SupplierProductsPage() {
 
   // Column with checkbox, image, description, quick price, regulatory
   const enhancedColumns = useMemo(() => {
+    // WO-O4O-BASETABLE-SELECTION-COLUMN-STICKY-AND-SELECT-ALL-V1: system + sticky
     const selectCol: ListColumnDef<SupplierProduct> = {
       key: '_select' as any,
       header: '' as any,
       width: '40px',
       align: 'center',
+      system: true,
+      sticky: true,
       render: (_v: any, row: SupplierProduct) => (
         <input
           type="checkbox"
@@ -1209,6 +1212,9 @@ export default function SupplierProductsPage() {
         reorderable
         persistState
         columnVisibility
+        selectable
+        selectedKeys={selectedIds}
+        onSelectionChange={setSelectedIds}
       />
 
       {/* Pagination */}

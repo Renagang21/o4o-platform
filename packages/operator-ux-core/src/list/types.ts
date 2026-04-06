@@ -36,6 +36,10 @@ export interface ListColumnDef<T> {
   maxWidth?: number | string;
   /** 컬럼 폭 드래그 리사이즈 허용 */
   resizable?: boolean;
+  /** 시스템 컬럼 — reorder/visibility 대상 제외 */
+  system?: boolean;
+  /** sticky 고정 (left: 0) */
+  sticky?: boolean;
   /** 텍스트 정렬 */
   align?: 'left' | 'center' | 'right';
   /** 정렬 가능 여부 */
@@ -112,4 +116,11 @@ export interface EditableDataTableProps<T extends Record<string, any>>
   persistState?: boolean;
   /** 컬럼 표시/숨김 토글 UI 표시 */
   columnVisibility?: boolean;
+  // WO-O4O-BASETABLE-SELECTION-COLUMN-STICKY-AND-SELECT-ALL-V1
+  /** 행 선택 활성화 */
+  selectable?: boolean;
+  /** 선택된 행 키 목록 */
+  selectedKeys?: Set<string>;
+  /** 선택 변경 콜백 */
+  onSelectionChange?: (keys: Set<string>) => void;
 }

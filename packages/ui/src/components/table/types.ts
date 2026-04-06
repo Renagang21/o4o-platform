@@ -32,6 +32,11 @@ export interface O4OColumn<T> {
   /** 컬럼 폭 드래그 리사이즈 허용 */
   resizable?: boolean;
 
+  /** 시스템 컬럼 — reorder/visibility 대상 제외, sticky 적용 가능 */
+  system?: boolean;
+  /** sticky 고정 (left: 0) */
+  sticky?: boolean;
+
   // ─── Editable (선택) ───
   editable?: boolean;
   editor?: (value: any, row: T, onChange: (v: any) => void) => ReactNode;
@@ -75,4 +80,12 @@ export interface BaseTableProps<T> {
   persistState?: boolean;
   /** 컬럼 표시/숨김 토글 UI 표시 */
   columnVisibility?: boolean;
+
+  // WO-O4O-BASETABLE-SELECTION-COLUMN-STICKY-AND-SELECT-ALL-V1
+  /** 행 선택 활성화 — 맨 왼쪽 체크박스 컬럼 자동 생성 */
+  selectable?: boolean;
+  /** 선택된 행 키 목록 */
+  selectedKeys?: Set<string>;
+  /** 선택 변경 콜백 */
+  onSelectionChange?: (keys: Set<string>) => void;
 }
