@@ -47,7 +47,7 @@ export interface AllRegisteredOffer {
   specification: string | null;
   primaryImageUrl: string | null;
   regulatoryType: string | null;
-  serviceApprovals: Array<{ serviceKey: string; status: string }>;
+  serviceApprovals: Array<{ id?: string; serviceKey: string; status: string }>;
   createdAt: string;
 }
 

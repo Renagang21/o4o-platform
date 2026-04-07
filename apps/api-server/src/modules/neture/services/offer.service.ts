@@ -1470,7 +1470,7 @@ export class NetureOfferService {
            WHERE master_id = pm.id AND is_primary = true LIMIT 1
          ) pi_img ON true
          LEFT JOIN LATERAL (
-           SELECT COALESCE(json_agg(json_build_object('serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
+           SELECT COALESCE(json_agg(json_build_object('id', osa.id, 'serviceKey', osa.service_key, 'status', osa.approval_status)), '[]'::json) AS approvals
            FROM offer_service_approvals osa WHERE osa.offer_id = spo.id
          ) svc_appr ON true
          WHERE ${where}

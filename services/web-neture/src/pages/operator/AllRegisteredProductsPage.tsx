@@ -17,6 +17,7 @@ import {
   type AllRegisteredOffer,
   type AllOffersKpi,
 } from '../../lib/api';
+import { operatorServiceApprovalApi } from '../../lib/api/serviceApproval';
 import {
   DISTRIBUTION_TYPE_LABELS,
   APPROVAL_STATUS_BADGE,
@@ -67,6 +68,10 @@ export default function AllRegisteredProductsPage() {
   const [primaryTab, setPrimaryTab] = useState<PrimaryTab>('all');
   const [supplySubTab, setSupplySubTab] = useState<SupplySubTab>('all');
   const [serviceTab, setServiceTab] = useState<ServiceTab>('kpa-society');
+
+  // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Selection state
+  const [selectedOfferIds, setSelectedOfferIds] = useState<Set<string>>(new Set());
+  const [actionLoading, setActionLoading] = useState(false);
 
   const PAGE_SIZE = 50;
 
@@ -135,6 +140,96 @@ export default function AllRegisteredProductsPage() {
   }, [offers, primaryTab, supplySubTab, serviceTab]);
 
   const displayOffers = filteredOffers;
+
+  // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1
+  // 선택 가능한 offer = serviceApprovals 중 pending이 1개 이상 있는 offer
+  const isSelectable = (o: AllRegisteredOffer) =>
+    (o.serviceApprovals || []).some((a) => a.status === 'pending' && a.id);
+
+  const selectableIds = useMemo(
+    () => displayOffers.filter(isSelectable).map((o) => o.id),
+    [displayOffers],
+  );
+
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedOfferIds.has(id));
+  const someSelected = selectableIds.some((id) => selectedOfferIds.has(id));
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedOfferIds(new Set());
+    } else {
+      setSelectedOfferIds(new Set(selectableIds));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedOfferIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Reset selection on filter/page change
+  useEffect(() => {
+    setSelectedOfferIds(new Set());
+  }, [page, search, distFilter, activeFilter, approvalFilter, regulatoryFilter, primaryTab, supplySubTab, serviceTab]);
+
+  // 선택된 offer들에서 pending service approval id 추출
+  const collectPendingApprovalIds = (): string[] => {
+    const ids: string[] = [];
+    for (const o of displayOffers) {
+      if (!selectedOfferIds.has(o.id)) continue;
+      for (const a of o.serviceApprovals || []) {
+        if (a.status === 'pending' && a.id) ids.push(a.id);
+      }
+    }
+    return ids;
+  };
+
+  const handleBulkApprove = async () => {
+    const ids = collectPendingApprovalIds();
+    if (ids.length === 0) return;
+    if (!confirm(`선택한 ${selectedOfferIds.size}개 상품의 ${ids.length}개 승인 요청을 일괄 승인합니다. 진행하시겠습니까?`)) return;
+    setActionLoading(true);
+    try {
+      const result = await operatorServiceApprovalApi.batchApprove(ids);
+      if (result.success) {
+        alert(`승인 완료: ${result.data?.approved ?? ids.length}건`);
+        setSelectedOfferIds(new Set());
+        fetchOffers(page);
+      } else {
+        alert(`승인 실패: ${result.error || '알 수 없는 오류'}`);
+      }
+    } catch {
+      alert('승인 중 오류가 발생했습니다');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    const ids = collectPendingApprovalIds();
+    if (ids.length === 0) return;
+    const reason = prompt('거절 사유를 입력하세요 (선택)') ?? '';
+    if (!confirm(`선택한 ${selectedOfferIds.size}개 상품의 ${ids.length}개 승인 요청을 일괄 거절합니다.`)) return;
+    setActionLoading(true);
+    try {
+      const result = await operatorServiceApprovalApi.batchReject(ids, reason || undefined);
+      if (result.success) {
+        alert(`거절 완료: ${result.data?.rejected ?? ids.length}건`);
+        setSelectedOfferIds(new Set());
+        fetchOffers(page);
+      } else {
+        alert(`거절 실패: ${result.error || '알 수 없는 오류'}`);
+      }
+    } catch {
+      alert('거절 중 오류가 발생했습니다');
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -313,11 +408,49 @@ export default function AllRegisteredProductsPage() {
         )}
       </div>
 
+      {/* WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Bulk Action Bar */}
+      {selectedOfferIds.size > 0 && (
+        <div className="flex items-center gap-3 mb-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+          <span className="text-sm text-blue-700 font-medium">{selectedOfferIds.size}개 선택</span>
+          <button
+            onClick={handleBulkApprove}
+            disabled={actionLoading}
+            className="px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded disabled:opacity-50"
+          >
+            {actionLoading ? '처리 중...' : '승인'}
+          </button>
+          <button
+            onClick={handleBulkReject}
+            disabled={actionLoading}
+            className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
+          >
+            거절
+          </button>
+          <button
+            onClick={() => setSelectedOfferIds(new Set())}
+            disabled={actionLoading}
+            className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded"
+          >
+            선택 해제
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase border-b border-slate-200">
+              <th className="px-4 py-3 font-medium w-10 text-center">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
+                  onChange={toggleSelectAll}
+                  disabled={selectableIds.length === 0}
+                  className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
+                />
+              </th>
               <th className="px-4 py-3 font-medium w-12"></th>
               <th className="px-4 py-3 font-medium">상품명</th>
               <th className="px-4 py-3 font-medium">공급자</th>
@@ -332,9 +465,9 @@ export default function AllRegisteredProductsPage() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
+              <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
             ) : displayOffers.length === 0 ? (
-              <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">
+              <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400">
                 {search || distFilter || activeFilter || approvalFilter || regulatoryFilter
                   ? '조건에 맞는 상품이 없습니다.'
                   : '등록된 상품이 없습니다.'}
@@ -346,8 +479,19 @@ export default function AllRegisteredProductsPage() {
               const apprBadge = APPROVAL_STATUS_BADGE[o.approvalStatus] || { label: o.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
               const regLabel = o.regulatoryType ? REGULATORY_TYPE_LABELS[o.regulatoryType] : null;
               const regBadge = o.regulatoryType ? REGULATORY_TYPE_BADGE[o.regulatoryType] : null;
+              const canSelect = isSelectable(o);
               return (
                 <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailOffer(o)}>
+                  <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedOfferIds.has(o.id)}
+                      onChange={() => toggleSelectOne(o.id)}
+                      disabled={!canSelect}
+                      className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                      title={canSelect ? '' : '승인 대기 항목만 선택 가능'}
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     {o.primaryImageUrl ? (
                       <img src={o.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
