@@ -281,9 +281,18 @@ export default function GuidelineManagementPage() {
         </div>
         <h1 className="text-xl font-bold text-slate-800">가이드라인 관리</h1>
       </div>
-      <p className="text-sm text-slate-500 mb-6 ml-[52px]">
+      <p className="text-sm text-slate-500 mb-3 ml-[52px]">
         당뇨인용 / 약국용 가이드라인을 편집하고 발행합니다.
       </p>
+
+      {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 제공 범위 안내 */}
+      <div className="mb-6 ml-[52px] flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+        <BookOpen className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
+        <div>
+          <span className="font-semibold">제공 범위:</span> 작성 · 수정 · 상태 변경(초안/발행/보관)까지 지원합니다.
+          <span className="ml-1 text-blue-700">버전 관리 · 배포 추적 · 승인 워크플로는 후속 단계에서 제공됩니다.</span>
+        </div>
+      </div>
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">

@@ -181,6 +181,17 @@ export default function OperatorCareAlertsPage() {
         </div>
       )}
 
+      {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 부분 구현 안내 */}
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
+        <div>
+          <p className="font-semibold">알림 목록 조회 단계</p>
+          <p className="mt-1 text-amber-700">
+            현재는 알림 목록 조회만 제공됩니다. 우선순위 조정·자동화 규칙·일괄 처리는 후속 단계에서 제공됩니다.
+          </p>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm p-4">

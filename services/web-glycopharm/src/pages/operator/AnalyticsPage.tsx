@@ -124,9 +124,23 @@ export default function AnalyticsPage() {
   return (
     <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>운영 액션 분석</h1>
-      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 24 }}>
+      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 16 }}>
         운영자 승인/거절 등 액션 이력을 분석합니다.
       </p>
+      {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 제한적 제공 안내 */}
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 24,
+        padding: 16, border: '1px solid #fcd34d', backgroundColor: '#fffbeb',
+        borderRadius: 12, fontSize: 13, color: '#92400e',
+      }}>
+        <span style={{ fontSize: 16, lineHeight: 1 }}>⚠️</span>
+        <div>
+          <div style={{ fontWeight: 600 }}>분석 기능 준비 중</div>
+          <div style={{ marginTop: 4, color: '#b45309' }}>
+            현재는 기본 액션 이력만 표시되며, 세그먼트·예측·심층 분석은 후속 단계에서 제공됩니다.
+          </div>
+        </div>
+      </div>
 
       {/* Period Filter */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>

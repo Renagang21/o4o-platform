@@ -19,7 +19,6 @@ import {
   Smartphone,
   Clock,
   Save,
-  RefreshCw,
   ChevronRight,
   AlertCircle,
 } from 'lucide-react';
@@ -73,7 +72,6 @@ function SettingRow({
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('general');
-  const [saving, setSaving] = useState(false);
 
   // Settings state
   const [settings, setSettings] = useState({
@@ -100,13 +98,6 @@ export default function SettingsPage() {
     commissionRate: 5,
   });
 
-  const handleSave = async () => {
-    setSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setSaving(false);
-  };
-
   const toggleSetting = (key: keyof typeof settings) => {
     setSettings((prev) => ({
       ...prev,
@@ -122,23 +113,28 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-slate-800">설정</h1>
           <p className="text-slate-500 text-sm">시스템 및 서비스 설정 관리</p>
         </div>
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 저장 API 미연동 → 비활성화 */}
         <button
-          onClick={handleSave}
-          disabled={saving}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+          type="button"
+          disabled
+          title="저장 기능 준비 중 — 백엔드 연동 후 제공 예정"
+          className="flex items-center gap-2 px-4 py-2 bg-slate-200 text-slate-500 rounded-lg cursor-not-allowed"
         >
-          {saving ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
-              저장 중...
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4" />
-              변경사항 저장
-            </>
-          )}
+          <Save className="w-4 h-4" />
+          변경사항 저장
         </button>
+      </div>
+
+      {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 준비중 안내 */}
+      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="text-sm text-amber-800">
+          <p className="font-semibold">설정 기능 준비 중</p>
+          <p className="mt-1 text-amber-700">
+            현재 화면은 미리보기입니다. 저장 기능은 백엔드 연동 작업 이후 제공됩니다.
+            아래 입력은 데모 값이며, 변경해도 실제로 저장되지 않습니다.
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
