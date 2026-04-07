@@ -94,8 +94,6 @@ const SignageTemplateDetailPage = lazy(() => import('@/pages/operator/signage/Te
 const MarketTrialListPage = lazy(() => import('@/pages/pharmacy/market-trial').then(m => ({ default: m.MarketTrialListPage })));
 // OperatorTrialSelectorPage removed (WO-O4O-OPERATOR-COMMON-CAPABILITY-REFINE-V1: deprecated)
 // WO-O4O-MARKET-TRIAL-PHASE1-V1: Service approval + store detail pages
-const MarketTrialServiceApprovalsPage = lazy(() => import('@/pages/operator/market-trial/MarketTrialServiceApprovalsPage'));
-const MarketTrialServiceApprovalDetailPage = lazy(() => import('@/pages/operator/market-trial/MarketTrialServiceApprovalDetailPage'));
 const MarketTrialDetailPage = lazy(() => import('@/pages/pharmacy/market-trial/MarketTrialDetailPage'));
 
 // B2B Order & Supply
@@ -523,11 +521,8 @@ function AppRoutes() {
         <Route path="stores" element={<OperatorStoresPage />} />
         <Route path="stores/:storeId" element={<OperatorStoreDetailPage />} />
         <Route path="orders" element={<OrdersPage />} />
-        {/* WO-O4O-ROUTE-GUARD-AUDIT-V1: admin-only 라우트 */}
-        <Route path="settlements" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><SettlementsPage /></RoleGuard>} />
-        <Route path="reports" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><ReportsPage /></RoleGuard>} />
-        <Route path="billing-preview" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><BillingPreviewPage /></RoleGuard>} />
-        <Route path="invoices" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><InvoicesPage /></RoleGuard>} />
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: Finance/Governance routes moved to /admin/* only.
+            Removed from /operator/*: settlements, reports, billing-preview, invoices, roles. */}
         <Route path="forum-requests" element={<ForumRequestsPage />} />
         <Route path="forum-delete-requests" element={<ForumDeleteRequestsPage />} />
         {/* WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1 */}
@@ -555,8 +550,8 @@ function AppRoutes() {
         <Route path="signage/templates/:templateId" element={<SignageTemplateDetailPage />} />
         {/* 운영 분석 (WO-O4O-AUDIT-ANALYTICS-LAYER-V1) */}
         <Route path="analytics" element={<OperatorAnalyticsPage />} />
-        {/* 역할 관리 (WO-O4O-ROLE-MANAGEMENT-UI-V1) — admin-only */}
-        <Route path="roles" element={<RoleGuard allowedRoles={[GLYCOPHARM_ROLES.ADMIN, GLYCOPHARM_ROLES.PLATFORM_SUPER_ADMIN]}><RoleManagementPage /></RoleGuard>} />
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
+            역할 관리는 /admin/roles 에서만 접근. /operator/roles 라우트 제거. */}
         {/* Care (WO-O4O-GLYCOPHARM-OPERATOR-CARE-PAGES-V1) */}
         <Route path="care" element={<OperatorCareDashboardPage />} />
         <Route path="care/alerts" element={<OperatorCareAlertsPage />} />

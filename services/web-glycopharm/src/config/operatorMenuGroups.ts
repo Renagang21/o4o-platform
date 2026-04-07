@@ -29,7 +29,8 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   approvals: [
     { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },
-    { label: 'Market Trial', path: '/operator/market-trial' },
+    /* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1:
+       Market Trial operator 콘솔은 미구현 → 메뉴/라우트에서 제거. 후속 별도 WO 예정. */
   ],
   products: [{ label: '상품 관리', path: '/operator/products' }],
   stores: [
@@ -97,7 +98,6 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   approvals: [
     { label: '신청 관리', path: '/operator/applications' },
     { label: '매장 승인', path: '/operator/store-approvals' },
-    { label: 'Market Trial', path: '/operator/market-trial' },
   ],
   products: [{ label: '상품 관리', path: '/operator/products' }],
   stores: [

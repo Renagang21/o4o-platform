@@ -82,13 +82,28 @@ export default function CommunityManagementPage() {
   return (
     <div style={{ padding: '24px 0' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: '#d1fae5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Monitor size={20} color="#059669" />
         </div>
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>커뮤니티 관리</h1>
           <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Community Hub 광고 및 스폰서 관리</p>
+        </div>
+      </div>
+
+      {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 제한적 제공 안내 */}
+      <div style={{
+        display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 20,
+        padding: 16, border: '1px solid #fcd34d', backgroundColor: '#fffbeb',
+        borderRadius: 12, fontSize: 13, color: '#92400e',
+      }}>
+        <AlertCircle size={18} style={{ flexShrink: 0, marginTop: 1 }} />
+        <div>
+          <div style={{ fontWeight: 600 }}>커뮤니티 관리 준비 중</div>
+          <div style={{ marginTop: 4, color: '#b45309' }}>
+            현재는 광고/스폰서 기본 등록만 가능하며, 콘텐츠 모더레이션·신고 처리·자동 필터 등 운영 기능은 후속 단계에서 제공됩니다.
+          </div>
         </div>
       </div>
 
