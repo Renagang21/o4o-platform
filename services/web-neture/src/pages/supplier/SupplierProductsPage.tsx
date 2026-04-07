@@ -837,6 +837,41 @@ export default function SupplierProductsPage() {
     });
   }, [products, filterVisibility]);
 
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1
+  const hasAnyFilter = !!(
+    keyword || filterHasImage || filterHasDescription || filterBarcodeSource ||
+    filterCompleteness || filterVisibility || activeTab !== 'all'
+  );
+
+  const resetAllFilters = useCallback(() => {
+    setKeyword('');
+    setFilterHasImage('');
+    setFilterHasDescription('');
+    setFilterBarcodeSource('');
+    setFilterCompleteness('');
+    setFilterVisibility('');
+    setActiveTab('all');
+  }, []);
+
+  const emptyStateNode = useMemo(() => {
+    if (hasAnyFilter) {
+      return (
+        <div className="flex flex-col items-center gap-2 py-8">
+          <p className="text-sm text-slate-500">현재 필터/검색 조건에 맞는 상품이 없습니다.</p>
+          <p className="text-xs text-slate-400">검색어나 필터를 초기화한 뒤 다시 확인해 주세요.</p>
+          <button
+            type="button"
+            onClick={resetAllFilters}
+            className="mt-1 px-3 py-1 text-xs text-white bg-blue-600 hover:bg-blue-700 rounded"
+          >
+            필터 초기화
+          </button>
+        </div>
+      );
+    }
+    return '등록된 제품이 없습니다';
+  }, [hasAnyFilter, resetAllFilters]);
+
   const handleGenerateAiTags = async (masterId: string) => {
     setGeneratingTagFor(masterId);
     await productApi.regenerateAiTags(masterId);
@@ -867,10 +902,18 @@ export default function SupplierProductsPage() {
   }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness, activeTab]);
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: fetch tab counts
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1:
+  // count도 rows와 동일한 보조 필터/검색어를 적용하여 기준 일치
   const fetchTabCounts = useCallback(async () => {
-    const counts = await supplierApi.getApprovalCounts();
+    const counts = await supplierApi.getApprovalCounts({
+      keyword: keyword || undefined,
+      hasImage: filterHasImage || undefined,
+      hasDescription: filterHasDescription || undefined,
+      barcodeSource: filterBarcodeSource || undefined,
+      completenessStatus: filterCompleteness || undefined,
+    });
     setTabCounts(counts);
-  }, []);
+  }, [keyword, filterHasImage, filterHasDescription, filterBarcodeSource, filterCompleteness]);
 
   useEffect(() => {
     fetchProducts(1);
@@ -1011,7 +1054,7 @@ export default function SupplierProductsPage() {
         {([
           { key: 'all' as ApprovalTab, label: '전체', count: tabCounts.total },
           { key: 'unrequested' as ApprovalTab, label: '승인요청 전', count: tabCounts.unrequested },
-          { key: 'pending' as ApprovalTab, label: '승인대기', count: tabCounts.pending },
+          { key: 'pending' as ApprovalTab, label: '승인 요청 중', count: tabCounts.pending },
           { key: 'approved' as ApprovalTab, label: '승인완료', count: tabCounts.approved },
           { key: 'rejected' as ApprovalTab, label: '거절', count: tabCounts.rejected },
         ]).map((tab) => (
@@ -1094,6 +1137,8 @@ export default function SupplierProductsPage() {
         </div>
       )}
 
+      {/* WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1:
+          빈 화면 안내 — 필터 조합으로 0건일 때 안내 + 필터 초기화 액션 */}
       {/* Table */}
       <EditableDataTable
         columns={[
@@ -1121,7 +1166,7 @@ export default function SupplierProductsPage() {
         data={filteredProducts}
         rowKey="id"
         loading={loading}
-        emptyMessage="등록된 제품이 없습니다"
+        emptyMessage={emptyStateNode}
         onSave={handleSave}
         saving={saving}
         tableId="supplier-products"

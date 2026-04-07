@@ -1168,7 +1168,31 @@ export class NetureOfferService {
 
   // WO-NETURE-SUPPLIER-PRODUCTS-TOP-COUNT-UNREQUESTED-TAB-V1:
   // total = unrequested + pending + approved + rejected
-  async getSupplierProductApprovalCounts(supplierId: string) {
+  /**
+   * 공급자 상품 승인 상태별 카운트.
+   *
+   * WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1:
+   * 탭 카운트도 rows 쿼리와 동일한 보조 필터(검색어/이미지/설명/바코드/완성도 등)를
+   * 적용하도록 수정. serviceApprovalStatus는 제외 — 5개 탭을 한 쿼리로 모두 계산.
+   */
+  async getSupplierProductApprovalCounts(
+    supplierId: string,
+    options: {
+      keyword?: string;
+      distributionType?: string;
+      isActive?: string;
+      hasImage?: string;
+      hasDescription?: string;
+      barcodeSource?: string;
+      completenessStatus?: string;
+    } = {},
+  ) {
+    // serviceApprovalStatus는 카운트 계산에 사용하지 않음 (FILTER로 5개 동시 집계)
+    const q = this.buildPaginatedWhereClause(supplierId, {
+      ...options,
+      serviceApprovalStatus: undefined,
+    });
+
     const rows: Array<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> = await AppDataSource.query(
       `SELECT
          COUNT(*)::int AS total,
@@ -1188,8 +1212,9 @@ export class NetureOfferService {
            WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
          ))::int AS rejected
        FROM supplier_product_offers spo
-       WHERE spo.supplier_id = $1`,
-      [supplierId],
+       JOIN product_masters pm ON pm.id = spo.master_id
+       WHERE ${q.where}`,
+      q.params,
     );
     return rows[0] || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
   }

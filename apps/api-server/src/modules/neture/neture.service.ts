@@ -251,8 +251,12 @@ export class NetureService {
   }
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: approval tab counts
-  async getSupplierProductApprovalCounts(supplierId: string) {
-    return this.offerService.getSupplierProductApprovalCounts(supplierId);
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1: forward filters
+  async getSupplierProductApprovalCounts(
+    supplierId: string,
+    options?: Parameters<typeof this.offerService.getSupplierProductApprovalCounts>[1],
+  ) {
+    return this.offerService.getSupplierProductApprovalCounts(supplierId, options);
   }
 
   async batchUpdateSupplierOffers(supplierId: string, updates: Parameters<typeof this.offerService.batchUpdateSupplierOffers>[1]) {

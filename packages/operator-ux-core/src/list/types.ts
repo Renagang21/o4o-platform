@@ -73,8 +73,8 @@ export interface DataTableProps<T extends Record<string, any>> {
   rowKey: keyof T | ((row: T) => string);
   /** 로딩 상태 */
   loading?: boolean;
-  /** 데이터 없을 때 메시지 */
-  emptyMessage?: string;
+  /** 데이터 없을 때 메시지 (ReactNode 허용 — 필터 안내/액션 등) */
+  emptyMessage?: ReactNode;
   /** 행 클릭 핸들러 */
   onRowClick?: (row: T) => void;
   /** 추가 CSS 클래스 */
