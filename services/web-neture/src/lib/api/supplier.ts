@@ -522,9 +522,18 @@ export const supplierApi = {
   },
 
   // WO-O4O-NETURE-PRODUCT-LIFECYCLE-FINALIZATION-V1: Approval tab counts
-  async getApprovalCounts(): Promise<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> {
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1: forward filters
+  async getApprovalCounts(params?: {
+    keyword?: string;
+    distributionType?: string;
+    isActive?: string;
+    hasImage?: string;
+    hasDescription?: string;
+    barcodeSource?: string;
+    completenessStatus?: string;
+  }): Promise<{ total: number; unrequested: number; pending: number; approved: number; rejected: number }> {
     try {
-      const response = await api.get('/neture/supplier/products/approval-counts');
+      const response = await api.get('/neture/supplier/products/approval-counts', { params });
       const result = response.data;
       return result.data || { total: 0, unrequested: 0, pending: 0, approved: 0, rejected: 0 };
     } catch (error) {
