@@ -14,16 +14,64 @@
  *   PATCH /contents/:id/status — Change status (admin)
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { CmsContent, ContentType, ContentStatus } from '@o4o-apps/cms-core';
-import { requireAuth, requireAdmin } from '../../middleware/auth.middleware.js';
+import { requireAuth } from '../../middleware/auth.middleware.js';
 import type { AuthRequest } from '../../middleware/auth.middleware.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import logger from '../../utils/logger.js';
 import { CmsContentService, StatusValidationError, StatusTransitionError } from './cms-content.service.js';
 import type { ContentAuthorRole, ContentVisibilityScope } from './cms-content-utils.js';
 import { VALID_CONTENT_TYPES } from './cms-content-utils.js';
+
+/**
+ * WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
+ *
+ * Authorize a CMS mutation request against a target serviceKey.
+ *
+ * Allowed:
+ *   - platform:admin / platform:super_admin (any serviceKey)
+ *   - `${serviceKey}:admin` or `${serviceKey}:operator` (only matching serviceKey)
+ *
+ * Returns { allowed, isPlatformAdmin } so callers can decide author_role / visibility_scope.
+ * Checks JWT payload roles first, falls back to RoleAssignment table.
+ */
+async function authorizeCmsMutation(
+  user: { id: string; roles?: string[] } | undefined,
+  serviceKey: string | null | undefined,
+): Promise<{ allowed: boolean; isPlatformAdmin: boolean }> {
+  if (!user) return { allowed: false, isPlatformAdmin: false };
+
+  const jwtRoles: string[] = user.roles || [];
+  const platformRoleNames = ['platform:admin', 'platform:super_admin'];
+
+  let isPlatformAdmin = jwtRoles.some((r) => platformRoleNames.includes(r));
+  if (!isPlatformAdmin) {
+    try {
+      isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, platformRoleNames);
+    } catch (err) {
+      logger.warn('[CMS] Platform admin RoleAssignment check failed:', (err as Error).message);
+    }
+  }
+
+  if (isPlatformAdmin) return { allowed: true, isPlatformAdmin: true };
+
+  // Service-scoped: requires serviceKey + matching service:operator|admin role
+  if (!serviceKey) return { allowed: false, isPlatformAdmin: false };
+
+  const allowedServiceRoles = [`${serviceKey}:admin`, `${serviceKey}:operator`];
+  let hasServiceRole = jwtRoles.some((r) => allowedServiceRoles.includes(r));
+  if (!hasServiceRole) {
+    try {
+      hasServiceRole = await roleAssignmentService.hasAnyRole(user.id, allowedServiceRoles);
+    } catch (err) {
+      logger.warn('[CMS] Service role RoleAssignment check failed:', (err as Error).message);
+    }
+  }
+
+  return { allowed: hasServiceRole, isPlatformAdmin: false };
+}
 
 export function createCmsContentMutationRoutes(deps: {
   dataSource: DataSource;
@@ -48,43 +96,6 @@ export function createCmsContentMutationRoutes(deps: {
         return;
       }
 
-      // Determine caller's author_role
-      const userRoles: string[] = user.roles || [];
-      let isPlatformAdmin = userRoles.some((r: string) =>
-        r === 'platform:admin' || r === 'platform:super_admin' || r === 'admin' || r === 'super_admin'
-      );
-
-      if (!isPlatformAdmin) {
-        try {
-          isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, ['platform:admin', 'platform:super_admin']);
-        } catch (err) {
-          logger.warn('[CMS] Platform admin RoleAssignment check failed, skipping:', (err as Error).message);
-        }
-      }
-
-      // Check service admin roles (e.g., glycopharm:admin, kpa:admin)
-      const serviceAdminMatch = userRoles.find((r: string) => r.endsWith(':admin') && !r.startsWith('platform:'));
-      const isServiceAdminByRole = !!serviceAdminMatch;
-
-      if (!isPlatformAdmin && !isServiceAdminByRole) {
-        // Also check RoleAssignment table for service admin roles
-        let hasServiceAdmin = false;
-        try {
-          const activeRoles = await roleAssignmentService.getActiveRoles(user.id);
-          hasServiceAdmin = activeRoles.some(a => a.role.endsWith(':admin') && !a.role.startsWith('platform:'));
-        } catch (err) {
-          logger.warn('[CMS] Service admin RoleAssignment check failed, skipping:', (err as Error).message);
-        }
-
-        if (!hasServiceAdmin) {
-          res.status(403).json({
-            success: false,
-            error: { code: 'FORBIDDEN', message: 'Admin or service admin privileges required' },
-          });
-          return;
-        }
-      }
-
       const {
         serviceKey,
         organizationId,
@@ -103,6 +114,20 @@ export function createCmsContentMutationRoutes(deps: {
         metadata = {},
         visibilityScope: reqVisibilityScope,
       } = req.body;
+
+      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
+      // Authorize against target serviceKey (allows platform admin OR ${serviceKey}:operator|admin)
+      const { allowed, isPlatformAdmin } = await authorizeCmsMutation(user, serviceKey);
+      if (!allowed) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Admin, service admin, or service operator privileges required for this serviceKey',
+          },
+        });
+        return;
+      }
 
       // Validate required fields
       if (!type || !title) {
@@ -182,7 +207,7 @@ export function createCmsContentMutationRoutes(deps: {
    * PUT /cms/contents/:id
    * Update content (admin only)
    */
-  router.put('/contents/:id', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+  router.put('/contents/:id', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const {
@@ -212,6 +237,29 @@ export function createCmsContentMutationRoutes(deps: {
         res.status(404).json({
           success: false,
           error: { code: 'NOT_FOUND', message: 'Content not found' },
+        });
+        return;
+      }
+
+      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
+      // Service-scoped authorization against the existing content's serviceKey.
+      // Non-platform-admin callers cannot move content across services.
+      const putAuth = await authorizeCmsMutation(req.user, content.serviceKey);
+      if (!putAuth.allowed) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Admin, service admin, or service operator privileges required for this content',
+          },
+        });
+        return;
+      }
+      // Non-platform-admins may not change serviceKey (would escape their scope)
+      if (!putAuth.isPlatformAdmin && serviceKey !== undefined && serviceKey !== content.serviceKey) {
+        res.status(403).json({
+          success: false,
+          error: { code: 'FORBIDDEN', message: 'Cannot change serviceKey without platform admin role' },
         });
         return;
       }
@@ -267,10 +315,33 @@ export function createCmsContentMutationRoutes(deps: {
    * - draft -> archived
    */
   // WO-O4O-CMS-TRANSITION-CENTRALIZATION-V1: delegated to CmsContentService
-  router.patch('/contents/:id/status', requireAdmin, async (req: Request, res: Response): Promise<void> => {
+  router.patch('/contents/:id/status', requireAuth, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
       const { status } = req.body;
+
+      // WO-O4O-GLYCOPHARM-OPERATOR-GUIDELINES-403-FIX-V1
+      // Load existing content to authorize against its serviceKey before transitioning.
+      const contentRepo = dataSource.getRepository(CmsContent);
+      const existing = await contentRepo.findOne({ where: { id } });
+      if (!existing) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Content not found' },
+        });
+        return;
+      }
+      const patchAuth = await authorizeCmsMutation(req.user, existing.serviceKey);
+      if (!patchAuth.allowed) {
+        res.status(403).json({
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Admin, service admin, or service operator privileges required for this content',
+          },
+        });
+        return;
+      }
 
       const updated = await cmsContentService.transitionContentStatus(id, status);
 
