@@ -128,6 +128,9 @@ export function EditableDataTable<T extends Record<string, any>>({
     system: col.system,
     sticky: col.sticky,
     align: col.align,
+    // WO-O4O-BASETABLE-FRONTEND-SORTING-V1
+    sortable: col.sortable,
+    sortAccessor: col.sortAccessor,
 
     accessor: (row: T, index: number) => {
       const rKey = getRowKeyValue(row, rowKey, index);

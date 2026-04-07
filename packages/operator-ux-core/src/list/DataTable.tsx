@@ -2,13 +2,15 @@
  * DataTable — Base List Table Component
  *
  * WO-O4O-LIST-BASE-MODULE-V1
+ * WO-O4O-BASETABLE-FRONTEND-SORTING-V1 — BaseTable에 정렬 위임
  *
- * 컬럼 정의 기반 렌더링 + 클라이언트 사이드 정렬 + 로딩/빈 상태.
- * Neture operator pages의 Tailwind slate 팔레트 기준.
+ * BaseTable thin wrapper. 컬럼 정의(ListColumnDef)를 O4OColumn으로 변환하고,
+ * 정렬/렌더링/empty/loading은 BaseTable에 일임한다.
  */
 
-import { useState } from 'react';
-import type { DataTableProps, ListColumnDef } from './types';
+import { BaseTable } from '@o4o/ui';
+import type { O4OColumn } from '@o4o/ui';
+import type { DataTableProps } from './types';
 
 function getRowKeyValue<T extends Record<string, any>>(
   row: T,
@@ -19,16 +21,6 @@ function getRowKeyValue<T extends Record<string, any>>(
   return String(row[rowKey]) || `row-${index}`;
 }
 
-function getCellValue<T>(row: T, key: string): any {
-  return (row as any)[key];
-}
-
-const alignClass = (align?: 'left' | 'center' | 'right') => {
-  if (align === 'center') return 'text-center';
-  if (align === 'right') return 'text-right';
-  return 'text-left';
-};
-
 export function DataTable<T extends Record<string, any>>({
   columns,
   data,
@@ -38,38 +30,6 @@ export function DataTable<T extends Record<string, any>>({
   onRowClick,
   className = '',
 }: DataTableProps<T>) {
-  const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
-
-  const handleSort = (col: ListColumnDef<T>) => {
-    if (!col.sortable) return;
-    if (sortKey === col.key) {
-      if (sortOrder === 'asc') {
-        setSortOrder('desc');
-      } else {
-        setSortKey(null);
-        setSortOrder(null);
-      }
-    } else {
-      setSortKey(col.key);
-      setSortOrder('asc');
-    }
-  };
-
-  // Sort data
-  const sortedData = [...data];
-  if (sortKey && sortOrder) {
-    sortedData.sort((a, b) => {
-      const aVal = getCellValue(a, sortKey);
-      const bVal = getCellValue(b, sortKey);
-      if (aVal === bVal) return 0;
-      if (aVal == null) return 1;
-      if (bVal == null) return -1;
-      const cmp = aVal < bVal ? -1 : 1;
-      return sortOrder === 'asc' ? cmp : -cmp;
-    });
-  }
-
   // Loading skeleton
   if (loading) {
     return (
@@ -84,74 +44,35 @@ export function DataTable<T extends Record<string, any>>({
     );
   }
 
+  // ListColumnDef → O4OColumn 매핑 (sortable / sortAccessor 포함)
+  const o4oColumns: O4OColumn<T>[] = columns.map((col) => ({
+    key: col.key,
+    header: col.header,
+    width: col.width,
+    minWidth: col.minWidth,
+    maxWidth: col.maxWidth,
+    resizable: col.resizable,
+    system: col.system,
+    sticky: col.sticky,
+    align: col.align,
+    sortable: col.sortable,
+    sortAccessor: col.sortAccessor,
+    render: col.render,
+  }));
+
   return (
     <div className={`bg-white rounded-xl shadow-sm overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  style={col.width ? { width: col.width } : undefined}
-                  className={`px-4 py-3 text-xs font-medium text-slate-500 uppercase ${alignClass(col.align)} ${col.sortable ? 'cursor-pointer select-none hover:bg-slate-100' : ''}`}
-                  onClick={() => handleSort(col)}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {col.header}
-                    {col.sortable && sortKey === col.key && (
-                      <span className="text-slate-400">
-                        {sortOrder === 'asc' ? '\u25B2' : '\u25BC'}
-                      </span>
-                    )}
-                    {col.sortable && sortKey !== col.key && (
-                      <span className="text-slate-300">{'\u25B2'}</span>
-                    )}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {sortedData.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-12 text-center text-sm text-slate-400"
-                >
-                  {emptyMessage}
-                </td>
-              </tr>
-            ) : (
-              sortedData.map((row, index) => {
-                const key = getRowKeyValue(row, rowKey, index);
-                return (
-                  <tr
-                    key={key}
-                    onClick={onRowClick ? () => onRowClick(row) : undefined}
-                    className={`hover:bg-slate-50 ${onRowClick ? 'cursor-pointer' : ''}`}
-                  >
-                    {columns.map((col) => {
-                      const value = getCellValue(row, col.key);
-                      const content = col.render
-                        ? col.render(value, row, index)
-                        : value;
-                      return (
-                        <td
-                          key={col.key}
-                          className={`px-4 py-3 text-sm text-slate-700 ${alignClass(col.align)}`}
-                        >
-                          {content}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+      <BaseTable
+        columns={o4oColumns}
+        data={data}
+        rowKey={(row, index) => getRowKeyValue(row, rowKey, index)}
+        headerClassName="bg-slate-50 border-b border-slate-200"
+        bodyClassName="divide-y divide-slate-100"
+        thClassName="px-4 py-3 text-xs font-medium text-slate-500 uppercase"
+        tdClassName="px-4 py-3 text-sm text-slate-700"
+        onRowClick={onRowClick ? (row) => onRowClick(row) : undefined}
+        emptyMessage={emptyMessage}
+      />
     </div>
   );
 }

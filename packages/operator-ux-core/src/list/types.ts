@@ -42,8 +42,14 @@ export interface ListColumnDef<T> {
   sticky?: boolean;
   /** 텍스트 정렬 */
   align?: 'left' | 'center' | 'right';
-  /** 정렬 가능 여부 */
+  /** 정렬 가능 여부 (BaseTable 프론트 정렬) */
   sortable?: boolean;
+  /**
+   * 정렬 기준 값 추출.
+   * 지정 안 하면 row[key] 사용. render 결과(JSX)는 정렬에 사용하지 않으므로
+   * 복합 컬럼은 반드시 지정할 것.
+   */
+  sortAccessor?: (row: T) => string | number | Date | null | undefined;
   /** 커스텀 셀 렌더러 */
   render?: (value: any, row: T, index: number) => ReactNode;
   /** 인라인 편집 가능 여부 (EditableDataTable 전용) */
