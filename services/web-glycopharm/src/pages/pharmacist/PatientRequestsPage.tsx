@@ -82,11 +82,11 @@ export default function PatientRequestsPage() {
             <UserPlus className="w-5 h-5 text-violet-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-800">연결 요청</h1>
+            <h1 className="text-xl font-bold text-slate-800">당뇨인 연결 요청</h1>
             <p className="text-xs text-slate-400">
               {requests.length > 0
-                ? `${requests.length}건의 대기 중인 요청`
-                : '당뇨인 연결 요청 관리'}
+                ? `${requests.length}건의 연결 승인 대기 중`
+                : '당뇨인이 보낸 약사 연결 신청 승인'}
             </p>
           </div>
         </div>
