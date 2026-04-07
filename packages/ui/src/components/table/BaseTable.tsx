@@ -16,10 +16,42 @@
  */
 
 import { Fragment, useState, useCallback, useRef, useEffect, useMemo } from 'react';
-import type { BaseTableProps, O4OColumn } from './types';
+import type { BaseTableProps, O4OColumn, SortState, SortDirection } from './types';
 
 // Re-export types for convenience
-export type { O4OColumn, BaseColumn, BaseTableProps } from './types';
+export type { O4OColumn, BaseColumn, BaseTableProps, SortState, SortDirection } from './types';
+
+// ─── Sort helpers (WO-O4O-BASETABLE-FRONTEND-SORTING-V1) ───
+
+function getSortValue<T>(col: O4OColumn<T>, row: T, index: number): unknown {
+  if (col.sortAccessor) return col.sortAccessor(row);
+  if (col.accessor) return col.accessor(row, index);
+  return (row as any)[col.key];
+}
+
+/**
+ * null/undefined/'' 는 항상 뒤로 보내고, 같은 타입이면 자연 비교.
+ * 숫자/문자 혼합 시 문자열로 강등.
+ * 동일 값일 때는 0 반환 → Array.sort는 stable이므로 기존 순서 유지.
+ */
+function compareSortValues(a: unknown, b: unknown): number {
+  const aEmpty = a == null || a === '';
+  const bEmpty = b == null || b === '';
+  if (aEmpty && bEmpty) return 0;
+  if (aEmpty) return 1;
+  if (bEmpty) return -1;
+
+  if (typeof a === 'number' && typeof b === 'number') return a - b;
+  if (a instanceof Date && b instanceof Date) return a.getTime() - b.getTime();
+  if (typeof a === 'boolean' && typeof b === 'boolean') {
+    return a === b ? 0 : a ? 1 : -1;
+  }
+
+  // locale-aware string compare
+  return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+}
+
+const SORT_NONE: SortState = { key: null, direction: null };
 
 // ─── Helpers ────────────────────────────────────
 
@@ -137,6 +169,44 @@ export function BaseTable<T extends Record<string, any>>({
       .map((key) => colMap.get(key)!);
     return [...systemCols, ...regularCols];
   }, [columns, columnOrder, hiddenKeys]);
+
+  // ─── Frontend sorting (WO-O4O-BASETABLE-FRONTEND-SORTING-V1) ───
+  // 정렬 UI/상태/실행을 BaseTable에서 일괄 처리.
+  // 정렬은 props.data 배열 기준으로 수행 (서버 정렬 아님).
+
+  const [sortState, setSortState] = useState<SortState>(SORT_NONE);
+
+  // 정렬 컬럼이 visibility로 숨겨지면 정렬 해제 (UI 혼란 방지)
+  useEffect(() => {
+    if (sortState.key && hiddenKeys.has(sortState.key)) {
+      setSortState(SORT_NONE);
+    }
+  }, [hiddenKeys, sortState.key]);
+
+  const handleHeaderSort = useCallback((col: O4OColumn<T>) => {
+    if (col.system || !col.sortable) return;
+    setSortState((prev) => {
+      if (prev.key !== col.key) return { key: col.key, direction: 'asc' };
+      if (prev.direction === 'asc') return { key: col.key, direction: 'desc' };
+      return SORT_NONE; // desc → none
+    });
+  }, []);
+
+  const sortedData = useMemo(() => {
+    if (!sortState.key || !sortState.direction) return data;
+    const col = effectiveColumns.find((c) => c.key === sortState.key);
+    if (!col) return data;
+    // 안정 정렬 — Array.sort는 stable
+    const indexed = data.map((row, i) => ({ row, i }));
+    indexed.sort((a, b) => {
+      const av = getSortValue(col, a.row, a.i);
+      const bv = getSortValue(col, b.row, b.i);
+      const cmp = compareSortValues(av, bv);
+      if (cmp !== 0) return sortState.direction === 'desc' ? -cmp : cmp;
+      return a.i - b.i; // tie-breaker: 원본 순서 유지
+    });
+    return indexed.map((x) => x.row);
+  }, [data, sortState, effectiveColumns]);
 
   // ─── Selection (select-all / indeterminate) ───
 
@@ -419,19 +489,52 @@ export function BaseTable<T extends Record<string, any>>({
                 )
                 : col.header;
 
+              const isSortable = !!col.sortable && !isSystem;
+              const isSorted = isSortable && sortState.key === col.key && sortState.direction !== null;
+              const sortDir: SortDirection = isSorted ? sortState.direction : null;
+
+              const onThClick = isSortable
+                ? (e: React.MouseEvent) => {
+                    col.onHeaderClick?.();
+                    handleHeaderSort(col);
+                    e.stopPropagation();
+                  }
+                : col.onHeaderClick;
+
               return (
                 <th
                   key={col.key}
                   style={{ ...widthStyle, ...stickyStyle }}
-                  onClick={col.onHeaderClick}
+                  onClick={onThClick}
+                  aria-sort={
+                    !isSortable
+                      ? undefined
+                      : sortDir === 'asc'
+                      ? 'ascending'
+                      : sortDir === 'desc'
+                      ? 'descending'
+                      : 'none'
+                  }
                   draggable={canDrag}
                   onDragStart={canDrag ? (e) => handleDragStart(e, col.key) : undefined}
                   onDragEnd={canDrag ? handleDragEnd : undefined}
                   onDragOver={canDrag ? (e) => handleDragOver(e, col.key) : undefined}
                   onDrop={canDrag ? (e) => handleDrop(e, col.key) : undefined}
-                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''} ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragOver ? 'bg-blue-50 border-l-2 border-blue-400' : ''} ${isSticky ? 'border-r border-gray-200' : ''}`}
+                  className={`whitespace-nowrap ${thBase} ${alignClass(col.align)} ${col.headerClassName ?? ''} ${col.resizable ? 'relative' : ''} ${canDrag ? 'cursor-grab active:cursor-grabbing' : ''} ${isSortable ? 'cursor-pointer select-none hover:bg-gray-100' : ''} ${isDragOver ? 'bg-blue-50 border-l-2 border-blue-400' : ''} ${isSticky ? 'border-r border-gray-200' : ''}`}
                 >
-                  {headerContent}
+                  {isSortable ? (
+                    <span className="inline-flex items-center gap-1">
+                      {headerContent}
+                      <span
+                        aria-hidden="true"
+                        className={sortDir ? 'text-gray-700' : 'text-gray-300'}
+                      >
+                        {sortDir === 'asc' ? '\u25B2' : sortDir === 'desc' ? '\u25BC' : '\u25B4'}
+                      </span>
+                    </span>
+                  ) : (
+                    headerContent
+                  )}
                   {col.resizable && (
                     <div
                       onMouseDown={(e) => handleMouseDown(e, ci)}
@@ -468,7 +571,7 @@ export function BaseTable<T extends Record<string, any>>({
         </thead>
 
         <tbody className={bodyClassName}>
-          {data.length === 0 ? (
+          {sortedData.length === 0 ? (
             <tr>
               <td
                 colSpan={effectiveColumns.length}
@@ -478,7 +581,7 @@ export function BaseTable<T extends Record<string, any>>({
               </td>
             </tr>
           ) : (
-            data.map((row, rowIndex) => {
+            sortedData.map((row, rowIndex) => {
               const key = rowKey ? rowKey(row, rowIndex) : `row-${rowIndex}`;
               const rowCls = rowClassName
                 ? rowClassName(row, rowIndex)

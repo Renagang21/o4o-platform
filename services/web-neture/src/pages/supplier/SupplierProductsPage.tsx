@@ -283,6 +283,7 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '120px',
     minWidth: 80,
     resizable: true,
+    sortable: true,
     render: (v) => <span className="font-mono text-xs">{v || '-'}</span>,
   },
   {
@@ -291,6 +292,7 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '180px',
     minWidth: 100,
     resizable: true,
+    sortable: true,
     render: (v) => <span className="font-medium">{v || '-'}</span>,
   },
   {
@@ -299,6 +301,7 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '100px',
     minWidth: 60,
     resizable: true,
+    sortable: true,
     render: (v) => v || '-',
   },
   // primaryImageUrl column is inserted dynamically below
@@ -308,6 +311,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '110px',
     minWidth: 80,
     resizable: true,
+    sortable: true,
+    sortAccessor: (row) => (row.priceGeneral != null ? Number(row.priceGeneral) : null),
     align: 'right',
     editable: true,
     render: (v) =>
@@ -328,6 +333,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     width: '100px',
     minWidth: 80,
     resizable: true,
+    sortable: true,
+    sortAccessor: (row) => (row.consumerReferencePrice != null ? Number(row.consumerReferencePrice) : null),
     align: 'right',
     editable: true,
     render: (v) =>
@@ -348,6 +355,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     header: '재고',
     width: '80px',
     align: 'right' as const,
+    sortable: true,
+    sortAccessor: (row: any) => (row.stockQuantity != null ? Number(row.stockQuantity) : null),
     editable: true,
     render: (v: any) => v != null ? Number(v).toLocaleString() : '0',
     editRender: (value: any, _row: any, onChange: any) => (
@@ -438,6 +447,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     header: '승인',
     width: '90px',
     align: 'center',
+    sortable: true,
+    sortAccessor: (row: SupplierProduct) => deriveSubmissionStatus(row).label,
     render: (_v: string, row: SupplierProduct) => {
       const cfg = deriveSubmissionStatus(row);
       const approvals = (row.serviceApprovals || []).filter((a) => a.serviceKey !== 'neture');
@@ -457,6 +468,8 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
     header: '완성도',
     width: '90px',
     align: 'center' as const,
+    sortable: true,
+    sortAccessor: (row: any) => (row.completenessScore != null ? Number(row.completenessScore) : 0),
     render: (v: number | undefined, row: SupplierProduct) => {
       const score = v || 0;
       const color = score >= 80 ? 'text-green-600' : score >= 40 ? 'text-amber-600' : 'text-red-500';

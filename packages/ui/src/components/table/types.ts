@@ -50,6 +50,29 @@ export interface O4OColumn<T> {
   onHeaderClick?: () => void;
   /** th에 추가할 클래스 */
   headerClassName?: string;
+
+  // ─── Sorting (WO-O4O-BASETABLE-FRONTEND-SORTING-V1) ───
+  /**
+   * 정렬 가능 여부.
+   * - true: BaseTable이 헤더 클릭으로 3-state 정렬 (none → asc → desc → none)
+   * - 시스템 컬럼(system: true)은 sortable로 지정해도 무시됨
+   */
+  sortable?: boolean;
+  /**
+   * 정렬 기준 값 추출 함수.
+   * 지정하지 않으면 accessor → row[key] 순으로 값을 사용한다.
+   * render 결과(JSX)를 정렬에 사용하지 않으므로 복합 컬럼은 반드시 지정할 것.
+   */
+  sortAccessor?: (row: T) => string | number | Date | null | undefined;
+}
+
+// ─── Sort State (WO-O4O-BASETABLE-FRONTEND-SORTING-V1) ───
+
+export type SortDirection = 'asc' | 'desc' | null;
+
+export interface SortState {
+  key: string | null;
+  direction: SortDirection;
 }
 
 /** @deprecated O4OColumn 사용 권장 */
