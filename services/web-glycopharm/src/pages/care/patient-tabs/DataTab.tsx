@@ -115,10 +115,14 @@ function buildDisplayEntries(r: HealthReadingDto): DisplayEntry[] {
 
   // Symptoms (backward compat handled by extractMetadata)
   if (meta.symptoms && meta.symptoms.items.length > 0) {
-    const { items, severity, duration } = meta.symptoms;
+    const { items, severity, duration, otherText } = meta.symptoms;
+    // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1: 기타 라벨 옆에 자유 입력 노출
+    const itemsLabel = items
+      .map((it) => (it === '기타' && otherText ? `기타(${otherText})` : it))
+      .join(', ');
     entries.push({
       id: `${r.id}-sym`, timestamp: ts, entryType: 'symptom',
-      label: `${items.join(', ')}${severity ? ` [${SEVERITY_LABELS[severity] || severity}]` : ''}${duration ? ` ${duration}분` : ''}`,
+      label: `${itemsLabel}${severity ? ` [${SEVERITY_LABELS[severity] || severity}]` : ''}${duration ? ` ${duration}분` : ''}`,
     });
   }
 
@@ -187,9 +191,18 @@ export default function DataTab() {
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [symSeverity, setSymSeverity] = useState('mild');
   const [symDuration, setSymDuration] = useState('');
+  // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1
+  const [symOtherText, setSymOtherText] = useState('');
 
   const toggleSymptom = (v: string) => {
-    setSymptoms((prev) => prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v]);
+    setSymptoms((prev) => {
+      const next = prev.includes(v) ? prev.filter((s) => s !== v) : [...prev, v];
+      // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1: 기타 해제 시 자유 입력 즉시 비움
+      if (v === '기타' && !next.includes('기타')) {
+        setSymOtherText('');
+      }
+      return next;
+    });
   };
 
   const selectedMetric = METRIC_OPTIONS.find(m => m.value === metricType) || METRIC_OPTIONS[0];
@@ -316,10 +329,15 @@ export default function DataTab() {
 
       // Symptoms — structured format
       if (symOpen && symptoms.length > 0) {
+        // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1
+        // 기타가 선택된 경우에만 otherText 포함. 기타 미선택 시 payload 에서 완전히 제외.
+        const otherTextTrimmed = symOtherText.trim();
+        const includeOther = symptoms.includes('기타') && otherTextTrimmed.length > 0;
         metadata.symptoms = {
           items: symptoms,
           severity: symSeverity,
           ...(symDuration ? { duration: Number(symDuration) } : {}),
+          ...(includeOther ? { otherText: otherTextTrimmed } : {}),
         };
       }
 
@@ -354,6 +372,7 @@ export default function DataTab() {
       setSymptoms([]);
       setSymSeverity('mild');
       setSymDuration('');
+      setSymOtherText('');
 
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -488,6 +507,8 @@ export default function DataTab() {
               setSymSeverity={setSymSeverity}
               symDuration={symDuration}
               setSymDuration={setSymDuration}
+              symOtherText={symOtherText}
+              setSymOtherText={setSymOtherText}
             />
           </div>
         </form>
