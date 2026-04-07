@@ -14,7 +14,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info } from 'lucide-react';
+import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info, Tag } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
   EditableDataTable,
@@ -484,24 +484,24 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
       );
     },
   },
+  // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
+  // 태그 컬럼: 텍스트 직접 노출 → 아이콘 + tooltip 조회 방식
   {
     key: 'tags',
     header: '태그',
-    width: '120px',
-    minWidth: 60,
-    resizable: true,
+    width: '60px',
+    align: 'center',
     render: (v: string[] | undefined | null) => {
       const tags = Array.isArray(v) ? v : [];
-      if (tags.length === 0) return <span className="text-xs text-slate-400">-</span>;
+      if (tags.length === 0) return <span className="text-xs text-slate-300">-</span>;
       return (
-        <div className="flex items-center gap-1 overflow-hidden whitespace-nowrap">
-          {tags.slice(0, 2).map((tag, i) => (
-            <span key={i} className="text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded truncate max-w-[50px]">{tag}</span>
-          ))}
-          {tags.length > 2 && (
-            <span className="text-xs text-slate-400 shrink-0">+{tags.length - 2}</span>
-          )}
-        </div>
+        <span
+          className="inline-flex items-center gap-1 text-blue-600"
+          title={`${tags.length}개: ${tags.join(', ')}`}
+        >
+          <Tag size={13} />
+          <span className="text-[11px] font-medium">{tags.length}</span>
+        </span>
       );
     },
   },
@@ -623,27 +623,44 @@ export default function SupplierProductsPage() {
         ),
     };
 
-    const descCol: ListColumnDef<SupplierProduct> = {
+    // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
+    // 설명 단일 컬럼 → 간단설명/상세설명 2개 분리 (아이콘 기반)
+    const shortDescCol: ListColumnDef<SupplierProduct> = {
       key: 'consumerShortDescription' as any,
-      header: '설명',
+      header: '간단설명',
       width: '70px',
       align: 'center',
-      render: (v: any, row: SupplierProduct) =>
-        v ? (
+      render: (v: any, row: SupplierProduct) => {
+        const has = !!v;
+        return (
           <button
             onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
-            className="text-xs text-green-600 hover:underline"
+            className={`p-1 rounded ${has ? 'text-emerald-600 hover:bg-emerald-50' : 'text-slate-300 hover:bg-slate-100'}`}
+            title={has ? '간단설명 보기/편집' : '간단설명 미작성'}
           >
-            있음
+            <FileText size={14} />
           </button>
-        ) : (
+        );
+      },
+    };
+
+    const detailDescCol: ListColumnDef<SupplierProduct> = {
+      key: '_detailDesc' as any,
+      header: '상세설명',
+      width: '70px',
+      align: 'center',
+      render: (_v: any, row: SupplierProduct) => {
+        const has = !!row.consumerDetailDescription;
+        return (
           <button
-            onClick={(e) => { e.stopPropagation(); setDrawerProduct(row); }}
-            className="text-xs text-red-500 hover:underline font-medium"
+            onClick={(e) => { e.stopPropagation(); setPreviewProduct(row); }}
+            className={`p-1 rounded ${has ? 'text-indigo-600 hover:bg-indigo-50' : 'text-slate-300 hover:bg-slate-100'}`}
+            title={has ? '상세설명 미리보기' : '상세설명 미작성'}
           >
-            미작성
+            <FileText size={14} />
           </button>
-        ),
+        );
+      },
     };
 
     // WO-NETURE-SUPPLIER-EDIT-UI-CONSISTENCY-FIX-V1: 규제 정보 읽기 전용 컬럼
@@ -750,9 +767,10 @@ export default function SupplierProductsPage() {
     const catIdx = cols.findIndex((c) => c.key === 'categoryName');
     if (catIdx >= 0) cols.splice(catIdx + 1, 0, imageCol);
 
-    // Insert descCol after consumerReferencePrice
+    // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
+    // 간단설명 / 상세설명 2개 컬럼 삽입
     const refPriceIdx = cols.findIndex((c) => c.key === 'consumerReferencePrice');
-    if (refPriceIdx >= 0) cols.splice(refPriceIdx + 1, 0, descCol);
+    if (refPriceIdx >= 0) cols.splice(refPriceIdx + 1, 0, shortDescCol, detailDescCol);
 
     // Insert regulatoryCol after barcode
     const barcodeIdx = cols.findIndex((c) => c.key === 'barcode');
@@ -1067,22 +1085,8 @@ export default function SupplierProductsPage() {
       <EditableDataTable
         columns={[
           ...enhancedColumns,
-          {
-            key: '_preview' as any,
-            header: '',
-            width: '40px',
-            align: 'center',
-            render: (_v: any, row: SupplierProduct) => (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); setPreviewProduct(row); }}
-                className={`p-1 rounded hover:bg-indigo-50 ${row.consumerDetailDescription ? 'text-indigo-500 hover:text-indigo-700' : 'text-slate-300'}`}
-                title="상세설명 미리보기"
-              >
-                <FileText size={14} />
-              </button>
-            ),
-          } as any,
+          // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
+          // _preview 컬럼 제거 → 상세설명 컬럼(detailDescCol)에 통합
           {
             key: 'masterId' as any,
             header: 'AI',

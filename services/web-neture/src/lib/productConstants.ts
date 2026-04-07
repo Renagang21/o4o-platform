@@ -109,7 +109,9 @@ export function getSupplyPolicyBadges(product: {
   if (isPublic) badges.push({ label: '전체공개', bg: 'bg-emerald-50', text: 'text-emerald-700' });
   if (keys.length > 0) badges.push({ label: '서비스', bg: 'bg-blue-50', text: 'text-blue-700' });
   if (hasSellers) badges.push({ label: '판매자모집', bg: 'bg-amber-50', text: 'text-amber-700' });
-  if (badges.length === 0) badges.push({ label: '비공개', bg: 'bg-slate-100', text: 'text-slate-500' });
+  // WO-NETURE-PRODUCT-LIST-COLUMN-LABEL-AND-DESCRIPTION-REFINE-V1:
+  // '비공개' → '정책 미설정' (어떤 유통 정책도 지정되지 않은 상태를 명확히 표현)
+  if (badges.length === 0) badges.push({ label: '정책 미설정', bg: 'bg-slate-100', text: 'text-slate-400' });
 
   return badges;
 }
