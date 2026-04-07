@@ -280,6 +280,13 @@ export default function RecordsPage() {
                   ? (rawSym as { items: string[] }).items
                   : undefined;
               const symptomSeverity = rawSym && typeof rawSym === 'object' && !Array.isArray(rawSym) ? (rawSym as { severity?: string }).severity : undefined;
+              // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1
+              const symptomOtherText = rawSym && typeof rawSym === 'object' && !Array.isArray(rawSym)
+                ? (rawSym as { otherText?: string }).otherText
+                : undefined;
+              const symptomLabel = symptomItems
+                ?.map((it) => (it === '기타' && symptomOtherText ? `기타(${symptomOtherText})` : it))
+                .join(', ');
               const hasMetadata = !!(mealTiming || meds.length > 0 || exercise?.type || (symptomItems && symptomItems.length > 0));
 
               return (
@@ -316,7 +323,7 @@ export default function RecordsPage() {
                           )}
                           {symptomItems && symptomItems.length > 0 && (
                             <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full bg-amber-50 text-amber-700">
-                              증상 {symptomItems.join(', ')}{symptomSeverity === 'severe' ? ' [심함]' : symptomSeverity === 'moderate' ? ' [보통]' : ''}
+                              증상 {symptomLabel}{symptomSeverity === 'severe' ? ' [심함]' : symptomSeverity === 'moderate' ? ' [보통]' : ''}
                             </span>
                           )}
                         </div>
