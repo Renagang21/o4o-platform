@@ -12,6 +12,8 @@ import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
   X, Eye, EyeOff,
 } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   operatorAllOffersApi,
   type AllRegisteredOffer,
@@ -231,6 +233,170 @@ export default function AllRegisteredProductsPage() {
     }
   };
 
+  // ─── Column definitions (WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1) ───
+  // selectedOfferIds / allSelected / someSelected 변경 시 헤더 체크박스가 함께 갱신되도록 deps에 포함.
+  const columns = useMemo<ListColumnDef<AllRegisteredOffer>[]>(() => [
+    {
+      key: '_select',
+      header: (
+        <input
+          type="checkbox"
+          checked={allSelected}
+          ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
+          onChange={toggleSelectAll}
+          disabled={selectableIds.length === 0}
+          className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
+          onClick={(e) => e.stopPropagation()}
+        />
+      ),
+      width: '40px',
+      align: 'center',
+      system: true,
+      sticky: true,
+      onCellClick: () => { /* swallow row click */ },
+      render: (_v, row) => {
+        const canSelect = isSelectable(row);
+        return (
+          <input
+            type="checkbox"
+            checked={selectedOfferIds.has(row.id)}
+            onChange={(e) => { e.stopPropagation(); toggleSelectOne(row.id); }}
+            onClick={(e) => e.stopPropagation()}
+            disabled={!canSelect}
+            className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            title={canSelect ? '' : '승인 대기 항목만 선택 가능'}
+          />
+        );
+      },
+    },
+    {
+      key: '_image',
+      header: '',
+      width: '56px',
+      system: true,
+      render: (_v, row) => row.primaryImageUrl ? (
+        <img src={row.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
+      ) : (
+        <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
+          <Package className="w-5 h-5 text-slate-400" />
+        </div>
+      ),
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      sortable: true,
+      sortAccessor: (row) => row.name || '',
+      render: (_v, row) => (
+        <>
+          <p className="font-medium text-slate-800">{row.name}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{row.barcode || row.id.slice(0, 8)}</p>
+        </>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급자',
+      sortable: true,
+      sortAccessor: (row) => row.supplierName || '',
+      render: (v) => <span className="text-slate-600">{v || '-'}</span>,
+    },
+    {
+      key: 'categoryName',
+      header: '카테고리',
+      sortable: true,
+      sortAccessor: (row) => row.categoryName || '',
+      render: (v) => <span className="text-slate-600 text-sm">{v || '-'}</span>,
+    },
+    {
+      key: 'regulatoryType',
+      header: '규제',
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.regulatoryType ? (REGULATORY_TYPE_LABELS[row.regulatoryType] || row.regulatoryType) : '',
+      render: (_v, row) => {
+        const regLabel = row.regulatoryType ? REGULATORY_TYPE_LABELS[row.regulatoryType] : null;
+        const regBadge = row.regulatoryType ? REGULATORY_TYPE_BADGE[row.regulatoryType] : null;
+        return regLabel && regBadge ? (
+          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${regBadge.bg} ${regBadge.text}`}>
+            {regLabel}
+          </span>
+        ) : (
+          <span className="text-xs text-slate-400">-</span>
+        );
+      },
+    },
+    {
+      key: 'isActive',
+      header: '활성',
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => (row.isActive ? 1 : 0),
+      render: (_v, row) => row.isActive ? (
+        <Eye className="w-4 h-4 text-green-600 mx-auto" />
+      ) : (
+        <EyeOff className="w-4 h-4 text-slate-400 mx-auto" />
+      ),
+    },
+    {
+      key: 'distributionType',
+      header: '유통',
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.distributionType || '',
+      render: (_v, row) => {
+        const policyBadges = getSupplyPolicyBadges(row);
+        return (
+          <div className="flex flex-wrap gap-0.5 justify-center">
+            {policyBadges.map((b) => (
+              <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
+                {b.label}
+              </span>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
+      key: 'priceGeneral',
+      header: '공급가',
+      align: 'right',
+      sortable: true,
+      sortAccessor: (row) => (row.priceGeneral != null ? Number(row.priceGeneral) : null),
+      render: (v) => <span className="text-slate-700">{v ? `₩${Number(v).toLocaleString()}` : '-'}</span>,
+    },
+    {
+      key: 'approvalStatus',
+      header: '승인',
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => row.approvalStatus || '',
+      render: (_v, row) => {
+        const apprBadge = APPROVAL_STATUS_BADGE[row.approvalStatus] || { label: row.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
+        return (
+          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${apprBadge.bg} ${apprBadge.text}`}>
+            {apprBadge.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'serviceApprovals',
+      header: '서비스',
+      align: 'center',
+      sortable: true,
+      sortAccessor: (row) => getServiceDisplay(row.serviceApprovals?.map((a) => a.serviceKey)) || '',
+      render: (_v, row) => {
+        const svcDisplay = getServiceDisplay(row.serviceApprovals?.map((a) => a.serviceKey));
+        return svcDisplay ? (
+          <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">{svcDisplay}</span>
+        ) : (
+          <span className="text-xs text-slate-300">-</span>
+        );
+      },
+    },
+  ], [selectedOfferIds, allSelected, someSelected, selectableIds.length]);
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
@@ -436,122 +602,24 @@ export default function AllRegisteredProductsPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Table — WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1 */}
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase border-b border-slate-200">
-              <th className="px-4 py-3 font-medium w-10 text-center">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(el) => { if (el) el.indeterminate = !allSelected && someSelected; }}
-                  onChange={toggleSelectAll}
-                  disabled={selectableIds.length === 0}
-                  className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30"
-                />
-              </th>
-              <th className="px-4 py-3 font-medium w-12"></th>
-              <th className="px-4 py-3 font-medium">상품명</th>
-              <th className="px-4 py-3 font-medium">공급자</th>
-              <th className="px-4 py-3 font-medium">카테고리</th>
-              <th className="px-4 py-3 font-medium text-center">규제</th>
-              <th className="px-4 py-3 font-medium text-center">활성</th>
-              <th className="px-4 py-3 font-medium text-center">유통</th>
-              <th className="px-4 py-3 font-medium text-right">공급가</th>
-              <th className="px-4 py-3 font-medium text-center">승인</th>
-              <th className="px-4 py-3 font-medium text-center">서비스</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
-            ) : displayOffers.length === 0 ? (
-              <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400">
-                {search || distFilter || activeFilter || approvalFilter || regulatoryFilter
-                  ? '조건에 맞는 상품이 없습니다.'
-                  : '등록된 상품이 없습니다.'}
-              </td></tr>
-            ) : displayOffers.map((o) => {
-              // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-V1: 공통 유통 정책 badge
-              const policyBadges = getSupplyPolicyBadges(o);
-              const svcDisplay = getServiceDisplay(o.serviceApprovals?.map(a => a.serviceKey));
-              const apprBadge = APPROVAL_STATUS_BADGE[o.approvalStatus] || { label: o.approvalStatus || '-', bg: 'bg-slate-100', text: 'text-slate-600' };
-              const regLabel = o.regulatoryType ? REGULATORY_TYPE_LABELS[o.regulatoryType] : null;
-              const regBadge = o.regulatoryType ? REGULATORY_TYPE_BADGE[o.regulatoryType] : null;
-              const canSelect = isSelectable(o);
-              return (
-                <tr key={o.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailOffer(o)}>
-                  <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedOfferIds.has(o.id)}
-                      onChange={() => toggleSelectOne(o.id)}
-                      disabled={!canSelect}
-                      className="w-4 h-4 accent-blue-600 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-                      title={canSelect ? '' : '승인 대기 항목만 선택 가능'}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    {o.primaryImageUrl ? (
-                      <img src={o.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
-                    ) : (
-                      <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
-                        <Package className="w-5 h-5 text-slate-400" />
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-slate-800">{o.name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{o.barcode || o.id.slice(0, 8)}</p>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{o.supplierName || '-'}</td>
-                  <td className="px-4 py-3 text-slate-600 text-sm">{o.categoryName || '-'}</td>
-                  <td className="px-4 py-3 text-center">
-                    {regLabel && regBadge ? (
-                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${regBadge.bg} ${regBadge.text}`}>
-                        {regLabel}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-slate-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {o.isActive ? (
-                      <Eye className="w-4 h-4 text-green-600 mx-auto" />
-                    ) : (
-                      <EyeOff className="w-4 h-4 text-slate-400 mx-auto" />
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <div className="flex flex-wrap gap-0.5 justify-center">
-                      {policyBadges.map((b) => (
-                        <span key={b.label} className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${b.bg} ${b.text}`}>
-                          {b.label}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-right text-slate-700">
-                    {o.priceGeneral ? `₩${o.priceGeneral.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${apprBadge.bg} ${apprBadge.text}`}>
-                      {apprBadge.label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {svcDisplay ? (
-                      <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">{svcDisplay}</span>
-                    ) : (
-                      <span className="text-xs text-slate-300">-</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <DataTable<AllRegisteredOffer>
+          columns={columns}
+          data={displayOffers}
+          rowKey="id"
+          loading={loading}
+          emptyMessage={
+            search || distFilter || activeFilter || approvalFilter || regulatoryFilter
+              ? '조건에 맞는 상품이 없습니다.'
+              : '등록된 상품이 없습니다.'
+          }
+          onRowClick={(row) => setDetailOffer(row)}
+          tableId="neture-operator-all-products"
+          reorderable
+          persistState
+          columnVisibility
+        />
 
         {/* Pagination */}
         {totalPages > 1 && (
