@@ -27,7 +27,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { pharmacyApi, type CareInsightDto, type KpiComparisonDto, type CareLlmInsightDto, type HealthReadingDto, type CgmEventAnalysisDto, type CareGeneratedActionDto, type CarePersistedActionDto, type TimeBasedAnalysisDto } from '@/api/pharmacy';
-import { Clock, Utensils, Footprints, BookOpen, Play, XCircle, Eye, EyeOff } from 'lucide-react';
+import { Clock, Utensils, Footprints, BookOpen, Play, XCircle } from 'lucide-react';
 import { usePatientDetail } from '../PatientDetailPage';
 import { RISK_DISPLAY } from '@/constants/care-display';
 

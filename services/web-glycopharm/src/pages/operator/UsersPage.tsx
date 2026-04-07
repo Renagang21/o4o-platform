@@ -24,7 +24,6 @@ import {
   Loader2,
   AlertCircle,
   X,
-  ChevronRight,
   Eye,
   EyeOff,
 } from 'lucide-react';
