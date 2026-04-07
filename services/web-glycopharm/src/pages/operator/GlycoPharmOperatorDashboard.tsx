@@ -275,7 +275,9 @@ export default function GlycoPharmOperatorDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">운영 대시보드</h1>
-          <p className="text-sm text-slate-500 mt-1">GlycoPharm 플랫폼 현황</p>
+          <p className="text-sm text-slate-500 mt-1">
+            GlycoPharm 운영 실행 — 신청 처리 · 약국·매장 운영 · 케어 모니터링 · 콘텐츠 관리
+          </p>
         </div>
         <button
           onClick={fetchData}

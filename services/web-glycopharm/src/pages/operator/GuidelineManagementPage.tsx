@@ -282,7 +282,7 @@ export default function GuidelineManagementPage() {
         <h1 className="text-xl font-bold text-slate-800">가이드라인 관리</h1>
       </div>
       <p className="text-sm text-slate-500 mb-3 ml-[52px]">
-        당뇨인용 / 약국용 가이드라인을 편집하고 발행합니다.
+        당뇨인용 · 약국용 가이드라인 콘텐츠를 작성·수정·발행합니다.
       </p>
 
       {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-CLEANUP-V1: 제공 범위 안내 */}
