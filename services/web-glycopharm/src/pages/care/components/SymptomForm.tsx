@@ -25,11 +25,18 @@ interface SymptomFormProps {
   setSymSeverity: (v: string) => void;
   symDuration: string;
   setSymDuration: (v: string) => void;
+  // WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1
+  symOtherText: string;
+  setSymOtherText: (v: string) => void;
 }
+
+const SYMPTOM_OTHER_MAX_LEN = 80;
 
 export default function SymptomForm({
   symOpen, setSymOpen, symptoms, toggleSymptom, symSeverity, setSymSeverity, symDuration, setSymDuration,
+  symOtherText, setSymOtherText,
 }: SymptomFormProps) {
+  const otherSelected = symptoms.includes('기타');
   return (
     <div>
       <button
@@ -66,6 +73,25 @@ export default function SymptomForm({
               ))}
             </div>
           </div>
+          {/* WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1: 기타 선택 시 자유 입력 */}
+          {otherSelected && (
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">
+                기타 증상 설명
+                <span className="ml-1 text-[10px] text-slate-400">
+                  ({symOtherText.length}/{SYMPTOM_OTHER_MAX_LEN})
+                </span>
+              </label>
+              <input
+                type="text"
+                value={symOtherText}
+                onChange={(e) => setSymOtherText(e.target.value.slice(0, SYMPTOM_OTHER_MAX_LEN))}
+                placeholder="예: 명치 통증"
+                maxLength={SYMPTOM_OTHER_MAX_LEN}
+                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-slate-500 mb-1">심각도</label>

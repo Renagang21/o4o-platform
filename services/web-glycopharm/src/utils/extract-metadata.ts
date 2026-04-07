@@ -60,6 +60,8 @@ export interface SymptomsMeta {
   items: string[];
   severity?: string;
   duration?: number;
+  /** WO-O4O-GLYCOPHARM-SYMPTOM-OTHER-INPUT-V1: 기타 선택 시 자유 입력 (~80자 메모) */
+  otherText?: string;
 }
 
 export interface ExtractedMetadata {
@@ -89,9 +91,17 @@ export function extractMetadata(metadata: unknown): ExtractedMetadata {
   if (Array.isArray(sympRaw)) {
     symptoms = { items: sympRaw as string[] };
   } else if (sympRaw && typeof sympRaw === 'object') {
-    const so = sympRaw as { items?: string[]; severity?: string; duration?: number };
+    const so = sympRaw as { items?: string[]; severity?: string; duration?: number; otherText?: string };
     if (so.items && so.items.length > 0) {
-      symptoms = { items: so.items, severity: so.severity, duration: so.duration };
+      symptoms = {
+        items: so.items,
+        severity: so.severity,
+        duration: so.duration,
+        // 기타가 선택된 경우에만 otherText 노출 (저장 단계에서 보장되지만 방어적으로 한 번 더)
+        ...(so.items.includes('기타') && typeof so.otherText === 'string' && so.otherText.trim()
+          ? { otherText: so.otherText.trim() }
+          : {}),
+      };
     }
   }
 

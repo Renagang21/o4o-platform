@@ -34,18 +34,21 @@ export default function PharmacistPlaceholderPage() {
           {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '약국'}님 환영합니다.
         </button>
         <p className="text-sm text-slate-400 mb-8">
-          당뇨인 관리와 코칭을 시작하세요.
+          등록된 당뇨인을 관리하고 상담을 진행하세요.
         </p>
         <div className="w-full max-w-xs mx-auto space-y-3">
           <button
             onClick={() => navigate('/pharmacy/patients')}
-            className="w-full py-3.5 text-base font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3.5 text-base font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors flex flex-col items-center justify-center gap-0.5"
           >
-            <Users className="w-5 h-5" />
-            당뇨인 관리
+            <span className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              당뇨인 관리
+            </span>
+            <span className="text-xs font-normal text-blue-100">등록된 당뇨인 목록 · 건강 기록 확인</span>
           </button>
 
-          {/* WO-O4O-CARE-PHARMACIST-APPOINTMENT-NAV-ACCESSIBILITY-V1: 예약 관리 카드 강화 */}
+          {/* WO-O4O-GLYCOPHARM-PHARMACY-MENU-LABEL-AND-CONSULTATION-VISIBILITY-REFINE-V1 */}
           <button
             onClick={() => navigate('/pharmacy/appointments')}
             className="w-full p-4 bg-orange-50 border border-orange-200 rounded-xl hover:bg-orange-100 transition-colors text-left"
@@ -55,18 +58,21 @@ export default function PharmacistPlaceholderPage() {
                 <Calendar className="w-5 h-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-orange-800">예약 관리</p>
-                <p className="text-xs text-orange-600/70">상담 요청 확인 · 승인/거절 · 완료 및 결과 기록</p>
+                <p className="text-sm font-semibold text-orange-800">상담 예약 관리</p>
+                <p className="text-xs text-orange-600/70">상담 요청 승인 · 일정 확인 · 결과 기록</p>
               </div>
             </div>
           </button>
 
           <button
             onClick={() => navigate('/pharmacy/patient-requests')}
-            className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3 text-sm font-medium text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors flex flex-col items-center justify-center gap-0.5"
           >
-            <UserPlus className="w-4 h-4" />
-            당뇨인 연결 요청
+            <span className="flex items-center gap-2">
+              <UserPlus className="w-4 h-4" />
+              당뇨인 연결 요청
+            </span>
+            <span className="text-[11px] font-normal text-violet-400">환자가 보낸 약사 연결 신청 승인</span>
           </button>
           <button
             onClick={() => navigate('/care')}
