@@ -14,7 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, Briefcase, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
-import { ProductForm, type ProductFormData } from '../../components/product';
+import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
 import { RichTextEditor, ContentRenderer } from '@o4o/content-editor';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
@@ -757,22 +757,15 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <div className="mb-5 p-4 bg-slate-50/60 border border-slate-200 rounded-xl space-y-4">
               <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">기본 정보</h4>
 
-              {/* 카테고리 */}
+              {/* 카테고리 — WO-NETURE-CATEGORY-SELECT-TWO-LEVEL-AND-SEARCH-REFINE-V1 */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">카테고리</label>
-                <select
-                  value={editCategory || ''}
-                  onChange={(e) => setEditCategory(e.target.value || null)}
+                <CategorySelect
+                  categories={categories}
+                  value={editCategory}
+                  onChange={setEditCategory}
                   disabled={saving}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-50"
-                >
-                  <option value="">선택 안함</option>
-                  {flattenCategories(categories).map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {'  '.repeat(cat.depth)}{cat.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               {/* 브랜드 */}
