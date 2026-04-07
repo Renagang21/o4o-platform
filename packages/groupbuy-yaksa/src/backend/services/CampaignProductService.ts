@@ -12,7 +12,10 @@ import {
   CampaignProduct,
   type CampaignProductStatus,
 } from '../entities/CampaignProduct.js';
-import { GroupbuyCampaign } from '../entities/GroupbuyCampaign.js';
+import {
+  GroupbuyCampaign,
+  normalizeApprovalState,
+} from '../entities/GroupbuyCampaign.js';
 
 export interface CreateCampaignProductDto {
   campaignId: string;
@@ -56,9 +59,9 @@ export class CampaignProductService {
       throw new Error('캠페인을 찾을 수 없습니다');
     }
 
-    // draft 상태에서만 상품 추가 가능
-    if (campaign.status !== 'draft') {
-      throw new Error('진행 중인 캠페인에는 상품을 추가할 수 없습니다');
+    // [event_offer] draft 상태에서만 상품 추가 가능 (승인 후 불변)
+    if (normalizeApprovalState(campaign.status) !== 'draft') {
+      throw new Error('승인 절차에 들어간 이벤트에는 상품을 추가할 수 없습니다');
     }
 
     // 기간 유효성 검증
@@ -157,8 +160,8 @@ export class CampaignProductService {
     if (options?.activeOnly) {
       query
         .andWhere('product.status = :status', { status: 'active' })
-        .andWhere('campaign.status = :campaignStatus', {
-          campaignStatus: 'active',
+        .andWhere('campaign.status IN (:...campaignStatuses)', {
+          campaignStatuses: ['approved', 'active'],
         });
     }
 
@@ -178,8 +181,11 @@ export class CampaignProductService {
       throw new Error('상품을 찾을 수 없습니다');
     }
 
-    if (product.campaign?.status !== 'draft') {
-      throw new Error('진행 중인 캠페인의 상품은 수정할 수 없습니다');
+    if (
+      !product.campaign ||
+      normalizeApprovalState(product.campaign.status) !== 'draft'
+    ) {
+      throw new Error('승인 절차에 들어간 이벤트의 상품은 수정할 수 없습니다');
     }
 
     // 기간 검증
@@ -210,8 +216,11 @@ export class CampaignProductService {
       throw new Error('상품을 찾을 수 없습니다');
     }
 
-    if (product.campaign?.status !== 'draft') {
-      throw new Error('진행 중인 캠페인의 상품은 삭제할 수 없습니다');
+    if (
+      !product.campaign ||
+      normalizeApprovalState(product.campaign.status) !== 'draft'
+    ) {
+      throw new Error('승인 절차에 들어간 이벤트의 상품은 삭제할 수 없습니다');
     }
 
     if (product.orderedQuantity > 0) {
@@ -318,7 +327,10 @@ export class CampaignProductService {
       })
       .andWhere('product.startDate <= :now', { now })
       .andWhere('product.endDate >= :now', { now })
-      .andWhere('campaign.status = :campaignStatus', { campaignStatus: 'active' })
+      // [event_offer] approved 또는 legacy 'active'를 진행 중으로 인정
+      .andWhere('campaign.status IN (:...campaignStatuses)', {
+        campaignStatuses: ['approved', 'active'],
+      })
       .getMany();
   }
 }

@@ -19,14 +19,55 @@ import { CampaignProduct } from './CampaignProduct.js';
 import { GroupbuyOrder } from './GroupbuyOrder.js';
 
 /**
- * 캠페인 상태
+ * 캠페인(이벤트) 승인 상태
+ *
+ * WO-O4O-EVENT-OFFER-CORE-TRANSITION-V1:
+ * - 새 정책: draft → submitted → approved | rejected → ended
+ * - 승인 후 본체/상품/가격/기간 모두 수정 불가
+ * - 중단 개념 없음 (cancel 제거)
+ *
+ * Legacy 값 보존 (DB 호환, WO-3에서 migration 예정):
+ * - 'active'    → 'approved'와 동일 의미로 취급
+ * - 'closed'    → 'ended'와 동일 의미
+ * - 'completed' → 'ended'와 동일 의미
+ * - 'cancelled' → 'ended'와 동일 의미 (신규 진입 차단)
  */
 export type CampaignStatus =
-  | 'draft'      // 초안
-  | 'active'     // 진행 중
-  | 'closed'     // 마감
-  | 'completed'  // 완료
-  | 'cancelled'; // 취소
+  // 새 승인 상태 (event_offer 표준)
+  | 'draft'
+  | 'submitted'
+  | 'approved'
+  | 'rejected'
+  | 'ended'
+  // Legacy (DB 호환 전용, 신규 코드에서 set 금지)
+  | 'active'
+  | 'closed'
+  | 'completed'
+  | 'cancelled';
+
+/**
+ * Approval state 정규화
+ * Legacy 값을 새 모델로 매핑하여 동일 로직으로 처리할 수 있게 한다.
+ */
+export function normalizeApprovalState(
+  status: CampaignStatus
+): 'draft' | 'submitted' | 'approved' | 'rejected' | 'ended' {
+  switch (status) {
+    case 'active':
+      return 'approved';
+    case 'closed':
+    case 'completed':
+    case 'cancelled':
+      return 'ended';
+    default:
+      return status;
+  }
+}
+
+/**
+ * 이벤트 시간 기반 운영 상태
+ */
+export type EventOfferTimeStatus = 'upcoming' | 'active' | 'ended';
 
 @Entity('groupbuy_campaigns')
 @Index(['organizationId', 'status'])
@@ -130,4 +171,43 @@ export class GroupbuyCampaign {
 
   @OneToMany(() => GroupbuyOrder, (order) => order.campaign)
   orders?: GroupbuyOrder[];
+
+  // ============================================
+  // Helper Methods (event_offer)
+  // ============================================
+
+  /**
+   * 정규화된 승인 상태 (legacy 값 자동 매핑)
+   */
+  get approvalState(): 'draft' | 'submitted' | 'approved' | 'rejected' | 'ended' {
+    return normalizeApprovalState(this.status);
+  }
+
+  /**
+   * 승인 후 객체인지 (불변 가드용)
+   */
+  get isApproved(): boolean {
+    return this.approvalState === 'approved';
+  }
+
+  /**
+   * 시간 기반 운영 상태 (upcoming / active / ended)
+   * - 정책: 승인 안 된 캠페인은 항상 'upcoming' 취급 (외부 노출 안 함)
+   * - 종료된(rejected/ended) 캠페인은 'ended'
+   */
+  getComputedTimeStatus(now: Date = new Date()): EventOfferTimeStatus {
+    const state = this.approvalState;
+    if (state === 'ended' || state === 'rejected') return 'ended';
+    if (state !== 'approved') return 'upcoming';
+    if (now < this.startDate) return 'upcoming';
+    if (now > this.endDate) return 'ended';
+    return 'active';
+  }
+
+  /**
+   * 주문(참여) 가능 여부 — 진행 중일 때만
+   */
+  canAcceptOrders(now: Date = new Date()): boolean {
+    return this.getComputedTimeStatus(now) === 'active';
+  }
 }

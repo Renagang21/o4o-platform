@@ -11,6 +11,8 @@ import { SupplierProfile } from './SupplierProfile.js';
 export {
   GroupbuyCampaign,
   type CampaignStatus,
+  type EventOfferTimeStatus,
+  normalizeApprovalState,
 } from './GroupbuyCampaign.js';
 
 export {

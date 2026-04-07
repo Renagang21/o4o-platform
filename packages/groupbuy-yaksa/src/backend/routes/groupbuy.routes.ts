@@ -352,13 +352,16 @@ export function createGroupbuyRoutes(
     }
   );
 
+  // [REMOVED] POST /campaigns/:id/cancel
+  // event_offer 정책: 승인 후 중단 불가. 사람이 멈추는 개념을 코어에서 제거.
+
   /**
-   * POST /campaigns/:id/cancel
-   * Cancel campaign
+   * POST /campaigns/:id/submit
+   * [event_offer] 이벤트 제출 (draft → submitted)
    * 권한: 캠페인 소유 조직 관리자
    */
   router.post(
-    '/campaigns/:id/cancel',
+    '/campaigns/:id/submit',
     externalAuth,
     ...withAuth(
       asHandler(groupbuyAuth.loadMembership),
@@ -367,14 +370,64 @@ export function createGroupbuyRoutes(
     async (req: Request, res: Response) => {
       try {
         const { id } = req.params;
-        const campaign = await campaignService.cancelCampaign(id);
-
-        res.json({
-          success: true,
-          data: campaign,
-        });
+        const campaign = await campaignService.submitCampaign(id);
+        res.json({ success: true, data: campaign });
       } catch (error) {
-        console.error('[Groupbuy] Cancel campaign error:', error);
+        console.error('[EventOffer] Submit error:', error);
+        res.status(500).json({
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  /**
+   * POST /campaigns/:id/approve
+   * [event_offer] 운영자 승인 (submitted → approved)
+   * 권한: 캠페인 소유 조직 관리자 (실제 운영자 권한 검증은 상위 layer)
+   */
+  router.post(
+    '/campaigns/:id/approve',
+    externalAuth,
+    ...withAuth(
+      asHandler(groupbuyAuth.loadMembership),
+      asHandler(groupbuyAuth.requireCampaignOwner)
+    ),
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params;
+        const campaign = await campaignService.approveCampaign(id);
+        res.json({ success: true, data: campaign });
+      } catch (error) {
+        console.error('[EventOffer] Approve error:', error);
+        res.status(500).json({
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+  );
+
+  /**
+   * POST /campaigns/:id/reject
+   * [event_offer] 운영자 반려 (submitted → rejected)
+   */
+  router.post(
+    '/campaigns/:id/reject',
+    externalAuth,
+    ...withAuth(
+      asHandler(groupbuyAuth.loadMembership),
+      asHandler(groupbuyAuth.requireCampaignOwner)
+    ),
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params;
+        const { reason } = req.body || {};
+        const campaign = await campaignService.rejectCampaign(id, reason);
+        res.json({ success: true, data: campaign });
+      } catch (error) {
+        console.error('[EventOffer] Reject error:', error);
         res.status(500).json({
           success: false,
           error: error instanceof Error ? error.message : 'Unknown error',

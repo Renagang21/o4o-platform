@@ -10,6 +10,7 @@
 import type { EntityManager, Repository } from 'typeorm';
 import {
   GroupbuyCampaign,
+  normalizeApprovalState,
   type CampaignStatus,
 } from '../entities/GroupbuyCampaign.js';
 import { CampaignProduct } from '../entities/CampaignProduct.js';
@@ -112,8 +113,9 @@ export class GroupbuyCampaignService {
   }
 
   /**
-   * 캠페인 정보 수정
+   * 캠페인(이벤트) 정보 수정
    * - draft 상태에서만 수정 가능
+   * - 승인 후 불변 (event_offer 정책)
    */
   async updateCampaign(
     id: string,
@@ -124,8 +126,8 @@ export class GroupbuyCampaignService {
       throw new Error('캠페인을 찾을 수 없습니다');
     }
 
-    if (campaign.status !== 'draft') {
-      throw new Error('진행 중인 캠페인은 수정할 수 없습니다');
+    if (normalizeApprovalState(campaign.status) !== 'draft') {
+      throw new Error('승인 절차에 들어간 이벤트는 수정할 수 없습니다 (event_offer 불변 정책)');
     }
 
     if (dto.startDate && dto.endDate && dto.startDate >= dto.endDate) {
@@ -137,33 +139,75 @@ export class GroupbuyCampaignService {
   }
 
   /**
-   * 캠페인 활성화
-   * - draft → active
-   * - 현재 날짜가 startDate 이상이어야 활성화 가능
+   * [event_offer] 이벤트 제출
+   * - draft → submitted
+   * - 운영자 승인 대기 상태로 전환
+   * - 최소 1개 이상의 상품이 등록되어야 함
    */
-  async activateCampaign(id: string): Promise<GroupbuyCampaign> {
+  async submitCampaign(id: string): Promise<GroupbuyCampaign> {
     const campaign = await this.getCampaignById(id);
     if (!campaign) {
       throw new Error('캠페인을 찾을 수 없습니다');
     }
 
-    if (campaign.status !== 'draft') {
-      throw new Error('초안 상태의 캠페인만 활성화할 수 있습니다');
+    if (normalizeApprovalState(campaign.status) !== 'draft') {
+      throw new Error('초안 상태의 이벤트만 제출할 수 있습니다');
     }
 
-    // 최소 1개 이상의 상품이 등록되어야 활성화 가능
     if (!campaign.products || campaign.products.length === 0) {
-      throw new Error('최소 1개 이상의 상품을 등록해야 활성화할 수 있습니다');
+      throw new Error('최소 1개 이상의 상품을 등록해야 제출할 수 있습니다');
     }
 
-    // Phase 2: 현재 날짜가 시작일 이상이어야 활성화 가능
-    const now = new Date();
-    if (now < campaign.startDate) {
-      throw new Error('캠페인 시작일 이후에만 활성화할 수 있습니다');
-    }
-
-    campaign.status = 'active';
+    campaign.status = 'submitted';
     return this.campaignRepository.save(campaign);
+  }
+
+  /**
+   * [event_offer] 이벤트 승인
+   * - submitted → approved
+   * - 승인 후 본체/상품/가격/기간 모두 변경 불가
+   * - 시간 기반 운영(upcoming/active/ended)이 자동 적용됨
+   */
+  async approveCampaign(id: string): Promise<GroupbuyCampaign> {
+    const campaign = await this.getCampaignById(id);
+    if (!campaign) {
+      throw new Error('캠페인을 찾을 수 없습니다');
+    }
+
+    if (normalizeApprovalState(campaign.status) !== 'submitted') {
+      throw new Error('제출된 이벤트만 승인할 수 있습니다');
+    }
+
+    campaign.status = 'approved';
+    return this.campaignRepository.save(campaign);
+  }
+
+  /**
+   * [event_offer] 이벤트 반려
+   * - submitted → rejected
+   * - 반려된 이벤트는 외부 노출되지 않음
+   */
+  async rejectCampaign(id: string, _reason?: string): Promise<GroupbuyCampaign> {
+    const campaign = await this.getCampaignById(id);
+    if (!campaign) {
+      throw new Error('캠페인을 찾을 수 없습니다');
+    }
+
+    if (normalizeApprovalState(campaign.status) !== 'submitted') {
+      throw new Error('제출된 이벤트만 반려할 수 있습니다');
+    }
+
+    campaign.status = 'rejected';
+    return this.campaignRepository.save(campaign);
+  }
+
+  /**
+   * @deprecated event_offer 정책에서 수동 활성화 개념 제거.
+   * 호환을 위해 submit + approve를 한 번에 수행.
+   */
+  async activateCampaign(id: string): Promise<GroupbuyCampaign> {
+    await this.submitCampaign(id);
+    return this.approveCampaign(id);
   }
 
   /**
@@ -178,8 +222,8 @@ export class GroupbuyCampaignService {
       throw new Error('캠페인을 찾을 수 없습니다');
     }
 
-    if (campaign.status !== 'active') {
-      throw new Error('진행 중인 캠페인만 마감할 수 있습니다');
+    if (normalizeApprovalState(campaign.status) !== 'approved') {
+      throw new Error('승인된 이벤트만 마감할 수 있습니다');
     }
 
     return this.entityManager.transaction(async (txManager) => {
@@ -227,8 +271,8 @@ export class GroupbuyCampaignService {
         await txProductRepo.save(product);
       }
 
-      // 캠페인 상태 변경
-      campaign.status = 'closed';
+      // 캠페인 상태 변경 (event_offer: ended)
+      campaign.status = 'ended';
       await txCampaignRepo.save(campaign);
 
       return {
@@ -241,40 +285,24 @@ export class GroupbuyCampaignService {
   }
 
   /**
-   * 캠페인 완료 처리
-   * - closed → completed
+   * @deprecated event_offer 정책에서는 closeCampaign이 곧 종료(ended).
+   * 호환을 위해 no-op 반환.
    */
   async completeCampaign(id: string): Promise<GroupbuyCampaign> {
     const campaign = await this.getCampaignById(id);
     if (!campaign) {
       throw new Error('캠페인을 찾을 수 없습니다');
     }
-
-    if (campaign.status !== 'closed') {
-      throw new Error('마감된 캠페인만 완료 처리할 수 있습니다');
-    }
-
-    campaign.status = 'completed';
-    return this.campaignRepository.save(campaign);
+    return campaign;
   }
 
-  /**
-   * 캠페인 취소
-   * - draft/active → cancelled
-   */
-  async cancelCampaign(id: string): Promise<GroupbuyCampaign> {
-    const campaign = await this.getCampaignById(id);
-    if (!campaign) {
-      throw new Error('캠페인을 찾을 수 없습니다');
-    }
-
-    if (campaign.status === 'completed' || campaign.status === 'cancelled') {
-      throw new Error('완료 또는 취소된 캠페인은 취소할 수 없습니다');
-    }
-
-    campaign.status = 'cancelled';
-    return this.campaignRepository.save(campaign);
-  }
+  // ============================================
+  // [REMOVED] cancelCampaign
+  //
+  // event_offer 정책: 승인 후 중단 불가.
+  // 사람이 이벤트를 멈추는 개념을 코어에서 제거했다.
+  // 호출 측은 closeCampaign(시간 마감) 또는 rejectCampaign(미승인 반려)을 사용해야 한다.
+  // ============================================
 
   /**
    * 캠페인 수량 집계 업데이트

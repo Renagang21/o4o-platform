@@ -149,25 +149,17 @@ export class GroupbuyOrderService {
         throw error;
       }
 
-      // Phase 5.1: 캠페인 상태 기반 작업 차단
-      if (campaign.status === 'closed') {
-        const error = new Error(`마감된 캠페인에는 주문할 수 없습니다`);
-        (error as any).code = GroupbuyOrderError.CAMPAIGN_CLOSED;
-        throw error;
-      }
-      if (campaign.status === 'completed') {
-        const error = new Error(`완료된 캠페인에는 주문할 수 없습니다`);
-        (error as any).code = GroupbuyOrderError.CAMPAIGN_COMPLETED;
-        throw error;
-      }
-      if (campaign.status === 'cancelled') {
-        const error = new Error(`취소된 캠페인에는 주문할 수 없습니다`);
-        (error as any).code = GroupbuyOrderError.CAMPAIGN_CANCELLED;
-        throw error;
-      }
-      if (campaign.status !== 'active') {
-        const error = new Error(`진행 중인 캠페인만 주문 가능합니다 (현재 상태: ${campaign.status})`);
-        (error as any).code = GroupbuyOrderError.CAMPAIGN_NOT_ACTIVE;
+      // [event_offer] 시간 기반 판정으로 주문 가능 여부 결정
+      // - 승인 상태(approved/legacy active) + 진행 중 시간(active)일 때만 허용
+      if (!campaign.canAcceptOrders()) {
+        const code =
+          campaign.approvalState === 'ended' || campaign.approvalState === 'rejected'
+            ? GroupbuyOrderError.CAMPAIGN_CLOSED
+            : GroupbuyOrderError.CAMPAIGN_NOT_ACTIVE;
+        const error = new Error(
+          `진행 중인 이벤트만 주문 가능합니다 (승인=${campaign.approvalState}, 시간=${campaign.getComputedTimeStatus()})`
+        );
+        (error as any).code = code;
         throw error;
       }
 
