@@ -136,6 +136,158 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
     }
   });
 
+  // GET /lookup?q=최고 — '최고약국' 미노출 원인 실측
+  // WO-O4O-GLYCOPHARM-PHARMACY-SEARCH-DEBUG-MEASUREMENT-V1
+  router.get('/lookup', async (req, res) => {
+    const q = (req.query.q as string) || '';
+    if (!q.trim()) {
+      res.send(page('Pharmacy Lookup', `
+        <h1>Pharmacy Search Lookup (실측)</h1>
+        <p>WO-O4O-GLYCOPHARM-PHARMACY-SEARCH-DEBUG-MEASUREMENT-V1</p>
+        <form method="GET">
+          <p>검색 키워드 (organization_name / applicant_name 부분일치):</p>
+          <input name="q" placeholder="최고" style="width:300px;padding:4px" />
+          <button type="submit" style="padding:6px 16px;background:#0066cc;color:white;border:none;cursor:pointer">조회</button>
+        </form>
+        <p>예: <a href="/__debug__/pharmacy/lookup?q=최고">/__debug__/pharmacy/lookup?q=최고</a></p>
+      `));
+      return;
+    }
+
+    const like = `%${q}%`;
+    const result: Record<string, any> = { keyword: q };
+
+    try {
+      // 1. glycopharm_applications
+      result.applications = await dataSource.query(
+        `SELECT id, status, organization_name, applicant_name, user_id, created_at, reviewed_at
+         FROM glycopharm_applications
+         WHERE organization_name ILIKE $1 OR applicant_name ILIKE $1
+         ORDER BY created_at DESC
+         LIMIT 20`,
+        [like],
+      );
+
+      // 2. organizations
+      result.organizations = await dataSource.query(
+        `SELECT id, name, "isActive", "createdAt"
+         FROM organizations
+         WHERE name ILIKE $1
+         ORDER BY "createdAt" DESC
+         LIMIT 20`,
+        [like],
+      );
+
+      const orgIds: string[] = result.organizations.map((o: any) => o.id);
+
+      // 3. organization_service_enrollments (해당 organizations 기준)
+      if (orgIds.length > 0) {
+        result.enrollments = await dataSource.query(
+          `SELECT organization_id, service_code, status, created_at
+           FROM organization_service_enrollments
+           WHERE organization_id = ANY($1::uuid[])
+           ORDER BY organization_id, service_code`,
+          [orgIds],
+        );
+
+        // 4. glycopharm_pharmacies
+        result.glycopharm_pharmacies = await dataSource.query(
+          `SELECT id, name FROM glycopharm_pharmacies WHERE id = ANY($1::uuid[])`,
+          [orgIds],
+        );
+      } else {
+        result.enrollments = [];
+        result.glycopharm_pharmacies = [];
+      }
+
+      // 5. 환자 검색 SoR 실제 쿼리 — 키워드와 무관하게 노출되는지 확인
+      result.patient_search_includes_keyword = await dataSource.query(
+        `SELECT
+           o.id,
+           COALESCE(gp.name, o.name) AS displayed_name,
+           o.name AS org_name,
+           gp.name AS gp_name,
+           o."isActive" AS org_active,
+           e.status AS enrollment_status
+         FROM organizations o
+         JOIN organization_service_enrollments e
+           ON e.organization_id = o.id
+           AND e.service_code = 'glycopharm'
+           AND e.status = 'active'
+         LEFT JOIN glycopharm_pharmacies gp ON gp.id = o.id
+         WHERE o."isActive" = true
+           AND (o.name ILIKE $1 OR gp.name ILIKE $1)
+         ORDER BY COALESCE(gp.name, o.name)`,
+        [like],
+      );
+
+      // 6. 시나리오 자동 판정
+      const scenarios: string[] = [];
+      if (result.applications.length === 0) {
+        scenarios.push('A0: glycopharm_applications에 해당 row가 없음 (가입 자체가 안 들어감)');
+      } else {
+        const approved = result.applications.filter((a: any) => a.status === 'approved');
+        if (approved.length === 0) {
+          scenarios.push(`A1: application이 있으나 approved 없음 (현재 상태: ${result.applications.map((a: any) => a.status).join(', ')})`);
+        }
+      }
+      if (result.organizations.length === 0) {
+        scenarios.push('B: organizations row 없음 (승인 핸들러가 organization 생성 단계까지 못 갔음)');
+      }
+      const inactiveOrgs = result.organizations.filter((o: any) => !o.isActive);
+      if (inactiveOrgs.length > 0) {
+        scenarios.push(`C: organizations.isActive=false 인 row 존재 (${inactiveOrgs.length}건)`);
+      }
+      if (orgIds.length > 0) {
+        const glycoEnrolls = (result.enrollments as any[]).filter((e) => e.service_code === 'glycopharm');
+        if (glycoEnrolls.length === 0) {
+          scenarios.push('D: 해당 organization에 service_code=glycopharm enrollment가 없음');
+        } else {
+          const inactiveEnrolls = glycoEnrolls.filter((e) => e.status !== 'active');
+          if (inactiveEnrolls.length > 0) {
+            scenarios.push(`E: enrollment.status가 active 아님 (${inactiveEnrolls.map((e) => e.status).join(', ')})`);
+          }
+        }
+        if (result.glycopharm_pharmacies.length === 0) {
+          scenarios.push('F: glycopharm_pharmacies row 없음 → COALESCE로 organizations.name fallback (이름 불일치 가능성)');
+        }
+      }
+      if (result.patient_search_includes_keyword.length > 0) {
+        scenarios.push('G: 환자 검색 SoR에는 키워드 매칭 결과가 존재함 → "검색 안 됨" 증상의 원인은 backend가 아니라 프론트 검색/필터일 수 있음');
+      } else if (orgIds.length > 0) {
+        scenarios.push('H: organizations는 있으나 환자 검색 SoR JOIN 결과는 0건 → enrollment.status 또는 isActive에서 탈락');
+      }
+      result.scenarios = scenarios.length > 0 ? scenarios : ['판정 불가 — 데이터 없음'];
+
+      res.send(page('Pharmacy Lookup', `
+        <h1>Pharmacy Search Lookup: <code>${esc(q)}</code></h1>
+        <p>WO-O4O-GLYCOPHARM-PHARMACY-SEARCH-DEBUG-MEASUREMENT-V1</p>
+
+        <h2>시나리오 자동 판정</h2>
+        <ul>${result.scenarios.map((s: string) => `<li>${esc(s)}</li>`).join('')}</ul>
+
+        <h2>1. glycopharm_applications (${result.applications.length})</h2>
+        <pre>${esc(JSON.stringify(result.applications, null, 2))}</pre>
+
+        <h2>2. organizations (${result.organizations.length})</h2>
+        <pre>${esc(JSON.stringify(result.organizations, null, 2))}</pre>
+
+        <h2>3. organization_service_enrollments (${result.enrollments.length})</h2>
+        <pre>${esc(JSON.stringify(result.enrollments, null, 2))}</pre>
+
+        <h2>4. glycopharm_pharmacies (${result.glycopharm_pharmacies.length})</h2>
+        <pre>${esc(JSON.stringify(result.glycopharm_pharmacies, null, 2))}</pre>
+
+        <h2>5. 환자 검색 SoR 실제 쿼리 결과 (${result.patient_search_includes_keyword.length})</h2>
+        <pre>${esc(JSON.stringify(result.patient_search_includes_keyword, null, 2))}</pre>
+
+        <p><a href="/__debug__/pharmacy/lookup">← 다시 조회</a> | <a href="/__debug__/pharmacy">전체 약국 목록</a></p>
+      `));
+    } catch (err) {
+      res.status(500).send(page('Error', `<pre>${esc(err)}</pre><pre>${esc(JSON.stringify(result, null, 2))}</pre>`));
+    }
+  });
+
   // GET /care-data — 환자별 health_readings + glucoseview_customers 진단
   router.get('/care-data', async (req, res) => {
     const email = req.query.email as string;
