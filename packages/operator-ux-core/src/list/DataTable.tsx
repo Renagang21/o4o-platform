@@ -29,6 +29,10 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = '데이터가 없습니다',
   onRowClick,
   className = '',
+  tableId,
+  reorderable,
+  persistState,
+  columnVisibility,
 }: DataTableProps<T>) {
   // Loading skeleton
   if (loading) {
@@ -58,6 +62,8 @@ export function DataTable<T extends Record<string, any>>({
     sortable: col.sortable,
     sortAccessor: col.sortAccessor,
     render: col.render,
+    accessor: col.accessor,
+    onCellClick: col.onCellClick,
   }));
 
   return (
@@ -72,6 +78,10 @@ export function DataTable<T extends Record<string, any>>({
         tdClassName="px-4 py-3 text-sm text-slate-700"
         onRowClick={onRowClick ? (row) => onRowClick(row) : undefined}
         emptyMessage={emptyMessage}
+        tableId={tableId}
+        reorderable={reorderable}
+        persistState={persistState}
+        columnVisibility={columnVisibility}
       />
     </div>
   );

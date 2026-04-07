@@ -26,8 +26,8 @@ export interface PaginatedResponse<T> {
 export interface ListColumnDef<T> {
   /** 고유 식별자 + dataIndex (T의 키 또는 커스텀 문자열) */
   key: string;
-  /** 테이블 헤더 텍스트 */
-  header: string;
+  /** 테이블 헤더 텍스트 (또는 ReactNode — system 컬럼의 select-all 등) */
+  header: ReactNode;
   /** 컬럼 너비 (CSS value, e.g. '120px', '20%') */
   width?: string;
   /** 최소 너비 */
@@ -50,6 +50,10 @@ export interface ListColumnDef<T> {
    * 복합 컬럼은 반드시 지정할 것.
    */
   sortAccessor?: (row: T) => string | number | Date | null | undefined;
+  /** 행에서 값 추출. 없으면 row[key] 사용. */
+  accessor?: (row: T, index: number) => any;
+  /** 셀 클릭 핸들러 (행 클릭과 분리) */
+  onCellClick?: (row: T, index: number) => void;
   /** 커스텀 셀 렌더러 */
   render?: (value: any, row: T, index: number) => ReactNode;
   /** 인라인 편집 가능 여부 (EditableDataTable 전용) */
@@ -75,6 +79,15 @@ export interface DataTableProps<T extends Record<string, any>> {
   onRowClick?: (row: T) => void;
   /** 추가 CSS 클래스 */
   className?: string;
+  // WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1: BaseTable passthrough
+  /** 테이블 고유 ID — 상태 저장에 사용 */
+  tableId?: string;
+  /** 컬럼 드래그 순서 변경 허용 */
+  reorderable?: boolean;
+  /** localStorage에 컬럼 상태 저장 */
+  persistState?: boolean;
+  /** 컬럼 표시/숨김 토글 UI */
+  columnVisibility?: boolean;
 }
 
 // ─── Pagination Props ───
