@@ -77,11 +77,32 @@ export class MarketTrialOperatorController {
         order: { createdAt: 'ASC' },
       });
 
+      // WO-MARKET-TRIAL-KPA-FORUM-INTEGRATION-V1: 연결된 KPA 포럼 게시글 정보
+      const forumMapping = await MarketTrialOperatorController.forumRepo.findOne({
+        where: { marketTrialId: id },
+      });
+      let forumLink: { forumPostId: string; slug: string | null; url: string } | null = null;
+      if (forumMapping && MarketTrialOperatorController.dataSource) {
+        const rows = await MarketTrialOperatorController.dataSource.query(
+          `SELECT slug FROM forum_post WHERE id = $1`,
+          [forumMapping.forumId],
+        );
+        if (rows.length > 0) {
+          forumLink = {
+            forumPostId: forumMapping.forumId,
+            slug: rows[0].slug,
+            // KPA-a forum post route: /forum/post/:slug
+            url: `/forum/post/${rows[0].slug}`,
+          };
+        }
+      }
+
       res.json({
         success: true,
         data: {
           ...toOperatorTrialDTO(trial),
           serviceApprovals: approvals.map(toServiceApprovalDTO),
+          forumLink,
         },
       });
     } catch (error) {
@@ -121,16 +142,69 @@ export class MarketTrialOperatorController {
       trial.status = TrialStatus.RECRUITING;
       await MarketTrialOperatorController.trialRepo.save(trial);
 
-      // Create forum mapping (placeholder for Phase 3 forum integration)
+      // WO-MARKET-TRIAL-KPA-FORUM-INTEGRATION-V1:
+      // KPA-a Market Trial 포럼 카테고리에 자동 게시글 생성 + 매핑 저장
       const existingForum = await MarketTrialOperatorController.forumRepo.findOne({
         where: { marketTrialId: trial.id },
       });
-      if (!existingForum) {
-        const forumMapping = MarketTrialOperatorController.forumRepo.create({
-          marketTrialId: trial.id,
-          forumId: `forum_${trial.id}`,
-        });
-        await MarketTrialOperatorController.forumRepo.save(forumMapping);
+      if (!existingForum && MarketTrialOperatorController.dataSource) {
+        try {
+          const ds = MarketTrialOperatorController.dataSource;
+          const TRIAL_FORUM_CATEGORY_ID = 'f0000000-0a00-4000-f000-0000000000f1';
+
+          // 카테고리 존재 확인
+          const catExists = await ds.query(
+            `SELECT id FROM forum_category WHERE id = $1`,
+            [TRIAL_FORUM_CATEGORY_ID],
+          );
+
+          if (catExists.length > 0) {
+            const slug = `market-trial-${trial.id.slice(0, 8)}-${Date.now().toString(36)}`;
+            const excerpt = (trial.description || '').slice(0, 200);
+            const content = JSON.stringify([
+              { type: 'paragraph', data: { text: `[시범판매 모집] ${trial.title}` } },
+              { type: 'paragraph', data: { text: trial.description || '' } },
+              { type: 'paragraph', data: { text: `공급자: ${trial.supplierName || '-'}` } },
+              { type: 'paragraph', data: { text: `상태: 모집 중 (RECRUITING)` } },
+              { type: 'paragraph', data: { text: `※ 본 게시글은 운영자 승인으로 자동 생성되었습니다.` } },
+            ]);
+
+            const inserted = await ds.query(
+              `INSERT INTO forum_post (
+                "id", "title", "slug", "content", "excerpt",
+                "type", "status", "categoryId", "author_id",
+                "isPinned", "isLocked", "allowComments",
+                "viewCount", "commentCount", "likeCount",
+                "published_at", "created_at", "updated_at"
+              ) VALUES (
+                gen_random_uuid(), $1, $2, $3, $4,
+                'announcement', 'publish', $5, NULL,
+                false, false, true,
+                0, 0, 0,
+                NOW(), NOW(), NOW()
+              ) RETURNING id`,
+              [
+                `[시범판매] ${trial.title}`,
+                slug,
+                content,
+                excerpt,
+                TRIAL_FORUM_CATEGORY_ID,
+              ],
+            );
+
+            const forumPostId = inserted[0]?.id;
+            if (forumPostId) {
+              const forumMapping = MarketTrialOperatorController.forumRepo.create({
+                marketTrialId: trial.id,
+                forumId: forumPostId,
+              });
+              await MarketTrialOperatorController.forumRepo.save(forumMapping);
+            }
+          }
+        } catch (forumError) {
+          // 포럼 생성 실패는 승인 자체를 막지 않음 (재시도/수동 연결 가능)
+          console.error('[MarketTrial] Forum post creation failed:', forumError);
+        }
       }
 
       res.json({
