@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, BookOpen } from 'lucide-react';
+import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, BookOpen, Info } from 'lucide-react';
 
 export default function PharmacistPlaceholderPage() {
   const { user, logout } = useAuth();
@@ -26,16 +26,28 @@ export default function PharmacistPlaceholderPage() {
         <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto mb-4">
           <Activity className="w-8 h-8 text-blue-600" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">약국용 시스템</h1>
+        <h1 className="text-2xl font-bold text-slate-800 mb-2">약국 메인</h1>
         <button
           onClick={() => navigate('/store/settings')}
           className="text-slate-500 mb-1 hover:text-blue-600 transition-colors cursor-pointer"
         >
           {(user?.lastName && user?.firstName) ? `${user.lastName}${user.firstName}` : user?.name || user?.email || '약국'}님 환영합니다.
         </button>
-        <p className="text-sm text-slate-400 mb-8">
+        <p className="text-sm text-slate-400 mb-6">
           등록된 당뇨인을 관리하고 상담을 진행하세요.
         </p>
+
+        {/* WO-O4O-GLYCOPHARM-ADMIN-OPERATOR-TERM-AND-UI-CONSISTENCY-CLEANUP-V1
+            약국 등록 안내: 약사 승인만으로는 당뇨인 검색 노출이 되지 않음 */}
+        <div className="w-full max-w-xs mx-auto mb-6 flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3 text-left">
+          <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-600" />
+          <div className="text-[12px] leading-relaxed text-blue-800">
+            <p className="font-semibold">당뇨인 검색에 노출되려면 약국 등록이 필요합니다.</p>
+            <p className="mt-0.5 text-blue-700">
+              회원 가입만으로는 당뇨인이 약국을 찾을 수 없습니다. 아래 <span className="font-medium">약국 경영 → 내 매장</span>에서 약국 등록·승인을 완료해 주세요.
+            </p>
+          </div>
+        </div>
         <div className="w-full max-w-xs mx-auto space-y-3">
           <button
             onClick={() => navigate('/pharmacy/patients')}

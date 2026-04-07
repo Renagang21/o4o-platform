@@ -86,7 +86,7 @@ export default function PatientRequestsPage() {
             <p className="text-xs text-slate-400">
               {requests.length > 0
                 ? `${requests.length}건의 연결 승인 대기 중`
-                : '당뇨인이 보낸 약사 연결 신청 승인'}
+                : '당뇨인이 보낸 약국 연결 신청 승인'}
             </p>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function PatientRequestsPage() {
               대기 중인 연결 요청이 없습니다
             </p>
             <p className="text-xs text-slate-400 mt-1">
-              당뇨인가 약국 연결을 요청하면 여기에 표시됩니다.
+              당뇨인이 약국 연결을 요청하면 여기에 표시됩니다.
             </p>
           </div>
         ) : (
