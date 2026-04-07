@@ -31,6 +31,9 @@ import {
   Briefcase,
   DollarSign,
   ShieldCheck,
+  Calendar,
+  UserPlus,
+  HeartPulse,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -84,6 +87,10 @@ const roleConfig: Record<string, RoleConfig> = {
     color: 'primary',
     menuItems: [
       { path: '/store', label: '대시보드', icon: LayoutDashboard },
+      // WO-O4O-GLYCOPHARM-PHARMACY-SIDEBAR-MENU-ADD-V1: Care 운영 메뉴 직접 진입
+      { path: '/pharmacy/appointments', label: '상담 예약 관리', icon: Calendar },
+      { path: '/pharmacy/patient-requests', label: '당뇨인 연결 요청', icon: UserPlus },
+      { path: '/pharmacy/patients', label: '당뇨인 관리', icon: HeartPulse },
       { path: '/store/identity', label: '매장 메인', icon: Store },
       { path: '/store/b2b-order', label: 'B2B 주문', icon: ShoppingCart },
       { path: '/store/products', label: '상품 관리', icon: Package },
