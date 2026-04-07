@@ -33,7 +33,6 @@ import {
 import { pharmacyApi, type PharmacyCustomer, type CareDashboardSummary, type PriorityPatientDto, type AiPriorityPatientDto, type PopulationDashboardDto, type CareAlertDto } from '@/api/pharmacy';
 import CareSubNav from './CareSubNav';
 import CareAiPopulationSummary from './CareAiPopulationSummary';
-import CareAiPrioritySummary from './CareAiPrioritySummary';
 import CareRiskSummary from './CareRiskSummary';
 import CareAiChatEntry from './CareAiChatEntry';
 import { getPatientDisplayName, getPatientInitial } from '@/utils/patient-display';
@@ -311,11 +310,6 @@ export default function CareDashboardPage() {
                   </div>
                 );
               })}
-            </div>
-
-            {/* AI Priority Summary */}
-            <div className="mt-3">
-              <CareAiPrioritySummary patients={priorityPatients} />
             </div>
           </div>
         )}
