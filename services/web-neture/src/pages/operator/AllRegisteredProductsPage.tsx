@@ -10,8 +10,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
-  X, Eye, EyeOff,
+  X, Eye, EyeOff, FileText, FileSearch, Tag,
 } from 'lucide-react';
+import { ContentRenderer } from '@o4o/content-editor';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -52,6 +53,115 @@ const SERVICE_TABS: { key: ServiceTab; label: string }[] = [
   { key: 'k-cosmetics', label: 'Cosmetics' },
 ];
 
+// ─── Description/Tags Preview Modals (WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1) ───
+// 운영자 검토 화면용 축약형: B2C/B2B를 탭 없이 한 화면에서 함께 표시.
+
+type DescriptionMode = 'short' | 'detail';
+
+function DescriptionPreviewModal({
+  offer,
+  mode,
+  onClose,
+}: {
+  offer: AllRegisteredOffer;
+  mode: DescriptionMode;
+  onClose: () => void;
+}) {
+  const b2c = mode === 'short' ? offer.consumerShortDescription : offer.consumerDetailDescription;
+  const b2b = mode === 'short' ? offer.businessShortDescription : offer.businessDetailDescription;
+  const title = mode === 'short' ? '간단 설명 미리보기' : '상세 설명 미리보기';
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+            <p className="text-xs text-slate-400 truncate">{offer.name}</p>
+          </div>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg flex-shrink-0">
+            <X size={16} className="text-slate-400" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* B2C */}
+          <section>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">B2C</span>
+              <span className="text-xs text-slate-500">소비자 공개 설명</span>
+            </div>
+            {b2c ? (
+              <ContentRenderer html={b2c} />
+            ) : (
+              <p className="text-xs text-slate-400 italic">미작성</p>
+            )}
+          </section>
+          {/* Divider */}
+          <div className="border-t border-slate-100" />
+          {/* B2B */}
+          <section>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">B2B</span>
+              <span className="text-xs text-slate-500">판매자 지원 설명</span>
+            </div>
+            {b2b ? (
+              <ContentRenderer html={b2b} />
+            ) : (
+              <p className="text-xs text-slate-400 italic">미작성</p>
+            )}
+          </section>
+        </div>
+        <div className="px-5 py-3 border-t border-slate-200 flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TagsPreviewModal({
+  offer,
+  onClose,
+}: {
+  offer: AllRegisteredOffer;
+  onClose: () => void;
+}) {
+  const tags = Array.isArray(offer.tags) ? offer.tags : [];
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-slate-800">태그 ({tags.length}개)</h3>
+            <p className="text-xs text-slate-400 truncate">{offer.name}</p>
+          </div>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg flex-shrink-0">
+            <X size={16} className="text-slate-400" />
+          </button>
+        </div>
+        {tags.length === 0 ? (
+          <p className="text-sm text-slate-400 italic text-center py-6">태그 없음</p>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((t, i) => (
+              <span key={i} className="inline-block px-2 py-1 text-xs bg-slate-100 text-slate-700 rounded">
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+        <div className="mt-5 flex justify-end">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AllRegisteredProductsPage() {
   const [offers, setOffers] = useState<AllRegisteredOffer[]>([]);
   const [kpi, setKpi] = useState<AllOffersKpi | null>(null);
@@ -65,6 +175,10 @@ export default function AllRegisteredProductsPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
   const [detailOffer, setDetailOffer] = useState<AllRegisteredOffer | null>(null);
+  // WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1
+  const [shortPreviewOffer, setShortPreviewOffer] = useState<AllRegisteredOffer | null>(null);
+  const [detailPreviewOffer, setDetailPreviewOffer] = useState<AllRegisteredOffer | null>(null);
+  const [tagsPreviewOffer, setTagsPreviewOffer] = useState<AllRegisteredOffer | null>(null);
 
   // Unified tabs state
   const [primaryTab, setPrimaryTab] = useState<PrimaryTab>('all');
@@ -395,6 +509,65 @@ export default function AllRegisteredProductsPage() {
         );
       },
     },
+    // WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1
+    {
+      key: '_shortDesc',
+      header: '간단 설명',
+      align: 'center',
+      width: '80px',
+      render: (_v, row) => {
+        const has = !!(row.consumerShortDescription || row.businessShortDescription);
+        return (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setShortPreviewOffer(row); }}
+            className={`p-1 rounded ${has ? 'text-emerald-600 hover:bg-emerald-50' : 'text-slate-300 hover:bg-slate-50'}`}
+            title={has ? '간단 설명 보기 (B2C/B2B)' : '미작성'}
+          >
+            <FileText className="w-4 h-4" />
+          </button>
+        );
+      },
+    },
+    {
+      key: '_detailDesc',
+      header: '상세 설명',
+      align: 'center',
+      width: '80px',
+      render: (_v, row) => {
+        const has = !!(row.consumerDetailDescription || row.businessDetailDescription);
+        return (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setDetailPreviewOffer(row); }}
+            className={`p-1 rounded ${has ? 'text-blue-600 hover:bg-blue-50' : 'text-slate-300 hover:bg-slate-50'}`}
+            title={has ? '상세 설명 보기 (B2C/B2B)' : '미작성'}
+          >
+            <FileSearch className="w-4 h-4" />
+          </button>
+        );
+      },
+    },
+    {
+      key: '_tags',
+      header: '태그',
+      align: 'center',
+      width: '80px',
+      render: (_v, row) => {
+        const count = Array.isArray(row.tags) ? row.tags.length : 0;
+        return (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setTagsPreviewOffer(row); }}
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded ${count > 0 ? 'text-violet-700 hover:bg-violet-50' : 'text-slate-300 hover:bg-slate-50'}`}
+            title={count > 0 ? `태그 ${count}개 보기` : '태그 없음'}
+          >
+            <Tag className="w-3.5 h-3.5" />
+            {count > 0 && <span className="text-[10px] font-medium">{count}</span>}
+          </button>
+        );
+      },
+    },
   ], [selectedOfferIds, allSelected, someSelected, selectableIds.length]);
 
   return (
@@ -647,6 +820,28 @@ export default function AllRegisteredProductsPage() {
           </div>
         )}
       </div>
+
+      {/* WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1: Preview modals */}
+      {shortPreviewOffer && (
+        <DescriptionPreviewModal
+          offer={shortPreviewOffer}
+          mode="short"
+          onClose={() => setShortPreviewOffer(null)}
+        />
+      )}
+      {detailPreviewOffer && (
+        <DescriptionPreviewModal
+          offer={detailPreviewOffer}
+          mode="detail"
+          onClose={() => setDetailPreviewOffer(null)}
+        />
+      )}
+      {tagsPreviewOffer && (
+        <TagsPreviewModal
+          offer={tagsPreviewOffer}
+          onClose={() => setTagsPreviewOffer(null)}
+        />
+      )}
 
       {/* Detail Panel (right slide) */}
       {detailOffer && (

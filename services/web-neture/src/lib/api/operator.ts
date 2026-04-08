@@ -49,6 +49,12 @@ export interface AllRegisteredOffer {
   regulatoryType: string | null;
   serviceApprovals: Array<{ id?: string; serviceKey: string; status: string }>;
   createdAt: string;
+  // WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1
+  consumerShortDescription?: string | null;
+  consumerDetailDescription?: string | null;
+  businessShortDescription?: string | null;
+  businessDetailDescription?: string | null;
+  tags?: string[] | null;
 }
 
 export interface AllOffersKpi {
