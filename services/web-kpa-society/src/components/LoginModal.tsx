@@ -255,18 +255,16 @@ export default function LoginModal() {
             </button>
           </form>
 
-          {/* 테스트 계정 자동입력 */}
-          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          {/* 테스트 계정 자동입력 — 약국 개설자만 노출 */}
+          <div className="mt-4 flex justify-center">
             {[
-              { label: '관리자', email: 'kpa-a-admin@o4o.com', password: 'O4oTestPass' },
-              { label: '운영자', email: 'kpa-a-operator@o4o.com', password: 'O4oTestPass' },
               { label: '약국 개설자', email: 'phamacy1@o4o.com', password: 'O4oTestPass@1' },
             ].map((acct) => (
               <button
                 key={acct.email}
                 type="button"
                 onClick={() => { setEmail(acct.email); setPassword(acct.password); setError(null); }}
-                className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                className="px-4 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
               >
                 {acct.label}
               </button>
