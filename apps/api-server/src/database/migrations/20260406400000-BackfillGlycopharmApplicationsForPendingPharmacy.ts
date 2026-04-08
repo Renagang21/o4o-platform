@@ -31,11 +31,10 @@ export class BackfillGlycopharmApplicationsForPendingPharmacy20260406400000
 
     // pending 약국 경영자 사용자 조회
     // 컬럼명 주의: service_memberships.user_id (snake_case), service_memberships.service_key (snake_case)
-    const pendingPharmacyUsers = await queryRunner.query(
-      `SELECT DISTINCT
-         u.id AS user_id,
-         u.name AS user_name,
-         u."businessInfo" AS business_info
+    // JSON 컬럼(businessInfo)은 DISTINCT 대상이면 PostgreSQL이 equality operator 못 찾으므로
+    // user.id 단위로 먼저 조회 후 별도 SELECT
+    const pendingUserIds = await queryRunner.query(
+      `SELECT DISTINCT u.id
        FROM users u
        JOIN service_memberships sm ON sm.user_id = u.id
        WHERE sm.service_key = 'glycopharm'
@@ -44,6 +43,16 @@ export class BackfillGlycopharmApplicationsForPendingPharmacy20260406400000
          AND NOT EXISTS (
            SELECT 1 FROM glycopharm_applications ga WHERE ga.user_id = u.id
          )`,
+    );
+
+    if (pendingUserIds.length === 0) return;
+
+    const userIds: string[] = pendingUserIds.map((r: any) => r.id);
+    const pendingPharmacyUsers = await queryRunner.query(
+      `SELECT id AS user_id, name AS user_name, "businessInfo" AS business_info
+       FROM users
+       WHERE id = ANY($1::uuid[])`,
+      [userIds],
     );
 
     let backfilled = 0;
