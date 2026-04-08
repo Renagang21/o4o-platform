@@ -30,14 +30,15 @@ export class BackfillGlycopharmApplicationsForPendingPharmacy20260406400000
     }
 
     // pending 약국 경영자 사용자 조회
+    // 컬럼명 주의: service_memberships.user_id (snake_case), service_memberships.service_key (snake_case)
     const pendingPharmacyUsers = await queryRunner.query(
       `SELECT DISTINCT
          u.id AS user_id,
          u.name AS user_name,
          u."businessInfo" AS business_info
        FROM users u
-       JOIN service_memberships sm ON sm."userId" = u.id
-       WHERE sm."serviceKey" = 'glycopharm'
+       JOIN service_memberships sm ON sm.user_id = u.id
+       WHERE sm.service_key = 'glycopharm'
          AND sm.status = 'pending'
          AND sm.role = 'pharmacy'
          AND NOT EXISTS (
