@@ -52,6 +52,9 @@ export default function RegisterPage() {
     phone: '',
     businessName: '',
     businessNumber: '',
+    // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1
+    representativeName: '',
+    licenseNumber: '',
     taxEmail: '',
     businessType: '',
     businessCategory: '',
@@ -122,6 +125,9 @@ export default function RegisterPage() {
         ...(memberType === 'pharmacy' && {
           businessName: formData.businessName || undefined,
           businessNumber: formData.businessNumber || undefined,
+          // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1
+          representativeName: formData.representativeName || undefined,
+          licenseNumber: formData.licenseNumber || undefined,
           taxEmail: formData.taxEmail || undefined,
           businessType: formData.businessType || undefined,
           businessCategory: formData.businessCategory || undefined,
@@ -183,7 +189,9 @@ export default function RegisterPage() {
       : isPasswordStrong && formData.password === formData.passwordConfirm;
     const baseValid = baseFields && passwordValid;
     if (memberType === 'pharmacy') {
-      return baseValid && formData.businessName && formData.businessNumber && formData.taxEmail;
+      // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 대표자명 필수 추가
+      return baseValid && formData.businessName && formData.businessNumber
+        && formData.taxEmail && formData.representativeName;
     }
     return baseValid;
   };
@@ -448,10 +456,15 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* 약국 정보 (약국 선택 시에만 표시) */}
+            {/* 약국 정보 (약국 선택 시에만 표시)
+                WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1:
+                약국 경영자 가입 신청 — 대표자명/면허번호 추가, 안내 문구 강화 */}
             {memberType === 'pharmacy' && (
               <div className="pt-4 border-t">
-                <h3 className="text-sm font-semibold text-slate-800 mb-3">약국 정보</h3>
+                <h3 className="text-sm font-semibold text-slate-800 mb-1">약국 경영자 가입 신청</h3>
+                <p className="text-xs text-slate-500 mb-3">
+                  GlycoPharm은 약국 경영자용 서비스입니다. 사업자 정보와 대표자 정보를 입력해 주세요.
+                </p>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -471,6 +484,25 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
+                  {/* 대표자명 (약국 경영자) */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      대표자명 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input
+                        type="text"
+                        name="representativeName"
+                        value={formData.representativeName}
+                        onChange={handleInputChange}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="약국 대표자 이름"
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
                       사업자등록번호 <span className="text-red-500">*</span>
@@ -485,6 +517,21 @@ export default function RegisterPage() {
                       placeholder="숫자만 입력 (1234567890)"
                       maxLength={10}
                       required
+                    />
+                  </div>
+
+                  {/* 약사 면허번호 (선택) */}
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      약사 면허번호 <span className="text-slate-400 text-xs">(선택)</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="licenseNumber"
+                      value={formData.licenseNumber}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="대표 약사 면허번호 (있는 경우)"
                     />
                   </div>
 

@@ -117,6 +117,8 @@ export class AuthRegisterController extends BaseController {
           if (data.businessType) newBiz.businessType = data.businessType;
           if (data.taxEmail) newBiz.email = data.taxEmail;
           if (data.businessCategory) newBiz.businessCategory = data.businessCategory;
+          // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 대표자명
+          if (data.representativeName) newBiz.representativeName = data.representativeName;
           if (data.zipCode) newBiz.zipCode = data.zipCode;
           if (data.address1) newBiz.address = data.address1;
           if (data.address2) newBiz.address2 = data.address2;
@@ -202,6 +204,10 @@ export class AuthRegisterController extends BaseController {
         }
         if (data.businessCategory) {
           businessInfo.businessCategory = data.businessCategory;
+        }
+        // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 대표자명
+        if (data.representativeName) {
+          businessInfo.representativeName = data.representativeName;
         }
         // WO-O4O-POSTAL-CODE-ADDRESS-V1: zipCode 저장
         if (data.zipCode) {
@@ -423,18 +429,31 @@ export class AuthRegisterController extends BaseController {
     );
     if (existing.length > 0) return;
 
+    // 약국 경영자 신청 metadata: 대표자명, 면허번호, 주소, 업태/업종 등
+    const metadata: Record<string, any> = {};
+    if (data.representativeName) metadata.representativeName = data.representativeName;
+    if (data.licenseNumber) metadata.licenseNumber = data.licenseNumber;
+    if (data.taxEmail) metadata.taxEmail = data.taxEmail;
+    if (data.businessType) metadata.businessType = data.businessType;
+    if (data.businessCategory) metadata.businessCategory = data.businessCategory;
+    if (data.zipCode) metadata.zipCode = data.zipCode;
+    if (data.address1) metadata.address = data.address1;
+    if (data.address2) metadata.addressDetail = data.address2;
+    if (data.phone) metadata.phone = data.phone;
+
     await manager.query(
       `INSERT INTO glycopharm_applications (
         id, user_id, organization_type, organization_name, business_number,
-        service_types, status, submitted_at, created_at, updated_at
+        service_types, status, submitted_at, metadata, created_at, updated_at
       ) VALUES (
         gen_random_uuid(), $1, 'pharmacy', $2, $3,
-        '["dropshipping"]'::jsonb, 'submitted', NOW(), NOW(), NOW()
+        '["dropshipping"]'::jsonb, 'submitted', NOW(), $4::jsonb, NOW(), NOW()
       )`,
       [
         userId,
         businessName,
         data.businessNumber || null,
+        JSON.stringify(metadata),
       ],
     );
   }

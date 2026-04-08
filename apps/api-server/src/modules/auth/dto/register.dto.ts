@@ -95,6 +95,11 @@ export class RegisterRequestDto {
   @IsString()
   businessName?: string;
 
+  /** WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-FORM-REFORM-V1: 약국 대표자명 */
+  @IsOptional()
+  @IsString()
+  representativeName?: string;
+
   @IsOptional()
   @IsString()
   businessNumber?: string;
