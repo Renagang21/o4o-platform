@@ -442,7 +442,7 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
 
       // 3. care_pharmacy_link_requests
       result.link_requests = await dataSource.query(
-        `SELECT id, patient_id, pharmacy_id, status, created_at, decided_at, decided_by, reason
+        `SELECT id, patient_id, patient_name, patient_email, pharmacy_id, pharmacy_name, status, message, reject_reason, handled_by, handled_at, created_at
          FROM care_pharmacy_link_requests
          WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
             OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
@@ -453,18 +453,18 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
 
       // 4. glucoseview_customers (연결 승인 결과)
       result.glucoseview_customers = await dataSource.query(
-        `SELECT id, user_id, organization_id, name, email, "createdAt"
+        `SELECT id, user_id, organization_id, pharmacist_id, name, email, phone, created_at
          FROM glucoseview_customers
          WHERE ($1::text[] IS NULL OR email = ANY($1::text[]))
             OR ($2::uuid[] IS NULL OR organization_id = ANY($2::uuid[]))
-         ORDER BY "createdAt" DESC
+         ORDER BY created_at DESC
          LIMIT 30`,
         [patientEmails.length > 0 ? patientEmails : null, pharmacyIds.length > 0 ? pharmacyIds : null],
       ).catch((e: any) => ({ error: String(e?.message || e) }));
 
       // 5. care_appointments (상담 예약)
       result.appointments = await dataSource.query(
-        `SELECT id, patient_id, pharmacy_id, status, scheduled_at, created_at, note
+        `SELECT id, patient_id, patient_name, patient_email, pharmacy_id, pharmacy_name, pharmacist_id, status, scheduled_at, notes, reject_reason, created_at
          FROM care_appointments
          WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
             OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
