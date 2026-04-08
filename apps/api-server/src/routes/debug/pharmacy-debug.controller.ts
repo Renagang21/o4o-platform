@@ -391,5 +391,170 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
     }
   });
 
+  // GET /appointment-trace?patient=전화수&pharmacy=테스트약국
+  // IR-O4O-GLYCOPHARM-APPOINTMENT-REQUEST-MISSING-IN-PHARMACY-V1
+  router.get('/appointment-trace', async (req, res) => {
+    const patient = (req.query.patient as string) || '';
+    const pharmacy = (req.query.pharmacy as string) || '';
+    if (!patient && !pharmacy) {
+      res.send(page('Appointment Trace', `
+        <h1>Appointment / Link Request 추적</h1>
+        <p>IR-O4O-GLYCOPHARM-APPOINTMENT-REQUEST-MISSING-IN-PHARMACY-V1</p>
+        <form method="GET">
+          <p>환자 이름 (부분일치): <input name="patient" placeholder="전화수" style="width:300px;padding:4px" /></p>
+          <p>약국명 (부분일치): <input name="pharmacy" placeholder="테스트약국" style="width:300px;padding:4px" /></p>
+          <button type="submit" style="padding:6px 16px;background:#0066cc;color:white;border:none;cursor:pointer">조회</button>
+        </form>
+      `));
+      return;
+    }
+
+    const result: Record<string, any> = { patient, pharmacy };
+
+    try {
+      // 1. 환자 조회
+      result.patients = await dataSource.query(
+        `SELECT id, email, name, status, "isActive", "createdAt"
+         FROM users
+         WHERE name ILIKE $1
+         ORDER BY "createdAt" DESC
+         LIMIT 10`,
+        [`%${patient}%`],
+      );
+      const patientIds: string[] = result.patients.map((p: any) => p.id);
+      const patientEmails: string[] = result.patients.map((p: any) => p.email);
+
+      // 2. 약국 조회
+      result.pharmacies = pharmacy
+        ? await dataSource.query(
+            `SELECT o.id, o.name, o."isActive", o."createdAt",
+                    e.service_code, e.status AS enrollment_status
+             FROM organizations o
+             LEFT JOIN organization_service_enrollments e
+               ON e.organization_id = o.id AND e.service_code = 'glycopharm'
+             WHERE o.name ILIKE $1
+             ORDER BY o."createdAt" DESC
+             LIMIT 10`,
+            [`%${pharmacy}%`],
+          )
+        : [];
+      const pharmacyIds: string[] = result.pharmacies.map((p: any) => p.id);
+
+      // 3. care_pharmacy_link_requests
+      result.link_requests = await dataSource.query(
+        `SELECT id, patient_id, pharmacy_id, status, created_at, decided_at, decided_by, reason
+         FROM care_pharmacy_link_requests
+         WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
+            OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
+         ORDER BY created_at DESC
+         LIMIT 30`,
+        [patientIds.length > 0 ? patientIds : null, pharmacyIds.length > 0 ? pharmacyIds : null],
+      ).catch((e: any) => ({ error: String(e?.message || e) }));
+
+      // 4. glucoseview_customers (연결 승인 결과)
+      result.glucoseview_customers = await dataSource.query(
+        `SELECT id, user_id, organization_id, name, email, "createdAt"
+         FROM glucoseview_customers
+         WHERE ($1::text[] IS NULL OR email = ANY($1::text[]))
+            OR ($2::uuid[] IS NULL OR organization_id = ANY($2::uuid[]))
+         ORDER BY "createdAt" DESC
+         LIMIT 30`,
+        [patientEmails.length > 0 ? patientEmails : null, pharmacyIds.length > 0 ? pharmacyIds : null],
+      ).catch((e: any) => ({ error: String(e?.message || e) }));
+
+      // 5. care_appointments (상담 예약)
+      result.appointments = await dataSource.query(
+        `SELECT id, patient_id, pharmacy_id, status, scheduled_at, created_at, note
+         FROM care_appointments
+         WHERE ($1::uuid[] IS NULL OR patient_id = ANY($1::uuid[]))
+            OR ($2::uuid[] IS NULL OR pharmacy_id = ANY($2::uuid[]))
+         ORDER BY created_at DESC
+         LIMIT 30`,
+        [patientIds.length > 0 ? patientIds : null, pharmacyIds.length > 0 ? pharmacyIds : null],
+      ).catch((e: any) => ({ error: String(e?.message || e) }));
+
+      // 6. 약국 owner / member 확인
+      if (pharmacyIds.length > 0) {
+        result.pharmacy_owners_and_members = await dataSource.query(
+          `SELECT o.id AS pharmacy_id, o.name AS pharmacy_name,
+                  o.created_by_user_id,
+                  om.user_id AS member_user_id, om.role, om.is_primary,
+                  u.email, u.name AS user_name
+           FROM organizations o
+           LEFT JOIN organization_members om ON om.organization_id = o.id
+           LEFT JOIN users u ON u.id = om.user_id
+           WHERE o.id = ANY($1::uuid[])`,
+          [pharmacyIds],
+        ).catch((e: any) => ({ error: String(e?.message || e) }));
+      } else {
+        result.pharmacy_owners_and_members = [];
+      }
+
+      // 자동 진단
+      const findings: string[] = [];
+      if (result.patients.length === 0) findings.push('❌ 환자(이름 매칭) 조회 결과 없음');
+      if (result.pharmacies.length === 0 && pharmacy) findings.push('❌ 약국(이름 매칭) 조회 결과 없음');
+
+      if (Array.isArray(result.link_requests)) {
+        if (result.link_requests.length === 0) {
+          findings.push('❌ care_pharmacy_link_requests 레코드 없음 → 환자가 약국 연결 요청을 보낸 적이 없거나, 다른 약국에 보냄');
+        } else {
+          const pending = result.link_requests.filter((r: any) => r.status === 'pending');
+          const approved = result.link_requests.filter((r: any) => r.status === 'approved');
+          if (pending.length > 0) findings.push(`⚠️ link_requests pending ${pending.length}건 — 약국이 아직 승인하지 않음 (당뇨인 연결 요청 화면에서 확인 필요)`);
+          if (approved.length > 0) findings.push(`✅ link_requests approved ${approved.length}건 — 연결 승인됨`);
+        }
+      }
+
+      if (Array.isArray(result.glucoseview_customers)) {
+        if (result.glucoseview_customers.length === 0) {
+          findings.push('❌ glucoseview_customers 없음 → 약국과 연결되지 않은 상태 → 상담 예약 생성 불가 (NOT_LINKED)');
+        } else {
+          findings.push(`✅ glucoseview_customers ${result.glucoseview_customers.length}건 — 환자가 약국과 연결됨`);
+        }
+      }
+
+      if (Array.isArray(result.appointments)) {
+        if (result.appointments.length === 0) {
+          findings.push('❌ care_appointments 없음 → 상담 예약 자체가 생성되지 않음');
+        } else {
+          findings.push(`✅ care_appointments ${result.appointments.length}건`);
+        }
+      }
+
+      result.findings = findings;
+
+      res.send(page('Appointment Trace', `
+        <h1>Appointment / Link Request 추적</h1>
+        <p>환자: <code>${esc(patient)}</code> / 약국: <code>${esc(pharmacy)}</code></p>
+
+        <h2>자동 진단</h2>
+        <ul>${findings.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+
+        <h2>1. 환자 (users) — ${result.patients.length}건</h2>
+        <pre>${esc(JSON.stringify(result.patients, null, 2))}</pre>
+
+        <h2>2. 약국 (organizations + glycopharm enrollment) — ${result.pharmacies.length}건</h2>
+        <pre>${esc(JSON.stringify(result.pharmacies, null, 2))}</pre>
+
+        <h2>3. care_pharmacy_link_requests</h2>
+        <pre>${esc(JSON.stringify(result.link_requests, null, 2))}</pre>
+
+        <h2>4. glucoseview_customers (연결 승인 결과)</h2>
+        <pre>${esc(JSON.stringify(result.glucoseview_customers, null, 2))}</pre>
+
+        <h2>5. care_appointments (상담 예약)</h2>
+        <pre>${esc(JSON.stringify(result.appointments, null, 2))}</pre>
+
+        <h2>6. 약국 owner/member</h2>
+        <pre>${esc(JSON.stringify(result.pharmacy_owners_and_members, null, 2))}</pre>
+
+        <p><a href="/__debug__/pharmacy/appointment-trace">← 다시 조회</a></p>
+      `));
+    } catch (err) {
+      res.status(500).send(page('Error', `<pre>${esc(err)}</pre><pre>${esc(JSON.stringify(result, null, 2))}</pre>`));
+    }
+  });
+
   return router;
 }
