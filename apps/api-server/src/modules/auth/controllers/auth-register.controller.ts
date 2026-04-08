@@ -130,6 +130,10 @@ export class AuthRegisterController extends BaseController {
 
           // KPA Society: auto-create KPA member
           await AuthRegisterController.createKpaRecords(manager, existingUser.id, data);
+
+          // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
+          // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
+          await AuthRegisterController.createGlycopharmApplication(manager, existingUser.id, data, effectiveRole);
         });
 
         logger.info('[AuthRegisterController.register] Service membership added to existing user', {
@@ -234,6 +238,10 @@ export class AuthRegisterController extends BaseController {
 
         // KPA Society: auto-create KPA member
         await AuthRegisterController.createKpaRecords(manager, newUser.id, data);
+
+        // WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1:
+        // GlycoPharm 약국 경영자 가입 시 glycopharm_applications 자동 생성
+        await AuthRegisterController.createGlycopharmApplication(manager, newUser.id, data, effectiveRole);
 
         // WO-O4O-AUTH-REGISTER-UX-IMPROVEMENT-V1: RoleAssignment는 서비스 승인 시에만 생성
 
@@ -380,5 +388,54 @@ export class AuthRegisterController extends BaseController {
         ]
       );
     }
+  }
+
+  /**
+   * WO-O4O-GLYCOPHARM-PHARMACY-OWNER-SIGNUP-AND-APPROVAL-FLOW-ALIGNMENT-V1
+   *
+   * GlycoPharm 약국 경영자 가입 시 glycopharm_applications 레코드 자동 생성.
+   * 이를 통해 운영자가 GlycoPharm 신청 화면에서 검토/승인 가능.
+   * 승인 시 organization_store + organization_service_enrollments + 환자 검색 노출까지 자동 연결됨.
+   *
+   * 조건:
+   * - service === 'glycopharm'
+   * - role === 'pharmacy' (약국 경영자)
+   * - businessName 있음 (약국 신청 최소 정보)
+   *
+   * 멱등: ON CONFLICT DO NOTHING (user_id 기준 중복 방지)
+   */
+  private static async createGlycopharmApplication(
+    manager: import('typeorm').EntityManager,
+    userId: string,
+    data: RegisterRequestDto,
+    effectiveRole: string,
+  ): Promise<void> {
+    if (data.service !== 'glycopharm') return;
+    if (effectiveRole !== 'pharmacy') return;
+
+    const businessName = data.businessName || data.companyName;
+    if (!businessName) return;
+
+    // 멱등 INSERT — 이미 application이 있으면 스킵
+    const existing = await manager.query(
+      `SELECT id FROM glycopharm_applications WHERE user_id = $1 LIMIT 1`,
+      [userId],
+    );
+    if (existing.length > 0) return;
+
+    await manager.query(
+      `INSERT INTO glycopharm_applications (
+        id, user_id, organization_type, organization_name, business_number,
+        service_types, status, submitted_at, created_at, updated_at
+      ) VALUES (
+        gen_random_uuid(), $1, 'pharmacy', $2, $3,
+        '["dropshipping"]'::jsonb, 'submitted', NOW(), NOW(), NOW()
+      )`,
+      [
+        userId,
+        businessName,
+        data.businessNumber || null,
+      ],
+    );
   }
 }
