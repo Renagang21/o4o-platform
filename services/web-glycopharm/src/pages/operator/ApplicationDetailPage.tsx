@@ -13,6 +13,10 @@ import {
   Phone,
   FileText,
   AlertCircle,
+  MapPin,
+  Briefcase,
+  IdCard,
+  Receipt,
 } from 'lucide-react';
 import { OperatorConfirmModal, useOperatorAction } from '@o4o/ui';
 import { OperatorActionType } from '@o4o/types';
@@ -163,50 +167,37 @@ export default function ApplicationDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Applicant Info */}
+          {/* Member Info — WO-O4O-GLYCOPHARM-APPLICATION-DETAIL-METADATA-VISIBILITY-V1 */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">신청자 정보</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">기본 회원 정보</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <User className="w-5 h-5 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">이름</p>
-                  <p className="text-sm font-medium text-slate-800">{application.userName || '-'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">이메일</p>
-                  <p className="text-sm font-medium text-slate-800">{application.userEmail || '-'}</p>
-                </div>
-              </div>
-              {application.userPhone && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-slate-500" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">전화번호</p>
-                    <p className="text-sm font-medium text-slate-800">{application.userPhone}</p>
-                  </div>
-                </div>
-              )}
-              {application.businessNumber && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-5 h-5 text-slate-500" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">사업자번호</p>
-                    <p className="text-sm font-medium text-slate-800">{application.businessNumber}</p>
-                  </div>
-                </div>
-              )}
+              <InfoField icon={User} label="이름" value={application.userName} />
+              <InfoField icon={Mail} label="이메일" value={application.userEmail} />
+              <InfoField icon={Phone} label="전화번호" value={application.userPhone || application.metadata?.phone} />
+            </div>
+          </div>
+
+          {/* Pharmacy / Business Info — WO-O4O-GLYCOPHARM-APPLICATION-DETAIL-METADATA-VISIBILITY-V1 */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4">약국 · 사업자 정보</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InfoField icon={Building2} label="약국명" value={application.organizationName} />
+              <InfoField icon={User} label="대표자명" value={application.metadata?.representativeName} />
+              <InfoField icon={FileText} label="사업자등록번호" value={application.businessNumber} />
+              <InfoField icon={IdCard} label="약사 면허번호" value={application.metadata?.licenseNumber} />
+              <InfoField icon={Receipt} label="세금계산서 이메일" value={application.metadata?.taxEmail} />
+              <InfoField icon={Briefcase} label="업태" value={application.metadata?.businessType} />
+              <InfoField icon={Briefcase} label="업종" value={application.metadata?.businessCategory} />
+              <InfoField
+                icon={MapPin}
+                label="주소"
+                value={formatAddress(
+                  application.metadata?.zipCode,
+                  application.metadata?.address,
+                  application.metadata?.addressDetail,
+                )}
+                colSpan={2}
+              />
             </div>
           </div>
 
@@ -361,4 +352,38 @@ export default function ApplicationDetailPage() {
       )}
     </div>
   );
+}
+
+// ─── WO-O4O-GLYCOPHARM-APPLICATION-DETAIL-METADATA-VISIBILITY-V1 ───
+
+interface InfoFieldProps {
+  icon: typeof User;
+  label: string;
+  value?: string | null;
+  colSpan?: 1 | 2;
+}
+
+/** 빈 값 처리: null/undefined/'' 이면 '미입력' 회색 표시 */
+function InfoField({ icon: Icon, label, value, colSpan = 1 }: InfoFieldProps) {
+  const isEmpty = value === null || value === undefined || value === '';
+  return (
+    <div className={`flex items-center gap-3 ${colSpan === 2 ? 'md:col-span-2' : ''}`}>
+      <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Icon className="w-5 h-5 text-slate-500" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-slate-500">{label}</p>
+        <p className={`text-sm font-medium truncate ${isEmpty ? 'text-slate-300' : 'text-slate-800'}`}>
+          {isEmpty ? '미입력' : value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function formatAddress(zipCode?: string, address?: string, addressDetail?: string): string {
+  if (!address) return '';
+  const zip = zipCode ? `(${zipCode}) ` : '';
+  const detail = addressDetail ? ` ${addressDetail}` : '';
+  return `${zip}${address}${detail}`;
 }
