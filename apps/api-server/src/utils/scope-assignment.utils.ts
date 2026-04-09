@@ -69,10 +69,13 @@ function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
   }
 
   // Member 계열 (인증된 일반 사용자)
+  // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1: GlycoPharm은 'pharmacy' (unprefixed)
+  // 기존 'pharmacist'는 KPA/GlucoseView/Cosmetics (prefixed)에서만 사용
   if (
     hasRole(allRoles, 'user') ||
     hasRole(allRoles, 'customer') ||
     hasRole(allRoles, 'member') ||
+    hasRole(allRoles, 'pharmacy') ||
     hasRole(allRoles, 'pharmacist') ||
     hasRole(allRoles, 'seller') ||
     hasRole(allRoles, 'vendor') ||
