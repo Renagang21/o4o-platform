@@ -1,8 +1,10 @@
 /**
- * PharmacistPlaceholderPage — 약사용 시스템 임시 페이지
+ * PharmacyPlaceholderPage — 약사용 시스템 임시 페이지
  * WO-GLYCOPHARM-ENTRY-SCREENS-V1
  * WO-GLYCOPHARM-PHARMACY-BIZ-MENU-V1:
  *   "약국 경영" 아코디언 메뉴 추가 (커뮤니티, 약국 HUB, 내 매장)
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+ *   file/component PharmacistPlaceholderPage → PharmacyPlaceholderPage 표준화.
  */
 
 import { useState } from 'react';
@@ -10,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Activity, LogOut, Users, UserPlus, Calendar, Briefcase, ChevronDown, MessageSquare, LayoutGrid, Store, BookOpen, Info } from 'lucide-react';
 
-export default function PharmacistPlaceholderPage() {
+export default function PharmacyPlaceholderPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [bizOpen, setBizOpen] = useState(false);

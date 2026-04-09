@@ -1,8 +1,12 @@
 /**
- * PharmacistGuidelinePage — 약국 케어 가이드라인
+ * PharmacyGuidelinePage — 약국 케어 가이드라인
  * WO-GLYCOPHARM-PHARMACIST-GUIDELINE-V1
  * WO-GLYCOPHARM-GUIDELINE-CMS-MIGRATION-V1: CMS 연동 + 정적 폴백
  * WO-O4O-CARE-GUIDELINE-SEARCH-V1: 검색 + 태그필터 + 코칭 연결
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+ *   file/component PharmacistGuidelinePage → PharmacyGuidelinePage 표준화.
+ *   단, CMS 메타 필드 `guidelineTarget: 'pharmacist'` 및 API 파라미터
+ *   `target: 'pharmacist'` 는 외부 계약이라 불변 — 별도 WO 로 처리 가능.
  *
  * 약사/약국 관리자용 당뇨 케어 실무 가이드라인.
  * 검색 시 API 기반 결과 카드 표시, 미검색 시 기존 CMS/아코디언 폴백.
@@ -137,7 +141,7 @@ const GUIDE_SECTIONS: GuideSection[] = [
   },
 ];
 
-export default function PharmacistGuidelinePage() {
+export default function PharmacyGuidelinePage() {
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(['initial-assessment']));
 
   // CMS 연동 상태

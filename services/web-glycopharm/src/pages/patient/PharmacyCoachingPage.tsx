@@ -1,6 +1,10 @@
 /**
- * PharmacistCoachingPage — 당뇨인용 약사 코칭 확인 화면
+ * PharmacyCoachingPage — 당뇨인용 약사 코칭 확인 화면 (환자 뷰)
  * WO-GLYCOPHARM-PATIENT-COACHING-VIEW-SCREEN-V1
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+ *   file/component PharmacistCoachingPage → PharmacyCoachingPage 표준화.
+ *   (patient-facing view of pharmacy coaching)
+ *   DTO 필드 pharmacistName 은 backend 계약이라 불변.
  *
  * 약사가 작성한 코칭 내용을 당뇨인가 확인.
  * - 최신 코칭 강조 표시
@@ -16,7 +20,7 @@ import { ArrowLeft, MessageCircle, UserCheck, ChevronDown, ChevronUp, Calendar }
 import { patientApi } from '@/api/patient';
 import type { PatientCoachingRecord } from '@/api/patient';
 
-export default function PharmacistCoachingPage() {
+export default function PharmacyCoachingPage() {
   const navigate = useNavigate();
   const [records, setRecords] = useState<PatientCoachingRecord[]>([]);
   const [loading, setLoading] = useState(true);

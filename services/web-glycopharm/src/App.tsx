@@ -38,11 +38,15 @@ const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage'));
 const RoleSelectPage = lazy(() => import('@/pages/auth/RoleSelectPage'));
 
 // WO-GLYCOPHARM-ENTRY-SCREENS-V1: Placeholder dashboards
+// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+//   PharmacistPlaceholderPage → PharmacyPlaceholderPage (file + component rename)
 const PatientMainPage = lazy(() => import('@/pages/PatientPlaceholderPage'));
-const PharmacistPlaceholderPage = lazy(() => import('@/pages/PharmacistPlaceholderPage'));
+const PharmacyPlaceholderPage = lazy(() => import('@/pages/PharmacyPlaceholderPage'));
 
 // WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1 + PATIENT-LIST-SCREEN-V1 + PATIENT-DETAIL-SCREEN-V1
-const PharmacistCoachingPage = lazy(() => import('@/pages/pharmacist/PharmacistCoachingPage'));
+// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+//   pages/pharmacist/PharmacistCoachingPage → pages/pharmacist/PharmacyCoachingPage
+const PharmacyCoachingPage = lazy(() => import('@/pages/pharmacist/PharmacyCoachingPage'));
 const PharmacistPatientsPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientsPage'));
 const PharmacistPatientDetailPage = lazy(() => import('@/pages/pharmacist/PharmacistPatientDetailPage'));
 
@@ -59,7 +63,9 @@ const PatientProfilePage = lazy(() => import('@/pages/patient/ProfilePage'));
 const PatientGlucoseInputPage = lazy(() => import('@/pages/patient/GlucoseInputPage'));
 const PatientRecordsListPage = lazy(() => import('@/pages/patient/RecordsListPage'));
 const PatientDataAnalysisPage = lazy(() => import('@/pages/patient/DataAnalysisPage'));
-const PatientPharmacistCoachingPage = lazy(() => import('@/pages/patient/PharmacistCoachingPage'));
+// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+//   pages/patient/PharmacistCoachingPage → pages/patient/PharmacyCoachingPage
+const PatientPharmacyCoachingPage = lazy(() => import('@/pages/patient/PharmacyCoachingPage'));
 const PatientCareGuidelinePage = lazy(() => import('@/pages/patient/CareGuidelinePage'));
 
 // Store pages (files under pages/pharmacy/ — reused by /store routes)
@@ -213,7 +219,9 @@ const AnalysisPage = lazy(() => import('@/pages/care').then(m => ({ default: m.A
 const CoachingPage = lazy(() => import('@/pages/care').then(m => ({ default: m.CoachingPage })));
 
 // Pharmacist Guideline (WO-GLYCOPHARM-PHARMACIST-GUIDELINE-V1)
-const PharmacistGuidelinePage = lazy(() => import('@/pages/care/PharmacistGuidelinePage'));
+// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+//   pages/care/PharmacistGuidelinePage → pages/care/PharmacyGuidelinePage
+const PharmacyGuidelinePage = lazy(() => import('@/pages/care/PharmacyGuidelinePage'));
 
 // Full Records View (WO-O4O-GLYCOPHARM-PATIENT-FULL-DATA-VIEW-V1)
 const RecordsPage = lazy(() => import('@/pages/care/RecordsPage'));
@@ -370,18 +378,18 @@ function AppRoutes() {
         <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
         <Route path="patient/records" element={<PatientRecordsListPage />} />
         <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
-        <Route path="patient/pharmacist-coaching" element={<PatientPharmacistCoachingPage />} />
+        <Route path="patient/pharmacist-coaching" element={<PatientPharmacyCoachingPage />} />
         <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
         <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
         <Route path="patient/appointments" element={<PatientAppointmentsPage />} />
       </Route>
       {/* WO-GLYCOPHARM-GATEWAY-SERVICE-ROUTING-CLEANUP-V1: /pharmacist → /pharmacy */}
-      <Route path="pharmacy" element={<PharmacistPlaceholderPage />} />
+      <Route path="pharmacy" element={<PharmacyPlaceholderPage />} />
       <Route path="pharmacy/patients" element={<PharmacistPatientsPage />} />
       <Route path="pharmacy/patient/:patientId" element={<PharmacistPatientDetailPage />} />
       <Route path="pharmacy/patient-requests" element={<PharmacistPatientRequestsPage />} />
       <Route path="pharmacy/appointments" element={<PharmacistAppointmentsPage />} />
-      <Route path="pharmacy/coaching/:patientId" element={<PharmacistCoachingPage />} />
+      <Route path="pharmacy/coaching/:patientId" element={<PharmacyCoachingPage />} />
 
       {/* Public Routes with MainLayout */}
       <Route element={<MainLayout />}>
@@ -442,7 +450,7 @@ function AppRoutes() {
           </Route>
           <Route path="analysis" element={<AnalysisPage />} />
           <Route path="coaching" element={<CoachingPage />} />
-          <Route path="guideline" element={<PharmacistGuidelinePage />} />
+          <Route path="guideline" element={<PharmacyGuidelinePage />} />
           <Route path="records" element={<RecordsPage />} />
         </Route>
       </Route>

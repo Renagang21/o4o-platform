@@ -1,6 +1,10 @@
 /**
- * PharmacistCoachingPage — 약사 코칭 화면
+ * PharmacyCoachingPage — 약사 코칭 화면 (약사 뷰)
  * WO-GLYCOPHARM-PHARMACIST-COACHING-SCREEN-V1
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C1:
+ *   file/component PharmacistCoachingPage → PharmacyCoachingPage 표준화.
+ *   (pharmacist-facing coaching editor)
+ *   상위 디렉토리명 pages/pharmacist/ 는 별도 WO 에서 정리 예정.
  *
  * 당뇨인 분석 결과 + 문제 유형 + 코칭 입력/기록을 하나의 화면에 표시.
  * 기존 care 백엔드 API 100% 재사용 (새 엔드포인트 없음).
@@ -181,7 +185,7 @@ function computeReadingStats(readings: HealthReadingDto[]): ReadingStats | null 
 
 // ─── Main Component ───
 
-export default function PharmacistCoachingPage() {
+export default function PharmacyCoachingPage() {
   const navigate = useNavigate();
   const { patientId } = useParams<{ patientId: string }>();
 
