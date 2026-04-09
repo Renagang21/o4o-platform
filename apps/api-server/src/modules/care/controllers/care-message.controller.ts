@@ -1,6 +1,10 @@
 /**
- * Care Message Controller — 환자 ↔ 약사 Q&A 메시징
+ * Care Message Controller — 환자 ↔ 약국(약사) Q&A 메시징
  * WO-O4O-CARE-QNA-SYSTEM-V1
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-A:
+ *   - 신규 경로 /messages/pharmacy/* 도입
+ *   - legacy /messages/pharmacist/* 는 동일 핸들러 alias로 유지 (배포 시차/캐시 대응)
+ *   - pharmacistId local var → senderUserId
  *
  * Routes (patient — authenticate only):
  *   POST   /messages              — 메시지 전송
@@ -8,12 +12,17 @@
  *   PATCH  /messages/read         — 읽음 처리
  *   GET    /messages/unread-count — 안읽은 수
  *
- * Routes (pharmacist — authenticate + pharmacyContext):
- *   GET    /messages/pharmacist/unread-count      — 전체 안읽은 수
- *   GET    /messages/pharmacist/unread-by-patient  — 환자별 안읽은 수
- *   POST   /messages/pharmacist       — 메시지 전송
- *   GET    /messages/:patientId       — 환자별 대화 조회
- *   PATCH  /messages/:patientId/read  — 읽음 처리
+ * Routes (pharmacy — authenticate + pharmacyContext):
+ *   GET    /messages/pharmacy/unread-count       — 전체 안읽은 수
+ *   GET    /messages/pharmacy/unread-by-patient  — 환자별 안읽은 수
+ *   POST   /messages/pharmacy                    — 메시지 전송
+ *   GET    /messages/:patientId                  — 환자별 대화 조회
+ *   PATCH  /messages/:patientId/read             — 읽음 처리
+ *
+ * Legacy aliases (deprecated, 제거 예정):
+ *   GET    /messages/pharmacist/unread-count
+ *   GET    /messages/pharmacist/unread-by-patient
+ *   POST   /messages/pharmacist
  */
 
 import { Router } from 'express';
@@ -173,13 +182,15 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
     }
   });
 
-  // ─── Pharmacist APIs ───
+  // ─── Pharmacy APIs ───
+  // 신규 표준: /messages/pharmacy/*
+  // Legacy alias: /messages/pharmacist/* (동일 핸들러, 제거 예정)
 
   /**
-   * GET /messages/pharmacist/unread-count
+   * GET /messages/pharmacy/unread-count
    * 약국 전체 안읽은 메시지 수
    */
-  router.get('/messages/pharmacist/unread-count', authenticate, requirePharmacyContext, async (req, res) => {
+  const pharmacyUnreadCountHandler = async (req: any, res: any) => {
     try {
       const pcReq = req as PharmacyContextRequest;
       const pharmacyId = pcReq.pharmacyId;
@@ -191,16 +202,18 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
       const count = await service.getPharmacyUnreadCount(pharmacyId);
       res.json({ success: true, data: { count } });
     } catch (error) {
-      console.error('[messages] GET /pharmacist/unread-count failed:', error);
+      console.error('[messages] GET /pharmacy/unread-count failed:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to get unread count' } });
     }
-  });
+  };
+  router.get('/messages/pharmacy/unread-count', authenticate, requirePharmacyContext, pharmacyUnreadCountHandler);
+  router.get('/messages/pharmacist/unread-count', authenticate, requirePharmacyContext, pharmacyUnreadCountHandler); // legacy alias
 
   /**
-   * GET /messages/pharmacist/unread-by-patient
+   * GET /messages/pharmacy/unread-by-patient
    * 환자별 안읽은 메시지 수
    */
-  router.get('/messages/pharmacist/unread-by-patient', authenticate, requirePharmacyContext, async (req, res) => {
+  const pharmacyUnreadByPatientHandler = async (req: any, res: any) => {
     try {
       const pcReq = req as PharmacyContextRequest;
       const pharmacyId = pcReq.pharmacyId;
@@ -212,10 +225,12 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
       const data = await service.getPharmacyUnreadByPatient(pharmacyId);
       res.json({ success: true, data });
     } catch (error) {
-      console.error('[messages] GET /pharmacist/unread-by-patient failed:', error);
+      console.error('[messages] GET /pharmacy/unread-by-patient failed:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to get unread counts' } });
     }
-  });
+  };
+  router.get('/messages/pharmacy/unread-by-patient', authenticate, requirePharmacyContext, pharmacyUnreadByPatientHandler);
+  router.get('/messages/pharmacist/unread-by-patient', authenticate, requirePharmacyContext, pharmacyUnreadByPatientHandler); // legacy alias
 
   /**
    * GET /messages/:patientId
@@ -241,16 +256,16 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
   });
 
   /**
-   * POST /messages/pharmacist
-   * 약사 메시지 전송
+   * POST /messages/pharmacy
+   * 약국(약사) 메시지 전송
    */
-  router.post('/messages/pharmacist', authenticate, requirePharmacyContext, async (req, res) => {
+  const pharmacyCreateMessageHandler = async (req: any, res: any) => {
     try {
       const pcReq = req as PharmacyContextRequest;
       const pharmacyId = pcReq.pharmacyId;
-      const pharmacistId = pcReq.user?.id;
+      const senderUserId = pcReq.user?.id;
 
-      if (!pharmacyId || !pharmacistId) {
+      if (!pharmacyId || !senderUserId) {
         res.status(403).json({ success: false, error: { code: 'PHARMACY_REQUIRED', message: 'Pharmacy context required' } });
         return;
       }
@@ -283,7 +298,7 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
         patientId,
         pharmacyId,
         senderType: 'pharmacy',
-        senderId: pharmacistId,
+        senderId: senderUserId,
         content: content.trim(),
         messageType: coachingId ? 'coaching_ref' : 'text',
         coachingId: coachingId || null,
@@ -291,10 +306,12 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
 
       res.status(201).json({ success: true, data: message });
     } catch (error) {
-      console.error('[messages] POST /pharmacist failed:', error);
+      console.error('[messages] POST /pharmacy failed:', error);
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to send message' } });
     }
-  });
+  };
+  router.post('/messages/pharmacy', authenticate, requirePharmacyContext, pharmacyCreateMessageHandler);
+  router.post('/messages/pharmacist', authenticate, requirePharmacyContext, pharmacyCreateMessageHandler); // legacy alias
 
   /**
    * PATCH /messages/:patientId/read

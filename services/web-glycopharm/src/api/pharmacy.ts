@@ -841,7 +841,8 @@ class PharmacyApiClient {
     content: string,
     coachingId?: string,
   ): Promise<CareMessageDto> {
-    const res = await this.request('/care/messages/pharmacist', {
+    // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-A: /pharmacist → /pharmacy
+    const res = await this.request('/care/messages/pharmacy', {
       method: 'POST',
       body: JSON.stringify({ patientId, content, ...(coachingId ? { coachingId } : {}) }),
     });
@@ -855,13 +856,14 @@ class PharmacyApiClient {
   }
 
   // Notification (WO-O4O-CARE-NOTIFICATION-V1)
+  // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-A: /pharmacist → /pharmacy
   async getPharmacyUnreadCount(): Promise<{ count: number }> {
-    const res = await this.request('/care/messages/pharmacist/unread-count');
+    const res = await this.request('/care/messages/pharmacy/unread-count');
     return this.unwrap(res);
   }
 
   async getPharmacyUnreadByPatient(): Promise<Array<{ patientId: string; count: number }>> {
-    const res = await this.request('/care/messages/pharmacist/unread-by-patient');
+    const res = await this.request('/care/messages/pharmacy/unread-by-patient');
     return this.unwrap(res);
   }
 
