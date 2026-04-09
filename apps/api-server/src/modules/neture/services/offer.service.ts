@@ -48,6 +48,68 @@ function resolveRegulatoryType(raw?: string): RegulatoryType | null {
 }
 
 /**
+ * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
+ *
+ * 규제 상품(의약품/건강기능식품/의약외품 등)은 약국 전용 서비스에만 연결될 수 있다.
+ *
+ * ⚠️ 임시 fallback 상수.
+ *  - admin 운영자가 약국 전용 서비스를 지정하는 설정 소스가 아직 없음
+ *    (참고: services/web-neture/.../appsCatalog.ts:500의 'yaksa' serviceGroup 결정 보류 상태)
+ *  - 추후 admin 설정 소스가 도입되면 이 상수 대신 그것을 우선 사용해야 함 (별도 후속 WO)
+ *  - 본 WO에서는 카테고리 정의 / 규제 판정 기준 자체는 변경하지 않는다.
+ */
+const PHARMACY_ALLOWED_SERVICE_KEYS: readonly string[] = ['glycopharm', 'kpa-society'];
+
+/**
+ * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
+ *
+ * 규제 상품 permit 게이트 공통 헬퍼.
+ * 기존 두 분기(승인 / 등록)의 동작을 그대로 유지하며 단일 진입점으로 흡수.
+ *
+ * - 'approval': 승인 시점 — DB 조회된 mfds_permit_number 부재 시 PERMIT_REQUIRED_FOR_APPROVAL
+ * - 'registration': 등록 시점 — master MFDS 미검증 + 입력 허가번호 부재 시 PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED
+ */
+function assertRegulatedPermit(args: {
+  isRegulated: boolean;
+  mfdsPermitNumber: string | null | undefined;
+  isMfdsVerified?: boolean;
+  mode: 'approval' | 'registration';
+}): OfferErrorCode | null {
+  if (!args.isRegulated) return null;
+  if (args.mode === 'approval') {
+    return args.mfdsPermitNumber ? null : OfferErrorCode.PERMIT_REQUIRED_FOR_APPROVAL;
+  }
+  // registration
+  if (!args.isMfdsVerified && !args.mfdsPermitNumber) {
+    return OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED;
+  }
+  return null;
+}
+
+/**
+ * WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1
+ *
+ * 규제 상품의 service_keys가 약국 전용 서비스의 부분집합인지 검증.
+ * 위반 시 OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE 반환.
+ *
+ * - 규제 상품 아님 → no-op
+ * - service_keys 비어있음 → 본 WO에서는 강제하지 않음 (no-op)
+ * - service_keys에 비-약국 서비스 1개라도 포함 → 거부
+ */
+function assertPharmacyOnlyServiceKeys(
+  isRegulated: boolean,
+  serviceKeys: string[] | null | undefined,
+): OfferErrorCode | null {
+  if (!isRegulated) return null;
+  if (!serviceKeys || serviceKeys.length === 0) return null;
+  const violating = serviceKeys.filter((k) => !PHARMACY_ALLOWED_SERVICE_KEYS.includes(k));
+  if (violating.length > 0) {
+    return OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE;
+  }
+  return null;
+}
+
+/**
  * NetureOfferService
  *
  * Offer CRUD, approval/rejection, supplier products, operator supply dashboard.
@@ -130,6 +192,7 @@ export class NetureOfferService {
       }
 
       // WO-NETURE-REGULATORY-POLICY-ENFORCEMENT-V1: 규제 상품 permit 게이트
+      // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 공통 헬퍼(assertRegulatedPermit)로 흡수 — 동작 변경 없음
       const masterForApproval: Array<{
         mfds_permit_number: string | null;
         category_id: string | null;
@@ -141,8 +204,15 @@ export class NetureOfferService {
          WHERE pm.id = $1`,
         [offer.masterId],
       );
-      if (masterForApproval.length > 0 && masterForApproval[0].is_regulated && !masterForApproval[0].mfds_permit_number) {
-        return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_APPROVAL };
+      if (masterForApproval.length > 0) {
+        const permitError = assertRegulatedPermit({
+          isRegulated: !!masterForApproval[0].is_regulated,
+          mfdsPermitNumber: masterForApproval[0].mfds_permit_number,
+          mode: 'approval',
+        });
+        if (permitError) {
+          return { success: false, error: permitError };
+        }
       }
 
       // WO-NETURE-APPROVAL-SYSTEM-FINALIZATION-V1:
@@ -552,7 +622,7 @@ export class NetureOfferService {
     marketingName: string,
     categoryId: string | null,
     brandName: string | undefined,
-  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any> } }> {
+  ): Promise<{ success: false; error: string; message?: string } | { success: true; data: { masterId: string; masterBarcode: string; manualData: Record<string, any>; isRegulated: boolean } }> {
     const resolvedCategoryId: string | null = categoryId || rawManualData?.categoryId || null;
     let isRegulated = false;
     if (resolvedCategoryId) {
@@ -594,8 +664,15 @@ export class NetureOfferService {
       return { success: false, error: masterResult.error || 'MASTER_RESOLVE_FAILED' };
     }
 
-    if (isRegulated && !masterResult.data.isMfdsVerified && !manualData.mfdsPermitNumber) {
-      return { success: false, error: OfferErrorCode.PERMIT_REQUIRED_FOR_UNVERIFIED_REGULATED, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
+    // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 공통 헬퍼(assertRegulatedPermit)로 흡수 — 동작 변경 없음
+    const registrationPermitError = assertRegulatedPermit({
+      isRegulated,
+      mfdsPermitNumber: manualData.mfdsPermitNumber,
+      isMfdsVerified: masterResult.data.isMfdsVerified,
+      mode: 'registration',
+    });
+    if (registrationPermitError) {
+      return { success: false, error: registrationPermitError, message: '규제 상품은 MFDS 검증이 없는 경우 허가번호가 필수입니다.' };
     }
 
     const extFields: Record<string, unknown> = {};
@@ -610,7 +687,7 @@ export class NetureOfferService {
       await this.catalogService.updateProductMaster(masterResult.data.id, extFields);
     }
 
-    return { success: true, data: { masterId: masterResult.data.id, masterBarcode: masterResult.data.barcode || masterResult.data.id, manualData } };
+    return { success: true, data: { masterId: masterResult.data.id, masterBarcode: masterResult.data.barcode || masterResult.data.id, manualData, isRegulated } };
   }
 
   // ==================== createSupplierOffer (orchestrator) ====================
@@ -664,7 +741,7 @@ export class NetureOfferService {
       const metadata = await this.resolveProductMetadata(data.manualData, barcode, marketingName, categoryId, data.brandName);
       if ('error' in metadata) return { success: false, error: metadata.error, message: metadata.message };
 
-      const { masterId, masterBarcode, manualData } = metadata.data;
+      const { masterId, masterBarcode, manualData, isRegulated } = metadata.data;
 
       // slug + stockQty + offer entity
       const slug = `${masterBarcode}-${supplierId.slice(0, 8)}-${Date.now()}`;
@@ -672,6 +749,16 @@ export class NetureOfferService {
 
       // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
       const filteredServiceKeys = (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
+
+      // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1: 규제 상품은 약국 전용 서비스에만 연결 가능
+      const pharmacyServiceError = assertPharmacyOnlyServiceKeys(isRegulated, filteredServiceKeys);
+      if (pharmacyServiceError) {
+        return {
+          success: false,
+          error: pharmacyServiceError,
+          message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
+        };
+      }
       const resolvedIsPublic = data.isPublic ?? (data.distributionType === OfferDistributionType.PUBLIC);
 
       const offer = this.offerRepo.create({
