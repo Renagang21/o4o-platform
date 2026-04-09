@@ -32,7 +32,7 @@
 | `product_approvals` | 취급요청 승인 추적 | `offer_id`, `organization_id`, `approval_type` (SERVICE/PRIVATE), `approval_status` (pending/approved/rejected/revoked) | `entities/ProductApproval.ts` |
 | `organization_product_listings` | 매장 진열 상품 | `organization_id`, `offer_id`, `is_active`, `service_key` | `modules/store-core/entities/organization-product-listing.entity.ts` |
 | `offer_service_approvals` | 서비스별 오퍼 승인 (공급자 측) | `offer_id`, `service_key`, `approval_status` | `modules/neture/entities/OfferServiceApproval.entity.ts` |
-| `offer_curations` | 운영자 추천 큐레이션 | `offer_id`, `placement` (featured/category/banner), `is_active`, `start_at`, `end_at` | `modules/neture/entities/OfferCuration.entity.ts` |
+| ~~`offer_curations`~~ | **폐기됨** (WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1) — 추천 노출은 `supplier_product_offers.is_featured` 컬럼으로 일원화. 운영자 큐레이션 구조 자체가 "통제 극소화" 원칙에 위배되어 제거됨 | — | — |
 
 ### 2.2 OfferDistributionType Enum
 
@@ -266,7 +266,7 @@ PUBLIC 내에서 승인형/즉시형 분리는 존재하지 않는다.
 |-----|------|----------|
 | 전체 | `distributionType` 없음 | PUBLIC + SERVICE 전체 |
 | B2B | `distributionType=SERVICE` | 취급요청형 (승인 필요) |
-| 운영자 추천 | `recommended=true` | `offer_curations` 기반 |
+| 추천 상품 | `recommended=true` | `supplier_product_offers.is_featured DESC, created_at DESC` (공급자 자율 강조 + fallback) |
 | 거점판매 모집 | `distributionType=PUBLIC` | 즉시 등록형 |
 
 **추가 개발 불필요.**

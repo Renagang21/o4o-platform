@@ -291,9 +291,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
 
   // ==================== Execute Endpoints ====================
 
-  // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1:
-  // POST /operator/actions/execute/curate-all 제거 — 운영자 일괄 큐레이션 압박 제거
-  // (Phase 3에서 offer_curations 전체 제거 시 OfferCurationService도 함께 제거 예정)
+  // WO-NETURE-CURATION-PHASE1/PHASE3-FULL-REMOVAL: curate-all 엔드포인트 제거 완료
 
   /**
    * POST /operator/actions/execute/inquiries-mark-read

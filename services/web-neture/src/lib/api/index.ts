@@ -165,8 +165,7 @@ export {
   type ContactSubmitResult,
 } from './contact.js';
 
-// Operator Curation API (WO-NETURE-PRODUCT-CURATION-V1)
-export { operatorCurationApi, type CurationItem } from './operatorCuration.js';
+// WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: operatorCurationApi 제거
 
 // Store API + Order/Fulfillment types
 export {

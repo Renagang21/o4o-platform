@@ -33,8 +33,7 @@ export { default as BrandManagementPage } from './BrandManagementPage';
 export { default as ProductDataCleanupPage } from './ProductDataCleanupPage';
 // WO-NETURE-PRODUCT-APPROVAL-FLOW-V1
 export { default as ProductServiceApprovalPage } from './ProductServiceApprovalPage';
-// WO-NETURE-PRODUCT-CURATION-V1
-export { default as ProductCurationPage } from './ProductCurationPage';
+// WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: ProductCurationPage 제거
 // WO-O4O-OPERATOR-ACTION-QUEUE-V1
 export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
 // WO-O4O-NETURE-PRODUCT-APPROVAL-UI-V1

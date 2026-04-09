@@ -392,9 +392,7 @@ const ProductDataCleanupPage = lazy(() =>
 const ProductServiceApprovalPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.ProductServiceApprovalPage }))
 );
-// WO-NETURE-PRODUCT-CURATION-V1 — Phase 1 (WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1):
-// 라우트는 차단되었으나 Phase 3 완전 제거 전까지 lazy import만 유지
-// const ProductCurationPage = lazy(() => import('./pages/operator').then((m) => ({ default: m.ProductCurationPage })));
+// WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: ProductCurationPage 완전 제거
 const OperatorActionQueuePage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorActionQueuePage }))
 );
@@ -794,8 +792,7 @@ function App() {
               <Route path="/admin/brands" element={<BrandManagementPage />} />
               <Route path="/admin/product-cleanup" element={<ProductDataCleanupPage />} />
               <Route path="/admin/product-service-approvals" element={<ProductServiceApprovalPage />} />
-              {/* WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: /admin/curation 진입 차단 */}
-              <Route path="/admin/curation" element={<Navigate to="/admin/all-registered-products" replace />} />
+              {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /admin/curation 라우트 제거 */}
               <Route path="/admin/actions" element={<OperatorActionQueuePage />} />
               {/* Admin-only 페이지 */}
               <Route path="/admin/operators" element={<OperatorsPage />} />
@@ -870,8 +867,7 @@ function App() {
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />
               <Route path="/operator/product-service-approvals" element={<ProductServiceApprovalPage />} />
               <Route path="/operator/product-approvals" element={<OperatorProductApprovalPage />} />
-              {/* WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: /operator/curation 진입 차단 */}
-              <Route path="/operator/curation" element={<Navigate to="/operator/all-registered-products" replace />} />
+              {/* WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: /operator/curation 라우트 제거 */}
               <Route path="/operator/actions" element={<OperatorActionQueuePage />} />
             </Route>
 

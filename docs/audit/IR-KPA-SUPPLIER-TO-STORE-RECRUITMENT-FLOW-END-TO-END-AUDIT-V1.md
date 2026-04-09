@@ -150,7 +150,7 @@ WHERE spo.distribution_type IN ('PUBLIC', 'SERVICE')
 |-----|----------|--------|------|
 | 전체 | PUBLIC + SERVICE 전체 | ✅ | |
 | B2B | distributionType=SERVICE | ✅ | KPA 운영자 승인 필요 |
-| 운영자 추천 | offer_curations featured | ✅ | |
+| 추천 상품 | supplier_product_offers.is_featured (1순위) + created_at DESC (fallback) | ✅ | WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1 — 공급자 자율 강조 기반. 운영자 큐레이션 폐기됨 (Phase 3) |
 | 판매자 모집 | distributionType=PUBLIC | ⚠️ | 코드상 "즉시 등록"이지, "모집" 흐름은 아님 |
 
 "판매자 모집" 탭의 불일치:

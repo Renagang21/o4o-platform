@@ -20,5 +20,5 @@ export { NetureSettlement } from './neture-settlement.entity.js';
 export { NetureSettlementOrder } from './neture-settlement-order.entity.js';
 export { NetureContactMessage } from './NetureContactMessage.entity.js';
 export { OfferServiceApproval } from './OfferServiceApproval.entity.js';
-export { OfferCuration } from './OfferCuration.entity.js';
+// WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: OfferCuration entity 제거
 export { CategoryMappingRule } from './CategoryMappingRule.entity.js';
