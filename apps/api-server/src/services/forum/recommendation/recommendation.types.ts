@@ -101,8 +101,14 @@ export interface UserContext {
   skinType?: string;
   /** User's skin concerns (cosmetics domain) */
   concerns?: string[];
-  /** Is user a pharmacist (yaksa domain) */
-  isPharmacist?: boolean;
+  /**
+   * Is user a pharmacy-role user (GlycoPharm unprefixed 'pharmacy' 롤
+   * 또는 legacy yaksa pharmacist 시그널).
+   * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B:
+   *   field rename isPharmacist → isPharmacy (내부 표기 표준화).
+   *   query param 은 legacy alias 유지 — controller 에서 두 이름 모두 수용.
+   */
+  isPharmacy?: boolean;
   /** Recent search queries */
   recentSearches?: string[];
 }

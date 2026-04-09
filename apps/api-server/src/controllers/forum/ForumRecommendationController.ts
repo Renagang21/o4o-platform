@@ -283,13 +283,21 @@ export class ForumRecommendationController {
       context.concerns = (req.query.concerns as string).split(',');
     }
 
-    // Yaksa-specific context
+    // Pharmacy-role context (GlycoPharm 'pharmacy' 롤 + legacy yaksa signal)
     // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 3:
-    // GlycoPharm은 unprefixed 'pharmacy' 롤을 사용 (기존 legacy 'pharmacist' 롤 대체).
-    // KPA/GlucoseView/Cosmetics는 prefixed 롤(kpa:pharmacist 등)을 사용하므로
-    // 이 bare 문자열 검사에는 영향 없음 — GlycoPharm 범위만 변경.
-    if (req.query.isPharmacist === 'true' || user?.roles?.includes('pharmacy')) {
-      context.isPharmacist = true;
+    //   GlycoPharm은 unprefixed 'pharmacy' 롤을 사용 (기존 legacy 'pharmacist' 롤 대체).
+    //   KPA/GlucoseView/Cosmetics는 prefixed 롤(kpa:pharmacist 등)을 사용하므로
+    //   이 bare 문자열 검사에는 영향 없음 — GlycoPharm 범위만 변경.
+    // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B:
+    //   내부 필드명 context.isPharmacist → context.isPharmacy.
+    //   query param 은 신규 'isPharmacy' + legacy 'isPharmacist' 두 이름 모두 수용
+    //   (apps/main-site 의 기존 호출 호환 유지 — 제거는 별도 WO).
+    if (
+      req.query.isPharmacy === 'true' ||
+      req.query.isPharmacist === 'true' ||
+      user?.roles?.includes('pharmacy')
+    ) {
+      context.isPharmacy = true;
     }
 
     // Recent searches

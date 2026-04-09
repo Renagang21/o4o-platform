@@ -95,7 +95,10 @@ export function calculateDomainScore(post: ForumPost, userContext: UserContext):
   }
 
   const yaksaData = (metadata.extensions?.['yaksa'] || (metadata as any).yaksa) as YaksaForumMeta | undefined;
-  if (yaksaData && userContext.isPharmacist) {
+  // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B:
+  //   userContext.isPharmacist → isPharmacy (내부 필드명 표준화).
+  //   yaksaData.pharmacistVerified 는 KPA/Neture 메타데이터라 유지.
+  if (yaksaData && userContext.isPharmacy) {
     if (yaksaData.pharmacistVerified) return 0.7;
     if (yaksaData.professionalOnly) return 0.5;
   }
@@ -308,7 +311,8 @@ export function scoreYaksaPost(
           reasonCode = 'recommended_for_role';
         }
       }
-    } else if (userContext.isPharmacist) {
+    } else if (userContext.isPharmacy) {
+      // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B: isPharmacist → isPharmacy
       if (['education', 'resource'].includes(documentType)) {
         domainScore += 0.3;
         if (reasonCode !== 'same_organization') {
@@ -388,7 +392,8 @@ export function generateReason(
       if (userContext.skinType) {
         return { reason: '회원님의 피부타입과 관심사에 맞는 글입니다.', reasonCode: 'similar_skin_type' };
       }
-      if (userContext.isPharmacist) {
+      // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-B: isPharmacist → isPharmacy
+      if (userContext.isPharmacy) {
         return { reason: '약사님을 위한 전문 콘텐츠입니다.', reasonCode: 'recommended_for_role' };
       }
       return { reason: '회원님의 관심 분야와 관련된 글입니다.', reasonCode: 'personalized' };
