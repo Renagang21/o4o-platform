@@ -10,7 +10,7 @@
  * - 스코프: /supplier/*
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import {
   Home,
@@ -25,6 +25,13 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import AccountMenu from '../AccountMenu';
 import { useAuth } from '../../contexts/AuthContext';
+
+// WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
+// 자식 페이지가 본문 영역의 max-width 제약을 해제할 수 있도록 컨텍스트 제공
+export type SupplierSpaceOutletContext = {
+  wideMode: boolean;
+  setWideMode: (next: boolean) => void;
+};
 
 /* ------------------------------------------------------------------ */
 /*  Sidebar 그룹 정의                                                   */
@@ -104,6 +111,14 @@ export default function SupplierSpaceLayout() {
     });
   };
 
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
+  // 자식 페이지가 opt-in 으로 본문 max-width 제약을 해제할 수 있게 한다.
+  const [wideMode, setWideMode] = useState(false);
+  const outletContext = useMemo<SupplierSpaceOutletContext>(
+    () => ({ wideMode, setWideMode }),
+    [wideMode],
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -155,7 +170,13 @@ export default function SupplierSpaceLayout() {
       </header>
 
       {/* Body: Sidebar + Content */}
-      <div className="flex-1 max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1:
+          wideMode 활성 시 max-w 제약 해제하여 wide table 가로 영역 확장 */}
+      <div
+        className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 ${
+          wideMode ? 'max-w-none' : 'max-w-[1400px]'
+        }`}
+      >
         <div className="flex gap-6">
           {/* Desktop Sidebar */}
           <aside className="w-60 flex-shrink-0 hidden md:block">
@@ -253,7 +274,7 @@ export default function SupplierSpaceLayout() {
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
-            <Outlet />
+            <Outlet context={outletContext} />
           </main>
         </div>
       </div>

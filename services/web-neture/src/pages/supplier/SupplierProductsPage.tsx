@@ -13,7 +13,8 @@
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import type { SupplierSpaceOutletContext } from '../../components/layouts/SupplierSpaceLayout';
 import { Search, Plus, Sparkles, ImagePlus, X, Eye, Send, FileText, Info, Tag } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import {
@@ -524,6 +525,15 @@ const baseColumns: ListColumnDef<SupplierProduct>[] = [
 
 export default function SupplierProductsPage() {
   const navigate = useNavigate();
+
+  // WO-NETURE-SUPPLIER-PRODUCT-LIST-WIDE-TABLE-VIEW-APPLY-V1
+  // 21개 컬럼 wide table — 부모 레이아웃(SupplierSpaceLayout)의 max-w 제약 해제
+  const outletCtx = useOutletContext<SupplierSpaceOutletContext | null>();
+  useEffect(() => {
+    outletCtx?.setWideMode?.(true);
+    return () => outletCtx?.setWideMode?.(false);
+  }, [outletCtx]);
+
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 50, total: 0, totalPages: 0 });
   const [keyword, setKeyword] = useState('');
