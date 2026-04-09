@@ -1,9 +1,10 @@
 /**
- * CareMessage Entity — 환자 ↔ 약사 1:1 메시징
+ * CareMessage Entity — 환자 ↔ 약국(약사) 1:1 메시징
  * WO-O4O-CARE-QNA-SYSTEM-V1
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1: sender_type 'pharmacist' → 'pharmacy'
  *
  * patient_id + pharmacy_id 로 thread scope
- * sender_type 으로 방향 구분
+ * sender_type 으로 방향 구분 ('patient' | 'pharmacy')
  */
 
 import {
@@ -28,7 +29,7 @@ export class CareMessage {
   pharmacyId!: string;
 
   @Column({ name: 'sender_type', type: 'varchar', length: 20 })
-  senderType!: 'patient' | 'pharmacist';
+  senderType!: 'patient' | 'pharmacy';
 
   @Column({ name: 'sender_id', type: 'uuid' })
   senderId!: string;

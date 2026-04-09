@@ -1,6 +1,7 @@
 /**
- * CareMessageService — 환자 ↔ 약사 메시지 CRUD
+ * CareMessageService — 환자 ↔ 약국(약사) 메시지 CRUD
  * WO-O4O-CARE-QNA-SYSTEM-V1
+ * WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1: sender_type 'pharmacist' → 'pharmacy'
  */
 
 import type { DataSource, Repository } from 'typeorm';
@@ -9,7 +10,7 @@ import { CareMessage } from '../entities/care-message.entity.js';
 export interface CreateMessageDto {
   patientId: string;
   pharmacyId: string;
-  senderType: 'patient' | 'pharmacist';
+  senderType: 'patient' | 'pharmacy';
   senderId: string;
   content: string;
   messageType?: 'text' | 'coaching_ref';
@@ -52,10 +53,10 @@ export class CareMessageService {
   async markAsRead(
     patientId: string,
     pharmacyId: string,
-    readerType: 'patient' | 'pharmacist',
+    readerType: 'patient' | 'pharmacy',
   ): Promise<number> {
-    // reader가 patient이면 pharmacist가 보낸 메시지를 읽음 처리, 반대도 마찬가지
-    const senderType = readerType === 'patient' ? 'pharmacist' : 'patient';
+    // reader가 patient이면 pharmacy가 보낸 메시지를 읽음 처리, 반대도 마찬가지
+    const senderType = readerType === 'patient' ? 'pharmacy' : 'patient';
     const result = await this.dataSource.query(
       `UPDATE care_messages
        SET status = 'read', read_at = NOW()
@@ -68,11 +69,11 @@ export class CareMessageService {
 
   async getUnreadCount(
     userId: string,
-    userType: 'patient' | 'pharmacist',
+    userType: 'patient' | 'pharmacy',
     pharmacyId?: string | null,
   ): Promise<number> {
     // 본인이 받는 메시지 중 안읽은 수
-    const senderType = userType === 'patient' ? 'pharmacist' : 'patient';
+    const senderType = userType === 'patient' ? 'pharmacy' : 'patient';
     const idColumn = userType === 'patient' ? 'patient_id' : 'pharmacy_id';
     const idValue = userType === 'patient' ? userId : pharmacyId;
 

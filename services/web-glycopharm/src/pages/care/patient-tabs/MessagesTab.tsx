@@ -86,9 +86,10 @@ export default function MessagesTab() {
           </div>
         ) : (
           messages.map((msg, idx) => {
-            const isPharmacist = msg.senderType === 'pharmacist';
+            // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1: senderType 'pharmacist' → 'pharmacy'
+            const isPharmacy = msg.senderType === 'pharmacy';
             const isCoachingRef = msg.messageType === 'coaching_ref';
-            const isUnread = !isPharmacist && msg.status === 'sent';
+            const isUnread = !isPharmacy && msg.status === 'sent';
             const showNewDivider = isUnread && !messages.slice(0, idx).some(
               (m) => m.senderType === 'patient' && m.status === 'sent',
             );
@@ -101,10 +102,10 @@ export default function MessagesTab() {
                     <div className="flex-1 h-px bg-primary-300" />
                   </div>
                 )}
-                <div className={`flex ${isPharmacist ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex ${isPharmacy ? 'justify-end' : 'justify-start'}`}>
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                      isPharmacist
+                      isPharmacy
                         ? 'bg-primary-600 text-white rounded-br-md'
                         : isUnread
                           ? 'bg-blue-50 border border-blue-200 text-slate-800 rounded-bl-md'
@@ -113,15 +114,15 @@ export default function MessagesTab() {
                             : 'bg-slate-100 text-slate-800 rounded-bl-md'
                     }`}
                   >
-                    {isCoachingRef && !isPharmacist && (
+                    {isCoachingRef && !isPharmacy && (
                       <p className="text-[10px] font-medium text-violet-500 mb-1">코칭 관련 질문</p>
                     )}
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
-                    <div className={`flex items-center gap-1 mt-1 ${isPharmacist ? 'justify-end' : ''}`}>
-                      <span className={`text-[10px] ${isPharmacist ? 'text-primary-200' : 'text-slate-400'}`}>
+                    <div className={`flex items-center gap-1 mt-1 ${isPharmacy ? 'justify-end' : ''}`}>
+                      <span className={`text-[10px] ${isPharmacy ? 'text-primary-200' : 'text-slate-400'}`}>
                         {new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      {isPharmacist && msg.status === 'read' && (
+                      {isPharmacy && msg.status === 'read' && (
                         <span className="text-[10px] text-primary-200">읽음</span>
                       )}
                     </div>

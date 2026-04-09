@@ -282,7 +282,7 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
       const message = await service.createMessage({
         patientId,
         pharmacyId,
-        senderType: 'pharmacist',
+        senderType: 'pharmacy',
         senderId: pharmacistId,
         content: content.trim(),
         messageType: coachingId ? 'coaching_ref' : 'text',
@@ -311,7 +311,7 @@ export function createCareMessageRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const updated = await service.markAsRead(patientId, pharmacyId, 'pharmacist');
+      const updated = await service.markAsRead(patientId, pharmacyId, 'pharmacy');
       res.json({ success: true, data: { updated } });
     } catch (error) {
       console.error('[messages] PATCH /:patientId/read failed:', error);

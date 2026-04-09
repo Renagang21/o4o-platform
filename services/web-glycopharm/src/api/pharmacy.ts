@@ -1098,11 +1098,12 @@ export interface CoachingSession {
 }
 
 // WO-O4O-CARE-QNA-SYSTEM-V1
+// WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1: senderType 'pharmacist' → 'pharmacy'
 export interface CareMessageDto {
   id: string;
   patientId: string;
   pharmacyId: string;
-  senderType: 'patient' | 'pharmacist';
+  senderType: 'patient' | 'pharmacy';
   senderId: string;
   messageType: 'text' | 'coaching_ref';
   content: string;
