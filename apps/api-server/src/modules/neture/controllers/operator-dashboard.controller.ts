@@ -215,11 +215,11 @@ export function createOperatorDashboardController(dataSource: DataSource): Route
         'neture', copilotMetrics, copilotUser,
       );
 
-      // Block 3: Action Queue (5개)
+      // Block 3: Action Queue
+      // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'pending-products' (OSA 승인 대기) 항목 제거
       const actionQueue: ActionItem[] = [
         { id: 'pending-regs', label: '가입 승인 대기', count: pendingRegs, link: '/operator/applications' },
         { id: 'pending-suppliers', label: '공급사 승인 대기', count: pendingSuppliers, link: '/operator/admin-suppliers' },
-        { id: 'pending-products', label: '상품 승인 대기', count: products.pending, link: '/operator/product-service-approvals?status=pending' },
         { id: 'partner-requests', label: '파트너 요청', count: partnerRequests, link: '/operator/applications' },
         { id: 'unread-messages', label: '미확인 문의', count: unreadMessages, link: '/operator/contact-messages' },
       ];

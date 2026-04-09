@@ -118,13 +118,8 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
       ];
 
       // === Block B: Policy Overview ===
+      // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'pending-products' (OSA 승인 대기) 항목 제거
       const policies = [
-        {
-          key: 'pending-products',
-          label: '상품 승인 대기',
-          status: (pendingApprovals > 0 ? 'partial' : 'configured') as 'partial' | 'configured',
-          link: '/admin/product-service-approvals?status=pending',
-        },
         {
           key: 'pending-suppliers',
           label: '공급사 승인 대기',

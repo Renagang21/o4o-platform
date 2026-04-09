@@ -43,13 +43,7 @@ const ACTION_MAP: Record<string, {
     actionApi: '/neture/operator/actions/execute/inquiries-mark-read',
     actionMethod: 'POST',
   },
-  product: {
-    actionType: 'EXECUTE',
-    actionUrl: '/operator/product-service-approvals',
-    actionLabel: '일괄 승인',
-    actionApi: '/neture/operator/actions/execute/approve-pending-products',
-    actionMethod: 'POST',
-  },
+  // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: product (OSA 일괄 승인) 액션 매핑 제거
   supplier: {
     actionType: 'NAVIGATE',
     actionUrl: '/operator/admin-suppliers',
@@ -66,7 +60,7 @@ Rules:
 - Return ONLY a JSON array, no explanation outside JSON
 - Each item must include: type, priority, reason, confidence
 - confidence must be between 0 and 1
-- Available action types: inquiry, product, supplier
+- Available action types: inquiry, supplier
 - Only suggest actions where the context data shows a clear need
 - Use Korean for the reason field`;
 
@@ -91,8 +85,9 @@ let cache: CacheEntry | null = null;
 
 // ─── Validation ───
 
-// WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 'curation' 타입 제거
-const VALID_TYPES = new Set(['inquiry', 'product', 'supplier']);
+// WO-NETURE-CURATION-PHASE1: 'curation' 제거
+// WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: 'product' 제거
+const VALID_TYPES = new Set(['inquiry', 'supplier']);
 const VALID_PRIORITIES = new Set(['high', 'medium', 'low']);
 
 function isValidLlmAction(item: unknown): item is LlmAction {

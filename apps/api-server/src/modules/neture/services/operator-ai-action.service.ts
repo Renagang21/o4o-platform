@@ -107,38 +107,8 @@ export class OperatorAiActionService {
       });
     }
 
-    // Rule C — 상품 승인 적체
-    if (ctx.pendingApprovals > 0 && ctx.activeProducts === 0) {
-      actions.push({
-        id: 'ai-product-activate',
-        source: 'AI',
-        type: 'product',
-        title: '판매 가능한 상품이 없습니다',
-        description: `승인 대기 ${ctx.pendingApprovals}건 — 상품을 승인해야 판매가 가능합니다`,
-        priority: 'high',
-        confidence: 1.0,
-        actionType: 'EXECUTE',
-        actionUrl: '/operator/product-service-approvals',
-        actionLabel: '일괄 승인',
-        actionApi: '/neture/operator/actions/execute/approve-pending-products',
-        actionMethod: 'POST',
-      });
-    } else if (ctx.pendingApprovals >= 3) {
-      actions.push({
-        id: 'ai-product-backlog',
-        source: 'AI',
-        type: 'product',
-        title: '상품 승인이 적체되고 있습니다',
-        description: `승인 대기 ${ctx.pendingApprovals}건 — 빠른 처리가 공급사 만족도에 영향을 줍니다`,
-        priority: 'medium',
-        confidence: 0.7,
-        actionType: 'EXECUTE',
-        actionUrl: '/operator/product-service-approvals',
-        actionLabel: '일괄 승인',
-        actionApi: '/neture/operator/actions/execute/approve-pending-products',
-        actionMethod: 'POST',
-      });
-    }
+    // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1:
+    // Rule C (상품 승인 적체) 제거 — OSA 승인 결정을 운영자에게 강요하지 않음
 
     // Rule D — 공급사 승인 지연
     if (ctx.pendingSuppliers >= 2) {

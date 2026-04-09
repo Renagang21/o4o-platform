@@ -12,9 +12,6 @@
  * POST /api/v1/neture/operator/actions/execute/inquiries-mark-read
  *   → status='new' 문의 일괄 in_progress 전환
  *
- * POST /api/v1/neture/operator/actions/execute/approve-pending-products
- *   → pending 서비스 승인 일괄 approve
- *
  * Auth: requireAuth + requireNetureScope('neture:operator')
  */
 
@@ -23,7 +20,7 @@ import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: OfferCurationService import 제거
-import { OfferServiceApprovalService } from '../services/offer-service-approval.service.js';
+// WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: OfferServiceApprovalService import 제거
 import { OperatorAiActionService } from '../services/operator-ai-action.service.js';
 import logger from '../../../utils/logger.js';
 
@@ -51,7 +48,7 @@ interface ActionQueueItem {
 export function createOperatorActionQueueController(dataSource: DataSource): Router {
   const router = Router();
   // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: curationService 제거
-  const approvalService = new OfferServiceApprovalService(dataSource);
+  // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: approvalService 인스턴스 제거
   const aiService = new OperatorAiActionService();
 
   router.use(requireAuth);
@@ -62,11 +59,11 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
    */
   router.get('/actions', async (_req: Request, res: Response): Promise<void> => {
     try {
-      // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncuratedRow 제거
+      // WO-NETURE-CURATION-PHASE1: uncuratedRow 제거
+      // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: pendingProductsRow(OSA) 제거
       const [
         pendingRegsRow,
         pendingSuppliersRow,
-        pendingProductsRow,
         unreadMessagesRow,
         partnerRequestsRow,
       ] = await Promise.all([
@@ -82,12 +79,6 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
         ),
         dataSource.query(
           `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
-           FROM offer_service_approvals
-           WHERE service_key = 'neture' AND approval_status = 'pending'`,
-        ),
-        // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncurated 쿼리 제거
-        dataSource.query(
-          `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
            FROM neture_contact_messages
            WHERE status != 'resolved'`,
         ),
@@ -100,8 +91,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
 
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
       const pendingSuppliers = pendingSuppliersRow[0]?.cnt || 0;
-      const pendingProducts = pendingProductsRow[0]?.cnt || 0;
-      // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncurated 제거
+      // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: pendingProducts(OSA) 제거
       const unreadMessages = unreadMessagesRow[0]?.cnt || 0;
       const partnerRequests = partnerRequestsRow[0]?.cnt || 0;
 
@@ -152,21 +142,9 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           alwaysHigh: true,
           actionType: 'NAVIGATE',
         },
-        {
-          id: 'pending-products',
-          type: 'product',
-          title: '상품 승인 대기',
-          description: '서비스 상품 승인 요청이 대기 중입니다.',
-          count: pendingProducts,
-          oldest: pendingProductsRow[0]?.oldest || null,
-          actionUrl: '/operator/product-service-approvals',
-          actionLabel: '일괄 승인',
-          alwaysHigh: true,
-          actionType: 'EXECUTE',
-          actionApi: '/neture/operator/actions/execute/approve-pending-products',
-          actionMethod: 'POST',
-        },
-        // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: '큐레이션 필요' 항목 제거 — 운영자 압박 제거
+        // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1:
+        // '상품 승인 대기' (pending-products) 항목 제거 — OSA 승인 결정 압박 제거
+        // WO-NETURE-CURATION-PHASE1: '큐레이션 필요' 항목 제거
         {
           id: 'unread-messages',
           type: 'inquiry',
@@ -218,7 +196,8 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
 
       // ── AI actions (Rule → LLM → Fallback) ──
       const aiRaw = await aiService.generateActions({
-        pendingApprovals: pendingProducts,
+        // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1: OSA 승인 압박 제거
+        pendingApprovals: 0,
         pendingSuppliers,
         // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 압박 제거
         uncuratedProducts: 0,
@@ -316,44 +295,9 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
     }
   });
 
-  /**
-   * POST /operator/actions/execute/approve-pending-products
-   */
-  router.post('/actions/execute/approve-pending-products', async (req: Request, res: Response): Promise<void> => {
-    try {
-      const authReq = req as AuthenticatedRequest;
-      const userId = authReq.user?.id;
-      if (!userId) {
-        res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
-        return;
-      }
-
-      const rows = await dataSource.query(
-        `SELECT id FROM offer_service_approvals
-         WHERE service_key = 'neture' AND approval_status = 'pending'`,
-      );
-
-      let approved = 0;
-      let failed = 0;
-      for (const row of rows) {
-        const result = await approvalService.approve(row.id, userId);
-        if (result.success) {
-          approved++;
-        } else {
-          failed++;
-        }
-      }
-
-      logger.info(`[Action Engine] approve-pending-products: processed=${rows.length}, approved=${approved}, failed=${failed}`);
-      res.json({
-        success: true,
-        data: { processed: rows.length, approved, failed },
-      });
-    } catch (error: any) {
-      logger.error('[Action Engine] approve-pending-products error:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: error.message });
-    }
-  });
+  // WO-NETURE-OSA-PHASEA-DECISION-PRESSURE-REMOVE-V1:
+  // POST /operator/actions/execute/approve-pending-products 제거
+  // (OSA 일괄 승인 압박 제거. operator-service-approval.controller 의 단건/배치 라우트는 유지)
 
   return router;
 }
