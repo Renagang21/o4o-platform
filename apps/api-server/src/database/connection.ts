@@ -245,6 +245,12 @@ import { PlatformStoreSlug } from '@o4o/platform-core/store-identity';
 import { PlatformStoreSlugHistory } from '@o4o/platform-core/store-identity';
 
 // ============================================================================
+// CATALOG / STORE PRODUCT ENTITIES (WO-O4O-STORE-CATALOG-AND-STORE-PRODUCT-SCHEMA-IMPLEMENTATION-V1)
+// ============================================================================
+import { CatalogProduct } from '../modules/catalog/entities/catalog-product.entity.js';
+import { StoreProduct } from '../modules/store/entities/store-product.entity.js';
+
+// ============================================================================
 // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
 // ============================================================================
 import {
@@ -768,6 +774,11 @@ export const AppDataSource = new DataSource({
     // ============================================================================
     PlatformStoreSlug,
     PlatformStoreSlugHistory,
+    // ============================================================================
+    // CATALOG / STORE PRODUCT (WO-O4O-STORE-CATALOG-AND-STORE-PRODUCT-SCHEMA-IMPLEMENTATION-V1)
+    // ============================================================================
+    CatalogProduct,
+    StoreProduct,
     // ============================================================================
     // NETURE ENTITIES (Phase P1: Read-Only Information Platform)
     // ============================================================================
