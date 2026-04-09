@@ -14,6 +14,7 @@ import { ProductImportCommonService } from './product-import-common.service.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
+import { filterApprovalEligibleServiceKeys } from '../constants/approval-service-keys.js';
 
 /**
  * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
@@ -389,20 +390,35 @@ export class NetureOfferService {
 
   /**
    * POST /supplier/products/submit-approval
-   * 선택된 offer들에 대해 서비스별 승인 레코드를 생성하고 serviceKeys를 업데이트한다.
+   * 선택된 offer들에 대해 서비스별 pending 승인 레코드를 생성한다.
+   *
+   * WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
+   * 승인 요청 시 offer에 저장된 serviceKeys를 사용 (프론트에서 별도 선택 없음)
+   *
+   * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+   * - submitted는 **실제로 pending 행이 최소 1개 이상 INSERT된 offer 수**만 집계
+   * - INSERT가 한 건도 발생하지 않은 offer(정책상 대상 key 없음, 이미 pending/approved 존재 등)는 skipped에 reason과 함께 기록
+   * - 소유권 없음, DB 예외는 errors에 error code로 기록
+   * - 승인 대상 serviceKey 정책은 `filterApprovalEligibleServiceKeys`(SSOT)를 통해서만 결정
    */
-  // WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1:
-  // 승인 요청 시 offer에 저장된 serviceKeys를 사용 (프론트에서 별도 선택 없음)
   async submitForApproval(
     supplierId: string,
     offerIds: string[],
-  ): Promise<{ submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }> {
+  ): Promise<{
+    submitted: number;
+    skipped: Array<{ id: string; reason: string }>;
+    errors: Array<{ id: string; error: string }>;
+  }> {
     const approvalService = new OfferServiceApprovalService(AppDataSource);
-    const result = { submitted: 0, skipped: 0, errors: [] as Array<{ id: string; error: string }> };
+    const result = {
+      submitted: 0,
+      skipped: [] as Array<{ id: string; reason: string }>,
+      errors: [] as Array<{ id: string; error: string }>,
+    };
 
     // 소유권 + 저장된 정책 일괄 조회
     const ownedRows: Array<{ id: string; service_keys: string[] }> = await AppDataSource.query(
-      `SELECT id, service_keys FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2`,
+      `SELECT id, service_keys FROM supplier_product_offers WHERE id = ANY($1) AND supplier_id = $2 AND deleted_at IS NULL`,
       [offerIds, supplierId],
     );
     const ownedMap = new Map(ownedRows.map((r) => [r.id, r.service_keys || []]));
@@ -414,23 +430,36 @@ export class NetureOfferService {
       }
 
       try {
-        // offer에 저장된 serviceKeys 사용 (neture/glucoseview 제외)
-        const offerServiceKeys = ownedMap.get(offerId)!.filter(
-          (k) => k !== 'neture' && k !== 'glucoseview',
-        );
+        // 정책 필터: 승인 대상 서비스 키만 추출 (SSOT)
+        const eligibleKeys = filterApprovalEligibleServiceKeys(ownedMap.get(offerId));
 
-        if (offerServiceKeys.length > 0) {
-          await approvalService.createPendingApprovals(offerId, offerServiceKeys);
+        if (eligibleKeys.length === 0) {
+          // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture/glucoseview only)
+          result.skipped.push({ id: offerId, reason: 'NO_ELIGIBLE_SERVICE_KEYS' });
+          continue;
         }
 
-        result.submitted++;
+        const { insertedServiceKeys } = await approvalService.createPendingApprovals(
+          offerId,
+          eligibleKeys,
+        );
+
+        if (insertedServiceKeys.length > 0) {
+          // 하나라도 신규 INSERT가 발생했으면 submitted로 집계
+          result.submitted++;
+        } else {
+          // 모든 eligible key에 대해 이미 승인 레코드가 존재 (ON CONFLICT DO NOTHING)
+          result.skipped.push({ id: offerId, reason: 'ALREADY_REQUESTED_OR_DECIDED' });
+        }
       } catch (error) {
         logger.error(`[NetureOfferService] submitForApproval failed for ${offerId}:`, error);
         result.errors.push({ id: offerId, error: 'INTERNAL_ERROR' });
       }
     }
 
-    logger.info(`[NetureOfferService] submitForApproval: submitted=${result.submitted}, skipped=${result.skipped}, errors=${result.errors.length}`);
+    logger.info(
+      `[NetureOfferService] submitForApproval: requested=${offerIds.length}, submitted=${result.submitted}, skipped=${result.skipped.length}, errors=${result.errors.length}`,
+    );
     return result;
   }
 
@@ -789,10 +818,10 @@ export class NetureOfferService {
 
       // WO-NETURE-REMOVE-NETURE-FROM-SERVICE-SELECTION-AND-APPROVAL-V1:
       // Neture는 기본 운영 공간이므로 service approval 대상 아님
+      // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+      // 승인 대상 서비스 키 정책은 filterApprovalEligibleServiceKeys(SSOT) 통해서만 결정
       const approvalService = new OfferServiceApprovalService(AppDataSource);
-      const approvalKeys = data.serviceKeys && data.serviceKeys.length > 0
-        ? data.serviceKeys
-        : [];
+      const approvalKeys = filterApprovalEligibleServiceKeys(data.serviceKeys);
       if (approvalKeys.length > 0) {
         await approvalService.createPendingApprovals(savedOffer.id, approvalKeys);
       }
@@ -1533,10 +1562,23 @@ export class NetureOfferService {
       params.push(options.isActive === 'true');
       idx++;
     }
-    if (options.approvalStatus) {
-      conditions.push(`spo.approval_status = $${idx}`);
-      params.push(options.approvalStatus);
-      idx++;
+    // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+    // 승인 상태 필터도 SSOT(offer_service_approvals) 기준으로 통일.
+    // 기존 spo.approval_status는 submit 경로가 갱신하지 않아 실제 상태와 다를 수 있음.
+    if (options.approvalStatus === 'PENDING') {
+      conditions.push(
+        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`,
+      );
+    } else if (options.approvalStatus === 'APPROVED') {
+      conditions.push(
+        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
+         AND NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved')`,
+      );
+    } else if (options.approvalStatus === 'REJECTED') {
+      conditions.push(
+        `EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected')
+         AND NOT EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending')`,
+      );
     }
     if (options.category?.trim()) {
       conditions.push(`pc.name ILIKE $${idx}`);
@@ -1608,6 +1650,14 @@ export class NetureOfferService {
         [...params, limit, offset],
       ),
       // KPI 집계 (필터 무관 전체 대상)
+      // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+      // 승인 KPI는 SSOT인 offer_service_approvals 테이블을 기준으로 집계해야 한다.
+      // 기존 spo.approval_status는 파생 필드이며 submit 경로가 갱신하지 않아 stale 상태.
+      // 정의:
+      //   approvalPending  = 서비스 승인 레코드 중 하나라도 pending 인 offer 수
+      //   approvalApproved = offer의 모든 서비스 승인 레코드가 approved (1건 이상 존재)인 offer 수
+      //   approvalRejected = 서비스 승인 레코드 중 하나라도 rejected 이면서 pending 은 없는 offer 수
+      //   approvalNone     = offer_service_approvals 레코드가 하나도 없는 offer 수 (참고 — 현재 KPI 카드에는 미노출)
       AppDataSource.query(
         `SELECT
            COUNT(*)::int AS total,
@@ -1616,9 +1666,27 @@ export class NetureOfferService {
            COUNT(*) FILTER (WHERE spo.distribution_type = 'PUBLIC')::int AS "distPublic",
            COUNT(*) FILTER (WHERE spo.distribution_type = 'SERVICE')::int AS "distService",
            COUNT(*) FILTER (WHERE spo.distribution_type = 'PRIVATE')::int AS "distPrivate",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'PENDING')::int AS "approvalPending",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'APPROVED')::int AS "approvalApproved",
-           COUNT(*) FILTER (WHERE spo.approval_status = 'REJECTED')::int AS "approvalRejected"
+           COUNT(*) FILTER (WHERE EXISTS (
+             SELECT 1 FROM offer_service_approvals osa
+             WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
+           ))::int AS "approvalPending",
+           COUNT(*) FILTER (WHERE
+             EXISTS (SELECT 1 FROM offer_service_approvals osa WHERE osa.offer_id = spo.id)
+             AND NOT EXISTS (
+               SELECT 1 FROM offer_service_approvals osa
+               WHERE osa.offer_id = spo.id AND osa.approval_status != 'approved'
+             )
+           )::int AS "approvalApproved",
+           COUNT(*) FILTER (WHERE
+             EXISTS (
+               SELECT 1 FROM offer_service_approvals osa
+               WHERE osa.offer_id = spo.id AND osa.approval_status = 'rejected'
+             )
+             AND NOT EXISTS (
+               SELECT 1 FROM offer_service_approvals osa
+               WHERE osa.offer_id = spo.id AND osa.approval_status = 'pending'
+             )
+           )::int AS "approvalRejected"
          FROM supplier_product_offers spo
          WHERE spo.deleted_at IS NULL`,
       ),

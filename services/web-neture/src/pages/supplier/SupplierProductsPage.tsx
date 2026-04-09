@@ -1131,8 +1131,35 @@ export default function SupplierProductsPage() {
               if (!confirm(`선택한 ${selectedIds.size}개 상품의 저장된 공급 정책을 기준으로 승인 요청을 보냅니다.\n진행하시겠습니까?`)) return;
               const result = await supplierApi.submitForApproval(Array.from(selectedIds));
               if (result.success && result.data) {
+                // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+                // submitted=0 이거나 skipped가 있으면 그 이유를 사용자에게 명확히 알려야 한다.
+                // (이전 구현은 `${d.submitted}건 요청`으로 항상 성공 토스트를 띄워 사용자가 실제 DB 변경 여부를 알 수 없었음.)
                 const d = result.data;
-                showToast(`승인 요청 완료: ${d.submitted}건 요청${d.errors.length > 0 ? `, ${d.errors.length}건 실패` : ''}`);
+                const total = selectedIds.size;
+                const skippedCount = d.skipped?.length ?? 0;
+                const errorCount = d.errors?.length ?? 0;
+
+                // reason별 집계
+                const noEligible = (d.skipped || []).filter((s) => s.reason === 'NO_ELIGIBLE_SERVICE_KEYS').length;
+                const alreadyDone = (d.skipped || []).filter((s) => s.reason === 'ALREADY_REQUESTED_OR_DECIDED').length;
+
+                if (d.submitted === 0 && errorCount === 0) {
+                  // 전원 skipped: 사용자에게 원인 안내
+                  const parts: string[] = [];
+                  if (noEligible > 0) parts.push(`${noEligible}건은 공급 정책(서비스 키)이 설정되지 않았습니다`);
+                  if (alreadyDone > 0) parts.push(`${alreadyDone}건은 이미 승인 요청이 진행 중이거나 완료되었습니다`);
+                  const reason = parts.length > 0 ? parts.join('. ') : '변경사항이 없습니다';
+                  showToast(`승인 요청된 상품이 없습니다. ${reason}.`);
+                } else if (d.submitted > 0) {
+                  const tail: string[] = [];
+                  if (skippedCount > 0) tail.push(`${skippedCount}건 건너뜀`);
+                  if (errorCount > 0) tail.push(`${errorCount}건 실패`);
+                  const tailStr = tail.length > 0 ? ` (${tail.join(', ')})` : '';
+                  showToast(`${d.submitted}/${total}건 승인 요청 완료${tailStr}`);
+                } else {
+                  showToast(`승인 요청 실패: ${errorCount}건 오류`);
+                }
+
                 // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
                 // 승인 요청 직후 목록/탭 카운트가 stale 상태로 남지 않도록 반드시 await.
                 // fetchProducts는 기본값 page=1이 아닌 현재 페이지를 유지한다.

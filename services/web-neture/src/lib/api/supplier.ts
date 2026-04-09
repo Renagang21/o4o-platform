@@ -575,10 +575,27 @@ export const supplierApi = {
     }
   },
 
-  /** WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1: 저장된 정책 기준 승인 요청 */
+  /**
+   * WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1: 저장된 정책 기준 승인 요청
+   *
+   * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+   * - submitted: 실제로 pending 행이 최소 1개 이상 INSERT된 offer 수
+   * - skipped: INSERT가 한 건도 발생하지 않은 offer 목록 (reason 포함)
+   *   · NO_ELIGIBLE_SERVICE_KEYS: offer의 service_keys에 승인 대상 서비스 키가 없음
+   *   · ALREADY_REQUESTED_OR_DECIDED: 이미 모든 eligible key에 대해 승인 레코드가 존재 (재요청 불가)
+   * - errors: DB 예외, 소유권 없음 등 (NOT_OWNED / INTERNAL_ERROR)
+   */
   async submitForApproval(
     offerIds: string[],
-  ): Promise<{ success: boolean; data?: { submitted: number; skipped: number; errors: Array<{ id: string; error: string }> }; error?: string }> {
+  ): Promise<{
+    success: boolean;
+    data?: {
+      submitted: number;
+      skipped: Array<{ id: string; reason: string }>;
+      errors: Array<{ id: string; error: string }>;
+    };
+    error?: string;
+  }> {
     try {
       const response = await api.post('/neture/supplier/products/submit-approval', { offerIds });
       return response.data;

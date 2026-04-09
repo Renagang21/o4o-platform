@@ -21,20 +21,30 @@ export class OfferServiceApprovalService {
 
   /**
    * 상품 생성 시 pending 승인 자동 생성 (idempotent)
+   *
+   * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
+   * 실제 INSERT된 service_key 목록을 반환 (ON CONFLICT로 skip된 것 제외).
+   * submitForApproval이 이 값으로 "정말 새로 요청된 행"과 "이미 존재해서 skip된 행"을 구분한다.
    */
-  async createPendingApprovals(offerId: string, serviceKeys: string[]): Promise<void> {
-    if (!serviceKeys.length) return;
+  async createPendingApprovals(
+    offerId: string,
+    serviceKeys: string[],
+  ): Promise<{ insertedServiceKeys: string[] }> {
+    if (!serviceKeys.length) return { insertedServiceKeys: [] };
 
     const values = serviceKeys
       .map((_, i) => `($1, $${i + 2}, 'pending', NOW(), NOW())`)
       .join(', ');
 
-    await this.dataSource.query(
+    const rows: Array<{ service_key: string }> = await this.dataSource.query(
       `INSERT INTO offer_service_approvals (offer_id, service_key, approval_status, created_at, updated_at)
        VALUES ${values}
-       ON CONFLICT (offer_id, service_key) DO NOTHING`,
+       ON CONFLICT (offer_id, service_key) DO NOTHING
+       RETURNING service_key`,
       [offerId, ...serviceKeys],
     );
+
+    return { insertedServiceKeys: rows.map((r) => r.service_key) };
   }
 
   /**
