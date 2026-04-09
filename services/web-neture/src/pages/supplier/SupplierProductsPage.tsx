@@ -607,20 +607,33 @@ export default function SupplierProductsPage() {
   };
 
   // Column with checkbox, image, description, quick price, regulatory
+  const allSelected = products.length > 0 && selectedIds.size === products.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < products.length;
   const enhancedColumns = useMemo(() => {
-    // WO-O4O-BASETABLE-SELECTION-COLUMN-STICKY-AND-SELECT-ALL-V1: system + sticky
+    // WO-NETURE-SUPPLIER-PRODUCT-LIST-CHECKBOX-FIX-V1:
+    // operator 패턴과 동일하게 full custom — header 체크박스 직접 렌더 + onCellClick swallow
     const selectCol: ListColumnDef<SupplierProduct> = {
       key: '_select' as any,
-      header: '' as any,
+      header: (
+        <input
+          type="checkbox"
+          checked={allSelected}
+          ref={(el) => { if (el) el.indeterminate = someSelected; }}
+          onChange={toggleSelectAll}
+          onClick={(e) => e.stopPropagation()}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      ) as any,
       width: '40px',
       align: 'center',
       system: true,
       sticky: true,
+      onCellClick: () => { /* swallow row/cell click so checkbox clicks are isolated */ },
       render: (_v: any, row: SupplierProduct) => (
         <input
           type="checkbox"
           checked={selectedIds.has(row.id)}
-          onChange={() => toggleSelect(row.id)}
+          onChange={(e) => { e.stopPropagation(); toggleSelect(row.id); }}
           onClick={(e) => e.stopPropagation()}
           className="w-4 h-4 accent-blue-600 cursor-pointer"
         />
@@ -1183,9 +1196,6 @@ export default function SupplierProductsPage() {
         reorderable
         persistState
         columnVisibility
-        selectable
-        selectedKeys={selectedIds}
-        onSelectionChange={setSelectedIds}
       />
 
       {/* Pagination */}
