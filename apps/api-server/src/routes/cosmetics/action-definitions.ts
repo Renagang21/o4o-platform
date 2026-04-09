@@ -6,9 +6,8 @@
  * 기존 operator-dashboard.controller.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
-import type { DataSource } from 'typeorm';
+// WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1: DataSource/logger import 제거
 import type { ServiceActionConfig } from '../../common/action-queue/action-queue.types.js';
-import logger from '../../utils/logger.js';
 
 export const cosmeticsActionConfig: ServiceActionConfig = {
   serviceKey: 'k-cosmetics',
@@ -40,19 +39,20 @@ export const cosmeticsActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
       alwaysHigh: true,
     },
+    // WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1:
+    // EXECUTE(DRAFT → VISIBLE 일괄) 제거 → NAVIGATE 전환. 공급자가 작성 중일 수 있는
+    // 임시저장 상품을 운영자가 무차별 공개하지 않도록, 상품 검토 화면으로 이동만 허용.
     {
       id: 'draft-products',
       type: 'product-draft',
-      title: '임시저장 상품',
-      description: '임시저장 상태의 상품이 있습니다.',
+      title: '임시저장 상품 확인',
+      description: '검토가 필요한 임시저장 상품이 있습니다.',
       query: `SELECT COUNT(*)::int AS cnt
               FROM cosmetics.cosmetics_products
               WHERE status = 'DRAFT'`,
       actionUrl: '/operator/products?status=DRAFT',
-      actionLabel: '일괄 발행',
-      actionType: 'EXECUTE',
-      actionApi: '/cosmetics/operator/actions/execute/draft-products',
-      actionMethod: 'POST',
+      actionLabel: '상품 검토',
+      actionType: 'NAVIGATE',
     },
     {
       id: 'suspended-members',
@@ -67,18 +67,7 @@ export const cosmeticsActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
     },
   ],
-  executeHandlers: {
-    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 임시저장 상품 일괄 발행 (DRAFT → VISIBLE)
-    'draft-products': async (dataSource: DataSource, userId: string) => {
-      logger.info(`[ActionExecute] cosmetics/draft-products by ${userId}`);
-      const result = await dataSource.query(
-        `UPDATE cosmetics.cosmetics_products
-         SET status = 'VISIBLE', updated_at = NOW()
-         WHERE status = 'DRAFT'
-         RETURNING id`,
-      );
-      const count = Array.isArray(result) ? result.length : 0;
-      return { processed: count, succeeded: count, failed: 0 };
-    },
-  },
+  // WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1:
+  // 'draft-products' 일괄 VISIBLE execute handler 제거
+  executeHandlers: {},
 };

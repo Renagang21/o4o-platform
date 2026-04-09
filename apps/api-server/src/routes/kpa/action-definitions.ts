@@ -6,28 +6,27 @@
  * 기존 operator-summary.controller.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
-import type { DataSource } from 'typeorm';
+// WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1: DataSource/logger import 제거
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
-import logger from '../../utils/logger.js';
 
 export const kpaActionConfig: ServiceActionConfig = {
   serviceKey: 'kpa-society',
   definitions: [
+    // WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1:
+    // EXECUTE(일괄 published) 제거 → NAVIGATE 로 전환. 운영자는 콘텐츠 관리 화면에서
+    // 개별 검토 후 발행하도록 강제. alwaysHigh 도 제거하여 압박 강도 완화.
     {
       id: 'content-pending',
       type: 'content',
       title: '콘텐츠 승인 대기',
-      description: '승인 대기 중인 콘텐츠가 있습니다.',
+      description: '검토가 필요한 콘텐츠가 있습니다.',
       query: `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
               FROM cms_contents
               WHERE "serviceKey" IN ('kpa-society', 'kpa')
                 AND status = 'pending'`,
       actionUrl: '/operator/content?status=pending',
-      actionLabel: '일괄 승인',
-      actionType: 'EXECUTE',
-      actionApi: '/kpa/operator/actions/execute/content-pending',
-      actionMethod: 'POST',
-      alwaysHigh: true,
+      actionLabel: '콘텐츠 검토',
+      actionType: 'NAVIGATE',
     },
     {
       id: 'content-draft',
@@ -90,21 +89,9 @@ export const kpaActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
     },
   ],
-  executeHandlers: {
-    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 대기 콘텐츠 일괄 승인 (pending → published)
-    'content-pending': async (dataSource: DataSource, userId: string) => {
-      logger.info(`[ActionExecute] kpa/content-pending by ${userId}`);
-      const result = await dataSource.query(
-        `UPDATE cms_contents
-         SET status = 'published', updated_at = NOW()
-         WHERE "serviceKey" IN ('kpa-society', 'kpa')
-           AND status = 'pending'
-         RETURNING id`,
-      );
-      const count = Array.isArray(result) ? result.length : 0;
-      return { processed: count, succeeded: count, failed: 0 };
-    },
-  },
+  // WO-PLATFORM-ACTION-QUEUE-DECISION-PRESSURE-REMOVE-V1:
+  // 'content-pending' 일괄 published execute handler 제거 (검토 없는 일괄 발행 방지)
+  executeHandlers: {},
   aiRuleGenerator: (counts) => {
     const actions: AiRuleAction[] = [];
     if ((counts['content-draft'] || 0) > 10) {
