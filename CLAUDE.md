@@ -17,15 +17,30 @@
 
 **DB 접근 정책:**
 - ✅ Cloud Run 내부 / Admin API / Google Cloud Console / `gcloud sql` CLI
-- ❌ 로컬 psql / 로컬 scripts — **절대 금지** (방화벽 차단)
+- ✅ **Claude Code 직접 검증 허용** — `gcloud` CLI 또는 Google Cloud Console을 통해 배포 후 SQL 검증, 마이그레이션 확인, 테이블/row 상태 확인 등을 직접 수행할 수 있음
+- ❌ 로컬 psql 클라이언트 설치/사용 금지 (방화벽 차단 + 보안 정책)
+
+**Claude Code가 활용 가능한 검증 채널:**
+- `gcloud run services describe o4o-core-api --region asia-northeast3` — 리비전/상태
+- `gcloud run revisions list` — 배포 이력
+- `gcloud logging read 'resource.type=cloud_run_revision AND ...'` — 로그 조회 (마이그레이션/에러/특정 키워드)
+- `gcloud sql connect o4o-platform-db --user=postgres --database=o4o_platform` — 인터랙티브 psql (단, psql 클라이언트 미설치 시 사용 불가)
+- **권장**: `gcloud sql` 대신 Cloud SQL Admin API 또는 `gcloud` 래퍼 스크립트로 SQL 실행
+- DB 접속 정보 (host/user/password/database) 는 로컬 `.env.apiserver` 및 `apps/api-server/.env`에 존재하나, **프로덕션 DB 방화벽은 Cloud Run/Console/CLI 외 차단**되므로 값을 알아도 로컬 접속은 불가. Claude Code는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI에 전달할 수 있음
+
+**SQL 검증 원칙:**
+- read-only 검증(SELECT, 마이그레이션 이력 확인 등)은 Claude Code가 직접 수행 가능
+- 데이터 변경(UPDATE/DELETE/DROP/ALTER)은 **반드시 사용자 승인 필요**. 마이그레이션은 CI/CD 자동 실행이 원칙
+- 검증 결과에 의미 있는 운영 데이터(개인정보/비밀 등)가 포함될 수 있으므로 보고 시 민감 데이터는 요약/마스킹
 
 **마이그레이션:** main 배포 → CI/CD 자동 실행 (권장) | 긴급 시 Admin API 또는 Cloud Console SQL Editor 또는 `gcloud sql connect`
 
 > 📄 상세: `docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md`
 
 **로컬 도구:**
-- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회(`gcloud run services logs read`), 리비전 확인, Cloud SQL 접근(`gcloud sql connect`) 등 디버깅/운영에 활용 가능
+- ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회, 리비전 확인, Cloud SQL 접근, 로깅 API 등 디버깅/운영/검증에 활용 가능
 - ✅ `gh` CLI 설치됨 — GitHub PR/이슈 관리
+- ℹ️ `psql` 로컬 클라이언트는 **설치되어 있지 않음** — `gcloud sql connect` 의 인터랙티브 모드 사용 불가. 대안: Cloud SQL Admin API, Google Cloud Console SQL Editor, 또는 디버그 SSR 컨트롤러
 
 ---
 
