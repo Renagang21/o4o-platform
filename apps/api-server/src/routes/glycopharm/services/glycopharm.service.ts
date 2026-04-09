@@ -14,8 +14,9 @@ import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { GlycopharmRepository } from '../repositories/glycopharm.repository.js';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 import { GlycopharmPharmacyExtension } from '../entities/glycopharm-pharmacy-extension.entity.js';
-import type { GlycopharmProduct } from '../entities/glycopharm-product.entity.js';
-import { GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
+import { GlycopharmProduct, GlycopharmProductStatus } from '../entities/glycopharm-product.entity.js';
+import { GlycopharmProductLog } from '../entities/glycopharm-product-log.entity.js';
+import { upsertCatalogAndStoreFromGlycopharm } from './catalog-store-bridge.js';
 import {
   ListPharmaciesQueryDto,
   ListProductsQueryDto,
@@ -298,13 +299,13 @@ export class GlycopharmService {
     userId?: string,
     userName?: string
   ): Promise<ProductResponseDto> {
-    // Check for duplicate SKU
+    // Check for duplicate SKU (read-only, pre-tx)
     const existing = await this.repository.findProductBySku(dto.sku);
     if (existing) {
       throw new Error('Product SKU already exists');
     }
 
-    // Validate pharmacy if provided
+    // Validate pharmacy if provided (read-only, pre-tx)
     if (dto.pharmacy_id) {
       const pharmacy = await this.repository.findPharmacyById(dto.pharmacy_id);
       if (!pharmacy) {
@@ -312,21 +313,36 @@ export class GlycopharmService {
       }
     }
 
-    const product = await this.repository.createProduct({
-      ...dto,
-      status: dto.status || 'draft',
-      category: dto.category || 'other',
-      created_by_user_id: userId,
-      created_by_user_name: userName,
-    });
+    // WO-O4O-GLYCOPHARM-WRITE-DUAL-WRITE-SAFETY-BRIDGE-V1:
+    // 단일 트랜잭션 안에서 glycopharm_products + log + catalog/store 동시 반영
+    const product = await this.dataSource.transaction(async (em) => {
+      const productRepo = em.getRepository(GlycopharmProduct);
+      const logRepo = em.getRepository(GlycopharmProductLog);
 
-    // Create log
-    await this.repository.createProductLog({
-      product_id: product.id,
-      action: 'create',
-      after_data: { ...dto },
-      changed_by_user_id: userId,
-      changed_by_user_name: userName,
+      const created = await productRepo.save(
+        productRepo.create({
+          ...dto,
+          status: dto.status || 'draft',
+          category: dto.category || 'other',
+          created_by_user_id: userId,
+          created_by_user_name: userName,
+        }),
+      );
+
+      await logRepo.save(
+        logRepo.create({
+          product_id: created.id,
+          action: 'create',
+          after_data: { ...dto },
+          changed_by_user_id: userId,
+          changed_by_user_name: userName,
+        }),
+      );
+
+      // 이중 쓰기: catalog_products + store_products 동시 반영
+      await upsertCatalogAndStoreFromGlycopharm(em, created);
+
+      return created;
     });
 
     return this.toProductResponse(product);
@@ -365,24 +381,40 @@ export class GlycopharmService {
       status: existing.status,
     };
 
-    const product = await this.repository.updateProduct(id, {
-      ...dto,
-      updated_by_user_id: userId,
-      updated_by_user_name: userName,
+    // WO-O4O-GLYCOPHARM-WRITE-DUAL-WRITE-SAFETY-BRIDGE-V1:
+    // 단일 트랜잭션 안에서 glycopharm_products + log + catalog/store 동시 반영
+    const product = await this.dataSource.transaction(async (em) => {
+      const productRepo = em.getRepository(GlycopharmProduct);
+      const logRepo = em.getRepository(GlycopharmProductLog);
+
+      await productRepo.update(id, {
+        ...dto,
+        updated_by_user_id: userId,
+        updated_by_user_name: userName,
+      });
+
+      const updated = await productRepo.findOne({
+        where: { id },
+        relations: ['pharmacy'],
+      });
+      if (!updated) return null;
+
+      await logRepo.save(
+        logRepo.create({
+          product_id: updated.id,
+          action: 'update',
+          before_data: beforeData,
+          after_data: dto,
+          changed_by_user_id: userId,
+          changed_by_user_name: userName,
+        }),
+      );
+
+      await upsertCatalogAndStoreFromGlycopharm(em, updated);
+      return updated;
     });
 
     if (!product) return null;
-
-    // Create log
-    await this.repository.createProductLog({
-      product_id: product.id,
-      action: 'update',
-      before_data: beforeData,
-      after_data: dto,
-      changed_by_user_id: userId,
-      changed_by_user_name: userName,
-    });
-
     return this.toProductResponse(product);
   }
 
@@ -398,25 +430,40 @@ export class GlycopharmService {
 
     const beforeStatus = existing.status;
 
-    const product = await this.repository.updateProduct(id, {
-      status,
-      updated_by_user_id: userId,
-      updated_by_user_name: userName,
+    // WO-O4O-GLYCOPHARM-WRITE-DUAL-WRITE-SAFETY-BRIDGE-V1
+    const product = await this.dataSource.transaction(async (em) => {
+      const productRepo = em.getRepository(GlycopharmProduct);
+      const logRepo = em.getRepository(GlycopharmProductLog);
+
+      await productRepo.update(id, {
+        status,
+        updated_by_user_id: userId,
+        updated_by_user_name: userName,
+      });
+
+      const updated = await productRepo.findOne({
+        where: { id },
+        relations: ['pharmacy'],
+      });
+      if (!updated) return null;
+
+      await logRepo.save(
+        logRepo.create({
+          product_id: updated.id,
+          action: 'status_change',
+          before_data: { status: beforeStatus },
+          after_data: { status },
+          reason,
+          changed_by_user_id: userId,
+          changed_by_user_name: userName,
+        }),
+      );
+
+      await upsertCatalogAndStoreFromGlycopharm(em, updated);
+      return updated;
     });
 
     if (!product) return null;
-
-    // Create log
-    await this.repository.createProductLog({
-      product_id: product.id,
-      action: 'status_change',
-      before_data: { status: beforeStatus },
-      after_data: { status },
-      reason,
-      changed_by_user_id: userId,
-      changed_by_user_name: userName,
-    });
-
     return this.toProductResponse(product);
   }
 
@@ -433,23 +480,39 @@ export class GlycopharmService {
     const existing = await this.repository.findProductById(id);
     if (!existing) return null;
 
-    const product = await this.repository.updateProduct(id, {
-      is_partner_recruiting: value,
-      updated_by_user_id: userId,
-      updated_by_user_name: userName,
+    // WO-O4O-GLYCOPHARM-WRITE-DUAL-WRITE-SAFETY-BRIDGE-V1
+    const product = await this.dataSource.transaction(async (em) => {
+      const productRepo = em.getRepository(GlycopharmProduct);
+      const logRepo = em.getRepository(GlycopharmProductLog);
+
+      await productRepo.update(id, {
+        is_partner_recruiting: value,
+        updated_by_user_id: userId,
+        updated_by_user_name: userName,
+      });
+
+      const updated = await productRepo.findOne({
+        where: { id },
+        relations: ['pharmacy'],
+      });
+      if (!updated) return null;
+
+      await logRepo.save(
+        logRepo.create({
+          product_id: updated.id,
+          action: 'partner_recruiting_toggle',
+          before_data: { is_partner_recruiting: existing.is_partner_recruiting },
+          after_data: { is_partner_recruiting: value },
+          changed_by_user_id: userId,
+          changed_by_user_name: userName,
+        }),
+      );
+
+      await upsertCatalogAndStoreFromGlycopharm(em, updated);
+      return updated;
     });
 
     if (!product) return null;
-
-    await this.repository.createProductLog({
-      product_id: product.id,
-      action: 'partner_recruiting_toggle',
-      before_data: { is_partner_recruiting: existing.is_partner_recruiting },
-      after_data: { is_partner_recruiting: value },
-      changed_by_user_id: userId,
-      changed_by_user_name: userName,
-    });
-
     return this.toProductResponse(product);
   }
 
