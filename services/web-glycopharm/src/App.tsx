@@ -378,6 +378,10 @@ function AppRoutes() {
         <Route path="patient/glucose-input" element={<PatientGlucoseInputPage />} />
         <Route path="patient/records" element={<PatientRecordsListPage />} />
         <Route path="patient/data-analysis" element={<PatientDataAnalysisPage />} />
+        {/* WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
+            신규 표준 경로 `patient/pharmacy-coaching` + legacy alias `patient/pharmacist-coaching`
+            외부 북마크/이전 딥링크 호환을 위해 두 경로 모두 동일 컴포넌트를 가리킴. */}
+        <Route path="patient/pharmacy-coaching" element={<PatientPharmacyCoachingPage />} />
         <Route path="patient/pharmacist-coaching" element={<PatientPharmacyCoachingPage />} />
         <Route path="patient/care-guideline" element={<PatientCareGuidelinePage />} />
         <Route path="patient/select-pharmacy" element={<PatientSelectPharmacyPage />} />
@@ -472,7 +476,10 @@ function AppRoutes() {
         <Route path="dashboard" element={<ServiceDashboardPage />} />
       </Route>
 
-      {/* Backward compat redirects */}
+      {/* Backward compat redirects
+          WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
+            `/pharmacist` 및 `/pharmacist/*` → `/pharmacy` 리다이렉트는 레거시 북마크 대응
+            (외부 URL 영향이 있으므로 즉시 제거하지 않고 alias 유지). */}
       <Route path="pharmacist" element={<Navigate to="/pharmacy" replace />} />
       <Route path="pharmacist/*" element={<Navigate to="/pharmacy" replace />} />
 

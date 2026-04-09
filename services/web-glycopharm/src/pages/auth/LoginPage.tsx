@@ -22,7 +22,11 @@ export default function LoginPage() {
   const { login } = useAuth();
 
   const returnUrl = (location.state as any)?.from;
-  const rawType = searchParams.get('type'); // 'patient' | 'pharmacy' | 'pharmacist' | 'operator' | null
+  // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
+  //   query param `?type=pharmacist` 는 레거시 alias 로 유지.
+  //   내부 표준은 'pharmacy' 이며, 레거시 값은 즉시 normalize 된다.
+  //   외부 링크/북마크 호환을 위해 alias 제거는 별도 WO.
+  const rawType = searchParams.get('type'); // 'patient' | 'pharmacy' | 'pharmacist' (legacy) | 'operator' | null
   const loginType = (rawType === 'pharmacist' ? 'pharmacy' : rawType)
     || (location.pathname.startsWith('/admin') ? 'operator' : null);
 

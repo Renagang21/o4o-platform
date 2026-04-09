@@ -66,7 +66,10 @@ const MENU_ITEMS = [
   {
     label: '약사 코칭 확인',
     description: '약사 상담 내역 및 조언',
-    path: '/patient/pharmacist-coaching',
+    // WO-O4O-GLYCOPHARM-PHARMACY-ONLY-ROLE-CLEANUP-V1 Phase 4-C2:
+    //   내부 링크는 신규 표준 경로 `/patient/pharmacy-coaching` 사용.
+    //   레거시 `/patient/pharmacist-coaching` alias 는 App.tsx 에서 유지.
+    path: '/patient/pharmacy-coaching',
     icon: MessageCircle,
     color: 'text-violet-600',
     bg: 'bg-violet-50',
