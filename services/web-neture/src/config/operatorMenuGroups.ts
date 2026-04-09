@@ -42,7 +42,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [
     { label: '상품 관리', path: '/operator/all-registered-products' },
-    { label: '큐레이션', path: '/operator/curation' },
+    // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 메뉴 비노출 (운영자 통제 최소화)
     { label: '카테고리 관리', path: '/operator/categories', adminOnly: true },
     { label: '브랜드 관리', path: '/operator/brands', adminOnly: true },
     { label: '상품 데이터 정리', path: '/operator/product-cleanup', adminOnly: true },
@@ -140,7 +140,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
   products: [
     { label: '상품 관리', path: '/operator/all-registered-products' },
-    { label: '큐레이션', path: '/operator/curation' },
+    // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1
   ],
   stores: [{ label: '매장 관리', path: '/operator/stores' }],
   orders: [{ label: '주문 관리', path: '/operator/orders' }],

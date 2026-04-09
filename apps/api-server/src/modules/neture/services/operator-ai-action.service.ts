@@ -86,23 +86,8 @@ export class OperatorAiActionService {
   private generateRuleActions(ctx: OperatorContext): AiActionItem[] {
     const actions: AiActionItem[] = [];
 
-    // Rule A — 큐레이션 부족
-    if (ctx.uncuratedProducts >= 5) {
-      actions.push({
-        id: 'ai-curation',
-        source: 'AI',
-        type: 'curation',
-        title: '상품 노출이 부족합니다',
-        description: `큐레이션 미등록 ${ctx.uncuratedProducts}건 — 큐레이션을 추가하면 상품 노출이 증가합니다`,
-        priority: 'high',
-        confidence: 0.8,
-        actionType: 'EXECUTE',
-        actionUrl: '/operator/curation',
-        actionLabel: '일괄 큐레이션',
-        actionApi: '/neture/operator/actions/execute/curate-all',
-        actionMethod: 'POST',
-      });
-    }
+    // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1:
+    // Rule A (큐레이션 부족) 제거 — 운영자에게 큐레이션 결정을 강요하지 않음
 
     // Rule B — 문의 지연
     if (ctx.pendingInquiries > 0) {

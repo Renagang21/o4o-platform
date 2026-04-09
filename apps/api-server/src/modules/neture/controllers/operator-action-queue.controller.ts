@@ -9,9 +9,6 @@
  * GET /api/v1/neture/operator/actions
  *   → SYSTEM + AI 액션 병합, 타입/우선순위/설명과 함께 반환
  *
- * POST /api/v1/neture/operator/actions/execute/curate-all
- *   → 미큐레이션 오퍼 일괄 큐레이션 등록
- *
  * POST /api/v1/neture/operator/actions/execute/inquiries-mark-read
  *   → status='new' 문의 일괄 in_progress 전환
  *
@@ -25,7 +22,7 @@ import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
-import { OfferCurationService } from '../services/offer-curation.service.js';
+// WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: OfferCurationService import 제거
 import { OfferServiceApprovalService } from '../services/offer-service-approval.service.js';
 import { OperatorAiActionService } from '../services/operator-ai-action.service.js';
 import logger from '../../../utils/logger.js';
@@ -53,7 +50,7 @@ interface ActionQueueItem {
 
 export function createOperatorActionQueueController(dataSource: DataSource): Router {
   const router = Router();
-  const curationService = new OfferCurationService(dataSource);
+  // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: curationService 제거
   const approvalService = new OfferServiceApprovalService(dataSource);
   const aiService = new OperatorAiActionService();
 
@@ -65,12 +62,11 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
    */
   router.get('/actions', async (_req: Request, res: Response): Promise<void> => {
     try {
-      // 6 parallel queries
+      // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncuratedRow 제거
       const [
         pendingRegsRow,
         pendingSuppliersRow,
         pendingProductsRow,
-        uncuratedRow,
         unreadMessagesRow,
         partnerRequestsRow,
       ] = await Promise.all([
@@ -89,18 +85,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
            FROM offer_service_approvals
            WHERE service_key = 'neture' AND approval_status = 'pending'`,
         ),
-        dataSource.query(
-          `SELECT COUNT(*)::int AS cnt, MIN(spo.created_at) AS oldest
-           FROM supplier_product_offers spo
-           WHERE spo.approval_status = 'APPROVED'
-             AND spo.is_active = true
-             AND NOT EXISTS (
-               SELECT 1 FROM offer_curations oc
-               WHERE oc.offer_id = spo.id
-                 AND oc.service_key = 'neture'
-                 AND oc.is_active = true
-             )`,
-        ),
+        // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncurated 쿼리 제거
         dataSource.query(
           `SELECT COUNT(*)::int AS cnt, MIN(created_at) AS oldest
            FROM neture_contact_messages
@@ -116,7 +101,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
       const pendingRegs = pendingRegsRow[0]?.cnt || 0;
       const pendingSuppliers = pendingSuppliersRow[0]?.cnt || 0;
       const pendingProducts = pendingProductsRow[0]?.cnt || 0;
-      const uncurated = uncuratedRow[0]?.cnt || 0;
+      // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: uncurated 제거
       const unreadMessages = unreadMessagesRow[0]?.cnt || 0;
       const partnerRequests = partnerRequestsRow[0]?.cnt || 0;
 
@@ -181,20 +166,7 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
           actionApi: '/neture/operator/actions/execute/approve-pending-products',
           actionMethod: 'POST',
         },
-        {
-          id: 'uncurated',
-          type: 'curation',
-          title: '큐레이션 필요',
-          description: '승인된 상품 중 큐레이션이 등록되지 않았습니다.',
-          count: uncurated,
-          oldest: uncuratedRow[0]?.oldest || null,
-          actionUrl: '/operator/curation',
-          actionLabel: '일괄 큐레이션',
-          alwaysHigh: false,
-          actionType: 'EXECUTE',
-          actionApi: '/neture/operator/actions/execute/curate-all',
-          actionMethod: 'POST',
-        },
+        // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: '큐레이션 필요' 항목 제거 — 운영자 압박 제거
         {
           id: 'unread-messages',
           type: 'inquiry',
@@ -248,7 +220,8 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
       const aiRaw = await aiService.generateActions({
         pendingApprovals: pendingProducts,
         pendingSuppliers,
-        uncuratedProducts: uncurated,
+        // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 큐레이션 압박 제거
+        uncuratedProducts: 0,
         pendingInquiries: unreadMessages,
         activeProducts,
         pendingRegs,
@@ -318,50 +291,9 @@ export function createOperatorActionQueueController(dataSource: DataSource): Rou
 
   // ==================== Execute Endpoints ====================
 
-  /**
-   * POST /operator/actions/execute/curate-all
-   */
-  router.post('/actions/execute/curate-all', async (_req: Request, res: Response): Promise<void> => {
-    try {
-      const rows = await dataSource.query(
-        `SELECT spo.id
-         FROM supplier_product_offers spo
-         WHERE spo.approval_status = 'APPROVED'
-           AND spo.is_active = true
-           AND NOT EXISTS (
-             SELECT 1 FROM offer_curations oc
-             WHERE oc.offer_id = spo.id
-               AND oc.service_key = 'neture'
-               AND oc.is_active = true
-           )`,
-      );
-
-      let created = 0;
-      let skipped = 0;
-      for (const row of rows) {
-        const result = await curationService.createCuration({
-          offerId: row.id,
-          serviceKey: 'neture',
-          placement: 'featured',
-          isActive: true,
-        });
-        if (result.success) {
-          created++;
-        } else {
-          skipped++;
-        }
-      }
-
-      logger.info(`[Action Engine] curate-all: processed=${rows.length}, created=${created}, skipped=${skipped}`);
-      res.json({
-        success: true,
-        data: { processed: rows.length, created, skipped },
-      });
-    } catch (error: any) {
-      logger.error('[Action Engine] curate-all error:', error);
-      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: error.message });
-    }
-  });
+  // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1:
+  // POST /operator/actions/execute/curate-all 제거 — 운영자 일괄 큐레이션 압박 제거
+  // (Phase 3에서 offer_curations 전체 제거 시 OfferCurationService도 함께 제거 예정)
 
   /**
    * POST /operator/actions/execute/inquiries-mark-read

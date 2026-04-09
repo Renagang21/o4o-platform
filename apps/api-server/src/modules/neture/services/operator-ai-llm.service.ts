@@ -35,13 +35,7 @@ const ACTION_MAP: Record<string, {
   actionApi?: string;
   actionMethod?: string;
 }> = {
-  curation: {
-    actionType: 'EXECUTE',
-    actionUrl: '/operator/curation',
-    actionLabel: '일괄 큐레이션',
-    actionApi: '/neture/operator/actions/execute/curate-all',
-    actionMethod: 'POST',
-  },
+  // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: curation 액션 매핑 제거
   inquiry: {
     actionType: 'EXECUTE',
     actionUrl: '/operator/contact-messages',
@@ -72,7 +66,7 @@ Rules:
 - Return ONLY a JSON array, no explanation outside JSON
 - Each item must include: type, priority, reason, confidence
 - confidence must be between 0 and 1
-- Available action types: curation, inquiry, product, supplier
+- Available action types: inquiry, product, supplier
 - Only suggest actions where the context data shows a clear need
 - Use Korean for the reason field`;
 
@@ -82,7 +76,7 @@ ${JSON.stringify(ctx, null, 2)}
 
 Based on this data, suggest up to 3 actions as a JSON array.
 Example format:
-[{"type":"curation","priority":"high","reason":"큐레이션 미등록 상품이 많아 노출이 부족합니다","confidence":0.82}]`;
+[{"type":"inquiry","priority":"high","reason":"미처리 문의가 많아 응답이 지연되고 있습니다","confidence":0.82}]`;
 }
 
 // ─── In-memory cache ───
@@ -97,7 +91,8 @@ let cache: CacheEntry | null = null;
 
 // ─── Validation ───
 
-const VALID_TYPES = new Set(['curation', 'inquiry', 'product', 'supplier']);
+// WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1: 'curation' 타입 제거
+const VALID_TYPES = new Set(['inquiry', 'product', 'supplier']);
 const VALID_PRIORITIES = new Set(['high', 'medium', 'low']);
 
 function isValidLlmAction(item: unknown): item is LlmAction {
