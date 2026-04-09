@@ -649,6 +649,8 @@ export class NetureOfferService {
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured?: boolean;
     }
   ) {
     try {
@@ -691,6 +693,8 @@ export class NetureOfferService {
         consumerDetailDescription: data.consumerDetailDescription ?? null,
         businessShortDescription: null,
         businessDetailDescription: null,
+        // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+        isFeatured: data.isFeatured ?? false,
       });
 
       const savedOffer = await this.offerRepo.save(offer);
@@ -756,6 +760,8 @@ export class NetureOfferService {
       specification?: string | null;
       originCountry?: string | null;
       tags?: string[];
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured?: boolean;
     }
   ) {
     try {
@@ -769,6 +775,11 @@ export class NetureOfferService {
 
       if (updates.isActive !== undefined) {
         offer.isActive = updates.isActive;
+      }
+
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      if (updates.isFeatured !== undefined) {
+        offer.isFeatured = updates.isFeatured;
       }
 
       // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
@@ -1086,6 +1097,7 @@ export class NetureOfferService {
         `SELECT
            spo.id, spo.master_id AS "masterId", spo.is_active AS "isActive",
            spo.is_public AS "isPublic",
+           spo.is_featured AS "isFeatured",
            spo.distribution_type AS "distributionType",
            spo.allowed_seller_ids AS "allowedSellerIds",
            spo.approval_status AS "approvalStatus",

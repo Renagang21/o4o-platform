@@ -31,12 +31,15 @@ export function createSupplierProductController(dataSource: DataSource): Router 
       const { barcode, marketingName, categoryId, brandName,
               distributionType, manualData, priceGeneral, priceGold, pricePlatinum,
               consumerReferencePrice,
-              consumerShortDescription, consumerDetailDescription, serviceKeys } = req.body;
+              consumerShortDescription, consumerDetailDescription, serviceKeys,
+              // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+              isFeatured } = req.body;
       const result = await netureService.createSupplierOffer(supplierId, {
         barcode, marketingName, categoryId, brandName,
         manualData, distributionType, serviceKeys,
         priceGeneral, priceGold, pricePlatinum, consumerReferencePrice,
         consumerShortDescription, consumerDetailDescription,
+        isFeatured,
       });
       if (!result.success) {
         const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
@@ -207,13 +210,16 @@ export function createSupplierProductController(dataSource: DataSource): Router 
               priceGeneral, priceGold, pricePlatinum,
               consumerReferencePrice, stockQuantity,
               consumerShortDescription, consumerDetailDescription, marketingName,
-              categoryId, brandId, specification, originCountry, tags } = req.body;
+              categoryId, brandId, specification, originCountry, tags,
+              // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+              isFeatured } = req.body;
       const result = await netureService.updateSupplierOffer(id, supplierId, {
         isActive, isPublic, distributionType, allowedSellerIds,
         priceGeneral, priceGold, pricePlatinum,
         consumerReferencePrice, stockQuantity,
         consumerShortDescription, consumerDetailDescription, marketingName,
         categoryId, brandId, specification, originCountry, tags,
+        isFeatured,
       });
       if (!result.success) {
         const statusCode = result.error === 'PRODUCT_NOT_FOUND' ? 404 : 400;

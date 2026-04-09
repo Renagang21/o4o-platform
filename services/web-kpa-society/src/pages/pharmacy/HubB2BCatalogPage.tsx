@@ -28,7 +28,8 @@ import { colors, shadows, borderRadius } from '../../styles/theme';
 const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
-  { key: 'recommended', label: '운영자 추천' },
+  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1: 공급자 강조 기반으로 교체, 라벨 변경
+  { key: 'recommended', label: '추천 상품' },
   { key: 'PRIVATE', label: '판매자 모집' },
 ];
 

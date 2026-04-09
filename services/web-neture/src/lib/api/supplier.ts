@@ -111,6 +111,8 @@ export interface SupplierProduct {
   isActive: boolean;
   acceptsApplications: boolean;
   isPublic: boolean;
+  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+  isFeatured?: boolean;
   distributionType: DistributionType;
   allowedSellerIds: string[] | null;
   pendingRequestCount: number;
@@ -602,6 +604,8 @@ export const supplierApi = {
     consumerDetailDescription?: string | null;
     businessShortDescription?: string | null;
     businessDetailDescription?: string | null;
+    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+    isFeatured?: boolean;
   }): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       const response = await api.post('/neture/supplier/products', data);
@@ -635,6 +639,8 @@ export const supplierApi = {
       specification?: string | null;
       originCountry?: string | null;
       tags?: string[];
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured?: boolean;
     }
   ): Promise<{ success: boolean; error?: string; data?: any }> {
     try {

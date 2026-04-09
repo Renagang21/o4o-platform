@@ -299,6 +299,8 @@ export class NetureService {
       consumerReferencePrice?: number | null;
       consumerShortDescription?: string | null;
       consumerDetailDescription?: string | null;
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured?: boolean;
     }
   ) {
     return this.offerService.createSupplierOffer(supplierId, data);
@@ -326,6 +328,8 @@ export class NetureService {
       specification?: string | null;
       originCountry?: string | null;
       tags?: string[];
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured?: boolean;
     }
   ) {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);

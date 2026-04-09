@@ -146,6 +146,12 @@ export class SupplierProductOffer {
   @Column({ name: 'service_keys', type: 'text', array: true, default: '{}' })
   serviceKeys: string[];
 
+  // ==================== Supplier Highlight (WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1) ====================
+
+  /** 공급자가 직접 설정하는 "추천 노출 희망" 플래그 (운영자 개입 없음) */
+  @Column({ name: 'is_featured', type: 'boolean', default: false })
+  isFeatured: boolean;
+
   /** V2: SEO slug for store URLs (/store/{store_slug}/product/{slug}) */
   @Column({ name: 'slug', type: 'varchar', length: 160, unique: true })
   slug: string;

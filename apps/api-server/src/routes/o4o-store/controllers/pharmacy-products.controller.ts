@@ -68,7 +68,6 @@ export function createPharmacyProductsController(
 
     let categoryFilter = '';
     let distributionFilter = '';
-    let recommendedFilter = '';
     const params: any[] = [organizationId, limit, offset];
 
     if (category) {
@@ -79,16 +78,12 @@ export function createPharmacyProductsController(
       params.push(distributionType);
       distributionFilter = `AND spo.distribution_type = $${params.length}`;
     }
-    // 운영자 추천: offer_curations.placement='featured' 기준
-    if (recommended) {
-      recommendedFilter = `AND spo.id IN (
-        SELECT oc.offer_id FROM offer_curations oc
-        WHERE oc.placement = 'featured'
-          AND oc.is_active = true
-          AND (oc.start_at IS NULL OR oc.start_at <= NOW())
-          AND (oc.end_at IS NULL OR oc.end_at >= NOW())
-      )`;
-    }
+    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
+    // recommended 탭은 공급자 강조 플래그(spo.is_featured) 우선 → created_at DESC fallback
+    // 기존 offer_curations 의존 제거. 별도 WHERE 필터 없이 ORDER BY로 자연 fallback.
+    const orderBy = recommended
+      ? 'spo.is_featured DESC, spo.created_at DESC'
+      : 'spo.updated_at DESC';
 
     const rows = await dataSource.query(
       `SELECT
@@ -130,17 +125,17 @@ export function createPharmacyProductsController(
          AND s.status = 'ACTIVE'
          ${categoryFilter}
          ${distributionFilter}
-         ${recommendedFilter}
-       ORDER BY spo.updated_at DESC
+       ORDER BY ${orderBy}
        LIMIT $2 OFFSET $3`,
       params,
     );
 
     // Total count (for pagination)
+    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
+    // recommended 탭은 별도 필터 없이 정렬만 변경하므로 count는 기본 조건과 동일
     const countParams: any[] = [];
     let countCategoryFilter = '';
     let countDistributionFilter = '';
-    let countRecommendedFilter = '';
     if (category) {
       countParams.push(category);
       countCategoryFilter = `AND pm.brand_name = $${countParams.length}`;
@@ -148,15 +143,6 @@ export function createPharmacyProductsController(
     if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
       countParams.push(distributionType);
       countDistributionFilter = `AND spo.distribution_type = $${countParams.length}`;
-    }
-    if (recommended) {
-      countRecommendedFilter = `AND spo.id IN (
-        SELECT oc.offer_id FROM offer_curations oc
-        WHERE oc.placement = 'featured'
-          AND oc.is_active = true
-          AND (oc.start_at IS NULL OR oc.start_at <= NOW())
-          AND (oc.end_at IS NULL OR oc.end_at >= NOW())
-      )`;
     }
 
     const countResult = await dataSource.query(
@@ -168,8 +154,7 @@ export function createPharmacyProductsController(
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}
-         ${countDistributionFilter}
-         ${countRecommendedFilter}`,
+         ${countDistributionFilter}`,
       countParams,
     );
 

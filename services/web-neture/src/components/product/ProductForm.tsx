@@ -23,6 +23,8 @@ export interface ProductFormData {
   isActive: boolean;
   isPublic: boolean;
   serviceKeys: string[];
+  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+  isFeatured: boolean;
   /** @deprecated 하위호환용 — isPublic + serviceKeys에서 파생 */
   distributionType?: string;
 }
@@ -133,6 +135,8 @@ const DEFAULT_DATA: ProductFormData = {
   isActive: true,
   isPublic: false,
   serviceKeys: [],
+  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+  isFeatured: false,
 };
 
 // ─── Component ───
@@ -361,6 +365,30 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
             서비스 운영자가 상품을 검토 후 승인하면 해당 서비스에 노출됩니다
           </p>
         )}
+      </div>
+
+      {/* ── C. 추천 노출 희망 (WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1) ── */}
+      <div>
+        <FieldLabel>추천 노출 희망</FieldLabel>
+        <label
+          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+            data.isFeatured
+              ? 'border-amber-500 bg-amber-50'
+              : 'border-slate-200 hover:bg-slate-50'
+          } ${disabled ? 'opacity-60 pointer-events-none' : ''}`}
+        >
+          <input
+            type="checkbox"
+            checked={data.isFeatured}
+            onChange={(e) => updateField('isFeatured', e.target.checked)}
+            disabled={disabled}
+            className="w-4 h-4 text-amber-600 rounded"
+          />
+          <div>
+            <p className="font-medium text-slate-800">추천 상품으로 강조</p>
+            <p className="text-sm text-slate-500">매장 추천 탭 등에서 우선 노출됩니다 (운영자 승인 불필요)</p>
+          </div>
+        </label>
       </div>
     </div>
   );

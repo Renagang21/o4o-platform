@@ -113,6 +113,8 @@ function toFormData(p: SupplierProduct): Partial<ProductFormData> {
     isActive: p.isActive,
     // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
     isPublic: (p as any).isPublic ?? (p.distributionType === 'PUBLIC'),
+    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+    isFeatured: p.isFeatured ?? false,
     serviceKeys: p.serviceKeys || [],
     distributionType: p.distributionType || 'PRIVATE',
   };
@@ -340,6 +342,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
         isActive: form.isActive,
         // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: isPublic 직접 전달
         isPublic: form.isPublic,
+        // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+        isFeatured: form.isFeatured,
         // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
         // WO-NETURE-SUPPLIER-PRODUCT-SAVE-ERROR-RESOLUTION-V1: empty string → null (UUID 컬럼 보호)
         categoryId: editCategory || null,

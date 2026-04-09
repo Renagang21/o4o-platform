@@ -46,6 +46,8 @@ interface FormData {
   mfdsPermitNumber: string;
   specification: string;
   originCountry: string;
+  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+  isFeatured: boolean;
 }
 
 function flattenCategories(
@@ -85,6 +87,8 @@ export default function SupplierProductCreatePage() {
     mfdsPermitNumber: '',
     specification: '',
     originCountry: '',
+    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+    isFeatured: false,
   });
 
   // Barcode search state
@@ -189,6 +193,8 @@ export default function SupplierProductCreatePage() {
       stockQty: data.stockQuantity ? String(data.stockQuantity) : '',
       distributionType: data.distributionType || prev.distributionType,
       serviceKeys: data.serviceKeys || prev.serviceKeys,
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured: data.isFeatured ?? prev.isFeatured,
     }));
   };
 
@@ -259,6 +265,8 @@ export default function SupplierProductCreatePage() {
       consumerReferencePrice: form.consumerReferencePrice ? Number(form.consumerReferencePrice) : null,
       consumerShortDescription: consumerShortDesc || null,
       consumerDetailDescription: consumerDetailDesc || null,
+      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
+      isFeatured: form.isFeatured,
     });
     setSubmitting(false);
 
