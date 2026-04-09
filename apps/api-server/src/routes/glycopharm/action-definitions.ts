@@ -6,9 +6,8 @@
  * 기존 operator-dashboard.service.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
-import type { DataSource } from 'typeorm';
+// WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1: DataSource/logger import 제거
 import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
-import logger from '../../utils/logger.js';
 
 export const glycopharmActionConfig: ServiceActionConfig = {
   serviceKey: 'glycopharm',
@@ -36,22 +35,12 @@ export const glycopharmActionConfig: ServiceActionConfig = {
       actionLabel: '상품 관리',
       actionType: 'NAVIGATE',
     },
-    {
-      id: 'care-alerts',
-      type: 'care',
-      title: '케어 알림 미확인',
-      description: '확인되지 않은 환자 케어 알림이 있습니다.',
-      query: `SELECT COUNT(*)::int AS cnt
-              FROM care_alerts
-              WHERE is_resolved = false
-                AND service_code = 'glycopharm'`,
-      actionUrl: '/operator/care/alerts',
-      actionLabel: '일괄 확인',
-      actionType: 'EXECUTE',
-      actionApi: '/glycopharm/operator/actions/execute/care-alerts',
-      actionMethod: 'POST',
-      alwaysHigh: true,
-    },
+    // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
+    // 'care-alerts' 정의 제거. 사유:
+    // (1) 쿼리/핸들러가 존재하지 않는 컬럼(is_resolved, service_code)을 참조 → dead code
+    // (2) 활성화될 경우 약사가 환자 검토 없이 알림을 일괄 resolve 하게 됨 → 의료 안전 위험
+    // 정상 흐름(operator-dashboard.service.ts NAVIGATE 카드 + 약사용 OperatorCareAlertsPage
+    // + care-alert.service.ts 단건 acknowledge/resolve)은 그대로 유지
     {
       id: 'forum-requests',
       type: 'forum',
@@ -77,34 +66,13 @@ export const glycopharmActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
     },
   ],
-  executeHandlers: {
-    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 케어 알림 일괄 확인
-    'care-alerts': async (dataSource: DataSource, userId: string) => {
-      logger.info(`[ActionExecute] glycopharm/care-alerts by ${userId}`);
-      const result = await dataSource.query(
-        `UPDATE care_alerts SET is_resolved = true, updated_at = NOW()
-         WHERE is_resolved = false AND service_code = 'glycopharm'
-         RETURNING id`,
-      );
-      const count = Array.isArray(result) ? result.length : 0;
-      return { processed: count, succeeded: count, failed: 0 };
-    },
-  },
+  // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
+  // 'care-alerts' execute handler 제거 (broken SQL + 의료 안전 위험)
+  executeHandlers: {},
   aiRuleGenerator: (counts) => {
     const actions: AiRuleAction[] = [];
-    if ((counts['care-alerts'] || 0) > 3) {
-      actions.push({
-        id: 'ai-care-priority',
-        type: 'care',
-        title: '긴급 케어 알림 다수 발생',
-        description: `미확인 케어 알림 ${counts['care-alerts']}건 — 빠른 확인이 필요합니다`,
-        priority: 'high',
-        confidence: 0.85,
-        actionUrl: '/operator/care/alerts',
-        actionLabel: '알림 확인',
-        actionType: 'NAVIGATE',
-      });
-    }
+    // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
+    // 'ai-care-priority' (care-alerts > 3) 제거 — care-alerts 정의 자체가 사라져 카운트 항상 0
     if ((counts['pending-apps'] || 0) > 0 && (counts['care-alerts'] || 0) === 0) {
       actions.push({
         id: 'ai-app-review',

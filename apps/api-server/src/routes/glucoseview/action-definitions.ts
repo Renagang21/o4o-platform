@@ -6,9 +6,8 @@
  * 기존 operator-dashboard.service.ts actionQueue 항목을 ActionDefinition 형식으로 정의.
  */
 
-import type { DataSource } from 'typeorm';
-import type { ServiceActionConfig, AiRuleAction } from '../../common/action-queue/action-queue.types.js';
-import logger from '../../utils/logger.js';
+// WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1: DataSource/AiRuleAction/logger import 제거
+import type { ServiceActionConfig } from '../../common/action-queue/action-queue.types.js';
 
 export const glucoseviewActionConfig: ServiceActionConfig = {
   serviceKey: 'glucoseview',
@@ -37,22 +36,10 @@ export const glucoseviewActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
       alwaysHigh: true,
     },
-    {
-      id: 'care-alerts',
-      type: 'care',
-      title: '케어 알림 미확인',
-      description: '확인되지 않은 환자 케어 알림이 있습니다.',
-      query: `SELECT COUNT(*)::int AS cnt
-              FROM care_alerts
-              WHERE is_resolved = false
-                AND service_code = 'glucoseview'`,
-      actionUrl: '/operator/care/alerts',
-      actionLabel: '일괄 확인',
-      actionType: 'EXECUTE',
-      actionApi: '/glucoseview/operator/actions/execute/care-alerts',
-      actionMethod: 'POST',
-      alwaysHigh: true,
-    },
+    // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
+    // 'care-alerts' 정의 제거. 사유: broken SQL (is_resolved/service_code 컬럼 없음) +
+    // 활성화 시 검토 없는 일괄 resolve 위험. 정상 흐름은 operator-dashboard.service.ts
+    // NAVIGATE 카드로 유지
     {
       id: 'suspended-members',
       type: 'member',
@@ -66,34 +53,7 @@ export const glucoseviewActionConfig: ServiceActionConfig = {
       actionType: 'NAVIGATE',
     },
   ],
-  executeHandlers: {
-    // WO-O4O-ACTION-EXECUTION-LAYER-V1: 케어 알림 일괄 확인
-    'care-alerts': async (dataSource: DataSource, userId: string) => {
-      logger.info(`[ActionExecute] glucoseview/care-alerts by ${userId}`);
-      const result = await dataSource.query(
-        `UPDATE care_alerts SET is_resolved = true, updated_at = NOW()
-         WHERE is_resolved = false AND service_code = 'glucoseview'
-         RETURNING id`,
-      );
-      const count = Array.isArray(result) ? result.length : 0;
-      return { processed: count, succeeded: count, failed: 0 };
-    },
-  },
-  aiRuleGenerator: (counts) => {
-    const actions: AiRuleAction[] = [];
-    if ((counts['care-alerts'] || 0) > 5) {
-      actions.push({
-        id: 'ai-care-overload',
-        type: 'care',
-        title: '케어 알림 과다 — 즉시 확인 필요',
-        description: `미확인 케어 알림 ${counts['care-alerts']}건이 적체되고 있습니다`,
-        priority: 'high',
-        confidence: 0.9,
-        actionUrl: '/operator/care/alerts',
-        actionLabel: '알림 확인',
-        actionType: 'NAVIGATE',
-      });
-    }
-    return actions;
-  },
+  // WO-CARE-ALERTS-BROKEN-BULK-RESOLVE-REMOVE-V1:
+  // 'care-alerts' execute handler + 'ai-care-overload' AI rule 제거
+  executeHandlers: {},
 };
