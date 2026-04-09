@@ -1,18 +1,18 @@
 /**
  * LandingPage — GlycoPharm 진입 화면
  * WO-GLYCOPHARM-ENTRY-SCREENS-V1
- * WO-GLYCOPHARM-GATEWAY-ENTRY-SPLIT-V1:
- *   운영자 로그인 버튼 분리 (당뇨인용 → GlucoseView / 약국용 → GlycoPharm)
  * WO-GLYCOPHARM-LANDING-FLOW-FIX-V1:
- *   약국용 → /login?type=pharmacy, 당뇨인 운영자 → glucoseview/admin
+ *   약국용 → /login?type=pharmacy
+ * WO-O4O-GLYCOPHARM-LANDING-OPERATOR-BUTTONS-REMOVE-V1:
+ *   랜딩 화면에서 운영자 로그인 버튼 2종 제거
+ *   (당뇨인용 운영자 → GlucoseView, 약국/약사용 운영자 → /admin/login).
+ *   운영자 진입은 URL 직접 접근으로만 유지.
  *
  * MainLayout 밖에서 렌더링 (헤더/푸터 없음).
  */
 
 import { useNavigate } from 'react-router-dom';
 import { Activity } from 'lucide-react';
-
-const GLUCOSEVIEW_URL = import.meta.env.VITE_GLUCOSEVIEW_URL || 'https://glucoseview.co.kr';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -45,24 +45,6 @@ export default function LandingPage() {
             약국용 시스템
           </button>
           <p className="text-xs text-slate-400 text-center mt-1.5">당뇨인 데이터 열람·분석 및 코칭 작성</p>
-        </div>
-
-        <div className="pt-2">
-          <div className="border-t border-slate-200 mb-4" />
-          <div className="space-y-2">
-            <a
-              href={`${GLUCOSEVIEW_URL}/admin`}
-              className="block w-full py-3 text-sm font-medium text-slate-600 bg-white rounded-xl border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors text-center"
-            >
-              당뇨인용 운영자 로그인
-            </a>
-            <button
-              onClick={() => navigate('/admin/login')}
-              className="w-full py-3 text-sm font-medium text-slate-600 bg-white rounded-xl border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors"
-            >
-              약국/약사용 운영자 로그인
-            </button>
-          </div>
         </div>
       </div>
     </div>
