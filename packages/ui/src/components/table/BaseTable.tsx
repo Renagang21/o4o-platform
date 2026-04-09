@@ -239,13 +239,9 @@ export function BaseTable<T extends Record<string, any>>({
     }
   }, [data, getRowKey, selectAllState, selectedKeys, onSelectionChange]);
 
-  const handleToggleRow = useCallback((key: string) => {
-    if (!onSelectionChange) return;
-    const next = new Set(selectedKeys);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    onSelectionChange(next);
-  }, [selectedKeys, onSelectionChange]);
+  // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1
+  // `selectable` prop은 헤더 select-all만 auto-wire한다. body cell은 consumer의 render가 책임진다.
+  // 이전에 있던 handleToggleRow useCallback은 어디서도 호출되지 않는 dead code였으므로 제거했다.
 
   const selectAllRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -621,7 +617,13 @@ export function BaseTable<T extends Record<string, any>>({
                         <td
                           key={col.key}
                           style={tdStyle.width || col.sticky ? tdStyle : undefined}
-                          onClick={col.onCellClick ? () => col.onCellClick!(row, rowIndex) : undefined}
+                          // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
+                          // onCellClick이 정의된 셀은 "나는 이 셀을 처리한다"는 계약으로 간주.
+                          // row 클릭으로 버블링되지 않도록 stopPropagation을 먼저 호출한다.
+                          onClick={col.onCellClick ? (e) => {
+                            e.stopPropagation();
+                            col.onCellClick!(row, rowIndex);
+                          } : undefined}
                           className={`whitespace-nowrap ${cellCls} ${alignClass(col.align)} overflow-hidden text-ellipsis ${col.sticky ? 'border-r border-gray-200' : ''}`}
                         >
                           {content}

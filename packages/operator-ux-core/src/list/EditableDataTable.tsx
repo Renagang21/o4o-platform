@@ -137,12 +137,15 @@ export function EditableDataTable<T extends Record<string, any>>({
       return getDisplayValue(row, rKey, col.key);
     },
 
+    // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
+    // 편집 가능 컬럼은 EditableDataTable이 셀 클릭을 편집 모드로 전환한다.
+    // 비편집 컬럼은 consumer가 전달한 onCellClick을 그대로 보존한다 (이전에는 undefined로 덮어써서 consumer 핸들러가 소실됐음).
     onCellClick: col.editable
       ? (row: T, index: number) => {
           const rKey = getRowKeyValue(row, rowKey, index);
           handleCellClick(rKey, col);
         }
-      : undefined,
+      : col.onCellClick,
 
     cellClassName: (row: T, index: number) => {
       const rKey = getRowKeyValue(row, rowKey, index);

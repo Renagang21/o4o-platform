@@ -1133,9 +1133,14 @@ export default function SupplierProductsPage() {
               if (result.success && result.data) {
                 const d = result.data;
                 showToast(`승인 요청 완료: ${d.submitted}건 요청${d.errors.length > 0 ? `, ${d.errors.length}건 실패` : ''}`);
-                fetchProducts();
-                fetchTabCounts();
+                // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
+                // 승인 요청 직후 목록/탭 카운트가 stale 상태로 남지 않도록 반드시 await.
+                // fetchProducts는 기본값 page=1이 아닌 현재 페이지를 유지한다.
                 setSelectedIds(new Set());
+                await Promise.all([
+                  fetchProducts(pagination.page),
+                  fetchTabCounts(),
+                ]);
               } else {
                 showToast(result.error || '승인 요청에 실패했습니다.');
               }

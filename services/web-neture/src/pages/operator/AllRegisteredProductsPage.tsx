@@ -314,7 +314,10 @@ export default function AllRegisteredProductsPage() {
       if (result.success) {
         alert(`승인 완료: ${result.data?.approved ?? ids.length}건`);
         setSelectedOfferIds(new Set());
-        fetchOffers(page);
+        // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1:
+        // fetchOffers는 KPI/목록/pagination을 함께 refetch하므로 반드시 await하여
+        // actionLoading 해제(finally)가 refetch 완료 후에 발생하도록 보장.
+        await fetchOffers(page);
       } else {
         alert(`승인 실패: ${result.error || '알 수 없는 오류'}`);
       }
@@ -336,7 +339,8 @@ export default function AllRegisteredProductsPage() {
       if (result.success) {
         alert(`거절 완료: ${result.data?.rejected ?? ids.length}건`);
         setSelectedOfferIds(new Set());
-        fetchOffers(page);
+        // WO-NETURE-PRODUCT-TABLE-SELECTION-AND-APPROVAL-REFRESH-FIX-V1: await 필수
+        await fetchOffers(page);
       } else {
         alert(`거절 실패: ${result.error || '알 수 없는 오류'}`);
       }
