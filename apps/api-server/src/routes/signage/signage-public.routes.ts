@@ -65,7 +65,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
       const media = await dataSource.query(`
         SELECT
           m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
-          m.duration, m.tags, m.metadata, m.source,
+          m.duration, m.tags, m.metadata, m.source, m."createdByUserId",
           m."createdAt", m."updatedAt",
           COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_media m
@@ -140,7 +140,7 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
           p."totalDuration", p."itemCount",
           (p.status = 'active') as "isActive",
           p."loopEnabled" as "isLoop",
-          p.metadata, p.source,
+          p.metadata, p.source, p."createdByUserId",
           p."createdAt", p."updatedAt",
           COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_playlists p

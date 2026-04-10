@@ -250,8 +250,14 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // POST /api/signage/:serviceKey/community/media - Create community media (scope: global)
   router.post('/community/media', requireSignageCommunity, globalCtrl.createCommunityMedia);
 
+  // DELETE /api/signage/:serviceKey/community/media/:id - Delete own community media
+  router.delete('/community/media/:id', requireSignageCommunity, globalCtrl.deleteCommunityMedia);
+
   // POST /api/signage/:serviceKey/community/playlists - Create community playlist (scope: global)
   router.post('/community/playlists', requireSignageCommunity, globalCtrl.createCommunityPlaylist);
+
+  // DELETE /api/signage/:serviceKey/community/playlists/:id - Delete own community playlist
+  router.delete('/community/playlists/:id', requireSignageCommunity, globalCtrl.deleteCommunityPlaylist);
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)

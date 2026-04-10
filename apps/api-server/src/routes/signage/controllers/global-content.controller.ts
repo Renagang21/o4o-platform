@@ -259,7 +259,8 @@ export class SignageGlobalContentController {
         ...safeBody,
         source: 'community',
         scope: 'global',
-      };
+        status: 'active', // Community content is immediately public
+      } as CreateGlobalPlaylistDto & { status: SignageStatus };
 
       const playlist = await this.service.createGlobalPlaylist(dto, scope, userId);
       res.status(201).json({ data: playlist });
@@ -278,10 +279,59 @@ export class SignageGlobalContentController {
         ...safeBody,
         source: 'community',
         scope: 'global',
-      };
+        status: 'active', // Community content is immediately public
+      } as CreateGlobalMediaDto & { status: SignageStatus };
 
       const media = await this.service.createGlobalMedia(dto, scope, userId);
       res.status(201).json({ data: media });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCommunityMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const userId = extractUserId(req);
+      const { id } = req.params;
+
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required' });
+        return;
+      }
+
+      const result = await this.service.deleteCommunityMedia(id, userId, scope);
+      if (!result.deleted) {
+        const status = result.code === 'NOT_FOUND' ? 404 : result.code === 'NOT_OWNER' ? 403 : 400;
+        res.status(status).json({ success: false, error: result.code });
+        return;
+      }
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteCommunityPlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const userId = extractUserId(req);
+      const { id } = req.params;
+
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required' });
+        return;
+      }
+
+      const result = await this.service.deleteCommunityPlaylist(id, userId, scope);
+      if (!result.deleted) {
+        const status = result.code === 'NOT_FOUND' ? 404 : result.code === 'NOT_OWNER' ? 403 : 400;
+        res.status(status).json({ success: false, error: result.code });
+        return;
+      }
+
+      res.status(200).json({ success: true });
     } catch (error) {
       next(error);
     }

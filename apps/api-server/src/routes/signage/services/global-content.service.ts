@@ -82,7 +82,7 @@ export class SignageGlobalContentService {
   ): Promise<GlobalPlaylistResponseDto> {
     const playlist = await this.playlistRepository.createPlaylist({
       ...dto,
-      status: 'draft',
+      status: (dto as any).status || 'draft',
       serviceKey: scope.serviceKey,
       organizationId: null,
       createdByUserId: userId || null,
@@ -107,7 +107,7 @@ export class SignageGlobalContentService {
       serviceKey: scope.serviceKey,
       organizationId: null,
       createdByUserId: userId || null,
-      status: 'draft',
+      status: (dto as any).status || 'draft',
       source: dto.source,
       scope: dto.scope,
       parentMediaId: null,
@@ -147,6 +147,44 @@ export class SignageGlobalContentService {
     const media = await this.mediaRepository.updateMedia(id, safeDto, globalScope);
     if (!media) return null;
     return toGlobalMediaResponse(media);
+  }
+
+  async deleteCommunityMedia(
+    id: string,
+    userId: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const media = await this.mediaRepository.findMediaById(id, globalScope);
+    if (!media) return { deleted: false, code: 'NOT_FOUND' };
+    if ((media as any).source !== 'community') return { deleted: false, code: 'NOT_COMMUNITY' };
+    if ((media as any).createdByUserId !== userId) return { deleted: false, code: 'NOT_OWNER' };
+
+    await this.mediaRepository.softDeleteMedia(id, globalScope);
+    return { deleted: true };
+  }
+
+  async deleteCommunityPlaylist(
+    id: string,
+    userId: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    const globalScope: ScopeFilter = {
+      serviceKey: scope.serviceKey,
+      organizationId: undefined,
+    };
+
+    const playlist = await this.playlistRepository.findPlaylistById(id, globalScope);
+    if (!playlist) return { deleted: false, code: 'NOT_FOUND' };
+    if ((playlist as any).source !== 'community') return { deleted: false, code: 'NOT_COMMUNITY' };
+    if ((playlist as any).createdByUserId !== userId) return { deleted: false, code: 'NOT_OWNER' };
+
+    await this.playlistRepository.softDeletePlaylist(id, globalScope);
+    return { deleted: true };
   }
 
   async transitionHqMediaStatus(

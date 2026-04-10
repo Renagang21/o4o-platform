@@ -17,11 +17,11 @@
  */
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus, Trash2 } from 'lucide-react';
+import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus, Trash2, PlusCircle, X } from 'lucide-react';
 import { publicContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
 import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
-import { getAccessToken } from '../../contexts/AuthContext';
+import { getAccessToken, useAuth } from '../../contexts/AuthContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -55,12 +55,15 @@ function formatDuration(seconds: number): string {
 
 // ── Compact list-row components ──
 
-function PlaylistRow({ playlist, onAddToStore, onDelete }: {
+function PlaylistRow({ playlist, onAddToStore, onDelete, currentUserId }: {
   playlist: SignagePlaylist;
   onAddToStore: (id: string, name: string) => void;
-  onDelete?: (id: string, name: string) => void;
+  onDelete?: (id: string, name: string, source: string) => void;
+  currentUserId?: string;
 }) {
-  const isHq = (playlist as any).source === 'hq';
+  const source = (playlist as any).source as string;
+  const isHq = source === 'hq';
+  const isOwnCommunity = source === 'community' && !!currentUserId && (playlist as any).createdByUserId === currentUserId;
 
   return (
     <div
@@ -96,9 +99,9 @@ function PlaylistRow({ playlist, onAddToStore, onDelete }: {
         >
           <Plus className="h-4 w-4" />
         </button>
-        {isHq && onDelete && (
+        {(isHq || isOwnCommunity) && onDelete && (
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(playlist.id, playlist.name); }}
+            onClick={(e) => { e.stopPropagation(); onDelete(playlist.id, playlist.name, source); }}
             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title="삭제"
           >
@@ -110,12 +113,15 @@ function PlaylistRow({ playlist, onAddToStore, onDelete }: {
   );
 }
 
-function MediaRow({ item, onAddToStore, onDelete }: {
+function MediaRow({ item, onAddToStore, onDelete, currentUserId }: {
   item: SignageMedia;
   onAddToStore: (id: string, name: string) => void;
-  onDelete?: (id: string, name: string) => void;
+  onDelete?: (id: string, name: string, source: string) => void;
+  currentUserId?: string;
 }) {
-  const isHq = (item as any).source === 'hq';
+  const source = (item as any).source as string;
+  const isHq = source === 'hq';
+  const isOwnCommunity = source === 'community' && !!currentUserId && (item as any).createdByUserId === currentUserId;
 
   return (
     <div
@@ -148,9 +154,9 @@ function MediaRow({ item, onAddToStore, onDelete }: {
         >
           <Plus className="h-4 w-4" />
         </button>
-        {isHq && onDelete && (
+        {(isHq || isOwnCommunity) && onDelete && (
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(item.id, item.name); }}
+            onClick={(e) => { e.stopPropagation(); onDelete(item.id, item.name, source); }}
             className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title="삭제"
           >
@@ -224,6 +230,7 @@ function HighlightMediaCard({ item }: { item: SignageMedia }) {
 // ── Main Component ──
 
 export default function ContentHubPage() {
+  const { user } = useAuth();
   const [playlistSource, setPlaylistSource] = useState<ContentSource>('hq');
   const [mediaSource, setMediaSource] = useState<ContentSource>('hq');
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
@@ -231,8 +238,14 @@ export default function ContentHubPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'playlist' | 'media' } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'playlist' | 'media'; source: string } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Community content creation
+  const [createModal, setCreateModal] = useState<{ type: 'media' | 'playlist' } | null>(null);
+  const [createForm, setCreateForm] = useState({ name: '', description: '', sourceUrl: '' });
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // Load ALL content once (all sources)
   useEffect(() => {
@@ -315,9 +328,16 @@ export default function ContentHubPage() {
     if (!deleteConfirm) return;
     setIsDeleting(true);
     try {
-      const path = deleteConfirm.type === 'playlist'
-        ? `/api/signage/${SERVICE_KEY}/hq/playlists/${deleteConfirm.id}`
-        : `/api/signage/${SERVICE_KEY}/hq/media/${deleteConfirm.id}`;
+      let path: string;
+      if (deleteConfirm.source === 'community') {
+        path = deleteConfirm.type === 'playlist'
+          ? `/api/signage/${SERVICE_KEY}/community/playlists/${deleteConfirm.id}`
+          : `/api/signage/${SERVICE_KEY}/community/media/${deleteConfirm.id}`;
+      } else {
+        path = deleteConfirm.type === 'playlist'
+          ? `/api/signage/${SERVICE_KEY}/hq/playlists/${deleteConfirm.id}`
+          : `/api/signage/${SERVICE_KEY}/hq/media/${deleteConfirm.id}`;
+      }
       await apiFetch(path, { method: 'DELETE' });
       setDeleteConfirm(null);
       loadAllContent();
@@ -326,6 +346,41 @@ export default function ContentHubPage() {
       setDeleteConfirm(null);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCreateCommunity = async () => {
+    if (!createModal) return;
+    if (!createForm.name.trim()) {
+      setCreateError('이름을 입력하세요');
+      return;
+    }
+    if (createModal.type === 'media' && !createForm.sourceUrl.trim()) {
+      setCreateError('동영상 URL을 입력하세요');
+      return;
+    }
+    setIsCreating(true);
+    setCreateError(null);
+    try {
+      const body: Record<string, string> = {
+        name: createForm.name.trim(),
+        description: createForm.description.trim(),
+      };
+      if (createModal.type === 'media') {
+        body.sourceUrl = createForm.sourceUrl.trim();
+        body.mediaType = 'youtube';
+      }
+      await apiFetch(`/api/signage/${SERVICE_KEY}/community/${createModal.type === 'media' ? 'media' : 'playlists'}`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
+      setCreateModal(null);
+      setCreateForm({ name: '', description: '', sourceUrl: '' });
+      loadAllContent();
+    } catch (err: any) {
+      setCreateError(err?.message || '등록에 실패했습니다');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -340,7 +395,7 @@ export default function ContentHubPage() {
       setCopySuccess(`"${name}" — 내 매장에 추가되었습니다.`);
       setTimeout(() => {
         setCopySuccess(null);
-        navigate('/store/content?tab=signage');
+        window.location.href = '/store/content?tab=signage';
       }, 1500);
     } catch (e: any) {
       const msg = e?.message || '';
@@ -465,7 +520,17 @@ export default function ContentHubPage() {
               <List className="h-4 w-4 text-blue-600" />
               플레이리스트
             </h3>
-            <span className="text-xs text-slate-400">{filteredPlaylists.length}건</span>
+            <div className="flex items-center gap-2">
+              {playlistSource === 'community' && user && (
+                <button
+                  onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '' }); setCreateError(null); setCreateModal({ type: 'playlist' }); }}
+                  className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <PlusCircle className="h-3 w-3" /> 등록
+                </button>
+              )}
+              <span className="text-xs text-slate-400">{filteredPlaylists.length}건</span>
+            </div>
           </div>
           <div className="px-5">
             {filteredPlaylists.length === 0 ? (
@@ -473,7 +538,8 @@ export default function ContentHubPage() {
             ) : (
               filteredPlaylists.map((pl) => (
                 <PlaylistRow key={pl.id} playlist={pl} onAddToStore={handleAddToStore}
-                  onDelete={(id, name) => setDeleteConfirm({ id, name, type: 'playlist' })} />
+                  currentUserId={user?.id}
+                  onDelete={(id, name, src) => setDeleteConfirm({ id, name, type: 'playlist', source: src })} />
               ))
             )}
           </div>
@@ -507,7 +573,17 @@ export default function ContentHubPage() {
               <VideoIcon className="h-4 w-4 text-purple-600" />
               동영상
             </h3>
-            <span className="text-xs text-slate-400">{filteredMedia.length}건</span>
+            <div className="flex items-center gap-2">
+              {mediaSource === 'community' && user && (
+                <button
+                  onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
+                  className="flex items-center gap-1 text-xs px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <PlusCircle className="h-3 w-3" /> 등록
+                </button>
+              )}
+              <span className="text-xs text-slate-400">{filteredMedia.length}건</span>
+            </div>
           </div>
           <div className="px-5">
             {filteredMedia.length === 0 ? (
@@ -515,12 +591,86 @@ export default function ContentHubPage() {
             ) : (
               filteredMedia.map((m) => (
                 <MediaRow key={m.id} item={m} onAddToStore={handleAddToStore}
-                  onDelete={(id, name) => setDeleteConfirm({ id, name, type: 'media' })} />
+                  currentUserId={user?.id}
+                  onDelete={(id, name, src) => setDeleteConfirm({ id, name, type: 'media', source: src })} />
               ))
             )}
           </div>
         </div>
       </section>
+
+      {/* Community Content Creation Modal */}
+      {createModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-800">
+                {createModal.type === 'media' ? '동영상 등록' : '플레이리스트 등록'}
+              </h3>
+              <button onClick={() => setCreateModal(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  {createModal.type === 'media' ? '동영상 제목' : '플레이리스트 이름'} *
+                </label>
+                <input
+                  type="text"
+                  value={createForm.name}
+                  onChange={(e) => setCreateForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder={createModal.type === 'media' ? '예: 약사회 안내 영상' : '예: 약국 홍보 모음'}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                />
+              </div>
+              {createModal.type === 'media' && (
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">YouTube URL *</label>
+                  <input
+                    type="url"
+                    value={createForm.sourceUrl}
+                    onChange={(e) => setCreateForm(f => ({ ...f, sourceUrl: e.target.value }))}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">설명 (선택)</label>
+                <textarea
+                  value={createForm.description}
+                  onChange={(e) => setCreateForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="간단한 설명을 입력하세요"
+                  rows={2}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 resize-none"
+                />
+              </div>
+              {createError && (
+                <p className="text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> {createError}
+                </p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setCreateModal(null)}
+                disabled={isCreating}
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleCreateCommunity}
+                disabled={isCreating}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isCreating ? '등록 중...' : '등록'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
@@ -533,9 +683,11 @@ export default function ContentHubPage() {
             <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
               <p className="font-medium text-slate-700">{deleteConfirm.name}</p>
               <p className="text-slate-400 text-xs mt-1">
-                {deleteConfirm.type === 'playlist'
-                  ? 'HQ 플레이리스트 · 삭제 시 모든 재생 항목도 함께 제거됩니다'
-                  : 'HQ 미디어 · 삭제 시 연결된 플레이리스트 항목도 함께 제거됩니다'}
+                {deleteConfirm.source === 'community'
+                  ? `커뮤니티 ${deleteConfirm.type === 'playlist' ? '플레이리스트' : '동영상'} · 내가 등록한 콘텐츠`
+                  : deleteConfirm.type === 'playlist'
+                    ? 'HQ 플레이리스트 · 삭제 시 모든 재생 항목도 함께 제거됩니다'
+                    : 'HQ 미디어 · 삭제 시 연결된 플레이리스트 항목도 함께 제거됩니다'}
               </p>
             </div>
             <div className="flex justify-end gap-2">

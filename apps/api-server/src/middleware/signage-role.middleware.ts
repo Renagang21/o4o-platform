@@ -473,6 +473,10 @@ export function hasSignageCommunityPermission(user: any, serviceKey: string): bo
   // Check if user has any role for the service key
   if (userRoles.some((r: string) => r.startsWith(`${serviceKey}:`))) return true;
 
+  // KPA prefix mapping: kpa-society → kpa (e.g., kpa:member, kpa:pharmacist)
+  const rolePrefix = serviceKey.startsWith('kpa-') ? 'kpa' : null;
+  if (rolePrefix && userRoles.some((r: string) => r.startsWith(`${rolePrefix}:`))) return true;
+
   return false;
 }
 
