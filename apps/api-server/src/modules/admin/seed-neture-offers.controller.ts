@@ -45,23 +45,32 @@ function verify(req: Request, res: Response): boolean {
 }
 
 // ── 공급자 조회 헬퍼 ─────────────────────────────────────────────────────────
+// name 컬럼은 WO-O4O-NETURE-SUPPLIER-COLUMN-REMOVAL-V1로 삭제됨 → organizations.name 사용
 async function findSupplierByEmail(ds: DataSource, email: string) {
+  // user.email 기준
   const rows = await ds.query(
-    `SELECT ns.id, ns.name, ns.status
+    `SELECT ns.id, COALESCE(o.name, ns.slug) AS supplier_name, ns.status
      FROM neture_suppliers ns
+     LEFT JOIN organizations o ON o.id = ns.organization_id
      JOIN users u ON u.id = ns.user_id
      WHERE u.email = $1
      LIMIT 1`,
     [email],
   );
-  if (rows.length) return rows[0];
+  if (rows.length) return { id: rows[0].id, name: rows[0].supplier_name, status: rows[0].status };
 
-  // user_id 연결 없이 contact_email로도 시도
+  // contact_email 기준 fallback
   const rows2 = await ds.query(
-    `SELECT id, name, status FROM neture_suppliers WHERE contact_email = $1 LIMIT 1`,
+    `SELECT ns.id, COALESCE(o.name, ns.slug) AS supplier_name, ns.status
+     FROM neture_suppliers ns
+     LEFT JOIN organizations o ON o.id = ns.organization_id
+     WHERE ns.contact_email = $1
+     LIMIT 1`,
     [email],
   );
-  return rows2[0] ?? null;
+  if (rows2.length) return { id: rows2[0].id, name: rows2[0].supplier_name, status: rows2[0].status };
+
+  return null;
 }
 
 // ── 라우터 ───────────────────────────────────────────────────────────────────
@@ -75,13 +84,16 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
     if (!verify(req, res)) return;
     try {
       const suppliers = await ds.query(
-        `SELECT id, name, status, contact_email FROM neture_suppliers ORDER BY created_at`,
+        `SELECT ns.id, COALESCE(o.name, ns.slug) AS name, ns.status, ns.contact_email
+         FROM neture_suppliers ns
+         LEFT JOIN organizations o ON o.id = ns.organization_id
+         ORDER BY ns.created_at`,
       );
 
       const offerCounts = await ds.query(`
         SELECT
           ns.id                                                      AS supplier_id,
-          ns.name                                                    AS supplier_name,
+          COALESCE(o.name, ns.slug)                                  AS supplier_name,
           COUNT(spo.id)::int                                         AS total_offers,
           COUNT(spo.id) FILTER (WHERE spo.service_keys = '{}'
             OR spo.service_keys IS NULL)::int                       AS no_service_keys,
@@ -90,9 +102,10 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
           COUNT(spo.id) FILTER (WHERE spo.is_public = true)::int    AS is_public,
           COUNT(spo.id) FILTER (WHERE spo.id LIKE 'f0000000%')::int AS sample_offers
         FROM neture_suppliers ns
+        LEFT JOIN organizations o ON o.id = ns.organization_id
         LEFT JOIN supplier_product_offers spo
           ON spo.supplier_id = ns.id AND spo.deleted_at IS NULL
-        GROUP BY ns.id, ns.name
+        GROUP BY ns.id, o.name, ns.slug
         ORDER BY ns.name
       `);
 
