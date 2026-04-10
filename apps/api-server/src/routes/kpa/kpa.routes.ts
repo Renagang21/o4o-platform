@@ -103,6 +103,14 @@ import { createCommunityHubController } from './controllers/community-hub.contro
 import { createLegalDocumentsController } from './controllers/legal-documents.controller.js';
 import { createGroupbuyController } from './controllers/groupbuy.controller.js';
 import { createMypageController } from './controllers/mypage.controller.js';
+import { createWorkingContentController } from './controllers/working-content.controller.js';
+import { execute } from '@o4o/ai-core';
+import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
+import {
+  SUMMARIZE_SYSTEM_PROMPT, buildSummarizeUserPrompt,
+  EXTRACT_SYSTEM_PROMPT, buildExtractUserPrompt,
+  TAG_SYSTEM_PROMPT, buildTagUserPrompt,
+} from './prompts/content-prompts.js';
 import { CmsContent } from '@o4o-apps/cms-core';
 import { KpaAuditLog } from './entities/kpa-audit-log.entity.js';
 import { KpaMember } from './entities/kpa-member.entity.js';
@@ -215,6 +223,9 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
+
+  // WorkingContent CRUD + Publish (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1)
+  router.use('/operator/working-contents', createWorkingContentController(dataSource, coreRequireAuth as any));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
@@ -1126,7 +1137,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       res.json({ success: true, data: { deleted: true, id: existing.id } });
     }));
 
-    // ── AI stub endpoints ─────────────────────────────────────────────────
+    // ── AI endpoints (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1: stubs → execute()) ──
 
     // POST /contents/:id/ai/summarize
     contentRouter.post('/:id/ai/summarize', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
@@ -1138,47 +1149,91 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
-      // Stub: text 블록 합쳐 첫 200자 summary 저장
-      const textContent = (content.blocks as any[])
-        .filter((b: any) => b.type === 'text' && b.content)
-        .map((b: any) => b.content)
-        .join(' ')
-        .slice(0, 200);
-      const summary = textContent || content.title;
-      await dataSource.query(`UPDATE kpa_contents SET summary = $1, updated_at = NOW() WHERE id = $2`, [summary, content.id]);
-      res.json({ success: true, data: { summary } });
+      try {
+        const result = await execute({
+          systemPrompt: SUMMARIZE_SYSTEM_PROMPT,
+          userPrompt: buildSummarizeUserPrompt(content.title, content.blocks),
+          config: buildConfigResolver(dataSource, 'store'),
+          meta: { service: 'kpa', callerName: 'KpaContentSummarize' },
+        });
+        const parsed = JSON.parse(result.content);
+        const summary = parsed.summary || content.title;
+        await dataSource.query(`UPDATE kpa_contents SET summary = $1, updated_at = NOW() WHERE id = $2`, [summary, content.id]);
+        res.json({ success: true, data: { summary } });
+      } catch (e: any) {
+        console.error('[KPA AI Summarize] Failed:', e.message);
+        // Fallback to simple extraction
+        const textContent = (content.blocks as any[])
+          .filter((b: any) => b.type === 'text' && b.content)
+          .map((b: any) => b.content)
+          .join(' ')
+          .slice(0, 200);
+        const summary = textContent || content.title;
+        await dataSource.query(`UPDATE kpa_contents SET summary = $1, updated_at = NOW() WHERE id = $2`, [summary, content.id]);
+        res.json({ success: true, data: { summary } });
+      }
     }));
 
     // POST /contents/:id/ai/extract
     contentRouter.post('/:id/ai/extract', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
       const [content] = await dataSource.query(
-        `SELECT blocks FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
         [req.params.id]
       );
       if (!content) {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
-      const keyPoints = (content.blocks as any[])
-        .filter((b: any) => b.type === 'list' && Array.isArray(b.items))
-        .flatMap((b: any) => b.items)
-        .slice(0, 5);
-      res.json({ success: true, data: { keyPoints } });
+      try {
+        const result = await execute({
+          systemPrompt: EXTRACT_SYSTEM_PROMPT,
+          userPrompt: buildExtractUserPrompt(content.title, content.blocks),
+          config: buildConfigResolver(dataSource, 'store'),
+          meta: { service: 'kpa', callerName: 'KpaContentExtract' },
+        });
+        const parsed = JSON.parse(result.content);
+        const keyPoints = Array.isArray(parsed.keyPoints) ? parsed.keyPoints.slice(0, 5) : [];
+        res.json({ success: true, data: { keyPoints } });
+      } catch (e: any) {
+        console.error('[KPA AI Extract] Failed:', e.message);
+        // Fallback to list items
+        const keyPoints = (content.blocks as any[])
+          .filter((b: any) => b.type === 'list' && Array.isArray(b.items))
+          .flatMap((b: any) => b.items)
+          .slice(0, 5);
+        res.json({ success: true, data: { keyPoints } });
+      }
     }));
 
     // POST /contents/:id/ai/tag
     contentRouter.post('/:id/ai/tag', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
       const [content] = await dataSource.query(
-        `SELECT category, tags FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
         [req.params.id]
       );
       if (!content) {
         res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
         return;
       }
-      const existingTags: string[] = Array.isArray(content.tags) ? content.tags : [];
-      const suggestedTags = content.category ? [content.category, ...existingTags] : existingTags;
-      res.json({ success: true, data: { suggestedTags: [...new Set(suggestedTags)].slice(0, 8) } });
+      try {
+        const result = await execute({
+          systemPrompt: TAG_SYSTEM_PROMPT,
+          userPrompt: buildTagUserPrompt(content.title, content.blocks, content.category),
+          config: buildConfigResolver(dataSource, 'store'),
+          meta: { service: 'kpa', callerName: 'KpaContentTag' },
+        });
+        const parsed = JSON.parse(result.content);
+        const suggestedTags = Array.isArray(parsed.suggestedTags)
+          ? [...new Set(parsed.suggestedTags)].slice(0, 8)
+          : [];
+        res.json({ success: true, data: { suggestedTags } });
+      } catch (e: any) {
+        console.error('[KPA AI Tag] Failed:', e.message);
+        // Fallback to category + existing tags
+        const existingTags: string[] = Array.isArray(content.tags) ? content.tags : [];
+        const suggestedTags = content.category ? [content.category, ...existingTags] : existingTags;
+        res.json({ success: true, data: { suggestedTags: [...new Set(suggestedTags)].slice(0, 8) } });
+      }
     }));
 
     // ── Copy to Store ──────────────────────────────────────────────────────

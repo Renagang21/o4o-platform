@@ -2,6 +2,7 @@
  * OperatorContentDetailPage — 콘텐츠 상세/편집
  *
  * WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+ * WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1: BlockRenderer 패키지 통합
  */
 
 import { useState, useEffect } from 'react';
@@ -10,25 +11,20 @@ import {
   ArrowLeft, Tag, FileText, Loader2, AlertCircle,
   Sparkles, Copy, CheckCircle2, ExternalLink,
 } from 'lucide-react';
+import { BlockRenderer } from '@o4o/block-renderer';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+import { kpaBlocksToRendererBlocks, type KpaBlock } from '../../utils/kpa-block-adapter';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Block {
-  type: 'text' | 'image' | 'list';
-  content?: string;
-  url?: string;
-  items?: string[];
-}
-
 interface ContentDetail {
   id: string;
   title: string;
   summary: string | null;
-  blocks: Block[];
+  blocks: KpaBlock[];
   tags: string[];
   category: string | null;
   thumbnail_url: string | null;
@@ -56,31 +52,6 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.error?.message || body?.error || `API error ${res.status}`);
   return body;
-}
-
-// ─── Block Renderer ───────────────────────────────────────────────────────────
-
-function BlockRenderer({ block }: { block: Block }) {
-  if (block.type === 'text') {
-    return <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{block.content}</p>;
-  }
-  if (block.type === 'image') {
-    return (
-      <div className="rounded-lg overflow-hidden border border-slate-200">
-        <img src={block.url} alt="" className="w-full object-contain max-h-80" />
-      </div>
-    );
-  }
-  if (block.type === 'list' && Array.isArray(block.items)) {
-    return (
-      <ul className="list-disc list-inside space-y-1">
-        {block.items.map((item, i) => (
-          <li key={i} className="text-sm text-slate-700">{item}</li>
-        ))}
-      </ul>
-    );
-  }
-  return null;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -265,11 +236,10 @@ export default function OperatorContentDetailPage() {
               <h2 className="text-sm font-medium text-slate-600">콘텐츠</h2>
             </div>
             {content.blocks && content.blocks.length > 0 ? (
-              <div className="space-y-4">
-                {(content.blocks as Block[]).map((block, i) => (
-                  <BlockRenderer key={i} block={block} />
-                ))}
-              </div>
+              <BlockRenderer
+                blocks={kpaBlocksToRendererBlocks(content.blocks)}
+                className="space-y-4"
+              />
             ) : (
               <p className="text-sm text-slate-400 text-center py-8">
                 등록된 콘텐츠 블록이 없습니다.

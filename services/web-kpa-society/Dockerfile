@@ -35,6 +35,11 @@ COPY packages/store-asset-policy-core/package.json ./packages/store-asset-policy
 COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
+COPY packages/block-renderer/package.json ./packages/block-renderer/
+COPY packages/slide-app/package.json ./packages/slide-app/
+COPY packages/content-core/package.json ./packages/content-core/
+COPY packages/shortcodes/package.json ./packages/shortcodes/
+COPY packages/utils/package.json ./packages/utils/
 
 # Copy service package.json
 COPY services/web-kpa-society/package.json ./services/web-kpa-society/
@@ -59,6 +64,11 @@ COPY packages/store-asset-policy-core/ ./packages/store-asset-policy-core/
 COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
+COPY packages/block-renderer/ ./packages/block-renderer/
+COPY packages/slide-app/ ./packages/slide-app/
+COPY packages/content-core/ ./packages/content-core/
+COPY packages/shortcodes/ ./packages/shortcodes/
+COPY packages/utils/ ./packages/utils/
 
 # Copy service source
 COPY services/web-kpa-society/ ./services/web-kpa-society/
@@ -71,6 +81,7 @@ RUN pnpm --filter @o4o/ui build
 RUN pnpm --filter @o4o/organization-core build
 RUN pnpm --filter @o4o/forum-core build
 RUN pnpm --filter @o4o/content-editor build
+RUN pnpm --filter @o4o/block-renderer build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

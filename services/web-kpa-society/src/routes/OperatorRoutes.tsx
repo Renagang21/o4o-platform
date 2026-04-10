@@ -29,6 +29,8 @@ import { NewsPage } from '../pages/admin-branch';
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
 import OperatorContentHubPage from '../pages/operator/OperatorContentHubPage';
 import OperatorContentDetailPage from '../pages/operator/OperatorContentDetailPage';
+import WorkingContentListPage from '../pages/operator/WorkingContentListPage';
+import WorkingContentEditPage from '../pages/operator/WorkingContentEditPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
@@ -99,6 +101,10 @@ export function OperatorRoutes() {
           {/* 자료실 → 콘텐츠 허브로 전환 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) */}
           <Route path="docs" element={<OperatorContentHubPage />} />
           <Route path="content-hub/:id" element={<OperatorContentDetailPage />} />
+
+          {/* 내 콘텐츠 (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1) */}
+          <Route path="working-content" element={<WorkingContentListPage />} />
+          <Route path="working-content/:id" element={<WorkingContentEditPage />} />
 
           {/* 게시판 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
           <Route path="forum" element={<OperatorForumPage />} />
