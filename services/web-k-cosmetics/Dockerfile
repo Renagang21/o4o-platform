@@ -30,6 +30,7 @@ COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/hub-exploration-core/package.json ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
+COPY packages/account-ui/package.json ./packages/account-ui/
 
 # Copy service package.json
 COPY services/web-k-cosmetics/package.json ./services/web-k-cosmetics/
@@ -49,6 +50,7 @@ COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/hub-exploration-core/ ./packages/hub-exploration-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
+COPY packages/account-ui/ ./packages/account-ui/
 
 # Copy service source
 COPY services/web-k-cosmetics/ ./services/web-k-cosmetics/
@@ -58,6 +60,7 @@ RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
+RUN pnpm --filter @o4o/account-ui build
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

@@ -10,6 +10,7 @@
     "start": "serve -s dist -l $PORT"
   },
   "dependencies": {
+    "@o4o/account-ui": "workspace:*",
     "@o4o/error-handling": "workspace:*",
     "@o4o/admin-ux-core": "workspace:*",
     "@o4o/ai-components": "workspace:*",

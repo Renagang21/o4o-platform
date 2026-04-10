@@ -33,6 +33,7 @@ COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
 COPY packages/error-handling/package.json ./packages/error-handling/
+COPY packages/account-ui/package.json ./packages/account-ui/
 
 # Copy service package.json
 COPY services/web-neture/package.json ./services/web-neture/
@@ -54,6 +55,7 @@ COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/error-handling/ ./packages/error-handling/
+COPY packages/account-ui/ ./packages/account-ui/
 
 # Copy service source
 COPY services/web-neture/ ./services/web-neture/
@@ -64,6 +66,7 @@ RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
 RUN pnpm --filter @o4o/ui build
+RUN pnpm --filter @o4o/account-ui build
 RUN pnpm --filter @o4o/content-editor build
 RUN pnpm --filter @o4o/organization-core build
 RUN pnpm --filter @o4o/forum-core build

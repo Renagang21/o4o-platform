@@ -1,42 +1,32 @@
 /**
  * MyPage - 마이페이지 (프로필 관리)
  * WO-O4O-LOGIN-STANDARDIZATION-V1: 전체 서비스 로그인 표준화
- *
- * 표준 기능:
- * - 프로필 정보 표시 (이름, 이메일, 역할)
- * - 프로필 편집 기능
- * - 대시보드 이동 링크
- * - 보안 설정 (비밀번호 변경)
- * - 로그아웃
+ * WO-O4O-ACCOUNT-UI-COMMON-PACKAGE-V1: 공통 account-ui 패키지 기반 전환
  */
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
-import { User, Mail, Shield, Edit3, Check, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { User, Mail, Shield } from 'lucide-react';
 import { useAuth, ROLE_LABELS, getNetureDashboardRoute } from '../contexts';
 import { useLoginModal } from '../contexts/LoginModalContext';
-
-/**
- * 사용자 표시 이름 헬퍼
- * DB에 기본값 '운영자'가 설정되어 있으므로 name은 항상 존재
- */
-function getUserDisplayName(user: any): string {
-  if (!user) return '사용자';
-  return user.name || '사용자';
-}
+import { api } from '../lib/apiClient';
+import {
+  AccountPageLayout,
+  ProfileCard,
+  ProfileInfoField,
+  SecuritySection,
+  QuickActionsSection,
+} from '@o4o/account-ui';
 
 export default function MyPage() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, updateUser } = useAuth();
   const { openLoginModal } = useLoginModal();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-
-  // 표시 이름 계산
-  const displayName = getUserDisplayName(user);
-
+  const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState({
-    name: displayName,
+    name: user?.name || '',
   });
 
   if (!isAuthenticated || !user) {
@@ -63,9 +53,19 @@ export default function MyPage() {
   const dashboardPath = getNetureDashboardRoute(user.roles);
   const roleLabel = ROLE_LABELS[activeRole] || '사용자';
 
-  const handleSave = () => {
-    // TODO: Implement save API
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.put('/users/profile', { name: editData.name });
+      updateUser({ name: editData.name });
+      setIsEditing(false);
+      toast.success('프로필이 수정되었습니다.');
+    } catch (err: any) {
+      const message = err.response?.data?.message || err.response?.data?.error || '프로필 수정에 실패했습니다.';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -79,140 +79,47 @@ export default function MyPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto py-10 px-4">
-      {/* 페이지 헤더 */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">마이페이지</h1>
-        <p className="text-sm text-gray-500 mt-1">내 정보를 확인하고 관리할 수 있습니다</p>
-      </div>
+    <AccountPageLayout title="마이페이지" subtitle="내 정보를 확인하고 관리할 수 있습니다">
+      <ProfileCard
+        initial={user.name?.charAt(0) || '?'}
+        name={user.name}
+        email={user.email}
+        roleLabel={roleLabel}
+        isEditing={isEditing}
+        saving={saving}
+        onEdit={() => setIsEditing(true)}
+        onSave={handleSave}
+        onCancel={handleCancel}
+      >
+        <ProfileInfoField
+          label="이름"
+          value={user.name}
+          editValue={editData.name}
+          isEditing={isEditing}
+          onChange={(v) => setEditData({ name: v })}
+          icon={<User className="w-5 h-5 text-gray-400" />}
+        />
+        <ProfileInfoField
+          label="이메일"
+          value={user.email}
+          editable={false}
+          icon={<Mail className="w-5 h-5 text-gray-400" />}
+        />
+        <ProfileInfoField
+          label="역할"
+          value={roleLabel}
+          editable={false}
+          icon={<Shield className="w-5 h-5 text-gray-400" />}
+        />
+      </ProfileCard>
 
-      {/* 프로필 카드 */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
-        <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">
-                {displayName.charAt(0)}
-              </span>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-white">{displayName}</h2>
-              <p className="text-primary-100 text-sm">{user.email}</p>
-              <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium text-white">
-                {roleLabel}
-              </span>
-            </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-              >
-                <Edit3 className="w-5 h-5 text-white" />
-              </button>
-            )}
-          </div>
-        </div>
+      <SecuritySection onPasswordChange={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')} />
 
-        {/* 프로필 정보 */}
-        <div className="p-6">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">기본 정보</h3>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-400">이름</p>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 mt-1"
-                  />
-                ) : (
-                  <p className="text-sm font-medium text-gray-800">{displayName}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                <Mail className="w-5 h-5 text-gray-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-400">이메일</p>
-                <p className="text-sm font-medium text-gray-800">{user.email}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                <Shield className="w-5 h-5 text-gray-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-gray-400">역할</p>
-                <p className="text-sm font-medium text-gray-800">{roleLabel}</p>
-              </div>
-            </div>
-          </div>
-
-          {isEditing && (
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={handleCancel}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <X className="w-4 h-4" />
-                취소
-              </button>
-              <button
-                onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                <Check className="w-4 h-4" />
-                저장
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* 보안 설정 */}
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">보안 설정</h3>
-        <button
-          onClick={() => toast.info('비밀번호 변경 기능은 준비 중입니다.')}
-          className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-        >
-          <span className="text-sm text-gray-700">비밀번호 변경</span>
-          <span className="text-xs text-gray-400">마지막 변경: -</span>
-        </button>
-      </div>
-
-      {/* 빠른 이동 */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">빠른 이동</h3>
-        <div className="space-y-3">
-          {activeRole !== 'user' && (
-            <Link
-              to={dashboardPath}
-              className="flex items-center gap-3 w-full p-4 bg-primary-50 text-primary-700 rounded-xl hover:bg-primary-100 transition-colors"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="text-sm font-medium">내 대시보드</span>
-            </Link>
-          )}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-3 w-full p-4 bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="text-sm font-medium">로그아웃</span>
-          </button>
-        </div>
-      </div>
-    </div>
+      <QuickActionsSection
+        dashboardPath={dashboardPath}
+        showDashboard={activeRole !== 'user'}
+        onLogout={handleLogout}
+      />
+    </AccountPageLayout>
   );
 }

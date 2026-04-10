@@ -1,0 +1,29 @@
+{
+  "name": "@o4o/account-ui",
+  "version": "1.0.0",
+  "description": "Shared account/mypage UI components for O4O Platform",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npx tsc --build",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "lucide-react": ">=0.300.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "5.4.5"
+  }
+}
