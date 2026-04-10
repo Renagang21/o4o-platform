@@ -234,6 +234,17 @@ export const forumOperatorApi = {
     return res.data;
   },
 
+  // WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1
+  getDeleteCheck: async (id: string) => {
+    const res = await authClient.api.get(`${OPERATOR_BASE}/categories/${id}/delete-check?${SVC}`);
+    return res.data;
+  },
+
+  hardDelete: async (id: string, data: { reason: string }) => {
+    const res = await authClient.api.delete(`${OPERATOR_BASE}/categories/${id}/hard?${SVC}`, { data });
+    return res.data;
+  },
+
   getDeleteRequests: async (params?: { status?: string }) => {
     const query = new URLSearchParams({ serviceCode: 'kpa-society' });
     if (params?.status) query.set('status', params.status);

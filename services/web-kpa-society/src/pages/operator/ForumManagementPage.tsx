@@ -20,6 +20,8 @@ import {
   Trash2,
   AlertTriangle,
   List,
+  AlertOctagon,
+  Loader2 as Spinner,
 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { forumOperatorApi } from '../../api/forum';
@@ -104,6 +106,19 @@ export default function ForumManagementPage() {
   const [deactivateReason, setDeactivateReason] = useState('');
   const [isDeactivating, setIsDeactivating] = useState(false);
 
+  // ── Hard delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ──
+  interface DeleteCheckData {
+    postCount: number;
+    memberCount: number;
+    hardDeleteAllowed: boolean;
+    blockedReasons: string[];
+  }
+  const [hardDeleteTarget, setHardDeleteTarget] = useState<CategoryData | null>(null);
+  const [hardDeleteCheck, setHardDeleteCheck] = useState<DeleteCheckData | null>(null);
+  const [isCheckLoading, setIsCheckLoading] = useState(false);
+  const [hardDeleteReason, setHardDeleteReason] = useState('');
+  const [isHardDeleting, setIsHardDeleting] = useState(false);
+
   useEffect(() => {
     loadRequests();
   }, [statusFilter]);
@@ -157,6 +172,45 @@ export default function ForumManagementPage() {
       toast.error(err?.response?.data?.error || '오류가 발생했습니다');
     } finally {
       setIsDeactivating(false);
+    }
+  };
+
+  const openHardDeleteModal = async (cat: CategoryData) => {
+    setHardDeleteTarget(cat);
+    setHardDeleteCheck(null);
+    setHardDeleteReason('');
+    setIsCheckLoading(true);
+    try {
+      const result = await forumOperatorApi.getDeleteCheck(cat.id);
+      setHardDeleteCheck(result.data);
+    } catch {
+      toast.error('삭제 가능 여부를 확인할 수 없습니다');
+      setHardDeleteTarget(null);
+    } finally {
+      setIsCheckLoading(false);
+    }
+  };
+
+  const handleHardDelete = async () => {
+    if (!hardDeleteTarget || !hardDeleteReason.trim()) return;
+    setIsHardDeleting(true);
+    try {
+      const result = await forumOperatorApi.hardDelete(hardDeleteTarget.id, { reason: hardDeleteReason.trim() });
+      if (result.success) {
+        toast.success(`'${hardDeleteTarget.name}' 포럼이 영구 삭제되었습니다`);
+        setHardDeleteTarget(null);
+        setHardDeleteCheck(null);
+        setHardDeleteReason('');
+        loadCategories();
+      } else {
+        toast.error(result.error || '영구 삭제 실패');
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || '오류가 발생했습니다';
+      const reasons = err?.response?.data?.data?.blockedReasons;
+      toast.error(reasons ? `삭제 불가: ${reasons.join(', ')}` : msg);
+    } finally {
+      setIsHardDeleting(false);
     }
   };
 
@@ -528,16 +582,23 @@ export default function ForumManagementPage() {
                           )}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex justify-end">
+                          <div className="flex justify-end gap-1">
                             {cat.isActive && (
                               <button
                                 onClick={() => { setDeactivateTarget(cat); setDeactivateReason(''); }}
                                 className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors"
-                                title="비활성화"
+                                title="비활성화 (soft delete)"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             )}
+                            <button
+                              onClick={() => openHardDeleteModal(cat)}
+                              className="p-2 rounded-lg hover:bg-rose-100 text-slate-300 hover:text-rose-700 transition-colors"
+                              title="영구 삭제 (hard delete)"
+                            >
+                              <AlertOctagon className="w-4 h-4" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -617,6 +678,105 @@ export default function ForumManagementPage() {
                 )}
                 비활성화
               </button>
+            </div>
+          </div>
+        </>
+      )}
+      {/* ── Hard Delete 모달 (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) ── */}
+      {hardDeleteTarget && (
+        <>
+          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => { setHardDeleteTarget(null); setHardDeleteCheck(null); }} />
+          <div className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-md bg-white rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="px-6 py-4 border-b border-rose-200 bg-rose-50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0">
+                <AlertOctagon className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-rose-900">영구 삭제</h2>
+                <p className="text-xs text-rose-600">이 작업은 복구할 수 없습니다</p>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="p-3 bg-slate-50 rounded-lg">
+                <p className="font-medium text-slate-800">{hardDeleteTarget.name}</p>
+                {hardDeleteTarget.creatorName && (
+                  <p className="text-sm text-slate-500 mt-0.5">개설자: {hardDeleteTarget.creatorName}</p>
+                )}
+              </div>
+
+              {isCheckLoading && (
+                <div className="flex items-center justify-center py-4 gap-2 text-slate-500">
+                  <Spinner className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">삭제 가능 여부 확인 중...</span>
+                </div>
+              )}
+
+              {hardDeleteCheck && (
+                <>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="p-3 rounded-lg bg-slate-50 text-center">
+                      <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.postCount}</p>
+                      <p className="text-slate-500 mt-0.5">게시글</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-50 text-center">
+                      <p className="text-2xl font-bold text-slate-800">{hardDeleteCheck.memberCount}</p>
+                      <p className="text-slate-500 mt-0.5">멤버십</p>
+                    </div>
+                  </div>
+
+                  {hardDeleteCheck.hardDeleteAllowed ? (
+                    <>
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+                        연관 데이터 없음 — 영구 삭제 가능합니다.
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                          삭제 사유 <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={hardDeleteReason}
+                          onChange={(e) => setHardDeleteReason(e.target.value)}
+                          placeholder="예: 테스트 포럼 영구 정리, 오등록 포럼 제거 등"
+                          rows={3}
+                          className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-400 resize-none text-sm"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg space-y-1.5">
+                      <p className="text-sm font-medium text-rose-700">영구 삭제 불가</p>
+                      {hardDeleteCheck.blockedReasons.map((r, i) => (
+                        <p key={i} className="text-sm text-rose-600">• {r}</p>
+                      ))}
+                      <p className="text-xs text-rose-500 mt-2">대신 비활성화(soft delete)를 사용하세요.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
+              <button
+                onClick={() => { setHardDeleteTarget(null); setHardDeleteCheck(null); setHardDeleteReason(''); }}
+                className="flex-1 px-4 py-2 text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+              >
+                취소
+              </button>
+              {hardDeleteCheck?.hardDeleteAllowed && (
+                <button
+                  onClick={handleHardDelete}
+                  disabled={!hardDeleteReason.trim() || isHardDeleting}
+                  className="px-6 py-2 text-white bg-rose-600 rounded-lg hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+                >
+                  {isHardDeleting ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <AlertOctagon className="w-4 h-4" />
+                  )}
+                  영구 삭제
+                </button>
+              )}
             </div>
           </div>
         </>

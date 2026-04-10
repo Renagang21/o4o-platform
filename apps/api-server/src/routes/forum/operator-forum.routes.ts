@@ -24,7 +24,7 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { forumCategoryRequestService } from '../../services/forum/ForumCategoryRequestService.js';
 import { isServiceOperator } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
-import { ForumCategory } from '@o4o/forum-core/entities';
+import { ForumCategory, ForumPost, ForumCategoryMember } from '@o4o/forum-core/entities';
 import { ForumCategoryRequest } from '@o4o/forum-core/entities';
 import type { AuthRequest } from '../../types/auth.js';
 import type { ServiceKey } from '../../types/roles.js';
@@ -177,6 +177,8 @@ router.patch('/requests/:id/review', async (req: Request, res: Response): Promis
 
 const categoryRepo = () => AppDataSource.getRepository(ForumCategory);
 const requestRepo = () => AppDataSource.getRepository(ForumCategoryRequest);
+const postRepo = () => AppDataSource.getRepository(ForumPost);
+const memberRepo = () => AppDataSource.getRepository(ForumCategoryMember);
 
 /**
  * Find category IDs that belong to a specific service.
@@ -435,6 +437,94 @@ router.post('/categories/:id/deactivate', async (req: Request, res: Response): P
     res.json({ success: true, data: { id: category.id, isActive: false } });
   } catch (error: any) {
     logger.error('Error deactivating forum category:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** GET /categories/:id/delete-check — hard delete pre-flight check */
+router.get('/categories/:id/delete-check', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    if (!categoryIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Category not found for this service' });
+      return;
+    }
+
+    const [postCount, memberCount] = await Promise.all([
+      postRepo().count({ where: { categoryId: req.params.id } }),
+      memberRepo().count({ where: { forumCategoryId: req.params.id } }),
+    ]);
+
+    const blockedReasons: string[] = [];
+    if (postCount > 0) blockedReasons.push(`게시글 ${postCount}건이 남아 있습니다`);
+    if (memberCount > 0) blockedReasons.push(`멤버십 ${memberCount}건이 남아 있습니다`);
+
+    res.json({
+      success: true,
+      data: {
+        postCount,
+        memberCount,
+        hardDeleteAllowed: blockedReasons.length === 0,
+        blockedReasons,
+      },
+    });
+  } catch (error: any) {
+    logger.error('Error checking hard delete eligibility:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** DELETE /categories/:id/hard — operator permanent hard delete (WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-SAFE-GUARD-V1) */
+router.delete('/categories/:id/hard', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const userId = (req as AuthRequest).user?.id;
+    const { reason } = req.body;
+
+    if (!reason?.trim()) {
+      res.status(400).json({ success: false, error: '삭제 사유를 입력해주세요', code: 'REASON_REQUIRED' });
+      return;
+    }
+
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    if (!categoryIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Category not found for this service' });
+      return;
+    }
+
+    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
+    if (!category) {
+      res.status(404).json({ success: false, error: 'Category not found' });
+      return;
+    }
+
+    // Re-check conditions at delete time (race-condition safe)
+    const [postCount, memberCount] = await Promise.all([
+      postRepo().count({ where: { categoryId: req.params.id } }),
+      memberRepo().count({ where: { forumCategoryId: req.params.id } }),
+    ]);
+
+    const blockedReasons: string[] = [];
+    if (postCount > 0) blockedReasons.push(`게시글 ${postCount}건이 남아 있습니다`);
+    if (memberCount > 0) blockedReasons.push(`멤버십 ${memberCount}건이 남아 있습니다`);
+
+    if (blockedReasons.length > 0) {
+      res.status(409).json({
+        success: false,
+        error: '연관 데이터가 있어 영구 삭제를 할 수 없습니다',
+        code: 'HARD_DELETE_BLOCKED',
+        data: { blockedReasons },
+      });
+      return;
+    }
+
+    logger.info(`Forum category ${category.id} (${category.name}) hard deleted by operator ${userId} (reason: ${reason.trim()})`);
+    await categoryRepo().remove(category);
+
+    res.json({ success: true, data: { id: req.params.id, name: category.name, hardDeleted: true } });
+  } catch (error: any) {
+    logger.error('Error hard deleting forum category:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
