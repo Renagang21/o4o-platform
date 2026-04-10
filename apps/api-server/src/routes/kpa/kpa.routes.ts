@@ -211,6 +211,11 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Operations/Content → Operator
   // ============================================================================
 
+  // WorkingContent CRUD + Publish (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1)
+  // MUST be registered BEFORE operator summary controller (Express route ordering:
+  // summary controller's requireKpaScope('kpa:operator') middleware intercepts all /operator/* requests)
+  router.use('/operator/working-contents', createWorkingContentController(dataSource, coreRequireAuth as any));
+
   // Operator Summary routes (운영자 실사용 화면 1단계)
   router.use('/operator', createOperatorSummaryController(dataSource, {
     contentService,
@@ -223,9 +228,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // Product Application Management (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1)
   router.use('/operator/product-applications', createOperatorProductApplicationsController(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
-
-  // WorkingContent CRUD + Publish (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1)
-  router.use('/operator/working-contents', createWorkingContentController(dataSource, coreRequireAuth as any));
 
   // Groupbuy Operator routes (WO-KPA-GROUPBUY-OPERATOR-UI-V1)
   router.use('/groupbuy-admin', createGroupbuyOperatorController(dataSource, coreRequireAuth as any));
