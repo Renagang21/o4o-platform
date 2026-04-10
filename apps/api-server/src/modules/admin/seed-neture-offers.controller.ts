@@ -123,35 +123,56 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // DELETE — f0000000% 샘플 데이터만 삭제
+  // DELETE — 공급자 offer 전체 삭제 (sohae21@naver.com 자동 조회)
+  // ?sampleOnly=true 이면 f0000000% 샘플만 삭제
   // ────────────────────────────────────────────────────────────────────────
   router.delete('/', async (req: Request, res: Response) => {
     if (!verify(req, res)) return;
+    const sampleOnly = req.query.sampleOnly === 'true';
     try {
-      // approval → listings → offers → masters 순서로 삭제 (FK 순서)
-      const aprDel = await ds.query(
-        `DELETE FROM offer_service_approvals WHERE offer_id::text LIKE 'f0000000%'`,
-      );
-      const listDel = await ds.query(
-        `DELETE FROM organization_product_listings WHERE offer_id::text LIKE 'f0000000%'`,
-      );
-      const offDel = await ds.query(
-        `DELETE FROM supplier_product_offers WHERE id::text LIKE 'f0000000%'`,
-      );
-      const mstDel = await ds.query(
-        `DELETE FROM product_masters WHERE id::text LIKE 'f0000000%'`,
-      );
+      let deletedApprovals = 0;
+      let deletedListings = 0;
+      let deletedOffers = 0;
+      let deletedMasters = 0;
+
+      if (sampleOnly) {
+        // f0000000% 샘플만 삭제
+        const a = await ds.query(`DELETE FROM offer_service_approvals WHERE offer_id::text LIKE 'f0000000%'`);
+        const l = await ds.query(`DELETE FROM organization_product_listings WHERE offer_id::text LIKE 'f0000000%'`);
+        const o = await ds.query(`DELETE FROM supplier_product_offers WHERE id::text LIKE 'f0000000%'`);
+        const m = await ds.query(`DELETE FROM product_masters WHERE id::text LIKE 'f0000000%'`);
+        deletedApprovals = a.rowCount ?? 0;
+        deletedListings  = l.rowCount ?? 0;
+        deletedOffers    = o.rowCount ?? 0;
+        deletedMasters   = m.rowCount ?? 0;
+      } else {
+        // sohae21@naver.com 공급자 전체 offer 삭제
+        const supplier = await findSupplierByEmail(ds, TARGET_EMAIL);
+        if (!supplier) {
+          return res.status(404).json({ success: false, error: `Supplier not found: ${TARGET_EMAIL}` });
+        }
+        const offerIds: Array<{ id: string }> = await ds.query(
+          `SELECT id FROM supplier_product_offers WHERE supplier_id = $1`,
+          [supplier.id],
+        );
+        const ids = offerIds.map((r) => r.id);
+        if (ids.length > 0) {
+          const a = await ds.query(`DELETE FROM offer_service_approvals WHERE offer_id = ANY($1)`, [ids]);
+          const l = await ds.query(`DELETE FROM organization_product_listings WHERE offer_id = ANY($1)`, [ids]);
+          deletedApprovals = a.rowCount ?? 0;
+          deletedListings  = l.rowCount ?? 0;
+        }
+        const o = await ds.query(`DELETE FROM supplier_product_offers WHERE supplier_id = $1`, [supplier.id]);
+        const m = await ds.query(`DELETE FROM product_masters WHERE id::text LIKE 'f0000000%'`);
+        deletedOffers  = o.rowCount ?? 0;
+        deletedMasters = m.rowCount ?? 0;
+      }
 
       res.json({
         success: true,
         data: {
-          deleted: {
-            approvals: aprDel.rowCount ?? 0,
-            listings:  listDel.rowCount ?? 0,
-            offers:    offDel.rowCount ?? 0,
-            masters:   mstDel.rowCount ?? 0,
-          },
-          note: 'f0000000% UUID 샘플 데이터만 삭제. 실 운영 데이터 미영향.',
+          deleted: { approvals: deletedApprovals, listings: deletedListings, offers: deletedOffers, masters: deletedMasters },
+          mode: sampleOnly ? 'sampleOnly (f0000000%)' : `fullWipe (${TARGET_EMAIL})`,
         },
       });
     } catch (err: any) {
