@@ -66,16 +66,19 @@ interface MenuItem {
 
 /**
  * 메뉴 구조 (WO-KPA-A-ROLE-BASED-NAVIGATION-AND-ENTRY-REFINEMENT-V1)
+ * WO-KPA-A-TOP-NAV-SERVICE-ENTRY-RESTRUCTURE-V1:
+ *   - 내 약국: 프로필 드롭다운 → 상단 네비게이션으로 이동 (서비스 진입점)
+ *   - 프로필 드롭다운 = 개인 영역 / 상단 네비게이션 = 서비스 진입 영역
  *
  * 공개 기본: 홈 / 포럼 / 강의
- * 역할 조건부: 약국 HUB (pharmacy_owner) / 운영 대시보드 (operator/admin)
- * 내 약국: DashboardSwitcher (user dropdown)에서 접근 — 개인 약국 관리용
+ * 역할 조건부: 약국 HUB (pharmacy_owner) / 내 약국 (isStoreOwner) / 운영 대시보드 (operator/admin)
  */
 const menuItems: MenuItem[] = [
   { label: '홈', href: '/' },
   { label: '포럼', href: '/forum' },
   { label: '강의', href: '/lms' },
   { label: '약국 HUB', href: '/hub' },
+  { label: '내 약국', href: '/store' },
   { label: '운영 대시보드', href: '/operator' },
 ];
 
@@ -111,6 +114,7 @@ export function Header({ serviceName }: { serviceName: string }) {
       if (item.href === '/operator') return isOperator;
       if (item.href === '/admin') return isAdmin;
       if (item.href === '/hub') return isPharmacyRelated;
+      if (item.href === '/store') return isStoreOwner;
       return true;
     });
 

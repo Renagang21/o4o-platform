@@ -7,9 +7,8 @@
  */
 
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth, useOrganization } from '../../contexts';
+import { useAuth } from '../../contexts';
 import { colors } from '../../styles/theme';
-import { DASHBOARD_ADMIN_ROLES, hasAnyRole } from '../../lib/role-constants';
 
 interface DashboardItem {
   label: string;
@@ -19,10 +18,13 @@ interface DashboardItem {
 
 /**
  * 사용자의 role/context를 기반으로 접근 가능한 대시보드 목록 반환
+ *
+ * WO-KPA-A-TOP-NAV-SERVICE-ENTRY-RESTRUCTURE-V1:
+ * - 약국 HUB / 내 약국은 상단 네비게이션으로 이동 → 프로필 드롭다운은 개인 영역만
+ * - 서비스 진입점은 상단 nav에서, 개인 메뉴는 드롭다운에서 분리
  */
 export function useAccessibleDashboards(): DashboardItem[] {
   const { user } = useAuth();
-  const { accessibleOrganizations } = useOrganization();
 
   if (!user) return [];
 
@@ -30,18 +32,6 @@ export function useAccessibleDashboards(): DashboardItem[] {
 
   // WO-KPA-SOCIETY-DASHBOARD-TO-MYPAGE-CONSOLIDATION-V1: /dashboard → /mypage
   items.push({ label: '마이페이지', icon: '🏠', path: '/mypage' });
-
-  // WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
-  // pharmacy_owner → 약국 HUB 진입, isStoreOwner → 내 약국 추가 진입
-  const isAdminOrOperator = hasAnyRole(user.roles, DASHBOARD_ADMIN_ROLES);
-  const hasPharmacyContext = accessibleOrganizations.some(org => org.type === 'pharmacy');
-  const isPharmacyRelated = user.isStoreOwner || (user as any).activityType === 'pharmacy_owner';
-  if (hasPharmacyContext && !isAdminOrOperator && isPharmacyRelated) {
-    items.push({ label: '약국 HUB', icon: '🏪', path: '/hub' });
-    if (user.isStoreOwner) {
-      items.push({ label: '내 약국', icon: '💊', path: '/store' });
-    }
-  }
 
   return items;
 }
