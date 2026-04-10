@@ -100,7 +100,7 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
           COUNT(spo.id) FILTER (WHERE 'glycopharm' = ANY(spo.service_keys))::int AS glycopharm,
           COUNT(spo.id) FILTER (WHERE 'kpa-society' = ANY(spo.service_keys))::int AS kpa,
           COUNT(spo.id) FILTER (WHERE spo.is_public = true)::int    AS is_public,
-          COUNT(spo.id) FILTER (WHERE spo.id LIKE 'f0000000%')::int AS sample_offers
+          COUNT(spo.id) FILTER (WHERE spo.id::text LIKE 'f0000000%')::int AS sample_offers
         FROM neture_suppliers ns
         LEFT JOIN organizations o ON o.id = ns.organization_id
         LEFT JOIN supplier_product_offers spo
@@ -130,16 +130,16 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
     try {
       // approval → listings → offers → masters 순서로 삭제 (FK 순서)
       const aprDel = await ds.query(
-        `DELETE FROM offer_service_approvals WHERE offer_id LIKE 'f0000000%'`,
+        `DELETE FROM offer_service_approvals WHERE offer_id::text LIKE 'f0000000%'`,
       );
       const listDel = await ds.query(
-        `DELETE FROM organization_product_listings WHERE offer_id LIKE 'f0000000%'`,
+        `DELETE FROM organization_product_listings WHERE offer_id::text LIKE 'f0000000%'`,
       );
       const offDel = await ds.query(
-        `DELETE FROM supplier_product_offers WHERE id LIKE 'f0000000%'`,
+        `DELETE FROM supplier_product_offers WHERE id::text LIKE 'f0000000%'`,
       );
       const mstDel = await ds.query(
-        `DELETE FROM product_masters WHERE id LIKE 'f0000000%'`,
+        `DELETE FROM product_masters WHERE id::text LIKE 'f0000000%'`,
       );
 
       res.json({
@@ -254,7 +254,7 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
                spo.service_keys, spo.is_public, spo.distribution_type
         FROM supplier_product_offers spo
         JOIN product_masters pm ON pm.id = spo.master_id
-        WHERE spo.id LIKE 'f0000000%'
+        WHERE spo.id::text LIKE 'f0000000%'
         ORDER BY pm.marketing_name
       `);
 
