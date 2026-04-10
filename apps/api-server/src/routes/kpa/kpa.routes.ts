@@ -551,7 +551,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // WO-O4O-KPA-CODE-CLEANUP-V1: unified to 'kpa-society'
   const KPA_SERVICE_KEY = 'kpa-society';
   const KPA_SERVICE_KEYS = ['kpa-society', 'kpa']; // backward compat for reads
-  const ALLOWED_TYPES = ['notice', 'news'];
+  const ALLOWED_TYPES = ['notice', 'news', 'event'];
 
   // WO-KPA-A-OPERATOR-AUDIT-LOG-PHASE1-V1: helper
   async function writeAuditLog(
@@ -659,6 +659,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     if (content !== undefined) existing.body = content;
     if (type !== undefined && ALLOWED_TYPES.includes(type)) existing.type = type;
     if (isOperatorPicked !== undefined) existing.isOperatorPicked = isOperatorPicked === true;
+    if (req.body.isPinned !== undefined) existing.isPinned = req.body.isPinned === true;
     if (reqStatus !== undefined && ['draft', 'published', 'archived'].includes(reqStatus)) {
       if (reqStatus === 'published' && existing.status !== 'published') {
         existing.publishedAt = new Date();

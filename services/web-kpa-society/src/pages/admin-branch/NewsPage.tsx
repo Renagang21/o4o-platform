@@ -2,9 +2,10 @@
  * NewsPage - 지부 공지사항 관리
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@o4o/error-handling';
 import { AdminHeader } from '../../components/admin';
+import { authClient } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
 
 interface NewsItem {
@@ -18,52 +19,39 @@ interface NewsItem {
   viewCount: number;
 }
 
+function mapContent(c: any): NewsItem {
+  return {
+    id: c.id,
+    title: c.title,
+    category: (c.type as NewsItem['category']) ?? 'notice',
+    author: c.authorName ?? '-',
+    createdAt: c.createdAt ? String(c.createdAt).slice(0, 10) : '',
+    isPinned: c.isPinned ?? false,
+    isPublished: c.status === 'published',
+    viewCount: c.viewCount ?? 0,
+  };
+}
+
 export function NewsPage() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([
-    {
-      id: '1',
-      title: '2025년 신년 인사',
-      category: 'notice',
-      author: '관리자',
-      createdAt: '2025-01-01',
-      isPinned: true,
-      isPublished: true,
-      viewCount: 156,
-    },
-    {
-      id: '2',
-      title: '1월 정기 총회 안내',
-      category: 'event',
-      author: '사무국',
-      createdAt: '2025-01-03',
-      isPinned: true,
-      isPublished: true,
-      viewCount: 89,
-    },
-    {
-      id: '3',
-      title: '연회비 납부 안내',
-      category: 'notice',
-      author: '재무부',
-      createdAt: '2025-01-02',
-      isPinned: false,
-      isPublished: true,
-      viewCount: 234,
-    },
-    {
-      id: '4',
-      title: '신년 하례회 개최',
-      category: 'news',
-      author: '홍보부',
-      createdAt: '2025-01-04',
-      isPinned: false,
-      isPublished: false,
-      viewCount: 0,
-    },
-  ]);
+  const loadNews = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await authClient.api.get('/api/v1/kpa/news/admin/list?limit=100');
+      const items: NewsItem[] = (data?.data ?? []).map(mapContent);
+      setNewsItems(items);
+    } catch {
+      toast.error('공지사항 목록을 불러오지 못했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadNews(); }, [loadNews]);
 
   const filteredNews = newsItems.filter((item) => {
     const matchesCategory = filterCategory === 'all' || item.category === filterCategory;
@@ -77,30 +65,52 @@ export function NewsPage() {
       news: { bg: colors.accentGreen, label: '소식' },
       event: { bg: colors.accentYellow, label: '행사' },
     };
-    const { bg, label } = config[category];
+    const { bg, label } = config[category] ?? { bg: colors.neutral400, label: category };
     return <span style={{ ...styles.badge, backgroundColor: bg }}>{label}</span>;
   };
 
   const handleCreate = () => {
-    toast.info('새 공지 작성 (UI 데모)');
+    toast.info('새 공지 작성 (준비 중)');
   };
 
   const handleEdit = (id: string) => {
-    toast.info(`공지 #${id} 수정 (UI 데모)`);
+    toast.info(`공지 #${id} 수정 (준비 중)`);
   };
 
-  const handleTogglePublish = (id: string, currentState: boolean) => {
-    toast.info(`공지 #${id} ${currentState ? '비공개' : '게시'} 처리 (UI 데모)`);
+  const handleTogglePublish = async (id: string, currentIsPublished: boolean) => {
+    const newStatus = currentIsPublished ? 'draft' : 'published';
+    try {
+      await authClient.api.put(`/api/v1/kpa/news/${id}`, { status: newStatus });
+      setNewsItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, isPublished: !currentIsPublished } : item))
+      );
+      toast.success(currentIsPublished ? '비공개 처리되었습니다.' : '게시되었습니다.');
+    } catch {
+      toast.error('상태 변경에 실패했습니다.');
+    }
   };
 
-  const handleTogglePin = (id: string, currentState: boolean) => {
-    toast.info(`공지 #${id} ${currentState ? '고정 해제' : '고정'} 처리 (UI 데모)`);
+  const handleTogglePin = async (id: string, currentIsPinned: boolean) => {
+    try {
+      await authClient.api.put(`/api/v1/kpa/news/${id}`, { isPinned: !currentIsPinned });
+      setNewsItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, isPinned: !currentIsPinned } : item))
+      );
+      toast.success(currentIsPinned ? '고정 해제되었습니다.' : '고정되었습니다.');
+    } catch {
+      toast.error('고정 처리에 실패했습니다.');
+    }
   };
 
-  const handleDelete = (id: string, title: string) => {
+  const handleDelete = async (id: string, title: string) => {
     if (!window.confirm(`"${title}"\n\n이 공지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
-    setNewsItems((prev) => prev.filter((item) => item.id !== id));
-    toast.success('공지가 삭제되었습니다.');
+    try {
+      await authClient.api.delete(`/api/v1/kpa/news/${id}`);
+      setNewsItems((prev) => prev.filter((item) => item.id !== id));
+      toast.success('공지가 삭제되었습니다.');
+    } catch {
+      toast.error('삭제에 실패했습니다.');
+    }
   };
 
   return (
@@ -151,79 +161,89 @@ export function NewsPage() {
 
         {/* 공지 목록 */}
         <div style={styles.tableWrapper}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={{ ...styles.th, width: '60px' }}>고정</th>
-                <th style={{ ...styles.th, width: '80px' }}>분류</th>
-                <th style={styles.th}>제목</th>
-                <th style={{ ...styles.th, width: '100px' }}>작성자</th>
-                <th style={{ ...styles.th, width: '100px' }}>작성일</th>
-                <th style={{ ...styles.th, width: '80px' }}>조회</th>
-                <th style={{ ...styles.th, width: '80px' }}>상태</th>
-                <th style={{ ...styles.th, width: '170px' }}>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredNews.map((item) => (
-                <tr
-                  key={item.id}
-                  style={{
-                    ...styles.tr,
-                    backgroundColor: item.isPinned ? colors.neutral50 : 'transparent',
-                  }}
-                >
-                  <td style={styles.td}>
-                    <button
-                      style={{
-                        ...styles.iconButton,
-                        color: item.isPinned ? colors.primary : colors.neutral400,
-                      }}
-                      onClick={() => handleTogglePin(item.id, item.isPinned)}
-                    >
-                      📌
-                    </button>
-                  </td>
-                  <td style={styles.td}>{getCategoryBadge(item.category)}</td>
-                  <td style={styles.td}>
-                    <span style={{ fontWeight: item.isPinned ? 600 : 400 }}>{item.title}</span>
-                  </td>
-                  <td style={styles.td}>{item.author}</td>
-                  <td style={styles.td}>{item.createdAt}</td>
-                  <td style={styles.td}>{item.viewCount.toLocaleString()}</td>
-                  <td style={styles.td}>
-                    <span
-                      style={{
-                        ...styles.statusBadge,
-                        backgroundColor: item.isPublished ? colors.accentGreen : colors.neutral400,
-                      }}
-                    >
-                      {item.isPublished ? '게시' : '비공개'}
-                    </span>
-                  </td>
-                  <td style={styles.td}>
-                    <div style={styles.actionButtons}>
-                      <button style={styles.editButton} onClick={() => handleEdit(item.id)}>
-                        수정
-                      </button>
-                      <button
-                        style={styles.toggleButton}
-                        onClick={() => handleTogglePublish(item.id, item.isPublished)}
-                      >
-                        {item.isPublished ? '비공개' : '게시'}
-                      </button>
-                      <button
-                        style={styles.deleteButton}
-                        onClick={() => handleDelete(item.id, item.title)}
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </td>
+          {isLoading ? (
+            <div style={styles.loadingRow}>불러오는 중...</div>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={{ ...styles.th, width: '60px' }}>고정</th>
+                  <th style={{ ...styles.th, width: '80px' }}>분류</th>
+                  <th style={styles.th}>제목</th>
+                  <th style={{ ...styles.th, width: '100px' }}>작성자</th>
+                  <th style={{ ...styles.th, width: '100px' }}>작성일</th>
+                  <th style={{ ...styles.th, width: '80px' }}>조회</th>
+                  <th style={{ ...styles.th, width: '80px' }}>상태</th>
+                  <th style={{ ...styles.th, width: '170px' }}>관리</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredNews.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} style={{ ...styles.td, textAlign: 'center', color: colors.neutral400, padding: '40px' }}>
+                      공지사항이 없습니다.
+                    </td>
+                  </tr>
+                ) : filteredNews.map((item) => (
+                  <tr
+                    key={item.id}
+                    style={{
+                      ...styles.tr,
+                      backgroundColor: item.isPinned ? colors.neutral50 : 'transparent',
+                    }}
+                  >
+                    <td style={styles.td}>
+                      <button
+                        style={{
+                          ...styles.iconButton,
+                          color: item.isPinned ? colors.primary : colors.neutral400,
+                        }}
+                        onClick={() => handleTogglePin(item.id, item.isPinned)}
+                      >
+                        📌
+                      </button>
+                    </td>
+                    <td style={styles.td}>{getCategoryBadge(item.category)}</td>
+                    <td style={styles.td}>
+                      <span style={{ fontWeight: item.isPinned ? 600 : 400 }}>{item.title}</span>
+                    </td>
+                    <td style={styles.td}>{item.author}</td>
+                    <td style={styles.td}>{item.createdAt}</td>
+                    <td style={styles.td}>{item.viewCount.toLocaleString()}</td>
+                    <td style={styles.td}>
+                      <span
+                        style={{
+                          ...styles.statusBadge,
+                          backgroundColor: item.isPublished ? colors.accentGreen : colors.neutral400,
+                        }}
+                      >
+                        {item.isPublished ? '게시' : '비공개'}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <div style={styles.actionButtons}>
+                        <button style={styles.editButton} onClick={() => handleEdit(item.id)}>
+                          수정
+                        </button>
+                        <button
+                          style={styles.toggleButton}
+                          onClick={() => handleTogglePublish(item.id, item.isPublished)}
+                        >
+                          {item.isPublished ? '비공개' : '게시'}
+                        </button>
+                        <button
+                          style={styles.deleteButton}
+                          onClick={() => handleDelete(item.id, item.title)}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* 통계 */}
@@ -298,6 +318,12 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '12px',
     overflow: 'hidden',
     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+  },
+  loadingRow: {
+    padding: '40px',
+    textAlign: 'center' as const,
+    color: colors.neutral400,
+    fontSize: '14px',
   },
   table: {
     width: '100%',
