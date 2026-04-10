@@ -184,11 +184,12 @@ describe('KPA-a CMS: Soft Delete Enforcement', () => {
   });
 
   it('CMS delete route does NOT call repo.delete() or repo.remove()', () => {
-    const deleteBlock = extractRouteBlock(kpaRoutes, "newsRouter.delete", '');
-    // Check for DB delete operations (repo.delete, .delete().from), NOT Express route definition
-    expect(deleteBlock).not.toMatch(/[Rr]epo\.delete\s*\(/);
-    expect(deleteBlock).not.toMatch(/\.delete\(\)\s*\.from\s*\(/);
-    expect(deleteBlock).not.toMatch(/[Rr]epo\.remove\s*\(/);
+    // Target the soft-delete route (/:id) specifically, NOT the hard-delete route (/:id/hard)
+    // The hard-delete route legitimately uses repo.delete() — it is an intentional operator-only action
+    const softDeleteBlock = extractRouteBlock(kpaRoutes, "newsRouter.delete('/:id',", '');
+    expect(softDeleteBlock).not.toMatch(/[Rr]epo\.delete\s*\(/);
+    expect(softDeleteBlock).not.toMatch(/\.delete\(\)\s*\.from\s*\(/);
+    expect(softDeleteBlock).not.toMatch(/[Rr]epo\.remove\s*\(/);
   });
 });
 
