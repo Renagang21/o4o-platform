@@ -42,3 +42,6 @@ export { KpaCourseRequest } from './kpa-course-request.entity.js';
 export { KpaApprovalRequest } from './kpa-approval-request.entity.js';
 // WO-O4O-SERVICE-PRODUCT-LAYER-PREP-V1
 export { ServiceProduct } from './service-product.entity.js';
+// WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+export { KpaContent } from './kpa-content.entity.js';
+export { KpaWorkingContent } from './kpa-working-content.entity.js';

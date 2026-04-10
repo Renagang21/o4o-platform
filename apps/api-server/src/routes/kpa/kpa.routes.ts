@@ -557,7 +557,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   async function writeAuditLog(
     user: any,
     actionType: string,
-    targetType: 'member' | 'application' | 'content',
+    targetType: 'member' | 'application' | 'content' | 'kpa_content',
     targetId: string,
     metadata: Record<string, unknown> = {},
   ) {
@@ -566,7 +566,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         operator_id: user?.id,
         operator_role: (user?.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
         action_type: actionType as any,
-        target_type: targetType,
+        target_type: targetType as any,
         target_id: targetId,
         metadata,
       });
@@ -973,6 +973,246 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
 
   router.use('/resources', resourcesRouter);
+
+  // ============================================================================
+  // CONTENT HUB ROUTES — WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+  // Block 기반 콘텐츠 정리 허브 (기존 자료실 대체)
+  // ============================================================================
+  {
+    // WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1: Raw SQL (no dynamic import needed)
+    const contentRouter = Router();
+
+    // GET /contents — 목록 (optionalAuth: 공개 접근)
+    contentRouter.get('/', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
+      const { page = '1', limit = '20', category, search, status: statusFilter, tag } = req.query;
+      const pageNum = Math.max(1, Number(page));
+      const limitNum = Math.min(100, Math.max(1, Number(limit)));
+      const offset = (pageNum - 1) * limitNum;
+
+      const conditions: string[] = [`c.is_deleted = false`];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (category) { conditions.push(`c.category = $${idx++}`); params.push(category); }
+      if (statusFilter) { conditions.push(`c.status = $${idx++}`); params.push(statusFilter); }
+      if (search) {
+        conditions.push(`(c.title ILIKE $${idx} OR c.summary ILIKE $${idx})`);
+        params.push(`%${search}%`); idx++;
+      }
+      if (tag) {
+        conditions.push(`c.tags @> $${idx++}::jsonb`);
+        params.push(JSON.stringify([tag]));
+      }
+
+      const where = `WHERE ${conditions.join(' AND ')}`;
+      const [[{ total }], rows] = await Promise.all([
+        dataSource.query(`SELECT COUNT(*)::int as total FROM kpa_contents c ${where}`, params),
+        dataSource.query(
+          `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
+                  c.source_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at
+           FROM kpa_contents c ${where}
+           ORDER BY c.created_at DESC
+           LIMIT $${idx} OFFSET $${idx + 1}`,
+          [...params, limitNum, offset]
+        ),
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          items: rows,
+          total,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }));
+
+    // POST /contents — 등록 (operator)
+    contentRouter.post('/', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus } = req.body;
+
+      if (!title?.trim()) {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다' } });
+        return;
+      }
+
+      const [saved] = await dataSource.query(
+        `INSERT INTO kpa_contents (title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status, created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+         RETURNING *`,
+        [
+          title.trim(),
+          summary || null,
+          JSON.stringify(Array.isArray(blocks) ? blocks : []),
+          JSON.stringify(Array.isArray(tags) ? tags : []),
+          category || null,
+          thumbnail_url || null,
+          source_type || 'manual',
+          source_url || null,
+          source_file_name || null,
+          reqStatus === 'ready' ? 'ready' : 'draft',
+          userId,
+        ]
+      );
+      await writeAuditLog((req as any).user, 'CONTENT_CREATED', 'kpa_content', saved.id, { title: saved.title });
+      res.status(201).json({ success: true, data: saved });
+    }));
+
+    // GET /contents/:id — 상세
+    contentRouter.get('/:id', optionalAuth as any, asyncHandler(async (req: Request, res: Response) => {
+      const [content] = await dataSource.query(
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      res.json({ success: true, data: content });
+    }));
+
+    // PATCH /contents/:id — 수정 (operator)
+    contentRouter.patch('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const [existing] = await dataSource.query(
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!existing) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+
+      const { title, summary, blocks, tags, category, thumbnail_url, source_type, source_url, source_file_name, status: reqStatus } = req.body;
+
+      const sets: string[] = [`updated_at = NOW()`];
+      const params: any[] = [];
+      let idx = 1;
+
+      if (title !== undefined) { sets.push(`title = $${idx++}`); params.push(title.trim()); }
+      if (summary !== undefined) { sets.push(`summary = $${idx++}`); params.push(summary || null); }
+      if (blocks !== undefined) { sets.push(`blocks = $${idx++}`); params.push(JSON.stringify(Array.isArray(blocks) ? blocks : existing.blocks)); }
+      if (tags !== undefined) { sets.push(`tags = $${idx++}`); params.push(JSON.stringify(Array.isArray(tags) ? tags : existing.tags)); }
+      if (category !== undefined) { sets.push(`category = $${idx++}`); params.push(category || null); }
+      if (thumbnail_url !== undefined) { sets.push(`thumbnail_url = $${idx++}`); params.push(thumbnail_url || null); }
+      if (source_type !== undefined) { sets.push(`source_type = $${idx++}`); params.push(source_type); }
+      if (source_url !== undefined) { sets.push(`source_url = $${idx++}`); params.push(source_url || null); }
+      if (source_file_name !== undefined) { sets.push(`source_file_name = $${idx++}`); params.push(source_file_name || null); }
+      if (reqStatus !== undefined) { sets.push(`status = $${idx++}`); params.push(reqStatus === 'ready' ? 'ready' : 'draft'); }
+
+      params.push(existing.id);
+      const [updated] = await dataSource.query(
+        `UPDATE kpa_contents SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`,
+        params
+      );
+      await writeAuditLog((req as any).user, 'CONTENT_UPDATED', 'kpa_content', updated.id, { title: updated.title });
+      res.json({ success: true, data: updated });
+    }));
+
+    // DELETE /contents/:id — soft delete (operator)
+    contentRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const [existing] = await dataSource.query(
+        `SELECT id, title FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!existing) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      await dataSource.query(`UPDATE kpa_contents SET is_deleted = true, updated_at = NOW() WHERE id = $1`, [existing.id]);
+      await writeAuditLog((req as any).user, 'CONTENT_DELETED', 'kpa_content', existing.id, { title: existing.title });
+      res.json({ success: true, data: { deleted: true, id: existing.id } });
+    }));
+
+    // ── AI stub endpoints ─────────────────────────────────────────────────
+
+    // POST /contents/:id/ai/summarize
+    contentRouter.post('/:id/ai/summarize', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const [content] = await dataSource.query(
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      // Stub: text 블록 합쳐 첫 200자 summary 저장
+      const textContent = (content.blocks as any[])
+        .filter((b: any) => b.type === 'text' && b.content)
+        .map((b: any) => b.content)
+        .join(' ')
+        .slice(0, 200);
+      const summary = textContent || content.title;
+      await dataSource.query(`UPDATE kpa_contents SET summary = $1, updated_at = NOW() WHERE id = $2`, [summary, content.id]);
+      res.json({ success: true, data: { summary } });
+    }));
+
+    // POST /contents/:id/ai/extract
+    contentRouter.post('/:id/ai/extract', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const [content] = await dataSource.query(
+        `SELECT blocks FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      const keyPoints = (content.blocks as any[])
+        .filter((b: any) => b.type === 'list' && Array.isArray(b.items))
+        .flatMap((b: any) => b.items)
+        .slice(0, 5);
+      res.json({ success: true, data: { keyPoints } });
+    }));
+
+    // POST /contents/:id/ai/tag
+    contentRouter.post('/:id/ai/tag', authenticate, requireKpaScope('kpa:operator') as any, asyncHandler(async (req: Request, res: Response) => {
+      const [content] = await dataSource.query(
+        `SELECT category, tags FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      const existingTags: string[] = Array.isArray(content.tags) ? content.tags : [];
+      const suggestedTags = content.category ? [content.category, ...existingTags] : existingTags;
+      res.json({ success: true, data: { suggestedTags: [...new Set(suggestedTags)].slice(0, 8) } });
+    }));
+
+    // ── Copy to Store ──────────────────────────────────────────────────────
+
+    // POST /contents/:id/copy-to-store
+    contentRouter.post('/:id/copy-to-store', authenticate, asyncHandler(async (req: Request, res: Response) => {
+      const userId = (req as any).user?.id;
+      const [content] = await dataSource.query(
+        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
+        [req.params.id]
+      );
+      if (!content) {
+        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
+        return;
+      }
+      // 완전 독립 복사 — 원본과 분리, sync 없음
+      const [saved] = await dataSource.query(
+        `INSERT INTO kpa_working_contents (source_content_id, owner_id, title, edited_blocks, tags, category)
+         VALUES ($1,$2,$3,$4,$5,$6)
+         RETURNING *`,
+        [
+          content.id,
+          userId,
+          content.title,
+          JSON.stringify(content.blocks),
+          JSON.stringify(Array.isArray(content.tags) ? content.tags : []),
+          content.category,
+        ]
+      );
+      res.status(201).json({ success: true, data: saved });
+    }));
+
+    router.use('/contents', contentRouter);
+  }
 
   // Groupbuy Routes (WO-O4O-ROUTES-REFACTOR-V1)
   router.use('/groupbuy', createGroupbuyController(dataSource, authenticate as any, optionalAuth as any, requireKpaScope));

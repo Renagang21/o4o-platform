@@ -37,7 +37,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
   ],
   content: [
     { label: '공지사항', path: '/operator/news' },
-    { label: '자료실', path: '/operator/docs' },
+    { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
   ],
   signage: [
@@ -100,7 +100,7 @@ export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuI
   ],
   content: [
     { label: '공지사항', path: '/operator/news' },
-    { label: '자료실', path: '/operator/docs' },
+    { label: '콘텐츠 허브', path: '/operator/docs' },
     { label: '콘텐츠 관리', path: '/operator/content' },
   ],
   signage: [

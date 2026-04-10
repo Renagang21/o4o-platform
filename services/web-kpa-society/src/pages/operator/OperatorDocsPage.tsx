@@ -1,5 +1,8 @@
 /**
- * OperatorDocsPage — KPA-a Operator 자료실
+ * @deprecated WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
+ * 파일 저장소 구조(kpa_branch_docs 기반) — OperatorContentHubPage로 대체됨.
+ * /operator/docs 라우트는 OperatorContentHubPage를 렌더하며,
+ * 이 파일은 레거시 참조용으로만 유지됨.
  *
  * WO-KPA-A-RESOURCES-API-IMPLEMENTATION-V1: 실데이터 조회
  * WO-KPA-A-OPERATOR-RESOURCES-CMS-V1: 등록/수정/삭제 CMS 기능

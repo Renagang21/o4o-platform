@@ -27,7 +27,8 @@ import OperatorStoreChannelsPage from '../pages/operator/OperatorStoreChannelsPa
 import { NewsPage } from '../pages/admin-branch';
 // WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용 페이지로 교체
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
-import OperatorDocsPage from '../pages/operator/OperatorDocsPage';
+import OperatorContentHubPage from '../pages/operator/OperatorContentHubPage';
+import OperatorContentDetailPage from '../pages/operator/OperatorContentDetailPage';
 import { OrganizationJoinRequestsPage } from '../pages/admin/OrganizationJoinRequestsPage';
 import ContentHubPage from '../pages/signage/ContentHubPage';
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
@@ -95,8 +96,9 @@ export function OperatorRoutes() {
           {/* 공지사항 */}
           <Route path="news" element={<NewsPage />} />
 
-          {/* 자료실 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
-          <Route path="docs" element={<OperatorDocsPage />} />
+          {/* 자료실 → 콘텐츠 허브로 전환 (WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1) */}
+          <Route path="docs" element={<OperatorContentHubPage />} />
+          <Route path="content-hub/:id" element={<OperatorContentDetailPage />} />
 
           {/* 게시판 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
           <Route path="forum" element={<OperatorForumPage />} />
