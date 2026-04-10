@@ -74,6 +74,8 @@ export interface CatalogProduct {
   isApplied: boolean;
   isApproved: boolean;
   isListed: boolean;
+  /** listing 존재하지만 is_active=false (auto-expand 후 미활성) */
+  isListingInactive: boolean;
 }
 
 export interface CatalogResponse {
@@ -89,6 +91,7 @@ export async function getCatalog(params?: {
   category?: string;
   distributionType?: string;
   recommended?: boolean;
+  operatorView?: boolean;
   limit?: number;
   offset?: number;
 }): Promise<CatalogResponse> {

@@ -25,25 +25,30 @@ import { colors, shadows, borderRadius } from '../../styles/theme';
 // 카테고리 필터
 // ============================================
 
-// WO-KPA-HUB-RECOMMENDED-TAB-HIDE-AND-STATE-CLEANUP-V1:
-// 운영자 추천 탭은 실제 큐레이션 운영 플로우가 비활성 상태이므로 사용자 화면에서 숨김.
+// WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1:
+// 운영자 탭 추가 — KPA 운영자 승인 흐름 관련 상품을 모아보는 뷰.
+// 과거 비활성화된 '운영자 추천(offer_curations)' 개념과는 다른 개념임.
 // 백엔드(offer_curations) 및 getCatalog의 recommended 파라미터는 향후 재활성화를 위해 유지.
 const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
+  { key: 'operator', label: '운영자' },
   { key: 'PRIVATE', label: '판매자 모집' },
 ];
 
 const PAGE_LIMIT = 20;
 
 // ============================================
-// 상태 정의 (WO-O4O-HUB-B2B-STATE-VISIBILITY-V1)
+// 상태 정의
+// WO-O4O-HUB-B2B-STATE-VISIBILITY-V1
+// WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: '판매 준비' 상태 추가, isListed 수정 반영
 // ============================================
 
-type ProductState = 'listed' | 'approved' | 'pending' | 'available';
+type ProductState = 'listed' | 'ready' | 'approved' | 'pending' | 'available';
 
 const STATE_CONFIG: Record<ProductState, { label: string; color: string; bg: string; border: string }> = {
-  listed:    { label: '판매 중',  color: '#065f46', bg: '#d1fae5', border: '#6ee7b7' },
+  listed:    { label: '판매 중',   color: '#065f46', bg: '#d1fae5', border: '#6ee7b7' },
+  ready:     { label: '판매 준비', color: '#7c3aed', bg: '#ede9fe', border: '#c4b5fd' },
   approved:  { label: '승인 완료', color: '#1e40af', bg: '#dbeafe', border: '#93c5fd' },
   pending:   { label: '승인 대기', color: '#92400e', bg: '#fef3c7', border: '#fcd34d' },
   available: { label: '신청 가능', color: '#6b7280', bg: '#f3f4f6', border: '#d1d5db' },
@@ -53,6 +58,7 @@ function getProductState(item: CatalogProduct): ProductState {
   if (item.isListed) return 'listed';
   if (item.isApproved) return 'approved';
   if (item.isApplied) return 'pending';
+  if (item.isListingInactive) return 'ready';
   return 'available';
 }
 
@@ -81,9 +87,11 @@ export function HubB2BCatalogPage() {
     setLoading(true);
     setError(null);
     try {
+      const isOperator = distType === 'operator';
       const res = await getCatalog({
-        distributionType: (distType === 'all' || distType === 'recommended') ? undefined : distType,
+        distributionType: (distType === 'all' || distType === 'recommended' || isOperator) ? undefined : distType,
         recommended: distType === 'recommended' ? true : undefined,
+        operatorView: isOperator ? true : undefined,
         limit: PAGE_LIMIT,
         offset: pageOffset,
       });
@@ -132,17 +140,22 @@ export function HubB2BCatalogPage() {
     }
   };
 
-  // 상태 요약 (WO-O4O-HUB-B2B-STATE-VISIBILITY-V1 §4)
+  // 상태 요약
+  // WO-O4O-HUB-B2B-STATE-VISIBILITY-V1 §4
+  // WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: ready 상태 추가
   const summary = useMemo(() => {
     let listed = 0;
+    let ready = 0;
     let approved = 0;
     let pending = 0;
     for (const p of products) {
-      if (p.isListed) listed++;
-      else if (p.isApproved) approved++;
-      else if (p.isApplied) pending++;
+      const s = getProductState(p);
+      if (s === 'listed') listed++;
+      else if (s === 'ready') ready++;
+      else if (s === 'approved') approved++;
+      else if (s === 'pending') pending++;
     }
-    return { listed, approved, pending };
+    return { listed, ready, approved, pending };
   }, [products]);
 
   // 정렬 적용
@@ -157,7 +170,7 @@ export function HubB2BCatalogPage() {
         case 'supplier': va = a.supplierName || ''; vb = b.supplierName || ''; break;
         case 'category': va = a.category || ''; vb = b.category || ''; break;
         case 'status': {
-          const order: Record<ProductState, number> = { listed: 0, approved: 1, pending: 2, available: 3 };
+          const order: Record<ProductState, number> = { listed: 0, ready: 1, approved: 2, pending: 3, available: 4 };
           return (order[getProductState(a)] - order[getProductState(b)]) * dir;
         }
         case 'date': va = a.updatedAt || ''; vb = b.updatedAt || ''; break;
@@ -194,13 +207,20 @@ export function HubB2BCatalogPage() {
       </header>
 
       {/* Summary Box */}
-      {!loading && !error && products.length > 0 && (summary.listed > 0 || summary.pending > 0 || summary.approved > 0) && (
+      {!loading && !error && products.length > 0 && (summary.listed > 0 || summary.ready > 0 || summary.pending > 0 || summary.approved > 0) && (
         <div style={styles.summaryBox}>
           {summary.listed > 0 && (
             <div style={styles.summaryItem}>
               <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.listed.border }} />
               <span style={styles.summaryLabel}>판매 중</span>
               <span style={styles.summaryCount}>{summary.listed}건</span>
+            </div>
+          )}
+          {summary.ready > 0 && (
+            <div style={styles.summaryItem}>
+              <span style={{ ...styles.summaryDot, backgroundColor: STATE_CONFIG.ready.border }} />
+              <span style={styles.summaryLabel}>판매 준비</span>
+              <span style={styles.summaryCount}>{summary.ready}건</span>
             </div>
           )}
           {summary.approved > 0 && (
@@ -267,9 +287,11 @@ export function HubB2BCatalogPage() {
         </div>
       ) : products.length === 0 ? (
         <div style={styles.emptyState}>
-          {distributionFilter === 'all'
-            ? '현재 공급 가능한 상품이 없습니다.'
-            : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`}
+          {distributionFilter === 'operator'
+            ? '운영자 승인 흐름에 참여 중인 상품이 없습니다. B2B 탭에서 상품을 확인하고 취급 신청을 해보세요.'
+            : distributionFilter === 'all'
+              ? '현재 공급 가능한 상품이 없습니다.'
+              : `"${DISTRIBUTION_TABS.find(t => t.key === distributionFilter)?.label}" 유형의 상품이 없습니다.`}
         </div>
       ) : (
         <>
@@ -353,7 +375,9 @@ export function HubB2BCatalogPage() {
                   {/* 액션 */}
                   <div style={{ ...styles.td, flex: 1, justifyContent: 'flex-end' }}>
                     {state === 'listed' ? (
-                      <button disabled style={styles.buttonDisabled}>판매 중</button>
+                      <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
+                    ) : state === 'ready' ? (
+                      <button disabled style={styles.buttonReady}>판매 준비 중</button>
                     ) : state === 'approved' ? (
                       <button onClick={() => navigate('/store/products/b2c')} style={styles.buttonNavigate}>매장 관리</button>
                     ) : state === 'pending' ? (
@@ -412,9 +436,10 @@ export function HubB2BCatalogPage() {
       <div style={styles.notice}>
         <span style={styles.noticeIcon}>💡</span>
         <span>
-          취급 신청 후 공급자 승인이 완료되면{' '}
+          취급 신청 후 운영자 승인이 완료되면{' '}
           <Link to="/store/commerce/orderable" style={{ color: colors.primary }}>내 매장관리 &gt; 주문 가능 상품</Link>
           에서 상품을 관리할 수 있습니다.
+          "판매 준비" 상태는 운영자 승인 대기 중인 상품입니다.
         </span>
       </div>
     </div>
@@ -685,6 +710,16 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '6px',
     cursor: 'pointer',
     transition: 'opacity 0.15s',
+  },
+  buttonReady: {
+    padding: '6px 14px',
+    fontSize: '0.75rem',
+    fontWeight: 500,
+    color: '#7c3aed',
+    backgroundColor: '#f5f3ff',
+    border: '1px solid #ddd6fe',
+    borderRadius: '6px',
+    cursor: 'not-allowed',
   },
 
   // Pagination

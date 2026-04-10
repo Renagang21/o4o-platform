@@ -57,24 +57,37 @@ export function createPharmacyProductsController(
   // ─── GET /catalog — 플랫폼 B2B 상품 카탈로그 ─────────────────────
   // WO-O4O-API-PHARMACY-B2B-CATALOG-V1
   // WO-KPA-HUB-PRODUCT-TABS-DATA-CRITERIA-REALIGNMENT-V1: recommended 필터 추가
+  // WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1:
+  //   - isListed 버그 수정 (opl.is_active=true 체크 추가)
+  //   - isListingInactive 필드 추가 (auto-expand 후 미활성 listing 식별)
+  //   - operatorView 필터 추가 (운영자 승인 흐름 관련 상품만 표시)
   // supplier_product_offers (PUBLIC + active) + 내 신청/진열 상태 조인
   router.get('/catalog', requireAuth, requirePharmacyOwner, asyncHandler(async (req: Request, res: Response) => {
     const organizationId = (req as any).organizationId;
     const category = req.query.category as string | undefined;
     const distributionType = req.query.distributionType as string | undefined;
     const recommended = req.query.recommended === 'true';
+    const operatorView = req.query.operatorView === 'true';
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
     const offset = parseInt(req.query.offset as string) || 0;
 
     let categoryFilter = '';
     let distributionFilter = '';
+    let operatorFilter = '';
     const params: any[] = [organizationId, limit, offset];
 
     if (category) {
       params.push(category);
       categoryFilter = `AND pm.brand_name = $${params.length}`;
     }
-    if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
+    if (operatorView) {
+      // 운영자 탭: SERVICE 상품 중 약국이 승인 흐름에 참여 중인 상품만
+      distributionFilter = `AND spo.distribution_type = 'SERVICE'`;
+      operatorFilter = `AND (
+        EXISTS(SELECT 1 FROM product_approvals pa3 WHERE pa3.organization_id = $1 AND pa3.offer_id = spo.id)
+        OR EXISTS(SELECT 1 FROM organization_product_listings opl2 WHERE opl2.organization_id = $1 AND opl2.offer_id = spo.id)
+      )`;
+    } else if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
       params.push(distributionType);
       distributionFilter = `AND spo.distribution_type = $${params.length}`;
     }
@@ -111,11 +124,25 @@ export function createPharmacyProductsController(
              AND pa2.offer_id = spo.id
              AND pa2.approval_status = 'approved'
          )) AS "isApproved",
+         -- WO-KPA-HUB-OPERATOR-TAB-AND-STATUS-ALIGNMENT-V1: isListed = is_active=true인 경우만
          (EXISTS(
            SELECT 1 FROM organization_product_listings opl
            WHERE opl.organization_id = $1
              AND opl.offer_id = spo.id
-         )) AS "isListed"
+             AND opl.is_active = true
+         )) AS "isListed",
+         -- 판매 준비 상태: listing 존재하지만 is_active=false (auto-expand 후 미활성)
+         (EXISTS(
+           SELECT 1 FROM organization_product_listings opl
+           WHERE opl.organization_id = $1
+             AND opl.offer_id = spo.id
+             AND opl.is_active = false
+         ) AND NOT EXISTS(
+           SELECT 1 FROM organization_product_listings opl
+           WHERE opl.organization_id = $1
+             AND opl.offer_id = spo.id
+             AND opl.is_active = true
+         )) AS "isListingInactive"
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN neture_suppliers s ON s.id = spo.supplier_id
@@ -125,22 +152,28 @@ export function createPharmacyProductsController(
          AND s.status = 'ACTIVE'
          ${categoryFilter}
          ${distributionFilter}
+         ${operatorFilter}
        ORDER BY ${orderBy}
        LIMIT $2 OFFSET $3`,
       params,
     );
 
     // Total count (for pagination)
-    // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1:
-    // recommended 탭은 별도 필터 없이 정렬만 변경하므로 count는 기본 조건과 동일
-    const countParams: any[] = [];
+    const countParams: any[] = operatorView ? [organizationId] : [];
     let countCategoryFilter = '';
     let countDistributionFilter = '';
+    let countOperatorFilter = '';
     if (category) {
       countParams.push(category);
       countCategoryFilter = `AND pm.brand_name = $${countParams.length}`;
     }
-    if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
+    if (operatorView) {
+      countDistributionFilter = `AND spo.distribution_type = 'SERVICE'`;
+      countOperatorFilter = `AND (
+        EXISTS(SELECT 1 FROM product_approvals pa3 WHERE pa3.organization_id = $1 AND pa3.offer_id = spo.id)
+        OR EXISTS(SELECT 1 FROM organization_product_listings opl2 WHERE opl2.organization_id = $1 AND opl2.offer_id = spo.id)
+      )`;
+    } else if (distributionType && ['PUBLIC', 'SERVICE', 'PRIVATE'].includes(distributionType)) {
       countParams.push(distributionType);
       countDistributionFilter = `AND spo.distribution_type = $${countParams.length}`;
     }
@@ -154,7 +187,8 @@ export function createPharmacyProductsController(
          AND spo.is_active = true
          AND s.status = 'ACTIVE'
          ${countCategoryFilter}
-         ${countDistributionFilter}`,
+         ${countDistributionFilter}
+         ${countOperatorFilter}`,
       countParams,
     );
 
