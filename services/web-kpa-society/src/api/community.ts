@@ -3,9 +3,15 @@
  *
  * WO-KPA-A-COMMUNITY-HUB-IMPLEMENTATION-V1
  * Public read endpoints for ads/sponsors + Operator CRUD
+ *
+ * WO-KPA-A-OPERATOR-COMMUNITY-REGRESSION-FIX-V1:
+ * authClient.api (axios, localStorage strategy) 통일
+ * — apiClient (fetch 기반)에서 전환하여 다른 operator API와 동일한 인증 방식 사용
  */
 
-import { apiClient } from './client';
+import { authClient } from '../contexts/AuthContext';
+
+const KPA_BASE = '/kpa';
 
 // ==================== Types ====================
 
@@ -43,47 +49,71 @@ export interface CommunitySponsorFull extends CommunitySponsor {
 // ==================== Public API ====================
 
 export const communityApi = {
-  getHeroAds: () =>
-    apiClient.get<{ ads: CommunityAd[] }>('/community/ads', { type: 'hero' }),
+  getHeroAds: async (): Promise<{ ads: CommunityAd[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/ads`, { params: { type: 'hero' } });
+    return res.data?.data ?? res.data;
+  },
 
-  getPageAds: () =>
-    apiClient.get<{ ads: CommunityAd[] }>('/community/ads', { type: 'page' }),
+  getPageAds: async (): Promise<{ ads: CommunityAd[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/ads`, { params: { type: 'page' } });
+    return res.data?.data ?? res.data;
+  },
 
-  getSponsors: () =>
-    apiClient.get<{ sponsors: CommunitySponsor[] }>('/community/sponsors'),
+  getSponsors: async (): Promise<{ sponsors: CommunitySponsor[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/sponsors`);
+    return res.data?.data ?? res.data;
+  },
 };
 
 // ==================== Operator API ====================
 
 export const communityManageApi = {
   // Ads
-  listAds: (type?: string) =>
-    apiClient.get<{ ads: CommunityAdFull[] }>('/community/manage/ads', type ? { type } : undefined),
+  listAds: async (type?: string): Promise<{ ads: CommunityAdFull[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/manage/ads`, {
+      params: type ? { type } : undefined,
+    });
+    return res.data?.data ?? res.data;
+  },
 
-  createAd: (data: {
+  createAd: async (data: {
     type: string; title: string; imageUrl: string;
     linkUrl?: string; startDate?: string; endDate?: string;
     displayOrder?: number; isActive?: boolean;
-  }) => apiClient.post<CommunityAdFull>('/community/manage/ads', data),
+  }): Promise<CommunityAdFull> => {
+    const res = await authClient.api.post(`${KPA_BASE}/community/manage/ads`, data);
+    return res.data?.data ?? res.data;
+  },
 
-  updateAd: (id: string, data: Record<string, unknown>) =>
-    apiClient.put<CommunityAdFull>(`/community/manage/ads/${id}`, data),
+  updateAd: async (id: string, data: Record<string, unknown>): Promise<CommunityAdFull> => {
+    const res = await authClient.api.put(`${KPA_BASE}/community/manage/ads/${id}`, data);
+    return res.data?.data ?? res.data;
+  },
 
-  deleteAd: (id: string) =>
-    apiClient.delete<void>(`/community/manage/ads/${id}`),
+  deleteAd: async (id: string): Promise<void> => {
+    await authClient.api.delete(`${KPA_BASE}/community/manage/ads/${id}`);
+  },
 
   // Sponsors
-  listSponsors: () =>
-    apiClient.get<{ sponsors: CommunitySponsorFull[] }>('/community/manage/sponsors'),
+  listSponsors: async (): Promise<{ sponsors: CommunitySponsorFull[] }> => {
+    const res = await authClient.api.get(`${KPA_BASE}/community/manage/sponsors`);
+    return res.data?.data ?? res.data;
+  },
 
-  createSponsor: (data: {
+  createSponsor: async (data: {
     name: string; logoUrl: string; linkUrl?: string;
     displayOrder?: number; isActive?: boolean;
-  }) => apiClient.post<CommunitySponsorFull>('/community/manage/sponsors', data),
+  }): Promise<CommunitySponsorFull> => {
+    const res = await authClient.api.post(`${KPA_BASE}/community/manage/sponsors`, data);
+    return res.data?.data ?? res.data;
+  },
 
-  updateSponsor: (id: string, data: Record<string, unknown>) =>
-    apiClient.put<CommunitySponsorFull>(`/community/manage/sponsors/${id}`, data),
+  updateSponsor: async (id: string, data: Record<string, unknown>): Promise<CommunitySponsorFull> => {
+    const res = await authClient.api.put(`${KPA_BASE}/community/manage/sponsors/${id}`, data);
+    return res.data?.data ?? res.data;
+  },
 
-  deleteSponsor: (id: string) =>
-    apiClient.delete<void>(`/community/manage/sponsors/${id}`),
+  deleteSponsor: async (id: string): Promise<void> => {
+    await authClient.api.delete(`${KPA_BASE}/community/manage/sponsors/${id}`);
+  },
 };
