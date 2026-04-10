@@ -73,8 +73,8 @@ export function OperatorRoutes() {
           {/* 콘텐츠 관리 (WO-KPA-A-CONTENT-CMS-PHASE1-V1) */}
           <Route path="content" element={<ContentManagementPage />} />
 
-          {/* 사이니지 콘텐츠 허브 */}
-          <Route path="signage/content" element={<ContentHubPage />} />
+          {/* 사이니지 콘텐츠 허브 (운영자 모드: 커뮤니티 등록 UI 숨김) */}
+          <Route path="signage/content" element={<ContentHubPage operatorMode />} />
           {/* Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1) */}
           <Route path="signage/hq-media" element={<HqMediaPage />} />
           <Route path="signage/hq-media/:mediaId" element={<HqMediaDetailPage />} />

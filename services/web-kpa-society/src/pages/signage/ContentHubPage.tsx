@@ -98,7 +98,7 @@ const SOURCE_TABS: { key: ContentSource | 'all'; label: string }[] = [
 
 // ─── Main Component ────────────────────────────────────
 
-export default function ContentHubPage() {
+export default function ContentHubPage({ operatorMode = false }: { operatorMode?: boolean }) {
   const { user } = useAuth();
 
   // Filter state
@@ -288,7 +288,7 @@ export default function ContentHubPage() {
             약사회 및 커뮤니티에서 제공하는 안내·교육 영상을 탐색하고 내 매장에서 활용하세요
           </p>
         </div>
-        {user && (
+        {user && !operatorMode && (
           <button
             onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
             className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -380,7 +380,7 @@ export default function ContentHubPage() {
           <div className="py-16 text-center text-sm text-slate-400 flex flex-col items-center gap-2">
             <VideoIcon className="h-8 w-8 text-slate-200" />
             <p>등록된 콘텐츠가 없습니다</p>
-            {user && source === 'community' && (
+            {user && !operatorMode && source === 'community' && (
               <button
                 onClick={() => { setCreateForm({ name: '', description: '', sourceUrl: '', category: '' }); setCreateError(null); setCreateModal({ type: 'media' }); }}
                 className="mt-1 text-blue-600 hover:underline"
@@ -548,7 +548,7 @@ export default function ContentHubPage() {
       </div>
 
       {/* Community Content Creation Modal */}
-      {createModal && (
+      {createModal && !operatorMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
@@ -580,13 +580,16 @@ export default function ContentHubPage() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">카테고리 (선택)</label>
-                <input
-                  type="text"
+                <select
                   value={createForm.category}
                   onChange={(e) => setCreateForm(f => ({ ...f, category: e.target.value }))}
-                  placeholder="예: 건강정보, 약국홍보"
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400"
-                />
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-400 bg-white"
+                >
+                  <option value="">카테고리 선택</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">설명 (선택)</label>

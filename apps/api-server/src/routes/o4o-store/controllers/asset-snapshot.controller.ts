@@ -4,7 +4,7 @@
  * WO-O4O-ASSET-COPY-CORE-EXTRACTION-V1
  *
  * Uses Core Controller Factory with KPA-specific config:
- * - Roles: kpa:admin, kpa:operator, kpa:branch_admin, kpa:branch_operator
+ * - Roles: kpa:admin, kpa:operator, kpa:branch_admin, kpa:branch_operator, kpa:pharmacist
  * - Org: KpaMember.organization_id
  * - Resolver: KpaAssetResolver (CmsContent + signage_media)
  */
@@ -37,7 +37,7 @@ export function createAssetSnapshotController(
   requireAuth: AuthMiddleware,
 ): Router {
   return createAssetCopyController(dataSource, requireAuth, {
-    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:branch_admin', 'kpa:branch_operator'],
+    allowedRoles: ['kpa:admin', 'kpa:operator', 'kpa:branch_admin', 'kpa:branch_operator', 'kpa:pharmacist'],
     sourceService: 'kpa',
     resolver: new KpaAssetResolver(dataSource),
     resolveOrgId: resolveKpaOrgId,

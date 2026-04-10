@@ -83,9 +83,9 @@ export class CourseController extends BaseController {
         totalPages: Math.ceil(total / (Number(filters.limit) || 20))
       });
     } catch (error: any) {
-      // Graceful fallback: return empty data if table doesn't exist
-      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-        logger.warn('[CourseController.listCourses] LMS tables not found - returning empty courses');
+      // Graceful fallback: return empty data if table or column doesn't exist
+      if (error.message?.includes('does not exist') && (error.message?.includes('relation') || error.message?.includes('column'))) {
+        logger.warn('[CourseController.listCourses] LMS schema issue - returning empty courses', { detail: error.message });
         return BaseController.okPaginated(res, [], {
           total: 0,
           page: Number(req.query.page) || 1,

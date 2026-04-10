@@ -31,7 +31,7 @@ export function BranchOperatorRoutes() {
         <Route element={<BranchOperatorLayout />}>
           <Route index element={<BranchOperatorDashboard />} />
           <Route path="forum-management" element={<ForumManagementPage />} />
-          <Route path="signage/content" element={<ContentHubPage />} />
+          <Route path="signage/content" element={<ContentHubPage operatorMode />} />
           {/* 레거시 리다이렉트 (WO-KPA-OPERATOR-MANAGEMENT-MIGRATION-V1) */}
           <Route path="operators" element={<Navigate to="/operator/users" replace />} />
 
