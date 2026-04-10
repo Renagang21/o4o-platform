@@ -16,12 +16,15 @@
  *    모든 매장 추가는 assetSnapshotApi.copy() 단일 경로만 사용
  */
 
-import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus } from 'lucide-react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { Download, Video as VideoIcon, List, AlertCircle, Play, Clock, Film, ImageOff, Plus, Trash2 } from 'lucide-react';
 import { publicContentApi, SignagePlaylist, SignageMedia, type ContentSource } from '../../lib/api/signageV2';
 import { getMediaThumbnailUrl } from '@o4o/types/signage';
 import { assetSnapshotApi } from '../../api/assetSnapshot';
+import { getAccessToken } from '../../contexts/AuthContext';
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+const SERVICE_KEY = 'kpa-society';
 
 /** Image with onError fallback — shows placeholder icon when image fails to load */
 function SafeImg({ src, alt, className }: { src: string; alt: string; className: string }) {
@@ -52,15 +55,16 @@ function formatDuration(seconds: number): string {
 
 // ── Compact list-row components ──
 
-function PlaylistRow({ playlist, onAddToStore }: {
+function PlaylistRow({ playlist, onAddToStore, onDelete }: {
   playlist: SignagePlaylist;
   onAddToStore: (id: string, name: string) => void;
+  onDelete?: (id: string, name: string) => void;
 }) {
-  const navigate = useNavigate();
+  const isHq = (playlist as any).source === 'hq';
 
   return (
     <div
-      onClick={() => navigate(`/signage/playlist/${playlist.id}`)}
+      onClick={() => window.open(`/signage/playlist/${playlist.id}`, '_blank')}
       className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
     >
       <div className="flex-shrink-0 w-8 text-center">
@@ -92,20 +96,30 @@ function PlaylistRow({ playlist, onAddToStore }: {
         >
           <Plus className="h-4 w-4" />
         </button>
+        {isHq && onDelete && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(playlist.id, playlist.name); }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="삭제"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-function MediaRow({ item, onAddToStore }: {
+function MediaRow({ item, onAddToStore, onDelete }: {
   item: SignageMedia;
   onAddToStore: (id: string, name: string) => void;
+  onDelete?: (id: string, name: string) => void;
 }) {
-  const navigate = useNavigate();
+  const isHq = (item as any).source === 'hq';
 
   return (
     <div
-      onClick={() => navigate(`/signage/media/${item.id}`)}
+      onClick={() => window.open(`/signage/media/${item.id}`, '_blank')}
       className="flex items-center gap-4 py-3 border-b border-slate-100 last:border-b-0 group cursor-pointer hover:bg-slate-50 transition-colors"
     >
       <div className="flex-shrink-0 w-8 text-center">
@@ -134,6 +148,15 @@ function MediaRow({ item, onAddToStore }: {
         >
           <Plus className="h-4 w-4" />
         </button>
+        {isHq && onDelete && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(item.id, item.name); }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+            title="삭제"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -142,13 +165,12 @@ function MediaRow({ item, onAddToStore }: {
 // ── Highlight card (for top section) ──
 
 function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
-  const navigate = useNavigate();
   const firstItem = playlist.items?.[0];
   const previewThumbnail = firstItem?.media ? getMediaThumbnailUrl(firstItem.media) : null;
 
   return (
     <div
-      onClick={() => navigate(`/signage/playlist/${playlist.id}`)}
+      onClick={() => window.open(`/signage/playlist/${playlist.id}`, '_blank')}
       className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
     >
       {previewThumbnail ? (
@@ -178,11 +200,9 @@ function HighlightPlaylistCard({ playlist }: { playlist: SignagePlaylist }) {
 }
 
 function HighlightMediaCard({ item }: { item: SignageMedia }) {
-  const navigate = useNavigate();
-
   return (
     <div
-      onClick={() => navigate(`/signage/media/${item.id}`)}
+      onClick={() => window.open(`/signage/media/${item.id}`, '_blank')}
       className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
     >
       <div className="w-full h-32 bg-gradient-to-br from-purple-50 to-slate-100 flex items-center justify-center">
@@ -204,7 +224,6 @@ function HighlightMediaCard({ item }: { item: SignageMedia }) {
 // ── Main Component ──
 
 export default function ContentHubPage() {
-  const navigate = useNavigate();
   const [playlistSource, setPlaylistSource] = useState<ContentSource>('community');
   const [mediaSource, setMediaSource] = useState<ContentSource>('community');
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
@@ -212,6 +231,8 @@ export default function ContentHubPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; type: 'playlist' | 'media' } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Load ALL content once (all sources)
   useEffect(() => {
@@ -272,6 +293,41 @@ export default function ContentHubPage() {
     () => allMedia.filter((m) => (m as any).source === mediaSource),
     [allMedia, mediaSource],
   );
+
+  const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
+    const token = getAccessToken();
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options?.headers,
+      },
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error || body?.message || `API error ${res.status}`);
+    }
+    return res.json();
+  }, []);
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirm) return;
+    setIsDeleting(true);
+    try {
+      const path = deleteConfirm.type === 'playlist'
+        ? `/api/signage/${SERVICE_KEY}/hq/playlists/${deleteConfirm.id}`
+        : `/api/signage/${SERVICE_KEY}/hq/media/${deleteConfirm.id}`;
+      await apiFetch(path, { method: 'DELETE' });
+      setDeleteConfirm(null);
+      loadAllContent();
+    } catch (err: any) {
+      setError(err?.message || '삭제에 실패했습니다');
+      setDeleteConfirm(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   // Add to Store handler (asset snapshot copy)
   const handleAddToStore = async (sourceId: string, name: string) => {
@@ -416,7 +472,8 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 플레이리스트가 없습니다</div>
             ) : (
               filteredPlaylists.map((pl) => (
-                <PlaylistRow key={pl.id} playlist={pl} onAddToStore={handleAddToStore} />
+                <PlaylistRow key={pl.id} playlist={pl} onAddToStore={handleAddToStore}
+                  onDelete={(id, name) => setDeleteConfirm({ id, name, type: 'playlist' })} />
               ))
             )}
           </div>
@@ -457,12 +514,41 @@ export default function ContentHubPage() {
               <div className="py-8 text-center text-sm text-slate-400">등록된 동영상이 없습니다</div>
             ) : (
               filteredMedia.map((m) => (
-                <MediaRow key={m.id} item={m} onAddToStore={handleAddToStore} />
+                <MediaRow key={m.id} item={m} onAddToStore={handleAddToStore}
+                  onDelete={(id, name) => setDeleteConfirm({ id, name, type: 'media' })} />
               ))
             )}
           </div>
         </div>
       </section>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">
+              {deleteConfirm.type === 'playlist' ? '플레이리스트' : '미디어'} 완전 삭제
+            </h3>
+            <p className="text-sm text-slate-500 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
+              <p className="font-medium text-slate-700">{deleteConfirm.name}</p>
+              <p className="text-slate-400 text-xs mt-1">
+                {deleteConfirm.type === 'playlist'
+                  ? 'HQ 플레이리스트 · 삭제 시 모든 재생 항목도 함께 제거됩니다'
+                  : 'HQ 미디어 · 삭제 시 연결된 플레이리스트 항목도 함께 제거됩니다'}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting}
+                className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
+              <button onClick={handleDeleteConfirmed} disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
+                {isDeleting ? '삭제 중...' : '완전 삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
