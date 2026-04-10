@@ -263,12 +263,15 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)
 
   // ========== Category Routes (WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1 Phase 4) ==========
-  // GET /api/signage/:serviceKey/categories — list active categories (public read)
+  // GET /api/signage/:serviceKey/categories — list categories (operator sees all, others see active only)
   router.get('/categories', allowSignageStoreRead, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { serviceKey } = req.params;
+      const userRoles: string[] = (req as any).user?.roles || [];
+      const isOperator = userRoles.some((r: string) => ['operator', 'admin', 'super_admin', 'kpa:operator', 'kpa:admin'].includes(r));
+      const activeFilter = isOperator ? '' : `AND "isActive" = true`;
       const rows = await dataSource.query(
-        `SELECT id, name, "sortOrder" FROM signage_categories WHERE "serviceKey" = $1 AND "isActive" = true ORDER BY "sortOrder", name`,
+        `SELECT id, name, "sortOrder", "isActive", "createdAt" FROM signage_categories WHERE "serviceKey" = $1 ${activeFilter} ORDER BY "sortOrder", name`,
         [serviceKey],
       );
       res.json({ data: rows });
@@ -288,6 +291,31 @@ export function createSignageRoutes(dataSource: DataSource): Router {
         [serviceKey, name.trim(), sortOrder],
       );
       res.status(201).json({ data: rows[0] });
+    } catch (error) { next(error); }
+  });
+
+  // PATCH /api/signage/:serviceKey/categories/:id — update isActive or sortOrder (operator only)
+  router.patch('/categories/:id', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { serviceKey, id } = req.params;
+      const { isActive, sortOrder } = req.body;
+      const sets: string[] = [`"updatedAt" = NOW()`];
+      const params: any[] = [id, serviceKey];
+      if (isActive !== undefined) {
+        params.push(isActive);
+        sets.push(`"isActive" = $${params.length}`);
+      }
+      if (sortOrder !== undefined) {
+        params.push(sortOrder);
+        sets.push(`"sortOrder" = $${params.length}`);
+      }
+      if (sets.length === 1) { res.status(400).json({ error: 'Nothing to update' }); return; }
+      const rows = await dataSource.query(
+        `UPDATE signage_categories SET ${sets.join(', ')} WHERE id = $1 AND "serviceKey" = $2 RETURNING id, name, "sortOrder", "isActive"`,
+        params,
+      );
+      if (!rows.length) { res.status(404).json({ error: 'Category not found' }); return; }
+      res.json({ data: rows[0] });
     } catch (error) { next(error); }
   });
 

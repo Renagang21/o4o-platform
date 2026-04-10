@@ -13,6 +13,12 @@ import type {
   SignageStatus,
 } from '../dto/index.js';
 
+function detectVideoSourceType(url: string): 'youtube' | 'vimeo' {
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  if (url.includes('vimeo.com')) return 'vimeo';
+  throw new Error('UNSUPPORTED_VIDEO_SOURCE');
+}
+
 export class SignageGlobalContentController {
   private service: SignageGlobalContentService;
 
@@ -275,8 +281,25 @@ export class SignageGlobalContentController {
       const userId = extractUserId(req);
 
       const { source: _s, scope: _sc, organizationId: _oid, serviceKey: _sk, ...safeBody } = req.body;
+
+      // Phase 2: URL validation — YouTube/Vimeo only for community video uploads
+      let resolvedSourceType = safeBody.sourceType;
+      if (safeBody.sourceUrl) {
+        try {
+          resolvedSourceType = detectVideoSourceType(safeBody.sourceUrl);
+        } catch {
+          res.status(400).json({
+            success: false,
+            error: '유튜브 또는 비메오 URL만 등록할 수 있습니다',
+            code: 'UNSUPPORTED_VIDEO_SOURCE',
+          });
+          return;
+        }
+      }
+
       const dto: CreateGlobalMediaDto = {
         ...safeBody,
+        sourceType: resolvedSourceType,
         source: 'community',
         scope: 'global',
         status: 'active', // Community content is immediately public
