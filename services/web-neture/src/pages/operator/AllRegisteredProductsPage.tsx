@@ -379,6 +379,29 @@ export default function AllRegisteredProductsPage() {
     }
   };
 
+  const handleBulkToggleActive = async (isActive: boolean) => {
+    const ids = Array.from(selectedOfferIds);
+    if (ids.length === 0) return;
+    const label = isActive ? '활성화' : '비활성화';
+    if (!confirm(`선택한 ${ids.length}개 상품을 ${label}합니다. 진행하시겠습니까?`)) return;
+    setActionLoading(true);
+    try {
+      const result = await operatorAllOffersApi.batchToggleActive(ids, isActive);
+      const failCount = result.failed?.length || 0;
+      if (failCount === 0) {
+        alert(`${ids.length}개 ${label} 완료`);
+      } else {
+        alert(`${ids.length - failCount}개 ${label}, ${failCount}개 실패`);
+      }
+      setSelectedOfferIds(new Set());
+      await fetchOffers(page);
+    } catch {
+      alert(`${label} 중 오류가 발생했습니다`);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // ─── Column definitions (WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1) ───
   // selectedOfferIds / allSelected / someSelected 변경 시 헤더 체크박스가 함께 갱신되도록 deps에 포함.
   const columns = useMemo<ListColumnDef<AllRegisteredOffer>[]>(() => [
@@ -803,6 +826,22 @@ export default function AllRegisteredProductsPage() {
                 </button>
               </>
             )}
+            <button
+              onClick={() => handleBulkToggleActive(true)}
+              disabled={actionLoading}
+              className="px-3 py-1 text-sm text-white bg-green-600 hover:bg-green-700 rounded disabled:opacity-50 flex items-center gap-1"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              {actionLoading ? '처리 중...' : `활성화 (${selectedOfferIds.size})`}
+            </button>
+            <button
+              onClick={() => handleBulkToggleActive(false)}
+              disabled={actionLoading}
+              className="px-3 py-1 text-sm text-white bg-slate-500 hover:bg-slate-600 rounded disabled:opacity-50 flex items-center gap-1"
+            >
+              <EyeOff className="w-3.5 h-3.5" />
+              {actionLoading ? '처리 중...' : `비활성화 (${selectedOfferIds.size})`}
+            </button>
             <button
               onClick={handleBulkDelete}
               disabled={actionLoading}

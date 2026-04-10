@@ -112,6 +112,34 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
     }
   });
 
+  /**
+   * PATCH /api/v1/neture/operator/all-offers/batch-active
+   * 운영자 일괄 활성/비활성 토글
+   */
+  router.patch('/operator/all-offers/batch-active', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
+      }
+      const { offerIds, isActive } = req.body;
+      if (!Array.isArray(offerIds) || offerIds.length === 0) {
+        return res.status(400).json({ success: false, error: 'INVALID_PARAMS', message: 'offerIds array is required' });
+      }
+      if (offerIds.length > 100) {
+        return res.status(400).json({ success: false, error: 'TOO_MANY_ITEMS', message: 'Max 100 items per request' });
+      }
+      if (typeof isActive !== 'boolean') {
+        return res.status(400).json({ success: false, error: 'INVALID_PARAMS', message: 'isActive must be a boolean' });
+      }
+      const result = await netureService.batchToggleOfferActive(offerIds, isActive);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error('[Neture API] Error batch toggling offer active status:', error);
+      res.status(500).json({ success: false, error: 'INTERNAL_ERROR', message: 'Failed to batch toggle active status' });
+    }
+  });
+
   // Operator domain — dashboard + registration + category management
   // WO-O4O-OPERATOR-API-ARCHITECTURE-UNIFICATION-V1 (Phase 2)
   router.use('/operator', createOperatorDashboardController(dataSource));

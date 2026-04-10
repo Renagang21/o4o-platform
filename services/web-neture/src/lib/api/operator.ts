@@ -100,6 +100,16 @@ export const operatorAllOffersApi = {
       };
     }
   },
+
+  async batchToggleActive(offerIds: string[], isActive: boolean): Promise<{ updated: string[]; failed: Array<{ id: string; error: string }> }> {
+    try {
+      const response = await api.patch('/neture/operator/all-offers/batch-active', { offerIds, isActive });
+      return response.data?.data || { updated: [], failed: [] };
+    } catch (error) {
+      console.warn('[Operator API] Failed to batch toggle active:', error);
+      return { updated: [], failed: [{ id: 'all', error: 'NETWORK_ERROR' }] };
+    }
+  },
 };
 
 export const operatorSupplyApi = {

@@ -263,6 +263,10 @@ export class NetureService {
     return this.offerService.batchUpdateSupplierOffers(supplierId, updates);
   }
 
+  async batchToggleOfferActive(offerIds: string[], isActive: boolean) {
+    return this.offerService.batchToggleOfferActive(offerIds, isActive);
+  }
+
   async bulkDeleteOffers(...args: Parameters<typeof this.offerService.bulkDeleteOffers>) {
     return this.offerService.bulkDeleteOffers(...args);
   }

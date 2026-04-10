@@ -1387,6 +1387,33 @@ export class NetureOfferService {
     return { updated, failed };
   }
 
+  // ==================== Operator Batch Toggle Active ====================
+
+  async batchToggleOfferActive(
+    offerIds: string[],
+    isActive: boolean,
+  ): Promise<{ updated: string[]; failed: Array<{ id: string; error: string }> }> {
+    const updated: string[] = [];
+    const failed: Array<{ id: string; error: string }> = [];
+
+    for (const offerId of offerIds) {
+      try {
+        const offer = await this.offerRepo.findOne({ where: { id: offerId } });
+        if (!offer) {
+          failed.push({ id: offerId, error: 'PRODUCT_NOT_FOUND' });
+          continue;
+        }
+        offer.isActive = isActive;
+        await this.offerRepo.save(offer);
+        updated.push(offerId);
+      } catch (err) {
+        failed.push({ id: offerId, error: (err as Error).message });
+      }
+    }
+
+    return { updated, failed };
+  }
+
   // ==================== Bulk Delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1) ====================
 
   async bulkDeleteOffers(
