@@ -224,8 +224,8 @@ function HighlightMediaCard({ item }: { item: SignageMedia }) {
 // ── Main Component ──
 
 export default function ContentHubPage() {
-  const [playlistSource, setPlaylistSource] = useState<ContentSource>('community');
-  const [mediaSource, setMediaSource] = useState<ContentSource>('community');
+  const [playlistSource, setPlaylistSource] = useState<ContentSource>('hq');
+  const [mediaSource, setMediaSource] = useState<ContentSource>('hq');
   const [allPlaylists, setAllPlaylists] = useState<SignagePlaylist[]>([]);
   const [allMedia, setAllMedia] = useState<SignageMedia[]>([]);
   const [loading, setLoading] = useState(true);
