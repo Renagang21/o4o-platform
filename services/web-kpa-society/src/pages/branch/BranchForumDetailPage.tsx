@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { ForumBlockRenderer } from '@o4o/forum-core/public-ui';
+import { ContentRenderer } from '@o4o/content-editor';
 
 import { useAuth } from '../../contexts';
 import { useBranchContext } from '../../contexts/BranchContext';
@@ -101,7 +103,11 @@ export function BranchForumDetailPage() {
         </div>
 
         <div style={styles.content}>
-          {post.content}
+          {Array.isArray(post.content) ? (
+            <ForumBlockRenderer content={post.content} />
+          ) : (
+            <ContentRenderer html={post.content} />
+          )}
         </div>
 
         <div style={styles.postActions}>
@@ -208,7 +214,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '16px',
     lineHeight: 1.8,
     color: colors.neutral800,
-    whiteSpace: 'pre-wrap',
     minHeight: '150px',
   },
   postActions: {
