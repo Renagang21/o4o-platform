@@ -535,7 +535,7 @@ function App() {
           <Route path="/register" element={<RegisterRedirect />} />
           <Route path="/forgot-password" element={<AccountRecoveryPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/admin/*" element={<Navigate to="/demo/admin" replace />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
           {/* 약국 HUB — WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 좌측 사이드바 레이아웃 */}
           <Route path="/hub" element={<Layout serviceName={SERVICE_NAME}><HubGuard><PharmacyHubLayout /></HubGuard></Layout>}>
             <Route index element={<Navigate to="/hub/b2b" replace />} />
