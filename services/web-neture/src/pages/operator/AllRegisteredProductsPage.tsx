@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
-  X, Eye, EyeOff, FileText, FileSearch, Tag,
+  X, Eye, EyeOff, FileText, FileSearch, Tag, Trash2,
 } from 'lucide-react';
 import { ContentRenderer } from '@o4o/content-editor';
 import { DataTable } from '@o4o/operator-ux-core';
@@ -21,6 +21,7 @@ import {
   type AllOffersKpi,
 } from '../../lib/api';
 import { operatorServiceApprovalApi } from '../../lib/api/serviceApproval';
+import { productCleanupApi } from '../../lib/api/operatorProductCleanup';
 import {
   DISTRIBUTION_TYPE_LABELS,
   APPROVAL_STATUS_BADGE,
@@ -188,6 +189,7 @@ export default function AllRegisteredProductsPage() {
   // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Selection state
   const [selectedOfferIds, setSelectedOfferIds] = useState<Set<string>>(new Set());
   const [actionLoading, setActionLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const PAGE_SIZE = 50;
 
@@ -258,8 +260,9 @@ export default function AllRegisteredProductsPage() {
   const displayOffers = filteredOffers;
 
   // WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1
-  // 선택 가능한 offer = serviceApprovals 중 pending이 1개 이상 있는 offer
-  const isSelectable = (o: AllRegisteredOffer) =>
+  // 선택 가능한 offer = 모든 offer (승인/거절은 내부에서 pending 필터, 삭제는 전체 대상)
+  const isSelectable = (_o: AllRegisteredOffer) => true;
+  const hasPendingApproval = (o: AllRegisteredOffer) =>
     (o.serviceApprovals || []).some((a) => a.status === 'pending' && a.id);
 
   const selectableIds = useMemo(
@@ -304,9 +307,34 @@ export default function AllRegisteredProductsPage() {
     return ids;
   };
 
+  const handleBulkDelete = async () => {
+    const targetOffers = displayOffers.filter((o) => selectedOfferIds.has(o.id));
+    if (targetOffers.length === 0) return;
+    if (!confirm(`선택한 ${targetOffers.length}개 상품을 삭제합니다. (휴지통으로 이동) 진행하시겠습니까?`)) return;
+    setActionLoading(true);
+    try {
+      const results = await Promise.all(targetOffers.map((o) => productCleanupApi.softDelete(o.id)));
+      const failed = results.filter((r) => !r.success).length;
+      if (failed === 0) {
+        alert(`${targetOffers.length}개 삭제 완료 (휴지통으로 이동)`);
+      } else {
+        alert(`${targetOffers.length - failed}개 삭제, ${failed}개 실패`);
+      }
+      setSelectedOfferIds(new Set());
+      await fetchOffers(page);
+    } catch {
+      alert('삭제 중 오류가 발생했습니다');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleBulkApprove = async () => {
     const ids = collectPendingApprovalIds();
-    if (ids.length === 0) return;
+    if (ids.length === 0) {
+      alert('선택한 상품 중 승인 대기 중인 항목이 없습니다.');
+      return;
+    }
     if (!confirm(`선택한 ${selectedOfferIds.size}개 상품의 ${ids.length}개 승인 요청을 일괄 승인합니다. 진행하시겠습니까?`)) return;
     setActionLoading(true);
     try {
@@ -752,32 +780,47 @@ export default function AllRegisteredProductsPage() {
       </div>
 
       {/* WO-NETURE-OPERATOR-APPROVAL-LIST-SELECTION-ACTION-BAR-V1: Bulk Action Bar */}
-      {selectedOfferIds.size > 0 && (
-        <div className="flex items-center gap-3 mb-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
-          <span className="text-sm text-blue-700 font-medium">{selectedOfferIds.size}개 선택</span>
-          <button
-            onClick={handleBulkApprove}
-            disabled={actionLoading}
-            className="px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded disabled:opacity-50"
-          >
-            {actionLoading ? '처리 중...' : '승인'}
-          </button>
-          <button
-            onClick={handleBulkReject}
-            disabled={actionLoading}
-            className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
-          >
-            거절
-          </button>
-          <button
-            onClick={() => setSelectedOfferIds(new Set())}
-            disabled={actionLoading}
-            className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded"
-          >
-            선택 해제
-          </button>
-        </div>
-      )}
+      {selectedOfferIds.size > 0 && (() => {
+        const pendingCount = displayOffers.filter((o) => selectedOfferIds.has(o.id) && hasPendingApproval(o)).length;
+        return (
+          <div className="flex items-center gap-3 mb-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+            <span className="text-sm text-blue-700 font-medium">{selectedOfferIds.size}개 선택</span>
+            {pendingCount > 0 && (
+              <>
+                <button
+                  onClick={handleBulkApprove}
+                  disabled={actionLoading}
+                  className="px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded disabled:opacity-50"
+                >
+                  {actionLoading ? '처리 중...' : `승인 (${pendingCount})`}
+                </button>
+                <button
+                  onClick={handleBulkReject}
+                  disabled={actionLoading}
+                  className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
+                >
+                  {`거절 (${pendingCount})`}
+                </button>
+              </>
+            )}
+            <button
+              onClick={handleBulkDelete}
+              disabled={actionLoading}
+              className="px-3 py-1 text-sm text-white bg-slate-600 hover:bg-slate-700 rounded disabled:opacity-50 flex items-center gap-1"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              {actionLoading ? '처리 중...' : `삭제 (${selectedOfferIds.size})`}
+            </button>
+            <button
+              onClick={() => setSelectedOfferIds(new Set())}
+              disabled={actionLoading}
+              className="px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 rounded"
+            >
+              선택 해제
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Table — WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1 */}
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
@@ -907,6 +950,33 @@ export default function AllRegisteredProductsPage() {
               <div className="bg-slate-50 rounded-lg p-3">
                 <p className="text-xs text-slate-500">등록일</p>
                 <p className="text-sm text-slate-800 mt-0.5">{new Date(detailOffer.createdAt).toLocaleDateString('ko-KR')}</p>
+              </div>
+              {/* Delete */}
+              <div className="pt-2 border-t border-slate-100">
+                <button
+                  disabled={deleteLoading}
+                  onClick={async () => {
+                    if (!confirm(`"${detailOffer.name}" 상품을 삭제합니다. (휴지통으로 이동) 진행하시겠습니까?`)) return;
+                    setDeleteLoading(true);
+                    try {
+                      const result = await productCleanupApi.softDelete(detailOffer.id);
+                      if (result.success) {
+                        setDetailOffer(null);
+                        await fetchOffers(page);
+                      } else {
+                        alert(`삭제 실패: ${result.error || '알 수 없는 오류'}`);
+                      }
+                    } catch {
+                      alert('삭제 중 오류가 발생했습니다');
+                    } finally {
+                      setDeleteLoading(false);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {deleteLoading ? '삭제 중...' : '상품 삭제 (휴지통)'}
+                </button>
               </div>
             </div>
           </div>
