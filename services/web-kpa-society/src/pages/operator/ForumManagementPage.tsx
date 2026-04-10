@@ -592,13 +592,16 @@ export default function ForumManagementPage() {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             )}
-                            <button
-                              onClick={() => openHardDeleteModal(cat)}
-                              className="p-2 rounded-lg hover:bg-rose-100 text-slate-300 hover:text-rose-700 transition-colors"
-                              title="영구 삭제 (hard delete)"
-                            >
-                              <AlertOctagon className="w-4 h-4" />
-                            </button>
+                            {/* WO-KPA-A-OPERATOR-FORUM-HARD-DELETE-ICON-V1: 비활성 포럼에만 hard delete 아이콘 노출 */}
+                            {!cat.isActive && (
+                              <button
+                                onClick={() => openHardDeleteModal(cat)}
+                                className="p-2 rounded-lg hover:bg-rose-100 text-red-400 hover:text-rose-700 transition-colors"
+                                title="완전 삭제 (복구 불가)"
+                              >
+                                <AlertOctagon className="w-4 h-4" />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
