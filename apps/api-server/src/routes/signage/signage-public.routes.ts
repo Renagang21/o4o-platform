@@ -16,6 +16,8 @@ interface PublicQueryParams {
   source?: string;
   limit?: string;
   page?: string;
+  search?: string;
+  category?: string;
 }
 
 /**
@@ -39,24 +41,34 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
   router.get('/media', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serviceKey = req.params.serviceKey;
-      const { source, limit = '20', page = '1' } = req.query as PublicQueryParams;
+      const { source, limit = '20', page = '1', search, category } = req.query as PublicQueryParams;
 
       const limitNum = Math.min(parseInt(limit) || 20, 50);
       const pageNum = parseInt(page) || 1;
       const offset = (pageNum - 1) * limitNum;
 
-      // Build source filter
-      let sourceFilter = '';
+      const conditions: string[] = [`m."serviceKey" = $1`, `m.scope = 'global'`, `m.status = 'active'`];
       const params: any[] = [serviceKey];
 
       if (source && ['hq', 'supplier', 'community'].includes(source)) {
-        sourceFilter = 'AND source = $2';
         params.push(source);
+        conditions.push(`m.source = $${params.length}`);
       } else {
-        // Default: public sources only
-        sourceFilter = 'AND source IN ($2, $3, $4)';
         params.push('hq', 'supplier', 'community');
+        conditions.push(`m.source IN ($${params.length - 2}, $${params.length - 1}, $${params.length})`);
       }
+
+      if (search && search.trim()) {
+        params.push(`%${search.trim()}%`);
+        conditions.push(`(m.name ILIKE $${params.length} OR m.description ILIKE $${params.length})`);
+      }
+
+      if (category && category.trim()) {
+        params.push(category.trim());
+        conditions.push(`m.category = $${params.length}`);
+      }
+
+      const whereClause = conditions.join(' AND ');
 
       const limitIndex = params.length + 1;
       const offsetIndex = params.length + 2;
@@ -64,25 +76,24 @@ export function createSignagePublicRoutes(dataSource: DataSource): Router {
 
       const media = await dataSource.query(`
         SELECT
-          m.id, m.name, m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
+          m.id, m.name, m.description, m.category,
+          m."mediaType", m."sourceUrl" as url, m."thumbnailUrl",
           m.duration, m.tags, m.metadata, m.source, m."createdByUserId",
           m."createdAt", m."updatedAt",
           COALESCE(o.name, u.name, u.email) as "creatorName"
         FROM signage_media m
         LEFT JOIN organizations o ON m."organizationId" = o.id
         LEFT JOIN users u ON m."createdByUserId" = u.id
-        WHERE m."serviceKey" = $1 AND m.scope = 'global' ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
+        WHERE ${whereClause}
         ORDER BY m."createdAt" DESC
         LIMIT $${limitIndex} OFFSET $${offsetIndex}
       `, params);
 
-      // Get total count
-      const countParams = params.slice(0, -2); // Remove limit/offset
       const countResult = await dataSource.query(`
         SELECT COUNT(*) as total
         FROM signage_media m
-        WHERE m."serviceKey" = $1 AND m.scope = 'global' ${sourceFilter.replace(/source/g, 'm.source')} AND m.status = 'active'
-      `, countParams);
+        WHERE ${whereClause}
+      `, params.slice(0, -2));
 
       const total = parseInt(countResult[0]?.total || '0', 10);
 

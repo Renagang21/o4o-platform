@@ -45,13 +45,15 @@ const getBaseUrl = (serviceKey: string = 'kpa-society') =>
  * 비로그인 사용자도 콘텐츠 조회 가능
  */
 export const publicContentApi = {
-  async listMedia(source?: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<PaginatedResponse<SignageMedia>>> {
+  async listMedia(source?: ContentSource, serviceKey?: string, params?: { page?: number; limit?: number; search?: string; category?: string }): Promise<ApiResponse<PaginatedResponse<SignageMedia>>> {
     try {
       const base = getBaseUrl(serviceKey);
       const searchParams = new URLSearchParams();
       if (source) searchParams.append('source', source);
       if (params?.page) searchParams.append('page', params.page.toString());
       if (params?.limit) searchParams.append('limit', params.limit.toString());
+      if (params?.search) searchParams.append('search', params.search);
+      if (params?.category) searchParams.append('category', params.category);
       const query = searchParams.toString();
       const url = query ? `${base}/public/media?${query}` : `${base}/public/media`;
 
