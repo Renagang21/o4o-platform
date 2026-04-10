@@ -671,6 +671,26 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     res.json({ success: true, data: updated });
   }));
 
+  // DELETE /news/:id/hard — Hard delete (physical removal, archived items only, operator only)
+  newsRouter.delete('/:id/hard', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
+    const existing = await contentRepo.createQueryBuilder('c')
+      .where('c.id = :id', { id: req.params.id })
+      .andWhere('c.serviceKey IN (:...sks)', { sks: KPA_SERVICE_KEYS })
+      .getOne();
+    if (!existing) {
+      res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Content not found' } });
+      return;
+    }
+    if (existing.status !== 'archived') {
+      res.status(400).json({ success: false, error: { code: 'NOT_ARCHIVED', message: '보관 상태의 콘텐츠만 완전 삭제할 수 있습니다.' } });
+      return;
+    }
+    const title = existing.title;
+    await contentRepo.delete({ id: existing.id });
+    await writeAuditLog((req as any).user, 'CONTENT_HARD_DELETED', 'content', existing.id, { title });
+    res.json({ success: true, data: { deleted: true, id: existing.id } });
+  }));
+
   // DELETE /news/:id — Soft delete (status → archived)
   newsRouter.delete('/:id', authenticate, requireKpaScope('kpa:operator'), asyncHandler(async (req: Request, res: Response) => {
     const existing = await contentRepo.createQueryBuilder('c')

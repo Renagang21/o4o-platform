@@ -265,13 +265,27 @@ function ContentList({
   }
 
   async function handleDelete(item: CmsContent) {
-    if (!confirm(`"${item.title}"을(를) 삭제(보관)하시겠습니까?`)) return;
+    if (!confirm(`"${item.title}"을(를) 보관 처리하시겠습니까?\n(보관된 콘텐츠는 이후 완전 삭제할 수 있습니다)`)) return;
     setActionLoading(item.id);
     try {
       await apiFetch(`/api/v1/kpa/news/${item.id}`, { method: 'DELETE' });
       onDeleted();
     } catch (e: any) {
-      toast.error(e.message || '삭제에 실패했습니다.');
+      toast.error(e.message || '보관 처리에 실패했습니다.');
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleHardDelete(item: CmsContent) {
+    if (!confirm(`"${item.title}"\n\n보관된 콘텐츠를 완전 삭제합니다. 이 작업은 되돌릴 수 없습니다.\n계속하시겠습니까?`)) return;
+    setActionLoading(item.id);
+    try {
+      await apiFetch(`/api/v1/kpa/news/${item.id}/hard`, { method: 'DELETE' });
+      toast.success('콘텐츠가 완전 삭제되었습니다.');
+      onDeleted();
+    } catch (e: any) {
+      toast.error(e.message || '완전 삭제에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }
@@ -453,7 +467,19 @@ function ContentList({
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400">보관됨</span>
+                        <div className="flex gap-1">
+                          {actionLoading === item.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                          ) : (
+                            <button
+                              onClick={() => handleHardDelete(item)}
+                              className="p-1 text-red-500 hover:bg-red-50 rounded"
+                              title="완전 삭제"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
