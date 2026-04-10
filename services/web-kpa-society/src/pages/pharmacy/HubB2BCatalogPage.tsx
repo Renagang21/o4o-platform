@@ -25,11 +25,12 @@ import { colors, shadows, borderRadius } from '../../styles/theme';
 // 카테고리 필터
 // ============================================
 
+// WO-KPA-HUB-RECOMMENDED-TAB-HIDE-AND-STATE-CLEANUP-V1:
+// 운영자 추천 탭은 실제 큐레이션 운영 플로우가 비활성 상태이므로 사용자 화면에서 숨김.
+// 백엔드(offer_curations) 및 getCatalog의 recommended 파라미터는 향후 재활성화를 위해 유지.
 const DISTRIBUTION_TABS: { key: string; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'SERVICE', label: 'B2B' },
-  // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1: 공급자 강조 기반으로 교체, 라벨 변경
-  { key: 'recommended', label: '추천 상품' },
   { key: 'PRIVATE', label: '판매자 모집' },
 ];
 
@@ -100,7 +101,10 @@ export function HubB2BCatalogPage() {
   }, [fetchCatalog, distributionFilter, offset]);
 
   const handleDistributionChange = (key: string) => {
-    setDistributionFilter(key);
+    // WO-KPA-HUB-RECOMMENDED-TAB-HIDE-AND-STATE-CLEANUP-V1:
+    // recommended 탭 숨김 — 혹시 외부에서 값이 들어와도 'all'로 fallback.
+    const safeKey = DISTRIBUTION_TABS.some(t => t.key === key) ? key : 'all';
+    setDistributionFilter(safeKey);
     setOffset(0);
   };
 

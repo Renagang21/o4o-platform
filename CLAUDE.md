@@ -18,7 +18,7 @@
 **DB 접근 정책:**
 - ✅ Cloud Run 내부 / Admin API / Google Cloud Console / `gcloud sql` CLI
 - ✅ **Claude Code 직접 검증 허용** — `gcloud` CLI 또는 Google Cloud Console을 통해 배포 후 SQL 검증, 마이그레이션 확인, 테이블/row 상태 확인 등을 직접 수행할 수 있음
-- ❌ 로컬 psql 클라이언트 설치/사용 금지 (방화벽 차단 + 보안 정책)
+- ✅ 로컬 `psql` 클라이언트 설치 허용 — `gcloud sql connect` 인터랙티브 모드 사용을 위해 필요. 단, **프로덕션 DB는 방화벽으로 차단**되므로 직접 TCP 접속은 불가하며, 반드시 `gcloud sql connect`를 통해서만 사용
 
 **Claude Code가 활용 가능한 검증 채널:**
 - `gcloud run services describe o4o-core-api --region asia-northeast3` — 리비전/상태
@@ -40,7 +40,7 @@
 **로컬 도구:**
 - ✅ `gcloud` CLI 설치됨 — Cloud Run 로그 조회, 리비전 확인, Cloud SQL 접근, 로깅 API 등 디버깅/운영/검증에 활용 가능
 - ✅ `gh` CLI 설치됨 — GitHub PR/이슈 관리
-- ℹ️ `psql` 로컬 클라이언트는 **설치되어 있지 않음** — `gcloud sql connect` 의 인터랙티브 모드 사용 불가. 대안: Cloud SQL Admin API, Google Cloud Console SQL Editor, 또는 디버그 SSR 컨트롤러
+- ✅ `psql` 로컬 클라이언트 설치 허용 — `gcloud sql connect` 인터랙티브 모드 지원 목적. 직접 TCP 접속은 방화벽으로 차단됨
 
 ---
 
