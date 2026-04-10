@@ -444,6 +444,76 @@ export class ForumPostController extends ForumControllerBase {
   }
 
   /**
+   * PATCH /forum/posts/:id/pin
+   * Pin or unpin a post as forum notice — forum owner only.
+   * Only one pinned post is allowed per forum; pinning a new one auto-unpins the previous.
+   * WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1
+   */
+  async pinPost(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
+        return;
+      }
+
+      const { id } = req.params;
+      const { pin } = req.body;
+
+      const post = await this.postRepository.findOne({ where: { id } });
+      if (!post) {
+        res.status(404).json({ success: false, error: 'Post not found' });
+        return;
+      }
+
+      if (!post.categoryId) {
+        res.status(400).json({ success: false, error: 'Post has no forum', code: 'NO_FORUM' });
+        return;
+      }
+
+      // Ownership check: createdBy match OR membership role='owner'
+      const category = await this.categoryRepository.findOne({
+        where: { id: post.categoryId },
+        select: ['id', 'createdBy'] as any,
+      });
+      if (!category) {
+        res.status(404).json({ success: false, error: 'Forum not found' });
+        return;
+      }
+
+      const isOwnerByCreatedBy = category.createdBy === userId;
+      if (!isOwnerByCreatedBy) {
+        const [member] = await AppDataSource.query(
+          `SELECT role FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2 LIMIT 1`,
+          [post.categoryId, userId],
+        );
+        if (!member || member.role !== 'owner') {
+          res.status(403).json({ success: false, error: 'Only the forum owner can pin posts', code: 'NOT_FORUM_OWNER' });
+          return;
+        }
+      }
+
+      if (pin) {
+        // Auto-unpin any existing pinned post in this forum
+        await this.postRepository.update(
+          { categoryId: post.categoryId, isPinned: true },
+          { isPinned: false },
+        );
+        post.isPinned = true;
+      } else {
+        post.isPinned = false;
+      }
+
+      await this.postRepository.save(post);
+
+      res.json({ success: true, data: { id: post.id, isPinned: post.isPinned } });
+    } catch (error: any) {
+      logger.error('Error pinning forum post:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to pin post' });
+    }
+  }
+
+  /**
    * POST /forum/posts/:id/like
    * Toggle like on a post (like → unlike, unlike → like)
    */

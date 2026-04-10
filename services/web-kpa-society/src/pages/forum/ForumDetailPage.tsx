@@ -26,6 +26,8 @@ export function ForumDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const [isForumOwner, setIsForumOwner] = useState(false);
+  const [isPinning, setIsPinning] = useState(false);
 
   useEffect(() => {
     if (id) loadData();
@@ -43,6 +45,16 @@ export function ForumDetailPage() {
 
       setPost(postRes.data);
       setComments(commentsRes.data);
+
+      // Check if current user is the forum owner
+      if (postRes.data?.categoryId && user?.id) {
+        try {
+          const catRes = await forumApi.getCategory(postRes.data.categoryId);
+          setIsForumOwner(catRes.data?.createdBy === user.id);
+        } catch {
+          // non-critical — ignore
+        }
+      }
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
       const code = err?.response?.data?.code;
@@ -88,6 +100,19 @@ export function ForumDetailPage() {
       toast.error('댓글 작성에 실패했습니다.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handlePin = async (pin: boolean) => {
+    if (!post || isPinning) return;
+    try {
+      setIsPinning(true);
+      const res = await forumApi.pinPost(post.id, pin);
+      setPost({ ...post, isPinned: res.data.isPinned });
+    } catch (err: any) {
+      toast.error(pin ? '공지 지정에 실패했습니다.' : '공지 해제에 실패했습니다.');
+    } finally {
+      setIsPinning(false);
     }
   };
 
@@ -167,16 +192,37 @@ export function ForumDetailPage() {
             {isLiked ? '❤️' : '🤍'} 좋아요{post.likeCount > 0 ? ` ${post.likeCount}` : ''}
           </button>
 
-          {isAuthor && (
-            <div style={styles.authorActions}>
-              <Link to={`/forum/edit/${post.id}`} style={styles.editButton}>
-                수정
-              </Link>
-              <button style={styles.deleteButton} onClick={handleDelete}>
-                삭제
-              </button>
-            </div>
-          )}
+          <div style={styles.authorActions}>
+            {isForumOwner && (
+              post.isPinned ? (
+                <button
+                  style={styles.unpinButton}
+                  onClick={() => handlePin(false)}
+                  disabled={isPinning}
+                >
+                  {isPinning ? '처리 중...' : '공지 해제'}
+                </button>
+              ) : (
+                <button
+                  style={styles.pinButton}
+                  onClick={() => handlePin(true)}
+                  disabled={isPinning}
+                >
+                  {isPinning ? '처리 중...' : '공지 지정'}
+                </button>
+              )
+            )}
+            {isAuthor && (
+              <>
+                <Link to={`/forum/edit/${post.id}`} style={styles.editButton}>
+                  수정
+                </Link>
+                <button style={styles.deleteButton} onClick={handleDelete}>
+                  삭제
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </Card>
 
@@ -323,6 +369,25 @@ const styles: Record<string, React.CSSProperties> = {
   authorActions: {
     display: 'flex',
     gap: '8px',
+  },
+  pinButton: {
+    padding: '8px 16px',
+    backgroundColor: '#fef2f2',
+    color: colors.accentRed,
+    border: `1px solid #fecaca`,
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    fontWeight: 500,
+  },
+  unpinButton: {
+    padding: '8px 16px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral600,
+    border: `1px solid ${colors.neutral300}`,
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
   },
   editButton: {
     padding: '8px 16px',

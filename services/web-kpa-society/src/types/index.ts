@@ -50,6 +50,7 @@ export interface ForumCategory {
   description?: string;
   postCount: number;
   forumType?: string;
+  createdBy?: string;
 }
 
 export interface ForumPost extends Partial<ForumPostResponse> {

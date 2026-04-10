@@ -68,6 +68,9 @@ router.delete('/posts/:id', authenticate, postController.deletePost.bind(postCon
 // Like/unlike post (authenticated)
 router.post('/posts/:id/like', authenticate, postController.toggleLike.bind(postController));
 
+// Pin/unpin post as forum notice (authenticated, forum owner only) — WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1
+router.patch('/posts/:id/pin', authenticate, postController.pinPost.bind(postController));
+
 // ============================================================================
 // Post Comments
 // ============================================================================

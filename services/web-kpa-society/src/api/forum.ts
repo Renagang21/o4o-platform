@@ -66,6 +66,10 @@ export const forumApi = {
   likePost: (id: string) =>
     apiClient.post<ApiResponse<{ likeCount: number }>>(`${getForumBasePath()}/posts/${id}/like`),
 
+  // WO-KPA-A-FORUM-NOTICE-PIN-BY-OWNER-V1: forum owner pin/unpin
+  pinPost: (id: string, pin: boolean) =>
+    apiClient.patch<ApiResponse<{ id: string; isPinned: boolean }>>(`${getForumBasePath()}/posts/${id}/pin`, { pin }),
+
   // 댓글
   getComments: (postId: string) =>
     apiClient.get<ApiResponse<ForumComment[]>>(`${getForumBasePath()}/posts/${postId}/comments`),
