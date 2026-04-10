@@ -219,6 +219,21 @@ export const forumOperatorApi = {
     return res.data;
   },
 
+  // WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
+  getCategories: async () => {
+    try {
+      const res = await authClient.api.get(`${OPERATOR_BASE}/categories?${SVC}`);
+      return res.data;
+    } catch {
+      return { success: true, data: [], count: 0 };
+    }
+  },
+
+  directDeactivate: async (id: string, data: { reason: string }) => {
+    const res = await authClient.api.post(`${OPERATOR_BASE}/categories/${id}/deactivate?${SVC}`, data);
+    return res.data;
+  },
+
   getDeleteRequests: async (params?: { status?: string }) => {
     const query = new URLSearchParams({ serviceCode: 'kpa-society' });
     if (params?.status) query.set('status', params.status);

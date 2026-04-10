@@ -348,6 +348,98 @@ router.post('/delete-requests/:id/reject', async (req: Request, res: Response): 
 });
 
 // ============================================================================
+// DIRECT CATEGORY MANAGEMENT — operator direct deactivation
+// WO-KPA-A-OPERATOR-FORUM-DIRECT-SOFT-DELETE-V1
+// ============================================================================
+
+/** GET /categories — all forum categories for service (active + inactive) */
+router.get('/categories', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+
+    if (categoryIds.length === 0) {
+      res.json({ success: true, data: [], count: 0 });
+      return;
+    }
+
+    const categories = await categoryRepo()
+      .createQueryBuilder('cat')
+      .leftJoinAndSelect('cat.creator', 'creator')
+      .where('cat.id IN (:...categoryIds)', { categoryIds })
+      .orderBy('cat.createdAt', 'DESC')
+      .getMany();
+
+    const data = categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      description: cat.description,
+      slug: cat.slug,
+      isActive: cat.isActive,
+      postCount: cat.postCount,
+      forumType: cat.forumType,
+      createdBy: cat.createdBy,
+      creatorName: (cat as any).creator?.name || null,
+      createdAt: cat.createdAt,
+      updatedAt: cat.updatedAt,
+    }));
+
+    res.json({ success: true, data, count: data.length });
+  } catch (error: any) {
+    logger.error('Error listing forum categories:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/** POST /categories/:id/deactivate — operator direct soft delete */
+router.post('/categories/:id/deactivate', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceCode = (req as any)._serviceCode;
+    const userId = (req as AuthRequest).user?.id;
+    const { reason } = req.body;
+
+    if (!reason?.trim()) {
+      res.status(400).json({ success: false, error: '삭제 사유를 입력해주세요', code: 'REASON_REQUIRED' });
+      return;
+    }
+
+    const categoryIds = await getCategoryIdsForService(serviceCode);
+    if (!categoryIds.includes(req.params.id)) {
+      res.status(404).json({ success: false, error: 'Category not found for this service' });
+      return;
+    }
+
+    const category = await categoryRepo().findOne({ where: { id: req.params.id } });
+    if (!category) {
+      res.status(404).json({ success: false, error: 'Category not found' });
+      return;
+    }
+
+    if (!category.isActive) {
+      res.status(400).json({ success: false, error: '이미 비활성화된 포럼입니다', code: 'ALREADY_INACTIVE' });
+      return;
+    }
+
+    const meta = category.metadata || {};
+    category.isActive = false;
+    category.metadata = {
+      ...meta,
+      directDeactivatedAt: new Date().toISOString(),
+      directDeactivatedBy: userId,
+      directDeactivateReason: reason.trim(),
+      archivedAt: new Date().toISOString(),
+    };
+
+    await categoryRepo().save(category);
+    logger.info(`Forum category ${category.id} deactivated by operator ${userId} (reason: ${reason.trim()})`);
+    res.json({ success: true, data: { id: category.id, isActive: false } });
+  } catch (error: any) {
+    logger.error('Error deactivating forum category:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================================================
 // ANALYTICS — read-only aggregation queries
 // WO-O4O-FORUM-ANALYTICS-UNIFICATION-V1
 // ============================================================================
