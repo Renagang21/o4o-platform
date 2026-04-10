@@ -9,7 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { Film, RefreshCw, Plus, ChevronRight, Sparkles } from 'lucide-react';
+import { Film, RefreshCw, Plus, ChevronRight, Sparkles, Trash2 } from 'lucide-react';
 import AiContentGenerationModal from './AiContentGenerationModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
@@ -49,6 +49,8 @@ export default function HqMediaPage() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [showAiModal, setShowAiModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Create form
   const [formName, setFormName] = useState('');
@@ -108,6 +110,21 @@ export default function HqMediaPage() {
       setError(err?.message || '미디어 생성에 실패했습니다');
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirm) return;
+    setIsDeleting(true);
+    try {
+      await apiFetch(`/api/signage/${SERVICE_KEY}/hq/media/${deleteConfirm.id}`, { method: 'DELETE' });
+      setDeleteConfirm(null);
+      fetchMedia();
+    } catch (err: any) {
+      setError(err?.message || '삭제에 실패했습니다');
+      setDeleteConfirm(null);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -240,7 +257,18 @@ export default function HqMediaPage() {
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-500">{formatDate(m.createdAt)}</td>
-                    <td className="px-4 py-3"><ChevronRight className="w-4 h-4 text-slate-300" /></td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={e => { e.stopPropagation(); setDeleteConfirm({ id: m.id, name: m.name }); }}
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="완전 삭제"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <ChevronRight className="w-4 h-4 text-slate-300" />
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -255,6 +283,26 @@ export default function HqMediaPage() {
           onClose={() => setShowAiModal(false)}
           onSaved={() => { setShowAiModal(false); fetchMedia(); }}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">미디어 완전 삭제</h3>
+            <p className="text-sm text-slate-500 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
+              <p className="font-medium text-slate-700">{deleteConfirm.name}</p>
+              <p className="text-slate-400 text-xs mt-1">타입: HQ 미디어 · 삭제 시 연결된 플레이리스트 항목도 함께 제거됩니다</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setDeleteConfirm(null)} disabled={isDeleting} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
+              <button onClick={handleDeleteConfirmed} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
+                {isDeleting ? '삭제 중...' : '완전 삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

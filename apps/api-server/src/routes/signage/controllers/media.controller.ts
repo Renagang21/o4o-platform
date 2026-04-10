@@ -104,6 +104,24 @@ export class SignageMediaController {
     }
   };
 
+  /** WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1 */
+  hardDeleteMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const { id } = req.params;
+
+      const result = await this.service.hardDeleteMedia(id, scope);
+      if (!result.deleted) {
+        res.status(404).json({ success: false, error: 'Media not found', code: result.code || 'MEDIA_NOT_FOUND' });
+        return;
+      }
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   getMediaLibrary = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const scope = extractScope(req);

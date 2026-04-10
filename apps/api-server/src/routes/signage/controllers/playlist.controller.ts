@@ -105,6 +105,24 @@ export class SignagePlaylistController {
     }
   };
 
+  /** WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1 */
+  hardDeletePlaylist = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const { id } = req.params;
+
+      const result = await this.service.hardDeletePlaylist(id, scope);
+      if (!result.deleted) {
+        res.status(404).json({ success: false, error: 'Playlist not found', code: result.code || 'PLAYLIST_NOT_FOUND' });
+        return;
+      }
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   // ========== Playlist Item Endpoints ==========
 
   getPlaylistItems = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

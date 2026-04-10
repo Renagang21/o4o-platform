@@ -236,11 +236,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // PATCH /api/signage/:serviceKey/hq/media/:id - Update HQ media
   router.patch('/hq/media/:id', requireSignageOperator, globalCtrl.updateHqMedia);
 
-  // DELETE /api/signage/:serviceKey/hq/playlists/:id - Delete HQ playlist (Operator only)
-  router.delete('/hq/playlists/:id', requireSignageOperator, playlistCtrl.deletePlaylist);
+  // DELETE /api/signage/:serviceKey/hq/playlists/:id - Hard delete HQ playlist (Operator only)
+  // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+  router.delete('/hq/playlists/:id', requireSignageOperator, playlistCtrl.hardDeletePlaylist);
 
-  // DELETE /api/signage/:serviceKey/hq/media/:id - Delete HQ media (Operator only)
-  router.delete('/hq/media/:id', requireSignageOperator, mediaCtrl.deleteMedia);
+  // DELETE /api/signage/:serviceKey/hq/media/:id - Hard delete HQ media (Operator only)
+  // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+  router.delete('/hq/media/:id', requireSignageOperator, mediaCtrl.hardDeleteMedia);
 
   // ========== Community Content Creation Routes (WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1) ==========
   // Community creates global content with source='community', scope='global'

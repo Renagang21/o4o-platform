@@ -90,6 +90,13 @@ export class SignagePlaylistService {
     return this.repository.softDeletePlaylist(id, scope);
   }
 
+  async hardDeletePlaylist(
+    id: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    return this.repository.hardDeletePlaylist(id, scope);
+  }
+
   // ========== Playlist Item Methods ==========
 
   async getPlaylistItems(

@@ -95,6 +95,46 @@ export class SignagePlaylistRepository {
     return (result.affected || 0) > 0;
   }
 
+  /**
+   * Hard delete playlist — WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+   *
+   * Cascade (auto by FK):
+   *   signage_playlist_items  (onDelete: CASCADE)
+   *   signage_playlist_shares (onDelete: CASCADE)
+   *   signage_schedules       (onDelete: CASCADE)
+   *
+   * Manual cleanup before delete:
+   *   o4o_asset_snapshots.source_asset_id — no FK constraint, orphan-safe cleanup
+   *
+   * Not cleaned (acceptable orphans):
+   *   signage_analytics.entityId — loose reference, historical data retention
+   */
+  async hardDeletePlaylist(
+    id: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    const playlist = await this.playlistRepo.findOne({
+      where: {
+        id,
+        serviceKey: scope.serviceKey,
+        ...(scope.organizationId && { organizationId: scope.organizationId }),
+      },
+      withDeleted: true,
+    });
+    if (!playlist) return { deleted: false, code: 'PLAYLIST_NOT_FOUND' };
+
+    // Clean up orphan asset snapshots (no FK — must be manual)
+    await this.dataSource.query(
+      `DELETE FROM o4o_asset_snapshots WHERE source_asset_id = $1`,
+      [id],
+    );
+
+    // Physical delete — playlist_items, shares, schedules cascade automatically
+    await this.playlistRepo.delete({ id });
+
+    return { deleted: true };
+  }
+
   // ========== Playlist Item Methods ==========
 
   async findPlaylistItems(playlistId: string): Promise<SignagePlaylistItem[]> {

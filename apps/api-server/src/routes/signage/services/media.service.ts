@@ -75,6 +75,13 @@ export class SignageMediaService {
     return this.repository.softDeleteMedia(id, scope);
   }
 
+  async hardDeleteMedia(
+    id: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    return this.repository.hardDeleteMedia(id, scope);
+  }
+
   async getMediaLibrary(
     scope: ScopeFilter,
     mediaType?: string,

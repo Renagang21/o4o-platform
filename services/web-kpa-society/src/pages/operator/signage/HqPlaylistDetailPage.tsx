@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getAccessToken } from '../../../contexts/AuthContext';
-import { ArrowLeft, ListMusic, Play } from 'lucide-react';
+import { ArrowLeft, ListMusic, Play, Trash2 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -73,6 +73,8 @@ export default function HqPlaylistDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
     const token = getAccessToken();
@@ -127,6 +129,20 @@ export default function HqPlaylistDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!playlist) return;
+    setIsDeleting(true);
+    try {
+      await apiFetch(`/api/signage/${SERVICE_KEY}/hq/playlists/${playlist.id}`, { method: 'DELETE' });
+      navigate('/operator/signage/hq-playlists');
+    } catch (err: any) {
+      setError(err?.message || '삭제에 실패했습니다');
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const formatDate = (d: string) => {
     try { return new Date(d).toLocaleString('ko-KR'); } catch { return '-'; }
   };
@@ -171,6 +187,14 @@ export default function HqPlaylistDetailPage() {
         <ListMusic className="w-6 h-6 text-blue-600" />
         <h1 className="text-2xl font-bold text-slate-800">{playlist.name}</h1>
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${sc.cls}`}>{sc.text}</span>
+        <div className="ml-auto">
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-2 px-3 py-1.5 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors text-sm"
+          >
+            <Trash2 className="w-4 h-4" /> 완전 삭제
+          </button>
+        </div>
       </div>
 
       {/* Status Control */}
@@ -239,6 +263,26 @@ export default function HqPlaylistDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">플레이리스트 완전 삭제</h3>
+            <p className="text-sm text-slate-500 mb-4">이 작업은 되돌릴 수 없습니다.</p>
+            <div className="bg-slate-50 rounded-lg p-3 mb-4 text-sm">
+              <p className="font-medium text-slate-700">{playlist.name}</p>
+              <p className="text-slate-400 text-xs mt-1">타입: HQ 플레이리스트 · 삭제 시 모든 재생 항목도 함께 제거됩니다</p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting} className="px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50 disabled:opacity-50">취소</button>
+              <button onClick={handleDelete} disabled={isDeleting} className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50">
+                {isDeleting ? '삭제 중...' : '완전 삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

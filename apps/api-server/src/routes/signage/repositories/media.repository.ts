@@ -98,6 +98,45 @@ export class SignageMediaRepository {
     return (result.affected || 0) > 0;
   }
 
+  /**
+   * Hard delete media — WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+   *
+   * Cascade (auto by FK):
+   *   signage_playlist_items (onDelete: CASCADE)
+   *   signage_media_tags     (onDelete: CASCADE)
+   *
+   * Manual cleanup before delete:
+   *   o4o_asset_snapshots.source_asset_id — no FK constraint, orphan-safe cleanup
+   *
+   * Not cleaned (acceptable orphans):
+   *   signage_analytics.entityId — loose reference, historical data retention
+   */
+  async hardDeleteMedia(
+    id: string,
+    scope: ScopeFilter,
+  ): Promise<{ deleted: boolean; code?: string }> {
+    const media = await this.mediaRepo.findOne({
+      where: {
+        id,
+        serviceKey: scope.serviceKey,
+        ...(scope.organizationId && { organizationId: scope.organizationId }),
+      },
+      withDeleted: true,
+    });
+    if (!media) return { deleted: false, code: 'MEDIA_NOT_FOUND' };
+
+    // Clean up orphan asset snapshots (no FK — must be manual)
+    await this.dataSource.query(
+      `DELETE FROM o4o_asset_snapshots WHERE source_asset_id = $1`,
+      [id],
+    );
+
+    // Physical delete — playlist_items and media_tags cascade automatically
+    await this.mediaRepo.delete({ id });
+
+    return { deleted: true };
+  }
+
   async findMediaLibrary(
     scope: ScopeFilter,
     mediaType?: string,
