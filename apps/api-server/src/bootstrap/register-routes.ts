@@ -901,6 +901,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Store HUB Seed routes:', seedStoreHubError);
     }
 
+    // 37-b2. Neture Supplier Offers Test Seed routes (WO-NETURE-TEST-PRODUCT-RESET-AND-RESEED-V1)
+    try {
+      const { createSeedNetureOffersRouter } = await import('../modules/admin/seed-neture-offers.controller.js');
+      app.use('/api/v1/ops/seed-neture-offers', createSeedNetureOffersRouter(dataSource));
+      logger.info('✅ Neture Offers Seed routes registered at /api/v1/ops/seed-neture-offers');
+    } catch (seedNetureOffersError) {
+      logger.error('Failed to register Neture Offers Seed routes:', seedNetureOffersError);
+    }
+
     // 37-c. Register Care Diagnostic routes (WO-HOME-CGM-CARD-V1)
     try {
       const { createCareDiagnosticRouter } = await import('../modules/admin/care-diagnostic.controller.js');
