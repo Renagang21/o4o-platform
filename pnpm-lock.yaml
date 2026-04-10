@@ -1441,6 +1441,31 @@ importers:
         specifier: ^5.3.0
         version: 5.9.3
 
+  packages/account-ui:
+    dependencies:
+      lucide-react:
+        specifier: '>=0.300.0'
+        version: 0.523.0(react@19.2.0)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/action-log-core:
     dependencies:
       typeorm:
@@ -2806,6 +2831,9 @@ importers:
       '@o4o/utils':
         specifier: workspace:*
         version: link:../utils
+      lucide-react:
+        specifier: ^0.523.0
+        version: 0.523.0(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -3268,6 +3296,9 @@ importers:
 
   services/web-glycopharm:
     dependencies:
+      '@o4o/account-ui':
+        specifier: workspace:*
+        version: link:../../packages/account-ui
       '@o4o/admin-ux-core':
         specifier: workspace:*
         version: link:../../packages/admin-ux-core
@@ -3380,6 +3411,9 @@ importers:
 
   services/web-k-cosmetics:
     dependencies:
+      '@o4o/account-ui':
+        specifier: workspace:*
+        version: link:../../packages/account-ui
       '@o4o/ai-components':
         specifier: workspace:*
         version: link:../../packages/o4o-ai-components
@@ -3547,6 +3581,9 @@ importers:
 
   services/web-neture:
     dependencies:
+      '@o4o/account-ui':
+        specifier: workspace:*
+        version: link:../../packages/account-ui
       '@o4o/admin-ux-core':
         specifier: workspace:*
         version: link:../../packages/admin-ux-core
@@ -15427,6 +15464,7 @@ snapshots:
       '@o4o/content-editor': link:packages/content-editor
       '@o4o/types': link:packages/types
       '@o4o/utils': link:packages/utils
+      lucide-react: 0.523.0(react@19.2.0)
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
@@ -18439,7 +18477,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
