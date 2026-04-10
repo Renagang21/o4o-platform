@@ -291,7 +291,18 @@ export function HubSignageLibraryPage() {
                     <div style={styles.listIcon}>🖥️</div>
                     <div style={styles.listContent}>
                       <div style={styles.listTitleRow}>
-                        <span style={styles.listTitle}>{media.title}</span>
+                        {media.sourceUrl ? (
+                          <a
+                            href={media.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={styles.listTitleLink}
+                          >
+                            {media.title}
+                          </a>
+                        ) : (
+                          <span style={styles.listTitle}>{media.title}</span>
+                        )}
                         <div style={styles.listBadges}>
                           {mediaTypeLabel && (
                             <span style={styles.mediaTypeBadge}>{mediaTypeLabel}</span>
@@ -301,9 +312,15 @@ export function HubSignageLibraryPage() {
                           )}
                         </div>
                       </div>
+                      {media.description && (
+                        <p style={styles.listDesc}>{media.description}</p>
+                      )}
                       <div style={styles.listMeta}>
                         {media.duration != null && media.duration > 0 && (
                           <span>{formatDuration(media.duration)}</span>
+                        )}
+                        {media.creatorName && (
+                          <span>등록자: {media.creatorName}</span>
                         )}
                         <span>{new Date(media.createdAt).toLocaleDateString('ko-KR')}</span>
                       </div>
@@ -378,7 +395,18 @@ export function HubSignageLibraryPage() {
                     <div style={styles.listIcon}>📋</div>
                     <div style={styles.listContent}>
                       <div style={styles.listTitleRow}>
-                        <span style={styles.listTitle}>{pl.title}</span>
+                        {pl.sourceUrl ? (
+                          <a
+                            href={pl.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={styles.listTitleLink}
+                          >
+                            {pl.title}
+                          </a>
+                        ) : (
+                          <span style={styles.listTitle}>{pl.title}</span>
+                        )}
                         <div style={styles.listBadges}>
                           <span style={styles.playlistBadge}>플레이리스트</span>
                           {producerLabel && (
@@ -616,6 +644,17 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap' as const,
+  },
+  listTitleLink: {
+    fontSize: '0.9rem',
+    fontWeight: 600,
+    color: colors.primary,
+    textDecoration: 'underline',
+    textDecorationColor: 'transparent',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap' as const,
+    cursor: 'pointer',
   },
   listBadges: {
     display: 'flex',
