@@ -3,7 +3,7 @@
  */
 
 import { apiClient } from './client';
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../contexts/AuthContext';
 import type {
   Enrollment,
   Certificate,

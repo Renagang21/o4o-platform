@@ -4,7 +4,7 @@
  */
 
 import { RoleManagementPage } from '@o4o/ui';
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts/AuthContext';
 

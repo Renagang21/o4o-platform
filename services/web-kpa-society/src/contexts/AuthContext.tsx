@@ -65,7 +65,9 @@ export function getServiceAccessToken(): string | null {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 // Create auth client with localStorage strategy for cross-domain authentication
-const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
+// Exported so KPA API modules share this single instance (localStorage strategy)
+// instead of the @o4o/auth-client singleton which defaults to cookie strategy.
+export const authClient = new AuthClient(`${API_BASE_URL}/api/v1`, {
   strategy: 'localStorage',
 });
 

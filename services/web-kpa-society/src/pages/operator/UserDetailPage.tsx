@@ -6,7 +6,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROLES } from '../../lib/role-constants';
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../../contexts/AuthContext';
 import {
   UserDetailPage as CommonUserDetailPage,
 } from '@o4o/ui';

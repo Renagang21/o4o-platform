@@ -30,7 +30,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import EditUserModal from './EditUserModal';
 

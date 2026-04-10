@@ -146,7 +146,7 @@ export const forumMembershipApi = {
 // Category Request API — WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 // Uses authClient.api (base: /api/v1) for common forum endpoints
 // ============================================================================
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../contexts/AuthContext';
 
 export const forumRequestApi = {
   getMyRequests: async (): Promise<{ success: boolean; data: any[] }> => {

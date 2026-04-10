@@ -14,7 +14,7 @@ import {
   Building2,
   Mail,
 } from 'lucide-react';
-import { authClient } from '@o4o/auth-client';
+import { authClient } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
 import { AddressSearch } from '@o4o/ui';
 
