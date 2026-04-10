@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignagePlaylistController } from './controllers/playlist.controller.js';
 import { SignageMediaController } from './controllers/media.controller.js';
@@ -261,6 +261,47 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-CONTENT-SNAPSHOT-UNIFICATION-V1: clone routes removed
   // Content copy is now handled via asset-snapshot-copy (assetSnapshotApi.copy)
+
+  // ========== Category Routes (WO-O4O-SIGNAGE-CONTENT-CENTERED-REFACTOR-V1 Phase 4) ==========
+  // GET /api/signage/:serviceKey/categories — list active categories (public read)
+  router.get('/categories', allowSignageStoreRead, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { serviceKey } = req.params;
+      const rows = await dataSource.query(
+        `SELECT id, name, "sortOrder" FROM signage_categories WHERE "serviceKey" = $1 AND "isActive" = true ORDER BY "sortOrder", name`,
+        [serviceKey],
+      );
+      res.json({ data: rows });
+    } catch (error) { next(error); }
+  });
+
+  // POST /api/signage/:serviceKey/categories — create category (operator only)
+  router.post('/categories', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { serviceKey } = req.params;
+      const { name, sortOrder = 0 } = req.body;
+      if (!name?.trim()) { res.status(400).json({ error: 'name required' }); return; }
+      const rows = await dataSource.query(
+        `INSERT INTO signage_categories ("serviceKey", name, "sortOrder") VALUES ($1, $2, $3)
+         ON CONFLICT ("serviceKey", name) DO UPDATE SET "sortOrder" = $3, "isActive" = true, "updatedAt" = NOW()
+         RETURNING id, name, "sortOrder"`,
+        [serviceKey, name.trim(), sortOrder],
+      );
+      res.status(201).json({ data: rows[0] });
+    } catch (error) { next(error); }
+  });
+
+  // DELETE /api/signage/:serviceKey/categories/:id — deactivate category (operator only)
+  router.delete('/categories/:id', requireSignageOperator, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { serviceKey, id } = req.params;
+      await dataSource.query(
+        `UPDATE signage_categories SET "isActive" = false, "updatedAt" = NOW() WHERE id = $1 AND "serviceKey" = $2`,
+        [id, serviceKey],
+      );
+      res.json({ success: true });
+    } catch (error) { next(error); }
+  });
 
   return router;
 }

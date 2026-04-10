@@ -105,7 +105,11 @@ export default function ContentHubPage() {
   const [source, setSource] = useState<ContentSource | 'all'>('all');
   const [keyword, setKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [page, setPage] = useState(1);
+
+  // Category list
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   // Data
   const [items, setItems] = useState<MediaItem[]>([]);
@@ -141,6 +145,11 @@ export default function ContentHubPage() {
     setPage(1);
   };
 
+  const handleCategoryChange = (cat: string) => {
+    setSelectedCategory(cat);
+    setPage(1);
+  };
+
   // Load media
   const loadMedia = useCallback(async () => {
     setLoading(true);
@@ -151,6 +160,7 @@ export default function ContentHubPage() {
         page,
         limit: PAGE_LIMIT,
         search: debouncedKeyword || undefined,
+        category: selectedCategory || undefined,
       });
       if (res.success && res.data) {
         setItems((res.data as any).items ?? []);
@@ -163,9 +173,19 @@ export default function ContentHubPage() {
     } finally {
       setLoading(false);
     }
-  }, [source, page, debouncedKeyword]);
+  }, [source, page, debouncedKeyword, selectedCategory]);
 
   useEffect(() => { loadMedia(); }, [loadMedia]);
+
+  // Load categories once
+  useEffect(() => {
+    fetch(`${API_BASE}/api/signage/${SERVICE_KEY}/categories`, {
+      headers: getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {},
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(json => { if (json?.data) setCategories(json.data); })
+      .catch(() => {});
+  }, []);
 
   // ── Auth fetch helper ──
   const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
@@ -309,16 +329,30 @@ export default function ContentHubPage() {
             </button>
           ))}
         </div>
-        {/* Keyword search */}
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => handleKeywordChange(e.target.value)}
-            placeholder="제목 또는 설명으로 검색..."
-            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400"
-          />
+        {/* Keyword search + category */}
+        <div className="flex flex-wrap gap-2">
+          <div className="relative flex-1 min-w-[200px] max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => handleKeywordChange(e.target.value)}
+              placeholder="제목 또는 설명으로 검색..."
+              className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400"
+            />
+          </div>
+          {categories.length > 0 && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              className="py-2 pl-3 pr-8 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 bg-white"
+            >
+              <option value="">전체 카테고리</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.name}>{cat.name}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
