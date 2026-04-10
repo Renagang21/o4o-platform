@@ -41,6 +41,7 @@ interface AuthContextType {
   switchRole: (role: UserRole) => void;
   hasMultipleRoles: boolean;
   checkSession: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -114,6 +115,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateUser = (updates: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...updates });
+    }
+  };
+
   const hasMultipleRoles = user ? user.roles.length > 1 : false;
 
   return (
@@ -128,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         switchRole,
         hasMultipleRoles,
         checkSession,
+        updateUser,
       }}
     >
       {children}

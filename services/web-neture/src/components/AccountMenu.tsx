@@ -10,7 +10,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { User, LogOut, LayoutDashboard } from 'lucide-react';
 
 import { useAuth, ROLE_LABELS, getNetureDashboardRoute, useLoginModal } from '../contexts';
 
@@ -136,13 +136,13 @@ export default function AccountMenu() {
               </Link>
             )}
 
-            {/* 마이페이지 */}
+            {/* 마이페이지 — WO-O4O-MYPAGE-LABEL-AND-ICON-UNIFICATION-V1: Settings → LayoutDashboard */}
             <Link
               to="/mypage"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              <Settings className="w-4 h-4 text-gray-500" />
+              <LayoutDashboard className="w-4 h-4 text-gray-500" />
               마이페이지
             </Link>
 

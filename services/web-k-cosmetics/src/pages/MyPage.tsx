@@ -14,10 +14,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth, ROLE_LABELS, getKCosmeticsDashboardRoute } from '@/contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+import { api } from '@/lib/apiClient';
 
 export default function MyPage() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
   });
@@ -36,9 +38,19 @@ export default function MyPage() {
   const dashboardPath = getKCosmeticsDashboardRoute(user.roles);
   const roleLabel = ROLE_LABELS[user.roles[0]];
 
-  const handleSave = () => {
-    // TODO: Implement save API
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.put('/users/profile', { name: editData.name });
+      updateUser({ name: editData.name });
+      setIsEditing(false);
+      toast.success('프로필이 수정되었습니다.');
+    } catch (err: any) {
+      const message = err.response?.data?.message || err.response?.data?.error || '프로필 수정에 실패했습니다.';
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -105,8 +117,8 @@ export default function MyPage() {
               <button onClick={handleCancel} style={styles.cancelButton}>
                 취소
               </button>
-              <button onClick={handleSave} style={styles.saveButton}>
-                저장
+              <button onClick={handleSave} style={styles.saveButton} disabled={saving}>
+                {saving ? '저장 중...' : '저장'}
               </button>
             </div>
           )}

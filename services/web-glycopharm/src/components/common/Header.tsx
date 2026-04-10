@@ -156,8 +156,8 @@ export default function Header() {
                         className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                         onClick={() => setUserMenuOpen(false)}
                       >
-                        <User className="w-4 h-4" />
-                        내정보
+                        <LayoutDashboard className="w-4 h-4" />
+                        마이페이지
                       </NavLink>
                       {/* Account Center — 임시 숨김: account.neture.co.kr 서비스 미배포/SSL 미구성 (WO-O4O-ACCOUNT-CENTER-LINK-VISIBILITY-POLICY-ALIGNMENT-V1) */}
                       <button
