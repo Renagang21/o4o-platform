@@ -83,9 +83,32 @@ export function hasServiceAccess(scope: ServiceScope, rolePrefix: string): boole
 /**
  * Express middleware — injects `req.serviceScope` for downstream controllers.
  * Must be placed after requireAuth / requireRole.
+ *
+ * WO-KPA-SOCIETY-STORE-ACCESS-FIX-V1:
+ * Fallback to JWT memberships for membership-based operators (e.g., KPA Society)
+ * who don't have role_assignments and therefore have no roles in user.roles.
  */
 export function injectServiceScope(req: Request, _res: Response, next: NextFunction): void {
-  const userRoles: string[] = (req as any).user?.roles || [];
-  (req as any).serviceScope = extractServiceScope(userRoles);
+  const user = (req as any).user;
+  const userRoles: string[] = user?.roles || [];
+  const scope = extractServiceScope(userRoles);
+
+  // If no service scope from roles, derive from JWT memberships
+  if (!scope.isPlatformAdmin && scope.serviceKeys.length === 0) {
+    const memberships: { serviceKey: string; status: string }[] = user?.memberships || [];
+    const activeKeys = memberships
+      .filter(m => m.status === 'active')
+      .map(m => m.serviceKey);
+    if (activeKeys.length > 0) {
+      const SERVICE_KEY_TO_PREFIX: Record<string, string> = {
+        'kpa-society': 'kpa',
+        'k-cosmetics': 'cosmetics',
+      };
+      scope.serviceKeys = activeKeys;
+      scope.rolePrefixes = activeKeys.map(k => SERVICE_KEY_TO_PREFIX[k] || k);
+    }
+  }
+
+  (req as any).serviceScope = scope;
   next();
 }
