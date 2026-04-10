@@ -186,6 +186,13 @@ export class AuthClient {
             // Refresh failed, clear tokens
             if (this.strategy === 'localStorage') {
               clearAllTokens();
+              // Notify React layer (AuthContext) to set user=null.
+              // auth:token-cleared is already handled by AuthContext.tsx listener.
+              // Using window.dispatchEvent (not localStorage event) so it only affects
+              // the current tab — no cross-tab side-effects.
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('auth:token-cleared'));
+              }
             }
 
             // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
