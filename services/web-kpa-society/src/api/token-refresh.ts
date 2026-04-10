@@ -50,7 +50,11 @@ export async function tryRefreshToken(): Promise<string | null> {
       }
 
       const data = await res.json();
-      const { accessToken, refreshToken: newRefresh } = data;
+      // Handle BaseController.ok() wrapped format: { success, data: { tokens: { accessToken, refreshToken } } }
+      // Also handles flat format: { accessToken, refreshToken }
+      const tokens = data?.data?.tokens || data?.data || data;
+      const accessToken: string | undefined = tokens?.accessToken;
+      const newRefresh: string | undefined = tokens?.refreshToken;
 
       if (accessToken) {
         localStorage.setItem(TOKEN_KEY, accessToken);
