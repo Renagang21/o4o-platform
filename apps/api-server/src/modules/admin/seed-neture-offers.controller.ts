@@ -106,7 +106,7 @@ export function createSeedNetureOffersRouter(ds: DataSource): Router {
         LEFT JOIN supplier_product_offers spo
           ON spo.supplier_id = ns.id AND spo.deleted_at IS NULL
         GROUP BY ns.id, o.name, ns.slug
-        ORDER BY ns.name
+        ORDER BY supplier_name
       `);
 
       const approvals = await ds.query(`
