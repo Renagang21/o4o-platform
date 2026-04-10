@@ -9,13 +9,10 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { getAccessToken } from '../../contexts/AuthContext';
+import { apiClient } from '../../api/client';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 
 type TemplateProfile = 'BASIC' | 'COMMERCE_FOCUS' | 'CONTENT_FOCUS' | 'MINIMAL';
-
-const GLYCOPHARM_API = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/glycopharm`
-  : '/api/v1/glycopharm';
 
 interface TemplateOption {
   id: TemplateProfile;
@@ -59,17 +56,13 @@ export function PharmacyTemplatePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Resolve slug from cockpit
+  // Resolve slug from KPA pharmacy info
   useEffect(() => {
     const fetchSlug = async () => {
       try {
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${GLYCOPHARM_API}/pharmacy/cockpit/status`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json = await res.json();
-        if (json.success && json.data?.storeSlug) {
-          setSlug(json.data.storeSlug);
+        const resolved = await getStoreSlug();
+        if (resolved) {
+          setSlug(resolved);
         } else {
           setError('매장 정보를 찾을 수 없습니다.');
         }
@@ -84,8 +77,9 @@ export function PharmacyTemplatePage() {
   const loadTemplate = useCallback(async () => {
     if (!slug) return;
     try {
-      const res = await fetch(`${GLYCOPHARM_API}/stores/${encodeURIComponent(slug)}/template`);
-      const json = await res.json();
+      const json = await apiClient.get<{ success: boolean; data: { templateProfile?: TemplateProfile } }>(
+        `/stores/${encodeURIComponent(slug)}/template`
+      );
       if (json.success) {
         setCurrent(json.data.templateProfile || 'BASIC');
       }
@@ -102,16 +96,10 @@ export function PharmacyTemplatePage() {
     setSuccess(null);
 
     try {
-      const token = getAccessToken();
-      const res = await fetch(`${GLYCOPHARM_API}/stores/${encodeURIComponent(slug)}/template`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ templateProfile: profile }),
-      });
-      const json = await res.json();
+      const json = await apiClient.put<{ success: boolean; error?: { message: string } }>(
+        `/stores/${encodeURIComponent(slug)}/template`,
+        { templateProfile: profile }
+      );
       if (!json.success) throw new Error(json.error?.message || 'Failed to update');
       setCurrent(profile);
       setSuccess('템플릿이 변경되었습니다.');

@@ -45,6 +45,7 @@ export class ForumCommentController extends ForumControllerBase {
             success: false,
             error: 'This post belongs to a closed forum. Membership is required.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
+            data: { categoryId: parentPost.categoryId },
           });
           return;
         }
@@ -129,6 +130,7 @@ export class ForumCommentController extends ForumControllerBase {
             success: false,
             error: 'Membership is required to comment in this closed forum.',
             code: 'CLOSED_FORUM_ACCESS_DENIED',
+            data: { categoryId: post.categoryId },
           });
           return;
         }

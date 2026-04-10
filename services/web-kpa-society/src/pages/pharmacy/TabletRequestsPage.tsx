@@ -19,6 +19,7 @@ import {
   type StaffTabletRequest,
   type StaffInterestRequest,
 } from '../../api/tabletStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 
 type TabView = 'interest' | 'service';
 
@@ -47,21 +48,12 @@ export function TabletRequestsPage() {
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Resolve pharmacy slug from cockpit (needed for service requests)
+  // Resolve pharmacy slug from KPA pharmacy info (needed for service requests)
   useEffect(() => {
     const fetchSlug = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/glycopharm`
-          : '/api/v1/glycopharm';
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE}/pharmacy/cockpit/status`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json = await res.json();
-        if (json.success && json.data?.storeSlug) {
-          setSlug(json.data.storeSlug);
-        }
+        const resolved = await getStoreSlug();
+        if (resolved) setSlug(resolved);
       } catch {
         // Slug resolution failure is non-critical (interest tab doesn't need it)
       }

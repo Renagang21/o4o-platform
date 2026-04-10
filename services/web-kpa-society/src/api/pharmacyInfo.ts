@@ -25,6 +25,7 @@ export interface PharmacyInfoData {
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
+  storeSlug: string | null;
 }
 
 export interface UpdatePharmacyInfoPayload {
@@ -40,6 +41,16 @@ export async function getPharmacyInfo(): Promise<PharmacyInfoData | null> {
     '/pharmacy/info'
   );
   return response.data;
+}
+
+/**
+ * Get store slug from pharmacy info.
+ * Used by pages that need the store slug for store channel APIs
+ * (layout, template, blog, tablet).
+ */
+export async function getStoreSlug(): Promise<string | null> {
+  const info = await getPharmacyInfo();
+  return info?.storeSlug || null;
 }
 
 export async function updatePharmacyInfo(data: UpdatePharmacyInfoPayload): Promise<PharmacyInfoData> {

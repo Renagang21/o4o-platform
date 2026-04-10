@@ -29,6 +29,7 @@ interface PharmacyInfoResponse {
   addressDetail: StoreAddress | null;
   taxInvoiceEmail: string | null;
   ownerPhone: string | null;
+  storeSlug: string | null;
 }
 
 function composeAddress(detail: StoreAddress | null | undefined): string | null {
@@ -80,6 +81,7 @@ export function createPharmacyInfoController(
       addressDetail: (org.address_detail as StoreAddress) || null,
       taxInvoiceEmail: meta.taxInvoiceEmail || null,
       ownerPhone: meta.ownerPhone || null,
+      storeSlug: org.code || null,
     };
 
     // Fallback: if key fields are empty, try kpa_pharmacy_requests
@@ -239,6 +241,7 @@ export function createPharmacyInfoController(
         addressDetail: (org as any).address_detail || null,
         taxInvoiceEmail: meta?.taxInvoiceEmail || null,
         ownerPhone: meta?.ownerPhone || null,
+        storeSlug: org.code || null,
       } satisfies PharmacyInfoResponse,
     });
   }));

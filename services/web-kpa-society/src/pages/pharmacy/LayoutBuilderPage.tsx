@@ -13,18 +13,13 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAccessToken } from '../../contexts/AuthContext';
-import { listPlatformServices } from '../../api/platform-services';
-import type { PlatformServiceItem } from '../../api/platform-services';
+import { apiClient } from '../../api/client';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 import {
   StoreBlockRegistry,
   type StoreBlock,
   type StoreBlockType,
 } from '@o4o/ui';
-
-const GLYCOPHARM_API = import.meta.env.VITE_API_BASE_URL
-  ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/glycopharm`
-  : '/api/v1/glycopharm';
 
 export function LayoutBuilderPage() {
   const navigate = useNavigate();
@@ -38,34 +33,21 @@ export function LayoutBuilderPage() {
 
   // No-store state
   const [noStore, setNoStore] = useState(false);
-  const [glycopharmSvc, setGlycopharmSvc] = useState<PlatformServiceItem | null>(null);
 
-  // Resolve slug from cockpit
+  // Resolve slug from KPA pharmacy info
   useEffect(() => {
-    const checkEnrollment = async () => {
-      try {
-        const services = await listPlatformServices();
-        const gp = services.find(s => s.code.toLowerCase().includes('glycopharm'));
-        setGlycopharmSvc(gp || null);
-      } catch { /* silent */ }
-      setNoStore(true);
-      setLoading(false);
-    };
-
     const fetchSlug = async () => {
       try {
-        const token = getAccessToken();
-        const res = await fetch(`${GLYCOPHARM_API}/pharmacy/cockpit/status`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json = await res.json();
-        if (json.success && json.data?.storeSlug) {
-          setSlug(json.data.storeSlug);
+        const resolved = await getStoreSlug();
+        if (resolved) {
+          setSlug(resolved);
         } else {
-          await checkEnrollment();
+          setNoStore(true);
+          setLoading(false);
         }
       } catch {
-        await checkEnrollment();
+        setNoStore(true);
+        setLoading(false);
       }
     };
     fetchSlug();
@@ -75,8 +57,9 @@ export function LayoutBuilderPage() {
   const loadLayout = useCallback(async () => {
     if (!slug) return;
     try {
-      const res = await fetch(`${GLYCOPHARM_API}/stores/${encodeURIComponent(slug)}/layout`);
-      const json = await res.json();
+      const json = await apiClient.get<{ success: boolean; data: { blocks: StoreBlock[]; isDefault?: boolean } }>(
+        `/stores/${encodeURIComponent(slug)}/layout`
+      );
       if (json.success) {
         setBlocks(json.data.blocks || []);
         setIsDefault(json.data.isDefault ?? true);
@@ -121,16 +104,10 @@ export function LayoutBuilderPage() {
     setSuccess(null);
 
     try {
-      const token = getAccessToken();
-      const res = await fetch(`${GLYCOPHARM_API}/stores/${encodeURIComponent(slug)}/layout`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ blocks }),
-      });
-      const json = await res.json();
+      const json = await apiClient.put<{ success: boolean; error?: { message: string } }>(
+        `/stores/${encodeURIComponent(slug)}/layout`,
+        { blocks }
+      );
       if (!json.success) throw new Error(json.error?.message || 'Failed to save');
       setIsDefault(false);
       setSuccess('레이아웃이 저장되었습니다.');
@@ -152,19 +129,11 @@ export function LayoutBuilderPage() {
 
   // No-store empty state
   if (noStore) {
-    const enrolled = glycopharmSvc?.enrollmentStatus;
-
     return (
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
         <div style={{ marginBottom: '24px' }}>
           <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b' }}>스토어 레이아웃</h1>
         </div>
-
-        {error && (
-          <div style={{ padding: '12px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', color: '#dc2626', fontSize: '14px', marginBottom: '16px' }}>
-            {error}
-          </div>
-        )}
 
         <div style={{
           padding: '40px 24px',
@@ -173,40 +142,12 @@ export function LayoutBuilderPage() {
           border: '1px solid #e2e8f0',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🏪</div>
           <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#1e293b', margin: '0 0 8px' }}>
-            사이버 공간이 설정되지 않았습니다
+            매장이 설정되지 않았습니다
           </h3>
-
-          {enrolled === 'applied' ? (
-            <>
-              <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-                서비스 이용 신청이 접수되어 있습니다.<br />
-                운영자 승인 후 이용 가능합니다.
-              </p>
-              <span style={{
-                display: 'inline-block',
-                padding: '8px 20px',
-                borderRadius: '8px',
-                backgroundColor: '#f1f5f9',
-                color: '#64748b',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}>
-                승인 대기 중
-              </span>
-            </>
-          ) : enrolled === 'approved' ? (
-            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-              서비스가 승인되었으나 매장 설정이 완료되지 않았습니다.<br />
-              잠시 후 다시 시도해주세요.
-            </p>
-          ) : (
-            <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
-              사이버 공간(온라인 매장)을 이용하려면 약국 HUB에서 서비스를 확인해주세요.
-            </p>
-          )}
-
+          <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 20px' }}>
+            매장 설정을 완료한 후 레이아웃을 관리할 수 있습니다.
+          </p>
           <div style={{ marginTop: '20px' }}>
             <button
               onClick={() => navigate('/hub')}
@@ -221,7 +162,7 @@ export function LayoutBuilderPage() {
                 cursor: 'pointer',
               }}
             >
-              약국 HUB로 이동 →
+              약국 HUB로 이동
             </button>
           </div>
         </div>

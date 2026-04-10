@@ -105,7 +105,7 @@ import { BranchServicesPage } from './pages/BranchServicesPage';
 import { BranchJoinPage, DivisionJoinPage, PharmacyJoinPage } from './pages/join';
 
 // Pharmacy Management (WO-KPA-PHARMACY-MANAGEMENT-V1, WO-KPA-UNIFIED-AUTH-PHARMACY-GATE-V1)
-import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreMarketingDashboardPage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
+import { PharmacyPage, PharmacyB2BPage, PharmacyStorePage, PharmacyApprovalGatePage, HubContentLibraryPage, HubB2BCatalogPage, HubSignageLibraryPage, PharmacySellPage, StoreAssetsPage, StoreContentEditPage, TabletRequestsPage, PharmacyBlogPage, PharmacyTemplatePage, LayoutBuilderPage, StoreChannelsPage, StoreOrdersPage, StoreBillingPage, StoreSignagePage, StoreLibraryNewPage, StoreLibraryPage, StoreLibraryDetailPage, StoreLibraryEditPage, StoreQRPage, StorePopPage, MarketingAnalyticsPage, StoreHomePage, ProductMarketingPage, StoreLocalProductsPage, StoreTabletDisplaysPage } from './pages/pharmacy';
 import { StoreOrderWorktablePage } from './pages/pharmacy/StoreOrderWorktablePage';
 // WO-KPA-PHARMACY-HUB-SIDEBAR-LAYOUT-AND-PRODUCT-TABS-FIX-V1: 약국 HUB 사이드바 레이아웃
 import { PharmacyHubLayout } from './components/pharmacy/PharmacyHubLayout';
@@ -646,9 +646,10 @@ function App() {
            * PharmacyGuard로 인증/승인 보호
            * ======================================== */}
           <Route path="/store" element={<PharmacyGuard><KpaStoreLayoutWrapper /></PharmacyGuard>}>
-            {/* Dashboard */}
-            <Route index element={<StoreMarketingDashboardPage />} />
-            <Route path="dashboard" element={<StoreMarketingDashboardPage />} />
+            {/* Home (WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1) */}
+            <Route index element={<StoreHomePage />} />
+            {/* 레거시 /store/dashboard → /store 리다이렉트 */}
+            <Route path="dashboard" element={<Navigate to="/store" replace />} />
 
             {/* Pharmacy Info (WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1) */}
             <Route path="info" element={<PharmacyInfoPage />} />

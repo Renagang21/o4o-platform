@@ -85,6 +85,7 @@ export class ApiClient {
         const error: any = new Error(body.message || body.error || `HTTP error! status: ${response.status}`);
         error.status = response.status;
         error.code = body.code;
+        error.data = body.data;
         throw error;
       }
 

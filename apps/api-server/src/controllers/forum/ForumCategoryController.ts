@@ -93,6 +93,7 @@ export class ForumCategoryController extends ForumControllerBase {
           success: false,
           error: 'This is a closed forum. Membership is required.',
           code: 'CLOSED_FORUM_ACCESS_DENIED',
+          data: { categoryId: category.id },
         });
         return;
       }

@@ -18,6 +18,7 @@ import {
   deleteBlogPost,
   type StaffBlogPost,
 } from '../../api/blogStaff';
+import { getStoreSlug } from '../../api/pharmacyInfo';
 
 type ViewMode = 'list' | 'editor';
 type StatusFilter = 'all' | 'draft' | 'published' | 'archived';
@@ -49,20 +50,13 @@ export function PharmacyBlogPage({ service }: { service?: string }) {
   const [editorSlug, setEditorSlug] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Resolve slug from cockpit
+  // Resolve slug from KPA pharmacy info
   useEffect(() => {
     const fetchSlug = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE_URL
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/v1/glycopharm`
-          : '/api/v1/glycopharm';
-        const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE}/pharmacy/cockpit/status`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const json = await res.json();
-        if (json.success && json.data?.storeSlug) {
-          setSlug(json.data.storeSlug);
+        const resolved = await getStoreSlug();
+        if (resolved) {
+          setSlug(resolved);
         } else {
           setError('매장 정보를 찾을 수 없습니다.');
         }

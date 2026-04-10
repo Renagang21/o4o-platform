@@ -9,7 +9,7 @@
 
 import { getAccessToken } from '../contexts/AuthContext';
 
-function getApiBase(service: string = 'glycopharm'): string {
+function getApiBase(service: string = 'kpa'): string {
   const base = import.meta.env.VITE_API_BASE_URL || '';
   return `${base}/api/v1/${service}`;
 }

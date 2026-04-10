@@ -102,6 +102,12 @@ export const GLUCOSEVIEW_STORE_CONFIG: StoreDashboardConfig = {
  * WO-KPA-PHARMACY-HUB-NAVIGATION-RESTRUCTURE-V1:
  *   - 약국 정보 섹션 추가 (대시보드 아래)
  *   - 주문 가능 상품 제거 (canonical: /hub/b2b)
+ *
+ * WO-KPA-A-STORE-HOME-AND-SIDEBAR-RESTRUCTURE-V1:
+ *   - 8섹션/20항목 → 5섹션/13항목 재구성
+ *   - 대시보드→홈, 운영+마케팅→콘텐츠+홍보, 채널/디바이스·구매 섹션 제거
+ *   - 미완성 메뉴 비노출 (B2C, 주문 작업대, 구매 내역)
+ *   - 상품 관리(B2B)→상품 관리 명칭 정리
  */
 export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   serviceKey: 'kpa-society',
@@ -110,40 +116,29 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
   enabledMenus: ['dashboard'],
   menuSections: [
     { label: '', items: [
-      { key: 'dashboard', label: '대시보드', subPath: '/dashboard' },
-    ]},
-    { label: '', items: [
+      { key: 'home', label: '홈', subPath: '' },
       { key: 'pharmacy-info', label: '약국 정보', subPath: '/info' },
     ]},
-    { label: '운영', items: [
+    { label: '콘텐츠', items: [
       { key: 'library', label: '자료실', subPath: '/operation/library' },
       { key: 'blog', label: '블로그', subPath: '/content/blog' },
+      { key: 'signage', label: '매장 사이니지', subPath: '/marketing/signage' },
     ]},
-    { label: '마케팅', items: [
+    { label: '홍보', items: [
       { key: 'qr', label: 'QR 관리', subPath: '/marketing/qr' },
       { key: 'pop', label: 'POP 자료', subPath: '/marketing/pop' },
-      { key: 'signage', label: '매장 사이니지', subPath: '/marketing/signage' },
-      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
-    { label: '상품/판매', items: [
-      { key: 'products', label: '상품 관리(B2B)', subPath: '/commerce/products' },
-      { key: 'b2c', label: 'B2C 상품 판매', subPath: '/commerce/products/b2c' },
+    { label: '상품/주문', items: [
+      { key: 'products', label: '상품 관리', subPath: '/commerce/products' },
       { key: 'local-products', label: '자체 상품', subPath: '/commerce/local-products' },
-      { key: 'suppliers', label: '공급자', subPath: '/commerce/products/suppliers' },
-      { key: 'order-worktable', label: '주문 작업대', subPath: '/commerce/order-worktable' },
       { key: 'orders', label: '주문 관리', subPath: '/commerce/orders' },
     ]},
-    { label: '채널/디바이스', items: [
-      { key: 'channels', label: '채널 관리', subPath: '/channels' },
-      { key: 'tablet-channels', label: '태블릿 채널', subPath: '/channels/tablet' },
-      { key: 'tablet-displays', label: '태블릿 디스플레이', subPath: '/commerce/tablet-displays' },
+    { label: '분석', items: [
+      { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
     ]},
     { label: '설정', items: [
       { key: 'store-settings', label: '매장 설정', subPath: '/settings' },
       { key: 'layout-builder', label: '레이아웃 빌더', subPath: '/settings/layout' },
-    ]},
-    { label: '구매', items: [
-      { key: 'billing', label: '구매 내역', subPath: '/billing' },
     ]},
   ],
 };

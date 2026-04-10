@@ -144,6 +144,17 @@ export const forumMembershipApi = {
     apiClient.delete<ApiResponse<{ removed: boolean; userId: string }>>(
       `${getForumBasePath()}/categories/${categoryId}/members/${userId}`,
     ),
+
+  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 일반 사용자용
+  requestJoin: (categoryId: string) =>
+    apiClient.post<ApiResponse<any>>(
+      `${getForumBasePath()}/categories/${categoryId}/join`,
+    ),
+
+  getMembershipStatus: (categoryId: string) =>
+    apiClient.get<ApiResponse<{ isMember: boolean; role: string | null; pendingRequest: boolean }>>(
+      `${getForumBasePath()}/categories/${categoryId}/membership-status`,
+    ),
 };
 
 // ============================================================================

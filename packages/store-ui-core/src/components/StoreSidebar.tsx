@@ -34,6 +34,7 @@ import {
   Palette,
   ClipboardList,
   Building2,
+  Home,
 } from 'lucide-react';
 import type { StoreDashboardConfig, StoreMenuKey } from '../config/storeMenuConfig';
 import { ALL_STORE_MENUS } from '../config/storeMenuConfig';
@@ -53,6 +54,7 @@ const MENU_ICONS: Record<StoreMenuKey, typeof LayoutDashboard> = {
 
 /** Section mode 아이콘 매핑 (WO-KPA-STORE-SIDEBAR-REALIGNMENT-V1) */
 const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
+  home: Home,
   dashboard: LayoutDashboard,
   'pharmacy-info': Building2,
   'orderable-products': ClipboardList,
@@ -139,7 +141,7 @@ export function StoreSidebar({
                       <NavLink
                         key={item.key}
                         to={fullPath}
-                        end={item.key === 'dashboard'}
+                        end={item.key === 'dashboard' || item.key === 'home'}
                         onClick={onItemClick}
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${

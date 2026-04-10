@@ -6,8 +6,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from '@o4o/error-handling';
 import { ForumBlockRenderer } from '@o4o/forum-core/public-ui';
-import { PageHeader, LoadingSpinner, EmptyState, Card } from '../../components/common';
+import { PageHeader, LoadingSpinner, Card } from '../../components/common';
 import { forumApi } from '../../api';
+import { forumMembershipApi } from '../../api/forum';
 import { useAuth } from '../../contexts';
 import { colors, typography } from '../../styles/theme';
 import type { ForumPost, ForumComment } from '../../types';
@@ -28,6 +29,10 @@ export function ForumDetailPage() {
   const [isLiking, setIsLiking] = useState(false);
   const [isForumOwner, setIsForumOwner] = useState(false);
   const [isPinning, setIsPinning] = useState(false);
+  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1
+  const [closedCategoryId, setClosedCategoryId] = useState<string | null>(null);
+  const [joinStatus, setJoinStatus] = useState<'none' | 'pending' | 'member' | 'loading'>('none');
+  const [isRequesting, setIsRequesting] = useState(false);
 
   useEffect(() => {
     if (id) loadData();
@@ -57,14 +62,55 @@ export function ForumDetailPage() {
       }
     } catch (err: any) {
       const status = err?.response?.status || err?.status;
-      const code = err?.response?.data?.code;
+      const code = err?.response?.data?.code || err?.code;
       if (status === 403 && code === 'CLOSED_FORUM_ACCESS_DENIED') {
         setError('비공개 포럼입니다. 가입 신청 후 승인을 받으면 열람할 수 있습니다.');
+        // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: Extract categoryId for join request
+        const catId = err?.data?.categoryId;
+        if (catId) {
+          setClosedCategoryId(catId);
+          if (user) {
+            setJoinStatus('loading');
+            try {
+              const statusRes = await forumMembershipApi.getMembershipStatus(catId);
+              const d = statusRes.data;
+              if (d.isMember) setJoinStatus('member');
+              else if (d.pendingRequest) setJoinStatus('pending');
+              else setJoinStatus('none');
+            } catch {
+              setJoinStatus('none');
+            }
+          }
+        }
       } else {
         setError(err instanceof Error ? err.message : '게시글을 불러오는데 실패했습니다.');
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1: 가입 신청
+  const handleJoinRequest = async () => {
+    if (!closedCategoryId || isRequesting) return;
+    setIsRequesting(true);
+    try {
+      await forumMembershipApi.requestJoin(closedCategoryId);
+      setJoinStatus('pending');
+      toast.success('가입 신청이 완료되었습니다. 포럼 운영자의 승인을 기다려주세요.');
+    } catch (err: any) {
+      const errCode = err?.code;
+      if (errCode === 'ALREADY_MEMBER') {
+        toast.info('이미 회원입니다. 페이지를 새로고침해주세요.');
+        setJoinStatus('member');
+      } else if (errCode === 'PENDING_REQUEST') {
+        toast.info('이미 가입 신청이 진행 중입니다.');
+        setJoinStatus('pending');
+      } else {
+        toast.error(err?.message || '가입 신청에 실패했습니다.');
+      }
+    } finally {
+      setIsRequesting(false);
     }
   };
 
@@ -135,12 +181,56 @@ export function ForumDetailPage() {
     const isClosed = error?.includes('비공개 포럼');
     return (
       <div style={styles.container}>
-        <EmptyState
-          icon={isClosed ? '🔒' : '⚠️'}
-          title={isClosed ? '비공개 포럼' : '게시글을 찾을 수 없습니다'}
-          description={error || '삭제되었거나 존재하지 않는 게시글입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/forum') }}
-        />
+        <div style={styles.accessDenied}>
+          <span style={styles.accessDeniedIcon}>{isClosed ? '🔒' : '⚠️'}</span>
+          <h2 style={styles.accessDeniedTitle}>
+            {isClosed ? '비공개 포럼' : '게시글을 찾을 수 없습니다'}
+          </h2>
+          <p style={styles.accessDeniedDesc}>
+            {error || '삭제되었거나 존재하지 않는 게시글입니다.'}
+          </p>
+
+          {isClosed && closedCategoryId && user && (
+            <div style={styles.joinSection}>
+              {joinStatus === 'loading' ? (
+                <p style={styles.joinStatusText}>상태 확인 중...</p>
+              ) : joinStatus === 'pending' ? (
+                <div style={styles.joinPendingBox}>
+                  <p style={styles.joinStatusText}>
+                    가입 신청이 진행 중입니다. 포럼 운영자의 승인을 기다려주세요.
+                  </p>
+                </div>
+              ) : joinStatus === 'member' ? (
+                <div style={styles.joinApprovedBox}>
+                  <p style={styles.joinStatusText}>
+                    가입이 승인되었습니다.
+                  </p>
+                  <button style={styles.joinButton} onClick={() => window.location.reload()}>
+                    새로고침
+                  </button>
+                </div>
+              ) : (
+                <button
+                  style={styles.joinButton}
+                  onClick={handleJoinRequest}
+                  disabled={isRequesting}
+                >
+                  {isRequesting ? '신청 중...' : '가입 신청'}
+                </button>
+              )}
+            </div>
+          )}
+
+          {isClosed && !user && (
+            <p style={styles.loginHint}>
+              가입 신청을 하려면 먼저 로그인해주세요.
+            </p>
+          )}
+
+          <button style={styles.accessDeniedBack} onClick={() => navigate('/forum')}>
+            목록으로
+          </button>
+        </div>
       </div>
     );
   }
@@ -509,5 +599,74 @@ const styles: Record<string, React.CSSProperties> = {
     textDecoration: 'none',
     borderRadius: '6px',
     fontSize: '14px',
+  },
+  // WO-KPA-A-PRIVATE-FORUM-JOIN-UX-CONNECT-V1
+  accessDenied: {
+    maxWidth: '480px',
+    margin: '60px auto',
+    padding: '48px 24px',
+    textAlign: 'center' as const,
+    backgroundColor: colors.white,
+    borderRadius: '12px',
+    border: `1px solid ${colors.neutral200}`,
+  },
+  accessDeniedIcon: {
+    fontSize: '48px',
+    display: 'block',
+    marginBottom: '16px',
+  },
+  accessDeniedTitle: {
+    ...typography.headingL,
+    color: colors.neutral900,
+    margin: '0 0 8px',
+  },
+  accessDeniedDesc: {
+    ...typography.bodyM,
+    color: colors.neutral500,
+    margin: '0 0 24px',
+  },
+  joinSection: {
+    marginBottom: '24px',
+  },
+  joinPendingBox: {
+    padding: '16px',
+    backgroundColor: '#fffbeb',
+    borderRadius: '8px',
+    border: '1px solid #fde68a',
+  },
+  joinApprovedBox: {
+    padding: '16px',
+    backgroundColor: '#f0fdf4',
+    borderRadius: '8px',
+    border: '1px solid #bbf7d0',
+  },
+  joinStatusText: {
+    ...typography.bodyM,
+    color: colors.neutral700,
+    margin: 0,
+  },
+  joinButton: {
+    padding: '10px 28px',
+    backgroundColor: colors.primary,
+    color: colors.white,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  loginHint: {
+    ...typography.bodyS,
+    color: colors.neutral500,
+    marginBottom: '24px',
+  },
+  accessDeniedBack: {
+    padding: '10px 24px',
+    backgroundColor: colors.neutral100,
+    color: colors.neutral700,
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    cursor: 'pointer',
   },
 };
